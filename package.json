@@ -1,0 +1,53 @@
+{
+  "name": "chemikart",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "npm run test:integration && npm run test:unit",
+    "lint": "prettier --check . && eslint .",
+    "format": "prettier --write .",
+    "test:integration": "playwright test",
+    "test:unit": "vitest",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "devDependencies": {
+    "@chromatic-com/storybook": "^1.9.0",
+    "@playwright/test": "^1.28.1",
+    "@storybook/addon-essentials": "^8.3.1",
+    "@storybook/addon-interactions": "^8.3.1",
+    "@storybook/addon-links": "^8.3.1",
+    "@storybook/addon-svelte-csf": "^4.1.7",
+    "@storybook/blocks": "^8.3.1",
+    "@storybook/svelte": "^8.3.1",
+    "@storybook/sveltekit": "^8.3.1",
+    "@storybook/test": "^8.3.1",
+    "@sveltejs/adapter-auto": "^3.0.0",
+    "@sveltejs/kit": "^2.0.0",
+    "@sveltejs/vite-plugin-svelte": "^3.0.0",
+    "@types/eslint": "^9.6.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-storybook": "^0.8.0",
+    "eslint-plugin-svelte": "^2.36.0",
+    "globals": "^15.0.0",
+    "postcss": "^8.4.47",
+    "prettier": "^3.1.1",
+    "prettier-plugin-svelte": "^3.1.2",
+    "storybook": "^8.3.1",
+    "svelte": "^4.2.7",
+    "tailwindcss": "^3.4.11",
+    "vite": "^5.0.3",
+    "vitest": "^2.0.0"
+  },
+  "type": "module",
+  "eslintConfig": {
+    "extends": [
+      "plugin:storybook/recommended"
+    ]
+  }
+}
