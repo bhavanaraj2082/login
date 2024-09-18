@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Fmoc-Asp(OtBu)-OH",
+    "description": "Fmoc-Asp(OtBu)-OH",
+    "image": "https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/139/991/66539125-546e-4d34-b65a-70903e9a6306/300/66539125-546e-4d34-b65a-70903e9a6306.jpg",
+    "price": 1200
+    
+  },
+  {
+    "id": 2,
+    "name": "Buffer & Media Prep",
+    "description": "Fmoc-Asp(OtBu)-OH",
+    "image": "https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/marketing/global/images/categories/analytical-reagents/spectroscopy/spectroscopy_w300.jpg",
+    "price": 1700
+   
+  },
+  {
+    "id": 3,
+    "name": "Bioprocessing & Formulation Raw Materials",
+    "description": "Fmoc-Asp(OtBu)-OH",
+    "image": "https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/139/991/66539125-546e-4d34-b65a-70903e9a6306/300/66539125-546e-4d34-b65a-70903e9a6306.jpg",
+    "price": 1577
+    
+  }
+]
