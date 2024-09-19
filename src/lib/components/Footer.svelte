@@ -55,7 +55,7 @@
         </div>
     </div>
     <div class="bg-slate-100 md:bg-gray-300 w-full mt-8">
-        <div class="md:flex justify-evenly mt-2 ">
+        <div class=" mx-2 md:flex justify-evenly mt-2 ">
             <div >
                 <div class="flex justify-between">
                   <p class=" mt-4 font-bold md:text-sky-900 text-lg md:text-2xl">Products and Services</p>
