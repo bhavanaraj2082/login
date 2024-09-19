@@ -38,18 +38,18 @@
 </script>
 
 <section class="bg-slate-200 md:bg-slate-50 border-t border-black mt-4">
-    <p class='text-center mt-8 font-bold text-sky-900 text-2xl'>Stay in the know with the latest updates</p>
-    <div class="flex justify-around mt-8 md:flex flex-wrap">
+    <p class='text-center text-xl mt-8 font-bold md:text-sky-900 md:text-2xl'>Stay in the know with the latest updates</p>
+    <div class="flex  justify-around mt-8 md:flex flex-wrap">
         <div>
             <p class="font-bold">By following us on social media</p>
-            <div class="flex justify-around mt-2">
+            <div class="flex justify-around mt-2 ">
                 <Icon icon="skill-icons:linkedin" width="2em" height="2em"/>
                 <Icon icon="skill-icons:twitter" width="2em" height="2em" />
                 <Icon icon="logos:youtube-icon" width="2em" height="2em"/>
                 <Icon icon="logos:facebook" width="2em" height="2em"/>
             </div>
         </div>
-        <div>
+        <div class="mt-6 sm:mt-0">
             <p class="font-bold">By registering for our email newsletter</p>
             <button class=" flex justify-center items-center  bg-teal-700 text-gray-50 font-bold rounded-2xl mt-2 p-2 w-full  "><p class="pe-2 hover:pe-4 text-gray-100">Get updates </p> <Icon icon="mdi:arrow-right" width="1.2em" height="1.2em" /></button>
         </div>
@@ -343,7 +343,7 @@
                 </div>
               {/if}
             </div>
-            <div class="border-t border-gray-700 mt-4 md:border-none md:mt-0">
+            <div class="border-y border-gray-700 mt-4 md:border-none md:mt-0">
               <div class="flex justify-between ">
                 <p class=" mt-8 font-bold text-sky-900 text-2xl">Help & Support</p>
                 <p on:click={() => toggleSection('Help & Support')} class='text-4xl mt-10 me-4  cursor-pointer  md:hidden' >
@@ -368,25 +368,25 @@
 
             </div>
         </div>
-        <div class="md:grid md:grid-cols-8 p-8 border-t border-black mt-10 flex flex-col-reverse ms-0 me-0 md:ms-12 md:mt-16 md:me-16  ">
-             <p class="w-12 h-12  rounded-full bg-slate-50 text-sky-900 font-bold pt-3 text-center hidden md:block md:col-span-*">LGC</p>      
-          <div class="text-center md:text-start md:col-span-2">
-              <p class="text-sm">LGC Limited 2024. All rights reserved.</p>
-              <p class="text-sm">All trademarks acknowledged.</p>
-          </div>
+        <div class="md:grid md:grid-cols-7 p-8   md:border-t border-black mt-10 flex flex-col-reverse ms-0 me-0 md:ms-12 md:mt-16 md:me-16  ">
+            <p class="w-12 h-12  rounded-full bg-slate-50 text-sky-900 font-bold pt-3 text-center hidden md:block md:col-span-*">LGC</p>      
+            <div class="text-center md:text-start md:col-span-2">
+                <p class="text-sm">LGC Limited 2024. All rights reserved.</p>
+                <p class="text-sm">All trademarks acknowledged.</p>
+            </div>
+        
+            <div class="flex justify-center  md:col-span-3  md:flex gap-8  md:gap-8">
+                <p class="text-xs  font-bold mt-2 md:m-0 md:text-sm md:font-normal"><a href="/Terms and Conditions">Terms and Conditions</a></p>
+                <p class=" text-xs font-bold mt-2 md:m-0 md:text-sm md:font-normal"><a href="/Privacy Notice">Privacy Notice</a></p>
+                <p class=" text-xs font-bold mt-2 md:m-0 md:text-sm md:font-normal"><a href="/Cookie Policy">Cookie Policy</a></p>
+            </div>
       
-          <div class="grid grid-cols-3 justify-center  md:justify-start  md:col-span-3 ">
-              <p class="text-xs font-bold mt-2 md:m-0 md:text-sm md:font-normal"><a href="/Terms and Conditions">Terms and Conditions</a></p>
-              <p class=" text-xs font-bold mt-2 md:m-0 md:text-sm md:font-normal"><a href="/Privacy Notice">Privacy Notice</a></p>
-              <p class=" text-xs font-bold mt-2 md:m-0 md:text-sm md:font-normal"><a href="/Cookie Policy">Cookie Policy</a></p>
-          </div>
-      
-          <div class="flex justify-center md:justify-between w-full md:w-40 mt-4 md:mt-0 gap-4">
-              <Icon icon="mdi:post-it-note" width="1.8em" height="1.8em" />
-              <Icon icon="ri:visa-fill" width="1.8em" height="1.8em" />
-              <Icon icon="logos:mastercard" width="1.8em" height="1.8em" />
-              <Icon icon="icons8:amex" width="1.8em" height="1.8em" />
-          </div>
+            <div class="flex justify-center col-start-7 md:justify-between w-full md:w-40 mt-4  md:mt-0 gap-4">
+                <Icon icon="mdi:post-it-note" width="1.8em" height="1.8em" />
+                <Icon icon="ri:visa-fill" width="1.8em" height="1.8em" />
+                <Icon icon="logos:mastercard" width="1.8em" height="1.8em" />
+                <Icon icon="icons8:amex" width="1.8em" height="1.8em" />
+            </div>
       </div>
       
     </div>
