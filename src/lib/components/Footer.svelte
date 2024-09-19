@@ -38,11 +38,11 @@
 </script>
 
 <section class="bg-slate-200 md:bg-slate-50 border-t border-black mt-4">
-    <p class='text-center text-xl mt-8 font-bold md:text-sky-900 md:text-2xl'>Stay in the know with the latest updates</p>
+    <p class='text-center text-lg mt-8 font-bold mx-3 md:text-sky-900 md:text-2xl'>Stay in the know with the latest updates</p>
     <div class="flex  justify-around mt-8 md:flex flex-wrap">
         <div>
-            <p class="font-bold">By following us on social media</p>
-            <div class="flex justify-around mt-2 ">
+            <p class="font-bold hidden sm:block">By following us on social media</p>
+            <div class="flex justify-between w-60  mt-2 ">
                 <Icon icon="skill-icons:linkedin" width="2em" height="2em"/>
                 <Icon icon="skill-icons:twitter" width="2em" height="2em" />
                 <Icon icon="logos:youtube-icon" width="2em" height="2em"/>
@@ -50,7 +50,7 @@
             </div>
         </div>
         <div class="mt-6 sm:mt-0">
-            <p class="font-bold">By registering for our email newsletter</p>
+            <p class="font-bold font-sm md:font-md">By registering for our email newsletter</p>
             <button class=" flex justify-center items-center  bg-teal-700 text-gray-50 font-bold rounded-2xl mt-2 p-2 w-full  "><p class="pe-2 hover:pe-4 text-gray-100">Get updates </p> <Icon icon="mdi:arrow-right" width="1.2em" height="1.2em" /></button>
         </div>
     </div>
@@ -58,7 +58,7 @@
         <div class=" md:flex justify-evenly mt-8 ">
             <div>
                 <div class="flex justify-between">
-                  <p class=" mt-8 font-bold text-sky-900 text-2xl">Products and Services</p>
+                  <p class=" mt-8 font-bold md:text-sky-900 text-lg md:text-2xl">Products and Services</p>
                   <p on:click={() => toggleSection('Products and Services')} class='text-4xl cursor-pointer mt-10 me-4  md:hidden'  >
                     {#if !isProductsAndServicesActive}
                     <Icon icon="ic:baseline-plus" width="0.6em" height="0.6em" />
@@ -319,7 +319,7 @@
             </div>
             <div>
               <div class="flex justify-between border-t border-black mt-4 md:border-none md:mt-0">
-                <p class=" mt-8 font-bold text-sky-900 text-2xl ">LGC Group</p>
+                <p class=" mt-8 font-bold md:text-sky-900 text-lg md:text-2xl ">LGC Group</p>
                 <p on:click={() => toggleSection('LGC Group')} class='text-4xl mt-10 me-4 cursor-pointer  md:hidden' >
                   {#if !isLGCGroupActive}
                   <Icon icon="ic:baseline-plus" width="0.6em" height="0.6em" />
@@ -345,7 +345,7 @@
             </div>
             <div class="border-y border-gray-700 mt-4 md:border-none md:mt-0">
               <div class="flex justify-between ">
-                <p class=" mt-8 font-bold text-sky-900 text-2xl">Help & Support</p>
+                <p class=" my-6 font-bold md:text-sky-900 text-lg md:text-2xl">Help & Support</p>
                 <p on:click={() => toggleSection('Help & Support')} class='text-4xl mt-10 me-4  cursor-pointer  md:hidden' >
                   {#if !isHelpAndSupportActive}
                   <Icon icon="ic:baseline-plus" width="0.6em" height="0.6em" />
@@ -375,7 +375,7 @@
                 <p class="text-sm">All trademarks acknowledged.</p>
             </div>
         
-            <div class="flex justify-center  md:col-span-3  md:flex gap-8  md:gap-8">
+            <div class="flex justify-center  md:col-span-3  md:flex gap-2  md:gap-8">
                 <p class="text-xs  font-bold mt-2 md:m-0 md:text-sm md:font-normal"><a href="/Terms and Conditions">Terms and Conditions</a></p>
                 <p class=" text-xs font-bold mt-2 md:m-0 md:text-sm md:font-normal"><a href="/Privacy Notice">Privacy Notice</a></p>
                 <p class=" text-xs font-bold mt-2 md:m-0 md:text-sm md:font-normal"><a href="/Cookie Policy">Cookie Policy</a></p>
