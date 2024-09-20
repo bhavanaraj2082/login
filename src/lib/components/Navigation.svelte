@@ -33,7 +33,7 @@
     <div class="w-full px-5 py-5 border-b bg-white relative">
         
         <div class="md:hidden">
-            <button id="hamburger" class="text-white bg-blue-600 hover:bg-blue-700 focus:outline-none p-4 rounded-lg text-xl">
+            <button id="hamburger" class="text-white bg-blue-300 hover:bg-blue-500 focus:outline-none p-4 rounded-lg text-xl">
 				&#9776;
 			</button>
         </div>
@@ -503,11 +503,6 @@
                     <a href="/US/en/Pharmaceuticals/cat/123456" class="mode text-black hover:underline font-bold block p-4">Custom Solution</a>
 									<li class="relative-group block flex justify-between items-center  ">
                     <a href="https://www.lgcstandards.com/US/en/structure-search" class="mode text-black hover:underline font-bold block p-4">Structure Search</a>
-							
-            
-        </div>
-    
-
-    
+					</div>
 </body>
 
