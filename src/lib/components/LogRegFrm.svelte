@@ -25,7 +25,8 @@
           <div class="text-sm font-normal text-center mt-5">
             <span class="text-[#666]">Don't have an account?</span>
             <span>
-              <button id="registerFormBtn" class="text-blue-500 text-sm mb-5 font-bold" onclick="changeColor('register')">Create an account</button>
+              <button id="registerFormBtn" class="text-blue-500 text-sm mb-5 font-bold" onclick="changeColor('register')">Create an 
+              account</button>
             </span>
           </div>
         </form>
@@ -63,7 +64,8 @@
               <label for="titles" class="block text-sm font-normal mb-1.5 mt-5 ">Phone Number *</label>
               <select id="titles" class="w-full p-2 border border-gray-300 rounded-md" required name="titles">
                 <option value="" selected disabled hidden></option>
-                {#each ['+1 (United States)', '+1 (Canada)', '+91 (India)', '+44 (United Kingdom)', '+61 (Australia)', '+49 (Germany)', '+33 (France)', '+86 (China)', '+27 (South Africa)', 
+                {#each ['+1 (United States)', '+1 (Canada)', '+91 (India)', '+44 (United Kingdom)', '+61 (Australia)',
+                '+49 (Germany)', '+33 (France)', '+86 (China)', '+27 (South Africa)', 
                 '+39 (Italy)'] as c}
                   <option value={c}>{c}</option>
                 {/each}
@@ -79,7 +81,8 @@
               <label for="countryregistration" class="block text-sm font-normal mb-1.5 mt-5">Country of Registration *</label>
               <select id="countryregistration" class="w-full p-2 border border-gray-300 rounded-md"  required name="countryregistration">
                 <option value="" selected disabled hidden>Please select</option>
-                {#each ['United States', 'Canada', 'India', 'United Kingdom', 'Australia', 'Germany', 'France','China', 'South Africa', 'Italy'] as c}
+                {#each ['United States', 'Canada', 'India', 'United Kingdom', 'Australia', 'Germany', 'France','China', 
+                'South Africa', 'Italy'] as c}
                   <option value={c}>{c}</option>
                 {/each}
               </select>
@@ -101,9 +104,12 @@
             <label for="primaryfield" class="block text-sm font-normal mb-1.5 mt-5">Primary Field of Interest *</label>
             <select id="primaryfield" class="w-full p-2 border border-gray-300 rounded-md" required name="primaryfield">
               <option value="" selected disabled hidden >Please select</option>
-              {#each ['Agbio - Plant Biotechnology Research', 'Cannabis Manufacturing', 'Cannabis Reference Materials', 'Cell Biology and Microorganism Materials', 'Diagnostics Research', 
-              'Drug Discovery and Development', 'Environment Reference Materials', 'Food & Beverage Reference Materials', 'Forensic Reference Materials', 'Metal Reference Materials', 
-              'Petroleum and Oils Reference Materials', 'Pharmaceutical Manufacturing', 'Pharmaceutical Reference Materials', 'Proficiency Testing', 'Research Chemicals and Analytical Standards'] as c}
+              {#each ['Agbio - Plant Biotechnology Research', 'Cannabis Manufacturing', 'Cannabis Reference Materials', 
+              'Cell Biology and Microorganism Materials', 'Diagnostics Research', 
+              'Drug Discovery and Development', 'Environment Reference Materials', 'Food & Beverage Reference Materials', 
+              'Forensic Reference Materials', 'Metal Reference Materials', 
+              'Petroleum and Oils Reference Materials', 'Pharmaceutical Manufacturing', 'Pharmaceutical Reference Materials', 
+              'Proficiency Testing', 'Research Chemicals and Analytical Standards'] as c}
                 <option value={c}>{c}</option>
               {/each}
             </select>
@@ -112,7 +118,8 @@
             <label for="role" class="block text-sm font-normal mb-1.5 mt-5">What Best Describes Your Role? *</label>
             <select id="role" class="w-full p-2 border border-gray-300 rounded-md" required name="role">
               <option value="" selected disabled hidden>Please select</option>
-              {#each ['I am a researcher working in academia', 'I am a researcher working in industry', 'I manage a laboratory', 'I work for an authorised TRC/LGC distributor', 'I work in a laboratory',
+              {#each ['I am a researcher working in academia', 'I am a researcher working in industry', 'I manage a laboratory',
+              'I work for an authorised TRC/LGC distributor', 'I work in a laboratory',
               'I work in procurement/finance', 'I work in quality control', 'Other'] as c}
                 <option value={c}>{c}</option>
               {/each}
@@ -143,7 +150,8 @@
           </div>
           <p class="text-lg mb-4">
             We will occasionally contact you with relevant updates about your account and our products and services. You may manage your contact preferences
-            in your account or unsubscribe at any time. We are committed to protecting the privacy of your personal data. Please see our <a href="##" class="text-blue-600">Privacy Policy</a> for further details.
+            in your account or unsubscribe at any time. We are committed to protecting the privacy of your personal data. 
+            Please see our <a href="##" class="text-blue-600">Privacy Policy</a> for further details.
           </p>
           <button type="submit" class="w-full p-3 bg-blue-500 text-white font-bold rounded-md">Submit →</button>
         </form>
