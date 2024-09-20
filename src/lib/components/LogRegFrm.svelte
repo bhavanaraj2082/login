@@ -131,7 +131,8 @@
           </div>
           <div>
             <label for="confirmpassword" class="block text-sm font-normal mb-1.5 mt-5">Confirm Your Password *</label>
-            <input type="password" id="confirmpassword" class="w-full p-2 border border-gray-300 rounded-md" required name="confirmpassword" />
+            <input type="password" id="confirmpassword" class="w-full p-2 border border-gray-300 rounded-md" 
+            required name="confirmpassword" />
           </div>
           <p class="text-sm mb-4 mt-5">
             Your new password will need to:
@@ -149,7 +150,8 @@
             <label for="terms" class="text-sm font-normal">By creating an account you agree to our Terms and Conditions</label>
           </div>
           <p class="text-lg mb-4">
-            We will occasionally contact you with relevant updates about your account and our products and services. You may manage your contact preferences
+            We will occasionally contact you with relevant updates about your account and our products and services. 
+            You may manage your contact preferences
             in your account or unsubscribe at any time. We are committed to protecting the privacy of your personal data. 
             Please see our <a href="##" class="text-blue-600">Privacy Policy</a> for further details.
           </p>
