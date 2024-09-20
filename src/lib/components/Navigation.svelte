@@ -1,52 +1,49 @@
 <script>
-        let isVisible = false;
+	import { onMount } from 'svelte';
+	onMount(() => {
+	const hamburger = document.getElementById('hamburger');
+	const dropdownMenu = document.getElementById('dropdownMenu');
 
-        function toggleMenu() {
-            isVisible = !isVisible;
-            document.getElementById('mobile-menu').classList.toggle('hidden', !isVisible);
+	hamburger.addEventListener('click', function() {
+		dropdownMenu.classList.toggle('hidden');
+	});
+
+	document.querySelectorAll('.toggle-content').forEach(button => {
+		button.addEventListener('click', function(event) {
+			event.stopPropagation(); 
+			const content = button.closest('li').nextElementSibling;
+			content.classList.toggle('hidden');
+		});
+	});
+});
+		</script>
+
+   
+    <style>
+        .megamenu {
+            display: none; 
         }
-    </script>
+        .group:hover .megamenu {
+            display: block; 
+        }
+    </style>
+ <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+<body class="bg-gray-100">
 
-    <div>
-        <main class="w-full overflow-x-hidden">
-            <nav class="bg-white shadow-md border-b border-gray-200">
-                <div class="w-full px-4 py-3 flex items-center justify-between">
-                    <a href="/" class="flex-shrink-0">
-                        <img src="https://www.lgcstandards.com/medias/sys_master/root/h6c/hfb/10397484711966/10397484711966.jpg" alt="LGC Standards Logo" class="max-w-xs">
-                    </a>
-                    <div class="hidden md:flex items-center space-x-6">
-                        <ul class="flex items-center space-x-6">
-                            <li><a href="/about-us" class="text-black hover:underline">About Us</a></li>
-                            <li><a href="/quality" class="text-black hover:underline">Quality</a></li>
-                            <li><a href="/resources" class="text-black hover:underline">Resources</a></li>
-                            <li><a href="/contact-us" class="text-black hover:underline">Contact Us</a></li>
-                            <li><a href="/help-support" class="text-black hover:underline">Help & Support</a></li>
-                        </ul>
-                    </div>
-                    <button class="md:hidden" onclick="toggleMenu()">
-                        <span class="text-black">Menu</span>
-                    </button>
-                </div>
-            </nav>
-            <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    
-            <div id="mobile-menu" class="hidden flex flex-col items-center bg-white border-t border-gray-200 md:hidden">
-                <ul class="flex flex-col space-y-4 px-4 py-3">
-                    <li><a href="/about-us" class="text-black hover:underline">About Us</a></li>
-                    <li><a href="/quality" class="text-black hover:underline">Quality</a></li>
-                    <li><a href="/resources" class="text-black hover:underline">Resources</a></li>
-                    <li><a href="/contact-us" class="text-black hover:underline">Contact Us</a></li>
-                    <li><a href="/help-support" class="text-black hover:underline">Help & Support</a></li>
-                </ul>
-            </div>
+    <div class="w-full px-5 py-5 border-b bg-white relative">
+        
+        <div class="md:hidden">
+            <button id="hamburger" class="text-white bg-blue-600 hover:bg-blue-700 focus:outline-none p-4 rounded-lg text-xl">
+				&#9776;
+			</button>
+        </div>
 
-            <div class="w-full px-5 py-5 border-b">
-                <ul class="flex flex-col md:flex-row md:flex-wrap gap-4">
-                    
-        <li class="relative group">
-            <a href="/US/en/Research-Tools/cat/323667" class="text-black hover:underline font-bold">Research Tools</a>
-            <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
-            <div class="flex p-4">
+       
+        <ul class="hidden md:flex flex-col md:flex-row md:flex-wrap gap-4">
+            <li class="relative group block">
+                <a href="https://www.lgcstandards.com/US/en/Research-Tools/cat/323667" class="mode text-black hover:underline font-bold block pl-2">Research Tools</a>
+                    <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+                   <div class="flex p-4">
             <div class="w-1/3 pr-4">
             <p class="font-bold">Our Products</p>
                                     <ul class="mt-2 space-y-1">
@@ -62,7 +59,7 @@
                                         <li>Immortalised primary cells</li>
                                         <li>Primary cells</li>
                                     </ul>
-                                    <p class="text-blue-500 mt-2">View all</p>
+									<a href="https://www.lgcstandards.com/US/en/Research-Tools/cat/323667" class="font-bold text-blue-500 mt-2 inline-block hover:underline">View All</a>
                                 </div>
                                 <div class="w-full md:w-1/3 px-4">
                                     <p class="font-bold">Resources</p>
@@ -88,14 +85,11 @@
                                 </div>
                             </div>
                         </div>
-                    </li>
-
-                    
-                    
-                    <li class="relative group">
-                        <a href="/US/en/Pharmaceuticals/cat/123456" class="text-black hover:underline font-bold">Pharmaceuticals</a>
-                        
-					<div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+            </li>
+          
+            <li class="relative group block">
+                <a href="https://www.lgcstandards.com/US/en/Pharmaceutical-Reference-Standards/cat/279492" class="mode text-black hover:underline font-bold block pl-2">Pharmaceuticals</a>
+    <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
           <div class="flex p-4">
             <div class="w-1/3 pr-4">
               <p class="font-bold">Our Products</p>
@@ -111,7 +105,7 @@
                 <li>Pharmacopoeia listed materials</li>
                 <li>Enzyme activators, inhibitors & substrates</li>
               </ul>
-              <p class="text-blue-500 mt-2">View all</p>
+			  <a href="https://www.lgcstandards.com/US/en/Pharmaceutical-Reference-Standards/cat/279492" class="font-bold text-blue-500 mt-2 inline-block hover:underline">View All</a>
             </div>
             <div class="w-1/3 px-4">
               <p class="font-bold">Resources</p>
@@ -137,12 +131,11 @@
             </div>
           </div>
         </div>
-                    </li>
-        <li class="relative group">
-            <a href="/US/en/Food-Beverages/cat/789012" class="text-black hover:underline font-bold">Food & Beverages</a>
-                        
-			<div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
-          <div class="flex p-4">
+	</li>
+					<li class="relative group block">
+                <a href="https://www.lgcstandards.com/US/en/Food-and-Beverage-Reference-Materials/cat/279493" class="mode text-black hover:underline font-bold block pl-2">Food & Beverages</a>
+    <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+         <div class="flex p-4">
             <div class="w-1/3 pr-4">
               <p class="font-bold">Our Products</p>
               <ul class="mt-2 space-y-1">
@@ -155,7 +148,7 @@
                 <li>Stability studies</li>
                 <li>Traceability</li>
               </ul>
-              <p class="text-black mt-2">View all</p>
+              <a href="https://www.lgcstandards.com/US/en/Food-and-Beverage-Reference-Materials/cat/279493" class="font-bold text-blue-500 mt-2 inline-block hover:underline">View All</a>
             </div>
             <div class="w-1/3 px-4">
               <p class="font-bold">Resources</p>
@@ -178,12 +171,11 @@
             </div>
           </div>
         </div>
-                    </li>
-									<li class="relative group">
-                        <a href="/US/en/Food-Beverages/cat/789012" class="text-black hover:underline font-bold">Industrial</a>
-                        
-					<div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
-                    <div class="flex p-4">
+					</li>
+					 <li class="relative group block">
+                <a href="https://www.lgcstandards.com/US/en/Industrial-Reference-Materials/cat/279495" class="mode text-black hover:underline font-bold block pl-2">Industrial</a>
+    <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+          <div class="flex p-4">
                         <div class="w-1/3 pr-4"> 
                             <p class="font-bold">Our Products</p>
                             <ul class="mt-2 space-y-1">
@@ -201,7 +193,7 @@
                                 <li>Laboratory consumables</li>
                                 <li>Equipment for sample preparation</li>
                             </ul>
-                            <p class="text-blue-500 mt-2">View all</p>
+                            <a href="https://www.lgcstandards.com/US/en/Industrial-Reference-Materials/cat/279495" class="font-bold text-blue-500 mt-2 inline-block hover:underline">View All</a>
                         </div>
                         <div class="w-1/3 px-4"> 
                             <p class="font-bold">Resources</p>
@@ -222,12 +214,12 @@
                         </div>
                     </div>
                 </div>
-                    </li>
-
-									<li class="relative group">
-                        <a href="/US/en/Food-Beverages/cat/789012" class="text-black hover:underline font-bold">Proficiency & Testing</a>
-                        
-										<div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+						 
+						</li>
+            <li class="relative group block">
+                <a href="https://www.lgcstandards.com/US/en/Proficiency-Testing/cat/280731" class="mode text-black hover:underline font-bold block pl-2">Proficiency & Testing</a>
+    <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+         <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
                     <div class="flex p-4">
                         <div class="w-1/3 pr-4"> 
                             <p class="font-bold">Our Products</p>
@@ -241,7 +233,7 @@
                                 <li>Forensic standards</li>
                                 <li>Quality Control Materials</li>
                             </ul>
-                            <p class="text-blue-500 mt-2">View all</p>
+							<a href="https://www.lgcstandards.com/US/en/Proficiency-Testing/cat/280731" class="font-bold text-blue-500 mt-2 inline-block hover:underline">View All</a>
                         </div>
                         <div class="w-1/3 px-4"> 
                             <p class="font-bold">Resources</p>
@@ -263,16 +255,223 @@
     </div>
     </div>
     </div>
-    </li>
-									
-	<li class="relative group">
-        <a href="/US/en/Food-Beverages/cat/789012" class="text-black hover:underline font-bold">Environmental</a>
-        <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
-        <div class="flex p-4">
+						</li>
+					<li class="relative group block">
+                <a href="https://www.lgcstandards.com/US/en/Environmental-Reference-Materials/cat/279494" class="mode text-black hover:underline font-bold block pl-2">Environmental</a>
+    <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+         <div class="flex p-4">
         <div class="w-1/3 pr-4"> 
         <p class="font-bold">Our Products</p>
         <ul class="mt-2 space-y-1">
                                 <li>Stable isotope labelled compounds</li>
+                                <li>PCBs & related compounds</li>
+                                <li>Flame retardants</li>
+                                <li>Dyes & metabolites</li>
+                                <li>Dioxins & furans</li>
+                                <li>Pharma & vet compounds & metabolites</li>
+                                <li>Mycotoxins</li>
+                                <li>Additional organic reference materials</li>
+                                <li>Polycyclic aromatic hydrocarbons (PAHs)</li>
+                                <li>Volatile organic compounds (VOCs)</li>
+                                <li>Hydrocarbons & petrochemicals</li>
+                               
+                            </ul>
+							<a href="https://www.lgcstandards.com/US/en/Environmental-Reference-Materials/cat/279494" class="font-bold text-blue-500 mt-2 inline-block hover:underline">View All</a>
+        </div>
+        <div class="w-1/3 px-4"> 
+        <p class="font-bold">Resources</p>
+        <ul class="mt-2 space-y-1">
+        <li>Environmental testing services</li>
+    <li>Consultation on regulations</li>
+	<li>Standards for environmental regulatory methods</li>
+	<li>Aqueous inorganic</li>
+	<li>Environmental proficiency testing</li>
+	<li>Physical properties</li>
+	<li>Pesticides & metabolites</li>
+	<li>Perfluoroalkylated substances (PFAS)</li>
+    </ul>
+    </div>
+    <div class="w-1/3 pl-4 relative"> 
+    <img src="https://www.lgcstandards.com/medias/sys_master/root/h59/h13/10583540957214/TRC-convergence-450x428.jpg" alt="TRC Convergence" class="mb-4">
+    <div class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/50 text-white p-4">
+    <div class="bg-black bg-opacity-50 text-white p-4 flex flex-col items-center justify-center">
+	<p class="font-bold text-lg">Everything on one site!</p>
+	<p>TRC research chemicals are now fully available at lgcstandards.com</p>
+	</div>
+    <a href="https://www.lgcstandards.com/GB/en/TRC/cat/279854" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Explore now</a>
+    </div>
+    </div>
+     </div>
+    </div>
+    </li>
+					<li class="relative group block">
+                <a href="https://www.lgcstandards.com/US/en/orderRequest" class="mode text-black hover:underline font-bold block pl-2">Custom solution</a>
+					</li>
+						<li class="relative group block">
+                <a href="https://www.lgcstandards.com/US/en/structure-search" class="mode text-black hover:underline font-bold block pl-2">Structure Search</a>
+					</li>
+				 </ul>
+					
+        <div id="dropdownMenu" class="hidden md:hidden mt-2">
+            <ul class="flex flex-col ">
+                <li class="relative-group block flex justify-between items-center">
+                    <a href="/US/en/Research-Tools/cat/323667" class="mode text-black hover:underline font-bold block p-4">Research Tools</a>
+                 <button class="text-black bg-transparent hover:bg-gray-200 rounded p-2 font-bold focus:outline-none toggle-content">+</button>
+                </li>
+                <div class="hidden content pl-3">
+									<a href="/US/en/Phermaceuticals/cat/323668" class="font-bold text-green-400 mt-2 inline-block hover:underline">View All</a>
+                   <p class="font-bold  text-green-400 pl-1 ">Our Products</p>
+                    <ul class="mt-2 space-y-1 pl-3">
+                        <li>Cancer research</li>
+                        <li>Neurology</li>
+                        <li>Covid-19 research</li>
+                        <li>Infectious disease research</li>
+                        <li>Pharmaceutical toxicology</li>
+                        <li>Stable isotope labelled</li>
+                        <li>Synthetic chemistry</li>
+                        <li>Building blocks</li>
+                        <li>Next-generation cancer models</li>
+                        <li>Immortalised primary cells</li>
+                        <li>Primary cells</li>
+                    </ul>
+									  <p class="font-bold text-green-400   ">Resources</p>
+											<ul class="pl-1">
+												<li>Topic Insights</li>
+												<li>Custom quotation </li>
+											
+												
+											</ul>
+                </div>
+									
+                
+                <li class="relative-group block flex justify-between items-center  ">
+                    <a href="/US/en/Pharmaceuticals/cat/123456" class="mode text-black hover:underline font-bold block p-4">Pharmaceuticals</a>
+                    <button class="text-black bg-transparent hover:bg-gray-200 rounded p-2 font-bold focus:outline-none toggle-content">+</button>
+                </li>
+                <div class="hidden content  ">
+									<a href="/US/en/Phermaceuticals/cat/323668" class="font-bold text-green-400 mt-2 inline-block hover:underline">View All</a>
+                    <p class="font-bold  text-green-400 pl-1 ">Our Products</p>
+                    <ul class="mt-2 space-y-1  pl-3">
+                        <li>API standards</li>
+                        <li>Excipient standards</li>
+                        <li>Impurity standards</li>
+                        <li>Nitrosamines</li>
+                        <li>Pharmacopoeial standards</li>
+                        <li>European Pharmacopoeia (Ph. Eur.)</li>
+                        <li>British Pharmacopoeia</li>
+                        <li>Stable isotope labelled standards</li>
+                        <li>Pharmacopoeia listed materials</li>
+                        <li>Enzyme activators, inhibitors & substrates</li>
+											  <p class="font-bold text-green-400   ">Resources</p>
+											<ul class="pl-1">
+												<li>White Papers</li>
+												<li>Acreditation</li>
+												<li>Topic Insight</li>
+												
+											</ul>
+											
+                    </ul>
+                </div>
+                
+							 
+                <li class="relative-group block flex justify-between items-center  ">
+                    <a href="/US/en/Pharmaceuticals/cat/123456" class="mode text-black hover:underline font-bold block p-4">Food & Beverages</a>
+                    <button class="text-black bg-transparent hover:bg-gray-200 rounded p-2 font-bold focus:outline-none toggle-content">+</button>
+                </li>
+                <div class="hidden content  ">
+                  	<a href="/US/en/Phermaceuticals/cat/323668" class="font-bold text-green-400 mt-2 inline-block hover:underline">View All</a>
+                    <p class="font-bold  text-green-400 pl-1 ">Our Products</p>
+                    <ul class="mt-2 space-y-1 pl-3 ">
+                        <li>Cannabis-related compounds</li>
+					                <li>Dyes & metabolites</li>
+					                <li>Allergens</li>
+				                <li>Nutritional composition compounds</li>
+				                <li>Food additives, flavours & adulterants</li>
+				                <li>Mycotoxins</li>
+				                <li>Stability studies</li>
+				                <li>Traceability</li>
+              </ul>
+									  <p class="font-bold text-green-400   ">Resources</p>
+											<ul class="pl-1">
+												<li>White Papers</li>
+												<li>News</li>
+												<li>Acreditation</li>
+												<li>Topic Insight</li>
+												</ul>
+             
+                    
+                </div>
+             <li class="relative-group block flex justify-between items-center  ">
+                    <a href="/US/en/Pharmaceuticals/cat/123456" class="mode text-black hover:underline font-bold block p-4">Industrial</a>
+                    <button class="text-black bg-transparent hover:bg-gray-200 rounded p-2 font-bold focus:outline-none toggle-content">+</button>
+                </li>
+                <div class="hidden content  ">
+                  	<a href="/US/en/Phermaceuticals/cat/323668" class="font-bold text-green-400 mt-2 inline-block hover:underline">View All</a>
+                    <p class="font-bold  text-green-400 pl-1 ">Our Products</p>
+                    <ul class="mt-2 space-y-1 pl-3 ">
+                        <li>Petroleum reference materials</li>
+                                <li>Physical property analysis standards</li>
+                                <li>Sulfur, Nitrogen & Chlorine standards</li>
+                                <li>Metallo-organic standards</li>
+                                <li>Matrix oils & solvents</li>
+                                <li>Biodiesel standards</li>
+                                <li>Aqueous inorganic</li>
+                                <li>Metal alloys</li>
+                                <li>Aluminium base standards</li>
+                                <li>Process materials, geological, cement and soils</li>
+                                <li>XRF monitor glasses</li>
+                                <li>Laboratory consumables</li>
+                                <li>Equipment for sample preparation</li>
+              </ul>
+									  <p class="font-bold text-green-400   ">Resources</p>
+											<ul class="pl-1">
+												<li>Publiactions</li>
+												<li>News</li>
+												<li>Acreditation</li>
+												<li>Topic Insight</li>
+												</ul>
+             
+                    
+                </div>
+							<li class="relative-group block flex justify-between items-center  ">
+                    <a href="/US/en/Pharmaceuticals/cat/123456" class="mode text-black hover:underline font-bold block p-4">Proficiency & Testing</a>
+                    <button class="text-black bg-transparent hover:bg-gray-200 rounded p-2 font-bold focus:outline-none toggle-content">+</button>
+                </li>
+                <div class="hidden content  ">
+                  	<a href="/US/en/Phermaceuticals/cat/323668" class="font-bold text-green-400 mt-2 inline-block hover:underline">View All</a>
+                    <p class="font-bold  text-green-400 pl-1 ">Our Products</p>
+                    <ul class="mt-2 space-y-1 pl-3 ">
+                        <li>Food & Feed standards</li>
+                                <li>Beverage testing materials</li>
+                                <li>Water & Environmental standards</li>
+                                <li>Consumer Safety testing</li>
+                                <li>Pharmaceutical standards</li>
+                                <li>Clinical testing materials</li>
+                                <li>Forensic standards</li>
+                                <li>Quality Control Materials</li>
+								<li>Testing protocols</li>
+                                <li>Standard operating procedures</li>
+                                <li>Regulatory compliance resources</li>
+                    </ul>
+									  <p class="font-bold text-green-400   ">Resources</p>
+											<ul class="pl-1">
+												<li>Custom Made-Schemes</li>
+												<li>News</li>
+												<li>Acreditation</li>
+												<li>Topic Insight</li>
+											</ul>
+             
+                    
+                </div>
+							<li class="relative-group block flex justify-between items-center  ">
+                    <a href="/US/en/Pharmaceuticals/cat/123456" class="mode text-black hover:underline font-bold block p-4">Environmental</a>
+                    <button class="text-black bg-transparent hover:bg-gray-200 rounded p-2 font-bold focus:outline-none toggle-content">+</button>
+                </li>
+                <div class="hidden content  ">
+                  	<a href="/US/en/Phermaceuticals/cat/323668" class="font-bold text-green-400 mt-2 inline-block hover:underline">View All</a>
+                    <p class="font-bold  text-green-400 pl-1 ">Our Products</p>
+                    <ul class="mt-2 space-y-1 pl-3 ">
+                        <li>Stable isotope labelled compounds</li>
                                 <li>PCBs & related compounds</li>
                                 <li>Flame retardants</li>
                                 <li>Dyes & metabolites</li>
@@ -289,42 +488,26 @@
                                 <li>Physical properties</li>
                                 <li>Pesticides & metabolites</li>
                                 <li>Perfluoroalkylated substances (PFAS)</li>
-                            </ul>
-        <p class="text-black mt-2">View all</p>
+              </ul>
+									  <p class="font-bold text-green-400   ">Resources</p>
+											<ul class="pl-1">
+												<li>White Papers</li>
+												<li>News</li>
+												<li>Acreditation</li>
+												<li>Topic Insight</li>
+												</ul>
+             
+                    
+                </div>
+								<li class="relative-group block flex justify-between items-center  ">
+                    <a href="/US/en/Pharmaceuticals/cat/123456" class="mode text-black hover:underline font-bold block p-4">Custom Solution</a>
+									<li class="relative-group block flex justify-between items-center  ">
+                    <a href="https://www.lgcstandards.com/US/en/structure-search" class="mode text-black hover:underline font-bold block p-4">Structure Search</a>
+							
+            
         </div>
-        <div class="w-1/3 px-4"> 
-        <p class="font-bold">Resources</p>
-        <ul class="mt-2 space-y-1">
-        <li>Environmental testing services</li>
-    <li>Consultation on regulations</li>
-    </ul>
-    </div>
-    <div class="w-1/3 pl-4 relative"> 
-    <img src="https://www.lgcstandards.com/medias/sys_master/root/h59/h13/10583540957214/TRC-convergence-450x428.jpg" alt="TRC Convergence" class="mb-4">
-    <div class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/50 text-white p-4">
-    <div class="bg-black bg-opacity-50 text-white p-4 flex flex-col items-center justify-center">
-	<p class="font-bold text-lg">Everything on one site!</p>
-	<p>TRC research chemicals are now fully available at lgcstandards.com</p>
-	</div>
-    <a href="https://www.lgcstandards.com/GB/en/TRC/cat/279854" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Explore now</a>
-    </div>
-    </div>
-     </div>
-    </div>
-    </li>
-	<li class="relative group">
-    <a href="/US/en/Food-Beverages/cat/789012" class="text-black hover:underline font-bold">Custum structure</a>
-    </li>
-	<li class="relative group">
-    <a href="/US/en/structural/cat/456789" class="text-black hover:underline font-bold"> Structure Search</a>
-    </li>
-    </ul>
-    </div>
-    </main>
-    </div>
+    
 
-<style>
-        .group:hover .megamenu {
-            display: block; 
-        }
-</style>
+    
+</body>
+
