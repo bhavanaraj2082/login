@@ -42,7 +42,7 @@
         <ul class="hidden md:flex flex-col md:flex-row md:flex-wrap gap-4">
             <li class="relative group block">
                 <a href="https://www.lgcstandards.com/US/en/Research-Tools/cat/323667" class="mode text-black hover:underline font-bold block pl-2">Research Tools</a>
-                    <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+                    <div class="megamenu hidden w-screen h-3/4 fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
                    <div class="flex p-4">
             <div class="w-1/3 pr-4">
             <p class="font-bold">Our Products</p>
@@ -89,7 +89,7 @@
           
             <li class="relative group block">
                 <a href="https://www.lgcstandards.com/US/en/Pharmaceutical-Reference-Standards/cat/279492" class="mode text-black hover:underline font-bold block pl-2">Pharmaceuticals</a>
-    <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+    <div class="megamenu hidden w-screen h-3/4 fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
           <div class="flex p-4">
             <div class="w-1/3 pr-4">
               <p class="font-bold">Our Products</p>
@@ -134,7 +134,7 @@
 	</li>
 					<li class="relative group block">
                 <a href="https://www.lgcstandards.com/US/en/Food-and-Beverage-Reference-Materials/cat/279493" class="mode text-black hover:underline font-bold block pl-2">Food & Beverages</a>
-    <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+    <div class="megamenu hidden w-screen h-3/4 fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
          <div class="flex p-4">
             <div class="w-1/3 pr-4">
               <p class="font-bold">Our Products</p>
@@ -174,7 +174,7 @@
 					</li>
 					 <li class="relative group block">
                 <a href="https://www.lgcstandards.com/US/en/Industrial-Reference-Materials/cat/279495" class="mode text-black hover:underline font-bold block pl-2">Industrial</a>
-    <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+    <div class="megamenu hidden w-screen h-3/4 fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
           <div class="flex p-4">
                         <div class="w-1/3 pr-4"> 
                             <p class="font-bold">Our Products</p>
@@ -218,8 +218,8 @@
 						</li>
             <li class="relative group block">
                 <a href="https://www.lgcstandards.com/US/en/Proficiency-Testing/cat/280731" class="mode text-black hover:underline font-bold block pl-2">Proficiency & Testing</a>
-    <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
-         <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+    
+         <div class="megamenu hidden w-screen h-3/4 fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
                     <div class="flex p-4">
                         <div class="w-1/3 pr-4"> 
                             <p class="font-bold">Our Products</p>
@@ -258,7 +258,7 @@
 						</li>
 					<li class="relative group block">
                 <a href="https://www.lgcstandards.com/US/en/Environmental-Reference-Materials/cat/279494" class="mode text-black hover:underline font-bold block pl-2">Environmental</a>
-    <div class="megamenu hidden w-screen h-[70vh] fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
+    <div class="megamenu hidden w-screen h-3/4 fixed top-30 left-0 z-20 bg-white overflow-y-auto group-hover:block">
          <div class="flex p-4">
         <div class="w-1/3 pr-4"> 
         <p class="font-bold">Our Products</p>
@@ -349,7 +349,7 @@
                     <button class="text-black bg-transparent hover:bg-gray-200 rounded p-2 font-bold focus:outline-none toggle-content">+</button>
                 </li>
                 <div class="hidden content  ">
-									<a href="/US/en/Phermaceuticals/cat/323668" class="font-bold text-green-400 mt-2 inline-block hover:underline">View All</a>
+				<a href="/US/en/Phermaceuticals/cat/323668" class="font-bold text-green-400 mt-2 inline-block hover:underline">View All</a>
                     <p class="font-bold  text-green-400 pl-1 ">Our Products</p>
                     <ul class="mt-2 space-y-1  pl-3">
                         <li>API standards</li>
