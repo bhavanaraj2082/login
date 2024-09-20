@@ -6,6 +6,12 @@
   function getButtonClass(isActive) {
     return isActive ? 'bg-white' : 'bg-gray-100';
   }
+  let password = '';
+  let passwordError = '';
+  function validatePassword() {
+    const valid = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(password);
+    passwordError = valid ? '' : 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.';
+  }
 </script>
 <div class="bg-gray-100">
   <div class="min-h-screen flex flex-col items-center justify-center">
@@ -134,8 +140,14 @@
               </select>
             </div>
             <div>
-              <label for="password" class="block text-sm font-normal mb-1.5 mt-5">Create a Password * (at least 8 characters)</label>
-              <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded-md" required name="password" />
+              <label for="password" class="block text-sm font-normal mb-1.5 mt-5">Create a Password * (at least 8 characters, with uppercase, lowercase, numbers, and special characters)</label>
+              <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded-md" 
+                bind:value={password} 
+                on:input={validatePassword} 
+                required />
+              {#if passwordError}
+                <p class="text-red-600 text-sm">{passwordError}</p>
+              {/if}
             </div>
             <div>
               <label for="confirmpassword" class="block text-sm font-normal mb-1.5 mt-5">Confirm Your Password *</label>
