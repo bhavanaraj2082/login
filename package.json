@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^1.9.0",
+    "@iconify/svelte": "^4.0.2",
     "@playwright/test": "^1.28.1",
     "@storybook/addon-essentials": "^8.3.1",
     "@storybook/addon-interactions": "^8.3.1",
@@ -35,6 +36,7 @@
     "eslint-plugin-storybook": "^0.8.0",
     "eslint-plugin-svelte": "^2.36.0",
     "globals": "^15.0.0",
+    "pocketbase": "^0.21.5",
     "postcss": "^8.4.47",
     "prettier": "^3.1.1",
     "prettier-plugin-svelte": "^3.1.2",
@@ -42,7 +44,8 @@
     "svelte": "^4.2.7",
     "tailwindcss": "^3.4.11",
     "vite": "^5.0.3",
-    "vitest": "^2.0.0"
+    "vitest": "^2.0.0",
+    "xlsx": "^0.18.5"
   },
   "type": "module",
   "eslintConfig": {
