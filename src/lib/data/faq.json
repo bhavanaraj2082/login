@@ -1,0 +1,398 @@
+{
+    "all_questions": {
+      "title": "All Questions",
+      "faqs": [
+          {
+            "question": "I can't seem to locate the item I am looking for?",
+            "answer": "If a product you are searching for cannot be located on our website, it may not be available online. For assistance, contact your local sales office. To maximize your search results, use the 'all products' drop-down box in the search function."
+          },
+          {
+            "question": "How can I filter my search results?",
+            "answer": "The web shop has advanced search features to help you refine your search results. You can use the filters in the left-hand column to narrow down results by Category, Brand, Format, Technique, and Accreditation."
+          },
+          {
+            "question": "I know the product code that I want. How can I find it online?",
+            "answer": "Type the product code into the search bar on the left side of the webpage and click 'Go.' If the product is available, it will be shown in the search results. You can also use the 'Quick Order' feature."
+          },
+          {
+            "question": "Why are different analytical methods used for different lots of the same product?",
+            "answer": "We constantly review and optimize procedures, so analytical methods may vary between lots. We aim to use the best available methods at the time of testing."
+          },
+          {
+            "question": "Why does the purity sometimes vary from batch to batch for the same product?",
+            "answer": "Purity may vary due to different synthesis and purification processes used across batches. We aim to provide the highest purity possible, along with a stated uncertainty value."
+          },
+          {
+            "question": "Can I store my product at a lower temperature than stated on the Certificate of Analysis?",
+            "answer": "For solid materials, storage at a lower temperature is usually not an issue unless the material may freeze. For solutions, storing at lower temperatures than recommended may lead to precipitation."
+          },
+          {
+            "question": "How should I store my product once it has been opened?",
+            "answer": "After opening, store the product under the same conditions as before, ensuring lids are tightly closed. If provided in an ampoule, transfer to a suitable container for storage."
+          },
+          {
+            "question": "What should I do if I spot an error?",
+            "answer": "Please report any errors to web@lgcstandards.com."
+          },
+          {
+            "question": "What do the stock level traffic lights mean on the product pages?",
+            "answer": "Green: In stock, Amber: Delivery within 7-10 working days, Red: Out of stock or delivery after 28 days."
+          },
+          {
+            "question": "Do the prices included on the website include my discounts and customer-specific pricing agreements?",
+            "answer": "Yes. Prices displayed at checkout include all your discounts. Ensure you are logged in with your personal credentials."
+          },
+          {
+            "question": "Which card payment methods do you accept online?",
+            "answer": "We accept Visa, MasterCard, American Express, and others. Payments are processed securely via Sage Pay."
+          },
+          {
+            "question": "At what stage is my credit card charged?",
+            "answer": "Your credit card is charged when you place the order."
+          },
+          {
+            "question": "Can I still purchase an item that is out of stock?",
+            "answer": "Yes, but the item will only be dispatched once it's back in stock."
+          },
+          {
+            "question": "Can I purchase controlled drugs online?",
+            "answer": "Yes, controlled drugs can be purchased, but additional restrictions and licenses may apply. You'll be contacted for further details."
+          },
+          {
+            "question": "Will I get a receipt for my order?",
+            "answer": "Yes, a receipt is provided online and included in your delivery package."
+          },
+          {
+            "question": "Can I add items to an already placed order?",
+            "answer": "You can add or amend an order if it has not yet been processed. Contact your local sales office for assistance."
+          },
+          {
+            "question": "What does the status of my order mean?",
+            "answer": "Order statuses include Planned, Credit Blocked, Released, Reserved, Picked, Partially Delivered, Delivered, Invoiced, and Cancelled."
+          },
+          {
+            "question": "What shipping options do you offer?",
+            "answer": "We offer several shipping options including standard, expedited, and overnight delivery. You can choose your preferred shipping method at checkout."
+          },
+          {
+            "question": "How much does shipping cost?",
+            "answer": "Shipping costs vary depending on the weight of the package, the shipping method chosen, and the delivery location. You can view the shipping cost estimate during the checkout process."
+          },
+          {
+            "question": "How long does shipping take?",
+            "answer": "Shipping times vary based on the shipping method selected and your location. Standard shipping typically takes 5-7 business days, expedited shipping takes 2-3 business days, and overnight delivery arrives the next business day."
+          },
+          {
+            "question": "Can I track my shipment?",
+            "answer": "Yes, once your order has shipped, you will receive a tracking number via email. You can use this number to track your shipment on our website or the carrier's website."
+          },
+          {
+            "question": "Do you offer international shipping?",
+            "answer": "Yes, we offer international shipping. Shipping fees and delivery times will vary based on the destination. You can see international shipping options and costs during the checkout process."
+          },
+          {
+            "question": "How can I change my account details?",
+            "answer": "To change your details, email your local sales office. The change will be updated in your account within 24-48 hours."
+          },
+          {
+            "question": "How can I change my password?",
+            "answer": "Log in to your account, go to 'My Account', and select 'Change Password'. Follow best practices by using at least 6 characters, including one capital letter and one number."
+          },
+          {
+            "question": "Can multiple people use my account?",
+            "answer": "For security reasons, it is recommended that each person has their own login. Additional logins can be requested from your local sales office."
+          },
+          {
+            "question": "How do I select an appropriate solvent to prepare my standards?",
+            "answer": "In the first instance, you should refer to your in-house procedure/SOP. If this is the first time using a compound, factors like solubility, miscibility, and technique will influence the solvent choice. A suggested list of solvents is available, but other solvents may also be appropriate. If you require further assistance, please contact askus@lgcstandards.com."
+          },
+          {
+            "question": "Are all Dr. Ehrenstorfer products provided with a Certificate of Analysis?",
+            "answer": "Most Dr. Ehrenstorfer products come with a Certificate of Analysis. However, products with part numbers prefixed by DRE-E do not include a Certificate of Analysis due to limited availability, non-applicable chromatographic techniques, or because the material is a technical grade/mixture. These products may state purity on the container label if available. Some DRE-E products may be converted into DRE-C products in the future, which come with a Certificate of Analysis."
+          },
+          {
+            "question": "Are Dr. Ehrenstorfer Certificates of Analysis provided with chromatograms?",
+            "answer": "Where possible, example chromatograms are included in the Certificate of Analysis for information only. These are not provided to demonstrate product purity. In some cases, chromatograms may not be supplied due to the analytical technique used, or they may require supporting data for proper interpretation."
+          },
+          {
+            "question": "How does Dr. Ehrenstorfer demonstrate the traceability of its certified values?",
+            "answer": "Dr. Ehrenstorfer uses an ISO 9001-certified quality management system and ISO 17025-accredited methodologies. Measurements of weight, volume, and temperature are traceable to SI units. Some products are produced under ISO Guide 34, where uncertainties and traceability are achieved through reference measurement procedures such as chromatography, elemental analysis, and quantitative NMR."
+          },
+          {
+            "question": "How does Dr. Ehrenstorfer demonstrate the stability of its reference materials?",
+            "answer": "Real-time stability studies are conducted prior to product release. Products are not sold until at least three months of stability data is available. They are initially released with ‘short shelf life stability’ until more data is collected. Stability is assessed under long-term and short-term storage conditions, with products tested for stability at ambient temperature for at least one week unless otherwise stated on the Certificate of Analysis."
+          },
+          {
+            "question": "Are the expiry dates of lots/batches of Dr. Ehrenstorfer products reviewed and extended?",
+            "answer": "Expiry dates are valid for unopened, originally sealed containers and are specific to the lot. The storage conditions on the Certificate of Analysis must be followed for the expiry date to remain valid. Expiry dates for lots/batches are not reviewed or extended."
+          },
+          {
+            "question": "Why is the ratio of isomers or congeners not given on the Certificate of Analysis?",
+            "answer": "Where possible, the ratio of isomers or congeners is provided on the Certificate of Analysis. However, for some products, it may not be possible to state these quantities due to limitations in measurement uncertainty."
+          },
+          {
+            "question": "What does the term 'technical mixture' mean?",
+            "answer": "A 'technical mixture' refers to products where information on the quantity or identity of individual components is not available. Any available information is provided on the Certificate of Analysis."
+          },
+          {
+            "question": "Which international standards are relevant to LGC PT schemes?",
+            "answer": "All our PT schemes are operated in accordance with the international standard ISO/IEC 17043. The statistical analysis undertaken is in accordance with the international standard ISO 13528. LGC is accredited by the United Kingdom Accreditation Service (UKAS) for the provision of proficiency testing schemes against ISO/IEC 17043."
+          },
+          {
+            "question": "How are your schemes organised?",
+            "answer": "The day-to-day operation of each scheme is the responsibility of LGC Standards. Individual schemes are managed by a team of Scheme Coordinators, covering reporting, customer service, and technical functions. For some schemes, external advisors may also be used to provide relevant knowledge and expertise. A small number of schemes are run in collaboration with other organisations."
+          },
+          {
+            "question": "Do you use Advisors and Advisory Groups?",
+            "answer": "Yes, depending upon the scheme. Advisors are selected based on their technical knowledge and experience. They may be used on an ad-hoc basis or through formal Advisory Groups. These groups consist of experienced members in the field of testing covered by the PT scheme. Membership and terms of reference are agreed on a scheme-by-scheme basis."
+          },
+          {
+            "question": "Do you run schemes that are jointly managed?",
+            "answer": "Yes, some schemes are operated jointly with partner organisations. A Management Committee may be established to address operational issues for these jointly managed schemes."
+          },
+          {
+            "question": "How do I join a scheme?",
+            "answer": "Participants should choose schemes that fit their area of testing. Scheme descriptions and application forms are available, providing information about test materials and distribution dates. Participants complete the application form, select test materials, and receive an order confirmation. If test material availability changes, participants are kept informed."
+          },
+          {
+            "question": "Can you guarantee my laboratory’s confidentiality?",
+            "answer": "Yes, confidentiality is ensured by allocating a unique laboratory reference number to each participant. This number allows results to be reported without revealing laboratory identities. Only proficiency testing team staff and the laboratory itself will know this number."
+          },
+          {
+            "question": "How often do I need to participate?",
+            "answer": "Participation frequency depends on factors like other quality tools used, volume of work, and risk associated with measurements. LGC Standards offers flexible participation options, though some schemes have minimum levels. Regulatory bodies may recommend minimum participation levels. For trend analysis, participating in at least four rounds over a scheme year is generally recommended."
+          },
+          {
+            "question": "What are the fees for participation?",
+            "answer": "Fees are reviewed annually, and current fees are available on application. Payment terms are detailed on the application form and invoice. Delays in payments may result in withholding test materials or reports until payments are made."
+          },
+          {
+            "question": "Where do you source your test materials?",
+            "answer": "Most test materials are manufactured by LGC Standards. If not possible, test materials are carefully sourced to meet participant needs. Test materials are similar to those routinely tested by laboratories, but may be simulated matrices or concentrated spiking solutions to ensure homogeneity and stability."
+          },
+          {
+            "question": "How are test materials packaged and transported?",
+            "answer": "Test materials are packaged to protect contents during transit and sent using priority courier. Overseas customers must provide relevant documents for customs and may need to pay import duties. LGC Standards is not responsible for packages after delivery. Participants should check the contents immediately and contact LGC Standards if there are any issues."
+          },
+          {
+            "question": "How can I measure my laboratory’s performance over time?",
+            "answer": "Trend analysis is used to measure performance over time. Frequent participation in PT schemes provides greater insight into long-term performance and identifies internal biases. Performance scores are best summarized graphically. For detailed guidance, refer to the Eurachem guide and ISO 13528."
+          },
+          {
+            "question": "How will I receive my report?",
+            "answer": "Reports are generally available on the website within 4 to 10 working days of round closure. We aim to provide 95% of reports within 5 working days. Participants are notified by email when the report is available. Reports include details of test materials, assigned values, and participants’ results, with paper copies available for an additional charge."
+          }
+      ]
+    },
+    "products": {
+      "title": "Products",
+      "faqs": [
+          {
+            "question": "I can't seem to locate the item I am looking for?",
+            "answer": "If a product you are searching for cannot be located on our website, it may not be available online. For assistance, contact your local sales office. To maximize your search results, use the 'all products' drop-down box in the search function."
+          },
+          {
+            "question": "How can I filter my search results?",
+            "answer": "The web shop has advanced search features to help you refine your search results. You can use the filters in the left-hand column to narrow down results by Category, Brand, Format, Technique, and Accreditation."
+          },
+          {
+            "question": "I know the product code that I want. How can I find it online?",
+            "answer": "Type the product code into the search bar on the left side of the webpage and click 'Go.' If the product is available, it will be shown in the search results. You can also use the 'Quick Order' feature."
+          },
+          {
+            "question": "Why are different analytical methods used for different lots of the same product?",
+            "answer": "We constantly review and optimize procedures, so analytical methods may vary between lots. We aim to use the best available methods at the time of testing."
+          },
+          {
+            "question": "Why does the purity sometimes vary from batch to batch for the same product?",
+            "answer": "Purity may vary due to different synthesis and purification processes used across batches. We aim to provide the highest purity possible, along with a stated uncertainty value."
+          },
+          {
+            "question": "Can I store my product at a lower temperature than stated on the Certificate of Analysis?",
+            "answer": "For solid materials, storage at a lower temperature is usually not an issue unless the material may freeze. For solutions, storing at lower temperatures than recommended may lead to precipitation."
+          },
+          {
+            "question": "How should I store my product once it has been opened?",
+            "answer": "After opening, store the product under the same conditions as before, ensuring lids are tightly closed. If provided in an ampoule, transfer to a suitable container for storage."
+          },
+          {
+            "question": "What should I do if I spot an error?",
+            "answer": "Please report any errors to web@lgcstandards.com."
+          },
+          {
+            "question": "What do the stock level traffic lights mean on the product pages?",
+            "answer": "Green: In stock, Amber: Delivery within 7-10 working days, Red: Out of stock or delivery after 28 days."
+          }
+      ]
+    },
+    "orders": {
+      "title": "Orders",
+      "faqs": [
+          {
+            "question": "Do the prices included on the website include my discounts and customer-specific pricing agreements?",
+            "answer": "Yes. Prices displayed at checkout include all your discounts. Ensure you are logged in with your personal credentials."
+          },
+          {
+            "question": "Which card payment methods do you accept online?",
+            "answer": "We accept Visa, MasterCard, American Express, and others. Payments are processed securely via Sage Pay."
+          },
+          {
+            "question": "At what stage is my credit card charged?",
+            "answer": "Your credit card is charged when you place the order."
+          },
+          {
+            "question": "Can I still purchase an item that is out of stock?",
+            "answer": "Yes, but the item will only be dispatched once it's back in stock."
+          },
+          {
+            "question": "Can I purchase controlled drugs online?",
+            "answer": "Yes, controlled drugs can be purchased, but additional restrictions and licenses may apply. You'll be contacted for further details."
+          },
+          {
+            "question": "Will I get a receipt for my order?",
+            "answer": "Yes, a receipt is provided online and included in your delivery package."
+          },
+          {
+            "question": "Can I add items to an already placed order?",
+            "answer": "You can add or amend an order if it has not yet been processed. Contact your local sales office for assistance."
+          },
+          {
+            "question": "What does the status of my order mean?",
+            "answer": "Order statuses include Planned, Credit Blocked, Released, Reserved, Picked, Partially Delivered, Delivered, Invoiced, and Cancelled."
+          }
+      ]
+    },
+    "shipping": {
+     "title": "Shipping",
+        "faqs": [
+            {
+                "question": "What shipping options do you offer?",
+                "answer": "We offer several shipping options including standard, expedited, and overnight delivery. You can choose your preferred shipping method at checkout."
+            },
+            {
+                "question": "How much does shipping cost?",
+                "answer": "Shipping costs vary depending on the weight of the package, the shipping method chosen, and the delivery location. You can view the shipping cost estimate during the checkout process."
+            },
+            {
+                "question": "How long does shipping take?",
+                "answer": "Shipping times vary based on the shipping method selected and your location. Standard shipping typically takes 5-7 business days, expedited shipping takes 2-3 business days, and overnight delivery arrives the next business day."
+            },
+            {
+                "question": "Can I track my shipment?",
+                "answer": "Yes, once your order has shipped, you will receive a tracking number via email. You can use this number to track your shipment on our website or the carrier's website."
+            },
+            {
+                "question": "Do you offer international shipping?",
+                "answer": "Yes, we offer international shipping. Shipping fees and delivery times will vary based on the destination. You can see international shipping options and costs during the checkout process."
+            }
+            ]
+    },
+    "account": {
+      "title": "Account",
+      "faqs": [
+          {
+            "question": "How can I change my account details?",
+            "answer": "To change your details, email your local sales office. The change will be updated in your account within 24-48 hours."
+          },
+          {
+            "question": "How can I change my password?",
+            "answer": "Log in to your account, go to 'My Account', and select 'Change Password'. Follow best practices by using at least 6 characters, including one capital letter and one number."
+          },
+          {
+            "question": "Can multiple people use my account?",
+            "answer": "For security reasons, it is recommended that each person has their own login. Additional logins can be requested from your local sales office."
+          }
+      ]
+    },
+    "dr_ehrenstorfer": {
+    "title": "Dr. Ehrenstorfer",
+        "faqs": [
+            {
+            "question": "How do I select an appropriate solvent to prepare my standards?",
+            "answer": "In the first instance, you should refer to your in-house procedure/SOP. If this is the first time using a compound, factors like solubility, miscibility, and technique will influence the solvent choice. A suggested list of solvents is available, but other solvents may also be appropriate. If you require further assistance, please contact askus@lgcstandards.com."
+            },
+            {
+            "question": "Are all Dr. Ehrenstorfer products provided with a Certificate of Analysis?",
+            "answer": "Most Dr. Ehrenstorfer products come with a Certificate of Analysis. However, products with part numbers prefixed by DRE-E do not include a Certificate of Analysis due to limited availability, non-applicable chromatographic techniques, or because the material is a technical grade/mixture. These products may state purity on the container label if available. Some DRE-E products may be converted into DRE-C products in the future, which come with a Certificate of Analysis."
+            },
+            {
+            "question": "Are Dr. Ehrenstorfer Certificates of Analysis provided with chromatograms?",
+            "answer": "Where possible, example chromatograms are included in the Certificate of Analysis for information only. These are not provided to demonstrate product purity. In some cases, chromatograms may not be supplied due to the analytical technique used, or they may require supporting data for proper interpretation."
+            },
+            {
+            "question": "How does Dr. Ehrenstorfer demonstrate the traceability of its certified values?",
+            "answer": "Dr. Ehrenstorfer uses an ISO 9001-certified quality management system and ISO 17025-accredited methodologies. Measurements of weight, volume, and temperature are traceable to SI units. Some products are produced under ISO Guide 34, where uncertainties and traceability are achieved through reference measurement procedures such as chromatography, elemental analysis, and quantitative NMR."
+            },
+            {
+            "question": "How does Dr. Ehrenstorfer demonstrate the stability of its reference materials?",
+            "answer": "Real-time stability studies are conducted prior to product release. Products are not sold until at least three months of stability data is available. They are initially released with ‘short shelf life stability’ until more data is collected. Stability is assessed under long-term and short-term storage conditions, with products tested for stability at ambient temperature for at least one week unless otherwise stated on the Certificate of Analysis."
+            },
+            {
+            "question": "Are the expiry dates of lots/batches of Dr. Ehrenstorfer products reviewed and extended?",
+            "answer": "Expiry dates are valid for unopened, originally sealed containers and are specific to the lot. The storage conditions on the Certificate of Analysis must be followed for the expiry date to remain valid. Expiry dates for lots/batches are not reviewed or extended."
+            },
+            {
+            "question": "Why is the ratio of isomers or congeners not given on the Certificate of Analysis?",
+            "answer": "Where possible, the ratio of isomers or congeners is provided on the Certificate of Analysis. However, for some products, it may not be possible to state these quantities due to limitations in measurement uncertainty."
+            },
+            {
+            "question": "What does the term 'technical mixture' mean?",
+            "answer": "A 'technical mixture' refers to products where information on the quantity or identity of individual components is not available. Any available information is provided on the Certificate of Analysis."
+            }
+        ]
+    },
+    "proficiency_testing": {
+    "title": "Proficiency Testing",
+            "faqs": [
+            {
+                "question": "Which international standards are relevant to LGC PT schemes?",
+                "answer": "All our PT schemes are operated in accordance with the international standard ISO/IEC 17043. The statistical analysis undertaken is in accordance with the international standard ISO 13528. LGC is accredited by the United Kingdom Accreditation Service (UKAS) for the provision of proficiency testing schemes against ISO/IEC 17043."
+            },
+            {
+                "question": "How are your schemes organised?",
+                "answer": "The day-to-day operation of each scheme is the responsibility of LGC Standards. Individual schemes are managed by a team of Scheme Coordinators, covering reporting, customer service, and technical functions. For some schemes, external advisors may also be used to provide relevant knowledge and expertise. A small number of schemes are run in collaboration with other organisations."
+            },
+            {
+                "question": "Do you use Advisors and Advisory Groups?",
+                "answer": "Yes, depending upon the scheme. Advisors are selected based on their technical knowledge and experience. They may be used on an ad-hoc basis or through formal Advisory Groups. These groups consist of experienced members in the field of testing covered by the PT scheme. Membership and terms of reference are agreed on a scheme-by-scheme basis."
+            },
+            {
+                "question": "Do you run schemes that are jointly managed?",
+                "answer": "Yes, some schemes are operated jointly with partner organisations. A Management Committee may be established to address operational issues for these jointly managed schemes."
+            },
+            {
+                "question": "How do I join a scheme?",
+                "answer": "Participants should choose schemes that fit their area of testing. Scheme descriptions and application forms are available, providing information about test materials and distribution dates. Participants complete the application form, select test materials, and receive an order confirmation. If test material availability changes, participants are kept informed."
+            },
+            {
+                "question": "Can you guarantee my laboratory’s confidentiality?",
+                "answer": "Yes, confidentiality is ensured by allocating a unique laboratory reference number to each participant. This number allows results to be reported without revealing laboratory identities. Only proficiency testing team staff and the laboratory itself will know this number."
+            },
+            {
+                "question": "How often do I need to participate?",
+                "answer": "Participation frequency depends on factors like other quality tools used, volume of work, and risk associated with measurements. LGC Standards offers flexible participation options, though some schemes have minimum levels. Regulatory bodies may recommend minimum participation levels. For trend analysis, participating in at least four rounds over a scheme year is generally recommended."
+            },
+            {
+                "question": "What are the fees for participation?",
+                "answer": "Fees are reviewed annually, and current fees are available on application. Payment terms are detailed on the application form and invoice. Delays in payments may result in withholding test materials or reports until payments are made."
+            },
+            {
+                "question": "Where do you source your test materials?",
+                "answer": "Most test materials are manufactured by LGC Standards. If not possible, test materials are carefully sourced to meet participant needs. Test materials are similar to those routinely tested by laboratories, but may be simulated matrices or concentrated spiking solutions to ensure homogeneity and stability."
+            },
+            {
+                "question": "How are test materials packaged and transported?",
+                "answer": "Test materials are packaged to protect contents during transit and sent using priority courier. Overseas customers must provide relevant documents for customs and may need to pay import duties. LGC Standards is not responsible for packages after delivery. Participants should check the contents immediately and contact LGC Standards if there are any issues."
+            },
+            {
+                "question": "How can I measure my laboratory’s performance over time?",
+                "answer": "Trend analysis is used to measure performance over time. Frequent participation in PT schemes provides greater insight into long-term performance and identifies internal biases. Performance scores are best summarized graphically. For detailed guidance, refer to the Eurachem guide and ISO 13528."
+            },
+            {
+                "question": "How will I receive my report?",
+                "answer": "Reports are generally available on the website within 4 to 10 working days of round closure. We aim to provide 95% of reports within 5 working days. Participants are notified by email when the report is available. Reports include details of test materials, assigned values, and participants’ results, with paper copies available for an additional charge."
+            }
+        ] 
+    }
+}
+  
