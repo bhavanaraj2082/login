@@ -45,3 +45,51 @@ export async function handleFormSubmission(data) {
     }
 }
 // #112 end
+
+//#105 register/login widget
+export async function createLogin({ request }) {
+    const form = await request.formData();
+    const email = form.get('email') ?? '';
+    const password = form.get('password') ?? '';
+    const data = {
+      email,
+      password
+    };
+    await pb.collection('login').create(data);
+  }
+  export async function createAccount({ request }) {
+    const form = await request.formData();
+    const title = form.get('title') ?? '';
+    const fname = form.get('fname') ?? '';
+    const lname = form.get('lname') ?? '';
+    const email = form.get('email') ?? '';
+    const titles = form.get('titles') ?? '';
+    const phone = form.get('phone') ?? '';
+    const countryregistration = form.get('countryregistration') ?? '';
+    const state = form.get('state') ?? '';
+    const organisation = form.get('organisation') ?? '';
+    const jobtitle = form.get('jobtitle') ?? '';
+    const primaryfield = form.get('primaryfield') ?? '';
+    const role = form.get('role') ?? '';
+    const password = form.get('password') ?? '';
+    const confirmpassword = form.get('confirmpassword') ?? '';
+    const data = {
+      title,
+      fname,
+      lname,
+      email,
+      titles,
+      phone,
+      countryregistration,
+      state,
+      organisation,
+      jobtitle,
+      primaryfield,
+      role,
+      password,
+      confirmpassword
+    };
+    await pb.collection('account').create(data);
+  }
+  
+  
