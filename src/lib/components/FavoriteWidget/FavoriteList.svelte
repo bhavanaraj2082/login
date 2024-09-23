@@ -1,35 +1,14 @@
 <script>
-  import { onMount } from 'svelte';
   import Icon from '@iconify/svelte';
   import cartIcon from '@iconify-icons/mdi/cart';
   import trashIcon from '@iconify-icons/mdi/trash';
   import removeCircleIcon from '@iconify-icons/mdi/delete-circle-outline';
+  // import favorite from '$lib/data/favorites.json'
 
-   export let favorites= [];
-   console.log(favorites)
+   export let favorites = [];
+   
+   $: console.log('Favorites in component:', favorites);
 
-  onMount(async () => {
-  try {
-    const res = await fetch('/data/favorites.json');
-    console.log('Response status:', res.status);
-    console.log('Response headers:', res.headers);   
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-    const text = await res.text();
-    console.log('Response text:', text); 
-    const data = JSON.parse(text);
-    console.log('Parsed data:', data);
-    if (data && data.favorite) {
-      favorites = data.favorite;
-      console.log('Favorites set:', favorites);
-    } else {
-      console.error('Data structure is not as expected:', data);
-    }
-  } catch (error) {
-    console.error("Failed to fetch favorites data:", error);
-  }
-});
   function removeFavorite(itemId) {
     favorites = favorites.filter(fav => fav.item_id !== itemId);
   }

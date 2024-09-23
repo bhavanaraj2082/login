@@ -8,7 +8,6 @@ const config = {
     "@chromatic-com/storybook",
     "@storybook/addon-interactions",
   ],
-  staticDirs: ['../static'],
   framework: {
     name: "@storybook/sveltekit",
     options: {},
