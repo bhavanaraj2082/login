@@ -67,9 +67,9 @@
     updateQuantity(itemId, parseInt(inputValue) || 1);
   }
 </script>
+
 <section class="m-6 bg-gray-100 p-8 md:m-24 md:p-6">
   <h1 class="text-2xl md:text-3xl font-bold mb-6">My Favourites</h1>
-
   <!-- Action Buttons -->
   <div class="flex flex-wrap space-x-2 md:space-x-4 mb-4 md:mb-6">
     <button class="bg-gray-200 px-3 py-2 flex items-center space-x-2 rounded-md hover:bg-gray-300">
@@ -87,21 +87,30 @@
   <!-- Favourites List -->
   <ul class="space-y-4">
     {#each favorites as favorite (favorite.item_id)}
-      <li class="h-56 flex flex-col md:flex-row justify-evenly items-center p-2 bg-white shadow-md rounded animate-fadeIn">
-        <div class="flex items-center space-x-6 mb-4 overflow-auto md:mb-0">
-          <div class="p-2 justify-end">
-            <img src={favorite.item_image} alt={favorite.item_name} class="w-26 h-auto object-cover" />
-          </div>
-          <div>
+      <li class="h-auto flex flex-col md:flex-row justify-between items-center p-4 bg-white shadow-md rounded animate-fadeIn">  
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+          <!-- Image Section with Zoom Effect on Hover -->
+          <div class="flex justify-center p-2">
+            <img 
+              src={favorite.item_image} 
+              alt={favorite.item_name} 
+              class="w-28 h-auto object-cover rounded transition-transform duration-300 ease-in-out transform hover:scale-110" 
+            />
+          </div>      
+          <!-- Product Details Section -->
+          <div class="flex flex-col justify-center text-center md:text-left">
             <h2 class="font-bold text-sm">{favorite.item_name}</h2>
             <p class="text-sm text-gray-600">Product Code: {favorite.product_code}</p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600 mb-3">CAS Number: <span class="font-semibold">{favorite.cas_number}</span></p>
+          </div> 
+          <!-- CAS Number Section with Improved Responsiveness -->
+          <div class="flex flex-col justify-center text-center md:text-right md:self-end md:mr-12">
+            <p class="text-sm text-gray-600 mb-4">
+              CAS Number: <span class="font-semibold">{favorite.cas_number}</span>
+            </p>
           </div>
         </div>
-
-        <div class="flex items-center space-x-4 w-full md:w-auto justify-evenly">
+        <!-- Quantity and Actions Section -->
+        <div class="flex mr-4 items-center space-x-4 w-full md:w-auto justify-evenly mt-4 md:mt-0">
           <!-- Quantity Controls -->
           <div class="flex items-center">
             <button 
@@ -110,27 +119,28 @@
               -
             </button>
             <input
-            type="text"
-            class="border border-gray-300 rounded-md px-2 py-1 w-16 text-center"
-            bind:value={favorite.quantity}
-            on:input={(e) => handleInput(e, favorite.item_id)} 
-            min="1"
-            on:blur={(e) => updateQuantity(favorite.item_id, +e.target.value || 1)}
-          />
+              type="text"
+              class="border border-gray-300 rounded-md px-2 py-1 w-16 text-center"
+              bind:value={favorite.quantity}
+              on:input={(e) => handleInput(e, favorite.item_id)} 
+              min="1"
+              on:blur={(e) => updateQuantity(favorite.item_id, +e.target.value || 1)}
+            />
             <button 
               class="bg-gray-200 text-gray-600 px-2 py-1 rounded-md hover:bg-gray-300" 
               on:click={() => incrementQuantity(favorite.item_id)}>
               +
             </button>
-          </div>
-          <div class="flex flex-col items-center">
+          </div>        
+          <!-- Price & Cart Button -->
+          <div class="flex flex-col items-center m-2">
             <div class='flex-wrap mb-2'>
               <span class="font-bold text-xs">{favorite.amount} mg</span>
               <span class="font-bold text-xl text-gray-800"> ₹{favorite.price.toFixed(2)}</span>
             </div>  
             <button class="flex bg-blue-500 text-white px-2 py-2 rounded-2xl hover:bg-blue-600">
               <Icon icon={cartIcon} width="20" height="20" />
-              <span class="hidden sm:inline ml-2 ">Add to cart</span>
+              <span class="hidden sm:inline text-wrap text-xs ml-2">Add to cart</span>
             </button>
             <button
               on:click={() => removeFavorite(favorite.item_id)}
@@ -146,17 +156,6 @@
   </ul>
 </section>
 <style>
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
   .animate-fadeIn {
     animation: fadeIn 0.5s ease-in-out;
   }
