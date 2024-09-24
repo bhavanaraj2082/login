@@ -32,7 +32,6 @@ export const myDetails = async(request)=>{
     }
 }
 
-
 export async function Addqoutes({request}) {
     const formData = await request.formData();
   
