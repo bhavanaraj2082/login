@@ -1,0 +1,156 @@
+{
+  "sections": [
+    {
+      "title": "Homepage",
+      "titleUrl": "homepage",
+      "links": [
+        { "word": "About Us", "url": "about_us" },
+        { "word": "Quality", "url": "quality" }
+      ]
+    },
+    {
+      "title": "Resources",
+      "titleUrl": "resources",
+      "links": [
+        { "word": "Newsletter", "url": "newsletter" },
+        { "word": "Articles & Blogs", "url": "articles_blogs" },
+        { "word": "Catalogues & Publications", "url": "catalogues_publications" },
+        { "word": "TRC White Papers", "url": "trc_white_papers" },
+        { "word": "AXIO Webinars", "url": "axio_webinars" }
+      ]
+    },
+    {
+      "title": "Help & Support",
+      "titleUrl": "help_support",
+      "links": [
+        { "word": "FAQs", "url": "faqs" },
+        { "word": "Glossary", "url": "glossary" }
+      ]
+    },
+    {
+      "title": "Contact Us",
+      "titleUrl": "contact_us",
+      "links": [
+        { "word": "Webshop Enquiries", "url": "webshop_enquiries" },
+        { "word": "Sales Offices", "url": "sales_offices" },
+        { "word": "Distributors", "url": "distributors" }
+      ]
+    },
+    {
+      "title": "Custom Solutions",
+      "titleUrl": "custom_solutions",
+      "links": [
+        { "word": "Structure Search", "url": "structure_search" },
+        { "word": "Bulk Order", "url": "bulk_order" }
+      ]
+    },
+    {
+      "title": "Research Tools",
+      "titleUrl": "research_tools",
+      "links": [
+        { "word": "Alternative energy", "url": "alternative_energy" },
+        { "word": "Biomaterials", "url": "biomaterials" },
+        { "word": "Carbohydrates", "url": "carbohydrates" },
+        { "word": "Materials science", "url": "materials_science" },
+        { "word": "Vaccine development", "url": "vaccine_development" }
+      ]
+    },
+    {
+      "title": "Pharmaceutical",
+      "titleUrl": "pharmaceutical",
+      "links": [
+        { "word": "Antiviral", "url": "antiviral" },
+        { "word": "Building blocks", "url": "building_blocks" },
+        { "word": "Cross-linkers-Intermediates", "url": "cross-linkers-intermediates" },
+        { "word": "Neurochemicals", "url": "neurochemicals" }
+      ]
+    },
+    {
+      "title": "Food and Beverage",
+      "titleUrl": "food_and_beverage",
+      "links": [
+        { "word": "Allergens", "url": "allergens" },
+        { "word": "Food contact Materials", "url": "food_contact_materials" },
+        { "word": "GMO", "url": "gmo" },
+        { "word": "Micro Biology", "url": "micro_biology" },
+        { "word": "Proficiency Testing", "url": "proficiency_testing" }
+      ]
+    },
+    {
+      "title": "Environmental",
+      "titleUrl": "environmental",
+      "links": [
+        { "word": "Aqueous Inorganic", "url": "aqueous_inorganic" },
+        { "word": "Dioxins", "url": "dioxins" },
+        { "word": "Flame retardants", "url": "flame_retardants" },
+        { "word": "Microbiology", "url": "microbiology" },
+        { "word": "Nitrosamines", "url": "nitrosamines" }
+      ]
+    },
+    {
+      "title": "Forensic",
+      "titleUrl": "forensic_and_toxicology",
+      "links": [
+        { "word": "Amphetamines", "url": "amphetamines" },
+        { "word": "Barbiturates", "url": "barbiturates" },
+        { "word": "Drug Metabolism", "url": "drug_metabolism" },
+        { "word": "Food mutagens", "url": "food_mutagens" },
+        { "word": "Mycotoxins", "url": "mycotoxins" }
+      ]
+    },
+    {
+      "title": "Industrial",
+      "titleUrl": "industrial",
+      "links": [
+        { "word": "Aqueous Inorganic", "url": "aqueous_inorganic" },
+        { "word": "Process materials", "url": "process_materials" },
+        { "word": "Metal alloys", "url": "metal_alloys" },
+        { "word": "Laboratory consumables", "url": "laboratory_consumables" },
+        { "word": "Cement and soils", "url": "cement_and_soils" }
+      ]
+    },
+    {
+      "title": "Proficiency Testing",
+      "titleUrl": "proficiency_testing",
+      "links": [
+        { "word": "Beverage Schemes", "url": "beverage_schemes" },
+        { "word": "Clinical Schemes", "url": "clinical_schemes" },
+        { "word": "Petroleum Schemes", "url": "petroleum_schemes" },
+        { "word": "Quality Control Material", "url": "quality_control_material" }
+      ]
+    },
+    {
+      "title": "NMIs",
+      "titleUrl": "nmis",
+      "links": [
+        { "word": "National Laboratory", "url": "national_laboratory" },
+        { "word": "European Reference Materials", "url": "european_reference_materials" },
+        { "word": "Join research centre", "url": "join_research_centre" },
+        { "word": "NITS", "url": "nits" },
+        { "word": "Bundesanstalt für", "url": "bundesanstalt_für" }
+      ]
+    },
+    {
+      "title": "Brands",
+      "titleUrl": "brands",
+      "links": [
+        { "word": "VHG", "url": "vhg" },
+        { "word": "ARMI|MBH", "url": "armi|mbh" },
+        { "word": "AXIO", "url": "axio" },
+        { "word": "Dr. Ehrenstorfer", "url": "dr.ehrenstorfer" },
+        { "word": "TRC", "url": "trc" }
+      ]
+    },
+    {
+      "title": "Sectors Interest pages",
+      "titleUrl": "sectors_interest_pages",
+      "links": [
+        { "word": "Antiviral", "url": "antiviral" },
+        { "word": "Cancer research tools", "url": "cancer_research_tools" },
+        { "word": "Dr. Ehrenstorfer heritage", "url": "dr_ehrenstorfer_heritage" },
+        { "word": "Environment and forensics", "url": "environment_and_forensics" },
+        { "word": "Pharmaceutical hub", "url": "pharmaceutical_hub" }
+      ]
+    }
+  ]
+}
