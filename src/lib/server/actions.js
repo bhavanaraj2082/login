@@ -31,3 +31,57 @@ export const myDetails = async(request)=>{
        console.log(error); 
     }
 }
+
+export async function Addqoutes({request}) {
+    const formData = await request.formData();
+  
+    const Custom_solution_type= formData.get("solutionValue")
+    const Custom_format= formData.get("selectedColor")
+    const Configure_custom_solution={
+      components : formData.getAll("components[]"),
+      solvent : formData.get("solvent"),
+      packagingType : formData.get("packagingType"),
+      volume : formData.get("volume"),
+      units : formData.get("units"),
+      qualityLevel : formData.get("qualityLevel"),
+      analyticalTechnique : formData.get("analyticalTechnique"),
+    }
+    const Additional_notes = formData.get("futherdetails")
+    const Customer_details={
+      Title : formData.get("title"),
+      Firstname : formData.get("first"),
+      Lastname : formData.get("last"),
+      organisation : formData.get("organisation"),
+      country : formData.get("country"),
+      lgc : formData.get("lgc"),
+      email : formData.get("email"),
+      number : formData.get("number"),
+    }
+    const Delivery_information={
+      Address1 : formData.get("address1"),
+      Address2 : formData.get("address2"),
+      Country1 : formData.get("country1"),
+      County : formData.get("county"),
+      City : formData.get("city"),
+      Post : formData.get("post")
+  
+    }
+  
+    const data = {
+      Custom_solution_type: Custom_solution_type,
+      Custom_format: Custom_format,
+      Configure_custom_solution: Configure_custom_solution,
+      Additional_notes: Additional_notes,
+      Customer_details: Customer_details,
+      Delivery_information: Delivery_information
+  };
+  
+  try {
+    await pb.admins.authWithPassword(`${DB_USER}`, `${DB_PASS}`);
+    const record = await pb.collection('Chemikart_Qoute').create(data);
+    return { status: 200, body: { success: true, record } };
+  } catch (error) {
+    // console.error('Error updating record:', error);
+    return { status: 500, body: { success: false, error: error.message } };
+  }
+  }
