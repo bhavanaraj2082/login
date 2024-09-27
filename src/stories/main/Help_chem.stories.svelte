@@ -1,8 +1,9 @@
 <script context="module">
-  import SiteMap from "$lib/components/SiteMap.svelte";
+  import Help_chem from "$lib/components/Help_chem.svelte";
+
   export const meta = {
-      title: "SiteMap",
-      component: SiteMap,
+      title: "Help_chem",
+      component: Help_chem,
   };
 </script>
 
@@ -12,7 +13,7 @@
 </script>
 
 <Template let:args>
-  <SiteMap></SiteMap>
+  <Help_chem></Help_chem>
 </Template>
 
-<Story name="SiteMap1" />
+<Story name="Help_chem1" />
