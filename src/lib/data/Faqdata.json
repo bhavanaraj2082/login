@@ -1,0 +1,74 @@
+
+{
+    "sections" : [
+       {
+         "title": "Account ",
+          "faqs": [
+            { "question": "I do not have an account; can I still place an online order?", 
+               "answer1": "Your organization does not need to have an account to order but you need to be registered to place an order through our website.",
+               "answer2": "Go to the ‘Login/Sign Up’ Tab on our site header and create your profile.  It will give you the option to affiliate your profile with your organization’s account.  If your organization does not have an existing account, you will need to select ‘Continue Registration’ and complete that process. After which, you can submit an order request."
+             },
+            { "question": "If I order online, will I still receive contractual pricing?", 
+               "answer1": "You will receive contractual pricing if you are a registered user and your profile is linked to your organization's account.",
+               "answer2":"To confirm that your profile is linked to an account. Log in and review the pricing of a product that is included in your contract.  If successfully linked, the discounted price will be in red with the list price marked through.  If your registered profile is not linked to an account. "
+             },
+            { "question": "How do I register with chemikart.com?", 
+               "answer1": "Registration is fast and easy and a great way to simplify your online experience.  Simply click ‘Login/Sign Up’ on the site header and select ‘Create New Profile.’  During registration, you will be given the option to affiliate your profile with your organization’s account.  This is useful to you, if your organization has contractual pricing or if you plan to order." ,
+               "answer2":""
+             },
+            { "question": "I forgot my password. What do I do?", 
+               "answer1": "If you click on the ‘Login/Sign up’ tab on top of the page, you will be taken to the page that allows you to log in. Under the password field is a ‘Forgot Password?’ link.  When you click on it, it will take you to ‘Reset Password Request’ page.  Enter in your email address and click ‘send email.’  You will then receive a password recovery email. If this doesn’t work. ",
+               "answer2":"" 
+             },
+            { "question": "How do I change my address?", 
+                 "answer1": " Though you can make some changes to your addresses during the ordering process, these are temporary and are limited to that order.  To make permanent changes to your shipping and/or billing address information, please ",
+                 "answer2":"To make a one-time shipping address change to an order click on the edit button located under your shipping address information.  Make the changes needed and click ‘Done.’  Note, editing these address fields will delay your order.  Additionally, these changes are only relevant for that specific order. To permanently edit this address." 
+               },
+            { "question": "Can I change the language from the default language provided?", 
+               "answer1": "Yes, this can be done through updating the ‘Manage Site Preferences’ section on your profile.",
+              "answer2":""
+            }
+          ]
+       },
+       {
+         "title": "Ordering",
+             "faqs": [
+               { "question": "Can I place an order online from anywhere in the world?",
+                  "answer1": "We have a wide range of countries that can place orders on our site. Go To the list of Worldwide Offices  to obtain the contact information for your local office if you are not able to enter products in the ‘Quick Order’ or ‘Cart.’" ,
+                  "answer2":""
+                },
+               { "question": "If I place a Web order in the US with my US-based account can I have it shipped to another country?", 
+                  "answer1": "Most US accounts do not have the option to place orders to be shipped outside of the US; the exception to this is 'Pack for Export' accounts.  Contact chemikart.com  for information on what is needed to place orders for shipping outside of the US.",
+                  "answer2":""
+                },
+               { "question": "If I order online, will I still receive contractual pricing?", 
+                  "answer1": "Your profile must be linked to your company/organization’s account for you to receive contractual pricing for your order(s).",
+                  "answer2":"" 
+                },
+                {
+                  "question":"My company has a custom-built PipeLine solution, can I place order outside of my pipeline account?",
+                  "answer1":"We would recommend that you contact us to create a new profile.",
+                  "answer2":""
+                }
+              ]
+       },
+       {
+         "title": " B2B ",
+             "faqs": [
+               { "question": "How do I order using an E-Procurement system?", 
+                  "answer1": "We offer a simple and streamlined process for our B2B-enabled accounts. Start on your internal E- Procurement system and click our logo or company name to punchout to our on-line catalog. You can then enter your product items in the Order Center or, Search for them. Once you confirm quantity and pack size, click Add to Cart. Once complete, click Checkout to return the cart details back to your internal E-Procurement system for review, approval routing and purchase order creation.",
+                  "answer2":""
+                },
+               { "question": "Do I need a username and password for Punchout?", 
+                  "answer1": "No. Once you connect to us via your internal E-Procurement system you are automatically logged in.",
+                   "answer2":""
+                },
+               { "question": "Will my Punchout order reflect my organization’s contract pricing?",
+                  "answer1": "Yes. If your organization has a pricing agreement in place this will be reflected when you connect to us via punchout.",
+                  "answer2":"" 
+                }
+             ]
+           }
+     ]
+   
+}
