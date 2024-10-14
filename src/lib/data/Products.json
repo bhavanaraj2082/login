@@ -1,0 +1,75 @@
+[
+    {
+        "src": "/image/slider.jpeg",
+        "brand": "Supelco",
+        "id": "57560",
+        "name": "Hybrid",
+        "category": "SPE Tube",
+        "price": "₹18,535.15",
+        "estimatedShipping": "26 October 2024",
+        "warehouse": "Bangalore Non-Bonded Warehouse",
+        "volume": "2 mL, pk of 1 ea",
+        "sku": "575659-U"
+    },
+    {
+        "src": "/image/slider.jpeg",
+        "brand": "Supelco",
+        "id": "57561",
+        "name": "Supliclean",
+        "category": "SPE Tube",
+        "price": "₹15,000.00",
+        "estimatedShipping": "28 October 2024",
+        "warehouse": "Delhi Warehouse",
+        "volume": "1 mL, pk of 1 ea",
+        "sku": "575660-U"
+    },
+    {
+        "src": "/image/slider.jpeg",
+        "brand": "Supelco",
+        "id": "57562",
+        "name": "ENVICarb",
+        "category": "SPF Tube",
+        "price": "₹20,250.00",
+        "estimatedShipping": "30 October 2024",
+        "warehouse": "Mumbai Warehouse",
+        "volume": "5 mL, pk of 1 ea",
+        "sku": "575661-U"
+    },
+    {
+        "src": "/image/slider.jpeg",
+        "brand": "Supelco",
+        "id": "57563",
+        "name": "ENVICarbSP2",
+        "category": "SPE Tube",
+        "price": "₹12,300.00",
+        "estimatedShipping": "29 October 2024",
+        "warehouse": "Bangalore Non-Bonded Warehouse",
+        "volume": "10 mL, pk of 1 ea",
+        "sku": "575662-U"
+    },
+    {
+        "src": "/image/slider.jpeg",
+        "brand": "Supelco",
+        "id": "57564",
+        "name": "SupliPSA",
+        "category": "Bulk Packing",
+        "price": "₹22,100.00",
+        "estimatedShipping": "1 November 2024",
+        "warehouse": "Chennai Warehouse",
+        "volume": "20 mL, pk of 1 ea",
+        "sku": "575663-U"
+    },
+    {
+        "src": "/image/slider.jpeg",
+        "brand": "Supelco",
+        "id": "57565",
+        "name": "SupliSPE",
+        "category": "SPF Tube",
+        "price": "₹19,000.00",
+        "estimatedShipping": "5 November 2024",
+        "warehouse": "Pune Warehouse",
+        "volume": "50 mL, pk of 1 ea",
+        "sku": "575664-U"
+    }
+]
+                
