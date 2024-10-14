@@ -1,0 +1,40 @@
+{
+    "products" : [
+        {
+          "name": "Mikromol",
+          "description": "More than 6,300 reference standards for pharmaceutical quality control.",
+          "image": "/PopularProductsImg1.jpeg",
+          "buttonLabel": "Shop Now"
+        },
+        {
+          "name": "Ethanol",
+          "description": "Ultra-pure ethanol for diverse laboratory applications.",
+          "image": "/PopularProductsImg2.jpeg",
+          "buttonLabel": "Shop Now"
+        },
+        {
+          "name": "Hydrochloric Acid",
+          "description": "High-quality hydrochloric acid for pracise laboratory procedures",
+          "image": "/PopularProductsImg3.jpeg",
+          "buttonLabel": "Shop Now"
+        },
+        {
+          "name": "Acctone",
+          "description": "Fast-evaparating acetone, ideal for clearing and extraction processes",
+          "image": "/PopularProductsImg4.jpeg",
+          "buttonLabel": "Shop Now"
+        },
+        {
+          "name": "Distilled Water",
+          "description": "Pure distilled water, free from impurities for laboratory accuracy",
+          "image": "/PopularProductsImg5.jpeg",
+          "buttonLabel": "Shop Now"
+        },
+        {
+          "name": "Molecular Grade",
+          "description": "High hydrochloric acid for precise titrations and pH adjestments",
+          "image": "/PopularProductsImg6.jpeg",
+          "buttonLabel": "Shop Now"
+        }
+    ]
+}
