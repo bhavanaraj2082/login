@@ -91,5 +91,29 @@ export async function createLogin({ request }) {
     };
     await pb.collection('account').create(data);
   }
+  // #201 Order Status form
+export async function checkOrderStatus({ request }) {
+    const form = await request.formData();
+    const orderNumber = form.get('orderNumber') ?? '';
+    const postalCode = form.get('postalCode') ?? '';
+
+    await adminLogin(); 
+    try {
+        const orderData = {
+            orderNumber,
+            postalCode,
+            status: 'Pending' 
+        };
+
+       
+        const record = await pb.collection('orderstatus').create(orderData);
+
+        return { success: true, message: "Order status saved successfully!", record };
+    } catch (error) {
+        console.error("Error submitting order status:", error);
+        return { success: false, message: "Error processing order status." };
+    }
+}
+
   
   
