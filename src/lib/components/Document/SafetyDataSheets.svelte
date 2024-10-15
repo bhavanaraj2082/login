@@ -1,4 +1,5 @@
 <script>
+
   let showProductDetails =false;
   let showLotDetails = false;
   let activeTab = "Safety Data Sheets";
