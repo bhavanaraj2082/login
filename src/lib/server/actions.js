@@ -85,3 +85,31 @@ export async function Addqoutes({request}) {
     return { status: 500, body: { success: false, error: error.message } };
   }
   }
+
+  export const submitContactForm = async (formData) => {
+    const contactData = {
+        firstName: formData.get('firstName'),
+        lastName: formData.get('lastName'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        company: formData.get('company'),
+        role: formData.get('role'),
+        details: formData.get('details'),
+        location: formData.get('location'),
+    };
+  
+    try {
+        await pb.admins.authWithPassword(`${DB_USER}`, `${DB_PASS}`)
+        const record = await pb.collection('ContactRequests').create(contactData);
+        return {
+            success: true,
+            record
+        };
+    } catch (error) {
+      console.log(error.response.data);
+        return {
+            success: false,
+            error: error.response.data || 'An error occurred while submitting your form.',
+        };
+    }
+  };
