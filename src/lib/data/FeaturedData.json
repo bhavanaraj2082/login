@@ -1,0 +1,22 @@
+{
+    "FeaturedData" : [
+       {
+           "name" : "Quick Order",
+           "description": "An easy to quickly purchase products used often",
+           "image" : "/quote_order",
+           "buttonLabel": "Explore"
+       },
+       {
+           "name" : "Quick Order",
+           "description": "Search for safety data sheets(SDS) and certificates (COA/COO) by product number",
+           "image" : "/documantation",
+           "buttonLabel": "Explore"
+       },
+       {
+           "name" : "Quick Order",
+           "description": "Exceptional customer service is our top priority",
+           "image" : "/contact_us",
+           "buttonLabel": "Explore"
+       }
+   ]
+}
