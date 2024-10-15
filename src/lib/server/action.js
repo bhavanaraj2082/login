@@ -114,6 +114,45 @@ export async function checkOrderStatus({ request }) {
         return { success: false, message: "Error processing order status." };
     }
 }
+//189 create document component
+export async function handleSDSForm({ request }) {
+    const data = await request.formData();
+    const productNumber = data.get('product-number-sds');
 
   
-  
+    console.log("SDS Product Number Submitted:", productNumber);
+    return { success: true };
+}
+
+export async function handleCOAForm({ request }) {
+    const data = await request.formData();
+    const productNumber = data.get('product-number-coa');
+    const lotNumber = data.get('lot-number-coa');
+
+
+    console.log("COA Product Number Submitted:", productNumber);
+    console.log("COA Lot Number Submitted:", lotNumber);
+    return { success: true };
+}
+
+export async function handleCOOForm({ request }) {
+    const data = await request.formData();
+    const productNumber = data.get('product-number-coo');
+    const lotNumber = data.get('lot-number-coo');
+
+    
+    console.log("COO Product Number Submitted:", productNumber);
+    console.log("COO Lot Number Submitted:", lotNumber);
+    return { success: true };
+}
+
+export async function handleCQForm({ request }) {
+    const data = await request.formData();
+    const productNumber = data.get('product-number-cq');
+    const lotNumber = data.get('lot-number-cq');
+
+
+    console.log("CQ Product Number Submitted:", productNumber);
+    console.log("CQ Lot Number Submitted:", lotNumber);
+    return { success: true };
+}
