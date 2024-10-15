@@ -1,0 +1,37 @@
+{
+    "products": [
+        {
+            "type": "SPE-phase chemistries and cartridges",
+            "description": [
+                "We offer a diverse range of SPE-phase chemistries and cartridges that are ideal for a variety of applications, including pharmaceutical, clinical, food and beverage, environmental, petrochemical, and agriculture.",
+                "Our phase chemistry selection enables users to effectively screen for the retention and selectivity required to achieve their sample preparation objectives."
+            ],
+            "image_path": "./subsubcategory/image1.png"
+        },
+        {
+            "type": "SPE Well Plates",
+            "description": [
+                "Our SPE plates allow users to process up to 96 samples simultaneously for increased reproducibility and throughput, while maintaining excellent recoveries and increased sensitivity.",
+                "The 96-well plates are compatible with multi-channel pipettors and automation, and are available with silica sorbent and polymeric adsorbent."
+            ],
+            "image_path": "./subsubcategory/image2.png"
+        },
+        {
+            "type": "QuEChERS",
+            "description": [
+                "The 'QuEChERS' (Dispersive SPE, dSPE) method has emerged as a popular sample preparation technique in the area of multi-residue pesticide analysis for food and agricultural products.",
+                "The QuEChERS technique offers the advantage of higher recoveries, accurate results, and high sample throughput."
+            ],
+            "image_path": "./subsubcategory/image3.png"
+        },
+        {
+            "type": "DPX® Tips",
+            "description": [
+                "Dispersive Pipette Extraction (DPX) tips provide an in-tip solution for complete sample preparation that can be easily automated to achieve extraction in seconds. HybridSPE® sorbent material is loosely contained within a tip, for selective retention and removal of endogenous phospholipid interferences from biological matrices for LC-MS or LC-MS/MS analysis."
+            ],
+            "image_path": "./subsubcategory/image4.png"
+        }
+
+    ]
+  }
+  
