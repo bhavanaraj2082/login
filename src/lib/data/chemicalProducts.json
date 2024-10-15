@@ -1,0 +1,84 @@
+{
+    "chemicalProducts": [
+      {
+        "id": 1,
+        "name": "Hydrazium Sulfate"
+      },
+      {
+        "id": 2,
+        "name": "Phenyl Bromide"
+      },
+      {
+        "id": 3,
+        "name": "Sodium Thiolate"
+      },
+      {
+        "id": 4,
+        "name": "Benzyl Nitrate"
+      },
+      {
+        "id": 5,
+        "name": "Methoxypyridine"
+      },
+      {
+        "id": 6,
+        "name": "Acetoxy Acetate"
+      },
+      {
+        "id": 7,
+        "name": "Ethyl Phosphite"
+      },
+      {
+        "id": 8,
+        "name": "Diethylamine Hydrochloride"
+      },
+      {
+        "id": 9,
+        "name": "Isopropyl Xanthate"
+      },
+      {
+        "id": 10,
+        "name": "Chloroformate Ester"
+      },
+      {
+        "id": 11,
+        "name": "Hexamethyl Disiloxane"
+      },
+      {
+        "id": 12,
+        "name": "Thioacetic Acid"
+      },
+      {
+        "id": 13,
+        "name": "Tetrahydrofuran"
+      },
+      {
+        "id": 14,
+        "name": "Butyl Acrylate"
+      },
+      {
+        "id": 15,
+        "name": "Dimethylformamide"
+      },
+      {
+        "id": 16,
+        "name": "Methyl Phenyl Ketone"
+      },
+      {
+        "id": 17,
+        "name": "Ammonium Perchlorate"
+      },
+      {
+        "id": 18,
+        "name": "Phosphoric Anhydride"
+      },
+      {
+        "id": 19,
+        "name": "Potassium Carbonate"
+      },
+      {
+        "id": 20,
+        "name": "Benzene Sulfonate"
+      }
+    ]
+  }
