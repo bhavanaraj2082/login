@@ -13,7 +13,7 @@
 </script>
 
 <Template>
-    <Subsubcategory />
+    <Subsubcategory/>
 </Template>
 
 <Story name="Subsubcategory12"/>
