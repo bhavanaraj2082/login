@@ -1,24 +1,28 @@
 [
   {
     "id": 1,
-    "name": "Fmoc-Asp(OtBu)-OH",
-    "description": "Fmoc-Asp(OtBu)-OH",
-    "image": "https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/139/991/66539125-546e-4d34-b65a-70903e9a6306/300/66539125-546e-4d34-b65a-70903e9a6306.jpg",
-    "price": 1200
+    "name": "Hamilton® 70IN syringe",
+    "code": "28169-U",
+    "description": "70IN (Slimline), volume 10 μL, needle size 26S ga (bevel tip), needle L 51 mm (2 in.)",
+    "price": 13521.25,
+    "image": "https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/139/991/66539125-546e-4d34-b65a-70903e9a6306/300/66539125-546e-4d34-b65a-70903e9a6306.jpg"
+
     
   },
   {
     "id": 2,
-    "name": "Buffer & Media Prep",
-    "description": "Fmoc-Asp(OtBu)-OH",
     "image": "https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/marketing/global/images/categories/analytical-reagents/spectroscopy/spectroscopy_w300.jpg",
-    "price": 1700
+    "name": "Hamilton® 70IN syringe",
+    "code": "28169-U",
+    "description": "70IN (Slimline), volume 10 μL, needle size 26S ga (bevel tip), needle L 51 mm (2 in.)",
+    "price": 13521.25
    
   },
   {
     "id": 3,
+    "code": "28169-U",
     "name": "Bioprocessing & Formulation Raw Materials",
-    "description": "Fmoc-Asp(OtBu)-OH",
+    "description": "70IN (Slimline), volume 10 μL, needle size 26S ga (bevel tip), needle L 51 mm (2 in.)",
     "image": "https://www.sigmaaldrich.com/deepweb/assets/sigmaaldrich/product/images/139/991/66539125-546e-4d34-b65a-70903e9a6306/300/66539125-546e-4d34-b65a-70903e9a6306.jpg",
     "price": 1577
     
