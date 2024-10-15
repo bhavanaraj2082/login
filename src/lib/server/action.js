@@ -156,3 +156,22 @@ export async function handleCQForm({ request }) {
     console.log("CQ Lot Number Submitted:", lotNumber);
     return { success: true };
 }
+
+export async function getProducts() {
+    const res = await import('$lib/data/products.json');
+    return res.default;
+  }
+  
+  // Fetch sub-products based on product ID
+  export async function getSubProducts(productId) {
+    const products = await getProducts();
+    const product = products.find((p) => p.id === productId);
+    return product.subProducts;
+  }
+  
+  // Fetch product information based on product and sub-product ID
+  export async function getProductInfo(productId, subProductId) {
+    const subProducts = await getSubProducts(productId);
+    const subProduct = subProducts.find((s) => s.id === subProductId);
+    return subProduct;
+  }
