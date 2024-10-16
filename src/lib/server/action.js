@@ -175,3 +175,46 @@ export async function getProducts() {
     const subProduct = subProducts.find((s) => s.id === subProductId);
     return subProduct;
   }
+
+
+  export const addItemToCart = async ({ request }) => {
+    const { id, quantity } = await request.json();
+    
+    let cart = getCartFromSession(request);
+    const existingItem = cart.items.find(item => item.id === id);
+  
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      cart.items.push({ id, quantity });
+    }
+  
+    updateCartSession(request, cart);
+    return { status: 200, body: { cart } };
+  };
+  
+  export const removeItemFromCart = async ({ request }) => {
+    const { id } = await request.json();
+    
+    let cart = getCartFromSession(request);
+    cart.items = cart.items.filter(item => item.id !== id);
+  
+    updateCartSession(request, cart);
+    return { status: 200, body: { cart } };
+  };
+  
+  export const emptyCart = async ({ request }) => {
+    let cart = { items: [] };
+    updateCartSession(request, cart);
+    return { status: 200, body: { cart } };
+  };
+  
+  function getCartFromSession(request) {
+    // Simulate session cart fetching logic
+    return request.locals.cart || { items: [] };
+  }
+  
+  function updateCartSession(request, cart) {
+    // Simulate session cart update logic
+    request.locals.cart = cart;
+  }
