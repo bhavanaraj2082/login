@@ -167,7 +167,8 @@
 							
 							{#if activeSection === 'a' && !isMdScreen}
 							<div class="p-2 bg-gray-100">
-								<h3 class="text-x md:text-md font-bold py-2">Your Privacy</h3>
+								<h3 class="text-x md:text-md font-bold py-2">
+									<span class="text-primary-400">Your Privacy</span></h3>
 								<p class="text-xs md:text-sm">When you visit any website, it may store or retrieve information on your browser, mostly in the form of cookies. This information might be about you, your preferences or your device and is mostly used to make the site work as you expect it to. The information does not usually directly identify you, but it can give a more personalized web exprience. Because we respect your right to privacy, you can choose not to allow some types cookies. 
 									Please note that blocking some types of cookies.</p>
 									<a class="text-xs text-primary-400 hover:text-primary-600 hover:underline" href="/about-privacy">Privacy Policy</a>
@@ -186,7 +187,8 @@
 						  </a>
 							{#if activeSection === 'b' && !isMdScreen}
 							<div class="p-2 bg-gray-100">
-								<h3 class="flex text-sm md:text-md font-bold py-2">Necessary Cookies
+								<h3 class="flex text-sm md:text-md font-bold py-2">
+									<span class="text-primary-400">Necessary Cookies</span>
                                     <button on:click={ontoggle} class={`ml-2 pl-16 py-1 text-xs font-semibold sm:ml-60 ${isActive ? 'text-primary-400' : 'text-primary-400'} transition-colors duration-300`}>
 										{isActive ? 'Active' : 'Inactive'}
 									  </button>
@@ -215,7 +217,8 @@
 						  </a>
 							{#if activeSection === 'c' && !isMdScreen}
 							<div class="p-2 bg-gray-100">
-								<h3 class="flex text-sm md:text-md font-bold  py-2">Functional Cookies
+								<h3 class="flex text-sm md:text-md font-bold  py-2">
+									<span class="text-primary-400">Functional Cookies</span>
 									<button on:click={ontoggle} class={`ml-2 pl-16 py-1 text-xs font-semibold sm:ml-60 ${isActive ? 'text-primary-400' : ''} transition-colors duration-300`}>
 										{isActive ? 'Active' : 'Inactive'}
 									  </button>
@@ -275,7 +278,8 @@
 							{#if activeSection === 'e'&& !isMdScreen}
 
 							<div class="p-2 bg-gray-100">
-								<h3 class="flex text-sm md:text-md font-bold py-2">Targeting Cookies
+								<h3 class="flex text-sm md:text-md font-bold py-2">
+							<span class="text-primary-400">Targeting Cookies</span>
 									<button on:click={ontoggle} class={`ml-2 pl-16 py-1 text-xs font-semibold sm:ml-60 ${isActive ? 'text-primary-400' : ''} transition-colors duration-300`}>
 										{isActive ? 'Active' : 'Inactive'}
 									  </button>
@@ -314,7 +318,7 @@
   						<div id="b">
     						<h3 class="text-md font-bold py-1 flex  ">
                                 <Icon icon="fluent:cookies-48-regular" width="1.6em" height="1.6em" class="text-primary-400"/>
-      							<span class="text-primary-400 ">Necessary Cookies</span>
+      							<span class="text-primary-400 pl-3">Necessary Cookies</span>
 								  <button 
 								  on:click={ontoggle} 
 								  class={`lg:ml-10 lg:pl-16 ml-5 pl-0 py-1 text-sm font-semibold  ${isActive ? 'text-primary-400' : 'text-primary-400'} transition-colors duration-300`}>
@@ -337,7 +341,7 @@
 					<div id="c">
 					  <h3 class="text-md font-bold py-1 flex ">
                         <Icon icon="fluent:cookies-48-regular" width="1.6em" height="1.6em" class="text-primary-400"/>
-                        <span class="text-primary-400">Functional Cookies</span>
+                        <span class="text-primary-400 pl-3">Functional Cookies</span>
                         <button 
                         on:click={ontoggle} 
                         class={`ml-10 pl-16 py-1 text-sm font-semibold  ${isActive ? 'text-primary-400' : 'text-primary-400'} transition-colors duration-300`}>
@@ -362,7 +366,7 @@
 				  <div id="d">
 					<h3 class="text-md font-bold py-1 flex ">
                     <Icon icon="fluent:cookies-48-regular" width="1.6em" height="1.6em" class="text-primary-400"/>
-                    <span class="text-primary-400">Performance Cookies</span>
+                    <span class="text-primary-400 pl-3">Performance Cookies</span>
                     <button 
                     on:click={ontoggle} 
                     class={`ml-10 pl-16 py-1 text-sm font-semibold  ${isActive ? 'text-primary-400' : 'text-primary-400'} transition-colors duration-300`}>
@@ -385,7 +389,7 @@
 				<div id="e">
                     <h3 class="text-md font-bold py-1 flex ">
                     <Icon icon="fluent:cookies-48-regular" width="1.6em" height="1.6em" class="text-primary-400"/>
-                    <span class="text-primary-400">Targeting Cookies</span>
+                    <span class="text-primary-400 pl-3">Targeting Cookies</span>
                     <button 
                     on:click={ontoggle} 
                     class={`ml-10 pl-16 py-1 text-sm font-semibold  ${isActive ? 'text-primary-400' : 'text-primary-400'} transition-colors duration-300`}>
