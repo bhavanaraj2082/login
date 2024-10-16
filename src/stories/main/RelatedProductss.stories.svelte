@@ -1,5 +1,5 @@
 <script context="module">
-    import RelatedProductss from '../../lib/components/RelatedProductss.svelte';
+    import RelatedProductss from '$lib/components/RelatedProductss.svelte';
   
     export const meta = {
       title: "RelatedProductss",

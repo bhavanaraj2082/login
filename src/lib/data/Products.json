@@ -1,9 +1,10 @@
 [
     {
-        "src": "/image/slider.jpeg",
+        "src": "/image/slider1.jpeg",
         "brand": "Supelco",
         "id": "57560",
-        "name": "Hybrid",
+        "name1": "Hybrid SPE",
+        "name2":"-Plus-96",
         "category": "SPE Tube",
         "price": "₹18,535.15",
         "estimatedShipping": "26 October 2024",
@@ -12,10 +13,12 @@
         "sku": "575659-U"
     },
     {
-        "src": "/image/slider.jpeg",
+        "src": "/image/slider1.jpeg",
         "brand": "Supelco",
         "id": "57561",
-        "name": "Supliclean",
+        "name1": "Supliclean",
+        "name2": "LC-Florisil",
+
         "category": "SPE Tube",
         "price": "₹15,000.00",
         "estimatedShipping": "28 October 2024",
@@ -24,10 +27,12 @@
         "sku": "575660-U"
     },
     {
-        "src": "/image/slider.jpeg",
+        "src": "/image/slider1.jpeg",
         "brand": "Supelco",
         "id": "57562",
-        "name": "ENVICarb",
+        "name1": "ENVICarb",
+        "name2": "ENVI-Chrom",
+
         "category": "SPF Tube",
         "price": "₹20,250.00",
         "estimatedShipping": "30 October 2024",
@@ -36,10 +41,12 @@
         "sku": "575661-U"
     },
     {
-        "src": "/image/slider.jpeg",
+        "src": "/image/slider1.jpeg",
         "brand": "Supelco",
         "id": "57563",
-        "name": "ENVICarbSP2",
+        "name1": "ENVISP2",
+        "name2": "ENVI-Card",
+
         "category": "SPE Tube",
         "price": "₹12,300.00",
         "estimatedShipping": "29 October 2024",
@@ -48,10 +55,12 @@
         "sku": "575662-U"
     },
     {
-        "src": "/image/slider.jpeg",
+        "src": "/image/slider1.jpeg",
         "brand": "Supelco",
         "id": "57564",
-        "name": "SupliPSA",
+        "name1": "SupliPSA",
+        "name2": "-SPE",
+
         "category": "Bulk Packing",
         "price": "₹22,100.00",
         "estimatedShipping": "1 November 2024",
@@ -60,10 +69,12 @@
         "sku": "575663-U"
     },
     {
-        "src": "/image/slider.jpeg",
+        "src": "/image/slider1.jpeg",
         "brand": "Supelco",
         "id": "57565",
-        "name": "SupliSPE",
+        "name1": "Visiprep",
+        "name2": "-SPE Vaccum",
+
         "category": "SPF Tube",
         "price": "₹19,000.00",
         "estimatedShipping": "5 November 2024",
@@ -72,4 +83,3 @@
         "sku": "575664-U"
     }
 ]
-                
