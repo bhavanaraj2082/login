@@ -10,6 +10,7 @@
     let showModal = false;
     let selectedProduct = {};
     let quantity = 1;
+    let id={};
 
     function prevSlide() {
         currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
@@ -79,8 +80,8 @@
                                 <img src={src} alt={name1} class="w-20 h-20 object-contain" />
                                 <div class="ml-2 text-left flex-1">
                                     <p class="font-semibold">{brand}</p>
-                                    <p class="text-gray-600 text-sm">{id}</p>
-                                    <p class="text-gray-800">{name1}<sup>®</sup>{name2}</p>
+                                    <p class=" text-gray-800 font-semibold">{id}</p>
+                                    <p class="text-gray-800 font-semibold">{name1}<sup class="font-semibold">®</sup>{name2}</p>
                                     <p class="text-gray-800">{category}</p>
                                 </div>
                             </div>
@@ -112,38 +113,41 @@
             <button on:click={() => (currentIndex = slideIndex)} class={`w-1.5 h-1.5 rounded-full mx-1 bg-gray-400 hover:bg-gray-600 ${currentIndex === slideIndex ? 'bg-gray-800' : ''}`}></button>
         {/each}
     </div>
-
-    </div>
+</div>
 
 <!-- Modal -->
 {#if showModal}
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
-        <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-full sm:max-w-lg lg:max-w-2xl w-full relative">
+    <div class="fixed inset-0 z-50 flex items-center  justify-center bg-black bg-opacity-70">
+        <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-full sm:max-w-lg lg:max-w-2xl w-full relative border border-orange-500">
             <button class="absolute top-3 right-3 text-black text-2xl" on:click={closeModal} aria-label="Close">&times;</button>
+            <p class="mt-8 text-sm text-gray-600 border  p-2 text-center md:hidden">
+                <a href="/sign-in" class="text-orange-500 hover:underline ">Sign In</a> to view organizational & contact pricing.
+            </p>
             <div class="flex flex-col sm:flex-row">
-                <img src={selectedProduct.src} alt={selectedProduct.name} class="w-28 h-28 mr-4 sm:mr-6 mb-4 sm:mb-0" />
+                <img src={selectedProduct.src} alt={selectedProduct.name1} class="w-28 h-28 mr-4 sm:mr-6 mb-4 sm:mb-0" />
                 <div class="flex-1">
-                    <p class="text-gray-700 font-semibold">{selectedProduct.brand}</p>
-                    <h3 class="text-lg font-bold">{selectedProduct.name1}<sup>®</sup>{selectedProduct.name2}</h3>
+                    <p class=" text-lg font-semibold">{selectedProduct.brand}</p>
+                    <p class="  font-semibold text-orange-500">{selectedProduct.id}</p>
+                    <h3 class="text-lg font-semibold">{selectedProduct.name1}<sup class="font-semibold">®</sup>{selectedProduct.name2}</h3>
                     <p class="text-gray-600">Volume: {selectedProduct.volume}</p>
-                    <p class="mt-4 text-sm text-gray-600 border bg-orange-100 p-2">
+                    <p class="mt-2 text-sm text-gray-600 border bg-orange-100 p-2 hidden md:block">
                         <a href="/sign-in" class="text-orange-500 hover:underline">Sign In</a> to view organizational & contact pricing.
                     </p>
                     <p class="text-lg mt-3">SKU</p>
                     <hr class="my-2 border-gray-300" />
-                    <span class="bg-gray-100 rounded-lg p-2 inline-block border border-orange-400">
+                    <span class="rounded-lg px-5 inline-block border  text-orange-500 bg-orange-50 border-orange-400 text-sm">
                         <p class="m-0">{selectedProduct.id}</p>
                     </span>
-                    <p class="text-xl font-semibold text-black mt-3">Price: {selectedProduct.price}</p>
-                    <p class="text-gray-600">Estimated to ship on {selectedProduct.estimatedShipping} from <span class="font-medium">{selectedProduct.warehouse}</span></p>
+                    <p class="text-xl font-semibold text-black mt-3  md:text-lg">Price: {selectedProduct.price}</p>
+                    <p class="text-gray-600 text-sm md:text-base">Estimated to ship on {selectedProduct.estimatedShipping} from <span class="font-medium">{selectedProduct.warehouse}</span></p>
 
                     <form class="mt-4 flex items-center flex-wrap">
-                        <label for="quantity" class="block text-sm font-medium mr-2">Quantity:</label>
-                        <input type="number" id="quantity" value={quantity} min="1" on:input={updateQuantity} class="border border-gray-300 rounded-md shadow-sm p-2 w-20" />
-                        <button type="submit" class="ml-2 bg-orange-500 text-white py-2 px-4 rounded-md hover:bg-orange-600 transition">Add to Cart</button>
+                        <label for="quantity" class="block text-xs font-medium mr-2">Quantity:</label>
+                        <input type="number" id="quantity" value={quantity} min="1" on:input={updateQuantity} class="border border-gray-300 rounded-md shadow-sm p-1 w-20" />
+                        <button type="submit" class="ml-2 border  border-orange-500 text-orange-500 py-1 px-2 rounded-md hover:bg-orange-600 hover:text-white transition text-sm md:py-2 md:px-4">Add to Cart</button>
                     </form>
 
-                    <a href="/check-availability" class={`mt-2 ${quantity > 1 ? 'text-orange-500' : 'text-gray-500'} hover:underline`}>
+                    <a href="/check-availability" class={`mt-2 ${quantity > 1 ? 'text-orange-500' : 'text-gray-500'} hover:underline text-xs md:text-sm`}>
                         Check Availability
                     </a>
                 </div>
