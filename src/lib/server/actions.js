@@ -113,3 +113,25 @@ export async function Addqoutes({request}) {
         };
     }
   };
+
+  export async function load({}) {
+    await pb.admins.authWithPassword(email, password);
+    const records = await pb.collection('Cart').getFullList(200, {
+        sort: '-created',
+    });
+
+    const results = records.map(record => {
+        return {
+            id: record.id,
+            name: record.name,
+            code: record.code,
+            description: record.description,
+            price: record.price,
+            image: record.image
+        };
+    });
+
+    return {
+        records: results
+    };
+}
