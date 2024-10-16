@@ -33,7 +33,7 @@
         quantity = event.target.value;
     }
 
-    // Update total slides based on logos per slide
+   
     function updateLogosPerSlide() {
         if (window.innerWidth < 640) { 
             logosPerSlide = 1;
@@ -59,7 +59,7 @@
     });
 </script>
 
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
 
 <!-- Slider -->
 <h2 class="font-bold text-orange-500 mt-4 ml-12">Related Products</h2>
