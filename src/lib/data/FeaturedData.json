@@ -3,19 +3,19 @@
        {
            "name" : "Quick Order",
            "description": "An easy to quickly purchase products used often",
-           "image" : "/quote_order",
+           "image" : "/quote_order.jpg",
            "buttonLabel": "Explore"
        },
        {
            "name" : "Quick Order",
            "description": "Search for safety data sheets(SDS) and certificates (COA/COO) by product number",
-           "image" : "/documantation",
+           "image" : "/documantation.jpg",
            "buttonLabel": "Explore"
        },
        {
            "name" : "Quick Order",
            "description": "Exceptional customer service is our top priority",
-           "image" : "/contact_us",
+           "image" : "/contact_us.jpg",
            "buttonLabel": "Explore"
        }
    ]
