@@ -218,3 +218,36 @@ export async function getProducts() {
     // Simulate session cart update logic
     request.locals.cart = cart;
   }
+
+
+
+  ////contactus
+  export const actions = {
+    submitForm: async ({ request }) => {
+       
+        try {
+            await authenticate();
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+
+        const formData = await request.formData();
+
+        const data = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            subject: formData.get('subject'),
+            message: formData.get('message'),
+        };
+
+        try {
+            const record = await pb.collection('ContactUS').create(data); // Using PocketBase SDK to create a record
+            console.log("Record created:", record);
+            return { success: true, message: 'Message sent successfully!', data: record };
+        } catch (error) {
+            console.error('Error sending data to PocketBase:', error);
+            return { success: false, error: 'Failed to send message. Please try again.' };
+        }
+    }
+};
