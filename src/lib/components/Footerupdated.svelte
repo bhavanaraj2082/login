@@ -10,7 +10,7 @@
 </script>
 
 
-<footer class="w-full bg-primary-300 p-6">
+<footer class="w-full bg-primary-400 p-6">
 	<div class="lg:w-10/12 mx-auto w-10/12 ">
 		<div class="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-4 gap-16 mt-4">
 			<div class="flex flex-col items-center md:items-start text-center md:text-left ">
@@ -30,37 +30,37 @@
 							href='https://facebook.com/chemikart'
 							target="_blank"
 							rel="noopener noreferrer"
-							class="flex items-center justify-center p-2 bg-gray-50 rounded-full shadow hover:bg-gray-100 transition transform duration-300 hover:scale-110 hover:shadow-xl hover:animate-pulse"
+							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300  hover:text-gray-50"
 							aria-label='Follow us on Facebook'
 						>
-						<Icon icon="ri:facebook-fill" width="1.2em" height="1.2em" class='text-primary-400' />
+						<Icon icon="ri:facebook-fill" width="1.2em" height="1.2em" />
 						</a>
 						<a
 							href='https://twitter.com/chemikart'
 							target="_blank"
 							rel="noopener noreferrer"
-							class="flex items-center justify-center p-2 bg-gray-50 rounded-full shadow hover:bg-gray-100 transition transform duration-300 hover:scale-110 hover:shadow-xl hover:animate-pulse"
+							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300   hover:text-gray-50"
 							aria-label='Follow us on twitter'
 						>
-						<Icon icon="ri:twitter-x-fill" width="1.2em" height="1.2em" class='text-primary-400' />
+						<Icon icon="ri:twitter-x-fill" width="1.2em" height="1.2em"  />
 						</a>
 						<a
 							href='https://instagram.com/chemikart'
 							target="_blank"
 							rel="noopener noreferrer"
-							class="flex items-center justify-center p-2 bg-gray-50 rounded-full shadow hover:bg-gray-100 transition transform duration-300 hover:scale-110 hover:shadow-xl hover:animate-pulse"
+							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300 hover:text-gray-50"
 							aria-label='Follow us on Instagram'
 						>
-						<Icon icon="typcn:social-instagram" width="1.2em" height="1.2em" class='text-primary-400' />
+						<Icon icon="typcn:social-instagram" width="1.2em" height="1.2em" />
 						</a>
 						<a
 							href='https://linkedin.com/chemikart'
 							target="_blank"
 							rel="noopener noreferrer"
-							class="flex items-center justify-center p-2 bg-gray-50 rounded-full shadow hover:bg-gray-100 transition transform duration-300 hover:scale-110 hover:shadow-xl hover:animate-pulse"
+							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300  hover:text-gray-50 "
 							aria-label='Follow us on Instagram'
 						>
-						<Icon icon="ant-design:linkedin-outlined" width="1.2em" height="1.2em" class='text-primary-400' />
+						<Icon icon="ant-design:linkedin-outlined" width="1.2em" height="1.2em" />
 						</a>
 				</div>
 				</div>
@@ -86,7 +86,7 @@
 			<ul class="mt-2 space-y-2 text-sm text-gray-50 font-work-sans">
 				<li><a href="/chemikart-solutions" class="hover:underline">Chemikart Solutions</a></li>
 				<li><a href="/quick-order" class="hover:underline">Quick Order</a></li>
-				<li><a href="/Delivery" class="hover:underline">Delivery</a></li>
+				<li><a href="/delivery" class="hover:underline">Delivery</a></li>
 			</ul>
 		</div> 
 		</div>
