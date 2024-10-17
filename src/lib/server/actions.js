@@ -135,3 +135,15 @@ export async function Addqoutes({request}) {
         records: results
     };
 }
+// ContactUs form
+export const saveContactInfo= async(contactData)=> {
+  try {
+  
+    await pb.admins.authWithPassword(`${DB_USER}`, `${DB_PASS}`)
+    const record = await pb.collection('helpandSupport').create(contactData);
+    return { success: true, record };
+  } catch (error) {
+    console.error('Error saving contact info:', error);
+    return { success: false, error: error.message };
+  }
+}
