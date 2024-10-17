@@ -29,9 +29,12 @@ export default {
 			},
 			fontSize:{
 				"1s":"9px",
-				"2s":"10px"
+				"2s":"10px",
+				"3s":"14px",
+				"4s":"16px"
 			}
 		}
 	},
 	plugins: []
 };
+
