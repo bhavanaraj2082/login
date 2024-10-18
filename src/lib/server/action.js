@@ -274,3 +274,18 @@ export default async function saveInfo(registerData) {
     return { success: false, error: error.message || 'Failed to save contact information.' };
   }
 }
+
+
+
+/////////////Contact Us 
+
+export default async function saveInfo(contactData) {
+  try {
+    await pb.admins.authWithPassword(`${DB_USER}`, `${DB_PASS}`)
+    const record = await pb.collection('ContactUs').create(contactData);
+    return { success: true, record };
+  } catch (error) {
+    console.error('Error saving contact info:', error);
+    return { success: false, error: 'Failed to save contact information.' };
+  }
+}
