@@ -251,3 +251,26 @@ export async function getProducts() {
         }
     }
 };
+
+
+///SignUp
+
+export default async function saveInfo(registerData) {
+  try {
+    
+    const existingUserQuery = await pb.collection('Register').getList(1, 1, {
+      filter: `email = "${registerData.email}"`,
+    });
+
+    if (existingUserQuery.items.length > 0) {
+      return { success: false, error: 'You already have an account.' };
+    }
+
+   
+    const record = await pb.collection('Register').create(registerData);
+    return { success: true, record };
+  } catch (error) {
+    console.error('Error saving contact info:', error);
+    return { success: false, error: error.message || 'Failed to save contact information.' };
+  }
+}
