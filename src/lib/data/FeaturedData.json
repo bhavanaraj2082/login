@@ -7,13 +7,13 @@
            "buttonLabel": "Explore"
        },
        {
-           "name" : "Quick Order",
+           "name" : "Documantation",
            "description": "Search for safety data sheets(SDS) and certificates (COA/COO) by product number",
            "image" : "/documantation.jpg",
            "buttonLabel": "Explore"
        },
        {
-           "name" : "Quick Order",
+           "name" : "Contact Us",
            "description": "Exceptional customer service is our top priority",
            "image" : "/contact_us.jpg",
            "buttonLabel": "Explore"
