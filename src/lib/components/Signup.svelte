@@ -34,6 +34,7 @@
 
             if (data.success) {
                 alert('Account created successfully!');
+                window.location.href = '/';
             } else {
                 alert(data.error || data.message || 'Error creating account.');
             }
