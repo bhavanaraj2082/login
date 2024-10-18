@@ -27,7 +27,7 @@
       </p>
       <button
         on:click={handleMoreClick}
-        class="mt-4 px-8 py-1 bg-primary-400 text-primary-50 text-lg font-semibold  hover:bg-red-500 transition duration-300"
+        class="mt-4 px-8 py-1 bg-primary-400 text-primary-50 text-lg font-semibold  transition duration-300"
       >
         More
       </button>
