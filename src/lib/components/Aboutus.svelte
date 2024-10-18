@@ -6,7 +6,7 @@
   }
 </script>
 
-<div class="flex items-center justify-center bg-primary-50 py-12 px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
   <div class="w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
     <!-- Left Side Image -->
     <div class="">
@@ -27,7 +27,7 @@
       </p>
       <button
         on:click={handleMoreClick}
-        class="mt-4 px-8 py-1 bg-red-400 text-primary-50 text-lg font-semibold  hover:bg-red-500 transition duration-300"
+        class="mt-4 px-8 py-1 bg-primary-400 text-primary-50 text-lg font-semibold  hover:bg-red-500 transition duration-300"
       >
         More
       </button>
