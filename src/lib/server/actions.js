@@ -190,3 +190,16 @@ function updateCartSession(request, cart) {
   request.locals.cart = cart;
 }
 
+
+//Document action function
+export async function fetchJobRecords(productNumberFilter = "") {
+    const records = await pb.collection('Documents').getFullList(200 /* batch size */, {
+        sort: '-created',
+        filter: productNumberFilter ? `productNumber = "${productNumberFilter}"` : '', 
+    });
+    const results = records.map((record) => {
+        return { certificate: record.certificate, productNumber: record.productNumber }; 
+    });
+    return results;
+}
+
