@@ -78,7 +78,7 @@
 				<ul class="mt-2 space-y-2 text-sm text-gray-50 font-work-sans"> 
 					<li><a href="/contact-us" class="hover:underline">Contact Us</a></li>
 					<li><a href="/customer-support" class="hover:underline">customerSupport</a></li>
-					<li><a href="/faqs" class="hover:underline">FAQs</a></li>
+					<li><a href="/faq" class="hover:underline">FAQs</a></li>
 				</ul>
 			</div>
 		 <div class="flex flex-col items-center md:items-start text-center md:text-left  lg:mr-12">
