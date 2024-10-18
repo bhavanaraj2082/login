@@ -1,6 +1,6 @@
 <script>
     import Icon from '@iconify/svelte';
-    
+
     let name = '';
     let email = '';
     let phone = '';
@@ -13,13 +13,14 @@
 
     async function handleSubmit(event) {
         event.preventDefault();
-        
+
         formValid = true;
         showErrors = false;
+        errorMessage = '';
 
-        // Validate fields
+        
         if (
-            phone.length !== 10 ||
+            phone.length === 0 ||
             email.length === 0 ||
             name.length === 0 ||
             message.length === 0 ||
@@ -28,33 +29,45 @@
             console.log('Validation failed: Missing required fields');
             formValid = false;
             showErrors = true;
-            errorMessage = "Please fill in all required fields correctly.";
+            errorMessage = 'Please fill in all required fields correctly.';
             return;
         }
 
-       
-        const response = await fetch('/?submitForm', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name, email, phone, subject, message }) 
-        });
+        
+        try {
+            const response = await fetch('/contact', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name, email, phone, subject, message }),
+            });
 
-        const result = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-        if (result.success) {
-            formSubmitted = true;
+            const result = await response.json();
+            console.log('Server response:', result);
 
-            name = '';
-            email = '';
-            phone = '';
-            subject = '';
-            message = '';
-            showErrors = false;
-        } else {
-            errorMessage = result.error || "An unexpected error occurred.";
-            formValid = false;
+            if (result.success) {
+                formSubmitted = true;
+                
+                name = '';
+                email = '';
+                phone = '';
+                subject = '';
+                message = '';
+                showErrors = false;
+            } else {
+                errorMessage = result.error || "An unexpected error occurred.";
+                formValid = false;
+                showErrors = true;
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            errorMessage = error.message || 'An error occurred while submitting the form.';
             showErrors = true;
         }
     }
@@ -95,12 +108,28 @@
         </div>
 
         <div class="flex-1 mb-6 p-4">
-            <h2 class="text-xl text-gray-700 font-semibold">Send a Message</h2>
-            <p class="text-gray-700">We’d love to hear from you! Send us a message, and let’s stay connected.</p>
+            <div class="block md:hidden mb-6">
+                <h2 class="text-xl text-gray-700 font-semibold">Send a Message</h2>
+                <p class="text-gray-700">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+            </div>
+
+            <div class="hidden md:block">
+                <h2 class="text-xl text-gray-700 font-semibold">Send a Message</h2>
+                <p class="text-gray-700">We’d love to hear from you! Send us a message, and let’s stay connected.</p>
+            </div>
 
             <div class="mt-7 flex flex-col md:flex-row md:gap-4">
                 <input type="text" name="name" bind:value={name} class="block w-full border border-gray-300 p-2 rounded-xl focus:outline-none focus:border-orange-200 focus:shadow-none focus:ring-0 placeholder-gray-400 mb-4 md:mb-0" placeholder="Your Name" required />
+                {#if showErrors && name.length === 0}
+                    <span class="text-red-400 text-xs">Name is required</span>
+                {/if}
                 <input type="email" name="email" bind:value={email} class="block w-full border border-gray-300 p-2 rounded-xl focus:outline-none focus:border-orange-200 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email" required />
+                {#if showErrors && email.length === 0}
+                    <span class="text-red-400 text-xs">Email is required</span>
+                {/if}
+                {#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
+                    <span class="text-red-400 text-xs">Please enter a valid email address.</span>
+                {/if}
             </div>
 
             <div class="mt-4 flex flex-col md:flex-row md:gap-4">
@@ -115,6 +144,9 @@
             </div>
             {#if showErrors}
                 <div class="text-red-500 text-xs mt-2">{errorMessage}</div>
+            {/if}
+            {#if formSubmitted} 
+                <div class="text-green-500 text-xs mt-2">Your message has been sent successfully!</div>
             {/if}
         </div>
     </form>
