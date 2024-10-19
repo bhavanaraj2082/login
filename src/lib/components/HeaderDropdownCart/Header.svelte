@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
+    import { page } from '$app/stores';
     // src/lib/components/HeaderDropdownCart/Cartrightside.svelte
     import Cartrightside from "../../components/HeaderDropdownCart/Cartrightside.svelte";
     // src/lib/data/chemicalProducts.json
@@ -206,6 +207,7 @@ function handleMouseLeaveSubmenu() {
 		</div>
 	</div>
 </div>
+{#if $page.url.pathname !== '/order-status' || $page.url.pathname !== '/login'}
 <div class="mx-auto flex items-center justify-center max-md:p-3 relative !-z-10 min-[768px]:hidden">
     <div class="relative w-full max-w-lg mx-auto">
       <input type="text" placeholder="Search your Product" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-400">
@@ -213,7 +215,8 @@ function handleMouseLeaveSubmenu() {
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
     </div>
-  </div>
+</div>
+{/if}
     <div class="hidden md:flex mx-auto justify-between py-2 pb-0 px-10 border-y border-gray-200">
         <div class="md:flex justify-between items-center lg:gap-2 hidden">
             {#each menus as menu, index}
@@ -270,7 +273,7 @@ function handleMouseLeaveSubmenu() {
                                 </div>
                                 {#if submenu.subSubmenus && submenu.subSubmenus.length > 0}
                                 <div
-                                    class={`mt-0 ml-0.5 h-full absolute left-full rounded-sm pb-2 top-0 z-30 w-full bg-white shadow-sm transition-opacity duration-200 ${activeSubmenu === submenu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                                    class={`mt-0 ml-px h-full absolute left-full rounded-sm pb-2 top-0 z-30 w-full bg-white shadow-sm transition-opacity duration-200 ${activeSubmenu === submenu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                                     role="menu"
                                 >
                                     <ul>
