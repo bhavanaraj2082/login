@@ -24,21 +24,62 @@
     }
 };
 
-const handleSubmit = (event) => {
+async function handleSubmit (event) {
   event.preventDefault();
+  const sanitizedData ={
+    firstName : sanitize(firstName),
+    lastName : sanitize(lastName),
+    email: sanitize(email),
+    phoneNumber : sanitize(phoneNumber),
+    companyName : sanitize(companyName),
+    location : sanitize(location),
+    accountNumber : sanitize(accountNumber),
+    addressType :  sanitize(addressType),
+    primaryAddress: sanitize(primaryAddress),
+    updateAddress: sanitize(updateAddress)
+  }
   
-  console.log(sanitize(firstName));
-  console.log(sanitize(lastName));
-  console.log(sanitize(email));
-  console.log(sanitize(phoneNumber));
-  console.log(sanitize(companyName));
-  console.log(sanitize(location));
-  console.log(sanitize(accountNumber));
-  console.log(sanitize(addressType));
-  console.log(sanitize(primaryAddress));
-  console.log(sanitize(updateAddress));
-  
+ console.log(sanitizedData);
+ const finalData = {
+  firstName : sanitizedData.firstName,
+    lastName : sanitizedData.lastName,
+    email: sanitizedData.email,
+    phoneNumber : sanitizedData.phoneNumber,
+    companyName : sanitizedData.companyName,
+    location : sanitizedData.location,
+    accountNumber : sanitizedData.accountNumber,
+    issue :  sanitizedData.addressType,
+    primaryAddress : sanitizedData.primaryAddress,
+    updateAddress :  sanitizedData.updateAddress
+ }
+ const response = await fetch('/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(finalData)
+    });
+    if (response.ok) {
+      const data = await response.json();
+      console.log(' information saved:', data.record);
+        // Clear the form 
+      firstName = '';
+      lastName = '';
+      email = '';
+      phoneNumber = '';
+      companyName = '';
+      location = '';
+      accountNumber = '';
+      addressType = '';
+      primaryAddress = '';
+      updateAddress = '';
   alert("Form submitted successfully!");
+    }
+    else {
+      const errorData = await response.json();
+      console.error('Failed to save contact information:', errorData.error);
+      alert('There was an error submitting your information. Please try again.');
+    }
 };
 
   const locations = [

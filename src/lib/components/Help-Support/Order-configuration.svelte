@@ -30,23 +30,65 @@
     }
 };
 
-const handleSubmit = (e) => {
+async function handleSubmit(e) {
   e.preventDefault();
 
-  const items = products.map((product) => ({
+  let items = products.map((product) => ({
     itemNumber: sanitize(product.itemNumber),
   }));
 
-  console.log(items);
-  console.log(sanitize(firstName));
-  console.log(sanitize(lastName));
-  console.log(sanitize(email));
-  console.log(sanitize(phoneNumber));
-  console.log(sanitize(companyName));
-  console.log(sanitize(location));
-  console.log(sanitize(accountNumber));
-};
+  const sanitizedData = {
+    poNumber : sanitize(poNumber),
+items : items,
+firstName : sanitize(firstName),
+lastName : sanitize(lastName),
+email: sanitize(email),
+phoneNumber : sanitize(phoneNumber),
+companyName : sanitize(companyName),
+location : sanitize(location),
+accountNumber : sanitize(accountNumber),
+  }
+  console.log(sanitizedData);
 
+  const finalData = {
+    poNumber:sanitizedData.poNumber,
+    items:sanitizedData.items,
+    firstName : sanitizedData.firstName,
+    lastName : sanitizedData.lastName,
+    email: sanitizedData.email,
+    phoneNumber : sanitizedData.phoneNumber,
+    companyName : sanitizedData.companyName,
+    location : sanitizedData.location,
+    accountNumber : sanitizedData.accountNumber,
+  }
+  const response = await fetch('/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(finalData)
+    });
+    if (response.ok) {
+      const data = await response.json();
+      console.log(' information saved:', data.record);
+
+      // Clear the form 
+      items = '';
+     
+      firstName = '';
+      lastName = '';
+      email = '';
+      phoneNumber = '';
+      companyName = '';
+      location = '';
+      accountNumber = '';
+      alert('Your information has been submitted successfully!');
+    } else {
+      const errorData = await response.json();
+      console.error('Failed to save contact information:', errorData.error);
+      alert('There was an error submitting your information. Please try again.');
+    }
+};
 
   const locations = [
     "United States",
@@ -64,7 +106,7 @@ const handleSubmit = (e) => {
     <div class=" flex flex-col h-full">
       <div class="lg:w-3/4 w-full pb-6 h-full">
         <h2 class="text-primary-400 font-semibold text-base pb-6">
-          ORDER CONFIGURATION
+          Order configuration
         </h2>
         <h3 class="block mb-2 text-sm">
           Please provide the following product information
