@@ -1,5 +1,6 @@
 <script context="module">
-    import Filterchemicart from '../../lib/components/Filterchemicart.svelte';
+    import Filterchemicart from '$lib/components/Filterchemicart.svelte';
+    import Chemicaldata from '$lib/data/Chemicaldata.json';
   
     export const meta = {
       title: "Filter widget",
