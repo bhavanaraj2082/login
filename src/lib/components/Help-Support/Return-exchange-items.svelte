@@ -61,22 +61,66 @@
     }
 };
 
-const handleSubmit = (event) => {
-  event.preventDefault();
+async function handleSubmit(event) {
+    event.preventDefault();
+    // let attachments = attachments.map((a) => sanitize(a.name));
 
-  console.log('Issue:', sanitize(issue));
-  console.log('Assistance Needed:', sanitize(assistance));
-  console.log('Attachments:', attachments.map(a => sanitize(a.name)));
-  console.log(sanitize(firstName));
-  console.log(sanitize(lastName));
-  console.log(sanitize(email));
-  console.log(sanitize(phoneNumber));
-  console.log(sanitize(companyName));
-  console.log(sanitize(location));
-  console.log(sanitize(accountNumber));
+    const sanitizedData = {
+      issue: sanitize(issue),
+      assistance: sanitize(assistance),
+      // attachments: attachments,
+      firstName: sanitize(firstName),
+      lastName: sanitize(lastName),
+      email: sanitize(email),
+      phoneNumber: sanitize(phoneNumber),
+      companyName: sanitize(companyName),
+      location: sanitize(location),
+      accountNumber: sanitize(accountNumber),
+    };
 
-  alert('Form submitted successfully!');
-};
+    console.log(sanitizedData);
+
+    const finalData = {
+      issue: sanitizedData.issue,
+      assistance: sanitizedData.assistance,
+      // attachments: attachments,
+      firstName: sanitizedData.firstName,
+      lastName: sanitizedData.lastName,
+      email: sanitizedData.email,
+      phoneNumber: sanitizedData.phoneNumber,
+      companyName: sanitizedData.companyName,
+      location: sanitizedData.location,
+      accountNumber: sanitizedData.accountNumber,
+    };
+    const response = await fetch("/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(finalData),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      console.log(" information saved:", data.record);
+      // Clear the form
+      issue = "";
+      assistance = "";
+      firstName = "";
+      lastName = "";
+      email = "";
+      phoneNumber = "";
+      companyName = "";
+      location = "";
+      accountNumber = "";
+      alert("Form submitted successfully!");
+    } else {
+      const errorData = await response.json();
+      console.error("Failed to save contact information:", errorData.error);
+      alert(
+        "There was an error submitting your information. Please try again."
+      );
+    }
+  }
 
   const locations = [
     "United States",

@@ -30,29 +30,71 @@
       return input.replace(/<\/?[^>]+(>|$)/g, "");
     }
 };
+async function handleSubmit(event) {
+    event.preventDefault();
 
-const handleSubmit = (event) => {
-  event.preventDefault();
-  alert('Form submitted successfully!');
+    const sanitizedData={
+      firstName : sanitize(firstName),
+    lastName : sanitize(lastName),
+    email: sanitize(email),
+    phoneNumber : sanitize(phoneNumber),
+    companyName : sanitize(companyName),
+    location : sanitize(location),
+    accountNumber : sanitize(accountNumber),
+    currentEmail :  sanitize(currentEmail),
+    newEmail :  sanitize(newEmail),
+    assistance : sanitize(assistance)
+    }
+    console.log(sanitizedData);
+    const finalData = {
+  firstName : sanitizedData.firstName,
+    lastName : sanitizedData.lastName,
+    email: sanitizedData.email,
+    phoneNumber : sanitizedData.phoneNumber,
+    companyName : sanitizedData.companyName,
+    location : sanitizedData.location,
+    accountNumber : sanitizedData.accountNumber,
+    currentEmail :  sanitizedData.currentEmail,
+    newEmail: sanitizedData.newEmail,
+    assistance :  sanitizedData.assistance
+ }
+ const response = await fetch('/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(finalData)
+    });
+    if (response.ok) {
+      const data = await response.json();
+      console.log(' information saved:', data.record);
+        // Clear the form 
+        firstName = '';
+      lastName = '';
+      email = '';
+      phoneNumber = '';
+      companyName = '';
+      location = '';
+      accountNumber = '';
+      currentEmail = '';
+      newEmail = '';
+      assistance = '';
+    alert("Form submitted successfully!");
+    }
+    else {
+      const errorData = await response.json();
+      console.error('Failed to save contact information:', errorData.error);
+      alert('There was an error submitting your information. Please try again.');
+    }
 
-  console.log(sanitize(currentEmail));
-  console.log(sanitize(newEmail));
-  console.log(sanitize(firstName));
-  console.log(sanitize(lastName));
-  console.log(sanitize(email));
-  console.log(sanitize(phoneNumber));
-  console.log(sanitize(companyName));
-  console.log(sanitize(location));
-  console.log(sanitize(accountNumber));
-  console.log('Assistance Needed:', sanitize(assistance));
-};
+  };
 
 
 </script>
 <div class="w-full p-4">
   <form on:submit={handleSubmit} >
     <div class=" w-full pb-6 h-full">
-      <h2 class="text-primary-400 font-semibold text-base pb-6">UPDATE EMAIL ADDRESS</h2>
+      <h2 class="text-primary-400 font-semibold text-base pb-6">Update Email Address</h2>
       
       <label class="text-base">*Current Email address (From online account)</label>
       <input

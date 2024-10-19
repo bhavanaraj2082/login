@@ -39,32 +39,92 @@
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  async function handleSubmit(e){
+  e.preventDefault();
 
-    const items = products.map((product) => ({
-      itemNumber: sanitize(product.itemNumber),
-      quantity: sanitize(product.quantity),
-    }));
+  let items = products.map((product) => ({
+    itemNumber: sanitize(product.itemNumber),
+    quantity: sanitize(product.quantity),
+  }));
 
-    console.log(items);
-    console.log(sanitize(exportMaterial));
-    console.log(sanitize(firstName));
-    console.log(sanitize(lastName));
-    console.log(sanitize(email));
-    console.log(sanitize(phoneNumber));
-    console.log(sanitize(companyName));
-    console.log(sanitize(location));
-    console.log(sanitize(accountNumber));
-    console.log(sanitize(streetAddress));
-    console.log(sanitize(city));
-    console.log(sanitize(postalCode));
-    console.log(sanitize(shippinglocation));
-    console.log(sanitize(billingStreetAddress));
-    console.log(sanitize(billingCity));
-    console.log(sanitize(billingPostalCode));
-    console.log(sanitize(billingLocation));
-  };
+  const sanitizedData = {
+items : items,
+exportMaterial : sanitize(exportMaterial),
+firstName : sanitize(firstName),
+lastName : sanitize(lastName),
+email: sanitize(email),
+phoneNumber : sanitize(phoneNumber),
+companyName : sanitize(companyName),
+location : sanitize(location),
+accountNumber : sanitize(accountNumber),
+streetAddress : sanitize(streetAddress),
+city : sanitize(city),
+postalCode : sanitize(postalCode),
+shippinglocation : sanitize(shippinglocation),
+billingStreetAddress : sanitize(billingStreetAddress),
+billingCity : sanitize(billingCity),
+billingPostalCode : sanitize(billingPostalCode),
+billingLocation : sanitize(billingLocation)
+
+  }
+  console.log(sanitizedData);
+
+  const finalData = {
+    items:sanitizedData.items,
+    exportMaterial : sanitizedData.exportMaterial,
+    firstName : sanitizedData.firstName,
+    lastName : sanitizedData.lastName,
+    email: sanitizedData.email,
+    phoneNumber : sanitizedData.phoneNumber,
+    companyName : sanitizedData.companyName,
+    location : sanitizedData.location,
+    accountNumber : sanitizedData.accountNumber,
+    streetAddress : sanitizedData.streetAddress,
+    city :  sanitizedData.city,
+    postalCode : sanitizedData.postalCode,
+    shippinglocation : sanitizedData.shippinglocation,
+    billingStreetAddress : sanitizedData.billingStreetAddress,
+    billingCity : sanitizedData.billingCity,
+    billingPostalCode : sanitizedData.billingPostalCode,
+    billingLocation : sanitizedData.billingLocation
+  }
+  const response = await fetch('/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(finalData)
+    });
+    if (response.ok) {
+      const data = await response.json();
+      console.log(' information saved:', data.record);
+
+      // Clear the form 
+      items = '';
+      exportMaterial = '';
+      firstName = '';
+      lastName = '';
+      email = '';
+      phoneNumber = '';
+      companyName = '';
+      location = '';
+      accountNumber = '';
+      streetAddress = '';
+      city= '';
+      postalCode = '';
+      shippinglocation = '';
+      billingStreetAddress = '';
+      billingCity = '';
+      billingPostalCode = '';
+      billingLocation = '';
+      alert('Your information has been submitted successfully!');
+    } else {
+      const errorData = await response.json();
+      console.error('Failed to save contact information:', errorData.error);
+      alert('There was an error submitting your information. Please try again.');
+    }
+
+};
 
   const locations = [
     "United States",

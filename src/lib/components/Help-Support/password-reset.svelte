@@ -18,7 +18,7 @@
     "India",
   ];
   const sanitize = (input) => {
-    if (typeof input !== "string") {
+    if (typeof input !== 'string') {
       
       return input; // or handle it appropriately
     } else {
@@ -30,20 +30,60 @@
     }
 };
 
-const handleSubmit = (event) => {
+async function handleSubmit (event) {
   event.preventDefault();
   
+  const sanitizedData ={
+    firstName : sanitize(firstName),
+    lastName : sanitize(lastName),
+    email: sanitize(email),
+    phoneNumber : sanitize(phoneNumber),
+    companyName : sanitize(companyName),
+    location : sanitize(location),
+    accountNumber : sanitize(accountNumber),
+    resetemail :  sanitize(resetemail),
+    assistance :  sanitize(assistance)
+  }
+  console.log(sanitizedData);
+ const finalData = {
+  firstName : sanitizedData.firstName,
+    lastName : sanitizedData.lastName,
+    email: sanitizedData.email,
+    phoneNumber : sanitizedData.phoneNumber,
+    companyName : sanitizedData.companyName,
+    location : sanitizedData.location,
+    accountNumber : sanitizedData.accountNumber,
+    resetemail :  sanitizedData.resetemail,
+    assistance :  sanitizedData.assistance
+ }
+ const response = await fetch('/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(finalData)
+    });
+    if (response.ok) {
+      const data = await response.json();
+      console.log(' information saved:', data.record);
+        // Clear the form 
+        firstName = '';
+      lastName = '';
+      email = '';
+      phoneNumber = '';
+      companyName = '';
+      location = '';
+      accountNumber = '';
+      resetemail = '';
+      assistance = '';
   alert('Form submitted successfully!');
+    }
+    else {
+      const errorData = await response.json();
+      console.error('Failed to save contact information:', errorData.error);
+      alert('There was an error submitting your information. Please try again.');
+    }
   
-  console.log(sanitize(resetemail));
-  console.log(sanitize(firstName));
-  console.log(sanitize(lastName));
-  console.log(sanitize(email));
-  console.log(sanitize(phoneNumber));
-  console.log(sanitize(companyName));
-  console.log(sanitize(location));
-  console.log(sanitize(accountNumber));
-  console.log('Assistance Needed:', sanitize(assistance));
 };
 
 
@@ -51,7 +91,7 @@ const handleSubmit = (event) => {
 <div class="w-full p-4">
   <form on:submit={handleSubmit} >
     <div class=" w-full pb-6 h-full">
-      <h2 class="text-primary-400 font-semibold text-base pb-6">PASSWORD RESET</h2>
+      <h2 class="text-primary-400 font-semibold text-base pb-6">Password Reset</h2>
       <label class="text-base">*Email address/User ID (From online account)</label>
       <input
       type="email"

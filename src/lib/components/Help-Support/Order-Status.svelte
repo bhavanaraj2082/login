@@ -24,23 +24,77 @@
     }
 }
 
-function handleSubmit() {
-  const sanitizedData = {
-    selectedOption: sanitize(selectedOption),
-    selectOptionNumber: sanitize(selectOptionNumber),
-    invoiceNumber: sanitize(invoiceNumber),
-    itemNumber: sanitize(itemNumber),
-    firstName: sanitize(firstName),
-    lastName: sanitize(lastName),
-    email: sanitize(email),
-    phoneNumber: sanitize(phoneNumber),
-    companyName: sanitize(companyName),
-    location: sanitize(location),
-    accountNumber: sanitize(accountNumber)
-  };
 
-  console.log(sanitizedData);
-}
+async function handleSubmit() {
+    const sanitizedData = {
+      selectedOption: sanitize(selectedOption),
+      selectOptionNumber: sanitize(selectOptionNumber),
+      invoiceNumber: sanitize(invoiceNumber),
+      itemNumber: sanitize(itemNumber),
+      firstName: sanitize(firstName),
+      lastName: sanitize(lastName),
+      email: sanitize(email),
+      phoneNumber: sanitize(phoneNumber),
+      companyName: sanitize(companyName),
+      location: sanitize(location),
+      accountNumber: sanitize(accountNumber),
+    };
+
+    console.log(sanitizedData);
+    let poNumber = "";
+    let orderNumber = "";
+    
+    if (sanitizedData.selectedOption === "PO Number") {
+      poNumber = sanitizedData.selectOptionNumber;
+    } else if (sanitizedData.selectedOption === "Order Number") {
+      orderNumber = sanitizedData.selectOptionNumber;
+    }
+    const finalData = {
+      poNumber: poNumber,
+      orderNumber: orderNumber,
+      invoiceNumber: sanitizedData.invoiceNumber,
+      itemNumber: sanitizedData.itemNumber,
+      firstName: sanitizedData.firstName,
+      lastName: sanitizedData.lastName,
+      email: sanitizedData.email,
+      phoneNumber: sanitizedData.phoneNumber,
+      companyName: sanitizedData.companyName,
+      location: sanitizedData.location,
+      accountNumber: sanitizedData.accountNumber,
+    };
+    const response = await fetch("/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(finalData),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Contact information saved:", data.record);
+
+      // Clear the form
+      selectedOption = "";
+      selectOptionNumber = "";
+      invoiceNumber = "";
+      itemNumber = "";
+      firstName = "";
+      lastName = "";
+      email = "";
+      phoneNumber = "";
+      companyName = "";
+      location = "";
+      accountNumber = "";
+      alert("Your information has been submitted successfully!");
+    } else {
+      const errorData = await response.json();
+      console.error("Failed to save contact information:", errorData.error);
+      alert(
+        "There was an error submitting your information. Please try again."
+      );
+    }
+  }
+
 
 
 
@@ -65,7 +119,7 @@ function handleSubmit() {
     <div class=" flex flex-col lg:flex-row justify-between  h-full  ">
       
     <div class="lg:w-1/2 w-full pb-6 mx-auto h-full">
-      <h2 class="text-primary-400 font-semibold text-base pb-6">ORDER STATUS</h2>
+      <h2 class="text-primary-400 font-semibold text-base pb-6">Order Status</h2>
       <div class="mb-4">
         <!-- svelte-ignore a11y-label-has-associated-control -->
         <label class="block font-semibold mb-2 text-sm"
