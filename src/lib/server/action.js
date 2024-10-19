@@ -289,3 +289,27 @@ export default async function saveInfo(contactData) {
     return { success: false, error: 'Failed to save contact information.' };
   }
 }
+/////filter page login 
+export async function validateLogin(email, password) {
+  try {
+     
+      const users = await pb.collection('Register').getList(1, 50, { filter: `email="${email}"` });
+      
+      if (users.totalItems === 0) {
+          return { success: false, error: 'User not found.' };
+      }
+      
+    
+      const user = users.items[0];
+
+      
+      if (user.password === password) {
+          return { success: true, user };
+      } else {
+          return { success: false, error: 'Invalid password.' };
+      }
+  } catch (error) {
+      console.error('Login error:', error);
+      return { success: false, error: 'Login failed' };
+  }
+}

@@ -106,7 +106,7 @@
 	<button
 		on:click={prevPage}
 		disabled={currentPage === 0}
-		class="bg-blue-500 text-white px-4 py-2 rounded-l">Previous</button
+		class="bg-primary-400 text-white px-4 py-2 rounded-l">Previous</button
 	>
 	<span class="mx-2 pt-2">
 		Page {currentPage + 1} of {Math.ceil(
@@ -117,6 +117,6 @@
 		on:click={nextPage}
 		disabled={(currentPage + 1) * productsPerPage >=
 			filteredProducts.length}
-		class="bg-blue-500 text-white px-4 py-2 rounded-r">Next</button
+		class="bg-primary-400 text-white px-4 py-2 rounded-r">Next</button
 	>
 </div>
