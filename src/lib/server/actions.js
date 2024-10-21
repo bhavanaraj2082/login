@@ -203,3 +203,39 @@ export async function fetchJobRecords(productNumberFilter = "") {
     return results;
 }
 
+export async function submitProduct(product) {
+  try {
+      const response = await pb.collection('products').create({
+          name: product.name,
+          description: product.description
+      });
+      return response; // Return the response from PocketBase
+  } catch (error) {
+      console.error('Error submitting product to PocketBase:', error);
+      return null;
+  }
+}
+
+// Function to update an existing product in PocketBase
+export async function updateProduct(productId, productData) {
+  try {
+      const response = await pb.collection('products').update(productId, {
+          name: productData.name,
+          description: productData.description
+      });
+      return response;
+  } catch (error) {
+      console.error('Error updating product:', error);
+      return null;
+  }
+}
+
+// Function to delete a product from PocketBase
+export async function deleteProduct(productId) {
+  try {
+      await pb.collection('products').delete(productId);
+      console.log('Product deleted successfully');
+  } catch (error) {
+      console.error('Error deleting product:', error);
+  }
+}
