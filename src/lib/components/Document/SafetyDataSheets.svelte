@@ -1,6 +1,14 @@
 <script>
-  let showProductDetails = false;
-  let showLotDetails = false;
+	import Icon from '@iconify/svelte';
+  let showProductDetailsSafety = false;
+  let showProductDetailsCertificates =false;
+  let showProductDetailsOrigin = false;
+  let showProductDetailsQuality = false;
+  let showLotDetailsCertificates = false;
+  let showLotDetailsOrigin = false;
+  let showLotDetailsQuality = false;
+
+
   let activeTab = "Safety Data Sheets";
 
  
@@ -19,13 +27,28 @@
   let cooLotNumberError = '';
   let cqProductNumberError = '';
   let cqLotNumberError = '';
+  let scrollContainer;
 
-  function toggleProductDetails() {
-    showProductDetails = !showProductDetails;
+  function toggleProductDetails(tab) {
+    if (tab === "Safety Data Sheets") {
+      showProductDetailsSafety = !showProductDetailsSafety;
+    } else if (tab === "Certificates of Analysis") {
+      showProductDetailsCertificates = !showProductDetailsCertificates;
+    } else if (tab === "Certificates of Origin"){
+      showProductDetailsOrigin = !showProductDetailsOrigin;
+    } else if (tab === "Certificates of Quality"){
+      showProductDetailsQuality = !showProductDetailsQuality;
+    }
   }
 
-  function toggleLotDetails() {
-    showLotDetails = !showLotDetails;
+  function toggleLotDetails(tab) {
+     if (tab === "Certificates of Analysis") {
+      showLotDetailsCertificates = !showLotDetailsCertificates;
+    } else if (tab === "Certificates of Origin"){
+      showLotDetailsOrigin = !showLotDetailsOrigin;
+    } else if (tab === "Certificates of Quality"){
+      showProductDetailsQuality = !showProductDetailsQuality;
+    }
   }
 
   function validateSDSForm(event) {
@@ -114,223 +137,238 @@
 
     return isValid;
   }
+    
+  const scrollLeft = () => {
+    scrollContainer.scrollBy({ left: -200, behavior: 'smooth' });
+  };
+
+  const scrollRight = () => {
+    scrollContainer.scrollBy({ left: 200, behavior: 'smooth' });
+  };
 </script>
 
-<div class="max-w-7xl mx-auto px-6 py-8">
-  <h1 class="text-4xl font-bold mb-8">Documents</h1>
+<div class="max-w-7xl  mx-auto px-6 py-8">
+  <h1 class="relative text-4xl font-bold mb-8">Documents</h1>
   
-   <div class="absolute top-8 right-8 bg-white-50 px-3 py-2 rounded-md border border-primary-200 flex space-x-2 shadow-sm">
-    <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24" class="text-primary-500 flex-shrink-0">
-      <path fill="currentColor" d="M11 9h2V7h-2m1 13c-4.41 0-8-3.59-8-8s3.59-8 8-8s8 3.59 8 8s-3.59 8-8 8m0-18A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m-1 15h2v-6h-2z"/>
-    </svg>
+   <!-- <div class="absolute top-8 right-8 bg-white px-3 py-2 rounded-md border border-primary-200 flex space-x-2 shadow-sm">
+    <Icon icon="f7:exclamationmark-circle" width="2em" height="2em" class="text-primary-400"/>
     <span class="text-black-500 text-xs leading-snug">
       Sign in to import items<br>from your recent orders and quotes.
     </span>
-  </div>
-  
-  <div class="inline-flex bg-primary-100 p-0 rounded-md mb-8">
-    <nav class="flex space-x-8" aria-label="Tabs">
-      {#each tabs as tab}
-        <button
-          on:click={() => (activeTab = tab.name)} 
-          class="py-2 px-4 border-b-2 font-medium text-sm focus:outline-none transition duration-300"
-          class:border-orange-500={activeTab === tab.name}
-          class:text-orange-600={activeTab === tab.name}
-          class:text-gray-500={activeTab !== tab.name}>
-          {tab.name}
-        </button>
-      {/each}
-    </nav>
-  </div>
+  </div> -->
 
-  <div class="flex flex-col lg:flex-row gap-8 items-start">
-    <div class="flex-1">
-      
-      {#if activeTab === "Safety Data Sheets"}
+  
+    <div class="relative mb-8 ">
+      <!-- Left arrow -->
+      <button 
+        class="absolute -left-4 top-0 h-full  bg-white z-10 md:hidden" 
+        on:click={scrollLeft}>
+        <Icon icon="formkit:left" width="1.2em" height="1.2em" />
+      </button>
+    
+      <!-- Right arrow -->
+      <button 
+        class="absolute -right-4 top-0 h-full  bg-white  z-10 md:hidden" 
+        on:click={scrollRight}>
+        <Icon icon="formkit:right" width="1.2em" height="1.2em" />
+      </button>
+    
+      <div class="inline-flex overflow-hidden w-full">
+        <nav 
+          class="flex bg-primary-100 overflow-x-auto no-scrollbar" 
+          aria-label="Tabs" 
+          bind:this={scrollContainer}>
+          {#each tabs as tab}
+          <button
+            on:click={() => (activeTab = tab.name)} 
+            class="py-2 px-4  text-gray-600 text-sm focus:outline-none transition duration-300 whitespace-nowrap
+              {activeTab === tab.name ? ' bg-gray-100 font-semibold text-primary-400 text-sm' : 'font-medium'} ">
+            {tab.name}
+            {#if activeTab === tab.name}
+            <hr class="w-28 flex-center h-1 mx-auto bg-primary-400 mt-1">
+            {/if}
+          </button>
+          {/each}
+        </nav>
+      </div>
+    </div>
+    
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-8  ">
+        <div class="flex-1">
+            
+            {#if activeTab === "Safety Data Sheets"}
+              <div class="mb-6">
+                <h2 class="text-xl font-semibold mb-4 ">Safety Data Sheets (SDS)</h2>
+                <p class="mb-6 text-xs text-gray-600">To search for a Safety Data Sheet, please enter the product number.</p>
+                <form on:submit={validateSDSForm} class="space-y-2">
+                  <label for="product-number-sds" class="block text-sm font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+                    * Product Number
+                  </label>
+                  <div class="relative w-full">
+                    <input
+                      type="text"
+                      id="product-number-sds"
+                      name="product-number-sds"
+                      placeholder="E.G. T1503"
+                      class="block w-full p-3 border {sdsProductNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                    />
+                    {#if sdsProductNumberError}
+                      <p class="text-red-500 text-sm">{sdsProductNumberError}</p>
+                    {/if}
+                    <button
+                      type="submit"
+                      class="absolute right-0 bottom-0 w-full sm:w-40 transform translate-x-1 translate-y-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-600 transition duration-300"
+                    >
+                      SEARCH
+                    </button>
+                  </div>
+                </form>
+              </div>
+            {/if}
+            
+            
+          {#if activeTab === "Certificates of Analysis"}
         <div class="mb-6">
-          <h2 class="text-xl font-semibold mb-4 ">Safety Data Sheets (SDS)</h2>
-          <p class="mb-6 text-xs text-gray-600">To search for a Safety Data Sheet, please enter the product number.</p>
-          <form on:submit={validateSDSForm} class="space-y-2">
-            <label for="product-number-sds" class="block text-sm font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+          <h2 class="text-xl font-semibold mb-4">Certificates of Analysis (COA)</h2>
+          <form on:submit={validateCOAForm} class="space-y-2">
+            <label for="product-number-coa" class="block text-sm font-medium {coaProductNumberError ? 'text-red-500' : 'text-gray-700'}">
               * Product Number
             </label>
-            <div class="relative w-2/3">
-              <input
-                type="text"
-                id="product-number-sds"
-                name="product-number-sds"
-                placeholder="E.G. T1503"
-                class="block w-full p-3 border {sdsProductNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-              />
-              {#if sdsProductNumberError}
-                <p class="text-red-500 text-sm">{sdsProductNumberError}</p>
-              {/if}
+            <div class="relative w-full">
+            <input
+              type="text"
+              id="product-number-coa"
+              name="product-number-coa"
+              placeholder="E.G. T1503"
+              class="block w-full p-3 border {coaProductNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+            />
+            {#if coaProductNumberError}
+              <p class="text-red-500 text-sm">{coaProductNumberError}</p>
+            {/if}
+            
+            <label for="lot-number-coa" class="block text-sm font-medium {coaLotNumberError ? 'text-red-500' : 'text-gray-700'}">
+              * Lot Number
+            </label>
+            <input
+              type="text"
+              id="lot-number-coa"
+              name="lot-number-coa"
+              placeholder="E.G. L1234"
+              class="block w-full  p-3 border {coaLotNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+            />
+            {#if coaLotNumberError}
+              <p class="text-red-500 text-sm">{coaLotNumberError}</p>
+            {/if}
+          
               <button
-                type="submit"
-                class="absolute right-0 bottom-0 transform translate-x-1 translate-y-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-600 transition duration-300"
-              >
-                SEARCH
-              </button>
+              type="submit"
+              class="absolute right-0 bottom-0 w-full sm:w-40 transform translate-x-1 translate-y-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-600 transition duration-300"
+            >
+              SEARCH
+            </button>
             </div>
           </form>
         </div>
       {/if}
       
-   
-      {#if activeTab === "Certificates of Analysis"}
-  <div class="mb-6">
-    <h2 class="text-xl font-semibold mb-4">Certificates of Analysis (COA)</h2>
-    <form on:submit={validateCOAForm} class="space-y-2">
-      <label for="product-number-coa" class="block text-sm font-medium {coaProductNumberError ? 'text-red-500' : 'text-gray-700'}">
-        * Product Number
-      </label>
-      <input
-        type="text"
-        id="product-number-coa"
-        name="product-number-coa"
-        placeholder="E.G. T1503"
-        class="block w-2/3 p-3 border {coaProductNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-      />
-      {#if coaProductNumberError}
-        <p class="text-red-500 text-sm">{coaProductNumberError}</p>
-      {/if}
-      
-      <label for="lot-number-coa" class="block text-sm font-medium {coaLotNumberError ? 'text-red-500' : 'text-gray-700'}">
-        * Lot Number
-      </label>
-      <input
-        type="text"
-        id="lot-number-coa"
-        name="lot-number-coa"
-        placeholder="E.G. L1234"
-        class="block w-2/3 p-3 border {coaLotNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-      />
-      {#if coaLotNumberError}
-        <p class="text-red-500 text-sm">{coaLotNumberError}</p>
-      {/if}
-
-      <div class="relative w-2/3">
-        <button
-          type="submit"
-          class="absolute right-0 bottom-0 transform translate-x-1 translate-y-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-600 transition duration-300"
-        >
-          SEARCH
-        </button>
+            
+          
+      {#if activeTab === "Certificates of Origin"}
+      <div class="mb-6 relative">
+        <h2 class="text-xl font-semibold mb-4">Certificates of Origin (COO)</h2>
+        <form on:submit={validateCOOForm} class="space-y-2">
+          <label for="product-number-coo" class="block text-sm font-medium {cooProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+            * Product Number
+          </label>
+          <div class="relative w-full">
+          <input
+            type="text"
+            id="product-number-coo"
+            name="product-number-coo"
+            placeholder="E.G. T1503"
+            class="block w-full  p-3 border {cooProductNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+          />
+          {#if cooProductNumberError}
+            <p class="text-red-500 text-sm">{cooProductNumberError}</p>
+          {/if}
+          
+          <label for="lot-number-coo" class="block text-sm font-medium {cooLotNumberError ? 'text-red-500' : 'text-gray-700'}">
+            * Lot Number
+          </label>
+          <input
+            type="text"
+            id="lot-number-coo"
+            name="lot-number-coo"
+            placeholder="E.G. L1234"
+            class="block w-full  p-3 border {cooLotNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+          />
+          {#if cooLotNumberError}
+            <p class="text-red-500 text-sm">{cooLotNumberError}</p>
+          {/if}
+          <button
+            type="submit"
+            class="absolute right-0 bottom-0 w-full sm:w-40 transform translate-x-1 translate-y-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-600 transition duration-300"
+          >
+            SEARCH
+          </button>
+        </form>
       </div>
-    </form>
-  </div>
-{/if}
-
+      {/if}
       
-    
-{#if activeTab === "Certificates of Origin"}
-<div class="mb-6 relative">
-  <h2 class="text-xl font-semibold mb-4">Certificates of Origin (COO)</h2>
-  <form on:submit={validateCOOForm} class="space-y-2">
-    <label for="product-number-coo" class="block text-sm font-medium {cooProductNumberError ? 'text-red-500' : 'text-gray-700'}">
-      * Product Number
-    </label>
-    <input
-      type="text"
-      id="product-number-coo"
-      name="product-number-coo"
-      placeholder="E.G. T1503"
-      class="block w-2/3 p-3 border {cooProductNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-    />
-    {#if cooProductNumberError}
-      <p class="text-red-500 text-sm">{cooProductNumberError}</p>
-    {/if}
-    
-    <label for="lot-number-coo" class="block text-sm font-medium {cooLotNumberError ? 'text-red-500' : 'text-gray-700'}">
-      * Lot Number
-    </label>
-    <input
-      type="text"
-      id="lot-number-coo"
-      name="lot-number-coo"
-      placeholder="E.G. L1234"
-      class="block w-2/3 p-3 border {cooLotNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-    />
-    {#if cooLotNumberError}
-      <p class="text-red-500 text-sm">{cooLotNumberError}</p>
-    {/if}
-    <div class="relative w-2/3">
-    <button
-      type="submit"
-      class="absolute right-0 bottom-0 transform translate-x-1 translate-y-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-600 transition duration-300"
-    >
-      SEARCH
-    </button>
-  </form>
-</div>
-{/if}
+            
+      {#if activeTab === "Certificates of Quality"}
+      <div class="mb-6 relative">
+        <h2 class="text-xl font-semibold mb-4">Certificates of Quality (CQ)</h2>
+        <form on:submit={validateCQForm} class="space-y-2">
+          <label for="product-number-cq" class="block text-sm font-medium {cqProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+            * Product Number
+          </label>
+          <div class="relative w-full ">
+          <input
+            type="text"
+            id="product-number-cq"
+            name="product-number-cq"
+            placeholder="E.G. T1503"
+            class="block w-full p-3 border {cqProductNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+          />
+          {#if cqProductNumberError}
+            <p class="text-red-500 text-sm">{cqProductNumberError}</p>
+          {/if}
+          
+          <label for="lot-number-cq" class="block text-sm font-medium {cqLotNumberError ? 'text-red-500' : 'text-gray-700'}">
+            * Lot Number
+          </label>
+          <input
+            type="text"
+            id="lot-number-cq"
+            name="lot-number-cq"
+            placeholder="E.G. L1234"
+            class="block w-full  p-3 border {cqLotNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+          />
+          {#if cqLotNumberError}
+            <p class="text-red-500 text-sm">{cqLotNumberError}</p>
+          {/if}
+          <button
+            type="submit"
+            class="absolute right-0 bottom-0 w-full sm:w-40 transform translate-x-1 translate-y-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-600 transition duration-300"
+          >
+            SEARCH
+          </button>
+        </form>
+      </div>
+      {/if}
+    </div>
 
-      
-{#if activeTab === "Certificates of Quality"}
-<div class="mb-6 relative">
-  <h2 class="text-xl font-semibold mb-4">Certificates of Quality (CQ)</h2>
-  <form on:submit={validateCQForm} class="space-y-2">
-    <label for="product-number-cq" class="block text-sm font-medium {cqProductNumberError ? 'text-red-500' : 'text-gray-700'}">
-      * Product Number
-    </label>
-    <input
-      type="text"
-      id="product-number-cq"
-      name="product-number-cq"
-      placeholder="E.G. T1503"
-      class="block w-2/3 p-3 border {cqProductNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-    />
-    {#if cqProductNumberError}
-      <p class="text-red-500 text-sm">{cqProductNumberError}</p>
-    {/if}
-    
-    <label for="lot-number-cq" class="block text-sm font-medium {cqLotNumberError ? 'text-red-500' : 'text-gray-700'}">
-      * Lot Number
-    </label>
-    <input
-      type="text"
-      id="lot-number-cq"
-      name="lot-number-cq"
-      placeholder="E.G. L1234"
-      class="block w-2/3 p-3 border {cqLotNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-    />
-    {#if cqLotNumberError}
-      <p class="text-red-500 text-sm">{cqLotNumberError}</p>
-    {/if}
-
-    <div class="relative w-2/3">
-    <button
-      type="submit"
-      class="absolute right-0 bottom-0 transform translate-x-1 translate-y-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-600 transition duration-300"
-    >
-      SEARCH
-    </button>
-  </form>
-</div>
-{/if}
-</div>
-  <script>
-      let activeTab = "Safety Data Sheets";
-      let showProductDetails = false;
-    
-      function toggleProductDetails() {
-        showProductDetails = !showProductDetails;
-      }
-    </script>
-    
-    <div class="flex flex-col space-y-4">
-      
+    <div class="flex space-y-4 ml-0 md:ml-16 mt-10"> 
       {#if activeTab === "Safety Data Sheets"}
-        <div class="bg-white-50 p-4 border border-primary-100 rounded-lg shadow-md max-w-md self-start mt-4"> 
-          <div class="flex items-center justify-between">
+        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start "> 
+          <div on:click={() => toggleProductDetails("Safety Data Sheets")} class="flex items-center justify-between">
             <h3 class="text-xs font-medium text-gray-700">How to Find the Product Number</h3>
-            <a on:click={toggleProductDetails} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
-              <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
-                <path fill="currentColor" d="m5.99 16.596l8.192-8.192H7.818v-2h9.778v9.778h-2V9.818L7.403 18.01z"/>
-              </svg>
+            <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
+              <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showProductDetailsSafety ? 'rotate-45' : '-rotate-45'}`} />
             </a>
           </div>
-          {#if showProductDetails}
+          {#if showProductDetailsSafety}
             <div class="mt-4 text-sm text-gray-600">
               <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T1503-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T1503).</p>
               <div class="bg-gray-100 p-3 border border-gray-300 rounded mt-3">
@@ -351,21 +389,20 @@
           {/if}
         </div>
       {/if}
+   
     
       {#if activeTab === "Certificates of Analysis"}
 
-      <div class="flex flex-col space-y-4 mt-4">
+      <div class="flex flex-wrap  space-y-4 ml-0 md:ml-16">
         
-        <div class="bg-white-50 p-4 border border-primary-100 rounded-lg shadow-md w-full md:w-[320px] self-start"> 
-          <div class="flex items-center justify-between">
+        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start"> 
+          <div on:click={() => toggleProductDetails("Certificates of Analysis")} class="flex items-center justify-between">
             <h3 class="text-xs font-medium text-gray-700">How to Find the Product Number</h3>
-            <a on:click={toggleProductDetails} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
-              <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
-                <path fill="currentColor" d="m5.99 16.596l8.192-8.192H7.818v-2h9.778v9.778h-2V9.818L7.403 18.01z"/>
-              </svg>
+            <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
+              <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showProductDetailsCertificates ? 'rotate-45' : '-rotate-45'}`} />
             </a>
           </div>
-          {#if showProductDetails}
+          {#if showProductDetailsCertificates}
             <div class="mt-4 text-sm text-gray-600">
               <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T1503-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T1503).</p>
               <div class="bg-gray-100 p-3 border border-gray-300 rounded mt-3">
@@ -387,16 +424,14 @@
         </div>
       
        
-        <div class="bg-white-50 p-4 border border-primary-100 rounded-lg shadow-md w-full md:w-[320px] self-start">
-          <div class="flex items-center justify-between">
+        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start">
+          <div on:click={() => toggleLotDetails("Certificates of Analysis")} class="flex items-center justify-between">
             <h3 class="text-xs font-medium text-gray-700">How to Find a Lot/Batch Number for COO</h3>
-            <a on:click={toggleLotDetails} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
-              <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M14.59 16.003L5.983 7.397l1.414-1.415l8.607 8.607V7.003h2v11h-11v-2z"/>
-              </svg>
+            <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
+              <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showLotDetailsCertificates ? 'rotate-45' : '-rotate-45'}`} />
             </a>
           </div>
-          {#if showLotDetails}
+          {#if showLotDetailsCertificates}
             <div class="mt-4 text-xs text-gray-600">
               <p>Lot and Batch Numbers can be found on a product's label following the words 'Lot' or 'Batch'.</p>
               <h4 class="font-bold mt-2">Sigma Products</h4>
@@ -412,7 +447,7 @@
         </div>
       
        
-        <div class="bg-white-50 p-4 border border-primary-100 rounded-lg shadow-md w-full md:w-[320px] self-start">
+        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
           <div class="flex items-center justify-between">
             <h3 class="text-xs font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
           </div>
@@ -436,18 +471,16 @@
 
 {#if activeTab === "Certificates of Origin"}
 
-<div class="flex flex-col space-y-4 mt-4">
+<div class="flex flex-wrap space-y-4 ml-0 md:ml-16">
   
-  <div class="bg-white-50 p-4 border border-primary-100 rounded-lg shadow-md w-full md:w-[320px] self-start"> 
-    <div class="flex items-center justify-between">
+  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start"> 
+    <div on:click={() => toggleProductDetails("Certificates of Origin")} class="flex items-center justify-between">
       <h3 class="text-xs font-medium text-gray-700">How to Find the Product Number</h3>
-      <a on:click={toggleProductDetails} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
-          <path fill="currentColor" d="m5.99 16.596l8.192-8.192H7.818v-2h9.778v9.778h-2V9.818L7.403 18.01z"/>
-        </svg>
+      <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
+        <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showProductDetailsOrigin ? 'rotate-45' : '-rotate-45'}`} />
       </a>
     </div>
-    {#if showProductDetails}
+    {#if showProductDetailsOrigin}
       <div class="mt-4 text-sm text-gray-600">
         <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T1503-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T1503).</p>
         <div class="bg-gray-100 p-3 border border-gray-300 rounded mt-3">
@@ -469,16 +502,14 @@
   </div>
 
  
-  <div class="bg-white-50 p-4 border border-primary-100 rounded-lg shadow-md w-full md:w-[320px] self-start">
-    <div class="flex items-center justify-between">
+  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
+    <div on:click={() => toggleLotDetails("Certificates of Origin")} class="flex items-center justify-between">
       <h3 class="text-xs font-medium text-gray-700">How to Find a Lot/Batch Number for COO</h3>
-      <a on:click={toggleLotDetails} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M14.59 16.003L5.983 7.397l1.414-1.415l8.607 8.607V7.003h2v11h-11v-2z"/>
-        </svg>
+      <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
+        <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showLotDetailsOrigin ? 'rotate-45' : '-rotate-45'}`} />
       </a>
     </div>
-    {#if showLotDetails}
+    {#if showLotDetailsOrigin}
       <div class="mt-4 text-xs text-gray-600">
         <p>Lot and Batch Numbers can be found on a product's label following the words 'Lot' or 'Batch'.</p>
         <h4 class="font-bold mt-2">Sigma Products</h4>
@@ -494,7 +525,7 @@
   </div>
 
   
-  <div class="bg-white-50 p-4 border border-primary-100 rounded-lg shadow-md w-full md:w-[320px] self-start">
+  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
     <div class="flex items-center justify-between">
       <h3 class="text-xs font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
     </div>
@@ -514,18 +545,16 @@
       
 {#if activeTab === "Certificates of Quality"}
 
-<div class="flex flex-col space-y-4 mt-4">
+<div class="flex flex-wrap space-y-4 ml-0 md:ml-16">
  
-  <div class="bg-white-50 p-4 border border-primary-100 rounded-lg shadow-md w-full md:w-[320px] self-start"> 
+  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start"> 
     <div class="flex items-center justify-between">
       <h3 class="text-xs font-medium text-gray-700">How to Find the Product Number</h3>
-      <a on:click={toggleProductDetails} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
-          <path fill="currentColor" d="m5.99 16.596l8.192-8.192H7.818v-2h9.778v9.778h-2V9.818L7.403 18.01z"/>
-        </svg>
+      <a on:click={() => toggleProductDetails("Certificates of Quality")} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
+        <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-300 ${showProductDetailsQuality ? 'rotate-45' : '-rotate-45'}`} />
       </a>
     </div>
-    {#if showProductDetails}
+    {#if showProductDetailsQuality}
       <div class="mt-4 text-sm text-gray-600">
         <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T1503-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T1503).</p>
         <div class="bg-gray-100 p-3 border border-gray-300 rounded mt-3">
@@ -547,16 +576,14 @@
   </div>
 
   
-  <div class="bg-white-50 p-4 border border-primary-100 rounded-lg shadow-md w-full md:w-[320px] self-start">
+  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start">
     <div class="flex items-center justify-between">
       <h3 class="text-xs font-medium text-gray-700">How to Find a Lot/Batch Number for COO</h3>
-      <a on:click={toggleLotDetails} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M14.59 16.003L5.983 7.397l1.414-1.415l8.607 8.607V7.003h2v11h-11v-2z"/>
-        </svg>
+      <a on:click={() => toggleLotDetails("Certificates of Quality")} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
+        <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-300 ${showLotDetailsQuality ? 'rotate-45' : '-rotate-45'}`} />
       </a>
     </div>
-    {#if showLotDetails}
+    {#if showLotDetailsQuality}
       <div class="mt-4 text-xs text-gray-600">
         <p>Lot and Batch Numbers can be found on a product's label following the words 'Lot' or 'Batch'.</p>
         <h4 class="font-bold mt-2">Sigma Products</h4>
@@ -572,7 +599,7 @@
   </div>
 
   
-  <div class="bg-white-50 p-4 border border-primary-100 rounded-lg shadow-md w-full md:w-[320px] self-start">
+  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start">
     <div class="flex items-center justify-between">
       <h3 class="text-xs font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
     </div>
@@ -589,4 +616,6 @@
 
 {/if}
 
-  </div></div></div>
+  </div>
+</div>
+</div>
