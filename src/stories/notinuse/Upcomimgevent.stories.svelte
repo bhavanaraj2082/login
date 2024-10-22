@@ -1,9 +1,9 @@
 <script context="module">
-    import RelatedProducts from '../../lib/components/RelatedProducts.svelte';
+    import Upcomimgevent from '../../lib/components/Homepagecomponents/upcomimgevent.svelte';
   
     export const meta = {
-      title: "RelatedProducts",
-      component: RelatedProducts,
+      title: "notinuse/Homepagecomponents",
+      component: Upcomimgevent,
     }
   </script>
   
@@ -13,8 +13,8 @@
   </script>
   
   <Template let:args>
-    <RelatedProducts/>
+    <Upcomimgevent/>
   </Template>
   
   
-  <Story name="RelatedProducts1" />
+  <Story name="Upcomimgeventhome" />

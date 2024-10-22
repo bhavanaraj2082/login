@@ -1,9 +1,9 @@
 <script context="module">
-    import Log from '$lib/components/LoginPage/Log.svelte';
+    import Bulkorder from '../../lib/components/Homepagecomponents/Bulkorder.svelte';
   
     export const meta = {
-      title: "LoginPage",
-      component: Log
+      title: "notinuse/Homepagecomponents",
+      component: Bulkorder,
     }
   </script>
   
@@ -13,9 +13,8 @@
   </script>
   
   <Template let:args>
-    <Log >
-    </Log>
+    <Bulkorder/>
   </Template>
   
   
-  <Story name="LoginPage1" />
+  <Story name="Bulkorderhome" />

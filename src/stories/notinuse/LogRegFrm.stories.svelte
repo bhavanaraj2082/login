@@ -1,9 +1,9 @@
 <script context="module">
-  import Help_chem from "$lib/components/Help_chem.svelte";
+  import LogRegFrm from "$lib/components/LogRegFrm.svelte";
 
   export const meta = {
-      title: "Help_chem",
-      component: Help_chem,
+      title: "notinuse/LogRegFrm",
+      component: LogRegFrm,
   };
 </script>
 
@@ -13,7 +13,7 @@
 </script>
 
 <Template let:args>
-  <Help_chem></Help_chem>
+  <LogRegFrm></LogRegFrm>
 </Template>
 
-<Story name="Help_chem1" />
+<Story name="LogRegFrm1" />

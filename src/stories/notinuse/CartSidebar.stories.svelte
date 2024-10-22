@@ -1,10 +1,10 @@
 <script context="module">
-    import CartSlider from '$lib/components/ChemiKartSlider/Slider.svelte';
-    import carts from '$lib/data/images.json';
+    import CartSidebar from '$lib/components/ChemiKartWidget/CartSidebar.svelte';
+    import carts from '$lib/data/cart.json';
   
     export const meta = {
-      title: "CartSlider",
-      component: CartSlider,
+      title: "notinuse/CartSidebar",
+      component: CartSidebar,
       args: {
         data: carts,
       },
@@ -18,8 +18,8 @@
   </script>
   
   <Template let:args>
-      <CartSlider> </CartSlider>
+      <CartSidebar> </CartSidebar>
     </Template>
     
     
-    <Story name="CartSlider1" />
+    <Story name="CartSidebar1" />

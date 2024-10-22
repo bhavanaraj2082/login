@@ -1,9 +1,9 @@
 <script context="module">
-    import Youtubecomponent from '../../lib/components/Homepagecomponents/Youtubecomponent.svelte';
+    import Catolog from '../../lib/components/Homepagecomponents/catolog.svelte';
   
     export const meta = {
-      title: "Homepagecomponents",
-      component: Youtubecomponent,
+      title: "notinuse/Homepagecomponents",
+      component: Catolog,
     }
   </script>
   
@@ -13,8 +13,8 @@
   </script>
   
   <Template let:args>
-    <Youtubecomponent/>
+    <Catolog/>
   </Template>
   
   
-  <Story name="Youtubecomponenthome" />
+  <Story name="Catologhome" />

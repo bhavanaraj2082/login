@@ -2,7 +2,7 @@
     import MyDetails from "../../lib/components/MyDetails.svelte";
 
     export const meta = {
-        title: "MyDetails",
+        title: "notinuse/MyDetails",
         component: MyDetails,
     };
 </script>

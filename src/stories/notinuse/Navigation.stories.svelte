@@ -1,9 +1,9 @@
 <script context="module">
-    import CartForm from '$lib/components/ChemiKartWidget/cart.svelte';
+    import Navigation from '$lib/components/Navigation.svelte';
   
     export const meta = {
-      title: "CartForm",
-      component: CartForm
+      title: "notinuse/Navigation",
+      component: Navigation
     }
   </script>
   
@@ -13,8 +13,8 @@
   </script>
   
   <Template let:args>
-      <CartForm> </CartForm>
+      <Navigation> </Navigation>
     </Template>
     
     
-    <Story name="CartForm1" />
+    <Story name="Navigation1" />
