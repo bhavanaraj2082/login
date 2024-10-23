@@ -1,0 +1,78 @@
+{
+    "categories1": [
+      {
+        "name1": "Ordering & Shipping",
+        "link1": "/order",
+        "subcategories1": [
+          { "name1": "Conditions of Order", "link1": "/terms#ConOrd" },
+          { "name1": "Conditions of Quote", "link1": "/terms" },
+          { "name1": "Methods of Payment", "link1": "/terms#Pay" },
+          { "name1": "Online Ordering", "link1": "/cart" },
+          { "name1": "Ordering FAQ", "link1": "/help" },
+          { "name1": "Sales Tax", "link1": "/terms#tax" },
+          { "name1": "Shipping Rates/Options", "link1": "/shipping-rates" },
+          { "name1": "Terms & Conditions", "link1": "/terms" }
+        ]
+      },
+      {
+        "name1": "Products",
+        "link1": "/products",
+        "subcategories1": [
+          { "name1": "All Products", "link1": "/products/all-products" },
+          { "name1": "Manufacturers", "link1": "/products/manufacturers" },
+          { "name1": "Automation & Control", "link1": "/products/automation-control" },
+          { "name1": "Boxes, Enclosures, Racks", "link1": "/products/boxes-enclosures-racks" },
+          { "name1": "Cable Assemblies", "link1": "/products/cable-assemblies" },
+          { "name1": "Cables, Wires", "link1": "/products/cables-wires" },
+          { "name1": "Connectors", "link1": "/products/connectors" },
+          { "name1": "Electromechanical", "link1": "/products/electromechanical" },
+          { "name1": "Hardware, Fasteners", "link1": "/products/hardware-fasteners" },
+          { "name1": "Integrated Circuits (ICs)", "link1": "/products/integrated-circuits" },
+          { "name1": "Networking Solutions", "link1": "/products/networking-solutions" }
+        ]
+      },
+      {
+        "name1": "Applications & Services",
+        "link1": "/services",
+        "subcategories1": [
+          { "name1": "Supplier Application", "link1": "/supplier-apply" },
+          { "name1": "PartsKey Solutions", "link1": "/api-solutions" }
+        ]
+      }
+    ],
+ 
+	"categories2": [
+		{
+			"name2": "About Chemikart",
+			"link2": "/about",
+			"subcategories2": [
+				{ "name2": "Corporate Profile", "link2": "/about" },
+				{ "name2": "Supported Browsers and Applications", "link2": "/browser-support" },
+				{ "name2": "Why Register?", "link2": "/why-register" }
+			]
+		},
+		{
+			"name2": "Contact US",
+			"link2": "/contactus",
+			"subcategories2": [
+				{ "name2": "Help and Support", "link2": "/help" },
+				{ "name2": "Site Problems", "link2": "/site-problems" },
+				{ "name2": "Site Questions and Suggestions", "link2": "/feedback" }
+			]
+		}
+	],
+  "categories3": [
+		{
+			"name2": "Document",
+			"link2": "/document",
+			"subcategories2": [
+				{ "name2": "Safety Data Sheets (SDS)", "link2": "#" },
+				{ "name2": "Certificates of Analysis (COA)", "link2": "#" },
+				{ "name2": "Certificates of Origin (COO)", "link2": "#" },
+				{ "name2": "Certificates of Quality (CQ)", "link2": "#" }
+			]
+		}
+  ]
+}
+
+
