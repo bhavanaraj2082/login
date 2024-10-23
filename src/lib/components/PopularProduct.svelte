@@ -11,7 +11,7 @@
             <p class="text-xs">Choose Chemicart for your chemical needs and experience the different that quality and service can make in your scientific endeavors</p>
         </div>
         <div class="flex items-center justify-evenly sm:mr-10 mr-0 sm:mt-0 mt-2">
-            <button class="flex text-sm justify-center items-center font-semibold rounded-md bg-orange-600 text-gray-100 px-4 p-2 ">
+            <button class="flex text-sm justify-center items-center font-semibold rounded-md bg-primary-400 text-gray-100 px-4 p-2 ">
                 view All 
                 <Icon icon="formkit:right" width="1.2em" height="1.2em" />
             </button>
@@ -24,7 +24,7 @@
             <div class="space-y-4">
               <h3 class="text-xl font-semibold mb-2">{product.name}</h3>
               <p class="text-gray-600 mb-4 h-16">{product.description}</p>
-              <button class="bg-orange-500 text-white w-5/6 py-2 rounded hover:bg-orange-600">
+              <button class="bg-primary-400 text-white w-5/6 py-2 rounded hover:bg-primary-400">
                 {product.buttonLabel}
               </button>
             </div>
