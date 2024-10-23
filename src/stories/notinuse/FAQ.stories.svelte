@@ -3,7 +3,7 @@
     import faqData from '$lib/data/faq.json';
   
     export const meta = {
-      title: "FAQ",
+      title: "notinuse/FAQ",
       component: FAQ,
       args: {
         faqs: faqData,

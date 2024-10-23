@@ -1,7 +1,7 @@
 <script context="module">
     import Footer from "../../lib/components/Footer.svelte";
     export const meta ={
-        title:"Footer",
+        title:"notinuse/Footer",
         component: Footer
     }
     </script>

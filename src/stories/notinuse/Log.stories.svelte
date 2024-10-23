@@ -1,9 +1,9 @@
 <script context="module">
-    import Upcomimgevent from '../../lib/components/Homepagecomponents/upcomimgevent.svelte';
+    import Log from '$lib/components/LoginPage/Log.svelte';
   
     export const meta = {
-      title: "Homepagecomponents",
-      component: Upcomimgevent,
+      title: "notinuse/LoginPage",
+      component: Log
     }
   </script>
   
@@ -13,8 +13,9 @@
   </script>
   
   <Template let:args>
-    <Upcomimgevent/>
+    <Log >
+    </Log>
   </Template>
   
   
-  <Story name="Upcomimgeventhome" />
+  <Story name="LoginPage1" />

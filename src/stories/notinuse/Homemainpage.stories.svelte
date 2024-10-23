@@ -2,7 +2,7 @@
     import Homemainpage from '../../lib/components/Homemainpage.svelte';
   
     export const meta = {
-      title: "Homepagecomponents",
+      title: "notinuse/Homepagecomponents",
       component: Homemainpage,
     }
   </script>

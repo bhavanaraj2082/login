@@ -1,9 +1,9 @@
 <script context="module">
-    import Catolog from '../../lib/components/Homepagecomponents/catolog.svelte';
+    import RelatedProducts from '../../lib/components/RelatedProducts.svelte';
   
     export const meta = {
-      title: "Homepagecomponents",
-      component: Catolog,
+      title: "notinuse/RelatedProducts",
+      component: RelatedProducts,
     }
   </script>
   
@@ -13,8 +13,8 @@
   </script>
   
   <Template let:args>
-    <Catolog/>
+    <RelatedProducts/>
   </Template>
   
   
-  <Story name="Catologhome" />
+  <Story name="RelatedProducts1" />

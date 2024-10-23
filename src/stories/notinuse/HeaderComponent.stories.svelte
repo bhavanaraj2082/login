@@ -2,7 +2,7 @@
   import HeaderComponent from '../../lib/components/HeaderComponent/HeaderComponent.svelte';
 
   export const meta = {
-    title: "Header Section",
+    title: "notinuse/Header Section",
     component: HeaderComponent,
   }
 </script>

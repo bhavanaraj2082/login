@@ -2,7 +2,7 @@
     import Cards from '../../lib/components/Homepagecomponents/Cards.svelte';
   
     export const meta = {
-      title: "Homepagecomponents",
+      title: "notinuse/Homepagecomponents",
       component: Cards,
     }
   </script>
