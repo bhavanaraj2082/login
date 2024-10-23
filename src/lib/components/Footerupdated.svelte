@@ -86,7 +86,7 @@
 			<ul class="mt-2 space-y-2 text-sm text-gray-50 font-work-sans">
 				<li><a href="/chemikart-solutions" class="hover:underline">Chemikart Solutions</a></li>
 				<li><a href="/quick-order" class="hover:underline">Quick Order</a></li>
-				<li><a href="/delivery" class="hover:underline">Delivery</a></li>
+				
 			</ul>
 		</div> 
 		</div>
