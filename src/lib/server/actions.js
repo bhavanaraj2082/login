@@ -239,3 +239,57 @@ export async function deleteProduct(productId) {
       console.error('Error deleting product:', error);
   }
 }
+
+//*******SignUP*********/
+export const actions = {
+  register: async (userData,pb) => {
+    const { username, email, language, location, password, passwordConfirm } = userData;
+    const data = {
+      username,
+      email,
+      language,
+      location,
+      password,
+      passwordConfirm, 
+    };
+
+    if (passwordConfirm !== password) {
+      return {
+        type: "error",
+        message: "Passwords do not match. Please try again.",
+      };
+    }
+
+    try {
+      await pb.collection('Register').create(data);
+        return {
+          type: "success",
+          message: "Registration successful!",
+        };
+    } catch (error) {
+      return {
+        type: "error",
+        message: error.response?.data?.message || "Username or email already exists. Please use a different username or email, and ensure the passwords match.",
+      };
+    }
+  },
+};
+
+//********SignIn*********/
+export const signinActions = {
+  signin: async (email, password, pb) => {
+    try {
+      const authData = await pb.collection('Register').authWithPassword(email, password);
+      console.log("User authentication successful:", authData);
+      return {
+        type: "success",
+        message: "Login successful!",
+      };
+    } catch (error) {
+      return {
+        type: "error",
+        message: error.response?.data?.message || "Invalid credentials. Please try again.",
+      };
+    }
+  }
+};
