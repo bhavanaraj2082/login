@@ -15,16 +15,6 @@
     }
   </script>
   
-  <header class="flex gap-2.5 justify-left items-center px-4 ml-5 max-md:ml-2.5 max-md:justify-start mt-5">
-    <Icon icon="tabler:home" class="w-7 h-8 text-primary-500" />
-
-    <nav class="flex gap-2 justify-center items-center text-lg font-semibold">
-      <a href="/" class="hover:text-primary-600 text-primary-400">Home</a>
-      <Icon icon="ic:outline-greater-than" class="w-7 h-8 text-primary-500" />
-      <a href="/chemikart-solutions" class="hover:text-primary-600 text-primary-500">Chemikart Solutions</a>
-    </nav>
-  </header>
-  
     <section class="mt-16 px-5 max-md:mt-10">
         <p class="text-base leading-6 text-content mx-auto text-justify-center ml-10 mr-10 font-montserrat">
           We offer a full range of e-Commerce tools designed to enable greater spend control for your procurement staff, providing your researchers with ease of access to the products they've come to rely on.
@@ -34,7 +24,7 @@
           We have three solutions available to help you save time and cost in procurement management. Read further for more details of each solution, or fill out our contact form and our team will reach out to you to answer any questions.
         </p>      
       
-        <div class="mt-12 max-w-7xl mx-auto">
+        <div class="mt-12 max-w-7xl mx-auto ml-2">
           <div class="flex gap-5 max-md:flex-col">
             <div class="w-3/5 max-md:w-full">
               <div class="space-y-12 max-md:space-y-10">
@@ -64,7 +54,7 @@
               </div>
             </div>
       
-            <aside class="w-2/5 max-md:w-full">
+            <aside class="w-2/5 max-md:w-full ml-2">
               <div class="flex flex-col items-start space-y-5 text-black">
                 <Icon icon="game-icons:chemical-drop" class="w-20 h-24 text-primary-500" />
                 <p class="text-content font-montserrat">Discover our latest website features and enhance your experience with Chemikart.</p>
@@ -81,7 +71,7 @@
         </div>
       </section>
 
-      <section class="mx-4 sm:mx-8 md:mx-10">
+    <section class="mx-2 sm:mx-4 md:mx-6">
         <hr class="self-center mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-10" />
     </section>
 
@@ -180,9 +170,9 @@
     </div>
 </section>
 
-<section class="mx-4 sm:mx-8 md:mx-10">
-  <hr class="self-center mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-10" />
-</section>
+    <section class="mx-2 sm:mx-4 md:mx-6">
+        <hr class="self-center mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-10" />
+    </section>
 
 <section class="flex flex-col items-start px-4 sm:px-8 md:px-12 py-6 mt-16 max-w-full bg-gray-100 w-full max-md:px-2 max-md:mt-10">
   <h2 class="text-heading font-semibold text-lg font-worksans">Contact Our Team</h2>
