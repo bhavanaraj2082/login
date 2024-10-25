@@ -46,12 +46,9 @@
     function validateForm() {
         let isValid = true;
 
-        const usernameRegex = new RegExp(usernamePattern);
+        // const usernameRegex = new RegExp(usernamePattern);
         if (!username) {
-            errors.username = 'Username is required.';
-            isValid = false;
-        } else if (!usernameRegex.test(username)) {
-            errors.username = 'Username must contain only letters, without numbers or special characters.';
+            errors.username = 'Leave empty to auto generate..';
             isValid = false;
         } else {
             errors.username = '';
@@ -131,10 +128,9 @@
         use:enhance={() => {
             return async ({ result }) => {
                 console.log(result);
-    
+                if(validateForm()){
                 if (result.type === "success") {
-                    if (validateForm()) {
-                        const response = await handleFormSubmission({
+                       await handleFormSubmission({
                             username,
                             email,
                             language,
@@ -142,7 +138,7 @@
                             password,
                             passwordConfirm
                         });
-                        // console.log(response.message);
+                       
                         errorStatus = result.data.type;
                         errorMessage =  result.data.message;
                         console.log(result.data.message);   
@@ -152,7 +148,9 @@
                             resetForm();  
                         }                     
                     }
-                } else {
+                  
+                } 
+                else {
                     console.error(result.data.message);
                     errorStatus = result.data.type;
                     errorMessage =  result.data.message;
