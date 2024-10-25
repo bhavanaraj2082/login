@@ -260,36 +260,23 @@ export const actions = {
       };
     }
 
-    try {
-      await pb.collection('Register').create(data);
-        return {
-          type: "success",
-          message: "Registration successful!",
-        };
-    } catch (error) {
-      return {
-        type: "error",
-        message: error.response?.data?.message || "Username or email already exists. Please use a different username or email, and ensure the passwords match.",
-      };
-    }
+    const record = await pb.collection('Register').create(data);
+    return {
+    type: "success",
+    message: "Registration successful!",
+    record: record,
+    };
   },
 };
 
 //********SignIn*********/
 export const signinActions = {
   signin: async (email, password, pb) => {
-    try {
       const authData = await pb.collection('Register').authWithPassword(email, password);
       console.log("User authentication successful:", authData);
       return {
         type: "success",
         message: "Login successful!",
       };
-    } catch (error) {
-      return {
-        type: "error",
-        message: error.response?.data?.message || "Invalid credentials. Please try again.",
-      };
-    }
   }
 };
