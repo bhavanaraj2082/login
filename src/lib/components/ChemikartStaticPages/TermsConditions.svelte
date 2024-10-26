@@ -5,7 +5,7 @@
     }
 </script>
 
-<section class="shadow border-gray-200 pb-5 border-b">
+
     <div class="p-0 max-w-4xl mx-auto md:p-6">
         <!-- Header with print view link on the right -->
         <div class="flex justify-between items-center mb-6">
@@ -541,4 +541,4 @@
             </p>
         </div>
     </div>
-</section>
+
