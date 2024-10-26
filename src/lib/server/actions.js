@@ -280,3 +280,41 @@ export const signinActions = {
       };
   }
 };
+
+/******************Reset Password*******************/
+export const passwordActions = {
+  resetpassword: async (email, pb) => {
+      const records = await pb.collection('Register').getFullList({
+        filter: `email="${email}"`
+      });
+      console.log("Email check records:", records); 
+      
+      if (records.length === 0) {
+        return {
+          type: "error",
+          message: "Email not registered. Please check and try again."
+        };
+      }
+      await pb.collection('Register').requestPasswordReset(email);
+      console.log("Password reset request sent successfully to:", email);
+      return {
+        type: "success",
+        message: "Password reset email sent successfully! Please check your mail."
+      };
+  }
+};
+
+/******************Confirm Password********************/
+export async function confirmpasswordreset(token, newPassword, newConfirmPassword, pb) {
+  if (newPassword !== newConfirmPassword) {
+      return {
+        type: "error",
+        message: "Passwords do not match. Please try again!"
+      };
+    }
+    await pb.collection('Register').confirmPasswordReset(token, newPassword, newConfirmPassword);
+    return {
+      type: "success",
+      message: "Your password has been reset successfully! You can now log in."
+    };
+}
