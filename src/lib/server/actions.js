@@ -239,3 +239,44 @@ export async function deleteProduct(productId) {
       console.error('Error deleting product:', error);
   }
 }
+
+//*******SignUP*********/
+export const actions = {
+  register: async (userData,pb) => {
+    const { username, email, language, location, password, passwordConfirm } = userData;
+    const data = {
+      username,
+      email,
+      language,
+      location,
+      password,
+      passwordConfirm, 
+    };
+
+    if (passwordConfirm !== password) {
+      return {
+        type: "error",
+        message: "Passwords do not match. Please try again.",
+      };
+    }
+
+    const record = await pb.collection('Register').create(data);
+    return {
+    type: "success",
+    message: "Registration successful!",
+    record: record,
+    };
+  },
+};
+
+//********SignIn*********/
+export const signinActions = {
+  signin: async (email, password, pb) => {
+      const authData = await pb.collection('Register').authWithPassword(email, password);
+      console.log("User authentication successful:", authData);
+      return {
+        type: "success",
+        message: "Login successful!",
+      };
+  }
+};
