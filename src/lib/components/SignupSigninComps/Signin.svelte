@@ -8,10 +8,6 @@
     let successMessage = '';
     let formSubmitted = false;
 
-    function validateForm() {
-        return email.length > 0 && password.length > 0;
-    }
-
     function resetForm() {
         email = '';
         password = '';
@@ -32,17 +28,15 @@
             </p>
             
             {#if errorStatus === "success"}
-            <div class="text-green-500 font-semibold mb-4">{errorMessage}</div>
+            <div class="border border-green-400 p-3 w-auto text-sm text-gray-600 font-medium rounded my-6"><i class="fa-solid fa-circle-check text-green-400 mr-1"></i>{errorMessage}</div>
         {/if}
         {#if errorStatus === "error"}
-        <div class="text-red-500 font-semibold mb-4">{errorMessage}</div>
+            <div class="border border-red-400 p-3 w-auto text-sm text-gray-600 font-medium rounded my-6">{errorMessage}</div>
         {/if}
-
             <form action="?/signin" method="POST" 
             use:enhance={() => {
                 return async ({ result }) => {
                     console.log(result);
-
                     if(result.type === "success"){
                     console.log(result.data.type);
                     console.log(result.data.message);
@@ -85,7 +79,7 @@
                 </div>
 
                 <p class="mb-4">
-                    <a href="/forgot-password" class="text-primary-500 hover:text-primary-600 underline">Forgot password?</a>
+                    <a href="/reset" class="text-primary-400 hover:text-primary-500 underline">Forgot password?</a>
                 </p>
 
                 <button class="bg-primary-400 text-white rounded p-2 w-full text-center">

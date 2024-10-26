@@ -118,18 +118,19 @@
         <h2 class="text-2xl font-bold text-primary-500">Sign Up</h2>
         <p class="text-gray-500 mb-5">Already have an account? <a href='/signin' class="underline text-primary-500">Login.</a></p>
         
-        {#if errorStatus === "error"}
-            <div class="text-red-500 font-semibold mb-4">{errorMessage}</div>
-        {:else if errorStatus === "success"}
-            <div class="text-green-500 font-semibold mb-4">{errorMessage}</div>
-        {/if}
+        {#if errorStatus === "success"}
+        <div class="border border-green-400 p-3 w-auto text-sm text-gray-600 font-medium rounded my-6"><i class="fa-solid fa-circle-check text-green-400 mr-1"></i>{errorMessage}</div>
+    {/if}
+    {#if errorStatus === "error"}
+        <div class="border border-red-400 p-3 w-auto text-sm text-gray-600 font-medium rounded my-6">{errorMessage}</div>
+    {/if}
         
         <form method="POST" action="?/register" 
         use:enhance={() => {
             return async ({ result }) => {
                 console.log(result);
                 if(validateForm()){
-                if (result.type === "success") {
+                    if (result.data.type === "success") {
                        await handleFormSubmission({
                             username,
                             email,
@@ -138,7 +139,6 @@
                             password,
                             passwordConfirm
                         });
-                       
                         errorStatus = result.data.type;
                         errorMessage =  result.data.message;
                         console.log(result.data.message);   
@@ -147,15 +147,13 @@
                             formSubmitted = true;  
                             resetForm();  
                         }                     
-                    }
-                  
-                } 
-                else {
+                    } else {
                     console.error(result.data.message);
                     errorStatus = result.data.type;
                     errorMessage =  result.data.message;
                     formSubmitted = false;
-                }
+                    }
+                } 
             };
         }}
         >
@@ -258,7 +256,7 @@
                 </p>
             </div>
 
-            <button type="submit" class="w-full bg-primary-500 text-white py-2 rounded-md hover:bg-primary-400 transition duration-200">Create Account</button>
+            <button type="submit" class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-400 transition duration-200">Create Account</button>
         </form>
     </div>
 </div>
