@@ -3,13 +3,13 @@
     import { page } from '$app/stores';
     import Icon from '@iconify/svelte';
    
-
+    export let products = [];
     let error = null;
     let currentPage = 1;
     const itemsPerPage = 5;
     let selectedProduct = null; 
     let isFavorited = [];
-   let products = $page.data.products; 
+   //let products = $page.data.products; 
     let allProducts = products;
     let searchQuery = '';
     let selectedCategories = new Set();
@@ -26,7 +26,7 @@
     let showCategoryDropdown = false;
     let showManufacturerDropdown = false;
     let loading = false; 
-    //export let products = [];
+   
     let showCoAModal=false;
 
     onMount(() => {
@@ -497,7 +497,7 @@
             </div>
                 {/if}
 
-                <!---------COAA-->
+                <!---------COAA----------->
                
             </div>
 
