@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
-    import { page } from '$app/stores';
     import Icon from '@iconify/svelte';
+   
    
     export let products = [];
     let error = null;
@@ -9,7 +9,6 @@
     const itemsPerPage = 5;
     let selectedProduct = null; 
     let isFavorited = [];
-   //let products = $page.data.products; 
     let allProducts = products;
     let searchQuery = '';
     let selectedCategories = new Set();
@@ -22,15 +21,18 @@
     let showModal = false;
     let showSDSModal = false; 
     let isLoggedIn = false;
-    let showSearchDropdown = false;
-    let showCategoryDropdown = false;
-    let showManufacturerDropdown = false;
-    let loading = false; 
-   
-    let showCoAModal=false;
+    let loading = false;
+    let  showSearchDropdown=false;
+    let showCategoryDropdown=false;
+    let showManufacturerDropdown=false;
+    let currentProduct = null;
 
     onMount(() => {
-       
+        const userEmail = getCookieValue('userEmail');
+    isLoggedIn = !!userEmail; 
+    if (isLoggedIn) {
+        email = userEmail; 
+    }
         initializeProducts();
     });
 
@@ -42,8 +44,6 @@
         extractManufacturers(allProducts);
     }
 
-    
-
     function extractCategories(products) {
         categories = [...new Set(products.map(product => product.categoryName))];
     }
@@ -52,15 +52,49 @@
         manufacturers = [...new Set(products.map(product => product.manufacturerName))];
     }
 
+   
     function toggleFavorite(index) {
-        if (!isLoggedIn) {
+        const userEmail = getCookieValue('userEmail');
+
+        if (!userEmail) {
             showModal = true;
         } else {
-            isFavorited[index] = !isFavorited[index];
+            
+            showModal = true;
+            //console.log(`Product at index ${index} has been ${isFavorited[index] ? 'added to' : 'removed from'} favorites.`);
         }
     }
+    
+    let isAddingToFavorites = false; 
 
-    function closeModal() {
+function viewFavourites(product) {
+  
+    if (isAddingToFavorites) return;
+
+    isAddingToFavorites = true; // Set flag to true
+  //  console.log('Adding Product:', product); 
+
+    
+    const fav = JSON.parse(localStorage.getItem('fav')) || [];
+   // console.log('Current Favorites:', JSON.stringify(fav, null, 2));
+   // console.log('Number of Favorites:', fav.length);
+
+    // Check if the product is already in favorites
+    const existingProductIndex = fav.findIndex(item => item.id === product.id);
+    
+    if (existingProductIndex === -1) {
+        // If not, add the product to the favorites
+        fav.push(product);
+        localStorage.setItem('fav', JSON.stringify(fav));
+       // alert(`${product.productName} has been added to favourites!`);
+    }
+   
+    isAddingToFavorites = false;
+
+   
+    window.location.href = 'favourites'; 
+}
+function closeModal() {
         showModal = false;
     }
 
@@ -73,7 +107,6 @@
         showSDSModal = false;
         selectedProduct = null; 
     }
-   
 
     function updateDisplayedProducts() {
         const filteredProducts = allProducts.filter(product => {
@@ -133,10 +166,12 @@
         updateDisplayedProducts();
     }
 
-    async function validateLogin() {
+    function validateLogin() {
         if (email && password) {
-            isLoggedIn = true;
-            showModal = false;
+            isLoggedIn = true; 
+            setCookie("userEmail", email, 7); 
+            showModal = false; 
+           
         } else {
             alert('Please enter valid credentials.');
         }
@@ -144,7 +179,7 @@
 
     function downloadPDF(url) {
         if (!url) {
-            console.error("No URL provided for the Safety Data Sheet.");
+            
             return;
         }
         const link = document.createElement('a');
@@ -167,8 +202,46 @@
         localStorage.setItem('cart', JSON.stringify(cart));
         alert(`${product.productName} has been added to the cart!`);
     }
+
+
+
+
+// // manual setting cookies
+
+//     function setCookie(name, value, days) {
+//         if (typeof document === 'undefined') return; // Check if running in SSR
+//         let expires = "";
+//         if (days) {
+//             const date = new Date();
+//             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+//             expires = "; expires=" + date.toUTCString();
+//         }
+//         document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Lax";
+//         console.log(`Cookie set: ${name}=${value}; Expires in: ${days} days`);
+//     }
+
+//   setCookie("userEmail","123@gmail.com", 7);
     
-</script> 
+   
+function getCookieValue(cookieName) {
+    if (typeof window === 'undefined') {
+        return null; 
+    }
+    
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${cookieName}=`);
+    if (parts.length === 2) {
+        return parts.pop().split(';').shift();
+    }
+   
+}
+
+// const userEmail = getCookieValue('userEmail');
+// //console.log(userEmail);
+
+
+</script>
+
 <div  class="p-4 flex flex-col md:flex-row">
     <!-- Filters for smaller devices -->
     <div class="w-full md:hidden mb-4">
@@ -349,7 +422,7 @@
                              src={product.imageSrc}                          
                             alt={product.productNumber}  
                             
-                             class="w-[100px] h-[170px] sm:w-[110px] sm:h-[130px]   md:w-[140px] md:h-[160px] lg:w-[130px] lg:h-[130px] xl:w-35 xl:h-35 object-cover rounded" />
+                             class="w-[100px] h-[170px] sm:w-[110px] sm:h-[130px]   md:w-[140px] md:h-[160px] lg:w-[130px] lg:h-[130px] xl:w-35 xl:h-35  rounded" />
                         <div class="flex-grow ml-5">
                             <p class="text-gray-600 mt-1"><strong>Code:</strong> {product.productNumber}</p>
                             <p class="text-gray-600"><strong>Manufacturer:</strong> {product.manufacturerName}</p>
@@ -446,31 +519,75 @@
     {/if}
 </div>
 
-    <!-- Login/Register -->
-   {#if showModal}
-    <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="bg-white rounded-lg p-6 w-11/12 max-w-sm md:max-w-lg lg:max-w-xl relative">
-            <button
-                on:click={closeModal}
-                class="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-                aria-label="Close">
-                <Icon icon="mdi:close" class="text-xl" /></button>
-            <h2 class="text-xl font-bold mb-1">Please login or register to add to your favourites</h2>
-            <p class="text-sm text-gray-500 mb-2">Or continue browsing without access to favourites or pricing</p>
-            <label for="email" class="block font-bold text-gray-600 mb-2">Email</label>
-            <input id="email" type="email" placeholder="Enter your email" class="border border-gray-300 p-2 rounded w-full" />
-            <label for="password" class="block font-bold text-gray-600 mb-2 mt-1">Password</label>
-            <input id="password" type="password" placeholder="Enter your password" class="border border-gray-300 p-2 rounded w-full" />
-            <button on:click={validateLogin} class="bg-primary-400 text-white p-2 rounded w-full mt-4 mb-4">Login</button>
-            <div class="flex justify-between">
-                <a href="/" class="text-gray-500" on:click|preventDefault={closeModal}>Continue browsing</a>
-                <a href="/signup" class="text-primary-400">Register</a>
-            </div> </div></div>{/if}
+ 
 
+            {#if showModal}
+            {#if isLoggedIn}
+            {#each allProducts as product}
+            <div class="fixed inset-0 flex items-center justify-center bg-neutral-50 bg-opacity-20">
+                <div class="bg-white rounded-lg p-6 w-11/12 max-w-sm md:max-w-lg lg:max-w-xl relative">
+                    <button on:click={closeModal} class="absolute top-2 right-2 text-gray-600 hover:text-gray-900" aria-label="Close">
+                        <Icon icon="mdi:close" class="text-xl" />
+                    </button>
+                    <h2 class="text-xl font-bold mb-1 text-center">Item added to your favourites!</h2>
+                <p class="mb-4 text-center">You can continue shopping or view your favourites.</p>
+                <p class="mb-4 text-center">
+                    <span class="font-bold">{product.productName}</span> is added to the favourites
+                    </p>
 
+                    <div class="flex justify-between">
+                        <button 
+                        on:click={closeModal} 
+                        class="bg-primary-400 text-white p-2 mt-2 rounded w-1/3 mr-2 transition-shadow duration-300 hover:shadow-lg hover:shadow-primary-400">
+                        Continue Shopping
+                    </button>
+                    <button 
+                        on:click={() => viewFavourites(allProducts)} 
+                        class="bg-primary-400 text-white p-2 rounded w-1/3 transition-shadow duration-300 hover:shadow-lg hover:shadow-primary-400">
+                        View Favourites
+                    </button>
+                    
+                    </div>
+                </div>
+            </div>
+            {/each}
+            {:else}
+                <div class="fixed inset-0 flex items-center justify-center bg-neutral-50 bg-opacity-20">
+                    <div class="bg-white rounded-lg p-6 w-11/12 max-w-sm md:max-w-lg lg:max-w-xl relative">
+                        <button on:click={closeModal} class="absolute top-2 right-2 text-gray-600 hover:text-gray-900" aria-label="Close">
+                            <Icon icon="mdi:close" class="text-xl" />
+                        </button>
+                        <h2 class="text-xl font-bold mb-1">Please login to continue</h2>
+                        <label for="email" class="block font-bold text-gray-600 mb-2">Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            placeholder="Enter your email"
+                            class="border border-gray-300 p-2 rounded w-full"
+                            bind:value={email}
+                        />
+                        <label for="password" class="block font-bold text-gray-600 mb-2 mt-1">Password</label>
+                        <input
+                            id="password"
+                            type="password"
+                            placeholder="Enter your password"
+                            class="border border-gray-300 p-2 rounded w-full"
+                            bind:value={password}
+                        />
+                        <button on:click={validateLogin} class="bg-primary-400 text-white p-2 rounded w-full mt-4 mb-4">Login</button>
+                        <div class="flex justify-between">
+                            <a href="/" class="text-gray-500" on:click|preventDefault={closeModal}>Continue browsing</a>
+                            <a href="/signup" class="text-primary-400">Register</a>
+                        </div>
+                    </div>
+                </div>
+            {/if}
+        {/if}
+          
 
     {#if showSDSModal}
-    <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    
+    <div class="fixed inset-0 flex items-center justify-center bg-neutral-50 bg-opacity-20">
         <div class="bg-white rounded-lg p-6 w-10/12 md:w-5/12 lg:w-4/12 relative"> 
             <button
                 on:click={closeSDSModal}
@@ -485,7 +602,7 @@
                     <span class="border p-2 inline-block rounded bg-gray-100 ml-2">
                         {selectedProduct.priceSize[0].size}
                     </span></p>
-                <!-- <p class="text-center"><strong>Category:</strong> {selectedProduct.categoryName}</p> -->
+                
                 <div class="flex items-center justify-center mt-5">
                     <span class="font-semibold text-primary-400">{selectedProduct.productName}</span>
                     <span on:click={() => downloadPDF(selectedProduct.safetyDatasheet)} class="cursor-pointer">
@@ -494,13 +611,12 @@
                 </div>
                 {/if} 
             </div>
+            
             </div>
+          
+          
                 {/if}
 
-                <!---------COAA----------->
+                <!---------COAA-->
                
             </div>
-
-
-
-        
