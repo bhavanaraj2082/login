@@ -1,48 +1,28 @@
 <script>
+  import {enhance} from '$app/forms';
   let showNav = false;
+  let showErrors = false;
   let showProductDetails = false;
   let showProductDetails1 = false;
   let activeTab = "SafetyData Sheets"; 
-  let finalvalue = ""; 
-  let inputValue = ""; 
-  let lotNumber=null;
+  let inputValue = "";
+  let inputValue1 = ""; 
+  let inputValue2 = ""; 
+  let inputValue3 = ""; 
+  let lotNumber="";
+  let lotNumber1="";
+  let lotNumber2="";
+  let result='';
+  let errormssg='';
+  let status = '';
   let sdsLottNumberError="";
+  let certificate='';
   $: if (activeTab) {
-    finalvalue = ""; 
+    status = "";
   }
-  let validateAndCheckSDSForm = async (event) => {
-    event.preventDefault();
-    const productNumber = event.target['product-number-sds'].value;
-    if (!productNumber) {
-        sdsProductNumberError = "Product number is required.";
-        sdsLottNumberError="Lot number is required."
-        return; 
-    } else {
-        sdsProductNumberError = ""; 
-    }
-    const formData = new FormData();
-    formData.append('inputValue', productNumber); 
-    try {
-        const response = await fetch('/Document', {
-            method: 'POST',
-            body: formData
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const result = await response.json();
-        console.log(result);
-        let value = result.data;
-        const finalValue = value.replace("[", "").replace("]", "");
-        console.log(finalValue);
-        finalvalue = finalValue;
-        value = '';
-        console.log('Server response:', result);
-        inputValue = '';
-    } catch (error) {
-        console.error('Error during fetch:', error);
-    }
-};
+  function showMessage(s) {
+    status = s;
+  }
   function toggleProductDetails() {
     showProductDetails = !showProductDetails;
   }
@@ -128,7 +108,26 @@ function toggleRotation(index) {
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">SafetyData Sheets (SDS)</h2>
         <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Safety Data Sheet, please enter the product number.</p>
-        <form on:submit={validateAndCheckSDSForm}  class="space-y-2">
+        <form 
+        method="post" 
+        action="?/create" 
+        use:enhance={() => {
+            return async ({ result }) => {
+              showErrors = inputValue.length === 0;
+            if (showErrors) {
+              return;
+            }
+                if (result.data) {
+                    const certificate = result.data.certificate;
+                    showMessage(certificate);
+                    console.log(certificate);
+                } else if (result) {
+                    console.log(result);
+                    const errormssg = result.data.props.error;
+                    showMessage(errormssg);
+                }
+            };
+        }}>
           <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
@@ -137,10 +136,15 @@ function toggleRotation(index) {
             type="text"
             bind:value={inputValue}
             id="product-number-sds"
-            name="product-number-sds"
+            name="productNumber"
             placeholder="E.G. 1503"
             class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
           />
+          {#if showErrors && inputValue.length === 0}
+          <div class="flex text-start">
+            <span class="text-red-400 text-xs">Order Number is required</span>
+          </div>
+          {/if}
             {#if sdsProductNumberError}
             <p class="text-red-500 text-md">{sdsProductNumberError}</p>
             {/if}
@@ -152,7 +156,7 @@ function toggleRotation(index) {
             </button>
           </div>
           <p class="text-lg font-semibold text-primary-500 my-4 p-4">
-          {finalvalue}
+          {status}
           </p>
         </form>
       </div>
@@ -166,19 +170,43 @@ function toggleRotation(index) {
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">Certificates of Analysis (COA)</h2>
         <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Analysis (COA), please enter both the product number and the Lot/batch number.</p>
-        <form on:submit={validateAndCheckSDSForm} class="space-y-2">
-          <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+        <form 
+        method="post" 
+        action="?/create" 
+        use:enhance={() => {
+            return async ({ result }) => {
+              showErrors = inputValue1.length === 0 || lotNumber.length === 0;
+            if (showErrors) {
+              return;
+            }
+                if (result.data) {
+                    const certificate = result.data.certificate;
+                    showMessage(certificate);
+                    console.log(certificate);
+                } else if (result) {
+                    console.log(result);
+                    const errormssg = result.data.props.error;
+                    showMessage(errormssg);
+                }
+            };
+        }}>
+        <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
           <div class="relative w-full">
             <input 
-            bind:value={inputValue}
+            bind:value={inputValue1}
             type="text"
             id="product-number-sds"
-            name="product-number-sds"
+            name="productNumber"
             placeholder="E.G. 1503"
             class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
           />
+          {#if showErrors && inputValue1.length === 0}
+          <div class="flex text-start">
+            <span class="text-red-400 text-xs">Order Number is required</span>
+          </div>
+        {/if}
           {#if sdsProductNumberError}
             <p class="text-red-500 text-md">{sdsProductNumberError}</p>
             {/if}
@@ -196,9 +224,11 @@ function toggleRotation(index) {
                 placeholder="E.G. 1503"
                 class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
               />
-              {#if lotNumber === '' || lotNumber === null}
-                <p class="text-red-500 text-md mt-1">{sdsLottNumberError}</p>
-              {/if}
+              {#if showErrors && lotNumber.length === 0}
+              <div class="flex text-start">
+                <span class="text-red-400 text-xs">Lot Number is required</span>
+              </div>
+            {/if}
             </div>
               <button
               type="submit"
@@ -208,7 +238,7 @@ function toggleRotation(index) {
             </button>
           </div>
           <p class="text-lg font-semibold text-primary-500 my-4 p-4">
-          {finalvalue}
+          {status}
           </p>
         </form>
       </div>
@@ -221,19 +251,43 @@ function toggleRotation(index) {
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">Certificates of Origin (COO)</h2>
         <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Origin (COO), please enter both the product number and the Lot/batch number.</p>
-        <form on:submit={validateAndCheckSDSForm} class="space-y-2">
+        <form 
+        method="post" 
+        action="?/create" 
+        use:enhance={() => {
+            return async ({ result }) => {
+              showErrors = inputValue2.length === 0 || lotNumber1.length === 0;
+            if (showErrors) {
+              return;
+            }
+                if (result.data) {
+                    const certificate = result.data.certificate;
+                    showMessage(certificate);
+                    console.log(certificate);
+                } else if (result) {
+                    console.log(result);
+                    const errormssg = result.data.props.error;
+                    showMessage(errormssg);
+                }
+            };
+        }}>
           <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
           <div class="relative w-full">
             <input 
-            bind:value={inputValue}
+            bind:value={inputValue2}
             type="text"
             id="product-number-sds"
-            name="product-number-sds"
+            name="productNumber"
             placeholder="E.G. 1503"
             class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
           />
+          {#if showErrors && inputValue2.length === 0}
+          <div class="flex text-start">
+            <span class="text-red-400 text-xs">Order Number is required</span>
+          </div>
+          {/if}
           {#if sdsProductNumberError}
             <p class="text-red-500 text-md">{sdsProductNumberError}</p>
             {/if}
@@ -246,9 +300,15 @@ function toggleRotation(index) {
             type="text"
             id="product-number"
             name="product-number"
+            bind:value={lotNumber1}
             placeholder="E.G. 1503"
             class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
           />
+          {#if showErrors && lotNumber1.length === 0}
+          <div class="flex text-start">
+            <span class="text-red-400 text-xs">Lot Number is required</span>
+          </div>
+        {/if}
           {#if lotNumber === '' || lotNumber === null}
             <p class="text-red-500 text-md mt-1">{sdsLottNumberError}</p>
           {/if}
@@ -260,7 +320,7 @@ function toggleRotation(index) {
             </button>
           </div>
           <p class="text-lg font-semibold text-primary-500 my-4 p-4">
-            {finalvalue}
+            {status}
           </p>
         </form>
       </div>
@@ -274,19 +334,43 @@ function toggleRotation(index) {
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">Certificates of Quality (COQ)</h2>
         <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Quality (COQ), please enter both the product number and the Lot/batch number.</p>
-        <form on:submit={validateAndCheckSDSForm} class="space-y-2">
-          <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+        <form 
+        method="post" 
+        action="?/create" 
+        use:enhance={() => {
+            return async ({ result }) => {
+              showErrors = inputValue3.length === 0 || lotNumber2.length === 0;
+            if (showErrors) {
+              return;
+            }
+                if (result.data) {
+                    const certificate = result.data.certificate;
+                    showMessage(certificate);
+                    console.log(certificate);
+                } else if (result) {
+                    console.log(result);
+                    const errormssg = result.data.props.error;
+                    showMessage(errormssg);
+                }
+            };
+        }}>
+        <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
           <div class="relative w-full">
             <input 
-            bind:value={inputValue}
+            bind:value={inputValue3}
             type="text"
             id="product-number-sds"
-            name="product-number-sds"
+            name="productNumber"
             placeholder="E.G. 1503"
             class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
           />
+          {#if showErrors && inputValue3.length === 0}
+          <div class="flex text-start">
+            <span class="text-red-400 text-xs">Order Number is required</span>
+          </div>
+          {/if}
             <br>
             <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
               * Lot/batch number
@@ -296,9 +380,15 @@ function toggleRotation(index) {
             type="text"
             id="product-number"
             name="product-number"
+            bind:value={lotNumber2}
             placeholder="E.G. 1503"
             class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
           />
+          {#if showErrors && lotNumber2.length === 0}
+          <div class="flex text-start">
+            <span class="text-red-400 text-xs">Lot Number is required</span>
+          </div>
+          {/if}
           {#if lotNumber === '' || lotNumber === null}
             <p class="text-red-500 text-md mt-1">{sdsLottNumberError}</p>
           {/if}
@@ -310,7 +400,7 @@ function toggleRotation(index) {
             </button>
           </div>
           <p class="text-lg font-semibold text-primary-500 my-4 p-4">
-            {finalvalue}
+            {status}
           </p>
         </form>
       </div>
