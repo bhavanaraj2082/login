@@ -923,88 +923,17 @@
             "href": "/support",
             "submenus": [
               {
+                "title": "FAQ",
+                "href": "/faqs"
+              },
+              {
+                "title": "Contact Us",
+                "href": "/contact-us"
+              },
+              {
                 "title": "Customer Support",
-                "href": "/customer-support",
-                "subSubmenus": [
-                  { "title": "Contact Support", "href": "/contact-support" },
-                  { "title": "Live Chat", "href": "/live-chat" },
-                  { "title": "Support Ticket", "href": "/support-ticket" }
-                ]
-              },
-              {
-                "title": "Technical Support",
-                "href": "/technical-support",
-                "subSubmenus": [
-                  { "title": "Technical Documentation", "href": "/technical-documentation" },
-                  { "title": "FAQs", "href": "/faqs" },
-                  { "title": "System Requirements", "href": "/system-requirements" }
-                ]
-              },
-              {
-                "title": "Account Support",
-                "href": "/account-support",
-                "subSubmenus": [
-                  { "title": "Manage Account", "href": "/manage-account" },
-                  { "title": "Reset Password", "href": "/reset-password" },
-                  { "title": "Billing and Payments", "href": "/billing-payments" }
-                ]
-              },
-              {
-                "title": "Community Support",
-                "href": "/community-support",
-                "subSubmenus": [
-                  { "title": "Community Forum", "href": "/community-forum" },
-                  { "title": "User Groups", "href": "/user-groups" },
-                  { "title": "Events and Webinars", "href": "/events-webinars" }
-                ]
-              },
-              {
-                "title": "Product Updates",
-                "href": "/product-updates",
-                "subSubmenus": [
-                  { "title": "Latest Releases", "href": "/latest-releases" },
-                  { "title": "Release Notes", "href": "/release-notes" },
-                  { "title": "Feature Requests", "href": "/feature-requests" }
-                ]
-              },
-              {
-                "title": "Technical Support",
-                "href": "/technical-support",
-                "subSubmenus": [
-                  { "title": "Technical Documentation", "href": "/technical-documentation" },
-                  { "title": "FAQs", "href": "/faqs" },
-                  { "title": "System Requirements", "href": "/system-requirements" }
-                ]
-              },
-              {
-                "title": "Account Support",
-                "href": "/account-support",
-                "subSubmenus": [
-                  { "title": "Manage Account", "href": "/manage-account" },
-                  { "title": "Reset Password", "href": "/reset-password" },
-                  { "title": "Billing and Payments", "href": "/billing-payments" }
-                ]
-              },
-              {
-                "title": "Community Support",
-                "href": "/community-support",
-                "subSubmenus": [
-                  { "title": "Community Forum", "href": "/community-forum" },
-                  { "title": "User Groups", "href": "/user-groups" },
-                  { "title": "Events and Webinars", "href": "/events-webinars" }
-                ]
-              },
-              {
-                "title": "Feedback",
-                "href": "/feedback",
-                "subSubmenus": [
-                  { "title": "Submit Feedback", "href": "/submit-feedback" },
-                  { "title": "Product Surveys", "href": "/product-surveys" },
-                  { "title": "Customer Testimonials", "href": "/customer-testimonials" }
-                ]
+                "href": "/customer-support"
               }
             ]
           }
-          
-	]
-}
+        ]}          

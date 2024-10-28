@@ -1,6 +1,6 @@
 
 import { writable } from 'svelte/store';
-import { fetchproductName } from '../lib/server/actions.js';
+import { fetchproductName } from '../lib/server/actions';
 
 export const searchResult = writable([]);
 
