@@ -1,5 +1,6 @@
 <script>
     import { enhance } from '$app/forms';
+    import Cookies from 'js-cookie';
     let email = '';
     let password = '';
     let showPassword = false;
@@ -14,16 +15,11 @@
         formSubmitted = false;
     }
 
+        // Set cookie using js-cookie
         function setCookie(name, value, days) {
-    let expires = "";
-    if (days) {
-        const date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toUTCString();
-    }
-    document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Lax";
-    console.log(`Cookie set: ${name}=${value}; Expires in: ${days} days`);
-    }
+        Cookies.set(name, value, { expires: days, sameSite: 'Lax' });
+        console.log(`Cookie set: ${name}=${value}; Expires in: ${days} days`);
+        }
 </script>
 
 <div class="flex flex-col md:flex-row max-w-3xl shadow-lg rounded-lg mx-auto h-screen md:h-auto my-14">
@@ -57,7 +53,7 @@
                         if(result.data.type === "success"){
                             formSubmitted=true;
                             // console.log(result.data.message);
-                            setCookie("loginUsername/Email", email, 7);
+                            setCookie("Username_or_Email", email, 7);
                             resetForm();
                          }
                     }
