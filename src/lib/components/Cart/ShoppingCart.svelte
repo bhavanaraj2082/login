@@ -1,19 +1,27 @@
 <script>
     import { onMount } from "svelte";
     import cartData from '../../data/cart.json';
+    import { viewedCart } from "../../../stores/alsoViewedProducts_Store";
 
     let cartItems = [];
     let subtotal = 0;
     let tax = 0;
     let total = 0;
+    let viewedCartItems = [];
 
     onMount(() => {
-        cartItems = cartData.map(item => ({
+        const unsubscribe = viewedCart.subscribe(items =>{
+        viewedCartItems = items;
+        cartItems = [...cartData, ...viewedCartItems].map((item, index) => ({
             ...item,
+            id: item.id || `item-${index}`,
             quantity: item.quantity || 1,
-            price: item.price || 50
+            price: item.price || 50,
+            name: item.name1 && item.name2 ? `${item.name1} & ${item.name2}` : item.name1 || item.name2 || item.name
         }));
         calculateTotals();
+    });
+    return () => unsubscribe();
     });
 
     const calculateTotals = () => {
