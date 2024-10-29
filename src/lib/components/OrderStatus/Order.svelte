@@ -1,40 +1,63 @@
 <script>
-  export let error = '';
-  export let data = null;
+  import { enhance } from '$app/forms';
+  let order_number = '';  
+  let status = '';
+  let errormssg = '';
+  let postalcode = '';
+  let showErrors = false;
+  function showMessage(s) {
+    status = s;
+  }
 </script>
-
-<div class="min-h-screen flex flex-col justify-center bg-gray-100 px-4 sm:px-6 lg:px-8">
-  <h2 class="text-3xl font-bold mb-4 text-left">Order Status</h2>
-  <p class="text-left text-gray-600 mb-8">Please enter your order details below to check the status</p>
-
-  {#if error}
-    <div class="text-red-500 text-sm mb-6 text-center">{error}</div>
-  {/if}
-
-  {#if data}
-    <div class="text-center text-green-500 text-lg mb-6">Status: {data.status}</div>
-  {/if}
-
-  <form method="post" action="?/checkOrderStatus" class="max-w-4xl mx-auto w-full space-y-8">
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-      <div>
-        <label class="block text-gray-700 text-lg font-medium">*Order Number</label>
-        <input type="text" name="orderNumber" placeholder="Order Number"
-               class="mt-2 block w-full px-6 py-2 border rounded-lg text-lg focus:ring focus:outline-none" 
-               required />
-      </div>
-      <div>
-        <label class="block text-gray-700 text-lg font-medium">*Shipped to Postal Code</label>
-        <input type="text" name="postalCode" placeholder="Postal Code"
-               class="mt-2 block w-full px-6 py-2 border rounded-lg text-lg focus:ring focus:outline-none" 
-               required />
-      </div>
+<div class="flex items-center justify-center min-h-screen">
+  <div class="container mx-auto p-6 max-w-screen-lg rounded-lg">
+    <h2 class="text-2xl font-bold">Order Status</h2>
+    <p class="text-lg md:text-base sm:text-sm mb-4">
+      Please enter your order details below to check the status
+    </p>
+    <div class="bg-white p-6 rounded-md border border-gray-300 text-center">
+      <form method="post" action="?/orderStatus" use:enhance={() => {
+        return async({ result }) => {
+            showErrors = order_number.length === 0 || postalcode.length === 0;
+            if (showErrors) {
+              return;
+            }
+            console.log(result);
+            if (result.data) {
+                const order_status = result.data.order_status;
+                showMessage(order_status);
+            } else if (result) {
+                console.log(result);
+                errormssg = result.data.props.error;
+                showMessage(errormssg);
+            }
+        };
+      }}>
+        <div class="flex flex-col md:flex-row md:space-x-4 mb-4">
+          <div class="flex-1">     
+            <label for="order_number" class="block text-sm font-medium text-gray-700 text-start">*Order Number</label>
+            <input type="text" id="order_number" name="order_number" bind:value={order_number}  class="mt-1 p-2 border border-gray-300 rounded-sm w-full focus:outline-none focus:border-primary-500" />
+            {#if showErrors && order_number.length === 0}
+              <div class="flex text-start">
+                <span class="text-red-400 text-xs">Order Number is required</span>
+              </div>
+            {/if}
+          </div>
+          <div class="flex-1">  
+            <label for="postalcode" class="block text-sm font-medium text-gray-700 text-start sm:mt-0 mt-10">*Shipped to Postal Code</label>
+            <input type="text" id="postalcode" name="postalcode" bind:value={postalcode}  class="mt-1 p-2 border border-gray-300 rounded-sm w-full focus:outline-none focus:border-primary-500" />
+            {#if showErrors && postalcode.length === 0}
+              <div class="flex text-start">
+                <span class="text-red-400 text-xs">Postal Code is required</span>
+              </div>
+            {/if}
+          </div>
+        </div>
+        <div class="flex justify-start">
+          <button type="submit" class="sm:w-1/2 w-full md:w-1/4 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md mt-7">View Order Status</button>
+        </div>
+        <div class="text-primary-500 font-semibold text-base mt-4">{status}</div>
+      </form>
     </div>
-
-    <div class="flex justify-left">
-      <button type="submit" class="px-12 py-4 bg-primary-400 text-white text-lg rounded-lg hover:bg-primary-400 transition">
-        View Order Status
-      </button>
-    </div>
-  </form>
+  </div>
 </div>

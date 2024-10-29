@@ -135,6 +135,70 @@ export async function Addqoutes({request}) {
         records: results
     };
 }
+
+//ORDER STATUS ACTION FUNCTION
+export async function fetchorderstatus(orderNumber, pb) {
+  const query = orderNumber ? `order_number="${orderNumber}"` : '';
+  const record = await pb.collection('order').getFirstListItem(query, {
+      fields: 'order_number, order_status'
+  });
+  return record;
+}
+
+//DOCUMENT ACTION FUNCTION
+export async function fetchcertificate(inputValue,pb) {
+  const records = await pb.collection('Documents').getFirstListItem(`productNumber="${inputValue}"`, {
+          fields: 'certificate, productNumber', 
+      });
+  return records;
+}
+
+// CONTACT US ACTION FUNCTION
+export const submitContactInfo = async (data,pb) => {
+  return await pb.collection("ContactUS").create(data);
+};
+
+//CHEMIKART SOLUTIONS PAGE CONTACT ACTION FUNCTION
+export const submitContactData = async (data,pb) => {
+  return await pb.collection("ContactTeam").create(data);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // ContactUs form
 export const saveContactInfo= async(contactData)=> {
   try {
