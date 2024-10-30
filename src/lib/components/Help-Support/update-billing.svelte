@@ -1,5 +1,5 @@
 <script>
-  
+  import { enhance } from '$app/forms';
   let firstName = "";
   let lastName = "";
   let email = "";
@@ -10,77 +10,8 @@
   let addressType = '';
   let primaryAddress = '';
   let updateAddress = '';
-
-  const sanitize = (input) => {
-    if (typeof input !== "string") {
-      
-      return input; // or handle it appropriately
-    } else {
-      // Remove all <script> tags specifically
-      input = input.replace(/<script[^>]*>.*?<\/script>/gi, "");
-
-      // Remove all other HTML tags
-      return input.replace(/<\/?[^>]+(>|$)/g, "");
-    }
-};
-
-async function handleSubmit (event) {
-  event.preventDefault();
-  const sanitizedData ={
-    firstName : sanitize(firstName),
-    lastName : sanitize(lastName),
-    email: sanitize(email),
-    phoneNumber : sanitize(phoneNumber),
-    companyName : sanitize(companyName),
-    location : sanitize(location),
-    accountNumber : sanitize(accountNumber),
-    addressType :  sanitize(addressType),
-    primaryAddress: sanitize(primaryAddress),
-    updateAddress: sanitize(updateAddress)
-  }
-  
- console.log(sanitizedData);
- const finalData = {
-  firstName : sanitizedData.firstName,
-    lastName : sanitizedData.lastName,
-    email: sanitizedData.email,
-    phoneNumber : sanitizedData.phoneNumber,
-    companyName : sanitizedData.companyName,
-    location : sanitizedData.location,
-    accountNumber : sanitizedData.accountNumber,
-    issue :  sanitizedData.addressType,
-    primaryAddress : sanitizedData.primaryAddress,
-    updateAddress :  sanitizedData.updateAddress
- }
- const response = await fetch('/contact', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(finalData)
-    });
-    if (response.ok) {
-      const data = await response.json();
-      console.log(' information saved:', data.record);
-        // Clear the form 
-      firstName = '';
-      lastName = '';
-      email = '';
-      phoneNumber = '';
-      companyName = '';
-      location = '';
-      accountNumber = '';
-      addressType = '';
-      primaryAddress = '';
-      updateAddress = '';
-  alert("Form submitted successfully!");
-    }
-    else {
-      const errorData = await response.json();
-      console.error('Failed to save contact information:', errorData.error);
-      alert('There was an error submitting your information. Please try again.');
-    }
-};
+  let message="";
+  let errormessage = "";
 
   const locations = [
     "United States",
@@ -94,19 +25,61 @@ async function handleSubmit (event) {
 </script>
 
 <div class="w-full p-4">
-  <form on:submit={handleSubmit}>
+  <form method="POST" action="?/contact"  use:enhance={() => {
+    return async({ result }) => {
+   
+      console.log(result);
+
+      if(result.data.record && result.type === 'success')
+    {
+      // console.log(`${result.data.message}` );
+      // Clear the form 
+      firstName = '';
+      lastName = '';
+      email = '';
+      phoneNumber = '';
+      companyName = '';
+      location = '';
+      accountNumber = '';
+      addressType = '';
+      primaryAddress = '';
+      updateAddress = '';
+      message= 'Your information has been submitted successfully!';
+      // alert('Your information has been submitted successfully!');
+    }
+    else {
+      console.error(`${result.data.error}`, result.data.details);
+      errormessage = 'There was an error submitting your information. Please try again.';
+      alert('There was an error submitting your information. Please try again.');
+    }  
+    }; 
+}}>
     <div class=" w-full pb-6 h-full">
+      {#if message != ""}
+        <h2
+          class="text-center bg-green-50 text-green-500 font-semibold text-base w-full"
+        >
+          {message}
+        </h2>
+        {:else if errormessage!= ""}
+        <h2
+        class="text-center bg-red-50 text-red-500 font-semibold text-base w-full"
+      >
+        {errormessage}
+      </h2>
+      {/if}
       <h2 class="text-primary-400 font-semibold text-base pb-4">Update Billing</h2>
+      <input hidden name="issueName" value="Update Billing"/>
       <div>
 
         <label class="block text-base ">Is the new address:</label>
         <div class="flex flex-col text-sm my-4">
         <label class="mb-3">
-          <input type="radio" bind:group={addressType} value="New single address" />
+          <input type="radio" name="issue" bind:group={addressType} value="New single address" />
           A new single address that replaces the original
         </label>
         <label>
-          <input type="radio" bind:group={addressType} value="Additional location"/>
+          <input type="radio" name="issue" bind:group={addressType} value="Additional location"/>
           An additional location/address; original address should be maintained
         </label>
       </div>
@@ -116,11 +89,11 @@ async function handleSubmit (event) {
         <label class="block text-base">Would you like the new address to become your primary address in your online profile?</label>
         <div class="text-sm my-4 w-1/6 flex justify-between">
         <label>
-          <input type="radio" bind:group={primaryAddress} value="Yes" />
+          <input type="radio" name="primaryAddress" bind:group={primaryAddress} value="Yes" />
           Yes
         </label>
         <label>
-          <input type="radio" bind:group={primaryAddress} value="No" />
+          <input type="radio" name="primaryAddress" bind:group={primaryAddress} value="No" />
           No
         </label>
       </div>
@@ -130,15 +103,15 @@ async function handleSubmit (event) {
         <label class="block text-base">Please indicate the address(es) you would like to update:</label>
         <div class="flex flex-col text-sm my-4">
         <label class="mb-3">
-          <input type="radio" bind:group={updateAddress} value="Shipping address only" />
+          <input type="radio" name="updateAddress" bind:group={updateAddress} value="Shipping address only" />
           Shipping address only
         </label>
         <label class="mb-3">
-          <input type="radio" bind:group={updateAddress} value="Billing address only" />
+          <input type="radio" name="updateAddress" bind:group={updateAddress} value="Billing address only" />
           Billing address only
         </label>
         <label>
-          <input type="radio" bind:group={updateAddress} value="Shipping and billing address" />
+          <input type="radio" name="updateAddress" bind:group={updateAddress} value="Shipping and billing address" />
           Shipping and billing address
         </label>
       </div>
@@ -152,6 +125,7 @@ async function handleSubmit (event) {
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-6">
         <input
           type="text"
+          name="firstName"
           placeholder="First Name"
           bind:value={firstName}
           class="border rounded-md p-2 text-sm h-9 w-full"
@@ -159,6 +133,7 @@ async function handleSubmit (event) {
         />
         <input
           type="text"
+          name="lastName"
           placeholder="Last Name"
           bind:value={lastName}
           class="border rounded-md p-2 text-sm h-9 w-full"
@@ -166,6 +141,7 @@ async function handleSubmit (event) {
         />
         <input
           type="email"
+          name="email"
           placeholder="Email"
           bind:value={email}
           class="border rounded-md p-2 text-sm h-9 w-full"
@@ -173,6 +149,7 @@ async function handleSubmit (event) {
         />
         <input
           type="tel"
+          name="phoneNumber"
           placeholder="Phone Number"
           bind:value={phoneNumber}
           class="border rounded-md p-2 text-sm h-9 w-full"
@@ -180,12 +157,14 @@ async function handleSubmit (event) {
         />
         <input
           type="text"
+          name="companyName"
           placeholder="Company/Institution Name"
           bind:value={companyName}
           class="border rounded-md p-2 text-sm h-9 w-full"
         />
         <select
           bind:value={location}
+          name="location"
           class="border rounded-md p-2 text-sm h-9 w-full"
           required
         >
@@ -196,6 +175,7 @@ async function handleSubmit (event) {
         </select>
         <input
           type="text"
+          name="accountNumber"
           placeholder="Account Number"
           bind:value={accountNumber}
           class="border rounded-md p-2 text-sm h-9 w-full"

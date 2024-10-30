@@ -1,4 +1,5 @@
 <script>
+  import { enhance } from "$app/forms";
   let products = [{ itemNumber: "" }];
   let poNumber = "";
   let firstName = "";
@@ -8,7 +9,8 @@
   let companyName = "";
   let location = "";
   let accountNumber = "";
-
+  let message = "";
+  let errormessage = "";
   const addProduct = () => {
     products = [...products, { itemNumber: "" }];
   };
@@ -16,79 +18,6 @@
   const removeProduct = (index) => {
     products = products.filter((_, i) => i !== index);
   };
-
-  const sanitize = (input) => {
-    if (typeof input !== "string") {
-      
-      return input; // or handle it appropriately
-    } else {
-      // Remove all <script> tags specifically
-      input = input.replace(/<script[^>]*>.*?<\/script>/gi, "");
-
-      // Remove all other HTML tags
-      return input.replace(/<\/?[^>]+(>|$)/g, "");
-    }
-};
-
-async function handleSubmit(e) {
-  e.preventDefault();
-
-  let items = products.map((product) => ({
-    itemNumber: sanitize(product.itemNumber),
-  }));
-
-  const sanitizedData = {
-    poNumber : sanitize(poNumber),
-items : items,
-firstName : sanitize(firstName),
-lastName : sanitize(lastName),
-email: sanitize(email),
-phoneNumber : sanitize(phoneNumber),
-companyName : sanitize(companyName),
-location : sanitize(location),
-accountNumber : sanitize(accountNumber),
-  }
-  console.log(sanitizedData);
-
-  const finalData = {
-    poNumber:sanitizedData.poNumber,
-    items:sanitizedData.items,
-    firstName : sanitizedData.firstName,
-    lastName : sanitizedData.lastName,
-    email: sanitizedData.email,
-    phoneNumber : sanitizedData.phoneNumber,
-    companyName : sanitizedData.companyName,
-    location : sanitizedData.location,
-    accountNumber : sanitizedData.accountNumber,
-  }
-  const response = await fetch('/contact', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(finalData)
-    });
-    if (response.ok) {
-      const data = await response.json();
-      console.log(' information saved:', data.record);
-
-      // Clear the form 
-      items = '';
-     
-      firstName = '';
-      lastName = '';
-      email = '';
-      phoneNumber = '';
-      companyName = '';
-      location = '';
-      accountNumber = '';
-      alert('Your information has been submitted successfully!');
-    } else {
-      const errorData = await response.json();
-      console.error('Failed to save contact information:', errorData.error);
-      alert('There was an error submitting your information. Please try again.');
-    }
-};
 
   const locations = [
     "United States",
@@ -102,12 +31,56 @@ accountNumber : sanitize(accountNumber),
 </script>
 
 <div class="  w-full p-4">
-  <form on:submit={handleSubmit}>
+  <form
+    method="POST"
+    action="?/contact"
+    use:enhance={() => {
+      return async ({ result }) => {
+       
+        // console.log(result);
+
+        if (result.data.record && result.type === "success") {
+          // console.log(`${result.data.message}`);
+          // Clear the form
+          products = "";
+          poNumber = "";
+          firstName = "";
+          lastName = "";
+          email = "";
+          phoneNumber = "";
+          companyName = "";
+          location = "";
+          accountNumber = "";
+          message = "Your information has been submitted successfully!";
+          // alert('Your information has been submitted successfully!');
+        } else {
+          console.error(`${result.data.error}`, result.data.details);
+          errormessage =
+            "There was an error submitting your information. Please try again.";
+          // alert("There was an error submitting your information. Please try again.");
+        }
+      };
+    }}
+  >
     <div class=" flex flex-col h-full">
+      {#if message != ""}
+      <h2
+        class="text-center bg-green-50 text-green-500 font-semibold text-base w-full"
+      >
+        {message}
+      </h2>
+      {:else if errormessage!= ""}
+      <h2
+      class="text-center bg-red-50 text-red-500 font-semibold text-base w-full"
+    >
+      {errormessage}
+    </h2>
+    {/if}
       <div class="lg:w-3/4 w-full pb-6 h-full">
         <h2 class="text-primary-400 font-semibold text-base pb-6">
           Order configuration
         </h2>
+        <input hidden name="issueName" value="Order configuration" />
         <h3 class="block mb-2 text-sm">
           Please provide the following product information
         </h3>
@@ -115,6 +88,7 @@ accountNumber : sanitize(accountNumber),
         <div class="flex-1 w-3/4 mb-4 flex flex-col items-start">
           <!-- <label class=" mb-1 hidden" for={`item-number-${index}`}>Item Number</label> -->
           <input
+            name="poNumber"
             id={`item-number-${1}`}
             type="text"
             placeholder="PO Number"
@@ -152,6 +126,7 @@ accountNumber : sanitize(accountNumber),
         >
           Add another product
         </button>
+        <input hidden name="products" value={JSON.stringify(products)} />
       </div>
       <div class=" w-full pb-6 mx-auto h-full">
         <h2 class="text-primary-400 font-semibold text-base pb-6">
@@ -160,6 +135,7 @@ accountNumber : sanitize(accountNumber),
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-6">
           <input
             type="text"
+            name="firstName"
             placeholder="First Name"
             bind:value={firstName}
             class="border rounded-md p-2 text-sm h-9 w-full"
@@ -167,6 +143,7 @@ accountNumber : sanitize(accountNumber),
           />
           <input
             type="text"
+            name="lastName"
             placeholder="Last Name"
             bind:value={lastName}
             class="border rounded-md p-2 text-sm h-9 w-full"
@@ -174,6 +151,7 @@ accountNumber : sanitize(accountNumber),
           />
           <input
             type="email"
+            name="email"
             placeholder="Email"
             bind:value={email}
             class="border rounded-md p-2 text-sm h-9 w-full"
@@ -181,6 +159,7 @@ accountNumber : sanitize(accountNumber),
           />
           <input
             type="tel"
+            name="phoneNumber"
             placeholder="Phone Number"
             bind:value={phoneNumber}
             class="border rounded-md p-2 text-sm h-9 w-full"
@@ -188,11 +167,13 @@ accountNumber : sanitize(accountNumber),
           />
           <input
             type="text"
+            name="companyName"
             placeholder="Company/Institution Name"
             bind:value={companyName}
             class="border rounded-md p-2 text-sm h-9 w-full"
           />
           <select
+            name="location"
             bind:value={location}
             class="border rounded-md p-2 text-sm h-9 w-full"
             required
@@ -204,6 +185,7 @@ accountNumber : sanitize(accountNumber),
           </select>
           <input
             type="text"
+            name="accountNumber"
             placeholder="Account Number"
             bind:value={accountNumber}
             class="border rounded-md p-2 text-sm h-9 w-full"
@@ -211,16 +193,13 @@ accountNumber : sanitize(accountNumber),
           />
         </div>
 
-
-          <button
-            type="submit"
-            class="w-full bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
-          >
-            Submit
-          </button>
-
+        <button
+          type="submit"
+          class="w-full bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
+        >
+          Submit
+        </button>
       </div>
     </div>
   </form>
 </div>
-
