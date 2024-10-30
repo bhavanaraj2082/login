@@ -19,14 +19,24 @@
   import OtherWebsiteIssues from "./other-website-issues.svelte";
   import ReportProductIssues from "./Report-product-issues.svelte";
   // import ContactInfo1 from "./Contact-info1.svelte";
-  
+  let components = {};
   let Mainimage = "/images/Help&Support.JPG";
   let clickedButton = "";
 
-  function handleClick(buttonValue) {
-    clickedButton = buttonValue;
-    // alert(`${clickedButton} Clicked`);
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Async handleClick function
+async function handleClick(buttonValue) {
+  clickedButton = buttonValue;
+
+  // Wait for the component to render
+  await delay(0);
+
+  // Scroll to the respective component
+  if (components[buttonValue]) {
+    components[buttonValue].scrollIntoView({ behavior: "smooth" });
   }
+}
 </script>
 
 <div class="main-container mx-6 lg:mx-12 md:mx-8 sm:mx-8 my-10 bg-white">
@@ -217,45 +227,25 @@
       </div>
     </div>
   </div>
-{#if clickedButton === 'invoice'}
-<Invoice />
-{:else if clickedButton === 'quotes'}
-<Quotes />
-{:else if clickedButton === 'order-status'}
-<OrderStatus />
-{:else if clickedButton === 'order-configuration'}
-<OrderConfiguration />
-{:else if clickedButton === 'return-exchange-items'}
-<ReturnExchangeItems />
-{:else if clickedButton === 'other-issues'}
-<!-- Kindly provide data if required ,as of now No data provided -->
-<OtherIssues />
-{:else if clickedButton === 'update-billing'}
-<UpdateBilling />
-{:else if clickedButton === 'shipping-info'}
-<ShippingInfo />
-{:else if clickedButton === 'password-reset'}
-<PasswordReset />
-{:else if clickedButton === 'update-email'}
-<UpdateEmail />
-{:else if clickedButton === 'Other-account-issues'}
-<OtherAccountIssues />
-{:else if clickedButton === 'pricing-availability'}
-<PricingAvailability />
-{:else if clickedButton === 'product-documentation'}
-<ProductDocumentation />
-{:else if clickedButton === 'product-technical-issues'}
-<!-- Kindly provide data if required,as of now No data provided -->
-<ProductTechnicalIssues />
-{:else if clickedButton === 'report-product-issues'}
-<ReportProductIssues />
-{:else if clickedButton === 'technical-problem'}
-<!-- Kindly provide data if required,as of now No data provided -->
-<TechnicalProblems />
-{:else if clickedButton === 'other-website-issues'}
-<!-- Kindly provide data if required,as of now No data provided -->
-<OtherWebsiteIssues />
-{/if}
+  <div bind:this={components['invoice']}>{#if clickedButton === 'invoice'}<Invoice />{/if}</div>
+
+  <div bind:this={components['quotes']}>{#if clickedButton === 'quotes'}<Quotes />{/if}</div>
+  <div bind:this={components['order-status']}>{#if clickedButton === 'order-status'}<OrderStatus />{/if}</div>
+  <div bind:this={components['order-configuration']}>{#if clickedButton === 'order-configuration'}<OrderConfiguration />{/if}</div>
+  <div bind:this={components['return-exchange-items']}>{#if clickedButton === 'return-exchange-items'}<ReturnExchangeItems />{/if}</div>
+  <div bind:this={components['other-issues']}>{#if clickedButton === 'other-issues'}<OtherIssues />{/if}</div>
+  <div bind:this={components['update-billing']}>{#if clickedButton === 'update-billing'}<UpdateBilling />{/if}</div>
+  <div bind:this={components['shipping-info']}>{#if clickedButton === 'shipping-info'}<ShippingInfo />{/if}</div>
+  <div bind:this={components['password-reset']}>{#if clickedButton === 'password-reset'}<PasswordReset />{/if}</div>
+  <div bind:this={components['update-email']}>{#if clickedButton === 'update-email'}<UpdateEmail />{/if}</div>
+  <div bind:this={components['Other-account-issues']}>{#if clickedButton === 'Other-account-issues'}<OtherAccountIssues />{/if}</div>
+  <div bind:this={components['pricing-availability']}>{#if clickedButton === 'pricing-availability'}<PricingAvailability />{/if}</div>
+  <div bind:this={components['product-documentation']}>{#if clickedButton === 'product-documentation'}<ProductDocumentation />{/if}</div>
+  <div bind:this={components['product-technical-issues']}>{#if clickedButton === 'product-technical-issues'}<ProductTechnicalIssues />{/if}</div>
+  <div bind:this={components['report-product-issues']}>{#if clickedButton === 'report-product-issues'}<ReportProductIssues />{/if}</div>
+  <div bind:this={components['technical-problem']}>{#if clickedButton === 'technical-problem'}<TechnicalProblems />{/if}</div>
+  <div bind:this={components['other-website-issues']}>{#if clickedButton === 'other-website-issues'}<OtherWebsiteIssues />{/if}</div>
+
 <!-- If you require user to contact u directly send there contact details to email uncomment the below svelte file and use it -->
 <!-- <ContactInfo1 /> -->
 </div>

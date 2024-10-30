@@ -199,18 +199,108 @@ export const submitContactData = async (data,pb) => {
 
 
 
-// ContactUs form
-export const saveContactInfo= async(contactData)=> {
+// Help and Support Page
+function finalformdata(formData) {
+  let poNumber = "";
+  let orderNumber = "";
+  let invoiceNumber = "";
+  if (formData.reference === "PO Number") {
+    poNumber = formData.selectOptionNumber;
+  } else if (formData.reference === "Order Number") {
+    orderNumber = formData.selectOptionNumber;
+  } else if (formData.reference === "Invoice Number") {
+    invoiceNumber = formData.selectOptionNumber;
+  }
+  let items = {};
+  if (formData.products) {
+    items = JSON.parse(formData.products);
+  }
+
+  const finalData = {
+    technical_issue: formData.technical_issue,
+    issueName: formData.issueName,
+    documentRequired: formData.documentRequired,
+    currentEmail: formData.currentEmail,
+    newEmail: formData.newEmail,
+    assistance: formData.assistance,
+    resetemail: formData.resetemail,
+    primaryAddress: formData.primaryAddress,
+    updateAddress: formData.updateAddress,
+    issue: formData.issue,
+    assistance: formData.assistance || "",
+    items: items,
+    exportMaterial: formData.exportMaterial,
+    poNumber: formData.poNumber || poNumber,
+    orderNumber: orderNumber || "",
+    invoiceNumber: formData.invoiceNumber || invoiceNumber,
+    confirmationNumber: formData.confirmationNumber || "",
+    itemNumber: formData.itemNumber || "",
+    firstName: formData.firstName || "",
+    lastName: formData.lastName || "",
+    email: formData.email || "",
+    phoneNumber: formData.phoneNumber || "",
+    companyName: formData.companyName || "",
+    location: formData.location || "",
+    accountNumber: formData.accountNumber || "",
+    shippingStreetAddress: formData.streetAddress || "",
+    shippingCity: formData.city || "",
+    shippinglocation: formData.shippinglocation || "",
+    shippingPostalCode: formData.postalCode || "",
+    billingStreetAddress: formData.billingStreetAddress || "",
+    billingCity: formData.billingCity || "",
+    billingLocation: formData.billingLocation || "",
+    billingPostalCode: formData.billingPostalCode || "",
+    files: formData.files,
+  };
+  return finalData;
+}
+export const saveContactInfo = async (data, pb) => {
   try {
-  
-    await pb.admins.authWithPassword(`${DB_USER}`, `${DB_PASS}`)
-    const record = await pb.collection('helpandSupport').create(contactData);
+    let finalData = finalformdata(data);
+    const record = await pb.collection("helpandSupport").create(finalData);
     return { success: true, record };
   } catch (error) {
-    console.error('Error saving contact info:', error);
     return { success: false, error: error.message };
   }
+};
+// Help and Support page end
+
+
+//******** */ Recommended products
+export const fetchrecommended = async (data, pb) => {
+  const productsFulldata = await pb.collection("Products").getList(1, 15, {
+    filter: `productName="${data.productName}" `,
+    expand: `manufacturerName`,
+  });
+
+  // console.log(productsFulldata);
+  const products = productsFulldata.items.map((product) => ({
+    productName: product.productName,
+    productNumber: product.productNumber,
+    manufacturerName: product.expand?.manufacturerName?.name,
+    imageSrc: product.imageSrc,
+    prodDesc: product.prodDesc || "",
+    priceSize: product.priceSize,
+    productSynonym: product.filteredProductData[`Synonym(S)`] || "",
+  }));
+  return products;
+};
+
+export const checkavailability = async (data, pb) => {
+  
+  const result = await pb
+    .collection("Stocks")
+    .getFirstListItem(`partNumber.productNumber="${data.productNumber}"`, {
+      expand: `partNumber`,
+    });
+if(result)
+{
+  if(result.stockQuantity >= data.quantity)
+    return result
 }
+};
+// *****************/Recommended products end
+
 //shopping cart
 export const addItemToCart = async ({ request }) => {
   const { id, quantity } = await request.json();

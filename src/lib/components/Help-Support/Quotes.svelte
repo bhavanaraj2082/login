@@ -1,4 +1,5 @@
 <script>
+  import { enhance } from "$app/forms";
   let products = [{ itemNumber: "", quantity: "" }];
   let exportMaterial = "";
   let firstName = "";
@@ -17,7 +18,8 @@
   let billingPostalCode = "";
   let billingLocation = "";
   let useShippingAddress = false;
-
+  let message="";
+  let errormessage = "";
   const addProduct = () => {
     products = [...products, { itemNumber: "", quantity: "" }];
   };
@@ -25,106 +27,6 @@
   const removeProduct = (index) => {
     products = products.filter((_, i) => i !== index);
   };
-
-  const sanitize = (input) => {
-    if (typeof input !== "string") {
-      
-      return input; // or handle it appropriately
-    } else {
-      // Remove all <script> tags specifically
-      input = input.replace(/<script[^>]*>.*?<\/script>/gi, "");
-
-      // Remove all other HTML tags
-      return input.replace(/<\/?[^>]+(>|$)/g, "");
-    }
-  };
-
-  async function handleSubmit(e){
-  e.preventDefault();
-
-  let items = products.map((product) => ({
-    itemNumber: sanitize(product.itemNumber),
-    quantity: sanitize(product.quantity),
-  }));
-
-  const sanitizedData = {
-items : items,
-exportMaterial : sanitize(exportMaterial),
-firstName : sanitize(firstName),
-lastName : sanitize(lastName),
-email: sanitize(email),
-phoneNumber : sanitize(phoneNumber),
-companyName : sanitize(companyName),
-location : sanitize(location),
-accountNumber : sanitize(accountNumber),
-streetAddress : sanitize(streetAddress),
-city : sanitize(city),
-postalCode : sanitize(postalCode),
-shippinglocation : sanitize(shippinglocation),
-billingStreetAddress : sanitize(billingStreetAddress),
-billingCity : sanitize(billingCity),
-billingPostalCode : sanitize(billingPostalCode),
-billingLocation : sanitize(billingLocation)
-
-  }
-  console.log(sanitizedData);
-
-  const finalData = {
-    items:sanitizedData.items,
-    exportMaterial : sanitizedData.exportMaterial,
-    firstName : sanitizedData.firstName,
-    lastName : sanitizedData.lastName,
-    email: sanitizedData.email,
-    phoneNumber : sanitizedData.phoneNumber,
-    companyName : sanitizedData.companyName,
-    location : sanitizedData.location,
-    accountNumber : sanitizedData.accountNumber,
-    streetAddress : sanitizedData.streetAddress,
-    city :  sanitizedData.city,
-    postalCode : sanitizedData.postalCode,
-    shippinglocation : sanitizedData.shippinglocation,
-    billingStreetAddress : sanitizedData.billingStreetAddress,
-    billingCity : sanitizedData.billingCity,
-    billingPostalCode : sanitizedData.billingPostalCode,
-    billingLocation : sanitizedData.billingLocation
-  }
-  const response = await fetch('/contact', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(finalData)
-    });
-    if (response.ok) {
-      const data = await response.json();
-      console.log(' information saved:', data.record);
-
-      // Clear the form 
-      items = '';
-      exportMaterial = '';
-      firstName = '';
-      lastName = '';
-      email = '';
-      phoneNumber = '';
-      companyName = '';
-      location = '';
-      accountNumber = '';
-      streetAddress = '';
-      city= '';
-      postalCode = '';
-      shippinglocation = '';
-      billingStreetAddress = '';
-      billingCity = '';
-      billingPostalCode = '';
-      billingLocation = '';
-      alert('Your information has been submitted successfully!');
-    } else {
-      const errorData = await response.json();
-      console.error('Failed to save contact information:', errorData.error);
-      alert('There was an error submitting your information. Please try again.');
-    }
-
-};
 
   const locations = [
     "United States",
@@ -170,10 +72,65 @@ billingLocation : sanitize(billingLocation)
 </script>
 
 <div class="  w-full p-4">
-  <form on:submit={handleSubmit}>
+  <form
+    method="POST"
+    action="?/contact"
+    use:enhance={() => {
+      return async ({ result }) => {
+       
+        // console.log(result);
+
+        if (result.data.record && result.type === "success") {
+          // console.log(`${result.data.message}`);
+          // Clear the form
+          products = [{ itemNumber: "", quantity: "" }];
+         
+          exportMaterial = "";
+          firstName = "";
+          lastName = "";
+          email = "";
+          phoneNumber = "";
+          companyName = "";
+          location = "";
+          accountNumber = "";
+          streetAddress = "";
+          city = "";
+          postalCode = "";
+          shippinglocation = "";
+          billingStreetAddress = "";
+          billingCity = "";
+          billingPostalCode = "";
+          billingLocation = "";
+          message= 'Your information has been submitted successfully!';
+          // alert("Your information has been submitted successfully!");
+        } else {
+          // console.error(`${result.data.error}`, result.data.details);
+          errormessage = 'There was an error submitting your information. Please try again.';
+          alert(
+            "There was an error submitting your information. Please try again."
+          );
+        }
+      };
+    }}
+  >
     <div class=" flex flex-col h-full">
+        {#if message != ""}
+        <h2
+          class="text-center bg-green-50 text-green-500 font-semibold text-base w-full"
+        >
+          {message}
+        </h2>
+        {:else if errormessage!= ""}
+        <h2
+        class="text-center bg-red-50 text-red-500 font-semibold text-base w-full"
+      >
+        {errormessage}
+      </h2>
+      {/if}
       <div class="lg:w-3/4 w-full pb-6 h-full">
+       
         <h2 class="text-primary-400 font-semibold text-base pb-6">Quotes</h2>
+        <input hidden name="issueName" value="Quotes"/>
         <h3 class="block mb-2 text-sm">
           Please provide the following product information
         </h3>
@@ -183,6 +140,7 @@ billingLocation : sanitize(billingLocation)
             <div class="flex-1 w-3/4">
               <!-- <label class=" mb-1 hidden" for={`item-number-${index}`}>Item Number</label> -->
               <input
+              
                 id={`item-number-${index}`}
                 type="text"
                 placeholder="Item Number"
@@ -219,7 +177,7 @@ billingLocation : sanitize(billingLocation)
         >
           Add another product
         </button>
-
+        <input hidden name="products" value={JSON.stringify(products)} />
         <fieldset
           class="flex flex-col md:flex-row lg:flex-row justify-between p-2"
         >
@@ -229,6 +187,7 @@ billingLocation : sanitize(billingLocation)
           <div class="w-1/2">
             <label class="inline-flex items-center mr-4">
               <input
+              name="exportMaterial"
                 type="radio"
                 bind:group={exportMaterial}
                 value="Yes"
@@ -238,6 +197,7 @@ billingLocation : sanitize(billingLocation)
             </label>
             <label class="inline-flex items-center">
               <input
+              name="exportMaterial"
                 type="radio"
                 bind:group={exportMaterial}
                 value="No"
@@ -254,6 +214,7 @@ billingLocation : sanitize(billingLocation)
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-6">
           <input
+          name="firstName"
             type="text"
             placeholder="First Name"
             bind:value={firstName}
@@ -262,6 +223,7 @@ billingLocation : sanitize(billingLocation)
           />
           <input
             type="text"
+            name="lastName"
             placeholder="Last Name"
             bind:value={lastName}
             class="border rounded-md p-2 text-sm h-9 w-full"
@@ -269,6 +231,7 @@ billingLocation : sanitize(billingLocation)
           />
           <input
             type="email"
+            name="email"
             placeholder="Email"
             bind:value={email}
             class="border rounded-md p-2 text-sm h-9 w-full"
@@ -276,6 +239,7 @@ billingLocation : sanitize(billingLocation)
           />
           <input
             type="tel"
+            name="phoneNumber"
             placeholder="Phone Number"
             bind:value={phoneNumber}
             class="border rounded-md p-2 text-sm h-9 w-full"
@@ -283,11 +247,13 @@ billingLocation : sanitize(billingLocation)
           />
           <input
             type="text"
+            name="companyName"
             placeholder="Company/Institution Name"
             bind:value={companyName}
             class="border rounded-md p-2 text-sm h-9 w-full"
           />
           <select
+          name="location"
             bind:value={location}
             class="border rounded-md p-2 text-sm h-9 w-full"
             required
@@ -299,6 +265,7 @@ billingLocation : sanitize(billingLocation)
           </select>
           <input
             type="text"
+            name="accountNumber"
             placeholder="Account Number"
             bind:value={accountNumber}
             class="border rounded-md p-2 text-sm h-9 w-full"
@@ -310,6 +277,7 @@ billingLocation : sanitize(billingLocation)
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-6">
           <input
+          name="streetAddress"
             type="text"
             placeholder="Street Address*"
             bind:value={streetAddress}
@@ -317,6 +285,7 @@ billingLocation : sanitize(billingLocation)
             required
           />
           <input
+          name="city"
             type="text"
             placeholder="City*"
             bind:value={city}
@@ -325,6 +294,7 @@ billingLocation : sanitize(billingLocation)
           />
 
           <select
+          name="shippinglocation"
             bind:value={shippinglocation}
             class="border rounded-md p-2 text-sm h-9 w-full"
             required
@@ -336,6 +306,7 @@ billingLocation : sanitize(billingLocation)
           </select>
           <input
             type="text"
+            name="postalCode"
             placeholder="Postal Code*"
             bind:value={postalCode}
             class="border rounded-md p-2 text-sm h-9 w-full"
@@ -347,14 +318,15 @@ billingLocation : sanitize(billingLocation)
         </h2>
 
         <fieldset class="flex flex-col justify-between p-2">
-          <label for="same-as-shipping" class="block mb-2 text-sm"
+          <label for="sameasShipping" class="block mb-2 text-sm"
             >Same as shipping address?</label
           >
           <div class="w-1/2">
             <input
+           
               type="radio"
               id="yes"
-              name="same-as-shipping"
+              name="sameasShipping"
               value="yes"
               on:change={handleRadioChange}
             />
@@ -362,7 +334,7 @@ billingLocation : sanitize(billingLocation)
             <input
               type="radio"
               id="no"
-              name="same-as-shipping"
+              name="sameasShipping"
               value="no"
               on:change={handleRadioChange}
               checked
@@ -373,6 +345,7 @@ billingLocation : sanitize(billingLocation)
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <input
+          name="billingStreetAddress"
             type="text"
             placeholder="Street Address*"
             bind:value={billingStreetAddress}
@@ -380,6 +353,7 @@ billingLocation : sanitize(billingLocation)
             required
           />
           <input
+          name="billingCity"
             type="text"
             placeholder="City*"
             bind:value={billingCity}
@@ -388,6 +362,7 @@ billingLocation : sanitize(billingLocation)
           />
 
           <select
+          name="billingLocation"
             bind:value={billingLocation}
             class="border rounded-md p-2 text-sm h-9 w-full"
             required
@@ -400,6 +375,7 @@ billingLocation : sanitize(billingLocation)
 
           <input
             type="text"
+            name="billingPostalCode"
             placeholder="Postal Code*"
             bind:value={billingPostalCode}
             class="border rounded-md p-2 text-sm h-9 w-full"
