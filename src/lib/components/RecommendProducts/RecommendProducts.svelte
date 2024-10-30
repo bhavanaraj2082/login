@@ -189,15 +189,15 @@
     action="?/checkavailability"
     use:enhance={() => {
       return async ({ result }) => {
-        console.log("*****************");
+        // console.log("*****************");
         
-        console.log(result);
+        // console.log(result);
 message=""  
         if (result.data && result.type === "success") {
           // console.log(`${result.data.message}` );
           // Clear the form
           
-          message = result.data.message;
+          message = "Stock available";
           // alert('Stock available!');
         } else if (result.type === "success" && !result.data) {
           message = "Out of stock";
@@ -205,7 +205,7 @@ message=""
         } else {
           console.error(`${result.error}`, result.details);
           errormessage = "There was an error fetching stock. Please try again.";
-          alert("There was an error fetching stock. Please try again.");
+          // alert("There was an error fetching stock. Please try again.");
         }
       };
     }}
