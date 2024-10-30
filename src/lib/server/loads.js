@@ -73,3 +73,18 @@ export const loadFirstProduct = async (pb) => {
       return { success: false, data: [], error: error.message }; 
   }
 };
+
+export async function fetchViewedProducts(pb) {
+
+    const records = await pb.collection('ViewedProducts').getFullList({
+      sort: '-created',
+    });
+    const updatedRecords = records.map(record => {
+      const imgUrl = pb.files.getUrl(record, record.image);
+      return {
+        ...record,
+        image:imgUrl,
+      }
+    });
+    return updatedRecords;
+}

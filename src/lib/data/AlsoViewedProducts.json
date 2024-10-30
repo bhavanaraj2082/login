@@ -1,0 +1,80 @@
+[
+    {
+        "image": "PopularProductsImg1.jpeg",
+        "brand": "Supelco",
+        "code": "57560",
+        "name1": "Hybrid SPE",
+        "name2": "-Plus-96",
+        "category": "SPE Tube",
+        "price": 18535.15,
+        "estimatedShipping": "26 October 2024",
+        "warehouse": "Bangalore Non-Bonded Warehouse",
+        "volume": "2 mL, pk of 1 ea",
+        "sku": "575659-U"
+    },
+    {
+        "image": "PopularProductsImg2.jpeg",
+        "brand": "Supelco",
+        "code": "57561",
+        "name1": "Supliclean",
+        "name2": "LC-Florisil",
+        "category": "SPE Tube",
+        "price": 15000.00,
+        "estimatedShipping": "28 October 2024",
+        "warehouse": "Delhi Warehouse",
+        "volume": "1 mL, pk of 1 ea",
+        "sku": "575660-U"
+    },
+    {
+        "image": "PopularProductsImg3.jpeg",
+        "brand": "Supelco",
+        "code": "57562",
+        "name1": "ENVICarb",
+        "name2": "ENVI-Chrom",
+        "category": "SPF Tube",
+        "price": 20250.00,
+        "estimatedShipping": "30 October 2024",
+        "warehouse": "Mumbai Warehouse",
+        "volume": "5 mL, pk of 1 ea",
+        "sku": "575661-U"
+    },
+    {
+        "image": "PopularProductsImg1.jpeg",
+        "brand": "Supelco",
+        "code": "57563",
+        "name1": "ENVISP2",
+        "name2": "ENVI-Card",
+        "category": "SPE Tube",
+        "price": 12300.00,
+        "estimatedShipping": "29 October 2024",
+        "warehouse": "Bangalore Non-Bonded Warehouse",
+        "volume": "10 mL, pk of 1 ea",
+        "sku": "575662-U"
+    },
+    {
+        "image": "PopularProductsImg3.jpeg",
+        "brand": "Supelco",
+        "code": "57564",
+        "name1": "SupliPSA",
+        "name2": "-SPE",
+        "category": "Bulk Packing",
+        "price": 22100.00,
+        "estimatedShipping": "1 November 2024",
+        "warehouse": "Chennai Warehouse",
+        "volume": "20 mL, pk of 1 ea",
+        "sku": "575663-U"
+    },
+    {
+        "image": "PopularProductsImg2.jpeg",
+        "brand": "Supelco",
+        "code": "57565",
+        "name1": "Visiprep",
+        "name2": "-SPE Vaccum",
+        "category": "SPF Tube",
+        "price": 19000.00,
+        "estimatedShipping": "5 November 2024",
+        "warehouse": "Pune Warehouse",
+        "volume": "50 mL, pk of 1 ea",
+        "sku": "575664-U"
+    }
+]
