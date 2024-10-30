@@ -1,0 +1,43 @@
+{
+    
+    "MISSION_RNAi_Licenses": {
+        "Heading": "MISSION® RNAi Licenses",
+        "Description": "We have acquired necessary key licenses for lentiviral systems and RNAi and provide freedom to operate under our label license for relevant purchased products.",
+        "Description2":["This product is for non-clinical research use only. Use of this product for Commercial Purposes requires a license from Chemikart® Corporation. The purchase of", 
+        "this product conveys to the buyer the nontransferable right to use the purchased amount of the product and components of the product in research conducted by the buyer (whether the buyer", 
+        "is an academic or for-profit entity). The buyer cannot sell or otherwise transfer (a) this product; (b) its components; or (c) materials made using this product or its components to a third party,", 
+        "or otherwise use this product or its components or materials made using this product or its components for Commercial Purposes. Commercial Purposes means any activity by a party for consideration,", 
+        "but excludes not-for-profit core facilities providing services within their own research institutions at cost."]
+    },
+    "EMPROVE_Dossier_Access": {
+        "Heading": "Terms & Conditions of EMPROVE® Dossier Access",
+        "Description": "Applicable for all Dossiers provided by Chemikart KGaA, Darmstadt, Germany, acting through its division EMD Millipore Corporation, 400 Summit Drive, Burlington, MA 01803, USA.",
+        "Description2":["We reserve the right to withdraw access, Login Information, or amend this Emprove® Program, and any service or material we provide on the Emprove® Program, in our sole discretion", 
+        "without notice. We will not be liable if for any reason all or any part of the Emprove® Program is unavailable at any time or for any period. From time to time, we may restrict access to some parts", 
+        "of the Emprove® Program, or the entire Emprove® Program, to users, including registered users."]
+    },
+    "Oligonucleotide Label Licenses":{
+        "Heading":"Oligonucleotide Label Licenses",
+        "Description":"Label licenses for our oligonucleotide products, including Black Hole Quencher™, BlackBerry® Quencher, and Locked Nucleic Acid (LNA®).",
+        "Description2":["BHQ and Black Hole Quencher are licensed trademarks, wholly owned by Biosearch Technologies, Inc. and used with permission."]
+      
+    },
+    "CSIRO License for RAFT Reagents":{
+        "Heading":"CSIRO License for RAFT Reagents",
+        "Description":"This is a license page that provides conditions to the usage of RAFT reagents available from Chemikart. The license is provided by Australian Commonwealth Scientific and Industrial Research Organization (CSIRO).",
+
+        "Description2":["Sold for research purposes only. Not for use in humans or animals. This product is the subject of one or more issued and/or pending patents and patent applications owned by the Australian Commonwealth Scientific", 
+        "and Industrial Research Organisation, including US6747111, US6642318 and US7250479. Chemikart Co., Inc. is authorised and licensed to sell this product for research purposes only." ,
+        "The purchase of this product from ChemiKart Co., Inc conveys to the buyer a non-transferable and non-sublicensable sublicense from Chemikart Co., to use the quantity of product",
+         "so purchased for the sole purpose of carrying out reversible addition-fragmentation chain transfer (RAFT) polymerization using this product to make polymers (RAFT Polymers) and to make products", 
+         "using those polymers (RAFT Products) for the sole purpose of research and evaluation by the buyer. The buyer must not, and the purchase of this product does not convey or grant any license to the buyer,", 
+         "or otherwise authorise the buyer, to use this product for any purpose other than research and evaluation as described above (including, without limitation, the manufacture of RAFT Polymers or RAFT Products for sale or hire,", 
+         "use of this product to provide any commercial service for any other person, or resale of this product whether or not such resale is for use in research), or for any use in humans or animals. The buyer is not entitled to sell, hire, transfer", 
+         "or otherwise dipsose of product or any RAFT polymers or RAFT products made using this product to any third party (except to the extent required for the purposes of the buyer's research or evaluation). For a commercial license to use this product, please contact Chemikart Co.,", 
+         "for licensor contact details."]
+    }
+    
+
+
+
+}
