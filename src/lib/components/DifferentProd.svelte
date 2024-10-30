@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, afterUpdate } from 'svelte';
 
   export let data;
   let qualityLevels = {};
@@ -11,7 +11,8 @@
   let logosPerSlide = 4;
   let totalSlides = Math.ceil((data && data.records ? data.records.length : 0) / logosPerSlide);
 
-  let showDifference = false; // Default to unchecked
+  let showDifference = false;
+  let containerWidth = 0;
 
   function calculateQualityLevels() {
     qualityLevels = {};
@@ -48,9 +49,9 @@
   }
 
   function updateLogosPerSlide() {
-    if (window.innerWidth < 640) logosPerSlide = 1;
-    else if (window.innerWidth < 768) logosPerSlide = 2;
-    else if (window.innerWidth < 1024) logosPerSlide = 3;
+    if (containerWidth < 640) logosPerSlide = 1;
+    else if (containerWidth < 768) logosPerSlide = 2;
+    else if (containerWidth < 1024) logosPerSlide = 3;
     else logosPerSlide = 4;
     totalSlides = Math.ceil((data && data.records ? data.records.length : 0) / logosPerSlide);
     currentIndex = Math.min(currentIndex, totalSlides - 1);
@@ -60,16 +61,15 @@
     return name.length > maxLength ? name.slice(0, maxLength) + "..." : name;
   }
 
+  afterUpdate(updateLogosPerSlide);
+
   onMount(() => {
-    showDifference = false; // Reset toggle state on mount
+    showDifference = false;
     calculateQualityLevels();
-    updateLogosPerSlide();
-    window.addEventListener('resize', updateLogosPerSlide);
-    return () => window.removeEventListener('resize', updateLogosPerSlide);
   });
 </script>
 
-<div class="container mx-auto max-w-screen-lg bg-white mt-10">
+<div class="container mx-auto max-w-screen-lg bg-white mt-10" bind:clientWidth={containerWidth}>
   <div class="flex justify-between items-center mb-4">
     <div class="text-md font-semibold">Compare Similar Items</div>
     <div class="flex items-center space-x-2">
