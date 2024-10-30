@@ -403,3 +403,24 @@ export async function fetchproductName() {
       return []; 
   }
 }
+
+//My Favourite Page
+export async function loadFavourites(pb) {
+  try {
+      const records = await pb.collection('Products').getFullList();
+      
+      return records.map(record => ({
+          productName: record.productName,     
+          productNumber: record.productNumber, 
+          description: record.description,     
+          quantity: record.quantity || 1,      
+          price: record.priceSize,           
+          image: record.imageSrc               
+      }));
+      
+      
+  } catch (error) {
+      console.error('Error fetching favourites:', error);
+      return []; 
+  }
+}
