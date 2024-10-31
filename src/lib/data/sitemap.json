@@ -1,78 +1,498 @@
 {
-    "categories1": [
-      {
-        "name1": "Ordering & Shipping",
-        "link1": "/order",
-        "subcategories1": [
-          { "name1": "Conditions of Order", "link1": "/terms#ConOrd" },
-          { "name1": "Conditions of Quote", "link1": "/terms" },
-          { "name1": "Methods of Payment", "link1": "/terms#Pay" },
-          { "name1": "Online Ordering", "link1": "/cart" },
-          { "name1": "Ordering FAQ", "link1": "/help" },
-          { "name1": "Sales Tax", "link1": "/terms#tax" },
-          { "name1": "Shipping Rates/Options", "link1": "/shipping-rates" },
-          { "name1": "Terms & Conditions", "link1": "/terms" }
-        ]
-      },
-      {
-        "name1": "Products",
-        "link1": "/products",
-        "subcategories1": [
-          { "name1": "All Products", "link1": "/products/all-products" },
-          { "name1": "Manufacturers", "link1": "/products/manufacturers" },
-          { "name1": "Automation & Control", "link1": "/products/automation-control" },
-          { "name1": "Boxes, Enclosures, Racks", "link1": "/products/boxes-enclosures-racks" },
-          { "name1": "Cable Assemblies", "link1": "/products/cable-assemblies" },
-          { "name1": "Cables, Wires", "link1": "/products/cables-wires" },
-          { "name1": "Connectors", "link1": "/products/connectors" },
-          { "name1": "Electromechanical", "link1": "/products/electromechanical" },
-          { "name1": "Hardware, Fasteners", "link1": "/products/hardware-fasteners" },
-          { "name1": "Integrated Circuits (ICs)", "link1": "/products/integrated-circuits" },
-          { "name1": "Networking Solutions", "link1": "/products/networking-solutions" }
-        ]
-      },
-      {
-        "name1": "Applications & Services",
-        "link1": "/services",
-        "subcategories1": [
-          { "name1": "Supplier Application", "link1": "/supplier-apply" },
-          { "name1": "PartsKey Solutions", "link1": "/api-solutions" }
-        ]
-      }
-    ],
+  "categories1": [
+    {
+      "name1": "3D Cell Culture",
+      "link1": "/products/3d-cell-culture",
+      "subcategories1": [
+          { "name1": "Hydrogels", "link1": "/products/3d-cell-culture/hydrogels" },
+          { "name1": "Organoids", "link1": "/products/3d-cell-culture/organoids" },
+          { "name1": "Scaffolds", "link1": "/products/3d-cell-culture/scaffolds" }
+      ]
+    },
+    {
+      "name1": "Active Pharmaceutical Ingredients",
+      "link1": "/products/active-pharmaceutical-ingredients",
+      "subcategories1":[
+          { "name1": "API Processing Chemicals", "link1": "/products/active-pharmaceutical-ingredients/api-processing-chemicals" },
+          { "name1": "Folates", "link1": "/products/active-pharmaceutical-ingredients/folates" },
+          { "name1": "Portfolio APIs", "link1": "/products/active-pharmaceutical-ingredients/portfolio-apis" }
+      ]
+    },
+    {
+      "name1": "Analytical Chromatography",
+      "link1": "/products/analytical-chromatography",
+      "subcategories1":[
+          { "name1": "Analytical Syringes", "link1": "/products/analytical-chromatography/analytical-syringes" },
+          { "name1": "Analytical Vials", "link1": "/products/analytical-chromatography/analytical-vials" },
+          { "name1": "Carbon Adsorbents", "link1": "/products/analytical-chromatography/carbon-adsorbents" },
+          { "name1": "Chromatography Standards", "link1": "/products/analytical-chromatography/chromatography-standards" },
+          { "name1": "GC Columns, Accessories & Adsorbents", "link1": "/products/analytical-chromatography/gc-columns" },
+          { "name1": "HPLC Buffers", "link1": "/products/analytical-chromatography/hplc-buffers" },
+          { "name1": "HPLC Columns", "link1": "/products/analytical-chromatography/hplc-columns" },
+          { "name1": "LPLC Media & Accessories", "link1": "/products/analytical-chromatography/lplc-media" },
+          { "name1": "Purge Traps", "link1": "/products/analytical-chromatography/purge-traps" },
+          { "name1": "Solvents", "link1": "/products/analytical-chromatography/solvents" },
+          { "name1": "TLC Plates & Adsorbents", "link1": "/products/analytical-chromatography/tlc-plates" }
+      ]
+    },
+    {
+      "name1": "Analytical Reagents",
+      "link1": "/products/analytical-reagents",
+      "subcategories1":[
+          { "name1": "Acids", "link1": "/products/analytical-reagents/acids" },
+          { "name1": "Caustic Alkalis & Bases", "link1": "/products/analytical-reagents/alkalis-bases" },
+          { "name1": "Chromatography & Spectroscopy Reagents", "link1": "/products/analytical-reagents/chromatography-spectroscopy-reagents" },
+          { "name1": "Colorimetric & Titrimetric Test Kits", "link1": "/products/analytical-reagents/test-kits" },
+          { "name1": "Indicators", "link1": "/products/analytical-reagents/indicators" },
+          { "name1": "Karl Fischer Reagents", "link1": "/products/analytical-reagents/karl-fischer-reagents" },
+          { "name1": "Karl Fischer Standards", "link1": "/products/analytical-reagents/karl-fischer-standards" },
+          { "name1": "Metals", "link1": "/products/analytical-reagents/metals" },
+          { "name1": "pH Test Strips, Papers, Readers & Accessories", "link1": "/products/analytical-reagents/ph-test" },
+          { "name1": "Salts", "link1": "/products/analytical-reagents/salts" },
+          { "name1": "Spectroquant Photometry Instruments, Kits & Accessories", "link1": "/products/analytical-reagents/spectroquant-photometry" },
+          { "name1": "Test Strips, Papers & Readers", "link1": "/products/analytical-reagents/test-strips" },
+          { "name1": "Titration Reagents", "link1": "/products/analytical-reagents/titration-reagents" }
+      ]
+    },
+    {
+      "name1": "Analytical Sample Preparation",
+      "link1": "/products/analytical-sample-preparation",
+      "subcategories1":[
+          { "name1": "Air Monitoring Devices & Tubes", "link1": "/products/analytical-sample-preparation/air-monitoring" },
+          { "name1": "Laboratory Filter Holders", "link1": "/products/analytical-sample-preparation/laboratory-filter-holders" },
+          { "name1": "Millipore® Lab Filter Membranes", "link1": "/products/analytical-sample-preparation/lab-filter-membranes" },
+          { "name1": "Millex® Syringe Filters", "link1": "/products/analytical-sample-preparation/syringe-filters" },
+          { "name1": "Solid Phase Extraction (SPE) & QuEChERS", "link1": "/products/analytical-sample-preparation/solid-phase-extraction" },
+          { "name1": "Solid Phase Micro-Extraction (SPME)", "link1": "/products/analytical-sample-preparation/solid-phase-micro-extraction" },
+          { "name1": "Supported Liquid Extraction (SLE) Columns, Resins & Accessories", "link1": "/products/analytical-sample-preparation/supported-liquid-extraction" }
+      ]
+    },
+    {
+      "name1": "Cell Culture Media & Buffers",
+      "link1": "/products/cell-culture-media",
+      "subcategories1": [
+          { "name1": "Bioprocessing Cell Culture Media", "link1": "/products/cell-culture-media/bioprocessing-cell-culture-media" },
+          { "name1": "Bioprocessing Liquid Cell Culture Media & Buffers", "link1": "/products/cell-culture-media/bioprocessing-liquid-media" },
+          { "name1": "Classical Media & Buffers", "link1": "/products/cell-culture-media/classical-media" },
+          { "name1": "Custom GMP Cell Culture Media", "link1": "/products/cell-culture-media/custom-gmp-media" },
+          { "name1": "Custom Pre-GMP Cell Culture Media", "link1": "/products/cell-culture-media/custom-pre-gmp-media" },
+          { "name1": "Plant Culture Media", "link1": "/products/cell-culture-media/plant-culture-media" }
+      ]
+    },
+    {
+      "name1": "Cell Culture Supplements & Reagents",
+      "link1":"/products/cell-culture-supplements",
+      "subcategories1":[
+          { "name1": "Albumins & Transport Proteins", "link1": "/products/cell-culture-supplements/albumins-transport-proteins" },
+          { "name1": "Amino Acids", "link1": "/products/cell-culture-supplements/amino-acids" },
+          { "name1": "Antibiotics", "link1": "/products/cell-culture-supplements/antibiotics" },
+          { "name1": "Attachment Factors", "link1": "/products/cell-culture-supplements/attachment-factors" },
+          { "name1": "Bioprocessing Recombinant Supplements", "link1": "/products/cell-culture-supplements/bioprocessing-supplements" },
+          { "name1": "Carbohydrates", "link1": "/products/cell-culture-supplements/carbohydrates" },
+          { "name1": "Cell Dissociation Reagents", "link1": "/products/cell-culture-supplements/cell-dissociation-reagents" },
+          { "name1": "Cell Freezing Reagents", "link1": "/products/cell-culture-supplements/cell-freezing-reagents" },
+          { "name1": "FBS", "link1": "/products/cell-culture-supplements/fbs" },
+          { "name1": "Growth Factors & Cytokines", "link1": "/products/cell-culture-supplements/growth-factors" },
+          { "name1": "Hormones", "link1": "/products/cell-culture-supplements/hormones" },
+          { "name1": "Human Serum", "link1": "/products/cell-culture-supplements/human-serum" },
+          { "name1": "(Other) Sera", "link1": "/products/cell-culture-supplements/other-sera" },
+          { "name1": "Plant Culture Reagents", "link1": "/products/cell-culture-supplements/plant-culture-reagents" },
+          { "name1": "Sera", "link1": "/products/cell-culture-supplements/sera" },
+          { "name1": "Supplements for Cell Culture", "link1": "/products/cell-culture-supplements/cell-culture-supplements" },
+          { "name1": "Vitamins", "link1": "/products/cell-culture-supplements/vitamins" }
+      ]
+    },
+    {
+      "name1": "Cell Lines & Specialty Cell Culture",
+      "link1": "/products/cell-lines",
+      "subcategories1":[
+          { "name1": "Bioprocessing Cell Lines", "link1": "/products/cell-lines/bioprocessing-cell-lines" },
+          { "name1": "Mammalian Cell Lines", "link1": "/products/cell-lines/mammalian-cell-lines" },
+          { "name1": "Mouse Embryo Media", "link1": "/products/cell-lines/mouse-embryo-media" },
+          { "name1": "Primary Cells", "link1": "/products/cell-lines/primary-cells" },
+          { "name1": "Stem Cells", "link1": "/products/cell-lines/stem-cells" }
+      ]
+    },
+    {
+      "name1": "Cell Marque™",
+      "link1":"/products/cell-marque",
+      "subcategories1":[
+          { "name1": "Cell Marque™", "link1": "/products/cell-marque" },
+          { "name1": "Cell Marque™ Control Slides", "link1": "/products/cell-marque-control-slides" },
+          { "name1": "Cell Marque™ Detection Systems & Ancillary Reagents", "link1": "/products/cell-marque-detection" },
+          { "name1": "Cell Marque™ Primary Antibodies", "link1": "/products/cell-marque-antibodies" }
+      ]
+    },
+    {
+      "name1": "Chemical Biology",
+      "link1":"/products/chemical-biology",
+      "subcategories1":[
+          { "name1": "Chemical Biology Tools", "link1": "/products/chemical-biology/chemical-biology-tools" },
+          { "name1": "Click Chemistry Reagents", "link1": "/products/chemical-biology/click-chemistry-reagents" },
+          { "name1": "Crosslinkers", "link1": "/products/chemical-biology/crosslinkers" },
+          { "name1": "Protein Degrader Building Blocks", "link1": "/products/chemical-biology/protein-degrader-building-blocks" }
+      ]
+    },
+    {
+      "name1": "Immunoassay Platform Solutions",
+      "link1": "/products/immunoassay-platform-solutions",
+      "subcategories1": [                
+          { "name1": "ELISA Kits", "link1": "/products/immunoassay-platform-solutions/elisa-kits" },
+          { "name1": "MILLIPLEX® Kits", "link1": "/products/immunoassay-platform-solutions/milliplex-kits" },
+          { "name1": "SMC™ Technology", "link1": "/products/immunoassay-platform-solutions/smc-technology" }
+      ]
+    },
+    {
+      "name1": "Lab Equipment",
+      "link1": "/products/lab-equipment",
+      "subcategories1":[
+          { "name1": "Balances", "link1": "/products/lab-equipment/balances" },
+          { "name1": "Centrifugation", "link1": "/products/lab-equipment/centrifugation" },
+          { "name1": "Grinders & Homogenizers", "link1": "/products/lab-equipment/grinders-homogenizers" },
+          { "name1": "Laboratory Stirring & Mixing", "link1": "/products/lab-equipment/laboratory-stirring-mixing" },
+          { "name1": "Refrigerators & Freezers", "link1": "/products/lab-equipment/refrigerators-freezers" }
+      ]
+    },
+    {
+      "name1" : "Lab Safety",
+      "link1" : "/products/lab-safety",
+      "subcategories1":[
+          { "name1": "Labware Detergents & Cleaners", "link1": "/products/lab-safety/labware-detergents-cleaners" },
+          { "name1": "Safe Handling", "link1": "/products/lab-safety/products/lab-safety/safe-handling" },
+          { "name1": "Safety Accessories", "link1": "/products/lab-safety/safety-accessories" },
+          { "name1": "Spillage Absorption", "link1": "/products/lab-safety/spillage-absorption" }
+      ]
+    },
+    {
+      "name1" : "Laboratory Filter Membranes",
+      "link1" : "/products/laboratory-filter-membranes",
+      "subcategories1":[
+          { "name1": "Filter Membranes", "link1": "/products/laboratory-filter-membranes/filter-membranes" },
+          { "name1": "Millipore® Filter Membranes", "link1": "/products/laboratory-filter-membranes/millipore-filter-membranes" },
+          { "name1": "Laboratory Syringe Filters", "link1": "/products/laboratory-filter-membranes/laboratory-syringe-filters" },
+          { "name1": "Syringe Filters", "link1": "/products/laboratory-filter-membranes/syringe-filters" }
+      ]
+    },
+    {
+      "name1": "Laboratory Syringe Filters",
+      "link1": "/products/laboratory-syringe-filters",
+      "subcategories1": [
+          { "name1": "Syringe Filters", "link1": "/products/laboratory-syringe-filters/syringe-filters" }
+      ]
+    },      
+    {
+      "name1": "Labware Partners",
+      "link1": "/products/labware-partners",
+      "subcategories1": [
+          { "name1": "Brand® Products", "link1": "/products/labware-partners/brand-products" },
+          { "name1": "Corning® Products", "link1": "/products/labware-partners/corning-products" },
+          { "name1": "Cytiva™ Products", "link1": "/products/labware-partners/cytiva-products" },
+          { "name1": "Eppendorf® Products", "link1": "/products/labware-partners/eppendorf-products" }
+      ]
+    },      
+    {
+      "name1": "Nucleic Acid Electrophoresis & Hybridization",
+      "link1": "/products/nucleic-acid-electrophoresis",
+      "subcategories1":[
+          { "name1": "Nucleic Acid Electrophoresis, Transfer & Quantitation", "link1": "/products/nucleic-acid-electrophoresis/nucleic-acid-transfer-quantitation" },
+          { "name1": "Nucleic Acid Labeling", "link1": "/products/nucleic-acid-electrophoresis/nucleic-acid-labeling" }
+      ]
+    },
+    {
+      "name1": "Nucleic Acid Purification",
+      "link1": "/products/nucleic-acid-purification",
+      "subcategories1":[
+          { "name1": "gDNA Purification", "link1": "/products/nucleic-acid-purification/gdna-purification" },
+          { "name1": "Plasmid DNA Purification", "link1": "/products/nucleic-acid-purification/plasmid-dna-purification" },
+          { "name1": "Reaction Clean-Up", "link1": "/products/nucleic-acid-purification/reaction-clean-up" },
+          { "name1": "RNA Purification", "link1": "/products/nucleic-acid-purification/rna-purification" }
+      ]
+    },
+    {
+      "name1": "Oligos, qPCR Probes & Peptides",
+      "link1": "/products/oligos-qpcr-probes-peptides",
+      "subcategories1":[
+          { "name1": "Custom & Predesigned DNA Oligos and qPCR Probes", "link1": "/products/oligos-qpcr-probes-peptides/custom-dna-oligos-qpcr-probes" },
+          { "name1": "Custom & Predesigned RNA Oligos, siRNA Duplexes and Controls", "link1": "/products/oligos-qpcr-probes-peptides/custom-rna-oligos-sirna" },
+          { "name1": "Custom Peptides", "link1": "/products/oligos-qpcr-probes-peptides/custom-peptides" }
+      ]
+    },
+    {
+      "name1": "PCR & Amplification",
+      "link1": "/products/pcr-amplification",
+      "subcategories1": [
+          { "name1": "Kapa Biosystems PCR Reagents", "link1": "/products/pcr-amplification/kapa-biosystems-pcr-reagents" },
+          { "name1": "PCR Reagent & Kits", "link1": "/products/pcr-amplification/pcr-reagent-kits" },
+          { "name1": "PCR Supplies & Equipment", "link1": "/products/pcr-amplification/pcr-supplies-equipment" },
+          { "name1": "Whole Genome Amplification", "link1": "/products/pcr-amplification/whole-genome-amplification" }
+      ]
+    },
+    {
+      "name1": "Protein Purification Chromatography",
+      "link1": "/products/protein-purification-chromatography",
+      "subcategories1": [
+          { "name1": "Antibody Protein Purification", "link1": "/products/protein-purification-chromatography/antibody-protein-purification" },
+          { "name1": "Biotinylated Protein Purification", "link1": "/products/protein-purification-chromatography/biotinylated-protein-purification" },
+          { "name1": "FLAG® Purification", "link1": "/products/protein-purification-chromatography/flag-purification" },
+          { "name1": "Recombinant/Fusion Tag Protein Purification", "link1": "/products/protein-purification-chromatography/recombinant-fusion-tag-protein-purification" }
+      ]
+    },
+    {
+      "name1": "Proteins & Enzymes",
+      "link1": "/products/proteins-enzymes",
+      "subcategories1": [
+          { "name1": "Detection Substrates & Enzymes", "link1": "/products/proteins-enzymes/detection-substrates-enzymes" },
+          { "name1": "Drug Analysis Enzymes", "link1": "/products/proteins-enzymes/drug-analysis-enzymes" },
+          { "name1": "Glycobiology Profiling Tools", "link1": "/products/proteins-enzymes/glycobiology-profiling-tools" },
+          { "name1": "Nucleases", "link1": "/products/proteins-enzymes/nucleases" },
+          { "name1": "Proteases", "link1": "/products/proteins-enzymes/proteases" },
+          { "name1": "Tissue Dissociation", "link1": "/products/proteins-enzymes/tissue-dissociation" }
+      ]
+    },
+    {
+      "name1": "Sample Handling",
+      "link1": "/products/sample-handling",
+      "subcategories1": [
+          { "name1": "Laboratory Containers & Storage", "link1": "/products/sample-handling/laboratory-containers-storage" },
+          { "name1": "Laboratory Labels", "link1": "/products/sample-handling/laboratory-labels" },
+          { "name1": "Laboratory Sample Collection", "link1": "/products/sample-handling/laboratory-sample-collection" }
+      ]
+    },
+    {
+      "name1": "Synthesis Enabling Tools",
+      "link1": "/products/synthesis-enabling-tools",
+      "subcategories1": [
+          { "name1": "Automated Chemical Synthesis", "link1": "/products/synthesis-enabling-tools/automated-chemical-synthesis" },
+          { "name1": "High Throughput Screening", "link1": "/products/synthesis-enabling-tools/high-throughput-screening" },
+          { "name1": "Photoreactors", "link1": "/products/synthesis-enabling-tools/photoreactors" },
+          { "name1": "Electrosynthesis", "link1": "/products/synthesis-enabling-tools/electrosynthesis" }
+      ]
+    },
+    {
+      "name1": "Sterile Lab Media Filtration & Cultureware",
+      "link1": "/products/sterile-lab-media-filtration-cultureware",
+      "subcategories1": [
+          { "name1": "Cell Culture Supplies", "link1": "/products/sterile-lab-media-filtration-cultureware/cell-culture-supplies" },
+          { "name1": "Millicell® Cell Culture Inserts & Plates", "link1": "/products/sterile-lab-media-filtration-cultureware/millicell-cell-culture-inserts-plates" },
+          { "name1": "Millipore® Sterile Filters", "link1": "/products/sterile-lab-media-filtration-cultureware/millipore-sterile-filters" },
+          { "name1": "Multiscreen® Filter Plates", "link1": "/products/sterile-lab-media-filtration-cultureware/multiscreen-filter-plates" },
+          { "name1": "Stericup® Vacuum Filters", "link1": "/products/sterile-lab-media-filtration-cultureware/stericup-vacuum-filters" }
+      ]
+    }
+  ],
  
 	"categories2": [
 		{
-			"name2": "About Chemikart",
-			"link2": "/about",
+			"name2": "Biopharma 4.0",
+			"link2": "/applications/biopharma-4",
 			"subcategories2": [
-				{ "name2": "Corporate Profile", "link2": "/about" },
-				{ "name2": "Supported Browsers and Applications", "link2": "/browser-support" },
-				{ "name2": "Why Register?", "link2": "/why-register" }
+          { "name2": "Bioprocessing Automation & Control Software", "link2": "/applications/biopharma-4/bioprocessing-automation-control" },
+          { "name2": "Bioprocessing Data Analytics Software", "link2": "/applications/biopharma-4/bioprocessing-data-analytics" },
+          { "name2": "Closed Processing for Biomanufacturing", "link2": "/applications/biopharma-4/closed-processing-biomanufacturing" },
+          { "name2": "Intensified & Continuous Upstream (USP) Processing", "link2": "/applications/biopharma-4/intensified-continuous-usp" },
+          { "name2": "Intensified & Continuous Downstream (DSP) Processing", "link2": "/applications/biopharma-4/intensified-continuous-dsp" },
+          { "name2": "Process Analytical Technology (PAT)", "link2": "/applications/biopharma-4/process-analytical-technology" }
+      ]
+    },
+    {
+      "name2": "Biotech Resource Hub",
+      "link2": "/applications/biotech-resource-hub",
+      "subcategories2":[
+          { "name2": "Discovery", "link2": "/applications/biotech-resource-hub/discovery" },
+          { "name2": "Pre-clinical", "link2": "/applications/biotech-resource-hub/pre-clinical" },
+          { "name2": "Phase I-II", "link2": "/applications/biotech-resource-hub/phase-i-ii" },
+          { "name2": "Phase III and Manufacturing", "link2": "/applications/biotech-resource-hub/phase-iii-manufacturing" },
+          { "name2": "Regulatory", "link2": "/applications/biotech-resource-hub/regulatory" },
+          { "name2": "Startup Programs", "link2": "/applications/biotech-resource-hub/startup-programs" }
+      ]
+    },
+    {
+      "name2": "Cannabis Testing",
+      "link2": "/applications/cannabis-testing",
+      "subcategories2":[
+          { "name2": "Cannabinoids & Potency", "link2": "/applications/cannabis-testing/cannabinoids-potency" },
+          { "name2": "Pesticides & Mycotoxins", "link2": "/applications/cannabis-testing/pesticides-mycotoxins" },
+          { "name2": "Terpenes", "link2": "/applications/cannabis-testing/terpenes" }
+      ]
+    },
+    {
+      "name2": "Cell Analysis",
+      "link2": "/applications/cell-analysis",
+      "subcategories2": [
+          { "name2": "Cell-based Assays", "link2": "/applications/cell-analysis/cell-based-assays" },
+          { "name2": "Cell Counting & Health Analysis", "link2": "/applications/cell-analysis/cell-counting-health-analysis" },
+          { "name2": "Imaging Analysis & Live Cell Imaging", "link2": "/applications/cell-analysis/imaging-analysis-live-cell-imaging" }
+      ]
+    },
+    {
+      "name2":"Cell Culture by Cell Type",
+      "link2":"/applications/cell-culture-by-cell-type",
+      "subcategories2":[
+          { "name2": "Mammalian Cell Culture", "link2": "/applications/cell-culture-by-cell-type/mammalian-cell-culture" },
+          { "name2": "Microbial Cell Culture", "link2": "/applications/cell-culture-by-cell-type/microbial-cell-culture" },
+          { "name2": "Plant Tissue Culture", "link2": "/applications/cell-culture-by-cell-type/plant-tissue-culture" },
+          { "name2": "Primary Cell Culture", "link2": "/applications/cell-culture-by-cell-type/primary-cell-culture" },
+          { "name2": "Stem Cell Culture", "link2": "/applications/cell-culture-by-cell-type/stem-cell-culture" }
 			]
 		},
 		{
-			"name2": "Contact US",
-			"link2": "/contactus",
+			"name2": "Cell Culture by Technique",
+			"link2": "/applications/cell-culture-technique",
 			"subcategories2": [
-				{ "name2": "Help and Support", "link2": "/help" },
-				{ "name2": "Site Problems", "link2": "/site-problems" },
-				{ "name2": "Site Questions and Suggestions", "link2": "/feedback" }
+          { "name2": "Cell Culture by Technique", "link2": "/applications/cell-culture-technique/cell-culture-technique" },
+          { "name2": "3D Cell Culture", "link2": "/applications/cell-culture-technique/3d-cell-culture" },
+          { "name2": "Cell Culture Media Preparation", "link2": "/applications/cell-culture-technique/cell-culture-media-preparation" },
+          { "name2": "Cell Growth & Maintenance", "link2": "/applications/cell-culture-technique/cell-growth-maintenance" },
+          { "name2": "Transfection & Gene Editing", "link2": "/applications/cell-culture-technique/transfection-gene-editing" }
+      ]
+    },
+    {
+      "name2": "Classical Pharma Manufacturing",
+      "link2": "/applications/classical-pharma-manufacturing",
+      "subcategories2":[
+          { "name2": "Final Fill Strategies", "link2": "/applications/classical-pharma-manufacturing/final-fill-strategies" },
+          { "name2": "Liquid Formulation Strategies", "link2": "/applications/classical-pharma-manufacturing/liquid-formulation-strategies" },
+          { "name2": "Solid Formulation Strategies", "link2": "/applications/classical-pharma-manufacturing/solid-formulation-strategies" },
+          { "name2": "Sterile Filtration Strategies", "link2": "/applications/classical-pharma-manufacturing/sterile-filtration-strategies" }
+      ]
+    },
+    {
+      "name2": "Gene Therapy Manufacturing",
+      "link2": "/applications/gene-therapy-manufacturing",
+      "subcategories2":[
+          { "name2": "Viral Vector Upstream Processing", "link2": "/applications/gene-therapy-manufacturing/viral-vector-upstream-processing" },
+          { "name2": "Viral Vector Downstream Processing", "link2": "/applications/gene-therapy-manufacturing/viral-vector-downstream-processing" },
+          { "name2": "Viral Vector Formulation & Final Fill", "link2": "/applications/gene-therapy-manufacturing/viral-vector-formulation-final-fill" },
+          { "name2": "Viral Vector Characterization & Biosafety Testing", "link2": "/applications/gene-therapy-manufacturing/viral-vector-characterization-biosafety-testing" },
+          { "name2": "Viral Vector Contract Development & Manufacturing", "link2": "/applications/gene-therapy-manufacturing/viral-vector-contract-development-manufacturing" }
+      ]
+    },
+    {
+      "name2": "Liquid Chromatography",
+      "link2": "/applications/liquid-chromatography",
+      "subcategories2":[
+          { "name2": "Liquid Chromatography", "link2": "/applications/liquid-chromatography/liquid-chromatography" },
+          { "name2": "Large Molecule HPLC", "link2": "/applications/liquid-chromatography/large-molecule-hplc" },
+          { "name2": "Low Pressure Liquid Chromatography", "link2": "/applications/liquid-chromatography/low-pressure-liquid-chromatography" },
+          { "name2": "Small Molecule HPLC", "link2": "/applications/liquid-chromatography/small-molecule-hplc" }
+      ]
+    },
+    {
+      "name2": "Monoclonal Antibody Manufacturing",
+      "link2": "/applications/monoclonal-antibody-manufacturing",
+      "subcategories2":[
+          { "name2": "Monoclonal Antibody Manufacturing", "link2": "/applications/monoclonal-antibody-manufacturing/monoclonal-antibody-manufacturing" },
+          { "name2": "Cell Line Development", "link2": "/applications/monoclonal-antibody-manufacturing/cell-line-development" },
+          { "name2": "Media Development", "link2": "/applications/monoclonal-antibody-manufacturing/media-development" },
+          { "name2": "Bioreactor Production", "link2": "/applications/monoclonal-antibody-manufacturing/bioreactor-production" },
+          { "name2": "Downstream Processing", "link2": "/applications/monoclonal-antibody-manufacturing/downstream-processing" },
+          { "name2": "Final Sterile Filtration", "link2": "/applications/monoclonal-antibody-manufacturing/final-sterile-filtration" },
+          { "name2": "Preventing Adventitious Agent Contamination", "link2": "/applications/monoclonal-antibody-manufacturing/preventing-adventitious-agent-contamination" },
+          { "name2": "Detecting Viral Contamination", "link2": "/applications/monoclonal-antibody-manufacturing/detecting-viral-contamination" },
+          { "name2": "Removing Viruses Downstream", "link2": "/applications/monoclonal-antibody-manufacturing/removing-viruses-downstream" },
+          { "name2": "Bioburden & Aseptic Control Strategy", "link2": "/applications/monoclonal-antibody-manufacturing/bioburden-aseptic-control-strategy" },
+          { "name2": "Detecting & Removing Aggregates", "link2": "/applications/monoclonal-antibody-manufacturing/detecting-removing-aggregates" }
 			]
-		}
-	],
+		},
+    {
+      "name2": "Pharma Analysis & QC",
+      "link2": "/applications/pharma-analysis-qc",
+      "subcategories2": [
+          { "name2": "Biologics & Biosimilars Characterization", "link2": "/applications/pharma-analysis-qc/biologics-biosimilars-characterization" },
+          { "name2": "Compendial Testing & Regulatory Guidance", "link2": "/applications/pharma-analysis-qc/compendial-testing-regulatory-guidance" },
+          { "name2": "Small Molecules Analysis & Quality Control (QC)", "link2": "/applications/pharma-analysis-qc/small-molecules-analysis-qc" }
+      ]
+    },
+    {
+      "name2": "Sample Preparation",
+      "link2": "/applications/sample-preparation",
+      "subcategories2":[
+          { "name2": "Sample Filtration", "link2": "/applications/sample-preparation/sample-filtration" },
+          { "name2": "Sample Purification", "link2": "/applications/sample-preparation/sample-purification" },
+          { "name2": "QuEChERS Sample Preparation", "link2": "/applications/sample-preparation/quechers-sample-preparation" },
+          { "name2": "Solid Phase Extraction", "link2": "/applications/sample-preparation/solid-phase-extraction" },
+          { "name2": "Solid Phase Microextraction", "link2": "/applications/sample-preparation/solid-phase-microextraction" }
+      ]
+    },
+    {
+      "name2": "Synthetic Methods",
+      "link2": "/applications/synthetic-methods",
+      "subcategories2":[
+          { "name2": "Synthetic Methods", "link2": "/applications/synthetic-methods/synthetic-methods" },
+          { "name2": "C-H Functionalization", "link2": "/applications/synthetic-methods/c-h-functionalization" },
+          { "name2": "Cross Coupling", "link2": "/applications/synthetic-methods/cross-coupling" },
+          { "name2": "Fluorination", "link2": "/applications/synthetic-methods/fluorination" },
+          { "name2": "Metathesis", "link2": "/applications/synthetic-methods/metathesis" },
+          { "name2": "Organic Reaction Toolbox", "link2": "/applications/synthetic-methods/organic-reaction-toolbox" },
+          { "name2": "Photocatalysis", "link2": "/applications/synthetic-methods/photocatalysis" }
+      ]
+    },
+    {
+      "name2": "Vaccine Manufacturing",
+      "link2": "/applications/vaccine-manufacturing",
+      "subcategories2":[
+          { "name2": "Cell-Based Vaccine Manufacturing", "link2": "/applications/vaccine-manufacturing/cell-based-vaccine-manufacturing" },
+          { "name2": "mRNA Vaccine Manufacturing", "link2": "/applications/vaccine-manufacturing/mrna-vaccine-manufacturing" },
+          { "name2": "pDNA Vaccine Manufacturing", "link2": "/applications/vaccine-manufacturing/pdna-vaccine-manufacturing" },
+          { "name2": "Protein Subunit Vaccine Manufacturing", "link2": "/applications/vaccine-manufacturing/protein-subunit-vaccine-manufacturing" },
+          { "name2": "Viral-like Particles Vaccine Manufacturing", "link2": "/applications/vaccine-manufacturing/viral-like-particles-vaccine-manufacturing" },
+          { "name2": "Viral Vector Vaccine Manufacturing", "link2": "/applications/vaccine-manufacturing/viral-vector-vaccine-manufacturing" }
+      ]
+    }
+  ],
   "categories3": [
-		{
-			"name2": "Document",
-			"link2": "/document",
-			"subcategories2": [
-				{ "name2": "Safety Data Sheets (SDS)", "link2": "#" },
-				{ "name2": "Certificates of Analysis (COA)", "link2": "#" },
-				{ "name2": "Certificates of Origin (COO)", "link2": "#" },
-				{ "name2": "Certificates of Quality (CQ)", "link2": "#" }
-			]
-		}
+    {
+      "name3": "Safety Data Sheets (SDS)",
+      "link3": "/document/safety-data-sheets",
+      "subcategories3": [
+          { "name3": "Search SDS", "link3": "/document/safety-data-sheets/search-sds" },
+          { "name3": "SDS by Product", "link3": "/document/safety-data-sheets/sds-by-product" },
+          { "name3": "SDS Compliance", "link3": "/document/safety-data-sheets/sds-compliance" }
+      ]
+    },
+    {
+      "name3": "Certificates of Analysis (COA)",
+      "link3": "/document/certificates-of-analysis",
+      "subcategories3": [
+          { "name3": "View COA", "link3": "/document/certificates-of-analysis/view-coa" },
+          { "name3": "Request COA", "link3": "/document/certificates-of-analysis/request-coa" },
+          { "name3": "COA Compliance", "link3": "/document/certificates-of-analysis/coa-compliance" }
+      ]
+    },
+    {
+      "name3": "Certificates of Origin (COO)",
+      "link3": "/document/certificates-of-origin",
+      "subcategories3": [
+          { "name3": "View COO", "link3": "/document/certificates-of-origin/view-coo" },
+          { "name3": "Request COO", "link3": "/document/certificates-of-origin/request-coo" },
+          { "name3": "COO Compliance", "link3": "/document/certificates-of-origin/coo-compliance" }
+      ]
+    },
+    {
+      "name3": "Certificates of Quality (COQ)",
+      "link3": "/document/certificates-of-quality",
+      "subcategories3": [
+          { "name3": "View COQ", "link3": "/document/certificates-of-quality/view-coq" },
+          { "name3": "Request COQ", "link3": "/document/certificates-of-quality/request-coq" },
+          { "name3": "COQ Compliance", "link3": "/document/certificates-of-quality/coq-compliance" }
+      ]
+    }
+  ],
+  "categories4": [
+    {
+      "name4": "About",
+      "link4": "/careers/about",
+      "subcategories4": [
+          { "name4": "Corporate Profile", "link4": "/about-us" }
+      ]
+    },
+    {
+      "name4": "Contact",
+      "link4": "/careers/contact",
+      "subcategories4": [
+          { "name4": "Site Questions and Suggestions", "link4": "/feedback" }
+      ]
+    }
   ]
 }
-
-
+  
