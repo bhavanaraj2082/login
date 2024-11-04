@@ -1,5 +1,4 @@
 import { writable } from 'svelte/store';
-
 export const solutionType = writable('');
 export const formatType = writable('');
 export const formData = writable({
@@ -11,7 +10,7 @@ export const formData = writable({
     qualityLevel: '',
     analyticalTechnique: '',
 });
-export const AddNoted= writable('')
+export const AddNoted= writable('');
 export const Cusdetails= writable({
     Title:'',
     First:'',
@@ -29,5 +28,4 @@ export const Delivery= writable({
     County:'',
     City:'',
     Post:'',
-
 })

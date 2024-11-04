@@ -1,9 +1,7 @@
 <script>
-  import { Delivery } from '../../../stores/solution_stores'
-	import { get } from 'svelte/store';
+  import { Delivery } from '../../../src/stores/solution_stores'
+	// import { get } from 'svelte/store';
     import { onMount } from 'svelte';
-
-    
     export let tog
     export let tog1
     export let tog2
@@ -205,61 +203,60 @@
   { name: 'Zambia', code: '+260' },
   { name: 'Zimbabwe', code: '+263' },
 ];
+let errorMessage='';
 
 onMount(() => {
-    // Load stored details on component mount
     const storedDetails = JSON.parse(localStorage.getItem('Delivery'));
     if (storedDetails) {
-      Object.assign($Delivery, storedDetails);
+    Object.assign($Delivery, storedDetails);
     }
-  });
-
+});
 $: iscomplete= $Delivery.Address1 && $Delivery.Address2 && $Delivery.City && $Delivery.Country && $Delivery.County && $Delivery.Post
 const sub=()=>{
 
     if(!iscomplete){
-        alert("Please fill all the details")
-
-    }else{
-        tog5()
+        errorMessage = "Please fill all the details"; 
+        console.log(errorMessage);
+				
+    } else {
+        errorMessage = ''; 
+        tog5(); 
     }
 }
     </script>
-
-    
-    <div class="mx-10 my-10 flex justify-between">
+<div class="mx-10 my-10 flex justify-between">
         <h1 class="font-bold text-2xl text-black text-opacity-25">
             Step 1: Select custom solution type 
         </h1>
-        <button type="button" class="font-semibold text-blue" on:click={tog()}>Edit</button>
+        <button type="button" class="font-semibold text-primary-500" on:click={tog()}>Edit</button>
     </div>
     <hr>
     <div class="mx-10 my-10 flex justify-between">
         <h1 class="font-bold text-2xl text-black text-opacity-25">
             Step 2: Select custom format 
         </h1>
-        <button type="button" class="font-semibold text-blue" on:click={tog1()}>Edit</button>
+        <button type="button" class="font-semibold text-primary-500" on:click={tog1()}>Edit</button>
     </div>
     <hr>
     <div class="mx-10 my-10 flex justify-between">
         <h1 class="font-bold text-2xl text-black text-opacity-25">
             Step 3: Configure custom solution 
         </h1>
-        <button type="button" class="font-semibold text-blue" on:click={tog2()}>Edit</button>
+        <button type="button" class="font-semibold text-primary-500" on:click={tog2()}>Edit</button>
     </div>
     <hr>
     <div class="mx-10 my-10 flex justify-between">
         <h1 class="font-bold text-2xl text-black text-opacity-25">
             Step 4: Additional notes
         </h1>
-        <button type="button" class="font-semibold text-blue" on:click={tog3()}>Edit</button>
+        <button type="button" class="font-semibold text-primary-500" on:click={tog3()}>Edit</button>
     </div>
     <hr>
     <div class="mx-10 my-10 flex justify-between">
         <h1 class="font-bold text-2xl text-black text-opacity-25">
             Step 5: Customer details
         </h1>
-        <button type="button" class="font-semibold text-blue" on:click={tog4()}>Edit</button>
+        <button type="button" class="font-semibold text-primary-500" on:click={tog4()}>Edit</button>
     </div>
     <hr>
     <div class="ml-10">
@@ -271,50 +268,48 @@ const sub=()=>{
             <div class="">
                 <label for="" class="text-sm">Address line 1 *</label>
                 <br>
-                <input type="text" name="Address" bind:value={$Delivery.Address1} id="" class="lg:w-2/5 border-2" />
+                <input type="text" name="Address" bind:value={$Delivery.Address1} id="" class="block w-2/5 lg:w-1/2 p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500" />
             </div>
-            <div class="">
+            <div class="mt-2 mb-2">
                 <label for="" class="text-sm">Address line 2 *</label>
                 <br>
-                <input type="text" name="Address2" bind:value={$Delivery.Address2} id="" class="lg:w-2/5 border-2" />
+                <input type="text" name="Address2" bind:value={$Delivery.Address2} id="" class="block w-2/5 lg:w-1/2 p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500" />
             </div>
-            <div class="lg:flex">
-            <div class="">
+            <div class="mt-2 mb-2">
                 <label for="" class="text-sm">Country *</label>
                 <br>
-                <select class="sm:w-1/2 md:w-60 lg:w-60 border-2 " name="Country" id="country" bind:value={$Delivery.Country}>
+                <select class="block w-2/5 lg:w-1/2 p-1.5 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 bg-white"  name="Country" id="country" bind:value={$Delivery.Country}>
                     <option value="" disabled selected>Select your country</option>
                     {#each countries as country}
-                      <option value={`${country.name},${country.code}`}>{country.name} ({country.code})</option>
+                    <option value={`${country.name},${country.code}`}>{country.name} ({country.code})</option>
                     {/each}
-                  </select>
+                </select>
             </div>
-            <div class=" lg:ml-10">
+            <div class="mt-2 mb-2">
                 <label for="" class="text-sm ">County</label><br>
-                <input type="text" class="border-2" name="County" id="" bind:value={$Delivery.County}/>
+                <input type="text" class="block w-2/5 lg:w-1/2 p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500"  name="County" id="" bind:value={$Delivery.County}/>
             </div>
-        </div>
-            <div class="lg:flex">
-            <div class="">
+        <div class="mt-2 mb-2">
                 <label for="" class="text-sm">City *</label>
                 <br>
-                <input type="text" name="City" id="" class="lg:w-60 border-2" bind:value={$Delivery.City} />
+                <input type="text" name="City" id="" class="block w-2/5 lg:w-1/2 p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500" bind:value={$Delivery.City} />
             </div>
-            <div class="lg:ml-10">
+            <div class="mt-2 mb-2">
                 <label for="text1" class="text-sm">Post code *</label>
                 <br>
-                <input type="text" name="postcode" id="text1" class="border-2" bind:value={$Delivery.Post}/>
+                <input type="text" name="postcode" id="text1" class="block w-2/5 lg:w-1/2 p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500" bind:value={$Delivery.Post}/>
             </div>
         </div>
-        </div>
-        <button
+        <div class="flex space-x-4 mt-5">
+            <button
             type="button"
             on:click={sub}
-            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 px-20 my-5"
+            class="text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-500 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
             >Save & View Summary</button
         >
+        {#if errorMessage}
+        <div class="text-red-600 font-semibold text-xl ml-5 mt-5">{errorMessage}</div> <!-- Display the error message -->
+    {/if}
+        </div>
     </div>
     <hr>
-   
-    
-    

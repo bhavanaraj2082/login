@@ -1,16 +1,13 @@
 <script>
-  import { Cusdetails } from '../../../stores/solution_stores'
-
+  import { Cusdetails } from '../../../src/stores/solution_stores'
 	export let tog;
 	export let tog1;
 	export let tog2;
 	export let tog3;
 	export let tog4;
-
-	// List of titles
+  let errorMessage = '';
+  $: isFormData = $Cusdetails.Title && $Cusdetails.First && $Cusdetails.Last && $Cusdetails.Organisation && $Cusdetails.Country && $Cusdetails.Email && $Cusdetails.Number
 	const titles = ['Dr', 'Miss', 'Mr', 'Ms', 'Mrs', 'Prof'];
-
-      // List of countries and their respective calling codes
   const countries = [
      { name: 'Afghanistan', code: '+93' },
   { name: 'Albania', code: '+355' },
@@ -205,140 +202,151 @@
   { name: 'Zambia', code: '+260' },
   { name: 'Zimbabwe', code: '+263' },
 ];
-
-
- $: isFormComplete = $Cusdetails.Title && $Cusdetails.First && $Cusdetails.Last && $Cusdetails.Organisation && $Cusdetails.Country && $Cusdetails.Email && $Cusdetails.Number
-
  let emailError = '';
-
-  const cust=()=>{
-    if (!isFormComplete) {
-        alert("Please fill all the details");
-        return;
+ let phoneError='';
+ const cust = () => {
+    if (!isFormData) {
+        errorMessage = "Please fill all the details"; 
+        console.log(errorMessage); 
+        return; 
+    } else {
+        errorMessage = ''; 
     }
-    else{
-
-    // Email validation
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test($Cusdetails.Email)) {
         emailError = "Please enter a valid email address.";
+        console.log(emailError); 
+        return; 
     } else {
-        emailError = ""; // Clear error if valid
+        emailError = ""; 
     }
-
-    // Phone number validation (assuming US format for example)
-    const phonePattern = /^\d{10}$/; // Adjust regex based on your requirements
+    const phonePattern = /^\d{10}$/; 
     if (!phonePattern.test($Cusdetails.Number)) {
-        alert("Please enter a valid phone number (10 digits).");
-        return;
+        phoneError = "Please enter a valid  phone number (10 digits).";
+        console.log(phoneError); 
+        return; 
     }
-    {
-    // If everything is valid, proceed
     tog4();
-
-    }
-  }
-  }
+};
 </script>
 
 <div class="mx-10 my-10 flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 1: Select custom solution type</h1>
-  <button type="button" class="font-semibold text-blue" on:click={tog()}>Edit</button>
+  <button type="button" class="font-semibold text-primary-500" on:click={tog()}>Edit</button>
 </div>
 <hr />
 <div class="mx-10 my-10 flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 2: Select custom format</h1>
-  <button type="button" class="font-semibold text-blue" on:click={tog1()}>Edit</button>
+  <button type="button" class="font-semibold text-primary-500" on:click={tog1()}>Edit</button>
 </div>
 <hr />
 <div class="mx-10 my-10 flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 3: Configure custom solution</h1>
-  <button type="button" class="font-semibold text-blue" on:click={tog2()}>Edit</button>
+  <button type="button" class="font-semibold text-primary-500" on:click={tog2()}>Edit</button>
 </div>
 <hr />
 <div class="mx-10 my-10 flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 4: Additional notes</h1>
-	<button type="button" class="font-semibold text-blue" on:click={tog3()}>Edit</button>
+	<button type="button" class="font-semibold text-primary-500" on:click={tog3()}>Edit</button>
 </div>
 <hr />
-
 <div class="ml-10">
 	<h1 class="font-bold text-2xl my-10">Step 5: Customer details</h1>
 	<hr />
-    <!-- <form method="POST" action="?/cust"> -->
 	<h1 class="font-semibold my-5">Log in to auto fill</h1>
-        <div class="lg:flex">
-            <div class="">
-		<label for="" class="text-sm">Title</label>
-    <br>
-		<select id="title" name="title" class="lg:w-4/4 border-2" bind:value={$Cusdetails.Title}>
-			<option value="" disabled selected>Title</option>
-			{#each titles as title}
-				<option value={title}>{title}</option>
-			{/each}
-		</select>
-    </div >
-        <div class=" lg:ml-5">
-		<label for="" class="text-sm">First name *</label>
-    <br>
-    
-		<input type="text" class="lg:w-5/5 border-2" bind:value={$Cusdetails.First} name="Firstname" id="" />
+<div class="lg:flex lg:space-x-5 w-full lg:w-3/5">
+  <div class="mb-4 lg:mb-0 lg:w-1/5">
+      <label for="title" class="text-sm">Title</label>
+      <br />
+      <select 
+      id="title" 
+      name="title" 
+      class="block w-2/5 lg:w-full p-1.5 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 bg-white" 
+      bind:value={$Cusdetails.Title}>
+      <option value="" disabled selected>Title</option>
+      {#each titles as title}
+          <option value={title}>{title}</option>
+      {/each}
+  </select>
+  </div>
+  <div class="w-2/5 lg:w-3/5 lg:flex lg:space-x-5">
+    <div class="flex-1 mb-4 lg:mb-0">
+        <label for="firstname" class="text-sm">First name *</label>
+        <br />
+        <input 
+            type="text" 
+            class="block w-full p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 lg:w-full" 
+            bind:value={$Cusdetails.First} 
+            name="Firstname" 
+            id="firstname" 
+            required
+        />
     </div>
-    <div class="lg:mx-5">
-		<label for="" class="text-sm "> Last name *</label>
-    <br>
-        
-		<input type="text" name="lastname" class="border-2" id="" bind:value={$Cusdetails.Last}/>
+    <div class="flex-1 mb-4 lg:mb-0">
+        <label for="lastname" class="text-sm">Last name *</label>
+        <br />
+        <input 
+            type="text" 
+            name="lastname" 
+            class="block w-full p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 lg:w-full" 
+            id="lastname" 
+            bind:value={$Cusdetails.Last} 
+            required
+        />
     </div>
+  </div>
 </div>
-
-    <div class="">
+    <div class="mt-2 mb-2">
 		<label for="" class="text-sm">Organisation name *</label>
     <br>
-		<input type="text" name="organisation" id="" bind:value={$Cusdetails.Organisation} class="lg:w-2/5 border-2"/>
+		<input type="text" name="organisation" id="" bind:value={$Cusdetails.Organisation} class="block w-2/5 lg:w-1/2 p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500"/>
     </div >
     <div class="">
 		<label for="" class="text-sm">Country *</label>
     <br>
-		<select class="lg:w-2/5 border-2" name="country" id="country" bind:value={$Cusdetails.Country}>
-            <option value="" disabled selected>Select your country</option>
-            {#each countries as country}
-              <option value={`${country.name},${country.code}`}>{country.name} ({country.code})</option>
-            {/each}
-          </select>
+		<select class="block w-2/5 lg:w-1/2 p-1.5 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 bg-white" name="country" id="country" bind:value={$Cusdetails.Country}>
+      <option value="" disabled selected>Select your country</option>
+      {#each countries as country}
+        <option value={`${country.name},${country.code}`}>{country.name} ({country.code})</option>
+      {/each}
+    </select>
         </div>
-        <div class="">
-		<label for="" class="text-sm">Previous invoice number or LGC account number (if known)</label>
+        <div class="mt-2 mb-2">
+		<label for="" class="text-sm">Invoice number</label>
     <br>
-		<input type="text" name="lgcnumber" id=""  class="lg:w-2/5 border-2" bind:value={$Cusdetails.LGC}/>
+		<input type="text" name="lgcnumber" id=""  class="block w-2/5 lg:w-1/2 p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500" bind:value={$Cusdetails.LGC}/>
     </div>
-    <div class="">
+    <div class="mt-2 mb-2">
 		<label for="" class="text-sm">Email address *</label>
     <br>
-		<input type="text" name="email" id="" class="lg:w-2/5 border-2" bind:value={$Cusdetails.Email}/>
+		<input type="text" name="email" id="" class="block w-2/5 lg:w-1/2 p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500" bind:value={$Cusdetails.Email}/>
     {#if emailError}
         <p class="text-red-500">{emailError}</p>
       {/if}
     </div>
-
-    <div class="">
+    <div class="mt-2 mb-2">
 		<label for="" class="text-sm">Phone number *</label>
     <br>
-       <input class="lg:w-2/5 border-2" type="tel" name="phone" id="phone" bind:value={$Cusdetails.Number} placeholder="Enter your number" required>
+      <input class="block w-2/5 lg:w-1/2 p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500" type="tel" name="phone" id="phone" bind:value={$Cusdetails.Number} placeholder="Enter your number" required>
+      {#if phoneError}
+      <p class="text-red-500">{phoneError}</p>
+    {/if}
+          </div>  
+          <div class="flex space-x-4 mt-5">
+            <button
+            type="button"
+            on:click={cust}
+            class="text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-500 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
+            >Save & continue</button
+          >
+          {#if errorMessage}
+          <div class="text-red-600 font-semibold text-xl ml-5 mt-5">{errorMessage}</div> <!-- Display the error message -->
+      {/if}
+          
           </div>
-   
-		<button
-			type="button"
-      on:click={cust}
-      
-      
-			class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 px-20 my-5"
-			>Save & continue</button
-		>
-    <!-- </form> -->
+
 </div>
 <hr />
-
 <div class="mx-10 my-10 flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 6: Delivery information</h1>
 </div>
