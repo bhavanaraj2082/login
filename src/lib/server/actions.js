@@ -164,6 +164,70 @@ export const submitContactData = async (data,pb) => {
 };
 
 
+// profile page action function
+
+export async function updateprofile1(pb,body){
+  await pb.collection('Register').update(body.userId, body);
+  return{
+   status: 200 };
+ }
+ 
+ 
+ export async function updateOrganization1(pb,body){
+  await pb.collection('ChemiDashProfile').update(body.userId, body)
+   return{
+   status: 200,
+  };
+ } 
+ 
+ export async function updateShipping1(pb,body){  
+   await pb.collection('ChemiDashProfile').update(body.userId, body)
+   return{ 
+     status: 200 };
+ }
+ 
+ export async function updatedOrder1(pb,body){
+  await pb.collection('ChemiDashProfile').update(body.userId,body)
+   return {
+     status: 200 };
+ }
+ 
+ 
+ export async function updatePreferences(pb, body) {
+   const preferences = body.preferences;
+  await pb.collection('ChemiDashProfile').update(body.userId, { preferences });
+   return {
+       status: 200,
+   };
+ }
+ 
+ 
+ export async function updatedMethod1(pb,body){
+  await pb.collection('ChemiDashProfile').update(body.userId,body)
+   return {
+     status: 200 };
+ }
+ 
+ export async function updatedlink1(pb,body){
+   const updateData = { 
+     userId: body.userId,
+     phone: body.phone
+    };
+   
+   if (body.transactionType === 'orderNumber') {
+     updateData.orderNumber = body.transactionValue;
+ } else if (body.transactionType === 'quoteReference') {
+     updateData.quoteReference = body.transactionValue;
+ } else if (body.transactionType === 'invoiceno') {
+     updateData.invoiceno = body.transactionValue;
+ } 
+    await pb.collection('ChemiDashProfile').update(body.userId,updateData)
+    return {
+      status: 200 };
+  }
+ 
+ 
+  // profile page end
 
 
 
