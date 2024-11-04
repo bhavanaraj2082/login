@@ -1,40 +1,34 @@
 <script>
-	import { AddNoted } from "../../../src/stores/solution_stores";
-	import { get } from "svelte/store";
+	import { AddNoted } from '$lib/stores/solution_stores.js';
+	import { get } from 'svelte/store';
 	export let tog;
 	export let tog1;
 	export let tog2;
 	export let tog3;
-	let showRequiredMessage = false; 
+	let showRequiredMessage = false;
 	const handleSubmit = () => {
-		if (!$AddNoted) { 
+		if (!$AddNoted) {
 			showRequiredMessage = true;
 		} else {
 			showRequiredMessage = false;
-			console.log("Details saved:", get(AddNoted));
+			console.log('Details saved:', get(AddNoted));
 			tog3();
 		}
 	};
 </script>
 
 <div class="mx-10 my-10 flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">
-		Step 1: Select custom solution type
-	</h1>
+	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 1: Select custom solution type</h1>
 	<button class="font-semibold text-primary-500" on:click={tog()}>Edit</button>
 </div>
 <hr />
 <div class="mx-10 my-10 flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">
-		Step 2: Select custom format
-	</h1>
+	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 2: Select custom format</h1>
 	<button class="font-semibold text-primary-500" on:click={tog1()}>Edit</button>
 </div>
 <hr />
 <div class="mx-10 my-10 flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">
-		Step 3: Configure custom solution
-	</h1>
+	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 3: Configure custom solution</h1>
 	<button class="font-semibold text-primary-500" on:click={tog2()}>Edit</button>
 </div>
 <hr />
@@ -58,18 +52,15 @@
 		type="button"
 		on:click={handleSubmit}
 		class="text-white sm:ml-10 ml-5 bg-primary-500 hover:bg-primary-600 focus:ring-primary-500 focus:ring-opacity-50 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 focus:outline-none px-20 my-5"
-	>Save & continue</button>
+		>Save & continue</button
+	>
 </div>
 <hr />
 <div class="mx-10 my-10 flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">
-		Step 5: Customer details
-	</h1>
+	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 5: Customer details</h1>
 </div>
 <hr />
 <div class="mx-10 my-10 flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">
-		Step 6: Delivery information
-	</h1>
+	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 6: Delivery information</h1>
 </div>
 <hr />
