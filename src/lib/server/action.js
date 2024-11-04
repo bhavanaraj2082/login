@@ -313,3 +313,45 @@ export async function validateLogin(email, password) {
       return { success: false, error: 'Login failed' };
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+/////////COPY RIGHT CONSENT
+export const submitFormData = async (pb, formData) => {
+  //console.log('Submitting form data...');
+
+  try {
+      const dataToSubmit = {
+          ExtractedData:formData.ExtractedData,
+          title: formData.title,
+          firstname: formData.firstname,
+          lastname: formData.lastname,
+          company: formData.company,
+          street: formData.street,
+          postalcode: formData.postalcode,
+          city: formData.city,
+          location: formData.location,
+          email: formData.email,
+          description: formData.description,
+          url: formData.url,
+          file: formData.file,
+      };
+
+      // console.log('Data to submit:', dataToSubmit);
+
+      const response = await pb.collection('CopyrightConsent').create(dataToSubmit);
+
+      return { success: true, data: response }; 
+  } catch (error) {
+      console.error('Error submitting form data:', error);
+      return { success: false, error: error.message }; 
+  }
+};

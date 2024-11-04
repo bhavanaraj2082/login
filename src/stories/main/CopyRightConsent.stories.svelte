@@ -1,0 +1,21 @@
+<script context="module">
+    import CopyRightConsent from '$lib/components/CopyRightConsent.svelte';
+   
+  
+    export const meta = {
+      title: " CopyRightConsent",
+      component: CopyRightConsent,
+    }
+  </script>
+  
+  <script>
+    import { Story, Template } from '@storybook/addon-svelte-csf';
+    import '../../app.css';
+  </script>
+  
+  <Template let:args>
+    <CopyRightConsent/>
+  </Template>
+  
+  
+  <Story name="CopyRightConsent12" />
