@@ -17,4 +17,4 @@
   <ProductFilter/>
     
     
-    <Story name="ProductFilter12" />
+    <Story name="ProductFilter1" />
