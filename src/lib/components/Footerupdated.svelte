@@ -84,8 +84,10 @@
 			<div class="flex flex-col items-center md:items-start text-center md:text-left lg:mr-12">
 				<h3 class="font-bold text-lg text-gray-50">Orders</h3>
 				<ul class="mt-2 space-y-2 text-sm text-gray-50">
-					<li><a href="/chemikart-solutions" class="hover:underline">Chemikart Solutions</a></li>
+					<li><a href="/ecom-solutions" class="hover:underline">Chemikart Solutions</a></li>
 					<li><a href="/quick-order" class="hover:underline">Quick Order</a></li>
+					<li><a href="/quotes" class="hover:underline">Quotes</a></li>
+
 				</ul>
 			</div>
 		</div>
@@ -103,7 +105,7 @@
 			>
 				<a href="/cookies-settings" class="hover:underline text-xs font-medium">Cookies Settings</a>
 				<span class="hidden md:block lg:inline-block footer-separator">|</span>
-				<a href="/privacy-policy" class="hover:underline text-xs font-medium">Privacy Notice</a>
+				<a href="/terms" class="hover:underline text-xs font-medium">Privacy Notice</a>
 				<span class="hidden md:block lg:inline-block footer-separator">|</span>
 				<a href="/terms" class="hover:underline text-xs font-medium">Terms & Conditions</a>
 			</div>
