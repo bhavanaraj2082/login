@@ -37,13 +37,13 @@ export async function loadProductById(productId) {
 	}
 }
 
-//////////Product Filter
+//////////Product Filter 
 export const loadFirstProduct = async (pb) => {
 	console.log('Fetching chemical products...');
 
 	try {
 		const products = await pb.collection('Products').getList(1, 1000, {
-			sort: '-created',
+			//sort: '-created',
 			expand: 'manufacturerName,Category'
 		});
 
@@ -64,6 +64,16 @@ export const loadFirstProduct = async (pb) => {
 		return { success: false, data: [], error: error.message };
 	}
 };
+
+
+
+
+
+
+
+
+
+
 
 export async function fetchViewedProducts(pb) {
 	const records = await pb.collection('ViewedProducts').getFullList({
