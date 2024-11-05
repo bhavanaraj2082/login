@@ -494,7 +494,7 @@ export async function confirmpasswordreset(token, newPassword, newConfirmPasswor
 		message: 'Your password has been reset successfully! You can now log in.'
 	};
 }
-//search bar
+//search bar component
 export async function fetchproductName() {
 	try {
 		const subCategoryRecords = await pb.collection('SubCategories').getFullList();

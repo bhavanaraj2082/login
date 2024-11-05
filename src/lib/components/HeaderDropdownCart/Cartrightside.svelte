@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    // src/lib/data/cart.json
+    
     import cartData from '../../../lib/data/cart.json';
  
     let cartOpen = false;
