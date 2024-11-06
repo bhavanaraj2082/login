@@ -1,10 +1,7 @@
-
 import { writable } from 'svelte/store';
-import { fetchproductName } from '../lib/server/actions';
-
+import { fetchProductName } from '$lib/server/actions';
 export const searchResult = writable([]);
-
 export async function loadComponents() {
-    const products = await fetchproductName();
+    const products = await fetchProductName();
     searchResult.set(products);
 }
