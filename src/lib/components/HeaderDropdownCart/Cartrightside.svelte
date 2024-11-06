@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
     
-    import cartData from '../../../lib/data/cart.json';
+    import cartData from '$lib/data/cart.json';
  
     let cartOpen = false;
     let cartItems = [];
@@ -63,7 +63,7 @@
   <button on:click={toggleCart} class=" space-x-4 text-gray-600"><i class="fa-solid fa-cart-shopping"></i> </button>
 
   {#if cartOpen}
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+    <div class="fixed inset-0 bg-gray-400 bg-opacity-75 transition-opacity"></div>
     <div class="fixed inset-0 overflow-hidden">
       <div class="absolute inset-0 overflow-hidden">
         <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">

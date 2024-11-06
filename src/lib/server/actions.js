@@ -495,24 +495,27 @@ export async function confirmpasswordreset(token, newPassword, newConfirmPasswor
 	};
 }
 //search bar component
-export async function fetchproductName() {
-	try {
-		const subCategoryRecords = await pb.collection('SubCategories').getFullList();
-		const subSubCategoryRecords = await pb.collection('SubSubCategories').getFullList();
-		const manufacturerRecords = await pb.collection('Manufacturers').getFullList();
 
-		const allRecords = [
-			...subCategoryRecords.map((record) => ({ name: record.name })),
-			...subSubCategoryRecords.map((record) => ({ name: record.name })),
-			...manufacturerRecords.map((record) => ({ name: record.name }))
-		];
 
-		return allRecords;
-	} catch (error) {
-		console.error('Error fetching product names:', error);
-		return [];
-	}
+export async function fetchProductName(pb) {
+  try {
+    const subCategoryRecords = await pb.collection('SubCategories').getFullList();
+    const subSubCategoryRecords = await pb.collection('SubSubCategories').getFullList();
+    const manufacturerRecords = await pb.collection('Manufacturers').getFullList();
+
+    const allRecords = [
+      ...subCategoryRecords.map(record => ({ name: record.name })),
+      ...subSubCategoryRecords.map(record => ({ name: record.name })),
+      ...manufacturerRecords.map(record => ({ name: record.name }))
+    ];
+
+    return allRecords;
+  } catch (error) {
+    console.error('Error fetching product names:', error);
+    return [];
+  }
 }
+
 
 //My Favourite Page
 export async function loadFavourites(pb) {

@@ -1,19 +1,20 @@
-import { fetchproductName } from '../../lib/server/actions';
+
+import PocketBase from 'pocketbase';
+import { fetchProductName } from '$lib/server/actions'; 
 
 export async function load() {
+  const pb = new PocketBase("https://chemikartpb.partskeys.com");
+
   try {
-    const products = await fetchproductName();
-    return {
-      props: {
-        products
-      }
-    };
+    
+    await pb.admins.authWithPassword("team@partskeys.com", "eICwDzXNaqXjtmD0qHEUpb7PxfgKtJva");
+
+   
+    const productNames = await fetchProductName();
+
+    return { productNames }; 
   } catch (error) {
-    console.error('Error loading products:', error);
-    return {
-      props: {
-        products: []
-      }
-    };
+    console.error("Error loading page:", error);
+    return { productNames: [] }; 
   }
 }
