@@ -4,7 +4,7 @@
    
    
     export let data;
-     let products = data?.records || [];
+     let products = data?.data || [];
     let error = null;
     let currentPage = 1;
     const itemsPerPage = 5;

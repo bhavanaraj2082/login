@@ -39,31 +39,34 @@ export async function loadProductById(productId) {
 
 //////////Product Filter 
 export const loadFirstProduct = async (pb) => {
-	console.log('Fetching chemical products...');
+   // console.log('Fetching chemical products...');
 
-	try {
-		const products = await pb.collection('Products').getList(1, 1000, {
-			//sort: '-created',
-			expand: 'manufacturerName,Category'
-		});
+    
+        const products = await pb.collection('Products').getList(1, 2000, { 
+           // sort: '-created',
+            expand: 'manufacturerName,Category'
+        });
 
-		if (!products.items || products.items.length === 0) {
-			console.warn('No products found in the API response.');
-			return { success: false, data: [] };
-		}
+      //  console.log('API response:', products);  // Log the entire response from PocketBase
 
-		const productsWithNames = products.items.map((product) => ({
-			...product,
-			manufacturerName: product.expand?.manufacturerName?.name || 'Unknown Manufacturer',
-			categoryName: product.expand?.Category?.name || 'Unknown Category'
-		}));
+        if (!products.items || products.items.length === 0) {
+            console.warn('No products found in the API response.');
+            return  [] ;
+        }
 
-		return { success: true, data: productsWithNames };
-	} catch (error) {
-		console.error('Error fetching chemical products:', error);
-		return { success: false, data: [], error: error.message };
-	}
-};
+    
+        const productsWithNames = products.items.map(product => ({
+            ...product,
+            manufacturerName: product.expand?.manufacturerName?.name || 'Unknown Manufacturer',
+            categoryName: product.expand?.Category?.name || 'Unknown Category',
+        }));
+
+    //    console.log('Mapped products:', productsWithNames);  
+
+        return  productsWithNames ;
+    } 
+
+
 
 
 
