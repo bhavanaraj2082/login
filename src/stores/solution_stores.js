@@ -29,3 +29,9 @@ export const Delivery= writable({
     City:'',
     Post:'',
 })
+
+
+export const authedUser = writable({
+    email: '',
+   
+});
