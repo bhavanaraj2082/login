@@ -38,6 +38,8 @@ export async function loadProductById(productId) {
 }
 
 //////////Product Filter 
+
+
 export const loadFirstProduct = async (pb) => {
    // console.log('Fetching chemical products...');
 
@@ -47,7 +49,7 @@ export const loadFirstProduct = async (pb) => {
             expand: 'manufacturerName,Category'
         });
 
-      //  console.log('API response:', products);  // Log the entire response from PocketBase
+      //  console.log('API response:', products);  
 
         if (!products.items || products.items.length === 0) {
             console.warn('No products found in the API response.');
