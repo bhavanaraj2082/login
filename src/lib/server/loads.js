@@ -111,3 +111,32 @@ export async function getcookies(pb, cookies) {
 	const records = await pb.collection('ChemiDashProfile').getFirstListItem(`user="${model.id}"`);
 	return { token, model, records };
 }
+
+/*****************ProductsInfoPopup******************/
+export const loadProductsInfo = async (pb) => {
+	const response = await pb.collection('Products').getList(2, 1, {}); 
+	
+	const formattedRecords = response.items.map(record => ({
+		productId: record.id,
+		productName: record.productName,
+		productNumber: record.productNumber,
+		prodDesc: record.prodDesc,
+		imageSrc: record.imageSrc,
+		safetyDatasheet: record.safetyDatasheet,
+		priceSize: Array.isArray(record.priceSize) ? record.priceSize.map(item => ({
+			price: item.price,
+			size: item.size,
+		})) : [],
+		properties: record.properties || {},
+		description: record.description || {},
+		safetyInfo: record.safetyInfo || {},
+		productSynonym: record.filteredProductData[`Synonym(S)`] || "",
+	}));
+	
+	console.log("Formatted Product Records:", formattedRecords);
+
+	return {
+		type: "success",
+		records: formattedRecords,
+	};
+};
