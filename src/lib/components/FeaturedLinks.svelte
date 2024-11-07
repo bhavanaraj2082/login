@@ -1,6 +1,6 @@
 
 <script>
-    import {FeaturedData} from '../../lib/data/FeaturedData.json'
+    import {FeaturedData} from '$lib/data/FeaturedData.json'
 </script>
 
 <section class="w-11/12 mx-auto">

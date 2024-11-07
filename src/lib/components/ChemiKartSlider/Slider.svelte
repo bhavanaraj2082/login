@@ -1,5 +1,5 @@
 <script>
-    import images from '../../data/images.json';
+    import images from '$lib/data/images.json';
     
     let index = 0;
 

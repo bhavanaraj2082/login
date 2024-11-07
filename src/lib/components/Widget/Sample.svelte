@@ -1,6 +1,6 @@
 <script>
   import sampleData from '$lib/data/OrderWidget/sample.json';
-  import { selectedSample } from "$lib/OrderWidget/store"; 
+  import { selectedSample } from "$lib/OrderWidget/store.js"; 
 
   let chemistryChecked = false;
   let microbiologyChecked = false;

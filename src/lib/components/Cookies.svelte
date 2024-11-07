@@ -1,5 +1,5 @@
 <script>
-  import CookiesPopup from "./CookiesPopup.svelte";
+  import CookiesPopup from "$lib/components/CookiesPopup.svelte";
 
   export let isPopupOpen = false;
 

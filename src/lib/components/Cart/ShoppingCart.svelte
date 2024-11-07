@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
-    import cartData from '../../data/cart.json';
-    import { viewedCart } from "../../../stores/alsoViewedProducts_Store";
+    import cartData from '$lib/data/cart.json';
+    import { viewedCart } from "$lib/stores/alsoViewedProducts_Store";
 
     let cartItems = [];
     let subtotal = 0;

@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import data1 from '../data/sitemap.json';
+	import data1 from '$lib/data/sitemap.json';
 
 	let categories1 = [];
 	let categories2 = [];

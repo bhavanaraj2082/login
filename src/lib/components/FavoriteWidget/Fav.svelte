@@ -1,5 +1,5 @@
 <script>
-    import FavoriteButton from './FavoriteButton.svelte';
+    import FavoriteButton from '$lib/components/FavoriteWidget/FavoriteButton.svelte';
     let items = [
       { id: 1, name: "Item 1", isFavorite: false },
       { id: 2, name: "Item 2", isFavorite: false },

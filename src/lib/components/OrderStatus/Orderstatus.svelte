@@ -1,4 +1,4 @@
 <script>
-    import Order from "./Order.svelte";
+    import Order from "$lib/components/OrderStatus/Order.svelte";
 </script>
 <Order/>

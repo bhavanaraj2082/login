@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import Icon from '@iconify/svelte';
-    import { authedUser } from '$lib/../stores/solution_stores';
+    import { authedUser } from '$lib/stores/solution_stores.js';
 
     export let data;
     let products = data?.data || [];

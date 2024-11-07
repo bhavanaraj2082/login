@@ -1,6 +1,6 @@
 <script>
   import { enhance } from "$app/forms";
-  import RecommendProducts from "./RecommendProducts.svelte";
+  import RecommendProducts from "$lib/components/RecommendProducts/RecommendProducts.svelte";
   let productName = "";
   let products = [];
   let message = "";

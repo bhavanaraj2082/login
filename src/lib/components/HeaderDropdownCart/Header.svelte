@@ -4,7 +4,7 @@
     import Icon from '@iconify/svelte';
     import Cartrightside from "$lib/components/HeaderDropdownCart/Cartrightside.svelte";
     import menusdata from '$lib/data/chemicalProducts.json';
-    import { searchResult, loadComponents } from '$src/stores/searchStore';
+    import { searchResult, loadComponents } from '$lib/stores/searchStore.js';
 
     
 

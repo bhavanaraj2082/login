@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { viewedCart } from '../../stores/alsoViewedProducts_Store'
+    import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js'
     import Icon from '@iconify/svelte';
     import heartOutline from '@iconify-icons/mdi/heart-outline'; 
     import heartFilled from '@iconify-icons/mdi/heart'; 

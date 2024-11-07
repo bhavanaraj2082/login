@@ -1,5 +1,5 @@
 <script>
-    import SafetyDataSheets from "./SafetyDataSheets.svelte";
+    import SafetyDataSheets from "$lib/components/Document/SafetyDataSheets.svelte";
   
 
    

@@ -1,4 +1,4 @@
 <script>
-    import Search from "./Search.svelte";
+    import Search from "$lib/components/SearchComponent/Search.svelte";
     </script>
     <Search/>
