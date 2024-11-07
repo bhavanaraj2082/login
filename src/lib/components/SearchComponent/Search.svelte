@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { searchResult, loadComponents } from '../../stores/searchStore.js';
+    import { searchResult, loadComponents } from '$lib/stores/searchStore.js';
 
     let searchTerm = '';
     let suggestions = [];

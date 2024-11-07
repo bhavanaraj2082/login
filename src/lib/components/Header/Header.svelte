@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
-  import { searchResult, loadComponents } from '../../../stores/searchStore';
-  import chemicalProducts from '../../data/chemicalProducts.json';
+  import { searchResult, loadComponents } from '$lib/stores/searchStore';
+  import chemicalProducts from '$lib/data/chemicalProducts.json';
 
   let searchTerm = '';
   let suggestions = [];

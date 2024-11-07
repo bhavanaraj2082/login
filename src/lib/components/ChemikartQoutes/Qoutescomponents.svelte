@@ -1,11 +1,11 @@
 <script>
-  import Qoutes from "./Customsolution.svelte";
-  import Qoutes1 from "./Customformat.svelte";
-  import Qoutes2 from "./Configurecustom.svelte";
-  import Qoutes3 from "./Additionalnotes.svelte";
-  import Qoutes4 from "./Customerdetails.svelte";
-  import Qoutes5 from "./Deliveryinformation.svelte";
-  import Qoutes6 from "./Qoutesview.svelte";
+  import Qoutes from "$lib/components/ChemikartQoutes/Customsolution.svelte";
+  import Qoutes1 from "$lib/components/ChemikartQoutes/Customformat.svelte";
+  import Qoutes2 from "$lib/components/ChemikartQoutes/Configurecustom.svelte";
+  import Qoutes3 from "$lib/components/ChemikartQoutes/Additionalnotes.svelte";
+  import Qoutes4 from "$lib/components/ChemikartQoutes/Customerdetails.svelte";
+  import Qoutes5 from "$lib/components/ChemikartQoutes/Deliveryinformation.svelte";
+  import Qoutes6 from "$lib/components/ChemikartQoutes/Qoutesview.svelte";
   let currentView = 'qoutes'; // Initialize to show Qoutes by default
 const toggleQoutes = () => {
 currentView = currentView === 'qoutes' ? null : 'qoutes';

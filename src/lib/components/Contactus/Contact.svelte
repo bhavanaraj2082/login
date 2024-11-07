@@ -1,5 +1,5 @@
 <script>
-    import Contactus from "./Contactus.svelte";
+    import Contactus from "$lib/components/Contactus/Contactus.svelte";
     
 </script>
 <Contactus/>

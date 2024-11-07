@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import favouritesData from '../../data/favourites.json'; 
+    import favouritesData from '$lib/data/favourites.json'; 
     export let favouriteItems = []; 
 
     let cartItems = []; 

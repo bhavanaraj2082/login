@@ -1,5 +1,5 @@
 <script>
-	import { solutionType } from '$lib/stores/solution_stores';
+	import { solutionType } from '$lib/stores/solution_stores.js';
 	import { get } from 'svelte/store';
 	import { onMount } from 'svelte';
 	export let tag;

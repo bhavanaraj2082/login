@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from "svelte";
-	import Filterproducts from "../components/Fiterwidgets/Filterproducts.svelte";
-	import Filterwidget from "../components/Fiterwidgets/Filterwidget.svelte";
+	import Filterproducts from "$lib/components/Fiterwidgets/Filterproducts.svelte";
+	import Filterwidget from "$lib/components/Fiterwidgets/Filterwidget.svelte";
 
 	let products = [];
 	let filteredProducts = [];

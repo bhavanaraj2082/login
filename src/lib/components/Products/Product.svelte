@@ -1,7 +1,7 @@
 <script>
-    import ProductsPage from './ProductsPage.svelte';
-    import SubProductsPage from './SubProductsPage.svelte';
-    import ProductInfoPage from './ProductInfoPage.svelte';
+    import ProductsPage from '$lib/components/Products/ProductsPage.svelte';
+    import SubProductsPage from '$lib/components/Products/SubProductsPage.svelte';
+    import ProductInfoPage from '$lib/components/Products/ProductInfoPage.svelte';
     import { createEventDispatcher } from 'svelte';
   
     export let currentStep = 1;

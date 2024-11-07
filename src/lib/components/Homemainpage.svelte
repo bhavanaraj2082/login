@@ -1,10 +1,10 @@
 <script>
-    import Herosection from "./Homepagecomponents/Herosection.svelte";
-    import Cards from "./Homepagecomponents/Cards.svelte";
-    import Youtubecomponent from "./Homepagecomponents/Youtubecomponent.svelte";
-    import Upcomimgevent from "./Homepagecomponents/Upcomimgevent.svelte";
-    import Catolog from "./Homepagecomponents/catolog.svelte";
-    import Bulkorder from "./Homepagecomponents/Bulkorder.svelte";
+    import Herosection from "$lib/components/Homepagecomponents/Herosection.svelte";
+    import Cards from "$lib/components/Homepagecomponents/Cards.svelte";
+    import Youtubecomponent from "$lib/components/Homepagecomponents/Youtubecomponent.svelte";
+    import Upcomimgevent from "$lib/components/Homepagecomponents/Upcomimgevent.svelte";
+    import Catolog from "$lib/components/Homepagecomponents/catolog.svelte";
+    import Bulkorder from "$lib/components/Homepagecomponents/Bulkorder.svelte";
 </script>
 
 <div>
