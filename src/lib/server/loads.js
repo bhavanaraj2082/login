@@ -134,4 +134,23 @@ export const loadProductsInfo = async (pb) => {
 		type: "success",
 		records: formattedRecords,
 	};
-};
+};  
+// search bar component 
+export async function fetchProductName(pb) {
+	try {
+	  const subCategoryRecords = await pb.collection('SubCategories').getFullList();
+	  const subSubCategoryRecords = await pb.collection('SubSubCategories').getFullList();
+	  const manufacturerRecords = await pb.collection('Manufacturers').getFullList();
+  
+	  const allRecords = [
+		...subCategoryRecords.map(record => ({ name: record.name })),
+		...subSubCategoryRecords.map(record => ({ name: record.name })),
+		...manufacturerRecords.map(record => ({ name: record.name }))
+	  ];
+  
+	  return allRecords;
+	} catch (error) {
+	  console.error('Error fetching product names:', error);
+	  return [];
+	}
+  }

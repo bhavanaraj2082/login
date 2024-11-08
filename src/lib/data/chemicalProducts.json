@@ -1,5 +1,4 @@
-{
-	"menus": [
+{"menus": [
 		{
             "title": "Products",
             "href": "/products",
@@ -936,4 +935,4 @@
               }
             ]
           }
-        ]}          
+        ]}       
