@@ -4,10 +4,10 @@
     import Icon from '@iconify/svelte';
     import Cartrightside from "$lib/components/HeaderDropdownCart/Cartrightside.svelte";
     import menusdata from '$lib/data/chemicalProducts.json';
-    import { searchResult, loadComponents } from '$lib/stores/searchStore.js';
-
+    import { searchResult, loadComponents } from '../stores/searchStore';
+  
     
-
+    export let productNames = [];
     let menus = [];
     let submenuLeaveTimeoutId;
     let subSubmenuLeaveTimeoutId;
@@ -19,7 +19,7 @@
     let showSuggestions = false;
     let selectedIndex = -1;
     let addedItems = [];
-
+  
     const getInitial = (name) => name.charAt(0).toUpperCase();
     onMount(async () => {
         try {
@@ -28,72 +28,72 @@
             console.error('Error fetching menus:', error);
         }
     });
-
+  
     function handleMouseEnter(subSubmenu) {
         clearTimeout(subSubmenuLeaveTimeoutId);
         hoveredSubSubmenu = subSubmenu;
     }
-
+  
     function handleMouseLeave() {
         subSubmenuLeaveTimeoutId = setTimeout(() => {
             hoveredSubSubmenu = null;
         }, 800);
     }
-
+  
     let menuTimeoutId;
     function toggleMenu(menu) {
         activeMenu = activeMenu === menu ? null : menu;
         if (activeMenu) activeSubmenu = null;
     }
-
+  
     function handleMouseEnterMenu(menu) {
         clearTimeout(menuTimeoutId);
         activeMenu = menu;
         activeSubmenu = null;
     }
-
+  
     function handleMouseLeaveMenu() {
         menuTimeoutId = setTimeout(() => {
             activeMenu = null;
             activeSubmenu = null;
         }, 1000);
     }
-
+  
     function handleMouseEnterSubmenu(submenu) {
         clearTimeout(submenuLeaveTimeoutId);
         activeSubmenu = submenu;
     }
-
+  
     function handleMouseLeaveSubmenu() {
         submenuLeaveTimeoutId = setTimeout(() => {
             activeSubmenu = null;
         }, 10000);
     }
-
+  
     function navigateTo(url) {
         window.location.href = url;
     }
-
+  
     let isOpen = false;
-
+  
     function toggleLogoMenu() {
         isOpen = !isOpen;
     }
     $: suggestions = $searchResult.filter(
       (component) => component.name.toLowerCase().startsWith(searchTerm.toLowerCase())
     );
-
+  
     
     $: showSuggestions = searchTerm.length >= 1 && suggestions.length > 0;
-
+  
     onMount(() => {
-      loadComponents();
+      searchResult.set(productNames); 
     });
-
+  
     const handleInput = (e) => {
       searchTerm = e.target.value;
     };
-
+  
     const handleKeydown = (event) => {
       if (event.key === 'ArrowDown') {
         event.preventDefault();
@@ -109,27 +109,27 @@
         showSuggestions = false;
       }
     };
-
+  
     const addComponentToList = (component) => {
       
       if (!addedItems.some(item => item.name === component.name)) {
         addedItems = [...addedItems, component];
       }
     };
-
+  
     const selectSuggestion = (suggestion) => {
       addComponentToList(suggestion);
       searchTerm = suggestion.name; 
       showSuggestions = false; 
     };
-</script>
-
-<link
+  </script>
+  
+  <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-/>
-
-<nav class="my-3 justify-between relative w-full mx-auto">
+  />
+  
+  <nav class="my-3 justify-between relative w-full mx-auto">
    
     <div
         class={`fixed top-0 left-0 h-full bg-white transition-transform transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden z-50 w-full`}
@@ -145,7 +145,7 @@
                     <i class="fa-solid fa-xmark fa-sm text-primary-400"></i>
                 </button>
             </div>
-
+  
             {#if activeMenu === null}
                 {#each menus as menu}
                     <button
@@ -158,7 +158,7 @@
                         <i class="fa-solid fa-chevron-right fa-xs py-2"></i>
                     </button>
                 {/each}
-
+  
                 <div class="flex flex-col">
                     <a href="/bulk-order" class="text-left hover:text-primary-400 text-gray-800 font-semibold transition duration-200 w-full py-2">Bulk Order</a>
                     <a href="/order-status" class="text-left hover:text-primary-400 text-gray-800 font-semibold transition duration-200 w-full py-2">Order Status</a>
@@ -183,7 +183,7 @@
                     <Icon icon="material-symbols:chevron-backward" class="w-5 h-5" />
                     Back
                 </button>
-
+  
                 <div class="mt-2 pb-2">
                     {#each activeMenu.submenus as submenu}
                         <button
@@ -197,7 +197,7 @@
             {/if}
         </div>
     </div>
-
+  
     <div class="mx-auto flex items-center justify-between max-md:py-0 py-4 px-4">
       
         <div class="flex md:hidden float-end">
@@ -216,7 +216,7 @@
                 Chemikart
             </button>
         </div>
-
+  
        
         <div class="relative w-full max-w-lg mx-8 md:flex hidden">
             <input
@@ -248,7 +248,7 @@
             {/if}
           </div>
           
-
+  
           <div class="relative w-full max-w-lg mx-4 md:hidden flex">
             <input
               type="text"
@@ -280,7 +280,7 @@
             {/if}
           </div>
           
-
+  
         <div class="md:flex hidden">
             <div class="flex items-center justify-between mr-1">
                 <button
@@ -299,7 +299,7 @@
             </div>
         </div>
     </div>
-
+  
     <div class="hidden md:flex mx-auto justify-between py-2 pb-0 px-10 border-y border-gray-200">
         <div class="md:flex justify-between items-center lg:gap-2 hidden">
             {#each menus as menu, index}
@@ -324,7 +324,7 @@
                             {/if}
                         </button>
                     </div>
-
+  
                     {#if menu.submenus && menu.submenus.length > 0}
                         <div
                             class={`absolute shadow-sm z-20 rounded-sm mt-0.5 bg-white w-max transition-opacity duration-200 ${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
@@ -353,4 +353,4 @@
            
         </div>
     </div>
-</nav>
+  </nav>
