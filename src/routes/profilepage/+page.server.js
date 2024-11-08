@@ -98,7 +98,7 @@ updateData: async ({ request }) => {
         };
         const preferencesArray = Object.keys(preferencesUpdate).filter(key => preferencesUpdate[key]);
         let ccAddresses = body.ccAddresses || '';
-        ccAddresses = ccAddresses.split(',');     
+        ccAddresses = ccAddresses.replace(/\n/g, '').split(',');     
 
         const updatedPreference = { 
           userId,

@@ -16,10 +16,11 @@
 
     export let data;
 
-     $: userprofile  = $authedUser;
+     $: userData  = $authedUser;
+    let userprofile = data?.result;
     let orderCounts = data?.result?.expand?.chemiDashprofile;
     let organization = data?.result?.expand?.chemiDashprofile;
-    let preferences = data?.result?.expand?.chemiDashprofile?.preferences ;
+    let preferences = data?.result?.expand?.chemiDashprofile?.preferences;
     let organizationData =  data?.result?.expand?.chemiDashprofile;
     let paymentMethod =  data?.result?.expand?.chemiDashprofile;
     let orgnizationLink =  data?.result?.expand?.chemiDashprofile;
@@ -347,11 +348,11 @@
             <form method="post" action="?/ordermethods" use:enhance={() => {
                 return async ({ result }) => {
                     if (result.type === 'success') {
-                            console.log('submited successfully');
-                            location.reload();
-                        } else if (result.type === 'error') {
-                            console.error("error");
-                        }
+                        console.log('submited successfully');
+                        location.reload();
+                    } else if (result.type === 'error') {
+                        console.error("error");
+                    }
                 };
             }}>
                 <input type="hidden" name="userId" value="{paymentMethod.id}"/>
@@ -484,7 +485,7 @@
 
     {#if editOrganizationOpen}
     	<div class="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
-    		<div class="bg-white p-6 rounded shadow-lg w-full max-w-3xl ">
+    		<div class="bg-white p-6 rounded shadow-lg w-full max-w-3xl h-auto max-h-screen overflow-y-auto mx-4 sm:mx-0">
     			<p class="text-xl font-bold">Mailing Address</p>
                 <p class="text-sm">This is where literature and promotional requests made on the site will be mailed.</p>
                 <p>* Required</p> 
@@ -550,8 +551,8 @@
                 </div>
                 </div>
                 <div class="flex mt-2">
-                    <button class="bg-primary-500 text-white px-4 py-2 rounded mr-2" type="submit" >Save</button>
-                    <button class="border border-primary-400 px-4 py-2 rounded" type="button" on:click={editOrganization}>Cancel</button>
+                    <button class="bg-primary-500 text-white w-20 py-1 rounded m-2" type="submit" >Save</button>
+                    <button class="border border-primary-400 w-20 py-1 rounded m-2" type="button" on:click={editOrganization}>Cancel</button>
                 </div>
                 </form>
     		</div>
@@ -561,7 +562,7 @@
     
     {#if shippingOrganization}
     	<div class="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
-    		<div class="bg-white p-6 rounded shadow-lg w-full max-w-3xl ">
+    		<div class="bg-white p-6 rounded shadow-lg w-full max-w-3xl h-auto max-h-screen overflow-y-auto mx-4 sm:mx-0">
     			<p class="text-xl font-bold">Shipping Address</p>
                 <p class="text-sm">Manage specific recipient information for your orders. The address that will appear in the cart will be your organization's shipping address that is assigned to your profile.</p>
                 <p>* Required</p> 
