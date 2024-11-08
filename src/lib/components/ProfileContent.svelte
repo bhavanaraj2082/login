@@ -1,4 +1,5 @@
 <script>
+	import { authedUser} from '$lib/stores/UserData';
 	import { enhance } from '$app/forms';
     import Icon from '@iconify/svelte';
 	export let activeProfile;
@@ -12,17 +13,19 @@
     let selectedOrderNumber = "orderNumber";
     let isPOBox = false;
     let isChanged = false;
+    let resultMessage = '';
     let successMessage = '';
 	let errorMessage = '';
 
     export let data;
-    let userprofile=data.usercookie.model  
-    let orderCounts = data.usercookie.records  
-    let organization=data.usercookie.records
-    let preferences =  data.usercookie.records.preferences || [];       
-    let organizationData =data.usercookie.records
-    let paymentMethod =data.usercookie.records
-    let orgnizationLink = data.usercookie.records
+
+     $: userprofile  = $authedUser;
+    let orderCounts = data?.result?.expand?.chemiDashprofile;
+    let organization = data?.result?.expand?.chemiDashprofile;
+    let preferences = data?.result?.expand?.chemiDashprofile?.preferences ;
+    let organizationData =  data?.result?.expand?.chemiDashprofile;
+    let paymentMethod =  data?.result?.expand?.chemiDashprofile;
+    let orgnizationLink =  data?.result?.expand?.chemiDashprofile;
        
 
     function openEditModal() {
@@ -55,8 +58,8 @@
         isChanged = true;
     };
 
+    // console.log('user data', $authedUser );    
     
-
 </script>
 
 
@@ -126,6 +129,7 @@
                         </select>
                     </div>
                     <p class="font-semibold text-lg my-2">Order/Quote Preference</p>
+            {#if orderCounts}
                 <form action="?/orderdetail" method="post" use:enhance={() => {
                     return async ({ result }) => {
                         if (result.type === 'success') {
@@ -183,6 +187,7 @@
                     <button class={`text-white w-20 py-1 rounded m-2 ${!isChanged ? 'bg-primary-400' : 'bg-primary-500'}`} type="submit" disabled={!isChanged} >Save</button>
                 </div>
             </form>
+            {/if}
         </div> 
     </div>
     {/if}
@@ -241,16 +246,17 @@
             <h1 class="text-xl font-bold text-primary-400 mb-4">Manage Your Email Preferences</h1>
             <p class="font-semibold text-lg my-2">Order Confirmation Options</p>
             <p class="font-semibold text-sm">Reduce Your Environmental Footprint By Going Paperless.</p><hr>
+            {#if preferences}
             <form method="post" action="?/updateData" use:enhance={() => {
                 return async ({ result }) => {
                     if (result.type === 'success') {
                         console.log('data is submitted');
                     } else if (result.type === 'error') {
                         console.log('data is not submitted');
-                    }
+                    } 
                 };
-            }}>
-                <input type="hidden" name="userId" value="{preferences.id}"/>
+            }}> 
+                <input type="hidden" name="userId" value="{data.result.expand.chemiDashprofile.id}"/>
                 <div class="my-4">
                     <ul class="space-y-3">
                         <li class="flex gap-3 text-sm">
@@ -281,6 +287,7 @@
                     <button class="bg-primary-500 text-white w-20 py-1 rounded m-2" type="submit">Save</button>
                 </div>
             </form>       
+            {/if}   
          </div>
     </div>
     {/if}
@@ -340,6 +347,7 @@
             <h1 class="text-xl font-bold text-primary-400">Manage Your Payment Methods</h1>
             <p>Your Default Reference Numbers</p>
             <button on:click={ToggleFormate} class="flex text-primary-400 gap-2 rounded"><Icon icon="mynaui:info-circle-solid"  class="text-2xl" />Formating Guide</button>
+            {#if data}
             <form method="post" action="?/ordermethods" use:enhance={() => {
                 return async ({ result }) => {
                     if (result.type === 'success') {
@@ -364,6 +372,7 @@
                     <button class="bg-primary-500 text-white w-20 py-1 rounded m-2" type="submit">Save</button>
                 </div>
             </form>
+            {/if}
         </div>
     </div>
     {/if}
@@ -377,13 +386,15 @@
             <p class="text-xl">Has your organization ordered from us before?</p>
             <p class="text-xs">Expedite the process by entering a Customer Number along with a corresponding transaction number.</p>
             <p class="text-xs">* Required Fields</p>
+            {#if data}
             <form method="post" action="?/linkOrganization" use:enhance={() => {
                 return async ({ result }) => {
-                    if (result.type === 'success') {
-                        console.log('Data is submitted');
-                    } else if (result.type === 'error') {
-                        console.log('Data is not submitted');
-                    }
+                    console.log('result',result);
+                    if ( result.data?.updatedata?.type === 'success') {
+                        resultMessage = result.data?.updatedata?.message;
+                    } else if ( result.data?.updatedata?.type === 'error') {
+                        resultMessage = result.data?.updatedata?.message ;
+                    } 
                 };
             }}>
                 <input type="hidden" name="userId" value="{orgnizationLink.id}"/>
@@ -396,14 +407,18 @@
                     <div class="flex gap-4">
                         <select name="transactionType" bind:value={selectedOrderNumber} class="block w-full border outline-none rounded-md p-1" required>
                             <option value="orderNumber">Order Number</option>
-                            <option value="Quote Reference">Quote Reference</option>
                             <option value="invoiceno">Invoice number</option>
                         </select>
                         <input type="text" name="transactionValue" class="w-full max-w-96 p-1 outline-none border-2 rounded-md" required />
                     </div>
                 </div>
                 <button class="rounded-md bg-primary-400 p-2 px-4 my-3" type="submit">Link Organization</button>
+                {#if resultMessage}
+                    <p class="text-right text-primary-200">{resultMessage}</p>
+                {/if}
             </form>
+           
+            {/if}
         </div>
         <div>
             <p class="text-xl">Not Sure? Continue Registration.</p>

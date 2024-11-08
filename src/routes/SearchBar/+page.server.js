@@ -1,8 +1,8 @@
-import { fetchproductName } from '../../lib/server/actions';
+import { fetchProductName } from '../../lib/server/actions';
 
 export async function load() {
   try {
-    const products = await fetchproductName();
+    const products = await fetchProductName();
     return {
       props: {
         products
