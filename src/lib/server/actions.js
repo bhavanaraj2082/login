@@ -189,23 +189,19 @@ export async function updatedMethod1(pb, body) {
 	};
 }
 
-export async function updatedlink1(pb, body) {
-	const updateData = {
-		userId: body.userId,
-		phone: body.phone
-	};
-
-	if (body.transactionType === 'orderNumber') {
-		updateData.orderNumber = body.transactionValue;
-	} else if (body.transactionType === 'quoteReference') {
-		updateData.quoteReference = body.transactionValue;
-	} else if (body.transactionType === 'invoiceno') {
-		updateData.invoiceno = body.transactionValue;
-	}
-	await pb.collection('ChemiDashProfile').update(body.userId, updateData);
-	return {
-		status: 200
-	};
+export async function checkData(pb, body) {
+    const filterString = `${body.transactionType}="${body.transactionValue}" && phone="${body.phone}"`;        
+    try {
+        const linkData = await pb.collection('ChemiDashProfile').getFirstListItem(filterString);
+        return linkData;
+    } catch (error) {
+        if (error.status === 404) {
+            return null;
+        } else {
+            console.error("Unexpected error retrieving data:", error);
+            throw error;
+        }
+    }
 }
 
 // profile page end

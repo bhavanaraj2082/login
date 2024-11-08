@@ -3,6 +3,6 @@
     export let data;
   </script>
   
-  <div>
+  <div> 
    <Profile {data}/>
   </div>

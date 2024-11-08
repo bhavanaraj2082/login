@@ -95,22 +95,17 @@ export async function fetchViewedProducts(pb) {
 }
 
 // profile page loads function
-export async function getcookies(pb, cookies) {
-	const cookieData = cookies.get('token');
-
-	if (!cookieData) {
-		return {
-			status: 401,
-			body: { message: 'Unauthorized' }
-		};
-	}
-
-	const parsedCookieData = JSON.parse(cookieData);
-	const token = parsedCookieData.token;
-	const model = parsedCookieData.model;
-	const records = await pb.collection('ChemiDashProfile').getFirstListItem(`user="${model.id}"`);
-	return { token, model, records };
-}
+export async function profileupdate(pb,userId){
+    if (!userId) {
+        console.error("Invalid user ID");
+        return null;
+    }
+	const records = await pb.collection('Register').getFirstListItem(`id="${userId}"`,{
+		expand: 'chemiDashprofile',
+	});
+	
+	return records
+} 
 
 /*****************ProductsInfoPopup******************/
 export const loadProductsInfo = async (pb) => {

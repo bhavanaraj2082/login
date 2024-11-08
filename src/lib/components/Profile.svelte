@@ -45,7 +45,7 @@
 				{/each}
 			</div>
 
-			<!-- <ProfileContent {activeProfile} {data} /> -->
+			<ProfileContent {activeProfile} {data} />
 		</div>
 	</div>
 </section>

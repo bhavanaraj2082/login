@@ -1,20 +1,26 @@
-import { getcookies} from "$lib/server/loads.js";
-import { updateOrganization1,updateprofile1,updateShipping1,updatedOrder1,updatedMethod1,updatePreferences,updatedlink1 } from "$lib/server/actions";
+import { profileupdate} from "$lib/server/loads.js";
+import { updateOrganization1,updateprofile1,updateShipping1,updatedOrder1,updatedMethod1,updatePreferences,checkData } from "$lib/server/actions";
 import {authenticate} from '$lib/server/pocketbase.js'
+import { authedUser} from '$lib/stores/UserData'
 
+let user
+authedUser.subscribe(d=>user=d)
 
-
-export const load = async ({cookies}) => {
+ 
+export const load = async () => {
   try {
+      const userId = user?.id
+      if (!userId) {
+        throw new Error("User is not initialized or missing ID");
+      }
       const pb = await authenticate()
-      const usercookie = await getcookies(pb,cookies)      
-      return { usercookie };
+      const result= await profileupdate(pb,userId)       
+      return { result }; 
   } catch (error) {
       console.error("Error loading data:", error);
       return { status: 500, error: new Error("Failed to load data") };
   }
 };
-
 
 export const actions = {
   updateprofile: async ({ request }) => {
@@ -90,10 +96,6 @@ updateData: async ({ request }) => {
             repromiseNotifications: body.repromiseNotifications === 'on',
         };
         const preferencesArray = Object.keys(preferencesUpdate).filter(key => preferencesUpdate[key]);
-
-        if (!userId) {
-            throw new Error("Missing userId");
-        }
         const updatePreferencesData = await updatePreferences(pb, { userId, preferences: preferencesArray });
 
         return {
@@ -124,21 +126,26 @@ ordermethods: async({request}) => {
   };
 }
 },
-linkOrganization: async({request}) => {
-  const body = Object.fromEntries(await request.formData())
-  try{
-    const pb = await authenticate()
-    const updatedata = await updatedlink1(pb,body)
-    return {
-      updatedata
-    }
-
-  }catch (error) {
-    return {
-        error: 'Failed to update status',
-    };
-}
-
+linkOrganization: async ({ request }) => {
+  const body = Object.fromEntries(await request.formData());  
+  try {
+      const pb = await authenticate();
+      const updatedata = await checkData(pb, body);    
+      if (updatedata) {
+        return {
+          updatedata: { type: 'success', message: "Link organization found" }
+        };
+      } else {
+        return {
+          updatedata: { type: 'error', message: "Link organization not found" }
+        };
+      }
+  } catch (error) {
+    console.error('Error cheking  data:', error); 
+      return {
+          error: 'Failed to update status'
+      };
+  }
 }
 
 }
