@@ -176,7 +176,8 @@ export async function updatedOrder1(pb, body) {
 
 export async function updatePreferences(pb, body) {
 	const preferences = body.preferences;
-	await pb.collection('ChemiDashProfile').update(body.userId, { preferences });
+	const ccAddresses = body.ccAddresses
+	await pb.collection('ChemiDashProfile').update(body.userId, { preferences,ccAddresses });
 	return {
 		status: 200
 	};
