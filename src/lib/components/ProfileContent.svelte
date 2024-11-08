@@ -7,15 +7,12 @@
 	let editOrganizationOpen = false;
 	let shippingOrganization = false;
     let isopenFormate = false;
-    let address ='';
+    let ccAddresses = "";
     let selectedLanguage = '';
-    let selectedState = '';
     let selectedOrderNumber = "orderNumber";
     let isPOBox = false;
     let isChanged = false;
     let resultMessage = '';
-    let successMessage = '';
-	let errorMessage = '';
 
     export let data;
 
@@ -38,10 +35,10 @@
     function editShipping() {
 		shippingOrganization = !shippingOrganization
 	}
-    function handleInput(event) {
-        address = event.target.innerText; 
+    function handleCCInput(event) {
+        ccAddresses = event.target.value.split(',');
     }
-
+    
     function ToggleFormate(){
         isopenFormate = !isopenFormate;
     }
@@ -57,6 +54,9 @@
     const updateIsChanged = () => {
         isChanged = true;
     };
+    function selectedState() {
+        console.log("State selected");
+    }
 
     // console.log('user data', $authedUser );    
     
@@ -133,14 +133,10 @@
                 <form action="?/orderdetail" method="post" use:enhance={() => {
                     return async ({ result }) => {
                         if (result.type === 'success') {
-                            // successMessage = result.data.body.message;
                             console.log('data is submitted');
-                            
                             location.reload();
                         } else if (result.type === 'error') {
-                            // errorMessage = result.data.body.message;
-                            console.log('data is not submitted');
-                            
+                            console.error("error");                           
                         }
                     };
                 }}>
@@ -252,8 +248,8 @@
                     if (result.type === 'success') {
                         console.log('data is submitted');
                     } else if (result.type === 'error') {
-                        console.log('data is not submitted');
-                    } 
+                        console.error("error");
+                    }
                 };
             }}> 
                 <input type="hidden" name="userId" value="{data.result.expand.chemiDashprofile.id}"/>
@@ -279,8 +275,8 @@
                 </div>
                 <div>
                     <p class="font-semibold text-sm">Automatically Include Your Team When Orders Are Placed.</p>
-                    <p class="text-xs my-2">CC address</p>
-                    <div contenteditable="true" on:input={handleInput} class="w-full h-20 shadow-sm outline-none border-2"></div>
+                    <p class="text-xs my-2">CC address (comma-separated)</p>
+                    <textarea name="ccAddresses" class="w-full h-20 shadow-sm outline-none border-2" on:input={handleCCInput}></textarea>
                 </div>
                 <div class="flex mt-2">
                     <button class="border border-primary-400 w-20 py-1 rounded m-2" type="button">Cancel</button>
@@ -347,15 +343,15 @@
             <h1 class="text-xl font-bold text-primary-400">Manage Your Payment Methods</h1>
             <p>Your Default Reference Numbers</p>
             <button on:click={ToggleFormate} class="flex text-primary-400 gap-2 rounded"><Icon icon="mynaui:info-circle-solid"  class="text-2xl" />Formating Guide</button>
-            {#if data}
+            {#if paymentMethod}
             <form method="post" action="?/ordermethods" use:enhance={() => {
                 return async ({ result }) => {
                     if (result.type === 'success') {
-                        successMessage = result.data.body.message;
-                        location.reload();
-                    } else if (result.type === 'error') {
-                        errorMessage = result.data.body.message;
-                    }
+                            console.log('submited successfully');
+                            location.reload();
+                        } else if (result.type === 'error') {
+                            console.error("error");
+                        }
                 };
             }}>
                 <input type="hidden" name="userId" value="{paymentMethod.id}"/>
@@ -386,7 +382,7 @@
             <p class="text-xl">Has your organization ordered from us before?</p>
             <p class="text-xs">Expedite the process by entering a Customer Number along with a corresponding transaction number.</p>
             <p class="text-xs">* Required Fields</p>
-            {#if data}
+            {#if orgnizationLink}
             <form method="post" action="?/linkOrganization" use:enhance={() => {
                 return async ({ result }) => {
                     console.log('result',result);
@@ -395,6 +391,9 @@
                     } else if ( result.data?.updatedata?.type === 'error') {
                         resultMessage = result.data?.updatedata?.message ;
                     } 
+                    setTimeout(() => {
+                        resultMessage = ''; 
+                    }, 3000);
                 };
             }}>
                 <input type="hidden" name="userId" value="{orgnizationLink.id}"/>
@@ -414,7 +413,7 @@
                 </div>
                 <button class="rounded-md bg-primary-400 p-2 px-4 my-3" type="submit">Link Organization</button>
                 {#if resultMessage}
-                    <p class="text-right text-primary-200">{resultMessage}</p>
+                    <p class="text-right text-primary-500">{resultMessage}</p>
                 {/if}
             </form>
            
@@ -496,10 +495,10 @@
                 <form method="post"  action="?/updateOrganization" use:enhance={() => {
                     return async ({ result }) => {
                         if (result.type === 'success') {
-                            successMessage = result.data.body.message;
+                            console.log('submited successfully');
                             location.reload();
                         } else if (result.type === 'error') {
-                            errorMessage = result.data.body.message;
+                            console.error("error");
                         }
                     };
                 }}>
@@ -532,7 +531,7 @@
                 </div>
                 <div class="flex flex-col">
                     <label for="state">State</label>
-                    <select name="state" bind:value={organization.state} on:change={selectedState}  class="block  border border-primary-200 outline-none rounded-md p-2 "  required>
+                    <select name="state" bind:value={organization.state} on:change={() => selectedState()}  class="block  border border-primary-200 outline-none rounded-md p-2 "  required>
                         <option value="" disabled selected ></option>
                         {#each ['Andaman and Nicobar', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhaattisgarh', 'Daman and Diu', 'Delhi', 'Dadra and Nagar Hav.', 'Goa', 'Gujarat', 'Himachal Pradesh','Haryana','Jharkhand','Jammu and Kashmir','Karnataka','Kerala','Lakshadweep','Maharashtra','Megalaya','Manipur','Madhya Pradesh','Mumbai','Mizoram','New Delhi','Nagaland','Orissa','Punjab','Pondicherry','Rajasthan','Sikkim','Telangana','Tamil Nadu','Tripura','Uttaranchal','Uttar Pradesh','West Bengal'] as c}
                         <option value={c} class="text-gray-700">{c}</option>
@@ -573,10 +572,10 @@
                 <form method="post"  action="?/updateShipping" use:enhance={() => {
                     return async ({ result }) => {
                         if (result.type === 'success') {
-                            successMessage = result.data.body.message;
+                            console.log('submited successfully');
                             location.reload();
                         } else if (result.type === 'error') {
-                            errorMessage = result.data.body.message;
+                            console.error("error");
                         }
                     };
                 }}>
@@ -609,7 +608,7 @@
                 </div>
                 <div class="flex flex-col">
                     <label for="State">State</label>
-                    <select name="shippingstate" bind:value={organizationData.shippingstate} on:change={selectedState}  class="block  border border-primary-200 outline-none rounded-md p-2 "  required>
+                    <select name="shippingstate" bind:value={organizationData.shippingstate} on:change={() => selectedState()}  class="block  border border-primary-200 outline-none rounded-md p-2 "  required>
                         <option value="" disabled selected ></option>
                         {#each ['Andaman and Nicobar', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhaattisgarh', 'Daman and Diu', 'Delhi', 'Dadra and Nagar Hav.', 'Goa', 'Gujarat', 'Himachal Pradesh','Haryana','Jharkhand','Jammu and Kashmir','Karnataka','Kerala','Lakshadweep','Maharashtra','Megalaya','Manipur','Madhya Pradesh','Mumbai','Mizoram','New Delhi','Nagaland','Orissa','Punjab','Pondicherry','Rajasthan','Sikkim','Telangana','Tamil Nadu','Tripura','Uttaranchal','Uttar Pradesh','West Bengal'] as c}
                         <option value={c} class="text-gray-700">{c}</option>
@@ -622,7 +621,7 @@
                 </div>
                 <div class="flex flex-col">
                     <label for="country">Location</label>
-                    <select name="country" bind:value={organizationData.location} on:change={selectedState} disabled class="block border border-primary-200 outline-none rounded-md p-2 bg-gray-200 text-gray-700 cursor-not-allowed">
+                    <select name="country" bind:value={organizationData.location} on:change={() => selectedState()} disabled class="block border border-primary-200 outline-none rounded-md p-2 bg-gray-200 text-gray-700 cursor-not-allowed">
                         <option value="India">India</option>
                     </select>
                 </div>

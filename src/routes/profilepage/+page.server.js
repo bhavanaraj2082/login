@@ -17,8 +17,9 @@ export const load = async () => {
       const result= await profileupdate(pb,userId)       
       return { result }; 
   } catch (error) {
-      console.error("Error loading data:", error);
-      return { status: 500, error: new Error("Failed to load data") };
+      return { 
+      error: 'Failed to load data'}
+
   }
 };
 
@@ -96,8 +97,15 @@ updateData: async ({ request }) => {
             repromiseNotifications: body.repromiseNotifications === 'on',
         };
         const preferencesArray = Object.keys(preferencesUpdate).filter(key => preferencesUpdate[key]);
-        const updatePreferencesData = await updatePreferences(pb, { userId, preferences: preferencesArray });
+        let ccAddresses = body.ccAddresses || '';
+        ccAddresses = ccAddresses.split(',');     
 
+        const updatedPreference = { 
+          userId,
+          preferences: preferencesArray,
+          ccAddresses: ccAddresses
+        }
+        const updatePreferencesData = await updatePreferences(pb, updatedPreference);
         return {
             status: 200,
             updatePreferencesData,
