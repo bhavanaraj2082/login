@@ -297,46 +297,12 @@ export async function validateLogin(email, password) {
 }
 
 /////////COPY RIGHT CONSENT
-export const actions = {
-	async submitForm(data,pb ) {
-	  const formData = await data.formData();
-	  const formEntries = Object.fromEntries(formData.entries());
-	  
-	  console.log('Form Data:', formEntries);
-  
-	  const dataToSubmit = {
-		...formEntries,
-		url: formEntries.url ? String(formEntries.url) : undefined,
-	  };
-  
-	  const uploadData = new FormData();
-  
-	  // Add form data to FormData object
-	  Object.entries(dataToSubmit).forEach(([key, value]) => {
-		if (value) uploadData.append(key, value);  
-	  });
-  
-	  // Handle image and ExtractedData (if provided)
-	  const image = formData.get('image');
-	  if (image) {
-		uploadData.append('image', image);  
-	  }
-  
-	  const ExtractedData = formData.get('ExtractedData');
-	  if (ExtractedData) {
-		uploadData.append('ExtractedData', ExtractedData); 
-	  }
-  
-	  try {
-		// Submit the form data to PocketBase
-		const response = await pb.collection('CopyrightConsent').create(uploadData);
-		console.log('Form submitted successfully:', response);
-  
-		return { status: 200, body: { success: true, response } };
-	  } catch (error) {
-		console.error('Error submitting form data:', error);
-		return { status: 500, body: { success: false, message: 'Form submission failed.' } };
-	  }
-	},
-  };
-  
+export  async function submitForm( data,pb ) {
+   
+    const formData = await data.formData(); 
+    const formEntries = Object.fromEntries(formData.entries()); 
+    
+    //console.log('Form Data:', formEntries); 
+    const response = await pb.collection('CopyrightConsent').create(formEntries); 
+      return { status: 200, body: { success: true, response } };
+     };
