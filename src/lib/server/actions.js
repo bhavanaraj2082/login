@@ -492,25 +492,17 @@ export async function confirmpasswordreset(token, newPassword, newConfirmPasswor
 	};
 }
 //search bar component
-
-
-export async function fetchProductName(pb) {
-  try {
-    const subCategoryRecords = await pb.collection('SubCategories').getFullList();
-    const subSubCategoryRecords = await pb.collection('SubSubCategories').getFullList();
-    const manufacturerRecords = await pb.collection('Manufacturers').getFullList();
-
-    const allRecords = [
-      ...subCategoryRecords.map(record => ({ name: record.name })),
-      ...subSubCategoryRecords.map(record => ({ name: record.name })),
-      ...manufacturerRecords.map(record => ({ name: record.name }))
-    ];
-
-    return allRecords;
-  } catch (error) {
-    console.error('Error fetching product names:', error);
-    return [];
-  }
+export async function fetchsearchcomponent() {
+    try {
+        const records = await pb.collection('SubCategories').getFullList({
+        });
+        return records.map(record => ({
+            name: record.name 
+        }));
+    } catch (error) {
+        console.error('Error fetching product names:', error);
+        return []; 
+    }
 }
 
 
