@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { enhance } from '$app/forms';
+
   let quantity = 1;
   let showDropdown = false;
   let showSharePopup = false;
@@ -17,10 +18,27 @@
   let stockType = '';
   let stockUnAvailability = '';
   let index = 0;
+  let totalPrice = 0;
 
-function handleThumbnailClick(selectedIndex) {
+  function parsePrice(priceString) {
+    return parseFloat(priceString.replace(/[₹,]/g, ""));
+  }
+
+  function calculateTotalPrice(selectedIndex) {
+    const prod = product[selectedIndex]; 
+    if (prod.priceSize && prod.priceSize[selectedIndex] && prod.priceSize[selectedIndex].price) {
+      const unitPrice = parsePrice(prod.priceSize[selectedIndex].price);
+      totalPrice = quantity * unitPrice;
+    } else {
+      console.error("Price data is unavailable or incorrect at the specified index.");
+      totalPrice = 0; 
+    }
+  }
+
+  function handleThumbnailClick(selectedIndex) {
     index = selectedIndex;
-}
+    calculateTotalPrice(selectedIndex); 
+  }
 
   function togglePopup() {
     showPopup = !showPopup;
@@ -34,12 +52,6 @@ function handleThumbnailClick(selectedIndex) {
 
   product.forEach((prod, index) => {
     console.log(`Product ${index + 1} priceSize:`, prod.priceSize);
-
-    const firstPriceSize = prod.priceSize[0];
-    console.log(
-      `Product ${index + 1} - Size: ${firstPriceSize.size}, Price: ${firstPriceSize.price}`
-    );
-    console.log(firstPriceSize.price);
   });
 
   function toggleModal() {
@@ -52,21 +64,24 @@ function handleThumbnailClick(selectedIndex) {
 
   const increaseQuantity = () => {
     quantity++;
+    calculateTotalPrice(index);
   };
 
   const decreaseQuantity = () => {
     if (quantity > 1) quantity--;
+    calculateTotalPrice(index); 
   };
+
   function toggleSharePopup() {
     showSharePopup = !showSharePopup;
   }
 
   function toggleDetailsPopup() {
-    showDetailsPopup = !showDetailsPopup; 
+    showDetailsPopup = !showDetailsPopup;
   }
 
   function toggleImagePopup() {
-    showImagePopup = !showImagePopup; 
+    showImagePopup = !showImagePopup;
   }
 
   function copyToClipboard() {
@@ -90,7 +105,7 @@ function handleThumbnailClick(selectedIndex) {
 />
 
 {#each data.records as product}
-  <div class="flex justify-center">
+  <div class="flex h-full">
     <div
       class="bg-white shadow-lg rounded-lg w-full h-full max-w-4xl p-8 flex space-x-4 justify-between items-center flex-col lg:flex-row"
     >
@@ -164,7 +179,7 @@ function handleThumbnailClick(selectedIndex) {
           </button>
 
           
-            <div class="absolute w-full mt-2 rounded-lg p-2 space-y-1">
+            <div class="w-full mt-2 rounded-lg p-2 space-y-1">
               {#if showDropdown}
               <div
                 class="text-primary-400 border border-primary-400 rounded-lg py-2 px-4 text-center hover:bg-primary-400 hover:text-white cursor-pointer"
@@ -312,13 +327,17 @@ function handleThumbnailClick(selectedIndex) {
             {/if}
           </div>
         </div>
+        {#if product.productName !== ''}
         <h1 class="text-gray-800 font-semibold text-2xl">
           {product.productName}
         </h1>
+        {/if}
+        {#if product.prodDesc !== ''}
         <p class="text-gray-500 text-sm">
           {product.prodDesc}
         </p>
-        <div class="flex justify-between">
+        {/if}
+        <div class="flex justify-between !mt-3">
           <p class="text-gray-900 text-sm font-semibold text-start">
             Synonym(S): <span class="text-gray-500 font-normal">{product.productSynonym}</span>
           </p>
@@ -327,205 +346,40 @@ function handleThumbnailClick(selectedIndex) {
 
         <div>
           <h2 class="text-gray-800 font-semibold">SELECT A SIZE</h2>
-          <div class="grid grid-cols-4 gap-4 text-sm text-gray-500 mt-2">
-            <div>Pack Size</div>
-            <div>SKU</div>
-            <div>Availability</div>
-            <div>Price</div>
-          </div>
+<!-- Table Headers -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm font-semibold text-gray-700 mt-2">
+  <div class="p-1">Pack Size</div>
+  <div class="p-1">SKU</div>
+  <div class="p-1 text-center">Availability</div>
+  <div class="p-1">Price</div>
+</div>
 
-          <!-- {#each product.priceSize as priceItem, i}
-            <div
-              class="grid grid-cols-4 gap-4 text-sm text-gray-800 font-semibold mt-1"
-            >
-              <div>{priceItem.size}</div>
-              <div>{product.productNumber}-{priceItem.size}</div>
-              <div class="flex items-center space-x-2">
-                <span
-                  ><i class="fa-regular fa-circle-check mr-1 text-primary-400"
-                  ></i>Available</span
-                >
-              </div>
-              <div>{priceItem.price}</div>
-            </div>
-          {/each} -->
-        
-          {#each product.priceSize as priceItem, i}
-          <div class="w-full">
-            <button
-              type="button"
-              class={`w-full py-1 grid grid-cols-4 gap-4 md:gap-6 lg:gap-8 text-sm text-gray-800 font-semibold  cursor-pointer transition-transform 
-                ${index === i ? 'border md:border-l-6 lg:border bg-primary-50' : 'border-none'}`}
-              on:click={() => handleThumbnailClick(i)}
-            >
-              <div class="col-span-1 text-left">{priceItem.size}</div>
-              <div class="col-span-1 text-left">
-                {product.productNumber}-{priceItem.size}
-              </div>
-              <div class="col-span-1 flex items-center justify-center space-x-2">
-                <i class="fa-regular fa-circle-check text-primary-400"></i>
-                <span>Available</span>
-              </div>
-              <div class="col-span-1 text-left">{priceItem.price}</div>
-            </button>
-          </div>
-        {/each}
+<!-- Table Rows -->
+{#each product.priceSize as priceItem, i}
+  <div class="w-full">
+    <button
+      type="button"
+      class={`w-full py-1 grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-500 cursor-pointer transition-transform
+        ${index === i ? 'border md:border-l-6 lg:border bg-primary-50' : 'border-none'}`}
+      on:click={() => handleThumbnailClick(i)}
+    >
+      <div class="col-span-1 text-left">{priceItem.size}</div>
+      <div class="col-span-1 text-left">
+        {product.productNumber}-{priceItem.size}
+      </div>
+      <div class="col-span-1 flex items-center justify-center space-x-1 sm:space-x-2">
+        <i class="fa-regular fa-circle-check text-primary-400"></i>
+        <span>Available</span>
+      </div>
+      <div class="col-span-1 text-left">{priceItem.price}</div>
+    </button>
+  </div>
+{/each}
+
         
         </div>
       </div>
-    </div>
-    <div class="relative w-full lg:flex-1 ml-4">
-      <div class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white p-4 md:p-6 shadow-md max-w-lg z-10">
-        <div class="flex flex-col ">
-          <div class="">
-            <div class="text-gray-800">
-              <div
-                class=" items-center justify-between border-dotted border-b-2 border-gray-300 pb-2"
-              >
-                <div class="relative text-lg font-semibold">
-                  {product.productNumber}-{product.priceSize[index].size}
-                  <button on:click={toggleModal} class="ml-1 text-primary-400">
-                    <i class="fa-solid fa-circle-info"></i>
-                  </button>
-                    <!-- product info popup -->
-                    {#if showModal}
-                    <div
-                      class="absolute bottom-full mb-px left-0 bg-white p-2 rounded-lg shadow-lg w-72 border border-primary-400"
-                    >
-                      <button
-                        on:click={toggleModal}
-                        class="absolute top-2 right-2 text-gray-500 font-semibold"
-                        ><i
-                          class="fa-solid fa-xmark text-primary-400 font-semibold"
-                        ></i></button
-                      >
-                      <h2 class="text-sm">Product Information</h2>
-                      <p class="text-xs text-gray-500">
-                        Foreign Trade Community Code: {product.productNumber}
-                      </p>
-                    </div>
-                  {/if}
-                </div>
-                <span class="text-lg font-semibold">{product.priceSize[index].price}</span>
-              </div>
-            </div>
-
-            <div class="border-dotted border-b-2 border-gray-300 pb-2 mb-2">
-              <p class="text-gray-500 text-sm mt-1">Availability</p>
-              <p class="text-sm w-72">
-                <i class="fa-regular fa-circle-check mr-1 text-primary-400"
-                ></i>{#if stockAvailability !== ''} {stockAvailability} {:else} Available {/if}
-              </p>
-              <div class="flex space-x-2 items-center mt-2">
-              <button class="w-full text-sm font-semibold text-left text-primary-400" on:click={togglePopup}>More Info</button>
-                <!-- more info popup -->
-                {#if showPopup}
-                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                  <div class="bg-white rounded-lg w-full max-w-lg p-6 md:p-8 mx-4 md:mx-0 relative shadow-lg">
-                    <button
-                      on:click={togglePopup}
-                      class="absolute top-4 right-4 text-primary-400 text-xl font-bold"
-                    >
-                      <i class="fa-solid fa-xmark"></i>
-                    </button>
-              
-                    <h2 class="text-xl font-bold text-left">Availability for {product.productNumber}-{product.priceSize[index].size}</h2>
-                    <p class="text-gray-500 text-left mt-2">
-                      Enter quantity to check availability and estimated ship date. 
-                    </p>
-              
-                    <form method="POST" action="?/checkavailabilityproduct" 
-                    use:enhance={() => {
-                      return async({ result }) => {
-                      let status='';
-                              console.log(result); 
-                              status = result.type;
-                    console.log("success/error type:",status); 
-                    console.log("success/error message:result.data.message=",result.data.record.message);
-                    console.log("success/error message:result.data.message=",result.data.record.stock);
-                    stockStatus = result.data.record.stock;
-                    stockAvailability = result.data.record.message;
-                    stockUnAvailability = result.data.record.message1;
-                    stockType = result.data.record.type;
-                      }; 
-                  }}
-                    >
-              <div class="flex justify-between items-center mt-6">
-                <div class="flex items-center space-x-4">
-                  <button
-                    on:click={decreaseQuantity}
-                    class="w-8 h-8 text-primary-400 flex items-center justify-center"
-                  >
-                    <i class="fa-solid fa-minus"></i>
-                  </button>
-                  <input
-                    type="text"
-                    name="quantity"
-                    bind:value={quantity}
-                    readonly
-                    class="w-16 h-8 text-center border border-gray-300 rounded-md"
-                  />
-                <input type="hidden" name="ProductId" value={product.productId} />
-                  <button
-                    on:click={increaseQuantity}
-                    class="w-8 h-8  text-primary-400  flex items-center justify-center"
-                  >
-                    <i class="fa-solid fa-plus"></i>
-                  </button>
-                </div>
-              
-                <button type="submit" class="bg-primary-400 text-white p-2 text-sm rounded-lg flex items-center space-x-1">
-                  <i class="fa-regular fa-calendar-check"></i>
-                  <span>Check Availability</span>
-                </button>
-              
-              </div>
-              
-              
-                    {#if stockType === 'success'}
-                    <div class="mt-6 space-y-2 text-sm">
-                      <div class="flex items-center space-x-2">
-                        <i class="fa-regular fa-check-circle text-primary-400"></i>
-                        <p>{stockAvailability}</p>
-                      </div>
-                      {#if stockUnAvailability !== ''}
-                      <div class="flex items-center space-x-2">
-                        <i class="fa-regular fa-check-circle text-primary-400"></i>
-                        <p>{stockUnAvailability}</p>
-                      </div>
-                      {/if}
-                    </div>
-                    
-                    {:else if stockType === 'error'}
-                    <div class="mt-6 space-y-2 text-sm">
-                      <div class="flex items-center space-x-2">
-                        <i class="fa-regular fa-xmark-circle text-primary-400"></i>
-                        <p>{stockAvailability}</p>
-                      </div>
-                    </div>
-                    {/if}
-              
-              <div class="mt-6 flex justify-end">
-                <button class="bg-primary-400 text-white py-2 px-4 rounded-lg flex items-center space-x-1">
-                  <i class="fa-solid fa-cart-shopping"></i>
-                  <span>Add To Cart</span>
-                </button>
-              </div>
-              </form>
-                  </div>
-                </div>
-              {/if}
-                <button
-                  on:click={toggleSharePopup}
-                  class="w-full text-sm font-semibold text-right text-primary-400"
-                  >Share<i class="fa-regular fa-share-from-square ml-1"
-                  ></i></button
-                >
-              </div>
-            </div>
-
-<!-- share popup -->
-{#if showSharePopup}
+      {#if showSharePopup}
 <div class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
   <div class="bg-white w-full max-w-md rounded-md shadow-lg p-4 relative mx-4">
     <button
@@ -591,6 +445,157 @@ function handleThumbnailClick(selectedIndex) {
 </div>
 {/if}
 
+{#if showPopup}
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg w-full max-w-lg p-6 md:p-8 mx-4 md:mx-0 relative shadow-lg">
+    <button
+      on:click={togglePopup}
+      class="absolute top-4 right-4 text-primary-400 text-xl font-bold"
+    >
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <h2 class="text-xl font-bold text-left">Availability for {product.productNumber}-{product.priceSize[index].size}</h2>
+    <p class="text-gray-500 text-left mt-2">
+      Enter quantity to check availability and estimated ship date. 
+    </p>
+
+    <form method="POST" action="?/checkavailabilityproduct" 
+    use:enhance={() => {
+      return async({ result }) => {
+      let status='';
+              console.log(result); 
+              status = result.type;
+    console.log("success/error type:",status); 
+    console.log("success/error message:result.data.message=",result.data.record.message);
+    console.log("success/error message:result.data.message=",result.data.record.stock);
+    stockStatus = result.data.record.stock;
+    stockAvailability = result.data.record.message;
+    stockUnAvailability = result.data.record.message1;
+    stockType = result.data.record.type;
+      }; 
+  }}
+    >
+<div class="flex justify-between items-center mt-6">
+<div class="flex items-center space-x-4">
+  <button
+    on:click={decreaseQuantity}
+    class="w-8 h-8 text-primary-400 flex items-center justify-center"
+  >
+    <i class="fa-solid fa-minus"></i>
+  </button>
+  <input
+    type="text"
+    name="quantity"
+    bind:value={quantity}
+    readonly
+    class="w-16 h-8 text-center border border-gray-300 rounded-md"
+  />
+<input type="hidden" name="ProductId" value={product.productId} />
+  <button
+    on:click={increaseQuantity}
+    class="w-8 h-8  text-primary-400  flex items-center justify-center"
+  >
+    <i class="fa-solid fa-plus"></i>
+  </button>
+</div>
+
+<button type="submit" class="bg-primary-400 text-white p-2 rounded-lg flex items-center space-x-1">
+  <i class="fa-regular fa-calendar-check"></i>
+  <span>Check Availability</span>
+</button>
+
+</div>
+
+
+    {#if stockType === 'success'}
+    <div class="mt-6 space-y-2 text-sm">
+      <div class="flex items-center space-x-2">
+        <i class="fa-regular fa-check-circle text-primary-400"></i>
+        <p>{stockAvailability}</p>
+      </div>
+      {#if stockUnAvailability !== ''}
+      <div class="flex items-center space-x-2">
+        <i class="fa-regular fa-check-circle text-primary-400"></i>
+        <p>{stockUnAvailability}</p>
+      </div>
+      {/if}
+    </div>
+    
+    {:else if stockType === 'error'}
+    <div class="mt-6 space-y-2 text-sm">
+      <div class="flex items-center space-x-2">
+        <i class="fa-regular fa-xmark-circle text-primary-400"></i>
+        <p>{stockAvailability}</p>
+      </div>
+    </div>
+    {/if}
+
+<div class="mt-6 flex justify-end">
+<button class="bg-primary-400 text-white py-2 px-4 rounded-lg flex items-center space-x-1">
+  <i class="fa-solid fa-cart-shopping"></i>
+  <span>Add To Cart</span>
+</button>
+</div>
+</form>
+  </div>
+</div>
+{/if}
+    </div>
+    <div class="relative w-full lg:flex-1 ml-4">
+      <div class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white p-4 md:p-6 shadow-md max-w-lg z-10">
+        <div class="flex flex-col ">
+          <div class="">
+            <div class="text-gray-800">
+              <div
+                class=" items-center justify-between border-dotted border-b-2 border-gray-300 pb-2"
+              >
+                <div class="relative text-lg font-semibold">
+                  {product.productNumber}-{product.priceSize[index].size}
+                  <button on:click={toggleModal} class="ml-1 text-primary-400">
+                    <i class="fa-solid fa-circle-info"></i>
+                  </button>
+                    <!-- product info popup -->
+                    {#if showModal}
+                    <div
+                      class="absolute bottom-full mb-px left-0 bg-white p-2 rounded-lg shadow-lg w-72 border border-primary-400"
+                    >
+                      <button
+                        on:click={toggleModal}
+                        class="absolute top-2 right-2 text-gray-500 font-semibold"
+                        ><i
+                          class="fa-solid fa-xmark text-primary-400 font-semibold"
+                        ></i></button
+                      >
+                      <h2 class="text-sm">Product Information</h2>
+                      <p class="text-xs text-gray-500">
+                        Foreign Trade Community Code: {product.productNumber}
+                      </p>
+                    </div>
+                  {/if}
+                </div>
+                <span class="text-lg font-semibold">{product.priceSize[index].price}</span>
+              </div>
+            </div>
+
+            <div class="border-dotted border-b-2 border-gray-300 pb-2 mb-2">
+              <p class="text-gray-500 text-sm mt-1">Availability</p>
+              <p class="text-sm w-72">
+                <i class="fa-regular fa-circle-check mr-1 text-primary-400"
+                ></i>{#if stockAvailability !== ''} {stockAvailability} {:else} Available {/if}
+              </p>
+              <div class="flex space-x-2 items-center mt-2">
+              <button class="w-full text-sm font-semibold text-left text-primary-400" on:click={togglePopup}>More Info</button>
+                <!-- more info popup -->
+
+                <button
+                  on:click={toggleSharePopup}
+                  class="w-full text-sm font-semibold text-right text-primary-400"
+                  >Share<i class="fa-regular fa-share-from-square ml-1"
+                  ></i></button
+                >
+              </div>
+            </div>
           </div>
 
           <div class=" w-full  mt-4 space-y-4">
@@ -599,7 +604,7 @@ function handleThumbnailClick(selectedIndex) {
                 >Total</button
               >
               <button class="w-full text-right text-sm text-gray-600"
-                >{product.priceSize[index].price}</button
+                >₹{totalPrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</button
               >
             </div>
 
