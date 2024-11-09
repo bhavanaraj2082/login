@@ -225,7 +225,7 @@
                         {#if uploadOption === 'url'}
                             <div class="mb-4">
                                 <label for="url" class="block text-gray-700 font-semibold">*URL to the Work</label>
-                                <input type="url" id="url" name="url" bind:value={url} class="border rounded w-full p-2" required />
+                                <input type="url" placeholder="URL" id="url" name="url" bind:value={url} class="border rounded w-full p-2" required />
                             </div>
                         {/if}
                     </div>
@@ -246,7 +246,7 @@
 
         <!-- Thank you message -->
         {#if thankYouMessageVisible}
-            <p class="text-green-500 text-center mt-4">Thank you for submitting your request!</p>
+            <p class="text-green-500  text-center mt-4">Thank you for submitting your request!</p>
         {/if}
     </div>
 </body>
