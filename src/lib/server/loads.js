@@ -154,3 +154,28 @@ export async function fetchProductName(pb) {
 	  return [];
 	}
   }
+
+
+
+
+
+  ///Quick ORDER 
+  export const loadProduct = async (pb) => {
+    console.log('Fetching chemical products...');
+    
+    const products = await pb.collection('Products').getList(1, 2000);
+
+    if (!products.items || products.items.length === 0) {
+        //console.warn('No products');
+        return [];
+    }
+
+    // Map the products without category and manufacturer information
+    const productNames = products.items.map(product => ({
+        ...product,
+    }));
+
+    console.log('Mapped products:', productNames);
+
+    return productNames;
+};
