@@ -2,7 +2,7 @@
     import PrivacyNotice from "$lib/components/ChemiKartStaticPages/PrivacyNotice.svelte";
 
     export const meta = {
-        title: "TermsAndPrivacy",
+        title: "notinuse/TermsAndPrivacy",
         component: PrivacyNotice,
     };
 </script>

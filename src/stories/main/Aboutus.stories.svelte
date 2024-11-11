@@ -17,5 +17,5 @@
   </Template>
   
   
-  <Story name="Aboutus1" />
+  <Story name="AboutusSection" />
   

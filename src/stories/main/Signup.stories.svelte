@@ -3,7 +3,7 @@
    
   
     export const meta = {
-      title: "Signup",
+      title: "notinuse/Signup",
       component: Signup,
     
   

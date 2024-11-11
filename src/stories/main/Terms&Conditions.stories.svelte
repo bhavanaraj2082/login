@@ -2,7 +2,7 @@
     import TermsConditions from "$lib/components/ChemiKartStaticPages/TermsConditions.svelte";
 
     export const meta = {
-        title: "TermsAndPrivacy",
+        title: "notinuse/TermsAndPrivacy",
         component: TermsConditions,
     };
 </script>

@@ -17,5 +17,5 @@
   </Template>
   
   
-  <Story name="About1" />
+  <Story name="AboutPage" />
   
