@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
-  import Cartrightside from "../components/Cartrightside.svelte";
+    import Cartrightside from "../components/Cartrightside.svelte";
     import menusdata from '../data/chemicalProduts.json';
 	let menus = [];
 	let submenuLeaveTimeoutId;
@@ -144,7 +144,7 @@ function handleMouseLeaveSubmenu() {
 			{/if}	
 		</div>
 	</div>
-<div class="mx-auto flex items-center justify-between max-md:py-0 px-20 py-4">
+<div class="mx-auto flex items-center justify-between max-md:py-0 md:px-20 px-0 py-4">
         <div class="flex md:hidden float-end">
             <button on:click={toggleLogoMenu} class="flex items-center text-gray-600 focus:outline-none">
                 <Icon icon="fa6-solid:bars" class="w-10 h-5 text-gray-600" />
@@ -160,17 +160,18 @@ function handleMouseLeaveSubmenu() {
 			Chemikart
 		</button>
 	</div>
-  <div class="relative w-full max-w-lg mx-8">
-    <div class="relative w-full max-w-lg mx-4 flex items-center">
+  <div class="relative w-full max-w-lg mx-4 lg:mx-8">
+    <div class="relative w-full flex items-center">
         <input
             type="text"
             placeholder="Search your Product"
             bind:value={searchQuery}
             class="w-full px-3 py-3 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-400 placeholder:text-sm"
         />
-        <button class="absolute right-1 top-1/2 transform -translate-y-1/2 bg-primary-400 text-white p-0 w-10 h-10 flex items-center justify-center rounded-md">
+        <button class="absolute right-1 top-1/2 transform -translate-y-1/2 bg-primary-400 text-white w-10 h-10 sm:flex hidden items-center justify-center rounded-md">
             <Icon icon="feather:search" style="width: 25px; height: 25px;" />
         </button>
+        
         {#if searchQuery}
             <div class="absolute w-full mt-56 max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-md z-10">
                 <button 
@@ -209,61 +210,62 @@ function handleMouseLeaveSubmenu() {
 		</div>
 	</div>
 </div>
-    <div class="hidden md:flex mx-auto justify-between py-2 pb-0 px-20 border-y border-gray-200">
-        <div class="md:flex justify-between items-center lg:gap-2 hidden">
-            {#each menus as menu, index}
-                <!-- svelte-ignore a11y-interactive-supports-focus -->
+<div class="hidden md:flex mx-auto  justify-between py-2 pb-0 px-6 lg:px-20 md:px-20 border-y border-gray-200">
+    <!-- Menu Section -->
+    <div class="md:flex justify-between items-center lg:gap-2 hidden">
+        {#each menus as menu, index}
+            <!-- svelte-ignore a11y-interactive-supports-focus -->
+            <div
+                class="relative group"
+                role="menu"
+                on:mouseenter={() => handleMouseEnterMenu(menu)}
+                on:mouseleave={handleMouseLeaveMenu}
+            >
                 <div
-                    class="relative group"
-                    role="menu"
-                    on:mouseenter={() => handleMouseEnterMenu(menu)}
-                    on:mouseleave={handleMouseLeaveMenu}
+                    class={`py-2 pr-2 pl-3 ${activeMenu === menu ? 'text-orange-500' : 'text-gray-600'}`}
                 >
-                    <div
-                        class={` py-2 pr-2 pl-3  ${activeMenu === menu ? ' text-orange-500' : ' text-gray-600'}`}
+                    <button
+                        on:click={() => navigateTo(menu.href)}
+                        class={`flex items-center text-nowrap font-semibold text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-primary-400' : 'text-gray-700'}`}
+                        role="menuitem"
                     >
-                        <button
-                            on:click={() => navigateTo(menu.href)}
-                            class={`flex items-center text-nowrap font-semibold text-lg text-base font-medium text-left w-full ${activeMenu === menu ? 'text-primary-400' : 'text-gray-700'}`}
-                            role="menuitem"
-                        >
-                            {menu.title}
-                            {#if index < 5}
-                                <Icon icon="prime:chevron-down" class="ml-1 w-5 h-5 " />
-                            {/if}
-                        </button>
-                    </div>
-    
-                    {#if menu.submenus && menu.submenus.length > 0}
-                        <div
-                            class={`absolute shadow-sm z-20 rounded-sm mt-0.5 bg-white w-max transition-opacity duration-200 ${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-                            role="menu"
-                        >
-                            {#each menu.submenus as submenu}
-                                <div
-                                    class="relative group hover:text-primary-950"
-                                    role="menu"
-                                    on:mouseenter={() => handleMouseEnterSubmenu(submenu)}
-                                    on:mouseleave={handleMouseLeaveSubmenu}
+                        {menu.title}
+                        {#if index < 5}
+                            <Icon icon="prime:chevron-down" class="ml-1 w-5 h-5 " />
+                        {/if}
+                    </button>
+                </div>
+
+                {#if menu.submenus && menu.submenus.length > 0}
+                    <div
+                        class={`absolute shadow-sm z-20 rounded-sm mt-0.5 bg-white w-max transition-opacity duration-200 ${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                        role="menu"
+                    >
+                        {#each menu.submenus as submenu}
+                            <!-- svelte-ignore a11y-interactive-supports-focus -->
+                            <div
+                                class="relative group hover:text-primary-950"
+                                role="menu"
+                                on:mouseenter={() => handleMouseEnterSubmenu(submenu)}
+                                on:mouseleave={handleMouseLeaveSubmenu}
+                            >
+                                <button
+                                    on:click={() => navigateTo(`${menu.href}${submenu.href}`)}
+                                    class="flex relative text-left mr-24 pl-4 py-1 md:text-xs lg:text-sm hover:bg-primary-50 w-full"
+                                    role="menuitem"
                                 >
-                                    <button
-                                        on:click={() => navigateTo(`${menu.href}${submenu.href}`)}
-                                        class="flex relative text-left mr-24 pl-4 py-1 md:text-xs lg:text-sm hover:bg-primary-50 w-full"
-                                        role="menuitem"
-                                    >
-                                        <span
-                                            class={`absolute left-0 top-0 h-full w-1 transition-all duration-200 ${activeSubmenu === submenu ? 'opacity-100 text-gray-800' : 'opacity-0'}`}
-                                        ></span>
-                                        {submenu.title}
-                                        <Icon
-                                            icon="material-symbols:chevron-right"
-                                            class={`absolute right-2 w-5 h-5 transition-colors duration-200 ${activeSubmenu === submenu ? 'text-primary-600' : 'text-gray-300'}`}
-                                        />
-                                    </button>
-    
-                                
-                                </div>
-                                {#if submenu.subSubmenus && submenu.subSubmenus.length > 0}
+                                    <span
+                                        class={`absolute left-0 top-0 h-full w-1 transition-all duration-200 ${activeSubmenu === submenu ? 'opacity-100 text-gray-800' : 'opacity-0'}`}
+                                    ></span>
+                                    {submenu.title}
+                                    <Icon
+                                        icon="material-symbols:chevron-right"
+                                        class={`absolute right-2 w-5 h-5 transition-colors duration-200 ${activeSubmenu === submenu ? 'text-primary-600' : 'text-gray-300'}`}
+                                    />
+                                </button>
+                            </div>
+
+                            {#if submenu.subSubmenus && submenu.subSubmenus.length > 0}
                                 <div
                                     class={`mt-0 ml-0.5 h-full absolute left-full rounded-sm pb-2 top-0 z-30 w-full bg-white shadow-sm transition-opacity duration-200 ${activeSubmenu === submenu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                                     role="menu"
@@ -293,16 +295,16 @@ function handleMouseLeaveSubmenu() {
                                     </ul>
                                 </div>
                             {/if}
-                            {/each}
-                        </div>
-                    {/if}
-                </div>
-            {/each}
-        </div>
-        <div class="flex space-x-4 text-gray-600 pt-2">
-            <a href="/bulk-order" class="hover:text-primary-400 ml-20 mr-5 font-semibold text-xs sm:text-lg">Bulk Order</a>
-            <a href="/order-status" class="hover:text-primary-400 font-semibold text-lg">Order Status</a>
-            <Cartrightside/> 
-        </div>
+                        {/each}
+                    </div>
+                {/if}
+            </div>
+        {/each}
     </div>
+    <div class="flex space-x-4 text-gray-600 pt-2 items-center ">
+        <a href="/bulk-order" class="hover:text-primary-400 sm:mr-3 font-semibold text-xs lg:text-base mb-2">Bulk Order</a>
+        <a href="/order-status" class="hover:text-primary-400 font-semibold text-xs lg:text-base mb-2">Order Status</a>
+        <Cartrightside />
+    </div>
+</div>
 </nav>
