@@ -2,7 +2,7 @@
     import ContactUs from '$lib/components/ContactUs.svelte';
   
     export const meta = {
-      title: "ContactUs_form",
+      title: "notinuse/ContactUs_form",
       component: ContactUs
     }
   </script>

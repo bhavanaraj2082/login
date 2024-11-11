@@ -3,7 +3,7 @@
   import favoriteData from '$lib/data/favorites.json';
 
   export const meta = {
-    title: "FavoriteList",
+    title: "notinuse/FavoriteList",
     component: FavoriteList,
     argsTypes: {
       favorites:{control: 'object'}

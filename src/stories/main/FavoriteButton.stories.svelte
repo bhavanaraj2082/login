@@ -2,7 +2,7 @@
     import Fav from '$lib/components/FavoriteWidget/Fav.svelte';
     
     export const meta = {
-      title: "Fav",
+      title: "notinuse/Fav",
       component: Fav,
     }
   </script>

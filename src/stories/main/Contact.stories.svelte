@@ -2,7 +2,7 @@
     import Contactus from '$lib/components/Contactus/Contactus.svelte';
   
     export const meta = {
-      title: "Contactus_page",
+      title: "notinuse/Contactus_page",
       component: Contactus
     }
   </script>
