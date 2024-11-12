@@ -1,10 +1,16 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+  import Herosection from '$lib/components/Herosection.svelte';
+  import FeaturedLinks from '$lib/components/FeaturedLinks.svelte';
+  import PopularProduct from '../lib/components/PopularProduct.svelte';
+  import Aboutus from '../lib/components/Aboutus.svelte';
+  import Email from '../lib/components/Email.svelte';
+</script>
 
-
-<h1 class="text-3xl font-bold underline">
-  Hello world!
-</h1>
+<Herosection/>
+<FeaturedLinks/>
+<PopularProduct/>
+<Aboutus/>
+<Email/>
 
 <style lang="postcss">
   :global(html) {
