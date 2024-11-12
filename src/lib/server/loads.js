@@ -71,15 +71,6 @@ export const loadFirstProduct = async (pb) => {
 
 
 
-
-
-
-
-
-
-
-
-
 export async function fetchViewedProducts(pb) {
 	const records = await pb.collection('ViewedProducts').getFullList({
 		sort: '-created'
@@ -179,3 +170,58 @@ export async function fetchProductName(pb) {
 
     return productNames;
 };
+
+
+export async function getProductdatas(pb) {
+	const record = await pb.collection('Category').getFullList();
+	console.log("records",record)
+	if(record)
+	{
+		return {records : record}
+	}
+	else{
+		return { error : "Products not Found" }
+	}
+}
+
+
+
+export async function getSubCategoryDatas(pb, subid) {
+
+    const records = await pb.collection('SubCategories').getFullList({
+        expand: 'category'  
+    });
+
+    if (records) {
+        const filteredRecords = records.filter(record => 
+            record.expand.category.urlName === subid
+        );
+        if (filteredRecords.length > 0) {
+            return { records: filteredRecords };
+        } else {
+            return { error: "No SubCategories found matching the urlName" };
+        }
+    } else {
+        return { error: "SubCategories not found" };
+    }
+}
+
+export async function getSubSubCategoryDatas(pb, subsubid) {
+
+    const records = await pb.collection('SubSubCategories').getFullList({
+        expand: 'subCategory,category'  
+    });
+
+    if (records) {
+        const filteredRecords = records.filter(record => 
+            record.expand.subCategory.urlName === subsubid
+        );
+        if (filteredRecords.length > 0) {
+            return { records: filteredRecords };
+        } else {
+            return { error: "No SubSubCategories found matching the urlName" };
+        }
+    } else {
+        return { error: "SubSubCategories not found" };
+    }
+}
