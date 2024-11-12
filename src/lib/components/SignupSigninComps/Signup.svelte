@@ -116,7 +116,7 @@
 
     <div class="content w-full md:w-2/3 p-4 md:p-6 flex flex-col justify-center bg-white rounded-tr-lg rounded-b-lg md:rounded-l-lg md:rounded-tl-none">
         <h2 class="text-2xl font-bold text-primary-500">Sign Up</h2>
-        <p class="text-gray-500 mb-5">Already have an account? <a href='/signin' class="underline text-primary-500">Login.</a></p>
+        <p class="text-gray-500 mb-5">Already have an account? <a href='/login' class="underline text-primary-500">Login.</a></p>
         
         {#if errorStatus === "success"}
         <div class="border border-green-400 p-3 w-auto text-sm text-gray-600 font-medium rounded my-6"><i class="fa-solid fa-circle-check text-green-400 mr-1"></i>{errorMessage}</div>

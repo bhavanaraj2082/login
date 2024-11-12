@@ -31,7 +31,7 @@
         <div class="w-full mx-auto">
             <h1 class="text-2xl font-bold text-primary-500 mb-4">Sign In</h1>
             <p class="mb-4 text-gray-600">
-                Do not have an account? <a href="/signup" class="text-primary-500 hover:text-primary-600 underline">Create a new one</a>
+                Do not have an account? <a href="/register" class="text-primary-500 hover:text-primary-600 underline">Create a new one</a>
             </p>
             
             {#if errorStatus === "success"}
@@ -40,7 +40,7 @@
         {#if errorStatus === "error"}
             <div class="border border-red-400 p-3 w-auto text-sm text-gray-600 font-medium rounded my-6">{errorMessage}</div>
         {/if}
-            <form action="?/signin" method="POST" 
+            <form action="?/login" method="POST" 
             use:enhance={() => {
                 return async ({ result }) => {
                     console.log(result);
@@ -87,7 +87,7 @@
                 </div>
 
                 <p class="mb-4">
-                    <a href="/reset" class="text-primary-400 hover:text-primary-500 underline">Forgot password?</a>
+                    <a href="/reset-password" class="text-primary-400 hover:text-primary-500 underline">Forgot password?</a>
                 </p>
 
                 <button class="bg-primary-400 text-white rounded p-2 w-full text-center">
