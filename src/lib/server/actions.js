@@ -31,42 +31,48 @@ export const myDetails = async (request, pb) => {
 	}
 };
 
-export const Addquotes = async (data, pb) => {
-	console.log(data);
 
-	const formattedData = {
-		Custom_solution_type: data.solutionValue,
-		Custom_format: data.selectedColor,
-		Configure_custom_solution: {
-			solvent: data.solvent,
-			packagingType: data.packagingType,
-			volume: data.volume,
-			units: data.units,
-			qualityLevel: data.qualityLevel,
-			analyticalTechnique: data.analyticalTechnique
-		},
-		Additional_notes: data.futherdetails,
-		Customer_details: {
-			Title: data.title,
-			Firstname: data.first,
-			Lastname: data.last,
-			organisation: data.organisation,
-			country: data.country,
-			lgc: data.lgc,
-			email: data.email,
-			number: data.number
-		},
-		Delivery_information: {
-			Address1: data.address1,
-			Address2: data.address2,
-			Country1: data.country1,
-			County: data.county,
-			City: data.city,
-			Post: data.post
-		}
+
+
+//ACTION FUNCTION FOR QUOTES PAGE
+export const Addquotes = async (data, pb) => {
+	const componentsArray = data['components[]'].split('\n'); 
+			const formattedData = {
+					Custom_solution_type: data.solutionValue,
+					Custom_format: data.selectedColor,
+					Configure_custom_solution: {
+							components: componentsArray,  
+							solvent: data.solvent,
+							packagingType: data.packagingType,
+							volume: data.volume,
+							units: data.units,
+							qualityLevel: data.qualityLevel,
+							analyticalTechnique: data.analyticalTechnique,
+					},
+					Additional_notes: data.futherdetails,
+					Customer_details: {
+							Title: data.title,
+							Firstname: data.first,
+							Lastname: data.last,
+							organisation: data.organisation,
+							country: data.country,
+							lgc: data.lgc,
+							email: data.email,
+							number: data.number,
+					},
+					Delivery_information: {
+							Address1: data.address1,
+							Address2: data.address2,
+							Country1: data.country1,
+							County: data.county,
+							City: data.city,
+							Post: data.post,
+					}
+			};
+			return await pb.collection('Quote').create(formattedData);
 	};
-	return await pb.collection('Quote').create(formattedData);
-};
+
+	
 
 export const submitContactForm = async (pb, formData) => {
 	const contactData = {
