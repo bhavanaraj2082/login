@@ -37,7 +37,7 @@ export async function loadProductById(productId) {
 	}
 }
 
-//////////Product Filter 
+//////////Product Filter ///////////////
 
 
 export const loadFirstProduct = async (pb) => {
@@ -45,7 +45,7 @@ export const loadFirstProduct = async (pb) => {
 
     
         const products = await pb.collection('Products').getList(1, 2000, { 
-           // sort: '-created',
+            sort: '-created',
             expand: 'manufacturerName,Category'
         });
 
