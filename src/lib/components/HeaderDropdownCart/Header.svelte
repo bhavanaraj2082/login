@@ -73,7 +73,7 @@
 	}
 
 	export let data;
-	let searchResult = data.products;
+	let searchResult = data?.products;
 	$: filteredResults = searchQuery
 		? searchResult.filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
 		: [];
@@ -327,7 +327,8 @@
 		<div class="flex space-x-4 text-gray-600 pt-2 items-center">
 			<a
 				href="/quick-order"
-				class="hover:text-primary-400 sm:mr-3 font-semibold text-xs lg:text-base mb-2">Quick Order</a
+				class="hover:text-primary-400 sm:mr-3 font-semibold text-xs lg:text-base mb-2"
+				>Quick Order</a
 			>
 			<a href="/order-status" class="hover:text-primary-400 font-semibold text-xs lg:text-base mb-2"
 				>Order Status</a
