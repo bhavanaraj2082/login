@@ -50,10 +50,10 @@
                         <div class="h-5 w-7 py-2 bg-primary-500 text-white text-xs rounded-full flex justify-center items-center">1</div>
 
                         {#if errorStatus === "success"}
-                        <div class="w-full h-1 bg-primary-500 mx-2"></div>
+                        <div class="w-full h-1 bg-primary-500"></div>
                         <div class="h-5 w-7 py-2 text-xs bg-primary-500 text-white rounded-full flex justify-center items-center">2</div>
                         {:else}
-                        <div class="w-full h-1 bg-gray-300 mx-2"></div>
+                        <div class="w-full h-1 bg-gray-300"></div>
                         <div class="h-5 w-7 py-2 text-xs bg-gray-300 text-gray-500 rounded-full flex justify-center items-center">2</div>
                         {/if}
                     </div>
