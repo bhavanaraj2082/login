@@ -415,83 +415,66 @@ export async function deleteProduct(productId) {
 }
 
 //*******SignUP*********/
-export const actions = {
-	register: async (userData, pb) => {
-		const { username, email, language, location, password, passwordConfirm } = userData;
-		const data = {
-			username,
-			email,
-			language,
-			location,
-			password,
-			passwordConfirm
-		};
-
-		if (passwordConfirm !== password) {
-			return {
-				type: 'error',
-				message: 'Passwords do not match. Please try again.'
-			};
-		}
-
-		const record = await pb.collection('Register').create(data);
+export async function register(data, pb) {
+	  if (data.passwordConfirm !== data.password) {
 		return {
-			type: 'success',
-			message: 'Registration successful!',
-			record: record
+		  type: "error",
+		  message: "Passwords do not match. Please try again.",
 		};
-	}
-};
+	  }
+	  await pb.collection('Register').create(data);
+	  return {
+		type: "success",
+		message: "Registration successful!",
+	  };
+}  
 
 //********SignIn*********/
-export const signinActions = {
-	signin: async (email, password, pb) => {
+export async function login (email, password, pb) {
 		const authData = await pb.collection('Register').authWithPassword(email, password);
-		console.log('User authentication successful:', authData);
 		return {
-			type: 'success',
-			message: 'Login successful!'
+		  type: "success",
+		  message: "Login successful!",
 		};
-	}
-};
+}
 
 /******************Reset Password*******************/
-export const passwordActions = {
-	resetpassword: async (email, pb) => {
-		const records = await pb.collection('Register').getFullList({
-			filter: `email="${email}"`
-		});
-		console.log('Email check records:', records);
-
-		if (records.length === 0) {
-			return {
-				type: 'error',
-				message: 'Email not registered. Please check and try again.'
-			};
-		}
-		await pb.collection('Register').requestPasswordReset(email);
-		console.log('Password reset request sent successfully to:', email);
+export async function resetpassword(email, pb) {
+	  const records = await pb.collection('Register').getFullList({
+		filter: `email="${email}"`
+	  });
+	  console.log("Email check records:", records);
+	  if (records.length === 0) {
 		return {
-			type: 'success',
-			message: 'Password reset email sent successfully! Please check your mail.'
+		  type: "error",
+		  message: "Email not registered. Please check and try again."
 		};
-	}
-};
+	  }
+	  await pb.collection('Register').requestPasswordReset(email);
+	  return {
+		type: "success",
+		message: "Password reset email sent successfully! Please check your mail."
+	  };
+}
+  
 
 /******************Confirm Password********************/
 export async function confirmpasswordreset(token, newPassword, newConfirmPassword, pb) {
 	if (newPassword !== newConfirmPassword) {
-		return {
-			type: 'error',
-			message: 'Passwords do not match. Please try again!'
-		};
+	  return {
+		type: "error",
+		message: "Passwords do not match. Please try again!"
+	  };
 	}
-	await pb.collection('Register').confirmPasswordReset(token, newPassword, newConfirmPassword);
-	return {
-		type: 'success',
-		message: 'Your password has been reset successfully! You can now log in.'
+	  await pb.collection('Register').confirmPasswordReset(token, newPassword, newConfirmPassword);  
+	  return {
+		type: "success",
+		message: "Your password has been reset successfully! You can now log in."
 	};
 }
+
+
+
 //search bar component
 export async function fetchsearchcomponent() {
     try {
