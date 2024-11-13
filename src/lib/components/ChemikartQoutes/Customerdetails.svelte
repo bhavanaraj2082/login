@@ -379,7 +379,7 @@
 			>Save & continue</button
 		>
 		{#if errorMessage}
-			<div class="text-red-600 font-semibold text-xl ml-5 mt-5">{errorMessage}</div>
+			<div class="text-red-500 ml-5 mt-7">{errorMessage}</div>
 			<!-- Display the error message -->
 		{/if}
 	</div>
