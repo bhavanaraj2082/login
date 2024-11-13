@@ -133,9 +133,9 @@ export async function fetchorderstatus(orderNumber, pb) {
 //DOCUMENT ACTION FUNCTION
 export async function fetchcertificate(inputValue, pb) {
 	const records = await pb
-		.collection('Documents')
+		.collection('Products')
 		.getFirstListItem(`productNumber="${inputValue}"`, {
-			fields: 'certificate, productNumber'
+			fields: 'safetyDatasheet, productNumber'
 		});
 	return records;
 }
