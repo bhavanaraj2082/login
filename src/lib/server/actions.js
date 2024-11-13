@@ -566,3 +566,12 @@ export const checkavailabilityproduct = async (data, pb) => {
         }
     } 
 };
+
+export const checkoutOrder = async(pb,order)=>{
+	const record = await pb.collection("Orders").create(order)
+	if(record.id){
+		return { success:true,message:"Successfully Ordered"}
+	}else{
+		return { success:false,message:"Something went wrong"}
+	}
+}
