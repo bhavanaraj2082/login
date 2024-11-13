@@ -2,15 +2,9 @@
 	import Icon from '@iconify/svelte';
 	const currentYear = new Date().getFullYear();
 </script>
-
-<link
-	href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-	rel="stylesheet"
-/>
-
 <footer class="w-full bg-primary-400 p-6">
-	<div class="lg:w-10/12 mx-auto w-10/12">
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mt-4">
+	<div class="mx-auto">
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mt-4 w-11/12 mx-auto max-w-7xl">
 			<div class="flex flex-col items-center md:items-start text-center md:text-left">
 				<a href="/" aria-label="Go to homepage" class="text-2xl font-bold text-gray-50">
 					Chemikart
@@ -47,8 +41,7 @@
 							target="_blank"
 							rel="noopener noreferrer"
 							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300 hover:text-gray-50"
-							aria-label="Follow us on Instagram"
-						>
+							aria-label="Follow us on Instagram">
 							<Icon icon="typcn:social-instagram" width="1.2em" height="1.2em" />
 						</a>
 						<a
@@ -91,24 +84,24 @@
 				</ul>
 			</div>
 		</div>
-	</div>
-	<div class="md:w-10/12 mx-auto w-full mt-4">
-		<hr class="border-gray-50 mb-4" />
-		<div
-			class="flex flex-col md:flex-row justify-center md:justify-between items-center text-gray-50"
-		>
-			<p class="text-xs text-center font-medium">
-				&copy; {currentYear} Chemikart. All Rights Reserved.
-			</p>
+		<div class="w-full">
+			<hr class="border-gray-50 m-4" />
 			<div
-				class="flex flex-col md:flex-row items-center gap-0 md:gap-4 lg:gap-6 mt-2 md:mt-0 space-y-1 md:space-y-0"
+				class="flex flex-col md:flex-row justify-center md:justify-between items-center text-gray-50 mx-auto w-11/12 mt-4 max-w-7xl"
 			>
-				<a href="/cookies-settings" class="hover:underline text-xs font-medium">Cookies Settings</a>
-				<span class="hidden md:block lg:inline-block footer-separator">|</span>
-				<a href="/terms" class="hover:underline text-xs font-medium">Privacy Notice</a>
-				<span class="hidden md:block lg:inline-block footer-separator">|</span>
-				<a href="/terms" class="hover:underline text-xs font-medium">Terms & Conditions</a>
+				<p class="text-xs text-center font-medium">
+					&copy; {currentYear} Chemikart. All Rights Reserved.
+				</p>
+				<div
+					class="flex flex-col md:flex-row items-center gap-0 md:gap-4 lg:gap-6 mt-2 md:mt-0 space-y-1 md:space-y-0"
+				>
+					<a href="/cookies-settings" class="hover:underline text-xs font-medium">Cookies Settings</a>
+					<span class="hidden md:block lg:inline-block footer-separator">|</span>
+					<a href="/terms" class="hover:underline text-xs font-medium">Privacy Notice</a>
+					<span class="hidden md:block lg:inline-block footer-separator">|</span>
+					<a href="/terms" class="hover:underline text-xs font-medium">Terms & Conditions</a>
+				</div>
 			</div>
 		</div>
-	</div>
+	</div>	
 </footer>
