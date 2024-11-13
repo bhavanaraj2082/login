@@ -19,14 +19,14 @@
   </div>
   <div class="my-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-center">
       {#each products as product}
-          <div class="shadow-sm flex flex-col justify-between border bg-white rounded-lg pb-6 overflow-hidden min-h-[400px]">
-              <img src={product.image} alt={product.name} class="w-full h-48 object-cover rounded-t-lg mb-4">
-              <div class="flex-1 space-y-2">
+          <div class="shadow-sm flex flex-col justify-between border bg-white rounded-lg pb-6 overflow-hidden h-96">
+              <img src={product.image} alt={product.name} class="w-48 h-48 rounded-t-lg mx-auto object-contain mb-4">
+              <div class="flex-1 gap-2">
                   <h3 class="text-xl font-semibold">{product.name}</h3>
                   <p class="text-gray-600 h-16 p-2">{product.description}</p>
               </div>
               <a href={product.link || '#'} target="_blank" rel="noopener noreferrer"
-                 class="flex items-center justify-center bg-primary-400 text-white w-5/6 mx-auto  py-2.5 rounded hover:bg-primary-500 mt-4">
+                 class="bg-primary-400 text-white w-5/6 mx-auto  py-2.5 rounded hover:bg-primary-500 mt-4">
                   {product.buttonLabel}
               </a>
           </div>

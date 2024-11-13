@@ -4,7 +4,7 @@
       <img 
         src="/about.png"
         alt="A visual representation of Chemicart's mission to provide high-quality chemicals and laboratory supplies"
-        class="w-full h-60 sm:h-80 lg:h-[400px] object-cover rounded">
+        class="w-full h-60 sm:h-80 lg:h-96 object-cover rounded">
     </div>
     <div class="flex flex-col justify-center space-y-8">
       <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">

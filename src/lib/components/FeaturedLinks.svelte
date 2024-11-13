@@ -11,7 +11,7 @@
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-8">
       {#each FeaturedData as { name, description, image, buttonLabel, link }}
-          <div class="shadow-sm flex flex-col  bg-white justify-between items-center border rounded-lg overflow-hidden p-6 text-center min-h-[400px]">
+          <div class="shadow-sm flex flex-col  bg-white justify-between items-center border rounded-lg overflow-hidden p-6 text-center min-h-96">
               <img src={image} alt={name} class="w-full h-52 object-cover rounded mb-4">
               <div class="flex-1">
                   <h3 class="text-xl font-semibold mb-2">{name}</h3>
