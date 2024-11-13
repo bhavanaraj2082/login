@@ -1,29 +1,35 @@
 [ {
-    "id": 1,
-    "name": "Hamilton® 70IN syringe",
-    "code": "28169-U",
-    "description": "70IN (Slimline), volume 10 μL, needle size 26S ga (bevel tip), needle L 51 mm (2 in.)",
-    "price": 13521.25,
-    "image": "https://chemikart.partskeys.com/PopularProductsImg1.jpeg"
+  "id": "f5xgnpnx0x73upk",
+  "name": "Chloromethyl methyl sulfide",
+  "partNumber": "C54007",
+  "quantity":1,
+  "description": "95%",
+  "price": 3030.00,
+  "stock":200,
+  "image": "https://chemikart.partskeys.com/PopularProductsImg1.jpeg"
 
-    
-  },
-  {
-    "id": 2,
-    "image": "https://chemikart.partskeys.com/PopularProductsImg1.jpeg",
-    "name": "Hamilton® 70IN syringe",
-    "code": "28169-U",
-    "description": "70IN (Slimline), volume 10 μL, needle size 26S ga (bevel tip), needle L 51 mm (2 in.)",
-    "price": 13521.25
-   
-  },
-  {
-    "id": 3,
-    "code": "28169-U",
-    "name": "Bioprocessing & Formulation Raw Materials",
-    "description": "70IN (Slimline), volume 10 μL, needle size 26S ga (bevel tip), needle L 51 mm (2 in.)",
-    "image": "https://chemikart.partskeys.com/PopularProductsImg1.jpeg",
-    "price": 15770.05
-    
-  }
+  
+},
+{
+  "id": "cr9xk2c910xwkth",
+  "image": "https://chemikart.partskeys.com/PopularProductsImg1.jpeg",
+  "name": "Borane dimethyl sulfide complex solution",
+  "partNumber": "775118",
+  "quantity":1,
+  "stock":500,
+  "description": "1.0 M in 2-methyltetrahydrofuran",
+  "price": 7296.05
+ 
+},
+{
+  "id": "lylas1mbouizdp1",
+  "partNumber": "C6079",
+  "name": "Collagenase + protease inhibitor",
+  "quantity":1,
+  "stock":400,
+  "description": "2-5 FALGPA units/mg solid, ≥800 CDU/mg solid",
+  "image": "https://chemikart.partskeys.com/PopularProductsImg1.jpeg",
+  "price": 135830.70
+  
+}
 ]

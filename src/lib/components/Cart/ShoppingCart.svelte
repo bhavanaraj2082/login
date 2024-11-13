@@ -1,40 +1,52 @@
 <script>
+	import { enhance } from '$app/forms';
+	import { authedUser } from '$lib/stores/mainStores.js';
+	import Icon from '@iconify/svelte';
 	import { onMount } from 'svelte';
-	import cartData from '$lib/data/cart.json';
-	import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
+	import { viewedCart,updateCartState } from '$lib/stores/alsoViewedProducts_Store.js';
 
-	let cartItems = [];
+	let cartItems = $viewedCart;
 	let subtotal = 0;
 	let tax = 0;
 	let total = 0;
-	let viewedCartItems = [];
-
-	onMount(() => {
-		const unsubscribe = viewedCart.subscribe((items) => {
-			viewedCartItems = items;
-			cartItems = [...cartData, ...viewedCartItems].map((item, index) => ({
-				...item,
-				id: item.id || `item-${index}`,
-				quantity: item.quantity || 1,
-				price: item.price || 50,
-				name:
-					item.name1 && item.name2
-						? `${item.name1} & ${item.name2}`
-						: item.name1 || item.name2 || item.name
-			}));
-			calculateTotals();
-		});
-		return () => unsubscribe();
-	});
+	let totalPrice = 0
+	let order = ''
+	let successMessage = ''
 
 	const calculateTotals = () => {
 		subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 		tax = subtotal * 0.12;
 		total = subtotal + tax;
-	};
+		let ordernumber = "ORDER" + Math.floor(Math.random() * 9000) + 1000
+		let products = []
+		let orderdetails = cartItems.map(item=>{
+            const {id,name,partNumber,quantity,price,stock} = item
+			products.push(id)
+			totalPrice = parseInt(quantity) * parseFloat(price)
+			let backOrder = quantity > stock ? parseInt(quantity) - parseInt(stock) : 0;
+			let readyToShip = quantity < stock ? quantity : stock;
+			return {
+				productId:id,
+				productName:name,
+				partNumber,
+				orderQty:quantity,
+				price,
+				backOrder,
+				totalPrice,
+				readyToShip,
+				availableStock:stock
+			}
+		})
+	 order = {
+			ordernumber,
+			totalprice:total,
+			subtotalprice:subtotal,
+			shippingprice:tax,
+			products,
+			orderdetails,
+			dashuserprofileid:$authedUser.email
+		}
 
-	const updateLocalStorage = () => {
-		localStorage.setItem('cartItems', JSON.stringify(cartItems));
 	};
 
 	const incrementQuantity = (id) => {
@@ -42,8 +54,8 @@
 		if (index !== -1) {
 			cartItems[index].quantity += 1;
 			cartItems = [...cartItems];
+			updateCartState(cartItems)
 			calculateTotals();
-			updateLocalStorage();
 		}
 	};
 
@@ -52,15 +64,15 @@
 		if (index !== -1 && cartItems[index].quantity > 1) {
 			cartItems[index].quantity -= 1;
 			cartItems = [...cartItems];
+			updateCartState(cartItems)
 			calculateTotals();
-			updateLocalStorage();
 		}
 	};
 
 	const removeItem = (id) => {
 		cartItems = cartItems.filter((item) => item.id !== id);
+		updateCartState(cartItems)
 		calculateTotals();
-		updateLocalStorage();
 	};
 
 	const emptyCart = () => {
@@ -68,94 +80,105 @@
 		subtotal = 0;
 		tax = 0;
 		total = 0;
-		updateLocalStorage();
+		updateCartState(cartItems)
 	};
+
+	const handleSubmit = () =>{
+		return async ({result,update})=>{
+			console.log(result);
+			if(result.type === "success"){
+				successMessage = result.data
+			}
+			updateCartState([])
+			await update()
+			setTimeout(()=>successMessage = '',4000)
+		}
+	}
+
+	onMount(() => {
+			calculateTotals();
+	});
 </script>
 
-<div class="min-h-screen bg-gray-100 p-4 sm:p-6">
+<div class="min-h-screen mx-auto max-w-7xl bg-gray-100 p-4 sm:p-6">
+	{#if successMessage.length !== 0}
+	<div class=" absolute right-10 bottom-10 w-64 md:w-1/3 h-14 border rounded-sm text-xs md:text-sm font-medium flex items-center justify-center  {successMessage.success ? " text-green-600 bg-green-100 border-green-600" : "text-red-600 bg-red-100 border-red-600"}">{successMessage.message}</div>
+	{/if}
 	<!-- Main Cart Section -->
-	<div class="flex flex-col lg:flex-row justify-between gap-6">
+	<div class=" flex flex-col xl:flex-row justify-between gap-6">
 		<!-- Left Side: Cart Items -->
-		<div class="w-full lg:w-2/3 bg-white p-4 rounded-lg shadow-md">
-			<h2 class="text-xl font-bold mb-4">
+		 {#if !$viewedCart.length || $viewedCart === null}
+		   <div class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded-lg shadow-md ">
+			   <Icon icon="typcn:shopping-cart" class="text-5xl text-primary-500 md:text-8xl" />
+			   <p class=" font-bold text-lg md:text-xl  xl:text-2xl">Cart is Empty</p>
+		   </div>
+		{:else}
+		<div class="w-full lg:w-4/4 xl:w-3/4 bg-white p-4 rounded-lg shadow-md ">
+			<h2 class="text-xl font-bold">
 				Cart Items <span class="text-red-500">({cartItems.length})</span>
 			</h2>
 
 			<div
-				class="hidden sm:grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 text-gray-500 font-semibold mb-2"
+				class="hidden lg:flex text-gray-500 font-semibold mb-2"
 			>
-				<p>Product</p>
-				<p class="text-center">Price</p>
-				<p class="text-center">Quantity</p>
-				<p class="text-center">Total</p>
+				<p class=" w-6/12">Product</p>
+				<p class=" w-2/12">Price</p>
+				<p class=" w-2/12">Quantity</p>
+				<p class=" w-2/12">Total</p>
 			</div>
 
-			<ul class="space-y-4 divide-y divide-gray-200">
+			<ul class="">
 				{#each cartItems as item (item.id)}
-					<li class="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr_1fr] gap-4 items-center py-4">
+					<li class="flex flex-col lg:flex-row lg:items-center py-3 lg:py-5 border-b-1">
 						<!-- Product Image and Details -->
-						<div class="flex items-center">
+						<h3 class=" lg:hidden mt-3 font-medium text-sm">Product</h3>
+						<div class="flex items-center w-full md:w-6/12">
 							<img src={item.image} alt={item.name} class="w-16 h-16 object-cover rounded-md" />
 							<div class="ml-2">
-								<p class="text-sm text-red-500 font-semibold">{item.code}</p>
-								<p class="font-semibold text-gray-800">{item.name}</p>
+								<p class="text-sm text-red-500 font-semibold">{item.partNumber}</p>
+								<p class=" text-gray-800">{item.name}</p>
 							</div>
 						</div>
 
 						<!-- Price -->
-						<p class="text-lg font-semibold text-center text-gray-900">₹{item.price.toFixed(2)}</p>
+						<h3 class=" lg:hidden mt-3 font-medium text-sm">Price</h3>
+						<p class="text-md w-full md:w-2/12 font-semibold text-content">₹{item.price.toFixed(2)}</p>
 
 						<!-- Quantity Control -->
-						<div class="flex items-center justify-center">
-							<div class="flex items-center border border-gray-300 rounded-sm px-2">
-								<button on:click={() => decrementQuantity(item.id)} class="text-lg text-orange-500"
-									>-</button
+						<h3 class=" lg:hidden mt-3 font-medium text-sm">Quantity</h3>
+						<div class="flex items-center w-60 md:w-2/12">
+							<div class="flex items-center border-1 rounded">
+								<button on:click={() => decrementQuantity(item.id)} class=" border-r-1 p-2.5 text-primary-500"
+									><Icon icon="rivet-icons:minus" class="text-sm"/></button
 								>
-								<p class="mx-2">{item.quantity}</p>
-								<button on:click={() => incrementQuantity(item.id)} class="text-lg text-orange-500"
-									>+</button
+								<p class="w-fit mx-3 text-sm font-medium outline-none text-center">{item.quantity}</p>
+								<button on:click={() => incrementQuantity(item.id)} class=" border-l-1 p-2.5 text-primary-500"
+									><Icon icon="rivet-icons:plus" class="text-sm"/></button
 								>
 							</div>
 						</div>
 
 						<!-- Total Price & Delete Icon -->
-						<div class="flex justify-between items-center">
-							<p class="text-lg font-semibold text-center text-gray-900">
+						<h3 class=" lg:hidden mt-3 text-sm">Total</h3>
+						 <div class=" w-full lg:w-2/12 flex justify-between items-center">
+							<p class="text-md font-medium text-content">
 								₹{(item.price * item.quantity).toFixed(2)}
 							</p>
-							<button on:click={() => removeItem(item.id)} class="ml-4 text-lg text-orange-600">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="1em"
-									height="1em"
-									viewBox="0 0 512 512"
-									class="w-6 h-6"
-								>
-									<path
-										fill="currentColor"
-										d="M96 472a23.82 23.82 0 0 0 23.579 24h272.842A23.82 23.82 0 0 0 416 472V152H96Zm32-288h256v280H128Z"
-									/>
-									<path
-										fill="currentColor"
-										d="M168 216h32v200h-32zm72 0h32v200h-32zm72 0h32v200h-32zm16-128V40c0-13.458-9.488-24-21.6-24H205.6C193.488 16 184 26.542 184 40v48H64v32h384V88ZM216 48h80v40h-80Z"
-									/>
-								</svg>
+							<button on:click={() => removeItem(item.id)} class=" text-lg text-primary-600">
+								<Icon icon="mdi:delete" class=" text-3xl"/>
 							</button>
-						</div>
+						 </div>
 					</li>
 				{/each}
 			</ul>
-
-			<button on:click={emptyCart} class="mt-4 text-orange-500 font-semibold underline"
-				>Empty Cart</button
-			>
+			<button on:click={emptyCart} class="mt-4 text-sm w-32 sm:w-36 md:w-40 lg:w-48 py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-semibold">Clear cart</button>
 		</div>
+		{/if}
 
 		<!-- Right Side: Order Summary -->
-		<div class="w-full lg:w-1/3 bg-white p-4 rounded-lg shadow-md">
+		<div class="w-full lg:w-2/4 xl:w-1/4 self-end xl:self-start bg-white p-4 rounded-lg shadow-md">
 			<div>
 				<h2 class="text-xl font-bold mb-4">Your Order</h2>
-
 				<div class="space-y-2">
 					<div class="flex justify-between text-lg">
 						<p>Subtotal</p>
@@ -169,44 +192,42 @@
 						<p>Total</p>
 						<p>₹{total.toFixed(2)}</p>
 					</div>
-				</div>
-
-				<button
-					class="mt-4 w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600"
+				</div>	
+			</div>
+			{#if $viewedCart.length}
+			<div class="mt-4 grid grid-cols-2 gap-2">
+				<form method="POST" action="?/checkout" use:enhance={handleSubmit} class=" col-span-2">
+					<input type="hidden" name="order" value={JSON.stringify(order)}>
+					<button type="submit"
+					class="mt-4 w-full bg-primary-500 text-white py-2 rounded-lg font-semibold hover:bg-primary-600"
 				>
 					Checkout
 				</button>
-			</div>
-
-			<div class="mt-4 grid grid-cols-2 gap-2">
+				</form>
+				
 				<!-- Save Cart Button -->
 				<button
-					class="flex items-center justify-center gap-2 bg-white text-orange-500 border border-orange-500 py-2 rounded-lg font-semibold hover:bg-orange-100"
+					class="flex items-center justify-center gap-2 col-span-2 bg-white text-primary-500 border border-primary-500 py-2 rounded-lg font-semibold hover:bg-primary-100"
 				>
 					Save Cart
 				</button>
 
-				<!-- Email Button -->
-				<button
-					class="flex items-center justify-center gap-2 bg-white text-orange-500 border border-orange-500 py-2 rounded-lg font-semibold hover:bg-orange-100"
-				>
-					Email
-				</button>
-
 				<!-- Download Button -->
 				<button
-					class="flex items-center justify-center gap-2 bg-white text-orange-500 border border-orange-500 py-2 rounded-lg font-semibold hover:bg-orange-100"
+					class="flex items-center justify-center gap-2 bg-white text-primary-500 border border-primary-500 py-2 rounded-lg font-semibold hover:bg-primary-100"
 				>
 					Download
 				</button>
 
 				<!-- Print Button -->
 				<button
-					class="flex items-center justify-center gap-2 bg-white text-orange-500 border border-orange-500 py-2 rounded-lg font-semibold hover:bg-orange-100"
+					class="flex items-center justify-center gap-2 bg-white text-primary-500 border border-primary-500 py-2 rounded-lg font-semibold hover:bg-primary-100"
 				>
 					Print
 				</button>
 			</div>
+			{/if}
+			
 		</div>
 	</div>
 </div>
