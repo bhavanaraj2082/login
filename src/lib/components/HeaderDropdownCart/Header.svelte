@@ -134,7 +134,7 @@
 					</div>
 					<div>
 						<button
-							on:click={() => navigateTo('/register')}
+							on:click={() => navigateTo('/signup')}
 							class="hover:text-primary-400 transition text-sm duration-200 py-2">Register</button
 						>
 					</div>
