@@ -415,8 +415,7 @@ export async function deleteProduct(productId) {
 }
 
 //*******SignUP*********/
-export const actions = {
-	register: async (data, pb) => {
+export async function register(data, pb) {
 	  if (data.passwordConfirm !== data.password) {
 		return {
 		  type: "error",
@@ -428,24 +427,19 @@ export const actions = {
 		type: "success",
 		message: "Registration successful!",
 	  };
-	},
-};
-  
+}  
 
 //********SignIn*********/
-export const signinActions = {
-	login: async (email, password, pb) => {
+export async function login (email, password, pb) {
 		const authData = await pb.collection('Register').authWithPassword(email, password);
 		return {
 		  type: "success",
 		  message: "Login successful!",
 		};
-	}
-};
+}
 
 /******************Reset Password*******************/
-export const passwordActions = {
-	resetpassword: async (email, pb) => {
+export async function resetpassword(email, pb) {
 	  const records = await pb.collection('Register').getFullList({
 		filter: `email="${email}"`
 	  });
@@ -461,8 +455,7 @@ export const passwordActions = {
 		type: "success",
 		message: "Password reset email sent successfully! Please check your mail."
 	  };
-	}
-};
+}
   
 
 /******************Confirm Password********************/

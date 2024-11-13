@@ -1,4 +1,4 @@
-import { passwordActions } from '$lib/server/actions.js';
+import { resetpassword } from '$lib/server/actions.js';
 import { pb, authenticate } from '$lib/server/pocketbase.js';  
 
 export const actions = {
@@ -15,7 +15,7 @@ export const actions = {
     }
 
     try {
-      const result = await passwordActions.resetpassword(email, pb);
+      const result = await resetpassword(email, pb);
       console.log("Password reset request result:", result);
       return result; 
     } catch (error) {

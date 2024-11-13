@@ -1,4 +1,4 @@
-import { actions as registerActions } from '$lib/server/actions.js';
+import { register } from '$lib/server/actions.js';
 import { pb, authenticate } from '$lib/server/pocketbase.js';  
 export const actions = {
   register: async ({ request }) => {
@@ -22,7 +22,7 @@ export const actions = {
     }
 
     try {
-      const result = await registerActions.register(data, pb);
+      const result = await register(data, pb);
       return result;  
     } catch (error) {
       return {

@@ -1,4 +1,4 @@
-import { signinActions } from '$lib/server/actions.js';
+import { login } from '$lib/server/actions.js';
 import { pb, authenticate } from '$lib/server/pocketbase.js';  
 export const actions = {
   login: async ({ request }) => {
@@ -15,7 +15,7 @@ export const actions = {
     }
 
     try {
-      const result = await signinActions.login(data.email, data.password, pb);
+      const result = await login(data.email, data.password, pb);
       return result;  
     } catch (error) {
       console.error("Error during sign-in:", error);
