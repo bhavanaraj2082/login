@@ -221,7 +221,7 @@
 				<Icon icon="vaadin:line-v" class="mr-0 text-primary-400 font-semibold" />
 				<button
 					on:click={() => {
-						navigateTo('/register');
+						navigateTo('/signup');
 					}}
 					class=" registerbtn pr-2 text-primary-400 text-sm font-medium border-b-2 border-b-transparent hover:text-primary-400"
 					>Register</button
