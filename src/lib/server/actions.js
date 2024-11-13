@@ -252,7 +252,6 @@ function finalformdata(formData) {
 		documentRequired: formData.documentRequired,
 		currentEmail: formData.currentEmail,
 		newEmail: formData.newEmail,
-		assistance: formData.assistance,
 		resetemail: formData.resetemail,
 		primaryAddress: formData.primaryAddress,
 		updateAddress: formData.updateAddress,
@@ -284,14 +283,10 @@ function finalformdata(formData) {
 	};
 	return finalData;
 }
-export const saveContactInfo = async (data, pb) => {
-	try {
-		let finalData = finalformdata(data);
-		const record = await pb.collection('helpandSupport').create(finalData);
-		return { success: true, record };
-	} catch (error) {
-		return { success: false, error: error.message };
-	}
+export const saveContactInfo = async (pb, data) => {
+	let finalData = finalformdata(data);
+	const record = await pb.collection('helpandSupport').create(finalData);
+	return { success: true, record };
 };
 // Help and Support page end
 
