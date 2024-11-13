@@ -69,7 +69,7 @@
 				<h3 class="font-bold text-lg text-gray-50">Help & Support</h3>
 				<ul class="mt-2 space-y-2 text-sm text-gray-50">
 					<li><a href="/contact-us" class="hover:underline">Contact Us</a></li>
-					<li><a href="/customer-support" class="hover:underline">Customer Support</a></li>
+					<li><a href="/help-support" class="hover:underline">Customer Support</a></li>
 					<li><a href="/faq" class="hover:underline">FAQs</a></li>
 				</ul>
 			</div>
