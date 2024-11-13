@@ -81,8 +81,7 @@
 
 <nav class="my-3 justify-between relative w-full mx-auto">
 	<div
-		class={`fixed top-0 left-0 h-full bg-white transition-transform transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden z-50 w-full`}
-	>
+		class={`fixed top-0 left-0 h-full bg-white transition-transform transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden z-50 w-full`}>
 		<div class="flex flex-col h-full p-6 text-gray-600">
 			<div class="flex justify-between mb-2">
 				<div class="text-xl text-primary-400 font-bold">Chemikart</div>
@@ -104,8 +103,7 @@
 							menu.title === 'Support'
 								? toggleMenu(menu)
 								: navigateTo(menu.href)}
-						class="flex justify-between text-left hover:text-primary-400 text-gray-800 font-semibold transition duration-200 w-full py-2"
-					>
+						class="flex justify-between text-left hover:text-primary-400 text-gray-800 font-semibold transition duration-200 w-full py-2">
 						{menu.title}
 						<Icon
 							icon="prime:chevron-down"
@@ -328,11 +326,9 @@
 			<a
 				href="/quick-order"
 				class="hover:text-primary-400 sm:mr-3 font-semibold text-xs lg:text-base mb-2"
-				>Quick Order</a
-			>
+				>Quick Order</a>
 			<a href="/order-status" class="hover:text-primary-400 font-semibold text-xs lg:text-base mb-2"
-				>Order Status</a
-			>
+				>Order Status</a>
 			<Cartrightside />
 		</div>
 	</div>

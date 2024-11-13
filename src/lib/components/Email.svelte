@@ -1,31 +1,61 @@
 <script>
-	import Icon from '@iconify/svelte';
+  import Icon from '@iconify/svelte';
+  import { fade } from 'svelte/transition';
+
   let email = '';
-  
-  function handleSubmit() {
-      console.log("Email submitted:", email);
+  let isSubmitting = false;
+  let message = null;
+
+  async function handleSubmit() {
+    if (!email) {
+      setMessage('error', 'Please enter an email address.');
+      return;
+    }
+    isSubmitting = true;
+    await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulating a submit delay
+    isSubmitting = false;
+    setMessage('success', 'Subscription successful!');
+    email = '';
+  }
+
+  function setMessage(type, text) {
+    message = { type, text };
+    setTimeout(() => (message = null), 5000);
   }
 </script>
 
-<div class="flex flex-col items-center justify-center p-4 md:p-8 lg:p-12">
-  <h1 class="text-2xl  sm:text-4xl font-bold text-gray-800 text-center">Ready To Get Started</h1>
+<div class="flex flex-col p-14 items-center justify-center">
+  <h1 class="text-2xl sm:text-4xl font-bold text-gray-800 text-center md:pt-20">Ready To Get Started</h1>
   <p class="text-md sm:text-lg text-gray-500 mt-2 text-center">To Join Our Community</p>
-  
-  <form on:submit|preventDefault={handleSubmit} class="mt-6 flex w-full max-w-lg">
+  <form on:submit|preventDefault={handleSubmit} class="mt-6 flex w-full max-w-lg mx-auto">
     <div class="flex relative w-full">
       <input
-          type="email"
-          bind:value={email}
-          placeholder="person@email.com"
-          class="flex-grow px-4 py-2 border border-primary-500 rounded-md focus:outline-none text-gray-600"
-          required
+        type="email"
+        bind:value={email}
+        placeholder="Enter your email"
+        class="flex-grow px-4 py-2 border border-primary-400 rounded-md focus:outline-none text-gray-600"
+        required
       />
       <button
-          type="submit"
-          class="p-1 m-1 bg-primary-400 absolute right-0 text-primary-50 font-bold rounded-md focus:outline-none"
-      >
-      <Icon icon="lsicon:right-filled" width="1.6em" height="1.6em"/>
-      </button>
-      </div>
+      type="submit"
+      class="p-1 m-1 bg-primary-400 hover:bg-primary-600 absolute right-0 text-primary-50 font-bold rounded focus:outline-none w-12 h-8 flex items-center justify-center"
+      disabled={isSubmitting}>
+      {#if isSubmitting}
+        <span class="text-xl">...</span>
+      {:else}
+        <Icon icon="lsicon:right-filled" width="1.6em" height="1.6em" />
+      {/if}
+    </button>
+    </div>
   </form>
+  {#if message}
+    <p
+      class:text-green-600={message.type === 'success'}
+      class:text-red-600={message.type === 'error'}
+      class="mt-4 text-sm text-center"
+      role="alert"
+      transition:fade>
+      {message.text}
+    </p>
+  {/if}
 </div>
