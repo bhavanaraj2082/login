@@ -77,45 +77,45 @@
         We have three solutions available to help you save time and cost in procurement management. Read further for more details of each solution, or fill out our contact form and our team will reach out to you to answer any questions.
         </p>      
         <div class="mt-12 mx-auto">
-        <div class="flex gap-5 max-md:flex-col">
-            <div class="w-3/5 max-md:w-full">
-            <div class="space-y-12 max-md:space-y-10">
-                <div class="flex md:flex-row flex-col items-start gap-4">
-                <Icon icon="game-icons:on-target" class="w-12 h-12 text-primary-500 flex-shrink-0" />
-                <div class="flex-auto">
-                    <h2 class="text-heading font-semibold text-lg font-worksans text-primary-500">The One-to-One Solution: E-Procurement</h2>
-                    <p class="text-content font-montserrat mt-4">e-Procurement provides seamless system-to-system connectivity of your existing spend management system.</p>
+            <div class="flex gap-5 flex-wrap lg:flex-nowrap max-md:flex-col">
+                <div class="w-full lg:w-3/5">
+                    <div class="space-y-10 md:space-y-8 max-md:space-y-6">
+                        <div class="flex flex-col md:flex-row items-start gap-4">
+                            <Icon icon="game-icons:on-target" class="w-10 h-10 text-primary-500 flex-shrink-0" />
+                            <div class="flex-auto">
+                                <h2 class="text-heading font-semibold text-lg font-worksans text-primary-500">The One-to-One Solution: E-Procurement</h2>
+                                <p class="text-content font-montserrat mt-4">e-Procurement provides seamless system-to-system connectivity of your existing spend management system.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col md:flex-row items-start gap-4">
+                            <Icon icon="mdi:family-tree" class="w-10 h-8 text-primary-500 flex-shrink-0" />
+                            <div class="flex-auto">
+                                <h2 class="text-heading font-semibold text-lg font-worksans text-primary-500">The Customized Solution: Pipeline®</h2>
+                                <p class="text-content font-montserrat mt-4">This customized service balances your organization's business needs with the product requirements of your researchers.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col md:flex-row items-start gap-4">
+                            <Icon icon="fluent-mdl2:text-document-shared" class="w-10 h-8 text-primary-500 flex-shrink-0" />
+                            <div class="flex-auto">
+                                <h2 class="text-heading font-semibold text-lg font-worksans text-primary-500">The Simple Solution: Chemikart E-Shop</h2>
+                                <p class="text-content font-montserrat mt-4">Your procurement staff can access our products simply, easily, and securely through chemikart.com.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                </div>
-                <div class="flex md:flex-row flex-col items-start gap-4">
-                <Icon icon="mdi:family-tree" class="w-12 h-12 text-primary-500 flex-shrink-0" />
-                <div class="flex-auto">
-                    <h2 class="text-heading font-semibold text-lg font-worksans text-primary-500">The Customized Solution: Pipeline®</h2>
-                    <p class="text-content font-montserrat mt-4">This customized service balances your organization's business needs with the product requirements of your researchers.</p>
-                </div>
-                </div>
-                <div class="flex md:flex-row flex-col items-start gap-4">
-                <Icon icon="fluent-mdl2:text-document-shared" class="w-12 h-12 text-primary-500 flex-shrink-0" />
-                <div class="flex-auto">
-                    <h2 class="text-heading font-semibold text-lg font-worksans text-primary-500">The Simple Solution: Chemikart E-Shop</h2>
-                    <p class="text-content font-montserrat mt-4">Your procurement staff can access our products simply, easily, and securely through chemikart.com.</p>
-                </div>
-                </div>
+                <aside class="w-full lg:w-2/5 md:ml-0 lg:ml-8 max-md:w-full">
+                    <div class="flex flex-col items-start space-y-5 text-black">
+                        <Icon icon="game-icons:chemical-drop" class="w-20 h-24 text-primary-500" />
+                        <p class="text-content font-montserrat">Discover our latest website features and enhance your experience with Chemikart.<br>Find information regarding new features as well as tips and tricks with Get Site Smart.</p>
+                        <div class="mt-8">
+                            <button class="px-10 py-3 text-primary-500 border-2 border-primary-500 rounded hover:bg-primary-500 hover:text-white transition-all">
+                                Learn More
+                            </button>
+                        </div>
+                    </div>
+                </aside>
             </div>
-            </div>
-            <aside class="w-2/5 md:ml-36 sm:mr-32 lg:ml-36 ml-0 lg:mr-0 max-md:w-full">
-            <div class="flex flex-col items-start space-y-5 text-black">
-                <Icon icon="game-icons:chemical-drop" class="w-20 h-24 text-primary-500" />
-                <p class="text-content font-montserrat">Discover our latest website features and enhance your experience with Chemikart.</p>
-                <p class="text-content font-montserrat">Find information regarding new features as well as tips and tricks with Get Site Smart.</p>
-                <div class="mt-8">
-                <button class="px-10 py-3 text-primary-500 border-2 border-primary-500 rounded hover:bg-primary-500 hover:text-white transition-all">
-                    Learn More
-                </button>
-                </div>
-            </div>
-            </aside>
-        </div>
+            
         </div>
 </section>
 <section class="mx-4 sm:mx-8 md:mx-10">
