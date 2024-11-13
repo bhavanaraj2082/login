@@ -146,9 +146,9 @@ export const submitContactInfo = async (data, pb) => {
 };
 
 //CHEMIKART SOLUTIONS PAGE CONTACT ACTION FUNCTION
-export const submitContactData = async (data, pb) => {
-	return await pb.collection('ContactTeam').create(data);
-};
+export const submitContactData = async (data,pb) => {
+	return await pb.collection("ChemikartSolutions").create(data);
+  };
 
 // profile page action function
 
