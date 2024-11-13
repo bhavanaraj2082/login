@@ -1,3 +1,4 @@
+//Home search bar
 import { fetchsearchcomponent } from '$lib/server/actions.js';
 export async function load() {
     try {
