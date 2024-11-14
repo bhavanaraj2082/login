@@ -18,4 +18,4 @@
   </Template>
   
   
-  <Story name="QuickOrder12" />
+  <Story name="QuickOrder12"/>

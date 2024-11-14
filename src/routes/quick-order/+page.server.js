@@ -1,5 +1,7 @@
 import { loadProduct } from '$lib/server/loads.js';
+import PocketBase from 'pocketbase';
 
+const pb = new PocketBase("https://chemikartpb.partskeys.com");
 
 export async function load() {
     let data =[]
