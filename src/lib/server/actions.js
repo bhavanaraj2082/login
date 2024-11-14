@@ -31,48 +31,43 @@ export const myDetails = async (request, pb) => {
 	}
 };
 
-
-
-
 //ACTION FUNCTION FOR QUOTES PAGE
 export const Addquotes = async (data, pb) => {
-	const componentsArray = data['components[]'].split('\n'); 
-			const formattedData = {
-					Custom_solution_type: data.solutionValue,
-					Custom_format: data.selectedColor,
-					Configure_custom_solution: {
-							components: componentsArray,  
-							solvent: data.solvent,
-							packagingType: data.packagingType,
-							volume: data.volume,
-							units: data.units,
-							qualityLevel: data.qualityLevel,
-							analyticalTechnique: data.analyticalTechnique,
-					},
-					Additional_notes: data.futherdetails,
-					Customer_details: {
-							Title: data.title,
-							Firstname: data.first,
-							Lastname: data.last,
-							organisation: data.organisation,
-							country: data.country,
-							lgc: data.lgc,
-							email: data.email,
-							number: data.number,
-					},
-					Delivery_information: {
-							Address1: data.address1,
-							Address2: data.address2,
-							Country1: data.country1,
-							County: data.county,
-							City: data.city,
-							Post: data.post,
-					}
-			};
-			return await pb.collection('Quote').create(formattedData);
+	const componentsArray = data['components[]'].split('\n');
+	const formattedData = {
+		Custom_solution_type: data.solutionValue,
+		Custom_format: data.selectedColor,
+		Configure_custom_solution: {
+			components: componentsArray,
+			solvent: data.solvent,
+			packagingType: data.packagingType,
+			volume: data.volume,
+			units: data.units,
+			qualityLevel: data.qualityLevel,
+			analyticalTechnique: data.analyticalTechnique
+		},
+		Additional_notes: data.futherdetails,
+		Customer_details: {
+			Title: data.title,
+			Firstname: data.first,
+			Lastname: data.last,
+			organisation: data.organisation,
+			country: data.country,
+			lgc: data.lgc,
+			email: data.email,
+			number: data.number
+		},
+		Delivery_information: {
+			Address1: data.address1,
+			Address2: data.address2,
+			Country1: data.country1,
+			County: data.county,
+			City: data.city,
+			Post: data.post
+		}
 	};
-
-	
+	return await pb.collection('Quote').create(formattedData);
+};
 
 export const submitContactForm = async (pb, formData) => {
 	const contactData = {
@@ -146,9 +141,9 @@ export const submitContactInfo = async (data, pb) => {
 };
 
 //CHEMIKART SOLUTIONS PAGE CONTACT ACTION FUNCTION
-export const submitContactData = async (data,pb) => {
-	return await pb.collection("ChemikartSolutions").create(data);
-  };
+export const submitContactData = async (data, pb) => {
+	return await pb.collection('ChemikartSolutions').create(data);
+};
 
 // profile page action function
 
@@ -182,8 +177,8 @@ export async function updatedOrder1(pb, body) {
 
 export async function updatePreferences(pb, body) {
 	const preferences = body.preferences;
-	const ccAddresses = body.ccAddresses
-	await pb.collection('ChemiDashProfile').update(body.userId, { preferences,ccAddresses });
+	const ccAddresses = body.ccAddresses;
+	await pb.collection('ChemiDashProfile').update(body.userId, { preferences, ccAddresses });
 	return {
 		status: 200
 	};
@@ -197,18 +192,18 @@ export async function updatedMethod1(pb, body) {
 }
 
 export async function checkData(pb, body) {
-    const filterString = `${body.transactionType}="${body.transactionValue}" && phone="${body.phone}"`;        
-    try {
-        const linkData = await pb.collection('ChemiDashProfile').getFirstListItem(filterString);
-        return linkData;
-    } catch (error) {
-        if (error.status === 404) {
-            return null;
-        } else {
-            console.error("Unexpected error retrieving data:", error);
-            throw error;
-        }
-    }
+	const filterString = `${body.transactionType}="${body.transactionValue}" && phone="${body.phone}"`;
+	try {
+		const linkData = await pb.collection('ChemiDashProfile').getFirstListItem(filterString);
+		return linkData;
+	} catch (error) {
+		if (error.status === 404) {
+			return null;
+		} else {
+			console.error('Unexpected error retrieving data:', error);
+			throw error;
+		}
+	}
 }
 
 // profile page end
@@ -416,79 +411,74 @@ export async function deleteProduct(productId) {
 
 //*******SignUP*********/
 export async function register(data, pb) {
-	  if (data.passwordConfirm !== data.password) {
+	if (data.passwordConfirm !== data.password) {
 		return {
-		  type: "error",
-		  message: "Passwords do not match. Please try again.",
+			type: 'error',
+			message: 'Passwords do not match. Please try again.'
 		};
-	  }
-	  await pb.collection('Register').create(data);
-	  return {
-		type: "success",
-		message: "Registration successful!",
-	  };
-}  
+	}
+	await pb.collection('Register').create(data);
+	return {
+		type: 'success',
+		message: 'Registration successful!'
+	};
+}
 
 //********SignIn*********/
-export async function login (email, password, pb) {
-		const authData = await pb.collection('Register').authWithPassword(email, password);
-		return {
-		  type: "success",
-		  message: "Login successful!",
-		};
+export async function login(email, password, pb) {
+	const authData = await pb.collection('Register').authWithPassword(email, password);
+	return {
+		type: 'success',
+		message: 'Login successful!'
+	};
 }
 
 /******************Reset Password*******************/
 export async function resetpassword(email, pb) {
-	  const records = await pb.collection('Register').getFullList({
+	const records = await pb.collection('Register').getFullList({
 		filter: `email="${email}"`
-	  });
-	  console.log("Email check records:", records);
-	  if (records.length === 0) {
+	});
+	console.log('Email check records:', records);
+	if (records.length === 0) {
 		return {
-		  type: "error",
-		  message: "Email not registered. Please check and try again."
+			type: 'error',
+			message: 'Email not registered. Please check and try again.'
 		};
-	  }
-	  await pb.collection('Register').requestPasswordReset(email);
-	  return {
-		type: "success",
-		message: "Password reset email sent successfully! Please check your mail."
-	  };
+	}
+	await pb.collection('Register').requestPasswordReset(email);
+	return {
+		type: 'success',
+		message: 'Password reset email sent successfully! Please check your mail.'
+	};
 }
-  
 
 /******************Confirm Password********************/
 export async function confirmpasswordreset(token, newPassword, newConfirmPassword, pb) {
 	if (newPassword !== newConfirmPassword) {
-	  return {
-		type: "error",
-		message: "Passwords do not match. Please try again!"
-	  };
+		return {
+			type: 'error',
+			message: 'Passwords do not match. Please try again!'
+		};
 	}
-	  await pb.collection('Register').confirmPasswordReset(token, newPassword, newConfirmPassword);  
-	  return {
-		type: "success",
-		message: "Your password has been reset successfully! You can now log in."
+	await pb.collection('Register').confirmPasswordReset(token, newPassword, newConfirmPassword);
+	return {
+		type: 'success',
+		message: 'Your password has been reset successfully! You can now log in.'
 	};
 }
 
-
-
 //search bar component
 export async function fetchsearchcomponent() {
-    try {
-        const records = await pb.collection('SubCategories').getFullList({
-        });
-        return records.map(record => ({
-            name: record.name 
-        }));
-    } catch (error) {
-        console.error('Error fetching product names:', error);
-        return []; 
-    }
+	try {
+		const records = await pb.collection('SubCategories').getFullList({});
+		return records.map((record) => ({
+			name: record.name
+		}));
+	} catch (error) {
+		console.error('Error fetching product names:', error);
+		return [];
+	}
 }
-
 
 //My Favourite Page
 export async function loadFavourites(pb) {
@@ -511,67 +501,111 @@ export async function loadFavourites(pb) {
 
 /*******************ProductsInfoPopup******************/
 export const checkavailabilityproduct = async (data, pb) => {
-    const ProductId = data.ProductId;
-    const requestedQuantity = parseInt(data.quantity, 10);
+	const ProductId = data.ProductId;
+	const requestedQuantity = parseInt(data.quantity, 10);
 
-    let stockRecord = await pb.collection('Stocks').getFirstListItem(`partNumber="${ProductId}"`, {
-        expand: 'partNumber',
-    }).catch((error) => {
-        return null; 
-    });
+	let stockRecord = await pb
+		.collection('Stocks')
+		.getFirstListItem(`partNumber="${ProductId}"`, {
+			expand: 'partNumber'
+		})
+		.catch((error) => {
+			return null;
+		});
 
-    if (!stockRecord) {
-        return {
-            message: "Out of stock",
-            message1: "",
-            stock: "Unavailable",
-            type: "error",
-        };
-    }
+	if (!stockRecord) {
+		return {
+			message: 'Out of stock',
+			message1: '',
+			stock: 'Unavailable',
+			type: 'error'
+		};
+	}
 
-    const stockQuantity = stockRecord.stockQuantity;
-    const estimatedDate = new Date(stockRecord.estimatedDate);
-    const formattedDate = new Intl.DateTimeFormat('en-GB', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-    }).format(estimatedDate);
+	const stockQuantity = stockRecord.stockQuantity;
+	const estimatedDate = new Date(stockRecord.estimatedDate);
+	const formattedDate = new Intl.DateTimeFormat('en-GB', {
+		day: '2-digit',
+		month: 'long',
+		year: 'numeric'
+	}).format(estimatedDate);
 
-    if (stockQuantity > 0) {
-        if (requestedQuantity <= stockQuantity) {
-            return {
-                message: `${requestedQuantity} Available to ship on ${formattedDate}.`,
-                message1: "",
-                stock: "Available",
-                type: "success",
-            };
-        } else {
-            const unavailableQuantity = requestedQuantity - stockQuantity;
+	if (stockQuantity > 0) {
+		if (requestedQuantity <= stockQuantity) {
+			return {
+				message: `${requestedQuantity} Available to ship on ${formattedDate}.`,
+				message1: '',
+				stock: 'Available',
+				type: 'success'
+			};
+		} else {
+			const unavailableQuantity = requestedQuantity - stockQuantity;
 
-            const leadTimeDate = new Date(estimatedDate);
-            leadTimeDate.setDate(leadTimeDate.getDate() + 15);
+			const leadTimeDate = new Date(estimatedDate);
+			leadTimeDate.setDate(leadTimeDate.getDate() + 15);
 
-            const formattedLeadTimeDate = new Intl.DateTimeFormat('en-GB', {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
-            }).format(leadTimeDate);
+			const formattedLeadTimeDate = new Intl.DateTimeFormat('en-GB', {
+				day: '2-digit',
+				month: 'long',
+				year: 'numeric'
+			}).format(leadTimeDate);
 
-            return {
-                message: `${stockQuantity} Available to ship on ${formattedDate}.`,
-                message1: ` ${unavailableQuantity} Available to ship on ${formattedLeadTimeDate}.`,
-                stock: "Partial Availability",
-                type: "success",
-            };
-        }
-    } 
+			return {
+				message: `${stockQuantity} Available to ship on ${formattedDate}.`,
+				message1: ` ${unavailableQuantity} Available to ship on ${formattedLeadTimeDate}.`,
+				stock: 'Partial Availability',
+				type: 'success'
+			};
+		}
+	}
 };
 
-export const checkoutOrder = async(pb,order)=>{
-	const record = await pb.collection("Orders").create(order)
-	if(record.id){
-		return { success:true,message:"Successfully Ordered"}
-	}else{
-		return { success:false,message:"Something went wrong"}
+export const checkoutOrder = async (pb, order) => {
+	const record = await pb.collection('Orders').create(order);
+	if (record.id) {
+		return { success: true, message: 'Successfully Ordered' };
+	} else {
+		return { success: false, message: 'Something went wrong' };
 	}
-}
+};
+
+export const submitFormData = async (data, pb) => {
+	const formData = await data.formData();
+	const formEntries = Object.fromEntries(formData.entries());
+
+	console.log('Form Data:', formEntries);
+
+	const dataToSubmit = {
+		...formEntries,
+		url: formEntries.url ? String(formEntries.url) : undefined
+	};
+
+	const uploadData = new FormData();
+
+	// Add form data to FormData object
+	Object.entries(dataToSubmit).forEach(([key, value]) => {
+		if (value) uploadData.append(key, value);
+	});
+
+	// Handle image and ExtractedData (if provided)
+	const image = formData.get('image');
+	if (image) {
+		uploadData.append('image', image);
+	}
+
+	const ExtractedData = formData.get('ExtractedData');
+	if (ExtractedData) {
+		uploadData.append('ExtractedData', ExtractedData);
+	}
+
+	try {
+		// Submit the form data to PocketBase
+		const response = await pb.collection('CopyrightConsent').create(uploadData);
+		console.log('Form submitted successfully:', response);
+
+		return { status: 200, body: { success: true, response } };
+	} catch (error) {
+		console.error('Error submitting form data:', error);
+		return { status: 500, body: { success: false, message: 'Form submission failed.' } };
+	}
+};
