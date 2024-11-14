@@ -27,8 +27,8 @@
 <div class="flex flex-col p-14 items-center justify-center">
   <h1 class="text-2xl sm:text-4xl font-bold text-gray-800 text-center md:pt-20">Ready To Get Started</h1>
   <p class="text-md sm:text-lg text-gray-500 mt-2 text-center">To Join Our Community</p>
-  <form on:submit|preventDefault={handleSubmit} class="mt-6 flex w-full max-w-lg mx-auto">
-    <div class="flex relative w-full">
+  <form on:submit|preventDefault={handleSubmit} class="mt-6 w-full max-w-lg mx-auto">
+    <div class="relative flex w-full">
       <input
         type="email"
         bind:value={email}
@@ -37,15 +37,15 @@
         required
       />
       <button
-      type="submit"
-      class="p-1 m-1 bg-primary-400 hover:bg-primary-600 absolute right-0 text-primary-50 font-bold rounded focus:outline-none w-12 h-8 flex items-center justify-center"
-      disabled={isSubmitting}>
-      {#if isSubmitting}
-        <span class="text-xl">...</span>
-      {:else}
-        <Icon icon="lsicon:right-filled" width="1.6em" height="1.6em" />
-      {/if}
-    </button>
+        type="submit"
+        class="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 bg-primary-400 hover:bg-primary-600 text-primary-50 font-bold rounded-r focus:outline-none w-12 h-8 flex items-center justify-center"
+        disabled={isSubmitting}>
+        {#if isSubmitting}
+          <span class="text-xl">...</span>
+        {:else}
+          <Icon icon="lsicon:right-filled" width="1.6em" height="1.6em" />
+        {/if}
+      </button>
     </div>
   </form>
   {#if message}
