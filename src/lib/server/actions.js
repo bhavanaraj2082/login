@@ -609,3 +609,19 @@ export const submitFormData = async (data, pb) => {
 		return { status: 500, body: { success: false, message: 'Form submission failed.' } };
 	}
 };
+
+export const getOrderresultData = async (pb, body) => {
+	const record = await pb
+		.collection('Orders')
+		.getFirstListItem(`ordernumber="${body.orderNumber}"`)
+		.catch((e) => {
+			console.log('------', e);
+			return null;
+	});
+	// console.log("order-->",record)
+	if (record?.id) {
+		return { success:true, msg: 'Success', order: record };
+	} else {
+		return {success:false, message: 'Order not found' };
+	}
+};

@@ -1,19 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body{
-    @apply font-montserrat bg-gray-100;
+    @apply font-montserrat text-content bg-gray-100;
 }
 
 .scroll::-webkit-scrollbar{
     @apply hidden;
 }
 
-h1,h2,h3,h4,h5,h6{
+h1,h2,h3,h4,h5,h6,button{
     @apply font-workSans text-heading;
-}
-
-button{
-    @apply font-workSans;
 }
