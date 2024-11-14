@@ -1,9 +1,9 @@
 <script context="module">
-    import Aboutus from '$lib/components/Aboutus.svelte';
+    import AboutSection from '$lib/components/AboutSection.svelte';
     
     export const meta = {
       title: "Aboutus",
-      component: Aboutus,
+      component: AboutSection,
     }
   </script>
   
@@ -13,7 +13,7 @@
   </script>
   
   <Template let:args>
-    <Aboutus />
+    <AboutSection />
   </Template>
   
   
