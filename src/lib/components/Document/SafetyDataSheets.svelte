@@ -1,5 +1,50 @@
 <script>
-	import Icon from '@iconify/svelte';
+  import {enhance} from '$app/forms';
+  import Icon from '@iconify/svelte';
+  let showNav = false;
+  let showErrors = false;
+  let showProductDetails = false;
+  let showProductDetails1 = false;
+  let activeTab = "SafetyData Sheets"; 
+  let inputValue = "";
+  let inputValue1 = ""; 
+  let inputValue2 = ""; 
+  let inputValue3 = ""; 
+  let lotNumber="";
+  let lotNumber1="";
+  let lotNumber2="";
+  let result='';
+  let errormssg='';
+  let status = '';
+  let sdsLottNumberError="";
+  let safetyDatasheet='';
+  $: if (activeTab) {
+    status = "";
+  }
+  function showMessage(s) {
+    status = s;
+    if (status && status.includes('http')) {
+      window.location.href = status; 
+    }
+  }
+  function toggleProductDetails() {
+    showProductDetails = !showProductDetails;
+  }
+  function toggleProductDetails1() {
+    showProductDetails1 = !showProductDetails1;
+  }
+  let rotations = [false, false, false, false, false, false, false];
+function toggleRotation(index) {
+  rotations = rotations.map((_, i) => i === index ? !rotations[i] : false);
+}
+  const tabs = [
+    { name: "SafetyData Sheets" },
+    { name: "Certificates of Analysis" },
+    { name: "Certificates of Origin" },
+    { name: "Certificates of Quality" },
+  ];
+  console.log(tabs[0].name);  
+  let sdsProductNumberError = '';
   let showProductDetailsSafety = false;
   let showProductDetailsCertificates =false;
   let showProductDetailsOrigin = false;
@@ -7,20 +52,6 @@
   let showLotDetailsCertificates = false;
   let showLotDetailsOrigin = false;
   let showLotDetailsQuality = false;
-
-
-  let activeTab = "Safety Data Sheets";
-
- 
-  const tabs = [
-    { name: "Safety Data Sheets" },
-    { name: "Certificates of Analysis" },
-    { name: "Certificates of Origin" },
-    { name: "Certificates of Quality" },
-  ];
-
-  
-  let sdsProductNumberError = '';
   let coaProductNumberError = '';
   let coaLotNumberError = '';
   let cooProductNumberError = '';
@@ -28,8 +59,7 @@
   let cqProductNumberError = '';
   let cqLotNumberError = '';
   let scrollContainer;
-
-  function toggleProductDetails(tab) {
+  function toggleProductDetails2(tab) {
     if (tab === "Safety Data Sheets") {
       showProductDetailsSafety = !showProductDetailsSafety;
     } else if (tab === "Certificates of Analysis") {
@@ -40,9 +70,8 @@
       showProductDetailsQuality = !showProductDetailsQuality;
     }
   }
-
   function toggleLotDetails(tab) {
-     if (tab === "Certificates of Analysis") {
+    if (tab === "Certificates of Analysis") {
       showLotDetailsCertificates = !showLotDetailsCertificates;
     } else if (tab === "Certificates of Origin"){
       showLotDetailsOrigin = !showLotDetailsOrigin;
@@ -50,7 +79,6 @@
       showProductDetailsQuality = !showProductDetailsQuality;
     }
   }
-
   function validateSDSForm(event) {
     const productNumberSDS = event.target.elements['product-number-sds'].value;
     if (!productNumberSDS) {
@@ -60,14 +88,10 @@
       sdsProductNumberError = "";
     }
   }
-
- 
   function validateCOAForm(event) {
     const productNumberCOA = event.target.elements['product-number-coa'].value;
     const lotNumberCOA = event.target.elements['lot-number-coa'].value;
-
-    let isValid = true;
-    
+    let isValid = true;   
     if (!productNumberCOA) {
       event.preventDefault();
       coaProductNumberError = "*Please enter product number.";
@@ -75,7 +99,6 @@
     } else {
       coaProductNumberError = "";
     }
-
     if (!lotNumberCOA) {
       event.preventDefault();
       coaLotNumberError = "*Please enter lot number.";
@@ -83,17 +106,12 @@
     } else {
       coaLotNumberError = "";
     }
-
     return isValid;
   }
-
- 
   function validateCOOForm(event) {
     const productNumberCOO = event.target.elements['product-number-coo'].value;
     const lotNumberCOO = event.target.elements['lot-number-coo'].value;
-
-    let isValid = true;
-    
+    let isValid = true;    
     if (!productNumberCOO) {
       event.preventDefault();
       cooProductNumberError = "*Please enter product number.";
@@ -101,7 +119,6 @@
     } else {
       cooProductNumberError = "";
     }
-
     if (!lotNumberCOO) {
       event.preventDefault();
       cooLotNumberError = "*Please enter lot number.";
@@ -109,16 +126,12 @@
     } else {
       cooLotNumberError = "";
     }
-
     return isValid;
   }
-
   function validateCQForm(event) {
     const productNumberCQ = event.target.elements['product-number-cq'].value;
     const lotNumberCQ = event.target.elements['lot-number-cq'].value;
-
     let isValid = true;
-    
     if (!productNumberCQ) {
       event.preventDefault();
       cqProductNumberError = "*Please enter product number.";
@@ -126,7 +139,6 @@
     } else {
       cqProductNumberError = "";
     }
-
     if (!lotNumberCQ) {
       event.preventDefault();
       cqLotNumberError = "*Please enter lot number.";
@@ -134,236 +146,368 @@
     } else {
       cqLotNumberError = "";
     }
-
     return isValid;
-  }
-    
+  }  
   const scrollLeft = () => {
     scrollContainer.scrollBy({ left: -200, behavior: 'smooth' });
   };
-
   const scrollRight = () => {
     scrollContainer.scrollBy({ left: 200, behavior: 'smooth' });
   };
 </script>
 
-<div class="max-w-7xl  mx-auto px-6 py-8">
-  <h1 class="relative text-4xl font-bold mb-8">Documents</h1>
-  
-   <!-- <div class="absolute top-8 right-8 bg-white px-3 py-2 rounded-md border border-primary-200 flex space-x-2 shadow-sm">
-    <Icon icon="f7:exclamationmark-circle" width="2em" height="2em" class="text-primary-400"/>
-    <span class="text-black-500 text-xs leading-snug">
-      Sign in to import items<br>from your recent orders and quotes.
-    </span>
-  </div> -->
-
-  
-    <div class="relative mb-8 ">
-      <!-- Left arrow -->
-      <button 
-        class="absolute -left-4 top-0 h-full  bg-white z-10 md:hidden" 
-        on:click={scrollLeft}>
-        <Icon icon="formkit:left" width="1.2em" height="1.2em" />
-      </button>
-    
-      <!-- Right arrow -->
-      <button 
-        class="absolute -right-4 top-0 h-full  bg-white  z-10 md:hidden" 
-        on:click={scrollRight}>
-        <Icon icon="formkit:right" width="1.2em" height="1.2em" />
-      </button>
-    
-      <div class="inline-flex overflow-hidden w-full">
-        <nav 
-          class="flex bg-primary-100 overflow-x-auto no-scrollbar" 
-          aria-label="Tabs" 
-          bind:this={scrollContainer}>
+<div class="p-4 max-w-6xl mx-auto">
+  <div class="flex flex-col md:flex-row"> 
+    <div class="w-full md:w-7/12 p-2"> 
+      <h1 class="text-4xl font-bold mb-8">Documents</h1>
+      <div class="inline-flex bg-primary-300 p-0 rounded-md mb-8">
+          <button 
+          on:click={() => (showNav = !showNav)} 
+          class="sm:hidden text-white p-2 rounded-md bg-primary-300 hover:bg-primary-400"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            class="h-8 w-8" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <nav class="hidden sm:flex flex-col sm:flex-row space-x-0 overflow-x-auto" aria-label="Tabs">
           {#each tabs as tab}
-          <button
-            on:click={() => (activeTab = tab.name)} 
-            class="py-2 px-4  text-gray-600 text-sm focus:outline-none transition duration-300 whitespace-nowrap
-              {activeTab === tab.name ? ' bg-gray-100 font-semibold text-primary-400 text-sm' : 'font-medium'} ">
-            {tab.name}
-            {#if activeTab === tab.name}
-            <hr class="w-28 flex-center h-1 mx-auto bg-primary-400 mt-1">
-            {/if}
-          </button>
+            <div class="relative inline-block">
+              <button
+                on:click={() => (activeTab = tab.name)} 
+                class="py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300
+                {activeTab === tab.name 
+                  ? 'bg-white text-primary-300 font-bold'
+                  : 'bg-primary-100 text-black'}
+                hover:bg-white hover:text-primary-300 whitespace-nowrap">
+                {tab.name}
+              </button>
+              <span 
+                class="relative h-0.5 bg-primary-300 
+                {activeTab === tab.name ? 'w-0.5 h-3/4' : 'hidden'} sm:absolute sm:bottom-0 sm:left-1/2 sm:-translate-x-1/2 sm:w-3/4 sm:h-0.5"></span>
+            </div>
           {/each}
         </nav>
       </div>
-    </div>
-    
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-8  ">
-        <div class="flex-1">
-            
-            {#if activeTab === "Safety Data Sheets"}
-              <div class="mb-6">
-                <h2 class="text-xl font-semibold mb-4 ">Safety Data Sheets (SDS)</h2>
-                <p class="mb-6 text-xs text-gray-600">To search for a Safety Data Sheet, please enter the product number.</p>
-                <form on:submit={validateSDSForm} class="space-y-2">
-                  <label for="product-number-sds" class="block text-sm font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
-                    * Product Number
-                  </label>
-                  <div class="relative w-full">
-                    <input
-                      type="text"
-                      id="product-number-sds"
-                      name="product-number-sds"
-                      placeholder="E.G. T1503"
-                      class="block w-full p-3 border {sdsProductNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                    />
-                    {#if sdsProductNumberError}
-                      <p class="text-red-500 text-sm">{sdsProductNumberError}</p>
-                    {/if}
-                    <button
-                      type="submit"
-                      class="absolute right-0 bottom-0 w-full sm:w-40 transform translate-x-1 translate-y-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-600 transition duration-300"
-                    >
-                      SEARCH
-                    </button>
-                  </div>
-                </form>
-              </div>
-            {/if}
-            
-            
-          {#if activeTab === "Certificates of Analysis"}
-        <div class="mb-6">
-          <h2 class="text-xl font-semibold mb-4">Certificates of Analysis (COA)</h2>
-          <form on:submit={validateCOAForm} class="space-y-2">
-            <label for="product-number-coa" class="block text-sm font-medium {coaProductNumberError ? 'text-red-500' : 'text-gray-700'}">
-              * Product Number
-            </label>
-            <div class="relative w-full">
-            <input
-              type="text"
-              id="product-number-coa"
-              name="product-number-coa"
-              placeholder="E.G. T1503"
-              class="block w-full p-3 border {coaProductNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-            />
-            {#if coaProductNumberError}
-              <p class="text-red-500 text-sm">{coaProductNumberError}</p>
-            {/if}
-            
-            <label for="lot-number-coa" class="block text-sm font-medium {coaLotNumberError ? 'text-red-500' : 'text-gray-700'}">
-              * Lot Number
-            </label>
-            <input
-              type="text"
-              id="lot-number-coa"
-              name="lot-number-coa"
-              placeholder="E.G. L1234"
-              class="block w-full  p-3 border {coaLotNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-            />
-            {#if coaLotNumberError}
-              <p class="text-red-500 text-sm">{coaLotNumberError}</p>
-            {/if}
-          
-              <button
-              type="submit"
-              class="absolute right-0 bottom-0 w-full sm:w-40 transform translate-x-1 translate-y-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-600 transition duration-300"
-            >
-              SEARCH
-            </button>
-            </div>
-          </form>
-        </div>
-      {/if}
-      
-            
-          
-      {#if activeTab === "Certificates of Origin"}
-      <div class="mb-6 relative">
-        <h2 class="text-xl font-semibold mb-4">Certificates of Origin (COO)</h2>
-        <form on:submit={validateCOOForm} class="space-y-2">
-          <label for="product-number-coo" class="block text-sm font-medium {cooProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+
+      {#if activeTab === "SafetyData Sheets"}
+      <div class="mb-6 max-sm:w-full" >
+        <h2 class="text-lg font-semibold mb-4">SafetyData Sheets (SDS)</h2>
+        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Safety Data Sheet, please enter the product number.</p>
+        <form 
+        method="post" 
+        action="?/document" 
+        use:enhance={() => {
+            return async ({ result }) => {
+              showErrors = inputValue.length === 0;
+            if (showErrors) {
+              return;
+            }
+                if (result.data) {
+                    const safetyDatasheet = result.data.safetyDatasheet;
+                    showMessage(safetyDatasheet);
+                    console.log(safetyDatasheet);
+                } else if (result) {
+                    console.log(result);
+                    const errormssg = result.data.props.error;
+                    showMessage(errormssg);
+                }
+            };
+        }}>
+          <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
           <div class="relative w-full">
-          <input
+            <input
             type="text"
-            id="product-number-coo"
-            name="product-number-coo"
-            placeholder="E.G. T1503"
-            class="block w-full  p-3 border {cooProductNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+            bind:value={inputValue}
+            id="product-number-sds"
+            name="productNumber"
+            placeholder="E.G. 1503"
+            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
-          {#if cooProductNumberError}
-            <p class="text-red-500 text-sm">{cooProductNumberError}</p>
+          {#if showErrors && inputValue.length === 0}
+          <div class="flex text-start">
+            <span class="text-red-400 text-xs">Order Number is required</span>
+          </div>
           {/if}
-          
-          <label for="lot-number-coo" class="block text-sm font-medium {cooLotNumberError ? 'text-red-500' : 'text-gray-700'}">
-            * Lot Number
-          </label>
-          <input
-            type="text"
-            id="lot-number-coo"
-            name="lot-number-coo"
-            placeholder="E.G. L1234"
-            class="block w-full  p-3 border {cooLotNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-          />
-          {#if cooLotNumberError}
-            <p class="text-red-500 text-sm">{cooLotNumberError}</p>
-          {/if}
-          <button
-            type="submit"
-            class="absolute right-0 bottom-0 w-full sm:w-40 transform translate-x-1 translate-y-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-600 transition duration-300"
-          >
-            SEARCH
-          </button>
+            {#if sdsProductNumberError}
+            <p class="text-red-500 text-md">{sdsProductNumberError}</p>
+            {/if}
+            <button
+              type="submit"
+              class="absolute font-semibold right-0 mt-3 mb-3 mt-1 sm:mt-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300"
+            >
+              SEARCH
+            </button>
+          </div>
+          <!-- <p class="text-lg font-semibold text-primary-500 my-4 p-4">
+          {status}
+          </p> -->
         </form>
       </div>
       {/if}
       
-            
-      {#if activeTab === "Certificates of Quality"}
-      <div class="mb-6 relative">
-        <h2 class="text-xl font-semibold mb-4">Certificates of Quality (CQ)</h2>
-        <form on:submit={validateCQForm} class="space-y-2">
-          <label for="product-number-cq" class="block text-sm font-medium {cqProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+      
+      
+      
+      
+      {#if activeTab === "Certificates of Analysis"}
+      <div class="mb-6 max-sm:w-full" >
+        <h2 class="text-lg font-semibold mb-4">Certificates of Analysis (COA)</h2>
+        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Analysis (COA), please enter both the product number and the Lot/batch number.</p>
+        <form 
+        method="post" 
+        action="?/document" 
+        use:enhance={() => {
+            return async ({ result }) => {
+              showErrors = inputValue1.length === 0 || lotNumber.length === 0;
+            if (showErrors) {
+              return;
+            }
+                if (result.data) {
+                    const certificateOfAnalysis = result.data.certificateOfAnalysis;
+                    showMessage(certificateOfAnalysis);
+                    console.log(certificateOfAnalysis);
+                } else if (result) {
+                    console.log(result);
+                    const errormssg = result.data.props.error;
+                    showMessage(errormssg);
+                }
+            };
+        }}>
+        <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
-          <div class="relative w-full ">
-          <input
+          <div class="relative w-full">
+            <input 
+            bind:value={inputValue1}
             type="text"
-            id="product-number-cq"
-            name="product-number-cq"
-            placeholder="E.G. T1503"
-            class="block w-full p-3 border {cqProductNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+            id="product-number-sds"
+            name="productNumber"
+            placeholder="E.G. 1503"
+            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
-          {#if cqProductNumberError}
-            <p class="text-red-500 text-sm">{cqProductNumberError}</p>
-          {/if}
-          
-          <label for="lot-number-cq" class="block text-sm font-medium {cqLotNumberError ? 'text-red-500' : 'text-gray-700'}">
-            * Lot Number
+          {#if showErrors && inputValue1.length === 0}
+          <div class="flex text-start">
+            <span class="text-red-400 text-xs">Order Number is required</span>
+          </div>
+        {/if}
+          {#if sdsProductNumberError}
+            <p class="text-red-500 text-md">{sdsProductNumberError}</p>
+            {/if}
+            <br>
+            <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+              * Lot/batch number
+            </label>
+            
+            <div class="relative w-full">
+              <input 
+                type="text"
+                id="product-number"
+                name="product-number"
+                bind:value={lotNumber}
+                placeholder="E.G. 1503"
+                class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+              />
+              {#if showErrors && lotNumber.length === 0}
+              <div class="flex text-start">
+                <span class="text-red-400 text-xs">Lot Number is required</span>
+              </div>
+            {/if}
+            </div>
+              <button
+              type="submit"
+              class="absolute font-semibold right-0 mt-3 mb-3 sm:mt-20 mb-10 bg-primary-400 hover:bg-primary-500 text-white py-2 px-6 rounded-md shadow transition duration-300"
+            >
+              SEARCH
+            </button>
+          </div>
+          <p class="text-lg font-semibold text-primary-500 my-4 p-4">
+          {status}
+          </p>
+        </form>
+      </div>
+      {/if}
+      
+      
+      
+      
+      {#if activeTab === "Certificates of Origin"}
+      <div class="mb-6 max-sm:w-full" >
+        <h2 class="text-lg font-semibold mb-4">Certificates of Origin (COO)</h2>
+        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Origin (COO), please enter both the product number and the Lot/batch number.</p>
+        <form 
+        method="post" 
+        action="?/document" 
+        use:enhance={() => {
+            return async ({ result }) => {
+              showErrors = inputValue2.length === 0 || lotNumber1.length === 0;
+            if (showErrors) {
+              return;
+            }
+                if (result.data) {
+                    const certificateOfOrigin = result.data.certificateOfOrigin;
+                    showMessage(certificateOfOrigin);
+                    console.log(certificateOfOrigin);
+                } else if (result) {
+                    console.log(result);
+                    const errormssg = result.data.props.error;
+                    showMessage(errormssg);
+                }
+            };
+        }}>
+          <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+            * Product Number
           </label>
-          <input
+          <div class="relative w-full">
+            <input 
+            bind:value={inputValue2}
             type="text"
-            id="lot-number-cq"
-            name="lot-number-cq"
-            placeholder="E.G. L1234"
-            class="block w-full  p-3 border {cqLotNumberError ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+            id="product-number-sds"
+            name="productNumber"
+            placeholder="E.G. 1503"
+            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
-          {#if cqLotNumberError}
-            <p class="text-red-500 text-sm">{cqLotNumberError}</p>
+          {#if showErrors && inputValue2.length === 0}
+          <div class="flex text-start">
+            <span class="text-red-400 text-xs">Order Number is required</span>
+          </div>
           {/if}
+          {#if sdsProductNumberError}
+            <p class="text-red-500 text-md">{sdsProductNumberError}</p>
+            {/if}
+            <br>
+            <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+              * Lot/batch number
+            </label>
+            <div class="relative w-full">
+              <input 
+            type="text"
+            id="product-number"
+            name="product-number"
+            bind:value={lotNumber1}
+            placeholder="E.G. 1503"
+            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+          />
+          {#if showErrors && lotNumber1.length === 0}
+          <div class="flex text-start">
+            <span class="text-red-400 text-xs">Lot Number is required</span>
+          </div>
+        {/if}
+          {#if lotNumber === '' || lotNumber === null}
+            <p class="text-red-500 text-md mt-1">{sdsLottNumberError}</p>
+          {/if}
+            <button
+              type="submit"
+              class="absolute font-semibold right-0 mt-3 mb-3 mt-1 sm:mt-20 mb-10 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300"
+            >
+              SEARCH
+            </button>
+          </div>
+          <p class="text-lg font-semibold text-primary-500 my-4 p-4">
+          {status}
+          </p>
+        </form>
+      </div>
+      {/if}
+      
+      
+      
+      
+      
+      {#if activeTab === "Certificates of Quality"}
+      <div class="mb-6 max-sm:w-full" >
+        <h2 class="text-lg font-semibold mb-4">Certificates of Quality (COQ)</h2>
+        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Quality (COQ), please enter both the product number and the Lot/batch number.</p>
+        <form 
+        method="post" 
+        action="?/document" 
+        use:enhance={() => {
+            return async ({ result }) => {
+              showErrors = inputValue3.length === 0 || lotNumber2.length === 0;
+            if (showErrors) {
+              return;
+            }
+                if (result.data) {
+                    const certificateOfQuality = result.data.certificateOfQuality;
+                    showMessage(certificateOfQuality);
+                    console.log(certificateOfQuality);
+                } else if (result) {
+                    console.log(result);
+                    const errormssg = result.data.props.error;
+                    showMessage(errormssg);
+                }
+            };
+        }}>
+        <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+            * Product Number
+          </label>
+          <div class="relative w-full">
+            <input 
+            bind:value={inputValue3}
+            type="text"
+            id="product-number-sds"
+            name="productNumber"
+            placeholder="E.G. 1503"
+            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+          />
+          {#if showErrors && inputValue3.length === 0}
+          <div class="flex text-start">
+            <span class="text-red-400 text-xs">Order Number is required</span>
+          </div>
+          {/if}
+            <br>
+            <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+              * Lot/batch number
+            </label>
+            <div class="relative w-full">
+              <input 
+            type="text"
+            id="product-number"
+            name="product-number"
+            bind:value={lotNumber2}
+            placeholder="E.G. 1503"
+            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+          />
+          {#if showErrors && lotNumber2.length === 0}
+          <div class="flex text-start">
+            <span class="text-red-400 text-xs">Lot Number is required</span>
+          </div>
+          {/if}
+          {#if lotNumber === '' || lotNumber === null}
+            <p class="text-red-500 text-md mt-1">{sdsLottNumberError}</p>
+          {/if}
+
           <button
-            type="submit"
-            class="absolute right-0 bottom-0 w-full sm:w-40 transform translate-x-1 translate-y-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-600 transition duration-300"
-          >
-            SEARCH
-          </button>
+          type="submit"
+          class="absolute font-semibold right-0 mt-3 mb-3 mt-1 sm:mt-20 mb-10 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300"
+        >
+          SEARCH
+        </button>
+          <p class="text-lg font-semibold text-primary-500 my-4 p-4">
+          {status}
+          </p>
         </form>
       </div>
       {/if}
     </div>
-
-    <div class="flex space-y-4 ml-0 md:ml-16 mt-10"> 
-      {#if activeTab === "Safety Data Sheets"}
-        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start "> 
-          <div on:click={() => toggleProductDetails("Safety Data Sheets")} class="flex items-center justify-between">
-            <h3 class="text-xs font-medium text-gray-700">How to Find the Product Number</h3>
+    
+    
+    
+    <div class="w-full md:w-5/12 p-2 mt-1 sm:mt-32"> 
+      {#if activeTab === "SafetyData Sheets"}
+        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start ml-0 md:ml-7">
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+          <div on:click={() => toggleProductDetails2("Safety Data Sheets")} class="flex items-center justify-between">
+            <h3 class="text-md font-medium text-gray-700">How to Find the Product Number</h3>
+                  <!-- svelte-ignore a11y-missing-attribute -->
             <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
               <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showProductDetailsSafety ? 'rotate-45' : '-rotate-45'}`} />
             </a>
@@ -389,15 +533,16 @@
           {/if}
         </div>
       {/if}
-   
+  
     
       {#if activeTab === "Certificates of Analysis"}
-
-      <div class="flex flex-wrap  space-y-4 ml-0 md:ml-16">
-        
+      <div class="flex flex-wrap  space-y-4 ml-0 md:ml-16">       
         <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start"> 
-          <div on:click={() => toggleProductDetails("Certificates of Analysis")} class="flex items-center justify-between">
-            <h3 class="text-xs font-medium text-gray-700">How to Find the Product Number</h3>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+          <div on:click={() => toggleProductDetails2("Certificates of Analysis")} class="flex items-center justify-between">
+            <h3 class="text-md font-medium text-gray-700">How to Find the Product Number</h3>
+                  <!-- svelte-ignore a11y-missing-attribute -->
             <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
               <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showProductDetailsCertificates ? 'rotate-45' : '-rotate-45'}`} />
             </a>
@@ -423,33 +568,32 @@
           {/if}
         </div>
       
-       
         <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start">
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div on:click={() => toggleLotDetails("Certificates of Analysis")} class="flex items-center justify-between">
-            <h3 class="text-xs font-medium text-gray-700">How to Find a Lot/Batch Number for COO</h3>
+            <h3 class="text-md font-medium text-gray-700">How to Find a Lot/Batch Number for COA</h3>
+                  <!-- svelte-ignore a11y-missing-attribute -->
             <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
               <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showLotDetailsCertificates ? 'rotate-45' : '-rotate-45'}`} />
             </a>
           </div>
           {#if showLotDetailsCertificates}
-            <div class="mt-4 text-xs text-gray-600">
-              <p>Lot and Batch Numbers can be found on a product's label following the words 'Lot' or 'Batch'.</p>
-              <h4 class="font-bold mt-2">Sigma Products</h4>
-              <p>If the letter is preceded by only two numbers (e.g. 62K1064), insert a '0' to the beginning and enter it as <code>062K1064</code>.</p>
-              <h4 class="font-bold mt-2">Aldrich Products</h4>
-              <ul class="list-disc ml-5">
-                <li>For a lot number such as <code>TO09019TO</code>, enter it as <code>09019TO</code> (without the first two letters 'TO').</li>
-                <li>For a lot number with a filling-code such as <code>05427ES-021</code>, enter it as <code>05427ES</code> (without the filling-code '-021').</li>
-                <li>For a lot number with a filling-code such as <code>STBB0728K9</code>, enter it as <code>STBB0728</code> (without the filling-code 'K9').</li>
-              </ul>
-            </div>
+          <div class="mt-4 text-sm text-gray-600">
+            <p>Lot and Batch Numbers can be found on a product's label following the words 'Lot' or 'Batch'.</p>
+            <h4 class="font-bold mt-2">Mallipore Products</h4>
+            <h2>
+              For assistance obtaining the Lot or batch number for Millipore products, please contact 
+              <span class="font-bold">customer support</span>.
+            </h2>
+          </div>
           {/if}
         </div>
       
-       
+      
         <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
           <div class="flex items-center justify-between">
-            <h3 class="text-xs font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
+            <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
           </div>
           <p class="mt-4 text-sm text-gray-600">
             In some cases, a COA may not be available online. If your search was unable to find the COA, you can request one.
@@ -461,21 +605,16 @@
           </div>
         </div>
       </div>
-      
       {/if}
       
-        
-
-
-    
-
 {#if activeTab === "Certificates of Origin"}
-
 <div class="flex flex-wrap space-y-4 ml-0 md:ml-16">
-  
-  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start"> 
-    <div on:click={() => toggleProductDetails("Certificates of Origin")} class="flex items-center justify-between">
-      <h3 class="text-xs font-medium text-gray-700">How to Find the Product Number</h3>
+  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div on:click={() => toggleProductDetails2("Certificates of Origin")} class="flex items-center justify-between">
+      <h3 class="text-md font-medium text-gray-700">How to Find the Product Number</h3>
+            <!-- svelte-ignore a11y-missing-attribute -->
       <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
         <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showProductDetailsOrigin ? 'rotate-45' : '-rotate-45'}`} />
       </a>
@@ -503,14 +642,17 @@
 
  
   <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div on:click={() => toggleLotDetails("Certificates of Origin")} class="flex items-center justify-between">
-      <h3 class="text-xs font-medium text-gray-700">How to Find a Lot/Batch Number for COO</h3>
+      <h3 class="text-md font-medium text-gray-700">How to Find a Lot/Batch Number for COO</h3>
+            <!-- svelte-ignore a11y-missing-attribute -->
       <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
         <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showLotDetailsOrigin ? 'rotate-45' : '-rotate-45'}`} />
       </a>
     </div>
     {#if showLotDetailsOrigin}
-      <div class="mt-4 text-xs text-gray-600">
+      <div class="mt-4 text-sm text-gray-600">
         <p>Lot and Batch Numbers can be found on a product's label following the words 'Lot' or 'Batch'.</p>
         <h4 class="font-bold mt-2">Sigma Products</h4>
         <p>If the letter is preceded by only two numbers (e.g. 62K1064), insert a '0' to the beginning and enter it as <code>062K1064</code>.</p>
@@ -527,7 +669,7 @@
   
   <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
     <div class="flex items-center justify-between">
-      <h3 class="text-xs font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
+      <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
     </div>
     <p class="mt-4 text-sm text-gray-600">
       In some cases, a COA may not be available online. If your search was unable to find the COA, you can request one.
@@ -539,18 +681,18 @@
     </div>
   </div>
 </div>
-
 {/if}
 
       
 {#if activeTab === "Certificates of Quality"}
-
 <div class="flex flex-wrap space-y-4 ml-0 md:ml-16">
- 
   <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start"> 
     <div class="flex items-center justify-between">
-      <h3 class="text-xs font-medium text-gray-700">How to Find the Product Number</h3>
-      <a on:click={() => toggleProductDetails("Certificates of Quality")} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
+      <h3 class="text-md font-medium text-gray-700">How to Find the Product Number</h3>
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <a on:click={() => toggleProductDetails2("Certificates of Quality")} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
         <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-300 ${showProductDetailsQuality ? 'rotate-45' : '-rotate-45'}`} />
       </a>
     </div>
@@ -575,16 +717,18 @@
     {/if}
   </div>
 
-  
-  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start">
-    <div class="flex items-center justify-between">
-      <h3 class="text-xs font-medium text-gray-700">How to Find a Lot/Batch Number for COO</h3>
-      <a on:click={() => toggleLotDetails("Certificates of Quality")} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
-        <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-300 ${showLotDetailsQuality ? 'rotate-45' : '-rotate-45'}`} />
+  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div on:click={() => toggleLotDetails("Certificates of Origin")} class="flex items-center justify-between">
+      <h3 class="text-md font-medium text-gray-700">How to Find a Lot/Batch Number for COQ</h3>
+      <!-- svelte-ignore a11y-missing-attribute -->
+      <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
+        <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showLotDetailsOrigin ? 'rotate-45' : '-rotate-45'}`} />
       </a>
     </div>
-    {#if showLotDetailsQuality}
-      <div class="mt-4 text-xs text-gray-600">
+    {#if showLotDetailsOrigin}
+      <div class="mt-4 text-sm text-gray-600">
         <p>Lot and Batch Numbers can be found on a product's label following the words 'Lot' or 'Batch'.</p>
         <h4 class="font-bold mt-2">Sigma Products</h4>
         <p>If the letter is preceded by only two numbers (e.g. 62K1064), insert a '0' to the beginning and enter it as <code>062K1064</code>.</p>
@@ -598,10 +742,9 @@
     {/if}
   </div>
 
-  
-  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start">
+  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
     <div class="flex items-center justify-between">
-      <h3 class="text-xs font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
+      <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
     </div>
     <p class="mt-4 text-sm text-gray-600">
       In some cases, a COA may not be available online. If your search was unable to find the COA, you can request one.
@@ -613,9 +756,7 @@
     </div>
   </div>
 </div>
-
 {/if}
-
-  </div>
+</div>
 </div>
 </div>
