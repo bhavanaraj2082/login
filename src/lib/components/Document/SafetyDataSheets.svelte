@@ -180,9 +180,9 @@ function toggleRotation(index) {
             <div class="relative inline-block">
               <button
                 on:click={() => (activeTab = tab.name)} 
-                class="py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300
+                class="py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300 -z-10
                 {activeTab === tab.name 
-                  ? 'bg-white text-primary-300 font-bold'
+                  ? 'bg-gray-50 text-primary-300 font-bold'
                   : 'bg-primary-100 text-black'}
                 hover:bg-white hover:text-primary-300 whitespace-nowrap">
                 {tab.name}
@@ -211,7 +211,7 @@ function toggleRotation(index) {
                 if (result.data) {
                     const safetyDatasheet = result.data.safetyDatasheet;
                     showMessage(safetyDatasheet);
-                    console.log(safetyDatasheet);
+                    console.log("pdf_url",safetyDatasheet);
                 } else if (result) {
                     console.log(result);
                     const errormssg = result.data.props.error;
@@ -219,7 +219,7 @@ function toggleRotation(index) {
                 }
             };
         }}>
-          <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+          <label for="product-number-sds" class="block text-md font-medium mb-1 {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
           <div class="relative w-full">
@@ -228,8 +228,8 @@ function toggleRotation(index) {
             bind:value={inputValue}
             id="product-number-sds"
             name="productNumber"
-            placeholder="E.G. 1503"
-            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            placeholder="E.G. 775118"
+            class="block w-full p-3 -z-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm mb-0"
           />
           {#if showErrors && inputValue.length === 0}
           <div class="flex text-start">
@@ -240,11 +240,11 @@ function toggleRotation(index) {
             <p class="text-red-500 text-md">{sdsProductNumberError}</p>
             {/if}
             <button
-              type="submit"
-              class="absolute font-semibold right-0 mt-3 mb-3 mt-1 sm:mt-20 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300"
-            >
-              SEARCH
-            </button>
+            type="submit"
+            class="absolute right-0 -z-10 font-semibold bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300 sm:mt-5 mt-0.5"
+          >
+            SEARCH
+          </button>
           </div>
           <!-- <p class="text-lg font-semibold text-primary-500 my-4 p-4">
           {status}
@@ -260,7 +260,7 @@ function toggleRotation(index) {
       {#if activeTab === "Certificates of Analysis"}
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">Certificates of Analysis (COA)</h2>
-        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Analysis (COA), please enter both the product number and the Lot/batch number.</p>
+        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Analysis (COA), please enter both the product number and the Lot/batch Number.</p>
         <form 
         method="post" 
         action="?/document" 
@@ -281,7 +281,7 @@ function toggleRotation(index) {
                 }
             };
         }}>
-        <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+        <label for="product-number-sds" class="block text-md font-medium mb-1{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
           <div class="relative w-full">
@@ -290,8 +290,8 @@ function toggleRotation(index) {
             type="text"
             id="product-number-sds"
             name="productNumber"
-            placeholder="E.G. 1503"
-            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            placeholder="E.G. 775118"
+            class="block w-full -z-10 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
           {#if showErrors && inputValue1.length === 0}
           <div class="flex text-start">
@@ -302,8 +302,8 @@ function toggleRotation(index) {
             <p class="text-red-500 text-md">{sdsProductNumberError}</p>
             {/if}
             <br>
-            <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
-              * Lot/batch number
+            <label for="product-number-sds" class="block text-md font-medium mb-2{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+              * Lot/batch Number
             </label>
             
             <div class="relative w-full">
@@ -312,8 +312,8 @@ function toggleRotation(index) {
                 id="product-number"
                 name="product-number"
                 bind:value={lotNumber}
-                placeholder="E.G. 1503"
-                class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+                placeholder="E.G. 775118"
+                class="block w-full p-3 -z-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
               />
               {#if showErrors && lotNumber.length === 0}
               <div class="flex text-start">
@@ -323,7 +323,7 @@ function toggleRotation(index) {
             </div>
               <button
               type="submit"
-              class="absolute font-semibold right-0 mt-3 mb-3 sm:mt-20 mb-10 bg-primary-400 hover:bg-primary-500 text-white py-2 px-6 rounded-md shadow transition duration-300"
+              class="absolute -z-10 font-semibold right-0 mt-3 mb-3 sm:mt-20 mb-10 bg-primary-400 hover:bg-primary-500 text-white py-2 px-6 rounded-md shadow transition duration-300"
             >
               SEARCH
             </button>
@@ -341,7 +341,7 @@ function toggleRotation(index) {
       {#if activeTab === "Certificates of Origin"}
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">Certificates of Origin (COO)</h2>
-        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Origin (COO), please enter both the product number and the Lot/batch number.</p>
+        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Origin (COO), please enter both the product number and the Lot/batch Number.</p>
         <form 
         method="post" 
         action="?/document" 
@@ -362,7 +362,7 @@ function toggleRotation(index) {
                 }
             };
         }}>
-          <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+          <label for="product-number-sds" class="block text-md font-medium mb-1 {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
           <div class="relative w-full">
@@ -371,8 +371,8 @@ function toggleRotation(index) {
             type="text"
             id="product-number-sds"
             name="productNumber"
-            placeholder="E.G. 1503"
-            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            placeholder="E.G. 775118"
+            class="block w-full -z-10 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
           {#if showErrors && inputValue2.length === 0}
           <div class="flex text-start">
@@ -383,8 +383,8 @@ function toggleRotation(index) {
             <p class="text-red-500 text-md">{sdsProductNumberError}</p>
             {/if}
             <br>
-            <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
-              * Lot/batch number
+            <label for="product-number-sds" class="block text-md font-medium mb-2{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+              * Lot/batch Number
             </label>
             <div class="relative w-full">
               <input 
@@ -392,8 +392,8 @@ function toggleRotation(index) {
             id="product-number"
             name="product-number"
             bind:value={lotNumber1}
-            placeholder="E.G. 1503"
-            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            placeholder="E.G. 775118"
+            class="block w-full p-3 -z-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
           {#if showErrors && lotNumber1.length === 0}
           <div class="flex text-start">
@@ -405,7 +405,7 @@ function toggleRotation(index) {
           {/if}
             <button
               type="submit"
-              class="absolute font-semibold right-0 mt-3 mb-3 mt-1 sm:mt-20 mb-10 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300"
+              class="absolute -z-10 font-semibold right-0 mt-3 mb-3 mt-1 sm:mt-20 mb-10 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300"
             >
               SEARCH
             </button>
@@ -424,7 +424,7 @@ function toggleRotation(index) {
       {#if activeTab === "Certificates of Quality"}
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">Certificates of Quality (COQ)</h2>
-        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Quality (COQ), please enter both the product number and the Lot/batch number.</p>
+        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Quality (COQ), please enter both the product number and the Lot/batch Number.</p>
         <form 
         method="post" 
         action="?/document" 
@@ -445,7 +445,7 @@ function toggleRotation(index) {
                 }
             };
         }}>
-        <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+        <label for="product-number-sds" class="block text-md font-medium mb-1{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
           <div class="relative w-full">
@@ -454,8 +454,8 @@ function toggleRotation(index) {
             type="text"
             id="product-number-sds"
             name="productNumber"
-            placeholder="E.G. 1503"
-            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            placeholder="E.G. 775118"
+            class="block w-full p-3 -z-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
           {#if showErrors && inputValue3.length === 0}
           <div class="flex text-start">
@@ -463,8 +463,8 @@ function toggleRotation(index) {
           </div>
           {/if}
             <br>
-            <label for="product-number-sds" class="block text-md font-medium {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
-              * Lot/batch number
+            <label for="product-number-sds" class="block text-md font-medium mb-2{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+              * Lot/batch Number
             </label>
             <div class="relative w-full">
               <input 
@@ -472,8 +472,8 @@ function toggleRotation(index) {
             id="product-number"
             name="product-number"
             bind:value={lotNumber2}
-            placeholder="E.G. 1503"
-            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            placeholder="E.G. 775118"
+            class="block w-full p-3 -z-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
           {#if showErrors && lotNumber2.length === 0}
           <div class="flex text-start">
@@ -486,7 +486,7 @@ function toggleRotation(index) {
 
           <button
           type="submit"
-          class="absolute font-semibold right-0 mt-3 mb-3 mt-1 sm:mt-20 mb-10 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300"
+          class="absolute font-semibold right-0 mt-3 mb-3 mt-1 sm:mt-20 mb-10 bg-primary-400 text-white py-2 px-6 rounded-md -z-10 shadow hover:bg-primary-500 transition duration-300"
         >
           SEARCH
         </button>
@@ -514,10 +514,10 @@ function toggleRotation(index) {
           </div>
           {#if showProductDetailsSafety}
             <div class="mt-4 text-sm text-gray-600">
-              <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T1503-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T1503).</p>
+              <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T775118-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T775118).</p>
               <div class="bg-gray-100 p-3 border border-gray-300 rounded mt-3">
                 <p><strong>Example:</strong></p>
-                <p><code>T1503</code> <span class="font-bold">Product Number</span></p>
+                <p><code>T775118</code> <span class="font-bold">Product Number</span></p>
                 <p><span class="font-bold">-</span></p>
                 <p><code>25G</code> <span class="font-bold">Pack Size/Quantity</span></p>
                 <p><strong>Additional examples:</strong></p>
@@ -549,10 +549,10 @@ function toggleRotation(index) {
           </div>
           {#if showProductDetailsCertificates}
             <div class="mt-4 text-sm text-gray-600">
-              <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T1503-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T1503).</p>
+              <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T775118-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T775118).</p>
               <div class="bg-gray-100 p-3 border border-gray-300 rounded mt-3">
                 <p><strong>Example:</strong></p>
-                <p><code>T1503</code> <span class="font-bold">Product Number</span></p>
+                <p><code>T775118</code> <span class="font-bold">Product Number</span></p>
                 <p><span class="font-bold">-</span></p>
                 <p><code>25G</code> <span class="font-bold">Pack Size/Quantity</span></p>
                 <p><strong>Additional examples:</strong></p>
@@ -621,10 +621,10 @@ function toggleRotation(index) {
     </div>
     {#if showProductDetailsOrigin}
       <div class="mt-4 text-sm text-gray-600">
-        <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T1503-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T1503).</p>
+        <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T775118-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T775118).</p>
         <div class="bg-gray-100 p-3 border border-gray-300 rounded mt-3">
           <p><strong>Example:</strong></p>
-          <p><code>T1503</code> <span class="font-bold">Product Number</span></p>
+          <p><code>T775118</code> <span class="font-bold">Product Number</span></p>
           <p><span class="font-bold">-</span></p>
           <p><code>25G</code> <span class="font-bold">Pack Size/Quantity</span></p>
           <p><strong>Additional examples:</strong></p>
@@ -698,10 +698,10 @@ function toggleRotation(index) {
     </div>
     {#if showProductDetailsQuality}
       <div class="mt-4 text-sm text-gray-600">
-        <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T1503-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T1503).</p>
+        <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T775118-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T775118).</p>
         <div class="bg-gray-100 p-3 border border-gray-300 rounded mt-3">
           <p><strong>Example:</strong></p>
-          <p><code>T1503</code> <span class="font-bold">Product Number</span></p>
+          <p><code>T775118</code> <span class="font-bold">Product Number</span></p>
           <p><span class="font-bold">-</span></p>
           <p><code>25G</code> <span class="font-bold">Pack Size/Quantity</span></p>
           <p><strong>Additional examples:</strong></p>
