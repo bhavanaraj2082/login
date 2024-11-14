@@ -1,0 +1,128 @@
+[
+  {
+    "name": "Analytical Chemistry",
+    "description": "The science of analyzing substances to understand their composition and structure.",
+    "image": "path/to/analytical-chemistry-image.jpg",
+    "url": "analytical-chemistry",
+    "subcategories": [
+      {
+        "name": "Atomic Spectroscopy",
+        "description": "Techniques used to analyze the elemental composition of a sample using light emission or absorption.",
+        "image": "path/to/atomic-spectroscopy-image.jpg",
+        "url": "atomic-spectroscopy",
+        "subsubcategories": {},
+        "additionalInfo": "Atomic Spectroscopy encompasses a variety of methods for analyzing elements within samples, using light to either emit or absorb energy. These techniques are essential in both research and industrial laboratories to determine the presence and concentration of various metals and non-metals in materials. The application of atomic absorption spectroscopy (AAS), atomic emission spectroscopy (AES), and inductively coupled plasma (ICP) are commonly seen in fields such as environmental analysis, pharmaceuticals, and materials science."
+      },
+      {
+        "name": "Calibration, Qualification, Validation",
+        "description": "The process of ensuring instruments and methods meet specified performance standards.",
+        "image": "path/to/calibration-validation-image.jpg",
+        "url": "calibration-qualification-validation",
+        "subsubcategories": {},
+        "additionalInfo": "Calibration, qualification, and validation are fundamental procedures used to ensure the reliability and accuracy of laboratory instruments and analytical methods. Calibration involves adjusting instruments to provide accurate measurements, while qualification refers to verifying that an instrument is capable of performing within specified limits. Validation ensures that methods used in laboratories are suitable for their intended purposes. These processes are critical in fields like pharmaceuticals, environmental monitoring, and clinical diagnostics to meet regulatory and quality assurance standards."
+      },
+      {
+        "name": "Gas Chromatography (GC)",
+        "description": "A technique used to separate and analyze gases and volatile compounds in a sample.",
+        "image": "path/to/gc-image.jpg",
+        "url": "gas-chromatography",
+        "subsubcategories": {},
+        "additionalInfo": "Gas Chromatography (GC) is a widely used technique in analytical chemistry for separating and analyzing volatile compounds. This method involves injecting a sample into a chromatographic column, where it is separated based on the interaction between the sample components and the column material. GC is essential for analyzing complex mixtures of gases and volatile organic compounds in various fields such as environmental monitoring, food safety, and pharmaceuticals. The technique can be coupled with detectors like mass spectrometry (MS) for increased sensitivity and specificity.",
+        "subsubcategories": {
+          "mass_spectrometry": {
+            "name": "Mass Spectrometry (MS)",
+            "description": "A technique used to determine the molecular weight and structure of compounds.",
+            "image": "path/to/ms-image.jpg",
+            "url": "mass-spectrometry",
+            "subsubcategories": {},
+            "additionalInfo": "Mass Spectrometry (MS) is a powerful analytical technique used to measure the mass-to-charge ratio of ions. It is commonly employed in both qualitative and quantitative analysis of compounds, providing detailed information about molecular structures and elemental compositions. The technique is integral to a wide range of applications, including drug testing, proteomics, environmental analysis, and forensic science. With its high sensitivity and accuracy, MS is often used in conjunction with other techniques like gas chromatography (GC-MS) or liquid chromatography (LC-MS) for comprehensive analysis."
+          }
+        }
+      },
+      {
+        "name": "Nuclear Magnetic Resonance (NMR)",
+        "description": "A technique that provides detailed information about the structure of organic compounds.",
+        "image": "path/to/nmr-image.jpg",
+        "url": "nmr",
+        "subsubcategories": {},
+        "additionalInfo": "Nuclear Magnetic Resonance (NMR) spectroscopy is a non-destructive analytical technique used to determine the structure of organic compounds by measuring the interaction of atomic nuclei with magnetic fields. It provides detailed insights into molecular structure, dynamics, and purity. NMR is crucial in various fields such as chemistry, biochemistry, and material science, and it is often used for identifying compounds in research and industry. High-resolution NMR spectrometers can analyze complex mixtures and offer the ability to study both large biomolecules and small organic molecules."
+      },
+      {
+        "name": "Photometry & Reflectometry",
+        "description": "Methods used to measure light intensity and reflectivity for material analysis.",
+        "image": "path/to/photometry-image.jpg",
+        "url": "photometry-reflectometry",
+        "subsubcategories": {},
+        "additionalInfo": "Photometry and reflectometry are techniques used to analyze the optical properties of materials. Photometry measures light intensity, while reflectometry focuses on the measurement of light reflected from surfaces. These methods are widely used in material science to study the reflectance and transmittance properties of materials, as well as in the fields of quality control, colorimetry, and optical coatings. Photometry is also applied in environmental monitoring and astronomy, where light intensity measurements are crucial."
+      },
+      {
+        "name": "Thin Layer Chromatography (TLC)",
+        "description": "A technique used to separate mixtures of compounds by their different rates of movement.",
+        "image": "path/to/tlc-image.jpg",
+        "url": "thin-layer-chromatography",
+        "subsubcategories": {},
+        "additionalInfo": "Thin Layer Chromatography (TLC) is a simple, low-cost method for separating mixtures of substances based on their different polarities. TLC is often used for the qualitative analysis of plant extracts, pharmaceuticals, and food products. It involves applying a sample to a thin layer of adsorbent material, such as silica gel or alumina, and then separating the components by solvent elution. TLC is commonly used in laboratories for rapid screening of compounds, confirming the identity of substances, and monitoring reaction progress."
+      },
+      {
+        "name": "Titration & Karl Fischer",
+        "description": "Titration methods used to determine the concentration of substances, including Karl Fischer for water content.",
+        "image": "path/to/titration-image.jpg",
+        "url": "titration-karl-fischer",
+        "subsubcategories": {},
+        "additionalInfo": "Titration is a quantitative chemical analysis technique used to determine the concentration of a substance in a solution. Karl Fischer titration is a specific type of titration that is widely used to measure water content in samples. The method involves adding a reagent to the sample until a specific endpoint is reached. Karl Fischer titration is particularly important in industries like pharmaceuticals, food production, and petroleum, where precise moisture content determination is critical for quality control."
+      },
+      {
+        "name": "Wet Chemical Analysis",
+        "description": "Traditional laboratory methods using chemical reactions to analyze materials.",
+        "image": "path/to/wet-chemical-analysis-image.jpg",
+        "url": "wet-chemical-analysis",
+        "subsubcategories": {},
+        "additionalInfo": "Wet Chemical Analysis refers to traditional laboratory methods that use chemical reactions and titrations to analyze the composition of materials. These methods are based on the principle of utilizing reagents to react with substances in a sample to determine the presence and concentration of specific elements or compounds. While modern techniques like chromatography and spectroscopy have largely replaced wet chemistry in certain applications, wet chemical methods are still essential in many laboratories due to their simplicity, low cost, and accuracy."
+      },
+      {
+        "name": "Liquid Chromatography",
+        "description": "A technique used to separate and analyze compounds dissolved in a liquid phase.",
+        "image": "path/to/liquid-chromatography-image.jpg",
+        "url": "liquid-chromatography",
+        "subsubcategories": [
+          {
+            "name": "Large Molecule HPLC",
+            "description": "A type of High-Performance Liquid Chromatography designed for large molecules like proteins and peptides.",
+            "image": "path/to/hplc-large-molecule-image.jpg",
+            "url": "hplc-large-molecule",
+            "additionalInfo": "Large Molecule HPLC is used for the separation and analysis of large biomolecules such as proteins, peptides, and nucleic acids. This technique requires specialized columns and conditions to handle the high molecular weights of large molecules. It is critical in the fields of biotechnology, pharmacology, and proteomics for protein purification, peptide mapping, and quantification of biopharmaceuticals. The use of HPLC allows researchers to efficiently separate complex mixtures and analyze large molecules with high sensitivity and resolution."
+          },
+          {
+            "name": "Low Pressure Liquid Chromatography",
+            "description": "A form of liquid chromatography that operates at lower pressures compared to traditional HPLC, used for simpler separations.",
+            "image": "path/to/hplc-low-pressure-image.jpg",
+            "url": "hplc-low-pressure",
+            "additionalInfo": "Low Pressure Liquid Chromatography (LPLC) is a variant of traditional HPLC that uses lower pressures and is generally applied to simpler separations or preparative-scale chromatography. It is widely used for the isolation of large quantities of compounds, especially in the field of organic synthesis and natural product isolation. LPLC is also helpful when analyzing less complex samples or when working with more fragile compounds that could degrade under the high pressures of conventional HPLC."
+          },
+          {
+            "name": "Small Molecule HPLC",
+            "description": "A type of HPLC designed for separating small molecules, such as pharmaceuticals and organic compounds.",
+            "image": "path/to/hplc-small-molecule-image.jpg",
+            "url": "hplc-small-molecule",
+            "additionalInfo": "Small Molecule HPLC is a widely used method for the separation and analysis of small organic molecules such as pharmaceuticals, pesticides, and environmental contaminants. This technique involves the use of high-performance liquid chromatography to separate compounds based on their interactions with a stationary phase under high pressure. It plays a critical role in the pharmaceutical industry for drug development, as well as in environmental testing and food safety."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Dummy Category",
+    "description": "A category added for testing purposes.",
+    "image": "path/to/dummy-image.jpg",
+    "url": "dummy-category",
+    "subcategories": [
+      {
+        "name": "Dummy Subcategory",
+        "description": "A dummy subcategory used for testing data structure.",
+        "image": "path/to/dummy-subcategory-image.jpg",
+        "url": "dummy-subcategory",
+        "additionalInfo": "This subcategory is included to test the functionality of data structure management. It contains no actual data, only placeholder text for testing purposes."
+      }
+    ]
+  }
+]
