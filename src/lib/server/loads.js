@@ -225,3 +225,11 @@ export async function getSubSubCategoryDatas(pb, subsubid) {
         return { error: "SubSubCategories not found" };
     }
 }
+
+export async function popularProducts(pb) {
+	const record = await pb.collection('PopularProducts').getFullList({
+		sort: 'order',
+		expand: 'product'
+	});
+	return record
+}
