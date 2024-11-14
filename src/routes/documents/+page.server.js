@@ -1,6 +1,6 @@
 import { fetchcertificate } from '$lib/server/actions.js';
 export const actions = {
-    create: async ({ request }) => {
+    document: async ({ request }) => {
         const data = Object.fromEntries(await request.formData());
         const inputValue = data.productNumber;
         console.log(inputValue);

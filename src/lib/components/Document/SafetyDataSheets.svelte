@@ -201,7 +201,7 @@ function toggleRotation(index) {
         <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Safety Data Sheet, please enter the product number.</p>
         <form 
         method="post" 
-        action="?/create" 
+        action="?/document" 
         use:enhance={() => {
             return async ({ result }) => {
               showErrors = inputValue.length === 0;
@@ -263,7 +263,7 @@ function toggleRotation(index) {
         <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Analysis (COA), please enter both the product number and the Lot/batch number.</p>
         <form 
         method="post" 
-        action="?/create" 
+        action="?/document" 
         use:enhance={() => {
             return async ({ result }) => {
               showErrors = inputValue1.length === 0 || lotNumber.length === 0;
@@ -344,7 +344,7 @@ function toggleRotation(index) {
         <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Origin (COO), please enter both the product number and the Lot/batch number.</p>
         <form 
         method="post" 
-        action="?/create" 
+        action="?/document" 
         use:enhance={() => {
             return async ({ result }) => {
               showErrors = inputValue2.length === 0 || lotNumber1.length === 0;
@@ -427,7 +427,7 @@ function toggleRotation(index) {
         <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Quality (COQ), please enter both the product number and the Lot/batch number.</p>
         <form 
         method="post" 
-        action="?/create" 
+        action="?/document" 
         use:enhance={() => {
             return async ({ result }) => {
               showErrors = inputValue3.length === 0 || lotNumber2.length === 0;
