@@ -1,0 +1,88 @@
+<script>
+	import { page } from '$app/stores';    
+	let crumbs = [];
+    $: {
+		const tokens = $page.url.pathname.split('/').filter((t) => t !== '');
+		let tokenPath = '';
+		crumbs = [];
+		if (tokens.length > 0) {
+			crumbs.push({ label: 'Home', href: '/' });
+			tokens.forEach((t, index) => {
+				tokenPath += '/' + t;
+				const label = t
+					.split('-')
+					.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+					.join(' ');
+				crumbs.push({
+					label,
+					href: tokenPath
+				});
+			});
+			if (crumbs.length > 1) {
+				crumbs[1].label = tokens[0]
+					? tokens[0]
+							.split('-')
+							.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+							.join(' ')
+					: '';
+			}
+			if (crumbs.length > 2) {
+				crumbs[2].label = tokens[1]
+					? tokens[1]
+							.split('-')
+							.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+							.join(' ')
+					: '';
+			}
+		}
+	}
+</script>
+{#if crumbs.length > 0}
+	<div class="bg-gray-50">
+		<div class="w-full py-3 px-5 lg:w-10/12 mx-auto">
+			<div class="flex flex-wrap text-primary-400 items-center space-x-0">
+				{#if crumbs.length === 1}
+					<span class="text-primary-400 font-bold text-xs">{crumbs[0].label}</span>
+				{:else}
+					<div class="flex flex-wrap items-center">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 24 24"
+							class="mr-2 w-7 h-5"
+							>
+							<path
+								d="M12 3l10 9h-3v8h-5v-5h-4v5H5v-8H2l10-9z"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1"
+							/>
+						</svg>
+						{#each crumbs.slice(0, -1) as c}
+							<a
+								href={c.href}
+								class="text-primary-400 text-sm hover:underline hover:underline-offset-4 hover:decoration-primary-600 transition-colors"
+								>{c.label}</a
+							>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="2em"
+								height="2em"
+								viewBox="0 0 30 30"
+								class="mt-2"
+                                
+							>
+								<path
+									d="M8.59 16.34L13.17 12 8.59 7.66 10 6.25l5.25 5.25L10 16.75z"
+									fill="currentColor"
+								/>
+							</svg>
+						{/each}
+						<span class="text-primary-500 font-bold text-sm "
+							>{crumbs[crumbs.length - 1].label}</span
+						>
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
+{/if}
