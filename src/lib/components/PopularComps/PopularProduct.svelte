@@ -1,6 +1,6 @@
 <script>
     import Icon from "@iconify/svelte";
-    import ProductCard from "$lib/components/ProductCard.svelte";
+    import ProductCard from "$lib/components/PopularComps/ProductCard.svelte";
     export let PopularProducts;
 </script>
 

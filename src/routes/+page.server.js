@@ -9,11 +9,11 @@ export async function load() {
     try {
         // const products = await fetchsearchcomponent(pb);
         const PopularProductsData = await popularProducts(pb)
-        return {PopularProductsData}
-        }
-     catch (error) {
+        return { PopularProductsData }
+    }
+    catch (error) {
         console.error('Error loading products:', error);
         return {}
-            
-        };
-    }
+
+    };
+}
