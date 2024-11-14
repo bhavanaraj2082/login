@@ -233,3 +233,14 @@ export async function popularProducts(pb) {
 	});
 	return record
 }
+
+export async function getorderstatusdata(pb, orderid) {
+	let records = await pb
+		.collection('Orders')
+		.getOne(`${orderid}`, { expand: 'products,shipdetails' });
+	if (records) {
+		return { order: records };
+	} else {
+		return { error: 'Error in fetching orderStatus Data' };
+	}
+}

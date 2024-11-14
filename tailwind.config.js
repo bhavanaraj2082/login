@@ -22,7 +22,7 @@ export default {
 					"950":"#4a1005"
 				},
 				heading:"#374151",
-				content:"4b5563"
+				content:"#4b5563"
 			},
 			borderWidth:{
 				"1":"1.5px"
