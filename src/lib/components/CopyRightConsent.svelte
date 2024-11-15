@@ -7,7 +7,7 @@
     let email = '';
     let emailError = '';
     const maxFileSize = 5 * 1024 * 1024; // 5MB
-  
+    let   title="";
     let firstname = '';
     let lastname = '';
     let company = '';
@@ -89,9 +89,13 @@
         });
     });
 
-
+    function hideThankYouMessage() {
+        setTimeout(() => {
+            thankYouMessageVisible = false;
+        }, 3000);
+    }
 </script>
-<body class="bg-gray-100 p-2 md:p-8">
+<div class="bg-gray-100 p-2 md:p-8">
     <div class="mx-auto">
         <h1 class="text-2xl font-bold mb-4 mt-5 text-center">Copyright Consent</h1>
         <p class="mb-2 text-sm text-justify">In case you are requesting our consent to use copyrighted material available on our website, please make sure that you have checked our <a href="/terms" class="text-primary-500">Site Use Terms</a>.</p>
@@ -99,13 +103,15 @@
         <p class="mb-2 text-sm text-justify">Please note that sending the below request form does NOT give you any license or consent, including implied, to use our copyrighted work unless you receive our explicit consent or if the consent is provided according to the Site Use Terms.</p>
         <p class="mb-2 text-sm ">Fields indicated by an * are required.</p>
         
-        <form method="POST" action="/site1" enctype="multipart/form-data" class="space-y-4" use:enhance={() => {
+        <form method="POST" action="?/submitForm" enctype="multipart/form-data" class="space-y-4" use:enhance={() => {
             return async ({ result }) => {
                 console.log(result);
                 if (result.data.body && result.type === 'success') {
+                    title="";
                     ExtractedData="";
                     image="";
                     thankYouMessageVisible = true; 
+                    hideThankYouMessage();
                     firstname = "";
                     lastname = "";
                     email = "";
@@ -128,7 +134,7 @@
             <!-- Title -->
             <div class="mb-4">
                 <label for="title" class="block text-gray-700 font-semibold text-sm ">*Title</label>
-                <select id="title" name="title" class="border rounded w-full md:w-1/2 p-2" required>
+                <select id="title" name="title" class="border rounded  border-gray-400 focus:outline-primary-400 w-full md:w-1/2 p-2" required>
                     <option value="" disabled selected >Select Title</option>
                     <option value="Mr.">Mr.</option>
                     <option value="Mrs.">Mrs.</option>
@@ -137,8 +143,7 @@
                     <option value="Ph.D.">Ph.D.</option>
                     <option value="Prof.">Prof.</option>
                     <option value="Rev.">Rev.</option>
-                    <option value="Sir">Sir</option>
-                    <option value="Madam">Madam</option>
+                 
                 </select>
             </div>
             
@@ -147,11 +152,11 @@
             <div class="mb-4 flex flex-col md:flex-row">
                 <div class="mb-2 md:mb-0 md:mr-2 w-full md:w-1/2">
                     <label for="firstname" class="block text-gray-700 font-semibold text-sm">*First Name</label>
-                    <input type="text" placeholder="First Name" name="firstname" bind:value={firstname} class="border rounded-md p-2 text-sm w-full" required />
+                    <input type="text" placeholder="First Name" name="firstname" bind:value={firstname} class="border border-gray-400 focus:outline-primary-400 rounded-md p-2 text-sm w-full" required />
                 </div>
                 <div class="mb-2 md:mb-0 md:ml-2 w-full md:w-1/2">
                     <label for="lastname" class="block text-gray-700 font-semibold text-sm">*Last Name</label>
-                    <input type="text" placeholder="LastName" name="lastname" bind:value={lastname} class="border rounded-md p-2 text-sm w-full" required />
+                    <input type="text" placeholder="LastName" name="lastname" bind:value={lastname} class="border  border-gray-400 focus:outline-primary-400 rounded-md p-2 text-sm w-full" required />
                 </div>
             </div>
 
@@ -159,11 +164,11 @@
             <div class="mb-4 flex flex-col md:flex-row">
                 <div class="mb-2 md:mb-0 md:mr-2 w-full md:w-1/2">
                     <label for="company" class="block text-gray-700 font-semibold text-sm">*Company Name</label>
-                    <input type="text" placeholder="Company Name" name="company" bind:value={company} class="border rounded-md p-2 text-sm w-full" />
+                    <input type="text" placeholder="Company Name" name="company" bind:value={company} class="border  border-gray-400 focus:outline-primary-400 rounded-md p-2 text-sm w-full" />
                 </div>
                 <div class="mb-2 md:mb-0 md:ml-2 w-full md:w-1/2">
                     <label for="street" class="block text-gray-700 font-semibold text-sm">*Street or Postbox</label>
-                    <input type="text" placeholder="Street" id="street" name="street" bind:value={street} class="border rounded w-full p-2" required />
+                    <input type="text" placeholder="Street" id="street" name="street" bind:value={street} class="border   border-gray-400 focus:outline-primary-400 rounded w-full p-2" required />
                 </div>
             </div>
 
@@ -171,11 +176,11 @@
             <div class="mb-4 flex flex-col md:flex-row">
                 <div class="mb-2 md:mb-0 md:mr-2 w-full md:w-1/2">
                      <label for="postalcode" class="block text-gray-700 font-semibold text-sm">*ZIP or Postal Code</label> 
-                    <input type="number" placeholder="postal/ZipCode" id="postalcode" name="postalcode" bind:value={postalcode} class="border rounded w-full p-2" required />
+                    <input type="number" placeholder="postal/ZipCode" id="postalcode" name="postalcode" bind:value={postalcode} class="border  border-gray-400 focus:outline-primary-400 rounded w-full p-2" required />
                 </div>
                 <div class="mb-2 md:mb-0 md:ml-2 w-full md:w-1/2">
                     <label for="city" class="block text-gray-700 font-semibold text-sm">*City or Town</label> 
-                    <input type="text" id="city" placeholder="city" name="city" bind:value={city} class="border rounded w-full p-2" required />
+                    <input type="text" id="city" placeholder="city" name="city" bind:value={city} class="border  border-gray-400 focus:outline-primary-400 rounded w-full p-2" required />
                 </div>
             </div>
 
@@ -183,13 +188,13 @@
             <div class="mb-4 flex flex-col md:flex-row">
                 <div class="mb-2 md:mb-0 md:mr-2 w-full md:w-1/2">
                     <label for="country" class="block text-gray-700 font-semibold text-sm">*Country</label>
-                    <select id="country"  bind:value={country} bind:this={countrySelect} name="location" class="border rounded w-full p-2" >
+                    <select id="country"  bind:value={country} bind:this={countrySelect} name="location" class="border  border-gray-400 focus:outline-primary-400 rounded w-full p-2" >
                         <option value="" disabled selected>Select Country</option>
                     </select>
                 </div>
                 <div class="mb-2 md:mb-0 md:ml-2 w-full md:w-1/2">
                     <label for="email" class="block text-gray-700 font-semibold text-sm">*Email Address</label>
-                    <input type="email" id="email" name="email" placeholder="Email" bind:value={email} class="border rounded w-full p-2" required />
+                    <input type="email" id="email" name="email" placeholder="Email" bind:value={email} class="border   border-gray-400 focus:outline-primary-400 rounded w-full p-2" required />
                     {#if emailError}
                         <p class="text-red-500 text-sm">{emailError}</p>
                     {/if}
@@ -203,8 +208,8 @@
                     <div class="mb-4 w-full md:w-1/2">
                         <!-- Radio buttons to choose between file or URL -->
                         <div class="mb-4">
-                            <input type="radio" id="toggleUpload" name="uploadOption" value="file" bind:group={uploadOption} class="mr-2" />
-                            <label for="toggleUpload" class="text-sm text-gray-700">Choose File or Image</label>
+                            <input type="radio" id="toggleUpload" name="uploadOption" value="file" bind:group={uploadOption} class="mr-2 " />
+                            <label for="toggleUpload" class="text-sm text-gray-700 ">Choose File or Image</label>
                        
                 
                         <div class="mb-4">
@@ -217,7 +222,7 @@
                         {#if uploadOption === 'file'}
                             <div>
                                 <label for="file" class="block font-semibold text-gray-700 text-sm mt-2">Choose File (.csv,.txt,.pdf,.jpg,.png,.jpeg) </label>
-                                <input type="file" id="file" name={fileName} accept=".csv,.txt,.pdf,.jpg,.jpeg,.png" class="border rounded p-2 w-full" on:change={handleFileChange} />
+                                <input type="file" id="file" name={fileName} accept=".csv,.txt,.pdf,.jpg,.jpeg,.png" class="border border-gray-400  focus:outline-primary-400 rounded p-2 w-full" on:change={handleFileChange} />
                             </div>
                         {/if}
                 
@@ -225,7 +230,7 @@
                         {#if uploadOption === 'url'}
                             <div class="mb-4">
                                 <label for="url" class="block text-gray-700 font-semibold">*URL to the Work</label>
-                                <input type="url" placeholder="URL" id="url" name="url" bind:value={url} class="border rounded w-full p-2" required />
+                                <input type="url" placeholder="URL" id="url" name="url" bind:value={url} class="border border-gray-400 focus:outline-primary-400  rounded w-full p-2" required />
                             </div>
                         {/if}
                     </div>
@@ -236,7 +241,7 @@
             <div class="mb-4">
                 <label for="description" class="block text-gray-700 text-sm font-semibold ">
                     Please describe the way and the purpose you are going to use our copyrighted work</label>
-                <textarea id="description" name="description" rows="3" class="border rounded w-full lg:w-1/2 p-2" bind:value={description} ></textarea>
+                <textarea id="description" name="description" rows="3" class="border border-gray-400 focus:outline-primary-400  rounded w-full lg:w-1/2 p-2" bind:value={description} ></textarea>
             </div>
 
            
@@ -249,4 +254,4 @@
             <p class="text-green-500  text-center mt-4">Thank you for submitting your request!</p>
         {/if}
     </div>
-</body>
+</div>
