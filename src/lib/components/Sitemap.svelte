@@ -18,7 +18,7 @@
 <div class="font-sans mx-auto w-11/12 max-w-7xl">
 	<h1 class="text-3xl p-4 text-heading font-bold">Chemikart Site Map</h1>
 	<h1 class="text-lg p-2 m-4 text-primary-400 border-b max-w-50 text-start font-bold">
-        Prodcuts
+        Products
 	</h1>
 	<div class="columns-1 sm:columns-2 md:columns-4 gap-6">
 		{#each categories1 as { name1, link1, subcategories1 }}
