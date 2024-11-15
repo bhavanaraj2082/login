@@ -1,5 +1,5 @@
-import { pb,authenticate } from '../../lib/server/pocketbase.js';  // Adjust the path as necessary
-import { fetchcertificate } from '../../lib/server/actions.js';
+import { pb,authenticate } from '$lib/server/pocketbase.js';  // Adjust the path as necessary
+import { fetchcertificate } from '$lib/server/actions.js';
 
 export const actions = {
     document: async ({ request }) => {
