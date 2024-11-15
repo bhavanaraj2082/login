@@ -39,7 +39,7 @@ async function handleClick(buttonValue) {
 }
 </script>
 
-<div class="main-container mx-6 lg:mx-12 md:mx-8 sm:mx-8 my-10 bg-white">
+<div class="main-container mx-auto w-11/12 max-w-7xl lg:px-12 md:px-8 sm:px-8 my-10 bg-white">
   <div class="flex flex-col justify-evenly items-center lg:flex-row lg:mb-8 ">
     <img src={Mainimage} alt="MainImAGE" class="w-80" />
     <div class="lg:w-1/3 my-2 lg:my-0 p-4">

@@ -3,7 +3,7 @@
    
   
     export const meta = {
-      title: "notinuse/CopyRightConsent",
+      title: "CopyRightConsent",
       component: CopyRightConsent,
     }
   </script>

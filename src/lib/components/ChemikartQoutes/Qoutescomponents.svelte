@@ -32,7 +32,7 @@ const toggleQoutes6 = () => {
 currentView = currentView === 'qoutes6' ? null : 'qoutes6';
 };
 </script>
-<div class="p-4">
+<div class="p-4 w-11/12 mx-auto max-w-7xl">
   {#if currentView === 'qoutes'}
     <Qoutes tag={toggleQoutes1} />
   {/if}

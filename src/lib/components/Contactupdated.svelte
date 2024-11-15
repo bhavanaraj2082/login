@@ -44,7 +44,7 @@
     }
 	}
 </script>
-<section class="my-10 flex flex-wrap justify-center mx-auto px-2 sm:p-0 font-roboto">
+<section class="my-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto px-2 sm:p-0 font-roboto">
 	<div class="w-full md:w-4/5 bg-white border border-gray-300 rounded-lg">
 		<h1 class="text-2xl font-bold bg-primary-500 text-white py-4 pl-4 rounded-t-lg">
 			Get in Touch with Us
