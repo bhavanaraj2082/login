@@ -64,7 +64,7 @@
 			icon="eva:shopping-cart-fill"
 			class="md:w-5 md:h-5 sm:w-7 sm:h-7 lg:w-7 lg:h-7 w-7 h-7 mb-2 text-gray-800 sm:ml-3 hover:text-primary-400"
 		/>
-		<span class="hover:text-primary-400 font-semibold text-xs lg:text-base mb-3 hidden lg:block"
+		<span class="hover:text-primary-400 font-semibold text-xs lg:text-sm mb-3 hidden lg:block"
 			>Cart</span
 		>
 	</span>

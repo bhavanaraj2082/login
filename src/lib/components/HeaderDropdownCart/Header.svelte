@@ -110,7 +110,7 @@
 				{/each}
 				<div class="flex flex-col">
 					<a
-						href="/bulk-order"
+						href="/quick-order"
 						class=" text-left hover:text-primary-400 text-gray-800 font-semibold transition duration-200 w-full py-2"
 						>Quick Order</a
 					>
@@ -165,7 +165,7 @@
 				on:click={() => {
 					navigateTo('/');
 				}}
-				class="flex items-center text-primary-400 text-2xl md:text-3xl lg:text-3xl sm:text-2xl font-poppins font-semibold md:mb-0">
+				class="flex items-center text-primary-400 text-2xl md:text-3xl lg:text-3xl sm:text-2xl font-poppins md:mb-0 py-2 font-roboto font-bold">
 				Chemikart
 			</button>
 		</div>
@@ -226,7 +226,7 @@
 					<div class={`py-2 pr-2 pl-3 ${activeMenu === menu ? 'text-orange-500' : 'text-gray-600'}`}>
 						<button
 							on:click={() => navigateTo(menu.href)}
-							class={`flex items-center text-nowrap text-xs lg:text-base text-left w-full ${activeMenu === menu ? 'text-primary-400' : 'text-gray-700'}`}
+							class={`flex items-center text-nowrap text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-primary-400' : 'text-gray-700'}`}
 							role="menuitem">
 							{menu.title}
 							{#if index < 5}
@@ -288,8 +288,8 @@
 			{/each}
 		</div>
 		<div class="flex justify-evenly pr-2 text-gray-600 pt-2 items-center">
-			<a href="/quick-order" class="hover:text-primary-400 sm:mr-6 text-xs lg:text-base mb-2">Quick Order</a>
-			<a href="/order-status" class="hover:text-primary-400 sm:mr-6 text-xs lg:text-base mb-2">Order Status</a>
+			<a href="/quick-order" class="hover:text-primary-400 font-semibold text-xs lg:text-sm mb-3 mr-3">Quick Order</a>
+			<a href="/order-status" class="hover:text-primary-400 font-semibold text-xs lg:text-sm mb-3">Order Status</a>
 			<Cartrightside />
 		</div>
 	</div>
