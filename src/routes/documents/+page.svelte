@@ -1,4 +1,5 @@
 <script>
-    import Doc from '$lib/components/Document/Doc.svelte'
+    import SafetyDataSheets from '$lib/components/Document/SafetyDataSheets.svelte';
+    export let data;
 </script>
-<Doc/>
+<SafetyDataSheets {data}/>
