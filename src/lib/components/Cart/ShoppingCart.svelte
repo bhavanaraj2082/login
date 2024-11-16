@@ -17,7 +17,7 @@
 		subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 		tax = subtotal * 0.12;
 		total = subtotal + tax;
-		let ordernumber = "ORDER" + Math.floor(Math.random() * 9000) + 1000
+		let ordernumber = Math.floor(Math.random() * 900000) + 100000
 		let products = []
 		let orderdetails = cartItems.map(item=>{
             const {id,name,partNumber,quantity,price,stock} = item
@@ -28,12 +28,13 @@
 			return {
 				productId:id,
 				productName:name,
-				partNumber,
+				productNumber:partNumber,
 				orderQty:quantity,
-				price,
+				unitPrice:price,
 				backOrder,
-				totalPrice,
+				extendedPrice:totalPrice,
 				readyToShip,
+				supplierId:"",
 				availableStock:stock
 			}
 		})
@@ -44,6 +45,7 @@
 			shippingprice:tax,
 			products,
 			orderdetails,
+			status:"pending",
 			dashuserprofileid:$authedUser.email
 		}
 
@@ -108,7 +110,7 @@
 	<div class=" flex flex-col xl:flex-row justify-between gap-6">
 		<!-- Left Side: Cart Items -->
 		 {#if !$viewedCart.length || $viewedCart === null}
-		   <div class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded-lg shadow-md ">
+		   <div class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded shadow-md ">
 			   <Icon icon="typcn:shopping-cart" class="text-5xl text-primary-500 md:text-8xl" />
 			   <p class=" font-bold text-lg md:text-xl  xl:text-2xl">Cart is Empty</p>
 		   </div>
@@ -164,14 +166,14 @@
 							<p class="text-md font-medium text-content">
 								₹{(item.price * item.quantity).toFixed(2)}
 							</p>
-							<button on:click={() => removeItem(item.id)} class=" text-lg text-primary-600">
+							<button type="button" on:click={() => removeItem(item.id)} class=" text-lg text-primary-600">
 								<Icon icon="mdi:delete" class=" text-3xl"/>
 							</button>
 						 </div>
 					</li>
 				{/each}
 			</ul>
-			<button on:click={emptyCart} class="mt-4 text-sm w-32 sm:w-36 md:w-40 lg:w-48 py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-semibold">Clear cart</button>
+			<button type="button" on:click={emptyCart} class="mt-4 text-sm w-32 sm:w-36 md:w-40 lg:w-48 py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-semibold">Clear cart</button>
 		</div>
 		{/if}
 
@@ -206,22 +208,22 @@
 				</form>
 				
 				<!-- Save Cart Button -->
-				<button
-					class="flex items-center justify-center gap-2 col-span-2 bg-white text-primary-500 border border-primary-500 py-2 rounded-lg font-semibold hover:bg-primary-100"
+				<button type="button"
+					class="flex items-center justify-center gap-2 col-span-2 bg-white text-primary-500 border border-primary-500 py-2 rounded font-semibold hover:bg-primary-100"
 				>
 					Save Cart
 				</button>
 
 				<!-- Download Button -->
-				<button
-					class="flex items-center justify-center gap-2 bg-white text-primary-500 border border-primary-500 py-2 rounded-lg font-semibold hover:bg-primary-100"
+				<button type="button"
+					class="flex items-center justify-center gap-2 bg-white text-primary-500 border border-primary-500 py-2 rounded font-semibold hover:bg-primary-100"
 				>
 					Download
 				</button>
 
 				<!-- Print Button -->
-				<button
-					class="flex items-center justify-center gap-2 bg-white text-primary-500 border border-primary-500 py-2 rounded-lg font-semibold hover:bg-primary-100"
+				<button type="button"
+					class="flex items-center justify-center gap-2 bg-white text-primary-500 border border-primary-500 py-2 rounded font-semibold hover:bg-primary-100"
 				>
 					Print
 				</button>
