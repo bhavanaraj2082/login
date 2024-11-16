@@ -1,7 +1,9 @@
-import { submitContactInfo } from "../../lib/server/actions";
+import { submitContactInfo } from "$lib/server/actions.js";
+import { authenticate } from '$lib/server/pocketbase.js'
 export const actions = {
 contactus: async ({ request }) => {
     try {
+    const pb = await authenticate();
     const body = Object.fromEntries(await request.formData());
     await submitContactInfo(body,pb);
     return {
