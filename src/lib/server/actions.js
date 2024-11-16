@@ -643,3 +643,75 @@ export  async function submitForm( data,pb ) {
      
   
 };
+
+// profile action functions
+export async function editProfileContact(pb, body) {
+	const {recordId,...contact} = body
+	const record = await pb.collection('ChemiDashProfile').update(recordId, contact);
+	if(record.id){
+		return { success:true,message:" Updated contact information"}
+	}else{
+		return { success:false,message:"Something went wrong"}
+	}
+}
+
+export async function editProfileLinkOrganization(pb, body) {
+	const {recordId,...linkOrganization} = body
+	const record = await pb.collection('ChemiDashProfile').update(recordId, {linkOrganization});
+	if(record.id){
+		return { success:true,message:" Updated orgainization link"}
+	}else{
+		return { success:false,message:"Something went wrong"}
+	}
+}
+	
+
+export async function editProfileAddresses(pb, body) {
+	const {recordId,addressType,...address} = body
+	let record
+	if(addressType === "organization") record = await pb.collection('ChemiDashProfile').update(recordId,{organizationAddress:address});
+	if(addressType === "shipping") record = await pb.collection('ChemiDashProfile').update(recordId,{shippingAddress:address});
+	if(addressType === "billing") record = await pb.collection('ChemiDashProfile').update(recordId,{billingAddress:address});
+	if(addressType === "payment") record = await pb.collection('ChemiDashProfile').update(recordId,{paymentAddress:address});
+	if(record.id){
+		return { success:true,message:`updated ${addressType} address successfully`}
+	}else{
+		return { success:false,message:"Something went wrong"}
+	}
+}
+
+export async function editProfileSitePreferences(pb, body) {
+	const {recordId,preferences} = body
+	const sitePreferences = JSON.parse(preferences)
+	//console.log(sitePreferences);
+	const record = await pb.collection('ChemiDashProfile').update(recordId, {sitePreferences});
+	//console.log(record);
+	if(record.id){
+		return { success:true,message:" Updated site preferences"}
+	}else{
+		return { success:false,message:"Something went wrong"}
+	}
+}
+
+export async function editProfilePaymentMethod(pb, body) {
+	const {recordId,...paymentMethods} = body
+	const record = await pb.collection('ChemiDashProfile').update(recordId, {paymentMethods});
+	if(record.id){
+		return { success:true,message:" Updated payment methods"}
+	}else{
+		return { success:false,message:"Something went wrong"}
+	}
+}
+
+export async function editProfileEmailPreferences(pb, body) {
+	const {recordId,preference} = body
+	const emailPreferences = JSON.parse(preference)
+	console.log(emailPreferences);
+	const record = await pb.collection('ChemiDashProfile').update(recordId, {emailPreferences});
+	//console.log(record);
+	if(record.id){
+		return { success:true,message:" Updated email preferences"}
+	}else{
+		return { success:false,message:"Something went wrong"}
+	}
+}
