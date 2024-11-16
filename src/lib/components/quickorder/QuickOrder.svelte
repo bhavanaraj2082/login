@@ -10,16 +10,10 @@
   export let data;
   let email = '';
   let products = data?.data || [];  
-  console.log("**************************");
-  console.log("i am quick",products);
+ // console.log("**************************");
+  //console.log("i am quick",products);
 
-//   const targetProduct = products.find(data => data.productNumber === '775118');
 
-// if (targetProduct) {
-//     console.log("Details of product with productNumber 775118:", targetProduct);
-// } else {
-//     console.log("No product found with productNumber 775118.");
-// }
 
   
   
