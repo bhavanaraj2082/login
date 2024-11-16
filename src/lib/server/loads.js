@@ -49,7 +49,7 @@ export const loadFirstProduct = async (pb) => {
             expand: 'manufacturerName,Category'
         });
 
-      //  console.log('API response:', products);  
+  
 
         if (!products.items || products.items.length === 0) {
             console.warn('No products found in the API response.');

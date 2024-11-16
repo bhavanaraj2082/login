@@ -625,3 +625,21 @@ export const getOrderresultData = async (pb, body) => {
 		return {success:false, message: 'Order not found' };
 	}
 };
+
+
+
+
+/////////COPY RIGHT CONSENT///
+
+export  async function submitForm( data,pb ) {
+   
+    const formData = await data.formData(); 
+    const formEntries = Object.fromEntries(formData.entries()); 
+    
+    //console.log('Form Data:', formEntries); 
+    const response = await pb.collection('CopyrightConsent').create(formEntries); 
+      return { status: 200, body: { success: true, response } };
+     
+     
+  
+};

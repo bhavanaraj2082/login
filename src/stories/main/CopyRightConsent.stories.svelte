@@ -13,7 +13,7 @@
     import '../../app.css';
   </script>
   
-  <Template let:args>
+  <Template >
     <CopyRightConsent/>
   </Template>
   
