@@ -19,14 +19,14 @@
               />
               <div class="flex flex-col">
                 <p class="text-gray-600 text-sm font-semibold">
-                  {product.productName}
+                  {product.productName || '--'}
                 </p>
                 <p class="font-medium text-sm text-gray-500">
-                  Qty : <span class="text-gray-700">{product.remainingQuantity
+                  Qty : <span class="text-gray-700">{product.remainingQuantity || '--'
                 }</span>
                 </p>
                 <p class="font-medium text-sm text-gray-700">
-                  &#8377; <span>{product.unitPrice}</span>
+                  &#8377; <span>{product.unitPrice || '--'}</span>
                 </p>
               </div>
             </div>

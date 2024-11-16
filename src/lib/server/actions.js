@@ -643,3 +643,15 @@ export  async function submitForm( data,pb ) {
      
   
 };
+
+
+export const  CancelOrder = async(pb,body) =>{
+	const {recordId,status} = body
+	const record = await pb.collection('Orders').update(recordId, {status} );
+	if(record){
+		return { message: 'Order Cancelation Submited' }
+	}
+	else {
+		return { message: 'something went Wrong'}
+	}
+}
