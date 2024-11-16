@@ -154,6 +154,7 @@
 								<span class="text-red-400 text-xs">Message is required</span>
 							{/if}
 						</div>
+						<input type="hidden" name="status" value="unread" />
 						<div class="flex-1 mb-4 sm:mt-0">
 							<button type="submit" on:click={handleSubmit} class="px-5 py-2 bg-primary-500 text-white rounded-lg transition duration-300 hover:bg-primary-300 sm:w-auto">Send Message</button>
 						</div>
