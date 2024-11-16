@@ -219,7 +219,7 @@
         >
           <div class="text-sm font-semibold text-gray-500">Total:</div>
           <p class="text-sm font-medium text-heading">
-            &#8377; {order.totalprice || "--"}
+            &#8377; {order.totalprice.toFixed(3) || "--"}
           </p>
         </div>
 
@@ -302,7 +302,7 @@
               <div class="flex justify-between">
                 <p class="text-gray-500 text-sm font-medium">Subtotal:</p>
                 <p class="text-heading text-sm font-semibold">
-                  &#8377; {order.totalprice || "--"}
+                  &#8377; {order.totalprice.toFixed(3) || "0.00"}
                 </p>
               </div>
               <div class="flex justify-between mb-2">
@@ -310,14 +310,14 @@
                   Shipping Charge:
                 </p>
                 <p class="text-heading text-sm font-semibold">
-                  &#8377; {order.shippingprice || "--"}
+                  &#8377; {order.shippingprice.toFixed(3) || "0.00"}
                 </p>
               </div>
               <hr />
               <div class="flex justify-between mt-2">
                 <p class="text-gray-500 text-sm font-medium">Total:</p>
                 <p class="text-heading text-sm font-semibold">
-                  &#8377; {order.totalprice || "--"}
+                  &#8377; {order.totalprice.toFixed(3) || "0.00"}
                 </p>
               </div>
             </div>
@@ -327,7 +327,7 @@
                 Delivary Address
               </h1>
               <div class=" rounded-lg py-3 px-3 border-1 text-gray-500">
-                <p class="font-semibold text-sm text-gray-500">
+                <p class="font-medium text-sm text-gray-500">
                   {order.deliveryaddress || "--"}
                 </p>
               </div>

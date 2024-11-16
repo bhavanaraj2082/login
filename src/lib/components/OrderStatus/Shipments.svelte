@@ -47,6 +47,9 @@
 </script>
 
 <div class="col-span-2 mt-2">
+  <div class="flex justify-center mt-8">
+    <p class="text-content font-light">No products have been shipped yet.</p>
+  </div>  
   {#each shipmentdetails as shipment, index}
     <div class="mb-5">
       <div class="mb-3">

@@ -12,9 +12,9 @@
     {#each orderedproduct as product}
       <div class="border rounded-lg mb-5">
         <div
-          class="border grid grid-cols-2 sm:grid-cols-3 gap-4 justify-between items-center px-4 py-2 rounded-t-md"
+          class="border grid grid-cols-1 sm:grid-cols-4 gap-4 justify-between items-center px-4 py-2 rounded-md"
         >
-          <div class="flex gap-3 items-center col-span-2 sm:col-span-1 mb-2 sm:mb-0">
+          <div class="flex gap-3 items-center col-span-3 sm:col-span-2 mb-2 sm:mb-0">
             <img src={product.imgSrc} alt="img" class="w-16 rounded-lg" />
             <div class="flex flex-col">
               <p class="text-gray-600 text-sm font-semibold">
