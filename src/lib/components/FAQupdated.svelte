@@ -14,19 +14,19 @@
 	}
 </script>
 <section>
-    <div class="w-full max-w-8xl mx-auto p-0 px-0 border-gray-200 bg-white sm:p-4 sm:px-8">
-        <h1 class="lg:text-4xl md:text-3xl sm:text-2xl text-xl  font-bold text-gray-700 mb-6 sm:mb-4 md:mb-8 lg:mb-12">
+    <div class="w-11/12 max-w-7xl mx-auto p-0 px-0 border-gray-200 bg-white sm:p-4 sm:px-8">
+        <h1 class="lg:text-4xl md:text-3xl sm:text-2xl text-xl  font-bold text-gray-700 mb-6 sm:mb-4 md:mb-8 lg:mb-12 ml-2 sm:ml-2 md:ml-2 lg:ml-0">
           Frequently Asked Questions
         </h1>
-        <div class="flex gap-3 mb-4">
+        <div class="flex gap-3 mb-4 mx-2 sm:mx-2 md:mx-2 lg:mx-0">
         	{#each sections as { title }, index}
         	    <button
-        		    class={`flex flex-wrap justify-center items-center p-2 w-32 ${activeIndex === index ? ' font-semibold  bg-white'  : 'bg-red-100'}`}
+        		    class={`flex flex-wrap justify-center items-center p-2 w-32 ${activeIndex === index ? ' font-semibold  bg-white'  : 'bg-primary-100'}`}
         		    on:click={() => selectSection(index)}
         	    >   
         		{title}
                 {#if activeIndex === index}
-                    <hr class="w-24 h-1 bg-orange-500 mt-1">
+                    <hr class="w-24 h-1 bg-primary-500 mt-1 transition-all duration-300 ease-in-out">
                 {/if}
                 </button> 
         	{/each}

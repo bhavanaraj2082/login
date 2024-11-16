@@ -60,7 +60,7 @@
     });
 </script>
 
-<div class="p-6 max-w-6xl mx-auto">
+<div class="p-6 max-w-7xl mx-auto w-11/12">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <h1 class="text-3xl font-bold mb-6">My Favourites</h1>
 
