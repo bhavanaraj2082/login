@@ -1,6 +1,6 @@
 <script>
     import { enhance } from '$app/forms';
-    import Cookies from 'js-cookie';
+    import { goto } from '$app/navigation';
     let email = '';
     let password = '';
     let showPassword = false;
@@ -17,7 +17,7 @@
 
     function redirectToProfile() {
     setTimeout(() => {
-      window.location.href = "/profile";
+      goto('/profile'); 
     }, 10);
   }
 
