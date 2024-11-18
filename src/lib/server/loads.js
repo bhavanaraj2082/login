@@ -247,7 +247,15 @@ export async function getorderstatusdata(pb, orderid) {
 	}
 }
 
-
+export async function getProfileDetails(pb,userEmail){
+    if (!userEmail) {
+        console.error("Invalid user ID");
+        return null;
+    }
+	const records = await pb.collection('ChemiDashProfile').getFirstListItem(`userId.email="${userEmail}"`,{expand:'userId'});
+	
+	return records
+}
 
 
 
