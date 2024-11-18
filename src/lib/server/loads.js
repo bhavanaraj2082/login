@@ -40,34 +40,79 @@ export async function loadProductById(productId) {
 //////////Product Filter ///////////////
 
 
-export const loadFirstProduct = async (pb) => {
-   // console.log('Fetching chemical products...');
+// export const loadFirstProduct = async (pb) => {
+//    // console.log('Fetching chemical products...');
 
     
-        const products = await pb.collection('Products').getList(1, 2000, { 
-            sort: '-created',
-            expand: 'manufacturerName,Category'
-        });
+//         const products = await pb.collection('Products').getList(1, 2000, { 
+//             sort: '-created',
+//             expand: 'manufacturerName,Category'
+//         });
 
   
 
-        if (!products.items || products.items.length === 0) {
-            console.warn('No products found in the API response.');
-            return  [] ;
-        }
+//         if (!products.items || products.items.length === 0) {
+//             console.warn('No products found in the API response.');
+//             return  [] ;
+//         }
 
     
-        const productsWithNames = products.items.map(product => ({
+//         const productsWithNames = products.items.map(product => ({
+//             ...product,
+//             manufacturerName: product.expand?.manufacturerName?.name || 'Unknown Manufacturer',
+//             categoryName: product.expand?.Category?.name || 'Unknown Category',
+//         }));
+
+//     //    console.log('Mapped products:', productsWithNames);  
+
+//         return  productsWithNames ;
+//     } 
+
+//////////PRODUCTS FILTER WITH STOCk
+export const loadFirstProduct = async (pb) => {
+   
+    const products = await pb.collection('Products').getList(1, 1000, { 
+        sort: '-created',
+    });
+
+   // console.log("I am product", products.items);
+
+    if (!products.items || products.items.length === 0) {
+        console.warn('No products found');
+        return [];
+    }
+
+
+ 
+    const stocks = await pb.collection('Stocks').getList(1, 1000, 
+        { 
+        expand:'partNumber'
+        // sort: '-created',
+    });
+
+    
+    if (!stocks.items || stocks.items.length === 0) {
+        console.warn('No stock data found');
+    }
+
+    const productNames = products.items.map(product => {
+        
+        const stock = stocks.items.find(stockItem => 
+            stockItem.expand.partNumber?.id === product.id
+        );
+
+        
+
+        return {
             ...product,
-            manufacturerName: product.expand?.manufacturerName?.name || 'Unknown Manufacturer',
-            categoryName: product.expand?.Category?.name || 'Unknown Category',
-        }));
+            stockQuantity: stock ? stock.stockQuantity : 0,  
+        };
+    });
 
-    //    console.log('Mapped products:', productsWithNames);  
+    // console.log('Mapped products with stock quantity:', productNames);
 
-        return  productsWithNames ;
-    } 
-
+    return productNames;
+};
 
 
 
@@ -351,3 +396,65 @@ export async function getReturnSavedData(pb) {
 	return { records: records };
 }
 //returns loads ends
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// export const quick = async (pb) => {
+//     // Fetch products
+//     const products = await pb.collection('Products').getList(1, 1000, {
+//         sort: '-created',
+//     });
+
+//     if (!products.items || products.items.length === 0) {
+//         console.warn('No products found');
+//         return [];
+//     }
+
+//     // Fetch stocks
+//     const stocks = await pb.collection('Stocks').getList(1, 1000, {
+//         expand: 'partNumber',
+//     });
+
+//     if (!stocks.items || stocks.items.length === 0) {
+//         console.warn('No stock data found');
+//     }
+
+//     // // Debug: Log all products and stocks
+//     // console.log('Products:', products.items);
+//     // console.log('Stocks:', stocks.items);
+
+//     // Map products with stock data
+//     const productNames = products.items.map(product => {
+//         // Find stock for the current product based on `partNumber` expansion
+//         const stock = stocks.items.find(stockItem => 
+//             stockItem.expand.partNumber?.id === product.id
+//         );
+
+
+//         return {
+//             ...product,
+//             stockQuantity: stock ? stock.stockQuantity : 0,
+//         };
+//     });
+
+//     // Filter to check the specific ProductNumber
+//     const testProduct = productNames.find(product => product.productNumber === '775118');
+
+//     // Debug: Log result for the specific ProductNumber
+//     console.log('Test Product 775118:', testProduct);
+
+//     return productNames;
+// };
