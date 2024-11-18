@@ -99,33 +99,62 @@ export async function profileupdate(pb,userId){
 } 
 
 /*****************ProductsInfoPopup******************/
-export const loadProductsInfo = async (pb) => {
-	const response = await pb.collection('Products').getList(2, 1, {}); 
-	
-	const formattedRecords = response.items.map(record => ({
-		productId: record.id,
-		productName: record.productName,
-		productNumber: record.productNumber,
-		prodDesc: record.prodDesc,
-		imageSrc: record.imageSrc,
-		safetyDatasheet: record.safetyDatasheet,
-		priceSize: Array.isArray(record.priceSize) ? record.priceSize.map(item => ({
-			price: item.price,
-			size: item.size,
-		})) : [],
-		properties: record.properties || {},
-		description: record.description || {},
-		safetyInfo: record.safetyInfo || {},
-		productSynonym: record.filteredProductData[`Synonym(S)`] || "",
-	}));
-	
-	console.log("Formatted Product Records:", formattedRecords);
+export async function loadProductsInfo(pb, { ProductId }){
+    // console.log("Input ProductId:", ProductId);
+    const response = await pb.collection('Products').getFirstListItem(`productNumber="${ProductId}"`, { expand: 'manufacturerName' });
 
-	return {
-		type: "success",
-		records: formattedRecords,
-	};
-};  
+    if (!response) {
+        return {
+            type: "error",
+            message: "Product record not found",
+        };
+    }
+    const PartNumber = response.id; 
+    console.log("PartNumber for stock data:", PartNumber);
+    let stockQuantity = 0;
+
+    if (PartNumber) {
+        try {
+            const stockRecord = await pb.collection('Stocks').getFirstListItem(`partNumber="${PartNumber}"`, { expand: 'partNumber' });
+            console.log("Fetched stockRecord:", stockRecord); 
+            if (stockRecord && typeof stockRecord.stockQuantity !== "undefined") {
+                stockQuantity = stockRecord.stockQuantity;
+                console.log("Stock Quantity fetched:", stockQuantity);
+            } else {
+                console.log("Stock record found but stockQuantity is undefined.");
+            }
+        } catch (error) {
+            console.error("Error fetching stockRecord:", error);
+        }
+    }
+
+    const formattedRecord = {
+        productId: response.id,
+        productName: response.productName,
+        productNumber: response.productNumber,
+        prodDesc: response.prodDesc,
+        imageSrc: response.imageSrc,
+        safetyDatasheet: response.safetyDatasheet,
+        priceSize: Array.isArray(response.priceSize)
+            ? response.priceSize.map((item) => ({
+                  price: item.price,
+                  size: item.size,
+              }))
+            : [],
+        properties: response.properties || {},
+        description: response.description || {},
+        safetyInfo: response.safetyInfo || {},
+        productSynonym: response.filteredProductData?.['Synonym(S)'] || "",
+        stockQuantity, // Include stock quantity only if fetched
+    };
+
+    return {
+        type: "success",
+        records: [formattedRecord],
+    };
+}; 
+
+
 // search bar component 
 export async function fetchProductName(pb) {
 	try {

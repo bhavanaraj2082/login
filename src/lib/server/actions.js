@@ -501,7 +501,7 @@ export async function loadFavourites(pb) {
 }
 
 /*******************ProductsInfoPopup******************/
-export const checkavailabilityproduct = async (data, pb) => {
+export async function checkavailabilityproduct(data, pb){
 	const ProductId = data.ProductId;
 	const requestedQuantity = parseInt(data.quantity, 10);
 

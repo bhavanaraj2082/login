@@ -1,13 +1,6 @@
 <script>
-    import Filter from "$lib/components/ProductsFilter.svelte";
-    import Product from "$lib/components/Product/product.svelte";
-    export let data ;
+    import ProductDetails from "$lib/components/ProductInfoPopups/ProductDetails.svelte";
+    export let data;
 </script>
 
-<div>
-
-  <Product/>
-  <Filter {data} />
-</div>
-
-   
+<ProductDetails {data} />
