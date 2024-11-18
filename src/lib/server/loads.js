@@ -260,7 +260,7 @@ export async function getSubSubCategoryDatas(pb, subsubid) {
 export async function popularProducts(pb) {
 	const record = await pb.collection('PopularProducts').getFullList({
 		sort: 'order',
-		expand: 'product'
+		expand: 'product,product.Category,product.subCategory'
 	});
 	return record
 }
