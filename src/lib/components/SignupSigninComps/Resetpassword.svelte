@@ -44,7 +44,7 @@
         }}
         >
             <div class="bg-white p-8 shadow-lg rounded-lg max-w-lg">
-                <h2 class="text-2xl font-bold text-center text-primary-500 mb-6">Reset password</h2>
+                <h2 class="text-2xl font-bold text-center text-primary-500 mb-6">Reset Password</h2>
                 <div class="flex justify-center mb-6">
                     <div class="w-1/2 flex items-center">
                         <div class="h-5 w-7 py-2 bg-primary-500 text-white text-xs rounded-full flex justify-center items-center">1</div>
@@ -60,7 +60,7 @@
                 </div>
                 <h3 class="text-center text-gray-600 font-semibold mb-4">Step 1</h3>
                 <p class="text-gray-500 text-sm text-left mb-4 font-semibold">Forgot Password?</p>
-                <p class="text-gray-500 text-sm text-left mb-3">Enter Your Email To Receive A Link To Reset Your Password</p>
+                <p class="text-gray-500 text-sm text-left mb-3">Enter your email to receive a link to reset your password</p>
                 <div class="mb-14">
                     <input class="border border-gray-300 p-3 w-full text-sm rounded mb-2" name="email" type="email" placeholder="example@gmail.com" bind:value={email} required>
                     {#if emailError}

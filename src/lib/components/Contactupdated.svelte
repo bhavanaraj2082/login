@@ -44,7 +44,7 @@
     }
 	}
 </script>
-<section class="my-10 flex flex-wrap justify-center mx-auto px-2 sm:p-0 font-roboto">
+<section class="my-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto px-2 sm:p-0 font-roboto">
 	<div class="w-full md:w-4/5 bg-white border border-gray-300 rounded-lg">
 		<h1 class="text-2xl font-bold bg-primary-500 text-white py-4 pl-4 rounded-t-lg">
 			Get in Touch with Us
@@ -154,6 +154,7 @@
 								<span class="text-red-400 text-xs">Message is required</span>
 							{/if}
 						</div>
+						<input type="hidden" name="status" value="unread" />
 						<div class="flex-1 mb-4 sm:mt-0">
 							<button type="submit" on:click={handleSubmit} class="px-5 py-2 bg-primary-500 text-white rounded-lg transition duration-300 hover:bg-primary-300 sm:w-auto">Send Message</button>
 						</div>

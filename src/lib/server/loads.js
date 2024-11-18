@@ -255,4 +255,49 @@ export async function getProfileDetails(pb,userEmail){
 	const records = await pb.collection('ChemiDashProfile').getFirstListItem(`userId.email="${userEmail}"`,{expand:'userId'});
 	
 	return records
-} 
+}
+
+
+
+///Updated Quick Order 
+export const quick = async (pb) => {
+   
+    const products = await pb.collection('Products').getList(1, 1000, { 
+        sort: '-created',
+    });
+
+   // console.log("I am product", products.items);
+
+    if (!products.items || products.items.length === 0) {
+        console.warn('No products found');
+        return [];
+    }
+
+  
+    const stocks = await pb.collection('Stocks').getList(1, 1000);
+  //  console.log("Fetched stock data:", stocks.items);
+    
+    if (!stocks.items || stocks.items.length === 0) {
+        console.warn('No stock data found');
+    }
+
+
+    const productNames = products.items.map(product => {
+       
+        const stock = stocks.items.find(stockItem => 
+            stockItem.partNumber.trim() === product.ProductNumber);
+        
+      
+        //console.log(`Checking product: ${product.ProductNumber}, Found stock:`, stock);
+        
+
+        return {
+            ...product,
+            stockQuantity: stock ? stock.stockQuantity : 0,  
+        };
+    });
+
+   // console.log('Mapped products with stock quantity:', productNames);
+
+    return productNames;
+};

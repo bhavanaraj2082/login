@@ -44,7 +44,7 @@
         }}
         >
             <div class="bg-white p-8 shadow-lg rounded-lg w-[430px]">
-                <h2 class="text-2xl font-bold text-center text-primary-500 mb-6">Reset password</h2>
+                <h2 class="text-2xl font-bold text-center text-primary-500 mb-6">Confirm Password</h2>
                 <div class="flex justify-center mb-6">
                     <div class="w-1/2 flex items-center">
                         <div class="h-5 w-7 py-2 bg-primary-500 text-white text-xs rounded-full flex justify-center items-center">1</div>

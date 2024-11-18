@@ -95,8 +95,7 @@
         }, 3000);
     }
 </script>
-<div class="bg-gray-100 p-2 md:p-8">
-    <div class="mx-auto">
+    <div class="bg-gray-100 mx-auto w-11/12 max-w-7xl p-2">
         <h1 class="text-2xl font-bold mb-4 mt-5 text-center">Copyright Consent</h1>
         <p class="mb-2 text-sm text-justify">In case you are requesting our consent to use copyrighted material available on our website, please make sure that you have checked our <a href="/terms" class="text-primary-500">Site Use Terms</a>.</p>
         <p class="mb-2  text-sm text-justify">If you are requesting copyright consent that is not already provided by the “Intellectual Property Rights” section, then please fill out the below form, and send it to us. We will review your request.</p>
@@ -254,4 +253,3 @@
             <p class="text-green-500  text-center mt-4">Thank you for submitting your request!</p>
         {/if}
     </div>
-</div>
