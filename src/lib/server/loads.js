@@ -301,3 +301,24 @@ export const quick = async (pb) => {
 
     return productNames;
 };
+
+//returns loads Starts
+export async function getreturnstatusdata(pb, invoiceid) {
+	let records = await pb
+		.collection('Orders')
+		.getOne(`${invoiceid}`, { expand: 'products,shipdetails,dashuserprofileid' });
+
+	if (records) {
+		return { records: records };
+	} else {
+		return { error: 'Error in fetching orderStatus Data' };
+	}
+}
+
+export async function getReturnSavedData(pb) {
+	const records = await pb.collection('Returns').getFullList({
+		sort: '-created'
+	});
+	return { records: records };
+}
+//returns loads ends

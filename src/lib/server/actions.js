@@ -1,4 +1,5 @@
-import Pocketbase from 'pocketbase';
+// import Pocketbase from 'pocketbase';
+import {redirect} from '@sveltejs/kit';
 //import { DB_URL, DB_USER, DB_PASS } from '$env/static/private';
 //const pb = new Pocketbase(`${DB_URL}`);
 
@@ -788,3 +789,142 @@ export const  CancelOrder = async(pb,body) =>{
 		return { message: 'something went Wrong'}
 	}
 }
+//retuns page Starts
+export const getReturnresultData = async (pb, body) => {
+	const record = await pb
+		.collection('Orders')
+		.getFirstListItem(`Invoice="${body.invoiceNumber}"`)
+		.catch(() => {
+			return null;
+		});
+
+	if (record?.id) {
+		 return redirect(302, `/returns/${record.id}`);
+		// return { msg: 'Success', order: record };
+	} else {
+		return { message: 'Return-Order not found' };
+	}
+};
+
+const parseSelectedItems = (otherFields, mode = "individual") => {
+	const selectedItems = [];
+	const itemsByIndex = {};
+  
+	Object.entries(otherFields).forEach(([key, value]) => {
+	  const match = key.match(/^selectedItems\[(\d+)\]\[(\w+)\]$/);
+
+	  if (match) {
+		const index = parseInt(match[1], 10);
+		const field = match[2];
+
+		if (!itemsByIndex[index]) {
+			itemsByIndex[index] = {};
+		  }
+		  itemsByIndex[index][field] = value;
+		//   console.warn("Match for value:", value);
+		}
+	// 	if (!selectedItems[index]) {
+	// 	  selectedItems[index] = {};
+	// 	}
+	// 	selectedItems[index][field] = value;
+	//   } else {
+	// 	console.warn("No match for key:", key); 
+	//   }
+	});
+  
+	// console.log("Parsed selectedItems:", selectedItems);
+	Object.values(itemsByIndex).forEach((item) => {
+		if (item.productNumber) {
+		  const structuredItem = {
+			productNumber: item.productNumber || '',
+			productName: item.productName || '',
+			quantity: item.quantity || '0',
+			returnqty: item.returnqty || item.quantity,
+			reason: item.reason || '',
+			resolution: item.resolution || '',
+			additionalInfo: item.additionalInfo || '',
+			isSelected: item.isSelected === 'true' || false
+		  };
+		  selectedItems.push(structuredItem);
+		}
+	  });	  
+	//   console.log("Structured Items:", selectedItems);
+	const filteredItems = selectedItems.filter(item => {
+	  return (
+		item.productNumber &&
+		item.productName &&
+		item.quantity &&
+		item.returnqty !== undefined && 
+		item.reason && 
+		item.resolution &&
+		item.additionalInfo
+	  );
+	});
+	// console.log("Filtered Items:", filteredItems); 
+	switch (mode) {
+	  case "individual":
+		return filteredItems;
+	  case "multiple":
+		return filteredItems.filter(item => item.isSelected);
+	  case "entireOrder":
+		return filteredItems.map(item => ({
+		  ...item,
+		  isSelected: true,
+		  returnqty: item.quantity  
+		}));
+	  default:
+		throw new Error("Invalid selection mode");
+	}
+};
+
+const createReturnItems = (selectedItems, entireOrderResolution) => {
+	return selectedItems.map(item => {
+	  if (!item.productNumber || !item.productName ||!item.quantity || !item.reason) {
+		return null; 
+	  }
+  
+	  const returnqty = item.returnqty ? item.returnqty : item.quantity;
+  
+	  return {
+		reason: item.reason || "",
+		issue: item.resolution || entireOrderResolution || "",
+		description: item.additionalInfo || "",
+		productNumber: item.productNumber || "",
+		productName: item.productName || "",
+		quantity: item.quantity || "",
+		returnqty: returnqty,
+	  };
+	}).filter(item => item !== null); 
+};
+
+export const getreturnsOrderData = async ({ pb, body }) => {
+	const { orderNumber, invoiceNumber, returnOrderid, entireOrderResolution, ...otherFields } = body;
+
+	const selectedItems = parseSelectedItems(otherFields);
+
+	const returnItems = createReturnItems(selectedItems, entireOrderResolution);
+
+	const data = {
+		orderNumber,
+		invoiceNumber,
+		returnOrderid,
+		returnItems,
+		status: ''
+	};
+
+	const record = await pb.collection('Returns').create(data);
+
+	return { status: 200, record };
+};
+
+export const getcancelreturnData = async ({ pb, id }) => {
+	try {
+	  const deletedRecord = await pb.collection('Returns').delete(id);
+  		console.log(deletedRecord)
+		} catch (error) {
+	  console.error('Error deleting return order:', error);
+	  return { status: 500, message: 'An error occurred while canceling the return.' };
+	}
+};
+
+//return page close 
