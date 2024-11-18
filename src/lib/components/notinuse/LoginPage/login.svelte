@@ -15,6 +15,16 @@
         formSubmitted = false;
     }
 
+    function redirectToProfile() {
+    setTimeout(() => {
+      window.location.href = "/profile";
+    }, 10);
+  }
+
+    $: if (errorStatus === "success") {
+    redirectToProfile();
+  }
+
         // Set cookie using js-cookie
         // function setCookie(name, value, days) {
         // Cookies.set(name, value, { expires: days, sameSite: 'Lax' });
@@ -53,7 +63,7 @@
                         if(result.data.type === "success"){
                             formSubmitted=true;
                             // console.log(result.data.message);
-                            setCookie("Username_or_Email", email, 7);
+                            // setCookie("Username_or_Email", email, 7);
                             resetForm();
                          }
                     }
