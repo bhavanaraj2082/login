@@ -776,4 +776,15 @@ export async function quickcheck(data, pb){
       }
     }
   };
->>>>>>> 0d93b3c344b28ef2cc700d72ebd166a6716992e3
+
+
+export const  CancelOrder = async(pb,body) =>{
+	const {recordId,status} = body
+	const record = await pb.collection('Orders').update(recordId, {status} );
+	if(record){
+		return { message: 'Order Cancelation Submited' }
+	}
+	else {
+		return { message: 'something went Wrong'}
+	}
+}

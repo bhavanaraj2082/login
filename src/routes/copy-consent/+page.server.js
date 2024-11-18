@@ -1,5 +1,5 @@
 import { pb, authenticate } from '$lib/server/pocketbase';
-const pb = await authenticate();
+// const pb = await authenticate();
 export const actions = {
   submitForm: async ({ request }) => {
     const formData = await request.formData();
