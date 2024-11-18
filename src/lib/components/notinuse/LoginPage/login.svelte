@@ -1,6 +1,6 @@
 <script>
     import { enhance } from '$app/forms';
-    import Cookies from 'js-cookie';
+    import { goto } from '$app/navigation';
     let email = '';
     let password = '';
     let showPassword = false;
@@ -14,6 +14,16 @@
         password = '';
         formSubmitted = false;
     }
+
+    function redirectToProfile() {
+    setTimeout(() => {
+      goto('/profile'); 
+    }, 10);
+  }
+
+    $: if (errorStatus === "success") {
+    redirectToProfile();
+  }
 
         // Set cookie using js-cookie
         // function setCookie(name, value, days) {
@@ -53,7 +63,7 @@
                         if(result.data.type === "success"){
                             formSubmitted=true;
                             // console.log(result.data.message);
-                            setCookie("Username_or_Email", email, 7);
+                            // setCookie("Username_or_Email", email, 7);
                             resetForm();
                          }
                     }
