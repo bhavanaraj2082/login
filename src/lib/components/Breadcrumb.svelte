@@ -1,45 +1,35 @@
 <script>
 	import { page } from '$app/stores';    
 	let crumbs = [];
-    $: {
+	$: {
 		const tokens = $page.url.pathname.split('/').filter((t) => t !== '');
 		let tokenPath = '';
 		crumbs = [];
-		if (tokens.length > 0) {
-			crumbs.push({ label: 'Home', href: '/' });
-			tokens.forEach((t, index) => {
-				tokenPath += '/' + t;
-				const label = t
-					.split('-')
-					.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-					.join(' ');
-				crumbs.push({
-					label,
-					href: tokenPath
+		crumbs.push({ label: 'Home', href: '/' });
+		if (tokens.length === 0) {
+			crumbs = [];
+		} else {
+			if (tokens[0] === 'reset-password') {
+				crumbs.push({ label: 'Reset Password', href: '/reset-password' });
+			} else {
+				tokens.forEach((t) => {
+					tokenPath += '/' + t;
+					const label = t
+						.split('-')
+						.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+						.join(' ');
+					crumbs.push({
+						label,
+						href: tokenPath
+					});
 				});
-			});
-			if (crumbs.length > 1) {
-				crumbs[1].label = tokens[0]
-					? tokens[0]
-							.split('-')
-							.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-							.join(' ')
-					: '';
-			}
-			if (crumbs.length > 2) {
-				crumbs[2].label = tokens[1]
-					? tokens[1]
-							.split('-')
-							.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-							.join(' ')
-					: '';
 			}
 		}
 	}
 </script>
 {#if crumbs.length > 0}
-	<div class="bg-gray-100 w-11/12 mx-auto max-w-7xl">
-		<div class="w-full py-3 px-2 lg:w-10/12 mx-auto lg:mx-0">
+	<div class="bg-gray-50">
+		<div class="w-full py-3 px-5 lg:w-10/12 mx-auto">
 			<div class="flex flex-wrap text-primary-400 items-center space-x-0">
 				{#if crumbs.length === 1}
 					<span class="text-primary-400 font-bold text-xs">{crumbs[0].label}</span>
