@@ -1,4 +1,4 @@
 <script>
-   import Contactupdated from '../../lib/components/Contactupdated.svelte';
+   import Contactupdated from '$lib/components/Contactupdated.svelte';
 </script>
 <Contactupdated/>

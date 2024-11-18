@@ -4,9 +4,11 @@
     // console.log("remainingProducts",remainingProducts);
   </script>
 <div class="col-span-2 mt-6">
+  {#if !remainingProducts.length > 0}
   <div class="flex justify-center mt-5">
     <p class="text-content font-light">No pending products available.</p>
   </div>
+  {/if}
     <div class="mb-5">  
       {#each remainingProducts as product}
       <div class="mb-3">
