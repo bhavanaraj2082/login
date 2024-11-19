@@ -291,7 +291,7 @@ export async function getProfileDetails(pb,userEmail){
 ///Updated Quick Order 
 export const quick = async (pb) => {
    
-    const products = await pb.collection('Products').getList(1, 1000, { 
+    const products = await pb.collection('Products').getList(1, 2000, { 
         sort: '-created',
     });
 
@@ -302,22 +302,25 @@ export const quick = async (pb) => {
         return [];
     }
 
-  
-    const stocks = await pb.collection('Stocks').getList(1, 1000);
-  //  console.log("Fetched stock data:", stocks.items);
+
+ 
+    const stocks = await pb.collection('Stocks').getList(1, 1000, 
+        { 
+        expand:'partNumber'
+        // sort: '-created',
+    });
+
     
     if (!stocks.items || stocks.items.length === 0) {
         console.warn('No stock data found');
     }
 
-
     const productNames = products.items.map(product => {
-       
-        const stock = stocks.items.find(stockItem => 
-            stockItem.partNumber.trim() === product.ProductNumber);
         
-      
-        //console.log(`Checking product: ${product.ProductNumber}, Found stock:`, stock);
+        const stock = stocks.items.find(stockItem => 
+            stockItem.expand.partNumber?.id === product.id
+        );
+
         
 
         return {
@@ -326,7 +329,7 @@ export const quick = async (pb) => {
         };
     });
 
-   // console.log('Mapped products with stock quantity:', productNames);
+    // console.log('Mapped products with stock quantity:', productNames);
 
     return productNames;
 };
