@@ -7,9 +7,9 @@
     
   </script>
   
-  <section class="w-11/12 mx-auto mb-3">
-    <h1 class="text-2xl font-semibold text-primary-400">{categoryData.name}</h1>
-    <p class="mt-2 text-lg text-gray-600">{categoryData.description}</p>
+  <section class="w-11/12 mx-auto mb-3 max-w-7xl">
+    <h1 class="text-2xl font-bold text-primary-400">{categoryData.name}</h1>
+    <p class="mt-2 text-lg text-gray-600 sm:px-2">{categoryData.description}</p>
   
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-6 mb-3 ">
       {#each subcategories as subcategory}
