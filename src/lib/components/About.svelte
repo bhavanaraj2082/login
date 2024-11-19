@@ -1,12 +1,12 @@
 <section>
-  <div class="bg-gray-50 max-w-7xl px-32 mx-auto py-8">
+  <div class="bg-gray-50 max-w-7xl w-11/12 px-3 mx-auto py-8">
     <h1 class="text-2xl text-orange-500 font-bold mb-4">About Chemikart</h1>
     <div class="space-y-4">
       <div class="flex flex-col  sm:flex-row-reverse">
         <img
           src="/about.png"
           alt="About"
-          class=" sm:w-56"
+          class=" sm:w-56 lg:pl-2 md:pl-1"
         />
         <div class="py-2">
           <h4 class=" text-md py-2 text-orange-500 font-semibold">
