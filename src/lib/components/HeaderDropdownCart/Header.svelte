@@ -258,7 +258,7 @@
 								</div>
 								{#if submenu.subSubmenus && submenu.subSubmenus.length > 0}
 									<div
-										class={`mt-0 ml-0.5 h-full absolute left-full rounded-sm pb-2 top-0 z-30 w-full bg-white shadow-sm transition-opacity duration-200 ${activeSubmenu === submenu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+										class={`mt-0 ml-0 border-gray-300 border-l h-full absolute left-full rounded-sm pb-2 top-0 z-30 w-full bg-white shadow-sm transition-opacity duration-200 ${activeSubmenu === submenu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
 										role="menu">
 										<ul>
 											{#each submenu.subSubmenus as subSubmenu}
