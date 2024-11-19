@@ -470,7 +470,7 @@ $: updateFilteredProducts();
                     aria-label="View Safety Data Sheet for {product.productName}">SDS</button>
                   <div class="flex flex-col  md:flex-row lg:flex-row items-start justify-between">
                     <div class="hidden md:flex  items-center">
-                      <p class="text-gray-600 font-bold inline-block lg:ml-12 md:ml-10">Price: </p>
+                      <p class="text-gray-600 font-bold inline-block lg:ml-5 md:ml-5">Price: </p>
                       <p class="text-gray-600 text-lg inline-block">
                           {#if product.priceSize && Array.isArray(product.priceSize) && product.priceSize.length > 0}
                             {product.priceSize[0].price} 
@@ -496,7 +496,7 @@ $: updateFilteredProducts();
                         </div>
                         <button 
                           on:click={() => addToCart(product)} 
-                          class="text-primary-400 hover:bg-primary-600 hover:text-white border border-primary-400 p-2 ml-4 rounded text-sm lg:ml-10">Add To Cart</button>
+                          class="text-primary-400 hover:bg-primary-600 hover:text-white border border-primary-400 p-2 ml-2 rounded text-sm lg:ml-5">Add To Cart</button>
                       </div>
                     </div>
                   </div>
