@@ -1,9 +1,9 @@
 <script context="module">
-    import Footerupdated from '$lib/components/Footerupdated.svelte';
+    import Footer from '$lib/components/Footer.svelte';
   
     export const meta = {
-      title: "Footerupdated",
-      component: Footerupdated
+      title: "Footer",
+      component: Footer
     }
   </script>
   
@@ -13,8 +13,8 @@
   </script>
   
   <Template let:args>
-      <Footerupdated /> 
+      <Footer /> 
     </Template>
     
     
-    <Story name="Footerupdated1" />
+    <Story name="Footer1" />

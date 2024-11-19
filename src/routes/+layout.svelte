@@ -2,7 +2,7 @@
   import "../app.css";
   import Header from '$lib/components/HeaderDropdownCart/Header.svelte';
   import Breadcrumb from "$lib/components/Breadcrumb.svelte";
-  import Footer from '$lib/components/Footerupdated.svelte';
+  import Footer from '$lib/components/Footer.svelte';
   export let data;
 </script>
 <Header {data}/>

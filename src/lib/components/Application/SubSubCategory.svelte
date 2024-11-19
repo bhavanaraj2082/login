@@ -5,7 +5,7 @@
   let subsubcategoryData = data?.subsubcategoryData;
 </script>
 
-<section class="w-11/12 mx-auto mb-3">
+<section class="w-11/12 mx-auto mb-3 max-w-7xl">
   <div class="flex flex-col md:flex-row items-center lg:items-start gap-8 mt-8">
     <div class="flex-shrink-0 w-full md:w-1/3">
       <img
