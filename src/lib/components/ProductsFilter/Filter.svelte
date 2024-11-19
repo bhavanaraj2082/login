@@ -146,7 +146,7 @@ const applyFilters = () => {
  
 </script>
 
-<div class="lg:pl-16  lg:pr-12  flex flex-col lg:flex-row">
+<div class="   flex flex-col lg:flex-row">
 
   <!-- Mobile View -->
   <div class="w-full lg:hidden   p-4 mb-4 md:mb-0">
@@ -280,7 +280,7 @@ const applyFilters = () => {
   </div>
 
   <!-- Desktop View -->
-  <div class="hidden lg:block lg:w-1/3 mb-4 md:mb-0">
+  <div class="hidden mt-2 lg:block lg:w-1/3 mb-4 md:mb-0">
     <div class="filter-widget border border-gray-300 rounded-lg shadow-md p-4 w-full">
       <h3 class="text-lg font-bold mb-3 text-gray-700 flex items-center">
         <Icon icon="fluent-mdl2:sort-lines" class="mr-2 text-primary-500" />
@@ -391,4 +391,5 @@ const applyFilters = () => {
  
   <Maincontent {data} />
 </div>
+
 
