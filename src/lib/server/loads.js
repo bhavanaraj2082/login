@@ -189,6 +189,7 @@ export async function loadProductsInfo(pb, { ProductId }){
         properties: response.properties || {},
         description: response.description || {},
         safetyInfo: response.safetyInfo || {},
+        filteredProductData: response.filteredProductData || {},
         productSynonym: response.filteredProductData?.['Synonym(S)'] || "",
         stockQuantity, // Include stock quantity only if fetched
     };

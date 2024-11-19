@@ -4,6 +4,8 @@
   import DetailsPopup from './DetailsPopup.svelte';
   import Imageinfo from './Imageinfo.svelte';
   import Icon from '@iconify/svelte';
+  import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
+
   let quantity = 1;
   let showDropdown = false;
   let showSharePopup = false;
@@ -24,6 +26,7 @@
   let index = 0;
   let isLiked = false;
   let isFavorited = [];
+  let selectedIndex = 0;
   // console.log("Data Records:", data);
 
   function toggleFavorite(index) {
@@ -103,26 +106,50 @@ function toggleModal() {
         console.error("Failed to copy text: ", err);
       });
   }
-  export function addToCart(product) {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const existingProductIndex = cart.findIndex(item => item.id === product.id);
-  
+
+  export function addToCart(product, index) {
+  const cartProduct = {
+    id: product.id,
+    name: product.productName,
+    partNumber: product.productNumber,
+    description: product.prodDesc,
+    imageSrc: product.imageSrc,
+    stock: product.stockQuantity,
+    size: product.priceSize[index].size, 
+    price: product.priceSize[index].price,
+    quantity: product.quantity || 1,
+  };
+
+// console.log("Selected Index:", index);
+// console.log("Selected Size:", product.priceSize[index].size);
+
+  viewedCart.update((cart) => {
+    const existingProductIndex = cart.findIndex((item) => item.id === cartProduct.id && item.size === cartProduct.size);
+
     if (existingProductIndex !== -1) {
-        cart[existingProductIndex].quantity += product.quantity || 1;
+      cart[existingProductIndex].quantity += cartProduct.quantity;
     } else {
-        cart.push({ ...product, quantity: product.quantity || 1 });
+      cart.push(cartProduct);
     }
-  
+
     localStorage.setItem('cart', JSON.stringify(cart));
-    const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
-  
-    cartNotification = `You have ${totalQuantity} item(s) in your cart.`;
-  
-    if (notificationTimeout) clearTimeout(notificationTimeout);
-    notificationTimeout = setTimeout(() => {
-        cartNotification = ''; 
-    }, 3000);
-  }
+
+    return cart; 
+  });
+
+  const totalQuantity = JSON.parse(localStorage.getItem('cart')).reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
+  cartNotification = `You have ${totalQuantity} item(s) in your cart.`;
+
+  if (notificationTimeout) clearTimeout(notificationTimeout);
+  notificationTimeout = setTimeout(() => {
+    cartNotification = '';
+  }, 3000);
+}
+
 </script>
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet"/>
@@ -131,7 +158,7 @@ function toggleModal() {
 <div class="max-[991px]:block md:flex lg:flex bg-white shadow-lg rounded-lg m-10">
   <div class="bg-white shadow-sm rounded-sm p-3 flex space-x-4 justify-between items-center flex-col lg:flex-row m-3">     
     <div class="flex flex-col space-y-4 lg:w-1/3">
-      <div class="relative mb-3">
+      <div class="mb-3">
               <button on:click={toggleImagePopup}>
                 <!-- svelte-ignore a11y-img-redundant-alt -->
                 <img src="{product.imageSrc}" alt="Product Image" class="rounded-lg w-full lg:max-w-2/3">
@@ -141,7 +168,7 @@ function toggleModal() {
               {/if}
       </div>
       <h1 class="text-center text-primary-400 font-semibold !mt-0">All(1)</h1>
-      <div class="relative w-full mb-4">
+      <div class="w-full mb-4">
         <button on:click={toggleDropdown} class="w-full bg-white text-primary-400 border border-primary-400 rounded-lg py-2 px-4 hover:bg-primary-400 hover:text-white">
           Documents <i class="fa-solid fa-angle-down"></i>
         </button>
@@ -238,7 +265,7 @@ function toggleModal() {
     <div class="flex flex-col w-full">
       <div class="text-gray-800">
         <div class="items-center justify-between border-dotted border-b-2 border-gray-300 pb-2">
-          <div class="relative text-lg font-semibold">
+          <div class="text-lg font-semibold">
             {product.productNumber}-{product.priceSize[index].size} <button on:click={toggleModal} class="ml-1 text-primary-400"><i class="fa-solid fa-circle-info"></i></button>
               {#if showModal}
                 <div
@@ -359,7 +386,7 @@ function toggleModal() {
               {/if}
           </form>
           <div class="mt-6 flex justify-end">
-            <button on:click={() => addToCart(product)}  class="bg-primary-400 text-white py-2 px-4 rounded-lg flex items-center space-x-1">
+            <button on:click={() => addToCart(product, index)}  class="bg-primary-400 text-white py-2 px-4 rounded-lg flex items-center space-x-1">
               <i class="fa-solid fa-cart-shopping mr-1"></i>Add To Cart
             </button>
             </div>
@@ -374,7 +401,7 @@ function toggleModal() {
                   <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
 
-                <h2 class="text-sm font-semibold text-gray-600 mb-3">
+                <h2 class="text-base font-semibold text-primary-400 mb-3">
                   Share Product
                 </h2>
 
@@ -385,7 +412,7 @@ function toggleModal() {
                   </div>
 
                 <div>
-                <p class="text-lg font-semibold text-gray-800">{product.productNumber}</p>
+                <p class="text-lg font-semibold text-primary-400">{product.productNumber}</p>
                 <p class="text-sm text-gray-600">{product.productName}</p>
               </div>
             </div>
@@ -445,7 +472,7 @@ function toggleModal() {
       </div>
       <div class="w-full mt-3">
         <button 
-        on:click={() => addToCart(product)} 
+        on:click={() => addToCart(product, index)} 
         class="w-full text-white border border-primary-400 rounded-lg py-2 px-2 hover:bg-primary-400 bg-primary-400 hover:text-white"><i class="fa-solid fa-cart-shopping mr-1"></i>Add To Cart</button>
         <button class="mt-4 w-full bg-white text-primary-400 border border-primary-400 rounded-lg py-2 px-2 hover:bg-primary-400 hover:text-white">
           <i class="fa-solid fa-code-pull-request mr-1"></i>Request For Bulk
