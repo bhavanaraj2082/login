@@ -201,7 +201,7 @@ function addToCart(rowsToProcess) {
               id: product.id,
               name:product.productName,
               image: product.imageSrc,
-              productNumber: product.productNumber,
+              partNumber: product.productNumber,
               price: sizePriceInfo.price,
               size: selectedSize,
               quantity: row.quantity > 0 ? row.quantity : 1,
