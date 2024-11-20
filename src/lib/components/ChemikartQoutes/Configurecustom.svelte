@@ -1,42 +1,52 @@
 <script>
+    let data = {
+        headers: ["CasNumber", "Component Name", "Concentration"],
+        rows: [
+            // ["Row 1 Col 1", "Row 1 Col 2", "Row 1 Col 3"],
+            // ["Row 2 Col 1", "Row 2 Col 2", "Row 2 Col 3"]
+        ]
+    };
+function deleteRow(index) {
+    data.rows.splice(index, 1);
+    data = { ...data }; 
+}
+
+function updateCell(rowIndex, cellIndex, event) {
+    data.rows[rowIndex][cellIndex] = event.target.textContent.trim();
+    data = { ...data }; 
+}
+    let fileInput;
 	import * as XLSX from 'xlsx';
 	import Icon from "@iconify/svelte";
 	import { onMount, onDestroy } from "svelte";
 	import { formData } from '$lib/stores/solution_stores.js';
 	let fileLink = '/Custom_Quote_Template.xls';
-		let uploadedFiles = false;
-		let fileInput;
-		let data = {
-			rows: [],
-			headers: [],
-		};
-		const handleFileUpload = (event) => {
-		uploadedFiles = true;
-		const uploadedFile = event.target.files[0];
-		
-		if (uploadedFile) {
-			event.stopPropagation();
-			const reader = new FileReader();
-			
-			reader.onload = (e) => {
-				const arrayBuffer = new Uint8Array(e.target.result);
-				const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-				const firstSheetName = workbook.SheetNames[0];
-				const worksheet = workbook.Sheets[firstSheetName];
-				const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-				const headers = jsonData[0];
-				const rows = jsonData.slice(1).filter((row) => row.some((cell) => cell !== null && cell !== ''));
-				data = { headers, rows };
-				formData.update((currentData) => {
-					return { 
-						...currentData, 
-						components: [...currentData.components, ...rows] 
-					};
-				});
-			};
-			reader.readAsArrayBuffer(uploadedFile);
-		}
-	};
+		let uploadedFiles = false;	
+	const handleFileUpload = (event) => {
+    uploadedFiles = true;  
+    const uploadedFile = event.target.files[0];
+    if (uploadedFile) {
+        event.stopPropagation();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const arrayBuffer = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            const headers = jsonData[0];
+            const rows = jsonData.slice(1).filter((row) => row.some((cell) => cell !== null && cell !== ''));
+            data = { headers, rows };
+            formData.update((currentData) => {
+                return { 
+                    ...currentData, 
+                    components: rows  
+                };
+            });
+        };
+        reader.readAsArrayBuffer(uploadedFile);
+    }
+};
 		function triggerFileInput() {
 			fileInput.click();
 		}
@@ -141,6 +151,19 @@
 			console.log("currentData:", currentData);
 			data.rows = currentData.components;
 			console.log("currentData.components:", currentData.components);
+			
+			console.log("currentData:", currentData);
+
+// const keyValuePairs = currentData.components.map(item => {
+//   return {
+//     "CasNumber": item[0].toString(),      
+//     "Component Name": item[1],
+//     "Concentration": item[2].toString()    
+//   };
+// });
+// const data = { rows: keyValuePairs };
+// console.log("data.rows:", data.rows);
+
 			selectedSolvent = currentData.solvent;
 			selectedPackagingType = currentData.packagingType;
 			inputValue = currentData.volume;
@@ -154,7 +177,7 @@
 			unsubscribe();
 		});
 		const saveAndContinue = () => {
-			if (uploadedFiles===false) { 
+			if (!uploadedFiles) { 
 				errorMessage = "Please upload an Excel file.";
 			} else if (!isFormData) {
 				errorMessage = "Please fill all the details";
@@ -163,6 +186,13 @@
 				tog2();
 			}
 		};
+		
+		onMount(() => {
+    if (data.rows && data.rows.length > 0) {
+        uploadedFiles = true;
+    }
+});
+
 		</script>
 		<div class="mx-10 my-10 flex justify-between">
 			<h1 class="font-bold text-2xl text-black text-opacity-25">
@@ -223,17 +253,32 @@
 								{#each data.headers as header}
 									<th class="border p-2 text-center">{header}</th>
 								{/each}
+								<th class="border p-2 text-center">Action</th> <!-- Add manually -->
 							</tr>
 						</thead>
 						<tbody>
-							{#each data.rows as row, index}
+							{#each data.rows as row, rowIndex}
 								<tr>
-									{#each row as cell}
-										<td class="border p-2 text-center">{cell}</td>
+									{#each row as cell, cellIndex}
+										<td
+											class="border p-2 text-center"
+											contenteditable="true"
+											on:blur={(e) => updateCell(rowIndex, cellIndex, e)}
+										>
+											{cell}
+										</td>
 									{/each}
+									<td class="border p-2 text-center">
+										<button
+											class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700"
+											on:click={() => deleteRow(rowIndex)}
+										>
+											Delete
+										</button>
+									</td>
 								</tr>
 							{/each}
-						</tbody>
+						</tbody>						
 					</table>
 				</div>		
 			{/if}
@@ -348,11 +393,11 @@
 			<h1 class="font-bold text-2xl">What unit volume do you need?*</h1>
 			<div class="relative">
 				<select
-					class="ml-10 border-2 border-gray-300 rounded-md mt-5 h-8 w-28"
+					class="ml-10 border-2 border-gray-300 rounded-md mt-5 h-10 w-28"
 					on:change={handleSelect}
 					bind:value={inputValue}
 				>
-					<option value="" disabled selected>ml</option>
+					<option class="text-sm" value="" disabled selected>ml</option>
 					{#each options as option}
 						<option value={option}>{option}</option>
 					{/each}

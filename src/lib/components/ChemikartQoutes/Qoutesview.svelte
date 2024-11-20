@@ -32,6 +32,7 @@
 				}
 			});
 		}
+		let status = 'unread';
 	</script>
 	<form method="POST" action="?/qoutes" class="mx-10 p-5 bg-white rounded-lg shadow-lg space-y-4" use:enhance={() => {return async({ result }) => {
 				let message1 = '';
@@ -227,6 +228,7 @@
 		<input type="hidden" name="county" bind:value={$Delivery.County} />
 		<input type="hidden" name="city" bind:value={$Delivery.City} />
 		<input type="hidden" name="post" bind:value={$Delivery.Post} />
+		<input type="hidden" name="status" value="unread" />
 		<div class="flex space-x-4 mt-5">
 			<button
 				type="submit" 

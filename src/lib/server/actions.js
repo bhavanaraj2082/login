@@ -35,11 +35,20 @@ export const myDetails = async (request, pb) => {
 //ACTION FUNCTION FOR QUOTES PAGE
 export const Addquotes = async (data, pb) => {
 	const componentsArray = data['components[]'].split('\n');
+	const headers = ["CasNumber", "Component Name", "Concentration", "CasNumber2", "Component Name2", "Concentration2"];  
+	const formattedComponents = componentsArray.map(component => {
+		const componentValues = component.split(',');  
+		let componentObject = {};
+		headers.forEach((header, index) => {
+			componentObject[header] = componentValues[index] || '';  
+		});
+		return componentObject;
+	});
 	const formattedData = {
 		Custom_solution_type: data.solutionValue,
 		Custom_format: data.selectedColor,
 		Configure_custom_solution: {
-			components: componentsArray,
+			components: formattedComponents,  
 			solvent: data.solvent,
 			packagingType: data.packagingType,
 			volume: data.volume,
@@ -48,6 +57,7 @@ export const Addquotes = async (data, pb) => {
 			analyticalTechnique: data.analyticalTechnique
 		},
 		Additional_notes: data.futherdetails,
+		status: data.status,  
 		Customer_details: {
 			Title: data.title,
 			Firstname: data.first,
