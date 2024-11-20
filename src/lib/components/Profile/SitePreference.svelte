@@ -7,9 +7,10 @@
 
     export let recordId
     export let sitePreferences
-    export let changeTabs
 
-    let { productEntryType,noOfQuickOrderFields,noOfOrdersPerPage,noOfQuotesPerPage } = sitePreferences
+    let toggleEdit = false
+
+    $: ({ productEntryType,noOfQuickOrderFields,noOfOrdersPerPage,noOfQuotesPerPage } = sitePreferences)
 
     let productEntry = productEntryType || "Manual Entry"
     let quickOrder = noOfQuickOrderFields || 3
@@ -41,6 +42,7 @@ const handleSubmit =()=>{
         console.log(result);
         if(result.type === "success"){
             dispatch("onSuccess",result.data)
+            toggleEdit = false
             await update()
         }
     }
@@ -48,9 +50,26 @@ const handleSubmit =()=>{
 </script>
 
 <div class="border shadow-sm rounded-md p-5 bg-white">
+    <h1 class=" text-xl font-bold"> Manage Your Site Preferences</h1>
+      {#if !toggleEdit}
+         <div>
+            <div class=" flex items-center justify-between border-b-1 mt-2 pb-2">
+                <h2 class=" font-semibold text-4s">Site Preferences</h2>
+                <button on:click={()=>toggleEdit = true} class=" w-20 rounded py-1.5 font-medium text-xs md:text-sm text-white bg-primary-500 hover:bg-primary-600">Edit</button>
+            </div>
+            <div class=" space-y-2 my-4">
+                <div class=" text-xs md:text-sm font-medium">Product Entry Preference : <span class=" font-semibold">{productEntryType}</span></div>
+                <div class=" text-xs md:text-sm font-medium">Default number of entry fields on Quick Order : <span class=" font-semibold">{noOfQuickOrderFields}</span></div>
+                <div class=" text-xs md:text-sm font-medium">Display number of orders on Orders Page : <span class=" font-semibold">{noOfOrdersPerPage}</span></div>
+                <div class=" text-xs md:text-sm font-medium">Display number of orders on Orders Page: <span class=" font-semibold">{noOfQuotesPerPage}</span></div>
+            
+            </div>
+         </div>
+      {/if}
 
-    <div class=" max-w-2xl">
-        <h1 class=" text-xl font-bold"> Manage Your Site Preferences</h1>
+
+       {#if toggleEdit}
+      <div class=" max-w-2xl">
         <p class="mt-3 text-sm font-bold">Order/Quote Preference</p>
         <form class="my-3 flex flex-col sm:flex-row flex-wrap gap-y-6"
         method="POST" action="?/editSitePreferences" use:enhance={handleSubmit}>
@@ -109,10 +128,11 @@ const handleSubmit =()=>{
             
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
                 <button type="submit" class=" w-full rounded py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Save</button>
-                <button type="button" on:click={()=>changeTabs(0)} class=" w-full rounded py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
+                <button type="button" on:click={()=>toggleEdit = false} class=" w-full rounded py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
             </div>
     
         </form>
     
-     </div>
-     </div>
+      </div>
+       {/if}
+</div>

@@ -12,19 +12,52 @@
 
     let activeAddressType = ''
     let toggleEdit = false
-    let activeAddress = ''
-    let selectedAddress = ''
+    let activeAddress
+    let dummy = {
+        organizationName:'',
+        attentionTo:'',
+        street:'',
+        city:'',
+        state:'',
+        location:'',
+        department:'',
+        postalCode:'',
+        building:''
+    }
+   
     let errors = {}
+    
+
 
     $:(()=>{
-        if(activeAddressType === "shipping") activeAddress = shippingAddress
-        if(activeAddressType === "billing") activeAddress = billingAddress
-        if(activeAddressType === "payment") activeAddress = paymentAddress
-        if(activeAddressType === "organization") activeAddress = organizationAddress
+        if(activeAddressType === "shipping") {
+           shippingAddress === null ? activeAddress = dummy : activeAddress = shippingAddress
+        }
+        if(activeAddressType === "billing"){
+           billingAddress === null ? activeAddress = dummy : activeAddress = billingAddress
+        }
+        if(activeAddressType === "payment"){
+           paymentAddress === null ? activeAddress = dummy : activeAddress = paymentAddress
+        } 
+        if(activeAddressType === "organization"){
+            organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress  
+        } 
        // selectedAddress = activeAddress
     })()
      //console.log(selectedAddress);
-    // let { organizationName,attentionTo,street,city,state,location,department,postalCode,building} = selectedAddress
+    // $: if(activeAddress !== null){
+    //      organizationName = activeAddress.organizationName
+    //      attentionTo = activeAddress.attentionTo
+    //      street = activeAddress.street
+    //      city = activeAddress.city
+    //      state = activeAddress.state
+    //      location = activeAddress.location
+    //      department = activeAddress.department
+    //      postalCode = activeAddress.postalCode
+    //      building = activeAddress.building
+    // }else{
+        
+    // }
 
     let states = [
         "Andhra Pradesh",
@@ -260,6 +293,8 @@
         "Zimbabwe"
     ];
 
+
+
     const handleRadio = (address)=>{
         if(address === "shipping") activeAddress = shippingAddress
         if(address === "billing") activeAddress = billingAddress
@@ -359,14 +394,16 @@
          <div>
             <label for="pay" class="text-xs md:text-sm font-medium flex items-center gap-2 mt-2"> 
                 <input type="radio" 
+                disabled={shippingAddress === null}
                 on:change={e=>handleRadio("shipping")}
-                name="select" class=" focus:ring-0 text-primary-500" id="pay">
+                name="select" class=" focus:ring-0 text-primary-500 disabled:cursor-not-allowed" id="pay">
                 Same as Shipping Address
             </label>
             <label for="org" class="text-xs md:text-sm font-medium flex items-center gap-2 mt-2"> 
                 <input type="radio" 
+                disabled={billingAddress === null}
                 on:change={e=>handleRadio("billing")}
-                name="select" class=" focus:ring-0 text-primary-500" id="org">
+                name="select" class=" focus:ring-0 text-primary-500 disabled:cursor-not-allowed" id="org">
                 Same as Billing Address
             </label>
          </div>
@@ -376,7 +413,8 @@
             <label for="bill" class="text-xs md:text-sm font-medium flex items-center gap-2 mt-2"> 
                 <input type="radio"
                 on:change={e=>handleRadio("shipping")} 
-                class=" focus:ring-0 text-primary-500" id="bill">
+                disabled={shippingAddress === null}
+                class=" focus:ring-0 text-primary-500 disabled:cursor-not-allowed" id="bill">
                 Same as Shipping Address
             </label>
          </div>
@@ -389,7 +427,7 @@
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="organizationName"><span class=" text-sm font-bold text-red-500">*</span>Organization</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500"
-                     type="text" name="organizationName" bind:value={ activeAddress.organizationName}/>
+                     type="text" name="organizationName" bind:value={activeAddress.organizationName}/>
                      {#if errors?.organizationName}
 				      <span class="text-red-400 text-xs">{errors.organizationName}</span>
 			          {/if}
@@ -446,10 +484,10 @@
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="state"><span class=" text-sm font-bold text-red-500">*</span>State</label><br>
-                    <select name="state" id="" bind:value={activeAddress.state}
+                    <select name="state" bind:value={activeAddress.state}
                     class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500">
-                        {#each states as state}
-                            <option value={state}>{state}</option>
+                        {#each states as item}
+                            <option value={item}> {item}</option>
                         {/each}
                     </select>
                     {#if errors?.state}

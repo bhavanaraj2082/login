@@ -1,6 +1,8 @@
 <script>
+	import { browser } from '$app/environment';
     import { enhance } from '$app/forms';
-    let errorMessage="";
+    import { authedUser } from '$lib/stores/mainStores.js'
+    let successMessage="";
     let username = '';
     let email = '';
     let language = '';
@@ -9,154 +11,66 @@
     let passwordConfirm = '';
     let errorStatus = '';
     let formSubmitted = false;
-    let errors = {
-        username: '',
-        email: '',
-        language: '',
-        location: '',
-        password: '',
-        passwordConfirm: ''
-    };
+    let errors = {}
 
-    const passwordPattern = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[!@#$%_\\-*])[A-Za-z\\d!@#$%_\\-*]{8,}$";
-    const emailPattern = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$";
-    const usernamePattern = "^[A-Za-z]+$";
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%_\-*])[A-Za-z\d!@#$%_\-*]{8,}$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const usernameRegex = /^[A-Za-z]+$/;
 
     const languages = ['English', 'Spanish', 'French', 'German', 'Italian', 'Portuguese', 'Chinese', 'Japanese', 'Russian'];
     const locations = ['USA', 'Canada', 'UK', 'Australia', 'Germany', 'France', 'India', 'Brazil', 'Japan'];
 
-    function resetForm() {
-        username = '';
-        email = '';
-        language = '';
-        location = '';
-        password = '';
-        passwordConfirm = '';
-        // Reset errors
-        errors = {
-            username: '',
-            email: '',
-            language: '',
-            location: '',
-            password: '',
-            passwordConfirm: ''
-        };
-    }
-
     function validateForm() {
-        let isValid = true;
-
+        errors={}
         // const usernameRegex = new RegExp(usernamePattern);
-        if (!username) {
-            errors.username = 'Leave empty to auto generate..';
-            isValid = false;
-        } else {
-            errors.username = '';
-        }
-
-        const emailRegex = new RegExp(emailPattern);
-        if (!email) {
-            errors.email = 'Please enter a valid email address.';
-            isValid = false;
-        } else if (!emailRegex.test(email)) {
-            errors.email = 'Please enter a valid email address.';
-            isValid = false;
-        } else {
-            errors.email = '';
-        }
-
-        if (!language) {
-            errors.language = 'Please select a language.';
-            isValid = false;
-        } else {
-            errors.language = '';
-        }
-
-        if (!location) {
-            errors.location = 'Please select a location.';
-            isValid = false;
-        } else {
-            errors.location = '';
-        }
-
-        const passwordRegex = new RegExp(passwordPattern);
-        if (!password) {
-            errors.password = 'Password is required.';
-            isValid = false;
-        } else if (!passwordRegex.test(password)) {
-            errors.password = 'Password must contain at least 8 characters, one number, and one special character.';
-            isValid = false;
-        } else {
-            errors.password = '';
-        }
-
-        if (!passwordConfirm) {
-            errors.passwordConfirm = 'Please confirm your password.';
-            isValid = false;
-        } else if (passwordConfirm !== password) {
-            errors.passwordConfirm = 'Passwords do not match.';
-            isValid = false;
-        } else {
-            errors.passwordConfirm = '';
-        }
-
-        return isValid; 
+        if (!username || !usernameRegex.test(username)) errors.username = 'Please enter a valid username';
+        if (!email || !emailRegex.test(email)) errors.email = 'Please enter a valid email address.';
+        if (!language) errors.language = 'Please select a language.';
+        if (!location) errors.location = 'Please select a location.';
+        if (!password) errors.password = 'Password is required.';
+        if (!passwordRegex.test(password)) errors.password = 'Password must contain at least 8 characters, one number, and one special character.';
+        if (!passwordConfirm) errors.passwordConfirm = 'Please confirm your password.';
+        if (passwordConfirm !== password) errors.passwordConfirm = 'Passwords do not match.';
+         console.log('form errors',errors);
+        if(Object.keys(errors).length >0){
+            return false
+        }else{
+            return true
+        } 
     }
 
-    async function handleFormSubmission(data) {
-        console.log('Data to be inserted:', data);
-        // return Promise.resolve({ type: 'success', data: { message: '' } });
+    async function handleFormSubmission({cancel}) {
+        if(!validateForm()){
+            cancel()
+        }
+        return async({result,update})=>{
+            console.log("result",result);
+            if(result.type === "success"){
+                successMessage = result.data
+                if(result.data.success){
+                    await update()
+                    setTimeout(()=>successMessage = "",5000)
+                }else{
+                    setTimeout(()=>successMessage = "",5000)
+                }
+            }
+        }
+        
     }
 </script>
 
-<div class="flex flex-col md:flex-row justify-center items-start shadow-md my-12 rounded-lg max-w-5xl mx-auto">
+<div class="flex flex-col w-11/12 md:flex-row justify-center items-start shadow-md my-12 rounded-lg max-w-5xl bg-white mx-auto">
     <div class="image-container w-full md:w-1/2 flex items-center justify-center">
         <img src="/image.png" alt="Signup" class="w-full h-[200px] md:h-[835px] object-cover rounded-t-lg md:rounded-l-lg md:rounded-tr-none" />
     </div>
 
-    <div class="content w-full md:w-2/3 p-4 md:p-6 flex flex-col justify-center bg-white rounded-tr-lg rounded-b-lg md:rounded-l-lg md:rounded-tl-none">
+    <div class="content w-full md:w-2/3 p-4 md:p-6 flex flex-col justify-center rounded-tr-lg rounded-b-lg md:rounded-l-lg md:rounded-tl-none">
         <h2 class="text-2xl font-bold text-primary-500">Sign Up</h2>
         <p class="text-gray-500 mb-5">Already have an account? <a href='/login' class="underline text-primary-500">Login.</a></p>
         
-        {#if errorStatus === "success"}
-        <div class="border border-green-400 p-3 w-auto text-sm text-gray-600 font-medium rounded my-6"><i class="fa-solid fa-circle-check text-green-400 mr-1"></i>{errorMessage}</div>
-    {/if}
-    {#if errorStatus === "error"}
-        <div class="border border-red-400 p-3 w-auto text-sm text-gray-600 font-medium rounded my-6">{errorMessage}</div>
-    {/if}
-        
-        <form method="POST" action="?/register" 
-        use:enhance={() => {
-            return async ({ result }) => {
-                console.log(result);
-                if(validateForm()){
-                    if (result.data.type === "success") {
-                       await handleFormSubmission({
-                            username,
-                            email,
-                            language,
-                            location,
-                            password,
-                            passwordConfirm
-                        });
-                        errorStatus = result.data.type;
-                        errorMessage =  result.data.message;
-                        console.log(result.data.message);   
-                        if(result.data.type === "success"){
-                            errorStatus = result.data.type;
-                            formSubmitted = true;  
-                            resetForm();  
-                        }                     
-                    } else {
-                    console.error(result.data.message);
-                    errorStatus = result.data.type;
-                    errorMessage =  result.data.message;
-                    formSubmitted = false;
-                    }
-                } 
-            };
-        }}
-        >
+        <form 
+        method="POST" action="?/register"
+         use:enhance={handleFormSubmission}>
             <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
                 <div class="flex-1 mb-2 md:mb-0">
                     <label for="username" class="block text-sm font-medium text-gray-600">Username</label>
@@ -228,12 +142,13 @@
                 <p class="text-gray-500 text-sm">We will occasionally contact you with relevant updates about your account and our products and services. You may manage your account preferences in your account or unsubscribe at any time. We are committed to protecting the privacy of your personal data.</p>
             </div>
 
-            <div class="mb-4">
-                <label>
-                    <input type="checkbox" required />
-                    <!-- svelte-ignore a11y-missing-attribute -->
-                    <a class="text-orange-500">I have read and agreed to the Terms of Service and Privacy Policy</a>
-                </label>
+            <div class="mb-4 flex gap-2">
+                <input type="checkbox" name="termsAndConditions" required value={true} class="mt-0.5 text-primary-500 focus:ring-0" />
+                <!-- svelte-ignore a11y-missing-attribute -->
+                <div class=" text-sm">I have read and agreed to the 
+                    <a class=" font-medium text-primary-500 hover:underline" href="/terms/site-and-terms"> Terms of Service </a> and 
+                    <a class=" font-medium text-primary-500 hover:underline" href="/terms/privacy-notice">Privacy Policy</a>
+                </div>
             </div>
             <div class="mb-4 hidden md:block text-gray-500">
                 <div class="flex flex-col md:flex-row items-start">
@@ -258,5 +173,11 @@
 
             <button type="submit" class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-400 transition duration-200">Create Account</button>
         </form>
+        {#if successMessage.length !== 0}
+        <div class=" fixed w-11/12 mx-auto right-1 sm:right-5 bottom-5 text-center  sm:w-96 md:w-2/4 lg:w-2/5 h-10 md:h-14 border rounded-sm text-xs md:text-sm font-medium flex items-center justify-center 
+        {successMessage.success ? " text-green-600 bg-green-100 border-green-600" : "text-red-600 bg-red-100 border-red-600"}">
+            {successMessage.message}
+        </div>
+        {/if}
     </div>
 </div>

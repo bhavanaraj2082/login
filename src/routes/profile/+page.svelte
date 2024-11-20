@@ -7,7 +7,7 @@
   import PaymentMethod from "$lib/components/Profile/PaymentMethod.svelte";
   import SitePreference from "$lib/components/Profile/SitePreference.svelte";
   export let data;
-  
+  console.log('data',data);
   let activeComp = 0
   let message = ''
   
