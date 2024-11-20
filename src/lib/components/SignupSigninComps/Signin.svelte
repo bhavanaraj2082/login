@@ -1,6 +1,7 @@
 <script>
     import { enhance } from '$app/forms';
-    import Cookies from 'js-cookie';
+    import { goto } from '$app/navigation';
+
     let email = '';
     let password = '';
     let showPassword = false;
@@ -9,20 +10,30 @@
     let successMessage = '';
     let formSubmitted = false;
 
+    function redirectToProfile() {
+    setTimeout(() => {
+      goto('/profile'); 
+    }, 10);
+  }
+
+    $: if (errorStatus === "success") {
+    redirectToProfile();
+  }
+
     function resetForm() {
         email = '';
         password = '';
         formSubmitted = false;
     }
 
-        // Set cookie using js-cookie
-        function setCookie(name, value, days) {
-        Cookies.set(name, value, { expires: days, sameSite: 'Lax' });
-        console.log(`Cookie set: ${name}=${value}; Expires in: ${days} days`);
-        }
+        // // Set cookie using js-cookie
+        // function setCookie(name, value, days) {
+        // Cookies.set(name, value, { expires: days, sameSite: 'Lax' });
+        // console.log(`Cookie set: ${name}=${value}; Expires in: ${days} days`);
+        // }
 </script>
 
-<div class="flex flex-col md:flex-row max-w-3xl shadow-lg rounded-lg mx-auto h-screen md:h-auto my-14">
+<div class="flex flex-col md:flex-row max-w-3xl shadow-lg rounded-lg mx-auto h-screen md:h-auto my-14 border border-gray-200">
     <div class="md:hidden w-full h-1/2 mx-auto flex justify-center"> 
         <img src="/image-1.png" alt="Sign In" class="object-cover w-full h-full rounded" />
     </div>
@@ -53,7 +64,7 @@
                         if(result.data.type === "success"){
                             formSubmitted=true;
                             // console.log(result.data.message);
-                            setCookie("Username_or_Email", email, 7);
+                            // setCookie("Username_or_Email", email, 7);
                             resetForm();
                          }
                     }
