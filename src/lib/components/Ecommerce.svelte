@@ -345,12 +345,15 @@
                             <label class="flex items-center space-x-2">
                                 <input 
                                     type="checkbox" 
-                                    name="user_feedback" 
+                                    name="query" 
                                     bind:value={reason} 
                                     class="w-6 h-6 mb-5 form-checkbox accent-primary-500"
                                 />
                                 <span class="mb-5 text-lg">I agree to the terms and conditions</span>
                             </label>
+                            
+                            <input type="hidden" name="status" value="unread" />
+
                         </div>
                         <div class="flex-1 mb-4 sm:mt-0">
                             <button type="submit" on:click={handleSubmit} class="px-5 py-2 bg-primary-500 text-white rounded-lg transition duration-300 hover:bg-primary-300 sm:w-auto">Send Message</button>

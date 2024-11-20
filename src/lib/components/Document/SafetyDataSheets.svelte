@@ -181,20 +181,20 @@ function toggleRotation(index) {
           <!-- Navigation Menu (Mobile Toggle) -->
           <nav class={`sm:flex flex-col sm:flex-row space-x-0 overflow-x-auto ${showNav ? 'block' : 'hidden'}`} aria-label="Tabs">
             {#each tabs as tab}
-              <div class="relative inline-block">
-                <button
-                  on:click={() => (activeTab = tab.name)} 
-                  class="py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300 
+            <div class="inline-block">
+              <button
+                on:click={() => (activeTab = tab.name)} 
+                class="py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300 
                   {activeTab === tab.name 
                     ? 'bg-gray-50 text-primary-300 font-bold'
                     : 'sm:bg-primary-100 text-black'}
                   hover:bg-gray-50 hover:text-primary-300 whitespace-nowrap">
-                  {tab.name}
-                </button>
-                <span 
-                  class="h-0.5 bg-primary-300 
-                  {activeTab === tab.name ? 'w-0.5 h-3/4' : 'hidden'} sm:absolute sm:bottom-0 sm:left-1/2 sm:-translate-x-1/2 sm:w-3/4 sm:h-0.5"></span>
-              </div>
+                {tab.name}
+              </button>
+              <div class="h-0.5 bg-primary-300 
+                {activeTab === tab.name ? 'w-3/4 h-0.5' : 'hidden'}"></div>
+            </div>
+            
             {/each}
           </nav>
         </div>
