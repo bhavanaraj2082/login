@@ -204,6 +204,7 @@
 		{ name: 'Zimbabwe', code: '+263' }
 	];
 	let errorMessage = '';
+	let phoneError = '';
 
 	onMount(() => {
 		const storedDetails = JSON.parse(localStorage.getItem('Delivery'));
@@ -223,8 +224,13 @@
 			errorMessage = 'Please fill all the details';
 		} else {
 			errorMessage = '';
-			tog5();
 		}
+		const phonePattern = /^\d{6}$/;
+		if (!phonePattern.test($Delivery.Post)) {
+			phoneError = 'Please enter a valid  Post code (6 digits).';
+			return;
+		}
+		tog5();
 	};
 </script>
 
@@ -326,6 +332,9 @@
 				class="block w-2/5 lg:w-1/2 p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500"
 				bind:value={$Delivery.Post}
 			/>
+			{#if phoneError}
+			<p class="text-red-500">{phoneError}</p>
+		{/if}
 		</div>
 	</div>
 	<div class="flex space-x-4 mt-5">

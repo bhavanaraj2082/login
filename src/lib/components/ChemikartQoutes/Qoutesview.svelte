@@ -45,13 +45,27 @@
     keywordError = result.data.type;
     if (keywordError === "success") {
       message1 = result.data.data.message; 
-	  location.reload()
+      setTimeout(() => {
+        location.reload();
+      }, 2000)
     } else if (keywordError === "error") {
       message1 = result.data.data.error; 
     }
     showMessage(message1, keywordError);
   };
 }}>
+
+<div class="mt-3" bind:this={messageContainer}>
+  {#if errorMessage === "success"}
+    <div class="text-center bg-green-100 text-green-700 py-2 mb-4 rounded-md">
+      {successMessage}
+    </div>
+  {:else if errorMessage === 'error'}
+    <div class="text-center bg-red-100 text-red-700 py-2 mb-4 rounded-md">
+      {successMessage}
+    </div>
+  {/if}
+</div>
 
   <!-- Custom solution type -->
   <div class="lg:flex justify-between items-center">
@@ -152,8 +166,8 @@
   <input type="hidden" name="units" bind:value={$formData.units} />
   <input type="hidden" name="futherdetails" bind:value={$AddNoted} />
   <input type="hidden" name="title" bind:value={$Cusdetails.Title} />
-  <input type="hidden" name="first" bind:value={$Cusdetails.First} />
-  <input type="hidden" name="last" bind:value={$Cusdetails.Last} />
+  <input type="hidden" name="first" bind:value={$Cusdetails.FirstName} />
+  <input type="hidden" name="last" bind:value={$Cusdetails.LastName} />
   <input type="hidden" name="organisation" bind:value={$Cusdetails.Organisation} />
   <input type="hidden" name="country" bind:value={$Cusdetails.Country} />
   <input type="hidden" name="lgc" bind:value={$Cusdetails.LGC} />
@@ -166,18 +180,6 @@
   <input type="hidden" name="city" bind:value={$Delivery.City} />
   <input type="hidden" name="post" bind:value={$Delivery.Post} />
   <input type="hidden" name="status" value="unread" />
-
-  <div class="mt-3" bind:this={messageContainer}>
-    {#if errorMessage === "success"}
-      <div class="text-center bg-green-100 text-green-700 py-2 mb-4 rounded-md">
-        {successMessage}
-      </div>
-    {:else if errorMessage === 'error'}
-      <div class="text-center bg-red-100 text-red-700 py-2 mb-4 rounded-md">
-        {successMessage}
-      </div>
-    {/if}
-  </div>
   
   <!-- Form buttons -->
   <div class="flex space-x-4 mt-6">

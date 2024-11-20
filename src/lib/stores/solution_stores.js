@@ -44,8 +44,8 @@ export function resetFormData() {
     AddNoted.set('');
     Cusdetails.set({
         Title: '',
-        First: '',
-        Last: '',
+        FirstName: '',
+        LastName: '',
         Organisation: '',
         Country: '',
         LGC: '',
