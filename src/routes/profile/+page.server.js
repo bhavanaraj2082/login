@@ -8,17 +8,15 @@ import {
   editProfileEmailPreferences,
 } from "$lib/server/actions.js";
 import {authenticate} from '$lib/server/pocketbase.js'
-import { authedUser} from '$lib/stores/mainStores.js'
-
-let user
-authedUser.subscribe(data=>user=data)
 const pb = await authenticate()
  
-export const load = async () => {
+export const load = async ({cookies}) => {
   try {
-      const result = await getProfileDetails(pb,user.email)       
-      return { profileData:result }; 
+      const email = cookies.get('email')
+      console.log("hhhhhh",email);
+      return await getProfileDetails(pb,email)  
   } catch (error) {
+    console.log('error',error);
       return { 
       error: 'Failed to load data'}
 

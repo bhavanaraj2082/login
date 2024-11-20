@@ -1,28 +1,12 @@
 import { login } from '$lib/server/actions.js';
-import { pb, authenticate } from '$lib/server/pocketbase.js';  
+import {authenticate } from '$lib/server/pocketbase.js';
+
+const pb = await authenticate();
+
 export const actions = {
-  login: async ({ request }) => {
-    const data = Object.fromEntries(await request.formData());
-    console.log("form entries data:", data);
-
-    const authResult = await authenticate();
-
-    if (authResult.status === 400) {
-      return {
-        type: "error",
-        message: authResult.error || "Authentication failed. Please try again later.",
-      };
-    }
-
-    try {
-      const result = await login(data.email, data.password, pb);
-      return result;  
-    } catch (error) {
-      console.error("Error during sign-in:", error);
-      return {
-        type: "error",
-        message: error.response?.data?.message || "Invalid credentials. Please try again.",
-      };
-    }
-  },
+  login: async ({ request,cookies }) => {
+      const body = Object.fromEntries(await request.formData());
+      //console.log("form entries data:", data)
+      return await login(pb,body,cookies); 
+  }
 };

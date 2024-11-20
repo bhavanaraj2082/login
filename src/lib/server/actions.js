@@ -1,5 +1,6 @@
-// import Pocketbase from 'pocketbase';
-import {redirect} from '@sveltejs/kit';
+
+import { redirect } from '@sveltejs/kit';
+//import Pocketbase from 'pocketbase';
 //import { DB_URL, DB_USER, DB_PASS } from '$env/static/private';
 //const pb = new Pocketbase(`${DB_URL}`);
 
@@ -412,27 +413,52 @@ export async function deleteProduct(productId) {
 }
 
 //*******SignUP*********/
-export async function register(data, pb) {
-	if (data.passwordConfirm !== data.password) {
-		return {
-			type: 'error',
-			message: 'Passwords do not match. Please try again.'
-		};
-	}
-	await pb.collection('Register').create(data);
-	return {
-		type: 'success',
-		message: 'Registration successful!'
-	};
+export async function register(pb,data,cookies) {
+	//console.log(data);
+	let sitePreferences = {
+		noOfOrdersPerPage: 3,
+		noOfQuickOrderFields: 3,
+		noOfQuotesPerPage: 3,
+		productEntryType: "Manual Entry"
+	  }
+	const user = await pb.collection("Register").create(data)
+	const profile = await pb.collection("ChemiDashProfile").create({userId:user.id,email:user.email,sitePreferences})
+	const updatedUser = await pb.collection("Register").update(user.id,{chemiDashProfileId:profile.id})
+	cookies.set('email', user.email, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24, 
+    });
+	//console.log("user",user);
+	//console.log("updatedUser",updatedUser);
+	 const res = await pb.collection('Register').requestVerification(user.email);
+	 //console.log(res);
+	 if(res){
+       return {success:true,message:"check your email to verify email address",email:user.email}
+	 }else{
+		return {success:false,message:"verification email is not sent"}
+	 }
 }
 
 //********SignIn*********/
-export async function login(email, password, pb) {
-	const authData = await pb.collection('Register').authWithPassword(email, password);
-	return {
-		type: 'success',
-		message: 'Login successful!'
-	};
+export async function login(pb,body,cookies) {
+	const { email,password } = body
+	const {record} = await pb.collection('Register').authWithPassword(email, password);
+    console.log(record);
+	if(record.id){
+		cookies.set('email',record.email, {
+			path: '/',
+			httpOnly: true,
+			sameSite: 'strict',
+			maxAge: 60 * 60 * 24, 
+		});
+		return redirect(302,"/profile")
+	//return { success:true,message: 'Login successful' };
+	}else{
+	return { success:false,message: 'failed to login' };
+	}
+
 }
 
 /******************Reset Password*******************/
