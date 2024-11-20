@@ -8,8 +8,8 @@
 	let errorMessage = '';
 	$: isFormData =
 		$Cusdetails.Title &&
-		$Cusdetails.First &&
-		$Cusdetails.Last &&
+		$Cusdetails.FirstName &&
+		$Cusdetails.LastName &&
 		$Cusdetails.Organisation &&
 		$Cusdetails.Country &&
 		$Cusdetails.Email &&
@@ -281,7 +281,7 @@
 				<input
 					type="text"
 					class="block w-full p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 lg:w-full"
-					bind:value={$Cusdetails.First}
+					bind:value={$Cusdetails.FirstName}
 					name="Firstname"
 					id="firstname"
 					required
@@ -295,7 +295,7 @@
 					name="lastname"
 					class="block w-full p-1 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 lg:w-full"
 					id="lastname"
-					bind:value={$Cusdetails.Last}
+					bind:value={$Cusdetails.LastName}
 					required
 				/>
 			</div>
