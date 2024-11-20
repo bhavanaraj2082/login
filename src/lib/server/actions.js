@@ -1,5 +1,6 @@
+
 import { redirect } from '@sveltejs/kit';
-import Pocketbase from 'pocketbase';
+//import Pocketbase from 'pocketbase';
 //import { DB_URL, DB_USER, DB_PASS } from '$env/static/private';
 //const pb = new Pocketbase(`${DB_URL}`);
 
@@ -24,7 +25,6 @@ export const myDetails = async (request, pb) => {
 	};
 
 	try {
-		//await pb.admins.authWithPassword(`${DB_USER}`, `${DB_PASS}`);
 		const record = await pb.collection('chemikart_mydetails').create(details);
 		return { mydetails: { record } };
 	} catch (error) {
@@ -34,12 +34,12 @@ export const myDetails = async (request, pb) => {
 
 //ACTION FUNCTION FOR QUOTES PAGE
 export const Addquotes = async (data, pb) => {
-	const componentsArray = data['components[]'].split('\n');
+	const components = JSON.parse(data.components)
 	const formattedData = {
 		Custom_solution_type: data.solutionValue,
 		Custom_format: data.selectedColor,
 		Configure_custom_solution: {
-			components: componentsArray,
+			components: components,  
 			solvent: data.solvent,
 			packagingType: data.packagingType,
 			volume: data.volume,
@@ -48,6 +48,7 @@ export const Addquotes = async (data, pb) => {
 			analyticalTechnique: data.analyticalTechnique
 		},
 		Additional_notes: data.futherdetails,
+		status: data.status,  
 		Customer_details: {
 			Title: data.title,
 			Firstname: data.first,
@@ -275,7 +276,8 @@ function finalformdata(formData) {
 		billingCity: formData.billingCity || '',
 		billingLocation: formData.billingLocation || '',
 		billingPostalCode: formData.billingPostalCode || '',
-		files: formData.files
+		files: formData.files,
+		status:"unread"
 	};
 	return finalData;
 }
@@ -526,7 +528,7 @@ export async function loadFavourites(pb) {
 }
 
 /*******************ProductsInfoPopup******************/
-export const checkavailabilityproduct = async (data, pb) => {
+export async function checkavailabilityproduct(data, pb){
 	const ProductId = data.ProductId;
 	const requestedQuantity = parseInt(data.quantity, 10);
 
@@ -813,4 +815,150 @@ export const  CancelOrder = async(pb,body) =>{
 	else {
 		return { message: 'something went Wrong'}
 	}
+}
+//retuns page Starts
+export const getReturnresultData = async (pb, body) => {
+	const record = await pb
+		.collection('Orders')
+		.getFirstListItem(`Invoice="${body.invoiceNumber}"`)
+		.catch(() => {
+			return null;
+		});
+
+	if (record?.id) {
+		 return redirect(302, `/returns/${record.id}`);
+		// return { msg: 'Success', order: record };
+	} else {
+		return { message: 'Return-Order not found' };
+	}
+};
+
+const parseSelectedItems = (otherFields, mode = "individual") => {
+	const selectedItems = [];
+	const itemsByIndex = {};
+  
+	Object.entries(otherFields).forEach(([key, value]) => {
+	  const match = key.match(/^selectedItems\[(\d+)\]\[(\w+)\]$/);
+
+	  if (match) {
+		const index = parseInt(match[1], 10);
+		const field = match[2];
+
+		if (!itemsByIndex[index]) {
+			itemsByIndex[index] = {};
+		  }
+		  itemsByIndex[index][field] = value;
+		//   console.warn("Match for value:", value);
+		}
+	// 	if (!selectedItems[index]) {
+	// 	  selectedItems[index] = {};
+	// 	}
+	// 	selectedItems[index][field] = value;
+	//   } else {
+	// 	console.warn("No match for key:", key); 
+	//   }
+	});
+  
+	// console.log("Parsed selectedItems:", selectedItems);
+	Object.values(itemsByIndex).forEach((item) => {
+		if (item.productNumber) {
+		  const structuredItem = {
+			productNumber: item.productNumber || '',
+			productName: item.productName || '',
+			quantity: item.quantity || '0',
+			returnqty: item.returnqty || item.quantity,
+			reason: item.reason || '',
+			resolution: item.resolution || '',
+			additionalInfo: item.additionalInfo || '',
+			isSelected: item.isSelected === 'true' || false
+		  };
+		  selectedItems.push(structuredItem);
+		}
+	  });	  
+	//   console.log("Structured Items:", selectedItems);
+	const filteredItems = selectedItems.filter(item => {
+	  return (
+		item.productNumber &&
+		item.productName &&
+		item.quantity &&
+		item.returnqty !== undefined && 
+		item.reason && 
+		item.resolution &&
+		item.additionalInfo
+	  );
+	});
+	// console.log("Filtered Items:", filteredItems); 
+	switch (mode) {
+	  case "individual":
+		return filteredItems;
+	  case "multiple":
+		return filteredItems.filter(item => item.isSelected);
+	  case "entireOrder":
+		return filteredItems.map(item => ({
+		  ...item,
+		  isSelected: true,
+		  returnqty: item.quantity  
+		}));
+	  default:
+		throw new Error("Invalid selection mode");
+	}
+};
+
+const createReturnItems = (selectedItems, entireOrderResolution) => {
+	return selectedItems.map(item => {
+	  if (!item.productNumber || !item.productName ||!item.quantity || !item.reason) {
+		return null; 
+	  }
+  
+	  const returnqty = item.returnqty ? item.returnqty : item.quantity;
+  
+	  return {
+		reason: item.reason || "",
+		issue: item.resolution || entireOrderResolution || "",
+		description: item.additionalInfo || "",
+		productNumber: item.productNumber || "",
+		productName: item.productName || "",
+		quantity: item.quantity || "",
+		returnqty: returnqty,
+	  };
+	}).filter(item => item !== null); 
+};
+
+export const getreturnsOrderData = async ({ pb, body }) => {
+	const { orderNumber, invoiceNumber, returnOrderid, entireOrderResolution, ...otherFields } = body;
+
+	const selectedItems = parseSelectedItems(otherFields);
+
+	const returnItems = createReturnItems(selectedItems, entireOrderResolution);
+
+	const data = {
+		orderNumber,
+		invoiceNumber,
+		returnOrderid,
+		returnItems,
+		status: 'Pending'
+	};
+
+	const record = await pb.collection('Returns').create(data);
+
+	return { status: 200, record };
+};
+
+export const getcancelreturnData = async ({ pb, id }) => {
+	try {
+	  const deletedRecord = await pb.collection('Returns').delete(id);
+  		console.log(deletedRecord)
+		} catch (error) {
+	  console.error('Error deleting return order:', error);
+	  return { status: 500, message: 'An error occurred while canceling the return.' };
+	}
+};
+
+//return page close 
+export const serachByQuery= async(pb,body)=>{
+	const result = await pb.collection('Products').getList(1, 5, {
+		filter: `productName ~ "${body.query}" || productNumber ~ "${body.query}" || filteredProductData.CASNumber ~ "${body.query}"`,
+		expand: 'Category,subCategory',
+	});
+	return result
 }

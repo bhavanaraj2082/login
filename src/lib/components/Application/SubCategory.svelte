@@ -8,14 +8,14 @@
     let subsubcategories = data.subsubcategories || {};   
   </script>
   
-  <section class="w-11/12 mx-auto mb-3">
+  <section class="w-11/12 mx-auto my-3 max-w-7xl">
     <h1 class="text-2xl font-semibold text-primary-400">
       {subcategoryData.name}
     </h1>
     <p class="mt-2 text-lg text-gray-600">{subcategoryData.description}</p>
   
     {#if subsubcategories.length > 0}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-6 ">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-6">
         {#each subsubcategories as subsubcategory}
         <Card 
         url={`/applications/${categoryData.url}/${subcategoryData.url}/${subsubcategory.url}`}
@@ -28,8 +28,7 @@
       </div>
     {:else}
       <div
-        class="flex flex-col md:flex-row items-center lg:items-start gap-8 mt-8"
-      >
+        class="flex flex-col md:flex-row items-center lg:items-start gap-8 my-8">
         <div class="flex-shrink-0 w-full md:w-1/3">
           <img
             src="/PopularProductsImg1.jpeg"
@@ -37,7 +36,6 @@
             class="w-full h-auto rounded-lg shadow-lg"
           />
         </div>
-  
         <div class="flex-grow w-full md:w-2/3">
           <h2 class="text-2xl font-semibold text-gray-800">
             {subcategoryData.name}

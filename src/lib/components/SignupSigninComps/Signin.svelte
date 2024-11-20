@@ -1,10 +1,9 @@
 <script>
-	import { goto } from '$app/navigation';
     import { enhance,applyAction } from '$app/forms';
+
     let email = '';
     let password = '';
     let successMessage = '';
-    let formSubmitted = false;
 
     let errors= {}
 
@@ -40,17 +39,6 @@
         }
     }
 
-    // function resetForm() {
-    //     email = '';
-    //     password = '';
-    //     formSubmitted = false;
-    // }
-
-        // Set cookie using js-cookie
-        // function setCookie(name, value, days) {
-        // Cookies.set(name, value, { expires: days, sameSite: 'Lax' });
-        // console.log(`Cookie set: ${name}=${value}; Expires in: ${days} days`);
-        // }
 </script>
 
 <div class="flex flex-col md:flex-row max-w-3xl shadow-lg rounded-lg mx-auto h-auto md:h-auto my-14">
@@ -65,12 +53,6 @@
                 Do not have an account? <a href="/signup" class="text-primary-500 hover:text-primary-600 underline">Create a new one</a>
             </p>
             
-            <!-- {#if errorStatus === "success"}
-            <div class="border border-green-400 p-3 w-auto text-sm text-gray-600 font-medium rounded my-6"><i class="fa-solid fa-circle-check text-green-400 mr-1"></i>{errorMessage}</div>
-        {/if}
-        {#if errorStatus === "error"}
-            <div class="border border-red-400 p-3 w-auto text-sm text-gray-600 font-medium rounded my-6">{errorMessage}</div>
-        {/if} -->
             <form  method="POST" action="?/login"
             use:enhance={handleFormSubmit}>
                 <label for="email" class="mb-2 text-gray-600">Enter your email or username</label>

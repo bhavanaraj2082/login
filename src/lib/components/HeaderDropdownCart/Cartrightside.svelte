@@ -1,30 +1,44 @@
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import Icon from '@iconify/svelte';
-	import cartData from '$lib/data/cart.json';
 
-	let cartOpen = false;
+	let cartOpen = false; 
 	let cartItems = [];
-	let subtotal = 0;
+	let subtotal = 0; 
 
-	onMount(() => {
-		cartItems = cartData.map((item) => ({
-			...item,
-			quantity: item.quantity || 1
-		}));
-		calculateSubtotal();
-	});
+	function formatPriceToNumber(priceString) {
+		if (!priceString) return 0;
+		const formattedPrice = String(priceString)
+			.replace(/[^\d.-]/g, '')
+			.trim();
+		return parseFloat(formattedPrice) || 0;
+	}
 
-	const toggleCart = () => {
-		cartOpen = !cartOpen;
-	};
-
-	const updateLocalStorage = () => {
-		localStorage.setItem('cartItems', JSON.stringify(cartItems));
+	const loadCartFromLocalStorage = () => {
+		if (typeof window !== 'undefined' && window.localStorage) {
+			const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+			cartItems = storedCart.map((item) => ({
+				...item,
+				price: formatPriceToNumber(item.price),
+				quantity: item.quantity || 1,
+			}));
+			calculateSubtotal();
+		}
 	};
 
 	const calculateSubtotal = () => {
-		subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+		subtotal = cartItems.reduce((sum, item) => {
+			if (item.price && !isNaN(item.price)) {
+				return sum + item.price * item.quantity;
+			}
+			return sum;
+		}, 0);
+	};
+
+	const updateLocalStorage = () => {
+		if (typeof window !== 'undefined' && window.localStorage) {
+			localStorage.setItem('cart', JSON.stringify(cartItems));
+		}
 	};
 
 	const incrementQuantity = (id) => {
@@ -55,6 +69,29 @@
 		cartItems = [];
 		subtotal = 0;
 		updateLocalStorage();
+	};
+
+	const handleStorageChange = (event) => {
+		if (event.key === 'cart') {
+			loadCartFromLocalStorage();
+		}
+	};
+
+	onMount(() => {
+		loadCartFromLocalStorage();
+		if (typeof window !== 'undefined') {
+			window.addEventListener('storage', handleStorageChange);
+		}
+	});
+
+	onDestroy(() => {
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('storage', handleStorageChange);
+		}
+	});
+
+	const toggleCart = () => {
+		cartOpen = !cartOpen;
 	};
 </script>
 
@@ -92,13 +129,13 @@
 								<div class="flow-root">
 									<ul role="list" class="-my-6 divide-y divide-gray-200">
 										{#each cartItems as item}
-											<div class="flex items-center py-4 border-b">
-												<div class="flex flex-col space-y-4">
+											<div class="flex items-center py-4 border-b w-full">
+												<div class="flex flex-col space-y-4 w-full">
 													<div
 														class="flex items-center justify-between max-sm:flex-col max-sm:items-center"
 													>
 														<img
-															src={item.image}
+															src={item.imageSrc}
 															alt={item.name}
 															class="w-32 h-24 max-sm:w-24 rounded-md"
 														/>
@@ -106,7 +143,7 @@
 															class="ml-4 flex-1 flex justify-between max-sm:ml-0 max-sm:justify-center"
 														>
 															<div class="max-sm:w-full">
-																<p class="text-sm text-primary-400 font-semibold">{item.code}</p>
+																<p class="text-sm text-primary-400 font-semibold">{item.partNumber}</p>
 																<p class="font-semibold text-gray-800">{item.name}</p>
 																<p class="text-sm text-gray-500">{item.description}</p>
 															</div>
@@ -125,7 +162,7 @@
 														class="flex items-center justify-between ml-32 mt-3 max-sm:ml-0 max-sm:flex-row max-sm:items-center"
 													>
 														<p
-															class="flex-1 text-lg max-sm:text-sm max-sm:mr-0.5 font-bold max-sm:text-center"
+															class="flex-1 mr-3 text-base max-sm:text-sm max-sm:mr-0.5 font-semibold max-sm:text-center"
 														>
 															₹{item.price.toFixed(2)}
 														</p>
@@ -135,20 +172,21 @@
 														>
 															<button
 																on:click={() => decrementQuantity(item.id)}
-																class="text-2xl text-primary-500">-</button
+																class="text-2xl text-primary-400">-</button
 															>
 															<p class="px-6 max-sm:px-2">{item.quantity}</p>
 															<button
 																on:click={() => incrementQuantity(item.id)}
-																class="text-2xl text-primary-500">+</button
+																class="text-2xl text-primary-400">+</button
 															>
 														</div>
 
 														<p
-															class="flex-1 text-base font-semibold text-gray-800 max-sm:text-sm text-right max-sm:text-center mt-2 max-sm:ml-0.5 max-sm:w-full"
+															class="flex-1 ml-3 text-base font-semibold text-gray-600 max-sm:text-sm text-right max-sm:text-center mt-2 max-sm:ml-0.5 max-sm:w-full"
 														>
 															₹{(item.price * item.quantity).toFixed(2)}
 														</p>
+                                                        
 													</div>
 												</div>
 											</div>
@@ -163,13 +201,13 @@
 								<p class="font-bold text-lg">₹{subtotal.toFixed(2)}</p>
 							</div>
 							<div class="flex flex-col space-y-4">
-								<button
-									class="bg-primary-500 text-white text-center py-3 rounded-lg font-semibold hover:bg-primary-600"
+								<button on:click={toggleCart}
+									class="bg-primary-400 text-white text-center py-3 rounded-lg font-semibold hover:bg-primary-400"
 									><a href="/cart">VIEW CART</a></button
 								>
 								<button
 									on:click={emptyCart}
-									class="bg-white text-primary-500 border border-primary-500 text-center py-3 rounded-lg font-semibold hover:bg-primary-100"
+									class="bg-white text-primary-400 border border-primary-400 text-center py-3 rounded-lg font-semibold hover:bg-primary-400 hover:text-white"
 								>
 									EMPTY CART
 								</button>

@@ -1,8 +1,12 @@
 <script>
-	import Subsubcategory from '$lib/components/Product/subsubcategory.svelte';
+    import Filter from '$lib/components/productsFilter/Filter.svelte'
+	// import Subsubcategory from '$lib/components/Product/subsubcategory.svelte';
     export let data;
+    
+    // console.log("=====>",dat)
 </script>
 
 <div>
-    <Subsubcategory {data}/>
+    <Filter {data}/>
+    <!-- <Subsubcategory {data}/> -->
 </div>

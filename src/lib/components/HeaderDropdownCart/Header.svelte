@@ -3,12 +3,19 @@
 	import Icon from '@iconify/svelte';
 	import Cartrightside from '$lib/components/HeaderDropDownCart/Cartrightside.svelte';
 	import menusdata from '$lib/data/chemicalProducts.json';
+	import { enhance } from "$app/forms";
+
 	let menus = [];
 	let submenuLeaveTimeoutId;
 	let subSubmenuLeaveTimeoutId;
 	let activeMenu = null;
 	let activeSubmenu = null;
 	let hoveredSubSubmenu = null;
+	let form;
+	let searchQuery = "";
+	let debounceTimeout;
+	let isLoading = false;
+	let searchResults=[]
 
 	const getInitial = (name) => name.charAt(0).toUpperCase();
 	onMount(async () => {
@@ -18,12 +25,6 @@
 			console.error('Error fetching menus:', error);
 		}
 	});
-	let searchQuery = '';
-	let filteredResults = [];
-
-	function clearSearch() {
-		searchQuery = '';
-	}
 
 	function handleMouseEnter(subSubmenu) {
 		clearTimeout(subSubmenuLeaveTimeoutId);
@@ -72,11 +73,36 @@
 		isOpen = !isOpen;
 	}
 
-	export let data;
-	let searchResult = data?.products;
-	$: filteredResults = searchQuery
-		? searchResult.filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
-		: [];
+	function debounce(func, delay) {
+		clearTimeout(debounceTimeout);
+		debounceTimeout = setTimeout(() => {
+			func();
+		}, delay);
+	}
+
+	function selectProduct() {
+		searchQuery = "";	
+	}
+
+	function handleSearchSubmit() {
+		form.requestSubmit();
+	}
+
+	function handleInput(event) {
+		searchQuery = event.target.value;
+		isLoading=true
+		debounce(handleSearchSubmit, 800);
+	}
+
+	function handleData() {
+		return async ({ result }) => {
+			if (result) {
+				isLoading=false
+			}
+			searchResults=result.data.responce.items;
+		};
+	}
+
 </script>
 
 <nav class="my-3">
@@ -154,7 +180,7 @@
 			{/if}
 		</div>
 	</div>
-	<div class="flex items-center justify-between w-11/12 py-4 mx-auto max-w-7xl">
+	<div class="flex items-center justify-between w-11/12 py-4 mx-auto max-w-7xl flex-wrap">
 		<div class="flex md:hidden float-end">
 			<button on:click={toggleLogoMenu} class="flex items-center text-gray-600 focus:outline-none">
 				<Icon icon="fa6-solid:bars" class="w-10 h-5 text-gray-600" />
@@ -169,33 +195,65 @@
 				Chemikart
 			</button>
 		</div>
-		<div class="relative w-full max-w-lg mx-4 lg:mx-8">
-			<div class="relative w-full flex items-center">
-				<input
-					type="text"
-					placeholder="Search your Product"
-					bind:value={searchQuery}
-					class="w-full px-3 py-3 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-400 placeholder:text-sm"/>
-				<button class="absolute right-1 top-1/2 transform -translate-y-1/2 bg-primary-400 text-white w-10 h-10 sm:flex hidden items-center justify-center rounded-md">
-					<Icon icon="feather:search" style="width: 25px; height: 25px;"/>
-				</button>
 
-				{#if searchQuery}
-					<div class="absolute w-full mt-56 max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-md z-10">
-						<button class="absolute top-2 right-2 bg-transparent text-primary-400 hover:text-gray-600 p-1"
-							on:click={clearSearch}>
-							<Icon icon="cuida:x-outline" style="width: 20px; height: 20px;" />
-						</button>
-						{#each filteredResults as result, i}
-							<div class="p-4 border-b border-gray-300 last:border-b-0 hover:bg-gray-100 cursor-pointer">
-								{result.name}
-							</div>
+		<span class="hidden max-md:block w"><Cartrightside/></span>
+
+		<!-- Searchbar functionality -->
+		<div class="relative w-full md:max-w-sm lg:max-w-lg md:mx-4 lg:mx-8 sm:mt-2">
+			<form action="/?/search" method="post" bind:this={form} use:enhance={handleData}>
+				<div class=" w-full flex items-center">
+					<input
+						type="text"
+						placeholder="Search for Product Names, Numbers, or CAS Numbers"
+						bind:value={searchQuery}
+						name="query"
+						on:input={handleInput}
+						class="w-full px-3 py-3 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-400 placeholder:text-xs"
+					/>
+					<button
+						class="absolute right-1 top-1/2 transform -translate-y-1/2 bg-primary-400 text-white w-10 h-10 flex items-center justify-center rounded-md"
+				
+					>
+						<Icon icon="feather:search" style="width: 25px; height: 25px;" />
+					</button>
+				</div>
+				{#if searchQuery.trim() && searchResults && searchResults.length > 0}
+					<ul
+						class="absolute w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-30 max-h-60 overflow-y-auto"
+					>
+						{#each searchResults as product}
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+							<li
+								class="px-0 py-0 text-sm text-gray-800 hover:bg-primary-200 cursor-pointer"
+								on:click={() => selectProduct(product)}
+							>
+								<a
+									href={`/products/${product.expand?.Category?.urlName}/${product.expand?.subCategory?.urlName}/${product?.productNumber}`}
+									class="block w-full text-sm text-gray-800 px-4 py-2"
+								>
+									{product?.productName}
+								</a>
+							</li>
 						{/each}
-					</div>
+					</ul>
+				{:else if searchQuery.trim() && isLoading}
+					<p
+						class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-30 rounded"
+					>
+						Loading Products
+					</p>
+				{:else if searchQuery.trim() && searchResults && searchResults.length === 0}
+					<p
+						class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-30 rounded"
+					>
+						No products found
+					</p>
 				{/if}
-			</div>
-		</div>
-		<span class="hidden max-md:block"><Cartrightside/></span>
+			</form>
+		</div>	
+				<!-- Searchbar functionality ends-->	
+
 		<div class="md:flex hidden">
 			<div class="flex items-center justify-between">
 				<button
@@ -258,7 +316,7 @@
 								</div>
 								{#if submenu.subSubmenus && submenu.subSubmenus.length > 0}
 									<div
-										class={`mt-0 ml-0.5 h-full absolute left-full rounded-sm pb-2 top-0 z-30 w-full bg-white shadow-sm transition-opacity duration-200 ${activeSubmenu === submenu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+										class={`mt-0 ml-0 border-gray-300 border-l h-full absolute left-full rounded-sm pb-2 top-0 z-30 w-full bg-white shadow-sm transition-opacity duration-200 ${activeSubmenu === submenu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
 										role="menu">
 										<ul>
 											{#each submenu.subSubmenus as subSubmenu}

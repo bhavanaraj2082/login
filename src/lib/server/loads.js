@@ -40,34 +40,79 @@ export async function loadProductById(productId) {
 //////////Product Filter ///////////////
 
 
-export const loadFirstProduct = async (pb) => {
-   // console.log('Fetching chemical products...');
+// export const loadFirstProduct = async (pb) => {
+//    // console.log('Fetching chemical products...');
 
     
-        const products = await pb.collection('Products').getList(1, 2000, { 
-            sort: '-created',
-            expand: 'manufacturerName,Category'
-        });
+//         const products = await pb.collection('Products').getList(1, 2000, { 
+//             sort: '-created',
+//             expand: 'manufacturerName,Category'
+//         });
 
   
 
-        if (!products.items || products.items.length === 0) {
-            console.warn('No products found in the API response.');
-            return  [] ;
-        }
+//         if (!products.items || products.items.length === 0) {
+//             console.warn('No products found in the API response.');
+//             return  [] ;
+//         }
 
     
-        const productsWithNames = products.items.map(product => ({
+//         const productsWithNames = products.items.map(product => ({
+//             ...product,
+//             manufacturerName: product.expand?.manufacturerName?.name || 'Unknown Manufacturer',
+//             categoryName: product.expand?.Category?.name || 'Unknown Category',
+//         }));
+
+//     //    console.log('Mapped products:', productsWithNames);  
+
+//         return  productsWithNames ;
+//     } 
+
+//////////PRODUCTS FILTER WITH STOCk
+export const loadFirstProduct = async (pb) => {
+   
+    const products = await pb.collection('Products').getList(1, 1000, { 
+        sort: '-created',
+    });
+
+   // console.log("I am product", products.items);
+
+    if (!products.items || products.items.length === 0) {
+        console.warn('No products found');
+        return [];
+    }
+
+
+ 
+    const stocks = await pb.collection('Stocks').getList(1, 1000, 
+        { 
+        expand:'partNumber'
+        // sort: '-created',
+    });
+
+    
+    if (!stocks.items || stocks.items.length === 0) {
+        console.warn('No stock data found');
+    }
+
+    const productNames = products.items.map(product => {
+        
+        const stock = stocks.items.find(stockItem => 
+            stockItem.expand.partNumber?.id === product.id
+        );
+
+        
+
+        return {
             ...product,
-            manufacturerName: product.expand?.manufacturerName?.name || 'Unknown Manufacturer',
-            categoryName: product.expand?.Category?.name || 'Unknown Category',
-        }));
+            stockQuantity: stock ? stock.stockQuantity : 0,  
+        };
+    });
 
-    //    console.log('Mapped products:', productsWithNames);  
+    // console.log('Mapped products with stock quantity:', productNames);
 
-        return  productsWithNames ;
-    } 
-
+    return productNames;
+};
 
 
 
@@ -99,33 +144,63 @@ export async function profileupdate(pb,userId){
 } 
 
 /*****************ProductsInfoPopup******************/
-export const loadProductsInfo = async (pb) => {
-	const response = await pb.collection('Products').getList(2, 1, {}); 
-	
-	const formattedRecords = response.items.map(record => ({
-		productId: record.id,
-		productName: record.productName,
-		productNumber: record.productNumber,
-		prodDesc: record.prodDesc,
-		imageSrc: record.imageSrc,
-		safetyDatasheet: record.safetyDatasheet,
-		priceSize: Array.isArray(record.priceSize) ? record.priceSize.map(item => ({
-			price: item.price,
-			size: item.size,
-		})) : [],
-		properties: record.properties || {},
-		description: record.description || {},
-		safetyInfo: record.safetyInfo || {},
-		productSynonym: record.filteredProductData[`Synonym(S)`] || "",
-	}));
-	
-	console.log("Formatted Product Records:", formattedRecords);
+export async function loadProductsInfo(pb, { ProductId }){
+    // console.log("Input ProductId:", ProductId);
+    const response = await pb.collection('Products').getFirstListItem(`productNumber="${ProductId}"`, { expand: 'manufacturerName' });
 
-	return {
-		type: "success",
-		records: formattedRecords,
-	};
-};  
+    if (!response) {
+        return {
+            type: "error",
+            message: "Product record not found",
+        };
+    }
+    const PartNumber = response.id; 
+    console.log("PartNumber for stock data:", PartNumber);
+    let stockQuantity = 0;
+
+    if (PartNumber) {
+        try {
+            const stockRecord = await pb.collection('Stocks').getFirstListItem(`partNumber="${PartNumber}"`, { expand: 'partNumber' });
+            console.log("Fetched stockRecord:", stockRecord); 
+            if (stockRecord && typeof stockRecord.stockQuantity !== "undefined") {
+                stockQuantity = stockRecord.stockQuantity;
+                console.log("Stock Quantity fetched:", stockQuantity);
+            } else {
+                console.log("Stock record found but stockQuantity is undefined.");
+            }
+        } catch (error) {
+            console.error("Error fetching stockRecord:", error);
+        }
+    }
+
+    const formattedRecord = {
+        productId: response.id,
+        productName: response.productName,
+        productNumber: response.productNumber,
+        prodDesc: response.prodDesc,
+        imageSrc: response.imageSrc,
+        safetyDatasheet: response.safetyDatasheet,
+        priceSize: Array.isArray(response.priceSize)
+            ? response.priceSize.map((item) => ({
+                  price: item.price,
+                  size: item.size,
+              }))
+            : [],
+        properties: response.properties || {},
+        description: response.description || {},
+        safetyInfo: response.safetyInfo || {},
+        filteredProductData: response.filteredProductData || {},
+        productSynonym: response.filteredProductData?.['Synonym(S)'] || "",
+        stockQuantity, // Include stock quantity only if fetched
+    };
+
+    return {
+        type: "success",
+        records: [formattedRecord],
+    };
+}; 
+
+
 // search bar component 
 export async function fetchProductName(pb) {
 	try {
@@ -231,7 +306,7 @@ export async function getSubSubCategoryDatas(pb, subsubid) {
 export async function popularProducts(pb) {
 	const record = await pb.collection('PopularProducts').getFullList({
 		sort: 'order',
-		expand: 'product'
+		expand: 'product,product.Category,product.subCategory'
 	});
 	return record
 }
@@ -259,7 +334,7 @@ export async function getProfileDetails(pb,userEmail){
 ///Updated Quick Order 
 export const quick = async (pb) => {
    
-    const products = await pb.collection('Products').getList(1, 1000, { 
+    const products = await pb.collection('Products').getList(1, 2000, { 
         sort: '-created',
     });
 
@@ -270,22 +345,25 @@ export const quick = async (pb) => {
         return [];
     }
 
-  
-    const stocks = await pb.collection('Stocks').getList(1, 1000);
-  //  console.log("Fetched stock data:", stocks.items);
+
+ 
+    const stocks = await pb.collection('Stocks').getList(1, 1000, 
+        { 
+        expand:'partNumber'
+        // sort: '-created',
+    });
+
     
     if (!stocks.items || stocks.items.length === 0) {
         console.warn('No stock data found');
     }
 
-
     const productNames = products.items.map(product => {
-       
-        const stock = stocks.items.find(stockItem => 
-            stockItem.partNumber.trim() === product.ProductNumber);
         
-      
-        //console.log(`Checking product: ${product.ProductNumber}, Found stock:`, stock);
+        const stock = stocks.items.find(stockItem => 
+            stockItem.expand.partNumber?.id === product.id
+        );
+
         
 
         return {
@@ -294,7 +372,90 @@ export const quick = async (pb) => {
         };
     });
 
-   // console.log('Mapped products with stock quantity:', productNames);
+    // console.log('Mapped products with stock quantity:', productNames);
 
     return productNames;
 };
+
+//returns loads Starts
+export async function getreturnstatusdata(pb, invoiceid) {
+	let records = await pb
+		.collection('Orders')
+		.getOne(`${invoiceid}`, { expand: 'products,shipdetails,dashuserprofileid' });
+
+	if (records) {
+		return { records: records };
+	} else {
+		return { error: 'Error in fetching orderStatus Data' };
+	}
+}
+
+export async function getReturnSavedData(pb) {
+	const records = await pb.collection('Returns').getFullList({
+		sort: '-created'
+	});
+	return { records: records };
+}
+//returns loads ends
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// export const quick = async (pb) => {
+//     // Fetch products
+//     const products = await pb.collection('Products').getList(1, 1000, {
+//         sort: '-created',
+//     });
+
+//     if (!products.items || products.items.length === 0) {
+//         console.warn('No products found');
+//         return [];
+//     }
+
+//     // Fetch stocks
+//     const stocks = await pb.collection('Stocks').getList(1, 1000, {
+//         expand: 'partNumber',
+//     });
+
+//     if (!stocks.items || stocks.items.length === 0) {
+//         console.warn('No stock data found');
+//     }
+
+//     // // Debug: Log all products and stocks
+//     // console.log('Products:', products.items);
+//     // console.log('Stocks:', stocks.items);
+
+//     // Map products with stock data
+//     const productNames = products.items.map(product => {
+//         // Find stock for the current product based on `partNumber` expansion
+//         const stock = stocks.items.find(stockItem => 
+//             stockItem.expand.partNumber?.id === product.id
+//         );
+
+
+//         return {
+//             ...product,
+//             stockQuantity: stock ? stock.stockQuantity : 0,
+//         };
+//     });
+
+//     // Filter to check the specific ProductNumber
+//     const testProduct = productNames.find(product => product.productNumber === '775118');
+
+//     // Debug: Log result for the specific ProductNumber
+//     console.log('Test Product 775118:', testProduct);
+
+//     return productNames;
+// };

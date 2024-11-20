@@ -158,44 +158,46 @@ function toggleRotation(index) {
 </script>
 
 <div class="p-4 max-w-6xl mx-auto">
-  <div class="flex flex-col md:flex-row"> 
-    <div class="w-full md:w-7/12 p-2"> 
+  <div class="flex flex-col lg:flex-row"> 
+    <div class="w-full lg:w-7/12 p-2"> 
       <h1 class="text-4xl font-bold mb-8">Documents</h1>
-      <div class="inline-flex bg-primary-300 p-0 rounded-md mb-8">
+        <div class="inline-flex p-0 rounded-md mb-8">
+          <!-- Hamburger Button for Mobile -->
           <button 
-          on:click={() => (showNav = !showNav)} 
-          class="sm:hidden text-white p-2 rounded-md bg-primary-300 hover:bg-primary-400"
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            class="h-8 w-8" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
+            on:click={() => (showNav = !showNav)} 
+            class="sm:hidden text-white p-2 rounded-md bg-primary-300 hover:bg-primary-400"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-        <nav class="hidden sm:flex flex-col sm:flex-row space-x-0 overflow-x-auto" aria-label="Tabs">
-          {#each tabs as tab}
-            <div class="relative inline-block">
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              class="h-8 w-8" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        
+          <!-- Navigation Menu (Mobile Toggle) -->
+          <nav class={`sm:flex flex-col sm:flex-row space-x-0 overflow-x-auto ${showNav ? 'block' : 'hidden'}`} aria-label="Tabs">
+            {#each tabs as tab}
+            <div class="inline-block">
               <button
                 on:click={() => (activeTab = tab.name)} 
                 class="py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300 
-                {activeTab === tab.name 
-                  ? 'bg-gray-50 text-primary-300 font-bold'
-                  : 'bg-primary-100 text-black'}
-                hover:bg-gray-50 hover:text-primary-300 whitespace-nowrap">
+                  {activeTab === tab.name 
+                    ? 'bg-gray-50 text-primary-300 font-bold'
+                    : 'sm:bg-primary-100 text-black'}
+                  hover:bg-gray-50 hover:text-primary-300 whitespace-nowrap">
                 {tab.name}
               </button>
-              <span 
-                class="relative h-0.5 bg-primary-300 
-                {activeTab === tab.name ? 'w-0.5 h-3/4' : 'hidden'} sm:absolute sm:bottom-0 sm:left-1/2 sm:-translate-x-1/2 sm:w-3/4 sm:h-0.5"></span>
+              <div class="h-0.5 bg-primary-300 
+                {activeTab === tab.name ? 'w-3/4 h-0.5' : 'hidden'}"></div>
             </div>
-          {/each}
-        </nav>
-      </div>
-
+            
+            {/each}
+          </nav>
+        </div>
       {#if activeTab === "SafetyData Sheets"}
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">SafetyData Sheets (SDS)</h2>
@@ -223,14 +225,14 @@ function toggleRotation(index) {
           <label for="product-number-sds" class="block text-md font-medium mb-1 {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
-          <div class="relative w-full">
+          <div class="w-full">
             <input
             type="text"
             bind:value={inputValue}
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. 775118"
-            class="block w-full p-3  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm mb-0"
+            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm mb-0"
           />
           {#if showErrors && inputValue.length === 0}
           <div class="flex text-start">
@@ -242,7 +244,7 @@ function toggleRotation(index) {
             {/if}
             <button
             type="submit"
-            class="absolute right-0  font-semibold bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300 sm:mt-5 mt-0.5"
+            class="font-semibold bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300 mt-5"
           >
             SEARCH
           </button>
@@ -253,11 +255,6 @@ function toggleRotation(index) {
         </form>
       </div>
       {/if}
-      
-      
-      
-      
-      
       {#if activeTab === "Certificates of Analysis"}
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">Certificates of Analysis (COA)</h2>
@@ -285,7 +282,7 @@ function toggleRotation(index) {
         <label for="product-number-sds" class="block text-md font-medium mb-1{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
-          <div class="relative w-full">
+          <div class="w-full">
             <input 
             bind:value={inputValue1}
             type="text"
@@ -307,7 +304,7 @@ function toggleRotation(index) {
               * Lot/batch Number
             </label>
             
-            <div class="relative w-full">
+            <div class=" w-full">
               <input 
                 type="text"
                 id="product-number"
@@ -324,7 +321,7 @@ function toggleRotation(index) {
             </div>
               <button
               type="submit"
-              class="absolute  font-semibold right-0 mt-3 mb-3 sm:mt-20 mb-10 bg-primary-400 hover:bg-primary-500 text-white py-2 px-6 rounded-md shadow transition duration-300"
+              class="font-semibold mt-5 bg-primary-400 hover:bg-primary-500 text-white py-2 px-6 rounded-md shadow transition duration-300"
             >
               SEARCH
             </button>
@@ -335,10 +332,6 @@ function toggleRotation(index) {
         </form>
       </div>
       {/if}
-      
-      
-      
-      
       {#if activeTab === "Certificates of Origin"}
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">Certificates of Origin (COO)</h2>
@@ -366,7 +359,7 @@ function toggleRotation(index) {
           <label for="product-number-sds" class="block text-md font-medium mb-1 {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
-          <div class="relative w-full">
+          <div class=" w-full">
             <input 
             bind:value={inputValue2}
             type="text"
@@ -387,7 +380,7 @@ function toggleRotation(index) {
             <label for="product-number-sds" class="block text-md font-medium mb-2{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
               * Lot/batch Number
             </label>
-            <div class="relative w-full">
+            <div class=" w-full">
               <input 
             type="text"
             id="product-number"
@@ -406,7 +399,7 @@ function toggleRotation(index) {
           {/if}
             <button
               type="submit"
-              class="absolute  font-semibold right-0 mt-3 mb-3 mt-1 sm:mt-20 mb-10 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300"
+              class="font-semibold mt-5 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300"
             >
               SEARCH
             </button>
@@ -417,11 +410,6 @@ function toggleRotation(index) {
         </form>
       </div>
       {/if}
-      
-      
-      
-      
-      
       {#if activeTab === "Certificates of Quality"}
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">Certificates of Quality (COQ)</h2>
@@ -449,14 +437,14 @@ function toggleRotation(index) {
         <label for="product-number-sds" class="block text-md font-medium mb-1{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
-          <div class="relative w-full">
+          <div class=" w-full">
             <input 
             bind:value={inputValue3}
             type="text"
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. 775118"
-            class="block w-full p-3  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            class="block w-full p-3  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm" 
           />
           {#if showErrors && inputValue3.length === 0}
           <div class="flex text-start">
@@ -467,7 +455,7 @@ function toggleRotation(index) {
             <label for="product-number-sds" class="block text-md font-medium mb-2{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
               * Lot/batch Number
             </label>
-            <div class="relative w-full">
+            <div class=" w-full">
               <input 
             type="text"
             id="product-number"
@@ -484,10 +472,9 @@ function toggleRotation(index) {
           {#if lotNumber === '' || lotNumber === null}
             <p class="text-red-500 text-md mt-1">{sdsLottNumberError}</p>
           {/if}
-
           <button
           type="submit"
-          class="absolute font-semibold right-0 mt-3 mb-3 mt-1 sm:mt-20 mb-10 bg-primary-400 text-white py-2 px-6 rounded-md  shadow hover:bg-primary-500 transition duration-300"
+          class="font-semibold mt-5 bg-primary-400 text-white py-2 px-6 rounded-md  shadow hover:bg-primary-500 transition duration-300"
         >
           SEARCH
         </button>
@@ -498,19 +485,16 @@ function toggleRotation(index) {
       </div>
       {/if}
     </div>
-    
-    
-    
-    <div class="w-full md:w-5/12 p-2 mt-1 sm:mt-32"> 
+    <div class="w-full lg:w-5/12 p-2 lg:mt-32"> 
       {#if activeTab === "SafetyData Sheets"}
-        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start ml-0 md:ml-7">
+        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start ml-0 lg:ml-7">
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div on:click={() => toggleProductDetails2("Safety Data Sheets")} class="flex items-center justify-between">
             <h3 class="text-md font-medium text-gray-700">How to Find the Product Number</h3>
                   <!-- svelte-ignore a11y-missing-attribute -->
             <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
-              <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showProductDetailsSafety ? 'rotate-45' : '-rotate-45'}`} />
+              <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`  transition-transform duration-400 ${showProductDetailsSafety ? 'rotate-45' : '-rotate-45'}`} />
             </a>
           </div>
           {#if showProductDetailsSafety}
@@ -537,7 +521,7 @@ function toggleRotation(index) {
   
     
       {#if activeTab === "Certificates of Analysis"}
-      <div class="flex flex-wrap  space-y-4 ml-0 md:ml-16">       
+      <div class="flex flex-wrap  space-y-4 ml-0 lg:ml-16">       
         <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start"> 
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -609,7 +593,7 @@ function toggleRotation(index) {
       {/if}
       
 {#if activeTab === "Certificates of Origin"}
-<div class="flex flex-wrap space-y-4 ml-0 md:ml-16">
+<div class="flex flex-wrap space-y-4 ml-0 lg:ml-16">
   <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -673,7 +657,7 @@ function toggleRotation(index) {
       <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
     </div>
     <p class="mt-4 text-sm text-gray-600">
-      In some cases, a COA may not be available online. If your search was unable to find the COA, you can request one.
+      In some cases, a COO may not be available online. If your search was unable to find the COO, you can request one.
     </p>
     <div class="mt-4">
       <button class="bg-primary-400 text-white px-4 py-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-600">
@@ -686,7 +670,7 @@ function toggleRotation(index) {
 
       
 {#if activeTab === "Certificates of Quality"}
-<div class="flex flex-wrap space-y-4 ml-0 md:ml-16">
+<div class="flex flex-wrap space-y-4 ml-0 lg:ml-16">
   <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start"> 
     <div class="flex items-center justify-between">
       <h3 class="text-md font-medium text-gray-700">How to Find the Product Number</h3>
@@ -748,7 +732,7 @@ function toggleRotation(index) {
       <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
     </div>
     <p class="mt-4 text-sm text-gray-600">
-      In some cases, a COA may not be available online. If your search was unable to find the COA, you can request one.
+      In some cases, a COQ may not be available online. If your search was unable to find the COQ, you can request one.
     </p>
     <div class="mt-4">
       <button class="bg-primary-400 text-white px-4 py-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-600">

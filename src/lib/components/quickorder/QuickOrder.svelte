@@ -2,6 +2,7 @@
   import Icon from "@iconify/svelte";
   import {enhance} from "$app/forms"
   import { authedUser } from '$lib/stores/mainStores.js';
+  let uploadedRows=[];
 
   import * as XLSX from "xlsx";
   let stockAvailability ="";
@@ -12,12 +13,7 @@
   let products = data?.data || [];  
  // console.log("**************************");
   //console.log("i am quick",products);
-
-
-
-  
-  
-  let selectedProduct = null;
+let selectedProduct = null;
   let stockStatus = '';
   let searchQuery = "";
   let rawFileData = "";
@@ -30,8 +26,7 @@
   let fileError = "";
   let quantity=1;
   
-  let currentDate = new Date();
-  let estimatedShipDate = formatDate(currentDate);
+
 
   let rows = [
         { sku: "", size: '', quantity: 1, error: "", filteredProducts: [], selectedSize: null },
@@ -78,7 +73,7 @@
 
     for (let row of rows) {
       const columns = row.split(",");
-      const productNumber = columns[0].trim(); 
+      const productNumber = columns[0]?.trim(); 
  
       const product = products.find(p => p.productNumber === productNumber);
       
@@ -100,12 +95,16 @@
 
     validationMessages = validationResults;
   }
-  function formatDate(date) {
-      const options = { year: 'numeric', month: 'short', day: 'numeric' };
-      return date.toLocaleDateString('en-IN', options);
-  }
 
-  currentDate.setDate(currentDate.getDate() + 7); 
+  function formatDate(date) {
+  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  return date.toLocaleDateString('en-IN', options);
+}
+
+let currentDate = new Date();
+currentDate.setDate(currentDate.getDate() + 7);
+let estimatedShipDate = formatDate(currentDate);
+
 
   function findProductBySku(sku) {
       const productNumber = sku.split('-')[0].trim();  
@@ -180,84 +179,86 @@
   }
 
 
-  function addToCart(rows, products) {
-   
-      let validRows = rows.filter(row => row.sku.trim() !== '');
-      
-      let addCart = validRows.map((row) => {
-          let sku = row.sku.trim();
-          if (!sku) {
+
+
+function addToCart(rowsToProcess) {
+  const validRows = rowsToProcess.filter(row => row.sku.trim() !== '');
+ const newCartItems = validRows.map(row => {
+      const sku = row.sku.trim();
+      const product = findProductBySku(sku);
+
+      if (product) {
+          const selectedSize = row.size || product.priceSize?.[0]?.size; // Use first available size if none selected
+          const sizePriceInfo = product.priceSize?.find(item => item.size === selectedSize);
+
+          if (!sizePriceInfo) {
+              console.warn(`No size/price info for size: ${selectedSize}. Skipping product.`);
               return null;
           }
 
-          let product = findProductBySku(sku);
-
-          if (product) {
-              return {
-                  productNumber: product.productNumber,
-                  productName: product.productName,
-                  priceSize: product.priceSize,
-                  quantity: row.quantity > 0 ? row.quantity : 1,
-              };
-          } else {
-              console.log(`No matching product found for SKU: ${sku}`);
-              return null;
-          }
-      }).filter(item => item !== null);
-
-   
-      if (addCart.length === 0) {
-          //console.log('No valid products to add to the cart.');
-          return;
+          return {
+              description: product.prodDesc,
+              id: product.id,
+              name:product.productName,
+              image: product.imageSrc,
+              partNumber: product.productNumber,
+              price: sizePriceInfo.price,
+              size: selectedSize,
+              quantity: row.quantity > 0 ? row.quantity : 1,
+              stock: product.stockQuantity,
+          };
+      } else {
+          console.log(`No matching product found for SKU: ${sku}`);
+          return null;
       }
-
-
-  
-
-      try {
-          let currentCart = JSON.parse(localStorage.getItem("cartProducts")) || [];
-        //  console.log('Current Cart:', currentCart);
-
-       
-          addCart.forEach(newItem => {
-              let existingItem = currentCart.find(item => item.productNumber === newItem.productNumber);
-              if (existingItem) {
-                  existingItem.quantity += newItem.quantity; 
-              } else {
-                  currentCart.push(newItem); 
-              }
-          });
-
-          
-          localStorage.setItem("cartProducts", JSON.stringify(currentCart));
-         // console.log('Updated Cart:', currentCart);
-
-
-          cartProducts = currentCart;
-
-      } catch (err) {
-          console.error("Error saving to localStorage:", err);
-      }
-
-     
-      showCartMessage = true;
-  
-      setTimeout(() => {
-          showCartMessage = false;
-      }, 3000); 
+  }).filter(item => item !== null);
+  if (newCartItems.length === 0) {
+      console.log('No valid products to add to the cart.');
+      return;
   }
 
- 
-  function cartProducts() {
+  try {
+   
+      let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
+      newCartItems.forEach(newItem => {
+          const existingItem = currentCart.find(item => item.productNumber === newItem.productNumber && item.size === newItem.size);
+
+          if (existingItem) {
+              existingItem.quantity += newItem.quantity;
+          } else {
+              currentCart.push(newItem);
+          }
+      });
+
+     
+      localStorage.setItem("cart", JSON.stringify(currentCart));
+      cart = currentCart; 
+  } catch (err) {
+      console.error("Error saving to localStorage:", err);
+  }
+  showCartMessage = true;
+  setTimeout(() => {
+      showCartMessage = false;
+  }, 3000);
+}
+function addManualEntriesToCart() {
+  addToCart(rows); 
+}
+
+function addUploadedEntriesToCart() {
+  addToCart(uploadedRows); 
+}
+
+  function cart() {
       if (userLoggedIn) {
-          cartProducts = JSON.parse(localStorage.getItem("cartProducts")) || [];
+        cart = JSON.parse(localStorage.getItem("cart")) || [];
       }
   }
 
   import { onMount } from 'svelte';
   onMount(() => {
       if (userLoggedIn) {
-          cartProducts();
+        cart();
       }
   });
 
@@ -279,12 +280,19 @@
     }
   }
   function addRows() {
-      let newRows = rows.slice(0, 5).map(row => ({
-          quantity: row.quantity,
-          error: row.error,
-      }));
-      rows = [...rows, ...newRows];
-  }
+    const newRows = Array(3) 
+        .fill()
+        .map(() => ({
+            sku: "",
+            size: '',
+            quantity: 1,
+            error: "",
+            filteredProducts: [],
+            selectedSize: null,
+        }));
+    rows = [...rows, ...newRows]; 
+}
+
   function handleFileInputChange(event) {
       const files = event.target.files;
       if (files.length > 0) {
@@ -348,7 +356,7 @@ function cleanRawData() {
   const rowsData = rawFileData.trim().split('\n');
 
  
-  rows = rowsData.map((line, index) => {
+  uploadedRows = rowsData.map((line, index) => {
       const [sku, quantity] = line.split(',').map(item => item.trim());
       return {
           sku: sku || "", 
@@ -366,7 +374,7 @@ function decreaseQuantity() {
     }
   }
 
-  // Increment quantity function
+
   function increaseQuantity() {
     if (selectedProduct && selectedProduct.quantity < 9999) {
       selectedProduct.quantity += 1;
@@ -388,13 +396,13 @@ function decreaseQuantity() {
           <div class="flex justify-normal md:justify-end">
               <div class="flex items-center gap-2 w-72 text-xs rounded-md p-3 border border-primary-100 shadow-sm bg-white shadow-primary-100 my-1">
                   <Icon icon="mingcute:warning-line" class="text-primary-500 text-4xl shrink-0" />
-                  <a href="/signin">Sign in to import items from your recent orders and quotes.</a>
+                  <a href="/login">Sign in to import items from your recent orders and quotes.</a>
               </div>
           </div>
       {/if}
 
    
-      <div class="my-4 ml-4">
+      <div class="my-4 lg:ml-4">
           <button on:click={() => (toggle = false)} class="px-5 py-2 text-sm font-semibold {toggle ? 'bg-primary-200' : 'bg-white border-b-2 border-primary-500 text-primary-500'}">
               Manual Entry
           </button>
@@ -405,7 +413,9 @@ function decreaseQuantity() {
 
    
       {#if toggle}
-   <div class="w-full px-5">
+      
+
+   <div class="w-full   lg:px-5">
           
           
             <p class="text-2s md:text-xs font-medium py-1.5">
@@ -484,9 +494,9 @@ function decreaseQuantity() {
 
        
           <div class="mt-2 flex items-center justify-between space-x-2 lg:space-x-54">
-            <!-- Move button to the right -->
+         
             <button 
-                on:click={() => addToCart(rows, products)} 
+                on:click={addUploadedEntriesToCart}
                 class="lg:w-1/5 w-1/2 mt-6 lg:px-4 py-2 bg-primary-500 text-white rounded-md shadow-md hover:bg-primary-600 flex items-center justify-center ml-auto">
                 <span>Add to Cart</span>
                 <Icon icon="ion:cart-outline" class="text-2xl shrink-0" />
@@ -500,16 +510,17 @@ function decreaseQuantity() {
         <div class="text-primary-500 text-center mt-2">Products added to cart!</div>
     {/if}
     </div>
+ 
   {:else}
-      <div class="space-y-2 px-5 ">
+      <div class="space-y-2 lg:px-5 ">
           {#each rows as row, index}
-          <div class="flex sm:w-full gap-2 items-center relative ">
+          <div class="flex sm:w-full  gap-2 items-center relative ">
           <input
               type="text"
               bind:value={row.sku}
               placeholder="Product SKU"
               on:input={() => handleProductFilter(row.sku, index)}
-              class="p-2 border rounded w-full focus:outline-primary-400 "
+                  class="hover:border-primary-500 h-10 mt-2 focus:border-primary-400  focus:outline-none focus:ring-0 mb-2 rounded p-2 items-center ml-4 w-10/12 text-sm   border-1 border-gray-200 transition duration-200"
             />
             {#if searchQuery && row.filteredProducts.length > 0}
             <div class="absolute top-full w-full mt-1 max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-md z-10">
@@ -527,6 +538,7 @@ function decreaseQuantity() {
                       <div class="flex items-center gap-2">
                         <input
                           type="radio"
+                          class="form-radio rounded text-primary-600 mr-2 focus:outline-none focus:ring-2 focus:ring-primary-600"
                           id="size-{size.size}"
                           name="size-{result.productNumber}"
                           value={size.size}
@@ -552,12 +564,12 @@ function decreaseQuantity() {
             {/if}
       
          
-            <div class="w-full md:w-72 mt-3 md:mt-0 flex items-center gap-2">
+            <div class="w-full md:w-72  md:mt-0 flex items-center gap-2">
               <input
-                type="number"
+                type="text"
                 min="1"
                 bind:value={row.quantity}
-                class="w-2/3 grow text-center border-1 rounded bg-white font-medium h-10 outline-none py-2"
+            class="w-2/3 grow text-center border-1 border-gray-200 rounded bg-white font-medium h-10 outline-none py-2 hover:border-primary-400 focus:border-primary-400 focus:ring-0"
                 on:input={() => row.quantity = Math.max(1, Math.min(9999, row.quantity))}
               />
               <button class="outline-none" on:click={() => incrementQuantity(index)}>
@@ -573,10 +585,13 @@ function decreaseQuantity() {
        
  
   {#if selectedProduct && selectedProduct.productNumber === row.sku.split('-')[0].trim()}
-  <div class="w-full mt-3 flex gap-4 items-center hidden md:flex lg:flex xl:flex">
+  <div class="w-full mt-3 flex  ml-5 gap-4 items-center hidden md:flex lg:flex xl:flex">
     <span class="font-semibold">{selectedProduct.productName}</span>
     <span>Size: {selectedProduct.priceSize?.[0]?.size || 'No Size Available'}</span>
     <span>Price: {selectedProduct.priceSize?.[0]?.price}</span>
+    <span>
+        1 Estimated to ship on {estimatedShipDate} 
+    </span>
     <button class="p-2 text-primary-400 rounded" on:click={showDetails}>
       Details
     </button>
@@ -587,6 +602,7 @@ function decreaseQuantity() {
       <Icon icon="mdi:close-circle" class="w-6 h-6" />
     </div>
   </div>
+  <hr/>
   
 
   
@@ -596,10 +612,10 @@ function decreaseQuantity() {
       
       
           <div class="mt-2 flex items-center justify-between space-x-2 lg:space-x-54">
-              <button on:click={addRows} class="text-primary-500 text-md mt-6"> + Add More</button>
+              <button on:click={addRows} class="text-primary-500 text-md mt-6 ml-5"> + Add More</button>
               
               <button 
-                  on:click={() => addToCart(rows, products)} 
+                  on:click={addManualEntriesToCart} 
                   class="lg:w-1/5 w-1/2 mt-6 lg:px-4 py-2 bg-primary-500 text-white rounded-md shadow-md hover:bg-primary-600 flex items-center justify-center " >
                   <span>Add to Cart</span>
                   <Icon icon="ion:cart-outline" class="text-2xl shrink-0" />
@@ -620,7 +636,10 @@ function decreaseQuantity() {
       
       <div class="w-full sm:w-full md:w-1/4 lg:w-1/4 h-1/2 ml-0 sm:ml-0 mt-8 md:mt-24 bg-gray-50 border rounded-lg border-gray-400 p-4 ">
 
-          <h2 class="font-semibold text-xl mb-2">Hello, {email}</h2>
+          <h2 class="font-semibold text-xl mb-2">
+              Hello, {email.split('@')[0].replace(/\d+/g, '')}
+            </h2>
+            
           <div class="mb-2">
        
               <div class="flex items-center space-x-2">
@@ -638,11 +657,11 @@ function decreaseQuantity() {
           
             
               {#if showSavedCarts}
-                  {#if cartProducts.length > 0}
+                  {#if cart.length > 0}
                       <ul>
-                          {#each cartProducts as cart}
+                          {#each cart as cart}
                               <li class="text-sm mt-2 text-gray-700">
-                                  {cart.productName} ({cart.quantity} items)
+                                  {cart.name} ({cart.quantity} items)
                               </li>
                           {/each}
                       </ul>
@@ -651,7 +670,7 @@ function decreaseQuantity() {
                   {/if}
               {/if}
           </div>
-          <div class="mb-2">
+          <!-- <div class="mb-2">
              
               <div class="flex items-center space-x-2">
                   <h3 class="font-semibold text-lg">Recent Orders</h3>
@@ -680,7 +699,7 @@ function decreaseQuantity() {
                   {/if}
               {/if}
           </div>
-
+ -->
 
 
 
@@ -722,11 +741,11 @@ function decreaseQuantity() {
   
   
   {#if showDetailsModal && selectedProduct}
-  <div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center !ml-0 z-50">
-    <div class="bg-white p-6 rounded-lg w-1/2  relative">
+  <div class="fixed inset-0  bg-gray-600 bg-opacity-50 flex justify-center items-center !ml-0 z-50">
+    <div class="bg-white p-6 rounded-lg w-1/2   relative">
     
       <button
-        class="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+        class="absolute top-2 right-2 text-primary-500 hover:text-primary-700"
         on:click={hideDetails}
         aria-label="Close"
       >
@@ -741,7 +760,7 @@ function decreaseQuantity() {
           let status='';
                   console.log(result); 
                   status = result.type;
-        console.log("success/error type:",status); 
+      //  console.log("success/error type:",status); 
         console.log("success/error message:result.data.message=",result.data.record.message);
         console.log("success/error message:result.data.message=",result.data.record.stock);
         stockStatus = result.data.record.stock;
@@ -751,41 +770,46 @@ function decreaseQuantity() {
           }; 
       }}
         >
-            <div class="flex items-center gap-2">
-              <input type="hidden" name="ProductId" value={selectedProduct.id} />
-              <button 
-              class="p-2 text-white  rounded"
-              on:click={decreaseQuantity}
-            >
-            <Icon icon="ic:round-minus" class="text-lg border-1 rounded bg-white text-primary-500 w-12 h-10 p-2" />
-            </button>
-            
-            <input
-              type="text"
-              name="quantity"
-              bind:value={selectedProduct.quantity}
-              class="w-20 text-center p-2 border rounded"
-              on:input={() => {
-                if (selectedProduct.quantity < 1) selectedProduct.quantity = 1;
-                if (selectedProduct.quantity > 9999) selectedProduct.quantity = 9999;
-              }}
-            />
-            
-            <button 
-              class="outline-none" 
-              on:click={increaseQuantity}
-            >
-              <Icon icon="ic:round-plus" class="text-lg border-1 rounded bg-white text-primary-500 w-12 h-10 p-2" />
-            </button>
-              <button 
-                class="mt-3 p-2 text-white bg-primary-500 rounded"
-                on:click={() => {
-                  checkAvailability(); 
-                }}
-              >
-                Check Availability
-              </button>
-            </div>
+        <div class="flex items-center mt-2 gap-5">
+          <input type="hidden" name="ProductId" value={selectedProduct.id} />
+        
+          <!-- Decrease Quantity Button -->
+          <button 
+            class="flex justify-center items-center w-12 h-12 bg-white text-primary-500 rounded border border-gray-300"
+            on:click={decreaseQuantity}
+          >
+            <Icon icon="ic:round-minus" class="text-lg" />
+          </button>
+          
+          <!-- Quantity Input -->
+          <input
+            type="text"
+            name="quantity"
+            bind:value={selectedProduct.quantity}
+            class="w-20 h-12 text-center p-2 border border-gray-300 rounded"
+            on:input={() => {
+              if (selectedProduct.quantity < 1) selectedProduct.quantity = 1;
+              if (selectedProduct.quantity > 9999) selectedProduct.quantity = 9999;
+            }}
+          />
+          <button 
+            class="flex justify-center items-center w-12 h-12 bg-white text-primary-500 rounded border border-gray-300"
+            on:click={increaseQuantity}
+          >
+            <Icon icon="ic:round-plus" class="text-lg" />
+          </button>
+        
+       
+          <button 
+            class="flex justify-center items-center w-40 h-12 text-white bg-primary-500 rounded"
+            on:click={() => {
+              checkAvailability();
+            }}
+          >
+            Check Availability
+          </button>
+        </div>
+        
         </form>
       <p class="mt-2">
         Estimated to ship on {estimatedShipDate} for quantity {selectedProduct.quantity} from Bangalore Non-Bonded Warehouse
@@ -816,17 +840,20 @@ function decreaseQuantity() {
 
     
       <button
-        class="mt-3 p-2 text-white bg-primary-500 rounded"
-        on:click={() => {
-          addToCart(rows, products);  
-          showCartMessage = true;     
-          hideDetails();              
-        }}
-      >
-        Add to Cart
-      </button>
+class="mt-3 p-2 text-white bg-primary-500 rounded flex items-center gap-2"
+on:click={() => {
+  addToCart(rows, products);  
+  showCartMessage = true;     
+  hideDetails();              
+}}
+>
+<span>Add to Cart</span>
+<Icon icon="ion:cart-outline" class="text-2xl shrink-0" />
+</button>
+
     </div>
   </div>
 {/if}
 
 </main>
+
