@@ -30,7 +30,7 @@
     
 </script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
-<div class="bg-gray-100 min-h-screen flex items-center justify-center">
+<div class="bg-white min-h-screen flex items-center justify-center">
     <div class="flex justify-center space-x-10">
         <form method="POST" action="?/confirmpasswordreset"
         use:enhance={() => {
@@ -43,7 +43,7 @@
             };
         }}
         >
-            <div class="bg-white p-8 shadow-lg rounded-lg w-[430px]">
+            <div class="bg-white max-sm:m-0 m-10 p-8 shadow-md rounded-lg w-full sm:w-[430px] md:w-[430px] lg:w-[430px] border border-gray-200">
                 <h2 class="text-2xl font-bold text-center text-primary-500 mb-6">Confirm Password</h2>
                 <div class="flex justify-center mb-6">
                     <div class="w-1/2 flex items-center">

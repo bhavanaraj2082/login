@@ -22,7 +22,7 @@
 </script>
 
 
-<div class="bg-gray-100 min-h-screen flex items-center justify-center">
+<div class="bg-white min-h-screen flex items-center justify-center">
     <div class="flex justify-center space-x-10">
         <!-- Step 1: Forgot Password Form -->
         <form method="POST" action="?/resetpassword"
@@ -43,7 +43,7 @@
             };
         }}
         >
-            <div class="bg-white p-8 shadow-lg rounded-lg max-w-lg">
+            <div class="bg-white p-8 shadow-lg rounded-lg max-w-lg border border-gray-200">
                 <h2 class="text-2xl font-bold text-center text-primary-500 mb-6">Reset Password</h2>
                 <div class="flex justify-center mb-6">
                     <div class="w-1/2 flex items-center">
