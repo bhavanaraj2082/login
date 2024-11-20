@@ -2,7 +2,7 @@
     export let product;
 </script>
 
-<div
+<div    
     class="shadow-sm flex flex-col justify-between border bg-white rounded-lg pb-6 overflow-hidden"
 >
     <img
@@ -15,7 +15,7 @@
         <p class="text-gray-600 h-16 p-2">{product?.prodDesc}</p>
     </div>
     <a
-        href={product?.productNumber || "#"}
+    href={`products/${product.expand?.Category?.urlName}/${product.expand?.subCategory?.urlName}/${product.productNumber}`}
         class="bg-primary-400 text-white w-5/6 mx-auto py-2.5 rounded hover:bg-primary-500 mt-4"
     >
         View Details
