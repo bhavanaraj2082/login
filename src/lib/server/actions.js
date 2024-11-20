@@ -919,7 +919,7 @@ export const getreturnsOrderData = async ({ pb, body }) => {
 		invoiceNumber,
 		returnOrderid,
 		returnItems,
-		status: ''
+		status: 'Pending'
 	};
 
 	const record = await pb.collection('Returns').create(data);
