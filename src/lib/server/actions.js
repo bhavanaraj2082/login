@@ -275,7 +275,8 @@ function finalformdata(formData) {
 		billingCity: formData.billingCity || '',
 		billingLocation: formData.billingLocation || '',
 		billingPostalCode: formData.billingPostalCode || '',
-		files: formData.files
+		files: formData.files,
+		status:"unread"
 	};
 	return finalData;
 }
@@ -928,3 +929,10 @@ export const getcancelreturnData = async ({ pb, id }) => {
 };
 
 //return page close 
+export const serachByQuery= async(pb,body)=>{
+	const result = await pb.collection('Products').getList(1, 5, {
+		filter: `productName ~ "${body.query}" || productNumber ~ "${body.query}" || filteredProductData.CASNumber ~ "${body.query}"`,
+		expand: 'Category,subCategory',
+	});
+	return result
+}

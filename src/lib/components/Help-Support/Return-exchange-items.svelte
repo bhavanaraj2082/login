@@ -124,7 +124,7 @@ else {
         Item is defective or doesn't work
       </label>
       <label class="block text-sm py-2">
-        <input type="radio" name="issue" value="Product is damaged, but shipping box is OK" bind:group={issue} class="mr-2" required />
+        <input type="radio" name="issue" value="Product is damaged but shipping box is OK" bind:group={issue} class="mr-2" required />
         Product is damaged, but shipping box is OK
       </label>
       <label class="block text-sm py-2">

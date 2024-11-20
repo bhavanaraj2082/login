@@ -13,8 +13,8 @@ export const formData = writable({
 export const AddNoted = writable('');
 export const Cusdetails = writable({
     Title: '',
-    First: '',
-    Last: '',
+    FirstName: '',
+    LastName: '',
     Organisation: '',
     Country: '',
     LGC: '',
