@@ -155,7 +155,7 @@ function toggleModal() {
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet"/>
 
 {#each data.records as product}
-<div class="max-[991px]:block md:flex lg:flex bg-white shadow-lg rounded-lg m-10">
+<div class="max-[991px]:block md:flex lg:flex bg-white shadow-sm rounded-lg m-10">
   <div class="bg-white shadow-sm rounded-sm p-3 flex space-x-4 justify-between items-center flex-col lg:flex-row m-3">     
     <div class="flex flex-col space-y-4 lg:w-1/3">
       <div class="mb-3">

@@ -144,9 +144,9 @@ export async function profileupdate(pb,userId){
 } 
 
 /*****************ProductsInfoPopup******************/
-export async function loadProductsInfo(pb, { ProductId }){
+export async function loadProductsInfo(pb, productId){
     // console.log("Input ProductId:", ProductId);
-    const response = await pb.collection('Products').getFirstListItem(`productNumber="${ProductId}"`, { expand: 'manufacturerName' });
+    const response = await pb.collection('Products').getFirstListItem(`productNumber="${productId}"`, { expand: 'manufacturerName' });
 
     if (!response) {
         return {
@@ -462,3 +462,30 @@ export async function getReturnSavedData(pb) {
 
 //     return productNames;
 // };
+
+
+export async function RelatedProductData(pb, productId) {
+    const product = await pb.collection('Products').getFirstListItem(
+      `productNumber="${productId}"`, 
+      { expand: 'subsubCategory' }
+    );
+
+    let subsubCategoryId = product.expand.subsubCategory.id;
+    const relatedProducts = await pb.collection('Products').getList(1, 8, {
+      filter: `subsubCategory="${subsubCategoryId}"`,  
+      expand: 'subCategory,manufacturerName,subsubCategory,Category',
+    });
+
+   
+    for (let relatedProduct of relatedProducts.items) {
+        const stockData = await pb.collection('Stocks').getFirstListItem(
+          `partNumber.productNumber="${relatedProduct.productNumber}"`,  
+          { expand: 'partNumber' }  
+        ).catch(() => {
+            return { stockQuantity: 0 };  
+        });
+
+        relatedProduct.stockQuantity = stockData.stockQuantity || 0;  
+    }
+    return relatedProducts.items;
+}
