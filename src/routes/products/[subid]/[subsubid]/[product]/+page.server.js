@@ -1,9 +1,10 @@
 import { pb, authenticate } from '$lib/server/pocketbase.js'; 
 import { loadProductsInfo } from '$lib/server/loads.js';
 import { checkavailabilityproduct } from '$lib/server/actions.js';
+import { RelatedProductData } from '$lib/server/loads';
 
 export async function load({ params }) {
-  const { product } = params;
+  // const { product } = params;
 
   try {
     const authResponse = await authenticate();
@@ -13,7 +14,9 @@ export async function load({ params }) {
       };
     }
 
-    const productData = await loadProductsInfo(pb, { ProductId: product });
+    const productData = await loadProductsInfo(pb,params.product);
+    const relatedProducts  = await RelatedProductData(pb,params.product)
+    
 
     if (productData.type === "error") {
       return {
@@ -26,7 +29,7 @@ export async function load({ params }) {
 
     // console.log("Product Records:", productData);
 
-    return productData;
+    return { productData , relatedProducts}
   } catch (error) {
     console.error("Error loading product data:", error);
     return {
