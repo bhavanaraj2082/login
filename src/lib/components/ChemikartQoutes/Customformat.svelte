@@ -9,7 +9,6 @@
 	const Neatsolution = (type) => {
 		selectedColor = type;
 		formatType.set(type);
-		console.log('=====>', get(formatType));
 	};
 	onMount(() => {
 		selectedColor = get(formatType) || 'Neat';
@@ -18,9 +17,7 @@
 		const currentSelection = get(formatType);
 		if (!currentSelection) {
 			formatType.set('Neat');
-			console.log('Defaulting to Neat');
 		}
-		console.log('Final Selection:', get(formatType));
 		tog1();
 	};
 </script>

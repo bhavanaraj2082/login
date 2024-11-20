@@ -11,7 +11,6 @@
 			showRequiredMessage = true;
 		} else {
 			showRequiredMessage = false;
-			console.log("Details saved:", get(AddNoted));
 			tog3();
 		}
 	};

@@ -221,7 +221,6 @@
 	const sub = () => {
 		if (!iscomplete) {
 			errorMessage = 'Please fill all the details';
-			console.log(errorMessage);
 		} else {
 			errorMessage = '';
 			tog5();

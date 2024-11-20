@@ -25,27 +25,38 @@ function updateCell(rowIndex, cellIndex, event) {
 	const handleFileUpload = (event) => {
     uploadedFiles = true;  
     const uploadedFile = event.target.files[0];
-    if (uploadedFile) {
-        event.stopPropagation();
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const arrayBuffer = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            const headers = jsonData[0];
-            const rows = jsonData.slice(1).filter((row) => row.some((cell) => cell !== null && cell !== ''));
-            data = { headers, rows };
-            formData.update((currentData) => {
-                return { 
-                    ...currentData, 
-                    components: rows  
-                };
-            });
-        };
-        reader.readAsArrayBuffer(uploadedFile);
-    }
+	if (uploadedFile) {
+    event.stopPropagation();
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const arrayBuffer = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+        const headers = jsonData[0]; // First row is the header
+        const rows = jsonData.slice(1).filter((row) => row.some((cell) => cell !== null && cell !== ''));
+
+        // Map rows to an array of objects, using the headers as keys
+        const components = rows.map(row => {
+            return headers.reduce((acc, header, index) => {
+                acc[header] = row[index] || ''; // Set empty string for undefined/null values
+                return acc;
+            }, {});
+        });
+
+        // Update the formData store
+        formData.update((currentData) => {
+            return { 
+                ...currentData, 
+                components 
+            };
+        });
+    };
+    reader.readAsArrayBuffer(uploadedFile);
+}
+
 };
 		function triggerFileInput() {
 			fileInput.click();
@@ -146,32 +157,13 @@ function updateCell(rowIndex, cellIndex, event) {
 			}));
 		};
 		const unsubscribe = formData.subscribe((currentData) => {
-		console.log("####");
-		
-			console.log("currentData:", currentData);
 			data.rows = currentData.components;
-			console.log("currentData.components:", currentData.components);
-			
-			console.log("currentData:", currentData);
-
-// const keyValuePairs = currentData.components.map(item => {
-//   return {
-//     "CasNumber": item[0].toString(),      
-//     "Component Name": item[1],
-//     "Concentration": item[2].toString()    
-//   };
-// });
-// const data = { rows: keyValuePairs };
-// console.log("data.rows:", data.rows);
-
 			selectedSolvent = currentData.solvent;
 			selectedPackagingType = currentData.packagingType;
 			inputValue = currentData.volume;
 			count = currentData.units;
 			selectedFormat = currentData.qualityLevel;
 			setanalytic = currentData.analyticalTechnique;
-			console.log("Selected Solvent:", selectedSolvent);
-			console.log("Show Solvent Dropdown:", showSolventDropdown);
 		});
 		onDestroy(() => {
 			unsubscribe();
@@ -245,43 +237,44 @@ function updateCell(rowIndex, cellIndex, event) {
 					on:change={handleFileUpload}
 				/>
 			</label>
-			{#if data.rows && data.rows.length > 0}
-				<div class="overflow-x-auto mt-4 mx-4 sm:mx-8 lg:w-10/12">
-					<table class="min-w-full border-collapse">
-						<thead>
-							<tr>
-								{#each data.headers as header}
-									<th class="border p-2 text-center">{header}</th>
-								{/each}
-								<th class="border p-2 text-center">Action</th> <!-- Add manually -->
-							</tr>
-						</thead>
-						<tbody>
-							{#each data.rows as row, rowIndex}
-								<tr>
-									{#each row as cell, cellIndex}
-										<td
-											class="border p-2 text-center"
-											contenteditable="true"
-											on:blur={(e) => updateCell(rowIndex, cellIndex, e)}
-										>
-											{cell}
-										</td>
-									{/each}
-									<td class="border p-2 text-center">
-										<button
-											class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700"
-											on:click={() => deleteRow(rowIndex)}
-										>
-											Delete
-										</button>
-									</td>
-								</tr>
-							{/each}
-						</tbody>						
-					</table>
-				</div>		
-			{/if}
+			{#if data.rows && Array.isArray(data.rows) && data.rows.length > 0}
+			<div class="overflow-x-auto mt-4 mx-4 sm:mx-8 lg:w-10/12">
+			  <table class="min-w-full border-collapse">
+				<thead>
+				  <tr>
+					{#each data.headers as header}
+					  <th class="border p-2 text-center">{header}</th>
+					{/each}
+					<th class="border p-2 text-center">Action</th> <!-- Add manually -->
+				  </tr>
+				</thead>
+				<tbody>
+				  {#each data.rows as row, rowIndex}
+					<tr>
+					  {#each Object.values(row) as cell, cellIndex} <!-- Use Object.values(row) to iterate over the object's values -->
+						<td
+						  class="border p-2 text-center"
+						  contenteditable="true"
+						  on:blur={(e) => updateCell(rowIndex, cellIndex, e)}
+						>
+						  {cell}
+						</td>
+					  {/each}
+					  <td class="border p-2 text-center">
+						<button
+						  class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700"
+						  on:click={() => deleteRow(rowIndex)}
+						>
+						  Delete
+						</button>
+					  </td>
+					</tr>
+				  {/each}
+				</tbody>
+			  </table>
+			</div>
+		  {/if}
+		  
 		</div>
 		<div class="ml-10 my-10">
 			<h1 class="font-bold text-2xl">Would you like to specify a solvent?*</h1>

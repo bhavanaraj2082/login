@@ -15,9 +15,7 @@
 		const currentSelection = get(solutionType);
 		if (!currentSelection) {
 			solutionType.set('Organic');
-			console.log('Defaulting to Organic');
 		}
-		console.log('Final Selection:', get(solutionType));
 		tag();
 	};
 </script>
