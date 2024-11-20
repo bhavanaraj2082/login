@@ -1,20 +1,12 @@
-import { pb, authenticate } from '$lib/server/pocketbase.js';
+import { authenticate } from '$lib/server/pocketbase.js';
 import { Addquotes } from '$lib/server/actions.js';
+const pb = await authenticate();
+
 export const actions = {
     qoutes: async ({ request }) => {
         try {
-            const pocketInstance = await authenticate();
-            if (pocketInstance.status === 400) {
-                return {
-                    type: "error",
-                    data: {
-                        error: "Authentication failed. Please try again later!",
-                    },
-                };
-            }
-            const formData = Object.fromEntries(await request.formData());
-            console.log("formData", formData);
-            const record = await Addquotes(formData, pb);
+            const data = Object.fromEntries(await request.formData());
+            const record = await Addquotes(data, pb);
             return {
                 type: "success",
                 data: {

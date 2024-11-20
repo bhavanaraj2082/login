@@ -214,7 +214,6 @@
 	const cust = () => {
 		if (!isFormData) {
 			errorMessage = 'Please fill all the details';
-			console.log(errorMessage);
 			return;
 		} else {
 			errorMessage = '';
@@ -222,7 +221,6 @@
 		const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailPattern.test($Cusdetails.Email)) {
 			emailError = 'Please enter a valid email address.';
-			console.log(emailError);
 			return;
 		} else {
 			emailError = '';
@@ -230,7 +228,6 @@
 		const phonePattern = /^\d{10}$/;
 		if (!phonePattern.test($Cusdetails.Number)) {
 			phoneError = 'Please enter a valid  phone number (10 digits).';
-			console.log(phoneError);
 			return;
 		}
 		tog4();

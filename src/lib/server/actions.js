@@ -24,7 +24,6 @@ export const myDetails = async (request, pb) => {
 	};
 
 	try {
-		//await pb.admins.authWithPassword(`${DB_USER}`, `${DB_PASS}`);
 		const record = await pb.collection('chemikart_mydetails').create(details);
 		return { mydetails: { record } };
 	} catch (error) {
@@ -34,21 +33,12 @@ export const myDetails = async (request, pb) => {
 
 //ACTION FUNCTION FOR QUOTES PAGE
 export const Addquotes = async (data, pb) => {
-	const componentsArray = data['components[]'].split('\n');
-	const headers = ["CasNumber", "Component Name", "Concentration", "CasNumber2", "Component Name2", "Concentration2"];  
-	const formattedComponents = componentsArray.map(component => {
-		const componentValues = component.split(',');  
-		let componentObject = {};
-		headers.forEach((header, index) => {
-			componentObject[header] = componentValues[index] || '';  
-		});
-		return componentObject;
-	});
+	const components = JSON.parse(data.components)
 	const formattedData = {
 		Custom_solution_type: data.solutionValue,
 		Custom_format: data.selectedColor,
 		Configure_custom_solution: {
-			components: formattedComponents,  
+			components: components,  
 			solvent: data.solvent,
 			packagingType: data.packagingType,
 			volume: data.volume,
