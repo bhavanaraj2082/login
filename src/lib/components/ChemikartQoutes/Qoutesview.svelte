@@ -68,90 +68,83 @@
 </div>
 
   <!-- Custom solution type -->
-  <div class="lg:flex justify-between items-center">
+  <div class="sm:flex justify-between items-center">
     <div class="flex items-center">
       <h1 class="font-semibold text-lg">Custom solution type:</h1>
       <p class="ml-2 text-gray-600">{$solutionType}</p>
     </div>
-    <button type="button" class="font-semibold text-blue-600 hover:text-blue-800" on:click={tog}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 " on:click={tog}>Edit</button>
   </div>
 
   <!-- Custom format -->
-  <div class="lg:flex justify-between items-center">
+  <div class="sm:flex justify-between items-center">
     <div class="flex items-center">
       <h1 class="font-semibold text-lg">Custom format:</h1>
       <p class="ml-2 text-gray-600">{$formatType}</p>
     </div>
-    <button type="button" class="font-semibold text-blue-600 hover:text-blue-800" on:click={tog1}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600" on:click={tog1}>Edit</button>
   </div>
 
   <!-- Custom solution (Components) -->
-  <div class="lg:flex justify-between items-center">
-    <div>
-      <h1 class="font-semibold text-lg">Custom solution:</h1>
-      <div class="space-y-4">
-        <div class="flex items-center">
-          <h2 class="text-gray-600">Components:</h2>
-          {#if $formData.components.length > 0}
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 ml-2">
-              {#each $formData.components as component}
-                <div class="p-4 border rounded-lg shadow-sm">
-                  {#each Object.entries(component).slice(0, 3) as [key, value]}
-                    <div class="text-gray-600 mb-2">
-                      <strong>{key}:</strong> {value}
-                    </div>
-                  {/each}
-                </div>
-              {/each}
-            </div>
-          {:else}
-            <p class="text-gray-600">No components added yet.</p>
-          {/if}
-        </div>
+  <div class="flex flex-col sm:flex-row items-start sm:items-center">
+    <h2 class="text-gray-600">Components:</h2>
+    {#if $formData.components.length > 0}
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4 ml-0 sm:ml-2 w-full">
+        {#each $formData.components as component}
+          <div class="p-4 border rounded-lg shadow-sm text-xs sm:text-lg w-full max-w-full break-words">
+            {#each Object.entries(component).slice(0, 3) as [key, value]}
+              <div class="text-gray-600 mb-2">
+                <strong>{key}:</strong> {value}
+              </div>
+            {/each}
+          </div>
+        {/each}
       </div>
-    </div>
-    <button type="button" class="font-semibold text-blue-600 hover:text-blue-800" on:click={tog2}>Edit</button>
+    {:else}
+      <p class="text-gray-600 mt-4">No components added yet.</p>
+    {/if}
   </div>
+  
 
   <!-- Additional Notes -->
-  <div class="lg:flex justify-between items-center">
+  <div class="sm:flex justify-between items-center">
     <div class="flex items-center">
       <h1 class="font-semibold text-lg">Additional notes:</h1>
       <p class="ml-2 text-gray-600">{$AddNoted}</p>
     </div>
-    <button type="button" class="font-semibold text-blue-600 hover:text-blue-800" on:click={tog3}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600" on:click={tog3}>Edit</button>
   </div>
 
   <!-- Customer Details -->
-  <div class="lg:flex justify-between items-center">
+  <div class="sm:flex justify-between items-center">
     <div>
-      <h1 class="font-semibold text-lg">Customer details:</h1>
+      <h1 class="font-semibold text-lg mb-3">Customer details:</h1>
       <div class="space-y-4">
         {#each Object.entries($Cusdetails) as [key, value]}
           <div class="lg:flex md:flex items-center">
-            <label for={key} class="text-gray-600">{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
+            <label for={key} class="text-black text-base font-medium ml-1">{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
             <p class="ml-2 text-gray-600">{value}</p>
           </div>
         {/each}
       </div>
     </div>
-    <button type="button" class="font-semibold text-blue-600 hover:text-blue-800" on:click={tog4}>Edit</button>
+    <button type="button" class="font-semibold ml-2 sm:ml-0 text-primary-500 hover:text-primary-600" on:click={tog4}>Edit</button>
   </div>
 
   <!-- Delivery Details -->
-  <div class="lg:flex justify-between items-center">
+  <div class="sm:flex justify-between items-center">
     <div>
-      <h1 class="font-semibold text-lg">Delivery Details:</h1>
+      <h1 class="font-semibold text-lg mb-3">Delivery Details:</h1>
       <div class="space-y-4">
         {#each Object.entries($Delivery) as [key, value]}
           <div class="lg:flex md:flex items-center">
-            <label for={key} class="text-gray-600">{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
+            <label for={key} class="text-black text-base font-medium ml-1">{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
             <p class="ml-2 text-gray-600">{value}</p>
           </div>
         {/each}
       </div>
     </div>
-    <button type="button" class="font-semibold text-blue-600 hover:text-blue-800" on:click={tog5}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 ml-2 sm:ml-0" on:click={tog5}>Edit</button>
   </div>
 
   <!-- Hidden Inputs -->
@@ -186,8 +179,8 @@
     <button type="submit" class="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-none focus:ring focus:ring-primary-500">
       Send quote request
     </button>
-    <button type="button" on:click={refreshPage} class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring focus:ring-gray-500">
+    <!-- <button type="button" on:click={refreshPage} class="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-none focus:ring focus:ring-primary-500">
       Back
-    </button>
+    </button> -->
   </div>
 </form> 

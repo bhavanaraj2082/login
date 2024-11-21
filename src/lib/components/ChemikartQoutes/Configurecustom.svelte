@@ -186,6 +186,9 @@ function updateCell(rowIndex, cellIndex, event) {
 });
 
 		</script>
+		
+		
+		
 		<div class="mx-10 my-10 flex justify-between">
 			<h1 class="font-bold text-2xl text-black text-opacity-25">
 				Step 1: Select custom solution type
@@ -208,18 +211,26 @@ function updateCell(rowIndex, cellIndex, event) {
 			<h1 class="font-bold text-2xl">Step 3: Configure custom solution</h1>
 		</div>
 		<div class="ml-10">
+
+		
 			<button
 				class="box-content h-25 w-4/5 p-4 border-dashed border-primary-500 border-2 ml-8 my-10"
 				type="button"
 				on:click={triggerFileInput}
 			>
-			<h1 class="font-bold text-2xl">Add Components</h1>
+			
+			
+			<div class="flex items-center font-bold text-2xl justify-center">
+				<span>Add Components</span>
+				<Icon icon="material-symbols-light:upload" class="text-3xl text-primary-500 ml-2" />
+			</div>
+			
 			<div>
 				Upload an Excel
 				<a 
 					href={fileLink} 
 					download="Custom_Quote_Template.xls" 
-					class="text-primary-500 underline"
+					class="text-primary-500 underline ml-1.5 mr-1.5"
 					role="button">
 					download template
 				</a>
@@ -283,6 +294,7 @@ function updateCell(rowIndex, cellIndex, event) {
 					type="radio"
 					id="yes"
 					name="solvent"
+					class="form-radio text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600"
 					bind:group={selectedSolvent}
 					value="Yes"
 					on:change={() => {
@@ -293,11 +305,12 @@ function updateCell(rowIndex, cellIndex, event) {
 				/>
 				<label for="yes">Yes</label>
 				<input
-					class="ml-10"
-					type="radio"
+				class="form-radio text-primary-600 ml-10 focus:outline-none focus:ring-2 focus:ring-primary-600"
+				type="radio"
 					id="no"
 					name="solvent"
 					value="No"
+					
 					bind:group={selectedSolvent}
 					on:change={() => {
 						setSolvent("No");
@@ -308,7 +321,7 @@ function updateCell(rowIndex, cellIndex, event) {
 				<label for="no">No</label>
 				{#if showSolventDropdown}
 					<select
-						class="box-content border-2 mt-4"
+						class="box-content border-1 mt-4 px-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 rounded-md focus:border-primary-500 bg-white "
 						id="solvent"
 						name="solvent"
 						bind:value={selectedSolvent}
@@ -386,7 +399,7 @@ function updateCell(rowIndex, cellIndex, event) {
 			<h1 class="font-bold text-2xl">What unit volume do you need?*</h1>
 			<div class="relative">
 				<select
-					class="ml-10 border-2 border-gray-300 rounded-md mt-5 h-10 w-28"
+					class="ml-10 border-2 border-gray-300 rounded-md mt-5 h-10 w-28 focus:ring-0 focus:outline-none focus:border-primary-500  "
 					on:change={handleSelect}
 					bind:value={inputValue}
 				>
@@ -400,7 +413,8 @@ function updateCell(rowIndex, cellIndex, event) {
 		<div class="ml-10 my-10">
 			<h1 class="font-bold text-2xl">How many units do you need?*</h1>
 			<div
-				class="counter mt-3 ml-10 p-1 border border-gray-300 rounded-lg bg-gray-100 inline-flex items-center space-x-1"
+				class="counter mt-3 ml-10 p-1  border-gray-300 bg-white inline-flex items-center space-x-1 border-2 rounded-md h-10 w-28 focus:ring-0 focus:outline-none focus:border-primary-500  "
+
 			>
 				<button
 					type="button"
@@ -529,19 +543,22 @@ function updateCell(rowIndex, cellIndex, event) {
 					</div>
 				</button>
 			</div>
+			{#if errorMessage}
+				<div class="text-red-500 ml-10 mt-5 text-sm font-medium">
+					{errorMessage}
+				</div>
+			{/if}
 		</div>
+		
 		<div class="flex space-x-4 mt-5">
+		
 			<button
 				type="button"
 				on:click={saveAndContinue}
 				class="ml-20 text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
 				>Save & continue</button
 			>
-			{#if errorMessage}
-				<div class="text-red-500 ml-5 mt-7">
-					{errorMessage}
-				</div>
-			{/if}
+			
 		</div>
 		<hr />
 		<div class="mx-10 my-10 flex justify-between">

@@ -43,14 +43,15 @@
 	<h1 class="font-semibold my-5">Further details or requests</h1>
 	<textarea
 		rows="6"
-		class="w-80 p-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+		class="w-80 p-2  border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500
+		border-1 focus:border-primary-500"
 		bind:value={$AddNoted}
 		name="futherdetails"
 		placeholder="Add your notes here..."
 	></textarea>
 	<br />
 	{#if showRequiredMessage}
-		<p class="text-red-500">This field is required.</p>
+		<p class="text-red-500 text-sm font-medium">This field is required.</p>
 	{/if}
 	<button
 		type="button"
