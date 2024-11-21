@@ -947,3 +947,14 @@ export const serachByQuery= async(pb,body)=>{
 	});
 	return result
 }
+
+export const getUpdatedCartData = async(pb,product)=>{
+	const productNumber = product.split(',')
+        let productObj = []
+        for(let num of productNumber){
+            const records = await pb.collection("Products").getFirstListItem(`productNumber="${num}"`,{fields:"productNumber,priceSize"})
+            productObj.push(records)
+        }
+        console.log(productObj);
+        return JSON.stringify(productObj)
+}
