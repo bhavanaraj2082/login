@@ -249,17 +249,17 @@ export async function fetchProductName(pb) {
     return productNames;
 };
 
-export async function getProductdatas(pb) {
-	const record = await pb.collection('Category').getFullList();
-	console.log("records",record)
-	if(record)
-	{
-		return {records : record}
-	}
-	else{
-		return { error : "Products not Found" }
-	}
-}
+// export async function getProductdatas(pb) {
+// 	const record = await pb.collection('Category').getFullList();
+// 	console.log("records",record)
+// 	if(record)
+// 	{
+// 		return {records : record}
+// 	}
+// 	else{
+// 		return { error : "Products not Found" }
+// 	}
+// }
 
 
 
@@ -485,4 +485,12 @@ export async function RelatedProductData(pb, productId) {
         relatedProduct.stockQuantity = stockData.stockQuantity || 0;  
     }
     return relatedProducts.items;
+}
+
+export async function RelatedApplicationData(pb,urlName){
+    const relatedProducts = await pb.collection('Products').getList(1, 8, {
+        filter: `subsubCategory.urlName="${urlName}" || subCategory.urlName="${urlName}"`,  
+        expand: 'subCategory,manufacturerName,subsubCategory,Category',
+    });
+    return relatedProducts
 }

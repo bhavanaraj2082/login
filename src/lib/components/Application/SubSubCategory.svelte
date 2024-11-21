@@ -3,6 +3,7 @@
   
   import RelatedProductss from "$lib/components/RelatedProductss.svelte";
   let subsubcategoryData = data?.subsubcategoryData;
+  let relatedProducts=data.relatedProducts.items;
 </script>
 
 <section class="w-11/12 mx-auto mb-3 max-w-7xl">
@@ -23,7 +24,7 @@
     </div>
   </div>
 
-  <RelatedProductss />
+  <RelatedProductss {relatedProducts}/>
   {#if subsubcategoryData.additionalInfo}
     <div class="mt-8">
       <h2 class="text-2xl font-semibold text-gray-800">More Information</h2>
