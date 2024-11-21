@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { enhance } from '$app/forms';
   import DetailsPopup from './DetailsPopup.svelte';
+  import Properties from './Properties.svelte';
   import Imageinfo from './Imageinfo.svelte';
   import Icon from '@iconify/svelte';
   import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
@@ -27,6 +28,8 @@
   let isLiked = false;
   let isFavorited = [];
   let selectedIndex = 0;
+  let favoriteNotification = '';
+  let favoriteStatus = '';
   // console.log("Data Records:", data);
 
   function toggleFavorite(index) {
@@ -116,7 +119,7 @@ function toggleModal() {
     imageSrc: product.imageSrc,
     stock: product.stockQuantity,
     size: product.priceSize[index].size, 
-    price: product.priceSize[index].price,
+    price: product.priceSize[0].price,
     quantity: product.quantity || 1,
   };
 
@@ -167,28 +170,25 @@ function toggleModal() {
               <Imageinfo {data} ImageclosePopup={toggleImagePopup}/>
               {/if}
       </div>
-      <h1 class="text-center text-primary-400 font-semibold !mt-0">All(1)</h1>
       <div class="w-full mb-4">
-        <button on:click={toggleDropdown} class="w-full bg-white text-primary-400 border border-primary-400 rounded-lg py-2 px-4 hover:bg-primary-400 hover:text-white">
-          Documents <i class="fa-solid fa-angle-down"></i>
+        <button class="w-full text-left bg-white text-gray-900 font-medium p-2 pl-0">
+          Documents 
         </button>
-        <div class="w-full mt-2 rounded-lg p-2 space-y-1">
-          {#if showDropdown}
+        <div class="w-full rounded-lg space-y-1">
+          <!-- {#if showDropdown} -->
           <div
-            class="text-primary-400 border border-primary-400 rounded-lg py-2 px-4 text-center hover:bg-primary-400 hover:text-white cursor-pointer"
+            class="text-primary-400 text-sm text-left cursor-pointer"
           >
             <a href={product.safetyDatasheet} target="_blank">
-              SDS <i class="fa-solid fa-download"></i></a
+              <i class="fa-solid fa-download mr-1"></i>SDS </a
             >
           </div>
           <div
-            class="text-primary-400 border border-primary-400 rounded-lg py-2 px-4 text-center hover:bg-primary-400 hover:text-white cursor-pointer"
+            class="text-primary-400 text-sm text-left cursor-pointer"
           >
-            <a href="/" target="_blank">Specifications Sheet</a><i
-              class="fa-solid fa-sheet-plastic ml-1"
-            ></i>
+            <a href="/" target="_blank"><i class="fa-solid fa-sheet-plastic mr-1"></i>Specifications Sheet</a>
           </div>
-           {/if}
+           <!-- {/if} -->
         </div>
       </div>
     </div>
@@ -197,8 +197,37 @@ function toggleModal() {
     <div class="flex flex-col space-y-4 w-full lg:w-3/4 max-[991px]:mt-5 max-[991px]:!ml-0">
       <div class="flex items-center justify-between">
         <span class="text-primary-400 font-semibold">{product.productNumber}</span>
-        <div>
-          <button on:click={toggleDetailsPopup} class="text-primary-400 font-semibold cursor-pointer">Details</button>
+        <div class="flex">
+          <!-- <button on:click={toggleDetailsPopup} class="text-primary-400 font-semibold cursor-pointer">Details</button> -->
+          <form action="?/favorite" method="POST" class="text-end"
+            use:enhance={() => {
+              return async({ result }) => {
+              let status='';
+                      console.log(result); 
+                      status = result.type;
+            // console.log("success/error type:",status); 
+            // console.log("success/error message:result.data.message=",result.data.message);
+            favoriteNotification = result.data.message;
+            favoriteStatus=status;
+              }; 
+            }}
+            >
+              <input type="hidden" name="id" value={product.productId} />
+              <input type="hidden" name="imgUrl" value={product.imageSrc} />
+              <input type="hidden" name="priceSize"/>
+              <input type="hidden" name="price" value={product.priceSize[index].price} />
+              <input type="hidden" name="size" value={product.priceSize[index].size} />
+              <input type="hidden" name="productDesc" value={product.prodDesc} />
+              <input type="hidden" name="productName" value={product.productName} />
+              <input type="hidden" name="productNumber" value={product.productNumber} />
+              <input type="hidden" name="quantity" value={product.quantity || 1} />
+              <input type="hidden" name="stock" value={product.stockQuantity} />
+              <button type="submit" class="btn btn-primary">
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                <i class={`fa-heart ml-10 ${isLiked ? 'fa-solid text-orange-500' : 'fa-regular text-primary-400'} text-end`} on:click={toggleLike}></i>
+              </button>
+            </form>
           {#if showDetailsPopup}
           <DetailsPopup {data} closePopup={toggleDetailsPopup} />  
           {/if}
@@ -212,23 +241,6 @@ function toggleModal() {
       {/if}
       <div class="flex justify-between !mt-3">
         <p class="text-gray-900 text-sm font-semibold text-start">Synonym(S): <span class="text-gray-500 font-normal">{product.productSynonym}</span></p>
-         <!-- svelte-ignore a11y-click-events-have-key-events -->
-         <!-- svelte-ignore a11y-no-static-element-interactions -->
-         <p><i class={`fa-heart ${isLiked ? 'fa-solid text-orange-500' : 'fa-regular text-primary-400'} text-end`} on:click={toggleLike}></i></p>
-         <!-- <button
-         on:click={() => {
-           if (!isLoggedIn) {
-             showModal = true;
-             indexToToggle = index;
-           } else {
-             toggleFavorite(index);
-           }
-         }}
-         class="absolute -top-8 right-0 bg-transparent border-none p-0" aria-label="Toggle favorite">
-         <Icon 
-           icon={isFavorited[index] ? 'prime:heart-fill' : 'prime:heart'} 
-           class={`text-3xl ${isFavorited[index] ? 'text-primary-600' : 'text-primary-400'}`} />
-       </button> -->
       </div>
       
 <div class="p-2"> 
@@ -265,7 +277,7 @@ function toggleModal() {
     <div class="flex flex-col w-full">
       <div class="text-gray-800">
         <div class="items-center justify-between border-dotted border-b-2 border-gray-300 pb-2">
-          <div class="text-lg font-semibold">
+          <div class="text-lg font-semibold relative">
             {product.productNumber}-{product.priceSize[index].size} <button on:click={toggleModal} class="ml-1 text-primary-400"><i class="fa-solid fa-circle-info"></i></button>
               {#if showModal}
                 <div
@@ -434,12 +446,12 @@ function toggleModal() {
                   type="text"
                   readonly
                   bind:value={productURL}
-                  class="text-xs sm:text-sm md:text-base border border-primary-400 p-2 rounded-lg text-gray-600 outline-none flex-grow w-full"
+                  class="text-xs sm:text-sm md:text-sm border border-primary-400 p-2 rounded-lg text-gray-600 outline-none flex-grow w-full"
                 />
               
                 <button
                   on:click={copyToClipboard}
-                  class="text-primary-400 text-xs sm:text-sm md:text-base font-semibold border p-2 border-primary-400 rounded-lg flex items-center justify-center space-x-1 w-full sm:w-auto"
+                  class="text-primary-400 text-xs sm:text-sm md:text-sm font-semibold border p-2 border-primary-400 rounded-lg flex items-center justify-center space-x-1 w-full sm:w-auto"
                 >
                   <i class="fa-regular fa-copy"></i>
                   <span>Copy</span>
@@ -454,14 +466,14 @@ function toggleModal() {
     </div>
   
     <div class="w-full !ml-0">
-      <div class="flex items-center justify-between w-full space-x-4 mt-10">
+      <div class="flex items-center border border-gray-300 rounded-sm justify-between w-full space-x-4 mt-10">
         <button
           on:click={decreaseQuantity}
           class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
           ><i class="fa-solid fa-minus"></i></button
         >
         <span
-          class="w-full text-center text-gray-800 border border-gray-300 rounded-sm p-1"
+          class="w-full text-center text-gray-800 rounded-sm p-1"
           >{quantity}</span
         >
         <button
@@ -488,3 +500,5 @@ function toggleModal() {
 </div>
 {/if}
 {/each}
+
+<Properties {data}/>
