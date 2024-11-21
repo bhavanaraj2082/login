@@ -7,10 +7,26 @@ body{
     @apply font-montserrat text-content bg-gray-50;
 }
 
-.scroll::-webkit-scrollbar{
-    @apply hidden;
-}
-
 h1,h2,h3,h4,h5,h6,button{
     @apply font-workSans text-heading;
 }
+
+.scroll::-webkit-scrollbar {
+    @apply w-1.5 h-1.5;
+  }
+  
+  /* Track */
+  .scroll::-webkit-scrollbar-track {
+    @apply bg-primary-100 rounded;
+  }
+   
+  /* Handle */
+  .scroll::-webkit-scrollbar-thumb {
+    @apply bg-primary-400 rounded-md h-10;
+  }
+  
+  /* Handle on hover */
+  .scroll::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-600;
+  }
+  
