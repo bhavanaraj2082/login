@@ -1,5 +1,5 @@
 import { authenticate } from "$lib/server/pocketbase.js";
-import { checkoutOrder } from "$lib/server/actions.js";
+import { checkoutOrder,getUpdatedCartData } from "$lib/server/actions.js";
 const pb = await authenticate()
 
 export const actions = {
@@ -12,5 +12,15 @@ export const actions = {
             console.log(error);
             return { success:false,message:"Something went wrong"}
         }  
+    },
+    updatedCart:async({request})=>{
+        try {
+        const {product} = Object.fromEntries(await request.formData())
+        return await getUpdatedCartData(pb,product)
+        } catch (error) {
+            console.log(error);
+           // return { success:false,message:"Something went wrong"}
+        }
+       
     }
 }

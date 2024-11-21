@@ -1,9 +1,34 @@
 <script>
+	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
 	import { authedUser } from '$lib/stores/mainStores.js';
 	import Icon from '@iconify/svelte';
-	import { onMount } from 'svelte';
+	import { onMount, createEventDispatcher } from 'svelte';
 	import { viewedCart,updateCartState } from '$lib/stores/alsoViewedProducts_Store.js';
+    
+	const dispatch = createEventDispatcher()
+
+	let timestamp
+	let loading = true
+
+	const functionDispatch = ()=>{
+    let expireTime = 10000
+    if(browser){
+		timestamp = browser ? JSON.parse(localStorage.getItem("cartTimeStamp")) : null
+    
+	  if(timestamp === null){
+		timestamp = Date.now()
+		localStorage.setItem("cartTimeStamp",timestamp)
+	  }
+		if(Date.now()>timestamp + expireTime){
+			console.log("items has expired");
+            dispatch("onCart",{isExpired:true})
+		}else{
+            dispatch("onCart",{isExpired:false})
+			console.log("item is still valid");
+		}
+	}
+}
 
 	let cartItems = $viewedCart;
 	let subtotal = 0;
@@ -14,28 +39,33 @@
 	let successMessage = ''
 
 	const calculateTotals = () => {
-		subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-		tax = subtotal * 0.12;
-		total = subtotal + tax;
+		subtotal = cartItems.reduce((sum, item) => sum + parseFloat(item.priceSize.price.replace(/[^\d.-]/g, '')) * parseInt(item.quantity), 0);
+		    tax = subtotal * 0;
+		    total = subtotal + tax;
+
 		let ordernumber = Math.floor(Math.random() * 900000) + 100000
 		let products = []
 		let orderdetails = cartItems.map(item=>{
-            const {id,name,partNumber,quantity,price,stock} = item
+            const {id,name,partNumber,quantity,priceSize,stock} = item
+			const parsedPrice = parseFloat(priceSize.price.replace(/[^\d.-]/g, ''))
+			const parsedQty = parseInt(quantity)
+			const parsedStock = parseInt(stock)
+
 			products.push(id)
-			totalPrice = parseInt(quantity) * parseFloat(price)
-			let backOrder = quantity > stock ? parseInt(quantity) - parseInt(stock) : 0;
-			let readyToShip = quantity < stock ? quantity : stock;
+			totalPrice = parsedQty * parsedPrice
+			let backOrder = parsedQty > stock ? parsedQty - parsedStock : 0;
+			let readyToShip = parsedQty < stock ? parsedQty : stock;
 			return {
 				productId:id,
 				productName:name,
 				productNumber:partNumber,
-				orderQty:quantity,
-				unitPrice:price,
+				orderQty:parsedQty,
+				unitPrice:parsedPrice,
 				backOrder,
 				extendedPrice:totalPrice,
 				readyToShip,
 				supplierId:"",
-				availableStock:stock
+				availableStock:parsedStock
 			}
 		})
 	 order = {
@@ -98,7 +128,9 @@
 	}
 
 	onMount(() => {
-			calculateTotals();
+		calculateTotals();
+		functionDispatch()
+		loading = false
 	});
 </script>
 
@@ -108,6 +140,11 @@
 	{/if}
 	<!-- Main Cart Section -->
 	<div class=" flex flex-col xl:flex-row justify-between gap-6">
+          {#if loading}
+		  <div class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded shadow-md ">
+			<p class=" font-medium text-lg md:text-xl  xl:text-2xl">Loading...</p>
+		</div>
+		  {/if}
 		<!-- Left Side: Cart Items -->
 		 {#if !$viewedCart.length || $viewedCart === null}
 		   <div class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded shadow-md ">
@@ -139,12 +176,13 @@
 							<div class="ml-2">
 								<p class="text-sm text-red-500 font-semibold">{item.partNumber}</p>
 								<p class=" text-gray-800">{item.name}</p>
+								<p class=" text-gray-800 text-sm">{item.priceSize.size}</p>
 							</div>
 						</div>
 
 						<!-- Price -->
 						<h3 class=" lg:hidden mt-3 font-medium text-sm">Price</h3>
-						<p class="text-md w-full md:w-2/12 font-semibold text-content">₹{item.price.toFixed(2)}</p>
+						<p class="text-md w-full md:w-2/12 font-semibold text-content">{item.priceSize.price}</p>
 
 						<!-- Quantity Control -->
 						<h3 class=" lg:hidden mt-3 font-medium text-sm">Quantity</h3>
@@ -164,7 +202,7 @@
 						<h3 class=" lg:hidden mt-3 text-sm">Total</h3>
 						 <div class=" w-full lg:w-2/12 flex justify-between items-center">
 							<p class="text-md font-medium text-content">
-								₹{(item.price * item.quantity).toFixed(2)}
+								₹{(parseFloat(item.priceSize.price.replace(/[^\d.-]/g, '')) * item.quantity).toFixed(2)}
 							</p>
 							<button type="button" on:click={() => removeItem(item.id)} class=" text-lg text-primary-600">
 								<Icon icon="mdi:delete" class=" text-3xl"/>
