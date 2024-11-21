@@ -22,7 +22,7 @@
       </h1>        
       <div class="flex gap-3 mb-4 sm:mx-2 lg:mx-0 relative">
         {#each sections as { title }, index}
-          <div class="relative w-32">
+          <div class="relative w-full sm:w-32">
             <button
               class={`flex flex-col justify-center items-center rounded p-2 w-full pb-4 relative ${
                 activeIndex === index ? "font-semibold bg-white" : "bg-primary-200"
@@ -33,7 +33,7 @@
             </button>
             {#if activeIndex === index}
               <div
-                class="absolute bottom-2 left-1/2 transform -translate-x-1/2 h-1 w-24 bg-primary-500 rounded"
+                class="absolute bottom-2 left-1/2 transform -translate-x-1/2 h-1 bg-primary-500 rounded w-4/5 sm:w-24 md:w-30"
                 style="transition: width 0.3s ease, transform 0.3s ease;"/>
             {/if}
           </div>

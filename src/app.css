@@ -7,6 +7,10 @@ body{
     @apply font-montserrat text-content bg-gray-50;
 }
 
+.hide::-webkit-scrollbar{
+    @apply hidden;
+}
+
 h1,h2,h3,h4,h5,h6,button{
     @apply font-workSans text-heading;
 }
