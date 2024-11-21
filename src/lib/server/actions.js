@@ -210,21 +210,6 @@ export async function checkData(pb, body) {
 
 // profile page end
 
-//CHEMIKART PRODUCTS PAGE FINDING DIFFRENCES  ACTION FUNCTION
-export async function fetchProds(pb) {
-	const resultList = await pb.collection('Products').getList(1, 10);
-	const results = resultList.items.map((record) => ({
-		productName: record.productName,
-		productNumber: record.productNumber,
-		imageSrc: record.imageSrc,
-		qualityLevel: record.properties?.QualityLevel,
-		form: record.properties?.Form,
-		ph: record.properties?.PH,
-		priceSize: record.priceSize,
-		BiologicalSource: record.properties?.BiologicalSource
-	}));
-	return results;
-}
 
 // Help and Support Page
 function finalformdata(formData) {
