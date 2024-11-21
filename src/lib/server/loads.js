@@ -249,17 +249,17 @@ export async function fetchProductName(pb) {
     return productNames;
 };
 
-// export async function getProductdatas(pb) {
-// 	const record = await pb.collection('Category').getFullList();
-// 	console.log("records",record)
-// 	if(record)
-// 	{
-// 		return {records : record}
-// 	}
-// 	else{
-// 		return { error : "Products not Found" }
-// 	}
-// }
+export async function getProductdatas(pb) {
+	const record = await pb.collection('Category').getFullList();
+	console.log("records",record)
+	if(record)
+	{
+		return {records : record}
+	}
+	else{
+		return { error : "Products not Found" }
+	}
+}
 
 
 

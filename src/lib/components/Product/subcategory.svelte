@@ -3,9 +3,10 @@
     const subcategories = data.records
 </script>
 
-<div>
-    <div class="max-w-7xl mx-auto py-6 px-6 lg:px-8">
+
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <div class="pl-4">
+             <p class="text-primary-400 font-semibold text-xl">{subcategories[0].expand.category.name}</p> 
             <p class="mt-2 text-base text-content">
                 Precision-driven laboratory chemicals perfect for research, analysis, and experiments, with top-tier quality and reliability.
             </p>
@@ -23,4 +24,3 @@
             {/each} 
         </div>
     </div>
-</div>
