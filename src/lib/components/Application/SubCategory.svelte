@@ -5,7 +5,8 @@
     
     let categoryData = data.categoryData;
     let subcategoryData = data.subcategoryData;
-    let subsubcategories = data.subsubcategories || {};   
+    let subsubcategories = data.subsubcategories || {};  
+    let relatedProducts=data.relatedProducts.items; 
   </script>
   
   <section class="w-11/12 mx-auto my-3 max-w-7xl">
@@ -43,7 +44,7 @@
           <p class="mt-2 text-lg text-gray-600">{subcategoryData.description}</p>
         </div>
       </div>
-      <RelatedProductss />
+      <RelatedProductss {relatedProducts}/>
       {#if subcategoryData.additionalInfo}
         <div class="mt-8">
           <h3 class="text-xl font-semibold text-gray-800">More Information</h3>
