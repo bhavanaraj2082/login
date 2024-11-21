@@ -14,6 +14,18 @@
     let toggleEdit = false
     let errors = {}
 
+    let dummy = {
+        organizationName:'',
+        attentionTo:'',
+        street:'',
+        city:'',
+        state:'',
+        location:'',
+        department:'',
+        postalCode:'',
+        building:''
+    }
+
     let states = [
         "Andhra Pradesh",
         "Arunachal Pradesh",
@@ -55,16 +67,24 @@
        "India"
     ];
 
-
-    $: activeAddress = organizationAddress
-
+    $:activeAddress = organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress
+     
+    $:if(!toggleEdit){
+       organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress
+    }
 
     $: activeBook = (val,addressType)=>{
       active = val
       activeAddressType = addressType
-      if(addressType === "organization") activeAddress = organizationAddress
-      if(addressType === "shipping") activeAddress = shippingAddress
-      if(addressType === "billing") activeAddress = billingAddress
+      if(addressType === "organization"){
+        organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress
+      }
+      if(addressType === "shipping"){
+        shippingAddress === null ? activeAddress = dummy : activeAddress = shippingAddress
+      }
+      if(addressType === "billing"){
+        billingAddress === null ? activeAddress = dummy : activeAddress = billingAddress
+      }
     }
 
     const validateForm = ()=>{
@@ -92,10 +112,10 @@
         }
     return async({result,update})=>{
         if(result.type === "success"){
+            await update()
             toggleEdit = false
             active = 1
             dispatch("onSuccess",result.data)
-            await update()
         }
     }
 }
