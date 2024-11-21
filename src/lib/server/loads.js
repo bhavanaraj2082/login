@@ -323,7 +323,7 @@ export async function getorderstatusdata(pb, orderid) {
 }
 
 export async function getProfileDetails(pb,userEmail){
-	console.log('load',userEmail);
+	//console.log('load',userEmail);
 	const records = await pb.collection('ChemiDashProfile').getFirstListItem(`email="${userEmail}"`,{expand:'userId'})
 	//console.log("records",records);
 	return {profileData:records}

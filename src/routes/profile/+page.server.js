@@ -13,7 +13,7 @@ const pb = await authenticate()
 export const load = async ({cookies}) => {
   try {
       const email = cookies.get('email')
-      console.log("hhhhhh",email);
+      //console.log("hhhhhh",email);
       return await getProfileDetails(pb,email)  
   } catch (error) {
     console.log('error',error);
