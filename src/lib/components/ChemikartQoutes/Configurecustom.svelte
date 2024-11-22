@@ -189,7 +189,7 @@ function updateCell(rowIndex, cellIndex, event) {
 		
 		
 		
-		<div class="mx-10 my-10 flex justify-between">
+		<div class=" my-10 flex justify-between">
 			<h1 class="font-bold text-2xl text-black text-opacity-25">
 				Step 1: Select custom solution type
 			</h1>
@@ -198,7 +198,7 @@ function updateCell(rowIndex, cellIndex, event) {
 			>
 		</div>
 		<hr />
-		<div class="mx-10 my-10 flex justify-between">
+		<div class=" my-10 flex justify-between">
 			<h1 class="font-bold text-2xl text-black text-opacity-25">
 				Step 2: Select custom format
 			</h1>
@@ -207,10 +207,10 @@ function updateCell(rowIndex, cellIndex, event) {
 			>
 		</div>
 		<hr />
-		<div class="ml-10 my-10">
+		<div class=" my-10">
 			<h1 class="font-bold text-2xl">Step 3: Configure custom solution</h1>
 		</div>
-		<div class="ml-10">
+		<div class="">
 
 		
 			<button
@@ -294,7 +294,7 @@ function updateCell(rowIndex, cellIndex, event) {
 					type="radio"
 					id="yes"
 					name="solvent"
-					class="form-radio text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-600"
+					class="form-radio w-2.5 h-2.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
 					bind:group={selectedSolvent}
 					value="Yes"
 					on:change={() => {
@@ -305,7 +305,7 @@ function updateCell(rowIndex, cellIndex, event) {
 				/>
 				<label for="yes">Yes</label>
 				<input
-				class="form-radio text-primary-600 ml-10 focus:outline-none focus:ring-2 focus:ring-primary-600"
+				class="form-radio w-2.5 h-2.5 text-primary-500 ml-10 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
 				type="radio"
 					id="no"
 					name="solvent"
@@ -426,7 +426,7 @@ function updateCell(rowIndex, cellIndex, event) {
 				</button>
 				<input
 					type="text"
-					class="w-10 h-6 text-center border border-gray-300 rounded text-xs"
+					class="w-10 h-6 text-center border-0 rounded text-md"
 					bind:value={$formData.units}
 					on:input={handleInput1}
 				/>
@@ -561,19 +561,19 @@ function updateCell(rowIndex, cellIndex, event) {
 			
 		</div>
 		<hr />
-		<div class="mx-10 my-10 flex justify-between">
+		<div class="my-10 flex justify-between">
 			<h1 class="font-bold text-2xl text-black text-opacity-25">
 				Step 4: Additional notes
 			</h1>
 		</div>
 		<hr />
-		<div class="mx-10 my-10 flex justify-between">
+		<div class="my-10 flex justify-between">
 			<h1 class="font-bold text-2xl text-black text-opacity-25">
 				Step 5: Customer details
 			</h1>
 		</div>
 		<hr />
-		<div class="mx-10 my-10 flex justify-between">
+		<div class="my-10 flex justify-between">
 			<h1 class="font-bold text-2xl text-black text-opacity-25">
 				Step 6: Delivery information
 			</h1>

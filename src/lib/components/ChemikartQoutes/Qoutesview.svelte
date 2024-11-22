@@ -73,7 +73,7 @@
       <h1 class="font-semibold text-lg">Custom solution type:</h1>
       <p class="ml-2 text-gray-600">{$solutionType}</p>
     </div>
-    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 " on:click={tog}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog}>Edit</button>
   </div>
 
   <!-- Custom format -->
@@ -82,12 +82,18 @@
       <h1 class="font-semibold text-lg">Custom format:</h1>
       <p class="ml-2 text-gray-600">{$formatType}</p>
     </div>
-    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600" on:click={tog1}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog1}>Edit</button>
   </div>
 
   <!-- Custom solution (Components) -->
+  <div class="sm:flex justify-between items-center">
+    <div class="flex items-center">
+      <h1 class="font-semibold text-lg">Configure custom solution:</h1>
+    </div>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog2}>Edit</button>
+  </div>
   <div class="flex flex-col sm:flex-row items-start sm:items-center">
-    <h2 class="text-gray-600">Components:</h2>
+    <h2 class="text-black text-base font-medium">Components:</h2>
     {#if $formData.components.length > 0}
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4 ml-0 sm:ml-2 w-full">
         {#each $formData.components as component}
@@ -104,15 +110,38 @@
       <p class="text-gray-600 mt-4">No components added yet.</p>
     {/if}
   </div>
+  <div class="lg:flex md:flex items-center">
+    <label for="solvent" class="text-black text-base font-medium">Solvent:</label>
+    <p class="md:ml-2 ml-0 text-gray-600">{$formData.solvent}</p>
+  </div>
+  <div class="lg:flex md:flex items-center">
+    <label for="packagingType" class="text-black text-base font-medium">Packaging Type:</label>
+    <p class="md:ml-2 ml-0 text-gray-600">{$formData.packagingType}</p>
+  </div>
+  <div class="lg:flex md:flex items-center">
+    <label for="volume" class="text-black text-base font-medium">Volume:</label>
+    <p class="md:ml-2 ml-0 text-gray-600">{$formData.volume}</p>
+  </div>
+  <div class="lg:flex md:flex items-center">
+    <label for="units" class="text-black text-base font-medium">Units:</label>
+    <p class="md:ml-2 ml-0 text-gray-600">{$formData.units}</p>
+  </div>
+  <div class="lg:flex md:flex items-center">
+    <label for="qualityLevel" class="text-black text-base font-medium">Quality Level:</label>
+    <p class="md:ml-2 ml-0 text-gray-600">{$formData.qualityLevel}</p>
+  </div>
+  <div class="lg:flex md:flex items-center">
+    <label for="analyticalTechnique" class="text-black text-base font-medium">Analytical Technique:</label>
+    <p class="md:ml-2 ml-0 text-gray-600">{$formData.analyticalTechnique}</p>
+  </div>
   
-
   <!-- Additional Notes -->
   <div class="sm:flex justify-between items-center">
     <div class="flex items-center">
       <h1 class="font-semibold text-lg">Additional notes:</h1>
       <p class="ml-2 text-gray-600">{$AddNoted}</p>
     </div>
-    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600" on:click={tog3}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog3}>Edit</button>
   </div>
 
   <!-- Customer Details -->
@@ -128,7 +157,7 @@
         {/each}
       </div>
     </div>
-    <button type="button" class="font-semibold ml-2 sm:ml-0 text-primary-500 hover:text-primary-600" on:click={tog4}>Edit</button>
+    <button type="button" class="font-semibold ml-2 sm:ml-0 text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog4}>Edit</button>
   </div>
 
   <!-- Delivery Details -->
@@ -144,7 +173,7 @@
         {/each}
       </div>
     </div>
-    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 ml-2 sm:ml-0" on:click={tog5}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 ml-2 sm:ml-0 sm:mt-0 mt-5" on:click={tog5}>Edit</button>
   </div>
 
   <!-- Hidden Inputs -->

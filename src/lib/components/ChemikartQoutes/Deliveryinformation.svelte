@@ -233,42 +233,42 @@
 	  }
   }
 	  </script>
-  <div class="mx-10 my-10 flex justify-between">
+  <div class="my-10 flex justify-between">
 		  <h1 class="font-bold text-2xl text-black text-opacity-25">
 			  Step 1: Select custom solution type 
 		  </h1>
 		  <button type="button" class="font-semibold text-primary-500" on:click={tog()}>Edit</button>
 	  </div>
 	  <hr>
-	  <div class="mx-10 my-10 flex justify-between">
+	  <div class="my-10 flex justify-between">
 		  <h1 class="font-bold text-2xl text-black text-opacity-25">
 			  Step 2: Select custom format 
 		  </h1>
 		  <button type="button" class="font-semibold text-primary-500" on:click={tog1()}>Edit</button>
 	  </div>
 	  <hr>
-	  <div class="mx-10 my-10 flex justify-between">
+	  <div class="my-10 flex justify-between">
 		  <h1 class="font-bold text-2xl text-black text-opacity-25">
 			  Step 3: Configure custom solution 
 		  </h1>
 		  <button type="button" class="font-semibold text-primary-500" on:click={tog2()}>Edit</button>
 	  </div>
 	  <hr>
-	  <div class="mx-10 my-10 flex justify-between">
+	  <div class="my-10 flex justify-between">
 		  <h1 class="font-bold text-2xl text-black text-opacity-25">
 			  Step 4: Additional notes
 		  </h1>
 		  <button type="button" class="font-semibold text-primary-500" on:click={tog3()}>Edit</button>
 	  </div>
 	  <hr>
-	  <div class="mx-10 my-10 flex justify-between">
+	  <div class="my-10 flex justify-between">
 		  <h1 class="font-bold text-2xl text-black text-opacity-25">
 			  Step 5: Customer details
 		  </h1>
 		  <button type="button" class="font-semibold text-primary-500" on:click={tog4()}>Edit</button>
 	  </div>
 	  <hr>
-	  <div class="ml-10">
+	  <div class="">
 		  <div>
 			  <h1 class="font-bold text-2xl my-10"> Step 6: Delivery information
 			  </h1>
