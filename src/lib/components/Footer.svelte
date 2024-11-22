@@ -1,5 +1,13 @@
 <script>
 	import Icon from '@iconify/svelte';
+	import CookiesPopup from "$lib/components/CookiesPopup.svelte";
+	let isPopupOpen = false;
+
+	const togglePopup = (event) => {
+		event.preventDefault();  
+		isPopupOpen = !isPopupOpen; 
+	};
+
 	const currentYear = new Date().getFullYear();
 </script>
 <footer class="w-full bg-primary-400 p-6">
@@ -86,7 +94,7 @@
 					&copy; {currentYear} Chemikart. All Rights Reserved.
 				</p>
 				<div class="flex flex-col md:flex-row items-center gap-0 md:gap-4 lg:gap-6 mt-2 md:mt-0 space-y-1 md:space-y-0">
-					<a href="/cookies-settings" class="hover:underline text-xs font-medium">Cookies Settings</a>
+					<a href="/" class="hover:underline text-xs font-medium" on:click={togglePopup}>Cookies Settings</a>
 					<span class="hidden md:block lg:inline-block footer-separator">|</span>
 					<a href="/terms/privacy-notice" class="hover:underline text-xs font-medium">Privacy Notice</a>
 					<span class="hidden md:block lg:inline-block footer-separator">|</span>
@@ -97,4 +105,7 @@
 			</div>
 		</div>
 	</div>	
+	{#if isPopupOpen}
+		<CookiesPopup isOpen={isPopupOpen} closePopup={togglePopup} />
+	{/if}
 </footer>
