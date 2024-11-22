@@ -397,7 +397,12 @@ export async function getReturnSavedData(pb) {
 	return { records: records };
 }
 //returns loads ends
-
+// Myfavourites loads starts
+export async function getFavSavedData(pb,userProfileid) {
+	const records = await pb.collection('Myfavourites').getFirstListItem(`userProfileId.email='${userProfileid}'`)
+	return  records ;
+}
+//Myfavourites loads ends
 
 
 
