@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
 //    import { authedUser } from '$lib/stores/filter.js';
+import { enhance } from '$app/forms';
 
   import Icon from '@iconify/svelte';
   import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
@@ -8,6 +9,8 @@
  
   export let data;
   let products=data.data ||[] ;
+  // console.log("I am Content",products);
+  
   let allProducts = products; 
   let pageNumbersToShow = getPageNumbers();
  import { filteredProducts, currentPage,
@@ -23,7 +26,10 @@
   let selectedPackSize = '';
   let selectedProduct = null;
   let cartNotification = '';
+  let favoriteNotification=''
   let notificationTimeout;
+  let favoriteStatus;
+
   let loginError = '';
   let email = '';
   let password = '';
@@ -34,7 +40,8 @@
  
   let isFavorited = [];
  function updateFilteredProducts() {
-    let filtered = [...allProducts]; 
+  let filtered = Array.isArray(allProducts) ? [...allProducts] : [];
+
     const query = typeof $searchQuery === 'string' ? $searchQuery.toLowerCase() : '';
    
     if (query) {
@@ -119,22 +126,25 @@
       selectedProduct = product; 
       showCOAModal = true; 
   }
-  function toggleFavorite(index) {
-      const product = allProducts[index];
-      isFavorited[index] = !isFavorited[index];
-      modalProduct = product;
-      showModal = true;
-      let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-      const existingProductIndex = favorites.findIndex(item => item.id === product.id);
+  // function toggleFavorite(index) {
+  //     const product = allProducts[index];
+  //     isFavorited[index] = !isFavorited[index];
+  //     modalProduct = product;
+  //     showModal = true;
+  //     let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+  //     const existingProductIndex = favorites.findIndex(item => item.id === product.id);
 
-      if (isFavorited[index] && existingProductIndex === -1) {
-          favorites.push({ ...product, quantity: product.quantity || 1 });
-          localStorage.setItem('favorites', JSON.stringify(favorites));
-      } else if (!isFavorited[index] && existingProductIndex !== -1) {
-          favorites = favorites.filter(item => item.id !== product.id);
-          localStorage.setItem('favorites', JSON.stringify(favorites));
-      }
-  }
+  //     if (isFavorited[index] && existingProductIndex === -1) {
+  //         favorites.push({ ...product, quantity: product.quantity || 1 });
+  //         localStorage.setItem('favorites', JSON.stringify(favorites));
+  //     } else if (!isFavorited[index] && existingProductIndex !== -1) {
+  //         favorites = favorites.filter(item => item.id !== product.id);
+  //         localStorage.setItem('favorites', JSON.stringify(favorites));
+  //     }
+  // }
+
+
+  
   const incrementQuantity = (index) => {
       products = products.map((product, i) =>
           i === index ? { ...product, quantity: (product.quantity || 1) + 1 } : product
@@ -148,7 +158,7 @@
   };
   function viewFavourites() {
     
-    window.location.href = '/favourites'; 
+    window.location.href = '/my-favourite'; 
 }
 function validateLogin() {
   if (email && password) {
@@ -214,7 +224,7 @@ function updatePageNumbersToShow() {
           pageNumbers.push(i);
       }
   } else {
-      // Show 5 page numbers with ellipsis for larger page sets
+    
       const startPage = Math.max(1, currentPageValue - 2);
       const endPage = Math.min(totalPageCount, currentPageValue + 2);
 
@@ -279,6 +289,12 @@ products.priceSize = Array.isArray(products.priceSize) ? products.priceSize : []
 
 
 onMount(() => {
+  const storedFavorites = localStorage.getItem('isFavorited');
+    if (storedFavorites) {
+      isFavorited = JSON.parse(storedFavorites);
+    } else {
+      isFavorited = new Array(products.length).fill(false); 
+    }
   
   products = products.map(product => ({
           ...product,
@@ -300,76 +316,35 @@ function initializeProducts() {
     updateDisplayedProducts(); 
   }
 
-// export function addToCart(product) {
-//   const cart = JSON.parse(localStorage.getItem('cart')) || [];
-//   const existingProductIndex = cart.findIndex(item => item.id === product.id);
-
-
-//   const cartProduct = {
-//     id: product.id,
-//     name: product.productName,
-//     partNumber:product.productNumber,
-//     description: product.prodDesc,
-//     imageSrc: product.imageSrc,
-//     stock: product.stockQuantity,
-//     price:product.priceSize[0].price,
-//     quantity: product.quantity || 1, 
-//   };
-
-//   if (existingProductIndex !== -1) {
- 
-//     cart[existingProductIndex].quantity += cartProduct.quantity;
-//   } else {
-//     cart.push(cartProduct);
-//   }
-
-
-//   localStorage.setItem('cart', JSON.stringify(cart));
-
-
-//   const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
-
-
-//   cartNotification = `You have ${totalQuantity} item(s) in your cart.`;
-
-
-//   if (notificationTimeout) clearTimeout(notificationTimeout);
-//   notificationTimeout = setTimeout(() => {
-//     cartNotification = '';
-//   }, 3000);
-// }
-
-
-
 export function addToCart(product) {
   const cartProduct = {
-    id: product.id,
-    name: product.productName,
-    partNumber:product.productNumber,
-    description: product.prodDesc,
-    imageSrc: product.imageSrc,
-    stock: product.stockQuantity,
-    price:product.priceSize[0].price,
+    description: product.prodDesc,  
+    id: product.id,  
+    image: product.imageSrc,  
+    name: product.productName,  
+    partNumber: product.productNumber,  
+    priceSize: { 
+      price: product.priceSize[0].price,  
+      size: product.priceSize[0].size  
+    },
     quantity: product.quantity || 1, 
+    stock: product.stockQuantity 
   };
-
-
-  // Update the cart store
-  viewedCart.update((cart) => {
+viewedCart.update((cart) => {
     const existingProductIndex = cart.findIndex((item) => item.id === cartProduct.id);
 
     if (existingProductIndex !== -1) {
-      // If the product exists, update its quantity
+    
       cart[existingProductIndex].quantity += cartProduct.quantity;
     } else {
-      // Otherwise, add the new product
+     
       cart.push(cartProduct);
     }
 
-    return cart; // Return the updated cart
+    return cart; 
   });
 
-  // Show cart notification
+
   const totalQuantity = JSON.parse(localStorage.getItem('cart')).reduce(
     (total, item) => total + item.quantity,
     0
@@ -390,6 +365,19 @@ $: updateFilteredProducts();
   $: $currentPage, $totalPages;
   $: updatePageNumbersToShow($totalPages);
   filteredProducts.set(filtered || []);
+  
+  
+  const handleFavoriteToggle = (productId) => {
+    isFavorited[productId] = !isFavorited[productId];
+  };
+  const handleSubmit = async ({ result, productId }) => {
+    let status = '';
+    console.log(result);
+    status = result.type;
+    favoriteNotification = result.data.message;
+    favoriteStatus = status;
+    handleFavoriteToggle(productId); 
+  };
 </script>
 
 
@@ -413,49 +401,99 @@ $: updateFilteredProducts();
         <p class="text-md font-bold">
           <!-- svelte-ignore a11y-invalid-attribute -->
           <a 
-            href="javascript:void(0)" 
-            on:click={() => {
-              
+          href={typeof window !== 'undefined' ? `${window.location.pathname}/${encodeURIComponent(product.productNumber)}` : '#'}
+          on:click|preventDefault={() => {
+            if (typeof window !== 'undefined') {
               const currentPath = window.location.pathname;
-              
-
               const productPageUrl = `${currentPath}/${encodeURIComponent(product.productNumber)}`;
-              
               window.location.href = productPageUrl;
-            }}
-            class="text-gray-700 hover:text-primary-500">
-            {product.productName}
-          </a>
+            }
+          }}
+          class="text-gray-700 hover:text-primary-500">
+          {product.productName}
+        </a>
         </p>
         
-            
-          <div class="relative">
-            <button
-              on:click={() => {
-                if (!isLoggedIn) {
+          
+          
+          
+           <div class="relative">
+            {#if isLoggedIn}
+              <!-- Form for logged in users -->
+              <form
+                action="?/favorite"
+                method="POST"
+                class="text-end"
+                use:enhance={() => {
+                  return async ({ result }) => {
+                    let status = '';
+                    console.log(result);
+                    status = result.type;
+                    favoriteNotification = result.data.message;
+                    favoriteStatus = status;
+                    handleFavoriteToggle(index);  
+                   
+                  
+                  };
+                }}
+              >
+                <input type="hidden" name="id" value={product.id} />
+                <input type="hidden" name="imgUrl" value={product.imageSrc} />
+                <input type="hidden" name="priceSize" />
+                <input type="hidden" name="price" value={product.priceSize[0].price} />
+                <input type="hidden" name="size" value={product.priceSize[0].size} />
+                <input type="hidden" name="productDesc" value={product.prodDesc} />
+                <input type="hidden" name="productName" value={product.productName} />
+                <input type="hidden" name="productNumber" value={product.productNumber} />
+                <input type="hidden" name="quantity" value={product.quantity || 1} />
+                <input type="hidden" name="stock" value={product.stockQuantity} />
+                <button type="submit" class="absolute -top-8 right-0 bg-transparent border-none p-0" aria-label="Toggle favorite">
+                  <!-- <Icon
+                    icon={isFavorited[index] ? 'prime:heart-fill' : 'prime:heart'}
+                    class={`text-3xl ${isFavorited[index] ? 'text-primary-600' : 'text-primary-400'}`}
+                  /> -->
+                </button>
+              </form>
+            {:else}
+         
+              <button
+                on:click={() => {
                   showModal = true;
                   indexToToggle = index;
-                } else {
-                  toggleFavorite(index);
-                }
-              }}
-              class="absolute -top-8 right-0 bg-transparent border-none p-0" aria-label="Toggle favorite">
-              <Icon 
-                icon={isFavorited[index] ? 'prime:heart-fill' : 'prime:heart'} 
-                class={`text-3xl ${isFavorited[index] ? 'text-primary-600' : 'text-primary-400'}`} />
-            </button>
+                  handleFavoriteToggle(index);  
+                }}
+                class="absolute -top-8 right-0 bg-transparent border-none p-0"
+                aria-label="Toggle favorite"
+              >
+                <!-- <Icon
+                  icon={isFavorited[index] ? 'prime:heart-fill' : 'prime:heart'}
+                  class={`text-3xl ${isFavorited[index] ? 'text-primary-600' : 'text-primary-400'}`}
+                /> -->
+              </button>
+            {/if}
           </div>
-          <div class="flex items-start mt-4">
+          
+          
+          
+           <div class="flex items-start mt-4">
             <img 
             src={product.imageSrc} 
             alt={product.productNumber}  
-            class="w-24 h-40 sm:w-28 sm:h-44 md:w-36 md:h-48 lg:w-40 lg:h-48 xl:w-44 xl:h-48 rounded" />
+          class="w-24 h-36 sm:w-28 sm:h-48 md:w-36 md:h-36 lg:w-40 lg:h-36 xl:w-44 xl:h-48 rounded" />
           
-            <div class="flex-grow ml-5">
-              <p class="text-gray-600 mt-1"><strong>Code:</strong> {product.productNumber}</p>
-              <p class="text-gray-600 mt-1"><strong>Manufacturer:</strong> {product.manufacturerName}</p>
-              <p class="text-gray-600 mt-1"><strong>Category:</strong> {product.categoryName}</p>
-              <p class="text-gray-600 md:block hidden"><strong>Description:</strong> {product.prodDesc}</p>
+            <div class="flex-grow lg:ml-5 ml-3">
+              <p>
+              <span class="text-gray-600 font-medium  mt-1">Code: </span>
+              <span class="font-semibold"> {product.productNumber} </span>
+            </p>
+            <p>
+              <span class="text-gray-600 font-medium mt-1">Manufacturer:
+                <span class="font-semibold"> {product.manufacturerName}</span> </p>
+                <p>
+              <span class="text-gray-600 font-medium mt-1">Category:</span><span class="font-semibold"> {product.Category}</span>  </p>
+              <p class="md:block hidden">
+              <span class="text-gray-600 font-medium md:block hidden">Description:
+              <span class="font-semibold">{product.prodDesc}</span> </span> </p>
               <div class="flex flex-col md:flex-row items-start justify-between mt-2">
                 <div class="flex items-center mb-2 md:mb-0">
                   <Icon icon="mdi:file-document" class="text-primary-400 w-4 h-4 mr-1" />
@@ -470,8 +508,8 @@ $: updateFilteredProducts();
                     aria-label="View Safety Data Sheet for {product.productName}">SDS</button>
                   <div class="flex flex-col  md:flex-row lg:flex-row items-start justify-between">
                     <div class="hidden md:flex  items-center">
-                      <p class="text-gray-600 font-bold inline-block lg:ml-5 md:ml-5">Price: </p>
-                      <p class="text-gray-600 text-lg inline-block">
+                      <p class="text-gray-600 font-semibold inline-block lg:ml-10 md:ml-10"> 
+                   
                           {#if product.priceSize && Array.isArray(product.priceSize) && product.priceSize.length > 0}
                             {product.priceSize[0].price} 
                           {:else}
@@ -480,54 +518,29 @@ $: updateFilteredProducts();
                         </p>
                         
                         
-                      <div class="flex items-center  w-full lg:ml-4 md:ml-4">
+                      <div class="flex items-center  w-full lg:ml-4 md:ml-5">
                         <div class="border text-primary-400 flex items-center py-1 rounded">
                           <button 
                             on:click={() => decrementQuantity(index)} 
-                            class="font-bold w-8 h-8 bg-gray-100 rounded text-primary-400 hover:bg-primary-500 hover:text-white">-</button>
-                          <input 
+                            class="font-bold w-8 h-8  rounded text-primary-400 hover:bg-primary-500 hover:text-white">-</button>
+                            <input 
                             type="text" 
-                            class="w-10 h-8 text-center rounded text-base border-none bg-gray-100 mx-1" 
+                            class="w-10 h-8 text-center rounded font-medium text-primary-400 border-none bg-transparent  focus:outline-none focus:ring-0 focus:border-transparent mx-1" 
                             bind:value={products[index].quantity} 
                             readonly />
+                          
                           <button 
                             on:click={() => incrementQuantity(index)} 
-                            class="font-bold w-8 h-8 bg-gray-100 text-primary-400 rounded hover:bg-primary-500 hover:text-white">+</button>
+                            class="font-bold w-8 h-8  text-primary-400 rounded hover:bg-primary-500 hover:text-white">+</button>
                         </div>
                         <button 
                           on:click={() => addToCart(product)} 
-                          class="text-primary-400 hover:bg-primary-600 hover:text-white border border-primary-400 p-2 ml-2 rounded text-sm lg:ml-5">Add To Cart</button>
+                          class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400 p-2 ml-2 rounded text-sm lg:ml-5">Add To Cart</button>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class=" items-start sm:flex-row block  md:hidden  space-y-2">
-                  <!-- Price  -->
-                  <span class="text-gray-600 font-bold inline-block">Price: </span>
-                  <span class="text-gray-600 text-lg inline-block">{product.priceSize[0].price}</span>
-                  
-                  <!-- Quantity  -->
-                  <div class="border text-primary-400 flex items-center py-1 rounded">
-                    <button 
-                      on:click={() => decrementQuantity(index)} 
-                      class="font-bold w-8 h-8 bg-gray-100 rounded text-primary-400 hover:bg-primary-500 hover:text-white">-</button>
-                    <input 
-                      type="text" 
-                      class="w-10 h-8 text-center rounded text-base border-none bg-gray-100 mx-1" 
-                      bind:value={products[index].quantity} 
-                      readonly />
-                    <button 
-                      on:click={() => incrementQuantity(index)} 
-                      class="font-bold w-8 h-8 bg-gray-100 rounded text-primary-400 hover:bg-primary-500 hover:text-white">+</button>
-                  </div>
-                  
-                  <!--  Cart  -->
-                  <button 
-                    on:click={() => addToCart(product)} 
-                    class="text-primary-400 w-full hover:bg-primary-600 hover:text-white border border-primary-400 p-2 rounded text-sm">
-                    Add To Cart
-                  </button>
-                </div>
+               
                 
               </div>
            
@@ -535,7 +548,31 @@ $: updateFilteredProducts();
             </div>
             
           </div>
+          <div class="  flex items-center   md:hidden space-x-10">
+            <span class="text-gray-600 text-lg font-medium">{product.priceSize[0].price}</span>
+            <div class="border text-primary-400 flex items-center py-1   rounded">
+              <button 
+                on:click={() => decrementQuantity(index)} 
+                class="font-bold w-10 h-8 rounded text-primary-400 hover:bg-primary-500 hover:text-white">-</button>
+              <input 
+                type="text" 
+                class="w-10 h-8 text-center rounded font-medium text-primary-400 border-none bg-transparent focus:outline-none focus:ring-0 focus:border-transparent" 
+                bind:value={products[index].quantity} 
+                readonly />
+              <button 
+                on:click={() => incrementQuantity(index)} 
+                class="font-bold w-10 h-8 rounded text-primary-400 hover:bg-primary-500 hover:text-white">+</button>
+            </div>
+        
+           
+          </div>
+          <button 
+          on:click={() => addToCart(product)} 
+          class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400 mt-2 p-2 rounded text-sm block  md:hidden">
+          Add To Cart
+        </button>
         </div>
+        
       {/each}
 
       <!-- Pagination  -->
@@ -586,7 +623,7 @@ $: updateFilteredProducts();
   </div>
 {/if}
 {#if showModal}
-          {#if isLoggedIn}
+          <!-- {#if isLoggedIn}
               <div class="fixed inset-0 flex items-center justify-center bg-slate-500 bg-opacity-70">
                   <div class="bg-white rounded-lg p-6 w-11/12 max-w-sm md:max-w-lg lg:max-w-xl relative">
                       <button on:click={closeModal} class="absolute top-2 right-2 text-gray-600 hover:text-gray-900" aria-label="Close">
@@ -620,7 +657,7 @@ $: updateFilteredProducts();
                       </div>
                   </div>
               </div>
-          {:else}
+          {:else} -->
               <div class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-80">
                   <div class="bg-white rounded-lg p-6 w-11/12 max-w-sm md:max-w-lg lg:max-w-xl relative">
                       <button on:click={closeModal} class="absolute top-2 right-2 text-gray-600 hover:text-gray-900" aria-label="Close">
@@ -659,7 +696,7 @@ $: updateFilteredProducts();
                   </div>
               </div>
           {/if}
-      {/if}
+      <!-- {/if} -->
 {#if showSDSModal}
   
 <div class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-80">
@@ -674,7 +711,7 @@ $: updateFilteredProducts();
         {#if selectedProduct}
             <p class="text-center">
                 <strong>Pack Size:</strong>
-                <select bind:value={selectedPackSize} class="border p-2 inline-block rounded bg-gray-100 ml-2 focus:outline-primary-400">
+                <select bind:value={selectedPackSize} class="border w-1/4 p-2 inline-block rounded bg-gray-100 ml-2 hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0">
                   
                     <option value="" disabled selected>Select size</option>
                     {#each selectedProduct.priceSize as size}
@@ -708,13 +745,13 @@ $: updateFilteredProducts();
                         on:click={ closeCOAModal}
                         class="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
                         aria-label="Close">
-                        <Icon icon="mdi:close" class="text-xl text-primary-400" />
+                        <Icon icon="mdi:close" class="text-xlhover:text-primary-400" />
                     </button>
                     <h2 class="text-xl font-bold mb-4 text-center">Certificate of Analysis</h2>
                     {#if selectedProduct}
                         <p class="text-center">
                             <strong>Pack Size:</strong>
-                            <select bind:value={selectedPackSize} class="border p-2 inline-block rounded bg-gray-100 ml-2 focus:outline-primary-400">
+                            <select bind:value={selectedPackSize} class="border w-1/4 p-2 inline-block rounded bg-gray-100 ml-2 hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0">
 
                                 <option value="" disabled selected>Select size</option>
                                 {#each selectedProduct.priceSize as size}
