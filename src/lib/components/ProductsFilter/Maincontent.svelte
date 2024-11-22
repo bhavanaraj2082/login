@@ -484,16 +484,16 @@ $: updateFilteredProducts();
             <div class="flex-grow lg:ml-5 ml-3">
               <p>
               <span class="text-gray-600 font-medium  mt-1">Code: </span>
-              <span class="font-semibold"> {product.productNumber} </span>
+              <span class="font-semibold text-gray-600  "> {product.productNumber} </span>
             </p>
             <p>
               <span class="text-gray-600 font-medium mt-1">Manufacturer:
-                <span class="font-semibold"> {product.manufacturerName}</span> </p>
+                <span class="font-semibold text-gray-600"> {product.manufacturerName}</span> </p>
                 <p>
-              <span class="text-gray-600 font-medium mt-1">Category:</span><span class="font-semibold"> {product.Category}</span>  </p>
+              <span class="text-gray-600 font-medium mt-1">Category:</span><span class="font-semibold text-gray-600"> {product.Category}</span>  </p>
               <p class="md:block hidden">
               <span class="text-gray-600 font-medium md:block hidden">Description:
-              <span class="font-semibold">{product.prodDesc}</span> </span> </p>
+              <span class="font-semibold text-gray-600">{product.prodDesc}</span> </span> </p>
               <div class="flex flex-col md:flex-row items-start justify-between mt-2">
                 <div class="flex items-center mb-2 md:mb-0">
                   <Icon icon="mdi:file-document" class="text-primary-400 w-4 h-4 mr-1" />
