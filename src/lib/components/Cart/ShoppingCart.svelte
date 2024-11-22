@@ -12,7 +12,11 @@
 	let loading = true
 
 	const functionDispatch = ()=>{
-    let expireTime = 10000
+    let expireTime = 12*60*60*1000
+	if(!$viewedCart.length){
+		console.log('cart empty');
+		return
+	}
     if(browser){
 		timestamp = browser ? JSON.parse(localStorage.getItem("cartTimeStamp")) : null
     
@@ -144,9 +148,8 @@
 		  <div class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded shadow-md ">
 			<p class=" font-medium text-lg md:text-xl  xl:text-2xl">Loading...</p>
 		</div>
-		  {/if}
 		<!-- Left Side: Cart Items -->
-		 {#if !$viewedCart.length || $viewedCart === null}
+		 {:else if !$viewedCart.length || $viewedCart === null}
 		   <div class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded shadow-md ">
 			   <Icon icon="typcn:shopping-cart" class="text-5xl text-primary-500 md:text-8xl" />
 			   <p class=" font-bold text-lg md:text-xl  xl:text-2xl">Cart is Empty</p>
