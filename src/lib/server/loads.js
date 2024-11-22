@@ -532,3 +532,53 @@ export async function DifferentProductData(pb, productId) {
         throw new Error("Failed to load different product data");
     }
 }
+
+
+
+
+
+
+
+
+
+
+///////Filter  Based on sub categories
+
+export async function loadProducts(pb, { SubUrl }) {
+    // console.log("Input SubUrl:", SubUrl);
+    
+    const response = await pb.collection('SubCategories').getFirstListItem(`urlName="${SubUrl}"`, { expand: 'category' });
+    const subcategoryID = response.id;
+
+
+    const stockRecords = await pb.collection('Products').getList(1, 300, {
+        filter: `subCategory="${subcategoryID}"`,
+        expand: 'subCategory,Category,manufacturerName,subsubCategory',
+    });
+
+    
+    const stocks = await pb.collection('Stocks').getList(1, 1000, { 
+        expand: 'partNumber',
+    });
+
+
+    const productNames = stockRecords.items.map(product => {
+        const stock = stocks.items.find(stockItem => 
+            stockItem.expand.partNumber?.id === product.id
+        );
+
+        return {
+            ...product,
+            manufacturerName: product.expand?.manufacturerName?.name || 'Unknown Manufacturer',
+            Category: product.expand?.Category?.name || 'Unknown Category',
+            subsubCategory: product.expand?.subsubCategory?.name || 'Unknown Category',
+            stockQuantity: stock ? stock.stockQuantity : 0,  
+        };
+    });
+
+   // console.log("I am product from load",productNames);
+    return {
+        type: "success",
+        records: productNames,  
+    };
+}
