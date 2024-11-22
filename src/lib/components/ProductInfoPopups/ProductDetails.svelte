@@ -112,35 +112,54 @@ function toggleModal() {
 
   export function addToCart(product, index) {
   const cartProduct = {
-    id: product.id,
+    id: product.productId,
     name: product.productName,
     partNumber: product.productNumber,
     description: product.prodDesc,
-    imageSrc: product.imageSrc,
+    image: product.imageSrc,
     stock: product.stockQuantity,
-    size: product.priceSize[index].size, 
-    price: product.priceSize[0].price,
+    priceSize: {
+      price: product.priceSize[index].price,
+      size: product.priceSize[index].size,
+    },
     quantity: product.quantity || 1,
   };
 
-// console.log("Selected Index:", index);
-// console.log("Selected Size:", product.priceSize[index].size);
-
   viewedCart.update((cart) => {
-    const existingProductIndex = cart.findIndex((item) => item.id === cartProduct.id && item.size === cartProduct.size);
+    // Check if an item with the exact price and size exists
+    const exactMatchIndex = cart.findIndex(
+      (item) =>
+        item.priceSize.size === cartProduct.priceSize.size &&
+        item.priceSize.price === cartProduct.priceSize.price
+    );
 
-    if (existingProductIndex !== -1) {
-      cart[existingProductIndex].quantity += cartProduct.quantity;
+    if (exactMatchIndex !== -1) {
+      // If an exact match exists, update its quantity
+      cart[exactMatchIndex].quantity += cartProduct.quantity;
     } else {
+      // If no exact match exists, handle ID suffix
+      const similarItems = cart.filter(
+        (item) => item.id.startsWith(product.productId)
+      );
+
+      if (similarItems.length > 0) {
+        // Add a suffix based on existing similar items
+        const suffix = similarItems.length + 1;
+        cartProduct.id = `${product.productId}_${suffix}`;
+      }
+
+      // Add the new item to the cart
       cart.push(cartProduct);
     }
 
-    localStorage.setItem('cart', JSON.stringify(cart));
+    // Save updated cart to localStorage
+    localStorage.setItem("cart", JSON.stringify(cart));
 
-    return cart; 
+    return cart;
   });
 
-  const totalQuantity = JSON.parse(localStorage.getItem('cart')).reduce(
+  // Update cart notification
+  const totalQuantity = JSON.parse(localStorage.getItem("cart")).reduce(
     (total, item) => total + item.quantity,
     0
   );
@@ -149,10 +168,9 @@ function toggleModal() {
 
   if (notificationTimeout) clearTimeout(notificationTimeout);
   notificationTimeout = setTimeout(() => {
-    cartNotification = '';
+    cartNotification = "";
   }, 3000);
 }
-
 </script>
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet"/>
