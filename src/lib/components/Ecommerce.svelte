@@ -346,7 +346,7 @@
                                     type="checkbox" 
                                     name="query" 
                                     bind:value={reason} 
-                                    class="w-6 h-6 mb-5 form-checkbox rounded accent-primary-500"
+                                    class="w-6 h-6 mb-5 ml-1 form-checkbox rounded accent-primary-500"
                                 />
                                 <span class="mb-5 text-xs">I agree to the terms and conditions</span>
                             </label>

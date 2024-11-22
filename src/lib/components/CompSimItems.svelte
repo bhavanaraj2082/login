@@ -1,8 +1,33 @@
-
-  <script>
-    import { onMount, afterUpdate } from 'svelte';
-    import Icon from "@iconify/svelte";
-    let qualityLevels = {};
+<script>
+  import { onMount } from "svelte";
+  import { browser } from "$app/environment";
+  import Icon from "@iconify/svelte";
+  export let differentProducts;
+    const productsData = differentProducts;    
+    let DifferentProductData = productsData.map((product) => ({
+      productId: product.id,
+      prodDesc: product.prodDesc,
+      productNumber: product.productNumber,
+      productName: product.productName,
+      priceSize: product.priceSize,
+      synonym: product.filteredProductData?.["Synonym(S)"],
+      name: product.expand?.subCategory?.name,
+      image: product.imageSrc,
+      properties: product.properties,
+      Form:product.properties.Form,
+      manufacturerName: product.expand.manufacturerName.name,
+      stock : product.stockQuantity,
+      category : product.expand.Category.urlName,
+      subCategory : product.expand.subCategory.urlName,
+      subsubCategory : product.expand.subsubCategory.urlName,
+    }));
+function truncateText(text, maxLength = 50) {
+    if (!text || typeof text !== 'string') {
+        return '-'; 
+    }
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+}
+let qualityLevels = {};
     let formCounts = {};
     let mpCounts = {};
     let sustainabilityCounts = {};
@@ -32,237 +57,264 @@
         }
       });
     }
-    onMount(() => {
-      showDifference = false;
-      calculateCount();
-    });
-    
-    export let differentProducts;
-    const productsData = differentProducts;    
-    let DifferentProductData = productsData.map((product) => ({
-      productId: product.id,
-      prodDesc: product.prodDesc,
-      productNumber: product.productNumber,
-      productName: product.productName,
-      priceSize: product.priceSize,
-      synonym: product.filteredProductData?.["Synonym(S)"],
-      name: product.expand?.subCategory?.name,
-      image: product.imageSrc,
-      properties: product.properties,
-      Form:product.properties.Form,
-      manufacturerName: product.expand.manufacturerName.name,
-      stock : product.stockQuantity,
-      category : product.expand.Category.urlName,
-      subCategory : product.expand.subCategory.urlName,
-      subsubCategory : product.expand.subsubCategory.urlName,
-    }));
+ 
+  let currentIndex = 0;
+  let logosPerSlide = 4;
+  let totalSlides = Math.ceil(DifferentProductData.length / logosPerSlide);
 
-function truncateText(text, maxLength = 50) {
-    if (!text || typeof text !== 'string') {
-        return 'undefined'; 
-    }
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-}
+  function prevSlide() {
+    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+  }
 
-    let selectedProduct = {};
-    let selectedPrice;
-    let selectedPriceIndex = 0;
-    let showModal = false;
-    function openModal(product) {
-      selectedProduct = product;
-      selectedPrice = selectedProduct.price[0];
-      selectedPriceIndex = 0;
-      showModal = true;
+  function nextSlide() {
+    currentIndex = (currentIndex + 1) % totalSlides;
+  }
+
+  function updateLogosPerSlide() {
+    if (window.innerWidth < 640) {
+      logosPerSlide = 1;
+    } else if (window.innerWidth < 768) {
+      logosPerSlide = 2;
+    } else if (window.innerWidth < 1024) {
+      logosPerSlide = 3;
+    } else {
+      logosPerSlide = 4;
     }
-    function closeModal() {
+
+    totalSlides = Math.ceil(DifferentProductData.length / logosPerSlide);
+    currentIndex = Math.min(currentIndex, totalSlides - 1);
+  }
+
+
+
+  onMount(() => {
+    showDifference = false;
+    calculateCount();
+    updateLogosPerSlide();
+    window.addEventListener("resize", updateLogosPerSlide);
+
+    return () => {
+      window.removeEventListener("resize", updateLogosPerSlide);
+    };
+  });
+
+  let selectedProduct = {};
+  let selectedPrice;
+  let selectedPriceIndex = 0;
+  let showModal = false;
+  let showCartMessage = false;
+
+  function openModal(product) {
+    selectedProduct = product;
+    selectedPrice = selectedProduct.price[0];
+    selectedPriceIndex = 0;
+    showModal = true;
+    showCartMessage = false;
+  }
+
+  function closeModal() {
+    showModal = false;
+  }
+
+  function selectPrice(index, size) {
+    const filtered = selectedProduct.price.find((price) => price.size === size);
+    selectedPrice = filtered;
+    selectedPriceIndex = index;
+  }
+
+  function getCart() {
+    if (browser) {
+      const cart = localStorage.getItem("cart");
+      return cart ? JSON.parse(cart) : [];
+    }
+    return [];
+  }
+
+  function addToCart(product) {
+    if (!browser) return;
+
+    const cart = getCart();
+    const existingProduct = cart.find(
+      (item) => item.productNumber === product.partNumber
+    );
+
+    if (existingProduct) {
+      existingProduct.quantity += product.quantity;
+    } else {
+      cart.push(product);
+    }
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    popupQuantity = 1;
+    showCartMessage = true;
+    setTimeout(() => {
       showModal = false;
+    }, 1000);
+  }
+
+  let popupQuantity = 1;
+
+  function decrementPopupQuantity() {
+    if (popupQuantity > 1) {
+      popupQuantity--;
     }
-    function selectPrice(index, size) {
-      const filtered = selectedProduct.price.find((price) => price.size === size);
-      selectedPrice = filtered;
-      selectedPriceIndex = index;
+  }
+
+  function incrementPopupQuantity() {
+    popupQuantity++;
+  }
+
+  function handlePopupInput(event) {
+    const value = parseInt(event.target.value, 10);
+    if (value >= 1) {
+      popupQuantity = value;
+    } else {
+      popupQuantity = 1;
     }
-    function getCart() {
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
-      return cart;
-    }
-    function addToCart(product) {
-      const cart = getCart();
-      const existingProduct = cart.find(
-        (item) => item.productNumber === product.productNumber
-      );
-      if (existingProduct) {
-        existingProduct.quantity += product.quantity;
-      } else {
-        cart.push(product);
-      }
-      localStorage.setItem("cart", JSON.stringify(cart));
-    }
-    let popupQuantity = 1;
-    function decrementPopupQuantity() {
-      if (popupQuantity > 1) {
-        popupQuantity--;
-      }
-    }
-    function incrementPopupQuantity() {
-      popupQuantity++;
-    }
-    function handlePopupInput(event) {
-      const value = parseInt(event.target.value, 10);
-      if (value >= 1) {
-        popupQuantity = value;
-      } else {
-        popupQuantity = 1;
-      }
-    }
+  }
   
-    export let data;
-    let currentIndex = 0;
-    let logosPerSlide = 4;
-    let totalSlides = Math.ceil((data && data.records ? data.records.length : 0) / logosPerSlide);
-    let containerWidth = 0;
-    function toggleDifference() {
+  function toggleDifference() {
       showDifference = !showDifference;
     }
-  
-    function prevSlide() {
-      currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-    }
-  
-    function nextSlide() {
-      currentIndex = (currentIndex + 1) % totalSlides;
-    }
-  
-    function updateLogosPerSlide() {
-      if (containerWidth < 640) logosPerSlide = 1;
-      else if (containerWidth < 768) logosPerSlide = 2;
-      else if (containerWidth < 1024) logosPerSlide = 3;
-      else logosPerSlide = 4;
-      totalSlides = Math.ceil((data && data.records ? data.records.length : 0) / logosPerSlide);
-      currentIndex = Math.min(currentIndex, totalSlides - 1);
-    }
-  
-    afterUpdate(updateLogosPerSlide);
-    
-    
-    console.log("#######",DifferentProductData);
+</script>
 
-  </script>
-  
-  <div class=" bg-gray-50 mt-10 mx-4" bind:clientWidth={containerWidth}>
-    <div class="flex justify-between items-center mb-4">
-      <div class="text-md font-semibold ">Compare Similar Items</div>
-      <div class="flex items-center space-x-2 ">
-        <div class="text-md font-semibold">Show Difference</div>
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            class="sr-only peer"
-            id="toggleDifference"
-            checked={showDifference}
-            on:change={toggleDifference}
-          />
-          <div class="w-10 h-5 border-2 border-primary-500 rounded-full peer-checked:bg-primary-500 transition-colors duration-300"></div>
-          <div class="dot absolute left-1 top-1 bg-primary-500 w-3 h-3 rounded-full transition-transform duration-300 peer-checked:translate-x-5 peer-checked:bg-white"></div>
-        </label>
-      </div>
-    </div>
-    <div class="relative mt-1">
-      <div class="flex items-center">
-        <div class="overflow-x-auto flex-1 scrollbar-hide">
-          <div
-            class="flex transition-transform duration-300"
-            style={`transform: translateX(-${(currentIndex * 100) / logosPerSlide}%)`}
-          >
-          
-            {#each DifferentProductData as product}
-            <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-1">
-              <div
-                class="flex flex-col w-full bg-gray-50 rounded-lg overflow-hidden"
-              >
-                <div class="flex items-center p-3">
-                  <img
-                    src={product.image}
-                    alt="Img"
-                    class="w-20 h-20 object-contain rounded-sm"
-                  />
-                  <div class="ml-2 text-left flex-1">
-                    <h3 class="text-gray-600 text-xs font-semibold">
-                      {product.manufacturerName || "--"}
-                    </h3>
-                    <p class="font-bold text-sm text-primary-500">
-                      <a href="/products/{product.category}/{product.subCategory}/{product.productNumber}">{product.productNumber || "--"}</a>
-                    </p>
-                    <p class="font-medium text-sm h-10 overflow-hidden">
-                      {product.synonym
-                        ? product.synonym.slice(0, 35) + "..."
-                        : "--"}
-                    </p>
-                  </div>
-                </div>
-                <div class="flex justify-center">
-                  <button
-                    on:click={() =>
-                      openModal({
-                        image: product.image,
-                        brand: product.manufacturerName,
-                        partNumber: product.productNumber,
-                        name: product.productName,
-                        price: product.priceSize,
-                        description: product.prodDesc,
-                        id: product.productId,
-                        stock : product.stock,
-                        category : product.category,
-                        subCategory : product.subCategory,
-                        subsubCategory : product.subsubCategory,
-                      })}
-                    class="w-11/12 max-w-xs text-primary-500 py-2 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition p-2 mb-4"
-                  >
-                    View Price & Availability
-                  </button>
-                </div>
-              </div>
-              <div class={`flex justify-between items-center w-full mt-5 ${showDifference && qualityLevels[product.properties.QualityLevel] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>              
-                <span class="font-semibold text-xs ml-3 mb-1">Quality Level:</span>
-                <p class="font-normal text-xs mr-3 mb-1">{product.properties.QualityLevel}</p>
-              </div>
-              <hr class="border-t-2 mr-3 ml-3">
-              <div class={`flex justify-between items-center w-full mt-5 ${showDifference && formCounts[product.properties.Form] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>
-                <span class="font-semibold text-xs ml-3 mb-1">Form:</span>
-                <p class="font-normal text-xs mr-3 mb-1">{product.properties.Form}</p>
-              </div>  
-              <hr class="border-t-2 mr-3 ml-3">
-              <div class={`flex justify-between items-center w-full mt-5 ${showDifference && mpCounts[product.properties.Mp] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>
-                <span class="font-semibold text-xs ml-3 mb-1">Storage temp:</span>
-                <p class="font-normal text-xs mr-3 mb-1">{product.properties.Mp}</p>
-              </div>
-              <hr class="border-t-2 mr-3 ml-3">
-              <div class={`flex justify-between items-center w-full mt-5 ${showDifference && sustainabilityCounts[product.properties.Sustainability] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>
-                <span class="font-semibold text-xs ml-3 mb-1">Application(s):</span>
-                <p class="font-normal text-xs mr-3 mb-1">
-                  {truncateText(product.properties.Sustainability, 20)}
-              </p>
-              </div>
-              <hr class="border-t-2 mr-3 ml-3">
-              <div class={`flex justify-between items-center w-full mt-5 ${showDifference && descriptionCounts[product.prodDesc] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>
-                <span class="font-semibold text-xs ml-3 mb-1">Description:</span>
-                <p class="font-normal text-xs mr-3 mb-1">{truncateText(product.prodDesc, 25)}</p>
-              </div> 
-              <hr class="border-t-2 mr-3 ml-3 mb-10">
-            </div>
-          {/each}
-          </div>
-        </div>
-      </div>
+<div class="mx-10 mb-10">
+  <div class="flex justify-between items-center mb-4">
+    <div class="text-md font-semibold ">Compare Similar Items</div>
+    <div class="flex items-center space-x-2 ">
+      <div class="text-md font-semibold">Show Difference</div>
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input
+          type="checkbox"
+          class="sr-only peer"
+          id="toggleDifference"
+          checked={showDifference}
+          on:change={toggleDifference}
+        />
+        <div class="w-10 h-5 border-2 border-primary-500 rounded-full peer-checked:bg-primary-500 transition-colors duration-300"></div>
+        <div class="dot absolute left-1 top-1 bg-primary-500 w-3 h-3 rounded-full transition-transform duration-300 peer-checked:translate-x-5 peer-checked:bg-white"></div>
+      </label>
     </div>
   </div>
-  {#if showModal}
+
+  <div class="relative mt-1">
+    <div class="flex items-center">
+      <button on:click={prevSlide} class="lg:hidden text-primary-500">
+        <Icon class="text-3xl" icon="ion:chevron-back" />
+      </button>
+
+      <div class="overflow-hidden flex-1">
+        <div
+          class="flex transition-transform duration-300"
+          style={`transform: translateX(-${currentIndex * 100}%)`}
+        >
+
+        {#each DifferentProductData as product}
+        <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-1">
+          <div
+            class="flex flex-col w-full bg-gray-50 rounded-lg overflow-hidden"
+          >
+            <div class="flex items-center p-3">
+              <img
+                src={product.image}
+                alt="Img"
+                class="w-20 h-20 object-contain rounded-sm"
+              />
+              <div class="ml-2 text-left flex-1">
+                <h3 class="text-gray-600 text-xs font-semibold">
+                  {product.manufacturerName || "--"}
+                </h3>
+                <p class="font-bold text-sm text-primary-500">
+                  <a href="/products/{product.category}/{product.subCategory}/{product.productNumber}">{product.productNumber || "--"}</a>
+                </p>
+                <p class="font-medium text-sm h-10 overflow-hidden">
+                  {product.synonym
+                    ? product.synonym.slice(0, 35) + "..."
+                    : "--"}
+                </p>
+              </div>
+            </div>
+            <div class="flex justify-center">
+              <button
+                on:click={() =>
+                  openModal({
+                    image: product.image,
+                    brand: product.manufacturerName,
+                    partNumber: product.productNumber,
+                    name: product.productName,
+                    price: product.priceSize,
+                    description: product.prodDesc,
+                    id: product.productId,
+                    stock : product.stock,
+                    category : product.category,
+                    subCategory : product.subCategory,
+                    subsubCategory : product.subsubCategory,
+                  })}
+                class="w-11/12 max-w-xs text-primary-500 py-2 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition p-2 mb-4"
+              >
+                View Price & Availability
+              </button>
+            </div>
+          </div>
+          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && qualityLevels[product.properties.QualityLevel] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>              
+            <span class="font-semibold text-xs ml-3 mb-1">Quality Level:</span>
+            <p class="font-normal text-xs mr-3 mb-1 text-black">{product.properties.QualityLevel || '-'}</p>
+          </div>
+          <hr class="border-t-2 mr-3 ml-3">
+          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && formCounts[product.properties.Form] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>
+            <span class="font-semibold text-xs ml-3 mb-1">Form:</span>
+            <p class="font-normal text-xs mr-3 mb-1 text-black">{product.properties.Form || '-'}</p>
+          </div>  
+          <hr class="border-t-2 mr-3 ml-3">
+          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && mpCounts[product.properties.Mp] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>
+            <span class="font-semibold text-xs ml-3 mb-1">Storage temp:</span>
+            <p class="font-normal text-xs mr-3 mb-1 text-black">{truncateText(product.properties.Mp,10) || '-'}</p>
+          </div>
+          <hr class="border-t-2 mr-3 ml-3">
+          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && sustainabilityCounts[product.properties.Sustainability] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>
+            <span class="font-semibold text-xs ml-3 mb-1">Application(s):</span>
+            <p class="font-normal text-xs mr-3 mb-1 text-black">
+              {truncateText(product.properties.Sustainability, 10) || '-'}
+          </p>
+          </div>
+          <hr class="border-t-2 mr-3 ml-3">
+          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && descriptionCounts[product.prodDesc] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>
+            <span class="font-semibold text-xs ml-3 mb-1">Description:</span>
+            <p class="font-normal text-xs mr-3 mb-1 text-black">{truncateText(product.prodDesc, 15) || '-'}</p>
+          </div> 
+          <hr class="border-t-2 mr-3 ml-3 mb-10">
+        </div>
+      {/each}
+        </div>
+      </div>
+      <button on:click={nextSlide} class="lg:hidden text-primary-500">
+        <Icon class="text-4xl" icon="ion:chevron-forward" />
+      </button>
+    </div>
+    <div class="flex justify-center mt-4 relative">
+      {#each Array(totalSlides).fill(0) as _, slideIndex}
+        <button
+          on:click={() => (currentIndex = slideIndex)}
+          class={`w-1.5 h-1.5 rounded-full mx-1 bg-gray-400 hover:bg-gray-600 ${currentIndex === slideIndex ? "bg-primary-400" : ""}`}
+        ></button>
+      {/each}
+    </div>
+  </div>
+</div>
+
+{#if showModal}
   <div
     class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
   >
     <div
-      class="bg-gray-50 p-6 rounded-lg w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-5/12 relative"
+      class="bg-white p-6 rounded-lg w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-5/12 relative"
     >
+      {#if showCartMessage}
+        <div class=" bg-green-400 text-white my-2 text-center">
+          Item added to cart!
+        </div>
+      {/if}
       <div class="mt-2 absolute right-6 top-1">
         <button
           on:click={closeModal}
@@ -271,25 +323,26 @@ function truncateText(text, maxLength = 50) {
           <Icon icon="ion:close" class="text-2xl"></Icon>
         </button>
       </div>
-      <div class="flex flex-col sm:flex-row gap-4 mb-3">
+      <div class="flex flex-row sm:flex-row gap-4 mb-3">
         <img
           src={selectedProduct.image}
           alt="ProductImage"
           class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border mx-auto sm:mx-0"
         />
         <div>
-          <p class="text-xs font-semibold text-center sm:text-left">
-            {selectedProduct.brand || '--'}
+          <p class="text-xs font-semibold text-left">
+            {selectedProduct.brand || "--"}
           </p>
-          <p
-            class="text-base font-semibold text-primary-500 text-center sm:text-left"
-          >
-          <a href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}">{selectedProduct.partNumber || "--"}</a>
+          <p class="text-base font-semibold text-primary-500 text-left">
+            <a
+              href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
+              >{selectedProduct.partNumber || "--"}</a
+            >
           </p>
-          <h2 class="text-lg font-medium text-center sm:text-left">
-            {selectedProduct.name || '--'}
+          <h2 class="text-lg font-medium text-left">
+            {selectedProduct.name || "--"}
           </h2>
-          <p class="text-sm text-center sm:text-left">
+          <p class="text-sm text-left">
             {selectedProduct.description || "--"}
           </p>
         </div>
@@ -322,45 +375,43 @@ function truncateText(text, maxLength = 50) {
           </div>
         {/if}
         <div class="mt-4">
-          <form class="flex items-center gap-3">
-            <div class="flex items-center space-x-2 w-full justify-around">
-              <div
-                class="border border-gray-300 rounded-md w-4/12 flex gap-2 justify-around hover:shadow hover:shadow-orange-100"
-              >
-                <button
-                  class=" pl-3 text-xl text-primary-500 hover:scale-110"
-                  on:click={decrementPopupQuantity}
-                >
-                  -
-                </button>
-                <input
-                  type="number"
-                  id="popupQuantity"
-                  min="1"
-                  value={popupQuantity}
-                  on:input={handlePopupInput}
-                  class="w-20 h-9 text-center border-none focus:outline-none focus:ring-0"
-                />
-                <button
-                  class="pr-3 text-xl text-primary-500 hover:scale-110"
-                  on:click={incrementPopupQuantity}
-                >
-                  +
-                </button>
-              </div>
+          <form
+            class="flex items-center gap-3"
+            on:submit|preventDefault={() =>
+              addToCart({
+                ...selectedProduct,
+                price: selectedPrice.price,
+                quantity: popupQuantity,
+              })}
+          >
+            <div
+              class="border border-gray-300 rounded-md flex gap-2 justify-between items-center hover:shadow-lg hover:shadow-orange-100 w-full sm:w-36"
+            >
               <button
-                type="submit"
-                on:click={() =>
-                  addToCart({
-                    ...selectedProduct,
-                    price: selectedPrice.price,
-                    quantity : popupQuantity,
-                  })}
-                class=" text-sm font-semibold py-2 px-4 w-1/2 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-400 hover:text-white transition"
+                type="button"
+                class="pl-3 text-xl text-primary-500 hover:scale-110"
+                on:click={decrementPopupQuantity}>-</button
               >
-                Add to Cart
-              </button>
+              <input
+                type="number"
+                id="popupQuantity"
+                min="1"
+                value={popupQuantity}
+                on:input={handlePopupInput}
+                class="w-16 sm:w-20 h-9 text-center border-none focus:outline-none focus:ring-0"
+              />
+              <button
+                type="button"
+                class="pr-3 text-xl text-primary-500 hover:scale-110"
+                on:click={incrementPopupQuantity}>+</button
+              >
             </div>
+            <button
+              type="submit"
+              class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-400 hover:text-white transition"
+            >
+              Add to Cart
+            </button>
           </form>
         </div>
       </div>

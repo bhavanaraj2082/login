@@ -44,6 +44,12 @@ function toggleRotation(index) {
     { name: "Certificates of Origin" },
     { name: "Certificates of Quality" },
   ];
+  const productCodes = [
+    { code: "705578-5MG-PW" },
+    { code: "PL860-CGA/SHF-1EA" },
+    { code: "MMYOMAG-74K-13" },
+    { code: "1000309185", note: "1.000309185" },
+  ];
   console.log(tabs[0].name);  
   let sdsProductNumberError = '';
   let showProductDetailsSafety = false;
@@ -158,46 +164,31 @@ function toggleRotation(index) {
 </script>
 
 <div class="p-4 max-w-6xl mx-auto">
+  <h1 class="text-4xl font-bold mb-8">Documents</h1>
+  
+  <div class="w-full inline-flex rounded-md mb-8">
+    <!-- Navigation Menu (Tabs) -->
+    <nav aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto">
+      {#each tabs as tab}
+      <div class="inline-block w-full">
+        <button
+          on:click={() => (activeTab = tab.name)} 
+          class="w-full py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300
+            {activeTab === tab.name 
+              ? 'bg-gray-50 text-primary-300 font-bold'
+              : 'bg-primary-100 text-black'}
+            hover:bg-gray-50 hover:text-primary-300 whitespace-nowrap">
+          {tab.name}
+        </button>
+        <!-- Underline -->
+        <div class="h-0.5 bg-primary-300 w-3/4 ml-9
+          {activeTab === tab.name ? 'w-3/4' : 'w-0'} transition-all duration-300 ease-in-out"></div>
+      </div>
+      {/each}
+    </nav>
+  </div>
   <div class="flex flex-col lg:flex-row"> 
     <div class="w-full lg:w-7/12 p-2"> 
-      <h1 class="text-4xl font-bold mb-8">Documents</h1>
-        <div class="inline-flex p-0 rounded-md mb-8">
-          <!-- Hamburger Button for Mobile -->
-          <button 
-            on:click={() => (showNav = !showNav)} 
-            class="sm:hidden text-white p-2 rounded-md bg-primary-300 hover:bg-primary-400"
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              class="h-8 w-8" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        
-          <!-- Navigation Menu (Mobile Toggle) -->
-          <nav class={`sm:flex flex-col sm:flex-row space-x-0 overflow-x-auto ${showNav ? 'block' : 'hidden'}`} aria-label="Tabs">
-            {#each tabs as tab}
-            <div class="inline-block">
-              <button
-                on:click={() => (activeTab = tab.name)} 
-                class="py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300 
-                  {activeTab === tab.name 
-                    ? 'bg-gray-50 text-primary-300 font-bold'
-                    : 'sm:bg-primary-100 text-black'}
-                  hover:bg-gray-50 hover:text-primary-300 whitespace-nowrap">
-                {tab.name}
-              </button>
-              <div class="h-0.5 bg-primary-300 
-                {activeTab === tab.name ? 'w-3/4 h-0.5' : 'hidden'}"></div>
-            </div>
-            
-            {/each}
-          </nav>
-        </div>
       {#if activeTab === "SafetyData Sheets"}
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">SafetyData Sheets (SDS)</h2>
@@ -485,9 +476,9 @@ function toggleRotation(index) {
       </div>
       {/if}
     </div>
-    <div class="w-full lg:w-5/12 p-2 lg:mt-32"> 
+    <div class="w-full lg:w-5/12 p-2"> 
       {#if activeTab === "SafetyData Sheets"}
-        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start ml-0 lg:ml-7">
+        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start">
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div on:click={() => toggleProductDetails2("Safety Data Sheets")} class="flex items-center justify-between">
@@ -498,28 +489,43 @@ function toggleRotation(index) {
             </a>
           </div>
           {#if showProductDetailsSafety}
-            <div class="mt-4 text-sm text-gray-600">
-              <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T775118-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T775118).</p>
-              <div class="bg-gray-100 p-3 border border-gray-300 rounded mt-3">
-                <p><strong>Example:</strong></p>
-                <p><code>T775118</code> <span class="font-bold">Product Number</span></p>
-                <p><span class="font-bold">-</span></p>
-                <p><code>25G</code> <span class="font-bold">Pack Size/Quantity</span></p>
-                <p><strong>Additional examples:</strong></p>
-                <ul class="list-disc ml-5">
-                  <li><code>705578-5MG-PW</code></li>
-                  <li><code>PL860-CGA/SHF-1EA</code></li>
-                  <li><code>MMYOMAG-74K-13</code></li>
-                  <li><code>1000309185</code> (enter as <code>1.000309185</code>)</li>
+            <div class="mt-4 text-sm text-gray-600 leading-relaxed">
+              <p>
+                Product numbers are combined with Pack Sizes/Quantity when displayed on the website 
+                (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118-25G</code>). 
+                Please make sure you enter <strong>ONLY</strong> the product number in the Product Number field 
+                (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code>).
+              </p>
+              <div class="bg-gray-50 p-4 border border-gray-300 rounded mt-3">
+                <p class="font-semibold mb-2">Example:</p>
+                <p>
+                  <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code> 
+                  <span class="font-bold">Product Number</span>
+                </p>
+                <p>
+                  <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">25G</code> 
+                  <span class="font-bold">Pack Size/Quantity</span>
+                </p>
+                <p class="font-semibold mt-3">Additional examples:</p>
+                <ul class="list-disc ml-6">
+                  {#each productCodes as product}
+                    <li>
+                      <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">{product.code}</code>
+                      {#if product.note}
+                        (enter as 
+                        <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">{product.note}</code>)
+                      {/if}
+                    </li>
+                  {/each}
                 </ul>
               </div>
-              <p>Having trouble? Feel free to contact Technical Service for assistance.</p>
+              <p class="mt-3">
+                Having trouble? Feel free to contact <strong>Technical Service</strong> for assistance.
+              </p>
             </div>
           {/if}
         </div>
       {/if}
-  
-    
       {#if activeTab === "Certificates of Analysis"}
       <div class="flex flex-wrap  space-y-4 ml-0 lg:ml-16">       
         <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start"> 
@@ -533,26 +539,42 @@ function toggleRotation(index) {
             </a>
           </div>
           {#if showProductDetailsCertificates}
-            <div class="mt-4 text-sm text-gray-600">
-              <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T775118-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T775118).</p>
-              <div class="bg-gray-100 p-3 border border-gray-300 rounded mt-3">
-                <p><strong>Example:</strong></p>
-                <p><code>T775118</code> <span class="font-bold">Product Number</span></p>
-                <p><span class="font-bold">-</span></p>
-                <p><code>25G</code> <span class="font-bold">Pack Size/Quantity</span></p>
-                <p><strong>Additional examples:</strong></p>
-                <ul class="list-disc ml-5">
-                  <li><code>705578-5MG-PW</code></li>
-                  <li><code>PL860-CGA/SHF-1EA</code></li>
-                  <li><code>MMYOMAG-74K-13</code></li>
-                  <li><code>1000309185</code> (enter as <code>1.000309185</code>)</li>
-                </ul>
-              </div>
-              <p>Having trouble? Feel free to contact Technical Service for assistance.</p>
+          <div class="mt-4 text-sm text-gray-600 leading-relaxed">
+            <p>
+              Product numbers are combined with Pack Sizes/Quantity when displayed on the website 
+              (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118-25G</code>). 
+              Please make sure you enter <strong>ONLY</strong> the product number in the Product Number field 
+              (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code>).
+            </p>
+            <div class="bg-gray-50 p-4 border border-gray-300 rounded mt-3">
+              <p class="font-semibold mb-2">Example:</p>
+              <p>
+                <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code> 
+                <span class="font-bold">Product Number</span>
+              </p>
+              <p>
+                <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">25G</code> 
+                <span class="font-bold">Pack Size/Quantity</span>
+              </p>
+              <p class="font-semibold mt-3">Additional examples:</p>
+              <ul class="list-disc ml-6">
+                {#each productCodes as product}
+                  <li>
+                    <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">{product.code}</code>
+                    {#if product.note}
+                      (enter as 
+                      <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">{product.note}</code>)
+                    {/if}
+                  </li>
+                {/each}
+              </ul>
             </div>
-          {/if}
+            <p class="mt-3">
+              Having trouble? Feel free to contact <strong>Technical Service</strong> for assistance.
+            </p>
+          </div>
+        {/if}        
         </div>
-      
         <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start">
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -574,8 +596,6 @@ function toggleRotation(index) {
           </div>
           {/if}
         </div>
-      
-      
         <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
           <div class="flex items-center justify-between">
             <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
@@ -584,14 +604,16 @@ function toggleRotation(index) {
             In some cases, a COA may not be available online. If your search was unable to find the COA, you can request one.
           </p>
           <div class="mt-4">
-            <button class="bg-primary-400 text-white px-4 py-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-600">
-              Request COA
-            </button>
+            <button 
+            class="bg-primary-400 text-white px-4 py-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-600"
+            onclick="window.location.href='https://chemikart.partskeys.com/help-support'">
+            Request COA
+          </button>          
+
           </div>
         </div>
       </div>
-      {/if}
-      
+      {/if}   
 {#if activeTab === "Certificates of Origin"}
 <div class="flex flex-wrap space-y-4 ml-0 lg:ml-16">
   <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
@@ -605,27 +627,42 @@ function toggleRotation(index) {
       </a>
     </div>
     {#if showProductDetailsOrigin}
-      <div class="mt-4 text-sm text-gray-600">
-        <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T775118-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T775118).</p>
-        <div class="bg-gray-100 p-3 border border-gray-300 rounded mt-3">
-          <p><strong>Example:</strong></p>
-          <p><code>T775118</code> <span class="font-bold">Product Number</span></p>
-          <p><span class="font-bold">-</span></p>
-          <p><code>25G</code> <span class="font-bold">Pack Size/Quantity</span></p>
-          <p><strong>Additional examples:</strong></p>
-          <ul class="list-disc ml-5">
-            <li><code>705578-5MG-PW</code></li>
-            <li><code>PL860-CGA/SHF-1EA</code></li>
-            <li><code>MMYOMAG-74K-13</code></li>
-            <li><code>1000309185</code> (enter as <code>1.000309185</code>)</li>
-          </ul>
-        </div>
-        <p>Having trouble? Feel free to contact Technical Service for assistance.</p>
+    <div class="mt-4 text-sm text-gray-600 leading-relaxed">
+      <p>
+        Product numbers are combined with Pack Sizes/Quantity when displayed on the website 
+        (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118-25G</code>). 
+        Please make sure you enter <strong>ONLY</strong> the product number in the Product Number field 
+        (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code>).
+      </p>
+      <div class="bg-gray-50 p-4 border border-gray-300 rounded mt-3">
+        <p class="font-semibold mb-2">Example:</p>
+        <p>
+          <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code> 
+          <span class="font-bold">Product Number</span>
+        </p>
+        <p>
+          <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">25G</code> 
+          <span class="font-bold">Pack Size/Quantity</span>
+        </p>
+        <p class="font-semibold mt-3">Additional examples:</p>
+        <ul class="list-disc ml-6">
+          {#each productCodes as product}
+            <li>
+              <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">{product.code}</code>
+              {#if product.note}
+                (enter as 
+                <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">{product.note}</code>)
+              {/if}
+            </li>
+          {/each}
+        </ul>
       </div>
-    {/if}
+      <p class="mt-3">
+        Having trouble? Feel free to contact <strong>Technical Service</strong> for assistance.
+      </p>
+    </div>
+  {/if}
   </div>
-
- 
   <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -650,8 +687,6 @@ function toggleRotation(index) {
       </div>
     {/if}
   </div>
-
-  
   <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
     <div class="flex items-center justify-between">
       <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
@@ -660,15 +695,15 @@ function toggleRotation(index) {
       In some cases, a COO may not be available online. If your search was unable to find the COO, you can request one.
     </p>
     <div class="mt-4">
-      <button class="bg-primary-400 text-white px-4 py-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-600">
-        Request COA
-      </button>
+      <button 
+      class="bg-primary-400 text-white px-4 py-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-600"
+      onclick="window.location.href='https://chemikart.partskeys.com/help-support'">
+      Request COO
+    </button>   
     </div>
   </div>
 </div>
-{/if}
-
-      
+{/if}   
 {#if activeTab === "Certificates of Quality"}
 <div class="flex flex-wrap space-y-4 ml-0 lg:ml-16">
   <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start"> 
@@ -682,26 +717,42 @@ function toggleRotation(index) {
       </a>
     </div>
     {#if showProductDetailsQuality}
-      <div class="mt-4 text-sm text-gray-600">
-        <p>Product numbers are combined with Pack Sizes/Quantity when displayed on the website (example: T775118-25G). Please make sure you enter ONLY the product number in the Product Number field (example: T775118).</p>
-        <div class="bg-gray-100 p-3 border border-gray-300 rounded mt-3">
-          <p><strong>Example:</strong></p>
-          <p><code>T775118</code> <span class="font-bold">Product Number</span></p>
-          <p><span class="font-bold">-</span></p>
-          <p><code>25G</code> <span class="font-bold">Pack Size/Quantity</span></p>
-          <p><strong>Additional examples:</strong></p>
-          <ul class="list-disc ml-5">
-            <li><code>705578-5MG-PW</code></li>
-            <li><code>PL860-CGA/SHF-1EA</code></li>
-            <li><code>MMYOMAG-74K-13</code></li>
-            <li><code>1000309185</code> (enter as <code>1.000309185</code>)</li>
-          </ul>
-        </div>
-        <p>Having trouble? Feel free to contact Technical Service for assistance.</p>
+    <div class="mt-4 text-sm text-gray-600 leading-relaxed">
+      <p>
+        Product numbers are combined with Pack Sizes/Quantity when displayed on the website 
+        (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118-25G</code>). 
+        Please make sure you enter <strong>ONLY</strong> the product number in the Product Number field 
+        (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code>).
+      </p>
+      <div class="bg-gray-50 p-4 border border-gray-300 rounded mt-3">
+        <p class="font-semibold mb-2">Example:</p>
+        <p>
+          <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code> 
+          <span class="font-bold">Product Number</span>
+        </p>
+        <p>
+          <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">25G</code> 
+          <span class="font-bold">Pack Size/Quantity</span>
+        </p>
+        <p class="font-semibold mt-3">Additional examples:</p>
+        <ul class="list-disc ml-6">
+          {#each productCodes as product}
+            <li>
+              <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">{product.code}</code>
+              {#if product.note}
+                (enter as 
+                <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">{product.note}</code>)
+              {/if}
+            </li>
+          {/each}
+        </ul>
       </div>
-    {/if}
+      <p class="mt-3">
+        Having trouble? Feel free to contact <strong>Technical Service</strong> for assistance.
+      </p>
+    </div>
+  {/if}
   </div>
-
   <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -726,7 +777,6 @@ function toggleRotation(index) {
       </div>
     {/if}
   </div>
-
   <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
     <div class="flex items-center justify-between">
       <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
@@ -735,9 +785,11 @@ function toggleRotation(index) {
       In some cases, a COQ may not be available online. If your search was unable to find the COQ, you can request one.
     </p>
     <div class="mt-4">
-      <button class="bg-primary-400 text-white px-4 py-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-600">
-        Request COA
-      </button>
+      <button 
+      class="bg-primary-400 text-white px-4 py-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-600"
+      onclick="window.location.href='https://chemikart.partskeys.com/help-support'">
+      Request COQ
+    </button>   
     </div>
   </div>
 </div>
