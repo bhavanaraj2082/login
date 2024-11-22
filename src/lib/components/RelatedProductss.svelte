@@ -67,7 +67,7 @@
 
   function openModal(product) {
     selectedProduct = product;
-    selectedPrice = selectedProduct.price[0];
+    selectedPrice = selectedProduct.priceSize[0];
     selectedPriceIndex = 0;
     showModal = true;
     showCartMessage = false;
@@ -78,7 +78,7 @@
   }
 
   function selectPrice(index, size) {
-    const filtered = selectedProduct.price.find((price) => price.size === size);
+    const filtered = selectedProduct.priceSize.find((price) => price.size === size);
     selectedPrice = filtered;
     selectedPriceIndex = index;
   }
@@ -102,7 +102,10 @@
     if (existingProduct) {
       existingProduct.quantity += product.quantity;
     } else {
-      cart.push(product);
+      cart.push({
+        ...product,
+        priceSize: { price: selectedPrice.price, size: selectedPrice.size },
+      });
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -112,7 +115,7 @@
     setTimeout(() => {
       showModal = false;
     }, 1000);
-  }
+}
 
   let popupQuantity = 1;
 
@@ -186,7 +189,7 @@
                         brand: product.manufacturerName,
                         partNumber: product.productNumber,
                         name: product.productName,
-                        price: product.priceSize,
+                        priceSize: product.priceSize,
                         description: product.prodDesc,
                         id: product.productId,
                         stock: product.stock,
@@ -268,7 +271,7 @@
       <div class="pl-2">
         <h1 class="font-semibold">Select Size</h1>
         <div class="flex gap-3 mt-3 flex-wrap">
-          {#each selectedProduct.price as { price, size }, index}
+          {#each selectedProduct.priceSize as { price, size }, index}
             <button
               class="focus:bg-primary-400 hover:scale-105 focus:text-white border px-3 py-1 rounded-full {selectedPriceIndex ===
               index
@@ -297,7 +300,7 @@
             on:submit|preventDefault={() =>
               addToCart({
                 ...selectedProduct,
-                price: selectedPrice.price,
+                priceSize: { price: selectedPrice.price, size: selectedPrice.size },
                 quantity: popupQuantity,
               })}
           >
