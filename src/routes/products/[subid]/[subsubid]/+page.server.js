@@ -15,7 +15,7 @@
 
 import { pb, authenticate } from '$lib/server/pocketbase';  
 
-import { loadProducts } from '$lib/server/loads.js';
+import { loadProductsubcategory } from '$lib/server/loads.js';
 // const pb = await authenticate();
 
 
@@ -38,7 +38,7 @@ export async function load({ params }) {
         }
 
  
-        const productData = await loadProducts(pb, { SubUrl: subsubid });
+        const productData = await loadProductsubcategory(pb, { SubUrl: subsubid });
 
     
         if (productData && productData.type === 'success' && Array.isArray(productData.records)) {

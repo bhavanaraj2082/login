@@ -549,7 +549,7 @@ export async function DifferentProductData(pb, productId) {
 
 ///////Filter  Based on sub categories
 
-export async function loadProducts(pb, { SubUrl }) {
+export async function loadProductsubcategory(pb, { SubUrl }) {
     // console.log("Input SubUrl:", SubUrl);
     
     const response = await pb.collection('SubCategories').getFirstListItem(`urlName="${SubUrl}"`, { expand: 'category' });
