@@ -2,8 +2,6 @@ import { writable, derived } from 'svelte/store';
 import { get } from 'svelte/store';
 
 export const filteredProducts = writable([]);
-
-
 export const allProducts = writable([]);
 
 export const ITEMS_PER_PAGE = writable(5);

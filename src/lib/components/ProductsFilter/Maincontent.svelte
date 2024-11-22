@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte';
-//    import { authedUser } from '$lib/stores/filter.js';
+
 import { enhance } from '$app/forms';
 
   import Icon from '@iconify/svelte';

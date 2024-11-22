@@ -7,8 +7,7 @@
     updatePage, categories, manufacturers,getSubCategories
   } from '$lib/stores/filter.js';
 
-
-  export let data;
+ export let data;
   let products = data?.data || [];  
   $: updateCategories(products);
   
