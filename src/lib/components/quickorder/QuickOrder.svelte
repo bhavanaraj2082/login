@@ -1,7 +1,9 @@
 <script>
+    import { onMount } from 'svelte';
   import Icon from "@iconify/svelte";
   import {enhance} from "$app/forms"
   import { authedUser } from '$lib/stores/mainStores.js';
+  import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
   let uploadedRows=[];
 
   import * as XLSX from "xlsx";
@@ -25,6 +27,8 @@ let selectedProduct = null;
   let showDetailsModal=false;
   let fileError = "";
   let quantity=1;
+  let cartNotification = '';
+  let notificationTimeout;
   
 
 
@@ -181,68 +185,10 @@ let estimatedShipDate = formatDate(currentDate);
 
 
 
-function addToCart(rowsToProcess) {
-  const validRows = rowsToProcess.filter(row => row.sku.trim() !== '');
- const newCartItems = validRows.map(row => {
-      const sku = row.sku.trim();
-      const product = findProductBySku(sku);
 
-      if (product) {
-          const selectedSize = row.size || product.priceSize?.[0]?.size; // Use first available size if none selected
-          const sizePriceInfo = product.priceSize?.find(item => item.size === selectedSize);
 
-          if (!sizePriceInfo) {
-              console.warn(`No size/price info for size: ${selectedSize}. Skipping product.`);
-              return null;
-          }
 
-          return {
-              description: product.prodDesc,
-              id: product.id,
-              name:product.productName,
-              image: product.imageSrc,
-              partNumber: product.productNumber,
-              priceSize: { 
-              price: sizePriceInfo.price,  
-              size: selectedSize  
-               },
-              quantity: row.quantity > 0 ? row.quantity : 1,
-              stock: product.stockQuantity,
-          };
-      } else {
-          console.log(`No matching product found for SKU: ${sku}`);
-          return null;
-      }
-  }).filter(item => item !== null);
-  if (newCartItems.length === 0) {
-      console.log('No valid products to add to the cart.');
-      return;
-  }
 
-  try {
-   
-      let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
-      newCartItems.forEach(newItem => {
-          const existingItem = currentCart.find(item => item.productNumber === newItem.productNumber && item.size === newItem.size);
-
-          if (existingItem) {
-              existingItem.quantity += newItem.quantity;
-          } else {
-              currentCart.push(newItem);
-          }
-      });
-
-     
-      localStorage.setItem("cart", JSON.stringify(currentCart));
-      cart = currentCart; 
-  } catch (err) {
-      console.error("Error saving to localStorage:", err);
-  }
-  showCartMessage = true;
-  setTimeout(() => {
-      showCartMessage = false;
-  }, 3000);
-}
 function addManualEntriesToCart() {
   addToCart(rows); 
 }
@@ -257,7 +203,7 @@ function addUploadedEntriesToCart() {
       }
   }
 
-  import { onMount } from 'svelte';
+
   onMount(() => {
       if (userLoggedIn) {
         cart();
@@ -382,13 +328,172 @@ function decreaseQuantity() {
       selectedProduct.quantity += 1;
     }
   }
+// function addToCart(rowsToProcess) {
+//     const validRows = rowsToProcess.filter(row => row.sku.trim() !== '');
+//     const newCartItems = validRows.map(row => {
+//         const sku = row.sku.trim();
+//         const product = findProductBySku(sku);
+
+//         if (product) {
+//             const selectedSize = row.size || product.priceSize?.[0]?.size; 
+//             const sizePriceInfo = product.priceSize?.find(item => item.size === selectedSize);
+
+//             if (!sizePriceInfo) {
+//                 console.warn(`No size/price info for size: ${selectedSize}. Skipping product.`);
+//                 return null;
+//             }
+
+//             return {
+//                 description: product.prodDesc,
+//                 id: product.id,
+//                 name: product.productName,
+//                 image: product.imageSrc,
+//                 partNumber: product.productNumber,
+//                 priceSize: {
+//                     price: sizePriceInfo.price,
+//                     size: selectedSize,
+//                 },
+//                 quantity: row.quantity > 0 ? row.quantity : 1,
+//                 stock: product.stockQuantity,
+//             };
+//         } else {
+//             console.log(`No matching product found for SKU: ${sku}`);
+//             return null;
+//         }
+//     }).filter(item => item !== null);
+
+//     if (newCartItems.length === 0) {
+//         console.log('No valid products to add to the cart.');
+//         return;
+//     }
+
+//     try {
+//         let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
+//         newCartItems.forEach(newItem => {
+//             const existingItem = currentCart.find(item =>
+//                 item.partNumber === newItem.partNumber &&
+//                 item.priceSize.size === newItem.priceSize.size
+//             );
+
+//             if (existingItem) {
+//                 existingItem.quantity += newItem.quantity;
+//             } else {
+//                 currentCart.push(newItem);
+//             }
+//         });
+//         localStorage.setItem('cart', JSON.stringify(currentCart));
+//         viewedCart.set(currentCart);
+//         const totalItems = currentCart.length;
+//         cartNotification = `You have ${totalItems} item(s) in your cart.`;
+//     } catch (err) {
+//         console.error('Error saving to localStorage:', err);
+//     }
+
+ 
+//     if (notificationTimeout) clearTimeout(notificationTimeout);
+//     notificationTimeout = setTimeout(() => {
+//         cartNotification = '';
+//     }, 3000);
+// }
+
+
+function addToCart(rowsToProcess) {
+    const validRows = rowsToProcess.filter(row => row.sku.trim() !== '');
+    const newCartItems = validRows.map(row => {
+        const sku = row.sku.trim();
+        const product = findProductBySku(sku);
+
+        if (product) {
+            const selectedSize = row.size || product.priceSize?.[0]?.size; 
+            const sizePriceInfo = product.priceSize?.find(item => item.size === selectedSize);
+
+            if (!sizePriceInfo) {
+                console.warn(`No size/price info for size: ${selectedSize}. Skipping product.`);
+                return null;
+            }
+
+            return {
+                description: product.prodDesc,
+                id: product.id,
+                name: product.productName,
+                image: product.imageSrc,
+                partNumber: product.productNumber,
+                priceSize: {
+                    price: sizePriceInfo.price,
+                    size: selectedSize,
+                },
+                quantity: row.quantity > 0 ? row.quantity : 1,
+                stock: product.stockQuantity,
+            };
+        } else {
+            console.log(`No matching product found for SKU: ${sku}`);
+            return null;
+        }
+    }).filter(item => item !== null);
+
+    if (newCartItems.length === 0) {
+        console.log('No valid products to add to the cart.');
+        return;
+    }
+
+    try {
+        // Retrieve the current cart from localStorage or initialize an empty array
+        let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        newCartItems.forEach(newItem => {
+            const existingItem = currentCart.find(item =>
+                item.partNumber === newItem.partNumber &&
+                item.priceSize.size === newItem.priceSize.size
+            );
+
+            if (existingItem) {
+                // Update quantity if the product already exists
+                existingItem.quantity += newItem.quantity;
+            } else {
+                // Add new item if it does not already exist
+                currentCart.push(newItem);
+            }
+        });
+
+        // Save the updated cart to localStorage
+        localStorage.setItem('cart', JSON.stringify(currentCart));
+
+        // Update the `viewedCart` store
+        viewedCart.set(currentCart);
+
+        // Calculate the total number of distinct items in the cart
+        const totalItems = currentCart.length;
+        cartNotification = `You have ${totalItems} item(s) in your cart.`;
+    } catch (err) {
+        console.error('Error saving to localStorage:', err);
+    }
+
+    // Clear the notification after a timeout
+    if (notificationTimeout) clearTimeout(notificationTimeout);
+    notificationTimeout = setTimeout(() => {
+        cartNotification = '';
+
+        // Clear fields after the timeout
+        rows = [
+            { sku: "", size: '', quantity: 1, error: "", filteredProducts: [], selectedSize: null },
+            { sku: "", size: '', quantity: 1, error: "", filteredProducts: [], selectedSize: null },
+            { sku: "", size: '', quantity: 1, error: "", filteredProducts: [], selectedSize: null }
+        ];
+        uploadedRows = [];
+        validationMessages = [];
+        rawFileData = "";
+        stockStatus = '';
+    }, 3000);
+}
+
+
+
 
 </script>
 
 
 
-
-<main class="w-full mx-auto py-5 md:flex md:space-x-8 xl:max-w-7xl">
+<div class="w-full mx-auto py-5 md:flex md:space-x-8 xl:max-w-7xl">
  
   <div class="md:w-full">
       <h1 class="font-bold text-lg md:text-2xl">Quick Order</h1>
@@ -398,7 +503,7 @@ function decreaseQuantity() {
           <div class="flex justify-normal md:justify-end">
               <div class="flex items-center gap-2 w-72 text-xs rounded-md p-3 border border-primary-100 shadow-sm bg-white shadow-primary-100 my-1">
                   <Icon icon="mingcute:warning-line" class="text-primary-500 text-4xl shrink-0" />
-                  <a href="/login">Sign in to import items from your recent orders and quotes.</a>
+                  <a href="/login"><span class="hover:text-primary-600 text-primary-400">Sign in  </span> to import items from your recent orders and quotes.</a>
               </div>
           </div>
       {/if}
@@ -507,10 +612,11 @@ function decreaseQuantity() {
             
     
        
-            
-        {#if showCartMessage}
-        <div class="text-primary-500 text-center mt-2">Products added to cart!</div>
-    {/if}
+        {#if cartNotification}
+        <div class="fixed bottom-4 left-4 p-4 bg-primary-400 text-white rounded-md shadow-lg z-50">
+            {cartNotification}
+        </div>
+      {/if}
     </div>
  
   {:else}
@@ -575,15 +681,19 @@ function decreaseQuantity() {
                 on:input={() => row.quantity = Math.max(1, Math.min(9999, row.quantity))}
               />
               <button class="outline-none" on:click={() => incrementQuantity(index)}>
-                <Icon icon="ic:round-plus" class="text-lg border-1 rounded bg-white text-primary-500 w-12 h-10 p-2" />
+                <Icon icon="ic:round-plus" class="text-lg border-1 rounded bg-white text-primary-500 lg:w-12 w-10 h-10 p-2" />
               </button>
               <button class="outline-none" on:click={() => decrementQuantity(index)}>
-                <Icon icon="ic:round-minus" class="text-lg border-1 rounded bg-white text-primary-500 w-12 h-10 p-2" />
+                <Icon icon="ic:round-minus" class="text-lg border-1 rounded bg-white text-primary-500 lg:w-12 w-10 h-10 p-2" />
               </button>
             </div>
           </div>
       
-
+          {#if cartNotification}
+          <div class="fixed bottom-4 left-4 p-4 bg-primary-400 text-white rounded-md shadow-lg z-50">
+              {cartNotification}
+          </div>
+        {/if}
        
  
   {#if selectedProduct && selectedProduct.productNumber === row.sku.split('-')[0].trim()}
@@ -605,11 +715,8 @@ function decreaseQuantity() {
     </div>
   </div>
   <hr/>
-  
-
-  
-{/if}
-              {/each}
+  {/if}
+      {/each}
       
       
       
@@ -625,9 +732,11 @@ function decreaseQuantity() {
           </div>
       
          
-          {#if showCartMessage}
-              <div class="text-primary-500 text-center mt-2">Products added to cart!</div>
-          {/if}
+          {#if cartNotification}
+          <div class="fixed bottom-4 left-4 p-4 bg-primary-400 text-white rounded-md shadow-lg z-50">
+              {cartNotification}
+          </div>
+        {/if}
       </div>
       
       
@@ -857,5 +966,6 @@ on:click={() => {
   </div>
 {/if}
 
-</main>
+</div>
+
 
