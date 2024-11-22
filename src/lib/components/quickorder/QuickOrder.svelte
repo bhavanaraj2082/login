@@ -425,7 +425,7 @@ function addToCart(rowsToProcess) {
 </script>
 
 
-<div class="lg:w-10/12 mx-auto px-4">
+
 <div class="w-full mx-auto py-5 md:flex md:space-x-8 xl:max-w-7xl">
 
 <div class="md:w-full">
@@ -901,6 +901,6 @@ function addToCart(rowsToProcess) {
 </div>
 {/if}
 </div>
-</div>
+
 
 
