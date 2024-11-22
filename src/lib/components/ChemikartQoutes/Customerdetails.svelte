@@ -214,6 +214,8 @@
 	let phoneError = '';
 	
 	const cust = () => {
+	console.log("@@@@@@",$Cusdetails.FirstName);
+	
 		console.log("$$$",isFormData);
 
 		if (!isFormData) {
@@ -242,38 +244,38 @@
 	};
 </script>
 
-<div class="mx-10 my-10 flex justify-between">
+<div class="my-10 flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 1: Select custom solution type</h1>
 	<button type="button" class="font-semibold text-primary-500" on:click={tog()}>Edit</button>
 </div>
 <hr />
-<div class="mx-10 my-10 flex justify-between">
+<div class="my-10 flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 2: Select custom format</h1>
 	<button type="button" class="font-semibold text-primary-500" on:click={tog1()}>Edit</button>
 </div>
 <hr />
-<div class="mx-10 my-10 flex justify-between">
+<div class="my-10 flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 3: Configure custom solution</h1>
 	<button type="button" class="font-semibold text-primary-500" on:click={tog2()}>Edit</button>
 </div>
 <hr />
-<div class="mx-10 my-10 flex justify-between">
+<div class="my-10 flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 4: Additional notes</h1>
 	<button type="button" class="font-semibold text-primary-500" on:click={tog3()}>Edit</button>
 </div>
 <hr />
-<div class="ml-10">
+<div class="">
 	<h1 class="font-bold text-2xl my-10">Step 5: Customer details</h1>
 	<hr />
 	<h1 class="font-semibold my-5 ">Log in to auto fill</h1>
-	<div class="lg:flex lg:space-x-5 w-full lg:w-3/5">
-		<div class="mb-4 lg:mb-0 lg:w-1/5">
+	<div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-1 md:w-3/4 lg:w-1/2 sm:grid-cols-6">
+		<div class="sm:col-span-2  sm:col-start-1">
 			<label for="title" class="text-sm">Title</label>
-			<br />
+		  <div class="mt-2">
 			<select
 				id="title"
 				name="title"
-				class="block rounded-md h-9 w-2/5 lg:w-full p-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
+				class="block w-full rounded-md py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
 				bind:value={$Cusdetails.Title}
 			>
 				<option value="" disabled selected>Title</option>
@@ -281,34 +283,35 @@
 					<option value={title}>{title}</option>
 				{/each}
 			</select>
+		  </div>
 		</div>
-		<div class="w-2/5 lg:w-3/5 lg:flex lg:space-x-5">
-			<div class="flex-1 mb-4 lg:mb-0">
-				<label for="firstname" class="text-sm">First name <span class="text-primary-500"> *</span></label>
-				<br />
-				<input
-					type="text"
-					class="block w-full rounded-md p-1 lg:w-full border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-					bind:value={$Cusdetails.FirstName}
-					name="Firstname"
-					id="firstname"
-					required
-				/>
-			</div>
-			<div class="flex-1 mb-4 lg:mb-0">
-				<label for="lastname" class="text-sm">Last name <span class="text-primary-500"> *</span></label>
-				<br />
-				<input
+		<div class="sm:col-span-2">
+			<label for="" class="text-sm">First name <span class="text-primary-500"> *</span></label>
+			<div class="mt-2">
+			<input
+			type="text"
+			class="block w-full rounded-md py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			bind:value={$Cusdetails.FirstName}
+			name="Firstname"
+			id="firstname"
+			required
+		/>
+		  </div>
+		</div>
+		<div class="sm:col-span-2">
+			<label for="" class="text-sm">Last name <span class="text-primary-500"> *</span></label>
+			<div class="mt-2">
+			<input
 					type="text"
 					name="lastname"
-					class="block rounded-md w-full p-1 lg:w-full border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+					class="block w-full rounded-md py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 					id="lastname"
 					bind:value={$Cusdetails.LastName}
 					required
 				/>
-			</div>
+		  </div>
 		</div>
-	</div>
+	  </div>
 	<div class="mt-2 mb-2">
 		<label for="" class="text-sm">Organisation name <span class="text-primary-500"> *</span></label>
 		<br />
@@ -317,14 +320,14 @@
 			name="organisation"
 			id=""
 			bind:value={$Cusdetails.Organisation}
-			class="block rounded-md w-2/5 lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 		/>
 	</div>
 	<div class="">
 		<label for="" class="text-sm">Country <span class="text-primary-500"> *</span></label>
 		<br />
 		<select
-			class="block w-2/5 rounded-md lg:w-1/2 p-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
+			class="block md:w-3/4 sm:2/5 lg:w-1/2 w-full rounded-md p-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
 			name="country"
 			id="country"
 			bind:value={$Cusdetails.Country}
@@ -342,7 +345,7 @@
 			type="text"
 			name="lgcnumber"
 			id=""
-			class="block rounded-md w-2/5 lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 			bind:value={$Cusdetails.LGC}
 		/>
 	</div>
@@ -353,7 +356,7 @@
 			type="text"
 			name="email"
 			id=""
-			class="block w-2/5 rounded-md lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 			bind:value={$Cusdetails.Email}
 		/>
 		{#if emailError}
@@ -364,7 +367,7 @@
 		<label for="" class="text-sm">Phone number <span class="text-primary-500"> *</span></label>
 		<br />
 		<input
-			class="block rounded-md w-2/5 lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 			type="tel"
 			name="phone"
 			id="phone"
@@ -379,7 +382,6 @@
 		{#if errorMessage}
 		<div class="text-red-500 ml-1 mt-1 text-sm font-medium">
 			{errorMessage}</div>
-			<!-- Display the error message -->
 		{/if}
 	</div>
 	<div class="flex space-x-4 mt-5">
@@ -389,11 +391,10 @@
 			class="text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-500 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
 			>Save & continue</button
 		>
-		
 	</div>
 </div>
 <hr />
-<div class="mx-10 my-10 flex justify-between">
+<div class="my-10 flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 6: Delivery information</h1>
 </div>
 <hr />

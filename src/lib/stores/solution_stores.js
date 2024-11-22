@@ -6,7 +6,7 @@ export const formData = writable({
     solvent: '',
     packagingType: '',
     volume: '',
-    units: 0,
+    units: 1,
     qualityLevel: '',
     analyticalTechnique: '',
 });
@@ -37,7 +37,7 @@ export function resetFormData() {
         solvent: '',
         packagingType: '',
         volume: '',
-        units: 0,
+        units: 1,
         qualityLevel: '',
         analyticalTechnique: '',
     });
