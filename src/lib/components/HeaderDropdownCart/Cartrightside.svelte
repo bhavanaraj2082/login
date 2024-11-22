@@ -1,110 +1,147 @@
 <script>
 	import { onMount, onDestroy } from 'svelte';
 	import Icon from '@iconify/svelte';
-
-	let cartOpen = false; 
+  
+	let cartOpen = false;
 	let cartItems = [];
-	let subtotal = 0; 
-
+	let subtotal = 0;
+  
 	function formatPriceToNumber(priceString) {
-		if (!priceString) return 0;
-		const formattedPrice = String(priceString)
-			.replace(/[^\d.-]/g, '')
-			.trim();
-		return parseFloat(formattedPrice) || 0;
+	  if (!priceString) return 0;
+	  const formattedPrice = String(priceString)
+		.replace(/[^\d.-]/g, '')
+		.trim();
+	  return parseFloat(formattedPrice) || 0;
 	}
-
+  
 	const loadCartFromLocalStorage = () => {
-		if (typeof window !== 'undefined' && window.localStorage) {
-			const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-			cartItems = storedCart.map((item) => ({
-				...item,
-				price: formatPriceToNumber(item.price),
-				quantity: item.quantity || 1,
-			}));
-			calculateSubtotal();
-		}
+	  if (typeof window !== 'undefined' && window.localStorage) {
+		const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+		cartItems = storedCart.map((item) => ({
+		  ...item,
+		  price: formatPriceToNumber(item.priceSize?.price),
+		  size: item.priceSize?.size,
+		  quantity: item.quantity || 1,
+		}));
+		calculateSubtotal();
+	  }
 	};
-
+  
 	const calculateSubtotal = () => {
-		subtotal = cartItems.reduce((sum, item) => {
-			if (item.price && !isNaN(item.price)) {
-				return sum + item.price * item.quantity;
-			}
-			return sum;
-		}, 0);
+	  subtotal = cartItems.reduce((sum, item) => {
+		if (item.price && !isNaN(item.price)) {
+		  return sum + item.price * item.quantity;
+		}
+		return sum;
+	  }, 0);
 	};
-
+  
 	const updateLocalStorage = () => {
-		if (typeof window !== 'undefined' && window.localStorage) {
-			localStorage.setItem('cart', JSON.stringify(cartItems));
-		}
+	  if (typeof window !== 'undefined' && window.localStorage) {
+		localStorage.setItem('cart', JSON.stringify(cartItems));
+	  }
 	};
-
+  
 	const incrementQuantity = (id) => {
-		const index = cartItems.findIndex((item) => item.id === id);
-		if (index !== -1) {
-			cartItems[index].quantity += 1;
-			calculateSubtotal();
-			updateLocalStorage();
-		}
-	};
-
-	const decrementQuantity = (id) => {
-		const index = cartItems.findIndex((item) => item.id === id);
-		if (index !== -1 && cartItems[index].quantity > 1) {
-			cartItems[index].quantity -= 1;
-			calculateSubtotal();
-			updateLocalStorage();
-		}
-	};
-
-	const removeItem = (id) => {
-		cartItems = cartItems.filter((item) => item.id !== id);
+	  const index = cartItems.findIndex((item) => item.id === id);
+	  if (index !== -1) {
+		cartItems[index].quantity += 1;
 		calculateSubtotal();
 		updateLocalStorage();
+	  }
 	};
-
-	const emptyCart = () => {
-		cartItems = [];
-		subtotal = 0;
+  
+	const decrementQuantity = (id) => {
+	  const index = cartItems.findIndex((item) => item.id === id);
+	  if (index !== -1 && cartItems[index].quantity > 1) {
+		cartItems[index].quantity -= 1;
+		calculateSubtotal();
 		updateLocalStorage();
+	  }
 	};
-
+  
+	const removeItem = (id) => {
+	  cartItems = cartItems.filter((item) => item.id !== id);
+	  calculateSubtotal();
+	  updateLocalStorage();
+	};
+  
+	const emptyCart = () => {
+	  cartItems = [];
+	  subtotal = 0;
+	  updateLocalStorage();
+	};
+  
 	const handleStorageChange = (event) => {
-		if (event.key === 'cart') {
-			loadCartFromLocalStorage();
-		}
-	};
-
-	onMount(() => {
+	  if (event.key === 'cart') {
 		loadCartFromLocalStorage();
-		if (typeof window !== 'undefined') {
-			window.addEventListener('storage', handleStorageChange);
-		}
-	});
-
-	onDestroy(() => {
-		if (typeof window !== 'undefined') {
-			window.removeEventListener('storage', handleStorageChange);
-		}
-	});
-
-	const toggleCart = () => {
-		cartOpen = !cartOpen;
+	  }
 	};
-</script>
+  
+	const observeLocalStorage = () => {
+	  let originalSetItem = localStorage.setItem;
+	  localStorage.setItem = function (key, value) {
+		originalSetItem.apply(this, arguments);
+		if (key === 'cart') {
+		  loadCartFromLocalStorage();
+		}
+	  };
+	};
+  
+	const toggleCart = () => {
+	  cartOpen = !cartOpen;
+	};
+  
+	onMount(() => {
+	//   loadCartFromLocalStorage();
+	  observeLocalStorage();
+	  if (typeof window !== 'undefined') {
+		window.addEventListener('storage', handleStorageChange);
+	  }
+	});
+
+	loadCartFromLocalStorage();
+	updateLocalStorage();
+	// observeLocalStorage();
+  
+	onDestroy(() => {
+	  if (typeof window !== 'undefined') {
+		window.removeEventListener('storage', handleStorageChange);
+	  }
+	});
+
+
+	function getFullPath(partNumber) {
+    const basePath = '/products/analytical-chemistry/analytical-chromatography';
+    
+    if (typeof window !== 'undefined') {
+      const currentPath = window.location.pathname;
+      if (currentPath.startsWith(basePath)) {
+        return `${basePath}/${encodeURIComponent(partNumber)}`;
+      }
+    }
+    return `${basePath}/${encodeURIComponent(partNumber)}`;
+  }
+  </script>
 
 <button on:click={toggleCart} class=" space-x-4 text-gray-600">
 	<span class="flex items-center space-x-1">
-		<Icon
-			icon="eva:shopping-cart-fill"
-			class="md:w-5 md:h-5 sm:w-7 sm:h-7 lg:w-7 lg:h-7 w-7 h-7 mb-2 text-gray-800 sm:ml-3 hover:text-primary-400"
-		/>
-		<span class="hover:text-primary-400 font-semibold text-xs lg:text-sm mb-3 hidden lg:block"
-			>Cart</span
-		>
+		<!-- Wrapper for Icon with Badge -->
+		<div class="relative inline-block">
+			<!-- Shopping Cart Icon -->
+			<Icon
+				icon="eva:shopping-cart-fill"
+				class="md:w-5 md:h-5 sm:w-7 sm:h-7 lg:w-7 lg:h-7 w-7 h-7 mb-2 text-gray-800 sm:ml-3 hover:text-primary-400"
+			/>
+			<!-- Badge -->
+			<span
+				class="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-primary-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+			>
+			{cartItems.length}
+			</span>
+		</div>
 	</span>
+	
 </button>
 
 {#if cartOpen}
@@ -124,10 +161,27 @@
           <div class="flex flex-col py-4 border-b">
             <div class="flex items-center space-x-4">
               <div class="flex-shrink-0 w-28 h-28 bg-stone-300 rounded-md overflow-hidden">
-                <img src={item.imageSrc} alt="img" class="w-full h-full object-cover" />
+                <img src={item.image} alt="img" class="w-full h-full object-cover" />
               </div>
               <div class="flex-1">
-                <p class="text-sm text-primary-400 font-semibold">{item.partNumber}</p>
+				<a
+				href={typeof window !== 'undefined' ? getFullPath(item.partNumber) : '#'}
+				on:click|preventDefault={() => {
+				  if (typeof window !== 'undefined') {
+					const productPageUrl = getFullPath(item.partNumber);
+					window.location.href = productPageUrl;
+				  }
+				}}
+			  >
+				<p class="text-sm text-primary-400 font-semibold">
+				  {item.partNumber}
+				  {#if item.size !== '' || item.size !== 'undefined'}
+					- {item.size}
+				  {/if}
+				</p>
+			  </a>
+			  
+
                 <p class="font-semibold text-gray-800">{item.name}</p>
                 <p class="text-sm text-gray-500">{item.description}</p>
               </div>
