@@ -12,11 +12,11 @@
   </div>
   <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     {#each categories as category}
-      <div class="bg-white shadow-lg rounded-md overflow-hidden">
+      <div class="bg-white shadow rounded-md overflow-hidden">
         <img
-          src="image/category.jpeg"
+          src="category/{category.name || "img"}.jpg"
           alt="img"
-          class="w-full h-44 object-cover"
+          class=" w-full h-52  object-cover"
         />
         <div class="p-4">
           <a href="/products/{category.urlName}">
