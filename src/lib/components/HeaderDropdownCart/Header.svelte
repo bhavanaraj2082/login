@@ -1,4 +1,5 @@
 <script>
+	import { authedUser } from '$lib/stores/mainStores.js';
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import Cartrightside from '$lib/components/HeaderDropDownCart/Cartrightside.svelte';
@@ -107,7 +108,7 @@
 
 <nav class="my-3">
 	<div class={`fixed top-0 left-0 h-full bg-white transition-transform transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden z-50 w-full`}>
-		<div class="flex flex-col h-full p-6 text-gray-600">
+		<div class="flex flex-col h-full p-6 font-medium text-gray-600">
 			<div class="flex justify-between mb-2">
 				<div class="text-xl text-primary-400 font-bold">Chemikart</div>
 				<button
@@ -127,38 +128,45 @@
 							menu.title === 'Support'
 								? toggleMenu(menu)
 								: navigateTo(menu.href)}
-						class="flex justify-between text-left hover:text-primary-400 font-semibold text-gray-800 transition duration-200 w-full py-2">
+						class="flex justify-between text-left hover:text-primary-400 text-gray-800 transition duration-200 w-full py-2">
 						{menu.title}
 						<Icon
 							icon="prime:chevron-down"
 							class="w-5 h-5 mr-2 text-gray-800 hover:text-primary-400"/>
 					</button>
 				{/each}
-				<div class="flex flex-col">
+				<div class="flex flex-col font-semibold">
 					<a
 						href="/quick-order"
-						class=" text-left hover:text-primary-400 text-gray-800 font-semibold transition duration-200 w-full py-2"
+						class=" text-left hover:text-primary-400 text-sm text-gray-800 transition duration-200 w-full py-2"
 						>Quick Order</a
 					>
 					<a
 						href="/order-status"
-						class="text-left hover:text-primary-400 text-gray-800 font-semibold transition duration-200 w-full py-2"
+						class="text-left hover:text-primary-400 text-gray-800 text-sm transition duration-200 w-full py-2"
 						>Order Status</a
 					>
 				</div>
-				<div class="flex flex-col">
+				<div class="flex flex-col font-semibold">
+					{#if $authedUser.email}
+					<div>
+						<button
+							on:click={() => navigateTo('/logout')}
+							class="hover:text-primary-400 text-sm font-montserrat transition text-left duration-200 pb-3 pt-1">Logout</button
+						>
+					</div>
+					{:else}
 					<div>
 						<button
 							on:click={() => navigateTo('/login')}
-							class="hover:text-primary-400 text-sm transition duration-200 pb-2 pt-1">Login</button
+							class="hover:text-primary-400 w-full text-sm font-montserrat transition text-left duration-200 pb-3 pt-1">Login</button
 						>
-					</div>
-					<div>
 						<button
 							on:click={() => navigateTo('/signup')}
-							class="hover:text-primary-400 transition text-sm duration-200 py-2">Register</button
+							class="hover:text-primary-400 w-full transition text-sm font-montserrat text-left duration-200">Register</button
 						>
 					</div>
+					{/if}
 				</div>
 			{:else}
 				<button
@@ -255,6 +263,15 @@
 				<!-- Searchbar functionality ends-->	
 
 		<div class="md:flex hidden">
+			{#if $authedUser.email}
+			<div>
+				<button
+					on:click={() => {
+						navigateTo('/logout');
+					}}
+					class="  loginbtn text-sm font-medium border-b-2 border-b-transparent hover:text-primary-400 text-primary-400">Logout</button>
+			</div>
+			{:else}
 			<div class="flex items-center justify-between">
 				<button
 					on:click={() => {
@@ -268,6 +285,7 @@
 					}}
 					class=" registerbtn pr-2 text-primary-400 text-sm font-medium border-b-2 border-b-transparent hover:text-primary-400">Register</button>
 			</div>
+			{/if}
 		</div>
 	</div>
 	<div class="hidden bg-white md:flex mx-auto w-full border-y border-gray-200">
