@@ -958,3 +958,40 @@ export const getUpdatedCartData = async(pb,product)=>{
         console.log(productObj);
         return JSON.stringify(productObj)
 }
+
+// Myfavourite page starts
+export const getFavData = async (pb, itemId) => {
+    try {
+        const record = await pb.collection('Myfavourites').getFirstListItem(`userProfileId.email='test2@gmail.com'`);
+        const updatedFavorites = record.favorite.filter(item => item.id !== itemId);
+        await pb.collection('Myfavourites').update(record.id, {
+            favorite: updatedFavorites
+        });
+        return { 
+            status: 200, 
+            message: 'Item deleted successfully',
+            favorite: updatedFavorites 
+        };
+    } catch (error) {
+        console.error('Error deleting favourite item:', error);
+        throw error;
+    }
+};
+
+export const getFavAllData = async (pb) => {
+    try {
+        const record = await pb.collection('Myfavourites').getFirstListItem(`userProfileId.email='test2@gmail.com'`);
+        await pb.collection('Myfavourites').update(record.id, {
+            favorite: []
+        });
+        return { 
+            status: 200, 
+            message: 'All favorite items deleted successfully',
+            favorite: [] 
+        };
+    } catch (error) {
+        console.error('Error deleting favourite items:', error);
+        throw error;
+    }
+};
+//Myfavourite page ends

@@ -1,5 +1,6 @@
 <script>
-    import Favourite from '$lib/components/FavPage/Favourite.svelte'
+    import Favourites from '$lib/components/Favourites.svelte';
+    export let data;
 </script>
 
-<Favourite/>
+<Favourites {data}/>

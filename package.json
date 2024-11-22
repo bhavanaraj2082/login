@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@iconify/icons-mdi": "^1.2.48",
-    "js-cookie": "^3.0.5"
+    "js-cookie": "^3.0.5",
+    "svelte-sonner": "^0.3.28"
   }
 }
