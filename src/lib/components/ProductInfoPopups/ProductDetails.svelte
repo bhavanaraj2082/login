@@ -32,23 +32,6 @@
   let favoriteStatus = '';
   // console.log("Data Records:", data);
 
-  function toggleFavorite(index) {
-        const product = allProducts[index];
-        isFavorited[index] = !isFavorited[index];
-        modalProduct = product;
-        showModal = true;
-        let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-        const existingProductIndex = favorites.findIndex(item => item.id === product.id);
-  
-        if (isFavorited[index] && existingProductIndex === -1) {
-            favorites.push({ ...product, quantity: product.quantity || 1 });
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-        } else if (!isFavorited[index] && existingProductIndex !== -1) {
-            favorites = favorites.filter(item => item.id !== product.id);
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-        }
-    }
-
 function handleThumbnailClick(selectedIndex) {
     index = selectedIndex;
 }
@@ -122,50 +105,30 @@ function toggleModal() {
       price: product.priceSize[index].price,
       size: product.priceSize[index].size,
     },
-    quantity: product.quantity || 1,
+    quantity: quantity,
   };
-
   viewedCart.update((cart) => {
-    // Check if an item with the exact price and size exists
     const exactMatchIndex = cart.findIndex(
       (item) =>
         item.priceSize.size === cartProduct.priceSize.size &&
         item.priceSize.price === cartProduct.priceSize.price
     );
-
     if (exactMatchIndex !== -1) {
-      // If an exact match exists, update its quantity
-      cart[exactMatchIndex].quantity += cartProduct.quantity;
-    } else {
-      // If no exact match exists, handle ID suffix
-      const similarItems = cart.filter(
-        (item) => item.id.startsWith(product.productId)
-      );
-
-      if (similarItems.length > 0) {
-        // Add a suffix based on existing similar items
-        const suffix = similarItems.length + 1;
-        cartProduct.id = `${product.productId}_${suffix}`;
+      const existingItem = cart[exactMatchIndex];
+      if (existingItem.quantity !== cartProduct.quantity) {
+        cart[exactMatchIndex].quantity = cartProduct.quantity;
+        cartNotification = `Updated quantity for item  in your cart.`;
+      } else {
+        cartNotification = `The item is already in your cart with the same quantity.`;
       }
-
-      // Add the new item to the cart
+    } else {
       cart.push(cartProduct);
+      const totalItems = cart.length; // Get the updated cart length
+      cartNotification = `You have ${totalItems} item(s) in your cart.`;
     }
-
-    // Save updated cart to localStorage
     localStorage.setItem("cart", JSON.stringify(cart));
-
     return cart;
   });
-
-  // Update cart notification
-  const totalQuantity = JSON.parse(localStorage.getItem("cart")).reduce(
-    (total, item) => total + item.quantity,
-    0
-  );
-
-  cartNotification = `You have ${totalQuantity} item(s) in your cart.`;
-
   if (notificationTimeout) clearTimeout(notificationTimeout);
   notificationTimeout = setTimeout(() => {
     cartNotification = "";
