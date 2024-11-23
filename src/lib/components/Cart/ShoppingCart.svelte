@@ -5,14 +5,93 @@
 	import Icon from '@iconify/svelte';
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { viewedCart,updateCartState } from '$lib/stores/alsoViewedProducts_Store.js';
+	import jsPDF from 'jspdf'
+	import { toast } from 'svelte-sonner';
     
 	const dispatch = createEventDispatcher()
 
 	let timestamp
 	let loading = true
+	let cartItems = $viewedCart;
+	let subtotal = 0;
+	let tax = 0;
+	let total = 0;
+	let totalPrice = 0
+	let order = ''
+	let successMessage = ''
+
+  import 'jspdf-autotable';
+
+// Helper function to generate the PDF document
+const generatePDFDocument = () => {
+    const total = $viewedCart.reduce((sum, item) => sum + parseFloat(item.priceSize.price.replace(/[^\d.-]/g, '')) * item.quantity, 0);
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text('Chemikart Cart Summary', 14, 20);
+
+    doc.setFont('helvetica'); 
+
+    const tableColumns = ['Products', 'Price', 'Quantity', 'Total'];
+    const tableData = $viewedCart.map(item => [
+        `${item.partNumber}\n${item.name}\n${item.priceSize.size}`,
+        `${parseFloat(item.priceSize.price.replace(/[^\d.-]/g, ''))}`, // Use the ₹ symbol here
+        `${item.quantity}`,
+        `${parseFloat(item.priceSize.price.replace(/[^\d.-]/g, '')) * item.quantity}`, // Use the ₹ symbol for total as well
+    ]);
+
+    tableData.push([
+        'Total Price',
+        '', 
+        '', 
+        `${total}`, 
+    ]);
+
+    doc.autoTable({
+        head: [tableColumns],
+        body: tableData,
+        startY: 30,
+        margin: { top: 10 },
+        styles: {
+            fontSize: 12,
+            cellPadding: 5,
+            halign: 'left',
+            lineWidth: 0, 
+        },
+        headStyles: {
+            fillColor: [255, 229, 204], 
+            textColor: [0, 0, 0], 
+            fontSize: 12,  
+            cellPadding: 5,
+        },
+        theme: 'striped', 
+        tableLineWidth: 0, 
+        tableLineColor: [255, 255, 255], 
+        rowStyles: (rowIndex) => ({
+            fillColor: rowIndex % 2 === 0 ? [245, 245, 245] : [255, 255, 255], 
+        }),
+    });
+
+    return doc;
+};
+
+
+// Function to download the PDF
+const downloadPDF = () => {
+  const doc = generatePDFDocument();
+  doc.save('cart-summary.pdf');
+};
+
+// Function to print the PDF
+const printPDF = () => {
+  const doc = generatePDFDocument();
+  doc.autoPrint();
+  window.open(doc.output('bloburl'), '_blank');
+};
+
 
 	const functionDispatch = ()=>{
-	let expireTime = 12*60*60*1000
+    let expireTime = 12*60*60*1000
 	if(!$viewedCart.length){
 		console.log('cart empty');
 		return
@@ -32,15 +111,7 @@
 			console.log("item is still valid");
 		}
 	}
-}
-
-	let cartItems = $viewedCart;
-	let subtotal = 0;
-	let tax = 0;
-	let total = 0;
-	let totalPrice = 0
-	let order = ''
-	let successMessage = ''
+    }
 
 	const calculateTotals = () => {
 		subtotal = cartItems.reduce((sum, item) => sum + parseFloat(item.priceSize.price.replace(/[^\d.-]/g, '')) * parseInt(item.quantity), 0);
@@ -80,7 +151,7 @@
 			products,
 			orderdetails,
 			status:"pending",
-			dashuserprofileid:$authedUser.email
+			dashuserprofileid:$authedUser.profileId
 		}
 
 	};
@@ -123,7 +194,11 @@
 		return async ({result,update})=>{
 			console.log(result);
 			if(result.type === "success"){
-				successMessage = result.data
+				if(result.data.success){
+					toast.success('',{description:result.data.message})
+				}else{
+					toast.error('',{description:result.data.message})
+				}
 			}
 			updateCartState([])
 			await update()
@@ -155,7 +230,7 @@
 			   <p class=" font-bold text-lg md:text-xl  xl:text-2xl">Cart is Empty</p>
 		   </div>
 		{:else}
-		<div class="w-full lg:w-4/4 xl:w-3/4 bg-white p-4 rounded-lg shadow-md ">
+		<div class="w-full lg:w-4/4 xl:w-3/4 bg-white p-4 rounded-lg shadow-md h-fit ">
 			<h2 class="text-xl font-bold">
 				Cart Items <span class="text-red-500">({cartItems.length})</span>
 			</h2>
@@ -256,14 +331,14 @@
 				</button>
 
 				<!-- Download Button -->
-				<button type="button"
+				<button type="button" on:click={downloadPDF}
 					class="flex items-center justify-center gap-2 bg-white text-primary-500 border border-primary-500 py-2 rounded font-semibold hover:bg-primary-100"
 				>
 					Download
 				</button>
 
 				<!-- Print Button -->
-				<button type="button"
+				<button type="button" on:click={printPDF}
 					class="flex items-center justify-center gap-2 bg-white text-primary-500 border border-primary-500 py-2 rounded font-semibold hover:bg-primary-100"
 				>
 					Print

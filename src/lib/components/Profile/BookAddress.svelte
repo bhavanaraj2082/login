@@ -67,13 +67,16 @@
        "India"
     ];
 
-    $:activeAddress = organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress
+    $: activeAddress = organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress
      
     $:if(!toggleEdit){
        organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress
     }
 
     $: activeBook = (val,addressType)=>{
+      Object.keys(dummy).forEach(key => dummy[key] = "")
+      console.log('in activebook' ,val,addressType,dummy);
+      console.log(shippingAddress,billingAddress,organizationAddress);
       active = val
       activeAddressType = addressType
       if(addressType === "organization"){
@@ -85,10 +88,12 @@
       if(addressType === "billing"){
         billingAddress === null ? activeAddress = dummy : activeAddress = billingAddress
       }
+      //console.log('active address',activeAddress);
     }
+     
+    console.log('active address',activeAddress);
 
     const validateForm = ()=>{
-        console.log("++++++");
 		errors={}
             if(!activeAddress.organizationName || !/^[A-Za-z\s]+$/.test(activeAddress.organizationName)) errors.organizationName="Organization name required and valid"
             if(!activeAddress.attentionTo || !/^[A-Za-z\s]+$/.test(activeAddress.attentionTo)) errors.attentionTo="Person name is required and valid"
@@ -237,10 +242,10 @@
     {:else}
      <div class=" space-y-5">
         <h1 class=" text-xl font-bold">Address Book</h1>
-            <section class=" text-sm md:text-lg flex items-center overflow-x-scroll scroll">
-                <button on:click={()=>activeBook(1,"organization")} class="{1 === active ? " border-b-2 border-primary-500 text-primary-500 transition duration-300 " :"border-white"} border-b-2  font-semibold px-4 py-1">Organization & Mailing</button>
-                <button on:click={()=>activeBook(2,"shipping")} class="{2 === active ? " border-b-2 border-primary-500 text-primary-500 transition duration-300 " :"border-white"} border-b-2  font-semibold px-4 py-1">Shipping</button>
-                <button on:click={()=>activeBook(3,"billing")} class="{3 === active ? " border-b-2 border-primary-500 text-primary-500 transition duration-300 " :"border-white"} border-b-2  font-semibold px-4 py-1">Billing</button>
+            <section class=" text-sm md:text-lg flex flex-1 items-center overflow-x-scroll scroll sm:overflow-x-hidden py-1">
+                <button on:click={()=>activeBook(1,"organization")} class="{1 === active ? " border-b-2 border-primary-500 text-primary-500 transition duration-300 " :"border-white"} border-b-2 shrink-0 font-semibold px-4 py-1">Organization & Mailing</button>
+                <button on:click={()=>activeBook(2,"shipping")} class="{2 === active ? " border-b-2 border-primary-500 text-primary-500 transition duration-300 " :"border-white"} border-b-2 shrink-0 font-semibold px-4 py-1">Shipping</button>
+                <button on:click={()=>activeBook(3,"billing")} class="{3 === active ? " border-b-2 border-primary-500 text-primary-500 transition duration-300 " :"border-white"} border-b-2 shrink-0 font-semibold px-4 py-1">Billing</button>
             </section>
             <div class=" w-full md:w-2/3 flex flex-col gap-3">
                 <div class=" w-full h-40 border-1 font-medium capitalize rounded border-gray-300 p-4 md:p-5 text-xs md:text-sm leading-5">

@@ -7,9 +7,10 @@ export const actions = {
         try {
             const body = Object.fromEntries(await request.formData())
             const parsedBody = JSON.parse(body.order)
+            console.log(parsedBody);
             return await checkoutOrder(pb,parsedBody)   
         } catch (error) {
-            console.log(error);
+            console.log(error.response.data);
             return { success:false,message:"Something went wrong"}
         }  
     },

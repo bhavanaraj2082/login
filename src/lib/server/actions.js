@@ -409,7 +409,7 @@ export async function register(pb,data,cookies) {
 	const user = await pb.collection("Register").create(data)
 	const profile = await pb.collection("ChemiDashProfile").create({userId:user.id,email:user.email,sitePreferences})
 	const updatedUser = await pb.collection("Register").update(user.id,{chemiDashProfileId:profile.id})
-	cookies.set('email', user.email, {
+	cookies.set('token',JSON.stringify({email:user.email,profileId:profile.id,userId:user.id}), {
         path: '/',
         httpOnly: true,
         sameSite: 'strict',
@@ -417,10 +417,10 @@ export async function register(pb,data,cookies) {
     });
 	//console.log("user",user);
 	//console.log("updatedUser",updatedUser);
-	 const res = await pb.collection('Register').requestVerification(user.email);
+	 const res = await pb.collection('Register').requestVerification(user.email)
 	 //console.log(res);
 	 if(res){
-       return {success:true,message:"check your email to verify email address",email:user.email}
+       return {success:true,message:"check your email to verify email address"}
 	 }else{
 		return {success:false,message:"verification email is not sent"}
 	 }
@@ -429,10 +429,11 @@ export async function register(pb,data,cookies) {
 //********SignIn*********/
 export async function login(pb,body,cookies) {
 	const { email,password } = body
-	const {record} = await pb.collection('Register').authWithPassword(email, password);
-    console.log(record);
-	if(record.id){
-		cookies.set('email',record.email, {
+	const user = await pb.collection('Register').authWithPassword(email, password).catch(()=>null)
+    //console.log(record);
+	if(user){
+		const profile = await pb.collection("ChemiDashProfile").getFirstListItem(`userId.id="${user.record.id}"`,{fields:"id"})
+		cookies.set('token',JSON.stringify({email:user.record.email,profileId:profile.id,userId:user.record.id}), {
 			path: '/',
 			httpOnly: true,
 			sameSite: 'strict',
@@ -441,7 +442,7 @@ export async function login(pb,body,cookies) {
 		return redirect(302,"/profile")
 	//return { success:true,message: 'Login successful' };
 	}else{
-	return { success:false,message: 'failed to login' };
+	return { success:false,message: 'failed to login please check your email and password' };
 	}
 
 }

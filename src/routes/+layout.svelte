@@ -7,7 +7,17 @@
 	import { authedUser } from '$lib/stores/mainStores.js';
   
   export let data;
-  $: authedUser.update(user=> ({...user,email:data.email }))
+  let userData
+  //console.log(data);
+ $: if(data.token.length>0){
+    userData = JSON.parse(data.token)
+  }else{
+    userData = data.token
+  }
+ // console.log(userData);
+  $: authedUser.update(user=> ({...user,...userData}))
+
+  
 
 </script>
 

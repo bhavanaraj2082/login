@@ -12,9 +12,9 @@ const pb = await authenticate()
  
 export const load = async ({cookies}) => {
   try {
-      const email = cookies.get('email')
+      const user = JSON.parse(cookies.get('token'))
       //console.log("hhhhhh",email);
-      return await getProfileDetails(pb,email)  
+      return await getProfileDetails(pb,user.email)  
   } catch (error) {
     console.log('error',error);
       return { 

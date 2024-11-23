@@ -18,6 +18,7 @@
 	let isLoading = false;
 	let searchResults=[]
 
+	//console.log('header',$authedUser)
 	const getInitial = (name) => name.charAt(0).toUpperCase();
 	onMount(async () => {
 		try {
