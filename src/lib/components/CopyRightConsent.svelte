@@ -98,7 +98,7 @@
 <div class="lg:w-10/12  px-4 mx-auto">
     <div class="bg-gray-50 mx-auto w-11/12 max-w-7xl p-2">
         <h1 class="text-2xl font-bold mb-4 mt-5 text-center">Copyright Consent</h1>
-        <p class="mb-2 text-sm text-justify">In case you are requesting our consent to use copyrighted material available on our website, please make sure that you have checked our <a href="/terms" class="text-primary-500">Site Use Terms</a>.</p>
+        <p class="mb-2 text-sm text-justify">In case you are requesting our consent to use copyrighted material available on our website, please make sure that you have checked our <a href="/terms/site-and-terms" class="text-primary-500">Site Use Terms</a>.</p>
         <p class="mb-2  text-sm text-justify">If you are requesting copyright consent that is not already provided by the “Intellectual Property Rights” section, then please fill out the below form, and send it to us. We will review your request.</p>
         <p class="mb-2 text-sm text-justify">Please note that sending the below request form does NOT give you any license or consent, including implied, to use our copyrighted work unless you receive our explicit consent or if the consent is provided according to the Site Use Terms.</p>
         <p class="mb-2 text-sm ">Fields indicated by an * are required.</p>
@@ -134,7 +134,7 @@
             <!-- Title -->
             <div class="my-4">
                 <label for="title" class="block text-gray-700 font-semibold text-sm py-2 ">*Title</label>
-                <select id="title" name="title"  class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0  rounded  mb-2 w-full md:w-[400px] p-2" required>
+                <select id="title" name="title"  class="hover:border-primary-500 focus:border-primary-400  text-sm focus:outline-none focus:ring-0  rounded  mb-2 w-full md:w-[437px] p-2" required>
                     <option value="" disabled selected >Select Title</option>
                     <option value="Mr.">Mr.</option>
                     <option value="Mrs.">Mrs.</option>
@@ -249,8 +249,14 @@
         </form>
 
         <!-- Thank you message -->
-        {#if thankYouMessageVisible}
-            <p class="text-green-500  text-center mt-4">Thank you for submitting your request!</p>
-        {/if}
+   
+{#if thankYouMessageVisible}
+<div class="flex justify-center items-center">
+    <p class="text-white text-center w-1/2 bg-green-600 p-2 rounded-lg">
+        Thank you for submitting your request!
+    </p>
+</div>
+{/if}
+
     </div>
 </div>
