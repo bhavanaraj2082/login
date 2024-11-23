@@ -9,10 +9,13 @@
   const togglePopup = (event) => {
     event.preventDefault();
     isPopupOpen = !isPopupOpen;
+    showBanner = false;
   };
+  
   const closeBanner = () => {
     showBanner = false;
   };
+  
   const handleLinkClick = (event) => {
     const href = event.currentTarget.getAttribute('href');
     showBanner = false;
@@ -24,14 +27,13 @@
   <div class="w-full fixed m-1 bottom-0 left-0 right-0 bg-white shadow-lg md:p-6 p-4 z-50">
     <button
       on:click={closeBanner}
-      class="absolute sm:top-4 right-8 sm:right-4 text-primary-500 rounded-full p-2 hover:bg-gray-100 transition duration-100"
-    >
+      class="absolute sm:top-4 right-8 sm:right-4 text-primary-500 rounded-full p-2 hover:bg-gray-100 transition duration-100">
       <Icon icon="ic:baseline-close" width="24" height="24" />
     </button>
     <div class="max-w-7xl mx-auto w-11/12 flex flex-col md:flex-row border border-primary-200 rounded sm:p-10 p-6 items-start md:items-center justify-between relative">
       <div class="text-xs sm:text-sm md:text-base text-gray-800 mb-4 md:mb-0 md:mr-4">
         <p class="p-1">
-          Chemikart uses cookies and similar technologies to collect and process personal data. This may involve sharing information with third parties. By continuing, you consent to our data practices as outlined in our Privacy and Cookie Notice. Please review our
+          Chemikart uses cookies and similar technologies to improve your browsing experience. This includes personalizing content, analyzing website usage, and improving our services. <br> For more information, please refer to our
           <a 
             href="/terms/site-and-terms" 
             class="text-primary-600 underline"
@@ -45,7 +47,8 @@
           <a 
             href="/terms/privacy-notice/#" 
             class="text-primary-600 underline"
-            on:click={handleLinkClick}>Cookie Notice</a>.
+            on:click={handleLinkClick}
+          >Cookie Notice</a>.
         </p>
       </div>
       <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -60,6 +63,7 @@
   </div>
 </div>
 {/if}
+
 {#if isPopupOpen}
   <CookiesPopup isOpen={isPopupOpen} closePopup={togglePopup} />
 {/if}
