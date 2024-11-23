@@ -18,7 +18,6 @@
 	let total = 0;
 	let totalPrice = 0
 	let order = ''
-	let successMessage = ''
 
   import 'jspdf-autotable';
 
@@ -75,14 +74,11 @@ const generatePDFDocument = () => {
     return doc;
 };
 
-
-// Function to download the PDF
 const downloadPDF = () => {
   const doc = generatePDFDocument();
   doc.save('cart-summary.pdf');
 };
 
-// Function to print the PDF
 const printPDF = () => {
   const doc = generatePDFDocument();
   doc.autoPrint();
@@ -202,7 +198,6 @@ const printPDF = () => {
 			}
 			updateCartState([])
 			await update()
-			setTimeout(()=>successMessage = '',4000)
 		}
 	}
 
@@ -214,9 +209,6 @@ const printPDF = () => {
 </script>
 
 <div class="min-h-screen mx-auto max-w-7xl bg-gray-100 p-4 sm:p-6">
-	{#if successMessage.length !== 0}
-	<div class=" absolute right-10 bottom-10 w-64 md:w-1/3 h-14 border rounded-sm text-xs md:text-sm font-medium flex items-center justify-center  {successMessage.success ? " text-green-600 bg-green-100 border-green-600" : "text-red-600 bg-red-100 border-red-600"}">{successMessage.message}</div>
-	{/if}
 	<!-- Main Cart Section -->
 	<div class=" flex flex-col xl:flex-row justify-between gap-6">
           {#if loading}

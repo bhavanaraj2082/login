@@ -9,6 +9,8 @@
     export let shippingAddress
     export let billingAddress
 
+   // $: { organizationAddress ,shippingAddress, billingAddress}
+
     let active = 1
     let activeAddressType ='organization'
     let toggleEdit = false
@@ -67,31 +69,27 @@
        "India"
     ];
 
-    $: activeAddress = organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress
+    let activeAddress 
+    activeAddress = organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress
      
-    $:if(!toggleEdit){
+    if(!toggleEdit){
        organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress
     }
 
-    $: activeBook = (val,addressType)=>{
-      Object.keys(dummy).forEach(key => dummy[key] = "")
-      console.log('in activebook' ,val,addressType,dummy);
-      console.log(shippingAddress,billingAddress,organizationAddress);
+    const activeBook = (val,addressType)=>{
       active = val
       activeAddressType = addressType
-      if(addressType === "organization"){
+      console.log('form dummy',dummy);
+      if(activeAddressType === "organization"){
         organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress
       }
-      if(addressType === "shipping"){
+      if(activeAddressType === "shipping"){
         shippingAddress === null ? activeAddress = dummy : activeAddress = shippingAddress
       }
-      if(addressType === "billing"){
+      if(activeAddressType === "billing"){
         billingAddress === null ? activeAddress = dummy : activeAddress = billingAddress
       }
-      //console.log('active address',activeAddress);
     }
-     
-    console.log('active address',activeAddress);
 
     const validateForm = ()=>{
 		errors={}
@@ -119,7 +117,8 @@
         if(result.type === "success"){
             await update()
             toggleEdit = false
-            active = 1
+            dummy = Object.fromEntries(Object.keys(dummy).map(key => [key, ""]));
+            activeBook(active,activeAddressType)
             dispatch("onSuccess",result.data)
         }
     }
