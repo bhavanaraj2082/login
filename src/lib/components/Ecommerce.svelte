@@ -71,7 +71,7 @@
     }
 }
 </script>
-<section class="md:w-11/12 mx-auto max-w-7xl px-8">
+<section class="md:w-11/12 mx-auto max-w-7xl px-8 bg-white">
 <section class="mt-6">
     <div class="text-primary-500 text-2xl font-semibold mb-7">Chemikart Solutions</div>
         <p class="leading-6 text-content mx-auto text-justify-center">
@@ -248,23 +248,34 @@
             </div>
             <div>
                 <label class="flex items-center space-x-2 text-lg">
-                    <input type="checkbox"  bind:group={selectedNames} class="w-6 h-6 mb-5 form-checkbox accent-primary-500 rounded" value="I have a question about an existing B2B connection "/>
+                
+                
+                
+                
+                
+                
+                    <!-- type="checkbox"
+                    class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0" -->
+                
+                
+                
+                    <input type="checkbox"  bind:group={selectedNames} class="w-6 h-6 mb-5 form-checkbox rounded text-primary-500 focus:outline-none focus:ring-0" value="I have a question about an existing B2B connection "/>
                     <span class="mb-5 text-xs">I have a question about an existing B2B connection.</span>
                 </label>
                 <label class="flex items-center space-x-2 text-lg">
-                    <input type="checkbox"  bind:group={selectedNames} class="w-6 h-6 mb-5 form-checkbox accent-primary-500 rounded" value=" I would like have more information about B2B solutions "/>
+                    <input type="checkbox"  bind:group={selectedNames} class="w-6 h-6 mb-5 form-checkbox rounded text-primary-500 focus:outline-none focus:ring-0" value=" I would like have more information about B2B solutions "/>
                     <span class="mb-5 text-xs">I would like have more information about B2B solutions</span>
                 </label>
                 <label class="flex items-center space-x-2 text-lg">
-                    <input type="checkbox"  bind:group={selectedNames} class="w-6 h-6 mb-5 form-checkbox accent-primary-500 rounded" value=" I would like to be contacted about setting up a B2B connection "/>
+                    <input type="checkbox"  bind:group={selectedNames} class="w-6 h-6 mb-5 form-checkbox rounded text-primary-500 focus:outline-none focus:ring-0" value=" I would like to be contacted about setting up a B2B connection "/>
                     <span class="mb-5 text-xs">I would like to be contacted about setting up a B2B connection</span>
                 </label>
                 <label class="flex items-center space-x-2 text-lg">
-                    <input type="checkbox"  bind:group={selectedNames} class="w-6 h-6 mb-5 form-checkbox accent-primary-500 rounded" value=" I would like to know if there is an existing B2B connection for my organization "/>
+                    <input type="checkbox"  bind:group={selectedNames} class="w-6 h-6 mb-5 form-checkbox rounded text-primary-500 focus:outline-none focus:ring-0" value=" I would like to know if there is an existing B2B connection for my organization "/>
                     <span class="mb-5 text-xs">I would like to know if there is an existing B2B connection for my organization</span>
                 </label>
                 <label class="flex items-center space-x-2 text-lg">
-                    <input type="checkbox"  bind:group={selectedNames} class="w-6 h-6 mb-5 form-checkbox accent-primary-500 rounded" value=" I have another question (fill in below Additional details)"/>
+                    <input type="checkbox"  bind:group={selectedNames} class="w-6 h-6 mb-5 form-checkbox rounded text-primary-500 focus:outline-none focus:ring-0" value=" I have another question (fill in below Additional details)"/>
                     <span class="mb-5 text-xs">I have another question (fill in below Additional details)</span>
                 </label>
             </div>
@@ -346,7 +357,7 @@
                                     type="checkbox" 
                                     name="query" 
                                     bind:value={reason} 
-                                    class="w-6 h-6 mb-5 ml-1 form-checkbox rounded accent-primary-500"
+                                    class="w-6 h-6 mb-5 ml-1 form-checkbox rounded text-primary-500 focus:outline-none focus:ring-0 "
                                 />
                                 <span class="mb-5 text-xs">I agree to the terms and conditions</span>
                             </label>
