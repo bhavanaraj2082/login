@@ -383,7 +383,7 @@ $: updateFilteredProducts();
 
 
 
-<div class="w-full md:p-2 md:w-full lg:w-full  flex flex-col">
+<div class="w-full md:p-2  sm:p-2 md:w-full lg:w-full  flex flex-col">
  
   {#if $loading}
     <div class="flex items-center justify-center h-full">
@@ -419,7 +419,6 @@ $: updateFilteredProducts();
           
            <div class="relative">
             {#if isLoggedIn}
-              <!-- Form for logged in users -->
               <form
                 action="?/favorite"
                 method="POST"
@@ -479,21 +478,21 @@ $: updateFilteredProducts();
             <img 
             src={product.imageSrc} 
             alt={product.productNumber}  
-          class="w-24 h-36 sm:w-28 sm:h-48 md:w-36 md:h-36 lg:w-40 lg:h-36 xl:w-44 xl:h-48 rounded" />
+          class="  w-24 h-36   md:w-36 md:h-28 rounded-lg " />
           
             <div class="flex-grow lg:ml-5 ml-3">
               <p>
-              <span class="text-gray-600 font-medium  mt-1">Code: </span>
+              <span class="text-gray-600   mt-1">Code: </span>
               <span class="font-semibold text-gray-600  "> {product.productNumber} </span>
             </p>
             <p>
-              <span class="text-gray-600 font-medium mt-1">Manufacturer:
+              <span class="text-gray-600  mt-1">Manufacturer:
                 <span class="font-semibold text-gray-600"> {product.manufacturerName}</span> </p>
                 <p>
-              <span class="text-gray-600 font-medium mt-1">Category:</span><span class="font-semibold text-gray-600"> {product.Category}</span>  </p>
-              <p class="md:block hidden">
+              <span class="text-gray-600 mt-1">Category:</span><span class="font-semibold text-gray-600"> {product.Category}</span>  </p>
+              <!-- <p class="md:block hidden">
               <span class="text-gray-600 font-medium md:block hidden">Description:
-              <span class="font-semibold text-gray-600">{product.prodDesc}</span> </span> </p>
+              <span class="font-semibold text-gray-600">{product.prodDesc}</span> </span> </p> -->
               <div class="flex flex-col md:flex-row items-start justify-between mt-2">
                 <div class="flex items-center mb-2 md:mb-0">
                   <Icon icon="mdi:file-document" class="text-primary-400 w-4 h-4 mr-1" />
@@ -506,9 +505,9 @@ $: updateFilteredProducts();
                     on:click={() => showSDS(product)} 
                     class="text-primary-400 rounded" 
                     aria-label="View Safety Data Sheet for {product.productName}">SDS</button>
-                  <div class="flex flex-col  md:flex-row lg:flex-row items-start justify-between">
+                  <div class="flex flex-col  lg:ml-16 md:ml-16    md:flex-row lg:flex-row items-start justify-between">
                     <div class="hidden md:flex  items-center">
-                      <p class="text-gray-600 font-semibold inline-block lg:ml-10 md:ml-10"> 
+                      <p class="text-gray-600 font-semibold inline-block"> 
                    
                           {#if product.priceSize && Array.isArray(product.priceSize) && product.priceSize.length > 0}
                             {product.priceSize[0].price} 
@@ -518,11 +517,11 @@ $: updateFilteredProducts();
                         </p>
                         
                         
-                      <div class="flex items-center  w-full lg:ml-4 md:ml-5">
-                        <div class="border text-primary-400 flex items-center py-1 rounded">
+                      <div class="flex items-center px-3    w-full lg:ml-2 md:ml-5">
+                        <div class="border text-primary-400 flex items-center rounded">
                           <button 
                             on:click={() => decrementQuantity(index)} 
-                            class="font-bold w-8 h-8  rounded text-primary-400 hover:bg-primary-500 hover:text-white">-</button>
+                            class="font-bold w-8 h-8  rounded text-primary-400 ">-</button>
                             <input 
                             type="text" 
                             class="w-10 h-8 text-center rounded font-medium text-primary-400 border-none bg-transparent  focus:outline-none focus:ring-0 focus:border-transparent mx-1" 
@@ -531,11 +530,11 @@ $: updateFilteredProducts();
                           
                           <button 
                             on:click={() => incrementQuantity(index)} 
-                            class="font-bold w-8 h-8  text-primary-400 rounded hover:bg-primary-500 hover:text-white">+</button>
+                            class="font-bold w-8 h-8  text-primary-400 rounded">+</button>
                         </div>
                         <button 
                           on:click={() => addToCart(product)} 
-                          class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400 p-2 ml-2 rounded text-sm lg:ml-5">Add To Cart</button>
+                          class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400  px-2 py-1 ml-3 rounded text-md lg:ml-4">Add To Cart</button>
                       </div>
                     </div>
                   </div>
@@ -548,12 +547,12 @@ $: updateFilteredProducts();
             </div>
             
           </div>
-          <div class="  flex items-center   md:hidden space-x-10">
+          <div class="  flex items-center   md:hidden space-x-1">
             <span class="text-gray-600 text-lg font-medium">{product.priceSize[0].price}</span>
-            <div class="border text-primary-400 flex items-center py-1   rounded">
+            <div class="border text-primary-400 flex items-center ml-2   rounded">
               <button 
                 on:click={() => decrementQuantity(index)} 
-                class="font-bold w-10 h-8 rounded text-primary-400 hover:bg-primary-500 hover:text-white">-</button>
+                class="font-bold w-6 h-6 rounded text-primary-400 ">-</button>
               <input 
                 type="text" 
                 class="w-10 h-8 text-center rounded font-medium text-primary-400 border-none bg-transparent focus:outline-none focus:ring-0 focus:border-transparent" 
@@ -561,22 +560,24 @@ $: updateFilteredProducts();
                 readonly />
               <button 
                 on:click={() => incrementQuantity(index)} 
-                class="font-bold w-10 h-8 rounded text-primary-400 hover:bg-primary-500 hover:text-white">+</button>
+                class="font-bold w-6 h-6 rounded text-primary-400">+</button>
             </div>
+
+            <button 
+            on:click={() => addToCart(product)} 
+            class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400 p-1  rounded text-sm block  md:hidden">
+            Add To Cart
+          </button>
         
            
           </div>
-          <button 
-          on:click={() => addToCart(product)} 
-          class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400 mt-2 p-2 rounded text-sm block  md:hidden">
-          Add To Cart
-        </button>
+         
         </div>
         
       {/each}
 
       <!-- Pagination  -->
-      <div class="flex items-center   mt-10 ml-20 space-x-2 sm:space-x-1">
+      <div class="flex justify-center   mt-10 ml-20 space-x-2 sm:space-x-1">
           <button 
           on:click={() => changePage('prev')} 
           class={`bg-primary-400 text-white px-2 lg:px-4 py-2 rounded-full ${currentPage === 1 ? 'disabled' : ''}`} 

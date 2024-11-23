@@ -12,7 +12,7 @@
   $: updateCategories(products);
   
 
-  let localSearchQuery = '';
+  let localCategorySearchQuery = '';
 
 
   function updateSearchQuery() {
@@ -165,12 +165,13 @@ const applyFilters = () => {
  
 </script>
 
+<div class="lg:w-11/12  mx-auto">
 
-<div class="   flex flex-col lg:flex-row">
+<div class="  lg:w-11/12 mx-auto  max-w-7xl flex flex-col lg:flex-row">
 
   <!-- Mobile View -->
-  <div class="w-full lg:hidden   p-0 mb-4 md:mb-0">
-    <div class="border   flex flex-col border-gray-300 rounded-lg md:p-4 w-full">
+  <div class="w-full lg:hidden   p-2 mb-4 md:mb-0">
+    <div class="border   flex flex-col border-gray-300 rounded-lg md:p-4  w-full">
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
       <h1 class="text-lg mt-4 font-bold mb-2 text-gray-700 flex items-center justify-center" on:click={() => showFilters = !showFilters}>
@@ -181,26 +182,27 @@ const applyFilters = () => {
 
 
       {#if showFilters}
+  
       
-        <div class=" ml-4 filter-group border border-gray-300 rounded mb-3">
-          <div class="flex items-center justify-between">
-            <h4 class="font-semibold text-gray-700 mb-1 ml-3 mt-2">Search</h4>
-            <button class="text-primary-500" on:click={() => showSearchDropdown = !showSearchDropdown}>
-              <Icon icon={showSearchDropdown ? 'iconamoon:arrow-up-2-duotone' : 'iconamoon:arrow-down-2-duotone'} class="text-3xl" />
-            </button>
-          </div>
-          {#if showSearchDropdown}
-            <input
-              type="text"
-              placeholder="Search..."
-            class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 mb-2 rounded p-2 items-center ml-4 w-10/12 text-sm border border-transparent transition duration-200"
-              bind:value={$searchQuery}
-              on:input={handleSearchChange}
-            />
-          {/if}
+      <div class="filter-group ml-2 mr-2 border border-gray-300 rounded mb-3">
+        <div class="flex items-center justify-between">
+          <h4 class="font-semibold text-gray-700 mb-1 ml-3 mt-2">Search</h4>
+          <button class="text-primary-500" on:click={() => showSearchDropdown = !showSearchDropdown}>
+            <Icon icon={showSearchDropdown ? 'iconamoon:arrow-up-2-duotone' : 'iconamoon:arrow-down-2-duotone'} class="text-3xl" />
+          </button>
         </div>
-
-        <div class="ml-4 filter-group border border-gray-300 rounded mb-3">
+        {#if showSearchDropdown}
+        <input
+          type="text"
+          placeholder="Search Products..."
+          class="w-11/12 ml-2 mb-2 px-2 py-2  border border-primary-300 rounded hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0"
+          bind:value={$searchQuery}
+          on:input={handleSearchChange}
+        />
+      {/if}
+      
+      </div>
+        <div class=" filter-group border  ml-2 mr-2 border-gray-300 rounded mb-3">
           <div class="flex items-center justify-between">
             <h4 class="font-semibold text-gray-700 mb-1 ml-3 mt-2">Categories</h4>
             <button class="text-primary-500" on:click={() => showCategoryDropdown = !showCategoryDropdown}>
@@ -209,22 +211,22 @@ const applyFilters = () => {
           </div>
         
           <div class={showCategoryDropdown ? "space-y-2" : "hidden"}>
-        
+            <!-- Search bar for categories -->
             <div class="mb-2 mx-3">
               <input
                 type="text"
-                bind:value={localSearchQuery}
+                bind:value={localCategorySearchQuery}
                 placeholder="Search categories..."
                 on:input={updateSearchQuery}
-                class="w-full px-2 py-2  hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0"
+                class="w-full px-2 py-2  border border-primary-300 rounded hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0"
               />
             </div>
         
-            <!-- Category Checkboxes with Scroll -->
-            <div class="max-h-40 overflow-y-auto">
-              {#each $filteredCategories as category}
-                <div class="mb-3">
-                  <label class="flex items-center ml-3 text-gray-600">
+         
+            <div class="max-h-40 pb-2 overflow-y-auto">
+              {#each $filteredCategories.filter(category => category.toLowerCase().includes(localCategorySearchQuery.toLowerCase())) as category}
+                <div class="mb-3 ">
+                  <label class="flex items-center ml-3  text-gray-600">
                     <input
                       type="checkbox"
                       class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0"
@@ -234,9 +236,9 @@ const applyFilters = () => {
                     <span class="ml-2">{category}</span>
                   </label>
         
-                  <!-- Show subcategories for each category -->
+               
                   {#if $selectedCategories.has(category)}
-                    <div class="ml-6 mt-2">
+                    <div class="ml-6 mt-2 pb-2 ">
                       {#each getSubCategories(products, category) as subcategory}
                         <label class="flex items-center mb-2 text-gray-600">
                           <input
@@ -254,9 +256,9 @@ const applyFilters = () => {
             </div>
           </div>
         </div>
-        <div class=" ml-4 filter-group border border-gray-300 rounded mb-3">
+        <div class="  filter-group border  ml-2 mr-2 border-gray-300 rounded mb-3">
           <div class="flex items-center justify-between">
-            <h4 class="font-semibold text-gray-700 mb-3 ml-3 mt-2">Manufacturers</h4>
+            <h4 class="font-semibold text-gray-700 mb-1 ml-3 mt-2">Manufacturers</h4>
             <button class="text-primary-500" on:click={() => showManufacturerDropdown = !showManufacturerDropdown}>
               <Icon icon={showManufacturerDropdown ? 'iconamoon:arrow-up-2-duotone' : 'iconamoon:arrow-down-2-duotone'} class="text-3xl" />
             </button>
@@ -277,7 +279,7 @@ const applyFilters = () => {
         </div>
 
        
-        <div class=" ml-4 filter-group border border-gray-300 rounded mb-3">
+        <div class="  filter-group border  ml-2 mr-2 border-gray-300 rounded mb-3">
           <div class="flex items-center justify-between">
             <h4 class="font-semibold text-gray-700 mb-1 ml-3 mt-2">Sort By</h4>
             <button class="text-primary-500" on:click={() => showSortByDropdown = !showSortByDropdown}>
@@ -312,16 +314,17 @@ const applyFilters = () => {
           </div>
           
         </div>
-        <div class="flex justify-between ml-4 mb-2">
+        <div class="flex justify-between ml-2 mb-2">
           <button
             on:click={() => applyFilters()}
-            class="text-white bg-primary-500 px-4 py-2 rounded-lg text-sm"
+            class="text-white w-1/3 bg-primary-400 md:px-4 md:py-2 rounded-md text-sm"
           >
-            Apply Filters
+            Apply Filters 
           </button>
+          <Icon icon="weui:done-outlined" class="text-primary-500 text-xl" />
           <button
             on:click={() => { showFilters = false; resetFilters(); }}
-            class="text-gray-500 bg-gray-200 px-4 py-2 rounded-lg text-sm"
+            class="text-primary-400 w-1/3 bg-gray-200 px-1 py-1 md:px-4 md:py-2 mr-2 rounded-md text-sm"
           >
             Cancel
           </button>
@@ -348,8 +351,8 @@ const applyFilters = () => {
           {#if showSearchDropdown}
           <input
             type="text"
-            placeholder="Search..."
-            class="hover:border-primary-500  border-primary-300 focus:border-primary-400 focus:outline-none focus:ring-0 mb-2 rounded p-2 items-center ml-4 w-10/12 text-sm border  transition duration-200"
+            placeholder="Search Products..."
+            class="w-11/12 ml-2 mb-2 px-2 py-2  border border-primary-300 rounded hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0"
             bind:value={$searchQuery}
             on:input={handleSearchChange}
           />
@@ -371,7 +374,7 @@ const applyFilters = () => {
             <div class="mb-2 mx-3">
               <input
                 type="text"
-                bind:value={localSearchQuery}
+                bind:value={localCategorySearchQuery}
                 placeholder="Search categories..."
                 on:input={updateSearchQuery}
                 class="w-full px-2 py-2  border border-primary-300 rounded hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0"
@@ -379,10 +382,10 @@ const applyFilters = () => {
             </div>
         
          
-            <div class="max-h-40 overflow-y-auto">
-              {#each $filteredCategories as category}
-                <div class="mb-3">
-                  <label class="flex items-center ml-3 text-gray-600">
+            <div class="max-h-40 pb-2 overflow-y-auto">
+              {#each $filteredCategories.filter(category => category.toLowerCase().includes(localCategorySearchQuery.toLowerCase())) as category}
+                <div class="mb-3 ">
+                  <label class="flex items-center ml-3  text-gray-600">
                     <input
                       type="checkbox"
                       class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0"
@@ -394,7 +397,7 @@ const applyFilters = () => {
         
                
                   {#if $selectedCategories.has(category)}
-                    <div class="ml-6 mt-2">
+                    <div class="ml-6 mt-2 pb-2 ">
                       {#each getSubCategories(products, category) as subcategory}
                         <label class="flex items-center mb-2 text-gray-600">
                           <input
@@ -419,7 +422,7 @@ const applyFilters = () => {
               <Icon icon={showManufacturerDropdown ? 'iconamoon:arrow-up-2-duotone' : 'iconamoon:arrow-down-2-duotone'} class="text-3xl" />
             </button>
           </div>
-          <div class={showManufacturerDropdown ? "space-y-2" : "hidden"}>
+          <div class={showManufacturerDropdown ? "space-y-2 pb-2" : "hidden"}>
             {#each $manufacturers as manufacturer}
               <label class="flex items-center mb-3 text-gray-600 ml-3 text-sm">
                 <input
@@ -454,7 +457,7 @@ const applyFilters = () => {
                 Product Name
               </label>
             </div>
-            <div class="flex items-center">
+            <div class="flex items-center pb-2 ">
               <input
                 type="checkbox"
                 id="sortByPrice"
@@ -462,7 +465,7 @@ const applyFilters = () => {
                 on:change={() => changeSorting('price')}
                 checked={$sortBy === 'price'}
               />
-              <label for="sortByPrice" class="text-gray-600 text-sm">
+              <label for="sortByPrice" class="text-gray-600  text-sm">
                 Price
               </label>
             </div>
@@ -474,5 +477,7 @@ const applyFilters = () => {
  
   <Maincontent {data} />
 </div>
+</div>
+
 
 
