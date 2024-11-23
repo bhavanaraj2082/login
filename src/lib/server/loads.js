@@ -500,51 +500,33 @@ export async function RelatedApplicationData(pb,urlName){
     return relatedProducts
 }
 
+
 //Checking similar and differences in product details
 export async function DifferentProductData(pb, productId) {
     try {
-        // Fetch the product using the provided productId
         const product = await pb.collection('Products').getFirstListItem(
             `productNumber="${productId}"`, 
             { expand: 'subsubCategory' }
         );
-
-        // Extract the subsubCategory ID
         const subsubCategoryId = product.expand.subsubCategory.id;
-
-        // Fetch the related products using the subsubCategory ID
         const differentProducts = await pb.collection('Products').getList(1, 4, {
             filter: `subsubCategory="${subsubCategoryId}"`,
             expand: 'subCategory,manufacturerName,subsubCategory,Category',
         });
-
-        // Add stock data for each related product
         for (let relatedProduct of differentProducts.items) {
-            console.log("RP-->", relatedProduct.productNumber);
             const stockData = await pb.collection('Stocks').getFirstListItem(
                 `partNumber.productNumber="${relatedProduct.productNumber}"`,
                 { expand: 'partNumber' }
             ).catch(() => {
-                return { stockQuantity: 0 }; // Default stock data if none exists
+                return { stockQuantity: 0 }; 
             });
             relatedProduct.stockQuantity = stockData.stockQuantity || 0;
         }
-
-        console.log("---related", differentProducts.items.length);
         return differentProducts.items;
     } catch (error) {
-        console.error("Error in DifferentProductData:", error);
         throw new Error("Failed to load different product data");
     }
 }
-
-
-
-
-
-
-
-
 
 
 ///////Filter  Based on sub categories
