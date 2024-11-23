@@ -251,7 +251,6 @@ export async function fetchProductName(pb) {
 
 export async function getProductdatas(pb) {
 	const record = await pb.collection('Category').getFullList();
-	console.log("records",record)
 	if(record)
 	{
 		return {records : record}
@@ -531,10 +530,9 @@ export async function DifferentProductData(pb, productId) {
 
 ///////Filter  Based on sub categories
 
-export async function loadProductsubcategory(pb, { SubUrl }) {
-    // console.log("Input SubUrl:", SubUrl);
+export async function loadProductsubcategory(pb, suburl) {
     
-    const response = await pb.collection('SubCategories').getFirstListItem(`urlName="${SubUrl}"`, { expand: 'category' });
+    const response = await pb.collection('SubCategories').getFirstListItem(`urlName="${suburl}"`, { expand: 'category' });
     const subcategoryID = response.id;
 
 

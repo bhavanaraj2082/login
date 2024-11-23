@@ -1,8 +1,8 @@
 <script>
-	import Subcategory from '$lib/components/Product/subcategory.svelte';
-    export let data;
+  import Subcategory from "$lib/components/Product/subcategory.svelte";
+  export let data;
 </script>
 
 <div>
-    <Subcategory {data}/>
+  <Subcategory {data} />
 </div>

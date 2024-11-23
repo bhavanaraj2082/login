@@ -56,7 +56,7 @@
 </script>
 <div class="flex flex-col w-11/12 md:flex-row justify-center items-start shadow-md my-12 rounded-lg max-w-5xl bg-white mx-auto">
     <div class="image-container w-full md:w-1/2 flex items-center justify-center">
-        <img src="/image.png" alt="Signup" class="w-full h-[200px] md:h-[835px] object-cover rounded-t-lg md:rounded-l-lg md:rounded-tr-none" />
+        <img src="/image.jpg" alt="Signup" class="w-full transform scale-x-[-1]  object-center rounded-t-lg md:rounded-l-lg md:rounded-tr-none" />
     </div>
 
     <div class="content w-full md:w-2/3 p-4 md:p-6 flex flex-col justify-center rounded-tr-lg rounded-b-lg md:rounded-l-lg md:rounded-tl-none">

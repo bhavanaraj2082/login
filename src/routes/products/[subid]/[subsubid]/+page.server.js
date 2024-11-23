@@ -1,45 +1,15 @@
-// import {authenticate} from "$lib/server/pocketbase"
-// import { getSubSubCategoryDatas } from "$lib/server/loads"
-
-// export const load = async({params}) =>{
-
-//     const pb = await authenticate();
-//     const data = await getSubSubCategoryDatas(pb,params.subsubid);
-//     return data;
-
-// }
-
-
-
-
-
-import { pb, authenticate } from '$lib/server/pocketbase';  
-
+import {  authenticate } from '$lib/server/pocketbase';  
 import { loadProductsubcategory } from '$lib/server/loads.js';
-// const pb = await authenticate();
+import { getSubSubCategoryDatas } from "$lib/server/loads"
 
-
+const pb = await authenticate();
 
 export async function load({ params }) {
-    const { subsubid } = params;
-    // console.log("************", params);
-    
-    let data = [];
-    
+    let data = [];  
     try {
-      
-        const authResponse = await authenticate();
-        
-    
-        if (authResponse?.status === 400) {
-            return {
-                error: authResponse.error,
-            };
-        }
-
- 
-        const productData = await loadProductsubcategory(pb, { SubUrl: subsubid });
-
+       
+        const subproductdata = await getSubSubCategoryDatas(pb,params.subsubid);
+        const productData = await loadProductsubcategory(pb, params.subsubid);
     
         if (productData && productData.type === 'success' && Array.isArray(productData.records)) {
             data = productData.records; 
@@ -47,12 +17,9 @@ export async function load({ params }) {
             console.error('Unexpected product data structure:', productData);
             data = []; 
         }
-        
-        // console.log("I am from server:", data);
-        
-       
+           
         return {
-            data
+            data,subproductdata
         };
         
     } catch (error) {
