@@ -10,13 +10,13 @@
       categories, each playing a vital role in innovation and transformation.
     </p>
   </div>
-  <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mx-8 sm:mx-0">
     {#each categories as category}
       <div class="bg-white shadow rounded-md overflow-hidden">
         <img
-          src="category/{category.name || "img"}.jpg"
+          src="category/{category.name || "img"}.webp"
           alt="img"
-          class=" w-full h-52  object-cover"
+          class=" w-full h-60 object-center"
         />
         <div class="p-4">
           <a href="/products/{category.urlName}">

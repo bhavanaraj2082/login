@@ -59,7 +59,7 @@
                 id="email"
                 name="email"
                 bind:value={email}
-                class="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-primary-500"
+                class="mt-1 p-2 border-1 border-gray-200 rounded-md w-full focus:ring-0 focus:outline-none focus:border-primary-500"
               />
             </div>
             <div class="flex-1">
@@ -77,7 +77,7 @@
                 id="orderNumber"
                 name="orderNumber"
                 bind:value={orderNumber}
-                class="mt-1 p-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-primary-500"
+                class="mt-1 p-2 border-1 border-gray-200 rounded-md w-full focus:outline-none focus:ring-0 focus:border-primary-500"
               />
             </div>
           </div>
