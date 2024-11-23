@@ -8,6 +8,10 @@
 		isPopupOpen = !isPopupOpen; 
 	};
 
+	const closePopup = () => {
+		isPopupOpen = false;
+	};
+
 	const currentYear = new Date().getFullYear();
 </script>
 <footer class="w-full bg-primary-400 p-6">
@@ -82,7 +86,7 @@
 					<li><a href="/ecom-solutions" class="hover:underline">Chemikart Solutions</a></li>
 					<li><a href="/quick-order" class="hover:underline">Quick Order</a></li>
 					<li><a href="/quotes" class="hover:underline">Quotes</a></li>
-					<li><a href="/returns" class="hover:underline">Retruns & its Status</a></li>
+					<li><a href="/returns" class="hover:underline">Returns & its Status</a></li>
 				</ul>
 			</div>
 		</div>
@@ -106,6 +110,6 @@
 		</div>
 	</div>	
 	{#if isPopupOpen}
-		<CookiesPopup isOpen={isPopupOpen} closePopup={togglePopup} />
+		<CookiesPopup isOpen={isPopupOpen} closePopup={closePopup} />
 	{/if}
 </footer>
