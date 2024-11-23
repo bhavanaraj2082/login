@@ -217,7 +217,7 @@
 						bind:value={searchQuery}
 						name="query"
 						on:input={handleInput}
-						class="w-full px-3 py-3 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-400 placeholder:text-xs"
+						class=" border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 w-full px-3 py-3 text-sm placeholder:text-xs"
 					/>
 					<button
 						class="absolute right-1 top-1/2 transform -translate-y-1/2 bg-primary-400 text-white w-10 h-10 flex items-center justify-center rounded-md"
