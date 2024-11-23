@@ -1,5 +1,5 @@
 <script>
-	import { invalidateAll } from '$app/navigation';
+	//import { invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
     import { createEventDispatcher } from 'svelte';
 
@@ -8,14 +8,6 @@
     export let recordId
     export let contact
 
-    // $: ({
-    //     email,
-    //     firstName,
-    //     lastName,
-    //     cellPhone,
-    //     primaryPhone
-    // } = contact)
-    
     let {
         email,
         firstName,
@@ -26,17 +18,15 @@
 
     let toggleEdit = false
     let togglePass = false
-    //$:console.log(expand);
 
     let errors
     $:console.log(errors);
 	const validateForm = ()=>{
-        //console.log(firstName,cellPhone,primaryPhone);
 		errors={}
             if(!firstName || !/^[A-Za-z\s]+$/.test(firstName)) errors.firstName="First name is required and valid"
             if(!/^[A-Za-z\s]+$/.test(lastName)) errors.lastName="Last name must be valid"
-            if(!primaryPhone || !/^[0-9]+$/.test(primaryPhone)) errors.primaryPhone="Primary phone number is required and valid"
-            if(!cellPhone || !/^[0-9]+$/.test(cellPhone)) errors.cellPhone="Cell phone number is required and valid"
+            if(!primaryPhone || !/^\d{10}$/.test(primaryPhone)) errors.primaryPhone="Primary phone number is required and valid"
+            if(!cellPhone || !/^\d{10}$/.test(cellPhone)) errors.cellPhone="Cell phone number is required and valid"
 		if(Object.keys(errors).length >0){
 			return false
 		}else{
@@ -46,8 +36,6 @@
 
 
     const handleSubmit =({cancel})=>{
-        // validateForm()
-        // cancel()
         if(!validateForm()){
             cancel()
         }
@@ -117,7 +105,10 @@
             </div>
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
                 <button type="submit" class=" w-full rounded py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Submit</button>
-                <button type="button" on:click={()=>toggleEdit = false} class=" w-full rounded py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
+                <button type="button" on:click={()=>{
+                    toggleEdit = false
+                    window.location.reload()
+                    }} class=" w-full rounded py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
             </div>
 
         </form>
