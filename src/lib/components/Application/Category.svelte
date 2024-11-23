@@ -15,7 +15,7 @@
       {#each subcategories as subcategory}
         <Card 
           url={`/applications/${categoryData.url}/${subcategory.url}`}
-          imageSrc="/PopularProductsImg1.jpeg" 
+          imageSrc={subcategory.image}
           altText={subcategory.name} 
           name={subcategory.name} 
           description={subcategory.description} 

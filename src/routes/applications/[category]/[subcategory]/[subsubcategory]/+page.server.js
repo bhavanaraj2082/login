@@ -6,11 +6,15 @@ const pb = await authenticate();
 
 async function findSubcategoryData(categoryData, subcategory, subsubcategory) {
   const subcategoryData = categoryData.subcategories.find(sub => sub.url === subcategory);
-  if (!subcategoryData) return { status: 404, error: 'Subcategory not found' };
+  if (!subcategoryData) {
+    throw { status: 404, error: 'Subcategory not found' };
+  }
 
   if (subsubcategory) {
     const subsubcategoryData = subcategoryData.subsubcategories?.find(subsub => subsub.url === subsubcategory);
-    if (!subsubcategoryData) return { status: 404, error: 'Subsubcategory not found' };
+    if (!subsubcategoryData) {
+      throw { status: 404, error: 'Subsubcategory not found' };
+    }
     return subsubcategoryData;
   }
 
@@ -20,25 +24,20 @@ async function findSubcategoryData(categoryData, subcategory, subsubcategory) {
 export async function load({ params }) {
   try {
     const { category, subcategory, subsubcategory } = params;
-    const relatedProducts = await RelatedApplicationData(pb, subsubcategory);
-    
     const categoryData = data.find(cate => cate.url === category);
     if (!categoryData) {
       return { status: 404, error: 'Category not found' };
     }
 
     const subsubcategoryData = await findSubcategoryData(categoryData, subcategory, subsubcategory);
-    if (subsubcategoryData.status === 404) {
-      return subsubcategoryData; 
-    }
+    const relatedProducts = await RelatedApplicationData(pb, subsubcategoryData.name);
 
     return {
       subsubcategoryData,
-      relatedProducts
+      relatedProducts,
     };
-    
   } catch (error) {
     console.error('Error loading data:', error);
-    return { status: 500, error: 'Internal Server Error' };
+    return { status: error.status || 500, error: error.error || 'Internal Server Error' };
   }
 }

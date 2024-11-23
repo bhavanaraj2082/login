@@ -15,7 +15,7 @@ function findData(items, key, value) {
 export async function load({ params }) {
   try {
     const { category, subcategory } = params;
-    const relatedProducts = await RelatedApplicationData(pb, subcategory);
+
     const categoryData = findData(data, 'url', category);
     if (categoryData.status === 404) return categoryData; 
     
@@ -23,6 +23,10 @@ export async function load({ params }) {
     if (subcategoryData.status === 404) return subcategoryData; 
 
     const subsubcategories = subcategoryData.subsubcategories || [];
+    let relatedProducts = [];
+    if (subsubcategories.length ===0) {
+     relatedProducts = await RelatedApplicationData(pb, subcategoryData.name);
+    }
 
     return {
       categoryData,

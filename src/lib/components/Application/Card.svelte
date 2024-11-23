@@ -4,6 +4,13 @@
     export let name;       
     export let description;  
     export let url;           
+    const getTruncatedDescription = (description, maxWords = 10) => {
+    const words = description.split(' ');
+    if (words.length > maxWords) {
+      return words.slice(0, maxWords).join(' ') + '...';  // Add ellipsis if truncated
+    }
+    return description;
+  };
   </script>
   
   <div class="max-w-xs rounded-lg overflow-hidden shadow-lg bg-white mx-auto">
@@ -15,7 +22,7 @@
       />
       <div class="p-4">
         <h3 class="text-xl font-semibold text-gray-800">{name}</h3>
-        <p class="mt-2 text-gray-600">{description}</p>
+        <p class="mt-2 text-gray-600 ">{getTruncatedDescription(description)}</p>
       </div>
     </a>
   </div>

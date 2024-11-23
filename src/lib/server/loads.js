@@ -492,13 +492,14 @@ export async function RelatedProductData(pb, productId) {
     return relatedProducts.items;
 }
 
-export async function RelatedApplicationData(pb,urlName){
+export async function RelatedApplicationData(pb, name) {
     const relatedProducts = await pb.collection('Products').getList(1, 8, {
-        filter: `subsubCategory.urlName="${urlName}" || subCategory.urlName="${urlName}"`,  
+        filter: `description.Application~"${name}"||subsubCategory.name~"${name}" || subCategory.name~"${name}"`,  
         expand: 'subCategory,manufacturerName,subsubCategory,Category',
     });
-    return relatedProducts
+    return relatedProducts;
 }
+
 
 //Checking similar and differences in product details
 export async function DifferentProductData(pb, productId) {
