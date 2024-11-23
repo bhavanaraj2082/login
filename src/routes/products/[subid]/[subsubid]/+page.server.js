@@ -11,28 +11,57 @@
 
 
 
+
+
 import { pb, authenticate } from '$lib/server/pocketbase';  
 
-import { loadFirstProduct } from '$lib/server/loads.js';
+import { loadProducts } from '$lib/server/loads.js';
+// const pb = await authenticate();
 
 
-export async function load() {
-    const pb = await authenticate();
-    let data =[]
+
+export async function load({ params }) {
+    const { subsubid } = params;
+    // console.log("************", params);
+    
+    let data = [];
+    
     try {
-        const  productsWithNames  = await loadFirstProduct(pb);
-        // console.log('Data fetched from the server:', productsWithNames);
-        data= productsWithNames;
-        return {data}
+      
+        const authResponse = await authenticate();
+        
+    
+        if (authResponse?.status === 400) {
+            return {
+                error: authResponse.error,
+            };
+        }
+
+ 
+        const productData = await loadProducts(pb, { SubUrl: subsubid });
+
+    
+        if (productData && productData.type === 'success' && Array.isArray(productData.records)) {
+            data = productData.records; 
+        } else {
+            console.error('Unexpected product data structure:', productData);
+            data = []; 
+        }
+        
+        // console.log("I am from server:", data);
+        
+       
+        return {
+            data
+        };
+        
+    } catch (error) {
+        console.error("Error loading product data:", error);
+        return {
+            error: "Failed to load product data.",
+        };
     }
-    catch (error) {
-        console.error('Error fetching chemical products:', error);
-        return {data}
-    }
-};
-
-
-
+}
 
 
 

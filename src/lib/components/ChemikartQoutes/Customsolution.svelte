@@ -20,7 +20,7 @@
 	};
 </script>
 
-<div class="sm:ml-10 ml-0">
+<div class="">
 	<h1 class="font-bold text-2xl">Step 1: Select custom solution type</h1>
 	<br />
 	<div class="mt-4 flex flex-col md:flex-row lg:flex-row">
@@ -53,7 +53,7 @@
 		Continue
 	</button>
 </div>
-<ul class="ml-10">
+<ul class="">
 	<li>
 		<h1 class="font-bold text-2xl my-10 text-black text-opacity-25">
 			Step 2: Select custom format

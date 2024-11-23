@@ -3,28 +3,48 @@
   import { onMount } from 'svelte';
   import Icon from '@iconify/svelte';
   import {
-    allProducts,  currentPage, searchQuery, selectedCategories, selectedManufacturers, sortBy, sortOrder,  updateFilteredProducts,
-    updatePage, categories, manufacturers
+    allProducts,  currentPage, searchQuery, selectedCategories, updateCategories,  filteredCategories, selectedManufacturers, sortBy, sortOrder,  updateFilteredProducts,
+    updatePage, categories, manufacturers,getSubCategories
   } from '$lib/stores/filter.js';
 
 
   export let data;
   let products = data?.data || [];  
+  $: updateCategories(products);
+  
+
+  let localSearchQuery = '';
+
+
+  function updateSearchQuery() {
+    searchQuery.set(localSearchQuery);
+  }
+  
+
+
+
 
   function loadCategoriesAndManufacturers(products) {
+    if (!Array.isArray(products)) {
+        console.error('Expected an array, but got:', products);
+        products = []; 
+    }
+
     const categorySet = new Set();
     const manufacturerSet = new Set();
     products.forEach(product => {
-      if (product.categoryName) {
-        categorySet.add(product.categoryName);
-      }
-      if (product.manufacturerName) {
-        manufacturerSet.add(product.manufacturerName);
-      }
+        if (product.subsubCategory) {
+            categorySet.add(product.subsubCategory);
+        }
+        if (product.manufacturerName) {
+            manufacturerSet.add(product.manufacturerName);
+        }
     });
+
     categories.set(Array.from(categorySet));
     manufacturers.set(Array.from(manufacturerSet));
-  }
+}
+
 
   let showFilters = false;
   let showSearchDropdown = false;
@@ -123,7 +143,7 @@
   function changeSorting(sortByField) {
     
     if ($sortBy === sortByField) {
-      sortOrder.set($sortOrder === 'asc' ? 'desc' : 'asc'); // Toggle sort order
+      sortOrder.set($sortOrder === 'asc' ? 'desc' : 'asc'); 
     } else {
       sortBy.set(sortByField);
       sortOrder.set('asc'); 
@@ -146,11 +166,14 @@ const applyFilters = () => {
  
 </script>
 
+
 <div class="   flex flex-col lg:flex-row">
 
   <!-- Mobile View -->
-  <div class="w-full lg:hidden   p-4 mb-4 md:mb-0">
+  <div class="w-full lg:hidden   p-0 mb-4 md:mb-0">
     <div class="border   flex flex-col border-gray-300 rounded-lg md:p-4 w-full">
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
       <h1 class="text-lg mt-4 font-bold mb-2 text-gray-700 flex items-center justify-center" on:click={() => showFilters = !showFilters}>
         <Icon icon="fluent-mdl2:sort-lines" class="mr-2 text-primary-500" />
         <span>Filters</span>
@@ -178,31 +201,60 @@ const applyFilters = () => {
           {/if}
         </div>
 
-    
-        <div class=" ml-4 filter-group border border-gray-300 rounded mb-3">
+        <div class="ml-4 filter-group border border-gray-300 rounded mb-3">
           <div class="flex items-center justify-between">
             <h4 class="font-semibold text-gray-700 mb-1 ml-3 mt-2">Categories</h4>
             <button class="text-primary-500" on:click={() => showCategoryDropdown = !showCategoryDropdown}>
               <Icon icon={showCategoryDropdown ? 'iconamoon:arrow-up-2-duotone' : 'iconamoon:arrow-down-2-duotone'} class="text-3xl" />
             </button>
           </div>
+        
           <div class={showCategoryDropdown ? "space-y-2" : "hidden"}>
-            {#each $categories as category}
-              <label class="flex items-center mb-3 ml-3 text-gray-600">
-                <input
-                  type="checkbox"
-                   class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-2 focus:ring-primary-600" 
-
-                  on:change={() => toggleCategory(category)}
-                  checked={$selectedCategories.has(category)}
-                />
-                <span class="ml-2">{category}</span>
-              </label>
-            {/each}
+        
+            <div class="mb-2 mx-3">
+              <input
+                type="text"
+                bind:value={localSearchQuery}
+                placeholder="Search categories..."
+                on:input={updateSearchQuery}
+                class="w-full px-2 py-2  hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0"
+              />
+            </div>
+        
+            <!-- Category Checkboxes with Scroll -->
+            <div class="max-h-40 overflow-y-auto">
+              {#each $filteredCategories as category}
+                <div class="mb-3">
+                  <label class="flex items-center ml-3 text-gray-600">
+                    <input
+                      type="checkbox"
+                      class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0"
+                      on:change={() => toggleCategory(category)}
+                      checked={$selectedCategories.has(category)}
+                    />
+                    <span class="ml-2">{category}</span>
+                  </label>
+        
+                  <!-- Show subcategories for each category -->
+                  {#if $selectedCategories.has(category)}
+                    <div class="ml-6 mt-2">
+                      {#each getSubCategories(products, category) as subcategory}
+                        <label class="flex items-center mb-2 text-gray-600">
+                          <input
+                            type="checkbox"
+                            class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0"
+                 
+                          />
+                          <span class="ml-2">{subcategory}</span>
+                        </label>
+                      {/each}
+                    </div>
+                  {/if}
+                </div>
+              {/each}
+            </div>
           </div>
         </div>
-
-      
         <div class=" ml-4 filter-group border border-gray-300 rounded mb-3">
           <div class="flex items-center justify-between">
             <h4 class="font-semibold text-gray-700 mb-3 ml-3 mt-2">Manufacturers</h4>
@@ -215,7 +267,7 @@ const applyFilters = () => {
               <label class="flex items-center mb-3 text-gray-600 ml-3 text-sm">
                 <input
                   type="checkbox"
-                  class="form-checkbox rounded text-primary-600 mr-2 mb-1 focus:outline-none focus:ring-2 focus:ring-primary-600" 
+                  class="form-checkbox rounded text-primary-600 mr-2 mb-1 focus:outline-none focus:ring-0" 
                   on:change={() => toggleManufacturer(manufacturer)}
                   checked={$selectedManufacturers.has(manufacturer)}
                 />
@@ -238,7 +290,7 @@ const applyFilters = () => {
               <input
                 type="checkbox"
                 id="sortByProductName"
-                class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-2 focus:ring-primary-600" 
+                class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0" 
                 on:change={() => changeSorting('productName')}
                 checked={$sortBy === 'productName'}
               />
@@ -250,7 +302,7 @@ const applyFilters = () => {
               <input
                 type="checkbox"
                 id="sortByPrice"
-                class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-2 focus:ring-primary-600" 
+                class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0" 
                 on:change={() => changeSorting('price')}
                 checked={$sortBy === 'price'}
               />
@@ -298,7 +350,7 @@ const applyFilters = () => {
           <input
             type="text"
             placeholder="Search..."
-            class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 mb-2 rounded p-2 items-center ml-4 w-10/12 text-sm border border-transparent transition duration-200"
+            class="hover:border-primary-500  border-primary-300 focus:border-primary-400 focus:outline-none focus:ring-0 mb-2 rounded p-2 items-center ml-4 w-10/12 text-sm border  transition duration-200"
             bind:value={$searchQuery}
             on:input={handleSearchChange}
           />
@@ -306,29 +358,61 @@ const applyFilters = () => {
         
         </div>
 
-        <div class="filter-group border border-gray-300 rounded mb-3">
+
+        <div class=" filter-group border border-gray-300 rounded mb-3">
           <div class="flex items-center justify-between">
             <h4 class="font-semibold text-gray-700 mb-1 ml-3 mt-2">Categories</h4>
             <button class="text-primary-500" on:click={() => showCategoryDropdown = !showCategoryDropdown}>
               <Icon icon={showCategoryDropdown ? 'iconamoon:arrow-up-2-duotone' : 'iconamoon:arrow-down-2-duotone'} class="text-3xl" />
             </button>
           </div>
+        
           <div class={showCategoryDropdown ? "space-y-2" : "hidden"}>
-            {#each $categories as category}
-              <label class="flex items-center mb-3 ml-3 text-gray-600">
-                <input
-                  type="checkbox"
-                  class="form-checkbox rounded text-primary-600 mr-2 mb-1 focus:outline-none focus:ring-2 focus:ring-primary-600" 
-                  
-                  on:change={() => toggleCategory(category)}
-                  checked={$selectedCategories.has(category)}
-                />
-                <span class="ml-2">{category}</span>
-              </label>
-            {/each}
+            <!-- Search bar for categories -->
+            <div class="mb-2 mx-3">
+              <input
+                type="text"
+                bind:value={localSearchQuery}
+                placeholder="Search categories..."
+                on:input={updateSearchQuery}
+                class="w-full px-2 py-2  border border-primary-300 rounded hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0"
+              />
+            </div>
+        
+         
+            <div class="max-h-40 overflow-y-auto">
+              {#each $filteredCategories as category}
+                <div class="mb-3">
+                  <label class="flex items-center ml-3 text-gray-600">
+                    <input
+                      type="checkbox"
+                      class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0"
+                      on:change={() => toggleCategory(category)}
+                      checked={$selectedCategories.has(category)}
+                    />
+                    <span class="ml-2">{category}</span>
+                  </label>
+        
+               
+                  {#if $selectedCategories.has(category)}
+                    <div class="ml-6 mt-2">
+                      {#each getSubCategories(products, category) as subcategory}
+                        <label class="flex items-center mb-2 text-gray-600">
+                          <input
+                            type="checkbox"
+                            class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0"
+                 
+                          />
+                          <span class="ml-2">{subcategory}</span>
+                        </label>
+                      {/each}
+                    </div>
+                  {/if}
+                </div>
+              {/each}
+            </div>
           </div>
         </div>
-
         <div class="filter-group border border-gray-300 rounded mb-3">
           <div class="flex items-center justify-between">
             <h4 class="font-semibold text-gray-700 mb-1 ml-3 mt-2">Manufacturers</h4>
@@ -341,7 +425,7 @@ const applyFilters = () => {
               <label class="flex items-center mb-3 text-gray-600 ml-3 text-sm">
                 <input
                   type="checkbox"
-                  class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-2 focus:ring-primary-600" 
+                  class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0" 
                   on:change={() => toggleManufacturer(manufacturer)}
                   checked={$selectedManufacturers.has(manufacturer)}
                 />
@@ -363,7 +447,7 @@ const applyFilters = () => {
               <input
                 type="checkbox"
                 id="sortByProductName"
-                class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-2 focus:ring-primary-600" 
+                class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0" 
                 on:change={() => changeSorting('productName')}
                 checked={$sortBy === 'productName'}
               />
@@ -375,7 +459,7 @@ const applyFilters = () => {
               <input
                 type="checkbox"
                 id="sortByPrice"
-                class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-2 focus:ring-primary-600" 
+                class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0" 
                 on:change={() => changeSorting('price')}
                 checked={$sortBy === 'price'}
               />

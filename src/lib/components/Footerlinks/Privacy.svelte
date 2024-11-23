@@ -3,7 +3,7 @@
 </script>
 
 <div>
-	<h1 class="text-2xl font-bold mb-4 mt-10 text-center">Data Privacy Notice</h1>
+	<h1 class="text-2xl font-bold mb-4 mt-5 text-center">Data Privacy Notice</h1>
 	<p class="font-bold mb-2">Last modified August 6, 2024</p>
 	<p class="text-justify text-sm">
 		We take your data privacy and the protection of your personal data seriously and our data
@@ -13,7 +13,7 @@
 		stricter.
 	</p>
 	<hr class="border-t-1 mt-4 border border-gray-400" />
-	<ol class="list-decimal pl-5 mt-5 space-y-2 text-primary-400">
+	<ol class="list-decimal pl-5 mt-5 space-y-2 text-primary-500">
 		<li><a href="#preamble" class="hover:underline">Preamble</a></li>
 		<li><a href="#general-info" class="hover:underline">General Information</a></li>
 		<li>
@@ -26,26 +26,26 @@
 	</ol>
 	<hr class="border-t-1 mt-4 border border-gray-400 mb-10" />
 
-	<h3 id="preamble" class="text-primary-400 mt-5 text-lg">1. Preamble</h3>
+	<h3 id="preamble" class="text-primary-500 mt-5 text-lg">1. Preamble</h3>
 	<p class="text-sm">{dataPrivacyNotice.dataPrivacyNotice.preamble}</p>
 	<p class="mt-3 text-sm text-justify">
 		{dataPrivacyNotice.dataPrivacyNotice.preamble2}
-		<a href="mailto:privacy@chemikart.com" class="text-primary-400 font-bold"
+		<a href="mailto:privacy@chemikart.com" class="text-primary-500 font-bold"
 			>privacy@chemikart.com</a
 		> or the other contact details provided below.
 	</p>
 
-	<h3 id="general-info" class="text-primary-400 mt-5 text-lg">2. General Information</h3>
+	<h3 id="general-info" class="text-primary-500 mt-5 text-lg">2. General Information</h3>
 	<p class=" text-sm text-justify">{dataPrivacyNotice.dataPrivacyNotice.general_information}</p>
-	<h4 class="font-bold text-black mt-2 mb-2">2.1 Controller</h4>
+	<h4 class="font-bold text-gray-700 mt-2 mb-2">2.1 Controller</h4>
 	<p class="text-justify text-sm">{dataPrivacyNotice.dataPrivacyNotice.controller}</p>
-	<h4 class="font-bold text-black mt-2 mb-2">2.2 Data Privacy Officer</h4>
+	<h4 class="font-bold text-gray-700 mt-2 mb-2">2.2 Data Privacy Officer</h4>
 	<p class="text-justify text-sm">
 		We have appointed a Data Privacy Officer. You can contact this person and the team at any time:
 	</p>
 	<p class="text-justify text-sm">
 		Data Privacy Officer
-		<a href="mailto:privacy@chemikart.com" class="text-primary-400 font-bold mt-2"
+		<a href="mailto:privacy@chemikart.com" class="text-primary-500 font-bold mt-2"
 			>privacy@chemikart.com</a
 		>
 	</p>
@@ -54,14 +54,14 @@
 		in our Data Privacy Portal.
 	</p>
 
-	<h3 id="processing-activities" class="text-primary-400 mt-5 text-lg">
+	<h3 id="processing-activities" class="text-primary-500 mt-5 text-lg">
 		3. The Processing Activities in Detail
 	</h3>
 	<p class="text-sm">
 		This section explains the different data processing activities in which we process your personal
 		data.
 	</p>
-	<h4 class="font-bold text-black mt-2 mb-2">
+	<h4 class="font-bold text-gray-700 mt-2 mb-2">
 		3.1 Processing of Your Personal Data in Various Contexts
 	</h4>
 	<p class="mt-3 text-sm text-justify">
@@ -80,7 +80,7 @@
 		{dataPrivacyNotice.dataPrivacyNotice.processing_activities5}
 	</p>
 
-	<h3 id="data-retention" class="text-primary-400 mt-5 text-lg">4. Data Retention</h3>
+	<h3 id="data-retention" class="text-primary-500 mt-5 text-lg">4. Data Retention</h3>
 	<p class="mt-2 text-sm text-justify">{dataPrivacyNotice.dataPrivacyNotice.data_retention}</p>
 	<p class="mt-3 text-sm text-justify">
 		For more information about how long we store cookies for, please see above.
@@ -88,6 +88,6 @@
 	<p class="mt-3 text-sm text-justify">{dataPrivacyNotice.dataPrivacyNotice.data_retention2}</p>
 	<p class="mt-3 text-sm text-justify">{dataPrivacyNotice.dataPrivacyNotice.data_retention3}</p>
 
-	<h3 id="recipients" class="text-primary-400 mt-5 text-lg">5. Recipients of Personal Data</h3>
+	<h3 id="recipients" class="text-primary-500 mt-5 text-lg">5. Recipients of Personal Data</h3>
 	<p class="mt-2 text-sm text-justify">{dataPrivacyNotice.dataPrivacyNotice.personal_data}</p>
 </div>

@@ -1,8 +1,7 @@
 <script>
 import { goto } from '$app/navigation';
-//import { invalidateAll} from '$app/navigation'
+
 export let data
-console.log(data);
 const {success,message} = data
 </script>
 

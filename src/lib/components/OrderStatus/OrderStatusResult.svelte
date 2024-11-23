@@ -302,7 +302,7 @@
               <div class="flex justify-between">
                 <p class="text-gray-500 text-sm font-medium">Subtotal:</p>
                 <p class="text-heading text-sm font-semibold">
-                  &#8377; {order.totalprice.toFixed(3) || "0.00"}
+                  &#8377; {order.subtotalprice.toFixed(3) || "0.00"}
                 </p>
               </div>
               <div class="flex justify-between mb-2">

@@ -323,7 +323,7 @@ export async function getorderstatusdata(pb, orderid) {
 }
 
 export async function getProfileDetails(pb,userEmail){
-	console.log('load',userEmail);
+	//console.log('load',userEmail);
 	const records = await pb.collection('ChemiDashProfile').getFirstListItem(`email="${userEmail}"`,{expand:'userId'})
 	//console.log("records",records);
 	return {profileData:records}
@@ -397,7 +397,12 @@ export async function getReturnSavedData(pb) {
 	return { records: records };
 }
 //returns loads ends
-
+// Myfavourites loads starts
+export async function getFavSavedData(pb,userProfileid) {
+	const records = await pb.collection('Myfavourites').getFirstListItem(`userProfileId.email='${userProfileid}'`)
+	return  records ;
+}
+//Myfavourites loads ends
 
 
 
@@ -485,4 +490,100 @@ export async function RelatedProductData(pb, productId) {
         relatedProduct.stockQuantity = stockData.stockQuantity || 0;  
     }
     return relatedProducts.items;
+}
+
+export async function RelatedApplicationData(pb,urlName){
+    const relatedProducts = await pb.collection('Products').getList(1, 8, {
+        filter: `subsubCategory.urlName="${urlName}" || subCategory.urlName="${urlName}"`,  
+        expand: 'subCategory,manufacturerName,subsubCategory,Category',
+    });
+    return relatedProducts
+}
+
+//Checking similar and differences in product details
+export async function DifferentProductData(pb, productId) {
+    try {
+        // Fetch the product using the provided productId
+        const product = await pb.collection('Products').getFirstListItem(
+            `productNumber="${productId}"`, 
+            { expand: 'subsubCategory' }
+        );
+
+        // Extract the subsubCategory ID
+        const subsubCategoryId = product.expand.subsubCategory.id;
+
+        // Fetch the related products using the subsubCategory ID
+        const differentProducts = await pb.collection('Products').getList(1, 4, {
+            filter: `subsubCategory="${subsubCategoryId}"`,
+            expand: 'subCategory,manufacturerName,subsubCategory,Category',
+        });
+
+        // Add stock data for each related product
+        for (let relatedProduct of differentProducts.items) {
+            console.log("RP-->", relatedProduct.productNumber);
+            const stockData = await pb.collection('Stocks').getFirstListItem(
+                `partNumber.productNumber="${relatedProduct.productNumber}"`,
+                { expand: 'partNumber' }
+            ).catch(() => {
+                return { stockQuantity: 0 }; // Default stock data if none exists
+            });
+            relatedProduct.stockQuantity = stockData.stockQuantity || 0;
+        }
+
+        console.log("---related", differentProducts.items.length);
+        return differentProducts.items;
+    } catch (error) {
+        console.error("Error in DifferentProductData:", error);
+        throw new Error("Failed to load different product data");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+///////Filter  Based on sub categories
+
+export async function loadProducts(pb, { SubUrl }) {
+    // console.log("Input SubUrl:", SubUrl);
+    
+    const response = await pb.collection('SubCategories').getFirstListItem(`urlName="${SubUrl}"`, { expand: 'category' });
+    const subcategoryID = response.id;
+
+
+    const stockRecords = await pb.collection('Products').getList(1, 300, {
+        filter: `subCategory="${subcategoryID}"`,
+        expand: 'subCategory,Category,manufacturerName,subsubCategory',
+    });
+
+    
+    const stocks = await pb.collection('Stocks').getList(1, 1000, { 
+        expand: 'partNumber',
+    });
+
+
+    const productNames = stockRecords.items.map(product => {
+        const stock = stocks.items.find(stockItem => 
+            stockItem.expand.partNumber?.id === product.id
+        );
+
+        return {
+            ...product,
+            manufacturerName: product.expand?.manufacturerName?.name || 'Unknown Manufacturer',
+            Category: product.expand?.Category?.name || 'Unknown Category',
+            subsubCategory: product.expand?.subsubCategory?.name || 'Unknown Category',
+            stockQuantity: stock ? stock.stockQuantity : 0,  
+        };
+    });
+
+   // console.log("I am product from load",productNames);
+    return {
+        type: "success",
+        records: productNames,  
+    };
 }

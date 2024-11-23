@@ -1,9 +1,9 @@
 <script>
     import { enhance,applyAction } from '$app/forms';
+    import { toast } from 'svelte-sonner';
 
     let email = '';
     let password = '';
-    let successMessage = '';
 
     let errors= {}
 
@@ -29,12 +29,15 @@
         return async ({result,update})=>{
             console.log(result);
            if(result.type === "redirect"){
-           await update()
-            await applyAction(result)
+                await update()
+                await applyAction(result)
            }
             if(result.type === "success"){
-                successMessage = result.data
-                setTimeout(()=>successMessage = "",5000)
+                if(result.data.success){
+					toast.success('',{description:result.data.message})
+				}else{
+					toast.error('',{description:result.data.message})
+				}
             }
         }
     }
@@ -55,7 +58,7 @@
             
             <form  method="POST" action="?/login"
             use:enhance={handleFormSubmit}>
-                <label for="email" class="mb-2 text-gray-600">Enter your email or username</label>
+                <label for="email" class="mb-2 text-gray-600">Enter your email</label>
                 <input
                     type="text"
                     name="email"
@@ -95,12 +98,5 @@
     <div class="hidden md:flex md:w-1/2 flex-grow">
         <img src="/image-1.png" alt="Sign In" class="object-cover w-full h-full rounded-r-lg" /> 
     </div>
-    {#if successMessage.length !== 0}
-    <div class="fixed w-full bottom-5">
-        <div class=" w-11/12 mx-auto sm:w-96 md:w-2/4 lg:w-2/5 h-10 md:h-14 border rounded-sm text-xs md:text-sm font-medium flex items-center justify-center 
-        {successMessage.success ? " text-green-600 bg-green-100 border-green-600" : "text-red-600 bg-red-100 border-red-600"}">
-            {successMessage.message}
-        </div>
-    </div>
-    {/if}
+    
 </div>

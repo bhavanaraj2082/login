@@ -32,7 +32,7 @@
           <div class="flex flex-col justify-between items-start ml-3 sm:ml-0 sm:items-center">
             <p class="font-medium text-sm text-gray-600">Ext.price</p>
             <p class="font-medium text-sm text-gray-700">
-              &#8377; <span>{product.totalPrice || '--'}</span>
+              &#8377; <span>{(product.extendedPrice).toFixed(3) || '--'}</span>
             </p>
           </div>
 
@@ -67,7 +67,7 @@
                   icon="pajamas:canceled-circle"
                   class="text-primary-500 text-xl"
                 />
-                <h3 class="font-semibold text-sm text-gray-500">cancelled</h3>
+                <h3 class="font-semibold text-sm text-gray-500">Cancelled</h3>
               </div>
             {/if}
           </div>

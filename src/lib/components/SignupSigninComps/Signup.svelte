@@ -1,7 +1,7 @@
 <script>
     import { enhance } from '$app/forms';
+    import { toast } from 'svelte-sonner';
 
-    let successMessage="";
     let username = '';
     let email = '';
     let language = '';
@@ -43,13 +43,12 @@
         return async({result,update})=>{
             console.log("result",result);
             if(result.type === "success"){
-                successMessage = result.data
                 if(result.data.success){
                     await update()
-                    setTimeout(()=>successMessage = "",5000)
-                }else{
-                    setTimeout(()=>successMessage = "",5000)
-                }
+					toast.success('',{description:result.data.message})
+				}else{
+					toast.error('',{description:result.data.message})
+				}
             }
         }
         
@@ -169,11 +168,5 @@
 
             <button type="submit" class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-400 transition duration-200">Create Account</button>
         </form>
-        {#if successMessage.length !== 0}
-        <div class=" fixed w-11/12 mx-auto right-1 sm:right-5 bottom-5 text-center  sm:w-96 md:w-2/4 lg:w-2/5 h-10 md:h-14 border rounded-sm text-xs md:text-sm font-medium flex items-center justify-center 
-        {successMessage.success ? " text-green-600 bg-green-100 border-green-600" : "text-red-600 bg-red-100 border-red-600"}">
-            {successMessage.message}
-        </div>
-        {/if}
     </div>
 </div>
