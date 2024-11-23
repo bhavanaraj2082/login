@@ -163,29 +163,46 @@ function toggleRotation(index) {
   };
 </script>
 
-<div class="p-4 max-w-6xl mx-auto">
+<div class="p-4 max-w-6xl mx-auto bg-white">
   <h1 class="text-4xl font-bold mb-8">Documents</h1>
   
   <div class="w-full inline-flex rounded-md mb-8">
     <!-- Navigation Menu (Tabs) -->
-    <nav aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto">
+    <!-- <nav aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto">
       {#each tabs as tab}
       <div class="inline-block w-full">
         <button
           on:click={() => (activeTab = tab.name)} 
           class="w-full py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300
             {activeTab === tab.name 
-              ? 'bg-gray-50 text-primary-300 font-bold'
+              ? 'bg-white text-primary-500 font-bold'
               : 'bg-primary-100 text-black'}
-            hover:bg-gray-50 hover:text-primary-300 whitespace-nowrap">
+            hover:bg-white hover:text-primary-500 whitespace-nowrap">
           {tab.name}
         </button>
-        <!-- Underline -->
         <div class="h-0.5 bg-primary-300 w-3/4 ml-9
           {activeTab === tab.name ? 'w-3/4' : 'w-0'} transition-all duration-300 ease-in-out"></div>
       </div>
       {/each}
+    </nav> -->
+    <nav aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto">
+      {#each tabs as tab}
+        <div class="inline-block w-full">
+          <button
+            on:click={() => (activeTab = tab.name)} 
+            class="w-full py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300
+              {activeTab === tab.name 
+                ? 'bg-white text-primary-500 font-bold'
+                : 'bg-primary-100 text-black'}
+              hover:bg-white hover:text-primary-500 whitespace-nowrap">
+            {tab.name}
+          </button>
+          <div class="h-0.5 bg-primary-300 
+            {activeTab === tab.name ? 'w-full' : 'w-0'} transition-all duration-300 ease-in-out"></div>
+        </div>
+      {/each}
     </nav>
+    
   </div>
   <div class="flex flex-col lg:flex-row"> 
     <div class="w-full lg:w-7/12 p-2"> 

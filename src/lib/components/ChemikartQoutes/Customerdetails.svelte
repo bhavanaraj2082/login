@@ -244,31 +244,31 @@
 	};
 </script>
 
-<div class="my-10 flex justify-between">
+<div class="py-10 bg-white  flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 1: Select custom solution type</h1>
 	<button type="button" class="font-semibold text-primary-500" on:click={tog()}>Edit</button>
 </div>
 <hr />
-<div class="my-10 flex justify-between">
+<div class="py-10 bg-white  flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 2: Select custom format</h1>
 	<button type="button" class="font-semibold text-primary-500" on:click={tog1()}>Edit</button>
 </div>
 <hr />
-<div class="my-10 flex justify-between">
+<div class="py-10 bg-white  flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 3: Configure custom solution</h1>
 	<button type="button" class="font-semibold text-primary-500" on:click={tog2()}>Edit</button>
 </div>
 <hr />
-<div class="my-10 flex justify-between">
+<div class="py-10 bg-white  flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 4: Additional notes</h1>
 	<button type="button" class="font-semibold text-primary-500" on:click={tog3()}>Edit</button>
 </div>
 <hr />
-<div class="">
-	<h1 class="font-bold text-2xl my-10">Step 5: Customer details</h1>
+<div class="bg-white ">
+	<h1 class="font-bold text-2xl py-10">Step 5: Customer details</h1>
 	<hr />
-	<h1 class="font-semibold my-5 ">Log in to auto fill</h1>
-	<div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-1 md:w-3/4 lg:w-1/2 sm:grid-cols-6">
+	<h1 class="font-semibold py-5 text-primary-500 ">Log in to auto fill</h1>
+	<div class="grid grid-cols-1 gap-x-6 gap-y-1 md:w-3/4 lg:w-1/2 sm:grid-cols-6">
 		<div class="sm:col-span-2  sm:col-start-1">
 			<label for="title" class="text-sm">Title</label>
 		  <div class="mt-2">
@@ -394,7 +394,7 @@
 	</div>
 </div>
 <hr />
-<div class="my-10 flex justify-between">
+<div class="py-10 bg-white  flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 6: Delivery information</h1>
 </div>
 <hr />

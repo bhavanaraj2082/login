@@ -15,32 +15,32 @@
 		}
 	};
 </script>
-<div class="my-10 flex justify-between">
+<div class="py-10 flex justify-between bg-white ">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">
 		Step 1: Select custom solution type
 	</h1>
 	<button class="font-semibold text-primary-500" on:click={tog()}>Edit</button>
 </div>
 <hr />
-<div class="my-10 flex justify-between">
+<div class="py-10 flex justify-between bg-white ">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">
 		Step 2: Select custom format
 	</h1>
 	<button class="font-semibold text-primary-500" on:click={tog1()}>Edit</button>
 </div>
 <hr />
-<div class="my-10 flex justify-between">
+<div class=" py-10 flex justify-between bg-white ">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">
 		Step 3: Configure custom solution
 	</h1>
 	<button class="font-semibold text-primary-500" on:click={tog2()}>Edit</button>
 </div>
 <hr />
-<div class="">
-	<h1 class="font-bold text-2xl my-10">Step 4: Additional notes</h1>
+<div class="bg-white ">
+	<h1 class="font-bold text-2xl py-10 bg-white ">Step 4: Additional notes</h1>
 	<hr />
-	<div class="ml-10 my-10">
-	<h1 class="font-semibold my-5">Further details or requests</h1>
+	<div class="ml-20 bg-white ">
+	<h1 class="font-semibold py-5 text-primary-500">Further details or requests</h1>
 	<textarea
 		rows="6"
 		class="w-80 p-2  border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500
@@ -51,7 +51,7 @@
 	></textarea>
 	<br />
 	{#if showRequiredMessage}
-		<p class="text-red-500 text-sm font-medium">This field is required.</p>
+		<p class="text-red-500 text-sm font-medium ml-1">This field is required.</p>
 	{/if}
 	<button
 		type="button"
@@ -61,13 +61,13 @@
 </div>
 </div>
 <hr />
-<div class="my-10 flex justify-between">
+<div class="py-10 bg-white  flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">
 		Step 5: Customer details
 	</h1>
 </div>
 <hr />
-<div class="my-10 flex justify-between">
+<div class="py-10 bg-white  flex justify-between">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">
 		Step 6: Delivery information
 	</h1>

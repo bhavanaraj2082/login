@@ -22,17 +22,15 @@
 	};
 </script>
 
-<div class="my-10 flex justify-between">
+<div class="py-10 flex justify-between bg-white">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 1: Select custom solution type</h1>
 	<button type="button" class="font-semibold text-primary-500" on:click={tog()}>Edit</button>
 </div>
 <hr />
-<br />
-<br />
-<div class="">
-	<h1 class="font-bold text-2xl">Step 2: Select custom format</h1>
+<div class="bg-white">
+	<h1 class="font-bold text-2xl py-10">Step 2: Select custom format</h1>
 	<br />
-	<div class="mt-4 flex flex-col md:flex-row lg:flex-row">
+	<div class="flex flex-col md:flex-row lg:flex-row">
 		<button
 			type="button"
 			class="box-content md:mx-5 lg:mx-10 h-28 md:w-56 lg:w-56 p-4 border-2 transition duration-200 ease-in-out flex items-center justify-center
@@ -85,19 +83,19 @@
 	</button>
 </div>
 <hr />
-<div class=" my-10">
+<div class=" bg-white py-10">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 3: Configure custom solution</h1>
 </div>
 <hr />
-<div class="my-10">
+<div class="bg-white py-10">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 4: Additional notes</h1>
 </div>
 <hr />
-<div class="my-10">
+<div class="bg-white py-10">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 5: Customer details</h1>
 </div>
 <hr />
-<div class="my-10">
+<div class="bg-white py-10">
 	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 6: Delivery information</h1>
 </div>
 <hr />

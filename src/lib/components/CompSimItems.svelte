@@ -27,7 +27,7 @@ function truncateText(text, maxLength = 50) {
     }
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
-let qualityLevels = {};
+    let qualityLevels = {};
     let formCounts = {};
     let mpCounts = {};
     let sustainabilityCounts = {};
@@ -141,7 +141,10 @@ let qualityLevels = {};
     if (existingProduct) {
       existingProduct.quantity += product.quantity;
     } else {
-      cart.push(product);
+      cart.push({
+        ...product,
+        priceSize: { price: selectedPrice.price, size: selectedPrice.size },
+      });
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -151,7 +154,7 @@ let qualityLevels = {};
     setTimeout(() => {
       showModal = false;
     }, 1000);
-  }
+}
 
   let popupQuantity = 1;
 
@@ -179,11 +182,11 @@ let qualityLevels = {};
     }
 </script>
 
-<div class="mx-10 mb-10">
+<div class="mx-0 lg:mx-10 mb-10">
   <div class="flex justify-between items-center mb-4">
-    <div class="text-md font-semibold ">Compare Similar Items</div>
-    <div class="flex items-center space-x-2 ">
-      <div class="text-md font-semibold">Show Difference</div>
+    <div class="font-bold text-primary-500 ml-9 lg:ml-0">Compare Similar Items</div>
+    <div class="flex items-center space-x-2 mr-9 lg:mr-0">
+      <div class="font-bold text-primary-500">Show Difference</div>
       <label class="relative inline-flex items-center cursor-pointer">
         <input
           type="checkbox"
@@ -213,7 +216,7 @@ let qualityLevels = {};
         {#each DifferentProductData as product}
         <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-1">
           <div
-            class="flex flex-col w-full bg-gray-50 rounded-lg overflow-hidden"
+            class="flex flex-col w-full bg-white rounded-lg overflow-hidden"
           >
             <div class="flex items-center p-3">
               <img
@@ -257,33 +260,35 @@ let qualityLevels = {};
               </button>
             </div>
           </div>
-          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && qualityLevels[product.properties.QualityLevel] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>              
+          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && qualityLevels[product.properties.QualityLevel] === 1 ? 'bg-primary-200' : 'bg-white'}`}>              
             <span class="font-semibold text-xs ml-3 mb-1">Quality Level:</span>
             <p class="font-normal text-xs mr-3 mb-1 text-black">{product.properties.QualityLevel || '-'}</p>
           </div>
-          <hr class="border-t-2 mr-3 ml-3">
-          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && formCounts[product.properties.Form] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>
+          <hr class="border-t-2 w-full">
+          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && formCounts[product.properties.Form] === 1 ? 'bg-primary-200' : 'bg-white'}`}>
             <span class="font-semibold text-xs ml-3 mb-1">Form:</span>
-            <p class="font-normal text-xs mr-3 mb-1 text-black">{product.properties.Form || '-'}</p>
+            <p class="font-normal text-xs mr-3 mb-1 text-black">
+              {truncateText(product.properties.Form, 10) || '-'}
+            </p>
           </div>  
-          <hr class="border-t-2 mr-3 ml-3">
-          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && mpCounts[product.properties.Mp] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>
+          <hr class="border-t-2 w-full">
+          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && mpCounts[product.properties.Mp] === 1 ? 'bg-primary-200' : 'bg-white'}`}>
             <span class="font-semibold text-xs ml-3 mb-1">Storage temp:</span>
             <p class="font-normal text-xs mr-3 mb-1 text-black">{truncateText(product.properties.Mp,10) || '-'}</p>
           </div>
-          <hr class="border-t-2 mr-3 ml-3">
-          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && sustainabilityCounts[product.properties.Sustainability] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>
+          <hr class="border-t-2 w-full">
+          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && sustainabilityCounts[product.properties.Sustainability] === 1 ? 'bg-primary-200' : 'bg-white'}`}>
             <span class="font-semibold text-xs ml-3 mb-1">Application(s):</span>
             <p class="font-normal text-xs mr-3 mb-1 text-black">
               {truncateText(product.properties.Sustainability, 10) || '-'}
           </p>
           </div>
-          <hr class="border-t-2 mr-3 ml-3">
-          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && descriptionCounts[product.prodDesc] === 1 ? 'bg-blue-100' : 'bg-gray-50'}`}>
+          <hr class="border-t-2 w-full">
+          <div class={`flex justify-between items-center w-full mt-5 ${showDifference && descriptionCounts[product.prodDesc] === 1 ? 'bg-primary-200' : 'bg-white'}`}>
             <span class="font-semibold text-xs ml-3 mb-1">Description:</span>
-            <p class="font-normal text-xs mr-3 mb-1 text-black">{truncateText(product.prodDesc, 15) || '-'}</p>
+            <p class="font-normal text-xs mr-3 mb-1 text-black">{truncateText(product.prodDesc, 10) || '-'}</p>
           </div> 
-          <hr class="border-t-2 mr-3 ml-3 mb-10">
+          <hr class="border-t-2 w-full mb-10">
         </div>
       {/each}
         </div>
@@ -292,7 +297,7 @@ let qualityLevels = {};
         <Icon class="text-4xl" icon="ion:chevron-forward" />
       </button>
     </div>
-    <div class="flex justify-center mt-4 relative">
+    <div class="flex justify-center mt-4 relative lg:hidden">
       {#each Array(totalSlides).fill(0) as _, slideIndex}
         <button
           on:click={() => (currentIndex = slideIndex)}
@@ -302,6 +307,9 @@ let qualityLevels = {};
     </div>
   </div>
 </div>
+
+
+
 
 {#if showModal}
   <div
@@ -351,7 +359,7 @@ let qualityLevels = {};
       <div class="pl-2">
         <h1 class="font-semibold">Select Size</h1>
         <div class="flex gap-3 mt-3 flex-wrap">
-          {#each selectedProduct.price as { price, size }, index}
+          {#each selectedProduct.priceSize as { price, size }, index}
             <button
               class="focus:bg-primary-400 hover:scale-105 focus:text-white border px-3 py-1 rounded-full {selectedPriceIndex ===
               index
@@ -380,7 +388,7 @@ let qualityLevels = {};
             on:submit|preventDefault={() =>
               addToCart({
                 ...selectedProduct,
-                price: selectedPrice.price,
+                priceSize: { price: selectedPrice.price, size: selectedPrice.size },
                 quantity: popupQuantity,
               })}
           >

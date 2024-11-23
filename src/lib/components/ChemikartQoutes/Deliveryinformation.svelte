@@ -233,66 +233,66 @@
 	  }
   }
 	  </script>
-  <div class="my-10 flex justify-between">
+  <div class="py-10 bg-white  flex justify-between">
 		  <h1 class="font-bold text-2xl text-black text-opacity-25">
 			  Step 1: Select custom solution type 
 		  </h1>
 		  <button type="button" class="font-semibold text-primary-500" on:click={tog()}>Edit</button>
 	  </div>
 	  <hr>
-	  <div class="my-10 flex justify-between">
+	  <div class="py-10 bg-white  flex justify-between">
 		  <h1 class="font-bold text-2xl text-black text-opacity-25">
 			  Step 2: Select custom format 
 		  </h1>
 		  <button type="button" class="font-semibold text-primary-500" on:click={tog1()}>Edit</button>
 	  </div>
 	  <hr>
-	  <div class="my-10 flex justify-between">
+	  <div class="py-10 bg-white  flex justify-between">
 		  <h1 class="font-bold text-2xl text-black text-opacity-25">
 			  Step 3: Configure custom solution 
 		  </h1>
 		  <button type="button" class="font-semibold text-primary-500" on:click={tog2()}>Edit</button>
 	  </div>
 	  <hr>
-	  <div class="my-10 flex justify-between">
+	  <div class="py-10 bg-white  flex justify-between">
 		  <h1 class="font-bold text-2xl text-black text-opacity-25">
 			  Step 4: Additional notes
 		  </h1>
 		  <button type="button" class="font-semibold text-primary-500" on:click={tog3()}>Edit</button>
 	  </div>
 	  <hr>
-	  <div class="my-10 flex justify-between">
+	  <div class="py-10 bg-white  flex justify-between">
 		  <h1 class="font-bold text-2xl text-black text-opacity-25">
 			  Step 5: Customer details
 		  </h1>
 		  <button type="button" class="font-semibold text-primary-500" on:click={tog4()}>Edit</button>
 	  </div>
 	  <hr>
-	  <div class="">
+	  <div class="bg-white ">
 		  <div>
-			  <h1 class="font-bold text-2xl my-10"> Step 6: Delivery information
+			  <h1 class="font-bold text-2xl py-10"> Step 6: Delivery information
 			  </h1>
 			  <hr>
-			  <h1 class="font-semibold my-5">Address</h1>
+			  <h1 class="font-semibold py-5 text-primary-500 ">Address</h1>
 			  <div class="">
 				  <label for="" class="text-sm">Address line 1 <span class="text-primary-500"> *</span> </label>
 				  <br>
 				  <input type="text" name="Address" bind:value={$Delivery.Address1} id="" 
-				  class="block rounded-md w-2/5 lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+				  class="block rounded-md  md:w-3/4 w-full lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 				  />
 			  </div>
-			  <div class="mt-2 mb-2">
+			  <div class="mt-2 mb-2 ">
 				  <label for="" class="text-sm">Address line 2 <span class="text-primary-500"> *</span> </label>
 				  <br>
 				  <input type="text" name="Address2" bind:value={$Delivery.Address2} id="" 
-				  class="block rounded-md w-2/5 lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+				  class="block rounded-md md:w-3/4 w-full lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 				  />
 			  </div>
-			  <div class="mt-2 mb-2">
+			  <div class="mt-2 mb-2 ">
 				  <label for="" class="text-sm">Country <span class="text-primary-500"> *</span> </label>
 				  <br>
 				  <select 
-				  class="block rounded-md w-2/5 lg:w-1/2 p-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
+				  class="block rounded-md md:w-3/4 w-full lg:w-1/2 p-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
 				  name="Country" id="country" bind:value={$Delivery.Country}>
 					  <option value="" disabled selected>Select your country</option>
 					  {#each countries as country}
@@ -300,24 +300,24 @@
 					  {/each}
 				  </select>
 			  </div>
-			  <div class="mt-2 mb-2">
+			  <div class="mt-2 mb-2 ">
 				  <label for="" class="text-sm ">County</label><br>
 				  <input type="text" 
-				  class="block rounded-md w-2/5 lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+				  class="block rounded-md  md:w-3/4 w-full lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 				  name="County" id="" bind:value={$Delivery.County}/>
 			  </div>
-		  <div class="mt-2 mb-2">
+		  <div class="mt-2 mb-2 ">
 				  <label for="" class="text-sm">City <span class="text-primary-500"> *</span> </label>
 				  <br>
 				  <input type="text" name="City" id="" 
-				  class="block rounded-md w-2/5 lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+				  class="block rounded-md  md:w-3/4 w-full lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 				  bind:value={$Delivery.City} />
 			  </div>
-			  <div class="mt-2 mb-2">
+			  <div class="mt-2 mb-2 ">
 				  <label for="text1" class="text-sm">Post code <span class="text-primary-500"> *</span> </label>
 				  <br>
 				  <input type="text" name="postcode" id="text1" 
-				  class="block rounded-md w-2/5 lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+				  class="block rounded-md  md:w-3/4 w-full lg:w-1/2 p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 				  bind:value={$Delivery.Post}/>
 				  {#if pincodeError}
 				  <p class="text-red-500 text-sm font-medium">{pincodeError}</p>
@@ -325,17 +325,16 @@
 			  </div>
 
 		{#if errorMessage}
-		  <div class="text-red-500 text-sm font-medium">{errorMessage}</div> <!-- Display the error message -->
+		  <div class="text-red-500 text-sm font-medium ">{errorMessage}</div> <!-- Display the error message -->
 	  {/if}
 		  </div>
-		  <div class="flex space-x-4 mt-5">
+		  <div class="flex space-x-4 mt-5 ">
 			  <button
 			  type="button"
 			  on:click={sub}
 			  class="text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-500 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
 			  >Save & View Summary</button
-		  >
-		  
+		  >		  
 		  </div>
 	  </div>
 	  <hr>

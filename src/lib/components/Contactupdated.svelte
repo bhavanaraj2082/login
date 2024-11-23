@@ -44,8 +44,8 @@
     }
 	}
 </script>
-<section class="my-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto px-2 sm:p-0 font-roboto">
-	<div class="w-full md:w-4/5 bg-white border border-gray-300 rounded-lg">
+<section class="my-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto px-2 sm:p-0 font-roboto bg-white">
+	<div class="w-full md:w-4/5  border border-gray-300 rounded-lg shadow-lg">
 		<h1 class="text-2xl font-bold bg-primary-500 text-white py-4 pl-4 rounded-t-lg">
 			Get in Touch with Us
 		</h1>
