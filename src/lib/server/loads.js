@@ -263,43 +263,24 @@ export async function getProductdatas(pb) {
 
 
 export async function getSubCategoryDatas(pb, subid) {
-
     const records = await pb.collection('SubCategories').getFullList({
-        expand: 'category'  
+        expand: 'category', 
+        filter: `category.urlName="${subid}"` 
     });
-
-    if (records) {
-        const filteredRecords = records.filter(record => 
-            record.expand.category.urlName === subid
-        );
-        if (filteredRecords.length > 0) {
-            return { records: filteredRecords };
-        } else {
-            return { error: "No SubCategories found matching the urlName" };
-        }
-    } else {
-        return { error: "SubCategories not found" };
-    }
+    return records.length > 0 
+        ? { records }
+        : { error: "No SubCategories found matching the urlName" };
 }
 
+
 export async function getSubSubCategoryDatas(pb, subsubid) {
-
     const records = await pb.collection('SubSubCategories').getFullList({
-        expand: 'subCategory,category'  
+        expand: 'subCategory,category',
+        filter: `subCategory.urlName="${subsubid}"` 
     });
-
-    if (records) {
-        const filteredRecords = records.filter(record => 
-            record.expand.subCategory.urlName === subsubid
-        );
-        if (filteredRecords.length > 0) {
-            return { records: filteredRecords };
-        } else {
-            return { error: "No SubSubCategories found matching the urlName" };
-        }
-    } else {
-        return { error: "SubSubCategories not found" };
-    }
+    return records.length > 0 
+        ? { records }
+        : { error: "No SubSubCategories found matching the urlName" };
 }
 
 export async function popularProducts(pb) {
