@@ -2,7 +2,7 @@
     import Condition from '$lib/data/FooterLinks/condition.json'
     </script>
     <div>
-        <h1 class="text-2xl font-bold mb-4 mt-5 text-center">General Terms and Conditions of Sale
+        <h1 class="text-2xl font-bold mb-3 mt-6 text-center">General Terms and Conditions of Sale
         </h1>
         <p class="mt-2 font-bold">Rev. April 2021</p>
         <ol class="list-decimal pl-5 mt-5 space-y-2 text-primary-500">

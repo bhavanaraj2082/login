@@ -3,7 +3,7 @@
   </script>
   
   <div>
-    <h1 class="text-2xl font-bold mb-4 mt-10 text-center">Terms of Use</h1>
+    <h1 class="text-2xl font-bold mb-4 mt-5 text-center">Terms of Use</h1>
     <p class=" leading-relaxed text-sm lg:ml-5">
         {termsOfUseData.TermsOfUse.Content}
     </p>

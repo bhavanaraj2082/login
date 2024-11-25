@@ -1,4 +1,4 @@
-<div class="w-11/12 mx-auto max-w-7xl mt-10">
+<div class="w-11/12 mx-auto max-w-7xl mt-10 mb-2">
   <div class="w-full mx-auto grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
     <div class="flex justify-center lg:justify-start">
       <img 
