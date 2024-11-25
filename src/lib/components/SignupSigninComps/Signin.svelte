@@ -46,7 +46,7 @@
 
 <div class="flex flex-col md:flex-row max-w-3xl shadow-lg rounded-lg mx-auto h-auto md:h-auto my-14">
     <div class="md:hidden w-full h-1/2 mx-auto flex justify-center"> 
-        <img src="/image.jpg" alt="Sign In" class="object-cover transform scale-x-[-1] w-full h-full rounded" />
+        <img src="/image.jpg" alt="Sign In" class="object-cover h-full rounded" />
     </div>
 
     <div class="flex flex-col items-center w-full md:w-1/2 rounded-l md:rounded-l-lg p-8 bg-white">

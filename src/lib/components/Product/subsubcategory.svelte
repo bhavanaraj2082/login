@@ -5,12 +5,7 @@
   const categoryName = subcategories[0].expand.category.name;
   const subCategoryName = subcategories[0].expand.subCategory.name;
 
-  console.log("categoryName:", categoryName);
-  console.log("subCategoryName:", subCategoryName);
-
   import subcategorydatas from "$lib/data/subcategorydatas.json";
-  console.log("--->", subcategorydatas);
-
   const findContent = (categoryName, subCategoryName) => {
     const category = subcategorydatas.find(
       (category) => category.category.name.toLowerCase() === categoryName.toLowerCase()
