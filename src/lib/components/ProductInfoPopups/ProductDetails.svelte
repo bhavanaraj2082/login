@@ -6,6 +6,7 @@
   import Imageinfo from './Imageinfo.svelte';
   import Icon from '@iconify/svelte';
   import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
+  import {authedUser} from '$lib/stores/mainStores.js';
 
   let quantity = 1;
   let showDropdown = false;
@@ -26,10 +27,15 @@
   let notificationTimeout;
   let index = 0;
   let isLiked = false;
-  let isFavorited = [];
-  let selectedIndex = 0;
   let favoriteNotification = '';
   let favoriteStatus = '';
+  $: isLoggedIn = !!$authedUser.email;
+  let authedEmail= $authedUser.email;
+  let email= '';
+  let password= '';
+  let loginSuccessmsg='';
+  let loginSuccesstype='';
+  let showLikedPopup = false;
   // console.log("Data Records:", data);
 
 function handleThumbnailClick(selectedIndex) {
@@ -91,6 +97,10 @@ function toggleModal() {
       .catch((err) => {
         console.error("Failed to copy text: ", err);
       });
+  }
+
+  function toggleLikedPopup() {
+    showLikedPopup = !showLikedPopup;
   }
 
   export function addToCart(product, index) {
@@ -180,35 +190,11 @@ function toggleModal() {
         <span class="text-primary-400 font-semibold">{product.productNumber}</span>
         <div class="flex">
           <!-- <button on:click={toggleDetailsPopup} class="text-primary-400 font-semibold cursor-pointer">Details</button> -->
-          <form action="?/favorite" method="POST" class="text-end"
-            use:enhance={() => {
-              return async({ result }) => {
-              let status='';
-                      console.log(result); 
-                      status = result.type;
-            // console.log("success/error type:",status); 
-            // console.log("success/error message:result.data.message=",result.data.message);
-            favoriteNotification = result.data.message;
-            favoriteStatus=status;
-              }; 
-            }}
-            >
-              <input type="hidden" name="id" value={product.productId} />
-              <input type="hidden" name="imgUrl" value={product.imageSrc} />
-              <input type="hidden" name="priceSize"/>
-              <input type="hidden" name="price" value={product.priceSize[index].price} />
-              <input type="hidden" name="size" value={product.priceSize[index].size} />
-              <input type="hidden" name="productDesc" value={product.prodDesc} />
-              <input type="hidden" name="productName" value={product.productName} />
-              <input type="hidden" name="productNumber" value={product.productNumber} />
-              <input type="hidden" name="quantity" value={product.quantity || 1} />
-              <input type="hidden" name="stock" value={product.stockQuantity} />
-              <button type="submit" class="btn btn-primary">
+              <button type="submit" class="btn btn-primary" on:click={toggleLikedPopup}>
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <i class={`fa-heart ml-10 ${isLiked ? 'fa-solid text-orange-500' : 'fa-regular text-primary-400'} text-end`} on:click={toggleLike}></i>
               </button>
-            </form>
           {#if showDetailsPopup}
           <DetailsPopup {data} closePopup={toggleDetailsPopup} />  
           {/if}
@@ -479,6 +465,85 @@ function toggleModal() {
 <div class="fixed bottom-4 left-4 p-4 bg-primary-400 text-white rounded-md shadow-lg z-50">
     {cartNotification}
 </div>
+{/if}
+
+{#if loginSuccesstype!=='success'}
+{#if showLikedPopup}
+<div class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-80 z-50">
+  <div class="bg-white rounded-lg p-6 w-11/12 max-w-sm md:max-w-lg lg:max-w-xl relative">
+      <button on:click={toggleLikedPopup} class="absolute top-2 right-2 text-gray-600 hover:text-gray-900" aria-label="Close">
+          <Icon icon="mdi:close" class="text-xl hover:text-primary-400" />
+      </button>
+      <form method="POST" action="?/favorite" 
+      use:enhance={() => {
+        return async({ result }) => {
+        let status='';
+                console.log(result); 
+                status = result.type;
+      console.log("success/error type:",status); 
+      console.log("success/error message:result.data.message=",result.data.message);
+      loginSuccessmsg=result.data.message;
+      loginSuccesstype=result.data.type;
+      if (loginSuccesstype === 'success') {
+              showLikedPopup = false;
+              email='';password='';
+            }
+        }; 
+    }}
+      >
+      <h2 class="text-xl  text-center font-bold mb-1">Please Login or Register to continue</h2>
+      {#if loginSuccesstype==='success'}
+      <p class="text-green-400 text-sm text-center">{loginSuccessmsg}</p>
+      {:else}
+      <p class="text-red-400 text-sm text-center">{loginSuccessmsg}</p>
+      {/if}
+      <input type="hidden" name="id" value={product.productId} />
+      <input type="hidden" name="imgUrl" value={product.imageSrc} />
+      <input type="hidden" name="priceSize"/>
+      <input type="hidden" name="authedEmail" value={authedEmail} />
+      <input type="hidden" name="price" value={product.priceSize[index].price} />
+      <input type="hidden" name="size" value={product.priceSize[index].size} />
+      <input type="hidden" name="productDesc" value={product.prodDesc} />
+      <input type="hidden" name="productName" value={product.productName} />
+      <input type="hidden" name="productNumber" value={product.productNumber} />
+      <input type="hidden" name="quantity" value={product.quantity || 1} />
+      <input type="hidden" name="stock" value={product.stockQuantity} />
+      <label for="email" class="block font-bold text-gray-600 mb-2">Email</label>
+      <input
+          name="email"
+          type="email"
+          placeholder="Enter your email"
+          class="border border-gray-300 p-2 rounded w-full"
+          bind:value={email}
+      />
+      <label for="password" class="block font-bold text-gray-600 mb-2 mt-1">Password</label>
+      <input
+          name="password"
+          type="password"
+          placeholder="Enter your password"
+          class="border border-gray-300 p-2 rounded w-full"
+          bind:value={password}
+      />
+      <button class="bg-primary-400 text-white p-2 rounded w-full mt-4 mb-4">Login</button>
+    </form>
+      <div class="flex justify-between">
+          <a href="/" class="text-primary-400" on:click|preventDefault={toggleLikedPopup}>Continue browsing</a>
+          <a href="/signup" class="text-primary-400">Register</a>
+      </div>
+  </div>
+</div>
+{/if}
+{:else}
+{#if showLikedPopup}
+<div class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-80 z-50">
+  <div class="bg-white rounded-lg p-6 relative">
+      <button on:click={toggleLikedPopup} class="absolute top-2 right-2 text-gray-600 hover:text-gray-900" aria-label="Close">
+          <Icon icon="mdi:close" class="text-xl text-primary-400" />
+      </button>
+      <h1 class="text-primary-400 font-semibold text-center p-5">Added to favorites!</h1>
+  </div>
+</div>
+{/if}
 {/if}
 {/each}
 

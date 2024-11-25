@@ -1,6 +1,6 @@
 import { pb, authenticate } from '$lib/server/pocketbase.js'; 
 import { loadProductsInfo } from '$lib/server/loads.js';
-import { checkavailabilityproduct } from '$lib/server/actions.js';
+import { checkavailabilityproduct,favorite } from '$lib/server/actions.js';
 import { RelatedProductData } from '$lib/server/loads';
 import { DifferentProductData } from '$lib/server/loads';
 
@@ -56,7 +56,7 @@ export const actions = {
 
     try {
       const formData = Object.fromEntries(await request.formData());
-      console.log("Formatted Data:", formData);
+      // console.log("Formatted Data:", formData);
       const record = await checkavailabilityproduct(formData, pb);
       return {
         record: record,
@@ -66,6 +66,23 @@ export const actions = {
       return {
         type: "error",
         message: "An error occurred while processing the request.",
+      };
+    }
+  },
+
+  favorite: async ({ request }) => {
+    const favdata = Object.fromEntries(await request.formData());
+    // console.log("Form Data Received:", favdata);
+    const {productDesc, id, imgUrl,productName,productNumber,priceSize,quantity,stock,size,price,} = favdata;
+    const dataforfavorite = {productDesc,id,imgUrl,productName,productNumber,priceSize,quantity,stock,size,price,};
+    try {
+      const result = await favorite(favdata,pb);
+      return result; 
+    } catch (error) {
+      console.error("Error adding to favorites:", error.message);
+      return {
+        type: 'error',
+        message:'Invalid Credentials!',
       };
     }
   },
