@@ -548,3 +548,42 @@ export async function loadProductsubcategory(pb, suburl) {
         records: productNames,  
     };
 }
+
+export async function getSearchData(pb, search) {
+    const components = await getMatchedComponents(pb, search);
+    const categories = await getMatchedCategories(pb, search);
+    const subcategories = await getMatchedSubCategories(pb, search);
+
+    const allData = {
+        components,
+        categories,
+        subcategories
+    };
+
+    return allData;
+}
+
+async function getMatchedComponents(pb, search) {
+    const components = await pb.collection('Products').getList(1, 6, {
+        filter: `productName~"${search}" || productNumber~"${search}"|| prodDesc~"${search}"`,
+        expand: 'Category,subCategory'
+    });
+    return components.items;
+}
+
+async function getMatchedCategories(pb, search) {
+    const categories = await pb.collection('Category').getList(1, 6, {
+        filter: `name~"${search}"`,
+    });
+    return categories.items;
+}
+
+async function getMatchedSubCategories(pb, search) {
+    const subcategories = await pb.collection('SubCategories').getList(1, 6, {
+        expand: 'category',
+        filter: `name~"${search}"`,
+    });
+    return subcategories.items;
+}
+
+

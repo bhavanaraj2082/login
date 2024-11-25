@@ -5,6 +5,7 @@
 	import Cartrightside from '$lib/components/HeaderDropDownCart/Cartrightside.svelte';
 	import menusdata from '$lib/data/chemicalProducts.json';
 	import { enhance } from "$app/forms";
+	import {goto} from '$app/navigation'
 
 	let menus = [];
 	let submenuLeaveTimeoutId;
@@ -93,7 +94,7 @@
 	function handleInput(event) {
 		searchQuery = event.target.value;
 		isLoading=true
-		debounce(handleSearchSubmit, 800);
+		debounce(handleSearchSubmit, 300);
 	}
 
 	function handleData() {
@@ -104,6 +105,11 @@
 			searchResults=result.data.responce.items;
 		};
 	}
+	const handleSubmitBtn = () => {
+    if (searchQuery !== '') {
+        goto('/search?query=' + searchQuery);
+		searchQuery=""
+    }}
 
 </script>
 
@@ -221,7 +227,7 @@
 					/>
 					<button
 						class="absolute right-1 top-1/2 transform -translate-y-1/2 bg-primary-400 text-white w-10 h-10 flex items-center justify-center rounded-md"
-				
+						on:click={handleSubmitBtn}
 					>
 						<Icon icon="feather:search" style="width: 25px; height: 25px;" />
 					</button>
@@ -335,7 +341,7 @@
 								</div>
 								{#if submenu.subSubmenus && submenu.subSubmenus.length > 0}
 									<div
-										class={`mt-0 ml-0 border-gray-300 border-l h-full absolute left-full rounded-sm pb-2 top-0 z-30 w-full bg-white shadow-sm transition-opacity duration-200 ${activeSubmenu === submenu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+										class={`mt-0 ml-0 border-gray-300 border-l h-full overflow-y-scroll scroll absolute left-full rounded-sm pb-2 top-0 z-30 w-full bg-white shadow-sm transition-opacity duration-200 ${activeSubmenu === submenu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
 										role="menu">
 										<ul>
 											{#each submenu.subSubmenus as subSubmenu}
