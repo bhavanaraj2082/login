@@ -8,7 +8,7 @@
     <img
         src={product?.imageSrc}
         alt={product?.productName}
-        class="w-48 h-48 mx-auto object-contain rounded-t-lg mb-4"
+        class="w-7/12 h-4/6 m-6 mx-auto object-contain rounded-t-lg mb-4"
     />
     <div class="flex-1 space-y-2">
         <h3 class="text-xl font-semibold">{product?.productName}</h3>
