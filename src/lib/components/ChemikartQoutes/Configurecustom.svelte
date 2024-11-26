@@ -465,7 +465,7 @@ function updateCell(rowIndex, cellIndex, event) {
 					</button>
 					<button
 						type="button"
-						class="box-content mt-4 mx-5 h-20 w-24 p-3 border-2 ml-20
+						class="box-content mt-4 mx-5 h-20 w-24 p-3 border-2 md:ml-20 lg:ml-10
 					{selectedFormat === 'ISO/IEC 17025' ? 'border-primary-500' : ''}"
 						on:click={() => {
 							setquality("ISO/IEC 17025");

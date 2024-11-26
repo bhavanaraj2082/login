@@ -105,84 +105,84 @@ function truncateText(text, maxLength = 50) {
   let showCartMessage = false;
 
   function openModal(product) {
-    selectedProduct = product;
-    selectedPrice = selectedProduct.price[0];
-    selectedPriceIndex = 0;
-    showModal = true;
-    showCartMessage = false;
-  }
-
-  function closeModal() {
-    showModal = false;
-  }
-
-  function selectPrice(index, size) {
-    const filtered = selectedProduct.price.find((price) => price.size === size);
-    selectedPrice = filtered;
-    selectedPriceIndex = index;
-  }
-
-  function getCart() {
-    if (browser) {
-      const cart = localStorage.getItem("cart");
-      return cart ? JSON.parse(cart) : [];
+      selectedProduct = product;
+      selectedPrice = selectedProduct.priceSize[0];
+      selectedPriceIndex = 0;
+      showModal = true;
+      showCartMessage = false;
     }
-    return [];
-  }
-
-  function addToCart(product) {
-    if (!browser) return;
-
-    const cart = getCart();
-    const existingProduct = cart.find(
-      (item) => item.productNumber === product.partNumber
-    );
-
-    if (existingProduct) {
-      existingProduct.quantity += product.quantity;
-    } else {
-      cart.push({
-        ...product,
-        priceSize: { price: selectedPrice.price, size: selectedPrice.size },
-      });
-    }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-
-    popupQuantity = 1;
-    showCartMessage = true;
-    setTimeout(() => {
+  
+    function closeModal() {
       showModal = false;
-    }, 1000);
-}
-
-  let popupQuantity = 1;
-
-  function decrementPopupQuantity() {
-    if (popupQuantity > 1) {
-      popupQuantity--;
     }
-  }
 
-  function incrementPopupQuantity() {
-    popupQuantity++;
-  }
-
-  function handlePopupInput(event) {
-    const value = parseInt(event.target.value, 10);
-    if (value >= 1) {
-      popupQuantity = value;
-    } else {
+    function selectPrice(index, size) {
+      const filtered = selectedProduct.priceSize.find((price) => price.size === size);
+      selectedPrice = filtered;
+      selectedPriceIndex = index;
+    }
+  
+    function getCart() {
+      if (browser) {
+        const cart = localStorage.getItem("cart");
+        return cart ? JSON.parse(cart) : [];
+      }
+      return [];
+    }
+  
+    function addToCart(product) {
+      if (!browser) return;
+  
+      const cart = getCart();
+      const existingProduct = cart.find(
+        (item) => item.productNumber === product.partNumber
+      );
+  
+      if (existingProduct) {
+        existingProduct.quantity += product.quantity;
+      } else {
+        cart.push({
+          ...product,
+          priceSize: { price: selectedPrice.price, size: selectedPrice.size },
+        });
+      }
+  
+      localStorage.setItem("cart", JSON.stringify(cart));
+  
       popupQuantity = 1;
-    }
+      showCartMessage = true;
+      setTimeout(() => {
+        showModal = false;
+      }, 1000);
   }
+  
+    let popupQuantity = 1;
+  
+    function decrementPopupQuantity() {
+      if (popupQuantity > 1) {
+        popupQuantity--;
+      }
+    }
+  
+    function incrementPopupQuantity() {
+      popupQuantity++;
+    }
+  
+    function handlePopupInput(event) {
+      const value = parseInt(event.target.value, 10);
+      if (value >= 1) {
+        popupQuantity = value;
+      } else {
+        popupQuantity = 1;
+      }
+    }
   
   function toggleDifference() {
       showDifference = !showDifference;
     }
 </script>
 
-<div class="mx-0 lg:mx-10 mb-10">
+<div class="mx-0 lg:mx-16 mb-10">
   <div class="flex justify-between items-center mb-4">
     <div class="font-bold text-primary-500 ml-9 lg:ml-0">Compare Similar Items</div>
     <div class="flex items-center space-x-2 mr-9 lg:mr-0">
@@ -240,24 +240,24 @@ function truncateText(text, maxLength = 50) {
             </div>
             <div class="flex justify-center">
               <button
-                on:click={() =>
-                  openModal({
-                    image: product.image,
-                    brand: product.manufacturerName,
-                    partNumber: product.productNumber,
-                    name: product.productName,
-                    price: product.priceSize,
-                    description: product.prodDesc,
-                    id: product.productId,
-                    stock : product.stock,
-                    category : product.category,
-                    subCategory : product.subCategory,
-                    subsubCategory : product.subsubCategory,
-                  })}
-                class="w-11/12 max-w-xs text-primary-500 py-2 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition p-2 mb-4"
-              >
-                View Price & Availability
-              </button>
+              on:click={() =>
+                openModal({
+                  image: product.image,
+                  brand: product.manufacturerName,
+                  partNumber: product.productNumber,
+                  name: product.productName,
+                  priceSize: product.priceSize,
+                  description: product.prodDesc,
+                  id: product.productId,
+                  stock: product.stock,
+                  category: product.category,
+                  subCategory: product.subCategory,
+                  subsubCategory: product.subsubCategory,
+                })}
+              class="w-11/12 max-w-xs text-primary-500 py-2 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition p-2 mb-4"
+            >
+              View Price & Availability
+            </button>
             </div>
           </div>
           <div class={`flex justify-between items-center w-full mt-5 ${showDifference && qualityLevels[product.properties.QualityLevel] === 1 ? 'bg-primary-200' : 'bg-white'}`}>              

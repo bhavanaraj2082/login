@@ -397,6 +397,35 @@ export async function deleteProduct(productId) {
 	}
 }
 
+/*****************Add to Favorite*****************/
+export async function favorite(favdata, pb) {
+	const email = favdata.email;
+	const password = favdata.password;
+	const login = await pb.collection('Register').authWithPassword(email, password);
+	// if(login){ return { type: 'success',message: 'Login successful!',};}
+
+	const authedEmail = favdata.authedEmail;
+	const record = await pb.collection('ChemiDashProfile').getFirstListItem(`email="${authedEmail}"`);
+	let userProfileId = record.id; 
+
+	const existingRecord = await pb.collection('Myfavourites').getFirstListItem(`userProfileId="${userProfileId}"`);
+	const newFavorite = {
+		productDesc: favdata.productDesc,
+		id: favdata.id,
+		imgUrl: favdata.imgUrl,
+		productName: favdata.productName,
+		productNumber: favdata.productNumber,
+		priceSize: { price: favdata.price, size: favdata.size },
+		quantity: favdata.quantity,
+		stock: favdata.stock,
+	};
+	const updatedFavorites = Array.isArray(existingRecord.favorite)
+		? [...existingRecord.favorite, newFavorite]
+		: [newFavorite];
+	await pb.collection('Myfavourites').update(existingRecord.id, { favorite: updatedFavorites });
+	return {type: 'success',message: 'Added to favorites!',};
+}
+
 //*******SignUP*********/
 export async function register(pb,data,cookies) {
 	//console.log(data);
@@ -415,6 +444,7 @@ export async function register(pb,data,cookies) {
         sameSite: 'strict',
         maxAge: 60 * 60 * 24, 
     });
+	const favorite = await pb.collection("Myfavourites").create({ userProfileId: profile.id });
 	//console.log("user",user);
 	//console.log("updatedUser",updatedUser);
 	 const res = await pb.collection('Register').requestVerification(user.email)
