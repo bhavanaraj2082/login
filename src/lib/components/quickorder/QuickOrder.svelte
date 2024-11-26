@@ -3,7 +3,7 @@
 import Icon from "@iconify/svelte";
 import {enhance} from "$app/forms"
 import { authedUser } from '$lib/stores/mainStores.js';
-import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
+import { cartState } from '$lib/stores/cartStores.js';
 let uploadedRows=[];
 
 import * as XLSX from "xlsx";
@@ -391,8 +391,8 @@ function addToCart(rowsToProcess) {
       // Save the updated cart to localStorage
       localStorage.setItem('cart', JSON.stringify(currentCart));
 
-      // Update the `viewedCart` store
-      viewedCart.set(currentCart);
+      // Update the `cartState` store
+      cartState.set(currentCart);
 
       // Calculate the total number of distinct items in the cart
       const totalItems = currentCart.length;

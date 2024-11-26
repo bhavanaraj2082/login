@@ -5,7 +5,7 @@
   import Properties from './Properties.svelte';
   import Imageinfo from './Imageinfo.svelte';
   import Icon from '@iconify/svelte';
-  import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
+  import { cartState } from '$lib/stores/cartStores.js';
   import {authedUser} from '$lib/stores/mainStores.js';
 
   let quantity = 1;
@@ -117,7 +117,7 @@ function toggleModal() {
     },
     quantity: quantity,
   };
-  viewedCart.update((cart) => {
+  cartState.update((cart) => {
     const exactMatchIndex = cart.findIndex(
       (item) =>
         item.priceSize.size === cartProduct.priceSize.size &&

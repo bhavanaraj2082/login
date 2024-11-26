@@ -4,18 +4,18 @@ const initialCart = typeof window !== 'undefined' && localStorage.getItem('cart'
 		? JSON.parse(localStorage.getItem('cart'))
 		: [];
 
-export const viewedCart = writable(initialCart);
+export const cartState = writable(initialCart);
 
 
 if (typeof window !== 'undefined') {
-	viewedCart.subscribe((items) => {
+	cartState.subscribe((items) => {
 		localStorage.setItem('cart', JSON.stringify(items));
 	});
 }
 
-export const updateCartState = (cartState)=>{
-    viewedCart.update((cart)=>{
-        cart = cartState
-        return cart
+export const updateCartState = (cart)=>{
+    cartState.update((crt)=>{
+        crt = cart
+        return crt
     })
 }
