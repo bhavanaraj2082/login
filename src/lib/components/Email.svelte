@@ -24,16 +24,16 @@
   }
 </script>
 
-<div class="flex flex-col p-14 items-center justify-center bg-white">
+<div class="flex flex-col p-14 items-center justify-center bg-gray-50">
   <h1 class="text-2xl sm:text-4xl font-bold text-gray-800 text-center md:pt-20">Ready To Get Started</h1>
   <p class="text-md sm:text-lg text-gray-500 mt-2 text-center">To Join Our Community</p>
   <form on:submit|preventDefault={handleSubmit} class="mt-6 w-full max-w-lg mx-auto">
-    <div class="relative flex w-full">
+    <div class="relative flex w-full max-w-lg mx-auto">
       <input
         type="email"
         bind:value={email}
         placeholder="Enter your email"
-        class="flex-grow px-4 py-2 text-gray-600 border border-primary-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"
+        class="w-full px-4 sm:px-4 py-2  text-gray-600 border border-primary-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"
         required
       />
       <button

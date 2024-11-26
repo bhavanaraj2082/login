@@ -78,7 +78,7 @@
 <div class="lg:w-10/12 mx-auto px-4">
 
 <div class="flex flex-col   md:flex-row lg:p-6 min-h-screen">
-    <aside class="w-full lg:w-1/3 lg:p-4">
+    <aside class="{currentSection === 'Conditions' ? 'w-full lg:w-5/12' : 'lg:w-1/3'} w-full lg:w-1/3 md:p-4">
         {#if currentSection === 'siteTerms'}
             <h1 class="text-3xl font-semibold mb-8">Site Use Terms</h1> 
         {:else if currentSection === 'productLicense'}
@@ -125,7 +125,7 @@
         <hr class="border-t-1 border-gray-400" />
     </aside> 
 
-    <div class="w-full md:w-3/4 lg:p-4">
+    <div class="w-full md:w-3/4 py-4 md:p-4 lg:py-0">
         {#if currentSection === 'siteTerms'}
             <Terms />
         {:else if currentSection === 'productLicense'}
