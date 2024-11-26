@@ -183,8 +183,8 @@ const printPDF = () => {
 	const removeItem = (size,id) => {
 		cartItems = cartItems.filter((item) =>!(item.id === id && item.priceSize.size === size));
 		console.log("remove item",cartItems);
-		// updateCartState(cartItems)
-		// calculateTotals();
+		updateCartState(cartItems)
+		calculateTotals();
 	};
 
 	const emptyCart = () => {

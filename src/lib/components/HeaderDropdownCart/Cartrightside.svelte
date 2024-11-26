@@ -53,7 +53,7 @@
         updateCartState(cartItems)
 	  }
 	};
-  
+
 	const decrementQuantity = (size,id) => {
 	  const index = cartItems.findIndex((item) => item.priceSize.size === size && item.id === id);
 	  if (index !== -1 && cartItems[index].quantity > 1) {
