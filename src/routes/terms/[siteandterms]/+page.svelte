@@ -1,4 +1,10 @@
 <script>
-    import FooterLinks from "../../../lib/components/FooterLinks.svelte";
+    import Terms from '$lib/components/Footerlinks/SiteTerms.svelte';
+    import ProductLicense from '$lib/components/Footerlinks/Condition.svelte';
+    import Privacynotice from '$lib/components/Footerlinks/Privacy.svelte';
+    import Conditions from '$lib/components/Footerlinks/ProductLicence.svelte'; 
 </script>
-<FooterLinks />
+<Terms />
+<Conditions />
+<ProductLicense />
+<Privacynotice />
