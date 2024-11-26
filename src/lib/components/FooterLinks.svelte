@@ -1,140 +1,105 @@
 <script>
-    import { onMount } from 'svelte';  
+    import { page } from '$app/stores';  
     import Terms from '$lib/components/Footerlinks/SiteTerms.svelte';
     import ProductLicense from '$lib/components/Footerlinks/Condition.svelte';
     import Privacynotice from '$lib/components/Footerlinks/Privacy.svelte';
     import Conditions from '$lib/components/Footerlinks/ProductLicence.svelte'; 
 
-    let currentSection = 'siteTerms';  
-   
+    let contentComponent;
+    $: {
+        if ($page.url.pathname === '/terms/site-and-terms') {
+            contentComponent = Terms;
+        } else if ($page.url.pathname === '/terms/product-license') {
+            contentComponent = ProductLicense;
+        } else if ($page.url.pathname === '/terms/privacy-notice') {
+            contentComponent = Privacynotice;
+        } else if ($page.url.pathname === '/terms/conditions') {
+            contentComponent = Conditions;
+        }
+    }
+
     function showSection(section) {
-        currentSection = section;
         let url = '';  
-      
+        let component;
+
         if (section === 'siteTerms') {
             url = '/terms/site-and-terms'; 
+            component = Terms;
         } else if (section === 'productLicense') {
             url = '/terms/product-license';
-        } else if (section === 'Privacynotice') {
+            component = ProductLicense;
+        } else if (section === 'privacynotice') {
             url = '/terms/privacy-notice';
-        } else if (section === 'Conditions') {
+            component = Privacynotice;
+        } else if (section === 'conditions') {
             url = '/terms/conditions';
-        } else if (section === 'CopyRightConsent') {
-            url = '/terms/copy-consent'; 
+            component = Conditions;
         }
 
         if (typeof window !== 'undefined') {
-            window.history.pushState({}, '', url);  
+            window.history.pushState({}, '', url);
         }
+
+        contentComponent = component;
     }
-
-    function handlePopState() {
-        const path = window.location.pathname;
-        if (path === '/terms/site-and-terms') {
-            currentSection = 'siteTerms';
-        } else if (path === '/terms/product-license') {
-            currentSection = 'productLicense';
-        } else if (path === '/terms/privacy-notice') {
-            currentSection = 'Privacynotice';
-        } else if (path === '/terms/conditions') {
-            currentSection = 'Conditions';
-        } else if (path === '/terms/copy-consent') {
-            currentSection = 'CopyRightConsent'; 
-        }
-    }
-
-    onMount(() => {
-        if (typeof window !== 'undefined') {
-            window.addEventListener('popstate', handlePopState);
-
-            const path = window.location.pathname;
-            if (path === '/terms') {
-              
-                window.history.replaceState({}, '', '/terms/site-and-terms');
-                currentSection = 'siteTerms';  
-            } else if (path === '/terms/site-and-terms') {
-                currentSection = 'siteTerms';
-            } else if (path === '/terms/product-license') {
-                currentSection = 'productLicense';
-            } else if (path === '/terms/privacy-notice') {
-                currentSection = 'Privacynotice';
-            } else if (path === '/terms/conditions') {
-                currentSection = 'Conditions';
-            } else {
-                currentSection = 'siteTerms';  
-            }
-        }
-    });
-
-    import { onDestroy } from 'svelte';
-    onDestroy(() => {
-        if (typeof window !== 'undefined') {
-            window.removeEventListener('popstate', handlePopState);
-        }
-    });
 </script>
 
+<div class="flex flex-col md:flex-row lg:p-6 min-h-screen">
+    <aside class="w-full lg:w-1/3 lg:p-4">
+        <h1 class="text-3xl font-semibold mb-8">
+            {#if contentComponent === Terms}
+                Site Use Terms
+            {:else if contentComponent === ProductLicense}
+                Product Licenses        
+            {:else if contentComponent === Privacynotice}
+                Privacy Notice
+            {:else if contentComponent === Conditions}
+                General Terms        
+            {/if}
+        </h1>
 
-<div class="lg:w-10/12 mx-auto px-4">
+        <hr class="border-t-1 border-gray-400 mb-2 mt-12" />
 
-<div class="flex flex-col   md:flex-row lg:p-6 min-h-screen">
-    <aside class="{currentSection === 'Conditions' ? 'w-full lg:w-5/12' : 'lg:w-1/3'} w-full lg:w-1/3 md:p-4">
-        {#if currentSection === 'siteTerms'}
-            <h1 class="text-3xl font-semibold mb-8">Site Use Terms</h1> 
-        {:else if currentSection === 'productLicense'}
-            <h1 class="text-3xl font-semibold mb-8">Product License</h1> 
-        {:else if currentSection === 'Privacynotice'}
-            <h1 class="text-3xl font-semibold mb-8">Privacy Notice</h1> 
-        {:else if currentSection === 'Conditions'}
-        <h2 class="text-3xl font-semibold items-start  justify-start mb-4 whitespace-nowrap">General Terms of Sale</h2>
-
-        {/if}
-
-        <hr class="border-t-1 border-gray-400   mb-2 mt-12" />
-
+        <!-- Sidebar Buttons -->
         <button 
-            class={`text-xl font-semibold mb-2 ${currentSection === 'siteTerms' ? 'text-primary-500' : 'text-black'}`} 
+            class={`text-xl font-semibold mb-2 ${contentComponent === Terms ? 'text-primary-400' : 'text-black'}`} 
             on:click={() => showSection('siteTerms')}
         >
             Site Use Terms
         </button>
         <hr class="border-t-1 border-gray-400" />
-       
+        
         <button 
-            class={`text-xl mt-2 font-semibold mb-2 ${currentSection === 'productLicense' ? 'text-primary-500' : 'text-black'}`} 
-            on:click={() => showSection('productLicense')}
+            class={`text-xl mt-2 font-semibold mb-2 ${contentComponent === Conditions ? 'text-primary-400' : 'text-black'}`} 
+            on:click={() => showSection('conditions')}
         >
-            Product License
+            General Terms of Sale  
         </button>
         <hr class="border-t-1 border-gray-400" />
     
         <button 
-            class={`text-xl mt-2 font-semibold mb-2 ${currentSection === 'Privacynotice' ? 'text-primary-500' : 'text-black'}`} 
-            on:click={() => showSection('Privacynotice')}
+            class={`text-xl mt-2 font-semibold mb-2 ${contentComponent === Privacynotice ? 'text-primary-400' : 'text-black'}`} 
+            on:click={() => showSection('privacynotice')}
         >
             Privacy Notice
         </button>
         <hr class="border-t-1 border-gray-400" />
         
         <button 
-            class={`text-xl mt-2 font-semibold mb-2 ${currentSection === 'Conditions' ? 'text-primary-500' : 'text-black'}`} 
-            on:click={() => showSection('Conditions')}
+            class={`text-xl mt-2 font-semibold mb-2 ${contentComponent === ProductLicense ? 'text-primary-400' : 'text-black'}`} 
+            on:click={() => showSection('productLicense')}
         >
-            General Terms of Sale
+            Product Licenses
         </button>
         <hr class="border-t-1 border-gray-400" />
     </aside> 
 
-    <div class="w-full md:w-3/4 py-4 md:p-4 lg:py-0">
-        {#if currentSection === 'siteTerms'}
-            <Terms />
-        {:else if currentSection === 'productLicense'}
-        <Conditions />
-        {:else if currentSection === 'Privacynotice'}
-            <Privacynotice />
-        {:else if currentSection === 'Conditions'}
-             <ProductLicense />
+    <!-- Content Section -->
+    <div class="w-full md:w-3/4 lg:p-4">
+        {#if contentComponent}
+            <svelte:component this={contentComponent} />
+        {:else}
+            <p>Loading...</p>
         {/if}
     </div>
-</div>
 </div>
