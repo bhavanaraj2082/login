@@ -397,19 +397,18 @@ export async function deleteProduct(productId) {
 	}
 }
 
-/*****************Add to Favorite*****************/
-export async function favorite(favdata, pb) {
-	const email = favdata.email;
-	const password = favdata.password;
-	const login = await pb.collection('Register').authWithPassword(email, password);
-	// if(login){ return { type: 'success',message: 'Login successful!',};}
-
-	const authedEmail = favdata.authedEmail;
-	const record = await pb.collection('ChemiDashProfile').getFirstListItem(`email="${authedEmail}"`);
-	let userProfileId = record.id; 
-
-	const existingRecord = await pb.collection('Myfavourites').getFirstListItem(`userProfileId="${userProfileId}"`);
-	const newFavorite = {
+/**********************Delete and Add to Favorite***********************/
+export async function favorite(favdata, pb, cookies) {
+	const cookieValue = cookies.get('token');
+	if (!cookieValue) {
+		return { type: 'error', message: 'User is not logged in.' };
+	}
+	const parsedCookie = JSON.parse(cookieValue);
+	const userProfileId = parsedCookie.profileId;
+	const existingRecord = await pb
+		.collection('Myfavourites')
+		.getFirstListItem(`userProfileId="${userProfileId}"`);
+	const favoriteItem = {
 		productDesc: favdata.productDesc,
 		id: favdata.id,
 		imgUrl: favdata.imgUrl,
@@ -419,11 +418,36 @@ export async function favorite(favdata, pb) {
 		quantity: favdata.quantity,
 		stock: favdata.stock,
 	};
-	const updatedFavorites = Array.isArray(existingRecord.favorite)
-		? [...existingRecord.favorite, newFavorite]
-		: [newFavorite];
-	await pb.collection('Myfavourites').update(existingRecord.id, { favorite: updatedFavorites });
-	return {type: 'success',message: 'Added to favorites!',};
+	let updatedFavorites = [];
+	let isFavorite = false;
+	if (existingRecord && Array.isArray(existingRecord.favorite)) {
+		updatedFavorites = existingRecord.favorite.filter(
+			(item) => item.id !== favdata.id
+		);
+		isFavorite = updatedFavorites.length !== existingRecord.favorite.length;
+	}
+	if (isFavorite) {
+		await pb
+			.collection('Myfavourites')
+			.update(existingRecord.id, { favorite: updatedFavorites });
+		return { type: 'success', message: 'Removed from favorites!' };
+	} else {
+		updatedFavorites = existingRecord
+			? [...existingRecord.favorite, favoriteItem]
+			: [favoriteItem];
+
+		if (existingRecord) {
+			await pb
+				.collection('Myfavourites')
+				.update(existingRecord.id, { favorite: updatedFavorites });
+		} else {
+			await pb.collection('Myfavourites').create({
+				userProfileId,
+				favorite: updatedFavorites,
+			});
+		}
+		return { type: 'success', message: 'Added to favorites!' };
+	}
 }
 
 //*******SignUP*********/

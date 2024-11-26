@@ -70,19 +70,19 @@ export const actions = {
     }
   },
 
-  favorite: async ({ request }) => {
+  favorite: async ({ request, cookies }) => {
     const favdata = Object.fromEntries(await request.formData());
     // console.log("Form Data Received:", favdata);
     const {productDesc, id, imgUrl,productName,productNumber,priceSize,quantity,stock,size,price,} = favdata;
     const dataforfavorite = {productDesc,id,imgUrl,productName,productNumber,priceSize,quantity,stock,size,price,};
     try {
-      const result = await favorite(favdata,pb);
+      const result = await favorite(favdata,pb,cookies);
       return result; 
     } catch (error) {
       console.error("Error adding to favorites:", error.message);
       return {
         type: 'error',
-        message:'Invalid Credentials!',
+        message:'An error occurred while updating favorites.',
       };
     }
   },
