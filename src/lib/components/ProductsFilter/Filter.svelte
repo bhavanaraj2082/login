@@ -10,8 +10,6 @@
  export let data;
   let products = data?.data || [];  
   $: updateCategories(products);
-  
-
   let localCategorySearchQuery = '';
 
 

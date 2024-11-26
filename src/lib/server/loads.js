@@ -511,43 +511,89 @@ export async function DifferentProductData(pb, productId) {
 
 ///////Filter  Based on sub categories
 
-export async function loadProductsubcategory(pb, suburl) {
+// export async function loadProductsubcategory(pb, suburl) {
     
+//     const response = await pb.collection('SubCategories').getFirstListItem(`urlName="${suburl}"`, { expand: 'category' });
+//     const subcategoryID = response.id;
+
+
+//     const stockRecords = await pb.collection('Products').getList(1, 300, {
+//         filter: `subCategory="${subcategoryID}"`,
+//         expand: 'subCategory,Category,manufacturerName,subsubCategory',
+//     });
+
+    
+//     const stocks = await pb.collection('Stocks').getList(1, 1000, { 
+//         expand: 'partNumber',
+//     });
+
+
+//     const productNames = stockRecords.items.map(product => {
+//         const stock = stocks.items.find(stockItem => 
+//             stockItem.expand.partNumber?.id === product.id
+//         );
+
+//         return {
+//             ...product,
+//             manufacturerName: product.expand?.manufacturerName?.name || 'Unknown Manufacturer',
+//             Category: product.expand?.Category?.name || 'Unknown Category',
+//             subsubCategory: product.expand?.subsubCategory?.name || 'Unknown Category',
+//             stockQuantity: stock ? stock.stockQuantity : 0,  
+//         };
+//     });
+
+//    // console.log("I am product from load",productNames);
+//     return {
+//         type: "success",
+//         records: productNames,  
+//     };
+// }
+export async function loadProductsubcategory(pb, suburl, page = 1) {
     const response = await pb.collection('SubCategories').getFirstListItem(`urlName="${suburl}"`, { expand: 'category' });
     const subcategoryID = response.id;
 
+    const productPageSize = 20;
+    const stockPageSize = 20;
 
-    const stockRecords = await pb.collection('Products').getList(1, 300, {
+    let allProducts = [];
+    let allStocks = [];
+    const productData = await pb.collection('Products').getList(page, productPageSize, {
         filter: `subCategory="${subcategoryID}"`,
-        expand: 'subCategory,Category,manufacturerName,subsubCategory',
+        expand: 'subCategory,Category,manufacturerName,subsubCategory'
     });
 
-    
-    const stocks = await pb.collection('Stocks').getList(1, 1000, { 
-        expand: 'partNumber',
-    });
+    if (productData.items && productData.items.length > 0) {
+        allProducts = productData.items;
+    } else {
+        return { type: 'error', message: 'No products found.' };
+    }
+    const stockData = await pb.collection('Stocks').getList(1, stockPageSize, { expand: 'partNumber' });
 
-
-    const productNames = stockRecords.items.map(product => {
-        const stock = stocks.items.find(stockItem => 
-            stockItem.expand.partNumber?.id === product.id
-        );
+    if (stockData.items && stockData.items.length > 0) {
+        allStocks = stockData.items;
+    } else {
+        return { type: 'error', message: 'No stocks found.' };
+    }
+    const productNames = allProducts.map(product => {
+        const stock = allStocks.find(stockItem => stockItem.expand.partNumber?.id === product.id);
 
         return {
             ...product,
             manufacturerName: product.expand?.manufacturerName?.name || 'Unknown Manufacturer',
             Category: product.expand?.Category?.name || 'Unknown Category',
             subsubCategory: product.expand?.subsubCategory?.name || 'Unknown Category',
-            stockQuantity: stock ? stock.stockQuantity : 0,  
+            stockQuantity: stock ? stock.stockQuantity : 0,
         };
     });
+    console.log("Sending batch of products:", productNames.length);
 
-   // console.log("I am product from load",productNames);
     return {
-        type: "success",
-        records: productNames,  
+        type: 'success',
+        records: productNames, 
+        nextPage: productData.items.length === productPageSize ? page + 1 : null 
     };
 }
+///////Flter End////////
 
 export async function getSearchData(pb, search) {
     const components = await getMatchedComponents(pb, search);
