@@ -38,7 +38,7 @@
   const componentsString = derived(formData, $formData => JSON.stringify($formData.components))
 
 	</script>
-<form method="POST" action="?/qoutes" class="mx-10 p-8 bg-white rounded-lg shadow-lg space-y-6"
+<form method="POST" action="?/qoutes" class="mx-10 lg:p-8 md:p-2 bg-white rounded-lg shadow-lg space-y-6"
  use:enhance={() => {return async({ result }) => {
     let message1 = '';
     let keywordError = '';
@@ -95,7 +95,7 @@
   <div class="flex flex-col sm:flex-row items-start sm:items-center">
     <h2 class="text-black text-base font-medium">Components:</h2>
     {#if $formData.components.length > 0}
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4 ml-0 sm:ml-2 w-full">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-2 sm:gap-4 ml-0 sm:ml-2 w-full">
         {#each $formData.components as component}
           <div class="p-4 border rounded-lg shadow-sm text-xs sm:text-lg w-full max-w-full break-words">
             {#each Object.entries(component).slice(0, 3) as [key, value]}
@@ -157,7 +157,7 @@
         {/each}
       </div>
     </div>
-    <button type="button" class="font-semibold ml-2 sm:ml-0 text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog4}>Edit</button>
+    <button type="button" class="font-semibold lg:ml-2 sm:ml-0 text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog4}>Edit</button>
   </div>
 
   <!-- Delivery Details -->
@@ -173,7 +173,7 @@
         {/each}
       </div>
     </div>
-    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 ml-2 sm:ml-0 sm:mt-0 mt-5" on:click={tog5}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 lg:ml-2 sm:ml-0 sm:mt-0 mt-5" on:click={tog5}>Edit</button>
   </div>
 
   <!-- Hidden Inputs -->

@@ -39,11 +39,11 @@
 <div class="bg-white ">
 	<h1 class="font-bold text-2xl py-10 bg-white ">Step 4: Additional notes</h1>
 	<hr />
-	<div class="ml-20 bg-white ">
+	<div class="sm:ml-20 ml-10 bg-white ">
 	<h1 class="font-semibold py-5 text-primary-500">Further details or requests</h1>
 	<textarea
 		rows="6"
-		class="w-80 p-2  border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500
+		class="w-5/6 sm:w-80 p-2  border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500
 		border-1 focus:border-primary-500"
 		bind:value={$AddNoted}
 		name="futherdetails"
