@@ -26,7 +26,7 @@
 	<div class="mt-4 flex flex-col md:flex-row lg:flex-row">
 		<button
 			type="button"
-			class={`box-content h-25 w-56 p-4 border-2 mx-10 ${solutionValue === 'Organic' ? 'border-primary-500' : ''}`}
+			class={`box-content h-25 w-56 p-4 border-2 md:mx-10 ${solutionValue === 'Organic' ? 'border-primary-500' : ''}`}
 			on:click={() => {
 				selectOrgan('Organic');
 			}}
@@ -36,7 +36,7 @@
 		<br />
 		<button
 			type="button"
-			class={`box-content h-25 w-56 p-4 border-2 mx-10 mt-4 sm:mt-0  ${solutionValue === 'Inorganic' ? 'border-primary-500' : ''}`}
+			class={`box-content h-25 w-56 p-4 border-2 md:mx-10 mt-4 sm:mt-0  ${solutionValue === 'Inorganic' ? 'border-primary-500' : ''}`}
 			on:click={() => {
 				selectOrgan('Inorganic');
 			}}
@@ -48,7 +48,7 @@
 	<button
 		type="button"
 		on:click={organ}
-		class=" ml-10 lg:ml-10 text-white bg-primary-500 hover:bg-primary-500 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
+		class="md:ml-10 lg:ml-10 text-white bg-primary-500 hover:bg-primary-500 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
 	>
 		Continue
 	</button>
