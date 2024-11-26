@@ -102,7 +102,7 @@
 			if (result) {
 				isLoading=false
 			}
-			searchResults=result.data.responce.items;
+			searchResults=result?.data?.responce?.items;
 		};
 	}
 	const handleSubmitBtn = () => {

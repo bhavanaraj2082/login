@@ -550,38 +550,45 @@ export async function loadProductsubcategory(pb, suburl) {
 }
 
 export async function getSearchData(pb, search) {
-    const components = await getMatchedComponents(pb, search);
-    const categories = await getMatchedCategories(pb, search);
-    const subcategories = await getMatchedSubCategories(pb, search);
+    const requestKey = `search-${search}-${Date.now()}`;
+    //used requestKey to prevent pocketbase requests autocancellation
+    const components = await getMatchedComponents(pb, search,requestKey);
+    const categories = await getMatchedCategories(pb, search,requestKey);
+    const subcategories = await getMatchedSubCategories(pb, search,requestKey);
 
     const allData = {
         components,
         categories,
         subcategories
     };
-
     return allData;
 }
 
-async function getMatchedComponents(pb, search) {
+async function getMatchedComponents(pb, search,requestKey) {
     const components = await pb.collection('Products').getList(1, 6, {
         filter: `productName~"${search}" || productNumber~"${search}"|| prodDesc~"${search}"`,
-        expand: 'Category,subCategory'
+        expand: 'Category,subCategory',
+        requestKey  
+        //used requestKey to prevent pocketbase requests autocancellation
     });
     return components.items;
 }
 
-async function getMatchedCategories(pb, search) {
+async function getMatchedCategories(pb, search,requestKey) {
     const categories = await pb.collection('Category').getList(1, 6, {
         filter: `name~"${search}"`,
+        requestKey
+        //used requestKey to prevent pocketbase requests autocancellation
     });
     return categories.items;
 }
 
-async function getMatchedSubCategories(pb, search) {
+async function getMatchedSubCategories(pb, search,requestKey) {
     const subcategories = await pb.collection('SubCategories').getList(1, 6, {
         expand: 'category',
         filter: `name~"${search}"`,
+        requestKey
+        //used requestKey to prevent pocketbase requests autocancellation
     });
     return subcategories.items;
 }
