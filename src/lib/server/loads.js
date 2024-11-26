@@ -200,6 +200,29 @@ export async function loadProductsInfo(pb, productId){
     };
 }; 
 
+/********************** Check Favorite Status ***********************/
+export async function isProductFavorite(params, pb, cookies) {
+    const cookieValue = cookies.get('token');
+    let isFavorite = false;
+  
+    if (!cookieValue) {
+      console.error('User is not logged in.');
+      return isFavorite; // Return false if the user is not logged in
+    }
+  
+    const parsedCookie = JSON.parse(cookieValue);
+    const userProfileId = parsedCookie.profileId;
+    const existingRecord = await pb
+        .collection('Myfavourites')
+        .getFirstListItem(`userProfileId="${userProfileId}"`);
+  
+      if (existingRecord && Array.isArray(existingRecord.favorite)) {
+        isFavorite = existingRecord.favorite.some(
+          (item) => item.productNumber === params.product
+        );
+      }
+    return isFavorite;
+  }
 
 // search bar component 
 export async function fetchProductName(pb) {
