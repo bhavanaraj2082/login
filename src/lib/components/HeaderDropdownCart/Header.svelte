@@ -198,7 +198,7 @@
 	<div class="flex items-center justify-between w-11/12 py-4 mx-auto max-w-7xl flex-wrap">
 		<div class="flex md:hidden float-end">
 			<button on:click={toggleLogoMenu} class="flex items-center text-gray-600 focus:outline-none">
-				<Icon icon="fa6-solid:bars" class="w-10 h-5 text-gray-600" />
+				<Icon icon="fa6-solid:bars" class=" text-2xl text-gray-600" />
 			</button>
 		</div>
 		<div class="text-center pl-2">
@@ -211,7 +211,7 @@
 			</button>
 		</div>
 
-		<span class="hidden max-md:block w"><Cartrightside/></span>
+		<div class=" md:hidden"><Cartrightside/></div>
 
 		<!-- Searchbar functionality -->
 		<div class="relative w-full md:max-w-sm lg:max-w-lg md:mx-4 lg:mx-8 sm:mt-2">
@@ -370,9 +370,9 @@
 				</div>
 			{/each}
 		</div>
-		<div class="flex justify-evenly pr-2 text-gray-600 pt-2 items-center">
-			<a href="/quick-order" class="hover:text-primary-400 font-semibold text-xs lg:text-sm mb-3 mr-3">Quick Order</a>
-			<a href="/order-status" class="hover:text-primary-400 font-semibold text-xs lg:text-sm mb-3">Order Status</a>
+		<div class="flex gap-4 text-gray-600 items-center">
+			<a href="/quick-order" class="hover:text-primary-400 font-semibold text-xs lg:text-sm ">Quick Order</a>
+			<a href="/order-status" class="hover:text-primary-400 font-semibold text-xs lg:text-sm">Order Status</a>
 			<Cartrightside />
 		</div>
 	</div>

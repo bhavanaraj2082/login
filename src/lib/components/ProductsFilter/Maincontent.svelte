@@ -1,10 +1,8 @@
 <script>
+  import { enhance } from '$app/forms';
+  import Icon from '@iconify/svelte';
+  import { cartState } from '$lib/stores/cartStores.js'
   import { onMount, createEventDispatcher } from 'svelte';
- 
- import { enhance } from '$app/forms';
- 
-   import Icon from '@iconify/svelte';
-   import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
    const dispatch = createEventDispatcher();
   
    export let data;
@@ -284,7 +282,6 @@
    });
  }
  
- 
  $: updateDisplayedProducts($filteredProducts);
  const applyFilters = () => {
   
@@ -306,17 +303,14 @@
      return fieldB - fieldA; 
    }
  });
- 
- 
-  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+
+const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedProducts = filteredProducts.slice(startIdx, startIdx + ITEMS_PER_PAGE);
  
   return paginatedProducts;
  };
  
  products.priceSize = Array.isArray(products.priceSize) ? products.priceSize : [];
- 
- 
  
  
  onMount(() => {
@@ -364,7 +358,7 @@
      quantity: product.quantity || 1, 
      stock: product.stockQuantity 
    };
- viewedCart.update((cart) => {
+ cartState.update((cart) => {
      const existingProductIndex = cart.findIndex((item) => item.id === cartProduct.id);
  
      if (existingProductIndex !== -1) {
