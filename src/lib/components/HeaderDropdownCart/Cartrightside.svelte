@@ -42,8 +42,8 @@
 	  }
 	};
   
-	const incrementQuantity = (id) => {
-	  const index = cartItems.findIndex((item) => item.id === id);
+	const incrementQuantity = (size) => {
+	  const index = cartItems.findIndex((item) => item.size === size);
 	  if (index !== -1) {
 		cartItems[index].quantity += 1;
 		calculateSubtotal();
@@ -51,8 +51,8 @@
 	  }
 	};
   
-	const decrementQuantity = (id) => {
-	  const index = cartItems.findIndex((item) => item.id === id);
+	const decrementQuantity = (size) => {
+	  const index = cartItems.findIndex((item) => item.size === size);
 	  if (index !== -1 && cartItems[index].quantity > 1) {
 		cartItems[index].quantity -= 1;
 		calculateSubtotal();
@@ -60,8 +60,8 @@
 	  }
 	};
   
-	const removeItem = (id) => {
-	  cartItems = cartItems.filter((item) => item.id !== id);
+	const removeItem = (size) => {
+	  cartItems = cartItems.filter((item) => item.size !== size);
 	  calculateSubtotal();
 	  updateLocalStorage();
 	};
@@ -187,7 +187,7 @@
               </div>
               <button
                 class="text-primary-400"
-                on:click={() => removeItem(item.id)}
+                on:click={() => removeItem(item.size)}
               >
                 <Icon icon="codicon:trash" class="text-2xl hover:scale-105" />
               </button>
@@ -197,11 +197,11 @@
               <p class="text-base font-semibold text-gray-600">₹{item.price.toFixed(2)}</p>
               <div class="flex items-center border border-gray-300 rounded-sm px-2">
                 <button
-                  on:click={() => decrementQuantity(item.id)}
+                  on:click={() => decrementQuantity(item.size)}
                   class="text-2xl text-primary-400">-</button>
                 <p class="px-4">{item.quantity}</p>
                 <button
-                  on:click={() => incrementQuantity(item.id)}
+                  on:click={() => incrementQuantity(item.size)}
                   class="text-2xl text-primary-400">+</button>
               </div>
               <p class="text-base font-semibold text-gray-600">
