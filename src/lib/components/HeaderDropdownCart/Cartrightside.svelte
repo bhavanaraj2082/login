@@ -1,4 +1,6 @@
 <script>
+	import { goto } from '$app/navigation';
+	import { updateCartState } from '$lib/stores/cartStores.js';
 	import { onMount, onDestroy } from 'svelte';
 	import Icon from '@iconify/svelte';
   
@@ -42,34 +44,38 @@
 	  }
 	};
   
-	const incrementQuantity = (id) => {
-	  const index = cartItems.findIndex((item) => item.id === id);
+	const incrementQuantity = (size,id) => {
+	  const index = cartItems.findIndex((item) => item.priceSize.size === size && item.id === id);
 	  if (index !== -1) {
 		cartItems[index].quantity += 1;
 		calculateSubtotal();
 		updateLocalStorage();
+        updateCartState(cartItems)
 	  }
 	};
   
-	const decrementQuantity = (id) => {
-	  const index = cartItems.findIndex((item) => item.id === id);
+	const decrementQuantity = (size,id) => {
+	  const index = cartItems.findIndex((item) => item.priceSize.size === size && item.id === id);
 	  if (index !== -1 && cartItems[index].quantity > 1) {
 		cartItems[index].quantity -= 1;
 		calculateSubtotal();
 		updateLocalStorage();
+        updateCartState(cartItems)
 	  }
 	};
   
-	const removeItem = (id) => {
-	  cartItems = cartItems.filter((item) => item.id !== id);
+	const removeItem = (size,id) => {
+	  console.log(size,id);
+	  cartItems = cartItems.filter((item) =>( item.id !== id && item.priceSize.size !== size));
 	  calculateSubtotal();
 	  updateLocalStorage();
+	  updateCartState(cartItems)
 	};
   
 	const emptyCart = () => {
 	  cartItems = [];
-	  subtotal = 0;
 	  updateLocalStorage();
+	  updateCartState(cartItems)
 	};
   
 	const handleStorageChange = (event) => {
@@ -90,6 +96,7 @@
   
 	const toggleCart = () => {
 	  cartOpen = !cartOpen;
+	  goto('/cart')
 	};
   
 	onMount(() => {
@@ -124,18 +131,18 @@
   }
   </script>
 
-<button on:click={toggleCart} class=" space-x-4 text-gray-600">
+<button on:click={toggleCart} class=" space-x-4 text-gray-600 pr-2">
 	<span class="flex items-center space-x-1">
 		<!-- Wrapper for Icon with Badge -->
 		<div class="relative inline-block">
 			<!-- Shopping Cart Icon -->
 			<Icon
 				icon="eva:shopping-cart-fill"
-				class="md:w-5 md:h-5 sm:w-7 sm:h-7 lg:w-7 lg:h-7 w-7 h-7 mb-2 text-gray-800 sm:ml-3 hover:text-primary-400"
+				class=" text-3xl hover:text-primary-400 shrink-0"
 			/>
 			<!-- Badge -->
 			<span
-				class="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-primary-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+				class="absolute top-1 right-0 transform translate-x-1/2 -translate-y-1/2 {cartItems.length === 0 ? "hidden" : "bg-primary-500 text-white"} text-2s font-medium rounded-full w-4 h-4 flex items-center justify-center"
 			>
 			{cartItems.length}
 			</span>
@@ -157,6 +164,12 @@
         </button>
       </div>
       <div class="px-4 py-2 overflow-y-auto scroll flex-1">
+		{#if !cartItems.length}
+		<div class="w-full h-full flex flex-col gap-2 items-center justify-center">
+			<Icon icon="typcn:shopping-cart" class="text-5xl text-primary-500 md:text-8xl" />
+			<p class=" font-bold text-lg md:text-xl  xl:text-2xl">Cart is Empty</p>
+		</div>
+		{:else}
         {#each cartItems as item}
           <div class="flex flex-col py-4 border-b">
             <div class="flex items-center space-x-4">
@@ -185,9 +198,9 @@
                 <p class="font-semibold text-gray-800">{item.name}</p>
                 <p class="text-sm text-gray-500">{item.description}</p>
               </div>
-              <button
+              <button type="button"
                 class="text-primary-400"
-                on:click={() => removeItem(item.id)}
+                on:click={() => removeItem(item.priceSize.size,item.id)}
               >
                 <Icon icon="codicon:trash" class="text-2xl hover:scale-105" />
               </button>
@@ -197,11 +210,11 @@
               <p class="text-base font-semibold text-gray-600">₹{item.price.toFixed(2)}</p>
               <div class="flex items-center border border-gray-300 rounded-sm px-2">
                 <button
-                  on:click={() => decrementQuantity(item.id)}
+                  on:click={() => decrementQuantity(item.priceSize.size,item.id)}
                   class="text-2xl text-primary-400">-</button>
                 <p class="px-4">{item.quantity}</p>
                 <button
-                  on:click={() => incrementQuantity(item.id)}
+                  on:click={() => incrementQuantity(item.priceSize.size,item.id)}
                   class="text-2xl text-primary-400">+</button>
               </div>
               <p class="text-base font-semibold text-gray-600">
@@ -210,6 +223,7 @@
             </div>
           </div>
         {/each}
+		{/if}
       </div>
       <div class="p-4 border-t mt-4 sticky bottom-0 bg-white z-10">
         <div class="flex justify-between items-center mb-4">
@@ -222,14 +236,16 @@
             on:click={toggleCart}
             class="bg-primary-400 text-white text-center py-3 rounded-lg font-semibold hover:bg-primary-500"
           >
-            <a href="/cart">VIEW CART</a>
+            VIEW CART
           </button>
+		  {#if cartItems.length}
           <button
             on:click={emptyCart}
             class="bg-white text-primary-400 border border-primary-400 text-center py-3 rounded-lg font-semibold hover:bg-primary-400 hover:text-white"
           >
             EMPTY CART
           </button>
+		  {/if}
         </div>
       </div>
 

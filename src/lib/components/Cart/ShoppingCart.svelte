@@ -1,29 +1,37 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
 	import { authedUser } from '$lib/stores/mainStores.js';
 	import Icon from '@iconify/svelte';
 	import { onMount, createEventDispatcher } from 'svelte';
-	import { viewedCart,updateCartState } from '$lib/stores/alsoViewedProducts_Store.js';
+	import { cartState,updateCartState } from '$lib/stores/cartStores.js';
 	import jsPDF from 'jspdf'
 	import { toast } from 'svelte-sonner';
+	import 'jspdf-autotable';
     
 	const dispatch = createEventDispatcher()
 
+
 	let timestamp
 	let loading = true
-	let cartItems = $viewedCart;
+	$: cartItems = $cartState;
 	let subtotal = 0;
 	let tax = 0;
 	let total = 0;
 	let totalPrice = 0
 	let order = ''
 
-  import 'jspdf-autotable';
+	$: if(!$cartState.length){
+		subtotal = 0
+		totalPrice =0
+		tax = 0
+		total = 0
+		subtotal = 0
+	}
 
-// Helper function to generate the PDF document
 const generatePDFDocument = () => {
-    const total = $viewedCart.reduce((sum, item) => sum + parseFloat(item.priceSize.price.replace(/[^\d.-]/g, '')) * item.quantity, 0);
+    const total = $cartState.reduce((sum, item) => sum + parseFloat(item.priceSize.price.replace(/[^\d.-]/g, '')) * item.quantity, 0);
     const doc = new jsPDF();
 
     doc.setFontSize(18);
@@ -32,7 +40,7 @@ const generatePDFDocument = () => {
     doc.setFont('helvetica'); 
 
     const tableColumns = ['Products', 'Price', 'Quantity', 'Total'];
-    const tableData = $viewedCart.map(item => [
+    const tableData = $cartState.map(item => [
         `${item.partNumber}\n${item.name}\n${item.priceSize.size}`,
         `${parseFloat(item.priceSize.price.replace(/[^\d.-]/g, ''))}`, // Use the ₹ symbol here
         `${item.quantity}`,
@@ -88,7 +96,7 @@ const printPDF = () => {
 
 	const functionDispatch = ()=>{
     let expireTime = 12*60*60*1000
-	if(!$viewedCart.length){
+	if(!$cartState.length){
 		console.log('cart empty');
 		return
 	}
@@ -152,8 +160,8 @@ const printPDF = () => {
 
 	};
 
-	const incrementQuantity = (id) => {
-		const index = cartItems.findIndex((item) => item.id === id);
+	const incrementQuantity = (size,id) => {
+		const index = cartItems.findIndex((item) => item.priceSize.size === size && item.id === id);
 		if (index !== -1) {
 			cartItems[index].quantity += 1;
 			cartItems = [...cartItems];
@@ -162,8 +170,8 @@ const printPDF = () => {
 		}
 	};
 
-	const decrementQuantity = (id) => {
-		const index = cartItems.findIndex((item) => item.id === id);
+	const decrementQuantity = (size,id) => {
+		const index = cartItems.findIndex((item) => item.priceSize.size === size && item.id === id);
 		if (index !== -1 && cartItems[index].quantity > 1) {
 			cartItems[index].quantity -= 1;
 			cartItems = [...cartItems];
@@ -172,17 +180,20 @@ const printPDF = () => {
 		}
 	};
 
-	const removeItem = (id) => {
-		cartItems = cartItems.filter((item) => item.id !== id);
-		updateCartState(cartItems)
-		calculateTotals();
+	const removeItem = (size,id) => {
+		cartItems = cartItems.filter((item) =>!(item.id === id && item.priceSize.size === size));
+		console.log("remove item",cartItems);
+		// updateCartState(cartItems)
+		// calculateTotals();
 	};
 
 	const emptyCart = () => {
 		cartItems = [];
-		subtotal = 0;
-		tax = 0;
-		total = 0;
+		subtotal = 0
+		totalPrice =0
+		tax = 0
+		total = 0
+		subtotal = 0
 		updateCartState(cartItems)
 	};
 
@@ -197,6 +208,11 @@ const printPDF = () => {
 				}
 			}
 			updateCartState([])
+			subtotal = 0
+			totalPrice =0
+			tax = 0
+			total = 0
+			subtotal = 0
 			await update()
 		}
 	}
@@ -216,14 +232,14 @@ const printPDF = () => {
 			<p class=" font-medium text-lg md:text-xl  xl:text-2xl">Loading...</p>
 		</div>
 		<!-- Left Side: Cart Items -->
-		 {:else if !$viewedCart.length || $viewedCart === null}
+		 {:else if !$cartState.length || $cartState === null}
 		   <div class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded shadow-md ">
 			   <Icon icon="typcn:shopping-cart" class="text-5xl text-primary-500 md:text-8xl" />
 			   <p class=" font-bold text-lg md:text-xl  xl:text-2xl">Cart is Empty</p>
 		   </div>
 		{:else}
 		<div class="w-full lg:w-4/4 xl:w-3/4 bg-white p-4 rounded-lg shadow-md h-fit ">
-			<h2 class="text-xl font-bold">
+			<h2 class="text-xl mb-3 font-bold">
 				Cart Items <span class="text-red-500">({cartItems.length})</span>
 			</h2>
 
@@ -237,7 +253,7 @@ const printPDF = () => {
 			</div>
 
 			<ul class="">
-				{#each cartItems as item (item.id)}
+				{#each cartItems as item}
 					<li class="flex flex-col lg:flex-row lg:items-center py-3 lg:py-5 border-b-1">
 						<!-- Product Image and Details -->
 						<h3 class=" lg:hidden mt-3 font-medium text-sm">Product</h3>
@@ -246,7 +262,7 @@ const printPDF = () => {
 							<div class="ml-2">
 								<p class="text-sm text-red-500 font-semibold">{item.partNumber}</p>
 								<p class=" text-gray-800">{item.name}</p>
-								<p class=" text-gray-800 text-sm">{item.priceSize.size}</p>
+								<p class=" text-gray-800 text-sm font-semibold">{item.priceSize.size}</p>
 							</div>
 						</div>
 
@@ -258,11 +274,11 @@ const printPDF = () => {
 						<h3 class=" lg:hidden mt-3 font-medium text-sm">Quantity</h3>
 						<div class="flex items-center w-60 md:w-2/12">
 							<div class="flex items-center border-1 rounded">
-								<button on:click={() => decrementQuantity(item.id)} class=" border-r-1 p-2.5 text-primary-500"
+								<button on:click={() => decrementQuantity(item.priceSize.size,item.id)} class=" border-r-1 p-2.5 text-primary-500"
 									><Icon icon="rivet-icons:minus" class="text-sm"/></button
 								>
 								<p class="w-fit mx-3 text-sm font-medium outline-none text-center">{item.quantity}</p>
-								<button on:click={() => incrementQuantity(item.id)} class=" border-l-1 p-2.5 text-primary-500"
+								<button on:click={() => incrementQuantity(item.priceSize.size,item.id)} class=" border-l-1 p-2.5 text-primary-500"
 									><Icon icon="rivet-icons:plus" class="text-sm"/></button
 								>
 							</div>
@@ -271,17 +287,17 @@ const printPDF = () => {
 						<!-- Total Price & Delete Icon -->
 						<h3 class=" lg:hidden mt-3 text-sm">Total</h3>
 						 <div class=" w-full lg:w-2/12 flex justify-between items-center">
-							<p class="text-md font-medium text-content">
+							<p class="text-md font-semibold">
 								₹{(parseFloat(item.priceSize.price.replace(/[^\d.-]/g, '')) * item.quantity).toFixed(2)}
 							</p>
-							<button type="button" on:click={() => removeItem(item.id)} class=" text-lg text-primary-600">
-								<Icon icon="mdi:delete" class=" text-3xl"/>
+							<button type="button" on:click={() => removeItem(item.priceSize.size,item.id)} class=" text-lg text-primary-600">
+								<Icon icon="fluent-mdl2:delete" class=" text-2xl"/>
 							</button>
 						 </div>
 					</li>
 				{/each}
 			</ul>
-			<button type="button" on:click={emptyCart} class="mt-4 text-sm w-32 sm:w-36 md:w-40 lg:w-48 py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-semibold">Clear cart</button>
+			<button type="button" on:click={emptyCart} class="mt-4 text-sm w-32 sm:w-36 md:w-40 lg:w-48 py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-semibold">Clear Cart</button>
 		</div>
 		{/if}
 
@@ -304,8 +320,9 @@ const printPDF = () => {
 					</div>
 				</div>	
 			</div>
-			{#if $viewedCart.length}
+			{#if $cartState.length}
 			<div class="mt-4 grid grid-cols-2 gap-2">
+				{#if $authedUser.profileId}
 				<form method="POST" action="?/checkout" use:enhance={handleSubmit} class=" col-span-2">
 					<input type="hidden" name="order" value={JSON.stringify(order)}>
 					<button type="submit"
@@ -314,13 +331,13 @@ const printPDF = () => {
 					Checkout
 				</button>
 				</form>
-				
-				<!-- Save Cart Button -->
-				<button type="button"
-					class="flex items-center justify-center gap-2 col-span-2 bg-white text-primary-500 border border-primary-500 py-2 rounded font-semibold hover:bg-primary-100"
-				>
-					Save Cart
-				</button>
+				{:else}
+				<button type="button" on:click={()=>goto('/login')}
+				class="flex col-span-2 items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
+			>
+				Login to Checkout
+			</button>
+				{/if}
 
 				<!-- Download Button -->
 				<button type="button" on:click={downloadPDF}

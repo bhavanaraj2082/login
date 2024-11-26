@@ -4,7 +4,7 @@
 import { enhance } from '$app/forms';
 
   import Icon from '@iconify/svelte';
-  import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
+  import { cartState } from '$lib/stores/cartStores.js';
 
  
   export let data;
@@ -329,8 +329,7 @@ export function addToCart(product) {
     },
     quantity: product.quantity || 1, 
     stock: product.stockQuantity 
-  };
-viewedCart.update((cart) => {
+  }; cartState.update((cart) => {
     const existingProductIndex = cart.findIndex((item) => item.id === cartProduct.id);
 
     if (existingProductIndex !== -1) {
