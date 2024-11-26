@@ -61,6 +61,7 @@
   "dependencies": {
     "@iconify/icons-mdi": "^1.2.48",
     "js-cookie": "^3.0.5",
+    "mongoose": "^8.8.2",
     "svelte-sonner": "^0.3.28"
   }
 }
