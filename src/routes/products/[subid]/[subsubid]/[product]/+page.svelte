@@ -6,7 +6,7 @@
     export let data;
 </script>
 
-<ProductDetails data = {data.productData}/>
+<ProductDetails data = {data.productData} isFavorite={data.isFavorite}/>
 <RelatedProductss relatedProducts={data.relatedProducts}/>  
 <CompSimItems differentProducts={data.differentProducts}/>
 <Description data = {data.productData}/>

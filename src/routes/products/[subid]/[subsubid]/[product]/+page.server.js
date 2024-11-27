@@ -1,13 +1,11 @@
 import { pb, authenticate } from '$lib/server/pocketbase.js'; 
-import { loadProductsInfo } from '$lib/server/loads.js';
+import { loadProductsInfo,isProductFavorite } from '$lib/server/loads.js';
 import { checkavailabilityproduct,favorite } from '$lib/server/actions.js';
 import { RelatedProductData } from '$lib/server/loads';
 import { DifferentProductData } from '$lib/server/loads';
 
-
-export async function load({ params }) {
+export async function load({ params, cookies}) {
   // const { product } = params;
-
   try {
     const authResponse = await authenticate();
     if (authResponse?.status === 400) {
@@ -15,25 +13,19 @@ export async function load({ params }) {
         error: authResponse.error,
       };
     }
-
     const productData = await loadProductsInfo(pb,params.product);
     const relatedProducts  = await RelatedProductData(pb,params.product);
     const differentProducts = await DifferentProductData(pb, params.product);
-
-    
-
+    const isFavorite = await isProductFavorite(params, pb, cookies);
     if (productData.type === "error") {
       return {
         error: productData.message,
       };
     }
-
     const PartNumber = productData.records[0]?.productId;
     // console.log("PartNumber for stock data:", PartNumber);
-
     // console.log("Product Records:", productData);
-
-    return { productData , relatedProducts , differentProducts}
+    return { productData , relatedProducts , differentProducts,isFavorite}
   } catch (error) {
     console.error("Error loading product data:", error);
     return {
@@ -41,7 +33,6 @@ export async function load({ params }) {
     };
   }
 }
-
 
 /********************checkavailabilityproduct**********************/
 export const actions = {

@@ -15,6 +15,7 @@
   let showDetailsPopup = false;
   let showImagePopup = false;
   export let data;
+  export let isFavorite;
   let product = data.records;
   let showToast = false;
   let productURL = '';
@@ -26,7 +27,7 @@
   let cartNotification = '';
   let notificationTimeout;
   let index = 0;
-  let isLiked = false;
+  let isLiked = isFavorite;
   let favoriteNotification = '';
   let favoriteStatus = '';
   $: isLoggedIn = !!$authedUser.email;
