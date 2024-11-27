@@ -1,0 +1,41 @@
+import mongoose from 'mongoose';
+
+const { Schema } = mongoose;
+
+const productSchema = new Schema({
+    productName: { 
+        type: String, 
+        required: true 
+    },
+    prodDesc: { 
+        type: String, 
+        required: false 
+    },
+    description: { 
+        type: [String], 
+        required: false 
+    },
+    properties: {
+        type: Schema.Types.Mixed,
+        required: false,
+        default: {}
+    },
+    manufacturerName: { type: Schema.Types.ObjectId, ref: 'Manufacturer' },
+    productNumber: { type: String, required: true },
+    priceSize: { type:Schema.Types.Mixed, default: [], required:false},
+    category: { type: Schema.Types.ObjectId, ref: 'Category', required: false },
+    subCategory: { type: Schema.Types.ObjectId, ref: 'SubCategory', required: false },
+    subsubCategory: { type: Schema.Types.ObjectId, ref: 'SubSubCategory' },
+    subsubsubCategory: { type: Schema.Types.ObjectId, ref: 'SubSubSubCategory' },
+    imageSrc: { type: String, required: false },
+    returnPolicy: { type: Boolean, default: false },
+    safetyInfo: { type: [String], default: [] },
+    encompass: { type: String, default: null },
+    currency: { type: String, default: 'USD' },
+    variants: [{ type: Schema.Types.ObjectId, ref: 'Products' }]
+}, { timestamps: false, collection: "products" });
+
+// Create a Mongoose model
+const Products = mongoose.models.Products || mongoose.model('Products', productSchema);
+
+export default Products;
