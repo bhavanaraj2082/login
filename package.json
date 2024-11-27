@@ -47,6 +47,7 @@
     "storybook": "^8.3.1",
     "svelte": "^4.2.7",
     "svelte-preprocess": "^6.0.3",
+    "svelte-sonner": "^0.3.28",
     "tailwindcss": "^3.4.11",
     "vite": "^5.0.3",
     "vitest": "^2.0.0",
@@ -60,7 +61,6 @@
   },
   "dependencies": {
     "@iconify/icons-mdi": "^1.2.48",
-    "js-cookie": "^3.0.5",
-    "svelte-sonner": "^0.3.28"
+    "js-cookie": "^3.0.5"
   }
 }

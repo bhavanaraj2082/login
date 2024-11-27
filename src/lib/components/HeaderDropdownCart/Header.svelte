@@ -319,7 +319,7 @@
 					</div>
 
 					{#if menu.submenus && menu.submenus.length > 0}
-						<div class={`absolute shadow-sm z-20 rounded-sm mt-0.5 bg-white w-max transition-opacity duration-200 ${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+						<div class={`absolute shadow-sm z-20 rounded-sm mt-0.5 bg-white transition-opacity duration-200 ${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
 							role="menu">
 							{#each menu.submenus as submenu}
 								<!-- svelte-ignore a11y-interactive-supports-focus -->
