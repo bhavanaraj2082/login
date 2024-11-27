@@ -25,22 +25,22 @@
 
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Async handleClick function
-async function handleClick(buttonValue) {
-  clickedButton = buttonValue;
+  // Async handleClick function
+  async function handleClick(buttonValue) {
+    clickedButton = buttonValue;
 
-  // Wait for the component to render
-  await delay(0);
+    // Wait for the component to render
+    await delay(0);
 
-  // Scroll to the respective component
-  if (components[buttonValue]) {
-    components[buttonValue].scrollIntoView({ behavior: "smooth" });
+    // Scroll to the respective component
+    if (components[buttonValue]) {
+      components[buttonValue].scrollIntoView({ behavior: "smooth" });
+    }
   }
-}
 </script>
 
-<div class="main-container mx-auto w-11/12 max-w-7xl lg:px-12 md:px-8 sm:px-8 my-10 bg-white">
-  <div class="flex flex-col justify-evenly items-center lg:flex-row lg:mb-8 ">
+<div class="main-container mx-auto w-11/12 max-w-7xl lg:px-3 md:px-2 sm:px-8 px-3 my-10 bg-gray-50">
+  <div class="flex flex-col justify-evenly items-center lg:flex-row lg:mb-8 bg-white border p-6 rounded">
     <img src={Mainimage} alt="MainImAGE" class="w-80" />
     <div class="lg:w-1/3 my-2 lg:my-0 p-4">
       <h1 class="text-primary-400 font-semibold text-xl pb-2">
@@ -58,10 +58,10 @@ async function handleClick(buttonValue) {
 
   <!-- card container -->
   <div
-    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-9 p-4 bg-white"
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-9 py-4 bg-gray-50 rounded-lg"
   >
     <!-- card1 -->
-    <div class="  rounded-lg flex flex-col text-center">
+    <div class="  rounded flex flex-col text-center border bg-white p-4">
       <h2
         class=" flex items-center justify-center text-base font-semibold mb-2 text-white bg-primary-400 px-4 py-2 rounded"
       >
@@ -113,7 +113,7 @@ async function handleClick(buttonValue) {
       </div>
     </div>
     <!-- card2 -->
-    <div class="  rounded-lg  flex flex-col text-center">
+    <div class="  rounded  flex flex-col text-center border bg-white p-4">
       <h2
         class=" flex items-center justify-center text-base font-semibold mb-2  text-white bg-primary-400 px-4 py-2 rounded"
       >
@@ -159,7 +159,7 @@ async function handleClick(buttonValue) {
       </div>
     </div>
     <!-- card3 -->
-    <div class="  rounded-lg  flex flex-col text-center">
+    <div class="  rounded  flex flex-col text-center border bg-white p-4">
       <h2
         class=" flex items-center justify-center text-base font-semibold mb-2 text-white bg-primary-400 px-4 py-2 rounded"
       >
@@ -199,7 +199,7 @@ async function handleClick(buttonValue) {
       </div>
     </div>
     <!-- card4 -->
-    <div class="  rounded-lg  flex flex-col text-center">
+    <div class="  rounded  flex flex-col text-center border bg-white p-4">
       <h2
         class=" flex items-center justify-center text-base font-semibold mb-2 text-white bg-primary-400 px-4 py-2 rounded"
       >
@@ -228,7 +228,6 @@ async function handleClick(buttonValue) {
     </div>
   </div>
   <div bind:this={components['invoice']}>{#if clickedButton === 'invoice'}<Invoice />{/if}</div>
-
   <div bind:this={components['quotes']}>{#if clickedButton === 'quotes'}<Quotes />{/if}</div>
   <div bind:this={components['order-status']}>{#if clickedButton === 'order-status'}<OrderStatus />{/if}</div>
   <div bind:this={components['order-configuration']}>{#if clickedButton === 'order-configuration'}<OrderConfiguration />{/if}</div>

@@ -426,7 +426,7 @@ function addToCart(rowsToProcess) {
 
 
 
-<div class="w-full mx-auto py-5 md:flex md:space-x-8 xl:max-w-7xl">
+<div class="w-11/12 mx-auto py-5 px-2 md:flex md:space-x-8 max-w-7xl">
 
 <div class="md:w-full">
     <h1 class="font-bold text-lg md:text-2xl">Quick Order</h1>

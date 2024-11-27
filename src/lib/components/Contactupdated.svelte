@@ -20,7 +20,7 @@
 		successMessage = '';
 	  errorMessage = '';
 
-}
+	}
 	function handleSubmit(event) {
 		if (phone.length !== 10 || email.length === 0 || name.length === 0 || message.length === 0 || subject.length === 0) {
 			console.log('Validation failed: Missing required fields');
@@ -44,8 +44,8 @@
     }
 	}
 </script>
-<section class="my-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto px-2 sm:p-0 font-roboto bg-gray-50">
-	<div class="w-full md:w-4/5  border border-gray-300 rounded-lg shadow-lg">
+<section class="my-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto px-3 sm:p-0 font-roboto bg-gray-50">
+	<div class="w-full border border-gray-300 rounded-lg shadow-lg">
 		<h1 class="text-2xl font-bold bg-primary-500 text-white py-4 pl-4 rounded-t-lg">
 			Get in Touch with Us
 		</h1>
