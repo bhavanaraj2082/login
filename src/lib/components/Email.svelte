@@ -28,6 +28,7 @@
     await applyAction(result);
     setTimeout(() => {
           message = '';
+          email = ''
       }, 4000)
       };
   }}
