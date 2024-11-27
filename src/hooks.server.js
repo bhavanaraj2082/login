@@ -8,7 +8,7 @@ import {
 import mongoose from "mongoose";
 
 let isConnected = false;
-const MONGODB_URI = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DATABASE}?authSource=admin`;
+const MONGODB_URI = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DATABASE}?authSource=${MONGO_DATABASE}`;
 
 export const handle = async ({ event, resolve }) => {
   if (!isConnected) {

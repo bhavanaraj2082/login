@@ -1,11 +1,12 @@
 import { submitContactInfo } from "$lib/server/mongoActions.js";
-import { authenticate } from "$lib/server/pocketbase.js";
+
 export const actions = {
   contactus: async ({ request }) => {
     try {
-      const pb = await authenticate();
+      console.log("x-forward",await request.headers.get('x-forwarded-for'));
+      console.log("addr",await request.headers.get('remote-addr'));
       const body = Object.fromEntries(await request.formData());
-      await submitContactInfo(body, pb);
+      //await submitContactInfo(body);
       return {
         type: "success",
         data: {

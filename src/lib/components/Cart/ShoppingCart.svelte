@@ -125,17 +125,17 @@ const printPDF = () => {
 		let ordernumber = Math.floor(Math.random() * 900000) + 100000
 		let products = []
 		let orderdetails = cartItems.map(item=>{
-            const {id,name,partNumber,quantity,priceSize,stock} = item
+            const {_id,name,partNumber,quantity,priceSize,stock} = item
 			const parsedPrice = parseFloat(priceSize.price.replace(/[^\d.-]/g, ''))
 			const parsedQty = parseInt(quantity)
 			const parsedStock = parseInt(stock)
 
-			products.push(id)
+			products.push(_id)
 			totalPrice = parsedQty * parsedPrice
 			let backOrder = parsedQty > stock ? parsedQty - parsedStock : 0;
 			let readyToShip = parsedQty < stock ? parsedQty : stock;
 			return {
-				productId:id,
+				productId:_id,
 				productName:name,
 				productNumber:partNumber,
 				orderQty:parsedQty,
@@ -149,13 +149,14 @@ const printPDF = () => {
 		})
 	 order = {
 			ordernumber,
+			invoice:0,
 			totalprice:total,
 			subtotalprice:subtotal,
 			shippingprice:tax,
 			products,
 			orderdetails,
 			status:"pending",
-			dashuserprofileid:$authedUser.profileId
+			dashuserprofileid:"6746cc82aa1141b2ca728ad4"
 		}
 
 	};
