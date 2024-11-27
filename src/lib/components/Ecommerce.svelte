@@ -39,7 +39,7 @@
     company='';
     role='';
     selectedNames=[];
-}
+    }
     function handleSubmit(event) {
         if (number.length !== 10 || email.length === 0 || fname.length === 0 || company.length === 0 || details.length === 0 || role.length===0 || lname.length === 0) {
             console.log('Validation failed: Missing required fields');
@@ -71,7 +71,7 @@
     }
 }
 </script>
-<section class="md:w-11/12 mx-auto max-w-7xl px-8 bg-white">
+<section class="md:w-11/12 mx-auto max-w-7xl px-6 md:px-2 bg-gray-50">
 <section class="mt-6">
     <div class="text-primary-500 text-2xl font-semibold mb-7">Chemikart Solutions</div>
         <p class="leading-6 text-content mx-auto text-justify-center">
@@ -248,17 +248,8 @@
             </div>
             <div>
                 <label class="flex items-center space-x-2 text-lg">
-                
-                
-                
-                
-                
-                
                     <!-- type="checkbox"
                     class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0" -->
-                
-                
-                
                     <input type="checkbox"  bind:group={selectedNames} class="w-6 h-6 mb-5 form-checkbox rounded text-primary-500 focus:outline-none focus:ring-0" value="I have a question about an existing B2B connection "/>
                     <span class="mb-5 text-xs">I have a question about an existing B2B connection.</span>
                 </label>
