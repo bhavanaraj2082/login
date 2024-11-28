@@ -37,7 +37,6 @@ const productSchema = new Schema({
     variants: [{ type: Schema.Types.ObjectId, ref: 'Products' }]
 }, { timestamps: false, collection: "products" });
 
-
 productSchema.index({ productName: 1 }); // Matches PocketBase index
 productSchema.index({ productNumber: 1 });
 productSchema.index({ manufacturerName: 1 });

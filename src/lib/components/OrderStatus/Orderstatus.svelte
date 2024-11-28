@@ -26,7 +26,7 @@
       }
       return async ({ result }) => {
         if (result.type === "success" && result.data.success) {
-          goto(`/order-status/${result.data?.order?.id}`);
+          goto(`/order-status/${result.data?.order?.ordernumber}`);
         } else {
           showErrorPopup = true;
         }
