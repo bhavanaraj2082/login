@@ -1,6 +1,7 @@
 import Contact from "$lib/server/models/Contact.js";
 import Order from "$lib/server/models/Order.js"
 import Products from "$lib/server/models/Products";
+import CopyConsent from '../lib/server/models/CopyConsent.js'; // Adjust the path to your model
 
 
 export const submitContactInfo = async (data) => {
@@ -135,3 +136,20 @@ export const getUpdatedCartData = async (product) => {
   return JSON.stringify(productObj); 
 };
 
+
+
+
+
+
+
+export async function submitForm(data) {
+  try {
+    const formData = await data.formData();
+    const formEntries = Object.fromEntries(formData.entries());
+    const response = await CopyConsent.create(formEntries);
+  return { status: 200, body: { success: true, response } };
+  } catch (error) {
+    console.error('Error saving form data:', error);
+    return { status: 500, body: { success: false, error: error.message } };
+  }
+}
