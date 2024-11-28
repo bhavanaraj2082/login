@@ -14,13 +14,13 @@
       expandedFAQIndex[activeIndex] === index ? null : index;
   }
 </script>
-<section class="m-3">
+<section class="m-3 md:my-3 md:mx-0">
   <div>
-    <div class="pt-5 sm:p-4 w-11/12 max-w-7xl mx-auto">
-      <h1 class="sm:text-2xl text-xl font-bold text-gray-700 mb-6 sm:mb-4 md:mb-8 lg:mb-12 sm:ml-2 md:ml-2 lg:ml-0">
+    <div class="pt-5 sm:p-3 w-11/12 max-w-7xl mx-auto">
+      <h1 class="sm:text-2xl text-xl font-bold text-gray-700 mb-6 sm:mb-4 md:mb-8 lg:mb-12 sm:ml-2 md:ml-0 lg:ml-0">
         Frequently Asked Questions
       </h1>        
-      <div class="flex gap-3 mb-4 sm:mx-2 lg:mx-0 relative">
+      <div class="flex gap-3 mb-4 sm:mx-2 md:ml-0 lg:mx-0 relative">
         {#each sections as { title }, index}
           <div class="relative w-full sm:w-32">
             <button

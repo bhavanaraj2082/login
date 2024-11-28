@@ -1,6 +1,6 @@
 import Contact from "$lib/server/models/Contact.js";
+import Order from "$lib/server/models/Order.js"
 import Products from "$lib/server/models/Products";
-import Order from "$lib/server/models/Order.js";
 
 export const submitContactInfo = async (data) => {
   try {
@@ -13,10 +13,66 @@ export const submitContactInfo = async (data) => {
   }
 };
 
+export async function checkavailabilityproduct(data) {
+  const { ProductId, quantity: requestedQuantity } = data;
+  const requestedQty = parseInt(requestedQuantity, 10);
+
+    // Find the stock record for the given productId (partNumber)
+    const stockRecord = await Stock.findOne({ partNumber: ProductId }).exec();
+    console.log('stockRecord:', stockRecord);
+
+    if (!stockRecord) {
+      return {
+        message: 'Out of stock',
+        message1: '',
+        stock: 'Unavailable',
+        type: 'error',
+      };
+    }
+
+    const { stockQuantity, estimatedDate } = stockRecord;
+    const estimatedDateObj = new Date(estimatedDate);
+    const formattedDate = new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    }).format(estimatedDateObj);
+
+    if (stockQuantity > 0) {
+      if (requestedQty <= stockQuantity) {
+        return {
+          message: `${requestedQty} Available to ship on ${formattedDate}.`,
+          message1: '',
+          stock: 'Available',
+          type: 'success',
+        };
+      } else {
+        const unavailableQuantity = requestedQty - stockQuantity;
+
+        // Adding 15 days for the lead time
+        const leadTimeDate = new Date(estimatedDateObj);
+        leadTimeDate.setDate(leadTimeDate.getDate() + 15);
+
+        const formattedLeadTimeDate = new Intl.DateTimeFormat('en-GB', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric',
+        }).format(leadTimeDate);
+
+        return {
+          message: `${stockQuantity} Available to ship on ${formattedDate}.`,
+          message1: ` ${unavailableQuantity} Available to ship on ${formattedLeadTimeDate}.`,
+          stock: 'Partial Availability',
+          type: 'success',
+        };
+      }
+    }
+}
+
 export const checkoutOrder = async (order) => {
   try {
     const newOrder = await Order.create(order);
-    
+
     if (newOrder._id) {
       return { success: true, message: 'Successfully Ordered' };
     } else {
@@ -33,7 +89,7 @@ export const getUpdatedCartData = async (product) => {
   let productObj = [];
   for (let num of productNumbers) {
     try {
-      const record = await Products.findOne({ productNumber:num },{productNumber:1,priceSize:1,_id:0});
+      const record = await Products.findOne({ productNumber: num }, { productNumber: 1, priceSize: 1, _id: 0 });
       if (record) {
         productObj.push(record);
       }
@@ -43,5 +99,5 @@ export const getUpdatedCartData = async (product) => {
   }
 
   console.log(productObj);
-  return JSON.stringify(productObj); // Return the result as a JSON string
+  return JSON.stringify(productObj); 
 };

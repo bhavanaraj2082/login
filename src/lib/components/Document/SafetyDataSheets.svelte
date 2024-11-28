@@ -163,7 +163,7 @@ function toggleRotation(index) {
   };
 </script>
 
-<div class="p-4 max-w-6xl mx-auto bg-white">
+<div class="p-6 md:px-10 max-w-7xl lg:px-14 mx-auto">
   <h1 class="text-4xl font-bold mb-8">Documents</h1>
   
   <div class="w-full inline-flex rounded-md mb-8">
@@ -185,7 +185,7 @@ function toggleRotation(index) {
       </div>
       {/each}
     </nav> -->
-    <nav aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto">
+    <nav aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto rounded-t">
       {#each tabs as tab}
         <div class="inline-block w-full">
           <button
