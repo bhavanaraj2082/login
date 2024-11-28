@@ -19,9 +19,9 @@
             let decodedString = data.data.slice(2, -2).replace(/\\"/g, '"');
             let result = JSON.parse(decodedString);
             console.log("==============",result);
-             await result.map(crt=>{
-                crt.priceSize.map(sz=>{
-                     let search = $cartState.find(crt=>crt.priceSize.size === sz.size)
+             await result.map(cart=>{
+                cart.priceSize.map(sz=>{
+                     let search = $cartState.find(crt=>(crt.priceSize.size === sz.size && crt.partNumber === cart.productNumber ))
                      if(search !== undefined){
                         search.priceSize = sz
                      }

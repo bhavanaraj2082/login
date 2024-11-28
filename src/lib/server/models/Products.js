@@ -1,44 +1,51 @@
 import mongoose from 'mongoose';
 
-const { Schema, model } = mongoose;
+const { Schema } = mongoose;
 
-const ProductSchema = new Schema(
-  {
-    productName: { type: String, trim: true },
-    productNumber: { type: String, trim: true },
-    manufacturerName: { type: mongoose.Schema.Types.ObjectId, ref: 'Manufacturer' },
-    prodDesc: { type: String, trim: true },
-    priceSize: { type: Schema.Types.Mixed }, // JSON type
-    Category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
-    subCategory: { type: mongoose.Schema.Types.ObjectId, ref: 'SubCategory' },
-    subsubCategory: { type: mongoose.Schema.Types.ObjectId, ref: 'SubSubCategory' },
-    imageSrc: { type: String, trim: true },
-    filteredProductData: { type: Schema.Types.Mixed }, // JSON type
-    properties: { type: Schema.Types.Mixed }, // JSON type
-    description: { type: Schema.Types.Mixed }, // JSON type
+const productSchema = new Schema({
+    productName: { 
+        type: String, 
+        required: true 
+    },
+    prodDesc: { 
+        type: String, 
+        required: false 
+    },
+    description: { 
+        type: [String], 
+        required: false 
+    },
+    properties: {
+        type: Schema.Types.Mixed,
+        required: false,
+        default: {}
+    },
+    manufacturerName: { type: Schema.Types.ObjectId, ref: 'Manufacturer' },
+    productNumber: { type: String, required: true },
+    priceSize: { type:Schema.Types.Mixed, default: [], required:false},
+    category: { type: Schema.Types.ObjectId, ref: 'Category', required: false },
+    subCategory: { type: Schema.Types.ObjectId, ref: 'SubCategory', required: false },
+    subsubCategory: { type: Schema.Types.ObjectId, ref: 'SubSubCategory' },
+    subsubsubCategory: { type: Schema.Types.ObjectId, ref: 'SubSubSubCategory' },
+    imageSrc: { type: String, required: false },
+    returnPolicy: { type: Boolean, default: false },
+    filteredProductData: { type: Schema.Types.Mixed, required:false },
     safetyDatasheet: { type: String, trim: true },
-    safetyInfo: { type: Schema.Types.Mixed }, // JSON type
-    image: { type: String }, // Use a file storage mechanism or URL
-    currency: { type: String, enum: ['USD', 'INR', 'EUR'], trim: true },
-    return: { type: Boolean },
-    source: { type: String, trim: true },
-    variants: { type: mongoose.Schema.Types.ObjectId, ref: 'products' },
-    encompass: { type: String, trim: true },
-  },
-  {
-    timestamps: true, // Automatically manage createdAt and updatedAt fields
-    collection: 'products', // Ensure the name matches the PocketBase collection
-  }
-);
+    safetyInfo: { type: [String], default: [] },
+    encompass: { type: String, default: null },
+    currency: { type: String, default: 'USD' },
+    variants: [{ type: Schema.Types.ObjectId, ref: 'Products' }]
+}, { timestamps: false, collection: "products" });
 
-ProductSchema.index({ productName: 1 }); // Matches PocketBase index
-ProductSchema.index({ productNumber: 1 });
-ProductSchema.index({ manufacturerName: 1 });
-ProductSchema.index({ Category: 1 });
-ProductSchema.index({ subCategory: 1 });
-ProductSchema.index({ subsubCategory: 1 });
+
+productSchema.index({ productName: 1 }); // Matches PocketBase index
+productSchema.index({ productNumber: 1 });
+productSchema.index({ manufacturerName: 1 });
+productSchema.index({ category: 1 });
+productSchema.index({ subCategory: 1 });
+productSchema.index({ subsubCategory: 1 });
 
 // Fixed model definition
-const Product = mongoose.models.Product || mongoose.model('Product', ProductSchema);
+const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 
 export default Product;

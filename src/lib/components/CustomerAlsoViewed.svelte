@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte';
-    import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js'
+    import { cartState } from '$lib/stores/cartStores.js'
     import Icon from '@iconify/svelte';
     import heartOutline from '@iconify-icons/mdi/heart-outline'; 
     import heartFilled from '@iconify-icons/mdi/heart'; 
@@ -62,7 +62,7 @@
     }
 
     function addToCart() {
-        viewedCart.update(items => {
+        cartState.update(items => {
             const existingItemIndex = items.findIndex(item => item.code === selectedProduct.code);
 
             if (existingItemIndex !== -1) {
