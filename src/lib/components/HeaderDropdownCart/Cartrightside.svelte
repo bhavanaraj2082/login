@@ -66,7 +66,7 @@
   
 	const removeItem = (size,id) => {
 	  console.log(size,id);
-	  cartItems = cartItems.filter((item) =>( item.id !== id && item.priceSize.size !== size));
+	  cartItems = cartItems.filter((item) =>!(item.id === id && item.priceSize.size === size));
 	  calculateSubtotal();
 	  updateLocalStorage();
 	  updateCartState(cartItems)

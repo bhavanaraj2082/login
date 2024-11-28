@@ -70,6 +70,7 @@
 				<ul class="mt-2 space-y-2 text-sm text-gray-50">
 					<li><a href="/about-us" class="hover:underline">About Us</a></li>
 					<li><a href="/sitemap" class="hover:underline">Site Map</a></li>
+					<li><a href="/copy-consent" class="hover:underline">Copyright Consent</a></li>
 				</ul>
 			</div>
 			<div class="flex flex-col items-center md:items-start text-center md:text-left">
@@ -103,8 +104,8 @@
 					<a href="/terms/privacy-notice" class="hover:underline text-xs font-medium">Privacy Notice</a>
 					<span class="hidden md:block lg:inline-block footer-separator">|</span>
 					<a href="/terms/site-and-terms" class="hover:underline text-xs font-medium">Site-Terms</a>
-					<span class="hidden md:block lg:inline-block footer-separator">|</span>
-					<a href="/terms/conditions" class="hover:underline text-xs font-medium">General Terms and Conditions</a>
+					<!-- <span class="hidden md:block lg:inline-block footer-separator">|</span>
+					<a href="/terms/conditions" class="hover:underline text-xs font-medium">General Terms and Conditions</a> -->
 				</div>
 			</div>
 		</div>

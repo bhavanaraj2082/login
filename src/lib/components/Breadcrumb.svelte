@@ -29,7 +29,7 @@
 </script>
 {#if crumbs.length > 0}
 	<div class="w-11/12 mx-auto max-w-7xl">
-		<div class="py-3 lg:px-1 w-11/12 mx-auto lg:mx-0 sm:w-full">
+		<div class="py-3 px-1 mx-auto lg:mx-0 w-full">
 			<div class="flex flex-wrap text-primary-400 items-center space-x-0">
 				{#if crumbs.length === 1}
 					<span class="text-primary-400 font-bold text-xs">{crumbs[0].label}</span>

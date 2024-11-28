@@ -16,7 +16,7 @@
 </script>
 
 <div class="font-sans mx-auto w-11/12 max-w-7xl">
-	<h1 class="md:text-2xl text-2xl p-4 sm:px-2 text-heading font-bold">Chemikart Site Map</h1>
+	<h1 class="md:text-2xl text-2xl py-4 px-2 text-heading font-bold">Chemikart Site Map</h1>
 	<h1 class="text-lg p-2 m-4 text-primary-400 border-b max-w-50 text-start font-bold">
         Products
 	</h1>

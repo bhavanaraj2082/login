@@ -29,13 +29,22 @@ const productSchema = new Schema({
     subsubsubCategory: { type: Schema.Types.ObjectId, ref: 'SubSubSubCategory' },
     imageSrc: { type: String, required: false },
     returnPolicy: { type: Boolean, default: false },
+    filteredProductData: { type: Schema.Types.Mixed, required:false },
+    safetyDatasheet: { type: String, trim: true },
     safetyInfo: { type: [String], default: [] },
     encompass: { type: String, default: null },
     currency: { type: String, default: 'USD' },
     variants: [{ type: Schema.Types.ObjectId, ref: 'Products' }]
 }, { timestamps: false, collection: "products" });
 
-// Create a Mongoose model
-const Products = mongoose.models.Products || mongoose.model('Products', productSchema);
+productSchema.index({ productName: 1 }); // Matches PocketBase index
+productSchema.index({ productNumber: 1 });
+productSchema.index({ manufacturerName: 1 });
+productSchema.index({ category: 1 });
+productSchema.index({ subCategory: 1 });
+productSchema.index({ subsubCategory: 1 });
 
-export default Products;
+// Fixed model definition
+const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
+
+export default Product;
