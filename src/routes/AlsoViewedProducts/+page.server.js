@@ -1,9 +1,7 @@
-import { fetchViewedProducts } from '$lib/server/loads.js';
-import { authenticate } from '$lib/server/pocketbase.js';
+import { fetchViewedProducts } from '$lib/server/mongoLoads.js';
 
 export async function load() {
-  const pb = await authenticate();
-  const fetchedProducts = await fetchViewedProducts(pb);
-  console.log('fd',fetchedProducts);
+  const fetchedProducts = await fetchViewedProducts();
+  console.log('fd', fetchedProducts);
   return { fetchedProducts };
 }

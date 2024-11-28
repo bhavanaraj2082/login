@@ -1,8 +1,6 @@
-import {authenticate} from "$lib/server/pocketbase"
-import { getProductdatas } from "$lib/server/loads"
+import { getProductdatas } from "$lib/server/mongoLoads.js"
 
 export const load = async()=>{
-    const pb = await authenticate();
-    const data = await getProductdatas(pb);
+    const data = await getProductdatas();
     return data;
 }
