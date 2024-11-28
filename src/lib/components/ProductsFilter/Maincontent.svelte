@@ -1,8 +1,10 @@
 <script>
-  import { enhance } from '$app/forms';
-  import Icon from '@iconify/svelte';
-  import { cartState } from '$lib/stores/cartStores.js'
   import { onMount, createEventDispatcher } from 'svelte';
+ 
+ import { enhance } from '$app/forms';
+ 
+   import Icon from '@iconify/svelte';
+   import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
    const dispatch = createEventDispatcher();
   
    export let data;
@@ -172,17 +174,54 @@
  
  
    
-   const incrementQuantity = (index) => {
-       products = products.map((product, i) =>
-           i === index ? { ...product, quantity: (product.quantity || 1) + 1 } : product
-       );
-   };
+  //  const incrementQuantity = (index) => {
+  //      products = products.map((product, i) =>
+  //          i === index ? { ...product, quantity: (product.quantity || 1) + 1 } : product
+  //      );
+  //  };
  
-   const decrementQuantity = (index) => {
-       products = products.map((product, i) =>
-           i === index ? { ...product, quantity: Math.max(1, (product.quantity || 1) - 1) } : product
-       );
-   };
+  //  const decrementQuantity = (index) => {
+  //      products = products.map((product, i) =>
+  //          i === index ? { ...product, quantity: Math.max(1, (product.quantity || 1) - 1) } : product
+  //      );
+  //  };
+
+
+  const incrementQuantity = (index) => {
+    products = products.map((product, i) => {
+        if (i === index) {
+            const newQuantity = (product.quantity || 1) + 1;
+            updateLocalStorage(product.id, newQuantity); // Update local storage
+            return { ...product, quantity: newQuantity };
+        }
+        return product;
+    });
+};
+
+const decrementQuantity = (index) => {
+    products = products.map((product, i) => {
+        if (i === index) {
+            const newQuantity = Math.max(1, (product.quantity || 1) - 1);
+            updateLocalStorage(product.id, newQuantity); // Update local storage
+            return { ...product, quantity: newQuantity };
+        }
+        return product;
+    });
+};
+function updateLocalStorage(productId, quantity) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const productIndex = cart.findIndex(item => item.id === productId);
+
+    if (productIndex !== -1) {
+        // Update the quantity if the product already exists in the cart
+        cart[productIndex].quantity = quantity;
+    } else {
+        // If the product does not exist, you can choose to add it
+        // or handle it as per your application's logic
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+}
    function viewFavourites() {
      
      window.location.href = '/my-favourite'; 
@@ -282,6 +321,7 @@
    });
  }
  
+ 
  $: updateDisplayedProducts($filteredProducts);
  const applyFilters = () => {
   
@@ -303,14 +343,17 @@
      return fieldB - fieldA; 
    }
  });
-
-const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+ 
+ 
+  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedProducts = filteredProducts.slice(startIdx, startIdx + ITEMS_PER_PAGE);
  
   return paginatedProducts;
  };
  
  products.priceSize = Array.isArray(products.priceSize) ? products.priceSize : [];
+ 
+ 
  
  
  onMount(() => {
@@ -344,48 +387,45 @@ const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
      updateDisplayedProducts(); 
    }
  
- export function addToCart(product) {
-   const cartProduct = {
-     description: product.prodDesc,  
-     id: product.id,  
-     image: product.imageSrc,  
-     name: product.productName,  
-     partNumber: product.productNumber,  
-     priceSize: { 
-       price: product.priceSize[0].price,  
-       size: product.priceSize[0].size  
-     },
-     quantity: product.quantity || 1, 
-     stock: product.stockQuantity 
-   };
- cartState.update((cart) => {
-     const existingProductIndex = cart.findIndex((item) => item.id === cartProduct.id);
- 
-     if (existingProductIndex !== -1) {
-     
-       cart[existingProductIndex].quantity += cartProduct.quantity;
-     } else {
-      
-       cart.push(cartProduct);
-     }
- 
-     return cart; 
-   });
- 
- 
-   const totalQuantity = JSON.parse(localStorage.getItem('cart')).reduce(
-     (total, item) => total + item.quantity,
-     0
-   );
- 
-   cartNotification = `You have ${totalQuantity} item(s) in your cart.`;
- 
-   if (notificationTimeout) clearTimeout(notificationTimeout);
-   notificationTimeout = setTimeout(() => {
-     cartNotification = '';
-   }, 3000);
- }
- 
+   export function addToCart(product, quantity) {
+    const cartProduct = {
+        description: product.prodDesc,
+        id: product.id,
+        image: product.imageSrc,
+        name: product.productName,
+        partNumber: product.productNumber,
+        priceSize: {
+            price: product.priceSize[0].price,
+            size: product.priceSize[0].size
+        },
+        quantity: quantity, 
+        stock: product.stockQuantity
+    };
+
+    cartState.update((cart) => {
+        const existingProductIndex = cart.findIndex((item) => item.id === cartProduct.id);
+
+        if (existingProductIndex !== -1) {
+            cart[existingProductIndex].quantity += cartProduct.quantity;
+            updateLocalStorage(cartProduct.id, cart[existingProductIndex].quantity); 
+        } else {
+            // Add new product to cart
+            cart.push(cartProduct);
+            updateLocalStorage(cartProduct.id, cartProduct.quantity); 
+        }
+
+        return cart;
+    });
+    const totalItems = JSON.parse(localStorage.getItem('cart')).length;
+
+    cartNotification = `You have ${totalItems} item(s) in your cart.`;  
+
+    if (notificationTimeout) clearTimeout(notificationTimeout);
+    notificationTimeout = setTimeout(() => {
+        cartNotification = '';
+    }, 3000);
+}
+  
  
  $: updateFilteredProducts();
    $: updateDisplayedProducts();
@@ -561,8 +601,8 @@ const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
                              class="font-bold w-8 h-8  text-primary-400 rounded">+</button>
                          </div>
                          <button 
-                           on:click={() => addToCart(product)} 
-                           class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400  px-2 py-1 ml-3 rounded text-md lg:ml-4">Add To Cart</button>
+                         on:click={() => addToCart(product, products[index].quantity)} 
+                         class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400  px-2 py-1 ml-3 rounded text-md lg:ml-4">Add To Cart</button>
                        </div>
                      </div>
                    </div>
@@ -592,10 +632,8 @@ const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
              </div>
  
              <button 
-             on:click={() => addToCart(product)} 
-             class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400 p-1  rounded text-sm block  md:hidden">
-             Add To Cart
-           </button>
+             on:click={() => addToCart(product, products[index].quantity)} 
+             class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400  px-2 py-1 ml-3 rounded text-md lg:ml-4">Add To Cart</button>
          
             
            </div>

@@ -163,9 +163,8 @@ const applyFilters = () => {
  
 </script>
 
-<div class="lg:w-11/12  mx-auto">
 
-<div class="  lg:w-11/12 mx-auto  max-w-7xl flex flex-col lg:flex-row">
+<div class=" px-3 mx-auto   flex flex-col lg:flex-row">
 
   <!-- Mobile View -->
   <div class="w-full lg:hidden   p-2 mb-4 md:mb-0">
@@ -475,7 +474,7 @@ const applyFilters = () => {
  
   <Maincontent {data} />
 </div>
-</div>
+
 
 
 
