@@ -7,7 +7,7 @@ const orderSchema = new mongoose.Schema(
       required: false,
       unique: false,
     },
-    Invoice: {
+    invoice: {
       type: Number,
       required: false,
       unique: false,
@@ -72,6 +72,6 @@ const orderSchema = new mongoose.Schema(
 );
 
 // Create a model based on the schema
-const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
+const Order = mongoose.models.Order || mongoose.model('Order', orderSchema)
 
 export default Order;
