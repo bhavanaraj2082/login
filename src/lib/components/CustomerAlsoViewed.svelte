@@ -14,6 +14,7 @@
     let totalSlides = Math.ceil(repeatedProducts.length / logosPerSlide);
     let showModal = false;
     let isFavorite = false;
+    let showSuccessMessage = false;
     let selectedProduct = {};
     let quantity = 1;
     const itemsToAdd = logosPerSlide - (repeatedProducts.length % logosPerSlide);
@@ -73,7 +74,11 @@
 
             return items;
         });
-        closeModal();
+        showSuccessMessage = true; 
+        setTimeout(() => {
+            showSuccessMessage = false;
+            closeModal();
+        }, 3000);
     }
 
     onMount(() => {
@@ -147,6 +152,12 @@
         <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-full sm:max-w-lg lg:max-w-2xl w-full relative border border-primary-500">
             <button class="absolute top-3 right-3 text-primary-400 hover:text-primary-600 text-3xl font-medium" on:click={closeModal} aria-label="Close">&times;</button>
 
+            {#if showSuccessMessage}
+                <div class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white text-green-500 p-2 rounded-lg shadow- z-50">
+                    Item added to cart successfully!
+                </div>
+            {/if}
+            
             <p class="mt-8 text-sm text-gray-600 border-2 rounded p-2 text-center mb-6 border-green-600">
                 <a href="/login" class="text-primary-500 hover:underline">Sign In</a> to view organizational & contact pricing.
             </p>

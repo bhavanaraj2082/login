@@ -126,7 +126,7 @@
 }
 </script>
 
-<div class="border shadow-sm rounded-md p-5 bg-white">
+<div class="border shadow-sm md:w-11/12 max-w-7xl mx-auto rounded-md p-5 bg-white">
     {#if !toggleEdit}
     <div class=" max-w-2xl">
         <h1 class=" text-xl font-bold flex flex-col sm:flex-row sm:items-end gap-1">Link Your Organization <span class=" font-normal text-xs"><span class=" text-sm font-bold text-red-500">*</span>Represent required fields</span></h1>
