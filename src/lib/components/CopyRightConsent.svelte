@@ -1,933 +1,251 @@
 <script>
-    import { onMount, createEventDispatcher } from 'svelte';
-   
-   import { enhance } from '$app/forms';
-   
-     import Icon from '@iconify/svelte';
-     import { cartState } from '$lib/stores/cartStores.js';
-     const dispatch = createEventDispatcher();
-    
-     export let data;
-     let products=data.data ||[] ;
-     console.log("I am Content",products.length);
-     
-     let allProducts = products; 
-     let pageNumbersToShow = getPageNumbers();
-    import { filteredProducts, currentPage,
-       totalPages,   authedUser,
-        loading, error,pproducts, 
-       searchQuery, selectedManufacturers, selectedCategories ,getPageNumbers
-     } from '$lib/stores/filter.js';
-     
-     let indexToToggle = false;
-     let showSDSModal=false;
-     let showCOAModal=false;
-     const ITEMS_PER_PAGE = 5; 
-     let selectedPackSize = '';
-     let selectedProduct = null;
-     let cartNotification = '';
-     let favoriteNotification=''
-     let notificationTimeout;
-     let favoriteStatus;
-   
-     let loginError = '';
-     let email = '';
-     let password = '';
-     let showModal = false;
-     let modalProduct = null;
-     let modalOpenedForProduct = null;
-     $: isLoggedIn = !!$authedUser.email;
-    
-     let isFavorited = [];
-    function updateFilteredProducts() {
-     let filtered = Array.isArray(allProducts) ? [...allProducts] : [];
-   
-       const query = typeof $searchQuery === 'string' ? $searchQuery.toLowerCase() : '';
-      
-       if (query) {
-         filtered = filtered.filter(product =>
-           product.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           product.productNumber.toLowerCase().includes(searchQuery.toLowerCase())
-         );
-       }
-   
-     
-       if ($selectedCategories.size > 0) {
-         filtered = filtered.filter(product =>
-           Array.from($selectedCategories).some(category => product.categories.includes(category))
-         );
-       }
-   
-       if ($selectedManufacturers.size > 0) {
-         filtered = filtered.filter(product =>
-           Array.from($selectedManufacturers).some(manufacturer => product.manufacturer === manufacturer)
-         );
-       }
-   
-      
-       filteredProducts.set(filtered);
-     const totalFilteredProducts = filtered.length;
-       const calculatedTotalPages = Math.ceil(totalFilteredProducts / ITEMS_PER_PAGE);
-       totalPages.set(calculatedTotalPages);
-     }
-     function updateDisplayedProducts() {
-      let filtered = $filteredProducts || [];
-     const currentPageValue = $currentPage || 1;
-     const startIndex = (currentPageValue - 1) * ITEMS_PER_PAGE;
-     const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, filtered.length);
-   
-   
-     const paginatedProducts = filtered.slice(startIndex, endIndex);
-   
-   
-     pproducts.set(paginatedProducts);
-   }
-   
-   
-   // async function loadNextPage(currentPage) {
-   //     const result = await loadProductsubcategory(pb, suburl, currentPage);
-   //     if (result.type === 'success') {
-   //         // Append new products to the displayed list
-   //         displayProducts(result.records);
-   //         if (result.nextPage) {
-   //             loadNextPage(result.nextPage); // Continue loading if nextPage exists
-   //         }
-   //     } else {
-   //         console.error(result.message);
-   //     }
-   // }
-   
-   
-   let loadNextPage = async (currentPage) => {
-      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-      const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, allProducts.length);
-      const paginatedProducts = allProducts.slice(startIndex, endIndex);
-  
-      if (paginatedProducts.length > 0) {
-        pproducts.update((prevProducts) => [...prevProducts, ...paginatedProducts]);
-      }
-  
-      if (endIndex < allProducts.length) {
-        loadNextPage(currentPage + 1);
-      }
-    };
-   
-     function closeSDSModal() {
-         showSDSModal = false; 
-         selectedProduct = null; 
-     }
-     function closeCOAModal() {
-         showCOAModal = false; 
-         selectedProduct = null; 
-     }
-   
-     function downloadPDFSDS(url) {
-         if (!url) {
-             return;
-         }
-         const link = document.createElement('a');
-         link.href = url;
-         link.download = `SDS_${selectedProduct.productNumber}.pdf`;
-         document.body.appendChild(link);
-         link.click();
-         document.body.removeChild(link);
-     }
-     function downloadPDFCOA(url) {
-         if (!url) {
-             return;
-         }
-         const link = document.createElement('a');
-         link.href = url;
-         link.download = `SDS_${selectedProduct.productNumber}.pdf`;
-         document.body.appendChild(link);
-         link.click();
-         document.body.removeChild(link);
-     }
-     function closeModal() {
-         showModal = false;
-         modalOpenedForProduct = null;
-     }
-     function showSDS(product) {
-         selectedProduct = product; 
-         showSDSModal = true; 
-     }
-     function showCOA(product) {
-         selectedProduct = product; 
-         showCOAModal = true; 
-     }
-     // function toggleFavorite(index) {
-     //     const product = allProducts[index];
-     //     isFavorited[index] = !isFavorited[index];
-     //     modalProduct = product;
-     //     showModal = true;
-     //     let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-     //     const existingProductIndex = favorites.findIndex(item => item.id === product.id);
-   
-     //     if (isFavorited[index] && existingProductIndex === -1) {
-     //         favorites.push({ ...product, quantity: product.quantity || 1 });
-     //         localStorage.setItem('favorites', JSON.stringify(favorites));
-     //     } else if (!isFavorited[index] && existingProductIndex !== -1) {
-     //         favorites = favorites.filter(item => item.id !== product.id);
-     //         localStorage.setItem('favorites', JSON.stringify(favorites));
-     //     }
-     // }
-   
-   
-     
-    //  const incrementQuantity = (index) => {
-    //      products = products.map((product, i) =>
-    //          i === index ? { ...product, quantity: (product.quantity || 1) + 1 } : product
-    //      );
-    //  };
-   
-    //  const decrementQuantity = (index) => {
-    //      products = products.map((product, i) =>
-    //          i === index ? { ...product, quantity: Math.max(1, (product.quantity || 1) - 1) } : product
-    //      );
-    //  };
-  
-  
-    const incrementQuantity = (index) => {
-      products = products.map((product, i) => {
-          if (i === index) {
-              const newQuantity = (product.quantity || 1) + 1;
-              updateLocalStorage(product.id, newQuantity); // Update local storage
-              return { ...product, quantity: newQuantity };
-          }
-          return product;
-      });
-  };
-  
-  const decrementQuantity = (index) => {
-      products = products.map((product, i) => {
-          if (i === index) {
-              const newQuantity = Math.max(1, (product.quantity || 1) - 1);
-              updateLocalStorage(product.id, newQuantity); // Update local storage
-              return { ...product, quantity: newQuantity };
-          }
-          return product;
-      });
-  };
-  function updateLocalStorage(productId, quantity) {
-      let cart = JSON.parse(localStorage.getItem('cart')) || [];
-      const productIndex = cart.findIndex(item => item.id === productId);
-  
-      if (productIndex !== -1) {
-          // Update the quantity if the product already exists in the cart
-          cart[productIndex].quantity = quantity;
-      } else {
-          // If the product does not exist, you can choose to add it
-          // or handle it as per your application's logic
-      }
-  
-      localStorage.setItem('cart', JSON.stringify(cart));
-  }
-     function viewFavourites() {
-       
-       window.location.href = '/my-favourite'; 
-   }
-   function validateLogin() {
-     if (email && password) {
-         isLoggedIn = true;
-         showModal = false;
-         loginError = '';  
-     } else {
-       loginError = 'Please enter valid credentials.';
-     }
-   }
-   
-   
-   function changePage(direction) {
-   let newPage = $currentPage;
-    
-       if (direction === 'next' && newPage <  $totalPages) {
-         newPage++;
-       } else if (direction === 'prev' && newPage > 1) {
-         newPage--;
-       } else if (typeof direction === 'number') {
-         newPage = direction;
-       }
-        dispatch('pageChange', { newPage });
-       const url = new URL(window.location);
-       url.searchParams.set('page', newPage);
-       window.history.pushState({}, '', url);
-       
-       currentPage.set(newPage);
-       loadNextPage(newPage);
-       updateDisplayedProducts();
-       updatePageNumbersToShow($totalPages);
-       scrollToTop();
-   
-    updateDisplayedProducts($filteredProducts);
-       updatePageNumbersToShow($totalPages);
-   }
-   
-   $: updateFilteredProducts();
-   
-   $: updateDisplayedProducts($filteredProducts);
-   
-   
-   
-   const filtered = $filteredProducts;
-   
-   
-   
-    
-     $: updateDisplayedProducts($filteredProducts);
-   
-   
-   $: updateDisplayedProducts();
-   $: updatePageNumbersToShow($totalPages);
-   
-   
-   function updatePageNumbersToShow() {
-     const pageNumbers = [];
-     const maxVisiblePages = 5; 
-     const totalPageCount = $totalPages;
-     const currentPageValue = $currentPage;
-   
-     if (totalPageCount <= maxVisiblePages) {
-        
-         for (let i = 1; i <= totalPageCount; i++) {
-             pageNumbers.push(i);
-         }
-     } else {
-       
-         const startPage = Math.max(1, currentPageValue - 2);
-         const endPage = Math.min(totalPageCount, currentPageValue + 2);
-   
-         if (startPage > 1) {
-             pageNumbers.push(1);
-             if (startPage > 2) pageNumbers.push('...');
-         }
-   
-         for (let i = startPage; i <= endPage; i++) {
-             pageNumbers.push(i);
-         }
-   
-         if (endPage < totalPageCount) {
-             if (endPage < totalPageCount - 1) pageNumbers.push('...');
-             pageNumbers.push(totalPageCount);
-         }
-     }
-   
-     pageNumbersToShow = pageNumbers;
-   }
-   
-   function scrollToTop() {
-     window.scrollTo({
-         top: 0,
-         behavior: 'smooth'
-     });
-   }
-   
-   
-   $: updateDisplayedProducts($filteredProducts);
-   const applyFilters = () => {
-    
-    let filteredProducts = allProducts.filter(product => {
-      const matchesSearch = product.productName.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategories.size === 0 || selectedCategories.has(product.categoryName);
-      const matchesManufacturer = selectedManufacturers.size === 0 || selectedManufacturers.has(product.manufacturerName);
-      return matchesSearch && matchesCategory && matchesManufacturer;
-    });
-   
-   
-    filteredProducts = filteredProducts.sort((a, b) => {
-     const fieldA = sortBy === 'price' ? parseFloat(a[sortBy]) : a[sortBy];
-     const fieldB = sortBy === 'price' ? parseFloat(b[sortBy]) : b[sortBy];
-   
-     if (sortOrder === 'asc') {
-       return fieldA - fieldB; 
-     } else {
-       return fieldB - fieldA; 
-     }
-   });
-   
-   
-    const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
-    const paginatedProducts = filteredProducts.slice(startIdx, startIdx + ITEMS_PER_PAGE);
-   
-    return paginatedProducts;
-   };
-   
-   products.priceSize = Array.isArray(products.priceSize) ? products.priceSize : [];
-   
-   
-   
-   
-  //  onMount(() => {
-  //    const storedFavorites = localStorage.getItem('isFavorited');
-  //      if (storedFavorites) {
-  //        isFavorited = JSON.parse(storedFavorites);
-  //      } else {
-  //        isFavorited = new Array(products.length).fill(false); 
-  //      }
-     
-  //    products = products.map(product => ({
-  //            ...product,
-  //            quantity: product.quantity || 1,  
-  //        }));
-      
-  //     const urlParams = new URLSearchParams(window.location.search);
-  //      const pageParam = urlParams.get('page');
-  //      const initialPage = pageParam ? parseInt(pageParam, 10) : 1;
-  //      currentPage.set(initialPage);
-  //      allProducts = data.data;
-  //      currentPage.set(1);
-  //    initializeProducts();
-  //    updateFilteredProducts();
-  //    updateDisplayedProducts();
-  //    updatePageNumbersToShow($totalPages);
-  //  });
-  
-  
-  
-  onMount(() => {
-      // Initialize favorite status from localStorage or default to an array of `false`
-      const storedFavorites = localStorage.getItem('isFavorited');
-      isFavorited = storedFavorites ? JSON.parse(storedFavorites) : new Array(products.length).fill(false);
-  
-      // Ensure each product has a `quantity` set (if not, default to 1) and ensure `price` is set
-      products = products.map(product => {
-          // Check if priceSize exists and has at least one item, else default price to 0
-          const price = Array.isArray(product.priceSize) && product.priceSize.length > 0
-              ? product.priceSize[0].price  // Get price from the first element in priceSize
-              : 0;  // Default price if priceSize is empty or undefined
-  
-          return {
-              ...product,
-              quantity: product.quantity || 1,  // Default quantity to 1 if not set
-              price,  // Add the price field to the product
-          };
-      });
-  
-      // Get the page parameter from the URL search query (if exists), else default to page 1
-      const urlParams = new URLSearchParams(window.location.search);
-      const pageParam = urlParams.get('page');
-      const initialPage = pageParam ? parseInt(pageParam, 10) : 1;
-  
-      // Set the current page in the store
-      currentPage.set(initialPage);
-  
-      // Assign the data from the passed `data` prop to `allProducts`
-      allProducts = data.data;
-  
-      // Set the initial page to 1 and initialize products
-      currentPage.set(1);
-      initializeProducts();
-      updateFilteredProducts();
-      updateDisplayedProducts();
-      updatePageNumbersToShow($totalPages);
-  });
-  
-   function initializeProducts() {
-      
-       allProducts = data.data;  
-       updateFilteredProducts();
-       updateDisplayedProducts(); 
-     }
-   
-  //    export function addToCart(product, quantity) {
-  //     const priceSize = product.priceSize && Array.isArray(product.priceSize) && product.priceSize.length > 0
-  //         ? product.priceSize[0]
-  //         : { price: 0, size: '' }; 
-  //     const cartProduct = {
-  //         description: product.prodDesc,
-  //         id: product.id,
-  //         image: product.imageSrc,
-  //         name: product.productName,
-  //         partNumber: product.productNumber,
-  //         priceSize: {
-  //             // price: product.priceSize[0].price,
-  //             price:priceSize,
-  //             size: product.priceSize[0].size
-  //         },
-  //         quantity: quantity, 
-  //         stock: product.stockQuantity
-  //     };
-  
-  //     cartState.update((cart) => {
-  //         const existingProductIndex = cart.findIndex((item) => item.id === cartProduct.id);
-  
-  //         if (existingProductIndex !== -1) {
-  //             cart[existingProductIndex].quantity += cartProduct.quantity;
-  //             updateLocalStorage(cartProduct.id, cart[existingProductIndex].quantity); 
-  //         } else {
-  //             // Add new product to cart
-  //             cart.push(cartProduct);
-  //             updateLocalStorage(cartProduct.id, cartProduct.quantity); 
-  //         }
-  
-  //         return cart;
-  //     });
-  //     const totalItems = JSON.parse(localStorage.getItem('cart')).length;
-  
-  //     cartNotification = `You have ${totalItems} item(s) in your cart.`;  
-  
-  //     if (notificationTimeout) clearTimeout(notificationTimeout);
-  //     notificationTimeout = setTimeout(() => {
-  //         cartNotification = '';
-  //     }, 3000);
-  // }
-  
-  
-  export function addToCart(product, quantity) {
-      const cartProduct = {
-          description: product.prodDesc,
-          id: product.id,
-          image: product.imageSrc,
-          name: product.productName,
-          partNumber: product.productNumber,
-          priceSize: {
-              // price: product.priceSize[0].price,
-              // size: product.priceSize[0].size
-          },
-          quantity: quantity, 
-          stock: product.stockQuantity
-      };
-  
-      cartState.update((cart) => {
-          const existingProductIndex = cart.findIndex((item) => item.id === cartProduct.id);
-  
-          if (existingProductIndex !== -1) {
-              cart[existingProductIndex].quantity += cartProduct.quantity;
-              updateLocalStorage(cartProduct.id, cart[existingProductIndex].quantity); 
+  import { onMount } from 'svelte';
+  import { enhance } from '$app/forms';
+
+  let thankYouMessageVisible = false;
+  let uploadOption = ''; 
+  let email = '';
+  let emailError = '';
+  const maxFileSize = 5 * 1024 * 1024; // 5MB
+  let   title="";
+  let firstname = '';
+  let lastname = '';
+  let company = '';
+  let errormessage = '';
+  let phone = '';
+  let message = '';
+  let countrySelect;
+  let street = "";
+  let postalcode = "";
+  let country = "";
+  let city = "";
+  let selectedFileName = '';
+  let description = "";
+  let url = ""; 
+  let ExtractedData = null;
+  let image = null;
+  let fileName = ''; 
+
+  const countries = [
+      "United States", "Canada", "United Kingdom", "Australia", "Germany", "France",
+      "India", "Brazil", "Japan", "South Africa", "Italy", "Spain", "Mexico", 
+      "China", "Russia", "Netherlands", "Sweden", "Norway", "New Zealand", "Singapore", "China", "Other"
+  ];
+
+
+  function handleFileChange(event) {
+      const file = event.target.files[0];
+      if (file) {
+          selectedFileName = file.name;
+
+          if (file.type.startsWith('image/')) {
+              fileName = 'image'; 
+              image = file;
+              ExtractedData = null; 
           } else {
-              // Add new product to cart
-              cart.push(cartProduct);
-              updateLocalStorage(cartProduct.id, cartProduct.quantity); 
+              fileName = 'ExtractedData';
+              image = null; 
           }
-  
-          return cart;
+
+
+          if (file.size > maxFileSize) {
+              alert("File is too large, maximum size is 25MB.");
+              return;
+          }
+
+
+          if (file.type === 'text/plain' || file.type === 'application/csv' || file.type === 'application/pdf') {
+              const reader = new FileReader();
+              reader.onload = () => {
+                  let fileContent = reader.result;
+
+
+                  fileContent = sanitizeFileContent(fileContent);
+                  ExtractedData = fileContent;  
+
+              };
+
+              reader.readAsText(file);  
+          }
+      }
+  }
+
+
+  function sanitizeFileContent(content) {
+      if (typeof content === 'string') {
+
+          const scriptRegex = /<script.*?>.*?<\/script>/gi;
+          return content.replace(scriptRegex, ''); 
+      }
+      return content; 
+  }
+
+  onMount(() => {
+      countries.forEach(country => {
+          const option = document.createElement('option');
+          option.value = country;
+          option.textContent = country;
+          countrySelect.appendChild(option);
       });
-      const totalItems = JSON.parse(localStorage.getItem('cart')).length;
-  
-      cartNotification = `You have ${totalItems} item(s) in your cart.`;  
-  
-      if (notificationTimeout) clearTimeout(notificationTimeout);
-      notificationTimeout = setTimeout(() => {
-          cartNotification = '';
+  });
+
+  function hideThankYouMessage() {
+      setTimeout(() => {
+          thankYouMessageVisible = false;
       }, 3000);
   }
-    
-  
-  
-  
-   
-   $: updateFilteredProducts();
-     $: updateDisplayedProducts();
-     $: updateDisplayedProducts($filteredProducts);
-     $: $currentPage, $totalPages;
-     $: updatePageNumbersToShow($totalPages);
-     filteredProducts.set(filtered || []);
-     
-     
-     const handleFavoriteToggle = (productId) => {
-       isFavorited[productId] = !isFavorited[productId];
-     };
-     const handleSubmit = async ({ result, productId }) => {
-       let status = '';
-       console.log(result);
-       status = result.type;
-       favoriteNotification = result.data.message;
-       favoriteStatus = status;
-       handleFavoriteToggle(productId); 
-     };
-   </script>
-   
-   
-   
-   
-   <div class="w-full md:p-2  sm:p-2 md:w-full lg:w-full  flex flex-col">
-    
-     {#if $loading}
-       <div class="flex items-center justify-center h-full">
-         <div class="border-4 border-gray-300 border-t-primary-400 rounded-full w-10 h-10 animate-spin"></div>
-         <h3 class="ml-4 text-lg">Loading...</h3>
-       </div>
-     {:else if $error}
-       <p class="text-red-500 text-center">Error: {$error}</p>
-     {:else if $filteredProducts.length === 0}
-       <p class="text-center">No products found.</p>
-     {:else}
-       <div class="flex flex-col space-y-4 flex-grow">
-         {#each $pproducts as product, index}
-         <div class="border rounded-lg p-4 shadow-lg w-full flex flex-col relative">
-           <p class="text-md font-bold">
-             <!-- svelte-ignore a11y-invalid-attribute -->
-             <a 
-             href={typeof window !== 'undefined' ? `${window.location.pathname}/${encodeURIComponent(product.productNumber)}` : '#'}
-             on:click|preventDefault={() => {
-               if (typeof window !== 'undefined') {
-                 const currentPath = window.location.pathname;
-                 const productPageUrl = `${currentPath}/${encodeURIComponent(product.productNumber)}`;
-                 window.location.href = productPageUrl;
-               }
-             }}
-             class="text-gray-700 hover:text-primary-500">
-             {product.productName}
-           </a>
-           </p>
-           
-             
-             
-             
-              <div class="relative">
-               {#if isLoggedIn}
-                 <form
-                   action="?/favorite"
-                   method="POST"
-                   class="text-end"
-                   use:enhance={() => {
-                     return async ({ result }) => {
-                       let status = '';
-                       console.log(result);
-                       status = result.type;
-                       favoriteNotification = result.data.message;
-                       favoriteStatus = status;
-                       handleFavoriteToggle(index);  
-                      
+</script>
+<div class="lg:w-11/12 max-w-7xl px-3 mx-auto mb-3">
+  <div class="bg-gray-50 mx-auto w-full py-2 px-3 md:px-8 lg:px-0">
+      <h1 class="text-2xl font-bold mb-4 mt-5 text-center">Copyright Consent</h1>
+      <p class="mb-2 text-sm text-justify">In case you are requesting our consent to use copyrighted material available on our website, please make sure that you have checked our <a href="/terms/site-and-terms" class="text-primary-500">Site Use Terms</a>.</p>
+      <p class="mb-2  text-sm text-justify">If you are requesting copyright consent that is not already provided by the “Intellectual Property Rights” section, then please fill out the below form, and send it to us. We will review your request.</p>
+      <p class="mb-2 text-sm text-justify">Please note that sending the below request form does NOT give you any license or consent, including implied, to use our copyrighted work unless you receive our explicit consent or if the consent is provided according to the Site Use Terms.</p>
+      <p class="mb-2 text-sm ">Fields indicated by an * are required.</p>
+      
+      <form method="POST" action="?/submitForm" enctype="multipart/form-data" class="space-y-4" use:enhance={() => {
+          return async ({ result }) => {
+              console.log(result);
+              if (result) {
+                  title="";
+                  ExtractedData="";
+                  image="";
+                  thankYouMessageVisible = true; 
+                  hideThankYouMessage();
+                  firstname = "";
+                  lastname = "";
+                  email = "";
+                  phone = "";
+                  company = "";
+                  street = "";
+                  postalcode = "";
+                  country = "";
+                  city = "";
+                  url = "";
+                  description = "";
+                  message = 'Your information has been submitted successfully!';
+              } else {
+                  console.log(`${result.data.error}`, result.data.details);
+                  errormessage = 'There was an error submitting your information. Please try again.';
+                  alert('There was an error submitting your information. Please try again.');
+              }  
+          }; 
+      }}>
+          <!-- Title -->
+          <div class="md:w-1/2">
+              <label for="title" class="block text-gray-700 font-semibold text-sm py-2">*Title</label>
+              <select id="title" name="title"  class="hover:border-primary-500 focus:border-primary-400  text-sm focus:outline-none focus:ring-0 rounded mb-2 w-full md:w-4/5 p-2" required>
+                  <option value="" disabled selected >Select Title</option>
+                  <option value="Mr.">Mr.</option>
+                  <option value="Mrs.">Mrs.</option>
+                  <option value="Ms.">Ms.</option>
+                  <option value="Dr.">Dr.</option>
+                  <option value="Ph.D.">Ph.D.</option>
+                  <option value="Prof.">Prof.</option>
+                  <option value="Rev.">Rev.</option>      
+              </select>
+          </div>    
+          <!-- Name fields -->
+          <div class="mb-4 flex flex-col md:flex-row gap-x-6">
+              <div class="mb-3 md:mb-0 md:mr-12 w-full md:w-1/2">
+                  <label for="firstname" class="block text-gray-700 font-semibold text-sm my-2">*First Name</label>
+                  <input type="text" placeholder="First Name" name="firstname" bind:value={firstname} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded p-2  text-sm w-full" required />
+              </div>
+              <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2">
+                  <label for="lastname" class="block text-gray-700 font-semibold text-sm my-2">*Last Name</label>
+                  <input type="text" placeholder="LastName" name="lastname" bind:value={lastname} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded p-2 text-sm w-full" required />
+              </div>
+          </div>
+          <!-- Company and address fields -->
+          <div class="mb-4 flex flex-col md:flex-row gap-x-6">
+              <div class="mb-2 md:mb-0 md:mr-12 w-full md:w-1/2 my-2">
+                  <label for="company" class="block text-gray-700 font-semibold text-sm my-2">*Company Name</label>
+                  <input type="text" placeholder="Company Name" name="company" bind:value={company} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded p-2 text-sm w-full" />
+              </div>
+              <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2 my-2 ">
+                  <label for="street" class="block text-gray-700 font-semibold text-sm my-2">*Street or Postbox</label>
+                  <input type="text" placeholder="Street" id="street" name="street" bind:value={street} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded text-sm w-full p-2" required />
+              </div>
+          </div>
+
+          <!-- Postalcode and City -->
+          <div class="mb-4 flex flex-col md:flex-row gap-x-6">
+              <div class="mb-2 md:mb-0 md:mr-12 w-full md:w-1/2 my-2">
+                   <label for="postalcode" class="block text-gray-700 font-semibold text-sm my-2">*ZIP or Postal Code</label> 
+                  <input type="tel" placeholder="postal/ZipCode" id="postalcode" name="postalcode" bind:value={postalcode} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded text-sm w-full p-2" required />
+              </div>
+              <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2 my-2">
+                  <label for="city" class="block text-gray-700 font-semibold text-sm my-2">*City or Town</label> 
+                  <input type="text" id="city" placeholder="city" name="city" bind:value={city} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded text-sm w-full p-2" required />
+              </div>
+          </div>
+          <!-- Country & Email -->
+          <div class="mb-4 flex flex-col md:flex-row gap-x-6">
+              <div class="mb-2 md:mb-0 md:mr-12 w-full md:w-1/2">
+                  <label for="country" class="block text-gray-700 font-semibold text-sm my-2">*Country</label>
+                  <select id="country"  bind:value={country} bind:this={countrySelect} name="location" class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded text-sm w-full p-2" >
+                      <option value="" disabled selected>Select Country</option>
+                  </select>
+              </div>
+              <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2">
+                  <label for="email" class="block text-gray-700 font-semibold text-sm my-2">*Email Address</label>
+                  <input type="email" id="email" name="email" placeholder="Email" bind:value={email} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded w-full text-sm p-2" required />
+                  {#if emailError}
+                      <p class="text-red-500 text-sm">{emailError}</p>
+                  {/if}
+              </div>
+          </div>
+          <!-- File/Image Upload Selection -->
+          <fieldset class="mb-4">
+              <div class="font-semibold text-gray-700 mt-2 md:w-5/12">Please attach it to this request or share the link so that we could allocate it.</div>
+              <div class="flex flex-col md:flex-row mb-0">
+                  <div class="mt-1 w-full md:w-1/2">
+                      <!-- Radio buttons to choose between file or URL -->
+                      <div class="mb-4">
+                          <input type="radio" id="toggleUpload" name="uploadOption" value="file" bind:group={uploadOption} class="mr-2 rounded text-primary-600  focus:outline-none focus:ring-0 focus:ring-primary-600 " />
+                          <label for="toggleUpload" class="text-sm text-gray-700 ">Choose File or Image</label>
                      
-                     };
-                   }}
-                 >
-                   <input type="hidden" name="id" value={product.id} />
-                   <input type="hidden" name="imgUrl" value={product.imageSrc} />
-                   <input type="hidden" name="priceSize" />
-                   <input type="hidden" name="price" value={product.priceSize[0].price} />
-                   <input type="hidden" name="size" value={product.priceSize[0].size} />
-                   <input type="hidden" name="productDesc" value={product.prodDesc} />
-                   <input type="hidden" name="productName" value={product.productName} />
-                   <input type="hidden" name="productNumber" value={product.productNumber} />
-                   <input type="hidden" name="quantity" value={product.quantity || 1} />
-                   <input type="hidden" name="stock" value={product.stockQuantity} />
-                   <button type="submit" class="absolute -top-8 right-0 bg-transparent border-none p-0" aria-label="Toggle favorite">
-                     <!-- <Icon
-                       icon={isFavorited[index] ? 'prime:heart-fill' : 'prime:heart'}
-                       class={`text-3xl ${isFavorited[index] ? 'text-primary-600' : 'text-primary-400'}`}
-                     /> -->
-                   </button>
-                 </form>
-               {:else}
-            
-                 <button
-                   on:click={() => {
-                     showModal = true;
-                     indexToToggle = index;
-                     handleFavoriteToggle(index);  
-                   }}
-                   class="absolute -top-8 right-0 bg-transparent border-none p-0"
-                   aria-label="Toggle favorite"
-                 >
-                   <!-- <Icon
-                     icon={isFavorited[index] ? 'prime:heart-fill' : 'prime:heart'}
-                     class={`text-3xl ${isFavorited[index] ? 'text-primary-600' : 'text-primary-400'}`}
-                   /> -->
-                 </button>
-               {/if}
-             </div>
-             
-             
-             
-              <div class="flex items-start mt-4">
-               <img 
-               src={product.imageSrc} 
-               alt={product.productNumber}  
-             class="  w-24 h-36   md:w-36 md:h-28 rounded-lg " />
-             
-               <div class="flex-grow lg:ml-5 ml-3">
-                 <p>
-                 <span class="text-gray-600   mt-1">Code: </span>
-                 <span class="font-semibold text-gray-600  "> {product.productNumber} </span>
-               </p>
-               <p>
-                 <span class="text-gray-600  mt-1">Manufacturer:
-                   <span class="font-semibold text-gray-600"> {product.manufacturerName}</span> </p>
-                   <p>
-                 <span class="text-gray-600 mt-1">Category:</span><span class="font-semibold text-gray-600"> {product.category}</span>  </p>
-                 <!-- <p class="md:block hidden">
-                 <span class="text-gray-600 font-medium md:block hidden">Description:
-                 <span class="font-semibold text-gray-600">{product.prodDesc}</span> </span> </p> -->
-                 <div class="flex flex-col md:flex-row items-start justify-between mt-2">
-                   <div class="flex items-center mb-2 md:mb-0">
-                     <Icon icon="mdi:file-document" class="text-primary-400 w-4 h-4 mr-1" />
-                     <button 
-                       on:click={() => showCOA(product)} 
-                       class="text-primary-400 rounded" 
-                       aria-label="View Certificate of Analysis for {product.productName}">CoA</button>
-                     <Icon icon="mdi:file-document" class="text-primary-400 w-4 h-4 mr-1 ml-5" />
-                     <button 
-                       on:click={() => showSDS(product)} 
-                       class="text-primary-400 rounded" 
-                       aria-label="View Safety Data Sheet for {product.productName}">SDS</button>
-                     <div class="flex flex-col  lg:ml-16 md:ml-16    md:flex-row lg:flex-row items-start justify-between">
-                       <div class="hidden md:flex  items-center">
-                         <p class="text-gray-600 font-semibold inline-block"> 
-                      
-                             {#if product.priceSize && Array.isArray(product.priceSize) && product.priceSize.length > 0}
-                               {product.priceSize[0].price} 
-                             {:else}
-                               Price not available 
-                             {/if}
-                           </p>
-                           
-                           
-                         <div class="flex items-center px-3    w-full lg:ml-2 md:ml-5">
-                           <div class="border text-primary-400 flex items-center rounded">
-                             <button 
-                               on:click={() => decrementQuantity(index)} 
-                               class="font-bold w-8 h-8  rounded text-primary-400 ">-</button>
-                               <input 
-                               type="text" 
-                               class="w-10 h-8 text-center rounded font-medium text-primary-400 border-none bg-transparent  focus:outline-none focus:ring-0 focus:border-transparent mx-1" 
-                               bind:value={products[index].quantity} 
-                               readonly />
-                             
-                             <button 
-                               on:click={() => incrementQuantity(index)} 
-                               class="font-bold w-8 h-8  text-primary-400 rounded">+</button>
-                           </div>
-                           <button 
-                           on:click={() => addToCart(product, products[index].quantity)} 
-                           class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400  px-2 py-1 ml-3 rounded text-md lg:ml-4">Add To Cart</button>
-                         </div>
-                       </div>
-                     </div>
-                   </div>
-                  
-                   
-                 </div>
+                      <div class="mb-4">
+                          <input type="radio" id="toggleURL" name="uploadOption" value="url" bind:group={uploadOption} class="mr-2 rounded text-primary-600  focus:outline-none focus:ring-0 focus:ring-primary-600" />
+                          <label for="toggleURL" class="text-sm text-gray-700">Provide URL to the Work</label>
+                      </div>
+                  </div>
+                      <!-- Upload File -->
+                      {#if uploadOption === 'file'}
+                          <div>
+                              <label for="file" class="block font-semibold text-gray-700 text-sm mt-2 mb-1">Choose File (.csv,.txt,.pdf,.jpg,.png,.jpeg) </label>
+                              <input type="file" id="file" name={fileName} accept=".csv,.txt,.pdf,.jpg,.jpeg,.png" class="border border-gray-400  focus:outline-primary-400 rounded p-2 w-full md:w-3/4 lg:w-4/5" on:change={handleFileChange} />
+                          </div>
+                      {/if}
               
-                   
-               </div>
-               
-             </div>
-             <div class="  flex items-center   md:hidden space-x-1">
-               <span class="text-gray-600 text-lg font-medium"> {#if product.priceSize && Array.isArray(product.priceSize) && product.priceSize.length > 0}
-                               {product.priceSize[0].price} 
-                             {:else}
-                               Price not available 
-                             {/if}</span>
-               <div class="border text-primary-400 flex items-center ml-2   rounded">
-                 <button 
-                   on:click={() => decrementQuantity(index)} 
-                   class="font-bold w-6 h-6 rounded text-primary-400 ">-</button>
-                 <input 
-                   type="text" 
-                   class="w-10 h-8 text-center rounded font-medium text-primary-400 border-none bg-transparent focus:outline-none focus:ring-0 focus:border-transparent" 
-                   bind:value={products[index].quantity} 
-                   readonly />
-                 <button 
-                   on:click={() => incrementQuantity(index)} 
-                   class="font-bold w-6 h-6 rounded text-primary-400">+</button>
-               </div>
-   
-               <button 
-               on:click={() => addToCart(product, products[index].quantity)} 
-               class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400  px-2 py-1 ml-3 rounded text-md lg:ml-4">Add To Cart</button>
-           
-              
-             </div>
-            
-           </div>
-           
-         {/each}
-   
-         <!-- Pagination  -->
-         <div class="flex justify-center   mt-10 ml-20 space-x-2 sm:space-x-1">
-             <button 
-             on:click={() => changePage('prev')} 
-             class={`bg-primary-400 text-white px-2 lg:px-4 py-2 rounded-full ${currentPage === 1 ? 'disabled' : ''}`} 
-             disabled={$currentPage === 1}>
-             <Icon icon="mdi:chevron-left" class="w-5 h-5" />
-           </button>
-           
-          
-           <div class=" pagination flex items-center space-x-2">
-              
-               {#each pageNumbersToShow as pageNumber}
-                 {#if pageNumber === '...'}
-                   <span class="text-primary-500">...</span>
-                 {:else}
-                   <button 
-                     on:click={() => changePage(pageNumber)} 
-                     class={`text-lg lg:px-4 px-3 py-2 rounded-full ${currentPage === pageNumber ? 'bg-primary-400 text-white' : 'bg-white text-primary-500 border-primary-400'} 
-                     ${pageNumber !== $currentPage ? 'hidden sm:block' : ''}`} 
-                     aria-current={$currentPage === pageNumber ? 'page' : ''}>
-                     {pageNumber}
-                   </button>
-                 {/if}
-               {/each}
-             </div>
-             
-           
-          
-           <button 
-             on:click={() => changePage('next')} 
-             class={`bg-primary-400 text-white px-2 lg:px-4 py-2 rounded-full ${currentPage === totalPages ? 'disabled' : ''}`} 
-             disabled={$currentPage === totalPages}>
-             <Icon icon="mdi:chevron-right" class="w-5 h-5" />
-           </button>
-         
-         </div>
-         
-         
-       </div>
-     {/if}
-   </div>
-   {#if cartNotification}
-     <div class="fixed bottom-4 left-4 p-4 bg-primary-400 text-white rounded-md shadow-lg z-50">
-         {cartNotification}
-     </div>
-   {/if}
-   {#if showModal}
-             <!-- {#if isLoggedIn}
-                 <div class="fixed inset-0 flex items-center justify-center bg-slate-500 bg-opacity-70">
-                     <div class="bg-white rounded-lg p-6 w-11/12 max-w-sm md:max-w-lg lg:max-w-xl relative">
-                         <button on:click={closeModal} class="absolute top-2 right-2 text-gray-600 hover:text-gray-900" aria-label="Close">
-                             <Icon icon="mdi:close" class="text-xl hover:text-primary-400" />
-                         </button>
-         
-                         <h2 class="text-xl font-bold mb-1 text-center">
-                             {#if isFavorited[allProducts.indexOf(modalProduct)]}
-                                 Item added to your favourites!
-                             {:else}
-                                 Item removed from your favourites.
-                             {/if}
-                         </h2>
-                         <p class="mb-4 text-center">You can continue shopping or view your favourites.</p>
-                         <p class="mb-4 text-center">
-                             <span class="font-bold">{modalProduct ? modalProduct.productName : 'Product'}</span> 
-                             {#if isFavorited[allProducts.indexOf(modalProduct)]}
-                                 is added to the favourites.
-                             {:else}
-                                 is removed from the favourites.
-                             {/if}
-                         </p>
-         
-                         <div class="flex justify-between">
-                             <button on:click={closeModal} class="bg-primary-400 text-white p-1  rounded w-1/3 transition-shadow duration-300 hover:shadow-lg hover:shadow-primary-400">
-                                 Continue Shopping
-                             </button>
-                             <button on:click={viewFavourites} class="bg-primary-400 text-white p-1 rounded w-1/3 transition-shadow duration-300 hover:shadow-lg hover:shadow-primary-400">
-                                 View Favourites
-                             </button>
-                         </div>
-                     </div>
-                 </div>
-             {:else} -->
-                 <div class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-80">
-                     <div class="bg-white rounded-lg p-6 w-11/12 max-w-sm md:max-w-lg lg:max-w-xl relative">
-                         <button on:click={closeModal} class="absolute top-2 right-2 text-gray-600 hover:text-gray-900" aria-label="Close">
-                             <Icon icon="mdi:close" class="text-xl hover:text-primary-400" />
-                         </button>
-         
-                         <h2 class="text-xl  text-center font-bold mb-1">Please Login or Register to continue</h2>
-                         {#if loginError}
-                             <p class="text-red-500 mb-2">{loginError}</p>
-                         {/if}
-                         
-                         <label for="email" class="block font-bold text-gray-600 mb-2">Email</label>
-                         <input
-                             id="email"
-                             type="email"
-                             placeholder="Enter your email"
-                             class="border border-gray-300 p-2 rounded w-full"
-                             bind:value={email}
-                         />
-                         
-                         <label for="password" class="block font-bold text-gray-600 mb-2 mt-1">Password</label>
-                         <input
-                             id="password"
-                             type="password"
-                             placeholder="Enter your password"
-                             class="border border-gray-300 p-2 rounded w-full"
-                             bind:value={password}
-                         />
-                         
-                         <button on:click={validateLogin} class="bg-primary-400 text-white p-2 rounded w-full mt-4 mb-4">Login</button>
-         
-                         <div class="flex justify-between">
-                             <a href="/" class="text-primary-400" on:click|preventDefault={closeModal}>Continue browsing</a>
-                             <a href="/signup" class="text-primary-400">Register</a>
-                         </div>
-                     </div>
-                 </div>
-             {/if}
-         <!-- {/if} -->
-   {#if showSDSModal}
-     
-   <div class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-80">
-       <div class="bg-white rounded-lg p-6 w-11/12 md:w-5/12 lg:w-1/2 relative"> 
-           <button
-               on:click={ closeSDSModal}
-               class="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-               aria-label="Close">
-               <Icon icon="mdi:close" class="text-xl hover:text-primary-400" />
-           </button>
-           <h2 class="text-xl font-bold mb-4 text-center">Safety Data Sheet</h2>
-           {#if selectedProduct}
-               <p class="text-center">
-                   <strong>Pack Size:</strong>
-                   <select bind:value={selectedPackSize} class="border w-1/4 p-2 inline-block rounded bg-gray-100 ml-2 hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0">
-                     
-                       <option value="" disabled selected>Select size</option>
-                       {#each selectedProduct.priceSize as size}
-                           <option value={size.size}>{size.size}</option>
-                       {/each}
-                   </select></p>
-               
-               <div class="flex items-center justify-center mt-5">
-                   <span class="font-semibold text-primary-400">{selectedProduct.productName}</span>
-                   <!-- svelte-ignore a11y-click-events-have-key-events -->
-                   <!-- svelte-ignore a11y-no-static-element-interactions -->
-                   <span on:click={() => downloadPDFSDS(selectedProduct.safetyDatasheet)} class="cursor-pointer">
-                       <Icon icon="mynaui:download" class="text-primary-400 w-8 h-8 text-2xl" />
-                   </span>
-               </div>
-               {/if} 
-           </div>
-           
-           </div>
-         
-         
-               {/if} 
-   
-               <!---------COAA---------->
-               
-               {#if showCOAModal}
-   
-               <div class="fixed inset-0 flex items-center justify-center bg-gray-400 bg-opacity-80">
-                   <div class="bg-white rounded-lg p-6 w-11/12 md:w-5/12 lg:w-1/2 relative"> 
-                       <button
-                           on:click={ closeCOAModal}
-                           class="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-                           aria-label="Close">
-                           <Icon icon="mdi:close" class="text-xlhover:text-primary-400" />
-                       </button>
-                       <h2 class="text-xl font-bold mb-4 text-center">Certificate of Analysis</h2>
-                       {#if selectedProduct}
-                           <p class="text-center">
-                               <strong>Pack Size:</strong>
-                               <select bind:value={selectedPackSize} class="border w-1/4 p-2 inline-block rounded bg-gray-100 ml-2 hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0">
-   
-                                   <option value="" disabled selected>Select size</option>
-                                   {#each selectedProduct.priceSize as size}
-                                       <option value={size.size}>{size.size}</option>
-                                   {/each}
-                               </select></p>
-                           
-                           <div class="flex items-center justify-center mt-5">
-                               <span class="font-semibold text-primary-400">{selectedProduct.productName}</span>
-                               <!-- svelte-ignore a11y-click-events-have-key-events -->
-                               <!-- svelte-ignore a11y-no-static-element-interactions -->
-                               <span on:click={() => downloadPDFCOA(selectedProduct.certicateofAnalysis)} class="cursor-pointer">
-                                   <Icon icon="mynaui:download" class="text-primary-400 w-8 h-8 text-2xl" />
-                               </span>
-                           </div>
-                           {/if} 
-                       </div>
-                       
-                       </div>
-                     {/if} 
+            <!-- URL -->
+                      {#if uploadOption === 'url'}
+                          <div class="mb-4">
+                              <label for="url" class="block text-gray-700 font-semibold text-sm mb-1">*URL to the Work</label>
+                              <input type="url" placeholder="URL" id="url" name="url" bind:value={url} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0  rounded w-full md:w-3/4 lg:w-4/5 p-2" required />
+                          </div>
+                      {/if}
+                  </div>
+              </div>
+          </fieldset>
+
+          <div class="mb-4">
+              <label for="description" class="block text-gray-700 md:w-5/12 font-semibold mb-2">
+                  Please describe the way and the purpose you are going to use our copyrighted work</label>
+              <textarea id="description" name="description" rows="3" class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0  rounded w-full md:w-5/12 p-2" bind:value={description} ></textarea>
+          </div>
+
+          <button type="submit" class="bg-primary-500 hover:bg-primary-700 text-white py-2 px-4 rounded">Submit Request</button>
+      </form>
+
+      <!-- Thank you message -->
+ 
+      {#if thankYouMessageVisible}
+      <div class="flex justify-center items-center">
+          <p class="text-white text-center w-1/2 bg-green-600 p-2 rounded-lg">
+              Thank you for submitting your request!
+          </p>
+      </div>
+      {/if}
+  </div>
+</div>

@@ -7,7 +7,7 @@ const stocksSchema = new Schema(
   {
     partNumber: {
       type: Schema.Types.ObjectId, // Assuming partNumber refers to another collection, use ObjectId reference
-      ref: 'products', // The name of the related collection (adjust as needed)
+      ref: 'Product', // The name of the related collection (adjust as needed)
       required: false,
     },
     unitOfMeasure: {
@@ -81,7 +81,6 @@ const stocksSchema = new Schema(
   }
 );
 
-// Create and export the Stocks model
-const Stock = mongoose.model('stock', stocksSchema);
+const Stock = mongoose.models.Stock ||  mongoose.model('Stock', stocksSchema);
 
 export default Stock;

@@ -21,7 +21,6 @@ const myFavouritesSchema = new Schema(
   }
 );
 
-// Create the model
-const MyFavourite = mongoose.model("MyFavourite", myFavouritesSchema);
+const MyFavourite = mongoose.models.MyFavourite || mongoose.model("MyFavourite", myFavouritesSchema);
 
 export default MyFavourite;

@@ -29,7 +29,7 @@ const orderSchema = new mongoose.Schema(
     },
     products: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Products',  // Replace 'Product' with the appropriate model name for the product collection
+      ref: 'Product',  // Replace 'Product' with the appropriate model name for the product collection
       required: false,
     }],
     orderdetails: {

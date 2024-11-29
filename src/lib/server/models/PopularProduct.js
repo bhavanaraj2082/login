@@ -16,7 +16,8 @@ const popularProductSchema = new mongoose.Schema(
     },
     { timestamps: true } 
   );
-  
-  const PopularProduct = mongoose.model('PopularProduct', popularProductSchema);
+
+
+  const PopularProduct = mongoose.models.PopularProduct || mongoose.model('PopularProduct', popularProductSchema);
   
   export default PopularProduct;
