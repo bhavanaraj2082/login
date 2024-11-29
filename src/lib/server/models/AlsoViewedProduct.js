@@ -69,6 +69,6 @@ const viewedProductSchema = new Schema(
   }
 );
 
-const ViewedProduct = mongoose.models.ViewedProduct || mongoose.model("ViewedProducts", viewedProductSchema);
+const ViewedProduct = mongoose.models.ViewedProduct || mongoose.model("ViewedProduct", viewedProductSchema);
 
 export default ViewedProduct;

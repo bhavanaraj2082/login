@@ -6,7 +6,8 @@
   let categoryData = data.categoryData;
   let subcategoryData = data.subcategoryData;
   let subsubcategories = data.subsubcategories || {};
-  let relatedProducts = data?.relatedProducts?.items;
+  let relatedProducts = data?.relatedProducts;
+ // console.log("form subcategory",relatedProducts);
 </script>
 
 <section class="w-11/12 mx-auto my-3 max-w-7xl">

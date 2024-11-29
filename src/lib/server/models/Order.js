@@ -38,7 +38,7 @@ const orderSchema = new mongoose.Schema(
     },
     shipdetails: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Shipments', // Replace 'ShipDetail' with the appropriate model name for the ship details collection
+      ref: 'Shipment', // Replace 'ShipDetail' with the appropriate model name for the ship details collection
       required: false,
     }],
     currency: {
@@ -48,7 +48,7 @@ const orderSchema = new mongoose.Schema(
     },
     dashuserprofileid: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'profiles', // Replace 'UserProfile' with the appropriate model name for the user profile collection
+      ref: 'Profile', // Replace 'UserProfile' with the appropriate model name for the user profile collection
       required: false,
     },
     deliveryaddress: {

@@ -1,11 +1,11 @@
 import Contact from "$lib/server/models/Contact.js";
 import Order from "$lib/server/models/Order.js";
-import Products from "$lib/server/models/Products.js";
+import Product from "$lib/server/models/Product.js";
 import CopyConsent from "$lib/server/models/CopyConsent.js"; // Adjust the path to your model
 import Register from "$lib/server/models/Register.js";
-import Profiles from "$lib/server/models/Profiles.js";
-import MyFavourites from "$lib/server/models/MyFavourites.js";
-import Stock  from '$lib/server/models/Stocks.js'; 
+import Profile from "$lib/server/models/Profile.js";
+import MyFavourite from "$lib/server/models/MyFavourite.js";
+import Stock  from '$lib/server/models/Stock.js'; 
 import { redirect } from "@sveltejs/kit";
 
 export const submitContactInfo = async (data) => {
@@ -98,7 +98,7 @@ export async function favorite(favdata, cookies) {
   parsedCookie = JSON.parse(cookieValue);
   const userProfileId = parsedCookie?.profileId;
   // console.log("userProfileId",userProfileId);
-  const existingRecord = await MyFavourites.findOne({ userProfileId: userProfileId });
+  const existingRecord = await MyFavourite.findOne({ userProfileId: userProfileId });
   // console.log("existingRecord", existingRecord);
   const favoriteItem = {
     productDesc: favdata.productDesc,
@@ -131,7 +131,7 @@ export async function favorite(favdata, cookies) {
       existingRecord.favorite = updatedFavorites;
       await existingRecord.save();
     } else {
-      await MyFavourites.create({
+      await MyFavourite.create({
         userProfileId,
         favorite: updatedFavorites,
       });
@@ -163,7 +163,7 @@ export const getUpdatedCartData = async (product) => {
   let productObj = [];
   for (let num of productNumbers) {
     try {
-      const record = await Products.findOne(
+      const record = await Product.findOne(
         { productNumber: num },
         { productNumber: 1, priceSize: 1, _id: 0 }
       );
@@ -185,7 +185,7 @@ export async function login(body, cookies) {
   const user = await Register.findOne({ email, password });
 
   if (user) {
-    const profile = await Profiles.findOne({ userId: user._id });
+    const profile = await Profile.findOne({ userId: user._id });
     console.log("profile", profile);
     if (profile) {
       cookies.set(
@@ -238,7 +238,7 @@ export async function register(body, cookies) {
     }
 
     const user = await Register.create(data);
-    const profile = await Profiles.create({
+    const profile = await Profile.create({
       userId: user._id,
       email: user.email,
       sitePreferences,
@@ -262,7 +262,7 @@ export async function register(body, cookies) {
       }
     );
 
-    await MyFavourites.create({ userProfileId: profile._id });
+    await MyFavourite.create({ userProfileId: profile._id });
     isRedirect = true;
 
     // if (verificationResult.success) {
@@ -284,7 +284,7 @@ export async function editProfileContact(body) {
   const { recordId, ...contact } = body;
 
   try {
-    const result = await Profiles.findByIdAndUpdate(recordId, contact, {
+    const result = await Profile.findByIdAndUpdate(recordId, contact, {
       new: true, // Return the updated document
       runValidators: true, // Ensure that validation is run
     });
@@ -310,7 +310,7 @@ export async function editProfileLinkOrganization(body) {
 
   try {
     // Find the record by recordId and update the linkOrganization field
-    const result = await Profiles.findByIdAndUpdate(
+    const result = await Profile.findByIdAndUpdate(
       recordId,
       { linkOrganization }, // Set the linkOrganization field
       { new: true, runValidators: true } // Return the updated document and run validation
@@ -356,7 +356,7 @@ export async function editProfileAddresses(body) {
 
   try {
     // Perform the update based on the addressType
-    const result = await Profiles.findByIdAndUpdate(
+    const result = await Profile.findByIdAndUpdate(
       recordId,
       updateField, // Update the correct address field
       { new: true, runValidators: true } // Return the updated document and validate
@@ -393,8 +393,8 @@ export async function editProfileSitePreferences(body) {
   }
 
   try {
-    // Perform the update in the Profiles collection
-    const result = await Profiles.findByIdAndUpdate(
+    // Perform the update in the Profile collection
+    const result = await Profile.findByIdAndUpdate(
       recordId,
       { sitePreferences }, // Update the sitePreferences field with the parsed object
       { new: true, runValidators: true } // Return the updated document and apply schema validation
@@ -420,8 +420,8 @@ export async function editProfilePaymentMethod(body) {
   const { recordId, ...paymentMethods } = body;
 
   try {
-    // Perform the update in the Profiles collection
-    const result = await Profiles.findByIdAndUpdate(
+    // Perform the update in the Profile collection
+    const result = await Profile.findByIdAndUpdate(
       recordId,
       { paymentMethods }, // Update the paymentMethods field
       { new: true, runValidators: true } // Return the updated document and apply schema validation
@@ -455,8 +455,8 @@ export async function editProfileEmailPreferences(body) {
   }
 
   try {
-    // Perform the update in the Profiles collection
-    const result = await Profiles.findByIdAndUpdate(
+    // Perform the update in the Profile collection
+    const result = await Profile.findByIdAndUpdate(
       recordId,
       { emailPreferences }, // Update the emailPreferences field
       { new: true, runValidators: true } // Return the updated document and apply schema validation
@@ -488,7 +488,7 @@ export const searchByQuery = async (body) => {
   };
 
   try {
-    const result = await Products.find(queryFilter).limit(5).populate('category').populate('subCategory').exec();                  
+    const result = await Product.find(queryFilter).limit(5).populate('category').populate('subCategory').exec();                  
     return JSON.parse(JSON.stringify(result))
   } catch (error) {
     console.log(error);

@@ -2,7 +2,9 @@
   import RelatedProductss from "$lib/components/RelatedProductss.svelte";
   export let data;
   let subsubcategoryData = data.subsubcategoryData;
-  let relatedProducts = data?.relatedProducts?.items;
+  let relatedProducts = data?.relatedProducts;
+  //console.log("form subsubcategory",relatedProducts);
+
 </script>
 
 <section class="w-11/12 mx-auto mb-3 max-w-7xl">

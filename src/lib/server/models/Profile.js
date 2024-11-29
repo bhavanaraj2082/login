@@ -28,7 +28,7 @@ const chemiDashProfileSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'register', 
+    ref: 'Register', 
     required: false
   },
   linkOrganization: jsonSchema, 
@@ -44,6 +44,6 @@ const chemiDashProfileSchema = new mongoose.Schema({
   collection:"profiles"
 });
 
-const Profiles = mongoose.models.Profiles || mongoose.model('Profiles', chemiDashProfileSchema);
+const Profile = mongoose.models.Profile || mongoose.model('Profile', chemiDashProfileSchema);
 
-export default Profiles
+export default Profile
