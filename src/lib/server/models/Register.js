@@ -28,7 +28,7 @@ const registerSchema = new mongoose.Schema(
     },
     chemiDashProfileId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'profiles',
+      ref: 'Profile',
       required: false,
     },
     termsAndConditions: {
@@ -38,6 +38,7 @@ const registerSchema = new mongoose.Schema(
   },
   {
     timestamps: true, // Optional: add createdAt and updatedAt fields
+    collection:"registers"
   }
 );
 

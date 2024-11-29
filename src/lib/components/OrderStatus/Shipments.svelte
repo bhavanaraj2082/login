@@ -1,13 +1,13 @@
 <script>
   export let data;
   import Icon from "@iconify/svelte";
-  let products = data?.order?.expand?.products || [];
-  let shipments = data?.order?.expand?.shipdetails || [];
+  let products = data?.order?.products || [];
+  let shipments = data?.order?.shipdetails || [];
 
   const productDetails = products.map((product) => ({
     id: product.id,
     productName: product.productName,
-    imgSrc: product.imageSrc,
+    imageSrc: product.imageSrc,
   }));
 
   const shipmentdetails = shipments.map((shipment, index) => ({
@@ -19,12 +19,12 @@
     shipMethod: shipment.shipMethod,
     deliveryDate: shipment.deliveredDate,
     shipDetails: shipment.shipDetails.map((detail) => {
-      const product = productDetails.find((p) => p.id === detail.id);
+      const product = productDetails.find((p) => p._id === detail._id);
       if (product) {
         return {
           ...detail,
           productName: product.productName,
-          imgSrc: product.imgSrc,
+          imgSrc: product.imageSrc,
         };
       }
       return detail;

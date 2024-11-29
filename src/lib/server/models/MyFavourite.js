@@ -11,7 +11,7 @@ const myFavouritesSchema = new Schema(
     },
     userProfileId: {
       type: Schema.Types.ObjectId, 
-      ref: "profiles", 
+      ref: "Profile", 
       required: false, 
   }
 },
@@ -21,7 +21,8 @@ const myFavouritesSchema = new Schema(
   }
 );
 
-// Create the model
-const MyFavourites = mongoose.model("MyFavourites", myFavouritesSchema);
 
-export default MyFavourites;
+// Create the model
+const MyFavourite = mongoose.models.MyFavourite || mongoose.model("MyFavourite", myFavouritesSchema);
+
+export default MyFavourite;
