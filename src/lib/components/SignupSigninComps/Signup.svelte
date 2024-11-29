@@ -1,5 +1,5 @@
 <script>
-    import { enhance } from '$app/forms';
+    import { enhance,applyAction } from '$app/forms';
     import { toast } from 'svelte-sonner';
 
     let username = '';
@@ -42,6 +42,9 @@
         }
         return async({result,update})=>{
             console.log("result",result);
+            if(result.type === "redirect"){
+                await applyAction(result)
+            }
             if(result.type === "success"){
                 if(result.data.success){
                     await update()
@@ -126,7 +129,7 @@
 
             <div class="mb-4">
                 <label for="passwordConfirm" class="block text-sm font-medium text-gray-600">Confirm Password</label>
-                <input type="password" id="passwordConfirm" name="passwordConfirm" bind:value={passwordConfirm} placeholder="Confirm your password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300" />
+                <input type="password" id="passwordConfirm" name="confirmpassword" bind:value={passwordConfirm} placeholder="Confirm your password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300" />
                 {#if errors.passwordConfirm}
                     <div class="text-red-500 text-xs mt-1">{errors.passwordConfirm}</div>
                 {/if}

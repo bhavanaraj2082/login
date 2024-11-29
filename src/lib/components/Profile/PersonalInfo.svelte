@@ -131,7 +131,7 @@
             <section class=" w-full flex flex-col sm:flex-row flex-wrap gap-y-3 py-3">
                 <div class=" text-sm md:text-4s w-full sm:w-1/2">
                     <h4 class="font-medium">Name</h4>
-                    <p class=" text-sm">{firstName || "NA"} {lastName}</p>
+                    <p class=" text-sm">{firstName || "NA"} {lastName || ""}</p>
                 </div>
                 <div class=" w-full sm:w-1/2">
                     <h4 class="font-medium">Primary Phone</h4>

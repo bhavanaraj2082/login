@@ -1,4 +1,4 @@
-import { getProfileDetails } from "$lib/server/loads.js";
+import { getProfileDetails } from "$lib/server/mongoLoads.js";
 import {
   editProfileContact,
   editProfileAddresses,
@@ -6,15 +6,13 @@ import {
   editProfileLinkOrganization,
   editProfilePaymentMethod,
   editProfileEmailPreferences,
-} from "$lib/server/actions.js";
-import {authenticate} from '$lib/server/pocketbase.js'
-const pb = await authenticate()
+} from "$lib/server/mongoActions.js";
  
 export const load = async ({cookies}) => {
   try {
       const user = JSON.parse(cookies.get('token'))
       //console.log("hhhhhh",email);
-      return await getProfileDetails(pb,user.email)  
+      return await getProfileDetails(user.email)  
   } catch (error) {
     console.log('error',error);
       return { 
@@ -27,7 +25,7 @@ export const actions = {
   editContact:async({request})=>{
     try {
       const body = Object.fromEntries(await request.formData())
-      return await editProfileContact(pb,body)
+      return await editProfileContact(body)
     } catch (err) {
       console.log(err);
       return { success:false,message:"Something went wrong"}
@@ -37,7 +35,7 @@ export const actions = {
   editAddresses:async({request})=>{
     try {
       const body = Object.fromEntries(await request.formData())
-      return await editProfileAddresses(pb,body)
+      return await editProfileAddresses(body)
     } catch (err) {
       console.log(err);
       return { success:false,message:"Something went wrong"}
@@ -47,7 +45,7 @@ export const actions = {
   editSitePreferences:async({request})=>{
     try {
       const body = Object.fromEntries(await request.formData())
-      return await editProfileSitePreferences(pb,body)
+      return await editProfileSitePreferences(body)
     } catch (err) {
       console.log(err);
       return { success:false,message:"Something went wrong"}
@@ -57,7 +55,7 @@ export const actions = {
   editPaymentMethods:async({request})=>{
     try {
       const body = Object.fromEntries(await request.formData())
-      return await editProfilePaymentMethod(pb,body)
+      return await editProfilePaymentMethod(body)
     } catch (err) {
       console.log(err);
       return { success:false,message:"Something went wrong"}
@@ -67,7 +65,7 @@ export const actions = {
   editEmailPreferences:async({request})=>{
     try {
       const body = Object.fromEntries(await request.formData())
-      return await editProfileEmailPreferences(pb,body)
+      return await editProfileEmailPreferences(body)
     } catch (err) {
       console.log(err);
       return { success:false,message:"Something went wrong"}
@@ -77,7 +75,7 @@ export const actions = {
   linkOrganization:async({request})=>{
     try {
       const body = Object.fromEntries(await request.formData())
-      return await editProfileLinkOrganization(pb,body)
+      return await editProfileLinkOrganization(body)
     } catch (err) {
       console.log(err);
       return { success:false,message:"Something went wrong"}

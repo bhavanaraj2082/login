@@ -9,12 +9,11 @@
   import SitePreference from "$lib/components/Profile/SitePreference.svelte";
 
   export let data;
-
   let activeComp = 0
   let message = ''
   
   $: ({
-    id,
+    _id,
     linkOrganization,
     sitePreferences,
     shippingAddress,
@@ -26,7 +25,7 @@
     ...contact
   } = data.profileData)
 
- $: recordId = id
+ $: recordId = _id
   const changeTabs = (value)=>{
     activeComp = value
   }
