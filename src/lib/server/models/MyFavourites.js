@@ -11,7 +11,7 @@ const myFavouritesSchema = new Schema(
     },
     userProfileId: {
       type: Schema.Types.ObjectId, 
-      ref: "ChemiDashProfile", 
+      ref: "profiles", 
       required: false, 
   }
 },

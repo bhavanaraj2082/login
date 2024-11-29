@@ -1,10 +1,10 @@
 import Contact from "$lib/server/models/Contact.js";
 import Order from "$lib/server/models/Order.js";
-import Products from "$lib/server/models/Products";
-import CopyConsent from "../lib/server/models/CopyConsent.js"; // Adjust the path to your model
-import Register from "$lib/server/models/Register";
-import ChemiDashProfile from "$lib/server/models/ChemiDashProfile";
-import MyFavourites from "$lib/server/models/MyFavourites";
+import Products from "$lib/server/models/Products.js";
+import CopyConsent from "$lib/server/models/CopyConsent.js"; // Adjust the path to your model
+import Register from "$lib/server/models/Register.js";
+import Profiles from "$lib/server/models/Profiles.js";
+import MyFavourites from "$lib/server/models/MyFavourites.js";
 import Stock  from '$lib/server/models/Stocks.js'; 
 import { redirect } from "@sveltejs/kit";
 
@@ -185,7 +185,7 @@ export async function login(body, cookies) {
   const user = await Register.findOne({ email, password });
 
   if (user) {
-    const profile = await ChemiDashProfile.findOne({ userId: user._id });
+    const profile = await Profiles.findOne({ userId: user._id });
     console.log("profile", profile);
     if (profile) {
       cookies.set(
@@ -238,7 +238,7 @@ export async function register(body, cookies) {
     }
 
     const user = await Register.create(data);
-    const profile = await ChemiDashProfile.create({
+    const profile = await Profiles.create({
       userId: user._id,
       email: user.email,
       sitePreferences,
@@ -284,7 +284,7 @@ export async function editProfileContact(body) {
   const { recordId, ...contact } = body;
 
   try {
-    const result = await ChemiDashProfile.findByIdAndUpdate(recordId, contact, {
+    const result = await Profiles.findByIdAndUpdate(recordId, contact, {
       new: true, // Return the updated document
       runValidators: true, // Ensure that validation is run
     });
@@ -310,7 +310,7 @@ export async function editProfileLinkOrganization(body) {
 
   try {
     // Find the record by recordId and update the linkOrganization field
-    const result = await ChemiDashProfile.findByIdAndUpdate(
+    const result = await Profiles.findByIdAndUpdate(
       recordId,
       { linkOrganization }, // Set the linkOrganization field
       { new: true, runValidators: true } // Return the updated document and run validation
@@ -356,7 +356,7 @@ export async function editProfileAddresses(body) {
 
   try {
     // Perform the update based on the addressType
-    const result = await ChemiDashProfile.findByIdAndUpdate(
+    const result = await Profiles.findByIdAndUpdate(
       recordId,
       updateField, // Update the correct address field
       { new: true, runValidators: true } // Return the updated document and validate
@@ -393,8 +393,8 @@ export async function editProfileSitePreferences(body) {
   }
 
   try {
-    // Perform the update in the ChemiDashProfile collection
-    const result = await ChemiDashProfile.findByIdAndUpdate(
+    // Perform the update in the Profiles collection
+    const result = await Profiles.findByIdAndUpdate(
       recordId,
       { sitePreferences }, // Update the sitePreferences field with the parsed object
       { new: true, runValidators: true } // Return the updated document and apply schema validation
@@ -420,8 +420,8 @@ export async function editProfilePaymentMethod(body) {
   const { recordId, ...paymentMethods } = body;
 
   try {
-    // Perform the update in the ChemiDashProfile collection
-    const result = await ChemiDashProfile.findByIdAndUpdate(
+    // Perform the update in the Profiles collection
+    const result = await Profiles.findByIdAndUpdate(
       recordId,
       { paymentMethods }, // Update the paymentMethods field
       { new: true, runValidators: true } // Return the updated document and apply schema validation
@@ -455,8 +455,8 @@ export async function editProfileEmailPreferences(body) {
   }
 
   try {
-    // Perform the update in the ChemiDashProfile collection
-    const result = await ChemiDashProfile.findByIdAndUpdate(
+    // Perform the update in the Profiles collection
+    const result = await Profiles.findByIdAndUpdate(
       recordId,
       { emailPreferences }, // Update the emailPreferences field
       { new: true, runValidators: true } // Return the updated document and apply schema validation
@@ -478,304 +478,23 @@ export async function editProfileEmailPreferences(body) {
   }
 }
 
-export async function login(body, cookies) {
-  const { email, password } = body;
-
-  const user = await Register.findOne({ email, password });
-
-  if (user) {
-    const profile = await ChemiDashProfile.findOne({ userId: user._id });
-    console.log("profile", profile);
-    if (profile) {
-      cookies.set(
-        "token",
-        JSON.stringify({
-          email: user.email,
-          profileId: profile._id,
-          userId: user._id,
-        }),
-        {
-          path: "/",
-          httpOnly: true,
-          sameSite: "strict",
-          maxAge: 60 * 60 * 24 * 1000, // 1 day
-        }
-      );
-
-      // Redirect to the profile page
-      return redirect(302, "/profile");
-    } else {
-      return { success: false, message: "Profile not found" };
-    }
-  } else {
-    return {
-      success: false,
-      message: "Failed to login, please check your email and password",
-    };
-  }
-}
-
-export async function register(body, cookies) {
-  const data = body;
-  let isRedirect = false;
-
-  // Default site preferences
-  let sitePreferences = {
-    noOfOrdersPerPage: 3,
-    noOfQuickOrderFields: 3,
-    noOfQuotesPerPage: 3,
-    productEntryType: "Manual Entry",
+export const searchByQuery = async (body) => {
+  const queryFilter = {
+    $or: [
+      { productName: { $regex: body.query, $options: 'i' } },  
+      { productNumber: { $regex: body.query, $options: 'i' } }, 
+      { 'filteredProductData.CASNumber': { $regex: body.query, $options: 'i' } } 
+    ]
   };
 
   try {
-    const findUser = await Register.findOne({
-      email: data.email,
-      password: data.password,
-    });
-    if (findUser !== null) {
-      return { success: false, message: "User already exist" };
-    }
-
-    const user = await Register.create(data);
-    const profile = await ChemiDashProfile.create({
-      userId: user._id,
-      email: user.email,
-      sitePreferences,
-    });
-
-    user.chemiDashProfileId = profile._id;
-    await user.save();
-
-    cookies.set(
-      "token",
-      JSON.stringify({
-        email: user.email,
-        profileId: profile._id,
-        userId: user._id,
-      }),
-      {
-        path: "/",
-        httpOnly: true,
-        sameSite: "strict",
-        maxAge: 60 * 60 * 24 * 1000, // 1 day
-      }
-    );
-
-    await MyFavourites.create({ userProfileId: profile._id });
-    isRedirect = true;
-
-    // if (verificationResult.success) {
-    //     return { success: true, message: "Check your email to verify your email address" };
-    // } else {
-    //     return { success: false, message: "Verification email was not sent" };
-    // }
+    const result = await Products.find(queryFilter).limit(5).populate('category').populate('subCategory').exec();                  
+    return JSON.parse(JSON.stringify(result))
   } catch (error) {
-    console.log("Error during registration:", error);
-    return { success: false, message: "An error occurred during registration" };
+    console.log(error);
+    return { success:false,message:"something went wrong"}
   }
-  if (isRedirect) {
-    return redirect(302, "/profile");
-  }
-}
-
-// profile action functions
-export async function editProfileContact(body) {
-  const { recordId, ...contact } = body;
-
-  try {
-    const result = await ChemiDashProfile.findByIdAndUpdate(recordId, contact, {
-      new: true, // Return the updated document
-      runValidators: true, // Ensure that validation is run
-    });
-
-    // Check if a record was updated
-    if (result) {
-      return { success: true, message: "Updated contact information" };
-    } else {
-      return { success: false, message: "Record not found" };
-    }
-  } catch (error) {
-    // Handle any potential errors that might occur
-    return {
-      success: false,
-      message: "Something went wrong",
-      error: error.message,
-    };
-  }
-}
-
-export async function editProfileLinkOrganization(body) {
-  const { recordId, ...linkOrganization } = body;
-
-  try {
-    // Find the record by recordId and update the linkOrganization field
-    const result = await ChemiDashProfile.findByIdAndUpdate(
-      recordId,
-      { linkOrganization }, // Set the linkOrganization field
-      { new: true, runValidators: true } // Return the updated document and run validation
-    );
-
-    // Check if a record was found and updated
-    if (result) {
-      return { success: true, message: "Updated organization link" };
-    } else {
-      return { success: false, message: "Record not found" };
-    }
-  } catch (error) {
-    // Handle any potential errors
-    return {
-      success: false,
-      message: "Something went wrong",
-      error: error.message,
-    };
-  }
-}
-
-export async function editProfileAddresses(body) {
-  const { recordId, addressType, ...address } = body;
-  let updateField;
-
-  // Determine the update field based on addressType
-  switch (addressType) {
-    case "organization":
-      updateField = { organizationAddress: address };
-      break;
-    case "shipping":
-      updateField = { shippingAddress: address };
-      break;
-    case "billing":
-      updateField = { billingAddress: address };
-      break;
-    case "payment":
-      updateField = { paymentAddress: address };
-      break;
-    default:
-      return { success: false, message: "Invalid address type" };
-  }
-
-  try {
-    // Perform the update based on the addressType
-    const result = await ChemiDashProfile.findByIdAndUpdate(
-      recordId,
-      updateField, // Update the correct address field
-      { new: true, runValidators: true } // Return the updated document and validate
-    );
-
-    // Check if the record was updated
-    if (result) {
-      return {
-        success: true,
-        message: `Updated ${addressType} address successfully`,
-      };
-    } else {
-      return { success: false, message: "Record not found" };
-    }
-  } catch (error) {
-    // Handle any errors
-    return {
-      success: false,
-      message: "Something went wrong",
-      error: error.message,
-    };
-  }
-}
-
-export async function editProfileSitePreferences(body) {
-  const { recordId, preferences } = body;
-
-  // Parse the preferences string into a JavaScript object
-  let sitePreferences;
-  try {
-    sitePreferences = JSON.parse(preferences);
-  } catch (error) {
-    return { success: false, message: "Invalid preferences format" };
-  }
-
-  try {
-    // Perform the update in the ChemiDashProfile collection
-    const result = await ChemiDashProfile.findByIdAndUpdate(
-      recordId,
-      { sitePreferences }, // Update the sitePreferences field with the parsed object
-      { new: true, runValidators: true } // Return the updated document and apply schema validation
-    );
-
-    // Check if the record was updated
-    if (result) {
-      return { success: true, message: "Updated site preferences" };
-    } else {
-      return { success: false, message: "Record not found" };
-    }
-  } catch (error) {
-    // Handle any errors that occur during the update
-    return {
-      success: false,
-      message: "Something went wrong",
-      error: error.message,
-    };
-  }
-}
-
-export async function editProfilePaymentMethod(body) {
-  const { recordId, ...paymentMethods } = body;
-
-  try {
-    // Perform the update in the ChemiDashProfile collection
-    const result = await ChemiDashProfile.findByIdAndUpdate(
-      recordId,
-      { paymentMethods }, // Update the paymentMethods field
-      { new: true, runValidators: true } // Return the updated document and apply schema validation
-    );
-
-    // Check if the record was updated
-    if (result) {
-      return { success: true, message: "Updated payment methods" };
-    } else {
-      return { success: false, message: "Record not found" };
-    }
-  } catch (error) {
-    // Handle any errors that occur during the update
-    return {
-      success: false,
-      message: "Something went wrong",
-      error: error.message,
-    };
-  }
-}
-
-export async function editProfileEmailPreferences(body) {
-  const { recordId, preference } = body;
-
-  // Parse the preference string into a JavaScript object
-  let emailPreferences;
-  try {
-    emailPreferences = JSON.parse(preference);
-  } catch (error) {
-    return { success: false, message: "Invalid preference format" };
-  }
-
-  try {
-    // Perform the update in the ChemiDashProfile collection
-    const result = await ChemiDashProfile.findByIdAndUpdate(
-      recordId,
-      { emailPreferences }, // Update the emailPreferences field
-      { new: true, runValidators: true } // Return the updated document and apply schema validation
-    );
-
-    // Check if the record was updated
-    if (result) {
-      return { success: true, message: "Updated email preferences" };
-    } else {
-      return { success: false, message: "Record not found" };
-    }
-  } catch (error) {
-    // Handle any errors that occur during the update
-    return {
-      success: false,
-      message: "Something went wrong",
-      error: error.message,
-    };
-  }
-}
+};
 
 export async function submitForm(data) {
   try {
@@ -788,3 +507,4 @@ export async function submitForm(data) {
     return { status: 500, body: { success: false, error: error.message } };
   }
 }
+

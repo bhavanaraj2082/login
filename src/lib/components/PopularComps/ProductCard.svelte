@@ -3,20 +3,20 @@
 </script>
 
 <div    
-    class="shadow-sm flex flex-col justify-between border bg-white rounded-lg pb-6 overflow-hidden"
+    class="shadow-sm flex flex-col justify-between gap-2 border bg-white rounded-lg px-5 py-5 lg:px-10 overflow-hidden"
 >
     <img
         src={product?.imageSrc}
         alt={product?.productName}
-        class="w-7/12 h-4/6 m-6 mx-auto object-contain rounded-t-lg mb-4"
+        class=" w-44 h-44 mx-auto object-contain rounded-t-lg"
     />
-    <div class="flex-1 space-y-2">
-        <h3 class="text-xl font-semibold">{product?.productName}</h3>
-        <p class="text-gray-600 h-16 p-2">{product?.prodDesc}</p>
+    <div class="grow space-y-1 mt-4">
+        <h3 class=" text-sm font-semibold">{product?.productName}</h3>
+        <p class="text-gray-600 text-xs  p-2">{product?.prodDesc}</p>
     </div>
     <a
-    href={`products/${product.expand?.Category?.urlName}/${product.expand?.subCategory?.urlName}/${product.productNumber}`}
-        class="bg-primary-400 text-white w-5/6 mx-auto py-2.5 rounded hover:bg-primary-500 mt-4"
+    href={`products/${product?.category.urlName}/${product?.subCategory.urlName}/${product.productNumber}`}
+        class="bg-primary-400 text-white w-full mx-auto text-sm font-medium py-2 rounded hover:bg-primary-500"
     >
         View Details
     </a>

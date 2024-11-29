@@ -48,7 +48,7 @@ const orderSchema = new mongoose.Schema(
     },
     dashuserprofileid: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'ChemiDashProfile', // Replace 'UserProfile' with the appropriate model name for the user profile collection
+      ref: 'profiles', // Replace 'UserProfile' with the appropriate model name for the user profile collection
       required: false,
     },
     deliveryaddress: {
