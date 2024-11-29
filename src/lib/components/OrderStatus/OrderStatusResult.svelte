@@ -7,9 +7,9 @@
 
   export let data;
   let order = data?.order;
-  let recordId = data?.order?.id;
-  let products = data?.order?.expand?.products || [];
-  let shipedProducts = data?.order?.expand?.shipdetails || [];
+  let recordId = data?.order?._id;
+  let products = data?.order?.products || [];
+  let shipedProducts = data?.order?.shipdetails || [];
   let orderDetails = data?.order?.orderdetails;
   let orderStatus;
 
@@ -17,7 +17,7 @@
   const user = $authedUser.email;
   
   const productDetails = products.map((product) => ({
-    id: product.id,
+    id: product._id,
     productName: product.productName,
     // prodDesc: product.prodDesc,
     imgSrc: product.imageSrc,
@@ -228,7 +228,7 @@
         >
           <h1 class="text-sm font-semibold text-gray-500">Date:</h1>
           <p class="text-sm font-medium text-heading">
-            {formatDate(order.created)}
+            {formatDate(order.createdAt)}
           </p>
         </div>
 

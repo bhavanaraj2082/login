@@ -1,9 +1,10 @@
 <script>
   export let data;
   const categories = data.records;
+  // console.log("=======>cat",categories.length)
 </script>
 
-<div class="max-w-7xl mx-auto mb-10 lg:px-8">
+<div class="w-11/12 mx-auto mb-10 lg:px-8">
   <div class="pl-4">
     <p class="mt-2 text-base text-content">
       Explore our high-quality chemical products, Classified into various
@@ -14,7 +15,7 @@
     {#each categories as category}
       <div class="bg-white shadow rounded-md overflow-hidden">
         <img
-          src="category/{category.name || "img"}.webp"
+          src="/image/category.jpeg"
           alt="img"
           class=" w-full h-60 object-center"
         />

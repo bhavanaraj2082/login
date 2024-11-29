@@ -1,17 +1,14 @@
-import {authenticate} from "$lib/server/pocketbase";
-import { getorderstatusdata } from "$lib/server/loads";
-import { CancelOrder } from "$lib/server/actions";
-
-const pb = await authenticate();
+import { getOrderStatusData } from "$lib/server/mongoLoads.js";
+import { CancelOrder } from "$lib/server/mongoActions.js";
 
 export const load = async({params})=>{
-    return await getorderstatusdata(pb,params.orderid)
+    return await getOrderStatusData(params.orderid)
 }
 
 export const actions = {
 	cancelOrder: async ({ request }) => {
 		const body = Object.fromEntries(await request.formData());
-        const result = await CancelOrder(pb,body)
+        const result = await CancelOrder(body)
 		return result;
 	}
 };

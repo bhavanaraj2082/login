@@ -1,12 +1,13 @@
 <script>
   export let data;
   const subcategories = data.records;
+  // console.log("=======>subcat",subcategories.length)
 </script>
 
-<div class="max-w-7xl mx-auto mb-8 px-6 lg:px-8">
+<div class="w-11/12 mx-auto mb-8 px-6 lg:px-8">
   <div class="pl-4">
     <p class="text-primary-400 font-semibold text-xl">
-      {subcategories[0].expand.category.name}
+      {subcategories[0].category.name}
     </p>
     <p class="mt-2 text-base text-content">
       Precision-driven laboratory chemicals perfect for research, analysis, and
@@ -17,14 +18,13 @@
     {#each subcategories as subcategory}
       <div class="bg-white shadow rounded-md overflow-hidden">
         <img
-          src="/subcategory/{subcategories[0].expand.category
-            .name}/{subcategory.name || 'img'}.webp"
+          src="/image/category.jpeg"
           alt="img"
           class="w-full h-60 object-center"
         />
         <div class="p-4">
           <a
-            href="/products/{subcategory.expand.category
+            href="/products/{subcategory.category
               .urlName}/{subcategory.urlName}"
           >
             <h3 class="text-lg font-semibold text-heading hover:underline">
