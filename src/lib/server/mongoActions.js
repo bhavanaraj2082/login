@@ -6,7 +6,7 @@ import Register from "$lib/server/models/Register.js";
 import Profile from "$lib/server/models/Profile.js";
 import MyFavourite from "$lib/server/models/MyFavourite.js";
 import Stock from '$lib/server/models/Stock.js'; 
-import Solutions from "$lib/server/models/Solutions.js";
+import Solution from "$lib/server/models/Solution.js";
 import Quotes from "$lib/server/models/Quotes.js";
 import Products from "$lib/server/models/Product.js";
 import Helpsupport from "$lib/server/models/Helpsupport.js";
@@ -515,12 +515,12 @@ export async function submitForm(data) {
 //CHEMIKART SOLUTIONS
 export const submitContactData = async (data) => {
   try {
-    const newSolutions = new Solutions(data); 
+    const newSolutions = new Solution(data); 
     const savedSolutions = await newSolutions.save();
     return savedSolutions; 
   } catch (error) {
-    console.error("Error saving Solutions info:", error);
-    throw new Error("Failed to save Solutions information");
+    console.error("Error saving Solution info:", error);
+    throw new Error("Failed to save Solution information");
   }
 };
 

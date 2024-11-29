@@ -81,9 +81,6 @@ const stocksSchema = new Schema(
   }
 );
 
-
-
-// Create and export the Stocks model
 const Stock = mongoose.models.Stock ||  mongoose.model('Stock', stocksSchema);
 
 export default Stock;

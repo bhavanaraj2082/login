@@ -10,6 +10,7 @@ import Manufacturer from "$lib/server/models/Manufacturer.js";
 import SubSubCategory from "$lib/server/models/SubSubcategory.js";
 import Shipment from "$lib/server/models/Shipment.js";
 
+
 export async function getProductdatas() {
   const records = await Category.find();
   if (records.length > 0) {
@@ -320,23 +321,20 @@ export const loadProductsubcategory = async (suburl, page = 1) => {
 
 export async function RelatedApplicationData(name) {
   try {
-    const relatedProducts = await Products.find({
+    const queryFilter = {
       $or: [
-        { "description.Application": { $regex: name, $options: "i" } },
-        { "subsubCategory.name": { $regex: name, $options: "i" } },
-        { "subCategory.name": { $regex: name, $options: "i" } },
-      ],
-    })
-      .populate("subCategory")
-      .populate("manufacturerName")
-      .populate("subsubCategory")
-      .populate("category")
-      .limit(8)
-      .skip(0); // Start at page 1 (0-based index)
+        { description: { $regex: name, $options: 'i' } }, 
+        { 'subsubCategory.name': { $regex: name, $options: 'i' } },      
+        { 'subCategory.name': { $regex: name, $options: 'i' } }         
+      ]
+    };
 
-    return relatedProducts;
+    const relatedProducts = await Product.find(queryFilter).limit(8).populate('subCategory').populate('subsubCategory').populate('category').populate('manufacturerName').exec();           
+
+    return JSON.parse(JSON.stringify(relatedProducts)); 
   } catch (error) {
-    console.error("Error fetching related application data:", error);
-    throw error;
+    console.error('Error fetching related products:', error);
+    return {success:false,message:"Error fetching related products"}
   }
 }
+

@@ -1,8 +1,5 @@
 import data from '$lib/data/applications.json';  
-import { authenticate } from '$lib/server/pocketbase.js'; 
-import { RelatedApplicationData } from '$lib/server/loads.js';
-
-const pb = await authenticate();
+import { RelatedApplicationData } from '$lib/server/mongoLoads.js';
 
 function findData(items, key, value) {
   const found = items.find(item => item[key] === value);
@@ -25,7 +22,7 @@ export async function load({ params }) {
     const subsubcategories = subcategoryData.subsubcategories || [];
     let relatedProducts = [];
     if (subsubcategories.length ===0) {
-     relatedProducts = await RelatedApplicationData(pb, subcategoryData.name);
+     relatedProducts = await RelatedApplicationData(subcategoryData.name);
     }
 
     return {
