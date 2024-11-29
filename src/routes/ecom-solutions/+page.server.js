@@ -1,19 +1,9 @@
-import { pb, authenticate } from "$lib/server/pocketbase.js";
-import { submitContactData } from "$lib/server/actions";
+import { submitContactData } from "$lib/server/mongoActions.js";
 export const actions = {
   contactus: async ({ request }) => {
     try {
-      const authenticatedPb = await authenticate();
-      if (!authenticatedPb) {
-        return {
-          type: "error",
-          data: {
-            error: "Authentication failed. Please try again later!",
-          },
-        };
-      }
       const body = Object.fromEntries(await request.formData());
-      await submitContactData(body, authenticatedPb);
+      await submitContactData(body);
       return {
         type: "success",
         data: {

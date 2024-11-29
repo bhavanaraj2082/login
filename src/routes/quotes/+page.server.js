@@ -1,12 +1,9 @@
-import { authenticate } from '$lib/server/pocketbase.js';
-import { Addquotes } from '$lib/server/actions.js';
-const pb = await authenticate();
-
+import { Addquotes } from '$lib/server/mongoActions.js';
 export const actions = {
     qoutes: async ({ request }) => {
         try {
             const data = Object.fromEntries(await request.formData());
-            const record = await Addquotes(data, pb);
+            const record = await Addquotes(data);
             return {
                 type: "success",
                 data: {
