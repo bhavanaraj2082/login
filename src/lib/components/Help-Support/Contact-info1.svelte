@@ -33,7 +33,7 @@ let message = '';
     return async({ result }) => {
       
 
-      if(result.data.record && result.type === 'success')
+      if(result)
     {
       // console.log(`${result.data.message}` );
       // Clear the form 

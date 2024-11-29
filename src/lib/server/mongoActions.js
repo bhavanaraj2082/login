@@ -1,6 +1,9 @@
 import Contact from "$lib/server/models/Contact.js";
 import Order from "$lib/server/models/Order.js"
 import Products from "$lib/server/models/Products";
+import Solutions from "$lib/server/models/Solutions.js";
+import Quotes from "$lib/server/models/Quotes.js";
+import Helpsupport from "$lib/server/models/Helpsupport.js";
 
 
 export const submitContactInfo = async (data) => {
@@ -135,3 +138,146 @@ export const getUpdatedCartData = async (product) => {
   return JSON.stringify(productObj); 
 };
 
+//CHEMIKART SOLUTIONS
+export const submitContactData = async (data) => {
+  try {
+    const newSolutions = new Solutions(data); 
+    const savedSolutions = await newSolutions.save();
+    return savedSolutions; 
+  } catch (error) {
+    console.error("Error saving Solutions info:", error);
+    throw new Error("Failed to save Solutions information");
+  }
+};
+
+//QUOTES
+export const Addquotes = async (data) => {
+    const components = JSON.parse(data.components);
+    const formattedData = {
+        Custom_solution_type: data.solutionValue,
+        Custom_format: data.selectedColor,
+        Configure_custom_solution: {
+            components: components,
+            solvent: data.solvent,
+            packagingType: data.packagingType,
+            volume: data.volume,
+            units: data.units,
+            qualityLevel: data.qualityLevel,
+            analyticalTechnique: data.analyticalTechnique,
+        },
+        Additional_notes: data.futherdetails,
+        status: data.status,
+        Customer_details: {
+            Title: data.title,
+            Firstname: data.first,
+            Lastname: data.last,
+            organisation: data.organisation,
+            country: data.country,
+            lgc: data.lgc,
+            email: data.email,
+            number: data.number,
+        },
+        Delivery_information: {
+            Address1: data.address1,
+            Address2: data.address2,
+            Country1: data.country1,
+            County: data.county,
+            City: data.city,
+            Post: data.post,
+        },
+    };
+    const newQuote = new Quotes(formattedData);
+    try {
+        await newQuote.save();
+        return { success: true, message: "Quote added successfully" };
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
+};
+
+//DOCUMENTS
+/**
+ * Fetch a product's certificate data from MongoDB based on productNumber.
+ *
+ * @param {string} inputValue - The product number to search for.
+ * @returns {Promise<Object|null>} The product record or null if not found.
+ */
+export async function fetchcertificate(inputValue) {
+    try {
+        const record = JSON.parse(JSON.stringify(await Products.findOne(
+            { productNumber: inputValue }, 
+            'safetyDatasheet productNumber'      
+        ).lean())); 
+        return record || null;
+    } catch (error) {
+        console.error("Error fetching certificate:", error);
+        throw new Error("Unable to fetch certificate.");
+    }
+}
+
+//HELP & SUPPORT
+function finalformdata(formData) {
+  let poNumber = '';
+  let orderNumber = '';
+  let invoiceNumber = '';
+  if (formData.reference === 'PO Number') {
+    poNumber = formData.selectOptionNumber;
+  } else if (formData.reference === 'Order Number') {
+    orderNumber = formData.selectOptionNumber;
+  } else if (formData.reference === 'Invoice Number') {
+    invoiceNumber = formData.selectOptionNumber;
+  }
+  let items = {};
+  if (formData.products) {
+    items = JSON.parse(formData.products);
+  }
+  console.log("Raw Form Data:", formData);
+  const finalData = {
+    technical_issue: formData.technical_issue || '', 
+    issueName: formData.issueName || '',
+    documentRequired: formData.documentRequired || '',
+    currentEmail: formData.currentEmail || '',
+    newEmail: formData.newEmail || '',
+    resetemail: formData.resetemail || '',
+    primaryAddress: formData.primaryAddress || '',
+    updateAddress: formData.updateAddress || '',
+    issue: formData.issue || '',
+    assistance: formData.assistance || '',
+    items: items,
+    exportMaterial: formData.exportMaterial || '',
+    poNumber: formData.poNumber || poNumber,
+    orderNumber: orderNumber || '',
+    invoiceNumber: formData.invoiceNumber || invoiceNumber,
+    confirmationNumber: formData.confirmationNumber || '',
+    itemNumber: formData.itemNumber || '',
+    firstName: formData.firstName || '',
+    lastName: formData.lastName || '',
+    email: formData.email || '',
+    phoneNumber: formData.phoneNumber || '',
+    companyName: formData.companyName || '',
+    location: formData.location || '',
+    accountNumber: formData.accountNumber || '',
+    shippingStreetAddress: formData.streetAddress || '',
+    shippingCity: formData.city || '',
+    shippinglocation: formData.shippinglocation || '',
+    shippingPostalCode: formData.postalCode || '',
+    billingStreetAddress: formData.billingStreetAddress || '',
+    billingCity: formData.billingCity || '',
+    billingLocation: formData.billingLocation || '',
+    billingPostalCode: formData.billingPostalCode || '',
+    files: formData.files || [],
+    status: "unread", 
+  };
+  console.log("Processed Final Data:", finalData);
+  return finalData;
+}
+export const saveContactInfo = async (data) => {
+  try {
+    let finalData = finalformdata(data);
+    const record = await Helpsupport.create(finalData);
+    return { success: true, record };
+  } catch (error) {
+    console.error('Error saving contact info:', error);
+    return { success: false, error: error.message };
+  }
+};
