@@ -28,7 +28,7 @@ const chemiDashProfileSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Register', 
+    ref: 'register', 
     required: false
   },
   linkOrganization: jsonSchema, 
@@ -41,12 +41,9 @@ const chemiDashProfileSchema = new mongoose.Schema({
   paymentMethods: jsonSchema
 }, {
   timestamps: true,
-  collection:"chemidashprofile"
+  collection:"profiles"
 });
-// if(mongoose.models.ChemiDashProfile){
-//   delete mongoose.models.ChemiDashProfile
-// }
-// Create and export the Mongoose model
-const ChemiDashProfile = mongoose.models.ChemiDashProfile || mongoose.model('ChemiDashProfile', chemiDashProfileSchema);
 
-export default ChemiDashProfile
+const Profiles = mongoose.models.Profiles || mongoose.model('Profiles', chemiDashProfileSchema);
+
+export default Profiles

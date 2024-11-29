@@ -44,7 +44,7 @@
 </script>
 
 <div class="p-5">
-  <h1 class=" text-lg md:text-xl font-bold my-2">Profile</h1>
+  <h1 class=" text-lg md:text-xl md:mx-6 lg:mx-10 font-bold my-2">Profile</h1>
   <div class=" w-full flex flex-col md:flex-row gap-2 lg:gap-4 xl:gap-6">
     <div class=" w-full md:w-2/5 lg:w-1/3 xl:w-1/4">
       <ProfileSideBar {changeTabs} />

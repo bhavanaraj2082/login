@@ -18,6 +18,9 @@
 	let debounceTimeout;
 	let isLoading = false;
 	let searchResults=[]
+	let isLiked = false;
+	const heartOutline = 'mdi:heart-outline';
+  	const heartFilled = 'mdi:heart'; 
 
 	//console.log('header',$authedUser)
 	const getInitial = (name) => name.charAt(0).toUpperCase();
@@ -27,6 +30,7 @@
 		} catch (error) {
 			console.error('Error fetching menus:', error);
 		}
+		isLiked = false;
 	});
 
 	function handleMouseEnter(subSubmenu) {
@@ -69,11 +73,16 @@
 	}
 	function navigateTo(url) {
 		window.location.href = url;
+		isLiked = false;
 	}
 	let isOpen = false;
 
 	function toggleLogoMenu() {
 		isOpen = !isOpen;
+	}
+
+	function toggleLike() {
+		isLiked = !isLiked;
 	}
 
 	function debounce(func, delay) {
@@ -198,7 +207,7 @@
 	</div>
 	<div class="flex items-center justify-between w-11/12 py-4 mx-auto max-w-7xl flex-wrap">
 		<div class="flex md:hidden float-end">
-			<button on:click={toggleLogoMenu} class="flex items-center text-gray-600 focus:outline-none">
+			<button on:click={toggleLogoMenu} class="flex items-center text-gray-600 focus:outline-none pl-2">
 				<Icon icon="fa6-solid:bars" class=" text-2xl text-gray-600" />
 			</button>
 		</div>
@@ -212,7 +221,21 @@
 			</button>
 		</div>
 
-		<div class=" md:hidden"><Cartrightside/></div>
+		<div class="md:hidden flex items-center gap-2">
+		<a href="/my-favourite">
+		   <button 
+			 on:click={toggleLike} 
+			 aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
+			 class={`py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'bg-gray-50' : 'bg-transparent'}`}
+		   >
+			 <Icon 
+			   icon={isLiked ? heartFilled : heartOutline} 
+			   class={`text-2xl transition-colors duration-300 hover:text-primary-400 ease-in-out ${isLiked ? 'text-primary-400' : 'text-gray-600'}`} 
+			 />
+		   </button>
+		 </a>
+		   <Cartrightside />
+		 </div>
 
 		<!-- Searchbar functionality -->
 		<div class="relative w-full md:max-w-sm lg:max-w-lg md:mx-4 lg:mx-8 sm:mt-2">
@@ -224,8 +247,13 @@
 						bind:value={searchQuery}
 						name="query"
 						on:input={handleInput}
-						class=" border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 w-full px-3 py-3 text-sm placeholder:text-xs"
+						class=" border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 w-full px-3 py-3 text-sm placeholder:text-xs truncate pr-12 sm:pr-10"
 					/>
+					{#if isLoading}
+						<div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+						<Icon icon="ei:spinner" class="w-8 h-8 animate-spin text-primary-600 opacity-75 text-5xl" />
+						</div>
+					{/if}
 					<button
 						class="absolute right-1 top-1/2 transform -translate-y-1/2 bg-primary-400 text-white w-10 h-10 flex items-center justify-center rounded-md"
 						on:click={handleSubmitBtn}
@@ -255,9 +283,9 @@
 					</ul>
 				{:else if searchQuery.trim() && isLoading}
 					<p
-						class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-30 rounded"
-					>
-						Loading Products
+						class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-30 rounded flex items-center justify-start"
+					>	<Icon icon="ei:spinner" class="w-8 h-8 animate-spin text-primary-600 mx-2 text-5xl" />
+						<span>Loading Products...</span>
 					</p>
 				{:else if searchQuery.trim() && searchResults && searchResults.length === 0}
 					<p
@@ -374,6 +402,20 @@
 		<div class="flex gap-4 text-gray-600 items-center">
 			<a href="/quick-order" class="hover:text-primary-400 font-semibold text-xs lg:text-sm ">Quick Order</a>
 			<a href="/order-status" class="hover:text-primary-400 font-semibold text-xs lg:text-sm">Order Status</a>
+			<div class="md:flex hidden items-center justify-center">
+			<a href="/my-favourite">
+				<button 
+				on:click={toggleLike} 
+				aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
+				class={`py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'bg-white' : 'bg-transparent'}`}
+			>
+			<Icon 
+			  icon={isLiked ? heartFilled : heartOutline} 
+			  class={`text-2xl transition-colors duration-300 hover:text-primary-400 ease-in-out ${isLiked ? 'text-primary-400' : 'text-gray-600'}`} 
+			/>
+			  </button>
+			</a>
+			</div>
 			<Cartrightside />
 		</div>
 	</div>

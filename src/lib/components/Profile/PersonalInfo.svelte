@@ -49,7 +49,7 @@
 }
 </script>
 
-<div class="border shadow-sm rounded-md p-5 bg-white">
+<div class="border shadow-sm md:w-11/12 max-w-7xl mx-auto rounded-md p-5 bg-white">
     {#if toggleEdit}
     <!-- edit form for contact information -->
     <div class=" max-w-2xl">

@@ -1,32 +1,24 @@
-import { pb, authenticate } from '$lib/server/pocketbase.js'; 
-import { loadProductsInfo,isProductFavorite } from '$lib/server/loads.js';
-import { checkavailabilityproduct,favorite } from '$lib/server/actions.js';
-import { RelatedProductData } from '$lib/server/loads';
-import { DifferentProductData } from '$lib/server/loads';
+import { checkavailabilityproduct,favorite } from "$lib/server/mongoActions.js";
+import { loadProductsInfo,isProductFavorite } from "$lib/server/mongoLoads.js";
 
-export async function load({ params, cookies}) {
-  // const { product } = params;
+export async function load({ params, cookies }) {
+ const productNumber= params.product;
   try {
-    const authResponse = await authenticate();
-    if (authResponse?.status === 400) {
-      return {
-        error: authResponse.error,
-      };
-    }
-    const productData = await loadProductsInfo(pb,params.product);
-    const relatedProducts  = await RelatedProductData(pb,params.product);
-    const differentProducts = await DifferentProductData(pb, params.product);
-    const isFavorite = await isProductFavorite(params, pb, cookies);
+    const productData = await loadProductsInfo(params.product);
     if (productData.type === "error") {
       return {
         error: productData.message,
       };
     }
-    const PartNumber = productData.records[0]?.productId;
-    // console.log("PartNumber for stock data:", PartNumber);
-    // console.log("Product Records:", productData);
-    return { productData , relatedProducts , differentProducts,isFavorite}
-  } catch (error) {
+    // const relatedProducts = await RelatedProduct.find({ productId: params.product });
+    // const differentProducts = await DifferentProduct.find({ productId: params.product });
+    // const isFavorite = await isProductFavorite(productNumber, cookies);
+// return data;
+return productData
+  // isFavorite,
+  // relatedProducts,
+  // differentProducts,
+;} catch (error) {
     console.error("Error loading product data:", error);
     return {
       error: "Failed to load product data.",
@@ -34,21 +26,13 @@ export async function load({ params, cookies}) {
   }
 }
 
-/********************checkavailabilityproduct**********************/
+
 export const actions = {
   checkavailabilityproduct: async ({ request }) => {
-    const authResponse = await authenticate();
-    if (authResponse?.status === 400) {
-      return {
-        type: "error",
-        message: authResponse.error,
-      };
-    }
-
     try {
       const formData = Object.fromEntries(await request.formData());
       // console.log("Formatted Data:", formData);
-      const record = await checkavailabilityproduct(formData, pb);
+      const record = await checkavailabilityproduct(formData);
       return {
         record: record,
       };
@@ -67,7 +51,7 @@ export const actions = {
     const {productDesc, id, imgUrl,productName,productNumber,priceSize,quantity,stock,size,price,} = favdata;
     const dataforfavorite = {productDesc,id,imgUrl,productName,productNumber,priceSize,quantity,stock,size,price,};
     try {
-      const result = await favorite(favdata,pb,cookies);
+      const result = await favorite(favdata,cookies);
       return result; 
     } catch (error) {
       console.error("Error adding to favorites:", error.message);

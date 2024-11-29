@@ -14,6 +14,7 @@
     let totalSlides = Math.ceil(repeatedProducts.length / logosPerSlide);
     let showModal = false;
     let isFavorite = false;
+    let showSuccessMessage = false;
     let selectedProduct = {};
     let quantity = 1;
     const itemsToAdd = logosPerSlide - (repeatedProducts.length % logosPerSlide);
@@ -73,7 +74,11 @@
 
             return items;
         });
-        closeModal();
+        showSuccessMessage = true; 
+        setTimeout(() => {
+            showSuccessMessage = false;
+            closeModal();
+        }, 3000);
     }
 
     onMount(() => {
@@ -110,7 +115,9 @@
                                 <div class="flex flex-col justify-between flex-grow">
                                     <p class="font-semibold text-gray-600">{brand}</p>
                                     <p class="text-primary-500 font-semibold">{code}</p>
-                                    <p class="text-gray-800 font-semibold">{name1}<sup class="font-semibold">®</sup>{name2}</p>
+                                    <p class="text-gray-800 font-semibold">
+                                        <span class="block">{name1}<sup class="font-semibold">®</sup></span>
+                                        <span class="block">{name2}</span></p>
                                     <p class="text-gray-600 text-sm flex-grow">{category}</p>
                                 </div>
                             </div>
@@ -143,10 +150,16 @@
 {#if showModal}
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
         <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-full sm:max-w-lg lg:max-w-2xl w-full relative border border-primary-500">
-            <button class="absolute top-3 right-3 text-primary-600 text-2xl font-bold" on:click={closeModal} aria-label="Close">&times;</button>
+            <button class="absolute top-3 right-3 text-primary-400 hover:text-primary-600 text-3xl font-medium" on:click={closeModal} aria-label="Close">&times;</button>
 
+            {#if showSuccessMessage}
+                <div class="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white text-green-500 p-2 rounded-lg shadow- z-50">
+                    Item added to cart successfully!
+                </div>
+            {/if}
+            
             <p class="mt-8 text-sm text-gray-600 border-2 rounded p-2 text-center mb-6 border-green-600">
-                <a href="/sign-in" class="text-primary-500 hover:underline">Sign In</a> to view organizational & contact pricing.
+                <a href="/login" class="text-primary-500 hover:underline">Sign In</a> to view organizational & contact pricing.
             </p>
 
             <div class="flex flex-col sm:flex-row">
@@ -183,7 +196,7 @@
                         {selectedProduct.code}
                     </span>
                     <div class="md:flex-1 md:text-center">
-                        <p class="text-xl lg:mr-20 font-semibold text-black md:text-lg"> 
+                        <p class="text-xl md:mr-20 lg:mr-20 font-semibold text-black md:text-lg"> 
                             ₹{selectedProduct.price.toLocaleString()} / per item
                         </p>
                     </div>
@@ -193,11 +206,11 @@
                     <div class="flex justify-between items-center w-full mb-2 md:mb-0">
                         <div class="flex items-center border border-primary-400 rounded-md overflow-hidden bg-primary-50 mr-2">
                             <button type="button" on:click={() => quantity > 1 && (quantity--)} class="px-3 text-primary-500 hover:bg-primary-100">–</button>
-                            <input id="quantity" value={quantity} min="1" on:input={updateQuantity} class="text-center w-12 p-1 outline-none h-full bg-primary-50" />
+                            <input id="quantity" value={quantity} min="1" on:input={updateQuantity} class="text-center w-12 p-1 border-none outline-none h-full bg-primary-50" />
                             <button type="button" on:click={() => quantity++} class="px-3 text-primary-500 hover:bg-primary-100">+</button>
                         </div>
                     
-                        <div class="ml-22">
+                        <div class="lg:ml-32 sm:ml-12">
                             <button type="submit" on:click={addToCart} class="text-primary-500 border border-primary-500 hover:bg-primary-500 hover:text-white transition py-2 px-4 rounded-md font-semibold text-md w-32 h-full">
                                 Add to Cart
                             </button>
@@ -213,7 +226,7 @@
 
                 <div class="flex items-center mt-2">
                     <Icon icon="teenyicons:tick-circle-outline" class="text-primary-500 mr-2" />
-                    <p class="text-gray-600 text-sm md:text-base">
+                    <p class="text-gray-600 text-sm md:text-base ml-1 flex-1">
                         <span class="font-medium">Estimated</span> to ship on {selectedProduct.estimatedShipping} from <span class="font-medium">{selectedProduct.warehouse}</span>
                     </p>
                 </div>

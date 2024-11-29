@@ -57,7 +57,7 @@
     }
 </script>
 
-<div class="border shadow-sm rounded-md p-5 bg-white">
+<div class="border shadow-sm md:w-11/12 max-w-7xl mx-auto rounded-md p-5 bg-white">
     {#if toggleEdit}
         <div class=" max-w-2xl">
     <h1 class=" text-xl font-bold"> Manage your Email Preferences</h1>
