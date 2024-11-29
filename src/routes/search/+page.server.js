@@ -1,11 +1,10 @@
-import {authenticate} from '$lib/server/pocketbase.js'
-import { getSearchData } from '$lib/server/loads.js'
-const pb = await authenticate()
+
+import { getSearchData } from '$lib/server/mongoLoads.js'
 
 export const load = async ({url}) => {
   try {
     const search = url.searchParams.get('query')
-    const result= await getSearchData(pb,search);
+    const result= await getSearchData(search);
     return {result}
   } catch (error) {
     console.log(error)

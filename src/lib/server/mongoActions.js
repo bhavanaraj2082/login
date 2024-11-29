@@ -392,3 +392,20 @@ export async function editProfileEmailPreferences(body) {
   }
 }
 
+export const searchByQuery = async (body) => {
+  const queryFilter = {
+    $or: [
+      { productName: { $regex: body.query, $options: 'i' } },  
+      { productNumber: { $regex: body.query, $options: 'i' } }, 
+      { 'filteredProductData.CASNumber': { $regex: body.query, $options: 'i' } } 
+    ]
+  };
+
+  try {
+    const result = await Products.find(queryFilter).limit(5).populate('category').populate('subCategory').exec();                  
+    return JSON.parse(JSON.stringify(result))
+  } catch (error) {
+    console.log(error);
+    return { success:false,message:"something went wrong"}
+  }
+};

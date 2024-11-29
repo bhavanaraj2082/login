@@ -16,7 +16,7 @@
         reliability, and innovation, ensuring that our customers have access to the best products available.
       </p>
       <div>
-        <button class="bg-primary-400 rounded-md py-3 px-14 text-white hover:bg-primary-500" >
+        <button class="bg-primary-400 rounded-md py-2 px-14 text-white hover:bg-primary-500" >
           <a href="/about-us" >
             More
           </a>

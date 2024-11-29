@@ -102,7 +102,8 @@
 			if (result) {
 				isLoading=false
 			}
-			searchResults=result?.data?.responce?.items;
+			//console.log("search",result?.data?.responce);
+			searchResults=result?.data?.responce;
 		};
 	}
 	const handleSubmitBtn = () => {
@@ -244,7 +245,7 @@
 								on:click={() => selectProduct(product)}
 							>
 								<a
-									href={`/products/${product.expand?.Category?.urlName}/${product.expand?.subCategory?.urlName}/${product?.productNumber}`}
+									href={`/products/${product?.category?.urlName}/${product?.subCategory?.urlName}/${product?.productNumber}`}
 									class="block w-full text-sm text-gray-800 px-4 py-2"
 								>
 									{product?.productName}

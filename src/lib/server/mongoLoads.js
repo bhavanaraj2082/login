@@ -4,6 +4,7 @@ import Category from "$lib/server/models/Category";
 import SubCategory from "$lib/server/models/SubCategory";
 import Order from "$lib/server/models/Order";
 import Products from "$lib/server/models/Products";
+import PopularProduct from "$lib/server/models/PopularProduct";
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -115,3 +116,86 @@ export async function loadProductsInfo(productId) {
       return { success: false, message: "Something went wrong", error: error.message };
     }
   }
+
+  export async function popularProducts() {
+    const records = await PopularProduct.find({},{_id:0})
+        .sort('order') 
+        .populate({
+            path: 'product', select: '-_id prodDesc productName imageSrc' ,
+            populate: [
+                { path: 'category',select:'-_id urlName' },
+                { path: 'subCategory',select:'-_id urlName' } 
+            ]
+        });
+
+    return JSON.parse(JSON.stringify(records));
+}
+
+
+export async function getSearchData(search) {
+  try {
+    const components = await getMatchedComponents(search)
+    const categories = await getMatchedCategories(search)
+    const subcategories = await getMatchedSubCategories(search)
+
+    const allData = {
+      components,
+      categories,
+      subcategories
+    };
+
+    return JSON.parse(JSON.stringify(allData));
+  } catch (error) {
+    console.error('Error fetching search data:', error);
+    return { success:false,message:"Error fetching search data"}
+  }
+}
+
+async function getMatchedComponents(search) {
+  try {
+    const queryFilter = {
+      $or: [
+        { productName: { $regex: search, $options: 'i' } },  
+        { productNumber: { $regex: search, $options: 'i' } }, 
+        { prodDesc: { $regex: search, $options: 'i' } }      
+      ]
+    };
+
+    const components = await Products.find(queryFilter).limit(6).populate('category').populate('subCategory').exec(); 
+
+    return components; 
+  } catch (error) {
+    console.error('Error fetching matched components:', error);
+    return { success:false,message:"Error fetching matched components"}
+  }
+}
+
+async function getMatchedCategories(search) {
+  try {
+
+    const queryFilter = {
+      name: { $regex: search, $options: 'i' }
+    };
+
+    const categories = await Category.find(queryFilter).limit(6).exec();       
+    return JSON.parse(JSON.stringify(categories)); 
+  } catch (error) {
+    console.error('Error fetching matched categories:', error);
+    throw new Error('Error fetching matched categories');
+  }
+}
+
+async function getMatchedSubCategories(search) {
+  try {
+    const queryFilter = {
+      name: { $regex: search, $options: 'i' }
+    };
+
+    const subcategories = await SubCategory.find(queryFilter).limit(6).populate('category').exec();              
+
+    return JSON.parse(JSON.stringify(subcategories));
+  } catch (error) {
+    console.error('Error fetching matched subcategories', error);
+    return { success:false,message:"Error fetching matched subcategories"}
+  }
+}

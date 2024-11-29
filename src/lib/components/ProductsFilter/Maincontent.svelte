@@ -4,7 +4,7 @@
  import { enhance } from '$app/forms';
  
    import Icon from '@iconify/svelte';
-   import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
+   import { cartState } from '$lib/stores/cartStores.js';
    const dispatch = createEventDispatcher();
   
    export let data;
