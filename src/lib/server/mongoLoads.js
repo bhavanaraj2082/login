@@ -166,3 +166,73 @@ export const isProductFavorite = async (productNumber, cookies) => {
     return relatedProductsJson; 
 }
   
+
+
+
+
+
+
+
+
+
+
+
+
+export const loadProductsubcategory = async (suburl, page = 1) => {
+  try {
+     
+      const subcategory = await SubCategory.findOne({ urlName: suburl })
+          .populate('category');  
+
+      if (!subcategory) {
+          return { type: 'error', message: `Subcategory not found for URL: ${suburl}` };
+      }
+
+      const subcategoryID = subcategory._id.toString();
+      const productPageSize = 20;
+
+   
+      const productData = await Products.find({ subCategory: subcategoryID })
+          .skip((page - 1) * productPageSize)
+          .limit(productPageSize)
+          .populate('subCategory')
+          .populate('category') 
+          .populate('manufacturerName')
+          .populate('subsubCategory');
+          console.log("i am producr",productData);
+          
+
+      // Check if products exist
+      if (productData.length === 0) {
+          return { type: 'error', message: 'No products found for this subcategory.' };
+      }
+
+      // Fetch stock data
+      const stockData = await Stock.find({}).populate('partNumber');
+
+      // Map the product data to include the stock quantity and category name
+      const productNames = productData.map(product => {
+          const stock = stockData.find(
+              stockItem => stockItem.partNumber?._id.toString() === product._id.toString()
+          );
+
+          return {
+              ...product.toObject(),
+              manufacturerName: product.manufacturerName?.name || 'Unknown Manufacturer',
+              // Accessing populated 'category' field with lowercase 'category'
+              category: product.category ? product.category.name : 'Unknown Category',  // Accessing 'name' from populated category field
+              subsubCategory: product.subsubCategory?.name || 'Unknown Subsubcategory',
+              stockQuantity: stock ? stock.stockQuantity : 0,
+          };
+      });
+
+      return {
+          type: 'success',
+          records: productNames,
+          nextPage: productData.length === productPageSize ? page + 1 : null,
+      };
+  } catch (error) {
+      console.error('Error loading product subcategory:', error);
+      return { type: 'error', message: 'An error occurred while loading product data.' };
+  }
+};
