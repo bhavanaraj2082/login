@@ -42,7 +42,7 @@
     ];
 </script>
 
-<nav class="w-full space-y-3">
+<nav class="w-full mx-auto md:ml-6 lg:ml-10 md:pr-2 lg:pr-2 space-y-3">
     {#each profileSections as { title, desc, logo },index}
         <div class=" border shadow-sm rounded-md px-5 py-6 bg-white">
             <div class=" flex items-center gap-2 text-primary-500 mb-2">
