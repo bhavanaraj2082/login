@@ -1,3 +1,5 @@
+import ViewedProduct from "$lib/server/models/AlsoViewedProducts.js";
+import ChemiDashProfile from "./models/ChemiDashProfile";
 import Category from "$lib/server/models/Category";
 import SubCategory from "$lib/server/models/SubCategory";
 import Order from "$lib/server/models/Order";
@@ -35,8 +37,6 @@ export async function getOrderStatusData(ordernumber) {
       return { error: 'Order not found' };
     }
 }
-  
-import ViewedProduct from "$lib/server/models/AlsoViewedProducts.js";
 
 export async function fetchViewedProducts() {
   try {
@@ -54,7 +54,6 @@ export async function fetchViewedProducts() {
     throw new Error("Failed to fetch viewed products");
   }
 }
-
 
 export async function loadProductsInfo(productId) {
 
@@ -103,3 +102,16 @@ export async function loadProductsInfo(productId) {
           };
 
   };
+
+  export async function getProfileDetails(userEmail) {
+    try {
+      const record = await ChemiDashProfile.findOne({ email: userEmail })
+      if (record) {
+        return { profileData:JSON.parse(JSON.stringify(record)) };
+      } else {
+        return { success:false, message: "Profile not found" };
+      }
+    } catch (error) {
+      return { success: false, message: "Something went wrong", error: error.message };
+    }
+  }

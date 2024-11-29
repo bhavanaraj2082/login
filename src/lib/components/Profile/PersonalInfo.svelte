@@ -49,7 +49,7 @@
 }
 </script>
 
-<div class="border shadow-sm rounded-md p-5 bg-white">
+<div class="border shadow-sm md:w-11/12 max-w-7xl mx-auto rounded-md p-5 bg-white">
     {#if toggleEdit}
     <!-- edit form for contact information -->
     <div class=" max-w-2xl">
@@ -131,7 +131,7 @@
             <section class=" w-full flex flex-col sm:flex-row flex-wrap gap-y-3 py-3">
                 <div class=" text-sm md:text-4s w-full sm:w-1/2">
                     <h4 class="font-medium">Name</h4>
-                    <p class=" text-sm">{firstName || "NA"} {lastName}</p>
+                    <p class=" text-sm">{firstName || "NA"} {lastName || ""}</p>
                 </div>
                 <div class=" w-full sm:w-1/2">
                     <h4 class="font-medium">Primary Phone</h4>
