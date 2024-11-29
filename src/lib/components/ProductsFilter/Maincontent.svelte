@@ -5,6 +5,7 @@
  
    import Icon from '@iconify/svelte';
    import { cartState } from '$lib/stores/cartStores.js';
+   import {convertUsdToInr} from '$lib/stores/priceconversion.js'
    const dispatch = createEventDispatcher();
   
    export let data;
@@ -37,6 +38,40 @@
    let modalProduct = null;
    let modalOpenedForProduct = null;
    $: isLoggedIn = !!$authedUser.email;
+  
+  
+   const convertPriceToInr = (usdPrice) => {
+    return convertUsdToInr(usdPrice); // Use the store function to convert USD to INR
+  };
+
+  // Function to check if the price is in USD based on the presence of '$'
+  const isPriceInUsd = (price) => {
+    return price.startsWith('$');
+  };
+
+  // Function to convert the price from string to numeric USD value
+  const parseUsdPrice = (price) => {
+    return parseFloat(price.replace('$', '').replace(',', '')); // Removes '$' and converts to a number
+  };
+  const getPriceRange = (prices) => {
+  const priceNumbers = prices.map(p => parseUsdPrice(p.price)); // Convert all prices to numeric values
+  const minPrice = Math.min(...priceNumbers);
+  const maxPrice = Math.max(...priceNumbers);
+  return { 
+    min: convertUsdToInr(minPrice), 
+    max: convertUsdToInr(maxPrice) 
+  }; // Convert the min and max prices to INR
+};
+
+
+
+
+  let priceRanges = products.map(product => {
+    if (product.priceSize && product.priceSize.length > 1) {
+      return getPriceRange(product.priceSize);
+    }
+    return null;
+  });
   
    let isFavorited = [];
   function updateFilteredProducts() {
@@ -155,36 +190,6 @@
        selectedProduct = product; 
        showCOAModal = true; 
    }
-   // function toggleFavorite(index) {
-   //     const product = allProducts[index];
-   //     isFavorited[index] = !isFavorited[index];
-   //     modalProduct = product;
-   //     showModal = true;
-   //     let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-   //     const existingProductIndex = favorites.findIndex(item => item.id === product.id);
- 
-   //     if (isFavorited[index] && existingProductIndex === -1) {
-   //         favorites.push({ ...product, quantity: product.quantity || 1 });
-   //         localStorage.setItem('favorites', JSON.stringify(favorites));
-   //     } else if (!isFavorited[index] && existingProductIndex !== -1) {
-   //         favorites = favorites.filter(item => item.id !== product.id);
-   //         localStorage.setItem('favorites', JSON.stringify(favorites));
-   //     }
-   // }
- 
- 
-   
-  //  const incrementQuantity = (index) => {
-  //      products = products.map((product, i) =>
-  //          i === index ? { ...product, quantity: (product.quantity || 1) + 1 } : product
-  //      );
-  //  };
- 
-  //  const decrementQuantity = (index) => {
-  //      products = products.map((product, i) =>
-  //          i === index ? { ...product, quantity: Math.max(1, (product.quantity || 1) - 1) } : product
-  //      );
-  //  };
 
 
   const incrementQuantity = (index) => {
@@ -349,33 +354,6 @@ function updateLocalStorage(productId, quantity) {
  
  products.priceSize = Array.isArray(products.priceSize) ? products.priceSize : [];
  
- 
- 
- 
-//  onMount(() => {
-//    const storedFavorites = localStorage.getItem('isFavorited');
-//      if (storedFavorites) {
-//        isFavorited = JSON.parse(storedFavorites);
-//      } else {
-//        isFavorited = new Array(products.length).fill(false); 
-//      }
-   
-//    products = products.map(product => ({
-//            ...product,
-//            quantity: product.quantity || 1,  
-//        }));
-    
-//     const urlParams = new URLSearchParams(window.location.search);
-//      const pageParam = urlParams.get('page');
-//      const initialPage = pageParam ? parseInt(pageParam, 10) : 1;
-//      currentPage.set(initialPage);
-//      allProducts = data.data;
-//      currentPage.set(1);
-//    initializeProducts();
-//    updateFilteredProducts();
-//    updateDisplayedProducts();
-//    updatePageNumbersToShow($totalPages);
-//  });
 
 
 
@@ -420,49 +398,58 @@ onMount(() => {
  
 
 export function addToCart(product, quantity) {
-    const cartProduct = {
-        description: product.prodDesc,
-        id: product.id,
-        image: product.imageSrc,
-        name: product.productName,
-        partNumber: product.productNumber, 
-        // priceSize: {
-        //     // price: product.priceSize[0].price,
-        //     // size: product.priceSize[0].size
-        // },
+  const cartProduct = {
+    description: product.prodDesc,
+    id: product.id,
+    image: product.imageSrc,
+    name: product.productName,
+    partNumber: product.productNumber,
+    quantity: quantity,
+    stock: product.stockQuantity,
+    priceSize: {}
+  };
 
-
-        priceSize: {
-            price: product.priceSize && product.priceSize[0] ? product.priceSize[0].price : 0, 
-            size: product.priceSize && product.priceSize[0] ? product.priceSize[0].size : 0   
-        },
-        quantity: quantity,
-        stock: product.stockQuantity
+  if (product.priceSize && product.priceSize.length === 1) {
+    const price = product.priceSize[0].price;
+    cartProduct.priceSize = {
+      price: isPriceInUsd(price) ? `₹${convertUsdToInr(parseUsdPrice(price))}` : price,
+      size: product.priceSize[0].size
     };
+  }
 
-    cartState.update((cart) => {
+  if (product.priceSize && product.priceSize.length > 1) {
+    const prices = product.priceSize.map(item => parseUsdPrice(item.price));
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    cartProduct.priceSize = {
+      price: `₹${convertUsdToInr(minPrice)} - ₹${convertUsdToInr(maxPrice)}`,
+      size: "Range"
+    };
+  }
 
-        const existingProductIndex = cart.findIndex((item) => item.partNumber === cartProduct.partNumber);
+ 
+  cartState.update((cart) => {
+    const existingProductIndex = cart.findIndex((item) => item.partNumber === cartProduct.partNumber);
 
-        if (existingProductIndex !== -1) {
-            cart[existingProductIndex].quantity += cartProduct.quantity;
-            updateLocalStorage(cartProduct.partNumber, cart[existingProductIndex].quantity);
-        } else {
-            cart.push(cartProduct);
-            updateLocalStorage(cartProduct.partNumber, cartProduct.quantity);
-        }
+    if (existingProductIndex !== -1) {
+      cart[existingProductIndex].quantity += cartProduct.quantity;
+      updateLocalStorage(cartProduct.partNumber, cart[existingProductIndex].quantity);
+    } else {
+      cart.push(cartProduct);
+      updateLocalStorage(cartProduct.partNumber, cartProduct.quantity);
+    }
 
-        return cart;
-    });
+    return cart;
+  });
 
-    const totalItems = JSON.parse(localStorage.getItem('cart')).length;
+  const totalItems = JSON.parse(localStorage.getItem('cart')).length;
 
-    cartNotification = `You have ${totalItems} item(s) in your cart.`;  
+  cartNotification = `You have ${totalItems} item(s) in your cart.`;
 
-    if (notificationTimeout) clearTimeout(notificationTimeout);
-    notificationTimeout = setTimeout(() => {
-        cartNotification = '';
-    }, 3000);
+  if (notificationTimeout) clearTimeout(notificationTimeout);
+  notificationTimeout = setTimeout(() => {
+    cartNotification = '';
+  }, 3000);
 }
 
 
@@ -616,12 +603,29 @@ export function addToCart(product, quantity) {
                    <div class="flex flex-col  lg:ml-16 md:ml-16    md:flex-row lg:flex-row items-start justify-between">
                      <div class="hidden md:flex  items-center">
                        <p class="text-gray-600 font-semibold inline-block"> 
-                    
-                           {#if product.priceSize  && product.priceSize.length > 0}
-                             {product.priceSize[0].price} 
+                           {#if product.priceSize && product.priceSize.length > 0}
+                           {#if product.priceSize.length === 1}
+                             {#if isPriceInUsd(product.priceSize[0].price)}
+                               ₹{convertUsdToInr(parseUsdPrice(product.priceSize[0].price))} 
+                             {:else}
+                               {product.priceSize[0].price} 
+                             {/if}
                            {:else}
-                             Price not available 
+                             
+                             {#if priceRanges[index] && isPriceInUsd(product.priceSize[0].price)}
+                               ₹{convertUsdToInr(priceRanges[index].min)} - ₹{convertUsdToInr(priceRanges[index].max)} 
+                             {:else}
+                               {priceRanges[index].min} - {priceRanges[index].max} 
+                             {/if}
                            {/if}
+                         {:else}
+                         <p>
+                           <a href="/quote" class="text-primary-400 text-sm">Request Quote</a> 
+                          
+                          
+                         {/if}
+
+        
                          </p>
                          
                          
@@ -656,11 +660,28 @@ export function addToCart(product, quantity) {
              
            </div>
            <div class="  flex items-center   md:hidden space-x-1">
-             <span class="text-gray-600 text-lg font-medium"> {#if product.priceSize && Array.isArray(product.priceSize) && product.priceSize.length > 0}
-                             {product.priceSize[0].price} 
-                           {:else}
-                             Price not available 
-                           {/if}</span>
+             <span class="text-gray-600 text-lg font-medium"> 
+        {#if product.priceSize && product.priceSize.length > 0}
+      {#if product.priceSize.length === 1}
+        {#if isPriceInUsd(product.priceSize[0].price)}
+          ₹{convertUsdToInr(parseUsdPrice(product.priceSize[0].price))} 
+        {:else}
+          {product.priceSize[0].price} 
+        {/if}
+      {:else}
+
+        {#if priceRanges[index] && isPriceInUsd(product.priceSize[0].price)}
+          ₹{convertUsdToInr(priceRanges[index].min)} - ₹{convertUsdToInr(priceRanges[index].max)} 
+        {:else}
+          {priceRanges[index].min} - {priceRanges[index].max} 
+        {/if}
+      {/if}
+    {:else}
+      <a href="/quote" class="text-primary-400 text-sm">Request Quote</a>
+     
+      
+    {/if}
+             </span>
              <div class="border text-primary-400 flex items-center ml-2   rounded">
                <button 
                  on:click={() => decrementQuantity(index)} 
@@ -820,7 +841,7 @@ export function addToCart(product, quantity) {
          </button>
          <h2 class="text-xl font-bold mb-4 text-center">Safety Data Sheet</h2>
          {#if selectedProduct}
-             <!-- <p class="text-center">
+             <p class="text-center">
                  <strong>Pack Size:</strong>
                  <select bind:value={selectedPackSize} class="border w-1/4 p-2 inline-block rounded bg-gray-100 ml-2 hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0">
                    
@@ -828,7 +849,7 @@ export function addToCart(product, quantity) {
                       {#each selectedProduct.priceSize as size}
                          <option value={size.size}>{size.size}</option>
                      {/each} 
-                 </select></p> -->
+                 </select></p>
              
              <div class="flex items-center justify-center mt-5">
                  <span class="font-semibold text-primary-400">{selectedProduct.productName}</span>
