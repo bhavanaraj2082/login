@@ -4,6 +4,7 @@ import Category from "$lib/server/models/Category";
 import SubCategory from "$lib/server/models/SubCategory";
 import Order from "$lib/server/models/Order";
 import Products from "$lib/server/models/Products";
+import Stock  from '$lib/server/models/Stocks.js'; 
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -56,52 +57,64 @@ export async function fetchViewedProducts() {
 }
 
 export async function loadProductsInfo(productId) {
+  // console.log(productId);
+        const product = JSON.parse(JSON.stringify(await Products.findOne({ productNumber: productId })));
+        // console.log('Product:', [product]);
+        if (!product) {
+            return {type: "error",message: "Product record not found",};
+        }
+        const partNumber = product._id;
+        // console.log("PartNumber for stock data:", partNumber);
+        let stockQuantity = 0;
+        if (partNumber) {
+                const stockRecord = await Stock.findOne({ partNumber: product._id}).exec();
+                // console.log("Fetched stockRecord:", stockRecord);
+                if (stockRecord && typeof stockRecord.stockQuantity !== "undefined") {
+                    stockQuantity = stockRecord.stockQuantity;
+                    // console.log("Stock Quantity fetched:", stockQuantity);
+                } else {
+                    // console.log("Stock record found but stockQuantity is undefined.");
+                }}
+        const formattedRecord = {
+            productId: product._id.toString(),
+            productName: product.productName,
+            productNumber: product.productNumber,
+            prodDesc: product.prodDesc,
+            imageSrc: product.imageSrc,
+            safetyDatasheet: product.safetyDatasheet,
+            priceSize: Array.isArray(product.priceSize)
+                ? product.priceSize.map((item) => ({
+                      price: item.price,
+                      size: item.size,
+                  }))
+                : [],
+            properties: product.properties || {},
+            description: product.description || {},
+            safetyInfo: product.safetyInfo || {},
+            filteredProductData: product.filteredProductData || {},
+            productSynonym: product.filteredProductData?.['Synonym(S)'] || "",
+            stockQuantity, 
+        };
+        return {records: [formattedRecord],};
+};
 
-    // console.log(productId);
-    
-          // Fetch the product record by productId
-          const product = JSON.parse(JSON.stringify(await Products.findOne({ productNumber: productId })));
-          console.log('Product:', [product]);
-  
-          if (!product) {
-              return {
-                  type: "error",
-                  message: "Product record not found",
-              };
-          }
-  
-          const partNumber = product._id;
-          console.log("PartNumber for stock data:", partNumber);
-  
-          let stockQuantity = 0;
-  
-          // Format the product record
-          const formattedRecord = {
-              productId: product._id.toString(), // Convert ObjectId to string
-              productName: product.productName,
-              productNumber: product.productNumber,
-              prodDesc: product.prodDesc,
-              imageSrc: product.imageSrc,
-              safetyDatasheet: product.safetyDatasheet,
-              priceSize: Array.isArray(product.priceSize)
-                  ? product.priceSize.map((item) => ({
-                        price: item.price,
-                        size: item.size,
-                    }))
-                  : [],
-              properties: product.properties || {},
-              description: product.description || {},
-              safetyInfo: product.safetyInfo || {},
-              filteredProductData: product.filteredProductData || {},
-              productSynonym: product.filteredProductData?.['Synonym(S)'] || "",
-              stockQuantity, // Include stock quantity only if fetched
-          };
-  
-          return {
-              records: [formattedRecord],
-          };
-
-  };
+export const isProductFavorite = async (productNumber, cookies) => {
+  const cookieValue = cookies.get('token');
+  let isFavorite = false;
+  if (!cookieValue) {
+    console.error('User is not logged in.');
+    return isFavorite; 
+  }
+  const parsedCookie = JSON.parse(cookieValue);
+  const userProfileId = parsedCookie.profileId;
+    const existingRecord = await MyFavourites.findOne({ userProfileId: userProfileId });
+    if (existingRecord && Array.isArray(existingRecord.favorite)) {
+      isFavorite = existingRecord.favorite.some(
+        (item) => item.productNumber === productNumber
+      );
+    }
+  return isFavorite;
+};
 
   export async function getProfileDetails(userEmail) {
     try {

@@ -5,6 +5,7 @@ import CopyConsent from "../lib/server/models/CopyConsent.js"; // Adjust the pat
 import Register from "$lib/server/models/Register";
 import ChemiDashProfile from "$lib/server/models/ChemiDashProfile";
 import MyFavourites from "$lib/server/models/MyFavourites";
+import Stock  from '$lib/server/models/Stocks.js'; 
 import { redirect } from "@sveltejs/kit";
 
 export const submitContactInfo = async (data) => {
@@ -51,56 +52,91 @@ export const CancelOrder = async (body) => {
 export async function checkavailabilityproduct(data) {
   const { ProductId, quantity: requestedQuantity } = data;
   const requestedQty = parseInt(requestedQuantity, 10);
-
-  // Find the stock record for the given productId (partNumber)
-  const stockRecord = await Stock.findOne({ partNumber: ProductId }).exec();
-  console.log("stockRecord:", stockRecord);
-
-  if (!stockRecord) {
-    return {
-      message: "Out of stock",
-      message1: "",
-      stock: "Unavailable",
-      type: "error",
-    };
-  }
-
-  const { stockQuantity, estimatedDate } = stockRecord;
-  const estimatedDateObj = new Date(estimatedDate);
-  const formattedDate = new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  }).format(estimatedDateObj);
-
-  if (stockQuantity > 0) {
-    if (requestedQty <= stockQuantity) {
-      return {
-        message: `${requestedQty} Available to ship on ${formattedDate}.`,
-        message1: "",
-        stock: "Available",
-        type: "success",
-      };
-    } else {
-      const unavailableQuantity = requestedQty - stockQuantity;
-
-      // Adding 15 days for the lead time
-      const leadTimeDate = new Date(estimatedDateObj);
-      leadTimeDate.setDate(leadTimeDate.getDate() + 15);
-
-      const formattedLeadTimeDate = new Intl.DateTimeFormat("en-GB", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-      }).format(leadTimeDate);
-
-      return {
-        message: `${stockQuantity} Available to ship on ${formattedDate}.`,
-        message1: ` ${unavailableQuantity} Available to ship on ${formattedLeadTimeDate}.`,
-        stock: "Partial Availability",
-        type: "success",
-      };
+    const stockRecord = await Stock.findOne({ partNumber: ProductId }).exec();
+    // console.log('stockRecord:', stockRecord);
+    if (!stockRecord) {
+      return {message: 'Out of stock',message1: '',stock: 'Unavailable',type: 'error',};
     }
+    const { stockQuantity, estimatedDate } = stockRecord;
+    const estimatedDateObj = new Date(estimatedDate);
+    const formattedDate = new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    }).format(estimatedDateObj);
+    if (stockQuantity > 0) {
+      if (requestedQty <= stockQuantity) {
+        return {message: `${requestedQty} Available to ship on ${formattedDate}.`,message1: '',stock: 'Available',type: 'success',
+        };
+      } else {
+        const unavailableQuantity = requestedQty - stockQuantity;
+        const leadTimeDate = new Date(estimatedDateObj);
+        leadTimeDate.setDate(leadTimeDate.getDate() + 15);
+        const formattedLeadTimeDate = new Intl.DateTimeFormat('en-GB', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric',
+        }).format(leadTimeDate);
+        return {
+          message: `${stockQuantity} Available to ship on ${formattedDate}.`,
+          message1: ` ${unavailableQuantity} Available to ship on ${formattedLeadTimeDate}.`,
+          stock: 'Partial Availability',
+          type: 'success',
+        };
+      }
+    } else{
+      return {message: `Out of Stock`,message1: ``,stock: 'Out of Stock',type: 'success',};
+    }
+}
+
+export async function favorite(favdata, cookies) {
+  const cookieValue = cookies.get('token');
+  if (!cookieValue) {
+    return { type: 'error', message: 'Please login to add to favorites!' };
+  }
+  let parsedCookie;
+  parsedCookie = JSON.parse(cookieValue);
+  const userProfileId = parsedCookie?.profileId;
+  // console.log("userProfileId",userProfileId);
+  const existingRecord = await MyFavourites.findOne({ userProfileId: userProfileId });
+  // console.log("existingRecord", existingRecord);
+  const favoriteItem = {
+    productDesc: favdata.productDesc,
+    id: favdata.id,
+    imgUrl: favdata.imgUrl,
+    productName: favdata.productName,
+    productNumber: favdata.productNumber,
+    priceSize: { price: favdata.price, size: favdata.size },
+    quantity: favdata.quantity,
+    stock: favdata.stock,
+  };
+  let updatedFavorites = [];
+  let isFavorite = false;
+  if (existingRecord && Array.isArray(existingRecord.favorite)) {
+    updatedFavorites = existingRecord.favorite.filter(
+      (item) => item.id !== favdata.id
+    );
+    isFavorite = updatedFavorites.length !== existingRecord.favorite.length;
+  }
+  if (isFavorite) {
+    existingRecord.favorite = updatedFavorites;
+    await existingRecord.save();
+    return { type: 'success', message: 'Removed from favorites!' };
+  } else {
+    updatedFavorites = existingRecord
+      ? [...existingRecord.favorite, favoriteItem]
+      : [favoriteItem];
+
+    if (existingRecord) {
+      existingRecord.favorite = updatedFavorites;
+      await existingRecord.save();
+    } else {
+      await MyFavourites.create({
+        userProfileId,
+        favorite: updatedFavorites,
+      });
+    }
+    return { type: 'success', message: 'Added to favorites!' };
   }
 }
 
