@@ -1,12 +1,12 @@
-import Contact from '$lib/server/models/Contact.js';
-import Order from '$lib/server/models/Order.js';
-import Products from '$lib/server/models/Products.js';
-import CopyConsent from '$lib/server/models/CopyConsent.js'; // Adjust the path to your model
-import Register from '$lib/server/models/Register.js';
-import Profile from '$lib/server/models/Profile.js';
-import MyFavourites from '$lib/server/models/MyFavourites.js';
-import Stock from '$lib/server/models/Stocks.js';
-import { redirect } from '@sveltejs/kit';
+import Contact from "$lib/server/models/Contact.js";
+import Order from "$lib/server/models/Order.js";
+import Product from "$lib/server/models/Product.js";
+import CopyConsent from "$lib/server/models/CopyConsent.js"; // Adjust the path to your model
+import Register from "$lib/server/models/Register.js";
+import Profile from "$lib/server/models/Profile.js";
+import MyFavourite from "$lib/server/models/MyFavourite.js";
+import Stock from '$lib/server/models/Stock.js'; 
+import { redirect } from "@sveltejs/kit";
 
 export const submitContactInfo = async (data) => {
 	try {
@@ -90,50 +90,54 @@ export async function checkavailabilityproduct(data) {
 }
 
 export async function favorite(favdata, cookies) {
-	const cookieValue = cookies.get('token');
-	if (!cookieValue) {
-		return { type: 'error', message: 'Please login to add to favorites!' };
-	}
-	let parsedCookie;
-	parsedCookie = JSON.parse(cookieValue);
-	const userProfileId = parsedCookie?.profileId;
-	// console.log("userProfileId",userProfileId);
-	const existingRecord = await MyFavourites.findOne({ userProfileId: userProfileId });
-	// console.log("existingRecord", existingRecord);
-	const favoriteItem = {
-		productDesc: favdata.productDesc,
-		id: favdata.id,
-		imgUrl: favdata.imgUrl,
-		productName: favdata.productName,
-		productNumber: favdata.productNumber,
-		priceSize: { price: favdata.price, size: favdata.size },
-		quantity: favdata.quantity,
-		stock: favdata.stock
-	};
-	let updatedFavorites = [];
-	let isFavorite = false;
-	if (existingRecord && Array.isArray(existingRecord.favorite)) {
-		updatedFavorites = existingRecord.favorite.filter((item) => item.id !== favdata.id);
-		isFavorite = updatedFavorites.length !== existingRecord.favorite.length;
-	}
-	if (isFavorite) {
-		existingRecord.favorite = updatedFavorites;
-		await existingRecord.save();
-		return { type: 'success', message: 'Removed from favorites!' };
-	} else {
-		updatedFavorites = existingRecord ? [...existingRecord.favorite, favoriteItem] : [favoriteItem];
+  const cookieValue = cookies.get('token');
+  if (!cookieValue) {
+    return { type: 'error', message: 'Please login to add to favorites!' };
+  }
+  let parsedCookie;
+  parsedCookie = JSON.parse(cookieValue);
+  const userProfileId = parsedCookie?.profileId;
+  // console.log("userProfileId",userProfileId);
+  const existingRecord = await MyFavourite.findOne({ userProfileId: userProfileId });
+  // console.log("existingRecord", existingRecord);
+  const favoriteItem = {
+    productDesc: favdata.productDesc,
+    id: favdata.id,
+    imgUrl: favdata.imgUrl,
+    productName: favdata.productName,
+    productNumber: favdata.productNumber,
+    priceSize: { price: favdata.price, size: favdata.size },
+    quantity: favdata.quantity,
+    stock: favdata.stock,
+  };
+  let updatedFavorites = [];
+  let isFavorite = false;
+  if (existingRecord && Array.isArray(existingRecord.favorite)) {
+    updatedFavorites = existingRecord.favorite.filter(
+      (item) => item.id !== favdata.id
+    );
+    isFavorite = updatedFavorites.length !== existingRecord.favorite.length;
+  }
+  if (isFavorite) {
+    existingRecord.favorite = updatedFavorites;
+    await existingRecord.save();
+    return { type: 'success', message: 'Removed from favorites!' };
+  } else {
+    updatedFavorites = existingRecord
+      ? [...existingRecord.favorite, favoriteItem]
+      : [favoriteItem];
 
-		if (existingRecord) {
-			existingRecord.favorite = updatedFavorites;
-			await existingRecord.save();
-		} else {
-			await MyFavourites.create({
-				userProfileId,
-				favorite: updatedFavorites
-			});
-		}
-		return { type: 'success', message: 'Added to favorites!' };
-	}
+    if (existingRecord) {
+      existingRecord.favorite = updatedFavorites;
+      await existingRecord.save();
+    } else {
+      await MyFavourite.create({
+        userProfileId,
+        favorite: updatedFavorites,
+      });
+    }
+    return { type: 'success', message: 'Added to favorites!' };
+  }
 }
 
 export const checkoutOrder = async (order) => {
@@ -155,21 +159,21 @@ export const checkoutOrder = async (order) => {
 };
 
 export const getUpdatedCartData = async (product) => {
-	const productNumbers = product.split(',');
-	let productObj = [];
-	for (let num of productNumbers) {
-		try {
-			const record = await Products.findOne(
-				{ productNumber: num },
-				{ productNumber: 1, priceSize: 1, _id: 0 }
-			);
-			if (record) {
-				productObj.push(record);
-			}
-		} catch (error) {
-			console.error('Error fetching product:', error);
-		}
-	}
+  const productNumbers = product.split(",");
+  let productObj = [];
+  for (let num of productNumbers) {
+    try {
+      const record = await Product.findOne(
+        { productNumber: num },
+        { productNumber: 1, priceSize: 1, _id: 0 }
+      );
+      if (record) {
+        productObj.push(record);
+      }
+    } catch (error) {
+      console.error("Error fetching product:", error);
+    }
+  }
 
 	console.log(productObj);
 	return JSON.stringify(productObj);
@@ -180,24 +184,24 @@ export async function login(body, cookies) {
 
 	const user = await Register.findOne({ email, password });
 
-	if (user) {
-		const profile = await Profile.findOne({ userId: user._id });
-		console.log('profile', profile);
-		if (profile) {
-			cookies.set(
-				'token',
-				JSON.stringify({
-					email: user.email,
-					profileId: profile._id,
-					userId: user._id
-				}),
-				{
-					path: '/',
-					httpOnly: true,
-					sameSite: 'strict',
-					maxAge: 60 * 60 * 24 * 1000 // 1 day
-				}
-			);
+  if (user) {
+    const profile = await Profile.findOne({ userId: user._id });
+    console.log("profile", profile);
+    if (profile) {
+      cookies.set(
+        "token",
+        JSON.stringify({
+          email: user.email,
+          profileId: profile._id,
+          userId: user._id,
+        }),
+        {
+          path: "/",
+          httpOnly: true,
+          sameSite: "strict",
+          maxAge: 60 * 60 * 24 * 1000, // 1 day
+        }
+      );
 
 			// Redirect to the profile page
 			return redirect(302, '/profile');
@@ -233,12 +237,12 @@ export async function register(body, cookies) {
 			return { success: false, message: 'User already exist' };
 		}
 
-		const user = await Register.create(data);
-		const profile = await Profile.create({
-			userId: user._id,
-			email: user.email,
-			sitePreferences
-		});
+    const user = await Register.create(data);
+    const profile = await Profile.create({
+      userId: user._id,
+      email: user.email,
+      sitePreferences,
+    });
 
 		user.chemiDashProfileId = profile._id;
 		await user.save();
@@ -258,8 +262,8 @@ export async function register(body, cookies) {
 			}
 		);
 
-		await MyFavourites.create({ userProfileId: profile._id });
-		isRedirect = true;
+    await MyFavourite.create({ userProfileId: profile._id });
+    isRedirect = true;
 
 		// if (verificationResult.success) {
 		//     return { success: true, message: "Check your email to verify your email address" };
@@ -279,11 +283,11 @@ export async function register(body, cookies) {
 export async function editProfileContact(body) {
 	const { recordId, ...contact } = body;
 
-	try {
-		const result = await Profile.findByIdAndUpdate(recordId, contact, {
-			new: true, // Return the updated document
-			runValidators: true // Ensure that validation is run
-		});
+  try {
+    const result = await Profile.findByIdAndUpdate(recordId, contact, {
+      new: true, // Return the updated document
+      runValidators: true, // Ensure that validation is run
+    });
 
 		// Check if a record was updated
 		if (result) {
@@ -304,13 +308,13 @@ export async function editProfileContact(body) {
 export async function editProfileLinkOrganization(body) {
 	const { recordId, ...linkOrganization } = body;
 
-	try {
-		// Find the record by recordId and update the linkOrganization field
-		const result = await Profile.findByIdAndUpdate(
-			recordId,
-			{ linkOrganization }, // Set the linkOrganization field
-			{ new: true, runValidators: true } // Return the updated document and run validation
-		);
+  try {
+    // Find the record by recordId and update the linkOrganization field
+    const result = await Profile.findByIdAndUpdate(
+      recordId,
+      { linkOrganization }, // Set the linkOrganization field
+      { new: true, runValidators: true } // Return the updated document and run validation
+    );
 
 		// Check if a record was found and updated
 		if (result) {
@@ -350,13 +354,13 @@ export async function editProfileAddresses(body) {
 			return { success: false, message: 'Invalid address type' };
 	}
 
-	try {
-		// Perform the update based on the addressType
-		const result = await Profile.findByIdAndUpdate(
-			recordId,
-			updateField, // Update the correct address field
-			{ new: true, runValidators: true } // Return the updated document and validate
-		);
+  try {
+    // Perform the update based on the addressType
+    const result = await Profile.findByIdAndUpdate(
+      recordId,
+      updateField, // Update the correct address field
+      { new: true, runValidators: true } // Return the updated document and validate
+    );
 
 		// Check if the record was updated
 		if (result) {
@@ -388,13 +392,13 @@ export async function editProfileSitePreferences(body) {
 		return { success: false, message: 'Invalid preferences format' };
 	}
 
-	try {
-		// Perform the update in the Profiles collection
-		const result = await Profile.findByIdAndUpdate(
-			recordId,
-			{ sitePreferences }, // Update the sitePreferences field with the parsed object
-			{ new: true, runValidators: true } // Return the updated document and apply schema validation
-		);
+  try {
+    // Perform the update in the Profile collection
+    const result = await Profile.findByIdAndUpdate(
+      recordId,
+      { sitePreferences }, // Update the sitePreferences field with the parsed object
+      { new: true, runValidators: true } // Return the updated document and apply schema validation
+    );
 
 		// Check if the record was updated
 		if (result) {
@@ -415,13 +419,13 @@ export async function editProfileSitePreferences(body) {
 export async function editProfilePaymentMethod(body) {
 	const { recordId, ...paymentMethods } = body;
 
-	try {
-		// Perform the update in the Profiles collection
-		const result = await Profile.findByIdAndUpdate(
-			recordId,
-			{ paymentMethods }, // Update the paymentMethods field
-			{ new: true, runValidators: true } // Return the updated document and apply schema validation
-		);
+  try {
+    // Perform the update in the Profile collection
+    const result = await Profile.findByIdAndUpdate(
+      recordId,
+      { paymentMethods }, // Update the paymentMethods field
+      { new: true, runValidators: true } // Return the updated document and apply schema validation
+    );
 
 		// Check if the record was updated
 		if (result) {
@@ -450,13 +454,13 @@ export async function editProfileEmailPreferences(body) {
 		return { success: false, message: 'Invalid preference format' };
 	}
 
-	try {
-		// Perform the update in the Profiles collection
-		const result = await Profile.findByIdAndUpdate(
-			recordId,
-			{ emailPreferences }, // Update the emailPreferences field
-			{ new: true, runValidators: true } // Return the updated document and apply schema validation
-		);
+  try {
+    // Perform the update in the Profile collection
+    const result = await Profile.findByIdAndUpdate(
+      recordId,
+      { emailPreferences }, // Update the emailPreferences field
+      { new: true, runValidators: true } // Return the updated document and apply schema validation
+    );
 
 		// Check if the record was updated
 		if (result) {
@@ -483,17 +487,13 @@ export const searchByQuery = async (body) => {
 		]
 	};
 
-	try {
-		const result = await Products.find(queryFilter)
-			.limit(5)
-			.populate('category')
-			.populate('subCategory')
-			.exec();
-		return JSON.parse(JSON.stringify(result));
-	} catch (error) {
-		console.log(error);
-		return { success: false, message: 'something went wrong' };
-	}
+  try {
+    const result = await Product.find(queryFilter).limit(5).populate('category').populate('subCategory').exec();                  
+    return JSON.parse(JSON.stringify(result))
+  } catch (error) {
+    console.log(error);
+    return { success:false,message:"something went wrong"}
+  }
 };
 
 export async function submitForm(data) {

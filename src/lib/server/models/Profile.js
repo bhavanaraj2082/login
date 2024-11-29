@@ -1,112 +1,49 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const profileSchema = new mongoose.Schema(
-	{
-		firstname: {
-			type: String,
-			required: false,
-			unique: false,
-			minlength: null,
-			maxlength: null,
-			match: /.*/
-		},
-		lastname: {
-			type: String,
-			required: false,
-			unique: false,
-			minlength: null,
-			maxlength: null,
-			match: /.*/
-		},
-		email: {
-			type: String,
-			required: false,
-			unique: false,
-			minlength: null,
-			maxlength: null,
-			match: /.*/
-		},
-		userId: {
-			type: String, //mongoose.Schema.Types.ObjectId,
-			ref: 'User', // Referencing the User model
-			required: false,
-			unique: false
-		},
-		country: {
-			type: String,
-			required: false,
-			unique: false,
-			minlength: null,
-			maxlength: null,
-			match: /.*/
-		},
-		currency: {
-			type: String,
-			required: false,
-			unique: false,
-			minlength: null,
-			maxlength: null,
-			match: /.*/
-		},
-		mailstop: {
-			type: String,
-			required: false,
-			unique: false,
-			minlength: null,
-			maxlength: null,
-			match: /.*/
-		},
-		city: {
-			type: String,
-			required: false,
-			unique: false,
-			minlength: null,
-			maxlength: null,
-			match: /.*/
-		},
-		state: {
-			type: String,
-			required: false,
-			unique: false,
-			minlength: null,
-			maxlength: null,
-			match: /.*/
-		},
-		postalcode: {
-			type: Number,
-			required: false,
-			unique: false,
-			min: null,
-			max: null
-		},
-		address1: {
-			type: String,
-			required: false,
-			unique: false,
-			minlength: null,
-			maxlength: null,
-			match: /.*/
-		},
-		address2: {
-			type: String,
-			required: false,
-			unique: false,
-			minlength: null,
-			maxlength: null,
-			match: /.*/
-		},
-		shippingAddress: {
-			type: String,
-			required: false
-		},
-		billingAddress: {
-			type: String,
-			required: false
-		}
-	},
-	{
-		timestamps: true // Automatically manage createdAt and updatedAt fields
-	}
-);
+const jsonSchema = {
+  type: mongoose.Schema.Types.Mixed,
+  default: null
+};
 
-export default mongoose.model('Profile', profileSchema);
+const chemiDashProfileSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+    required: false
+  },
+  lastName: {
+    type: String,
+    required: false
+  },
+  primaryPhone: {
+    type: Number,
+    required: false
+  },
+  cellPhone: {
+    type: Number,
+    required: false
+  },
+  email: {
+    type: String,
+    required: false
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'register', 
+    required: false
+  },
+  linkOrganization: jsonSchema, 
+  sitePreferences: jsonSchema,
+  shippingAddress: jsonSchema,
+  billingAddress: jsonSchema,
+  organizationAddress: jsonSchema,
+  paymentAddress: jsonSchema,
+  emailPreferences: jsonSchema,
+  paymentMethods: jsonSchema
+}, {
+  timestamps: true,
+  collection:"profiles"
+});
+
+const Profile = mongoose.models.Profile || mongoose.model('Profile', chemiDashProfileSchema);
+
+export default Profile

@@ -34,7 +34,7 @@ const productSchema = new Schema({
     safetyInfo: { type: [String], default: [] },
     encompass: { type: String, default: null },
     currency: { type: String, default: 'USD' },
-    variants: [{ type: Schema.Types.ObjectId, ref: 'Products' }]
+    variants: [{ type: Schema.Types.ObjectId, ref: 'Product' }]
 }, { timestamps: false, collection: "products" });
 
 productSchema.index({ productName: 1 }); // Matches PocketBase index
@@ -44,7 +44,8 @@ productSchema.index({ category: 1 });
 productSchema.index({ subCategory: 1 });
 productSchema.index({ subsubCategory: 1 });
 
+
 // Fixed model definition
-const Product = mongoose.models.Product || mongoose.model('products', productSchema);
+const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
 
 export default Product;

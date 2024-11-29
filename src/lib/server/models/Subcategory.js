@@ -49,6 +49,6 @@ subCategorySchema.index({ urlName: 1 });
 subCategorySchema.index({ category: 1 });
 subCategorySchema.index({ specificationHeadings: 1 });
 
-const SubCategory = mongoose.model("SubCategory", subCategorySchema);
+const SubCategory = mongoose.models.SubCategory || mongoose.model("SubCategory", subCategorySchema);
 
 export default SubCategory;
