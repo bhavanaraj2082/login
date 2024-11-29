@@ -1,19 +1,16 @@
-import { popularProducts } from '$lib/server/loads.js';
-import { serachByQuery } from '$lib/server/actions.js';
-import { authenticate } from '$lib/server/pocketbase.js';
+import { popularProducts } from '$lib/server/mongoLoads.js';
+import { searchByQuery } from '$lib/server/mongoActions.js';
 import { MAILCHIMP_API_KEY,MAILCHIMP_LIST_ID,MAILCHIMP_SERVER_PREFIX } from '$env/static/private';
 
 
-const pb = await authenticate()
-
 export async function load() {
     try {
-        const PopularProductsData = await popularProducts(pb)
+        const PopularProductsData = await popularProducts()
         return { PopularProductsData }
     }
     catch (error) {
         console.error('Error loading products:', error);
-        return {}
+        return {success:false,message:"Error loading products"}
     };
 }
 
@@ -21,7 +18,8 @@ export const actions = {
     search: async ({ request }) => {
         const body = Object.fromEntries(await request.formData())
         try {
-            const responce = await serachByQuery(pb, body)
+            const responce = await searchByQuery(body)
+            console.log('form actionfor search',responce);
             return {responce}
         } catch (err) {
             console.error('Error fetching search results:', err);

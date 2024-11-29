@@ -21,7 +21,7 @@
 			<h3 class="text-xl font-bold">Products</h3>
 			<section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
 				{#each components as item}
-					<a href="/products/{item?.expand?.Category?.urlName}/{item?.expand?.subCategory?.urlName}/{item?.productNumber}" class="block">
+					<a href="/products/{item?.category?.urlName}/{item?.subCategory?.urlName}/{item?.productNumber}" class="block">
 						<div
 							class="flex gap-3 border rounded p-4 cursor-pointer hover:border-gray-400"
 						>

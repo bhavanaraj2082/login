@@ -4,7 +4,7 @@
  import { enhance } from '$app/forms';
  
    import Icon from '@iconify/svelte';
-   import { viewedCart } from '$lib/stores/alsoViewedProducts_Store.js';
+   import { cartState } from '$lib/stores/cartStores.js';
    const dispatch = createEventDispatcher();
   
    export let data;
@@ -191,7 +191,7 @@
     products = products.map((product, i) => {
         if (i === index) {
             const newQuantity = (product.quantity || 1) + 1;
-            updateLocalStorage(product.id, newQuantity); // Update local storage
+            updateLocalStorage(product.id, newQuantity);
             return { ...product, quantity: newQuantity };
         }
         return product;
@@ -202,7 +202,7 @@ const decrementQuantity = (index) => {
     products = products.map((product, i) => {
         if (i === index) {
             const newQuantity = Math.max(1, (product.quantity || 1) - 1);
-            updateLocalStorage(product.id, newQuantity); // Update local storage
+            updateLocalStorage(product.id, newQuantity); 
             return { ...product, quantity: newQuantity };
         }
         return product;
@@ -213,12 +213,8 @@ function updateLocalStorage(productId, quantity) {
     const productIndex = cart.findIndex(item => item.id === productId);
 
     if (productIndex !== -1) {
-        // Update the quantity if the product already exists in the cart
         cart[productIndex].quantity = quantity;
-    } else {
-        // If the product does not exist, you can choose to add it
-        // or handle it as per your application's logic
-    }
+    } 
 
     localStorage.setItem('cart', JSON.stringify(cart));
 }
@@ -356,30 +352,65 @@ function updateLocalStorage(productId, quantity) {
  
  
  
- onMount(() => {
-   const storedFavorites = localStorage.getItem('isFavorited');
-     if (storedFavorites) {
-       isFavorited = JSON.parse(storedFavorites);
-     } else {
-       isFavorited = new Array(products.length).fill(false); 
-     }
+//  onMount(() => {
+//    const storedFavorites = localStorage.getItem('isFavorited');
+//      if (storedFavorites) {
+//        isFavorited = JSON.parse(storedFavorites);
+//      } else {
+//        isFavorited = new Array(products.length).fill(false); 
+//      }
    
-   products = products.map(product => ({
-           ...product,
-           quantity: product.quantity || 1,  
-       }));
+//    products = products.map(product => ({
+//            ...product,
+//            quantity: product.quantity || 1,  
+//        }));
     
+//     const urlParams = new URLSearchParams(window.location.search);
+//      const pageParam = urlParams.get('page');
+//      const initialPage = pageParam ? parseInt(pageParam, 10) : 1;
+//      currentPage.set(initialPage);
+//      allProducts = data.data;
+//      currentPage.set(1);
+//    initializeProducts();
+//    updateFilteredProducts();
+//    updateDisplayedProducts();
+//    updatePageNumbersToShow($totalPages);
+//  });
+
+
+
+onMount(() => {
+   
+    const storedFavorites = localStorage.getItem('isFavorited');
+    isFavorited = storedFavorites ? JSON.parse(storedFavorites) : new Array(products.length).fill(false);
+
+   
+    products = products.map(product => {
+        
+        const price = Array.isArray(product.priceSize) && product.priceSize.length > 0
+            ? product.priceSize[0].price  
+            : 0;  
+
+        return {
+            ...product,
+            quantity: product.quantity || 1, 
+            price,  
+        };
+    });
+
     const urlParams = new URLSearchParams(window.location.search);
-     const pageParam = urlParams.get('page');
-     const initialPage = pageParam ? parseInt(pageParam, 10) : 1;
-     currentPage.set(initialPage);
-     allProducts = data.data;
-     currentPage.set(1);
-   initializeProducts();
-   updateFilteredProducts();
-   updateDisplayedProducts();
-   updatePageNumbersToShow($totalPages);
- });
+    const pageParam = urlParams.get('page');
+    const initialPage = pageParam ? parseInt(pageParam, 10) : 1;
+    currentPage.set(initialPage);
+
+    allProducts = data.data;
+    currentPage.set(1);
+    initializeProducts();
+    updateFilteredProducts();
+    updateDisplayedProducts();
+    updatePageNumbersToShow($totalPages);
+});
+
  function initializeProducts() {
     
      allProducts = data.data;  
@@ -387,35 +418,43 @@ function updateLocalStorage(productId, quantity) {
      updateDisplayedProducts(); 
    }
  
-   export function addToCart(product, quantity) {
+
+export function addToCart(product, quantity) {
     const cartProduct = {
         description: product.prodDesc,
         id: product.id,
         image: product.imageSrc,
         name: product.productName,
-        partNumber: product.productNumber,
+        partNumber: product.productNumber, 
+        // priceSize: {
+        //     // price: product.priceSize[0].price,
+        //     // size: product.priceSize[0].size
+        // },
+
+
         priceSize: {
-            price: product.priceSize[0].price,
-            size: product.priceSize[0].size
+            price: product.priceSize && product.priceSize[0] ? product.priceSize[0].price : 0, 
+            size: product.priceSize && product.priceSize[0] ? product.priceSize[0].size : 0   
         },
-        quantity: quantity, 
+        quantity: quantity,
         stock: product.stockQuantity
     };
 
     cartState.update((cart) => {
-        const existingProductIndex = cart.findIndex((item) => item.id === cartProduct.id);
+
+        const existingProductIndex = cart.findIndex((item) => item.partNumber === cartProduct.partNumber);
 
         if (existingProductIndex !== -1) {
             cart[existingProductIndex].quantity += cartProduct.quantity;
-            updateLocalStorage(cartProduct.id, cart[existingProductIndex].quantity); 
+            updateLocalStorage(cartProduct.partNumber, cart[existingProductIndex].quantity);
         } else {
-            // Add new product to cart
             cart.push(cartProduct);
-            updateLocalStorage(cartProduct.id, cartProduct.quantity); 
+            updateLocalStorage(cartProduct.partNumber, cartProduct.quantity);
         }
 
         return cart;
     });
+
     const totalItems = JSON.parse(localStorage.getItem('cart')).length;
 
     cartNotification = `You have ${totalItems} item(s) in your cart.`;  
@@ -425,7 +464,10 @@ function updateLocalStorage(productId, quantity) {
         cartNotification = '';
     }, 3000);
 }
-  
+
+
+
+
  
  $: updateFilteredProducts();
    $: updateDisplayedProducts();
@@ -557,10 +599,8 @@ function updateLocalStorage(productId, quantity) {
                <span class="text-gray-600  mt-1">Manufacturer:
                  <span class="font-semibold text-gray-600"> {product.manufacturerName}</span> </p>
                  <p>
-               <span class="text-gray-600 mt-1">Category:</span><span class="font-semibold text-gray-600"> {product.Category}</span>  </p>
-               <!-- <p class="md:block hidden">
-               <span class="text-gray-600 font-medium md:block hidden">Description:
-               <span class="font-semibold text-gray-600">{product.prodDesc}</span> </span> </p> -->
+               <span class="text-gray-600 mt-1">Category:</span><span class="font-semibold text-gray-600"> {product.category}</span>  </p>
+
                <div class="flex flex-col md:flex-row items-start justify-between mt-2">
                  <div class="flex items-center mb-2 md:mb-0">
                    <Icon icon="mdi:file-document" class="text-primary-400 w-4 h-4 mr-1" />
@@ -577,7 +617,7 @@ function updateLocalStorage(productId, quantity) {
                      <div class="hidden md:flex  items-center">
                        <p class="text-gray-600 font-semibold inline-block"> 
                     
-                           {#if product.priceSize && Array.isArray(product.priceSize) && product.priceSize.length > 0}
+                           {#if product.priceSize  && product.priceSize.length > 0}
                              {product.priceSize[0].price} 
                            {:else}
                              Price not available 
@@ -616,7 +656,11 @@ function updateLocalStorage(productId, quantity) {
              
            </div>
            <div class="  flex items-center   md:hidden space-x-1">
-             <span class="text-gray-600 text-lg font-medium">{product.priceSize[0].price}</span>
+             <span class="text-gray-600 text-lg font-medium"> {#if product.priceSize && Array.isArray(product.priceSize) && product.priceSize.length > 0}
+                             {product.priceSize[0].price} 
+                           {:else}
+                             Price not available 
+                           {/if}</span>
              <div class="border text-primary-400 flex items-center ml-2   rounded">
                <button 
                  on:click={() => decrementQuantity(index)} 
@@ -631,9 +675,9 @@ function updateLocalStorage(productId, quantity) {
                  class="font-bold w-6 h-6 rounded text-primary-400">+</button>
              </div>
  
-             <button 
+              <button 
              on:click={() => addToCart(product, products[index].quantity)} 
-             class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400  px-2 py-1 ml-3 rounded text-md lg:ml-4">Add To Cart</button>
+             class="text-primary-400 hover:bg-primary-500 hover:text-white border border-primary-400  px-2 py-1 ml-3 rounded text-md lg:ml-4">Add To Cart</button> 
          
             
            </div>
@@ -776,15 +820,15 @@ function updateLocalStorage(productId, quantity) {
          </button>
          <h2 class="text-xl font-bold mb-4 text-center">Safety Data Sheet</h2>
          {#if selectedProduct}
-             <p class="text-center">
+             <!-- <p class="text-center">
                  <strong>Pack Size:</strong>
                  <select bind:value={selectedPackSize} class="border w-1/4 p-2 inline-block rounded bg-gray-100 ml-2 hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0">
                    
                      <option value="" disabled selected>Select size</option>
-                     {#each selectedProduct.priceSize as size}
+                      {#each selectedProduct.priceSize as size}
                          <option value={size.size}>{size.size}</option>
-                     {/each}
-                 </select></p>
+                     {/each} 
+                 </select></p> -->
              
              <div class="flex items-center justify-center mt-5">
                  <span class="font-semibold text-primary-400">{selectedProduct.productName}</span>
@@ -816,7 +860,7 @@ function updateLocalStorage(productId, quantity) {
                      </button>
                      <h2 class="text-xl font-bold mb-4 text-center">Certificate of Analysis</h2>
                      {#if selectedProduct}
-                         <p class="text-center">
+                         <!-- <p class="text-center">
                              <strong>Pack Size:</strong>
                              <select bind:value={selectedPackSize} class="border w-1/4 p-2 inline-block rounded bg-gray-100 ml-2 hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0">
  
@@ -824,7 +868,7 @@ function updateLocalStorage(productId, quantity) {
                                  {#each selectedProduct.priceSize as size}
                                      <option value={size.size}>{size.size}</option>
                                  {/each}
-                             </select></p>
+                             </select></p> -->
                          
                          <div class="flex items-center justify-center mt-5">
                              <span class="font-semibold text-primary-400">{selectedProduct.productName}</span>

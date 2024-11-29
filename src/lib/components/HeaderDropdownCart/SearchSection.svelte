@@ -11,7 +11,7 @@
 		{#each items as item}
 			<a
 				href="{linkPrefix}{isSubcategory
-					? item?.expand?.category?.urlName + '/' + item?.urlName
+					? item?.category?.urlName + '/' + item?.urlName
 					: item?.urlName}"
 				class="block"
 			>

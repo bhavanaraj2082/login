@@ -45,6 +45,6 @@ productSchema.index({ subCategory: 1 });
 productSchema.index({ subsubCategory: 1 });
 
 // Fixed model definition
-const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
+const Product = mongoose.models.Product || mongoose.model('products', productSchema);
 
 export default Product;
