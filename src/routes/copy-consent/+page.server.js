@@ -78,10 +78,6 @@
 
 
 
-
-
-
-
 import CopyConsent from '$lib/server/models/Copyconsent.js'; 
 
 export const actions = {
