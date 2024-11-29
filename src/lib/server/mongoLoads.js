@@ -5,6 +5,8 @@ import SubCategory from "$lib/server/models/SubCategory";
 import Order from "$lib/server/models/Order";
 import Products from "$lib/server/models/Products";
 import Stock  from '$lib/server/models/Stocks.js'; 
+import Manufacturer from "$lib/server/models/Manufacturer";
+import SubSubCategory from "$lib/server/models/SubSubcategory";
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -128,3 +130,39 @@ export const isProductFavorite = async (productNumber, cookies) => {
       return { success: false, message: "Something went wrong", error: error.message };
     }
   }
+
+  export async function RelatedProductData(productId) {
+    const product = await Products.findOne({ productNumber: productId }).populate('subsubCategory');
+  
+    if (!product) {
+      return { error: 'Product not found' };
+    }
+  
+    const subsubCategoryId = product.subsubCategory._id;
+
+    const relatedProducts = await Products.find({ 'subsubCategory': subsubCategoryId })
+    .limit(8).populate('category')
+    .populate('subCategory')
+    .populate('manufacturerName')
+    .populate('subsubCategory');
+  
+    if (relatedProducts.length === 0) {
+      return { error: 'No related products found' };
+    }
+
+    const relatedProductsJson = JSON.parse(JSON.stringify(relatedProducts));
+  
+    for (let relatedProduct of relatedProductsJson) {
+  
+      const stockData = await Stock.findOne({ 'partNumber.productNumber': relatedProduct.productNumber });
+  
+      if (!stockData) {
+        relatedProduct.stockQuantity = 0; 
+      } else {
+        relatedProduct.stockQuantity = stockData.stockQuantity || 0; 
+      }
+  
+    }
+    return relatedProductsJson; 
+}
+  

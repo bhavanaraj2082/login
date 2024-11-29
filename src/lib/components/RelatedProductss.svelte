@@ -7,20 +7,19 @@
   const productsData = relatedProducts;
 
   let RelatedProductData = productsData.map((product) => ({
-    productId: product.id,
+    productId: product._id,
     prodDesc: product.prodDesc,
     productNumber: product.productNumber,
     productName: product.productName,
     priceSize: product.priceSize,
-    synonym: product.filteredProductData?.["Synonym(S)"],
-    name: product.expand?.subCategory?.name,
+    name: product.subCategory.name,
     image: product.imageSrc,
     properties: product.properties,
-    manufacturerName: product.expand.manufacturerName.name,
+    manufacturerName: product.manufacturerName?.name,
     stock: product.stockQuantity,
-    category: product.expand.Category.urlName,
-    subCategory: product.expand.subCategory.urlName,
-    subsubCategory: product.expand.subsubCategory.urlName,
+    category: product.Category?.urlName,
+    subCategory: product.subCategory?.urlName,
+    subsubCategory: product.subsubCategory?.urlName,
   }));
 
   let currentIndex = 0;
@@ -175,8 +174,8 @@
                       >
                     </p>
                     <p class="font-medium text-sm h-10 overflow-hidden">
-                      {product.synonym
-                        ? product.synonym.slice(0, 35) + "..."
+                      {product.prodDesc
+                        ? product.prodDesc.slice(0, 35) + "..."
                         : "--"}
                     </p>
                   </div>
