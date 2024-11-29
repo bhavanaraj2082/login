@@ -1,13 +1,12 @@
 import ViewedProduct from "$lib/server/models/AlsoViewedProducts.js";
-import Profiles from "$lib/server/models/Profiles.js";
+import Profile from "$lib/server/models/Profile.js";
 import Category from "$lib/server/models/Category";
 import SubCategory from "$lib/server/models/SubCategory";
 import Order from "$lib/server/models/Order";
-import Products from "$lib/server/models/Products";
+import Products from "$lib/server/models/Products.js";
 import PopularProduct from "$lib/server/models/PopularProduct";
 import Stock from "$lib/server/models/Stocks.js";
-import Manufacturer from "$lib/server/models/Manufacturer";
-import SubSubCategory from "$lib/server/models/SubSubcategory";
+import MyFavourites from "$lib/server/models/MyFavourites.js";
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -127,7 +126,7 @@ export const isProductFavorite = async (productNumber, cookies) => {
 
 export async function getProfileDetails(userEmail) {
   try {
-    const record = await ChemiDashProfile.findOne({ email: userEmail });
+    const record = await Profile.findOne({ email: userEmail });
     if (record) {
       return { profileData: JSON.parse(JSON.stringify(record)) };
     } else {
@@ -339,3 +338,26 @@ export const loadProductsubcategory = async (suburl, page = 1) => {
     };
   }
 };
+
+export async function RelatedApplicationData(name) {
+  try {
+    const relatedProducts = await Products.find({
+      $or: [
+        { "description.Application": { $regex: name, $options: "i" } },
+        { "subsubCategory.name": { $regex: name, $options: "i" } },
+        { "subCategory.name": { $regex: name, $options: "i" } },
+      ],
+    })
+      .populate("subCategory")
+      .populate("manufacturerName")
+      .populate("subsubCategory")
+      .populate("category")
+      .limit(8)
+      .skip(0); // Start at page 1 (0-based index)
+
+    return relatedProducts;
+  } catch (error) {
+    console.error("Error fetching related application data:", error);
+    throw error;
+  }
+}
