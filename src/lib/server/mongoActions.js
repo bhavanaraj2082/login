@@ -8,7 +8,7 @@ import MyFavourite from "$lib/server/models/MyFavourite.js";
 import Stock from '$lib/server/models/Stock.js'; 
 import Solutions from "$lib/server/models/Solutions.js";
 import Quotes from "$lib/server/models/Quotes.js";
-import Products from "$lib/server/models/Products.js";
+import Products from "$lib/server/models/Product.js";
 import Helpsupport from "$lib/server/models/Helpsupport.js";
 import { redirect } from "@sveltejs/kit";
 

@@ -315,10 +315,9 @@ const applyFilters = () => {
           <button
             on:click={() => applyFilters()}
             class="text-white w-1/3 bg-primary-400 md:px-4 md:py-2 rounded-md text-sm"
-          >
-            Apply Filters 
+          > Apply Filters 
           </button>
-          <Icon icon="weui:done-outlined" class="text-primary-500 text-xl" />
+         
           <button
             on:click={() => { showFilters = false; resetFilters(); }}
             class="text-primary-400 w-1/3 bg-gray-200 px-1 py-1 md:px-4 md:py-2 mr-2 rounded-md text-sm"
