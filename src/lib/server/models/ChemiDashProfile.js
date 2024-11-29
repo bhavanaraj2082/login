@@ -1,12 +1,11 @@
-import { Schema,model,models } from "mongoose";
+import mongoose from "mongoose";
 
 const jsonSchema = {
-  type: Schema.Types.Mixed,
-  required: false,
-  default: {}
+  type: mongoose.Schema.Types.Mixed,
+  default: null
 };
 
-const chemiDashProfileSchema = new Schema({
+const chemiDashProfileSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: false
@@ -25,11 +24,10 @@ const chemiDashProfileSchema = new Schema({
   },
   email: {
     type: String,
-    required: false,
-    match: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
+    required: false
   },
   userId: {
-    type: Schema.Types.ObjectId, 
+    type: mongoose.Schema.Types.ObjectId, 
     ref: 'Register', 
     required: false
   },
@@ -45,8 +43,10 @@ const chemiDashProfileSchema = new Schema({
   timestamps: true,
   collection:"chemidashprofile"
 });
-
+// if(mongoose.models.ChemiDashProfile){
+//   delete mongoose.models.ChemiDashProfile
+// }
 // Create and export the Mongoose model
-const ChemiDashProfile = models.ChemiDashProfile || model('ChemiDashProfile', chemiDashProfileSchema);
+const ChemiDashProfile = mongoose.models.ChemiDashProfile || mongoose.model('ChemiDashProfile', chemiDashProfileSchema);
 
 export default ChemiDashProfile

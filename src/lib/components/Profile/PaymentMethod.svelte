@@ -18,7 +18,7 @@
 </script>
 
 
-<div class="border shadow-sm rounded-md p-5 bg-white">
+<div class="border shadow-sm md:w-11/12 max-w-7xl mx-auto rounded-md p-5 bg-white">
 <div class=" max-w-2xl">
     <h1 class=" text-xl font-bold"> Manage Your Payment Methods</h1>
     <form class="my-3 flex flex-col sm:flex-row flex-wrap gap-y-3"

@@ -36,7 +36,7 @@ let message="";
      
       // console.log(result);
 
-      if(result.data.record && result.type === 'success')
+      if(result)
     {
       // console.log(`${result.data.message}` );
       // Clear the form 
@@ -57,7 +57,7 @@ let message="";
     else {
       console.error(`${result.data.error}`, result.data.details);
       errormessage = 'There was an error submitting your information. Please try again.';
-      alert('There was an error submitting your information. Please try again.');
+      // alert('There was an error submitting your information. Please try again.');
     }  
     }; 
 }} >
