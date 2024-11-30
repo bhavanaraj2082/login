@@ -6,9 +6,7 @@
     export let data;
     // console.log("Data Records:", data);    
 </script>
-
-
 <ProductDetails {data}/>
 <!-- <RelatedProductss relatedProducts={data.relatedProducts}/>   -->
-<!-- <CompSimItems differentProducts={data.differentProducts}/> -->
+<CompSimItems {data}/>
 <Description {data}/>
