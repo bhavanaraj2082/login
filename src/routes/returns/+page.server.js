@@ -1,12 +1,14 @@
-import {authenticate} from "$lib/server/pocketbase"
-import { getReturnresultData } from "$lib/server/actions.js";
-
-const pb = await authenticate()
+import { getReturnresultData } from "$lib/server/mongoActions.js";
+import { redirect } from '@sveltejs/kit';
 
 export const actions = {
-  returns:async({request})=>{
-    const body = Object.fromEntries(await request.formData()) 
-      const result = await getReturnresultData(pb,body)   
-      return result 
+  returns: async ({ request }) => {
+    const body = Object.fromEntries(await request.formData());
+    const result = await getReturnresultData(body); 
+
+    if (result.redirectTo) {
+      throw redirect(302, result.redirectTo);
     }
-}
+    return result;
+  }
+};

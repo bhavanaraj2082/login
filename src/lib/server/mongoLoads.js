@@ -10,6 +10,7 @@ import Manufacturer from "$lib/server/models/Manufacturer.js";
 import SubSubCategory from "$lib/server/models/SubSubcategory.js";
 import Shipment from "$lib/server/models/Shipment.js";
 import TokenVerification from "$lib/server/models/TokenVerification.js";
+import Return from '$lib/server/models/Return.js';
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -369,3 +370,28 @@ export const verifyPasswordToken = async(token)=>{
  
 }
 
+// returns starts
+export async function getreturnstatusdata(invoiceid) {
+    try {
+        const records = await Order.findOne({ _id: invoiceid }).populate('dashuserprofileid').populate('shipdetails');
+        if (records) {
+            return JSON.parse(JSON.stringify(records));
+        } else {
+            return { error: 'Error in fetching orderStatus Data' };
+        }
+    } catch (error) {
+        console.error('Error fetching order status:', error);
+        return { error: 'Error in fetching orderStatus Data' };
+    }
+}
+
+export async function getReturnSavedData() {
+    try {
+      const records = await Return.find().lean();
+      return { records: JSON.parse(JSON.stringify(records)) };
+    } catch (error) {
+      console.error('Error fetching saved returns:', error);
+      return { error: 'Error fetching saved returns data' };
+    }
+  }
+// returns ends

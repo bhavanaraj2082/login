@@ -17,6 +17,7 @@ import nodemailer from 'nodemailer';
 import { Lucia } from "lucia";
 import mongoose from "mongoose";
 import {APP_URL,SENDER_EMAIL,SENDER_PASSWORD,WEBSITE_NAME} from '$env/static/private'
+import Return from '$lib/server/models/Return.js';
 
 export const submitContactInfo = async (data) => {
 	try {
@@ -663,6 +664,7 @@ export const saveContactInfo = async (data) => {
   }
 };
 
+
 export const emailVerificationToken = async(body,verifyType)=>{
 	const {email,userId} = body
 	//console.log(email);
@@ -794,21 +796,131 @@ export const passwordVerificationToken = async(body,verifyType)=>{
 export const userUpdatePassword = async(body)=>{
 const {userId,newPassword} = body
 	  console.log(newPassword);
-// Initialize Lucia with Mongoose adapter
-// const auth = new Lucia({
-//   adapter: "mongoose",
-//   database: "",  // MongoDB URL
-// });
+//Initialize Lucia with Mongoose adapter
+const auth = new Lucia({
+  adapter: "mongoose",
+  database: "",  // MongoDB URL
+});
 
-//   try {
-//     // Update the password using Lucia's built-in method
-//     await auth.update_password(userId, newPassword);
+  try {
+    // Update the password using Lucia's built-in method
+    await auth.update_password(userId, newPassword);
 
-//     // Optionally, invalidate any existing sessions after password change
-//     await auth.invalidate_sessions(userId);  // Optional, for security
-//     throw redirect(302,'/profile')
-//     console.log("Password updated successfully.")
-//   } catch (error) {
-//     console.error("Error updating password:", error);
- // }
+    // Optionally, invalidate any existing sessions after password change
+    await auth.invalidateSession(userId);  // Optional, for security
+    throw redirect(302,'/profile')
+    console.log("Password updated successfully.")
+  } catch (error) {
+    console.error("Error updating password:", error);
+ }
 }
+
+//returns starts
+export const getReturnresultData = async (body) => {
+  console.log("getReturnresultData", body);
+  try {
+    const invoiceNumber = parseInt(body.invoiceNumber);
+    const record = await Order.findOne({ invoice: invoiceNumber });
+
+    if (record) {
+      return {
+        redirectTo: `/returns/${record._id}`
+      };
+    } else {
+      return { message: 'Return-Order not found' };
+    }
+  } catch (error) {
+    console.error('Error fetching return result:', error);
+    return { message: 'Error occurred while fetching the order' };
+  }
+};
+
+export const getreturnsOrderData = async ({ body }) => {
+	// console.log("-----", body);	
+	try {
+	  const {
+		orderNumber,
+		invoiceNumber,
+		returnOrderId,
+		selectall,
+		reason: entireOrderReason,
+		entireOrderResolution,
+		description: entireOrderInfo,
+		...otherFields
+	  } = body;
+  
+	  const isEntireOrder = selectall === 'on';
+  
+	  const selectedItems = [];
+	  const itemsByIndex = {};
+
+	  Object.entries(otherFields).forEach(([key, value]) => {
+		const match = key.match(/^selectedItems\[(\d+)\]\.(\w+)$/); 
+		if (match) {
+		  const index = parseInt(match[1], 10);
+		  const field = match[2];
+  
+		  if (!itemsByIndex[index]) {
+			itemsByIndex[index] = {};
+		  }
+		  itemsByIndex[index][field] = value;
+		}
+	  });
+  
+	  Object.values(itemsByIndex).forEach((item) => {
+		console.log("item", item);
+		
+		if (item.productNumber) {
+		  const processedItem = {
+			productNumber: item.productNumber,
+			productName: item.productName,
+			orderQty: parseInt(item.orderQty, 10),
+			returnqty: parseInt(item.returnqty, 10),
+			reason: isEntireOrder ? entireOrderReason : item.reason,
+			resolution: isEntireOrder ? entireOrderResolution : item.resolution,
+			additionalInfo: isEntireOrder ? entireOrderInfo : item.additionalInfo
+		  };
+		  selectedItems.push(processedItem);
+		}
+	  });
+  
+	  const returnData = {
+		returnItems: {
+		  selectedItems
+		},
+		invoiceNumber,
+		orderNumber,
+		returnOrderid: returnOrderId,
+		status: 'Pending'
+	  };
+  
+	  const newReturn = new Return(returnData);
+	  const savedReturn = await newReturn.save();
+
+	  return {
+		status: 200,
+		record: JSON.parse(JSON.stringify(savedReturn)) 
+	  };
+  
+	} catch (error) {
+	  console.error("Error processing return order:", error);
+	  return {
+		status: 500,
+		message: 'Error processing return order'
+	  };
+	}
+  };
+  
+  export const getcancelreturnData = async ({ id }) => {
+	  try {
+		  const deletedRecord = await Return.findByIdAndDelete(id);
+		  if (!deletedRecord) {
+			  return { status: 404, message: 'Return order not found.' };
+		  }
+		  return { status: 200, message: 'Return order cancelled successfully.' };
+	  } catch (error) {
+		  console.error('Error deleting return order:', error);
+		  return { status: 500, message: 'An error occurred while canceling the return.' };
+	  }
+  };
+//returns ends
