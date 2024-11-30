@@ -4,7 +4,7 @@
 	// console.log('=======>cat', categories);
 </script>
 
-<div class="w-11/12 mx-auto mb-10 lg:px-8">
+<div class="w-full mb-10 lg:px-8">
 	<div class="pl-4">
 		<p class="mt-2 text-base text-content">
 			Explore our high-quality chemical products, Classified into various categories, each playing a
