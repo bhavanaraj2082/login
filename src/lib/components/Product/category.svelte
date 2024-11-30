@@ -4,7 +4,7 @@
 	// console.log('=======>cat', categories);
 </script>
 
-<div class="w-11/12 mx-auto mb-10 lg:px-8">
+<div class="w-full mb-10 lg:px-8">
 	<div class="pl-4">
 		<p class="mt-2 text-base text-content">
 			Explore our high-quality chemical products, Classified into various categories, each playing a
@@ -16,7 +16,7 @@
 	>
 		{#each categories as category}
 			<div class="bg-white shadow rounded-md overflow-hidden">
-				<img src="/image/category.jpeg" alt="img" class=" w-full h-60 object-center" />
+				<img src="/category/{category.name}.webp" alt="img" class=" w-full h-60 object-center" />
 				<div class="p-4">
 					<a href="/products/{category.urlName}">
 						<h3 class="text-lg font-semibold text-heading hover:underline">

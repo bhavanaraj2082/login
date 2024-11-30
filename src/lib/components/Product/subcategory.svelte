@@ -4,7 +4,7 @@
 	// console.log("=======>subcat",subcategories.length)
 </script>
 
-<div class="mx-auto mb-8 px-6 lg:px-8">
+<div class="w-full mb-8 px-6 lg:px-8">
 	<div class="pl-4">
 		<p class="text-primary-400 font-semibold text-xl">
 			{subcategories[0].category.name}
