@@ -2,7 +2,8 @@
 	import InvoiceDatailes from "$lib/components/ReturnStatus/InvoiceDatailes.svelte";
 	import SelectItems from "$lib/components/ReturnStatus/SelectItems.svelte";
     export let data;
-
+	const returndata = data.returndata;
 </script>
-<InvoiceDatailes {data}/>
-<SelectItems {data}/>
+
+<InvoiceDatailes {returndata}/>
+<SelectItems {returndata}/>
