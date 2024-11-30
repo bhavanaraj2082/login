@@ -284,7 +284,7 @@
 				{:else if searchQuery.trim() && isLoading}
 					<p
 						class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-30 rounded flex items-center justify-start"
-					>	<Icon icon="ei:spinner" class="w-8 h-8 animate-spin text-primary-600 mx-2 text-5xl" />
+					>	<Icon icon="ei:spinner" class="w-8 h-8 animate-spin-slow text-primary-600 mx-2 text-5xl" />
 						<span>Loading Products...</span>
 					</p>
 				{:else if searchQuery.trim() && searchResults && searchResults.length === 0}

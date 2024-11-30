@@ -79,5 +79,4 @@
 			Step 6: Delivery information
 		</h1>
 	</li>
-	<hr />
 </ul>
