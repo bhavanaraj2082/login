@@ -59,5 +59,5 @@ const chemikartSchema = new mongoose.Schema(
     collection: 'chemikartsolutions', 
   }
 );
-const ChemikartSolution = mongoose.model('ChemikartSolution', chemikartSchema);
+const ChemikartSolution = mongoose.models.ChemikartSolution || mongoose.model('ChemikartSolution', chemikartSchema);
 export default ChemikartSolution;
