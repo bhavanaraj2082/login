@@ -1,12 +1,14 @@
 <script>
 	//import { invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
+    import Icon from '@iconify/svelte';
     import { createEventDispatcher } from 'svelte';
 
     const dispatch = createEventDispatcher()
 
     export let recordId
     export let contact
+    export let isEmailVerified
 
     let {
         email,
@@ -142,8 +144,18 @@
                     <p class=" text-sm">{cellPhone || "NA"}</p>
                 </div>
                 <div class=" w-full sm:w-1/2">
-                    <h4 class="font-medium">Email</h4>
+                    <div class=" flex items-center gap-2">
+                    <h4 class="font-medium">Email </h4>
+                    <Icon icon="tdesign:verified-filled" class=" text-xl {isEmailVerified ? "text-green-500":"text-gray-400"}"/>
+                    </div>
                     <p class=" text-sm">{email || "NA"}</p>
+                </div>
+                <div class=" w-full sm:w-1/2">
+                    <h4 class="font-medium">Password</h4>
+                    <div class=" flex items-center gap-2 -mt-1.5">
+                        <p class="pt-2 text-lg">*********</p>
+                        <a href="/reset-password" class=" text-xs text-primary-500 font-semibold">Reset Password</a>
+                    </div>
                 </div>
             </section>
         </div>

@@ -43,6 +43,6 @@ const registerSchema = new mongoose.Schema(
 );
 
 // Create the model based on the schema
-const Register = mongoose.model('Register', registerSchema);
+const Register = mongoose.models.Register || mongoose.model('Register', registerSchema);
 
 export default Register;

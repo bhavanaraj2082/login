@@ -1,28 +1,22 @@
-import { resetpassword } from '$lib/server/actions.js';
-import { pb, authenticate } from '$lib/server/pocketbase.js';  
+
+import { passwordVerificationToken,userUpdatePassword } from '$lib/server/mongoActions.js';
+import { verifyPasswordToken } from '$lib/server/mongoLoads.js';
+
+export const load = async({url})=>{
+  const token = await url.searchParams.get('token')
+  if(token === null){
+    return {success:null}
+  }
+  return await verifyPasswordToken(token)
+}
 
 export const actions = {
   resetpassword: async ({ request }) => {
-    const data = Object.fromEntries(await request.formData());
-    const email = data.email;
-
-    const authResult = await authenticate();
-    if (authResult.status === 400) {
-      return {
-        type: "error",
-        message: authResult.error || "Authentication failed. Please try again later.",
-      };
-    }
-
-    try {
-      const result = await resetpassword(email, pb);
-      console.log("Password reset request result:", result);
-      return result; 
-    } catch (error) {
-      return {
-        type: "error",
-        message: error.response?.data?.message || "Failed to send password reset request. Please try again."
-      };
-    }
+    const body = Object.fromEntries(await request.formData());
+    return await passwordVerificationToken(body,"Password");
+  },
+  updatePassword:async({request})=>{
+    const body = Object.fromEntries(await request.formData());
+    return await userUpdatePassword(body);
   }
 };

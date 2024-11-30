@@ -7,6 +7,7 @@
   import PersonalInfo from "$lib/components/Profile/PersonalInfo.svelte";
   import PaymentMethod from "$lib/components/Profile/PaymentMethod.svelte";
   import SitePreference from "$lib/components/Profile/SitePreference.svelte";
+  import EmailVerifyPopup from '$lib/components/EmailVerifyComp/EmailVerifyPopup.svelte';
 
   export let data;
   let activeComp = 0
@@ -14,6 +15,7 @@
   
   $: ({
     _id,
+    isEmailVerified,
     linkOrganization,
     sitePreferences,
     shippingAddress,
@@ -39,11 +41,15 @@
 					toast.error('',{description:e.detail.message})
 				}
    }
-   //$:console.log(expand);
 
 </script>
 
+
+
 <div class="p-5">
+  {#if !isEmailVerified}
+    <EmailVerifyPopup/>
+  {/if}
   <h1 class=" text-lg md:text-xl md:mx-6 lg:mx-10 font-bold my-2">Profile</h1>
   <div class=" w-full flex flex-col md:flex-row gap-2 lg:gap-4 xl:gap-6">
     <div class=" w-full md:w-2/5 lg:w-1/3 xl:w-1/4">
@@ -98,6 +104,7 @@
             on:onSuccess={handleEvent} 
             {recordId} 
             {contact} 
+            {isEmailVerified}
         />
       {/if}
     </div>

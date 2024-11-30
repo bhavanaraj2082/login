@@ -10,8 +10,14 @@ import Solution from "$lib/server/models/Solution.js";
 import Quotes from "$lib/server/models/Quotes.js";
 import Products from "$lib/server/models/Product.js";
 import Helpsupport from "$lib/server/models/Helpsupport.js";
+import TokenVerification from "$lib/server/models/TokenVerification.js";
+import { redirect,error } from "@sveltejs/kit";
+import { v4 as uuidv4 } from 'uuid';
+import nodemailer from 'nodemailer';
+import { Lucia } from "lucia";
+import mongoose from "mongoose";
+import {APP_URL,SENDER_EMAIL,SENDER_PASSWORD,WEBSITE_NAME} from '$env/static/private'
 import Return from '$lib/server/models/Return.js';
-import { redirect } from "@sveltejs/kit";
 
 export const submitContactInfo = async (data) => {
 	try {
@@ -657,6 +663,157 @@ export const saveContactInfo = async (data) => {
     return { success: false, error: error.message };
   }
 };
+
+
+export const emailVerificationToken = async(body,verifyType)=>{
+	const {email,userId} = body
+	//console.log(email);
+	const token = uuidv4();
+	// Set the expiry time (5 minutes from now)
+	const expiry = new Date(Date.now() + 24*60*60*1000);
+    //console.log(token,expiry);
+	// Store the token and expiry in the database
+	const verification = await TokenVerification.create({email,token,expiry,verificationType:verifyType,userId});
+    //console.log("-------",verification);
+	// Send the email with the verification link
+	const transporter = nodemailer.createTransport({
+	  service: 'gmail', // Use your email service here (SendGrid, Mailgun, etc.)
+	  auth: {
+		user: SENDER_EMAIL, // Replace with your email
+		pass: SENDER_PASSWORD // Replace with your email password or an app-specific password
+	  }
+	});
+   //console.log('=======',transporter);
+   const mailOptions = {
+	from: SENDER_EMAIL,
+	to:email,
+	subject: `Email Verification request from ${WEBSITE_NAME} `,
+	html: `
+	  <html>
+		<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+		  <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+			<h2 style="color: #333333; text-align: center; font-size: 24px;">Verify Your Email Address</h2>
+			<p style="font-size: 16px; color: #555555; line-height: 1.5; text-align: center;">
+			  Hi there,<br/><br/>
+			  Thanks for signing up! To complete your registration, please click the button below to verify your email address.
+			</p>
+			<div style="text-align: center;">
+			  <a href="${APP_URL}/verify?token=${token}" style="display: inline-block; background-color: #fe5939; color: #ffffff; padding: 15px 30px; font-size: 16px; text-decoration: none; border-radius: 5px; text-transform: uppercase; font-weight: bold; margin-top: 20px;">
+				Verify Your Email
+			  </a>
+			</div>
+			<p style="font-size: 14px; color: #777777; text-align: center; margin-top: 30px;">
+			  If you didn't sign up for this account, you can ignore this email.
+			</p>
+			<p style="font-size: 14px; color: #777777; text-align: center;">
+			  Thanks,<br/>
+			  The ${WEBSITE_NAME} Team
+			</p>
+		  </div>
+		</body>
+	  </html>
+	`,
+  };
+  
+     
+	//console.log("+++++++",mailOptions);
+	try {
+	  const res = await transporter.sendMail(mailOptions);
+	  //console.log("mail response",res);
+	  return {
+		success:true, title:"Email Verification Sent", message: 'Email verification token is sent to your email. Please verify.'
+	  };
+	} catch (err) {
+	  console.error(err);
+	  throw error(500, {title:"Failed to send email",message:"Something went wrong. try again later"});
+	}
+}
+
+export const passwordVerificationToken = async(body,verifyType)=>{
+	const {email,userId} = body
+	//console.log(email);
+	const token = uuidv4();
+	// Set the expiry time (5 minutes from now)
+	const expiry = new Date(Date.now() + 15*60*1000);
+    //console.log(token,expiry);
+	// Store the token and expiry in the database
+	const verification = await TokenVerification.create({email,token,expiry,verificationType:verifyType,userId});
+    //console.log("-------",verification);
+	// Send the email with the verification link
+	const transporter = nodemailer.createTransport({
+	  service: 'gmail', // Use your email service here (SendGrid, Mailgun, etc.)
+	  auth: {
+		user: SENDER_EMAIL, // Replace with your email
+		pass: SENDER_PASSWORD // Replace with your email password or an app-specific password
+	  }
+	});
+   //console.log('=======',transporter);
+   const mailOptions = {
+	from: SENDER_EMAIL,
+	to:email,
+	subject: `Password Reset Request for Your ${WEBSITE_NAME} Account `,
+	html: `
+	  <html>
+		<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+		  <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+			<h2 style="color: #333333; text-align: center; font-size: 24px;">Reset Your Password</h2>
+			<p style="font-size: 16px; color: #555555; line-height: 1.5; text-align: center;">
+			  Hi there,<br/><br/>
+			  We received a request to reset your password. To proceed, please click the button below to reset your password.
+			</p>
+			<div style="text-align: center;">
+			  <a href="${APP_URL}/reset-password?token=${token}" style="display: inline-block; background-color: #fe5939; color: #ffffff; padding: 15px 30px; font-size: 16px; text-decoration: none; border-radius: 5px; text-transform: uppercase; font-weight: bold; margin-top: 20px;">
+				Reset Password
+			  </a>
+			</div>
+			<p style="font-size: 14px; color: #777777; text-align: center; margin-top: 30px;">
+			  If you didn't sign up for this account, you can ignore this email.
+			</p>
+			<p style="font-size: 14px; color: #777777; text-align: center;">
+			  Thanks,<br/>
+			  The ${WEBSITE_NAME} Team
+			</p>
+		  </div>
+		</body>
+	  </html>
+	`,
+  };
+  
+     
+	//console.log("+++++++",mailOptions);
+	try {
+	  const res = await transporter.sendMail(mailOptions);
+	  //console.log("mail response",res);
+	  return {
+		success:true, message: 'Password verification token is sent to your email. Please verify.'
+	  };
+	} catch (err) {
+	  console.error(err);
+	  throw error(500, {message:"Something went wrong. try again later"});
+	}
+}
+
+export const userUpdatePassword = async(body)=>{
+const {userId,newPassword} = body
+	  console.log(newPassword);
+//Initialize Lucia with Mongoose adapter
+const auth = new Lucia({
+  adapter: "mongoose",
+  database: "",  // MongoDB URL
+});
+
+  try {
+    // Update the password using Lucia's built-in method
+    await auth.update_password(userId, newPassword);
+
+    // Optionally, invalidate any existing sessions after password change
+    await auth.invalidateSession(userId);  // Optional, for security
+    throw redirect(302,'/profile')
+    console.log("Password updated successfully.")
+  } catch (error) {
+    console.error("Error updating password:", error);
+ }
+}
 
 //returns starts
 export const getReturnresultData = async (body) => {

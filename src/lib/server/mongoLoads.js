@@ -3,16 +3,14 @@ import Profile from "$lib/server/models/Profile.js";
 import Category from "$lib/server/models/Category.js";
 import SubCategory from "$lib/server/models/SubCategory.js";
 import Order from "$lib/server/models/Order.js";
-import Product from "$lib/server/models/Product.js";
+import Product from "$lib/server/models/Product.js"
 import PopularProduct from "$lib/server/models/PopularProduct.js";
 import Stock  from '$lib/server/models/Stock.js'; 
 import Manufacturer from "$lib/server/models/Manufacturer.js";
 import SubSubCategory from "$lib/server/models/SubSubcategory.js";
 import Shipment from "$lib/server/models/Shipment.js";
+import TokenVerification from "$lib/server/models/TokenVerification.js";
 import Return from '$lib/server/models/Return.js';
-import dashuserprofileid from '$lib/server/models/Profile.js';
-
-
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -339,6 +337,37 @@ export async function RelatedApplicationData(name) {
     console.error('Error fetching related products:', error);
     return {success:false,message:"Error fetching related products"}
   }
+}
+
+export const verifyEmailToken = async(token)=>{
+    const verifyToken = await TokenVerification.findOne({token})
+    if(verifyToken !== null){
+      if(Date.now() >= verifyToken.expiry.getTime()){
+           return {success:false, message:"token has expired. please verify your email again"}
+      }else{
+         await Profile.updateOne({email:verifyToken.email},{isEmailVerified:true})
+         return {success:true,message:"Email is verified successfully"}
+      }
+        
+    }else{
+      return { success:false,message:"Token is not found "}
+    }
+   
+}
+
+export const verifyPasswordToken = async(token)=>{
+  const verifyToken = await TokenVerification.findOne({token})
+  if(verifyToken !== null){
+    if(Date.now() >= verifyToken.expiry.getTime()){
+         return {success:false, message:"token has expired. please verify again"}
+    }else{
+       return {success:true,message:"Token is verified successfully"}
+    }
+      
+  }else{
+    return { success:false,message:"Token is not found "}
+  }
+ 
 }
 
 // returns starts
