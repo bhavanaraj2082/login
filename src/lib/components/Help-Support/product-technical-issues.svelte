@@ -78,7 +78,6 @@
     action="?/contact"
     use:enhance={() => {
       return async ({ result }) => {
-
         // console.log(result);
 
         if (result) {
@@ -103,23 +102,14 @@
             "There was an error submitting your information. Please try again."
           );
         }
+        setTimeout(() => {
+          errormessage = "";
+          message = "";
+        }, 2000);
       };
     }}
   >
     <div class=" w-full pb-6 h-full">
-      {#if message != ""}
-      <h2
-        class="text-center bg-green-50 text-green-500 font-semibold text-base w-full"
-      >
-        {message}
-      </h2>
-      {:else if errormessage!= ""}
-      <h2
-      class="text-center bg-red-50 text-red-500 font-semibold text-base w-full"
-    >
-      {errormessage}
-    </h2>
-    {/if}
       <h2 class="text-primary-400 font-semibold text-base pb-6">
         Product Technical Issues
       </h2>
@@ -139,13 +129,13 @@
         >Please provide the Item Number, if you have one</label
       >
       {#each products as product}
-      <input
-        type="text"
-        id="itemNumber"
-        bind:value={product.itemNumber}
-        required
-        class="mt-1 block w-1/2 mb-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500"
-      />
+        <input
+          type="text"
+          id="itemNumber"
+          bind:value={product.itemNumber}
+          required
+          class="mt-1 block w-1/2 mb-4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:ring-blue-500"
+        />
       {/each}
       <input hidden name="products" value={JSON.stringify(products)} />
       <div class="mt-4">
@@ -169,7 +159,7 @@
         <button
           type="button "
           on:click={triggerFileInput}
-          class=" text-primary-400 border border-primary-400 mb-4 px-2 rounded-md lg:ml-8 md:ml-8 hover:text-white hover:bg-primary-400"
+          class=" text-primary-400 border border-primary-400 mb-4 px-2 rounded-md  md:ml-4 hover:text-white hover:bg-primary-400"
         >
           Choose Files
         </button>
@@ -284,4 +274,17 @@
       </button>
     </div>
   </form>
+  {#if message != ""}
+    <h2
+      class="text-center text-green-500 font-semibold text-base w-full"
+    >
+      {message}
+    </h2>
+  {:else if errormessage != ""}
+    <h2
+      class="text-center text-red-500 font-semibold text-base w-full"
+    >
+      {errormessage}
+    </h2>
+  {/if}
 </div>

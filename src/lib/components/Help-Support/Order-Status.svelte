@@ -24,18 +24,14 @@
   ];
 </script>
 
-<div class="  w-full p-4">
+<div class=" w-full p-4">
   <form
     method="POST"
     action="?/contact"
     use:enhance={() => {
       return async ({ result }) => {
-       
-        // console.log(result);
-
         if (result) {
           // console.log(`${result.data.message}`);
-          // Clear the form
           selectedOption = "";
           selectOptionNumber = "";
           invoiceNumber = "";
@@ -48,32 +44,20 @@
           location = "";
           accountNumber = "";
           message= 'Your information has been submitted successfully!';
-          // alert("Your information has been submitted successfully!");
         } else {
           console.error(`${result.data.error}`, result.data.details);
           errormessage = 'There was an error submitting your information. Please try again.';
-          // alert(
-          //   "There was an error submitting your information. Please try again."
-          // );
         }
+        setTimeout(() => {
+          errormessage = ""
+          message = ""
+        }, 2000);
       };
     }}
   >
     <div class=" flex flex-col lg:flex-row justify-between h-full">
       <div class="lg:w-1/2 w-full pb-6 mx-auto h-full">
-        {#if message != ""}
-        <h2
-          class="text-center bg-green-50 text-green-500 font-semibold text-base w-3/4"
-        >
-          {message}
-        </h2>
-        {:else if errormessage!= ""}
-        <h2
-        class="text-center bg-red-50 text-red-500 font-semibold text-base w-3/4"
-      >
-        {errormessage}
-      </h2>
-      {/if}
+     
         <h2 class="text-primary-400 font-semibold text-base pb-6">
           Order Status
         </h2>
@@ -215,4 +199,17 @@
       </div>
     </div>
   </form>
+  {#if message != ""}
+  <h2
+    class="text-center text-green-500 font-semibold text-base w-full"
+  >
+    {message}
+  </h2>
+  {:else if errormessage!= ""}
+  <h2
+  class="text-center text-red-500 font-semibold text-base w-full"
+>
+  {errormessage}
+</h2>
+{/if}
 </div>

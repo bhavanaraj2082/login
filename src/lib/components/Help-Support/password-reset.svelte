@@ -49,22 +49,13 @@
       errormessage = 'There was an error submitting your information. Please try again.';
       alert('There was an error submitting your information. Please try again.');
     }  
+    setTimeout(() => {
+          errormessage = ""
+          message = ""
+        }, 2000);
     }; 
 }} >
     <div class=" w-full pb-6 h-full">
-      {#if message != ""}
-      <h2
-        class="text-center bg-green-50 text-green-500 font-semibold text-base w-full"
-      >
-        {message}
-      </h2>
-      {:else if errormessage!= ""}
-      <h2
-      class="text-center bg-red-50 text-red-500 font-semibold text-base w-full"
-    >
-      {errormessage}
-    </h2>
-    {/if}
       <h2 class="text-primary-400 font-semibold text-base pb-6">Password Reset</h2>
       <input hidden name="issueName" value="Password Reset"/>
       <label class="text-base">*Email address/User ID (From online account)</label>
@@ -155,4 +146,17 @@
      
       </div>
   </form>
+  {#if message != ""}
+      <h2
+        class="text-center bg-green-50 text-green-500 font-semibold text-base w-full"
+      >
+        {message}
+      </h2>
+      {:else if errormessage!= ""}
+      <h2
+      class="text-center bg-red-50 text-red-500 font-semibold text-base w-full"
+    >
+      {errormessage}
+    </h2>
+    {/if}
 </div>

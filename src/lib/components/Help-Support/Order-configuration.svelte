@@ -36,7 +36,6 @@
     action="?/contact"
     use:enhance={() => {
       return async ({ result }) => {
-       
         // console.log(result);
 
         if (result) {
@@ -52,30 +51,19 @@
           location = "";
           accountNumber = "";
           message = "Your information has been submitted successfully!";
-          // alert('Your information has been submitted successfully!');
         } else {
           console.error(`${result.data.error}`, result.data.details);
           errormessage =
             "There was an error submitting your information. Please try again.";
-          // alert("There was an error submitting your information. Please try again.");
         }
+        setTimeout(() => {
+          errormessage = "";
+          message = "";
+        }, 2000);
       };
     }}
   >
     <div class=" flex flex-col h-full">
-      {#if message != ""}
-      <h2
-        class="text-center bg-green-50 text-green-500 font-semibold text-base w-full"
-      >
-        {message}
-      </h2>
-      {:else if errormessage!= ""}
-      <h2
-      class="text-center bg-red-50 text-red-500 font-semibold text-base w-full"
-    >
-      {errormessage}
-    </h2>
-    {/if}
       <div class="lg:w-3/4 w-full pb-6 h-full">
         <h2 class="text-primary-400 font-semibold text-base pb-6">
           Order configuration
@@ -122,7 +110,7 @@
         <button
           type="button"
           on:click={addProduct}
-          class=" text-primary-400 border border-primary-400 mb-4 px-2 rounded-md hover:text-white hover:bg-primary-400"
+          class=" text-primary-400 border border-primary-400 mb-4 px-2 py-1 rounded-md hover:text-white hover:bg-primary-400"
         >
           Add another product
         </button>
@@ -202,4 +190,17 @@
       </div>
     </div>
   </form>
+  {#if message != ""}
+    <h2
+      class="text-center text-green-500 font-semibold text-base w-full"
+    >
+      {message}
+    </h2>
+  {:else if errormessage != ""}
+    <h2
+      class="text-center text-red-500 font-semibold text-base w-full"
+    >
+      {errormessage}
+    </h2>
+  {/if}
 </div>

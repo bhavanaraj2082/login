@@ -1,5 +1,5 @@
 <script>
-  import { enhance } from '$app/forms';
+  import { enhance } from "$app/forms";
   let firstName = "";
   let lastName = "";
   let email = "";
@@ -7,10 +7,10 @@
   let companyName = "";
   let location = "";
   let accountNumber = "";
-  let addressType = '';
-  let primaryAddress = '';
-  let updateAddress = '';
-  let message="";
+  let addressType = "";
+  let primaryAddress = "";
+  let updateAddress = "";
+  let message = "";
   let errormessage = "";
   const locations = [
     "United States",
@@ -24,98 +24,130 @@
 </script>
 
 <div class="w-full p-4">
-  <form method="POST" action="?/contact"  use:enhance={() => {
-    return async({ result }) => {
-      
-      // console.log(result);
+  <form
+    method="POST"
+    action="?/contact"
+    use:enhance={() => {
+      return async ({ result }) => {
+        // console.log(result);
 
-      if(result)
-    {
-      // console.log(`${result.data.message}` );
-      // Clear the form 
-      firstName = '';
-      lastName = '';
-      email = '';
-      phoneNumber = '';
-      companyName = '';
-      location = '';
-      accountNumber = '';
-      addressType = '';
-      primaryAddress = '';
-      updateAddress = '';
-      message= 'Your information has been submitted successfully!';
-      // alert('Your information has been submitted successfully!');
-    }
-    else {
-      console.error(`${result.data.error}`, result.data.details);
-      errormessage = 'There was an error submitting your information. Please try again.';
-      alert('There was an error submitting your information. Please try again.');
-    }  
-    }; 
-}}>
+        if (result) {
+          // console.log(`${result.data.message}` );
+          // Clear the form
+          firstName = "";
+          lastName = "";
+          email = "";
+          phoneNumber = "";
+          companyName = "";
+          location = "";
+          accountNumber = "";
+          addressType = "";
+          primaryAddress = "";
+          updateAddress = "";
+          message = "Your information has been submitted successfully!";
+        } else {
+          console.error(`${result.data.error}`, result.data.details);
+          errormessage =
+            "There was an error submitting your information. Please try again.";
+        }
+
+        setTimeout(() => {
+          errormessage = "";
+          message = "";
+        }, 2000);
+      };
+    }}
+  >
     <div class=" w-full pb-6 h-full">
-      {#if message != ""}
-      <h2
-        class="text-center bg-green-50 text-green-500 font-semibold text-base w-full"
-      >
-        {message}
+      <h2 class="text-primary-400 font-semibold text-base pb-4">
+        Shipping Info
       </h2>
-      {:else if errormessage!= ""}
-      <h2
-      class="text-center bg-red-50 text-red-500 font-semibold text-base w-full"
-    >
-      {errormessage}
-    </h2>
-    {/if}
-      <h2 class="text-primary-400 font-semibold text-base pb-4">Shipping Info</h2>
-      <input hidden name="issueName" value="Shipping Info"/>
+      <input hidden name="issueName" value="Shipping Info" />
       <div>
+        <label class="block text-base">Is the new address:</label>
+        <div class="flex flex-col text-sm my-4">
+          <label class="mb-3">
+            <input
+              type="radio"
+              name="issue"
+              bind:group={addressType}
+              value="New single address"
+            />
+            A new single address that replaces the original
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="issue"
+              bind:group={addressType}
+              value="Additional location"
+            />
+            An additional location/address; original address should be maintained
+          </label>
+        </div>
+      </div>
 
-        <label class="block text-base ">Is the new address:</label>
-        <div class="flex flex-col text-sm my-4">
-        <label class="mb-3">
-          <input type="radio" name="issue" bind:group={addressType} value="New single address" />
-          A new single address that replaces the original
-        </label>
-        <label>
-          <input type="radio" name="issue" bind:group={addressType} value="Additional location"/>
-          An additional location/address; original address should be maintained
-        </label>
-      </div>
-      </div>
-    
       <div class="mt-4">
-        <label class="block text-base">Would you like the new address to become your primary address in your online profile?</label>
+        <label class="block text-base"
+          >Would you like the new address to become your primary address in your
+          online profile?</label
+        >
         <div class="text-sm my-4 w-1/6 flex justify-between">
-        <label>
-          <input type="radio" name="primaryAddress" bind:group={primaryAddress} value="Yes" />
-          Yes
-        </label>
-        <label>
-          <input type="radio" name="primaryAddress" bind:group={primaryAddress} value="No" />
-          No
-        </label>
+          <label>
+            <input
+              type="radio"
+              name="primaryAddress"
+              bind:group={primaryAddress}
+              value="Yes"
+            />
+            Yes
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="primaryAddress"
+              bind:group={primaryAddress}
+              value="No"
+            />
+            No
+          </label>
+        </div>
       </div>
-      </div>
-    
+
       <div class="mt-4">
-        <label class="block text-base">Please indicate the address(es) you would like to update:</label>
+        <label class="block text-base"
+          >Please indicate the address(es) you would like to update:</label
+        >
         <div class="flex flex-col text-sm my-4">
-        <label class="mb-3">
-          <input type="radio" name="updateAddress" bind:group={updateAddress} value="Shipping address only" />
-          Shipping address only
-        </label>
-        <label class="mb-3">
-          <input type="radio" name="updateAddress" bind:group={updateAddress} value="Billing address only" />
-          Billing address only
-        </label>
-        <label>
-          <input type="radio" name="updateAddress" bind:group={updateAddress} value="Shipping and billing address" />
-          Shipping and billing address
-        </label>
+          <label class="mb-3">
+            <input
+              type="radio"
+              name="updateAddress"
+              bind:group={updateAddress}
+              value="Shipping address only"
+            />
+            Shipping address only
+          </label>
+          <label class="mb-3">
+            <input
+              type="radio"
+              name="updateAddress"
+              bind:group={updateAddress}
+              value="Billing address only"
+            />
+            Billing address only
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="updateAddress"
+              bind:group={updateAddress}
+              value="Shipping and billing address"
+            />
+            Shipping and billing address
+          </label>
+        </div>
       </div>
-      </div>
-    
     </div>
     <div class=" w-full pb-6 mx-auto h-full">
       <h2 class="text-primary-400 font-semibold text-base pb-6">
@@ -182,16 +214,21 @@
         />
       </div>
 
-     
-        <button
-          type="submit"
-          class="w-full bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
-        >
-          Submit
-        </button>
-
+      <button
+        type="submit"
+        class="w-full bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
+      >
+        Submit
+      </button>
     </div>
   </form>
+  {#if message != ""}
+    <h2 class="text-center text-green-500 font-semibold text-base w-full">
+      {message}
+    </h2>
+  {:else if errormessage != ""}
+    <h2 class="text-center text-red-500 font-semibold text-base w-full">
+      {errormessage}
+    </h2>
+  {/if}
 </div>
-
-

@@ -613,7 +613,7 @@ function finalformdata(formData) {
   if (formData.products) {
     items = JSON.parse(formData.products);
   }
-  console.log("Raw Form Data:", formData);
+//   console.log("Raw Form Data:", formData);
   const finalData = {
     technical_issue: formData.technical_issue || '', 
     issueName: formData.issueName || '',
@@ -650,7 +650,7 @@ function finalformdata(formData) {
     files: formData.files || [],
     status: "unread", 
   };
-  console.log("Processed Final Data:", finalData);
+//   console.log("Processed Final Data:", finalData);
   return finalData;
 }
 export const saveContactInfo = async (data) => {
