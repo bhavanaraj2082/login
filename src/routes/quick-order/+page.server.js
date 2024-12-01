@@ -4,7 +4,6 @@ export async function load() {
     let data = [];
     try {
         const productNames = await quick();
-        
         data = productNames;
         console.log('Data fetched from the server:', productNames.length);
 

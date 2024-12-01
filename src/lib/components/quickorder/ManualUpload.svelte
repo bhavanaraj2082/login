@@ -334,12 +334,7 @@
             ];
         }, 4000);  
     }
-    
-      
-      
-    
-      
-      function cart() {
+    function cart() {
           if (userLoggedIn) {
             cart = JSON.parse(localStorage.getItem("cart")) || [];
           }

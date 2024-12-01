@@ -926,11 +926,6 @@ export const getreturnsOrderData = async ({ body }) => {
 //returns ends
 
 
-
-
-
-import mongoose from 'mongoose';
-
 export async function quickcheck(data) {
   const { ProductId, quantity } = data;
 

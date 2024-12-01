@@ -4,7 +4,7 @@
   import {enhance} from "$app/forms"
   import { authedUser } from '$lib/stores/mainStores.js';
   import { cartState } from '$lib/stores/cartStores.js';
-  import {convertUsdToInr} from '$lib/stores/priceconversion.js'
+
   let uploadedRows=[];
   
   
