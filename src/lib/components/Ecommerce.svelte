@@ -152,9 +152,11 @@
                 <li>Automated transactions increase productivity through improved order handling accuracy, paperless invoicing, and faster procure-to-pay cycles.</li>
                 <li>Global approach and management of scale, harmonized for all your sites.</li>
             </ol>
+            <a href="#contact-team">
             <button class="px-6 py-3 mt-4 text-primary-500 border-2 border-primary-500 rounded hover:bg-primary-500 hover:text-white transition-all max-md:self-start">
                 Request More Information
             </button>
+        </a>
         </div>
     </div>
     <div class="flex gap-8 max-md:flex-col mt-12">
@@ -180,9 +182,11 @@
                 <li>Customized invoicing and payment</li>
                 <li>Streamlined reconciliation process</li>
             </ul>
+            <a href="#contact-team">
             <button class="px-6 py-3 mt-4 text-primary-500 border-2 border-primary-500 rounded hover:bg-primary-500 hover:text-white transition-all max-md:self-start">
                 Request More Information
             </button>
+        </a>
         </div>
     </div>
     <div class="flex gap-8 max-md:flex-col mt-12">
@@ -203,16 +207,18 @@
                 <li>Account-specific pricing</li>
                 <li>e-Quotes converted directly to orders</li>
             </ul>
+            <a href="#contact-team">
             <button class="px-6 py-3 mt-4 text-primary-500 border-2 border-primary-500 rounded hover:bg-primary-500 hover:text-white transition-all max-md:self-start">
                 Request More Information
             </button>
+        </a>
         </div>
     </div>
 </section>
 <section class="mx-1 md:mx-1">
 <hr class="self-center mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-10" />
 </section>
-<section class="flex flex-col items-start py-6 w-full max-md:px-2 md:mt-10">
+<section id="contact-team" class="flex flex-col items-start py-6 w-full max-md:px-2 md:mt-10 scroll-smooth">
 <h2 class="font-semibold text-2xl font-worksans text-primary-500 ml-3">Contact Our Team</h2>
 <form method="POST" action="?/contactus" class="w-full mt-3 max-w-3xl ml-3" use:enhance={() => {
     return async({ result }) => {
@@ -357,7 +363,7 @@
 
                         </div>
                         <div class="flex-1 mb-4 sm:mt-0">
-                            <button type="submit" on:click={handleSubmit} class="px-5 py-2 bg-primary-500 text-white rounded transition duration-300 hover:bg-primary-300 sm:w-auto">Send Message</button>
+                            <button type="submit" on:click={handleSubmit} class="px-5 py-2 bg-primary-500 text-white rounded transition duration-300 hover:bg-primary-600 sm:w-auto">Send Message</button>
                         </div>
                 </div>
         </form>
