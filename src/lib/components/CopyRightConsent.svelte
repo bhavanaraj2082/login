@@ -235,7 +235,7 @@
               <textarea id="description" name="description" rows="3" class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0  rounded w-full md:w-5/12 p-2" bind:value={description} ></textarea>
           </div>
 
-          <button type="submit" class="bg-primary-500 hover:bg-primary-700 text-white py-2 px-4 rounded">Submit Request</button>
+          <button type="submit" class="bg-primary-500 hover:bg-primary-600 text-white py-2 px-4 rounded">Submit Request</button>
       </form>
 
       <!-- Thank you message -->

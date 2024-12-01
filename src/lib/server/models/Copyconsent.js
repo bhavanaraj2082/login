@@ -48,6 +48,11 @@ const CopyConsentSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    status: {
+      type: String,
+      required: false,
+      default:'unread'
+    },
     image: {
       type: String, 
       required: false,
