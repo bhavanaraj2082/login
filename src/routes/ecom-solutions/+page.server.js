@@ -1,4 +1,4 @@
-// import { submitContactData } from "$lib/server/mongoActions.js";
+import { submitContactData } from "$lib/server/mongoActions.js";
 export const actions = {
   contactus: async ({ request }) => {
     try {

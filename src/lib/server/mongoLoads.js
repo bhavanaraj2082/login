@@ -373,7 +373,8 @@ export const verifyPasswordToken = async(token)=>{
 // returns starts
 export async function getreturnstatusdata(invoiceid) {
     try {
-        const records = await Order.findOne({ _id: invoiceid }).populate('dashuserprofileid').populate('shipdetails');
+        const records = await Order.findOne({ 
+          invoice: invoiceid }).populate('dashuserprofileid').populate('shipdetails');
         if (records) {
             return JSON.parse(JSON.stringify(records));
         } else {
@@ -385,13 +386,65 @@ export async function getreturnstatusdata(invoiceid) {
     }
 }
 
-export async function getReturnSavedData() {
+export async function getReturnSavedData(invoiceid) {
+  
     try {
-      const records = await Return.find().lean();
-      return { records: JSON.parse(JSON.stringify(records)) };
+      const records = await Return.find({invoiceNumber:invoiceid})
+      return JSON.parse(JSON.stringify(records))
     } catch (error) {
       console.error('Error fetching saved returns:', error);
       return { error: 'Error fetching saved returns data' };
     }
   }
 // returns ends
+
+
+
+
+//////Quick Order//////////
+
+export const quick = async () => {
+  try {
+ 
+      const products =  JSON.parse(JSON.stringify(await Product.find({})
+          .sort({ createdAt: -1 }).limit(2000))); 
+      
+      console.log("Fetched products count:", products.length);
+
+      if (!products || products.length === 0) {
+          console.warn('No products found');
+          return []; 
+      }
+
+ 
+      const stocks = JSON.parse(JSON.stringify (await Stock.find({})
+          .populate('partNumber') 
+          .limit(2000))); 
+
+      console.log("Fetched stocks count:", stocks.length);
+
+      if (!stocks || stocks.length === 0) {
+          console.warn('No stock data found');
+      }
+
+   
+      const productNames = products.map(product => {
+       
+          const stock = stocks.find(
+              stockItem => stockItem.partNumber?._id.toString() === product._id.toString()
+          );
+
+          return {
+              ...product, 
+              stockQuantity: stock ? stock.stockQuantity : 0,  
+          };
+      });
+
+
+      return productNames;
+  } catch (error) {
+      console.error('Error fetching products or stocks:', error);
+      throw error; 
+  }
+};
+///Quick Order////

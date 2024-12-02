@@ -33,4 +33,8 @@ h1,h2,h3,h4,h5,h6,button{
   .scroll::-webkit-scrollbar-thumb:hover {
     @apply bg-primary-600;
   }
+
+  html {
+    scroll-behavior: smooth;  /* Apply smooth scrolling to the entire document */
+  }
   
