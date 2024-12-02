@@ -242,7 +242,7 @@
  
       {#if thankYouMessageVisible}
       <div class="flex justify-center items-center">
-          <p class="text-white text-center w-1/2 bg-green-600 p-2 rounded-lg">
+          <p class="text-center font-semibold text-green-600 p-2">
               Thank you for submitting your request!
           </p>
       </div>

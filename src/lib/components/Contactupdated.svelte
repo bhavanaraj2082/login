@@ -66,17 +66,7 @@
 				showMessage(message1, keywordError);
 			};
 		}}>
-			<div class="mt-3">
-				{#if errorMessage === "success"}
-					<div class="text-center bg-green-100 text-green-700 py-2 mb-4 rounded-md">
-						{successMessage}
-					</div>
-				{:else if errorMessage === 'error'}
-					<div class="text-center bg-red-100 text-red-700 py-2 mb-4 rounded-md">
-						{successMessage}
-					</div>
-				{/if}
-			</div>
+
 			<section class="flex flex-col md:flex-row p-2">
 				<div class="md:w-2/5 p-0 md:ml-10 mt-0 ">
 					<div class="flex items-start mt-6 ml-4">
@@ -158,12 +148,23 @@
 							{/if}
 						</div>
 						<input type="hidden" name="status" value="unread" />
-						<div class="flex-1 mb-4 sm:mt-0">
+						<div class="flex-1 mb-2 sm:mt-0">
 							<button type="submit" on:click={handleSubmit} class="px-5 py-2 bg-primary-400 text-white rounded transition duration-300 hover:bg-primary-500 sm:w-auto">Send Message</button>
 						</div>
 					</div>
 				</div>
 			</section>
 		</form>
+		<div class="">
+			{#if errorMessage === "success"}
+				<div class="text-center font-semibold text-green-600 py-2 mb-4">
+					{successMessage}
+				</div>
+			{:else if errorMessage === 'error'}
+				<div class="text-center font-semibold text-red-700 py-2 mb-4">
+					{successMessage}
+				</div>
+			{/if}
+		</div>
 	</div>
 </section>
