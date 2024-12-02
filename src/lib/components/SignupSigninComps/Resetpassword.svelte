@@ -90,7 +90,7 @@
                                 <input type="hidden" name="userId" value={$authedUser.userId}>
                                 <input class="border-1 border-gray-200 p-2 w-full text-sm rounded mb-2 focus:ring-0 focus:border-primary-400" name="email" type="text" placeholder="example@gmail.com" bind:value={email}>
                                 <p class=" text-xs md:text-sm text-red-500">{emailError}</p>
-                                <button type="submit" class="w-full bg-primary-400 text-white py-2 mt-2 font-medium rounded hover:bg-primary-400 transition-colors">Submit</button>
+                                <button type="submit" class="w-full bg-primary-400 text-white py-2 mt-2 font-medium rounded hover:bg-primary-500 transition-colors">Submit</button>
                             </form>
                         {:else}
                             <p class="text-sm md:text-4s font-medium {responseMsg.success ? " text-green-500" : " text-red-500"}">{responseMsg.message}</p>

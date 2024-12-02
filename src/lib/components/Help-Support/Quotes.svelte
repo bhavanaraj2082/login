@@ -156,6 +156,7 @@
                 bind:value={product.quantity}
                 class="border p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
                 required
+                min="1"
               />
             </div>
             {#if index > 0}
