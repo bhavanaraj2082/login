@@ -1,6 +1,6 @@
 <section>
   <div class="bg-gray-50 max-w-7xl w-11/12 px-3 mx-auto py-8">
-    <h1 class="text-2xl text-orange-500 font-bold mb-4">About Chemikart</h1>
+    <h1 class="text-2xl text-primary-500 font-bold mb-4">About Chemikart</h1>
     <div class="space-y-4">
       <div class="flex flex-col  sm:flex-row-reverse">
         <img
@@ -9,7 +9,7 @@
           class=" sm:w-56 lg:pl-2 md:pl-1"
         />
         <div class="py-2">
-          <h4 class=" text-md py-2 text-orange-500 font-semibold">
+          <h4 class=" text-md py-2 text-primary-500 font-semibold">
             Our Mission
           </h4>
           <p>
@@ -22,7 +22,7 @@
       </div>
 
       <div>
-        <h4 class="text-md py-2 text-orange-500 font-semibold">Our Vision</h4>
+        <h4 class="text-md py-2 text-primary-500 font-semibold">Our Vision</h4>
         <p>
           We envision a world where business thrive with access to premium
           chemical products and services. Our goal is to be the leading
@@ -31,7 +31,7 @@
         </p>
       </div>
       <div>
-        <h4 class="text-md py-2 text-orange-500 font-semibold">Our Values</h4>
+        <h4 class="text-md py-2 text-primary-500 font-semibold">Our Values</h4>
         <div class="space-y-1">
           <p>
             <span class="font-medium">Intigrity:</span>We belive in honest and
@@ -52,7 +52,7 @@
         </div>
       </div>
       <div>
-        <h4 class="text-md py-2 text-orange-500 font-semibold">Our Products</h4>
+        <h4 class="text-md py-2 text-primary-500 font-semibold">Our Products</h4>
         <p class="py-2">
           We offer a comprehensive range of chemicals, including:
         </p>
@@ -69,7 +69,7 @@
         </p>
       </div>
       <div>
-        <h4 class="text-md py-2 text-orange-500 font-semibold">Our Team</h4>
+        <h4 class="text-md py-2 text-primary-500 font-semibold">Our Team</h4>
         <p>
           Our team of experienced professionals is dedicated to providing
           exceptional service. with expertise in chemistry and logistcs, we
@@ -77,7 +77,7 @@
         </p>
       </div>
       <div>
-        <h4 class="text-md py-2 text-orange-500 font-semibold">
+        <h4 class="text-md py-2 text-primary-500 font-semibold">
           Why Choose Us?
         </h4>
         <div class="space-y-1">
