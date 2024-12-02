@@ -1,21 +1,21 @@
 import { getFavSavedData } from "$lib/server/mongoloads.js";
 import { deleteFavoriteItem, clearAllFavorites } from "$lib/server/mongoactions.js";
 
-export const load = async () => {
-    const favData = await getFavSavedData('674805c7ddd795c631519947'); 
+export const load = async ( userId ) => {
+    const favData = await getFavSavedData( userId ); 
     // console.log("===>",favData)
     return JSON.parse(JSON.stringify({ favData }))   
 };
 
 export const actions = {
-    removeItem: async ({ request }) => {
+    removeItem: async ({ request, userId }) => {
         try {
             const formData = await request.formData(); 
             const id = formData.get('itemId'); 
             if (!id) {
                 return { type: 'error', data: { message: 'Item ID is required' } }; 
             }
-            const result = await deleteFavoriteItem(id, 'morgan.doe@example.com'); 
+            const result = await deleteFavoriteItem(id, userId ); 
             return {
                 type: 'success',
                 data: { message: `Item with ID ${id} removed successfully`,result },
@@ -29,9 +29,9 @@ export const actions = {
             };
         }
     },
-    removeAllItem: async () => {
+    removeAllItem: async ( userID ) => {
         try {
-            const result = await clearAllFavorites('morgan.doe@example.com');
+            const result = await clearAllFavorites( userID );
             return {
                 type: 'success',
                 data: {

@@ -569,22 +569,9 @@ export const quick = async () => {
 };
 ///Quick Order////
 //Myfavourites loads starts
-// export async function getFavSavedData(userEmail) {
-//   try { 
-//       console.log("Attempting to find favorites for email:", userEmail);
-//       const userFavorites = await MyFavourite.findOne(
-//         { 'userProfileId.email': userEmail }
-//           // 'userProfileId.email': userEmail
-//       ).populate('userProfileId');
-//       console.log("===>loads",userFavorites)
-//       return userFavorites || { favorite: [] } ;
-//   } catch (error) {
-//       console.error('Error loading favourite data:', error);
-//       throw error;
-//   }
-// } 
-export async function getFavSavedData(userEmail) {
-  const records = await MyFavourite.findOne({ userProfileId: userEmail });
-  return records || { favorite: [] };
+
+export async function getFavSavedData( id ) {
+  const records = await MyFavourite.findOne({ userId : id });
+  return JSON.parse(JSON.stringify(records)) || { favorite: [] };
 }
 //Myfavourites loads ends
