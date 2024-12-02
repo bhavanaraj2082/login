@@ -1,333 +1,266 @@
 <script>
-    import {enhance,applyAction} from '$app/forms';
-    import { onMount } from 'svelte';
-    import { browser } from '$app/environment'
-    import  Icon from "@iconify/svelte";
-    import { toast } from 'svelte-sonner';
+    import { authedUser } from "$lib/stores/mainStores.js";
+    import { enhance, applyAction } from '$app/forms';
+    import { onMount } from "svelte";
+    import { toast } from "svelte-sonner";
+    import Icon from "@iconify/svelte";
+    import { browser } from '$app/environment';
 
     export let data;
- 
-    let favouriteItems = data.favData.favorite.map(item => ({
-        ...item,
-        price: item.priceSize ? 
-            (typeof item.priceSize.price === 'string' ? item.priceSize.price : `₹${item.priceSize.price}`) : 
-            (typeof item.price === 'string' ? item.price : `₹${item.price}`),
-        size: item.priceSize ? item.priceSize.size : item.size,
-        quantity: parseInt(item.quantity, 10) || 1,
-        stock: parseInt(item.stock, 10) || 0
+    const user = $authedUser?.email;
+    $: isAuthenticated = !!data?.user?.email;
+
+    let favData = (data?.favData?.favorite || []).map(item => ({
+        id: item.id,
+        name: item.productName,
+        description: item.productDesc,
+        partNumber: item.productNumber,
+        image: item.imgUrl,
+        priceSize: {
+            price: item.priceSize.price,
+            size: item.priceSize.size
+        },
+        quantity: parseInt(item.quantity) || 1,
+        stock: parseInt(item.stock) || 0
     }));
 
     let cartItems = [];
     let cart = browser? localStorage.getItem('cart') : []
-    console.log('you existing cart',cart);
+    // console.log('you existing cart',cart);
 
-    const calculateTotalPrice = (price, quantity) => {
-        let priceNumber = parseFloat(price.replace('₹', '').replace(',', ''));
-        return `₹${(priceNumber * quantity).toLocaleString('en-IN')}`;
-    };
+    onMount(() => {
+        if (browser) {
+            try {
+                const storedCart = localStorage.getItem("cart");
+                cartItems = storedCart ? JSON.parse(storedCart) : [];
+            } catch (error) {
+                console.error("Error loading cart from localStorage:", error);
+                cartItems = [];
+            }
+        }
+    });
+
+    function calculateTotalPrice(price, quantity) {
+        const numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
+        return (numericPrice * quantity).toFixed(2);
+    }
 
     function increaseQuantity(item) {
-       if(item.quantity < item.stock) {
-        item.quantity += 1;
-        favouriteItems = [...favouriteItems]; 
-        // toast.success('Quantity increased', { description: `${item.productName} quantity updated` });
+        if (item.quantity < item.stock) {
+            item.quantity += 1;
+            favData = [...favData];
         } else {
-            toast.warning('Maximum stock reached', { description: `Only ${item.stock} items available` });
+            toast.warning("Maximum stock reached", { 
+                description: `Only ${item.stock} items available` 
+            });
         }
     }
 
     function decreaseQuantity(item) {
         if (item.quantity > 1) {
             item.quantity -= 1;
-            favouriteItems = [...favouriteItems];
-            // toast.success('Quantity decreased', { description: `${item.productName} quantity updated` });
+            favData = [...favData];
         }
     }
 
     function addToCart(item) {
-    if (!item) {
-        toast.error('Invalid Item', { description: 'Cannot add undefined item to cart' });
-        return [];
+           if (!item || item.stock <= 0) {
+        toast.error('Item unavailable', { description: 'This item is out of Stock ' });
+        return;
     }
+        const cartItem = {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            partNumber: item.partNumber,
+            image: item.image,
+            priceSize: item.priceSize,
+            quantity: Math.min(item.quantity, item.stock),
+            stock: item.stock
+        };
 
-    const safePrice = typeof item.price === 'string' ? 
-            parseFloat(item.price.replace(/[^\d.]/g, '')) || 0 : 
-            parseFloat(item.price) || 0;
-
-    const safeItem = {
-        id: item.id || generateUniqueId(), 
-        description: item.productDesc || '',
-        imgUrl: item.imgUrl || '',
-        productName: item.productName || 'Unnamed Product',
-        partNumber: item.productNumber || '',
-        priceSize: {
-            price: safePrice,
-            size: item.size || (item.priceSize ? item.priceSize.size : '0')
-        },
-        quantity: Math.max(1, item.quantity || 1),
-        stock: parseInt(item.stock || 0, 10)
-    };
-
-    function generateUniqueId() {
-        return `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    }
-
-    const cartItem = {
-        description: safeItem.description,
-        id: safeItem.id,
-        image: safeItem.imgUrl,
-        name: safeItem.productName,
-        partNumber: safeItem.partNumber,
-        priceSize: {
-            price: safeItem.priceSize.price,
-            size: safeItem.priceSize.size
-        },
-        quantity: safeItem.quantity,
-        stock: safeItem.stock,
-        addedAt: new Date().toISOString(),
-        maxQuantity: safeItem.stock
-    };
-
-    const cartManagement = {
-        getCart: () => {
-            try {
-                const existingCart = localStorage.getItem('cart');
-                return existingCart ? JSON.parse(existingCart) : [];
-            } catch (error) {
-                console.error('Error parsing cart from localStorage:', error);
-                localStorage.removeItem('cart');
-                return [];
-            }
-        },
-
-        findExistingItem: (items, newItem) => {
-            return items.findIndex(existingItem => 
-                existingItem.id === newItem.id || 
-                (existingItem.partNumber && existingItem.partNumber === newItem.partNumber) ||
-                (existingItem.name && existingItem.name === newItem.name)
-            );
-        },
-
-        mergeItemDetails: (existingItem, newItem) => {
-            const mergedItem = { ...existingItem };
-            const existingQuantity = existingItem.quantity || 0;
-            const newQuantity = newItem.quantity || 0;
-            const existingPrice = existingItem.priceSize?.price || 0;
-            const newPrice = newItem.priceSize?.price || 0;
-            const proposedQuantity = existingQuantity + newQuantity;
-            const maxQuantity = existingItem.maxQuantity || proposedQuantity;
-            mergedItem.quantity = Math.min(proposedQuantity, maxQuantity);
-            mergedItem.priceSize = {
-                price: ((existingPrice * existingQuantity) + (newPrice * newQuantity)) / mergedItem.quantity,
-                size: existingItem.priceSize?.size || newItem.priceSize?.size
-            };
-
-            mergedItem.addedAt = new Date().toISOString();
+        try {
+            const existingItemIndex = cartItems.findIndex(cart => cart.id === item.id);
             
-            return mergedItem;
-        },
+            if (existingItemIndex !== -1) {
+                const existingItem = cartItems[existingItemIndex];
+                const newQuantity = Math.min(
+                    existingItem.quantity + cartItem.quantity, 
+                    cartItem.stock
+                );
+                cartItems[existingItemIndex] = {
+                    ...existingItem,
+                    quantity: newQuantity
+                };
+            } else {
+                cartItems.push(cartItem);
+            }
 
-        consolidateCart: (items) => {
-            const uniqueItems = new Map();
-
-            items.forEach(item => {
-                const existingItem = uniqueItems.get(item.id);
-                
-                if (existingItem) {
-                    const mergedItem = cartManagement.mergeItemDetails(existingItem, item);
-                    uniqueItems.set(item.id, mergedItem);
-                } else {
-                    uniqueItems.set(item.id, item);
-                }
+            updateCart(cartItems);
+            toast.success("Added to Cart", { 
+                description: `${item.name} added successfully` 
             });
-
-            return Array.from(uniqueItems.values());
-        },
-
-        updateLocalStorage: (items) => {
-            try {
-                localStorage.setItem('cart', JSON.stringify(items));
-            } catch (error) {
-                console.error('Failed to save cart to localStorage:', error);
-
-                if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-                    alert('Cart storage is full. Please remove some items.');
-                }
-            }
-        },
-
-        dispatchCartUpdateEvent: (items) => {
-            if (typeof window !== 'undefined') {
-                try {
-                    window.dispatchEvent(new CustomEvent('cartUpdated', { 
-                        detail: { 
-                            items: items, 
-                            totalItems: items.reduce((sum, item) => sum + (item.quantity || 0), 0),
-                            totalValue: items.reduce((sum, item) => sum + ((item.priceSize?.price || 0) * (item.quantity || 0)), 0)
-                        } 
-                    }));
-                } catch (error) {
-                    console.warn('Failed to dispatch cart update event:', error);
-                }
-            }
+        } catch (error) {
+            console.error("Error updating cart:", error);
+            toast.error("Cart Error", { 
+                description: "Failed to update cart" 
+            });
         }
-    };
-    let cartItems = cartManagement.getCart();
-
-    const existingItemIndex = cartManagement.findExistingItem(cartItems, cartItem);
-
-    if (existingItemIndex !== -1) {
-        cartItems[existingItemIndex] = cartManagement.mergeItemDetails(
-            cartItems[existingItemIndex], 
-            cartItem
-        );
-    } else {
-        cartItems.push(cartItem);
     }
 
-    const finalCartItems = cartManagement.consolidateCart(cartItems);
-
-    cartManagement.updateLocalStorage(finalCartItems);
-    cartManagement.dispatchCartUpdateEvent(finalCartItems);
-    toast.success('Added to Cart', { description: `${item.productName} added successfully` });
-    return finalCartItems;
+    function updateCart(updatedCart) {
+        try {
+            localStorage.setItem("cart", JSON.stringify(updatedCart));
+            window.dispatchEvent(new CustomEvent("cartUpdated", {
+                detail: {
+                    items: updatedCart,
+                    totalItems: updatedCart.reduce((sum, i) => sum + i.quantity, 0),
+                    totalValue: updatedCart.reduce((sum, i) => {
+                        const price = parseFloat(i.priceSize.price.replace(/[^\d.]/g, ''));
+                        return sum + (price * i.quantity);
+                    }, 0)
+                }
+            }));
+        } catch (error) {
+            console.error("Error updating localStorage:", error);
+        }
     }
 
     function addAllToCart() {
-        const availableItems = favouriteItems.filter(item => item.stock > 0);
-
-            if (availableItems.length === 0) {
-                toast.info('No Available Items', { description: 'All favourite items are out of stock' });
-                return;
-            }
-        const newCartItems = favouriteItems.map(item => {
-            const safeQuantity = Math.min(item.quantity || 1, item.stock);
-
-         return{ description: item.productDesc,
-            id: item.id,
-            image: item.imgUrl,
-            name: item.productName,
-            partNumber: item.productNumber,
-            priceSize: {
-                price: parseFloat(item.price.replace('₹', '').replace(',', '')),
-                size: item.size || (item.priceSize ? item.priceSize.size : '0')
-            }, 
-            quantity: item.quantity || 1,
-            stock: parseInt(item.stock, 10),
-        };
-    });
-
-        cartItems = newCartItems;
-        localStorage.setItem('cart', JSON.stringify(newCartItems));
-
-        toast.success('Added to Cart', { description: `${availableItems.length} ${availableItems.length === 1 ? 'item' : 'items'} added from favourites` });
-    }
-    function handleAddToCart(item) {
-        if (item.stock === 0) {
-        toast.warning('Out of Stock', { description: `${item.productName} is currently unavailable` });
+    const availableItems = favData.filter(item => item.stock > 0);
+    
+    if (availableItems.length === 0) {
+        toast.info("No Available Items", { 
+            description: "All favourite items are out of stock" 
+        });
         return;
-        }
-        try {
-            addToCart(item);
-            const itemIndex = favouriteItems.findIndex(favItem => favItem.id === item.id);
-            if (itemIndex !== -1) {
-                favouriteItems[itemIndex].quantity = 1;
-                favouriteItems = [...favouriteItems];
-            }
-        } catch (error) {
-            toast.error('Cart Error', { description: 'Failed to add item to cart' });
-        }
     }
+
+    const updatedCart = [...cartItems];
+    
+    availableItems.forEach(item => {
+        if (item.stock <= 0) return;
+
+        const existingItemIndex = updatedCart.findIndex(cart => cart.id === item.id);
+        const cartItem = {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            partNumber: item.partNumber,
+            image: item.image,
+            priceSize: item.priceSize,
+            quantity: Math.min(item.quantity, item.stock),
+            stock: item.stock
+        };
+
+        if (existingItemIndex !== -1) {
+            updatedCart[existingItemIndex] = {
+                ...updatedCart[existingItemIndex],
+                quantity: Math.min(
+                    updatedCart[existingItemIndex].quantity + item.quantity,
+                    item.stock
+                )
+            };
+        } else {
+            updatedCart.push(cartItem);
+        }
+    });
+    updateCart(updatedCart);
+    cartItems = updatedCart;
+    
+     toast.success("All available items added to cart", { 
+        description: "Added all items that are in stock to your cart" 
+        });
+    }
+
     function handleRemoveItem(item) {
-        return async ({ result, update }) => {
+        return async ({ result, update  }) => {
             await update();
             if (result.type === 'success') {
-                favouriteItems = favouriteItems.filter(fav => fav.id !== item.id);
+                favData = favData.filter(fav => fav.id !== item.id);
+                cartItems = cartItems.filter(cart => cart.id !== item.id);
                 if (browser) {
-                try {
-                    const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
-                    const updatedCart = currentCart.filter(cartItem => 
-                        cartItem.id !== item.id && 
-                        cartItem.partNumber !== item.productNumber
-                    );
-                    localStorage.setItem('cart', JSON.stringify(updatedCart));
-                    window.dispatchEvent(new CustomEvent('cartUpdated', { 
-                        detail: { 
-                            items: updatedCart,
-                            totalItems: updatedCart.reduce((sum, item) => sum + (item.quantity || 0), 0),
-                            totalValue: updatedCart.reduce((sum, item) => 
-                                sum + ((item.priceSize?.price || 0) * (item.quantity || 0)), 0)
-                        } 
-                    }));
-                } catch (error) {
-                    console.error('Error updating localStorage:', error);
+                    try {
+                        const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+                        const updatedCart = currentCart.filter(cartItem => 
+                            cartItem.id !== item.id && 
+                            cartItem.partNumber !== item.partNumber
+                        );
+                        updateCart(updatedCart);
+                        cartItems = updatedCart;
+                    } catch (error) {
+                        console.error('Error updating localStorage:', error);
+                    }
                 }
+                toast.success('Item removed', { 
+                    description: `${item.name} removed from favourites` 
+                });
+            } else {
+                toast.error('Remove Failed', { 
+                    description: result.data?.message || 'Failed to remove item' 
+                });
             }
-
-            toast.success('Item removed', { 
-                description: `${item.productName} removed from favourites` 
-            });
-        } else {
-            toast.error('Remove Failed', { 
-                description: result.data?.message || 'Failed to remove item' 
-            });
-        }
-    };
+        };
     }
+
     function handleClearAll() {
-    return async ({ result, update }) => {
-        await update();
-        
-        if (result.type === 'success') {
-            favouriteItems = [];
-            if (browser) {
-                try {
-                    localStorage.removeItem('cart');
-                    window.dispatchEvent(new CustomEvent('cartUpdated', { 
-                        detail: { 
-                            items: [],
-                            totalItems: 0,
-                            totalValue: 0
-                        } 
-                    }));
-                } catch (error) {
-                    console.error('Error clearing localStorage:', error);
+        return async ({ result, update  }) => {
+            await update();
+            if (result.type === 'success') {
+                favData = [];
+                cartItems = [];
+                if (browser) {
+                    try {
+                        localStorage.removeAllItem('cart');
+                        window.dispatchEvent(new CustomEvent('cartUpdated', {
+                            detail: {
+                                items: [],
+                                totalItems: 0,
+                                totalValue: 0
+                            }
+                        }));
+                        cartItems = [];
+                    } catch (error) {
+                        console.error('Error clearing localStorage:', error);
+                    }
                 }
+                toast.success('Favourites cleared', {
+                    description: 'All items removed from favourites and cart'
+                });
+            } else {
+                toast.error('Clear Failed', {
+                    description: result.data?.message || 'Failed to clear favourites'
+                });
             }
-            toast.success('Favourites cleared', { 
-                description: 'All items removed from favourites and cart' 
-            });
-        } else {
-            toast.error('Clear Failed', { 
-                description: result.data?.message || 'Failed to clear favourites' 
-            });
-        }
-    };
+        };
     }
-    onMount(() => {
-        const storedCartItems = localStorage.getItem('cart');
-        cartItems = storedCartItems ? JSON.parse(storedCartItems) : [];
-    });
-
 </script>
+{#if !isAuthenticated}
+<div class="p-6 max-w-7xl mx-auto w-11/12">
+    <div class="bg-primary-50 border-l-4 border-primary-500 p-4 rounded-lg shadow-sm">
+        <div class="flex items-center">
+            <div class="ml-4">
+                <h3 class="text-lg font-medium text-primary-800">
+                    Login Required
+                </h3>
+                <p class="mt-1 text-sm text-primary-600">
+                    Please login to view and manage your favorites list.
+                </p>
+                <div class="mt-4">
+                    <a href="/login?redirectTo=/my-favourite"
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
+                        Login to continue
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+{:else}
 <div class="p-6 max-w-7xl mx-auto w-11/12">
     <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6">My Favourites</h1>
-    {#if favouriteItems.length === 0}
-    <div class="flex flex-col items-center justify-center py-12 px-4 border border-primary-200 rounded-lg">
-        <Icon icon="mdi:heart-outline" width="64" class="text-primary-300 mb-4" />
-        <h2 class="text-xl font-semibold text-gray-700 mb-2">Your favourites list is empty</h2>
-        <p class="text-gray-500 text-center mb-6">Browse our products and add items to your favourites to see them here.</p>
-        <a href="/products" class="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors">
-            <Icon icon="game-icons:chemical-tank" width="20" class="mr-2" />
-            Browse Products
-        </a>
-    </div>
-    {:else}
-    <div class="flex flex-col md:flex-row md:justify-between mb-6 md:mb-8 space-y-4 md:space-y-0">
-        <div class="text-gray-500 text-base md:text-lg">
-            <p>Favourite items ({favouriteItems.length})</p>
-        </div>
-        <div class="flex space-x-4 items-center text-primary-400 overflow-hidden font-semibold">
+    {#if favData.length > 0}
+        <div class="flex space-x-4 items-center text-primary-400 overflow-hidden font-semibold mb-6">
             <button 
                 on:click={addAllToCart} 
                 class="flex items-center space-x-1 text-primary-500 hover:text-primary-600">
@@ -335,91 +268,106 @@
                 <Icon icon="heroicons-solid:shopping-cart" width="18" />
             </button>
             <form 
-            method="POST" 
-            action="?/removeAllItem"
-            use:enhance={handleClearAll}>
-            <button 
-                type="submit" 
-                class="flex items-center space-x-1 pr-6 text-primary-500 hover:text-primary-600">
-                <span>Clear all</span>
-                <Icon icon="mdi:delete" width="18" />
-            </button>
-        </form>   
+                method="POST" 
+                action="?/removeAllItem"
+                use:enhance={handleClearAll}>
+                <button 
+                    type="submit" 
+                    class="flex items-center space-x-1 pr-6 text-primary-500 hover:text-primary-600">
+                    <span>Clear all</span>
+                    <Icon icon="mdi:delete" width="18" />
+                </button>
+            </form>   
         </div>
-    </div>
-    <div class="space-y-6">
-        {#each favouriteItems as item}
-            <div class="flex flex-col md:flex-row items-stretch p-2 md:p-6 border border-primary-200 rounded-lg space-y-4 md:space-y-0">
-                <div class="flex flex-col md:flex-row items-stretch p-2 md:p-6 rounded-lg space-y-4 md:space-y-0 flex-1">
+        <div class="space-y-6">
+            {#each favData as item (item.id)}
+                <div class="flex flex-col md:flex-row items-center justify-between p-6 border border-gray-200 rounded-lg w-full shadow">
                     <img 
-                        src={item.imgUrl} 
-                        alt={item.productName} 
-                        class="w-full md:w-24 h-24 object-cover rounded-lg mx-auto md:mx-0" />
-                    <div class="flex-1 ml-0 md:ml-6 space-y-2 break-words sm:items-center">
-                        <h2 class="text-sm font-semibold text-primary-400">{item.productNumber}</h2>
-                        <p class="text-lg font-semibold text-gray-800">{item.productName}</p>
-                        <p class="text-sm text-gray-500">{item.productDesc}</p>
-                    </div>           
-                </div>
-                <div class="flex pl-2 justify-start md:w-1/4 sm:items-center sm:justify-center">
-                    <p class="font-semibold text-green-600 text-center">
-                        <span class="text-gray-500 text-xs">Available Stock:</span> {item.stock}
-                    </p>
-                </div>
-                <div class="flex flex-col justify-between items-start pl-2 md:items-end space-y-4 md:w-1/4">
-                    <div class="flex space-x-6 text-primary-400 font-semibold">
-                        <button 
-                            on:click={() => handleAddToCart(item)} 
-                            class="flex items-center space-x-1 text-primary-500 hover:text-primary-600">
-                            <span>Add to</span>
-                            <Icon icon="heroicons-solid:shopping-cart" width="18" />
-                        </button>                       
-                        <form 
-                            method="POST" 
-                            action="?/removeItem"
-                            use:enhance={() => handleRemoveItem(item)}>
-                            <input type="hidden" name="id" value={item.id} />
+                        src={item.image} 
+                        alt={item.name} 
+                        class="w-32 h-32 object-cover rounded-md mb-4 md:mb-0 md:mr-6"/>
+                    <div class="flex-1 text-center md:text-left space-y-2">
+                        <h2 class="text-lg font-bold text-gray-800">{item.name}</h2>
+                        <p class="text-sm">{item.description}</p>
+                        <p class="text-sm font-semibold">
+                            Price: <span class="text-black">{item.priceSize.price}</span>
+                        </p>
+                        <p class="text-xs">Size: {item.priceSize.size}</p>
+                    </div>
+                    <div class="flex pl-2 justify-start md:w-1/4 sm:items-center m-1 p-2 rounded sm:justify-center">
+                        <p class="font-semibold text-center" 
+                           class:text-green-600={item.stock > 0} 
+                           class:text-red-600={item.stock === 0}>
+                            <span class="text-gray-500 text-xs">Available Stock:</span> {item.stock}
+                        </p>
+                    </div>
+                    <div class="flex flex-col md:items-end items-center mt-4 md:mt-0 space-y-4">
+                        <div class="flex space-x-4 relative">
                             <button 
-                                type="submit" 
-                                class="flex items-center space-x-1 text-primary-500 hover:text-primary-600">
-                                <span>Remove</span>
-                                <Icon icon="mdi:delete" width="18" />
-                            </button>
-                        </form>
-                    </div>
-                    <div>
-                        {#if item.size}
-                            <span class="text-gray-800 text-xs">{item.size}/</span>
-                        {/if}
-                        <span class="font-semibold text-gray-800 text-xs">
-                            {typeof item.price === 'string' ? item.price : `₹${item.price}`}
-                        </span>
-                    </div>
-                    <div class="flex items-center pb-2 space-x-4">
-                        <div class="flex items-center border border-primary-200 rounded px-2 py-1 space-x-2">
+                                on:click={() => addToCart(item)} 
+                                class="flex items-center space-x-1 text-primary-500 hover:text-primary-600 relative group">
+                                <span class="hidden md:inline">Add to</span>
+                                <Icon 
+                                    icon="heroicons-solid:shopping-cart" 
+                                    class="w-6 h-6 md:w-5 md:h-5 lg:w-6 lg:h-6" 
+                                    aria-label="Add to Cart Icon" />
+                                <span class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 text-xs bg-primary-200 text-white px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 md:hidden">
+                                    Add to Cart
+                                </span>
+                            </button>  
+                            <form 
+                                method="POST" 
+                                action="?/removeItem"
+                                use:enhance={() => handleRemoveItem(item)}
+                                class="relative group">
+                                <input type="hidden" name="itemId" value={item.id} />
+                                <button 
+                                    type="submit" 
+                                    class="flex items-center space-x-1 text-primary-500 hover:text-primary-600 relative group">
+                                    <span class="hidden md:inline">Remove</span>
+                                    <Icon 
+                                        icon="mdi:delete" 
+                                        class="w-6 h-6 md:w-5 md:h-5 lg:w-6 lg:h-6" 
+                                        aria-label="Remove Icon" />
+                                    <span class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 text-xs bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 md:hidden">
+                                        Remove Item
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="flex items-center justify-center md:justify-start space-x-4">
                             <button 
                                 on:click={() => decreaseQuantity(item)} 
-                                class="text-primary-500 hover:text-primary-700 disabled:opacity-50" 
+                                class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                                 disabled={item.quantity <= 1}>
-                                <Icon icon="ic:outline-minus" width="18" />
+                                -
                             </button>
-                            <span class="text-sm font-medium text-gray-800">{item.quantity}</span>
+                            <span class="text-sm font-medium">{item.quantity}</span>
                             <button 
                                 on:click={() => increaseQuantity(item)} 
-                                class="text-primary-500 hover:text-primary-700 disabled:opacity-50" 
+                                class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                                 disabled={item.quantity >= item.stock}>
-                                <Icon icon="ic:outline-plus" width="18" />
+                                +
                             </button>
                         </div>
-                        <div class="flex flex-col items-start text-xs md:text-sm text-gray-700">
-                            <span class="font-semibold text-gray-800">
-                                Total: {calculateTotalPrice(item.price, item.quantity)}
-                            </span>
-                        </div>
-                    </div>                        
-                </div>
-            </div>
-        {/each}       
-    </div>    
+                        <p class="text-sm font-semibold text-gray-800">
+                            Total: {calculateTotalPrice(item.priceSize.price, item.quantity)}
+                        </p>
+                    </div>
+                </div> 
+            {/each}
+        </div>
+    {:else}
+        <div class="flex flex-col items-center justify-center py-12 px-4 border border-primary-200 rounded-lg">
+            <Icon icon="mdi:heart-outline" width="64" class="text-primary-300 mb-4" />
+            <h2 class="text-xl font-semibold text-gray-700 mb-2">Your favourites list is empty</h2>
+            <p class="text-gray-500 text-center mb-6">Browse our products and add items to your favourites to see them here.</p>
+            <a href="/products" class="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors">
+                <Icon icon="game-icons:chemical-tank" width="20" class="mr-2" />
+                Browse Products
+            </a>
+        </div>
+    {/if}
+</div>
 {/if}
-</div> 

@@ -11,6 +11,7 @@ import SubSubCategory from "$lib/server/models/SubSubcategory.js";
 import Shipment from "$lib/server/models/Shipment.js";
 import TokenVerification from "$lib/server/models/TokenVerification.js";
 import Return from '$lib/server/models/Return.js';
+import MyFavourite from '$lib/server/models/MyFavourite.js'
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -398,9 +399,6 @@ export async function getReturnSavedData(invoiceid) {
   }
 // returns ends
 
-
-
-
 //////Quick Order//////////
 
 export const quick = async () => {
@@ -448,3 +446,23 @@ export const quick = async () => {
   }
 };
 ///Quick Order////
+//Myfavourites loads starts
+// export async function getFavSavedData(userEmail) {
+//   try { 
+//       console.log("Attempting to find favorites for email:", userEmail);
+//       const userFavorites = await MyFavourite.findOne(
+//         { 'userProfileId.email': userEmail }
+//           // 'userProfileId.email': userEmail
+//       ).populate('userProfileId');
+//       console.log("===>loads",userFavorites)
+//       return userFavorites || { favorite: [] } ;
+//   } catch (error) {
+//       console.error('Error loading favourite data:', error);
+//       throw error;
+//   }
+// } 
+export async function getFavSavedData(userEmail) {
+  const records = await MyFavourite.findOne({ userProfileId: userEmail });
+  return records || { favorite: [] };
+}
+//Myfavourites loads ends

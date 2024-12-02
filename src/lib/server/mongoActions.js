@@ -1083,3 +1083,47 @@ export const handleFileUpload = async (fileData) => {
 
   return validationResults;
 };
+
+//Myfavouries actions starts
+export const deleteFavoriteItem = async (itemId, userEmail) => {
+    try {
+        const updatedDoc = await MyFavourite.findOneAndDelete(
+            { 'userProfileId.email': userEmail },
+            { $pull: { favorite: { id: itemId } } }, 
+            { new: true } 
+        );
+        if (!updatedDoc) {
+            throw new Error('User favorites not found');
+        }
+        return {
+            status: 'success',
+            message: 'Item deleted successfully',
+            favorite: updatedDoc.favorite 
+        };
+    } catch (error) {
+        console.error('Error deleting favorite item:', error);
+        throw error;
+    }
+};
+
+export const clearAllFavorites = async (userEmail) => {
+    try {
+        const updatedDoc = await MyFavourite.findOneAndDelete(
+            { 'userProfileId.email': userEmail },
+            { $set: { favorite: [] } }, 
+            { new: true } 
+        );
+        if (!updatedDoc) {
+            throw new Error('User favorites not found');
+        }
+        return {
+            status: 'success',
+            message: 'All favorite items deleted successfully',
+            favorite: [] 
+        };
+    } catch (error) {
+        console.error('Error deleting all favorite items:', error);
+        throw error;
+    }
+};
+//Myfavouries actions ends
