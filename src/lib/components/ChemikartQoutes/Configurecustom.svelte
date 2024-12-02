@@ -214,7 +214,7 @@ function updateCell(rowIndex, cellIndex, event) {
 
 		
 			<button
-				class="box-content h-25 w-4/5 p-4 border-dashed border-primary-500 border-2 ml-8 py-10 bg-white"
+				class="box-content h-25 w-4/5 p-4 border-dashed border-primary-500 border-2 ml-3 md:ml-8 py-10 bg-white"
 				type="button"
 				on:click={triggerFileInput}
 			>
@@ -288,8 +288,8 @@ function updateCell(rowIndex, cellIndex, event) {
 		  
 		</div>
 		<div class="bg-white">
-			<h1 class="font-bold text-2xl ml-10 py-5">Would you like to specify a solvent?*</h1>
-			<div class="mt-4 ml-20 ">
+			<h1 class="font-bold text-2xl ml-3 md:ml-10 py-5">Would you like to specify a solvent?*</h1>
+			<div class="mt-4 ml-3 md:ml-20 ">
 				<input
 					type="radio"
 					id="yes"
@@ -339,8 +339,8 @@ function updateCell(rowIndex, cellIndex, event) {
 			</div>
 		</div>
 		<div class=" bg-white">
-			<h1 class="font-bold text-2xl ml-10 py-5">Select your packaging type*</h1>
-			<div class="mt-4 ml-14">
+			<h1 class="font-bold text-2xl ml-3 md:ml-10 py-5">Select your packaging type*</h1>
+			<div class="mt-4 ml-3 md:ml-14">
 				<div class="flex flex-wrap">
 					<button
 						type="button"
@@ -396,10 +396,10 @@ function updateCell(rowIndex, cellIndex, event) {
 			</div>
 		</div>
 		<div class=" bg-white">
-			<h1 class="font-bold text-2xl ml-10 py-5">What unit volume do you need?*</h1>
+			<h1 class="font-bold text-2xl ml-3 md:ml-10 py-5">What unit volume do you need?*</h1>
 			<div class="relative">
 				<select
-					class="ml-20 border-2 border-gray-300 rounded-md mt-5 h-10 w-28 focus:ring-0 focus:outline-none focus:border-primary-500  "
+					class="ml-3 md:ml-20 border-2 border-gray-300 rounded-md mt-5 h-10 w-28 focus:ring-0 focus:outline-none focus:border-primary-500  "
 					on:change={handleSelect}
 					bind:value={inputValue}
 				>
@@ -411,9 +411,9 @@ function updateCell(rowIndex, cellIndex, event) {
 			</div>
 		</div>
 		<div class=" bg-white">
-			<h1 class="font-bold text-2xl ml-10 py-5">How many units do you need?*</h1>
+			<h1 class="font-bold text-2xl ml-3 md:ml-10 py-5">How many units do you need?*</h1>
 			<div
-				class="counter mt-3 ml-20 p-1  border-gray-300 bg-white inline-flex items-center space-x-1 border-2 rounded-md h-10 w-28 focus:ring-0 focus:outline-none focus:border-primary-500  "
+				class="counter mt-3 ml-3 md:ml-20 p-1  border-gray-300 bg-white inline-flex items-center space-x-1 border-2 rounded-md h-10 w-28 focus:ring-0 focus:outline-none focus:border-primary-500  "
 
 			>
 				<button
@@ -436,7 +436,7 @@ function updateCell(rowIndex, cellIndex, event) {
 			</div>
 		</div>
 		<div class=" bg-white  py-10">
-			<h1 class="font-bold text-2xl ml-10">Select your quality level*</h1>
+			<h1 class="font-bold text-2xl ml-3 md:ml-10">Select your quality level*</h1>
 			<div class="mt-4">
 				<div class="flex flex-wrap lg:ml-10 ml-14">
 					<button
@@ -491,15 +491,15 @@ function updateCell(rowIndex, cellIndex, event) {
 			</div>
 		</div>
 		<div class=" bg-white ">
-			<h1 class="font-bold text-2xl ml-10">
+			<h1 class="font-bold text-2xl ml-3 md:ml-10">
 				Which analytical technique will you use with this solution?*
 			</h1>
-			<p class="my-5 ml-11">
+			<p class="my-5 ml-3 md:ml-11">
 				We aim to optimise our solutions for your needs. Some components/solvents,
 				for example, do not perform well with certain analytical techniques. We may
 				offer a revised mixture in these cases.
 			</p>
-			<div class="lg:flex grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ml-14">
+			<div class="lg:flex grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ml-3 md:ml-14">
 				<button
 					type="button"
 					class="box-content mt-4 mx-5 h-20 w-28 p-3 border-2 transition duration-200 ease-in-out
@@ -544,7 +544,7 @@ function updateCell(rowIndex, cellIndex, event) {
 				</button>
 			</div>
 			{#if errorMessage}
-				<div class="text-red-500 ml-20 mt-5 text-sm font-medium">
+				<div class="text-red-500 ml-3 md:ml-20 mt-5 text-sm font-medium">
 					{errorMessage}
 				</div>
 			{/if}
@@ -555,7 +555,7 @@ function updateCell(rowIndex, cellIndex, event) {
 			<button
 				type="button"
 				on:click={saveAndContinue}
-				class="ml-20 mt-10 text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
+				class="ml-3 md:ml-20 mt-10 text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
 				>Save & continue</button
 			>
 			

@@ -1,4 +1,4 @@
-<div class="lg:w-11/12 max-w-7xl mx-auto">
+<div class="lg:w-11/12 max-w-7xl mx-auto px-6 sm:px-8 md:px-10">
     <h1  class="font-bold text-3xl mb-5 ">Terms</h1>
 <p class="text-base md:mb-7">For legal statements and documentation, please visit the links below for our terms & conditions, site use terms, privacy policy, product license.</p>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
@@ -22,5 +22,4 @@
       <p class="text-sm">With this data protection declaration, we explain to you which personal data is processed for which purposes.</p>
     </div>
   </div>
-  
 </div>
