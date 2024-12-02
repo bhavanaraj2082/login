@@ -16,7 +16,9 @@
 	>
 		{#each categories as category}
 			<div class="bg-white shadow rounded-md overflow-hidden">
+			 <a href="/products/{category.urlName}">
 				<img src="/category/{category.name}.webp" alt="img" class=" w-full h-60 object-center" />
+			 </a>
 				<div class="p-4">
 					<a href="/products/{category.urlName}">
 						<h3 class="text-lg font-semibold text-heading hover:underline">

@@ -5,14 +5,14 @@
             "description": "An easy way to quickly purchase products used often",
             "image": "/quote_order.jpg",
             "buttonLabel": "Explore",
-            "link": "https://chemikart.partskeys.com/quick-order"
+            "link": "/quick-order"
         },
         {
             "name": "Documentation",
             "description": "Search for safety data sheets (SDS) and certificates (COA/COO) by product number",
             "image": "/documantation.jpg",
             "buttonLabel": "Explore",
-            "link": "https://chemikart.partskeys.com/documents"
+            "link": "/documents"
         },
         {
             "name": "Contact Us",
