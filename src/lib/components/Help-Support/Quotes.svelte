@@ -18,7 +18,7 @@
   let billingPostalCode = "";
   let billingLocation = "";
   let useShippingAddress = false;
-  let message="";
+  let message = "";
   let errormessage = "";
   const addProduct = () => {
     products = [...products, { itemNumber: "", quantity: "" }];
@@ -77,14 +77,13 @@
     action="?/contact"
     use:enhance={() => {
       return async ({ result }) => {
-       
         // console.log(result);
 
         if (result) {
           // console.log(`${result.data.message}`);
           // Clear the form
           products = [{ itemNumber: "", quantity: "" }];
-         
+
           exportMaterial = "";
           firstName = "";
           lastName = "";
@@ -101,36 +100,24 @@
           billingCity = "";
           billingPostalCode = "";
           billingLocation = "";
-          message= 'Your information has been submitted successfully!';
+          message = "Your information has been submitted successfully!";
           // alert("Your information has been submitted successfully!");
         } else {
           // console.error(`${result.data.error}`, result.data.details);
-          errormessage = 'There was an error submitting your information. Please try again.';
-          alert(
-            "There was an error submitting your information. Please try again."
-          );
+          errormessage =
+            "There was an error submitting your information. Please try again.";
         }
+        setTimeout(() => {
+          errormessage = "";
+          message = "";
+        }, 2000);
       };
     }}
   >
     <div class=" flex flex-col h-full">
-        {#if message != ""}
-        <h2
-          class="text-center bg-green-50 text-green-500 font-semibold text-base w-full"
-        >
-          {message}
-        </h2>
-        {:else if errormessage!= ""}
-        <h2
-        class="text-center bg-red-50 text-red-500 font-semibold text-base w-full"
-      >
-        {errormessage}
-      </h2>
-      {/if}
       <div class="lg:w-3/4 w-full pb-6 h-full">
-       
         <h2 class="text-primary-400 font-semibold text-base pb-6">Quotes</h2>
-        <input hidden name="issueName" value="Quotes"/>
+        <input hidden name="issueName" value="Quotes" />
         <h3 class="block mb-2 text-sm">
           Please provide the following product information
         </h3>
@@ -140,7 +127,6 @@
             <div class="flex-1 w-3/4">
               <!-- <label class=" mb-1 hidden" for={`item-number-${index}`}>Item Number</label> -->
               <input
-              
                 id={`item-number-${index}`}
                 type="text"
                 placeholder="Item Number"
@@ -174,7 +160,7 @@
         <button
           type="button"
           on:click={addProduct}
-          class=" text-primary-400 border border-primary-400 mb-4 px-2 rounded-md hover:text-white hover:bg-primary-400"
+          class=" text-primary-400 border border-primary-400 mb-4 px-2 py-1 rounded-md hover:text-white hover:bg-primary-400"
         >
           Add another product
         </button>
@@ -188,7 +174,7 @@
           <div class="w-1/2">
             <label class="inline-flex items-center mr-4">
               <input
-              name="exportMaterial"
+                name="exportMaterial"
                 type="radio"
                 bind:group={exportMaterial}
                 value="Yes"
@@ -198,7 +184,7 @@
             </label>
             <label class="inline-flex items-center">
               <input
-              name="exportMaterial"
+                name="exportMaterial"
                 type="radio"
                 bind:group={exportMaterial}
                 value="No"
@@ -215,7 +201,7 @@
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-6">
           <input
-          name="firstName"
+            name="firstName"
             type="text"
             placeholder="First Name"
             bind:value={firstName}
@@ -254,7 +240,7 @@
             class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           />
           <select
-          name="location"
+            name="location"
             bind:value={location}
             class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
@@ -278,7 +264,7 @@
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-6">
           <input
-          name="streetAddress"
+            name="streetAddress"
             type="text"
             placeholder="Street Address*"
             bind:value={streetAddress}
@@ -286,7 +272,7 @@
             required
           />
           <input
-          name="city"
+            name="city"
             type="text"
             placeholder="City*"
             bind:value={city}
@@ -295,7 +281,7 @@
           />
 
           <select
-          name="shippinglocation"
+            name="shippinglocation"
             bind:value={shippinglocation}
             class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
@@ -324,7 +310,6 @@
           >
           <div class="w-1/2">
             <input
-           
               type="radio"
               id="yes"
               name="sameasShipping"
@@ -348,7 +333,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <input
-          name="billingStreetAddress"
+            name="billingStreetAddress"
             type="text"
             placeholder="Street Address*"
             bind:value={billingStreetAddress}
@@ -356,7 +341,7 @@
             required
           />
           <input
-          name="billingCity"
+            name="billingCity"
             type="text"
             placeholder="City*"
             bind:value={billingCity}
@@ -365,7 +350,7 @@
           />
 
           <select
-          name="billingLocation"
+            name="billingLocation"
             bind:value={billingLocation}
             class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
@@ -395,4 +380,17 @@
       </div>
     </div>
   </form>
+  {#if message != ""}
+    <h2
+      class="text-center text-green-500 font-semibold text-base w-full"
+    >
+      {message}
+    </h2>
+  {:else if errormessage != ""}
+    <h2
+      class="text-center text-red-500 font-semibold text-base w-full"
+    >
+      {errormessage}
+    </h2>
+  {/if}
 </div>

@@ -97,6 +97,7 @@ export const actions = {
       const email = formData.get('email');
       const url = formData.get('url');
       const image = formData.get('image');
+      const status = "unread";
 
     
       const dataToSubmit = {
@@ -111,6 +112,7 @@ export const actions = {
         description,
         email,
         url,
+        status,
         ExtractedData: ExtractedData && typeof ExtractedData === 'string' ? sanitizeFileContent(ExtractedData) : undefined,
         image: image && image.size > 0 ? image.name : undefined, 
       };

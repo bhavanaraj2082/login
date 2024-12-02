@@ -3,11 +3,11 @@ import { submitContactInfo } from "$lib/server/mongoActions.js";
 export const actions = {
   contactus: async ({ request },event) => {
     try {
-      console.log("x-forward",event.getClientAddress());
+      // console.log("x-forward",event.getClientAddress());
       //let ip = request.headers.get('x-forwarded-for') || request.connection.remoteAddress || request.socket.remoteAddress;
       //console.log("addr",ip);
       const body = Object.fromEntries(await request.formData());
-      //await submitContactInfo(body);
+      await submitContactInfo(body);
       return {
         type: "success",
         data: {

@@ -17,7 +17,7 @@
                   <h3 class="text-xl font-semibold mb-2">{name}</h3>
                   <p class="text-gray-600 mb-4 justify-center">{description}</p>
               </div>
-              <a href={link} class="text-primary-400 border border-primary-400 w-full py-2 rounded hover:bg-orange-600 hover:text-gray-100 transition-colors duration-500">
+              <a href={link} class="text-primary-400 border border-primary-400 w-full py-2 rounded hover:bg-primary-500 hover:text-gray-100 transition-colors duration-500">
                   {buttonLabel}
               </a>
           </div>

@@ -5,7 +5,7 @@
   let shipments = data?.order?.shipdetails || [];
 
   const productDetails = products.map((product) => ({
-    id: product.id,
+    id: product._id,
     productName: product.productName,
     imageSrc: product.imageSrc,
   }));
@@ -19,7 +19,7 @@
     shipMethod: shipment.shipMethod,
     deliveryDate: shipment.deliveredDate,
     shipDetails: shipment.shipDetails.map((detail) => {
-      const product = productDetails.find((p) => p._id === detail._id);
+      const product = productDetails.find((p) => p.id === detail.id);
       if (product) {
         return {
           ...detail,
