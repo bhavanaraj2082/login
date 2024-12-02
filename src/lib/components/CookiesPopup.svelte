@@ -433,7 +433,7 @@
 					  on:keydown={(event) => (event.key === 'Enter' || event.key === ' ') && toggleActive()}
 					  >
 					  <div
-						  class={`w-11 h-4 mt-1 border flex items-center rounded-full transition-colors duration-300 ${isActive ? 'border-primary-400' : 'border-gray-600'} transition-colors duration-300`}
+						  class={`w-11 h-4 mt-0.5 border flex items-center rounded-full transition-colors duration-300 ${isActive ? 'border-primary-400' : 'border-gray-600'} transition-colors duration-300`}
 					  >
 						  <div
 						  class={`w-3 h-3 rounded-full shadow-md transform transition-transform duration-300 ${isActive ? 'bg-primary-600 translate-x-7' : 'bg-gray-800 translate-x-0.5'}`}
@@ -471,7 +471,7 @@
 				  on:keydown={(event) => (event.key === 'Enter' || event.key === ' ') && toggleActive()}
 				  >
 				  <div
-					  class={`w-11 h-4 mt-1 border flex items-center rounded-full transition-colors duration-300 ${isActive ? 'border-primary-400' : 'border-gray-600'} transition-colors duration-300`}
+					  class={`w-11 h-4 mt-0.5 border flex items-center rounded-full transition-colors duration-300 ${isActive ? 'border-primary-400' : 'border-gray-600'} transition-colors duration-300`}
 				  >
 					  <div
 					  class={`w-3 h-3 rounded-full shadow-md transform transition-transform duration-300 ${isActive ? 'bg-primary-600 translate-x-7' : 'bg-gray-800 translate-x-0.5'}`}
@@ -507,7 +507,7 @@
 				  on:keydown={(event) => (event.key === 'Enter' || event.key === ' ') && toggleActive()}
 				  >
 				  <div
-					  class={`w-11 h-4 mt-1 border flex items-center rounded-full transition-colors duration-300 ${isActive ? 'border-primary-400' : 'border-gray-600'} transition-colors duration-300`}
+					  class={`w-11 h-4 mt-0.5 border flex items-center rounded-full transition-colors duration-300 ${isActive ? 'border-primary-400' : 'border-gray-600'} transition-colors duration-300`}
 				  >
 					  <div
 					  class={`w-3 h-3 rounded-full shadow-md transform transition-transform duration-300 ${isActive ? 'bg-primary-600 translate-x-7' : 'bg-gray-800 translate-x-0.5'}`}
@@ -530,7 +530,7 @@
 			<div class="flex relative justify-between mb-2 space-x-2">
 				<div class="w-full sm:w-auto flex">
 				<button
-					class="ml-0 sm:ml-0 mt-5 sm:mt-5 py-2 sm:w-py-2 px-4 sm:px-8 md:px-12 text-xs sm:text-sm bg-primary-400 text-white rounded cursor-pointer font-medium hover:bg-primary-400 hover:bg-opacity-75 transition-all duration-300"
+					class="ml-1 mt-5 sm:mt-5 py-2 sm:w-py-2 px-4 sm:px-8 md:px-12 text-xs sm:text-sm bg-primary-400 text-white rounded cursor-pointer font-medium hover:bg-primary-500 transition-all duration-300"
 					on:click={confirmCookies}
 				>
 					Confirm My Cookies
@@ -540,14 +540,14 @@
 				<div class="flex space-x-2">
                     {#if showAllowAllButton}
 						<button
-							class="mt-5 py-2 px-4 bg-primary-400 text-xs sm:text-sm text-white rounded cursor-pointer font-medium hover:bg-primary-400 hover:bg-opacity-75 transition-all duration-300"
+							class="mt-5 py-2 px-4 bg-primary-400 text-xs sm:text-sm text-white rounded cursor-pointer font-medium hover:bg-primary-500 transition-all duration-300"
 							on:click={allowAllCookies}
 						>
 							Allow All
 						</button>
 					{/if}
 					<button
-						class="mt-5 py-2 px-3 bg-primary-400 text-xs sm:text-sm text-white rounded cursor-pointer font-medium hover:bg-primary-400 hover:bg-opacity-75 transition-all duration-300"
+						class="mt-5 py-2 px-3 bg-primary-400 text-xs sm:text-sm text-white rounded cursor-pointer font-medium hover:bg-primary-500 transition-all duration-300"
 						on:click={rejectAllCookies}
 					>
 						Reject All
