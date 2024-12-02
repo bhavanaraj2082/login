@@ -23,7 +23,7 @@ import {
 	MAIL_HOST
 } from '$env/static/private';
 import Return from '$lib/server/models/Return.js';
-import { auth } from '$lib/server/lucia.js';
+// import { auth } from '$lib/server/lucia.js';
 
 export const submitContactInfo = async (data) => {
 	try {
@@ -1086,10 +1086,10 @@ export const handleFileUpload = async (fileData) => {
 };
 
 //Myfavouries actions starts
-export const deleteFavoriteItem = async (itemId, userEmail) => {
+export const deleteFavoriteItem = async (itemId , userId) => {
     try {
         const updatedDoc = await MyFavourite.findOneAndDelete(
-            { 'userProfileId.email': userEmail },
+            { userId : userId },
             { $pull: { favorite: { id: itemId } } }, 
             { new: true } 
         );
@@ -1107,10 +1107,10 @@ export const deleteFavoriteItem = async (itemId, userEmail) => {
     }
 };
 
-export const clearAllFavorites = async (userEmail) => {
+export const clearAllFavorites = async ( userId ) => {
     try {
         const updatedDoc = await MyFavourite.findOneAndDelete(
-            { 'userProfileId.email': userEmail },
+            { userId : userId },
             { $set: { favorite: [] } }, 
             { new: true } 
         );
