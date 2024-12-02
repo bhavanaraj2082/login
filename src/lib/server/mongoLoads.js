@@ -395,3 +395,54 @@ export async function getReturnSavedData() {
     }
   }
 // returns ends
+
+
+
+
+//////Quick Order//////////
+
+export const quick = async () => {
+  try {
+ 
+      const products =  JSON.parse(JSON.stringify(await Product.find({})
+          .sort({ createdAt: -1 }).limit(2000))); 
+      
+      console.log("Fetched products count:", products.length);
+
+      if (!products || products.length === 0) {
+          console.warn('No products found');
+          return []; 
+      }
+
+ 
+      const stocks = JSON.parse(JSON.stringify (await Stock.find({})
+          .populate('partNumber') 
+          .limit(2000))); 
+
+      console.log("Fetched stocks count:", stocks.length);
+
+      if (!stocks || stocks.length === 0) {
+          console.warn('No stock data found');
+      }
+
+   
+      const productNames = products.map(product => {
+       
+          const stock = stocks.find(
+              stockItem => stockItem.partNumber?._id.toString() === product._id.toString()
+          );
+
+          return {
+              ...product, 
+              stockQuantity: stock ? stock.stockQuantity : 0,  
+          };
+      });
+
+
+      return productNames;
+  } catch (error) {
+      console.error('Error fetching products or stocks:', error);
+      throw error; 
+  }
+};
+///Quick Order////

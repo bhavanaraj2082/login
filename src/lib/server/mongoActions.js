@@ -924,3 +924,164 @@ export const getreturnsOrderData = async ({ body }) => {
 	  }
   };
 //returns ends
+
+
+export async function quickcheck(data) {
+  const { ProductId, quantity } = data;
+
+  console.log("ProductId from loads:", ProductId);
+
+
+  if (!ProductId || !quantity) {
+    return {
+      type: 'error',
+      message: 'Product ID and Quantity are required.',
+    };
+  }
+
+
+  if (!mongoose.Types.ObjectId.isValid(ProductId)) {
+    return {
+      type: 'error',
+      message: 'Invalid Product ID.',
+    };
+  }
+
+  const requestedQuantity = parseInt(quantity, 10);
+
+  try {
+
+    const stockRecord = await Stock.findOne({ partNumber: ProductId })
+      .populate('partNumber') 
+      .exec();
+
+    if (!stockRecord) {
+      return {
+        message: 'Out of stock',
+        message1: '',
+        stock: 'Unavailable',
+        type: 'error'
+      };
+    }
+
+    const stockQuantity = stockRecord.stockQuantity;
+    const estimatedDate = new Date(stockRecord.estimatedDate);
+    const formattedDate = new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    }).format(estimatedDate);
+
+    if (stockQuantity > 0) {
+      if (requestedQuantity <= stockQuantity) {
+        return {
+          message: `${requestedQuantity} Available to ship on ${formattedDate}.`,
+          message1: '',
+          stock: 'Available',
+          type: 'success'
+        };
+      } else {
+        const unavailableQuantity = requestedQuantity - stockQuantity;
+
+        const leadTimeDate = new Date(estimatedDate);
+        leadTimeDate.setDate(leadTimeDate.getDate() + 15);
+
+        const formattedLeadTimeDate = new Intl.DateTimeFormat('en-GB', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric'
+        }).format(leadTimeDate);
+
+        return {
+          message: `${stockQuantity} Available to ship on ${formattedDate}.`,
+          message1: ` ${unavailableQuantity} Available to ship on ${formattedLeadTimeDate}.`,
+          stock: 'Partial Availability',
+          type: 'success'
+        };
+      }
+    }
+  } catch (error) {
+    console.error('Error during stock check:', error);
+    return {
+      message: 'Something went wrong with the stock check.',
+      message1: '',
+      stock: 'Unavailable',
+      type: 'error'
+    };
+  }
+}
+
+export const validateProductDetails = async (productNumber, size, quantity) => {
+  try {
+    const product = await Products.findOne({ productNumber });
+
+
+    if (!product) {
+      return {
+        isValid: false,
+        message: "Invalid product number",
+      };
+    }
+    const normalizedSizes = product.priceSize?.map((ps) => ps.size.replace(/\s+/g, ""));
+    const normalizedSize = size ? size.replace(/\s+/g, "") : null;
+
+
+    if (normalizedSizes && normalizedSizes.includes(normalizedSize)) {
+      if (product.stockQuantity >= quantity) {
+        return {
+          isValid: true,
+          message: `Valid (${quantity} unit${quantity > 1 ? "s" : ""})`,
+        };
+      } else {
+        return {
+          isValid: false,
+          message: `Insufficient stock. Only ${product.stockQuantity} unit${product.stockQuantity > 1 ? "s" : ""} available.`,
+        };
+      }
+    } else {
+      return {
+        isValid: false,
+        message: "Size is invalid or missing",
+      };
+    }
+  } catch (error) {
+    console.error("Error validating product details:", error);
+    return {
+      isValid: false,
+      message: "Error validating product details. Please try again later.",
+    };
+  }
+};
+
+
+export const handleFileUpload = async (fileData) => {
+  const rows = fileData.split("\n");
+  const validationResults = [];
+
+
+  for (let row of rows) {
+    const columns = row.split(",");
+    const productNumberAndSize = columns[0]?.trim();
+    const quantity = columns[1] ? parseInt(columns[1].trim(), 10) : 1;
+
+    if (!productNumberAndSize) {
+      validationResults.push({
+        productNumber: "Unknown",
+        message: "Invalid input format",
+        isValid: false,
+      });
+      continue;
+    }
+
+    const [productNumber, uploadedSize] = productNumberAndSize.split("-");
+    const validationResult = await validateProductDetails(productNumber, uploadedSize, quantity);
+
+    validationResults.push({
+      productNumber: productNumberAndSize,
+      message: validationResult.message,
+      isValid: validationResult.isValid,
+    });
+  }
+
+  return validationResults;
+};
