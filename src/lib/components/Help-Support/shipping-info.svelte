@@ -74,11 +74,13 @@
         <label class="block text-base ">Is the new address:</label>
         <div class="flex flex-col text-sm my-4">
         <label class="mb-3">
-          <input type="radio" name="issue" bind:group={addressType} value="New single address" />
+          <input type="radio" class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="issue" bind:group={addressType} value="New single address" />
           A new single address that replaces the original
         </label>
         <label>
-          <input type="radio" name="issue" bind:group={addressType} value="Additional location"/>
+          <input type="radio" class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="issue" bind:group={addressType} value="Additional location"/>
           An additional location/address; original address should be maintained
         </label>
       </div>
@@ -88,11 +90,13 @@
         <label class="block text-base">Would you like the new address to become your primary address in your online profile?</label>
         <div class="text-sm my-4 w-1/6 flex justify-between">
         <label>
-          <input type="radio" name="primaryAddress" bind:group={primaryAddress} value="Yes" />
+          <input type="radio" class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="primaryAddress" bind:group={primaryAddress} value="Yes" />
           Yes
         </label>
         <label>
-          <input type="radio" name="primaryAddress" bind:group={primaryAddress} value="No" />
+          <input type="radio" class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="primaryAddress" bind:group={primaryAddress} value="No" />
           No
         </label>
       </div>
@@ -102,15 +106,18 @@
         <label class="block text-base">Please indicate the address(es) you would like to update:</label>
         <div class="flex flex-col text-sm my-4">
         <label class="mb-3">
-          <input type="radio" name="updateAddress" bind:group={updateAddress} value="Shipping address only" />
+          <input type="radio" class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="updateAddress" bind:group={updateAddress} value="Shipping address only" />
           Shipping address only
         </label>
         <label class="mb-3">
-          <input type="radio" name="updateAddress" bind:group={updateAddress} value="Billing address only" />
+          <input type="radio" class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="updateAddress" bind:group={updateAddress} value="Billing address only" />
           Billing address only
         </label>
         <label>
-          <input type="radio" name="updateAddress" bind:group={updateAddress} value="Shipping and billing address" />
+          <input type="radio" class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="updateAddress" bind:group={updateAddress} value="Shipping and billing address" />
           Shipping and billing address
         </label>
       </div>
@@ -127,7 +134,7 @@
           name="firstName"
           placeholder="First Name"
           bind:value={firstName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -135,7 +142,7 @@
           name="lastName"
           placeholder="Last Name"
           bind:value={lastName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -143,7 +150,7 @@
           name="email"
           placeholder="Email"
           bind:value={email}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -151,7 +158,7 @@
           name="phoneNumber"
           placeholder="Phone Number"
           bind:value={phoneNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -159,12 +166,12 @@
           name="companyName"
           placeholder="Company/Institution Name"
           bind:value={companyName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
         />
         <select
           bind:value={location}
           name="location"
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         >
           <option value="" disabled selected>Location</option>
@@ -177,7 +184,7 @@
           name="accountNumber"
           placeholder="Account Number"
           bind:value={accountNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
       </div>

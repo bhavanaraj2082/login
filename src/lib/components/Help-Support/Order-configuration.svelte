@@ -93,7 +93,7 @@
             type="text"
             placeholder="PO Number"
             bind:value={poNumber}
-            class="border p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
+            class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
             required
           />
           <!-- <label class="hidden mb-1" for={`poNumber-${index}`}>poNumber</label> -->
@@ -103,7 +103,7 @@
               type="text"
               placeholder="Item Number"
               bind:value={product.itemNumber}
-              class="border p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
+              class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
               required
             />
 
@@ -138,7 +138,7 @@
             name="firstName"
             placeholder="First Name"
             bind:value={firstName}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -146,7 +146,7 @@
             name="lastName"
             placeholder="Last Name"
             bind:value={lastName}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -154,7 +154,7 @@
             name="email"
             placeholder="Email"
             bind:value={email}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -162,7 +162,7 @@
             name="phoneNumber"
             placeholder="Phone Number"
             bind:value={phoneNumber}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -170,12 +170,12 @@
             name="companyName"
             placeholder="Company/Institution Name"
             bind:value={companyName}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           />
           <select
             name="location"
             bind:value={location}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           >
             <option value="" disabled selected>Location</option>
@@ -188,7 +188,7 @@
             name="accountNumber"
             placeholder="Account Number"
             bind:value={accountNumber}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
         </div>

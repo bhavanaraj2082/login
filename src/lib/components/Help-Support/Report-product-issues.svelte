@@ -121,19 +121,23 @@ else {
     <label class="block text-sm ">*Please select the option that best describes your issue:</label>
     <div class="mt-2">
       <label class="block text-sm py-2">
-        <input type="radio" name="issue" value="Item is defective or doesn't work" bind:group={issue} class="mr-2" required />
+        <input type="radio" class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+ name="issue" value="Item is defective or doesn't work mr-2" bind:group={issue}  required />
         Item is defective or doesn't work
       </label>
       <label class="block text-sm py-2">
-        <input type="radio" name="issue" value="Product is damaged, but shipping box is OK" bind:group={issue} class="mr-2" required />
+        <input type="radio" class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+ name="issue" value="Product is damaged, but shipping box is OK mr-2" bind:group={issue}  required />
         Product is damaged, but shipping box is OK
       </label>
       <label class="block text-sm py-2">
-        <input type="radio" name="issue" value="Product and shipping box both damaged" bind:group={issue} class="mr-2" required />
+        <input type="radio" class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+ name="issue" value="Product and shipping box both damaged mr-2" bind:group={issue}  required />
         Product and shipping box both damaged
       </label>
       <label class="block text-sm py-2">
-        <input type="radio" name="issue" value="Missing or incorrect product" bind:group={issue} class="mr-2" required />
+        <input type="radio" class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+ name="issue" value="Missing or incorrect product mr-2" bind:group={issue}  required />
         Missing or incorrect product
       </label>
     </div>
@@ -141,7 +145,7 @@ else {
 
   <div class="mt-4">
     <label class="block text-sm ">Please let us know how we may assist you:</label>
-    <textarea rows="5" name="assistance" bind:value={assistance} class="w-full border p-2 text-sm" required></textarea>
+    <textarea rows="5" name="assistance" bind:value={assistance} class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm" required></textarea>
   </div>
 
   <div class="mt-4">
@@ -175,7 +179,7 @@ else {
       name="firstName"
       placeholder="First Name"
       bind:value={firstName}
-      class="border rounded-md p-2 text-sm h-9 w-full"
+      class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
       required
     />
     <input
@@ -183,7 +187,7 @@ else {
       name="lastName"
       placeholder="Last Name"
       bind:value={lastName}
-      class="border rounded-md p-2 text-sm h-9 w-full"
+      class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
       required
     />
     <input
@@ -191,7 +195,7 @@ else {
       name="email"
       placeholder="Email"
       bind:value={email}
-      class="border rounded-md p-2 text-sm h-9 w-full"
+      class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
       required
     />
     <input
@@ -199,7 +203,7 @@ else {
       name="phoneNumber"
       placeholder="Phone Number"
       bind:value={phoneNumber}
-      class="border rounded-md p-2 text-sm h-9 w-full"
+      class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
       required
     />
     <input
@@ -207,12 +211,12 @@ else {
       name="companyName"
       placeholder="Company/Institution Name"
       bind:value={companyName}
-      class="border rounded-md p-2 text-sm h-9 w-full"
+      class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
     />
     <select
     name="location"
       bind:value={location}
-      class="border rounded-md p-2 text-sm h-9 w-full"
+      class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
       required
     >
       <option value="" disabled selected>Location</option>
@@ -225,7 +229,7 @@ else {
       name="accountNumber"
       placeholder="Account Number"
       bind:value={accountNumber}
-      class="border rounded-md p-2 text-sm h-9 w-full"
+      class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
       required
     />
   </div>

@@ -2,8 +2,8 @@
 	import dataPrivacyNotice from '$lib/data/FooterLinks/privacynotice.json';
 </script>
 
-<div>
-	<h1 class="text-2xl font-bold mb-4 mt-5 text-center">Data Privacy Notice</h1>
+<div class="md:ml-5 ml-0">
+	<h1 class="text-2xl font-bold mb-4 mt-5 text-center ">Data Privacy Notice</h1>
 	<p class="font-bold mb-2">Last modified August 6, 2024</p>
 	<p class="text-justify text-sm">
 		We take your data privacy and the protection of your personal data seriously and our data
