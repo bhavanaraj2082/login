@@ -4,8 +4,9 @@ import { getreturnsOrderData, getcancelreturnData } from '$lib/server/mongoActio
 export const load = async ({ params }) => {
   const [returndata, returnstatus] = await Promise.all([
     getreturnstatusdata(params.invoiceid),
-    getReturnSavedData()
+    getReturnSavedData(params.invoiceid)
   ]);
+  
 
   return {
     returndata,
