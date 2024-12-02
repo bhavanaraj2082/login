@@ -817,14 +817,12 @@ const auth = new Lucia({
 
 //returns starts
 export const getReturnresultData = async (body) => {
-  console.log("getReturnresultData", body);
   try {
     const invoiceNumber = parseInt(body.invoiceNumber);
     const record = await Order.findOne({ invoice: invoiceNumber });
-
     if (record) {
       return {
-        redirectTo: `/returns/${record._id}`
+        redirectTo: `/returns/${record.invoice}`
       };
     } else {
       return { message: 'Return-Order not found' };

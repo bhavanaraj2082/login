@@ -373,7 +373,8 @@ export const verifyPasswordToken = async(token)=>{
 // returns starts
 export async function getreturnstatusdata(invoiceid) {
     try {
-        const records = await Order.findOne({ _id: invoiceid }).populate('dashuserprofileid').populate('shipdetails');
+        const records = await Order.findOne({ 
+          invoice: invoiceid }).populate('dashuserprofileid').populate('shipdetails');
         if (records) {
             return JSON.parse(JSON.stringify(records));
         } else {
@@ -385,10 +386,11 @@ export async function getreturnstatusdata(invoiceid) {
     }
 }
 
-export async function getReturnSavedData() {
+export async function getReturnSavedData(invoiceid) {
+  
     try {
-      const records = await Return.find().lean();
-      return { records: JSON.parse(JSON.stringify(records)) };
+      const records = await Return.find({invoiceNumber:invoiceid})
+      return JSON.parse(JSON.stringify(records))
     } catch (error) {
       console.error('Error fetching saved returns:', error);
       return { error: 'Error fetching saved returns data' };
