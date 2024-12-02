@@ -951,85 +951,68 @@ export const getcancelreturnData = async ({ id }) => {
 
 export async function quickcheck(data) {
 	const { ProductId, quantity } = data;
-
-	console.log('ProductId from loads:', ProductId);
-
+  
+	console.log("ProductId from actions:", ProductId);
+  
 	if (!ProductId || !quantity) {
-		return {
-			type: 'error',
-			message: 'Product ID and Quantity are required.'
-		};
+	  return {
+		type: 'error',
+		message: 'Product ID and Quantity are required.',
+	  };
 	}
-
-	if (!mongoose.Types.ObjectId.isValid(ProductId)) {
-		return {
-			type: 'error',
-			message: 'Invalid Product ID.'
-		};
-	}
-
+  
 	const requestedQuantity = parseInt(quantity, 10);
-
+  
 	try {
-		const stockRecord = await Stock.findOne({ partNumber: ProductId })
-			.populate('partNumber')
-			.exec();
-
-		if (!stockRecord) {
-			return {
-				message: 'Out of stock',
-				message1: '',
-				stock: 'Unavailable',
-				type: 'error'
-			};
-		}
-
-		const stockQuantity = stockRecord.stockQuantity;
-		const estimatedDate = new Date(stockRecord.estimatedDate);
-		const formattedDate = new Intl.DateTimeFormat('en-GB', {
-			day: '2-digit',
-			month: 'long',
-			year: 'numeric'
-		}).format(estimatedDate);
-
-		if (stockQuantity > 0) {
-			if (requestedQuantity <= stockQuantity) {
-				return {
-					message: `${requestedQuantity} Available to ship on ${formattedDate}.`,
-					message1: '',
-					stock: 'Available',
-					type: 'success'
-				};
-			} else {
-				const unavailableQuantity = requestedQuantity - stockQuantity;
-
-				const leadTimeDate = new Date(estimatedDate);
-				leadTimeDate.setDate(leadTimeDate.getDate() + 15);
-
-				const formattedLeadTimeDate = new Intl.DateTimeFormat('en-GB', {
-					day: '2-digit',
-					month: 'long',
-					year: 'numeric'
-				}).format(leadTimeDate);
-
-				return {
-					message: `${stockQuantity} Available to ship on ${formattedDate}.`,
-					message1: ` ${unavailableQuantity} Available to ship on ${formattedLeadTimeDate}.`,
-					stock: 'Partial Availability',
-					type: 'success'
-				};
-			}
-		}
-	} catch (error) {
-		console.error('Error during stock check:', error);
+	  // Add a debug log for the query being run
+	  console.log(`Querying stock with ProductId: ${ProductId}`);
+  
+	  // Remove populate for simplicity
+	  const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
+  
+	  console.log("Stock Record:", stockRecord);
+  
+	  if (!stockRecord) {
+		console.log(`No stock record found for ProductId: ${ProductId}`);
 		return {
-			message: 'Something went wrong with the stock check.',
-			message1: '',
-			stock: 'Unavailable',
-			type: 'error'
+		  message: 'Out of stock',
+		  stock: 'Unavailable',
+		  type: 'error',
 		};
+	  }
+  
+	  const stockQuantity = stockRecord.stock;
+  
+	  if (stockQuantity > 0) {
+		if (requestedQuantity <= stockQuantity) {
+		  return {
+			message: 'In Stock',
+			stock: 'Available',
+			type: 'success',
+		  };
+		} else {
+		  return {
+			message: `Only ${stockQuantity} units available.`,
+			stock: 'Limited Availability',
+			type: 'error',
+		  };
+		}
+	  } else {
+		return {
+		  message: 'Out of Stock',
+		  stock: 'Unavailable',
+		  type: 'error',
+		};
+	  }
+	} catch (error) {
+	  console.error('Error during stock check:', error);
+	  return {
+		message: 'Something went wrong with the stock check.',
+		stock: 'Unavailable',
+		type: 'error',
+	  };
 	}
-}
+  }
 
 export const validateProductDetails = async (productNumber, size, quantity) => {
 	try {
@@ -1101,3 +1084,20 @@ export const handleFileUpload = async (fileData) => {
 
 	return validationResults;
 };
+
+
+
+
+export const quicksearch = async ({ query }) => {
+	const queryFilter = { productNumber: { $regex: query, $options: 'i' } };
+  
+	const result = await Products.find(queryFilter)
+	  .limit(10)
+	 
+	  .exec();
+  console.log("i am actions",result);
+  
+	// Return the result as JSON
+	return JSON.parse(JSON.stringify(result));
+  
+  };

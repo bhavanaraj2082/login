@@ -1,5 +1,6 @@
 import { quick } from '$lib/server/mongoLoads.js';
-import { quickcheck } from '$lib/server/mongoActions.js';
+import { quickcheck ,quicksearch} from '$lib/server/mongoActions.js';
+
 export async function load() {
     let data = [];
     try {
@@ -16,6 +17,7 @@ export async function load() {
 
 import { json } from '@sveltejs/kit';
 import { handleFileUpload } from '$lib/server/mongoActions'; 
+import { quicksearch } from '../../lib/server/mongoActions';
 export const actions = {
   uploadFile: async ({ request }) => {
  
@@ -50,28 +52,86 @@ export const actions = {
     }
   },
 
-  quickcheck: async ({ request }) => {
-    try {
-      const formData = Object.fromEntries(await request.formData());
-      const { ProductId, quantity } = formData;
-      if (!ProductId || !quantity) {
-        return {
-          type: 'error',
-          message: 'Product ID and Quantity are required.',
-        };
-      }
-      const record = await quickcheck({ ProductId, quantity });
-      return {
-        record,
-      };
-    } catch (error) {
-      console.error('Error in quickcheck action:', error);
-
+  export async function quickcheck(data) {
+    const { ProductId, quantity } = data;
+  
+    console.log("ProductId from actions:", ProductId);
+  
+    if (!ProductId || !quantity) {
       return {
         type: 'error',
-        message: 'An error occurred while processing the request.',
+        message: 'Product ID and Quantity are required.',
       };
     }
+  
+    const requestedQuantity = parseInt(quantity, 10);
+  
+    try {
+      // Add a debug log for the query being run
+      console.log(`Querying stock with ProductId: ${ProductId}`);
+  
+      // Remove populate for simplicity
+      const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
+  
+      console.log("Stock Record:", stockRecord);
+  
+      if (!stockRecord) {
+        console.log(`No stock record found for ProductId: ${ProductId}`);
+        return {
+          message: 'Out of stock',
+          stock: 'Unavailable',
+          type: 'error',
+        };
+      }
+  
+      const stockQuantity = stockRecord.stock;
+  
+      if (stockQuantity > 0) {
+        if (requestedQuantity <= stockQuantity) {
+          return {
+            message: 'In Stock',
+            stock: 'Available',
+            type: 'success',
+          };
+        } else {
+          return {
+            message: `Only ${stockQuantity} units available.`,
+            stock: 'Limited Availability',
+            type: 'error',
+          };
+        }
+      } else {
+        return {
+          message: 'Out of Stock',
+          stock: 'Unavailable',
+          type: 'error',
+        };
+      }
+    } catch (error) {
+      console.error('Error during stock check:', error);
+      return {
+        message: 'Something went wrong with the stock check.',
+        stock: 'Unavailable',
+        type: 'error',
+      };
+    }
+  }
+  quicksearch: async ({ request }) => {
+    const data = Object.fromEntries(await request.formData());
+    console.log('Request body:', data);
+
+    const { quickSearch } = data;
+
+    if (quickSearch && quickSearch.length >= 2) {
+
+      const results = await quicksearch({ query: quickSearch });
+      console.log(results, 'Results from database');
+
+    
+      return results ;
+    }
+
+   
   },
 };
 
