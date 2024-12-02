@@ -35,5 +35,5 @@ const quoteSchema = new mongoose.Schema(
     collection: 'quotes', 
   }
 );
-const Quotes = mongoose.model('Quotes', quoteSchema);
+const Quotes = mongoose.models.Quotes || mongoose.model('Quotes', quoteSchema);
 export default Quotes;

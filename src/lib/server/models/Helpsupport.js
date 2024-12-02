@@ -44,6 +44,6 @@ const exampleSchema = new mongoose.Schema(
 );
 
 // Create and export the model
-const Helpsupport = mongoose.model('Helpsupport', exampleSchema);
+const Helpsupport = mongoose.models.Helpsupport || mongoose.model('Helpsupport', exampleSchema);
 
 export default Helpsupport;

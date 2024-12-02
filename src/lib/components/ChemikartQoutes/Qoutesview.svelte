@@ -38,7 +38,7 @@
   const componentsString = derived(formData, $formData => JSON.stringify($formData.components))
 
 	</script>
-<form method="POST" action="?/qoutes" class="mx-10 lg:p-8 md:p-2 bg-white rounded-lg shadow-lg space-y-6"
+<form method="POST" action="?/qoutes" class="mx-10 lg:p-8 md:p-2 bg-white rounded-lg shadow-lg mb-4 space-y-6"
  use:enhance={() => {return async({ result }) => {
     let message1 = '';
     let keywordError = '';

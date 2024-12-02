@@ -63,6 +63,6 @@ const CopyConsentSchema = new mongoose.Schema(
   }
 );
 
-const CopyConsent = mongoose.model('CopyConsent', CopyConsentSchema);
+const CopyConsent = mongoose.models.CopyConsent || mongoose.model('CopyConsent', CopyConsentSchema);
 
 export default CopyConsent;

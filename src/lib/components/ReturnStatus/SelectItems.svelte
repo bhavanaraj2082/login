@@ -2,7 +2,9 @@
   import { fade, slide } from "svelte/transition";
   import { enhance, applyAction } from "$app/forms";
 
-  export let returndata;
+  export let data;
+  let returndata= data?.returndata
+  let filteredReturnStatus=data?.returnstatus
   export let items;
 
   let orderDetail = {
@@ -10,11 +12,9 @@
     orderid: returndata?.ordernumber || "N/A",
   };
 
-  let returnstatus = returnstatus.records;
-
-  let filteredReturnStatus = returnstatus.filter(
-    (item) => String(item.invoiceNumber) === String(returndata)
-  );
+  // let filteredReturnStatus = returnstatus.filter(
+  //   (item) => String(item.records.invoice) === String(returndata)
+  // );
 
 
   let selectAll = false;
@@ -32,11 +32,11 @@
     return `${Math.floor(100000 + Math.random() * 900000)}`;
   }
 
-  filteredReturnStatus.forEach((item) => {
-    item.returnItems.forEach((returnItem) => {
-      returnedproductNumbers.add(returnItem.productNumber);
-    });
-  });
+  // filteredReturnStatus.forEach((item) => {
+  //   item.returnItems.forEach((returnItem) => {
+  //     returnedProductNumbers.add(returnItem.productNumber);
+  //   });
+  // });
 
   function getTotalShippedQuantity(items) {
     const totalQuantities = {};
@@ -291,18 +291,6 @@
       <input type="hidden" name={`selectedItems[${index}].additionalInfo`} value={item.additionalInfo} />
     {/each}
 
-    {#if successMessage}
-      <div class="bg-green-100 text-green-700 p-3 rounded mb-4" transition:fade>
-        {successMessage}
-      </div>
-    {/if}
-    
-    {#if errorMessage}
-      <div class="bg-red-100 text-red-700 p-3 rounded mb-4" transition:fade>
-        {errorMessage}
-      </div>
-    {/if}
-
     <div class="mb-6 py-2">
       <div class="flex items-center space-x-4">
         <input
@@ -518,6 +506,19 @@
           }}>
           Clear All
         </button>
+
+        {#if successMessage}
+        <div class="bg-green-100 text-green-700 p-3 rounded mb-4" transition:fade>
+          {successMessage}
+        </div>
+      {/if}
+      
+      {#if errorMessage}
+        <div class="bg-red-100 text-red-700 p-3 rounded mb-4" transition:fade>
+          {errorMessage}
+        </div>
+      {/if}
+      
         <button
           type="submit"
           disabled={selectedItems.length === 0}
@@ -528,146 +529,146 @@
     </div>
   </form>
   {#if filteredReturnStatus && filteredReturnStatus.length > 0}
-    <section class="w-full mx-auto border-t max-w-7xl bg-white rounded my-6">
-      <div class="mt-6 space-y-6">
-        <div class="pl-4">
-          <h1 class="text-2xl font-bold text-heading">
-            Return Order Status
-          </h1>
-          <h3 class="text-xl font-semibold text-heading mt-4">
-            Items to Return
-          </h3>
-        </div>
-        {#each filteredReturnStatus as item}
-          <div class="border-t-8 border-t-gray-200 0 pt-4">
-            <div class="overflow-x-auto bg-white p-6 rounded-t-lg shadow-sm">
-              <table class="min-w-full table-auto border-separate border-spacing-0">
-                <thead>
-                  <tr class="bg-gray-50 border-b">
-                    <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Return Order ID</th>
-                    <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Invoice Number</th>
-                    <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Order Number</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr class="border-b">
-                    <td class="px-4 py-2 text-sm text-description">{item.returnOrderid}</td>
-                    <td class="px-4 py-2 text-sm text-description">{item.invoiceNumber}</td>
-                    <td class="px-4 py-2 text-sm text-description">{item.orderNumber}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <h4 class="text-xl font-semibold text-heading mt-6">Items</h4>
-              <table class="min-w-full table-auto mt-4">
-                <thead>
-                  <tr class="bg-gray-50 border-b">
-                    <th
-                      class="px-4 py-2 text-left text-sm font-semibold text-heading">Description</th>
-                    <th
-                      class="px-4 py-2 text-left text-sm font-semibold text-heading">Return Issue</th>
-                    <th
-                      class="px-4 py-2 text-left text-sm font-semibold text-heading">Product Name</th>
-                    <th
-                      class="px-4 py-2 text-left text-sm font-semibold text-heading">Quantity</th>
-                    <th
-                      class="px-4 py-2 text-left text-sm font-semibold text-heading">Reason</th>
-                    <th
-                      class="px-4 py-2 text-left text-sm font-semibold text-heading">Return Quantity</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {#each item.returnItems as items}
+  <section class="w-full mx-auto border-t max-w-7xl bg-white rounded my-6">
+    <div class="mt-6 space-y-6">
+      <div class="pl-4">
+        <h1 class="text-2xl font-bold text-heading">
+          Return Order Status
+        </h1>
+        <h3 class="text-xl font-semibold text-heading mt-4">
+          Items to Return
+        </h3>
+      </div>
+      {#each filteredReturnStatus as item}
+        <div class="border-t-8 border-t-gray-200 pt-4">
+          <div class="overflow-x-auto bg-white p-6 rounded-t-lg shadow-sm">
+            <table class="min-w-full table-auto border-separate border-spacing-0">
+              <thead>
+                <tr class="bg-gray-50 border-b">
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Return Order ID</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Invoice Number</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Order Number</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b">
+                  <td class="px-4 py-2 text-sm text-description">{item.returnOrderid}</td>
+                  <td class="px-4 py-2 text-sm text-description">{item.invoiceNumber}</td>
+                  <td class="px-4 py-2 text-sm text-description">{item.orderNumber}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Items Table -->
+            <h4 class="text-xl font-semibold text-heading mt-6">Items</h4>
+            <table class="min-w-full table-auto mt-4">
+              <thead>
+                <tr class="bg-gray-50 border-b">
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Description</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Return Issue</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Product Name</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Quantity</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Reason</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Return Quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#if Array.isArray(item.returnItems)}
+                  {#each item.returnItems as returnItem}
                     <tr class="border-b">
-                      <td class="px-4 py-2 text-sm text-description">{items.description}</td>
-                      <td class="px-4 py-2 text-sm text-description">{items.issue}</td>
+                      <td class="px-4 py-2 text-sm text-description">{returnItem.description}</td>
+                      <td class="px-4 py-2 text-sm text-description">{returnItem.issue}</td>
                       <td class="px-4 py-2 text-sm text-description">
-                        <span class="font-semibold">
-                          {items.productName}
-                        </span><br>
-                        <span class="text-xs">
-                          {items.productNumber}
-                        </span>
+                        <span class="font-semibold">{returnItem.productName}</span><br>
+                        <span class="text-xs">{returnItem.productNumber}</span>
                       </td>
-                      <td class="px-4 py-2 text-sm text-description">{items.quantity}</td>
-                      <td class="px-4 py-2 text-sm text-description">{items.reason}</td>
-                      <td class="px-4 py-2 text-sm text-description">{items.returnqty}</td>
+                      <td class="px-4 py-2 text-sm text-description">{returnItem.quantity}</td>
+                      <td class="px-4 py-2 text-sm text-description">{returnItem.reason}</td>
+                      <td class="px-4 py-2 text-sm text-description">{returnItem.returnqty}</td>
                     </tr>
                   {/each}
-                </tbody>
-              </table>
-              <h4 class="text-xl font-semibold text-heading mt-6">
-                Status Information
-              </h4>
-              <table class="min-w-full table-auto mt-4">
-                <thead>
-                  <tr class="bg-gray-50 border-b">
-                    <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Estimation Date</th>
-                    <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Picked Date</th>
-                    <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr class="">
-                    <td class="px-4 py-2 text-sm text-description">{item.status.estimation || "In Progress"}</td>
-                    <td class="px-4 py-2 text-sm text-description">{item.status.picked || "In Progress"}</td>
-                    <td class="px-4 py-2 text-sm text-description">{item.status.status || "In Progress"}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <form
-              method="POST"
-              action="?/cancelreturn"
-              use:enhance={({ handleCancelReturn }) => {
-                if (!filteredReturnStatus.length) {
-                  cancelErrorMessage = "Please select the return component";
-                  setTimeout(() => {
-                    cancelErrorMessage = "";
-                  }, 3000);
-                  handleCancelReturn();
-                }
-                return async ({ result }) => {
-                  if (result.type === "success") {
-                    cancelSuccessMessage = "Successfully deleted from Returns";
-                    cancelErrorMessage = "";
-                    setTimeout(() => {
-                      cancelSuccessMessage = "";
-                      location.reload();
-                    }, 2000);
-                  } else {
-                    cancelSuccessMessage = "";
-                    cancelErrorMessage = "Error deleting return";
-                    setTimeout(() => {
-                      cancelErrorMessage = "";
-                    }, 3000);
-                  }
-                  await applyAction(result);
-                };
-              }}>
-              <input type="hidden" name="id" value={item.id} />
-              <button
-                type="submit"
-                class="py-2 px-4 border-1 rounded my-4 mx-6 border-primary-500 hover:text-white hover:bg-primary-500">
-                Cancel
-              </button>
-            </form>
+                {:else if item.returnItems.selectedItems}
+                  {#each item.returnItems.selectedItems as returnItem}
+                    <tr class="border-b">
+                      <td class="px-4 py-2 text-sm text-description">{returnItem.additionalInfo || "N/A"}</td>
+                      <td class="px-4 py-2 text-sm text-description">{returnItem.resolution}</td>
+                      <td class="px-4 py-2 text-sm text-description">
+                        <span class="font-semibold">{returnItem.productName}</span><br>
+                        <span class="text-xs">{returnItem.productNumber}</span>
+                      </td>
+                      <td class="px-4 py-2 text-sm text-description">{returnItem.orderQty}</td>
+                      <td class="px-4 py-2 text-sm text-description">{returnItem.reason}</td>
+                      <td class="px-4 py-2 text-sm text-description">{returnItem.returnqty}</td>
+                    </tr>
+                  {/each}
+                {/if}
+              </tbody>
+            </table>
+
+            <!-- Status Table -->
+            <h4 class="text-xl font-semibold text-heading mt-6">Status Information</h4>
+            <table class="min-w-full table-auto mt-4">
+              <thead>
+                <tr class="bg-gray-50 border-b">
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Estimation Date</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Picked Date</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-heading">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="px-4 py-2 text-sm text-description">{item.status.estimation || "In Progress"}</td>
+                  <td class="px-4 py-2 text-sm text-description">{item.status.picked || "In Progress"}</td>
+                  <td class="px-4 py-2 text-sm text-description">{item.status.status || "In Progress"}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          {/each}
-          {#if cancelSuccessMessage} 
-            <div class="mt-4 p-4 bg-green-100 text-green-800 rounded">
-              {cancelSuccessMessage}
-            </div>
-          {/if}
-          {#if cancelErrorMessage}
-            <div class="mt-4 p-4 bg-red-100 text-red-800 rounded">
-              {cancelErrorMessage}
-            </div>
-          {/if}
-      </div>
-    </section>
-  {:else}
-    <p class="text-center text-xs font-semibold mt-6 p-2 rounded border border-primary-200 text-red-600 shadow">
-      You have not raised any query for returning order.
-    </p>
-  {/if}
+
+          <!-- Cancel Form -->
+          <form method="POST" action="?/cancelreturn" use:enhance={({ handleCancelReturn }) => {
+            if (!filteredReturnStatus.length) {
+              cancelErrorMessage = "Please select the return component";
+              setTimeout(() => { cancelErrorMessage = ""; }, 3000);
+              handleCancelReturn();
+            }
+            return async ({ result }) => {
+              if (result.type === "success") {
+                cancelSuccessMessage = "Successfully deleted from Returns";
+                cancelErrorMessage = "";
+                setTimeout(() => { cancelSuccessMessage = ""; location.reload(); }, 2000);
+              } else {
+                cancelSuccessMessage = "";
+                cancelErrorMessage = "Error deleting return";
+                setTimeout(() => { cancelErrorMessage = ""; }, 3000);
+              }
+              await applyAction(result);
+            };
+          }}>
+            <input type="hidden" name="id" value={item._id} />
+            <button type="submit" class="py-2 px-4 border-1 rounded my-4 mx-6 border-primary-500 hover:text-white hover:bg-primary-500">Cancel</button>
+          </form>
+        </div>
+      {/each}
+
+      <!-- Success/Error Messages -->
+      {#if cancelSuccessMessage} 
+        <div class="mt-4 p-4 bg-green-100 text-green-800 rounded">
+          {cancelSuccessMessage}
+        </div>
+      {/if}
+      {#if cancelErrorMessage}
+        <div class="mt-4 p-4 bg-red-100 text-red-800 rounded">
+          {cancelErrorMessage}
+        </div>
+      {/if}
+    </div>
+  </section>
+{:else}
+  <p class="text-center text-xs font-semibold mt-6 p-2 rounded border border-primary-200 text-red-600 shadow">
+    You have not raised any query for returning order.
+  </p>
+{/if}
+
+
 </div>

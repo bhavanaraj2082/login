@@ -39,7 +39,7 @@
 <div class="bg-white ">
 	<h1 class="font-bold text-2xl py-10 bg-white ">Step 4: Additional notes</h1>
 	<hr />
-	<div class="sm:ml-20 ml-10 bg-white ">
+	<div class="lg:ml-20 ml-3 bg-white ">
 	<h1 class="font-semibold py-5 text-primary-500">Further details or requests</h1>
 	<textarea
 		rows="6"

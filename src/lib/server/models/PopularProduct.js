@@ -1,22 +1,21 @@
 import mongoose from "mongoose";
 
 const popularProductSchema = new mongoose.Schema(
-    {
-      product: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'Product',              
-        required: false               
-      },
-      order: {
-        type: Number,                
-        required: false,              
-        min: 0,                      
-        max: 100,                    
-      }
+  {
+    order: {
+      type: Number,
+      required: true,
     },
-    { timestamps: true } 
+    product: {
+     type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+     },
+  },
+  {
+    timestamps: true,  
+    collection: 'popularproducts', 
+  }
   );
-
 
   const PopularProduct = mongoose.models.PopularProduct || mongoose.model('PopularProduct', popularProductSchema);
   

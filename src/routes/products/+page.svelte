@@ -1,8 +1,8 @@
 <script>
-	//import Category from '$lib/components/Product/category.svelte';
+	import Category from '$lib/components/Product/category.svelte';
 	export let data;
 </script>
 
-<!-- <div>
+<div>
     <Category {data}/>  
-</div> -->
+</div> 

@@ -122,11 +122,13 @@ const triggerFileInput = () => {
         >
         <div class="text-sm my-4 w-full md:w-3/4 lg:w-3/4 flex justify-between">
           <label>
-            <input type="radio" name="documentRequired" bind:group={documentRequired} value="SDS / CoA / CoO" class="text-wrap"/>
+            <input type="radio"class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+name="documentRequired" bind:group={documentRequired} value="SDS / CoA / CoO"/>
             SDS / CoA / CoO
           </label>
           <label>
-            <input type="radio"  name="documentRequired" bind:group={documentRequired} value="Other Documentation" />
+            <input type="radio"class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+ name="documentRequired" bind:group={documentRequired} value="Other Documentation" />
             Other Documentation
           </label>
         </div>
@@ -134,7 +136,7 @@ const triggerFileInput = () => {
       </div>
       <div class="py-10 px-5 border border-gray-300 rounded-sm">
         <p>Did you know that you can find SDS, CoA, and CoO online?</p>
-        <p>Please try our <a href="/document-search-page" class="text-blue-500 font-semibold">Document Search Page</a></p>
+        <p>Please try our <a href="/document-search-page" class="text-primary-500 font-semibold">Document Search Page</a></p>
       </div>
 
       <div class="mt-8">
@@ -167,7 +169,7 @@ const triggerFileInput = () => {
           name="firstName"
           placeholder="First Name"
           bind:value={firstName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -175,7 +177,7 @@ const triggerFileInput = () => {
           name="lastName"
           placeholder="Last Name"
           bind:value={lastName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -183,7 +185,7 @@ const triggerFileInput = () => {
           name="email"
           placeholder="Email"
           bind:value={email}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -191,7 +193,7 @@ const triggerFileInput = () => {
           name="phoneNumber"
           placeholder="Phone Number"
           bind:value={phoneNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -199,12 +201,12 @@ const triggerFileInput = () => {
           name="companyName"
           placeholder="Company/Institution Name"
           bind:value={companyName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
         />
         <select
         name="location"
           bind:value={location}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         >
           <option value="" disabled selected>Location</option>
@@ -217,7 +219,7 @@ const triggerFileInput = () => {
           name="accountNumber"
           placeholder="Account Number"
           bind:value={accountNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
       </div>
