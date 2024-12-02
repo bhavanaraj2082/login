@@ -171,14 +171,15 @@ export async function getSearchData(search) {
 }
 
 async function getMatchedComponents(search) {
-	try {
-		const queryFilter = {
-			$or: [
-				{ productName: { $regex: search, $options: 'i' } },
-				{ productNumber: { $regex: search, $options: 'i' } },
-				{ prodDesc: { $regex: search, $options: 'i' } }
-			]
-		};
+  try {
+    const queryFilter = {
+      $or: [
+        { productName: { $regex: search, $options: "i" } },
+        { productNumber: { $regex: search, $options: "i" } },
+        { CAS: { $regex: search, $options: "i" } },
+      ],
+    };
+
 
 		const components = await Product.find(queryFilter)
 			.limit(6)
@@ -391,6 +392,126 @@ export async function getreturnstatusdata(invoiceid) {
 		console.error('Error fetching order status:', error);
 		return { error: 'Error in fetching orderStatus Data' };
 	}
+}
+
+
+// returns ends
+
+
+
+//PRODUCT SIMILAR ITEMS , FINDING DIFFERENCES
+export async function DifferentProds(productId) {
+  try {
+    const product = JSON.parse(JSON.stringify(await Product.findOne({ productNumber: productId })));
+    if (!product) {
+      return { type: "error", message: "Product record not found" };
+    }
+
+    const partNumber = product.productNumber;
+    const variants = product.variants || [];
+
+    const variantRecord = await Promise.all(
+      variants.map(async (variantId) => {
+        const variant = await Product.findById(variantId).lean();
+        if (!variant) return {}; 
+    
+        const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
+        
+        return { 
+          ...variant, 
+          pricing: stock ? stock.pricing : []  
+        };
+      })
+    );
+    
+    const manufacturerRecord = await Promise.all(
+      variants.map(async (manufacturerId) => {
+        const manufacturer = await Product.findById(manufacturerId).lean();
+        return manufacturer || {}; 
+      })
+    );
+    // console.log("manufacturerRecord", manufacturerRecord);
+    let stockQuantity = 0;
+    let orderMultiple=0;
+    let priceSize=[]
+    if (partNumber) {
+      const stockRecord = await Stock.findOne({ productNumber: partNumber }).exec();
+      if (stockRecord && typeof stockRecord.stock !== "undefined") {
+        stockQuantity = stockRecord.stock;
+        orderMultiple = stockRecord.orderMultiple;
+        priceSize=stockRecord.pricing
+      }
+    }
+    
+    const relatedProducts = await Product.find({
+      subsubCategory: product.subsubCategory,
+      _id: { $ne: product._id }, 
+    })
+      .limit(4)
+      .exec();
+    // console.log("relatedProducts", relatedProducts);
+    const relatedProductData = relatedProducts.map((relatedProduct) => ({
+      productId: relatedProduct?._id?.toString() || "",
+      productName: relatedProduct?.productName || "Unknown Product",
+      productNumber: relatedProduct?.productNumber || "N/A",
+      imageSrc: relatedProduct?.imageSrc || "",
+      properties: relatedProduct?.properties || {},
+      priceSize: Array.isArray(relatedProduct?.priceSize)
+        ? relatedProduct.priceSize.map((item) => ({
+            price: item.price || 0,
+            size: item.size || "Unknown",
+          }))
+        : [],
+    }));
+    for (let relatedProduct of relatedProductData) {
+      const stockData = await Stock.findOne({ partNumber: relatedProduct.productId }).exec();
+      if (stockData) {
+        relatedProduct.stockQuantity = stockData.stockQuantity;
+      }
+    }
+    const formattedRecord = {
+      productId: product?._id?.toString() || "",
+      productName: product?.productName || "Unknown Product",
+      CAS:product?.CAS,
+      productNumber: product?.productNumber || "N/A",
+      prodDesc: product?.prodDesc || "No description available",
+      imageSrc: product?.imageSrc || "",
+      safetyDatasheet: product?.safetyDatasheet || "",
+      priceSize,
+      properties: product?.properties || {},
+      description: product?.description || {},
+      safetyInfo: product?.safetyInfo || {},
+      filteredProductData: product?.filteredProductData || {},
+      productSynonym: product?.filteredProductData?.["Synonym(S)"] || "",
+      stockQuantity,
+      orderMultiple,
+      variants: variantRecord.map((variant) => ({
+        _id: variant?._id?.toString() || "",
+        productName: variant?.productName || "Unknown Product",
+        prodDesc: variant?.prodDesc || "No description available",
+        description: variant?.description || [],
+        properties: variant?.properties || {},
+        manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
+        productNumber: variant?.productNumber || "N/A",
+        priceSize: Array.isArray(variant?.priceSize) ? variant.priceSize : [],
+        category: variant?.category?.toString() || null,
+        subCategory: variant?.subCategory?.toString() || null,
+        subsubCategory: variant?.subsubCategory || "",
+        subsubsubCategory: variant?.subsubsubCategory || "",
+        imageSrc: variant?.imageSrc || "",
+        returnPolicy: variant?.returnPolicy || false,
+        safetyInfo: Array.isArray(variant?.safetyInfo) ? variant.safetyInfo : [],
+        encompass: variant?.encompass || null,
+        currency: variant?.currency || "USD",
+        pricing:variant?.pricing
+      })),
+      relatedProducts: relatedProductData, 
+    };
+    return { records: [formattedRecord] };
+  } catch (error) {
+    console.error("Error loading product data:", error);
+    return { type: "error", message: "An error occurred while loading product data." };
+  }
 }
 
 export async function getReturnSavedData(invoiceid) {

@@ -1,86 +1,28 @@
 import mongoose from 'mongoose';
+const { Schema, Types } = mongoose;
 
-const { Schema } = mongoose;
+// Embedded schema, _id not required
 
-// Define the Stocks schema
-const stocksSchema = new Schema(
-  {
-    partNumber: {
-      type: Schema.Types.ObjectId, // Assuming partNumber refers to another collection, use ObjectId reference
-      ref: 'Product', // The name of the related collection (adjust as needed)
-      required: false,
+const stockSchema = new Schema(
+    {
+        manufacturer: { type: Types.ObjectId, ref: 'Manufacturer', required: true },
+        productName: { type: String, required: true },
+        productNumber: { type: String, required: true },
+        stock: { type: Number, default: 0 },
+        minqtypurchase: { type: Number, default: 1 },
+        buylinkurl: { type: String },
+        distributor: { type: Types.ObjectId, ref: 'distributors', required: true },
+        distibutorName: { type: String },
+        distributorAlias: { type: String },
+        pricing: { type: Schema.Types.Mixed, default: [] },
+        orderMultiple: { type: Number },
+        priceone: { type: Number }
     },
-    unitOfMeasure: {
-      type: String,
-      required: false,
-    },
-    deliveryUnit: {
-      type: String,
-      required: false,
-    },
-    stockQuantity: {
-      type: Number,
-      required: false,
-    },
-    pricingUnit: {
-      type: String,
-      required: false,
-    },
-    priceQty1: {
-      type: String,
-      required: false,
-    },
-    price1USD: {
-      type: String,
-      required: false,
-    },
-    priceQtyLast: {
-      type: String,
-      required: false,
-    },
-    priceLastUSD: {
-      type: String,
-      required: false,
-    },
-    specPricingUnit: {
-      type: String,
-      required: false,
-    },
-    specPriceQty1: {
-      type: String,
-      required: false,
-    },
-    specPrice1USD: {
-      type: String,
-      required: false,
-    },
-    specPriceQty2: {
-      type: String,
-      required: false,
-    },
-    specPrice2USD: {
-      type: String,
-      required: false,
-    },
-    estimatedDate: {
-      type: Date,
-      required: false,
-    },
-    leadTime: {
-      type: Number,
-      required: false,
-    },
-    supplier: {
-      type: Schema.Types.ObjectId, // Assuming supplier refers to another collection, use ObjectId reference
-      ref: 'Supplier', // The name of the related collection (adjust as needed)
-      required: false,
-    },
-  },
-  {
-    timestamps: true, // Automatically add createdAt and updatedAt fields
-  }
+    {
+        timestamps: true,
+        collection: 'stocks'
+    }
 );
 
-const Stock = mongoose.models.Stock ||  mongoose.model('Stock', stocksSchema);
-
+export const Stock = mongoose.models.Stock || mongoose.model('Stock', stockSchema);
 export default Stock;

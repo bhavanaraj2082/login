@@ -40,7 +40,6 @@
     "globals": "^15.0.0",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
-    "lucia": "^3.2.2",
     "nodemailer": "^6.9.16",
     "pocketbase": "^0.21.5",
     "postcss": "^8.4.47",
@@ -64,7 +63,9 @@
   },
   "dependencies": {
     "@iconify/icons-mdi": "^1.2.48",
+    "@lucia-auth/adapter-mongoose": "^3.0.1",
     "js-cookie": "^3.0.5",
+    "lucia": "^2.7.7",
     "mongoose": "^8.8.3",
     "mongose": "^0.0.2-security",
     "svelte-sonner": "^0.3.28"

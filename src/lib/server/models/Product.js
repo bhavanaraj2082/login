@@ -12,7 +12,7 @@ const productSchema = new Schema({
         required: false 
     },
     description: { 
-        type: [String], 
+        type: Schema.Types.Mixed, 
         required: false 
     },
     properties: {
@@ -20,7 +20,7 @@ const productSchema = new Schema({
         required: false,
         default: {}
     },
-    manufacturerName: { type: Schema.Types.ObjectId, ref: 'Manufacturer' },
+    manufacturer: { type: Schema.Types.ObjectId, ref: 'Manufacturer' },
     productNumber: { type: String, required: true },
     priceSize: { type:Schema.Types.Mixed, default: [], required:false},
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: false },
@@ -33,6 +33,7 @@ const productSchema = new Schema({
     safetyDatasheet: { type: String, trim: true },
     safetyInfo: { type: [String], default: [] },
     encompass: { type: String, default: null },
+    CAS:{ type: String, default: null },
     currency: { type: String, default: 'USD' },
     variants: [{ type: Schema.Types.ObjectId, ref: 'Product' }]
 }, { timestamps: false, collection: "products" });

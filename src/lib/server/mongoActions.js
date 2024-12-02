@@ -496,7 +496,7 @@ export const searchByQuery = async (body) => {
 		$or: [
 			{ productName: { $regex: body.query, $options: 'i' } },
 			{ productNumber: { $regex: body.query, $options: 'i' } },
-			{ 'filteredProductData.CASNumber': { $regex: body.query, $options: 'i' } }
+			{ CAS: { $regex: body.query, $options: 'i' } }
 		]
 	};
 
