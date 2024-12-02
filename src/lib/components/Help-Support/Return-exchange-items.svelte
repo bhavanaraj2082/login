@@ -176,18 +176,10 @@
         </div>
       </div>
 
-      <div class="mt-4">
-        <label class="block text-sm"
-          >Please let us know how we may assist you:</label
-        >
-        <textarea
-          rows="5"
-          name="assistance"
-          bind:value={assistance}
-          class="w-full border p-2 text-sm"
-          required
-        ></textarea>
-      </div>
+  <div class="mt-4">
+    <label class="block text-sm">Please let us know how we may assist you:</label>
+    <textarea rows="5" name="assistance" bind:value={assistance} class="w-full border p-2 text-sm" required></textarea>
+  </div>
 
       <div class="mt-4">
         <label class="block text-sm pb-2"

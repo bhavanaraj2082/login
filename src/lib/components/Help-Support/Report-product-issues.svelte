@@ -125,6 +125,7 @@
         return using the form below.
       </p>
       <div>
+        <!-- svelte-ignore a11y-label-has-associated-control -->
         <label class="block text-sm"
           >*Please select the option that best describes your issue:</label
         >
@@ -177,6 +178,7 @@
       </div>
 
       <div class="mt-4">
+        <!-- svelte-ignore a11y-label-has-associated-control -->
         <label class="block text-sm"
           >Please let us know how we may assist you:</label
         >
@@ -190,6 +192,7 @@
       </div>
 
       <div class="mt-4">
+        <!-- svelte-ignore a11y-label-has-associated-control -->
         <label class="block text-sm pb-2"
           >Please attach any images or files that may assist in troubleshooting
           or investigation:</label
@@ -249,7 +252,7 @@
           name="firstName"
           placeholder="First Name"
           bind:value={firstName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -257,7 +260,7 @@
           name="lastName"
           placeholder="Last Name"
           bind:value={lastName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -265,7 +268,7 @@
           name="email"
           placeholder="Email"
           bind:value={email}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -273,7 +276,7 @@
           name="phoneNumber"
           placeholder="Phone Number"
           bind:value={phoneNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -281,12 +284,12 @@
           name="companyName"
           placeholder="Company/Institution Name"
           bind:value={companyName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
         />
         <select
           name="location"
           bind:value={location}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         >
           <option value="" disabled selected>Location</option>
@@ -299,7 +302,7 @@
           name="accountNumber"
           placeholder="Account Number"
           bind:value={accountNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
       </div>

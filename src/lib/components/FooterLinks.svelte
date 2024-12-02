@@ -43,7 +43,7 @@
         contentComponent = component;
     }
 </script>
-<div class="lg:w-11/12 mx-auto max-w-7xl">
+<div class="lg:w-11/12 mx-auto max-w-7xl px-6 sm:px-8 md:px-10">
 
 <div class="flex flex-col md:flex-row lg:p-6 ">
     <aside class="w-full lg:w-1/3 lg:p-4">

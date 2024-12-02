@@ -55,18 +55,18 @@ let message = '';
     }; 
 }} class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-    <input type="text" name="firstName" placeholder="First Name" bind:value={firstName} class="border rounded-md p-2 text-sm h-9 w-full" required />
-    <input type="text" name="lastName" placeholder="Last Name" bind:value={lastName} class="border rounded-md p-2 text-sm h-9 w-full" required />
-    <input type="email" name="email" placeholder="Email" bind:value={email} class="border rounded-md p-2 text-sm h-9 w-full" required />
-    <input type="tel" name="phoneNumber" placeholder="Phone Number" bind:value={phoneNumber} class="border rounded-md p-2 text-sm h-9 w-full" required />
-    <input type="text" name="companyName" placeholder="Company/Institution Name" bind:value={companyName} class="border rounded-md p-2 text-sm h-9 w-full" />
-    <select bind:value={location} name="location" class="border rounded-md p-2 text-sm h-9 w-full" required>
+    <input type="text" name="firstName" placeholder="First Name" bind:value={firstName} class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full" required />
+    <input type="text" name="lastName" placeholder="Last Name" bind:value={lastName} class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full" required />
+    <input type="email" name="email" placeholder="Email" bind:value={email} class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full" required />
+    <input type="tel" name="phoneNumber" placeholder="Phone Number" bind:value={phoneNumber} class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full" required />
+    <input type="text" name="companyName" placeholder="Company/Institution Name" bind:value={companyName} class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full" />
+    <select bind:value={location} name="location" class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full" required>
       <option value="" disabled selected>Location</option>
       {#each locations as loc}
         <option value={loc}>{loc}</option>
       {/each}
     </select>
-    <input type="text" name="accountNumber" placeholder="Account Number" bind:value={accountNumber} class="border rounded-md p-2 text-sm h-9 w-full" required />
+    <input type="text" name="accountNumber" placeholder="Account Number" bind:value={accountNumber} class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full" required />
     
     <div class="flex justify-center col-span-2 mt-2">
       <button type="submit" class="w-3/4 bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4">

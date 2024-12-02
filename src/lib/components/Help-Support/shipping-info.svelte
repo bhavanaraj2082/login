@@ -69,7 +69,8 @@
           <label class="mb-3">
             <input
               type="radio"
-              name="issue"
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="issue"
               bind:group={addressType}
               value="New single address"
             />
@@ -78,7 +79,8 @@
           <label>
             <input
               type="radio"
-              name="issue"
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="issue"
               bind:group={addressType}
               value="Additional location"
             />
@@ -96,7 +98,8 @@
           <label>
             <input
               type="radio"
-              name="primaryAddress"
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="primaryAddress"
               bind:group={primaryAddress}
               value="Yes"
             />
@@ -105,7 +108,8 @@
           <label>
             <input
               type="radio"
-              name="primaryAddress"
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="primaryAddress"
               bind:group={primaryAddress}
               value="No"
             />
@@ -122,7 +126,8 @@
           <label class="mb-3">
             <input
               type="radio"
-              name="updateAddress"
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="updateAddress"
               bind:group={updateAddress}
               value="Shipping address only"
             />
@@ -131,7 +136,8 @@
           <label class="mb-3">
             <input
               type="radio"
-              name="updateAddress"
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="updateAddress"
               bind:group={updateAddress}
               value="Billing address only"
             />
@@ -140,7 +146,8 @@
           <label>
             <input
               type="radio"
-              name="updateAddress"
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+           name="updateAddress"
               bind:group={updateAddress}
               value="Shipping and billing address"
             />
@@ -159,7 +166,7 @@
           name="firstName"
           placeholder="First Name"
           bind:value={firstName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -167,7 +174,7 @@
           name="lastName"
           placeholder="Last Name"
           bind:value={lastName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -175,7 +182,7 @@
           name="email"
           placeholder="Email"
           bind:value={email}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -183,7 +190,7 @@
           name="phoneNumber"
           placeholder="Phone Number"
           bind:value={phoneNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -191,12 +198,12 @@
           name="companyName"
           placeholder="Company/Institution Name"
           bind:value={companyName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
         />
         <select
           bind:value={location}
           name="location"
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         >
           <option value="" disabled selected>Location</option>
@@ -209,7 +216,7 @@
           name="accountNumber"
           placeholder="Account Number"
           bind:value={accountNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
       </div>

@@ -131,7 +131,7 @@
                 type="text"
                 placeholder="Item Number"
                 bind:value={product.itemNumber}
-                class="border p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
+                class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
                 required
               />
               <!-- <label class="hidden mb-1" for={`quantity-${index}`}>Quantity</label> -->
@@ -140,7 +140,7 @@
                 type="number"
                 placeholder="Quantity"
                 bind:value={product.quantity}
-                class="border p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
+                class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
                 required
               />
             </div>
@@ -177,7 +177,7 @@
                 type="radio"
                 bind:group={exportMaterial}
                 value="Yes"
-                class="form-radio"
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
               />
               <span class="ml-2 text-sm">Yes</span>
             </label>
@@ -187,7 +187,7 @@
                 type="radio"
                 bind:group={exportMaterial}
                 value="No"
-                class="form-radio"
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
               />
               <span class="ml-2 text-sm">No</span>
             </label>
@@ -204,7 +204,7 @@
             type="text"
             placeholder="First Name"
             bind:value={firstName}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -212,7 +212,7 @@
             name="lastName"
             placeholder="Last Name"
             bind:value={lastName}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -220,7 +220,7 @@
             name="email"
             placeholder="Email"
             bind:value={email}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -228,7 +228,7 @@
             name="phoneNumber"
             placeholder="Phone Number"
             bind:value={phoneNumber}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -236,12 +236,12 @@
             name="companyName"
             placeholder="Company/Institution Name"
             bind:value={companyName}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           />
           <select
             name="location"
             bind:value={location}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           >
             <option value="" disabled selected>Location</option>
@@ -254,7 +254,7 @@
             name="accountNumber"
             placeholder="Account Number"
             bind:value={accountNumber}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
         </div>
@@ -267,7 +267,7 @@
             type="text"
             placeholder="Street Address*"
             bind:value={streetAddress}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -275,14 +275,14 @@
             type="text"
             placeholder="City*"
             bind:value={city}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
 
           <select
             name="shippinglocation"
             bind:value={shippinglocation}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           >
             <option value="" disabled selected>Location</option>
@@ -295,7 +295,7 @@
             name="postalCode"
             placeholder="Postal Code*"
             bind:value={postalCode}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
         </div>
@@ -313,12 +313,14 @@
               id="yes"
               name="sameasShipping"
               value="yes"
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
               on:change={handleRadioChange}
             />
             <label for="yes" class="mr-4 text-sm">Yes</label>
             <input
               type="radio"
               id="no"
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
               name="sameasShipping"
               value="no"
               on:change={handleRadioChange}
@@ -334,7 +336,7 @@
             type="text"
             placeholder="Street Address*"
             bind:value={billingStreetAddress}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -342,14 +344,14 @@
             type="text"
             placeholder="City*"
             bind:value={billingCity}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
 
           <select
             name="billingLocation"
             bind:value={billingLocation}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           >
             <option value="" disabled selected>Location</option>
@@ -363,7 +365,7 @@
             name="billingPostalCode"
             placeholder="Postal Code*"
             bind:value={billingPostalCode}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
         </div>

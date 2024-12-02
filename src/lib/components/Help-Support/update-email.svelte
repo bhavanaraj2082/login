@@ -73,7 +73,7 @@
         type="email"
         name="currentEmail"
         bind:value={currentEmail}
-        class="border rounded-md p-2 text-sm h-9 w-full mb-4 mt-2"
+        class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full mb-4 mt-2"
         required
       />
       <label class="text-base">*New Email address</label>
@@ -81,7 +81,7 @@
         type="email"
         name="newEmail"
         bind:value={newEmail}
-        class="border rounded-md p-2 text-sm h-9 w-full mt-2"
+        class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full mt-2"
         required
       />
       <div class="mt-4">
@@ -92,7 +92,7 @@
           rows="5"
           name="assistance"
           bind:value={assistance}
-          class="w-full border p-2 text-sm mt-2"
+          class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm mt-2"
           required
         ></textarea>
       </div>
@@ -107,7 +107,7 @@
           placeholder="First Name"
           name="firstName"
           bind:value={firstName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -115,7 +115,7 @@
           placeholder="Last Name"
           name="lastName"
           bind:value={lastName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -123,7 +123,7 @@
           name="email"
           placeholder="Email"
           bind:value={email}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -131,7 +131,7 @@
           name="phoneNumber"
           placeholder="Phone Number"
           bind:value={phoneNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -139,12 +139,12 @@
           name="companyName"
           placeholder="Company/Institution Name"
           bind:value={companyName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
         />
         <select
           name="location"
           bind:value={location}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         >
           <option value="" disabled selected>Location</option>
@@ -157,7 +157,7 @@
           name="accountNumber"
           placeholder="Account Number"
           bind:value={accountNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
       </div>

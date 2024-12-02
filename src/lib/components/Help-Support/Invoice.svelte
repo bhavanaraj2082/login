@@ -81,8 +81,8 @@
                 value="PO Number"
                 bind:group={selectedOption}
                 required
-                class="text-sm"
-              />
+                class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+                />
               <label for="poNumber" class="ml-2 text-sm">PO Number</label>
             </div>
             <div class="flex items-center mb-2 text-sm">
@@ -91,7 +91,8 @@
                 id="orderNumber"
                 name="reference"
                 value="Order Number"
-                bind:group={selectedOption}
+                class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+              bind:group={selectedOption}
                 required
               />
               <label for="orderNumber" class="ml-2">Order Number</label>
@@ -102,7 +103,8 @@
                 id="invoiceNumber"
                 name="reference"
                 value="Invoice Number"
-                bind:group={selectedOption}
+                class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+              bind:group={selectedOption}
                 required
               />
               <label for="invoiceNumber" class="ml-2">Invoice Number</label>
@@ -111,7 +113,7 @@
           <input
             name="selectOptionNumber"
             type="text"
-            class="border p-2 w-full lg:w-3/4 md:w-3/4 text-sm rounded-md"
+            class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 text-sm rounded-md"
             bind:value={selectOptionNumber}
             required
           />
@@ -127,14 +129,14 @@
             type="text"
             placeholder="Confirmation Number"
             bind:value={confirmationNumber}
-            class="border p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
+            class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
           />
           <input
             name="itemNumber"
             type="text"
             placeholder="Item Number"
             bind:value={itemNumber}
-            class="border p-2 w-full lg:w-3/4 md:w-3/4 text-sm rounded-md"
+            class="border border-gray-300  shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 text-sm rounded-md"
           />
         </div>
       </div>
@@ -148,7 +150,7 @@
             type="text"
             placeholder="First Name"
             bind:value={firstName}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -156,7 +158,7 @@
             type="text"
             placeholder="Last Name"
             bind:value={lastName}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -164,7 +166,7 @@
             type="email"
             placeholder="Email"
             bind:value={email}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -172,7 +174,7 @@
             type="tel"
             placeholder="Phone Number"
             bind:value={phoneNumber}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -180,12 +182,12 @@
             type="text"
             placeholder="Company/Institution Name"
             bind:value={companyName}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           />
           <select
             name="location"
             bind:value={location}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           >
             <option value="" disabled selected>Location</option>
@@ -198,7 +200,7 @@
             name="accountNumber"
             placeholder="Account Number"
             bind:value={accountNumber}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
         </div>
