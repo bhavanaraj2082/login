@@ -139,7 +139,7 @@
 				type="email"
 				name="email"
 				bind:value={email}
-				class="w-full sm:w-1/3 p-2 m-2 border border-gray-300 rounded"
+				class="w-full sm:w-1/3 p-2 m-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"
 				required
 				placeholder="Email"
 			/>
@@ -147,7 +147,7 @@
 				type="text"
 				name="invoiceNumber"
 				bind:value={invoiceNumber}
-				class="w-full sm:w-1/3 p-2 m-2 border border-gray-300 rounded"
+				class="w-full sm:w-1/3 p-2 m-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"
 				required
 				placeholder="Invoice Number"
 			/>
