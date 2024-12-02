@@ -112,9 +112,6 @@
                         <Icon icon="game-icons:chemical-drop" class="w-20 h-24 text-primary-500" />
                         <p class="text-content">Discover our latest website features and enhance your experience with Chemikart.<br>Find information regarding new features as well as tips and tricks with Get Site Smart.</p>
                         <div class="mt-8">
-                            <button class="px-10 py-3 text-primary-500 border-2 border-primary-500 rounded hover:bg-primary-500 hover:text-white transition-all">
-                                Learn More
-                            </button>
                         </div>
                     </div>
                 </aside>
@@ -153,9 +150,6 @@
                 <li>Global approach and management of scale, harmonized for all your sites.</li>
             </ol>
             <a href="#contact-team">
-            <button class="px-6 py-3 mt-4 text-primary-500 border-2 border-primary-500 rounded hover:bg-primary-500 hover:text-white transition-all max-md:self-start">
-                Request More Information
-            </button>
         </a>
         </div>
     </div>
@@ -183,9 +177,6 @@
                 <li>Streamlined reconciliation process</li>
             </ul>
             <a href="#contact-team">
-            <button class="px-6 py-3 mt-4 text-primary-500 border-2 border-primary-500 rounded hover:bg-primary-500 hover:text-white transition-all max-md:self-start">
-                Request More Information
-            </button>
         </a>
         </div>
     </div>
@@ -208,9 +199,6 @@
                 <li>e-Quotes converted directly to orders</li>
             </ul>
             <a href="#contact-team">
-            <button class="px-6 py-3 mt-4 text-primary-500 border-2 border-primary-500 rounded hover:bg-primary-500 hover:text-white transition-all max-md:self-start">
-                Request More Information
-            </button>
         </a>
         </div>
     </div>
