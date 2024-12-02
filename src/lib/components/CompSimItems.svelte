@@ -61,7 +61,7 @@
     scroll-behavior: smooth;
   }
 </style>
-<div class="mx-0 lg:mx-10 mb-10">
+<div class="mx-0 lg:mx-10 mb-10 ">
   <div class="flex justify-between items-center mb-4">
     <div class="font-bold text-primary-500 ml-9 lg:ml-0">Compare Similar Items</div>
     <div class="flex items-center space-x-2 mr-9 lg:mr-0">
@@ -92,7 +92,7 @@
             <ul>
               {#each properties as property}
                 <li
-                  class={`flex justify-between items-center mb-2 ${
+                  class={`flex justify-between items-center mb-2 mt-2 px-2 rounded ${
                     showDifference &&
                     relatedProduct.properties &&
                     relatedProduct.properties[property] &&

@@ -179,7 +179,7 @@ async function getMatchedComponents(search) {
       $or: [
         { productName: { $regex: search, $options: "i" } },
         { productNumber: { $regex: search, $options: "i" } },
-        { prodDesc: { $regex: search, $options: "i" } },
+        { CAS: { $regex: search, $options: "i" } },
       ],
     };
 
@@ -376,35 +376,50 @@ export async function DifferentProds(productId) {
     if (!product) {
       return { type: "error", message: "Product record not found" };
     }
-    const partNumber = product._id;
-    const variants = product.variants || []; 
+
+    const partNumber = product.productNumber;
+    const variants = product.variants || [];
+
     const variantRecord = await Promise.all(
       variants.map(async (variantId) => {
         const variant = await Product.findById(variantId).lean();
-        return variant || {}; 
+        if (!variant) return {}; 
+    
+        const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
+        
+        return { 
+          ...variant, 
+          pricing: stock ? stock.pricing : []  
+        };
       })
     );
+    
     const manufacturerRecord = await Promise.all(
       variants.map(async (manufacturerId) => {
         const manufacturer = await Product.findById(manufacturerId).lean();
         return manufacturer || {}; 
       })
     );
-    console.log("manufacturerRecord", manufacturerRecord);
+    // console.log("manufacturerRecord", manufacturerRecord);
     let stockQuantity = 0;
+    let orderMultiple=0;
+    let priceSize=[]
     if (partNumber) {
-      const stockRecord = await Stock.findOne({ partNumber: product._id }).exec();
-      if (stockRecord && typeof stockRecord.stockQuantity !== "undefined") {
-        stockQuantity = stockRecord.stockQuantity;
+      const stockRecord = await Stock.findOne({ productNumber: partNumber }).exec();
+      if (stockRecord && typeof stockRecord.stock !== "undefined") {
+        stockQuantity = stockRecord.stock;
+        orderMultiple = stockRecord.orderMultiple;
+        priceSize=stockRecord.pricing
       }
     }
+    
     const relatedProducts = await Product.find({
       subsubCategory: product.subsubCategory,
       _id: { $ne: product._id }, 
     })
       .limit(4)
       .exec();
-    console.log("relatedProducts", relatedProducts);
+    // console.log("relatedProducts", relatedProducts);
     const relatedProductData = relatedProducts.map((relatedProduct) => ({
       productId: relatedProduct?._id?.toString() || "",
       productName: relatedProduct?.productName || "Unknown Product",
@@ -427,22 +442,19 @@ export async function DifferentProds(productId) {
     const formattedRecord = {
       productId: product?._id?.toString() || "",
       productName: product?.productName || "Unknown Product",
+      CAS:product?.CAS,
       productNumber: product?.productNumber || "N/A",
       prodDesc: product?.prodDesc || "No description available",
       imageSrc: product?.imageSrc || "",
       safetyDatasheet: product?.safetyDatasheet || "",
-      priceSize: Array.isArray(product?.priceSize)
-        ? product.priceSize.map((item) => ({
-            price: item.price || 0,
-            size: item.size || "Unknown",
-          }))
-        : [],
+      priceSize,
       properties: product?.properties || {},
       description: product?.description || {},
       safetyInfo: product?.safetyInfo || {},
       filteredProductData: product?.filteredProductData || {},
       productSynonym: product?.filteredProductData?.["Synonym(S)"] || "",
       stockQuantity,
+      orderMultiple,
       variants: variantRecord.map((variant) => ({
         _id: variant?._id?.toString() || "",
         productName: variant?.productName || "Unknown Product",
@@ -461,6 +473,7 @@ export async function DifferentProds(productId) {
         safetyInfo: Array.isArray(variant?.safetyInfo) ? variant.safetyInfo : [],
         encompass: variant?.encompass || null,
         currency: variant?.currency || "USD",
+        pricing:variant?.pricing
       })),
       relatedProducts: relatedProductData, 
     };
