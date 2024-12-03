@@ -5,7 +5,7 @@
 
 </script>
 
-<div>
+<div class=" mx-auto md:w-11/12 max-w-7xl">
     <!-- <Subsubcategory data ={data.subproductdata}/> -->
     <Filter {data}/> 
 </div>

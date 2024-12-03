@@ -27,7 +27,7 @@
   const content = findContent(categoryName, subCategoryName);
 </script>
 
-<div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-10 my-10 px-3">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-10 my-10 px-3 md:w-11/12">
   <img
     src={`/subcategory/${categoryName}/${subCategoryName || "img"}.webp`}
     alt="img"
