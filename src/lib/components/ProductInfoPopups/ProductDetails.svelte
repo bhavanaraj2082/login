@@ -1,6 +1,6 @@
 <script>
   import { onMount } from "svelte";
-  import { enhance } from "$app/forms";
+  import { enhance,applyAction } from "$app/forms";
   import Properties from "./Properties.svelte";
   import Imageinfo from "./Imageinfo.svelte";
   import Icon from "@iconify/svelte";
@@ -9,7 +9,6 @@
   import Variants from "$lib/components/ProductInfoPopups/Variants.svelte";
   import Description from "$lib/components/ProductInfoPopups/Description.svelte";
 
-  let quantity = 0;
   let showDropdown = false;
   let showSharePopup = false;
   let showModal = false;
@@ -17,10 +16,12 @@
   export let data;
 
   let showQuoteModal = false;
+  let productQuote = null;
 
-  const toggleQuoteModal = () => {
-    showQuoteModal = !showQuoteModal;
-  };
+function toggleQuoteModal(selectedProduct) {
+  showQuoteModal = !showQuoteModal;
+  productQuote = selectedProduct;
+}
 
   export let isFavorite;
   let product = data.records;
@@ -44,9 +45,11 @@
   let loginSuccessmsg = "";
   let loginSuccesstype = "";
   let showLikedPopup = false;
+  let successMessage =""
+  let errorMessage=""
   const conversionRate = 83;
 
-  data.records.forEach((record, index) => {
+  $:{data.records.forEach((record, index) => {
     record.priceSize.forEach((priceItem, i) => {
       if (!priceItem.hasOwnProperty("INR")) {
         const inrValue = Number(priceItem.USD * conversionRate);
@@ -54,12 +57,18 @@
         delete priceItem.USD;
       }
     });
-  });
+  })};
 
-  let orderMultiple = 1;
-  data.records.forEach((record) => {
-    orderMultiple = record.orderMultiple;
-  });
+  let orderMultiple = null;
+  let quantity = orderMultiple;
+  $: {
+    if (data.records.length > 0) {
+      orderMultiple = data.records[0].orderMultiple; 
+      quantity = orderMultiple; 
+    } else {
+      quantity = null; 
+    }
+  }
 
 let minPrice = Infinity;
 let maxPrice = -Infinity;
@@ -105,6 +114,7 @@ $: {
       }
     });
   }
+// console.log("data in componenet",data);
 
 
   function handleThumbnailClick(selectedIndex) {
@@ -245,7 +255,7 @@ $: {
             <!-- {#if showDropdown} -->
             <div class="text-primary-400 text-sm text-left cursor-pointer">
               <a href={product?.safetyDatasheet} target="_blank">
-                <i class="fa-solid fa-download mr-1"></i>SDS
+                <Icon icon="ic:round-download" class="text-md inline" />SDS
               </a>
             </div>
             <!-- <div class="text-primary-400 text-sm text-left cursor-pointer">
@@ -302,9 +312,12 @@ $: {
               <button type="submit" class="btn btn-primary" on:click={toggleLikedPopup}>
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
-                <i class={`fa-heart text-xl ml-10 ${isLiked ? "fa-solid text-orange-500" : "fa-regular text-primary-400"} text-end`}
-                  on:click={toggleLike}
-                ></i>
+                <Icon
+                icon="icon-park-outline:like"
+                class={`text-2xl ml-10 ${isLiked ? "text-orange-500" : "text-primary-400"} text-end`}
+                on:click={toggleLike}
+              />              
+
               </button>
             </form>
           </div>
@@ -316,14 +329,18 @@ $: {
           <p class="text-gray-500 text-sm !mt-1 mb-1">
             CAS Number: <span class="font-bold">{product?.CAS}</span>
           </p>
-        {:else}
-          <p class="text-gray-500 text-sm !mt-1 mb-1">
-            CAS Number: <span class="font-bold">Not available</span>
-          </p>
         {/if}
-
+        {#if product?.returnPolicy === true}
+        <p class="text-gray-500 text-sm font-bold !mt-1 mb-1">
+          This product is Returnable.
+        </p>
+      {:else}
+        <p class="text-gray-500 text-sm font-bold !mt-1 mb-1">
+          This product is Not Returnable.
+        </p>
+      {/if}
         {#if product.prodDesc !== ""}
-          <p class="text-gray-500 text-sm !mt-0">
+          <p class="text-gray-500 text-sm !mt-1">
             {product.prodDesc}
           </p>
         {/if}
@@ -370,19 +387,13 @@ $: {
                   >
                     <span class="text-left">
                       {#if product?.stockQuantity > 0}
-                        <i
-                          class="fa-regular fa-circle-check mr-1 text-primary-400"
-                        >
-                        </i> Available
+                         <Icon icon="carbon:checkmark-outline" class="text-sm text-primary-400 inline" /> Available
                       {:else}
-                        <i
-                          class="fa-regular fa-circle-xmark mr-1 text-primary-400"
-                        >
-                        </i> Out of stock
+                      <Icon icon="mdi:close" class="text-sm text-primary-400" /> Out of stock
                       {/if}</span
                     >
                   </div>
-                  <div class="col-span-1 p-2 text-left">₹ {priceItem?.INR}</div>
+                  <div class="col-span-1 p-2 text-left"> ₹ {priceItem.INR.toLocaleString('en-IN')}</div>
                 </button>
               </div>
             {/each}
@@ -392,7 +403,7 @@ $: {
           <div>
             <p>Price not available for this product, request Quote</p>
             <button
-              on:click={toggleQuoteModal}
+            on:click={() => toggleQuoteModal(product)}
               class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-white mt-2"
               >Request Quote</button
             >
@@ -412,7 +423,7 @@ $: {
               <div class="text-lg font-semibold relative">
                 {product?.productNumber}-{product?.priceSize[index]?.break}
                 <button on:click={toggleModal} class="ml-1 text-primary-400"
-                  ><i class="fa-solid fa-circle-info"></i></button
+                  > <Icon icon="material-symbols:info-outline" class="text-md" /></button
                 >
                 {#if showModal}
                   <div
@@ -421,9 +432,7 @@ $: {
                     <button
                       on:click={toggleModal}
                       class="absolute top-2 right-2 text-gray-500 font-semibold"
-                      ><i
-                        class="fa-solid fa-xmark text-primary-400 font-semibold"
-                      ></i>
+                      > <Icon icon="mdi:close" class="text-sm" />
                     </button>
                     <h2 class="text-sm font-medium">Product Information</h2>
                     <p class="text-xs text-gray-500 font-normal">
@@ -432,9 +441,10 @@ $: {
                   </div>
                 {/if}
               </div>
-              <span class="text-lg font-semibold"
-                >₹ {product?.priceSize[index]?.INR}</span
-              >
+              <span class="text-lg font-semibold">
+                ₹ {product?.priceSize[index]?.INR.toLocaleString('en-IN')}
+              </span>
+              
             </div>
           </div>
 
@@ -442,11 +452,9 @@ $: {
             <p class="text-gray-800 font-semibold text-sm mt-4">Availability</p>
             <p class="text-sm">
               {#if product?.stockQuantity > 0}
-                <i class="fa-regular fa-circle-check mr-1 text-primary-400">
-                </i> Available
+              <Icon icon="material-symbols:check-circle-outline" class="text-sm text-primary-400 inline" /> Available
               {:else}
-                <i class="fa-regular fa-circle-xmark mr-1 text-primary-400">
-                </i> Out of stock
+              <Icon icon="meteor-icons:circle-xmark" class="text-sm text-primary-400" /> Out of stock
               {/if}
             </p>
             <div class="flex space-x-2 items-center mt-2">
@@ -466,7 +474,7 @@ $: {
                       on:click={togglePopup}
                       class="absolute top-4 right-4 text-primary-400 text-xl font-bold"
                     >
-                      <i class="fa-solid fa-xmark"></i>
+                    <Icon icon="mdi:close" class="text-sm" />
                     </button>
 
                     <h2 class="text-xl font-bold text-left">
@@ -508,7 +516,7 @@ $: {
                             on:click={decreaseQuantity}
                             class="w-8 h-8 text-primary-400 flex items-center justify-center"
                           >
-                            <i class="fa-solid fa-minus"></i>
+                          <Icon icon="ic:round-minus" class="text-2xl" />
                           </button>
                           <input
                             type="text"
@@ -526,7 +534,7 @@ $: {
                             on:click={increaseQuantity}
                             class="w-8 h-8 text-primary-400 flex items-center justify-center"
                           >
-                            <i class="fa-solid fa-plus"></i>
+                          <Icon icon="ic:round-plus" class="text-2xl" />
                           </button>
                         </div>
 
@@ -534,7 +542,7 @@ $: {
                           type="submit"
                           class="bg-primary-400 text-white p-2 rounded-lg flex items-center space-x-1"
                         >
-                          <i class="fa-regular fa-calendar-check"></i>
+                        <Icon icon="tabler:calendar-check" class="text-sm" />
                           <span>Check Availability</span>
                         </button>
                       </div>
@@ -542,16 +550,12 @@ $: {
                       {#if stockType === "success"}
                         <div class="mt-6 space-y-2 text-sm">
                           <div class="flex items-center space-x-2">
-                            <i
-                              class="fa-regular fa-check-circle text-primary-400"
-                            ></i>
+                            <Icon icon="material-symbols:check-circle-outline" class="text-sm text-primary-400" />
                             <p>{stockAvailability}</p>
                           </div>
                           {#if stockUnAvailability !== ""}
                             <div class="flex items-center space-x-2">
-                              <i
-                                class="fa-regular fa-check-circle text-primary-400"
-                              ></i>
+                              <Icon icon="material-symbols:check-circle-outline" class="text-sm text-primary-400" />
                               <p>{stockUnAvailability}</p>
                             </div>
                           {/if}
@@ -559,9 +563,7 @@ $: {
                       {:else if stockType === "error"}
                         <div class="mt-6 space-y-2 text-sm">
                           <div class="flex items-center space-x-2">
-                            <i
-                              class="fa-regular fa-xmark-circle text-primary-400"
-                            ></i>
+                            <Icon icon="meteor-icons:circle-xmark" class="text-sm text-primary-400" />
                             <p>{stockAvailability}</p>
                           </div>
                         </div>
@@ -572,7 +574,7 @@ $: {
                         on:click={() => addToCart(product, index)}
                         class="bg-primary-400 text-white py-2 px-4 rounded-lg flex items-center space-x-1"
                       >
-                        <i class="fa-solid fa-cart-shopping mr-1"></i>Add To
+                      <Icon icon="ic:round-shopping-cart" class="text-2xl" />Add To
                         Cart
                       </button>
                     </div>
@@ -582,8 +584,7 @@ $: {
               <button
                 on:click={toggleSharePopup}
                 class="w-full text-sm font-semibold text-right text-primary-400"
-                >Share<i class="fa-regular fa-share-from-square ml-1"
-                ></i></button
+                >Share <Icon icon="fluent:share-24-regular" class="text-md inline" /></button
               >
               {#if showSharePopup}
                 <div
@@ -596,7 +597,7 @@ $: {
                       on:click={toggleSharePopup}
                       class="absolute top-3 right-3 text-primary-400"
                     >
-                      <i class="fa-solid fa-xmark text-lg"></i>
+                    <Icon icon="mdi:close" class="text-2xl" />
                     </button>
 
                     <h2 class="text-base font-semibold text-primary-400 mb-3">
@@ -653,7 +654,7 @@ $: {
                           on:click={copyToClipboard}
                           class="text-primary-400 text-xs sm:text-sm md:text-sm font-semibold border p-2 border-primary-400 rounded-lg flex items-center justify-center space-x-1 w-full sm:w-auto"
                         >
-                          <i class="fa-regular fa-copy"></i>
+                        <Icon icon="mingcute:copy-fill" class="text-md" />
                           <span>Copy</span>
                         </button>
                       </div>
@@ -672,7 +673,7 @@ $: {
             <button
               on:click={decreaseQuantity}
               class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
-              ><i class="fa-solid fa-minus"></i></button
+              ><Icon icon="ic:round-minus" class="text-2xl" /></button
             >
             <span class="w-full text-center text-gray-800 rounded-sm p-1"
               >{quantity}</span
@@ -680,14 +681,14 @@ $: {
             <button
               on:click={increaseQuantity}
               class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
-              ><i class="fa-solid fa-plus"></i></button
+              ><Icon icon="ic:round-plus" class="text-2xl" /></button
             >
           </div>
           <div class="w-full mt-3">
             <button
               on:click={() => addToCart(product, index)}
               class="w-full text-white border border-primary-400 rounded-lg py-2 px-2 hover:bg-primary-400 bg-primary-400 hover:text-white"
-              ><i class="fa-solid fa-cart-shopping mr-1"></i>Add To Cart</button
+              ><Icon icon="ic:round-shopping-cart" class="text-2xl inline mr-1" />Add To Cart</button
             >
             <!-- <button class="mt-4 w-full bg-white text-primary-400 border border-primary-400 rounded-lg py-2 px-2 hover:bg-primary-400 hover:text-white">
           <i class="fa-solid fa-code-pull-request mr-1"></i>Request For Bulk
@@ -772,18 +773,84 @@ $: {
   <div
     class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center"
   >
-    <div class="bg-white rounded-lg p-6 w-96">
+    <div class="bg-white rounded-lg p-6 w-96 h-4/5 overflow-y-auto">
       <h2 class="text-xl font-semibold mb-4">Request a Quote</h2>
       <!-- Form -->
-      <form>
+      <form method="POST" action="?/createQuote"use:enhance={()=>{
+        return async({result})=>{
+          if(result.status===200){
+            successMessage = 'Successfully create Quote'
+            errorMessage =''
+           location.reload()
+          }else{
+            successMessage = ''
+            errorMessage = 'Error creating Quote'
+          }
+          // showQuoteModal=false
+          await applyAction(result)
+        }
+      }}>
+        {#if product}
+        <div class="mb-4">
+          <p><strong>Product Name:</strong> {productQuote.productName}</p>
+        </div>
+      {/if}
+      <input type="text" hidden name="productName" value={productQuote.productName}>
+      <input type="text" hidden name="productNumber" value={productQuote.productNumber}>
+      <input type="text" hidden name="status" value="unread">
         <div class="mb-4">
           <label for="name" class="block text-sm font-medium text-gray-700"
-            >Name</label
+            >Units</label
+          >
+          <input
+            type="number"
+            name="units"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1"
+            placeholder="Units Required"
+          />
+        </div>
+        <div class="mb-4">
+          <label for="Firstname" class="block text-sm font-medium text-gray-700"
+            >First Name</label
           >
           <input
             type="text"
+            name="Firstname"
             class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1"
-            placeholder="Your name"
+            placeholder="First Name"
+          />
+        </div>
+        <div class="mb-4">
+          <label for="lastname" class="block text-sm font-medium text-gray-700"
+            >Last Name</label
+          >
+          <input
+            type="text"
+            name="lastname"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1"
+            placeholder="Last Name"
+          />
+        </div>
+        <div class="mb-4">
+          <label for="organisation" class="block text-sm font-medium text-gray-700"
+            >Organisation</label
+          >
+          <input
+            type="text"
+            name="organisation"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1"
+            placeholder="Organisation Name"
+          />
+        </div>
+        <div class="mb-4">
+          <label for="phone" class="block text-sm font-medium text-gray-700"
+            >Phone Number</label
+          >
+          <input
+            type="number"
+            name="phone"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1"
+            placeholder="Phone Number"
           />
         </div>
         <div class="mb-4">
@@ -792,20 +859,32 @@ $: {
           >
           <input
             type="email"
-            id="email"
+            name="email"
             class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1"
             placeholder="Your email"
           />
         </div>
         <div class="mb-4">
-          <label for="message" class="block text-sm font-medium text-gray-700"
+          <label for="futherdetails" class="block text-sm font-medium text-gray-700"
             >Message</label
           >
           <textarea
             class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1"
             placeholder="Your message"
+            name="futherdetails"
           ></textarea>
         </div>
+        {#if successMessage}
+        <div class="mt-4 p-4 bg-green-100 text-green-800 rounded-md">
+            {successMessage}
+        </div>
+    {/if}
+    
+    {#if errorMessage}
+        <div class="mt-4 p-4 bg-red-100 text-red-800 rounded-md">
+            {errorMessage}
+        </div>
+    {/if}
         <div class="flex justify-between">
           <button
             on:click={toggleQuoteModal}

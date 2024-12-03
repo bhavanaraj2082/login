@@ -1167,3 +1167,10 @@ export const uploadFile = async ({ query }) => {
 	  return [];
 	}
   };
+
+  
+  export const CreateProductQuote = async (formattedData) => {
+	const newQuote = new Quotes(formattedData);
+		await newQuote.save();
+		return { status: 200 };
+};
