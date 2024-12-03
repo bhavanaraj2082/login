@@ -2,7 +2,9 @@
 	import { goto } from '$app/navigation';
 	import { authedUser } from '$lib/stores/mainStores.js';
 	import { enhance, applyAction } from '$app/forms';
+	import { toast } from 'svelte-sonner';
 	export let data;
+	const token = data?.token;
 
 	let email = '';
 	let password = '';
@@ -55,6 +57,13 @@
 
 		return async ({ result }) => {
 			console.log(result);
+			
+			if(result.type === "success"){
+				toast.success(result.success.message)
+				}else{
+				toast.error(result.error.message)
+			}
+
 			if (result.type === 'success') {
 				if (result.data.success) responseMsg = result.data;
 			}
@@ -135,6 +144,7 @@
 				>
 					<p class=" text-center text-sm font-medium my-1 text-green-500">{data?.message || ''}</p>
 					<input type="hidden" name="userId" value={$authedUser.userId} />
+					<input type="hidden" name="email" value={token?.email} />
 					<label for="password" class=" text-xs font-medium md:text-sm">New Password</label>
 					<input
 						type="text"

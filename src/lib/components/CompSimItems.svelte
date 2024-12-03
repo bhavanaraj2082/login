@@ -1,123 +1,45 @@
 <script>
-//   export let data;
-//   import Icon from "@iconify/svelte";
-//   let currentIndex = 0; 
-//   const totalSlides = data.records.length; 
-//   let scrollContainer; 
-//   function prevSlide() {
-//     currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-//     scrollContainer.scrollLeft -= scrollContainer.offsetWidth; 
-//   }
-//   function nextSlide() {
-//     currentIndex = (currentIndex + 1) % totalSlides;
-//     scrollContainer.scrollLeft += scrollContainer.offsetWidth; 
-//   }
-//   let showDifference = false;
-//   function getUniqueValues(property) {
-//     const uniqueValues = new Set();
-//     data.records.forEach((product) => {
-//       product.relatedProducts.forEach((relatedProduct) => {
-//         const value = relatedProduct.properties && relatedProduct.properties[property];
-//         if (value && value !== '-') {
-//           uniqueValues.add(value);
-//         }
-//       });
-//     });
-//     return uniqueValues;
-//   }
-//   function isUnique(value, property) {
-//     if (!value || value === '-') return false; 
-//     let count = 0;
-//     data.records.forEach((product) => {
-//       product.relatedProducts.forEach((relatedProduct) => {
-//         const propValue = relatedProduct.properties && relatedProduct.properties[property];
-//         if (propValue === value) {
-//           count++;
-//         }
-//       });
-//     });
-//     return count === 1; 
-//   }
-//   function toggleDifference(event) {
-//     showDifference = event.target.checked;
-//   }
-//   let uniqueValuesMap = {};
-//   const properties = [
-//     'pH',
-//     'Purity',
-//     'Concentration',
-//     'Form',
-//     'Packaging Type',
-//     'Product Line',
-//     'Ligand Type',
-//   ];
-//   properties.forEach((property) => {
-//     uniqueValuesMap[property] = getUniqueValues(property);
-//   });
-import { onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 	import Icon from '@iconify/svelte';
-	export let differentProducts;
-	const productsData = differentProducts;
-	let DifferentProductData = productsData.map((product) => ({
-		productId: product.id,
-		prodDesc: product.prodDesc,
-		productNumber: product.productNumber,
-		productName: product.productName,
-		priceSize: product.priceSize,
-		synonym: product.filteredProductData?.['Synonym(S)'],
-		name: product.expand?.subCategory?.name,
-		image: product.imageSrc,
-		properties: product.properties,
-		Form: product.properties.Form,
-		manufacturer: product.expand.manufacturer.name,
-		stock: product.stockQuantity,
-		category: product.expand.Category.urlName,
-		subCategory: product.expand.subCategory.urlName,
-		subsubCategory: product.expand.subsubCategory.urlName
-	}));
-	function truncateText(text, maxLength = 50) {
-		if (!text || typeof text !== 'string') {
-			return '-';
-		}
-		return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-	}
-	let qualityLevels = {};
-	let formCounts = {};
-	let mpCounts = {};
-	let sustainabilityCounts = {};
-	let descriptionCounts = {};
+	export let compareSimilarity;
+	const productsData = compareSimilarity;
+	let specificKeys = ["material", "Agency", "matrix active group", "technique(s)", "application(s)"];
 	let showDifference = false;
-	function calculateCount() {
-		qualityLevels = {};
-		formCounts = {};
-		mpCounts = {};
-		sustainabilityCounts = {};
-		descriptionCounts = {};
-		DifferentProductData.forEach((product) => {
-			if (product.properties.QualityLevel) {
-				qualityLevels[product.properties.QualityLevel] =
-					(qualityLevels[product.properties.QualityLevel] || 0) + 1;
-			}
-			if (product.properties.Form) {
-				formCounts[product.properties.Form] = (formCounts[product.properties.Form] || 0) + 1;
-			}
-			if (product.properties.Mp) {
-				mpCounts[product.properties.Mp] = (mpCounts[product.properties.Mp] || 0) + 1;
-			}
-			if (product.properties.Sustainability) {
-				sustainabilityCounts[product.properties.Sustainability] =
-					(sustainabilityCounts[product.properties.Sustainability] || 0) + 1;
-			}
-			if (product.prodDesc) {
-				descriptionCounts[product.prodDesc] = (descriptionCounts[product.prodDesc] || 0) + 1;
-			}
-		});
+	function toggleDifference(event) {
+			showDifference = event.target.checked;
 	}
-
-	let currentIndex = 0;
+	function truncateByLength(text, maxLength) {
+			if (text.length > maxLength) {
+					return text.substring(0, maxLength) + "...";
+			}
+			return text;
+	}
+	let CompareSimilarityData = productsData.map((product) => ({
+			productId: product._id,
+			prodDesc: product.prodDesc,
+			productNumber: product.productNumber,
+			productName: product.productName,
+			priceSize: product.priceSize,
+			name: product.subCategory.name,
+			image: product.imageSrc,
+			properties: product.properties,
+			manufacturer: product.manufacturer?.name,
+			stock: product.stockQuantity,
+			category: product.Category?.urlName,
+			subCategory: product.subCategory?.urlName,
+			subsubCategory: product.subsubCategory?.urlName
+	}));
+	function isUnique(value, key) {
+	if (value === '-' || value === undefined) {
+		return false;
+		}
+	const values = CompareSimilarityData.map(product => product.properties[key]).filter(val => val !== '-'); 
+	return values.filter(v => v === value).length === 1;
+}
+let currentIndex = 0;
 	let logosPerSlide = 4;
-	let totalSlides = Math.ceil(DifferentProductData.length / logosPerSlide);
+	let totalSlides = Math.ceil(CompareSimilarityData.length / logosPerSlide);
 
 	function prevSlide() {
 		currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
@@ -138,13 +60,11 @@ import { onMount } from 'svelte';
 			logosPerSlide = 4;
 		}
 
-		totalSlides = Math.ceil(DifferentProductData.length / logosPerSlide);
+		totalSlides = Math.ceil(CompareSimilarityData.length / logosPerSlide);
 		currentIndex = Math.min(currentIndex, totalSlides - 1);
 	}
 
 	onMount(() => {
-		showDifference = false;
-		calculateCount();
 		updateLogosPerSlide();
 		window.addEventListener('resize', updateLogosPerSlide);
 
@@ -229,74 +149,104 @@ import { onMount } from 'svelte';
 			popupQuantity = 1;
 		}
 	}
-
-	function toggleDifference() {
-		showDifference = !showDifference;
-	}
 </script>
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet" />
-<!-- <style>
-  .scroll-container {
-    scroll-behavior: smooth;
-  }
-</style>
-<div class="mx-0 lg:mx-10 mb-10 ">
-  <div class="flex justify-between items-center mb-4">
-    <div class="font-bold text-primary-500 ml-9 lg:ml-0">Compare Similar Items</div>
-    <div class="flex items-center space-x-2 mr-9 lg:mr-0">
-      <div class="font-bold text-primary-500">Show Difference</div>
-      <label class="relative inline-flex items-center cursor-pointer">
-        <input
-          type="checkbox"
-          class="sr-only peer"
-          id="toggleDifference"
-          checked={showDifference}
-          on:change={toggleDifference}
-        />
-        <div class="w-10 h-5 border-2 border-primary-500 rounded-full peer-checked:bg-primary-500 transition-colors duration-300"></div>
-        <div
-          class="dot absolute left-1 top-1 bg-primary-500 w-3 h-3 rounded-full transition-transform duration-300 peer-checked:translate-x-5 peer-checked:bg-white"
-        ></div>
-      </label>
-    </div>
-  </div>
-  <div
-    class="relative mt-1 overflow-x-auto scroll-container"
-    bind:this={scrollContainer}
-  >
-    <div class="flex space-x-4">
-      {#each data.records as product}
-        {#each product.relatedProducts as relatedProduct}
-          <div class="rounded-lg shadow-sm bg-white flex-shrink-0 w-[283px]">
-            <ul>
-              {#each properties as property}
-                <li
-                  class={`flex justify-between items-center mb-2 mt-2 px-2 rounded ${
-                    showDifference &&
-                    relatedProduct.properties &&
-                    relatedProduct.properties[property] &&
-                    relatedProduct.properties[property] !== '-' &&
-                    isUnique(relatedProduct.properties[property], property)
-                      ? 'bg-primary-200'
-                      : 'bg-white'
-                  }`}
-                >
-                  <span class="font-semibold text-sm text-black">{property}:</span>
-                  <span class="text-sm text-black">
-                    {relatedProduct.properties && relatedProduct.properties[property]
-                      ? relatedProduct.properties[property]
-                      : "-"}
-                  </span>
-                </li>
-              {/each}
-            </ul>
-          </div>
-        {/each}
-      {/each}
-    </div>
-  </div>
-  <div class="flex justify-between mb-2 lg:hidden mx-10">
+<div class="max-w-7xl mx-auto my-10">
+	<div class="flex justify-between items-center mb-4 mx-9">
+			<div class="font-bold text-primary-500">Compare Similar Items</div>
+			<div class="flex items-center space-x-2">
+					<div class="font-bold text-primary-500">Show Difference</div>
+					<label class="relative inline-flex items-center cursor-pointer">
+							<input
+									type="checkbox"
+									class="sr-only peer"
+									id="toggleDifference"
+									checked={showDifference}
+									on:change={toggleDifference}
+							/>
+							<div class="w-10 h-5 border-2 border-primary-500 rounded-full peer-checked:bg-primary-500 transition-colors duration-300"></div>
+							<div
+									class="dot absolute left-1 top-1 bg-primary-500 w-3 h-3 rounded-full transition-transform duration-300 peer-checked:translate-x-5 peer-checked:bg-white"
+							></div>
+					</label>
+			</div>
+	</div>
+	<div class="relative mt-1 mx-8">
+			<div class="flex items-center">
+					<div class="overflow-hidden flex-1">
+							<div class="flex transition-transform duration-300"
+							style={`transform: translateX(-${currentIndex * 100}%)`}
+							>
+									{#each CompareSimilarityData as product}
+											<div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-1">
+													<div class="flex flex-col w-full bg-white shadow-sm border rounded-lg overflow-hidden">
+														<div class="flex items-center p-3">
+															<img src={product.image} alt="Img" class="w-20 h-20 object-contain rounded-sm" />
+															<div class="ml-2 text-left flex-1">
+																<h3 class="text-gray-600 text-xs font-semibold">
+																	{product.manufacturer || '--'}
+																</h3>
+																<p class="font-bold text-sm text-primary-500">
+																	<a
+																		href="/products/{product.category}/{product.subCategory}/{product.productNumber}"
+																		>{product.productNumber || '--'}</a
+																	>
+																</p>
+																<p class="font-medium text-sm h-10 overflow-hidden">
+																	{product.prodDesc ? product.prodDesc.slice(0, 35) + '...' : '--'}
+																</p>
+															</div>
+														</div>
+														<div class="flex justify-center">
+															<button
+																on:click={() =>
+																	openModal({
+																		image: product.image,
+																		brand: product.manufacturer,
+																		partNumber: product.productNumber,
+																		name: product.productName,
+																		priceSize: product.priceSize,
+																		description: product.prodDesc,
+																		id: product.productId,
+																		stock: product.stock,
+																		category: product.category,
+																		subCategory: product.subCategory,
+																		subsubCategory: product.subsubCategory
+																	})}
+																class="w-11/12 max-w-xs text-primary-500 py-2 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition p-2 mb-4"
+															>
+																View Price & Availability
+															</button>
+														</div>
+															<div class="px-3 mb-3">
+																	<h3 class="text-gray-600 text-xs font-semibold">
+																			{#each specificKeys as key}
+																					<div class="grid grid-cols-2 gap-4 mb-2 mt-2 pb-2 {showDifference && isUnique(product.properties[key], key) ? 'bg-primary-300' : 'bg-white'}">
+																							<span class="font-bold text-left">{key}:</span>
+																							<span class="text-gray-500 text-right">
+																									{#if product.properties && product.properties[key]}
+																											{#if typeof product.properties[key] === 'object'}
+																													{JSON.stringify(product.properties[key])}
+																											{:else}
+																													{truncateByLength(product.properties[key], 10)}
+																											{/if}
+																									{:else}
+																											-
+																									{/if}
+																							</span>
+																					</div>
+																					<hr class="border-t-2 border-gray-300" />
+																			{/each}
+																	</h3>
+															</div>
+													</div>
+											</div>
+									{/each}
+							</div>
+					</div>
+			</div>
+	</div>
+	
+	<div class="flex justify-between mb-2 lg:hidden mx-10">
     <button on:click={prevSlide} class="text-primary-500">
       <Icon class="text-3xl" icon="ion:chevron-back" />
     </button>
@@ -304,148 +254,7 @@ import { onMount } from 'svelte';
       <Icon class="text-4xl" icon="ion:chevron-forward" />
     </button>
   </div>
-</div> -->
-	
-<div class="mx-0 lg:mx-16 mb-10">
-	<div class="flex justify-between items-center mb-4">
-		<div class="font-bold text-primary-500 ml-9 lg:ml-0">Compare Similar Items</div>
-		<div class="flex items-center space-x-2 mr-9 lg:mr-0">
-			<div class="font-bold text-primary-500">Show Difference</div>
-			<label class="relative inline-flex items-center cursor-pointer">
-				<input
-					type="checkbox"
-					class="sr-only peer"
-					id="toggleDifference"
-					checked={showDifference}
-					on:change={toggleDifference}
-				/>
-				<div
-					class="w-10 h-5 border-2 border-primary-500 rounded-full peer-checked:bg-primary-500 transition-colors duration-300"
-				></div>
-				<div
-					class="dot absolute left-1 top-1 bg-primary-500 w-3 h-3 rounded-full transition-transform duration-300 peer-checked:translate-x-5 peer-checked:bg-white"
-				></div>
-			</label>
-		</div>
-	</div>
-
-	<div class="relative mt-1">
-		<div class="flex items-center">
-			<button on:click={prevSlide} class="lg:hidden text-primary-500">
-				<Icon class="text-3xl" icon="ion:chevron-back" />
-			</button>
-
-			<div class="overflow-hidden flex-1">
-				<div
-					class="flex transition-transform duration-300"
-					style={`transform: translateX(-${currentIndex * 100}%)`}
-				>
-					{#each DifferentProductData as product}
-						<div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-1">
-							<div class="flex flex-col w-full bg-white rounded-lg overflow-hidden">
-								<div class="flex items-center p-3">
-									<img src={product.image} alt="Img" class="w-20 h-20 object-contain rounded-sm" />
-									<div class="ml-2 text-left flex-1">
-										<h3 class="text-gray-600 text-xs font-semibold">
-											{product.manufacturer || '--'}
-										</h3>
-										<p class="font-bold text-sm text-primary-500">
-											<a
-												href="/products/{product.category}/{product.subCategory}/{product.productNumber}"
-												>{product.productNumber || '--'}</a
-											>
-										</p>
-										<p class="font-medium text-sm h-10 overflow-hidden">
-											{product.synonym ? product.synonym.slice(0, 35) + '...' : '--'}
-										</p>
-									</div>
-								</div>
-								<div class="flex justify-center">
-									<button
-										on:click={() =>
-											openModal({
-												image: product.image,
-												brand: product.manufacturer,
-												partNumber: product.productNumber,
-												name: product.productName,
-												priceSize: product.priceSize,
-												description: product.prodDesc,
-												id: product.productId,
-												stock: product.stock,
-												category: product.category,
-												subCategory: product.subCategory,
-												subsubCategory: product.subsubCategory
-											})}
-										class="w-11/12 max-w-xs text-primary-500 py-2 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition p-2 mb-4"
-									>
-										View Price & Availability
-									</button>
-								</div>
-							</div>
-							<div
-								class={`flex justify-between items-center w-full mt-5 ${showDifference && qualityLevels[product.properties.QualityLevel] === 1 ? 'bg-primary-200' : 'bg-white'}`}
-							>
-								<span class="font-semibold text-xs ml-3 mb-1">Quality Level:</span>
-								<p class="font-normal text-xs mr-3 mb-1 text-black">
-									{product.properties.QualityLevel || '-'}
-								</p>
-							</div>
-							<hr class="border-t-2 w-full" />
-							<div
-								class={`flex justify-between items-center w-full mt-5 ${showDifference && formCounts[product.properties.Form] === 1 ? 'bg-primary-200' : 'bg-white'}`}
-							>
-								<span class="font-semibold text-xs ml-3 mb-1">Form:</span>
-								<p class="font-normal text-xs mr-3 mb-1 text-black">
-									{truncateText(product.properties.Form, 10) || '-'}
-								</p>
-							</div>
-							<hr class="border-t-2 w-full" />
-							<div
-								class={`flex justify-between items-center w-full mt-5 ${showDifference && mpCounts[product.properties.Mp] === 1 ? 'bg-primary-200' : 'bg-white'}`}
-							>
-								<span class="font-semibold text-xs ml-3 mb-1">Storage temp:</span>
-								<p class="font-normal text-xs mr-3 mb-1 text-black">
-									{truncateText(product.properties.Mp, 10) || '-'}
-								</p>
-							</div>
-							<hr class="border-t-2 w-full" />
-							<div
-								class={`flex justify-between items-center w-full mt-5 ${showDifference && sustainabilityCounts[product.properties.Sustainability] === 1 ? 'bg-primary-200' : 'bg-white'}`}
-							>
-								<span class="font-semibold text-xs ml-3 mb-1">Application(s):</span>
-								<p class="font-normal text-xs mr-3 mb-1 text-black">
-									{truncateText(product.properties.Sustainability, 10) || '-'}
-								</p>
-							</div>
-							<hr class="border-t-2 w-full" />
-							<div
-								class={`flex justify-between items-center w-full mt-5 ${showDifference && descriptionCounts[product.prodDesc] === 1 ? 'bg-primary-200' : 'bg-white'}`}
-							>
-								<span class="font-semibold text-xs ml-3 mb-1">Description:</span>
-								<p class="font-normal text-xs mr-3 mb-1 text-black">
-									{truncateText(product.prodDesc, 10) || '-'}
-								</p>
-							</div>
-							<hr class="border-t-2 w-full mb-10" />
-						</div>
-					{/each}
-				</div>
-			</div>
-			<button on:click={nextSlide} class="lg:hidden text-primary-500">
-				<Icon class="text-4xl" icon="ion:chevron-forward" />
-			</button>
-		</div>
-		<div class="flex justify-center mt-4 relative lg:hidden">
-			{#each Array(totalSlides).fill(0) as _, slideIndex}
-				<button
-					on:click={() => (currentIndex = slideIndex)}
-					class={`w-1.5 h-1.5 rounded-full mx-1 bg-gray-400 hover:bg-gray-600 ${currentIndex === slideIndex ? 'bg-primary-400' : ''}`}
-				></button>
-			{/each}
-		</div>
-	</div>
 </div>
-
 {#if showModal}
 	<div class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
 		<div class="bg-white p-6 rounded-lg w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-5/12 relative">

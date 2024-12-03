@@ -4,7 +4,7 @@
 	// console.log("=======>subcat",subcategories.length)
 </script>
 
-<div class="w-full mb-8 px-6 lg:px-8">
+<div class="w-full mb-8 px-6 lg:px-8 md:w-11/12 mx-auto max-w-7xl">
 	<div class="pl-4">
 		<p class="text-primary-400 font-semibold text-xl">
 			{subcategories[0].category.name}
@@ -14,17 +14,20 @@
 			top-tier quality and reliability.
 		</p>
 	</div>
-	<div
-		class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mx-8 sm:mx-0"
-	>
+	<div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mx-8 sm:mx-0">
 		{#each subcategories as subcategory}
 			<div class="bg-white shadow rounded-md overflow-hidden">
 				<img src="/image/category.jpeg" alt="img" class="w-full h-60 object-center" />
 				<div class="p-4">
-					<a href="/products/{subcategory.category.urlName}/{subcategory.urlName}">
+					<a href="/products/{subcategory.category.urlName}/{subcategory.urlName}" class="flex justify-between items-center">
 						<h3 class="text-lg font-semibold text-heading hover:underline">
 							{subcategory.name}
 						</h3>
+						{#if subcategory.productCount}
+							<span class="text-xs text-gray-400">
+								({subcategory.productCount})
+							</span>
+						{/if}
 					</a>
 				</div>
 			</div>

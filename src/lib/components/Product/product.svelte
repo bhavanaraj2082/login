@@ -1,7 +1,7 @@
 <script>
 </script>
   
-<div class="max-w-6xl flex flex-col  md:flex-row justify-center gap-10 items-center mx-auto p-4 mb-10">
+<div class="flex flex-col  md:flex-row justify-center gap-10 items-center p-4 mb-10 mx-auto md:w-11/12 max-w-7xl">
     
     <img src="/image/category.jpeg" alt="img" class="w-full h-full md:h-44 object-cover rounded-lg" />
     

@@ -4,8 +4,12 @@
     import CompSimItems from '$lib/components/CompSimItems.svelte'
 
     export let data;
-    // console.log("Data Records:", data);    
+    // console.log("Data relatedProducts===>:", data);    
 </script>
 <ProductDetails data = {data.productData}/>
-<RelatedProductss relatedProducts={data.relatedProducts}/>  
-<!-- <CompSimItems {data}/> -->
+ {#if data.relatedProducts.length !== 0}
+ <RelatedProductss relatedProducts={data.relatedProducts}/>  
+{/if} 
+{#if data.relatedProducts.length !== 0}
+<CompSimItems compareSimilarity={data.compareSimilarity}/>
+{/if} 

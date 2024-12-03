@@ -6,20 +6,13 @@
   import { cartState } from '$lib/stores/cartStores.js';
 
   let uploadedRows=[];
-  
-  
-  
-   
-  
-  
-  
   import * as XLSX from "xlsx";
   
   export let data;
   let email = '';
   let products = data?.data || [];  
   // console.log("**************************");
-  console.log("i am quick",products.length);
+  // console.log("i am quick",products.length);
   
   let stockStatus = '';
   
@@ -338,7 +331,7 @@
   
   
   
-  <form action="?/uploadFile" method="POST" enctype="multipart/form-data">
+  <form action="?/uploadFile" method="POST" enctype="multipart/form-data" >
       <div class="w-full lg:px-5">
         <p class="text-2s md:text-xs font-medium py-1.5">
           Type or paste product SKU (product number and pack size), quantity, promo code, and reference number separated by commas*.
