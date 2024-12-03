@@ -6,37 +6,29 @@ const subCategorySchema = new Schema(
   {
     name: {
       type: String,
-      required: false,  
+      required: false,
       trim: true,
     },
     urlName: {
       type: String,
-      required: false,  
+      required: false,
       trim: true,
     },
-    category: {
-      type: Schema.Types.ObjectId,  
-      ref: "Category",              
-      required: false,              
+    category:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Category"
     },
-    specificationHeadings: {
-      type: Schema.Types.Mixed,  
-      required: false,           
-    },
-    componentsCount: {
-      type: Number,
-      required: false,  
-      min: 0,           
-    },
-    subSubCategories: {
-      type: [Schema.Types.ObjectId],  
-      ref: "SubSubCategory",          
-      required: false,
-    },
-    filterCount: {
-      type: Schema.Types.Mixed,  
-      required: false,           
-    },
+    manufacturerIds: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Manufacturer', // Reference to the Seller model
+      default:[]
+    }],
+    subSubCategoryIds: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'SubSubCategory', // Reference to the Seller model
+      default:[]
+    }]
+
   },
   {
     timestamps: true,       
@@ -47,7 +39,6 @@ const subCategorySchema = new Schema(
 subCategorySchema.index({ name: 1 });
 subCategorySchema.index({ urlName: 1 });
 subCategorySchema.index({ category: 1 });
-subCategorySchema.index({ specificationHeadings: 1 });
 
 const SubCategory = mongoose.models.SubCategory || mongoose.model("SubCategory", subCategorySchema);
 
