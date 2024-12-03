@@ -65,12 +65,12 @@
   <div class="w-full max-w-7xl mx-4 bg-white shadow rounded relative overflow-hidden">
     <button
       on:click={closeBanner}
-      class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition duration-100"
+      class="absolute top-2 right-2 text-gray-500 hover:text-primary-600 p-2 sm:pl-2 sm:pb-2 rounded-full hover:bg-gray-100 transition duration-100"
       aria-label="Close cookie banner">
       <Icon icon="ic:baseline-close" width="24" height="24" />
     </button>
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between px-4 py-4 gap-4">
-      <div class="flex-1 text-xs text-gray-800">
+      <div class="px-4 sm:px-4 sm:pr-5 flex-1 text-xs text-gray-800">
         <p class="sm:text-sm">
           Chemikart uses cookies and similar technologies to collect and process personal data. This may involve sharing information with third parties.
           <br />
@@ -92,16 +92,16 @@
           >Cookie Notice</a>.
         </p>
       </div>
-      <div class="flex sm:flex-col mr-14 gap-4 w-full md:w-auto">
+      <div class="flex sm:flex-col mr-9 gap-4 w-full md:w-auto">
         <button
           on:click={() => handleConsent(true)}
-          class="flex-1 flex items-center justify-center border border-primary-500 text-primary-500 px-3 py-1 text-sm rounded font-medium hover:bg-primary-500 hover:text-white transition duration-100">
+          class="flex-1 flex items-center justify-center bg-primary-500 text-white hover:bg-primary-700 px-3 py-1 text-sm rounded font-medium transition duration-100">
           Allow
           <Icon icon="fluent:cookies-48-regular" width="16" height="16" class="ml-1" />
         </button>
         <button
           on:click={() => handleConsent(false)}
-          class="flex-1 flex items-center justify-center bg-primary-500 text-white px-3 py-1 text-sm rounded font-medium hover:bg-primary-700 transition duration-100">
+          class="flex-1 flex items-center justify-center border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white px-3 py-1 text-sm rounded font-medium transition duration-100">
           Reject
         </button>
       </div>

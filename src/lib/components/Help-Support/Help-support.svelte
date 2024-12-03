@@ -76,37 +76,37 @@
       <div class="flex flex-col text-sm bg-primary-50 rounded-lg h-full">
         <button
           on:click={() => handleClick("invoice")}
-          class=" px-4 py-2 rounded   m-2 hover:font-semibold"
+          class=" px-4 py-2 rounded   m-2 hover:font-semibold shadow"
         >
           Invoice
         </button>
         <button
           on:click={() => handleClick("quotes")}
-          class=" px-4 py-2 rounded m-2"
+          class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
         >
           Quotes
         </button>
         <button
           on:click={() => handleClick("order-status")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Order Status
         </button>
         <button
           on:click={() => handleClick("order-configuration")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Order Configuration
         </button>
         <button
           on:click={() => handleClick("return-exchange-items")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Return & Exchange Items
         </button>
         <button
           on:click={() => handleClick("other-issues")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Other Issues
         </button>
@@ -128,31 +128,31 @@
       <div class="flex flex-col text-sm bg-primary-50 rounded-lg h-full">
         <button
           on:click={() => handleClick("update-billing")}
-          class=" px-4 py-2 rounded  m-2 hover:font-semibold"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Update Billing
         </button>
         <button
           on:click={() => handleClick("shipping-info")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Shipping info
         </button>
         <button
           on:click={() => handleClick("password-reset")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Password reset
         </button>
         <button
           on:click={() => handleClick("update-email")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Update Email
         </button>
         <button
           on:click={() => handleClick("Other-account-issues")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Other Account issues
         </button>
@@ -174,25 +174,25 @@
       <div class="flex flex-col text-sm bg-primary-50 rounded-lg h-full">
         <button
           on:click={() => handleClick("pricing-availability")}
-          class=" px-4 py-2 rounded  m-2 hover:font-semibold"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Pricing & Availability
         </button>
         <button
           on:click={() => handleClick("product-documentation")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Product Documentation
         </button>
         <button
           on:click={() => handleClick("product-technical-issues")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Product technical Issues
         </button>
         <button
           on:click={() => handleClick("report-product-issues")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Report Product Issues
         </button>
@@ -214,13 +214,13 @@
       <div class="flex flex-col text-sm bg-primary-50 rounded-lg h-full">
         <button
           on:click={() => handleClick("technical-problem")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Technical Problem
         </button>
         <button
           on:click={() => handleClick("other-website-issues")}
-          class=" px-4 py-2 rounded  m-2"
+          class=" px-4 py-2 rounded  m-2 hover:font-semibold shadow"
         >
           Other Website Issues
         </button>

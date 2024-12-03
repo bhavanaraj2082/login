@@ -190,7 +190,7 @@
 			<h2 class="pt-4 ml-2 text-xs xs:text-md sm:text-lg  mb-4 text-primary-400  font-bold">CHEMIKART</h2>
             <div class="flex sm:gap-20 gap-2">
                 <h2 class="pt-4 pl-2 text-xs xs:text-md sm:text-lg  mb-4 text-primary-400  font-bold">Privacy Preference Center</h2>
-                <button class="relative text-lg sm:text-xl md:text-2xl  text-primary-400 cursor-pointer transition duration-200 " on:click={closePopup}><Icon icon="gravity-ui:xmark" width="1.2em" height="1.2em"/></button>
+                <button class="relative text-lg sm:text-xl md:text-2xl  text-primary-400 hover:text-primary-500 cursor-pointer transition duration-200 " on:click={closePopup}><Icon icon="gravity-ui:xmark" width="1.2em" height="1.2em"/></button>
             </div>
 		</header>
 		<section class="md:h-full overflow-y-scroll hide">
