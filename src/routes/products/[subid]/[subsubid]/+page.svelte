@@ -27,9 +27,8 @@
 
 
 </script>
-
-<section class="bg-gray-50 py-10">
-	<div class="px-4 max-w-7xl mx-auto">
+<section class="bg-gray-50 py-10 ">
+	<div class="px-4 max-w-7xl md:w-11/12 mx-auto">
 		<!-- <Subsubcategory data={data.productdata} count={data.count} />-->
 		<!-- <Filter {data} on:pageChange={handlePageChange} />  -->
 		 <ProductFilter on:onPageChange={(e)=>handlePage(e)} {manufacturers} {products} />

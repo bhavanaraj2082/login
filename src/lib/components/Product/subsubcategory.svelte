@@ -26,14 +26,12 @@
 
 	const content = findContent(categoryName, subCategoryName);
 </script>
-
-<div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-10 my-10 px-3">
-	<img
-		src={`/subcategory/${categoryName}/${subCategoryName || 'img'}.webp`}
-		alt="img"
-		class="w-full h-52 md:w-80 md:h-72 object-cover rounded-lg"
-	/>
-
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-10 my-10 px-3 md:w-11/12">
+  <img
+    src={`/subcategory/${categoryName}/${subCategoryName || "img"}.webp`}
+    alt="img"
+    class="w-full h-52 md:w-80 md:h-72 object-cover rounded-lg"
+  />
 	<div class="flex flex-col">
 		<h1 class="text-2xl font-semibold mb-2 text-primary-400">
 			{subCategoryName}
