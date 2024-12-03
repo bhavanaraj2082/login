@@ -576,7 +576,7 @@ export const quick = async () => {
 			JSON.stringify(await Product.find({}).sort({ createdAt: -1 }).limit(2000))
 		);
 
-		console.log('Fetched products count:', products.length);
+		// console.log('Fetched products count:', products.length);
 
 		if (!products || products.length === 0) {
 			console.warn('No products found');
@@ -584,10 +584,10 @@ export const quick = async () => {
 		}
 
 		const stocks = JSON.parse(
-			JSON.stringify(await Stock.find({}).populate('partNumber').limit(2000))
+			JSON.stringify(await Stock.find({}).populate('productNumber').limit(2000))
 		);
 
-		console.log('Fetched stocks count:', stocks.length);
+		// console.log('Fetched stocks count:', stocks.length);
 
 		if (!stocks || stocks.length === 0) {
 			console.warn('No stock data found');
