@@ -31,7 +31,7 @@
 	}
 
 const generatePDFDocument = () => {
-    const total = $cartState.reduce((sum, item) => sum + parseFloat(item.priceSize.price.replace(/[^\d.-]/g, '')) * item.quantity, 0);
+    const total = $cartState.reduce((sum, item) => sum + parseFloat(item.priceSize.price) * item.quantity, 0);
     const doc = new jsPDF();
 
     doc.setFontSize(18);
@@ -42,9 +42,9 @@ const generatePDFDocument = () => {
     const tableColumns = ['Products', 'Price', 'Quantity', 'Total'];
     const tableData = $cartState.map(item => [
         `${item.partNumber}\n${item.name}\n${item.priceSize.size}`,
-        `${parseFloat(item.priceSize.price.replace(/[^\d.-]/g, ''))}`, // Use the ₹ symbol here
+        `${parseFloat(item.priceSize.price)}`, // Use the ₹ symbol here
         `${item.quantity}`,
-        `${parseFloat(item.priceSize.price.replace(/[^\d.-]/g, '')) * item.quantity}`, // Use the ₹ symbol for total as well
+        `${parseFloat(item.priceSize.price) * item.quantity}`, // Use the ₹ symbol for total as well
     ]);
 
     tableData.push([
@@ -118,7 +118,7 @@ const printPDF = () => {
     }
 
 	const calculateTotals = () => {
-		subtotal = cartItems.reduce((sum, item) => sum + parseFloat(item.priceSize.price.replace(/[^\d.-]/g, '')) * parseInt(item.quantity), 0);
+		subtotal = cartItems.reduce((sum, item) => sum + parseFloat(item.priceSize.price) * parseInt(item.quantity), 0);
 		    tax = subtotal * 0;
 		    total = subtotal + tax;
 
@@ -126,7 +126,7 @@ const printPDF = () => {
 		let products = []
 		let orderdetails = cartItems.map(item=>{
             const {_id,name,partNumber,quantity,priceSize,stock} = item
-			const parsedPrice = parseFloat(priceSize.price.replace(/[^\d.-]/g, ''))
+			const parsedPrice = parseFloat(priceSize.price)
 			const parsedQty = parseInt(quantity)
 			const parsedStock = parseInt(stock)
 
@@ -289,7 +289,7 @@ const printPDF = () => {
 						<h3 class=" lg:hidden mt-3 text-sm">Total</h3>
 						 <div class=" w-full lg:w-2/12 flex justify-between items-center">
 							<p class="text-md font-semibold">
-								₹{(parseFloat(item.priceSize.price.replace(/[^\d.-]/g, '')) * item.quantity).toFixed(2)}
+								₹{(parseFloat(item.priceSize.price) * item.quantity).toFixed(2)}
 							</p>
 							<button type="button" on:click={() => removeItem(item.priceSize.size,item.id)} class=" text-lg text-primary-600">
 								<Icon icon="fluent-mdl2:delete" class=" text-2xl"/>
