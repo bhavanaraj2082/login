@@ -15,20 +15,17 @@
             </p>
         </div>
         <div
-            class="flex items-center gap-2"
-        >
+            class="flex items-center gap-2">
             <a
                 href="/products"
-                class="flex text-sm justify-center items-center font-medium rounded-md bg-primary-400 text-gray-100 px-10 hover:bg-primary-500 p-2"
-            >
+                class="flex text-sm justify-center items-center font-medium rounded-md bg-primary-400 text-gray-100 px-10 hover:bg-primary-500 p-2">
                 View All
                 <Icon icon="zondicons:cheveron-right" class=" text-lg"/>
             </a>
         </div>
     </div>
     <div
-        class="my-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-center"
-    >
+        class="my-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-center">
         {#each PopularProducts as {product}}
             <ProductCard {product} />
         {/each}
