@@ -33,7 +33,7 @@
             </button>
             {#if activeIndex === index}
               <div
-                class="absolute bottom-2 left-1/2 transform -translate-x-1/2 h-1 bg-primary-500 rounded w-4/5 sm:w-24 md:w-30"
+                class="absolute bottom-2 left-1/2 transform -translate-x-1/2 h-1 bg-primary-400 rounded w-4/5 sm:w-24 md:w-30"
                 style="transition: width 0.3s ease, transform 0.3s ease;"/>
             {/if}
           </div>

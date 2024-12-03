@@ -1,63 +1,45 @@
-import { checkavailabilityproduct,favorite } from "$lib/server/mongoActions.js";
-import { loadProductsInfo,isProductFavorite } from "$lib/server/mongoLoads.js";
+import { DifferentProds } from "$lib/server/mongoLoads.js";
+import { RelatedProductData } from "$lib/server/mongoLoads.js";
+import { favorite } from "$lib/server/mongoActions.js";
 
-export async function load({ params, cookies }) {
- const productNumber= params.product;
+export async function load({ params }) {
   try {
-    const productData = await loadProductsInfo(params.product);
-    if (productData.type === "error") {
+      const results = await Promise.allSettled([
+          DifferentProds(params.product),
+          RelatedProductData(params.product)
+      ]);
+
+  const [productData, relatedProducts] = results.map((result) =>
+      result.status === 'fulfilled' ? result.value : []
+  );
+
+  if (productData.type === 'error') {
       return {
-        error: productData.message,
+          error: productData.message
       };
-    }
-    // const relatedProducts = await RelatedProduct.find({ productId: params.product });
-    // const differentProducts = await DifferentProduct.find({ productId: params.product });
-    // const isFavorite = await isProductFavorite(productNumber, cookies);
-// return data;
-return productData
-  // isFavorite,
-  // relatedProducts,
-  // differentProducts,
-;} catch (error) {
-    console.error("Error loading product data:", error);
-    return {
-      error: "Failed to load product data.",
-    };
   }
+  return { productData ,relatedProducts};
+} catch (error) {
+  console.error('Error loading product data:', error);
+  return {
+      error: 'Failed to load product data.'
+  };
+}
 }
 
-
 export const actions = {
-  checkavailabilityproduct: async ({ request }) => {
-    try {
-      const formData = Object.fromEntries(await request.formData());
-      // console.log("Formatted Data:", formData);
-      const record = await checkavailabilityproduct(formData);
-      return {
-        record: record,
-      };
-    } catch (error) {
-      console.error("Error in action:", error);
-      return {
-        type: "error",
-        message: "An error occurred while processing the request.",
-      };
-    }
-  },
-
-  favorite: async ({ request, cookies }) => {
+  favorite: async ({ request }) => {
     const favdata = Object.fromEntries(await request.formData());
     // console.log("Form Data Received:", favdata);
     const {productDesc, id, imgUrl,productName,productNumber,priceSize,quantity,stock,size,price,} = favdata;
-    const dataforfavorite = {productDesc,id,imgUrl,productName,productNumber,priceSize,quantity,stock,size,price,};
     try {
-      const result = await favorite(favdata,cookies);
+      const result = await favorite(favdata);
       return result; 
     } catch (error) {
-      console.error("Error adding to favorites:", error.message);
+      console.error("Error adding to favourites:", error.message);
       return {
         type: 'error',
-        message:'An error occurred while updating favorites.',
+        message:'Please login to add to favourites!.',
       };
     }
   },

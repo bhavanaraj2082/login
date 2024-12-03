@@ -1,7 +1,7 @@
 <script>
   import { enhance } from "$app/forms";
   import Icon from "@iconify/svelte";
-  let technical_issue="";
+  let technical_issue = "";
   let issue = "";
   let assistance = "";
   let attachments = [];
@@ -37,7 +37,7 @@
     "Loggin in to my account",
     "Web profile change",
     "Website slower than expected",
-    "Other"
+    "Other",
   ];
 
   const toggleDropdown = () => {
@@ -109,13 +109,12 @@
     action="?/contact"
     use:enhance={() => {
       return async ({ result }) => {
-       
         // console.log(result);
 
         if (result) {
           // console.log(`${result.data.message}`);
           // Clear the form
-          technical_issue="";
+          technical_issue = "";
           issue = "";
           assistance = "";
           firstName = "";
@@ -131,50 +130,47 @@
           console.error(`${result.data.error}`, result.data.details);
           errormessage =
             "There was an error submitting your information. Please try again.";
-          alert(
-            "There was an error submitting your information. Please try again."
-          );
+
         }
+        setTimeout(() => {
+          errormessage = "";
+          message = "";
+        }, 2000);
       };
     }}
   >
     <div class=" w-full pb-6 h-full">
-      {#if message != ""}
-        <h2
-          class="text-center bg-green-50 text-green-500 font-semibold text-base w-full"
-        >
-          {message}
-        </h2>
-        {:else if errormessage!= ""}
-        <h2
-        class="text-center bg-red-50 text-red-500 font-semibold text-base w-full"
-      >
-        {errormessage}
-      </h2>
-      {/if}
       <h2 class="text-primary-400 font-semibold text-base pb-6">
         Technical Problems
       </h2>
       <input hidden name="issueName" value="Technical Problems" />
-      <div class=" relative">
-        <label class="block text-sm pb-2">Where are you experiencing difficulties on our website?</label>
-        <div class="border rounded-md cursor-pointer" on:click={toggleDropdown}>
+      <div class="relative">
+        <label class="block text-sm pb-2"
+          >Where are you experiencing difficulties on our website?</label
+        >
+        <div class="border rounded-md cursor-pointer" >
           <input
             type="text"
             name="technical_issue"
             placeholder="Select an option"
-            class="w-full border-none pt-2 text-sm focus:outline-none"
+            class="w-full pt-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"
             readonly
-            
             bind:value={selectedOption}
+            on:click={toggleDropdown}
           />
           {#if isDropdownOpen}
-            <div class="absolute w-full bg-white border rounded-md max-h-40 overflow-y-auto z-10">
+            <div
+              class="absolute w-full bg-white border rounded-md max-h-40 overflow-y-auto z-10"
+            >
               <ul>
                 {#each options as option}
-                  <li class="p-2 text-sm hover:bg-gray-200" on:click={() => selectOption(option)}>
+                <li>
+                  <button class="p-2 text-sm hover:bg-gray-200 w-full text-start" on:click={() => selectOption(option)}>
+                    
                     {option}
-                  </li>
+                    
+                  </button>
+                </li>
                 {/each}
               </ul>
             </div>
@@ -189,7 +185,7 @@
           rows="5"
           name="assistance"
           bind:value={assistance}
-          class="w-full border p-2 text-sm"
+          class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm"
           required
         ></textarea>
       </div>
@@ -202,7 +198,7 @@
         <button
           type="button "
           on:click={triggerFileInput}
-          class=" text-primary-400 border border-primary-400 mb-4 px-2 rounded-md lg:ml-8 md:ml-8 hover:text-white hover:bg-primary-400"
+          class=" text-primary-400 border border-primary-400 mb-4 px-2 rounded-md  md:ml-3 hover:text-white hover:bg-primary-400"
         >
           Choose Files
         </button>
@@ -238,7 +234,7 @@
           </div>
         {/each}
       </div>
-      <div class="flex justify-center ">
+      <div class="flex justify-center">
         <p class="text-gray-400 text-sm">
           Attachments are limited to a combined size of 25MB
         </p>
@@ -252,8 +248,7 @@
               name="issue"
               value="Please respond to my question/comment"
               bind:group={issue}
-              class="mr-2"
-              required
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500 mr-2"              required
             />
             Please respond to my question/comment
           </label>
@@ -263,8 +258,7 @@
               name="issue"
               value="need further information please contact me"
               bind:group={issue}
-              class="mr-2"
-              required
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500 mr-2"              required
             />
             If you need further information, please contact me
           </label>
@@ -274,8 +268,7 @@
               name="issue"
               value="Please do not contact me regarding my comment"
               bind:group={issue}
-              class="mr-2"
-              required
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500 mr-2"              required
             />
 
             Please do not contact me regarding my comment
@@ -283,7 +276,7 @@
         </div>
       </div>
     </div>
-    <div class=" w-full pb-6 mx-auto h-full ">
+    <div class=" w-full pb-6 mx-auto h-full">
       <h2 class="text-primary-400 font-semibold text-base pb-6">
         Please provide your contact information
       </h2>
@@ -293,7 +286,7 @@
           name="firstName"
           placeholder="First Name"
           bind:value={firstName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -301,7 +294,7 @@
           name="lastName"
           placeholder="Last Name"
           bind:value={lastName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -309,7 +302,7 @@
           name="email"
           placeholder="Email"
           bind:value={email}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -317,7 +310,7 @@
           name="phoneNumber"
           placeholder="Phone Number"
           bind:value={phoneNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -325,12 +318,12 @@
           name="companyName"
           placeholder="Company/Institution Name"
           bind:value={companyName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
         />
         <select
           name="location"
           bind:value={location}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         >
           <option value="" disabled selected>Location</option>
@@ -343,7 +336,7 @@
           name="accountNumber"
           placeholder="Account Number"
           bind:value={accountNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
       </div>
@@ -356,4 +349,13 @@
       </button>
     </div>
   </form>
+  {#if message != ""}
+    <h2 class="text-center text-green-500 font-semibold text-base w-full">
+      {message}
+    </h2>
+  {:else if errormessage != ""}
+    <h2 class="text-center text-red-500 font-semibold text-base w-full">
+      {errormessage}
+    </h2>
+  {/if}
 </div>

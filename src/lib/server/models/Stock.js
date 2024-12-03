@@ -1,14 +1,6 @@
 import mongoose from 'mongoose';
 const { Schema, Types } = mongoose;
 
-const pricingSchema = new Schema(
-    {
-        break: { type: String, required: true },
-        usd: { type: Number, required: true },
-        offer: { type: String, default: '0' }
-    },
-    { _id: false }
-); // Embedded schema, _id not required
 
 const stockSchema = new Schema(
     {
@@ -21,7 +13,7 @@ const stockSchema = new Schema(
         distributor: { type: Types.ObjectId, ref: 'distributors', required: true },
         distibutorName: { type: String },
         distributorAlias: { type: String },
-        pricing: { type: [pricingSchema], default: [] },
+        pricing: { type: Schema.Types.Mixed, default: [] },
         orderMultiple: { type: Number },
         priceone: { type: Number }
     },
@@ -31,6 +23,5 @@ const stockSchema = new Schema(
     }
 );
 
-delete mongoose.models.Stock
 export const Stock = mongoose.models.Stock || mongoose.model('Stock', stockSchema);
 export default Stock;

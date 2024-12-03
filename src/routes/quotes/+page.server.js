@@ -1,4 +1,4 @@
-// import { Addquotes } from '$lib/server/mongoActions.js';
+import { Addquotes } from '$lib/server/mongoActions.js';
 export const actions = {
     qoutes: async ({ request }) => {
         try {

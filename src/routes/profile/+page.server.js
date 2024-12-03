@@ -6,13 +6,13 @@ import {
   editProfileLinkOrganization,
   editProfilePaymentMethod,
   editProfileEmailPreferences,
+  emailVerificationToken
 } from "$lib/server/mongoActions.js";
  
 export const load = async ({cookies}) => {
   try {
-      const user = JSON.parse(cookies.get('token'))
-      //console.log("hhhhhh",email);
-      return await getProfileDetails(user.email)  
+    //authedUser.email is the parameter for getProfileDetails
+     return await getProfileDetails("")  
   } catch (error) {
     console.log('error',error);
       return { 
@@ -22,6 +22,11 @@ export const load = async ({cookies}) => {
 };
 
 export const actions = {
+  verifyEmail:async({request})=>{
+    const body = Object.fromEntries(await request.formData())
+    //console.log("-----",body);
+    return await emailVerificationToken(body,"Email")
+  },
   editContact:async({request})=>{
     try {
       const body = Object.fromEntries(await request.formData())

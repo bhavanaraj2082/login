@@ -16,7 +16,7 @@
 		userData = data.token;
 	}
 	// console.log(userData);
-	$: authedUser.update((user) => ({ ...user, ...userData }));
+	//$: authedUser.update((user) => ({ ...user, ...userData }));
 </script>
 
  <Header {data}/>

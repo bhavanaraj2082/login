@@ -95,8 +95,8 @@
       }, 3000);
   }
 </script>
-<div class="lg:w-11/12 max-w-7xl px-3 mx-auto mb-3">
-  <div class="bg-gray-50 mx-auto w-full py-2 px-3 md:px-8 lg:px-0">
+<div class="lg:w-11/12 max-w-7xl px-3 mx-auto mb-4">
+  <div class="bg-white mx-auto border rounded lg:w-full w-11/12 py-3 px-3 md:px-7 lg:px-7">
       <h1 class="text-2xl font-bold mb-4 mt-5 text-center">Copyright Consent</h1>
       <p class="mb-2 text-sm text-justify">In case you are requesting our consent to use copyrighted material available on our website, please make sure that you have checked our <a href="/terms/site-and-terms" class="text-primary-500">Site Use Terms</a>.</p>
       <p class="mb-2  text-sm text-justify">If you are requesting copyright consent that is not already provided by the “Intellectual Property Rights” section, then please fill out the below form, and send it to us. We will review your request.</p>
@@ -134,7 +134,7 @@
           <!-- Title -->
           <div class="md:w-1/2">
               <label for="title" class="block text-gray-700 font-semibold text-sm py-2">*Title</label>
-              <select id="title" name="title"  class="hover:border-primary-500 focus:border-primary-400  text-sm focus:outline-none focus:ring-0 rounded mb-2 w-full md:w-4/5 p-2" required>
+              <select id="title" name="title"  class="focus:border-primary-500  text-sm focus:outline-none focus:ring-0 rounded mb-2 w-full md:w-4/5 p-2" required>
                   <option value="" disabled selected >Select Title</option>
                   <option value="Mr.">Mr.</option>
                   <option value="Mrs.">Mrs.</option>
@@ -149,22 +149,22 @@
           <div class="mb-4 flex flex-col md:flex-row gap-x-6">
               <div class="mb-3 md:mb-0 md:mr-12 w-full md:w-1/2">
                   <label for="firstname" class="block text-gray-700 font-semibold text-sm my-2">*First Name</label>
-                  <input type="text" placeholder="First Name" name="firstname" bind:value={firstname} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded p-2  text-sm w-full" required />
+                  <input type="text" placeholder="First Name" name="firstname" bind:value={firstname} class="focus:border-primary-500 focus:outline-none focus:ring-0 rounded p-2  text-sm w-full" required />
               </div>
               <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2">
                   <label for="lastname" class="block text-gray-700 font-semibold text-sm my-2">*Last Name</label>
-                  <input type="text" placeholder="LastName" name="lastname" bind:value={lastname} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded p-2 text-sm w-full" required />
+                  <input type="text" placeholder="LastName" name="lastname" bind:value={lastname} class="focus:border-primary-500 focus:outline-none focus:ring-0 rounded p-2 text-sm w-full" required />
               </div>
           </div>
           <!-- Company and address fields -->
           <div class="mb-4 flex flex-col md:flex-row gap-x-6">
               <div class="mb-2 md:mb-0 md:mr-12 w-full md:w-1/2 my-2">
                   <label for="company" class="block text-gray-700 font-semibold text-sm my-2">*Company Name</label>
-                  <input type="text" placeholder="Company Name" name="company" bind:value={company} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded p-2 text-sm w-full" />
+                  <input type="text" placeholder="Company Name" name="company" bind:value={company} class="focus:border-primary-500 focus:outline-none focus:ring-0 rounded p-2 text-sm w-full" />
               </div>
               <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2 my-2 ">
                   <label for="street" class="block text-gray-700 font-semibold text-sm my-2">*Street or Postbox</label>
-                  <input type="text" placeholder="Street" id="street" name="street" bind:value={street} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded text-sm w-full p-2" required />
+                  <input type="text" placeholder="Street" id="street" name="street" bind:value={street} class="focus:border-primary-500 focus:outline-none focus:ring-0 rounded text-sm w-full p-2" required />
               </div>
           </div>
 
@@ -172,24 +172,24 @@
           <div class="mb-4 flex flex-col md:flex-row gap-x-6">
               <div class="mb-2 md:mb-0 md:mr-12 w-full md:w-1/2 my-2">
                    <label for="postalcode" class="block text-gray-700 font-semibold text-sm my-2">*ZIP or Postal Code</label> 
-                  <input type="tel" placeholder="postal/ZipCode" id="postalcode" name="postalcode" bind:value={postalcode} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded text-sm w-full p-2" required />
+                  <input type="tel" placeholder="postal/ZipCode" id="postalcode" name="postalcode" bind:value={postalcode} class="focus:border-primary-500 focus:outline-none focus:ring-0 rounded text-sm w-full p-2" required />
               </div>
               <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2 my-2">
                   <label for="city" class="block text-gray-700 font-semibold text-sm my-2">*City or Town</label> 
-                  <input type="text" id="city" placeholder="city" name="city" bind:value={city} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded text-sm w-full p-2" required />
+                  <input type="text" id="city" placeholder="city" name="city" bind:value={city} class="focus:border-primary-500 focus:outline-none focus:ring-0 rounded text-sm w-full p-2" required />
               </div>
           </div>
           <!-- Country & Email -->
           <div class="mb-4 flex flex-col md:flex-row gap-x-6">
               <div class="mb-2 md:mb-0 md:mr-12 w-full md:w-1/2">
                   <label for="country" class="block text-gray-700 font-semibold text-sm my-2">*Country</label>
-                  <select id="country"  bind:value={country} bind:this={countrySelect} name="location" class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded text-sm w-full p-2" >
+                  <select id="country"  bind:value={country} bind:this={countrySelect} name="location" class="focus:border-primary-500 focus:outline-none focus:ring-0 rounded text-sm w-full p-2" >
                       <option value="" disabled selected>Select Country</option>
                   </select>
               </div>
               <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2">
                   <label for="email" class="block text-gray-700 font-semibold text-sm my-2">*Email Address</label>
-                  <input type="email" id="email" name="email" placeholder="Email" bind:value={email} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0 rounded w-full text-sm p-2" required />
+                  <input type="email" id="email" name="email" placeholder="Email" bind:value={email} class="focus:border-primary-500 focus:outline-none focus:ring-0 rounded w-full text-sm p-2" required />
                   {#if emailError}
                       <p class="text-red-500 text-sm">{emailError}</p>
                   {/if}
@@ -202,11 +202,11 @@
                   <div class="mt-1 w-full md:w-1/2">
                       <!-- Radio buttons to choose between file or URL -->
                       <div class="mb-4">
-                          <input type="radio" id="toggleUpload" name="uploadOption" value="file" bind:group={uploadOption} class="mr-2 rounded text-primary-600  focus:outline-none focus:ring-0 focus:ring-primary-600 " />
+                          <input type="radio" id="toggleUpload" name="uploadOption" value="file" bind:group={uploadOption} class="mr-2 rounded text-primary-500  focus:outline-none focus:ring-0 focus:ring-primary-600 " />
                           <label for="toggleUpload" class="text-sm text-gray-700 ">Choose File or Image</label>
                      
                       <div class="mb-4">
-                          <input type="radio" id="toggleURL" name="uploadOption" value="url" bind:group={uploadOption} class="mr-2 rounded text-primary-600  focus:outline-none focus:ring-0 focus:ring-primary-600" />
+                          <input type="radio" id="toggleURL" name="uploadOption" value="url" bind:group={uploadOption} class="mr-2 rounded text-primary-500  focus:outline-none focus:ring-0 focus:ring-primary-600" />
                           <label for="toggleURL" class="text-sm text-gray-700">Provide URL to the Work</label>
                       </div>
                   </div>
@@ -222,7 +222,7 @@
                       {#if uploadOption === 'url'}
                           <div class="mb-4">
                               <label for="url" class="block text-gray-700 font-semibold text-sm mb-1">*URL to the Work</label>
-                              <input type="url" placeholder="URL" id="url" name="url" bind:value={url} class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0  rounded w-full md:w-3/4 lg:w-4/5 p-2" required />
+                              <input type="url" placeholder="URL" id="url" name="url" bind:value={url} class="focus:border-primary-500 focus:outline-none focus:ring-0  rounded w-full md:w-3/4 lg:w-4/5 p-2" required />
                           </div>
                       {/if}
                   </div>
@@ -232,17 +232,17 @@
           <div class="mb-4">
               <label for="description" class="block text-gray-700 md:w-5/12 font-semibold mb-2">
                   Please describe the way and the purpose you are going to use our copyrighted work</label>
-              <textarea id="description" name="description" rows="3" class="hover:border-primary-500 focus:border-primary-400 focus:outline-none focus:ring-0  rounded w-full md:w-5/12 p-2" bind:value={description} ></textarea>
+              <textarea id="description" name="description" rows="3" class="focus:border-primary-500 focus:outline-none focus:ring-0  rounded w-full md:w-5/12 p-2" bind:value={description} ></textarea>
           </div>
 
-          <button type="submit" class="bg-primary-500 hover:bg-primary-700 text-white py-2 px-4 rounded">Submit Request</button>
+          <button type="submit" class="bg-primary-400 hover:bg-primary-500 text-white py-2 px-4 transition duration-300 rounded">Submit Request</button>
       </form>
 
       <!-- Thank you message -->
  
       {#if thankYouMessageVisible}
       <div class="flex justify-center items-center">
-          <p class="text-white text-center w-1/2 bg-green-600 p-2 rounded-lg">
+          <p class="text-center font-semibold text-green-600 p-2">
               Thank you for submitting your request!
           </p>
       </div>

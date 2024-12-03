@@ -64,7 +64,7 @@
 	}
 
 	function extractManufacturers(products) {
-		manufacturers = [...new Set(products.map((product) => product.manufacturerName))];
+		manufacturers = [...new Set(products.map((product) => product.manufacturer))];
 	}
 
 	function toggleFavorite(index) {
@@ -105,7 +105,7 @@
 			const matchesCategory =
 				selectedCategories.size === 0 || selectedCategories.has(product.categoryName);
 			const matchesManufacturer =
-				selectedManufacturers.size === 0 || selectedManufacturers.has(product.manufacturerName);
+				selectedManufacturers.size === 0 || selectedManufacturers.has(product.manufacturer);
 			return matchesSearch && matchesCategory && matchesManufacturer;
 		});
 
@@ -118,7 +118,7 @@
 			const matchesCategory =
 				selectedCategories.size === 0 || selectedCategories.has(product.categoryName);
 			const matchesManufacturer =
-				selectedManufacturers.size === 0 || selectedManufacturers.has(product.manufacturerName);
+				selectedManufacturers.size === 0 || selectedManufacturers.has(product.manufacturer);
 			return matchesSearch && matchesCategory && matchesManufacturer;
 		}).length;
 
@@ -476,7 +476,7 @@
 								<p class="text-gray-600 mt-1"><strong>Code:</strong> {product.productNumber}</p>
 								<p class="text-gray-600 mt-1">
 									<strong>Manufacturer:</strong>
-									{product.manufacturerName}
+									{product.manufacturer}
 								</p>
 								<p class="text-gray-600 mt-1"><strong>Category:</strong> {product.categoryName}</p>
 								<p class="text-gray-600 md:block hidden">

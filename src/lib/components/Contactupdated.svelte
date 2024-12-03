@@ -44,9 +44,9 @@
     }
 	}
 </script>
-<section class="my-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto px-3 sm:p-0 font-roboto bg-gray-50">
-	<div class="w-full border border-gray-300 rounded-lg shadow-lg">
-		<h1 class="text-2xl font-bold bg-primary-500 text-white py-4 pl-4 rounded-t-lg">
+<section class="my-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto sm:p-0 font-roboto bg-white">
+	<div class="w-full border border-gray-300 rounded-lg">
+		<h1 class="text-2xl font-bold bg-primary-400 text-white py-4 pl-4 rounded-t-lg">
 			Get in Touch with Us
 		</h1>
 		<form method="POST" action="?/contactus" class="space-y-4" use:enhance={() => {
@@ -66,21 +66,11 @@
 				showMessage(message1, keywordError);
 			};
 		}}>
-			<div class="mt-3">
-				{#if errorMessage === "success"}
-					<div class="text-center bg-green-100 text-green-700 py-2 mb-4 rounded-md">
-						{successMessage}
-					</div>
-				{:else if errorMessage === 'error'}
-					<div class="text-center bg-red-100 text-red-700 py-2 mb-4 rounded-md">
-						{successMessage}
-					</div>
-				{/if}
-			</div>
+
 			<section class="flex flex-col md:flex-row p-2">
 				<div class="md:w-2/5 p-0 md:ml-10 mt-0 ">
 					<div class="flex items-start mt-6 ml-4">
-						<Icon icon="prime:phone" class="text-primary-500 w-6 h-6 mr-2" />
+						<Icon icon="prime:phone" class="text-primary-400 w-6 h-6 mr-2" />
 						<div>
 							<p class="text-lg mb-2 font-semibold">Phone Number</p>
 							<div class="text-base">7829922222</div>
@@ -88,7 +78,7 @@
 					</div>
 					<hr class="my-2 " />
 					<div class="flex items-start mt-6 ml-4">
-						<Icon icon="mdi-light:email" class="text-primary-500 w-6 h-6 mr-2" />
+						<Icon icon="mdi-light:email" class="text-primary-400 w-6 h-6 mr-2" />
 						<div>
 							<p class="text-lg mb-2 font-semibold">Email</p>
 							<div class="text-base">chemikart@gmail.com</div>
@@ -96,7 +86,7 @@
 					</div>
 					<hr class="my-2" />
 					<div class="flex items-start mt-6 ml-4">
-						<Icon icon="ep:location" class="text-primary-500 w-6 h-6 mr-2 shrink-0" />
+						<Icon icon="ep:location" class="text-primary-400 w-6 h-6 mr-2 shrink-0" />
 						<div>
 							<p class="text-lg mb-2 font-semibold">Location</p>
 							<div class="text-base">No. 206, Vinni Arcade 100
@@ -114,7 +104,7 @@
 						</div>
 						<div class="flex flex-col md:flex-row md:space-x-4">
 							<div class="flex-1 mb-4">
-								<input type="text" name="name" id="name" bind:value={name} class="flex w-full border border-gray-300 p-2 rounded-xl focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="User Name" />
+								<input type="text" name="name" id="name" bind:value={name} class="flex w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="User Name" />
 								{#if showErrors && name.length === 0}
 									<span class="text-red-400 text-xs">Name is required</span>
 								{/if}
@@ -125,7 +115,7 @@
 						</div>
 						<div class="flex flex-col md:flex-row md:space-x-4">
 							<div class="flex-1 mb-4">
-								<input type="text" name="email" id="email" bind:value={email} class="block w-full border border-gray-300 p-2 rounded-xl focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email" />
+								<input type="text" name="email" id="email" bind:value={email} class="block w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email" />
 								{#if showErrors && email.length === 0}
 									<span class="text-red-400 text-xs">Email is required</span>
 								{/if}
@@ -136,7 +126,7 @@
 						</div>
 						<div class="flex flex-col md:flex-row md:space-x-4">
 							<div class="flex-1 mb-4">
-								<input type="tel" name="phone" id="phone" bind:value={phone} class="block w-full border border-gray-300 p-2 rounded-xl focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Phone" />
+								<input type="tel" name="phone" id="phone" bind:value={phone} class="block w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Phone" />
 								{#if showErrors && phone.length === 0}
 									<span class="text-red-400 text-xs">Phone number is required</span>
 								{/if}
@@ -145,25 +135,36 @@
 								{/if}
 							</div>
 							<div class="flex-1 mb-4">
-								<input type="text" name="subject" id="subject" bind:value={subject} class="block w-full border border-gray-300 p-2 rounded-xl focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Subject" />
+								<input type="text" name="subject" id="subject" bind:value={subject} class="block w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Subject" />
 								{#if showErrors && subject.length === 0}
 									<span class="text-red-400 text-xs">Subject is required</span>
 								{/if}
 							</div>
 						</div>
 						<div class="flex-1 mb-4">
-							<textarea name="message" id="message" bind:value={message} class="w-full p-2 border border-gray-300 rounded-xl focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400 mb-4 h-32" placeholder="Message"></textarea>
+							<textarea name="message" id="message" bind:value={message} class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400 mb-4 h-32" placeholder="Message"></textarea>
 							{#if showErrors && message.length === 0}
 								<span class="text-red-400 text-xs">Message is required</span>
 							{/if}
 						</div>
 						<input type="hidden" name="status" value="unread" />
-						<div class="flex-1 mb-4 sm:mt-0">
-							<button type="submit" on:click={handleSubmit} class="px-5 py-2 bg-primary-500 text-white rounded-lg transition duration-300 hover:bg-primary-600 sm:w-auto">Send Message</button>
+						<div class="flex-1 mb-2 sm:mt-0">
+							<button type="submit" on:click={handleSubmit} class="px-5 py-2 bg-primary-400 text-white rounded transition duration-300 hover:bg-primary-500 sm:w-auto">Send Message</button>
 						</div>
 					</div>
 				</div>
 			</section>
 		</form>
+		<div class="">
+			{#if errorMessage === "success"}
+				<div class="text-center font-semibold text-green-600 py-2 mb-4">
+					{successMessage}
+				</div>
+			{:else if errorMessage === 'error'}
+				<div class="text-center font-semibold text-red-700 py-2 mb-4">
+					{successMessage}
+				</div>
+			{/if}
+		</div>
 	</div>
 </section>

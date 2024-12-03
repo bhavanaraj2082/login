@@ -9,7 +9,7 @@
   let companyName = "";
   let location = "";
   let accountNumber = "";
-  let message="";
+  let message = "";
   let errormessage = "";
   const addProduct = () => {
     products = [...products, { itemNumber: "", quantity: "" }];
@@ -51,37 +51,29 @@
           companyName = "";
           location = "";
           accountNumber = "";
-          message= 'Your information has been submitted successfully!';
+          message = "Your information has been submitted successfully!";
           // alert("Your information has been submitted successfully!");
         } else {
           console.error(`${result.data.error}`, result.data.details);
-          errormessage = 'There was an error submitting your information. Please try again.';
+          errormessage =
+            "There was an error submitting your information. Please try again.";
           alert(
             "There was an error submitting your information. Please try again."
           );
         }
+        setTimeout(() => {
+          errormessage = "";
+          message = "";
+        }, 2000);
       };
     }}
   >
     <div class=" flex flex-col h-full">
       <div class="lg:w-3/4 w-full pb-6 h-full">
-        {#if message != ""}
-        <h2
-          class="text-center bg-green-50 text-green-500 font-semibold text-base w-3/4"
-        >
-          {message}
-        </h2>
-        {:else if errormessage!= ""}
-        <h2
-        class="text-center bg-red-50 text-red-500 font-semibold text-base w-3/4"
-      >
-        {errormessage}
-      </h2>
-      {/if}
         <h2 class="text-primary-400 font-semibold text-base pb-6">
           Pricing and Availability
         </h2>
-        <input hidden name="issueName" value="Pricing and Availability"/>
+        <input hidden name="issueName" value="Pricing and Availability" />
         <h3 class="block mb-2 text-sm">
           Please provide the following product information
         </h3>
@@ -95,7 +87,7 @@
                 type="text"
                 placeholder="*Item Number"
                 bind:value={product.itemNumber}
-                class="border p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
+                class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
                 required
               />
               <!-- <label class="hidden mb-1" for={`quantity-${index}`}>Quantity</label> -->
@@ -104,15 +96,16 @@
                 type="number"
                 placeholder="*Quantity"
                 bind:value={product.quantity}
-                class="border p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
+                class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
                 required
+                min="1"
               />
             </div>
             {#if index > 0}
               <button
                 type="button"
                 on:click={() => removeProduct(index)}
-                class="ml-2 text-red-500"
+                class="ml-2 text-red-500 hover:scale-105"
               >
                 &times;
               </button>
@@ -123,9 +116,9 @@
         <button
           type="button"
           on:click={addProduct}
-          class=" text-primary-400 border border-primary-400 mb-4 px-2 rounded-md hover:text-white hover:bg-primary-400"
+          class=" text-primary-400 border border-primary-400 mb-4 px-2 py-1 rounded-md hover:text-white hover:bg-primary-400"
         >
-          Add another product
+          + Add another product
         </button>
         <input hidden name="products" value={JSON.stringify(products)} />
       </div>
@@ -139,7 +132,7 @@
             name="firstName"
             placeholder="First Name"
             bind:value={firstName}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -147,7 +140,7 @@
             name="lastName"
             placeholder="Last Name"
             bind:value={lastName}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -155,7 +148,7 @@
             name="email"
             placeholder="Email"
             bind:value={email}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -163,7 +156,7 @@
             name="phoneNumber"
             placeholder="Phone Number"
             bind:value={phoneNumber}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
           <input
@@ -171,12 +164,12 @@
             name="companyName"
             placeholder="Company/Institution Name"
             bind:value={companyName}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           />
           <select
             name="location"
             bind:value={location}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           >
             <option value="" disabled selected>Location</option>
@@ -189,7 +182,7 @@
             name="accountNumber"
             placeholder="Account Number"
             bind:value={accountNumber}
-            class="border rounded-md p-2 text-sm h-9 w-full"
+            class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
             required
           />
         </div>
@@ -203,4 +196,17 @@
       </div>
     </div>
   </form>
+  {#if message != ""}
+    <h2
+      class="text-center text-green-500 font-semibold text-base"
+    >
+      {message}
+    </h2>
+  {:else if errormessage != ""}
+    <h2
+      class="text-center text-red-500 font-semibold text-base"
+    >
+      {errormessage}
+    </h2>
+  {/if}
 </div>

@@ -690,43 +690,11 @@
     },
     {
       "title": "Documents",
-      "href": "/documents",
-      "submenus": [
-        {
-          "title": "Safety Data Sheets",
-          "href": "/"
-        },
-        {
-          "title": "Certificates of Analysis",
-          "href": "/"
-        },
-        {
-          "title": "Certificates of Origin",
-          "href": "/"
-        },
-        {
-          "title": "Certificates of Quality",
-          "href": "/"
-        }
-      ]
+      "href": "/documents"
     },
     {
       "title": "Support",
-      "href": "/",
-      "submenus": [
-        {
-          "title": "FAQ",
-          "href": "/chemikart.partskeys.com/faq"
-        },
-        {
-          "title": "Contact Us",
-          "href": "/chemikart.partskeys.com/contact-us"
-        },
-        {
-          "title": "Customer Support",
-          "href": "/chemikart.partskeys.com/help-support"
-        }
-      ]
+      "href": "/help-support"
     }
   ]
 }

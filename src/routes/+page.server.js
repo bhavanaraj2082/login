@@ -19,7 +19,7 @@ export const actions = {
         const body = Object.fromEntries(await request.formData())
         try {
             const responce = await searchByQuery(body)
-            console.log('form actionfor search',responce);
+            // console.log('form actionfor search',responce);
             return {responce}
         } catch (err) {
             console.error('Error fetching search results:', err);

@@ -26,10 +26,13 @@ const chemiDashProfileSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  isEmailVerified:{
+    type:Boolean,
+    default:false
+  },
   userId: {
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Register', 
-    required: false
+    type: String,
+    required: true
   },
   linkOrganization: jsonSchema, 
   sitePreferences: jsonSchema,
@@ -43,6 +46,10 @@ const chemiDashProfileSchema = new mongoose.Schema({
   timestamps: true,
   collection:"profiles"
 });
+
+if(mongoose.models.Profile){
+  delete mongoose.models.Profile
+}
 
 const Profile = mongoose.models.Profile || mongoose.model('Profile', chemiDashProfileSchema);
 

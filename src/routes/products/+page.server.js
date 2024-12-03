@@ -1,6 +1,6 @@
-//import { getProductdatas } from '$lib/server/mongoLoads.js';
+import { getProductdatas } from '$lib/server/mongoLoads.js';
 
 export const load = async () => {
-	const data = []; //await getProductdatas();
+	const data = await getProductdatas();
 	return data;
 };

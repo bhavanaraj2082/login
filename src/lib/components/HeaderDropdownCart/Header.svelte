@@ -147,9 +147,14 @@
 								: navigateTo(menu.href)}
 						class="flex justify-between text-left hover:text-primary-400 text-gray-800 transition duration-200 w-full py-2">
 						{menu.title}
-						<Icon
+						<!-- <Icon
 							icon="prime:chevron-down"
-							class="w-5 h-5 mr-2 text-gray-800 hover:text-primary-400"/>
+							class="w-5 h-5 mr-2 text-gray-800 hover:text-primary-400"/> -->
+							{#if menu.title !== 'Documents' && menu.title !== 'Support'}
+              <Icon
+            icon="prime:chevron-down"
+            class="w-5 h-5 mr-2 text-gray-800 hover:text-primary-400" />
+              {/if}
 					</button>
 				{/each}
 				<div class="flex flex-col font-semibold">
@@ -284,7 +289,7 @@
 				{:else if searchQuery.trim() && isLoading}
 					<p
 						class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-30 rounded flex items-center justify-start"
-					>	<Icon icon="ei:spinner" class="w-8 h-8 animate-spin text-primary-600 mx-2 text-5xl" />
+					>	<Icon icon="ei:spinner" class="w-8 h-8 animate-spin-slow text-primary-600 mx-2 text-5xl" />
 						<span>Loading Products...</span>
 					</p>
 				{:else if searchQuery.trim() && searchResults && searchResults.length === 0}
@@ -341,7 +346,7 @@
 							class={`flex items-center text-nowrap text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-primary-400' : 'text-gray-700'}`}
 							role="menuitem">
 							{menu.title}
-							{#if index < 5}
+							{#if index < 5 && menu.title !== 'Documents' && menu.title !== 'Support'}
 								<Icon icon="prime:chevron-down" class="ml-1 w-5 h-5 " />
 							{/if}
 						</button>

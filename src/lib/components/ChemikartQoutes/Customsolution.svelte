@@ -19,14 +19,13 @@
 		tag();
 	};
 </script>
-
 <div class="bg-white">
 	<h1 class="font-bold text-2xl">Step 1: Select custom solution type</h1>
 	<br />
 	<div class="mt-4 flex flex-col md:flex-row lg:flex-row">
 		<button
 			type="button"
-			class={`box-content h-25 w-56 p-4 border-2 md:mx-10 ${solutionValue === 'Organic' ? 'border-primary-500' : ''}`}
+			class={`box-content h-25 lg:w-56 p-4 border-2 md:mx-10 ${solutionValue === 'Organic' ? 'border-primary-500' : ''}`}
 			on:click={() => {
 				selectOrgan('Organic');
 			}}
@@ -35,8 +34,8 @@
 		</button>
 		<br />
 		<button
-			type="button"
-			class={`box-content h-25 w-56 p-4 border-2 md:mx-10 mt-4 sm:mt-0  ${solutionValue === 'Inorganic' ? 'border-primary-500' : ''}`}
+			type="button" 
+			class={`box-content h-25 lg:w-56 p-4 border-2 md:mx-10 mt-4 sm:mt-0  ${solutionValue === 'Inorganic' ? 'border-primary-500' : ''}`}
 			on:click={() => {
 				selectOrgan('Inorganic');
 			}}
@@ -79,5 +78,4 @@
 			Step 6: Delivery information
 		</h1>
 	</li>
-	<hr />
 </ul>

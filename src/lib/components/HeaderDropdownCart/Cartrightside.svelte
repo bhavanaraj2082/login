@@ -96,8 +96,14 @@
   
 	const toggleCart = () => {
 	  cartOpen = !cartOpen;
-	  goto('/cart')
 	};
+
+    const visitcart =() =>
+	{
+		goto('/cart')
+		cartOpen = !cartOpen;
+		
+	}
   
 	onMount(() => {
 	//   loadCartFromLocalStorage();
@@ -233,7 +239,7 @@
 
         <div class="flex flex-col space-y-4">
           <button
-            on:click={toggleCart}
+            on:click={visitcart}
             class="bg-primary-400 text-white text-center py-3 rounded-lg font-semibold hover:bg-primary-500"
           >
             VIEW CART

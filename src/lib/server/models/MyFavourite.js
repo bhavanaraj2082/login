@@ -2,15 +2,14 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-// Define the schema for Myfavourites
 const myFavouritesSchema = new Schema(
   {
     favorite: {
       type: Schema.Types.Mixed, 
       required: false,
     },
-    userProfileId: {
-      type: Schema.Types.ObjectId, 
+    userId: {
+      type: Schema.Types.String, 
       ref: "Profile", 
       required: false, 
   }

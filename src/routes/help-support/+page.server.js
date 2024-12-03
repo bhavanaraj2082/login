@@ -1,11 +1,11 @@
-// import { saveContactInfo } from '$lib/server/mongoActions.js'
+import { saveContactInfo } from '$lib/server/mongoActions.js'
 export const actions = {
     contact: async ({ request }) => {
       try {
         const body = Object.fromEntries(await request.formData());
-        console.log('Form Data:', body); // Log for debugging
+        // console.log('Form Data:', body); // Log for debugging
         const output = await saveContactInfo(body);
-        console.log("outputttttttttt",output);
+        // console.log("outputttttttttt",output);
         
         return output;
       } catch (error) {

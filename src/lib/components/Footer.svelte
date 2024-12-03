@@ -103,6 +103,8 @@
 					<span class="hidden md:block lg:inline-block footer-separator">|</span>
 					<a href="/terms/privacy-notice" class="hover:underline text-xs font-medium">Privacy Notice</a>
 					<span class="hidden md:block lg:inline-block footer-separator">|</span>
+					<a href="/safety" class="hover:underline text-xs font-medium">Product Safety</a>
+					<span class="hidden md:block lg:inline-block footer-separator">|</span>
 					<a href="/terms/site-and-terms" class="hover:underline text-xs font-medium">Site-Terms</a>
 					<!-- <span class="hidden md:block lg:inline-block footer-separator">|</span>
 					<a href="/terms/conditions" class="hover:underline text-xs font-medium">General Terms and Conditions</a> -->

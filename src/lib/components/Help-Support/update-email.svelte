@@ -10,7 +10,7 @@
   let accountNumber = "";
   let currentEmail = "";
   let newEmail = "";
-  let message="";
+  let message = "";
   let errormessage = "";
   const locations = [
     "United States",
@@ -21,8 +21,6 @@
     "France",
     "India",
   ];
-
-  
 </script>
 
 <div class="w-full p-4">
@@ -31,7 +29,6 @@
     action="?/contact"
     use:enhance={() => {
       return async ({ result }) => {
-       
         // console.log(result);
 
         if (result) {
@@ -47,36 +44,28 @@
           currentEmail = "";
           newEmail = "";
           assistance = "";
-          message= 'Your information has been submitted successfully!';
+          message = "Your information has been submitted successfully!";
           // alert("Your information has been submitted successfully!");
         } else {
           console.error(`${result.data.error}`, result.data.details);
-          errormessage = 'There was an error submitting your information. Please try again.';
+          errormessage =
+            "There was an error submitting your information. Please try again.";
           alert(
             "There was an error submitting your information. Please try again."
           );
         }
+        setTimeout(() => {
+          errormessage = "";
+          message = "";
+        }, 2000);
       };
     }}
   >
     <div class=" w-full pb-6 h-full">
-      {#if message != ""}
-        <h2
-          class="text-center bg-green-50 text-green-500 font-semibold text-base w-full"
-        >
-          {message}
-        </h2>
-        {:else if errormessage!= ""}
-        <h2
-        class="text-center bg-red-50 text-red-500 font-semibold text-base w-full"
-      >
-        {errormessage}
-      </h2>
-      {/if}
       <h2 class="text-primary-400 font-semibold text-base pb-6">
         Update Email Address
       </h2>
-      <input hidden name="issueName" value="Update Email Address"/>
+      <input hidden name="issueName" value="Update Email Address" />
       <label class="text-base"
         >*Current Email address (From online account)</label
       >
@@ -84,7 +73,7 @@
         type="email"
         name="currentEmail"
         bind:value={currentEmail}
-        class="border rounded-md p-2 text-sm h-9 w-full mb-4 mt-2"
+        class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full mb-4 mt-2"
         required
       />
       <label class="text-base">*New Email address</label>
@@ -92,7 +81,7 @@
         type="email"
         name="newEmail"
         bind:value={newEmail}
-        class="border rounded-md p-2 text-sm h-9 w-full mt-2"
+        class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full mt-2"
         required
       />
       <div class="mt-4">
@@ -103,7 +92,7 @@
           rows="5"
           name="assistance"
           bind:value={assistance}
-          class="w-full border p-2 text-sm mt-2"
+          class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm mt-2"
           required
         ></textarea>
       </div>
@@ -118,7 +107,7 @@
           placeholder="First Name"
           name="firstName"
           bind:value={firstName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -126,7 +115,7 @@
           placeholder="Last Name"
           name="lastName"
           bind:value={lastName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -134,7 +123,7 @@
           name="email"
           placeholder="Email"
           bind:value={email}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -142,7 +131,7 @@
           name="phoneNumber"
           placeholder="Phone Number"
           bind:value={phoneNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
         <input
@@ -150,12 +139,12 @@
           name="companyName"
           placeholder="Company/Institution Name"
           bind:value={companyName}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
         />
         <select
-        name="location"
+          name="location"
           bind:value={location}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         >
           <option value="" disabled selected>Location</option>
@@ -168,7 +157,7 @@
           name="accountNumber"
           placeholder="Account Number"
           bind:value={accountNumber}
-          class="border rounded-md p-2 text-sm h-9 w-full"
+          class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         />
       </div>
@@ -181,4 +170,17 @@
       </button>
     </div>
   </form>
+  {#if message != ""}
+    <h2
+      class="text-center text-green-500 font-semibold text-base w-full"
+    >
+      {message}
+    </h2>
+  {:else if errormessage != ""}
+    <h2
+      class="text-center text-red-500 font-semibold text-base w-full"
+    >
+      {errormessage}
+    </h2>
+  {/if}
 </div>

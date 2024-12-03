@@ -1,10 +1,10 @@
 <script>
-    import QuickOrder from "$lib/components/quickorder/QuickOrder.svelte";
-    export let data;
 
-
-    // console.log(data);
-    
-    
-</script>
-<QuickOrder {data}/>
+    import Manualupload from "$lib/components/quickorder/Manualupload.svelte"
+      export let data;
+  // console.log(data)
+      
+      
+  </script>
+  <Manualupload {data} />
+  

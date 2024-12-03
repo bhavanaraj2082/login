@@ -12,7 +12,7 @@ const productSchema = new Schema({
         required: false 
     },
     description: { 
-        type: [String], 
+        type: Schema.Types.Mixed, 
         required: false 
     },
     properties: {
@@ -33,6 +33,7 @@ const productSchema = new Schema({
     safetyDatasheet: { type: String, trim: true },
     safetyInfo: { type: [String], default: [] },
     encompass: { type: String, default: null },
+    CAS:{ type: String, default: null },
     currency: { type: String, default: 'USD' },
     variants: [{ type: Schema.Types.ObjectId, ref: 'Product' }]
 }, { timestamps: false, collection: "products" });
