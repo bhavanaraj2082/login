@@ -419,18 +419,18 @@ export async function DifferentProds(productId) {
 		}
 	  }
    // fetching varints stocks
-	const variants = product.variants || [];
-    const variantRecord = await Promise.all(
-      variants.map(async (variantId) => {
-        const variant = await Product.findById(variantId).lean();
-        if (!variant) return {}; 
-        const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
-        return { 
-          ...variant, 
-          pricing: stock ? stock.pricing : []  
-        };
-      })
-    );
+	// const variants = product.variants || [];
+    // const variantRecord = await Promise.all(
+    //   variants.map(async (variantId) => {
+    //     const variant = await Product.findById(variantId).lean();
+    //     if (!variant) return {}; 
+    //     const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
+    //     return { 
+    //       ...variant, 
+    //       pricing: stock ? stock.pricing : []  
+    //     };
+    //   })
+    // );
 	// formattedRecord
     const formattedRecord = {
       productId: product?._id?.toString() || "",
@@ -447,18 +447,18 @@ export async function DifferentProds(productId) {
       filteredProductData: product?.filteredProductData || {},
       productSynonym: product?.filteredProductData?.["Synonym(S)"] || "",
       stockQuantity,
-      orderMultiple,
-      variants: variantRecord.map((variant) => ({
-        _id: variant?._id?.toString() || "",
-        productName: variant?.productName || "Unknown Product",
-        prodDesc: variant?.prodDesc || "No description available",
-        description: variant?.description || [],
-        properties: variant?.properties || {},
-        manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
-        productNumber: variant?.productNumber || "N/A",
-        imageSrc: variant?.imageSrc || "",
-        pricing:variant?.pricing
-      })),
+      orderMultiple
+    //   variants: variantRecord.map((variant) => ({
+    //     _id: variant?._id?.toString() || "",
+    //     productName: variant?.productName || "Unknown Product",
+    //     prodDesc: variant?.prodDesc || "No description available",
+    //     description: variant?.description || [],
+    //     properties: variant?.properties || {},
+    //     manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
+    //     productNumber: variant?.productNumber || "N/A",
+    //     imageSrc: variant?.imageSrc || "",
+    //     pricing:variant?.pricing
+    //   })),
     };
 	
     return { records: [formattedRecord] };
