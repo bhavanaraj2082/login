@@ -223,41 +223,75 @@ async function getMatchedSubCategories(search) {
 }
 
 export async function RelatedProductData(productId) {
-	// console.log(productId);
+	// console.log("==",productId);
 	const product = await Product.findOne({ productNumber: productId }).populate('subsubCategory');
-
 	if (!product) {
 		return { error: 'Product not found' };
+	};
+
+	// console.log("====",product.subCategory._id);
+    if(!product.subsubCategory._id){
+       return []
 	}
-
-	const subsubCategoryId = product.subsubCategory._id;
-
-	const relatedProducts = await Product.find({ subsubCategory: subsubCategoryId })
-		.limit(8)
-		.populate('category')
-		.populate('subCategory')
-		.populate('manufacturer')
-		.populate('subsubCategory');
-
-	if (relatedProducts.length === 0) {
-		return { error: 'No related products found' };
+	else{
+		const relatedProducts = await Product.aggregate([
+			{ $match: { subsubCategory: product.subsubCategory._id } },
+			{ $limit: 8 },
+			{
+				$lookup: {
+					from: 'categories', 
+					localField: 'category',
+					foreignField: '_id',
+					as: 'category'
+				}
+			},
+			{
+				$lookup: {
+					from: 'subcategories', 
+					localField: 'subCategory',
+					foreignField: '_id',
+					as: 'subCategory'
+				}
+			},
+			{
+				$lookup: {
+					from: 'manufacturers', 
+					localField: 'manufacturer',
+					foreignField: '_id',
+					as: 'manufacturer'
+				}
+			},
+			{
+				$lookup: {
+					from: 'subsubcategories', 
+					localField: 'subsubCategory',
+					foreignField: '_id',
+					as: 'subsubCategory'
+				}
+			},
+			{
+				$lookup: {
+					from: 'stocks', 
+					localField: 'productNumber',
+					foreignField: 'productNumber',
+					as: 'stock'
+				}
+			},
+			{
+				$addFields: {
+					stockQuantity: {
+						$ifNull: [{ $arrayElemAt: ['$stock.stockQuantity', 0] }, 0]
+					}
+				}
+			},
+			{
+				$project: {
+					stock: 0 
+				}
+			}
+		]);
+		return  JSON.parse(JSON.stringify(relatedProducts));
 	}
-
-	const relatedProductsJson = JSON.parse(JSON.stringify(relatedProducts));
-
-	for (let relatedProduct of relatedProductsJson) {
-		const stockData = await Stock.findOne({
-			'partNumber.productNumber': relatedProduct.productNumber
-		});
-
-		if (!stockData) {
-			relatedProduct.stockQuantity = 0;
-		} else {
-			relatedProduct.stockQuantity = stockData.stockQuantity || 0;
-		}
-	}
-	// console.log("=======",relatedProductsJson.length);
-	return relatedProductsJson;
 }
 
 export const loadProductsubcategory = async (suburl, page = 1) => {
