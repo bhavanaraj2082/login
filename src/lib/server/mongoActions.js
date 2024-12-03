@@ -1142,3 +1142,10 @@ export const quicksearch = async ({ query }) => {
 	return JSON.parse(JSON.stringify(result));
   
   };
+
+  
+  export const CreateProductQuote = async (formattedData) => {
+	const newQuote = new Quotes(formattedData);
+		await newQuote.save();
+		return { status: 200 };
+};
