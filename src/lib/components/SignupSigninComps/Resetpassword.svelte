@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { authedUser } from '$lib/stores/mainStores.js';
 	import { enhance, applyAction } from '$app/forms';
+	import { toast } from 'svelte-sonner';
 	export let data;
 	const token = data?.token;
 
@@ -56,6 +57,13 @@
 
 		return async ({ result }) => {
 			console.log(result);
+			
+			if(result.type === "success"){
+				toast.success(result.success.message)
+				}else{
+				toast.error(result.error.message)
+			}
+
 			if (result.type === 'success') {
 				if (result.data.success) responseMsg = result.data;
 			}
