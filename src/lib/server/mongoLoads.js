@@ -224,6 +224,7 @@ async function getMatchedSubCategories(search) {
 }
 
 export async function RelatedProductData(productId) {
+	// console.log(productId);
 	const product = await Product.findOne({ productNumber: productId }).populate('subsubCategory');
 
 	if (!product) {
@@ -236,7 +237,7 @@ export async function RelatedProductData(productId) {
 		.limit(8)
 		.populate('category')
 		.populate('subCategory')
-		.populate('manufacturerName')
+		.populate('manufacturer')
 		.populate('subsubCategory');
 
 	if (relatedProducts.length === 0) {
@@ -256,6 +257,7 @@ export async function RelatedProductData(productId) {
 			relatedProduct.stockQuantity = stockData.stockQuantity || 0;
 		}
 	}
+	// console.log("=======",relatedProductsJson.length);
 	return relatedProductsJson;
 }
 
