@@ -11,6 +11,8 @@ import Quotes from '$lib/server/models/Quotes.js';
 import Products from '$lib/server/models/Product.js';
 import Helpsupport from '$lib/server/models/Helpsupport.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
+import MyFavourites from '../server/models/MyFavourites.js';
+import ChemiDashProfile from "$lib/server/models/ChemiDashProfile.js";
 import { redirect, error } from '@sveltejs/kit';
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from 'nodemailer';
@@ -106,18 +108,16 @@ export async function checkavailabilityproduct(data) {
 	}
 }
 
-export async function favorite(favdata, cookies) {
-	const cookieValue = cookies.get('token');
-	if (!cookieValue) {
-		return { type: 'error', message: 'Please login to add to favorites!' };
-	}
-	let parsedCookie;
-	parsedCookie = JSON.parse(cookieValue);
-	const userProfileId = parsedCookie?.profileId;
-	// console.log("userProfileId",userProfileId);
-	const existingRecord = await MyFavourite.findOne({ userProfileId: userProfileId });
-	// console.log("existingRecord", existingRecord);
-	const favoriteItem = {
+export async function favorite(favdata) {
+	const authedUser=favdata.authedEmail;
+	// console.log(authedUser);
+	if(authedUser){
+	  const chemiDashProfileId= await ChemiDashProfile.findOne({email: authedUser});
+	  const userProfileId=chemiDashProfileId.id;
+	//   console.log(chemiDashProfileId,"chemiDashProfileId");
+	  const existingRecord = await MyFavourites.findOne({ userProfileId: userProfileId });
+	//   console.log("existingRecord", existingRecord);
+	  const favoriteItem = {
 		productDesc: favdata.productDesc,
 		id: favdata.id,
 		imgUrl: favdata.imgUrl,
@@ -125,31 +125,36 @@ export async function favorite(favdata, cookies) {
 		productNumber: favdata.productNumber,
 		priceSize: { price: favdata.price, size: favdata.size },
 		quantity: favdata.quantity,
-		stock: favdata.stock
-	};
-	let updatedFavorites = [];
-	let isFavorite = false;
-	if (existingRecord && Array.isArray(existingRecord.favorite)) {
-		updatedFavorites = existingRecord.favorite.filter((item) => item.id !== favdata.id);
+		stock: favdata.stock,
+	  };
+	  let updatedFavorites = [];
+	  let isFavorite = false;
+	  if (existingRecord && Array.isArray(existingRecord.favorite)) {
+		updatedFavorites = existingRecord.favorite.filter(
+		  (item) => item.id !== favdata.id
+		);
 		isFavorite = updatedFavorites.length !== existingRecord.favorite.length;
-	}
-	if (isFavorite) {
+	  }
+	  if (isFavorite) {
 		existingRecord.favorite = updatedFavorites;
 		await existingRecord.save();
 		return { type: 'success', message: 'Removed from favorites!' };
-	} else {
-		updatedFavorites = existingRecord ? [...existingRecord.favorite, favoriteItem] : [favoriteItem];
-
+	  } else {
+		updatedFavorites = existingRecord
+		  ? [...existingRecord.favorite, favoriteItem]
+		  : [favoriteItem];
+	
 		if (existingRecord) {
-			existingRecord.favorite = updatedFavorites;
-			await existingRecord.save();
+		  existingRecord.favorite = updatedFavorites;
+		  await existingRecord.save();
 		} else {
-			await MyFavourite.create({
-				userProfileId,
-				favorite: updatedFavorites
-			});
+		  await MyFavourites.create({
+			userProfileId,
+			favorite: updatedFavorites,
+		  });
 		}
 		return { type: 'success', message: 'Added to favorites!' };
+	  }
 	}
 }
 
