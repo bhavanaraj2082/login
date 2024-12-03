@@ -11,7 +11,7 @@ import SubSubCategory from '$lib/server/models/SubSubcategory.js';
 import Shipment from '$lib/server/models/Shipment.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import Return from '$lib/server/models/Return.js';
-import MyFavourite from '$lib/server/models/MyFavourite.js'
+import MyFavourite from '$lib/server/models/MyFavourite.js';
 
 export async function getProductdatas() {
 	const records = await Category.find();
@@ -123,9 +123,9 @@ export const isProductFavorite = async (productNumber, cookies) => {
 	return isFavorite;
 };
 
-export async function getProfileDetails(userEmail) {
+export async function getProfileDetails(userId) {
 	try {
-		const record = await Profile.findOne({ email: userEmail });
+		const record = await Profile.findOne({ userId });
 		if (record) {
 			return { profileData: JSON.parse(JSON.stringify(record)) };
 		} else {
@@ -171,15 +171,14 @@ export async function getSearchData(search) {
 }
 
 async function getMatchedComponents(search) {
-  try {
-    const queryFilter = {
-      $or: [
-        { productName: { $regex: search, $options: "i" } },
-        { productNumber: { $regex: search, $options: "i" } },
-        { CAS: { $regex: search, $options: "i" } },
-      ],
-    };
-
+	try {
+		const queryFilter = {
+			$or: [
+				{ productName: { $regex: search, $options: 'i' } },
+				{ productNumber: { $regex: search, $options: 'i' } },
+				{ CAS: { $regex: search, $options: 'i' } }
+			]
+		};
 
 		const components = await Product.find(queryFilter)
 			.limit(6)
@@ -366,7 +365,11 @@ export const verifyPasswordToken = async (token) => {
 			if (Date.now() >= verifyToken.expiry.getTime()) {
 				return { success: false, message: 'token has expired. please verify again' };
 			} else {
-				return { success: true, message: 'Token is verified successfully' };
+				return {
+					success: true,
+					message: 'Token is verified successfully',
+					token: JSON.parse(JSON.stringify(verifyToken))
+				};
 			}
 		} else {
 			return { success: false, message: 'Token is not found ' };
@@ -396,73 +399,69 @@ export async function getreturnstatusdata(invoiceid) {
 	}
 }
 
-
 // returns ends
-
-
 
 //PRODUCT SIMILAR ITEMS , FINDING DIFFERENCES
 export async function DifferentProds(productId) {
 	// fething product
-    const product = JSON.parse(JSON.stringify(await Product.findOne({ productNumber: productId })));
-    const partNumber = product.productNumber;
-   // products stocks
+	const product = JSON.parse(JSON.stringify(await Product.findOne({ productNumber: productId })));
+	const partNumber = product.productNumber;
+	// products stocks
 	let stockQuantity = 0;
-    let orderMultiple=0;
-    let priceSize=[]
-    if (partNumber) {
+	let orderMultiple = 0;
+	let priceSize = [];
+	if (partNumber) {
 		const stockRecord = await Stock.findOne({ productNumber: partNumber }).exec();
-		if (stockRecord && typeof stockRecord.stock !== "undefined") {
-		  stockQuantity = stockRecord.stock;
-		  orderMultiple = stockRecord.orderMultiple;
-		  priceSize=stockRecord.pricing
+		if (stockRecord && typeof stockRecord.stock !== 'undefined') {
+			stockQuantity = stockRecord.stock;
+			orderMultiple = stockRecord.orderMultiple;
+			priceSize = stockRecord.pricing;
 		}
-	  }
-   // fetching varints stocks
+	}
+	// fetching varints stocks
 	// const variants = product.variants || [];
-    // const variantRecord = await Promise.all(
-    //   variants.map(async (variantId) => {
-    //     const variant = await Product.findById(variantId).lean();
-    //     if (!variant) return {}; 
-    //     const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
-    //     return { 
-    //       ...variant, 
-    //       pricing: stock ? stock.pricing : []  
-    //     };
-    //   })
-    // );
+	// const variantRecord = await Promise.all(
+	//   variants.map(async (variantId) => {
+	//     const variant = await Product.findById(variantId).lean();
+	//     if (!variant) return {};
+	//     const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
+	//     return {
+	//       ...variant,
+	//       pricing: stock ? stock.pricing : []
+	//     };
+	//   })
+	// );
 	// formattedRecord
-    const formattedRecord = {
-      productId: product?._id?.toString() || "",
-      productName: product?.productName || "Unknown Product",
-      CAS:product?.CAS,
-      productNumber: product?.productNumber || "N/A",
-      prodDesc: product?.prodDesc || "No description available",
-      imageSrc: product?.imageSrc || "",
-      safetyDatasheet: product?.safetyDatasheet || "",	
-      priceSize,
-      properties: product?.properties || {},
-      description: product?.description || {},
-      safetyInfo: product?.safetyInfo || {},
-      filteredProductData: product?.filteredProductData || {},
-      productSynonym: product?.filteredProductData?.["Synonym(S)"] || "",
-      stockQuantity,
-      orderMultiple
-    //   variants: variantRecord.map((variant) => ({
-    //     _id: variant?._id?.toString() || "",
-    //     productName: variant?.productName || "Unknown Product",
-    //     prodDesc: variant?.prodDesc || "No description available",
-    //     description: variant?.description || [],
-    //     properties: variant?.properties || {},
-    //     manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
-    //     productNumber: variant?.productNumber || "N/A",
-    //     imageSrc: variant?.imageSrc || "",
-    //     pricing:variant?.pricing
-    //   })),
-    };
-	
-    return { records: [formattedRecord] };
+	const formattedRecord = {
+		productId: product?._id?.toString() || '',
+		productName: product?.productName || 'Unknown Product',
+		CAS: product?.CAS,
+		productNumber: product?.productNumber || 'N/A',
+		prodDesc: product?.prodDesc || 'No description available',
+		imageSrc: product?.imageSrc || '',
+		safetyDatasheet: product?.safetyDatasheet || '',
+		priceSize,
+		properties: product?.properties || {},
+		description: product?.description || {},
+		safetyInfo: product?.safetyInfo || {},
+		filteredProductData: product?.filteredProductData || {},
+		productSynonym: product?.filteredProductData?.['Synonym(S)'] || '',
+		stockQuantity,
+		orderMultiple
+		//   variants: variantRecord.map((variant) => ({
+		//     _id: variant?._id?.toString() || "",
+		//     productName: variant?.productName || "Unknown Product",
+		//     prodDesc: variant?.prodDesc || "No description available",
+		//     description: variant?.description || [],
+		//     properties: variant?.properties || {},
+		//     manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
+		//     productNumber: variant?.productNumber || "N/A",
+		//     imageSrc: variant?.imageSrc || "",
+		//     pricing:variant?.pricing
+		//   })),
+	};
 
+	return { records: [formattedRecord] };
 }
 
 export async function getReturnSavedData(invoiceid) {
@@ -521,8 +520,8 @@ export const quick = async () => {
 ///Quick Order////
 //Myfavourites loads starts
 
-export async function getFavSavedData( id ) {
-  const records = await MyFavourite.findOne({ userId : id });
-  return JSON.parse(JSON.stringify(records)) || { favorite: [] };
+export async function getFavSavedData(id) {
+	const records = await MyFavourite.findOne({ userId: id });
+	return JSON.parse(JSON.stringify(records)) || { favorite: [] };
 }
 //Myfavourites loads ends
