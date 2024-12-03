@@ -257,66 +257,117 @@ export async function RelatedProductData(productId) {
 	return relatedProductsJson;
 }
 
-export const loadProductsubcategory = async (suburl, page = 1) => {
+export const loadProductsubcategory = async (suburl,pageNum) => {
+	//console.log(typeof(pageNum),pageNum);
+    const conversionRate = 90
+	const page = pageNum || 1 // Current page number (this could be dynamically set)
+    const pageSize = 10;
+	//console.log(suburl);
 	try {
-		const subcategory = await SubCategory.findOne({ urlName: suburl }).populate('category');
+		const subcategory = await SubCategory.findOne({ urlName: suburl }).populate({path:"manufacturerIds",select:"-_id name"});
+		console.log(subcategory,"+++");
 		//console.log('----suburl----', suburl, subcategory, page);
 		if (!subcategory) {
 			return { type: 'error', message: `Subcategory not found for URL: ${suburl}` };
-		}
+		}	   
 
-		const subcategoryID = subcategory._id.toString();
-		const productPageSize = 20;
-		const totalCount = JSON.parse(
-			JSON.stringify(await Product.countDocuments({ subCategory: subcategoryID }))
-		);
 
-		const products = JSON.parse(
-			JSON.stringify(
-				await Product.find({ subCategory: subcategoryID })
-					.skip((page - 1) * productPageSize)
-					.limit(productPageSize)
-					.populate('subCategory')
-					.populate('category')
-					.populate('manufacturer')
-					.populate('subsubCategory')
-			)
-		);
-
-		// console.log("i am product", productData.length);
-
-		// productData.forEach(product => {
-		//   if (product.subsubCategory && product.subsubCategory.name) {
-		//     console.log("SubsubCategory Name:", product.subsubCategory.name);
-		//   } else {
-		//     console.log("SubsubCategory Name: Unknown Subsubcategory");
-		//   }
-		// });
-
-		if (products.length === 0) {
-			return { type: 'error', message: 'No products found for this subcategory.' };
-		}
-		// const stockData = await Stock.find({}).populate('partNumber');
-		// const productNames = productData.map(product => {
-		//   const stock = stockData.find(
-		//     stockItem => stockItem.partNumber?._id.toString() === product._id.toString()
-		//   );
-
-		//   return {
-		//     ...product.toObject(),
-		//     manufacturerName: product.manufacturerName?.name || 'Unknown Manufacturer',
-		//     category: product.category ? product.category.name : 'Unknown Category',
-		//     subsubCategory: product.subsubCategory?.name || 'Unknown Subsubcategory',
-		//     stockQuantity: stock ? stock.stockQuantity : 0,
-		//   };
-		// });
-
-		// return {
-		//   type: 'success',
-		//   records: productNames,
-		//   nextPage: productData.length === productPageSize ? page + 1 : null,
-		// };
-		return { products, totalCount };
+		const products =  await Stock.aggregate([
+			// Stage 1: Lookup Product details in the Stock collection
+			{
+			  $lookup: {
+				from: 'products',           // The collection to join with (Product)
+				localField: 'productid',     // The field in Stock (reference to Product)
+				foreignField: '_id',         // The field in Product (primary key)
+				as: 'productDetails'         // The field to store the product data
+			  }
+			},
+			{
+			  $unwind: '$productDetails'    // Unwind to flatten the product data
+			},
+			{
+				$lookup: {
+				  from: 'manufacturers',        // The collection to join with (Manufacturer)
+				  localField: 'productDetails.manufacturer', // Manufacturer ID from Product
+				  foreignField: '_id',           // Manufacturer primary key
+				  as: 'manufacturerDetails'      // The field to store manufacturer data
+				}
+			  },
+			  {
+				$unwind: '$manufacturerDetails' // Unwind to flatten the manufacturer data
+			  },
+			  {
+				$lookup: {
+				  from: 'distributors',         // The collection to join with (Distributor)
+				  localField: 'distributor',   // The field in Stock (reference to Distributor)
+				  foreignField: '_id',           // The field in Distributor (primary key)
+				  as: 'distributorDetails'       // The field to store distributor data
+				}
+			  },
+			  {
+				$unwind: '$distributorDetails'  // Unwind to flatten the distributor data
+			  },
+			  {
+				$lookup: {
+				  from: 'categories',         // The collection to join with (Category)
+				  localField: 'productDetails.category', // category ID from Product
+				  foreignField: '_id',        // category primary key
+				  as: 'categoryDetails'       // The field to store category data
+				}
+			  },
+			  {
+				$unwind: '$categoryDetails'   // Unwind to flatten the category data
+			  },
+			// Stage 2: Lookup Category details in the Product collection
+			{
+			  $lookup: {
+				from: 'subcategories',         // The collection to join with (Category)
+				localField: 'productDetails.subCategory', // Category ID from Product
+				foreignField: '_id',        // Category primary key
+				as: 'subCategoryDetails'       // The field to store category data
+			  }
+			},
+			{
+			  $unwind: '$subCategoryDetails'   // Unwind to flatten the category data
+			},
+			{
+			  $match: {
+				'subCategoryDetails.name': subcategory.name // Filter by category name
+			  }
+			},
+			// Optional: Project specific fields for the result
+			{
+			  $project: {
+				'productDetails.productNumber': 1,
+				'productDetails.productName': 1,
+				'productDetails.prodDesc': 1,
+				'productDetails.imageSrc': 1,
+				'subCategoryDetails.name': 1,
+				'categoryDetails.name': 1,        // Category name
+				'categoryDetails.urlName': 1,        // Category name
+                'subCategoryDetails.urlName': 1,     // Subcategory name
+                'distributorDetails.distributorName': 1,     // Distributor name
+                'manufacturerDetails.name': 1,
+				'pricing':1,
+				'stock':1,
+				'orderMultiple':1,
+			  }
+			},
+			{
+				$skip: (page - 1) * pageSize // Skip the documents for previous pages
+			  },
+			  {
+				$limit: pageSize // Limit to the number of documents per page
+			  }
+		  ])
+		  const filtered = products.map(product=>{
+			const {_id,pricing,orderMultiple,stock,productDetails,manufacturerDetails,distributorDetails,categoryDetails,subCategoryDetails} = product
+			const priceConversion = pricing.map(price=>{
+				return {...price,INR:price.USD*conversionRate}
+			})
+			 return {_id,pricing:priceConversion,totalPrice:priceConversion[0].INR,orderMultiple,quantity:orderMultiple,stock,...productDetails,...distributorDetails,categoryDetails,subCategoryDetails,manufacturerDetails}
+		  })
+		return { products:JSON.parse(JSON.stringify(filtered)),manufacturers:JSON.parse(JSON.stringify(subcategory.manufacturerIds)) };
 	} catch (error) {
 		console.error('Error loading product subcategory:', error);
 		return { type: 'error', message: 'An error occurred while loading product data.' };

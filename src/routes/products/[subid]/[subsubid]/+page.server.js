@@ -1,10 +1,14 @@
 import { loadProductsubcategory } from '$lib/server/mongoLoads.js';
 
-export async function load({ params }) {
+export async function load({ params,url,depends }) {
 	try {
+		const page = parseInt(url.searchParams.get('page')) || 1
+		//console.log("]]]]",page);
+        depends("page:data")
+
 		// let productPage = 1;
 		// let productPageSize = 20;
-		const { products, totalCount } = await loadProductsubcategory(params.subsubid);
+		const { products, manufacturers } = await loadProductsubcategory(params.subsubid,page);
 		// const fetchProductChunk = async () => {
 		// 	let allProducts = [];
 		// 	let moreDataAvailable = true;
@@ -31,11 +35,11 @@ export async function load({ params }) {
 		// };
 
 		//const data = await fetchProductChunk();
-		console.log('i am srver', products.length, totalCount);
+		//console.log('i am srver', products, totalCount);
 
 		return {
 			products,
-			totalCount
+			manufacturers
 		};
 	} catch (error) {
 		console.error('Error loading product data:', error);

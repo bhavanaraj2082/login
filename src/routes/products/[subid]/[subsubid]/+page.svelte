@@ -1,28 +1,37 @@
 <script>
+	import { page } from '$app/stores';
+	import { invalidate } from '$app/navigation'
 	import Subsubcategory from '$lib/components/Product/subsubcategory.svelte';
 	import Filter from '$lib/components/productsFilter/Filter.svelte';
 	import { sendMessage } from '$lib/utils.js';
 	import { allProducts } from '$lib/stores/filter.js';
+    import ProductFilter from '$lib/components/ProductsFilter/ProductFilter.svelte';
 
 	export let data;
-	//console.log(data);
-	$allProducts = data.products;
+	$: ({manufacturers,products} = data)
+	const handlePage = (e) =>{
+		console.log('object',e.detail);
+		invalidate('page:data')
+	}
 
-	const handlePageChange = (e) => {
-		console.log('data1', e);
-		let formData = new FormData();
-		formData.append('page', JSON.stringify(e.detail));
+	//$:console.log(data.products,"======");
+	//$: upd = data
+	// $: {
+	// 	const query = $page.url.searchParams.get("page") || 1
+	// 	if(current !== query){
+	// 		current = query
+	// 		console.log('object');
+	// 		invalidateAll()
+	// 	}
+	// }
 
-		sendMessage('?/pageChange', formData, (result) => {
-			console.log(result);
-			$allProducts = data.products;
-		});
-	};
+
 </script>
 
 <section class="bg-gray-50 py-10">
-	<div class="px-4 lg:w-10/12 mx-auto">
-		<!-- <Subsubcategory data={data.productdata} count={data.count} /> -->
-		<Filter {data} on:pageChange={handlePageChange} />
+	<div class="px-4 max-w-7xl mx-auto">
+		<!-- <Subsubcategory data={data.productdata} count={data.count} />-->
+		<!-- <Filter {data} on:pageChange={handlePageChange} />  -->
+		 <ProductFilter on:onPageChange={(e)=>handlePage(e)} {manufacturers} {products} />
 	</div>
 </section>

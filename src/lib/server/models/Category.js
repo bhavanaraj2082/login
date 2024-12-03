@@ -9,31 +9,22 @@ const categorySchema = new Schema(
       required: false,
       trim: true,
     },
-    subCategory: {
-      type: Schema.Types.ObjectId, 
-      ref: "SubCategory",           
-      required: false,             
-    },
     urlName: {
       type: String,
       required: false,
       trim: true,
     },
-    componentsCount: {
-      type: Number,
-      required: false,  
-      min: 0,           
-      max: 10000,       
-    },
-    filterCount: {
-      type: Schema.Types.Mixed,  
-      required: false,           
-    },
-    leadTime: {
-      type: Number,
-      required: false,  
-      min: 0,           
-    },
+    manufacturerIds: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Manufacturer', // Reference to the Seller model
+      default:[]
+    }],
+    subCategoryIds: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'SubCategory', // Reference to the Seller model
+      default:[]
+    }]
+
   },
   {
     timestamps: true,      
@@ -42,11 +33,9 @@ const categorySchema = new Schema(
 );
 
 categorySchema.index({ name: 1 });
-categorySchema.index({ subCategory: 1 });
 categorySchema.index({ urlName: 1 });
-categorySchema.index({ componentsCount: 1 });
 
 
-const Category = mongoose.models.Category || mongoose.model("Category", categorySchema);
+const Category =mongoose.models.Category || mongoose.model("Category", categorySchema);
 
 export default Category;

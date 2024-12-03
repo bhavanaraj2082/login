@@ -20,7 +20,7 @@ const productSchema = new Schema({
         required: false,
         default: {}
     },
-    manufacturerName: { type: Schema.Types.ObjectId, ref: 'Manufacturer' },
+    manufacturer: { type: Schema.Types.ObjectId, ref: 'Manufacturer' },
     productNumber: { type: String, required: true },
     priceSize: { type:Schema.Types.Mixed, default: [], required:false},
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: false },

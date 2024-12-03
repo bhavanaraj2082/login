@@ -21,8 +21,8 @@
 	} from '$lib/stores/filter.js';
 	const dispatch = createEventDispatcher();
 
-	// export let data;
-	// let products = data?.products || [];
+	 export let data;
+	 //let products = data?.products || [];
 	//console.log('----products---', data, products);
 	$: updateCategories($allProducts);
 	let localCategorySearchQuery = '';
@@ -287,7 +287,7 @@
 						</button>
 					</div>
 					<div class={showManufacturerDropdown ? 'space-y-2' : 'hidden'}>
-						{#each $manufacturers as manufacturer}
+						{#each manufacturers as manufacturer}
 							<label class="flex items-center mb-3 text-gray-600 ml-3 text-sm">
 								<input
 									type="checkbox"
@@ -472,15 +472,14 @@
 					</button>
 				</div>
 				<div class={showManufacturerDropdown ? 'space-y-2 pb-2' : 'hidden'}>
-					{#each $manufacturers as manufacturer}
+					{#each manufacturers as manufacturer}
 						<label class="flex items-center mb-3 text-gray-600 ml-3 text-sm">
 							<input
 								type="checkbox"
 								class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0"
-								on:change={() => toggleManufacturer(manufacturer)}
-								checked={$selectedManufacturers.has(manufacturer)}
+								on:change={() => toggleManufacturer(manufacturer.name)}
 							/>
-							<span class="ml-2">{manufacturer}</span>
+							<span class="ml-2">{manufacturer.name}</span>
 						</label>
 					{/each}
 				</div>
