@@ -403,74 +403,35 @@ export async function getreturnstatusdata(invoiceid) {
 
 //PRODUCT SIMILAR ITEMS , FINDING DIFFERENCES
 export async function DifferentProds(productId) {
-  try {
+	// fething product
     const product = JSON.parse(JSON.stringify(await Product.findOne({ productNumber: productId })));
-    if (!product) {
-      return { type: "error", message: "Product record not found" };
-    }
-
     const partNumber = product.productNumber;
-    const variants = product.variants || [];
-
+   // products stocks
+	let stockQuantity = 0;
+    let orderMultiple=0;
+    let priceSize=[]
+    if (partNumber) {
+		const stockRecord = await Stock.findOne({ productNumber: partNumber }).exec();
+		if (stockRecord && typeof stockRecord.stock !== "undefined") {
+		  stockQuantity = stockRecord.stock;
+		  orderMultiple = stockRecord.orderMultiple;
+		  priceSize=stockRecord.pricing
+		}
+	  }
+   // fetching varints stocks
+	const variants = product.variants || [];
     const variantRecord = await Promise.all(
       variants.map(async (variantId) => {
         const variant = await Product.findById(variantId).lean();
         if (!variant) return {}; 
-    
         const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
-        
         return { 
           ...variant, 
           pricing: stock ? stock.pricing : []  
         };
       })
     );
-    
-    const manufacturerRecord = await Promise.all(
-      variants.map(async (manufacturerId) => {
-        const manufacturer = await Product.findById(manufacturerId).lean();
-        return manufacturer || {}; 
-      })
-    );
-    // console.log("manufacturerRecord", manufacturerRecord);
-    let stockQuantity = 0;
-    let orderMultiple=0;
-    let priceSize=[]
-    if (partNumber) {
-      const stockRecord = await Stock.findOne({ productNumber: partNumber }).exec();
-      if (stockRecord && typeof stockRecord.stock !== "undefined") {
-        stockQuantity = stockRecord.stock;
-        orderMultiple = stockRecord.orderMultiple;
-        priceSize=stockRecord.pricing
-      }
-    }
-    
-    const relatedProducts = await Product.find({
-      subsubCategory: product.subsubCategory,
-      _id: { $ne: product._id }, 
-    })
-      .limit(4)
-      .exec();
-    // console.log("relatedProducts", relatedProducts);
-    const relatedProductData = relatedProducts.map((relatedProduct) => ({
-      productId: relatedProduct?._id?.toString() || "",
-      productName: relatedProduct?.productName || "Unknown Product",
-      productNumber: relatedProduct?.productNumber || "N/A",
-      imageSrc: relatedProduct?.imageSrc || "",
-      properties: relatedProduct?.properties || {},
-      priceSize: Array.isArray(relatedProduct?.priceSize)
-        ? relatedProduct.priceSize.map((item) => ({
-            price: item.price || 0,
-            size: item.size || "Unknown",
-          }))
-        : [],
-    }));
-    for (let relatedProduct of relatedProductData) {
-      const stockData = await Stock.findOne({ partNumber: relatedProduct.productId }).exec();
-      if (stockData) {
-        relatedProduct.stockQuantity = stockData.stockQuantity;
-      }
-    }
+	// formattedRecord
     const formattedRecord = {
       productId: product?._id?.toString() || "",
       productName: product?.productName || "Unknown Product",
@@ -478,7 +439,7 @@ export async function DifferentProds(productId) {
       productNumber: product?.productNumber || "N/A",
       prodDesc: product?.prodDesc || "No description available",
       imageSrc: product?.imageSrc || "",
-      safetyDatasheet: product?.safetyDatasheet || "",
+      safetyDatasheet: product?.safetyDatasheet || "",	
       priceSize,
       properties: product?.properties || {},
       description: product?.description || {},
@@ -495,25 +456,13 @@ export async function DifferentProds(productId) {
         properties: variant?.properties || {},
         manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
         productNumber: variant?.productNumber || "N/A",
-        priceSize: Array.isArray(variant?.priceSize) ? variant.priceSize : [],
-        category: variant?.category?.toString() || null,
-        subCategory: variant?.subCategory?.toString() || null,
-        subsubCategory: variant?.subsubCategory || "",
-        subsubsubCategory: variant?.subsubsubCategory || "",
         imageSrc: variant?.imageSrc || "",
-        returnPolicy: variant?.returnPolicy || false,
-        safetyInfo: Array.isArray(variant?.safetyInfo) ? variant.safetyInfo : [],
-        encompass: variant?.encompass || null,
-        currency: variant?.currency || "USD",
         pricing:variant?.pricing
       })),
-      relatedProducts: relatedProductData, 
     };
+	
     return { records: [formattedRecord] };
-  } catch (error) {
-    console.error("Error loading product data:", error);
-    return { type: "error", message: "An error occurred while loading product data." };
-  }
+
 }
 
 export async function getReturnSavedData(invoiceid) {
