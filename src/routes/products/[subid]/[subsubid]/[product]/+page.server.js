@@ -1,15 +1,16 @@
 import { DifferentProds } from "$lib/server/mongoLoads.js";
 import { RelatedProductData } from "$lib/server/mongoLoads.js";
-import { favorite } from "$lib/server/mongoActions.js";
+import { CompareSimilarityData } from "$lib/server/mongoLoads.js";
 
 export async function load({ params }) {
   try {
       const results = await Promise.allSettled([
           DifferentProds(params.product),
-          RelatedProductData(params.product)
+          RelatedProductData(params.product),
+          CompareSimilarityData(params.product)
       ]);
 
-  const [productData, relatedProducts] = results.map((result) =>
+  const [productData, relatedProducts, compareSimilarity] = results.map((result) =>
       result.status === 'fulfilled' ? result.value : []
   );
 
@@ -18,7 +19,7 @@ export async function load({ params }) {
           error: productData.message
       };
   }
-  return { productData ,relatedProducts};
+  return { productData ,relatedProducts,compareSimilarity};
 } catch (error) {
   console.error('Error loading product data:', error);
   return {
@@ -26,6 +27,8 @@ export async function load({ params }) {
   };
 }
 }
+
+
 
 export const actions = {
   favorite: async ({ request }) => {

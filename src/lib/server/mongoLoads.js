@@ -559,3 +559,74 @@ export async function getFavSavedData(id) {
 	return JSON.parse(JSON.stringify(records)) || { favorite: [] };
 }
 //Myfavourites loads ends
+
+
+//CompareSimilar I tems in product page
+export async function CompareSimilarityData(productId) {
+	const product = await Product.findOne({ productNumber: productId }).populate('subsubCategory');
+	if (!product) {
+		return { error: 'Product not found' };
+	};
+    if(!product.subsubCategory._id){
+       return []
+	}
+	else{
+		const compareSimilarity = await Product.aggregate([
+			{ $match: { subsubCategory: product.subsubCategory._id } },
+			{ $limit: 4 },
+			{
+				$lookup: {
+					from: 'categories', 
+					localField: 'category',
+					foreignField: '_id',
+					as: 'category'
+				}
+			},
+			{
+				$lookup: {
+					from: 'subcategories', 
+					localField: 'subCategory',
+					foreignField: '_id',
+					as: 'subCategory'
+				}
+			},
+			{
+				$lookup: {
+					from: 'manufacturers', 
+					localField: 'manufacturer',
+					foreignField: '_id',
+					as: 'manufacturer'
+				}
+			},
+			{
+				$lookup: {
+					from: 'subsubcategories', 
+					localField: 'subsubCategory',
+					foreignField: '_id',
+					as: 'subsubCategory'
+				}
+			},
+			{
+				$lookup: {
+					from: 'stocks', 
+					localField: 'productNumber',
+					foreignField: 'productNumber',
+					as: 'stock'
+				}
+			},
+			{
+				$addFields: {
+					stockQuantity: {
+						$ifNull: [{ $arrayElemAt: ['$stock.stockQuantity', 0] }, 0]
+					}
+				}
+			},
+			{
+				$project: {
+					stock: 0 
+				}
+			}
+		]);
+		return  JSON.parse(JSON.stringify(compareSimilarity));
+	}
+}

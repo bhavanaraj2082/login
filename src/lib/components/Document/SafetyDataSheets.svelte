@@ -239,7 +239,7 @@ function toggleRotation(index) {
             bind:value={inputValue}
             id="product-number-sds"
             name="productNumber"
-            placeholder="E.G. 775118"
+            placeholder="E.G. IPAKKIT00"
             class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm mb-0"
           />
           {#if showErrors && inputValue.length === 0}
@@ -296,7 +296,7 @@ function toggleRotation(index) {
             type="text"
             id="product-number-sds"
             name="productNumber"
-            placeholder="E.G. 775118"
+            placeholder="E.G. IPAKKIT00"
             class="block w-full  p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
           {#if showErrors && inputValue1.length === 0}
@@ -373,7 +373,7 @@ function toggleRotation(index) {
             type="text"
             id="product-number-sds"
             name="productNumber"
-            placeholder="E.G. 775118"
+            placeholder="E.G. IPAKKIT00"
             class="block w-full  p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
           {#if showErrors && inputValue2.length === 0}
@@ -451,7 +451,7 @@ function toggleRotation(index) {
             type="text"
             id="product-number-sds"
             name="productNumber"
-            placeholder="E.G. 775118"
+            placeholder="E.G. IPAKKIT00"
             class="block w-full p-3  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm" 
           />
           {#if showErrors && inputValue3.length === 0}
@@ -509,14 +509,14 @@ function toggleRotation(index) {
             <div class="mt-4 text-sm text-gray-600 leading-relaxed">
               <p>
                 Product numbers are combined with Pack Sizes/Quantity when displayed on the website 
-                (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118-25G</code>). 
+                (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00-25G</code>). 
                 Please make sure you enter <strong>ONLY</strong> the product number in the Product Number field 
-                (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code>).
+                (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00</code>).
               </p>
               <div class="bg-gray-50 p-4 border border-gray-300 rounded mt-3">
                 <p class="font-semibold mb-2">Example:</p>
                 <p>
-                  <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code> 
+                  <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00</code> 
                   <span class="font-bold">Product Number</span>
                 </p>
                 <p>
@@ -559,14 +559,14 @@ function toggleRotation(index) {
           <div class="mt-4 text-sm text-gray-600 leading-relaxed">
             <p>
               Product numbers are combined with Pack Sizes/Quantity when displayed on the website 
-              (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118-25G</code>). 
+              (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00-25G</code>). 
               Please make sure you enter <strong>ONLY</strong> the product number in the Product Number field 
-              (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code>).
+              (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00</code>).
             </p>
             <div class="bg-gray-50 p-4 border border-gray-300 rounded mt-3">
               <p class="font-semibold mb-2">Example:</p>
               <p>
-                <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code> 
+                <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00</code> 
                 <span class="font-bold">Product Number</span>
               </p>
               <p>
@@ -647,14 +647,14 @@ function toggleRotation(index) {
     <div class="mt-4 text-sm text-gray-600 leading-relaxed">
       <p>
         Product numbers are combined with Pack Sizes/Quantity when displayed on the website 
-        (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118-25G</code>). 
+        (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00-25G</code>). 
         Please make sure you enter <strong>ONLY</strong> the product number in the Product Number field 
-        (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code>).
+        (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00</code>).
       </p>
       <div class="bg-gray-50 p-4 border border-gray-300 rounded mt-3">
         <p class="font-semibold mb-2">Example:</p>
         <p>
-          <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code> 
+          <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00</code> 
           <span class="font-bold">Product Number</span>
         </p>
         <p>
@@ -737,14 +737,14 @@ function toggleRotation(index) {
     <div class="mt-4 text-sm text-gray-600 leading-relaxed">
       <p>
         Product numbers are combined with Pack Sizes/Quantity when displayed on the website 
-        (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118-25G</code>). 
+        (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00-25G</code>). 
         Please make sure you enter <strong>ONLY</strong> the product number in the Product Number field 
-        (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code>).
+        (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00</code>).
       </p>
       <div class="bg-gray-50 p-4 border border-gray-300 rounded mt-3">
         <p class="font-semibold mb-2">Example:</p>
         <p>
-          <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">T775118</code> 
+          <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00</code> 
           <span class="font-bold">Product Number</span>
         </p>
         <p>
