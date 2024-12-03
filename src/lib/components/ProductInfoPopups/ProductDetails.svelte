@@ -70,12 +70,12 @@ $: {
     maxPrice = -Infinity;
     
     data.records.forEach((record) => {
-      if (record.variants && record.variants.length > 0) {
-        record.variants.forEach((variant) => {
+      if (record?.variants && record?.variants.length > 0) {
+        record?.variants.forEach((variant) => {
           let variantMinPrice = Infinity;
           let variantMaxPrice = -Infinity;
 
-          if (variant.pricing && variant.pricing.length > 0) {
+          if (variant?.pricing && variant?.pricing?.length > 0) {
             variant.pricing.forEach((priceItem) => {
               if (priceItem.USD) {
                 // Convert USD to INR
@@ -866,7 +866,7 @@ $: {
 <Properties {data} />
 
 {#each data.records as record}
-  {#if record.variants && record.variants.length > 0}
+  {#if record?.variants && record?.variants?.length > 0}
     <Variants {record} />
   {/if}
 {/each}
