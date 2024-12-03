@@ -1138,11 +1138,32 @@ export const quicksearch = async ({ query }) => {
 	const queryFilter = { productNumber: { $regex: query, $options: 'i' } };
 
 	const result = await Products.find(queryFilter)
-		.limit(10)
+		.limit(30)
 
 		.exec();
-	console.log('i am actions', result);
-
-	// Return the result as JSON
+	// console.log('i am actions', result);
 	return JSON.parse(JSON.stringify(result));
 };
+
+
+export const uploadFile = async ({ query }) => {
+	const queryFilter = { productNumber: { $in: query.map(pn => new RegExp(pn, 'i')) } };
+  
+	try {
+	  const result = await Products.find(queryFilter).exec();
+  
+	  const validationResults = query.map((productNumber) => {
+		const product = result.find((r) => r.productNumber.toLowerCase() === productNumber.toLowerCase());
+		return {
+		  productNumber,
+		  isValid: product ? true : false,
+		  message: product ? 'Product number is valid' : 'Product number is not valid',
+		};
+	  });
+  
+	  return validationResults;
+	} catch (error) {
+	//   console.error('Error checking product numbers in MongoDB:', error);
+	  return [];
+	}
+  };
