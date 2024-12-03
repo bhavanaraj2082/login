@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 const { Schema, Types } = mongoose;
 
-// Embedded schema, _id not required
 
 const stockSchema = new Schema(
     {

@@ -11,7 +11,7 @@ import SubSubCategory from '$lib/server/models/SubSubcategory.js';
 import Shipment from '$lib/server/models/Shipment.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import Return from '$lib/server/models/Return.js';
-import MyFavourite from '$lib/server/models/MyFavourite.js'
+import MyFavourite from '$lib/server/models/MyFavourite.js';
 
 export async function getProductdatas() {
 	const records = await Category.find();
@@ -123,9 +123,9 @@ export const isProductFavorite = async (productNumber, cookies) => {
 	return isFavorite;
 };
 
-export async function getProfileDetails(userEmail) {
+export async function getProfileDetails(userId) {
 	try {
-		const record = await Profile.findOne({ email: userEmail });
+		const record = await Profile.findOne({ userId });
 		if (record) {
 			return { profileData: JSON.parse(JSON.stringify(record)) };
 		} else {
@@ -171,15 +171,14 @@ export async function getSearchData(search) {
 }
 
 async function getMatchedComponents(search) {
-  try {
-    const queryFilter = {
-      $or: [
-        { productName: { $regex: search, $options: "i" } },
-        { productNumber: { $regex: search, $options: "i" } },
-        { CAS: { $regex: search, $options: "i" } },
-      ],
-    };
-
+	try {
+		const queryFilter = {
+			$or: [
+				{ productName: { $regex: search, $options: 'i' } },
+				{ productNumber: { $regex: search, $options: 'i' } },
+				{ CAS: { $regex: search, $options: 'i' } }
+			]
+		};
 
 		const components = await Product.find(queryFilter)
 			.limit(6)
@@ -223,101 +222,196 @@ async function getMatchedSubCategories(search) {
 	}
 }
 
-export async function RelatedProductData(productId) {
-	// console.log(productId);
-	const product = await Product.findOne({ productNumber: productId }).populate('subsubCategory');
 
-	if (!product) {
-		return { error: 'Product not found' };
-	}
-
-	const subsubCategoryId = product.subsubCategory._id;
-
-	const relatedProducts = await Product.find({ subsubCategory: subsubCategoryId })
-		.limit(8)
-		.populate('category')
-		.populate('subCategory')
-		.populate('manufacturer')
-		.populate('subsubCategory');
-
-	if (relatedProducts.length === 0) {
-		return { error: 'No related products found' };
-	}
-
-	const relatedProductsJson = JSON.parse(JSON.stringify(relatedProducts));
-
-	for (let relatedProduct of relatedProductsJson) {
-		const stockData = await Stock.findOne({
-			'partNumber.productNumber': relatedProduct.productNumber
-		});
-
-		if (!stockData) {
-			relatedProduct.stockQuantity = 0;
-		} else {
-			relatedProduct.stockQuantity = stockData.stockQuantity || 0;
-		}
-	}
-	// console.log("=======",relatedProductsJson.length);
-	return relatedProductsJson;
-}
-
-export const loadProductsubcategory = async (suburl, page = 1) => {
+export const loadProductsubcategory = async (suburl,pageNum) => {
+	//console.log(typeof(pageNum),pageNum);
+    const conversionRate = 90
+	const page = pageNum || 1 // Current page number (this could be dynamically set)
+    const pageSize = 10;
+	//console.log(suburl);
 	try {
-		const subcategory = await SubCategory.findOne({ urlName: suburl }).populate('category');
-
+		const subcategory = await SubCategory.findOne({ urlName: suburl }).populate({path:"manufacturerIds",select:"-_id name"});
+		console.log(subcategory,"+++");
+		//console.log('----suburl----', suburl, subcategory, page);
 		if (!subcategory) {
 			return { type: 'error', message: `Subcategory not found for URL: ${suburl}` };
-		}
+		}	   
 
-		const subcategoryID = subcategory._id.toString();
-		const productPageSize = 20;
 
-		const productData = await Product.find({ subCategory: subcategoryID })
-			.skip((page - 1) * productPageSize)
-			.limit(productPageSize)
-			.populate('subCategory')
-			.populate('category')
-			.populate('manufacturerName')
-			.populate('subsubCategory');
-
-		console.log('i am product', productData.length);
-
-		// productData.forEach(product => {
-		//   if (product.subsubCategory && product.subsubCategory.name) {
-		//     console.log("SubsubCategory Name:", product.subsubCategory.name);
-		//   } else {
-		//     console.log("SubsubCategory Name: Unknown Subsubcategory");
-		//   }
-		// });
-
-		if (productData.length === 0) {
-			return { type: 'error', message: 'No products found for this subcategory.' };
-		}
-		const stockData = await Stock.find({}).populate('partNumber');
-		const productNames = productData.map((product) => {
-			const stock = stockData.find(
-				(stockItem) => stockItem.partNumber?._id.toString() === product._id.toString()
-			);
-
-			return {
-				...product.toObject(),
-				manufacturerName: product.manufacturerName?.name || 'Unknown Manufacturer',
-				category: product.category ? product.category.name : 'Unknown Category',
-				subsubCategory: product.subsubCategory?.name || 'Unknown Subsubcategory',
-				stockQuantity: stock ? stock.stockQuantity : 0
-			};
-		});
-
-		return {
-			type: 'success',
-			records: productNames,
-			nextPage: productData.length === productPageSize ? page + 1 : null
-		};
+		const products =  await Stock.aggregate([
+			// Stage 1: Lookup Product details in the Stock collection
+			{
+			  $lookup: {
+				from: 'products',           // The collection to join with (Product)
+				localField: 'productid',     // The field in Stock (reference to Product)
+				foreignField: '_id',         // The field in Product (primary key)
+				as: 'productDetails'         // The field to store the product data
+			  }
+			},
+			{
+			  $unwind: '$productDetails'    // Unwind to flatten the product data
+			},
+			{
+				$lookup: {
+				  from: 'manufacturers',        // The collection to join with (Manufacturer)
+				  localField: 'productDetails.manufacturer', // Manufacturer ID from Product
+				  foreignField: '_id',           // Manufacturer primary key
+				  as: 'manufacturerDetails'      // The field to store manufacturer data
+				}
+			  },
+			  {
+				$unwind: '$manufacturerDetails' // Unwind to flatten the manufacturer data
+			  },
+			  {
+				$lookup: {
+				  from: 'distributors',         // The collection to join with (Distributor)
+				  localField: 'distributor',   // The field in Stock (reference to Distributor)
+				  foreignField: '_id',           // The field in Distributor (primary key)
+				  as: 'distributorDetails'       // The field to store distributor data
+				}
+			  },
+			  {
+				$unwind: '$distributorDetails'  // Unwind to flatten the distributor data
+			  },
+			  {
+				$lookup: {
+				  from: 'categories',         // The collection to join with (Category)
+				  localField: 'productDetails.category', // category ID from Product
+				  foreignField: '_id',        // category primary key
+				  as: 'categoryDetails'       // The field to store category data
+				}
+			  },
+			  {
+				$unwind: '$categoryDetails'   // Unwind to flatten the category data
+			  },
+			// Stage 2: Lookup Category details in the Product collection
+			{
+			  $lookup: {
+				from: 'subcategories',         // The collection to join with (Category)
+				localField: 'productDetails.subCategory', // Category ID from Product
+				foreignField: '_id',        // Category primary key
+				as: 'subCategoryDetails'       // The field to store category data
+			  }
+			},
+			{
+			  $unwind: '$subCategoryDetails'   // Unwind to flatten the category data
+			},
+			{
+			  $match: {
+				'subCategoryDetails.name': subcategory.name // Filter by category name
+			  }
+			},
+			// Optional: Project specific fields for the result
+			{
+			  $project: {
+				'productDetails.productNumber': 1,
+				'productDetails.productName': 1,
+				'productDetails.prodDesc': 1,
+				'productDetails.imageSrc': 1,
+				'subCategoryDetails.name': 1,
+				'categoryDetails.name': 1,        // Category name
+				'categoryDetails.urlName': 1,        // Category name
+                'subCategoryDetails.urlName': 1,     // Subcategory name
+                'distributorDetails.distributorName': 1,     // Distributor name
+                'manufacturerDetails.name': 1,
+				'pricing':1,
+				'stock':1,
+				'orderMultiple':1,
+			  }
+			},
+			{
+				$skip: (page - 1) * pageSize // Skip the documents for previous pages
+			  },
+			  {
+				$limit: pageSize // Limit to the number of documents per page
+			  }
+		  ])
+		  const filtered = products.map(product=>{
+			const {_id,pricing,orderMultiple,stock,productDetails,manufacturerDetails,distributorDetails,categoryDetails,subCategoryDetails} = product
+			const priceConversion = pricing.map(price=>{
+				return {...price,INR:price.USD*conversionRate}
+			})
+			 return {_id,pricing:priceConversion,totalPrice:priceConversion[0].INR,orderMultiple,quantity:orderMultiple,stock,...productDetails,...distributorDetails,categoryDetails,subCategoryDetails,manufacturerDetails}
+		  })
+		return { products:JSON.parse(JSON.stringify(filtered)),manufacturers:JSON.parse(JSON.stringify(subcategory.manufacturerIds)) };
 	} catch (error) {
 		console.error('Error loading product subcategory:', error);
 		return { type: 'error', message: 'An error occurred while loading product data.' };
 	}
 };
+
+export async function RelatedProductData(productId) {
+
+	// console.log("==",productId);
+	const product = await Product.findOne({ productNumber: productId }).populate('subsubCategory');
+	if (!product) {
+		return { error: 'Product not found' };
+	};
+
+	// console.log("====",product.subCategory._id);
+    if(!product.subsubCategory._id){
+       return []
+	}
+	else{
+		const relatedProducts = await Product.aggregate([
+			{ $match: { subsubCategory: product.subsubCategory._id } },
+			{ $limit: 8 },
+			{
+				$lookup: {
+					from: 'categories', 
+					localField: 'category',
+					foreignField: '_id',
+					as: 'category'
+				}
+			},
+			{
+				$lookup: {
+					from: 'subcategories', 
+					localField: 'subCategory',
+					foreignField: '_id',
+					as: 'subCategory'
+				}
+			},
+			{
+				$lookup: {
+					from: 'manufacturers', 
+					localField: 'manufacturer',
+					foreignField: '_id',
+					as: 'manufacturer'
+				}
+			},
+			{
+				$lookup: {
+					from: 'subsubcategories', 
+					localField: 'subsubCategory',
+					foreignField: '_id',
+					as: 'subsubCategory'
+				}
+			},
+			{
+				$lookup: {
+					from: 'stocks', 
+					localField: 'productNumber',
+					foreignField: 'productNumber',
+					as: 'stock'
+				}
+			},
+			{
+				$addFields: {
+					stockQuantity: {
+						$ifNull: [{ $arrayElemAt: ['$stock.stockQuantity', 0] }, 0]
+					}
+				}
+			},
+			{
+				$project: {
+					stock: 0 
+				}
+			}
+		]);
+		return  JSON.parse(JSON.stringify(relatedProducts));
+	}
+}
 
 export async function RelatedApplicationData(name) {
 	try {
@@ -366,7 +460,11 @@ export const verifyPasswordToken = async (token) => {
 			if (Date.now() >= verifyToken.expiry.getTime()) {
 				return { success: false, message: 'token has expired. please verify again' };
 			} else {
-				return { success: true, message: 'Token is verified successfully' };
+				return {
+					success: true,
+					message: 'Token is verified successfully',
+					token: JSON.parse(JSON.stringify(verifyToken))
+				};
 			}
 		} else {
 			return { success: false, message: 'Token is not found ' };
@@ -382,9 +480,7 @@ export async function getreturnstatusdata(invoiceid) {
 	try {
 		const records = await Order.findOne({
 			invoice: invoiceid
-		})
-			.populate('dashuserprofileid')
-			.populate('shipdetails');
+		}).populate('dashuserprofileid').populate('shipdetails');
 		if (records) {
 			return JSON.parse(JSON.stringify(records));
 		} else {
@@ -396,124 +492,69 @@ export async function getreturnstatusdata(invoiceid) {
 	}
 }
 
-
 // returns ends
-
-
 
 //PRODUCT SIMILAR ITEMS , FINDING DIFFERENCES
 export async function DifferentProds(productId) {
-  try {
-    const product = JSON.parse(JSON.stringify(await Product.findOne({ productNumber: productId })));
-    if (!product) {
-      return { type: "error", message: "Product record not found" };
-    }
+	// fething product
+	const product = JSON.parse(JSON.stringify(await Product.findOne({ productNumber: productId })));
+	const partNumber = product.productNumber;
+	// products stocks
+	let stockQuantity = 0;
+	let orderMultiple = 0;
+	let priceSize = [];
+	if (partNumber) {
+		const stockRecord = await Stock.findOne({ productNumber: partNumber }).exec();
+		if (stockRecord && typeof stockRecord.stock !== 'undefined') {
+			stockQuantity = stockRecord.stock;
+			orderMultiple = stockRecord.orderMultiple;
+			priceSize = stockRecord.pricing;
+		}
+	}
+	// fetching varints stocks
+	// const variants = product.variants || [];
+	// const variantRecord = await Promise.all(
+	//   variants.map(async (variantId) => {
+	//     const variant = await Product.findById(variantId).lean();
+	//     if (!variant) return {};
+	//     const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
+	//     return {
+	//       ...variant,
+	//       pricing: stock ? stock.pricing : []
+	//     };
+	//   })
+	// );
+	// formattedRecord
+	const formattedRecord = {
+		productId: product?._id?.toString() || '',
+		productName: product?.productName || 'Unknown Product',
+		CAS: product?.CAS,
+		productNumber: product?.productNumber || 'N/A',
+		prodDesc: product?.prodDesc || 'No description available',
+		imageSrc: product?.imageSrc || '',
+		safetyDatasheet: product?.safetyDatasheet || '',
+		priceSize,
+		properties: product?.properties || {},
+		description: product?.description || {},
+		safetyInfo: product?.safetyInfo || {},
+		filteredProductData: product?.filteredProductData || {},
+		productSynonym: product?.filteredProductData?.['Synonym(S)'] || '',
+		stockQuantity,
+		orderMultiple
+		//   variants: variantRecord.map((variant) => ({
+		//     _id: variant?._id?.toString() || "",
+		//     productName: variant?.productName || "Unknown Product",
+		//     prodDesc: variant?.prodDesc || "No description available",
+		//     description: variant?.description || [],
+		//     properties: variant?.properties || {},
+		//     manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
+		//     productNumber: variant?.productNumber || "N/A",
+		//     imageSrc: variant?.imageSrc || "",
+		//     pricing:variant?.pricing
+		//   })),
+	};
 
-    const partNumber = product.productNumber;
-    const variants = product.variants || [];
-
-    const variantRecord = await Promise.all(
-      variants.map(async (variantId) => {
-        const variant = await Product.findById(variantId).lean();
-        if (!variant) return {}; 
-    
-        const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
-        
-        return { 
-          ...variant, 
-          pricing: stock ? stock.pricing : []  
-        };
-      })
-    );
-    
-    const manufacturerRecord = await Promise.all(
-      variants.map(async (manufacturerId) => {
-        const manufacturer = await Product.findById(manufacturerId).lean();
-        return manufacturer || {}; 
-      })
-    );
-    // console.log("manufacturerRecord", manufacturerRecord);
-    let stockQuantity = 0;
-    let orderMultiple=0;
-    let priceSize=[]
-    if (partNumber) {
-      const stockRecord = await Stock.findOne({ productNumber: partNumber }).exec();
-      if (stockRecord && typeof stockRecord.stock !== "undefined") {
-        stockQuantity = stockRecord.stock;
-        orderMultiple = stockRecord.orderMultiple;
-        priceSize=stockRecord.pricing
-      }
-    }
-    
-    const relatedProducts = await Product.find({
-      subsubCategory: product.subsubCategory,
-      _id: { $ne: product._id }, 
-    })
-      .limit(4)
-      .exec();
-    // console.log("relatedProducts", relatedProducts);
-    const relatedProductData = relatedProducts.map((relatedProduct) => ({
-      productId: relatedProduct?._id?.toString() || "",
-      productName: relatedProduct?.productName || "Unknown Product",
-      productNumber: relatedProduct?.productNumber || "N/A",
-      imageSrc: relatedProduct?.imageSrc || "",
-      properties: relatedProduct?.properties || {},
-      priceSize: Array.isArray(relatedProduct?.priceSize)
-        ? relatedProduct.priceSize.map((item) => ({
-            price: item.price || 0,
-            size: item.size || "Unknown",
-          }))
-        : [],
-    }));
-    for (let relatedProduct of relatedProductData) {
-      const stockData = await Stock.findOne({ partNumber: relatedProduct.productId }).exec();
-      if (stockData) {
-        relatedProduct.stockQuantity = stockData.stockQuantity;
-      }
-    }
-    const formattedRecord = {
-      productId: product?._id?.toString() || "",
-      productName: product?.productName || "Unknown Product",
-      CAS:product?.CAS,
-      productNumber: product?.productNumber || "N/A",
-      prodDesc: product?.prodDesc || "No description available",
-      imageSrc: product?.imageSrc || "",
-      safetyDatasheet: product?.safetyDatasheet || "",
-      priceSize,
-      properties: product?.properties || {},
-      description: product?.description || {},
-      safetyInfo: product?.safetyInfo || {},
-      filteredProductData: product?.filteredProductData || {},
-      productSynonym: product?.filteredProductData?.["Synonym(S)"] || "",
-      stockQuantity,
-      orderMultiple,
-      variants: variantRecord.map((variant) => ({
-        _id: variant?._id?.toString() || "",
-        productName: variant?.productName || "Unknown Product",
-        prodDesc: variant?.prodDesc || "No description available",
-        description: variant?.description || [],
-        properties: variant?.properties || {},
-        manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
-        productNumber: variant?.productNumber || "N/A",
-        priceSize: Array.isArray(variant?.priceSize) ? variant.priceSize : [],
-        category: variant?.category?.toString() || null,
-        subCategory: variant?.subCategory?.toString() || null,
-        subsubCategory: variant?.subsubCategory || "",
-        subsubsubCategory: variant?.subsubsubCategory || "",
-        imageSrc: variant?.imageSrc || "",
-        returnPolicy: variant?.returnPolicy || false,
-        safetyInfo: Array.isArray(variant?.safetyInfo) ? variant.safetyInfo : [],
-        encompass: variant?.encompass || null,
-        currency: variant?.currency || "USD",
-        pricing:variant?.pricing
-      })),
-      relatedProducts: relatedProductData, 
-    };
-    return { records: [formattedRecord] };
-  } catch (error) {
-    console.error("Error loading product data:", error);
-    return { type: "error", message: "An error occurred while loading product data." };
-  }
+	return { records: [formattedRecord] };
 }
 
 export async function getReturnSavedData(invoiceid) {
@@ -572,8 +613,8 @@ export const quick = async () => {
 ///Quick Order////
 //Myfavourites loads starts
 
-export async function getFavSavedData( id ) {
-  const records = await MyFavourite.findOne({ userId : id });
-  return JSON.parse(JSON.stringify(records)) || { favorite: [] };
+export async function getFavSavedData(id) {
+	const records = await MyFavourite.findOne({ userId: id });
+	return JSON.parse(JSON.stringify(records)) || { favorite: [] };
 }
 //Myfavourites loads ends

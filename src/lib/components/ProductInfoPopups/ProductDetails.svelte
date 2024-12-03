@@ -70,12 +70,12 @@ $: {
     maxPrice = -Infinity;
     
     data.records.forEach((record) => {
-      if (record.variants && record.variants.length > 0) {
-        record.variants.forEach((variant) => {
+      if (record?.variants && record?.variants.length > 0) {
+        record?.variants.forEach((variant) => {
           let variantMinPrice = Infinity;
           let variantMaxPrice = -Infinity;
 
-          if (variant.pricing && variant.pricing.length > 0) {
+          if (variant?.pricing && variant?.pricing?.length > 0) {
             variant.pricing.forEach((priceItem) => {
               if (priceItem.USD) {
                 // Convert USD to INR
@@ -214,11 +214,6 @@ $: {
   }
 </script>
 
-<link
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-  rel="stylesheet"
-/>
-
 {#each data.records as product}
   <div
     class="max-[991px]:block md:flex lg:flex bg-white shadow-sm rounded-lg m-10"
@@ -297,50 +292,17 @@ $: {
               <input type="hidden" name="imgUrl" value={product.imageSrc} />
               <input type="hidden" name="priceSize" />
               <input type="hidden" name="authedEmail" value={authedEmail} />
-              <input
-                type="hidden"
-                name="price"
-                value={product?.priceSize[index]?.INR}
-              />
-              <input
-                type="hidden"
-                name="size"
-                value={product?.priceSize[index]?.break}
-              />
-              <input
-                type="hidden"
-                name="productDesc"
-                value={product.prodDesc}
-              />
-              <input
-                type="hidden"
-                name="productName"
-                value={product.productName}
-              />
-              <input
-                type="hidden"
-                name="productNumber"
-                value={product?.productNumber}
-              />
-              <input
-                type="hidden"
-                name="quantity"
-                value={product?.quantity || 1}
-              />
-              <input
-                type="hidden"
-                name="stock"
-                value={product?.stockQuantity}
-              />
-              <button
-                type="submit"
-                class="btn btn-primary"
-                on:click={toggleLikedPopup}
-              >
+              <input type="hidden" name="price" value={product?.priceSize[index]?.INR}/>
+              <input type="hidden" name="size" value={product?.priceSize[index]?.break}/>
+              <input type="hidden" name="productDesc" value={product.prodDesc}/>
+              <input type="hidden" name="productName" value={product.productName} />
+              <input type="hidden" name="productNumber" value={product?.productNumber} />
+              <input type="hidden" name="quantity" value={product?.quantity || 1} />
+              <input type="hidden" name="stock" value={product?.stockQuantity} />
+              <button type="submit" class="btn btn-primary" on:click={toggleLikedPopup}>
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
-                <i
-                  class={`fa-heart text-xl ml-10 ${isLiked ? "fa-solid text-orange-500" : "fa-regular text-primary-400"} text-end`}
+                <i class={`fa-heart text-xl ml-10 ${isLiked ? "fa-solid text-orange-500" : "fa-regular text-primary-400"} text-end`}
                   on:click={toggleLike}
                 ></i>
               </button>
@@ -866,7 +828,7 @@ $: {
 <Properties {data} />
 
 {#each data.records as record}
-  {#if record.variants && record.variants.length > 0}
+  {#if record?.variants && record?.variants?.length > 0}
     <Variants {record} />
   {/if}
 {/each}
