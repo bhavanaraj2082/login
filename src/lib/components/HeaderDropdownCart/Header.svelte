@@ -147,9 +147,14 @@
 								: navigateTo(menu.href)}
 						class="flex justify-between text-left hover:text-primary-400 text-gray-800 transition duration-200 w-full py-2">
 						{menu.title}
-						<Icon
+						<!-- <Icon
 							icon="prime:chevron-down"
-							class="w-5 h-5 mr-2 text-gray-800 hover:text-primary-400"/>
+							class="w-5 h-5 mr-2 text-gray-800 hover:text-primary-400"/> -->
+							{#if menu.title !== 'Documents' && menu.title !== 'Support'}
+              <Icon
+            icon="prime:chevron-down"
+            class="w-5 h-5 mr-2 text-gray-800 hover:text-primary-400" />
+              {/if}
 					</button>
 				{/each}
 				<div class="flex flex-col font-semibold">
@@ -341,7 +346,7 @@
 							class={`flex items-center text-nowrap text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-primary-400' : 'text-gray-700'}`}
 							role="menuitem">
 							{menu.title}
-							{#if index < 5}
+							{#if index < 5 && menu.title !== 'Documents' && menu.title !== 'Support'}
 								<Icon icon="prime:chevron-down" class="ml-1 w-5 h-5 " />
 							{/if}
 						</button>
