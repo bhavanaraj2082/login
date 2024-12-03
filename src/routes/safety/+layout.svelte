@@ -12,36 +12,44 @@
       </a>
       <ul class="pl-2 mt-2 space-y-7 border-gray-300">
         <li>
+          <div class="flex flex-col items-start">
           <a href="/safety/understanding-product-labels" 
-             class="py-1 px-4 w-full font-medium text-sm text-left cursor-pointer transition duration-200 ease-in-out"
+             class="py-1 px-4 w-full font-medium text-sm text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500"
              class:text-primary-500={$page.url.pathname === "/safety/understanding-product-labels"}
              class:font-semibold={$page.url.pathname === "/safety/understanding-product-labels"}>
             - Understanding Product Labels
           </a>
+          </div>
         </li>
         <li>
+          <div class="flex flex-col items-start">
           <a href="/safety/globally-harmonized-system" 
-             class="py-1 px-4 w-full font-medium text-sm text-left cursor-pointer transition duration-200 ease-in-out"
+             class="py-1 px-4 w-full font-medium text-sm text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500"
              class:text-primary-500={$page.url.pathname === "/safety/globally-harmonized-system"}
              class:font-semibold={$page.url.pathname === "/safety/globally-harmonized-system"}>
             - Globally Harmonized System
           </a>
+          </div>
         </li>
         <li>
+          <div class="flex flex-col items-start">
           <a href="/safety/tsca-8-notification" 
-             class="py-1 px-4 w-full font-medium text-sm text-left cursor-pointer transition duration-200 ease-in-out"
+             class="py-1 px-4 w-full font-medium text-sm text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500"
              class:text-primary-500={$page.url.pathname === "/safety/tsca-8-notification"}
              class:font-semibold={$page.url.pathname === "/safety/tsca-8-notification"}>
             - TSCA 8 Notification
           </a>
+          </div>
         </li>
         <li>
+          <div class="flex flex-col items-start">
           <a href="/safety/hazard-and-precautionary-statements" 
-             class="py-1 px-4 w-full font-medium text-sm text-left cursor-pointer transition duration-200 ease-in-out"
+             class="py-1 px-4 w-full font-medium text-sm text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500"
              class:text-primary-500={$page.url.pathname === "/safety/hazard-and-precautionary-statements"}
              class:font-semibold={$page.url.pathname === "/safety/hazard-and-precautionary-statements"}>
             - Hazard & Precautions
           </a>
+          </div>
         </li>
       </ul>
     </div>
@@ -65,7 +73,7 @@
           <div class="">
             <img src="/productsafety/Understanding Product Labels.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-52" />
               <a href="/safety/understanding-product-labels" 
-                  class="text-xl font-bold mb-2 py-1 w-full text-left cursor-pointer transition duration-200 ease-in-out"
+                  class="text-xl font-bold mb-2 py-1 w-full text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:underline decoration-2 underline-offset-4"
                   class:text-primary-500={$page.url.pathname === "/safety/understanding-product-labels"}
                   class:font-semibold={$page.url.pathname === "/safety/understanding-product-labels"}>
                   Understanding Product Labels
@@ -78,7 +86,7 @@
           <div class="">
             <img src="/productsafety/GHS.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-52" />
               <a href="/safety/globally-harmonized-system" 
-                  class="py-1 w-full text-xl font-bold mb-2 text-left cursor-pointer transition duration-200 ease-in-out"
+                  class="py-1 w-full text-xl font-bold mb-2 text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:underline decoration-2 underline-offset-4"
                   class:text-primary-500={$page.url.pathname === "/safety/globally-harmonized-system"}
                   class:font-semibold={$page.url.pathname === "/safety/globally-harmonized-system"}>
                   Globally Harmonized System
@@ -91,7 +99,7 @@
           <div class="">
           <img src="/productsafety/TSCA.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-52"/>
               <a href="/safety/tsca-8-notification" 
-                  class="py-1 w-full text-xl font-bold mb-2 text-left cursor-pointer transition duration-200 ease-in-out"
+                  class="py-1 w-full text-xl font-bold mb-2 text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:underline decoration-2 underline-offset-4"
                   class:text-primary-500={$page.url.pathname === "/safety/tsca-8-notification"}
                   class:font-semibold={$page.url.pathname === "/safety/tsca-8-notification"}>
                   TSCA 8 Notification
@@ -104,7 +112,7 @@
           <div class="">
             <img src="/productsafety/Hazard_Precaution.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-28 mt-5"/>
               <a href="/safety/hazard-and-precautionary-statements" 
-                  class="py-1 w-full text-xl font-bold mb-2 text-left cursor-pointer transition duration-200 ease-in-out"
+                  class="py-1 w-full text-xl font-bold mb-2 text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:underline decoration-2 underline-offset-4"
                   class:text-primary-500={$page.url.pathname === "/safety/hazard-and-precautionary-statements"}
                   class:font-semibold={$page.url.pathname === "/safety/hazard-and-precautionary-statements"}>
                   Hazard and Precautionary Statements

@@ -41,7 +41,7 @@
     selectedNames=[];
     }
     function handleSubmit(event) {
-        if (number.length !== 10 || email.length === 0 || fname.length === 0 || company.length === 0 || details.length === 0 || role.length===0 || lname.length === 0) {
+        if (number.length !== 10 || email.length === 0 || fname.length === 0 || company.length === 0 || details.length === 0 || role.length===0 || lname.length === 0 || reason.length === 0) {
             console.log('Validation failed: Missing required fields');
             event.preventDefault();
             formValid = false;
@@ -112,9 +112,6 @@
                         <Icon icon="game-icons:chemical-drop" class="w-20 h-24 text-primary-400" />
                         <p class="text-content">Discover our latest website features and enhance your experience with Chemikart.<br>Find information regarding new features as well as tips and tricks with Get Site Smart.</p>
                         <div class="mt-8">
-                            <button class="px-10 py-3 text-primary-400 border-2 border-primary-400 rounded hover:bg-primary-400 hover:text-white transition-all">
-                                Learn More
-                            </button>
                         </div>
                     </div>
                 </aside>
@@ -153,9 +150,6 @@
                 <li>Global approach and management of scale, harmonized for all your sites.</li>
             </ol>
             <a href="#contact-team">
-            <button class="px-6 py-3 mt-4 text-primary-400 border-2 border-primary-400 rounded hover:bg-primary-400 hover:text-white transition-all max-md:self-start">
-                Request More Information
-            </button>
         </a>
         </div>
     </div>
@@ -183,9 +177,6 @@
                 <li>Streamlined reconciliation process</li>
             </ul>
             <a href="#contact-team">
-            <button class="px-6 py-3 mt-4 text-primary-400 border-2 border-primary-400 rounded hover:bg-primary-400 hover:text-white transition-all max-md:self-start">
-                Request More Information
-            </button>
         </a>
         </div>
     </div>
@@ -208,9 +199,6 @@
                 <li>e-Quotes converted directly to orders</li>
             </ul>
             <a href="#contact-team">
-            <button class="px-6 py-3 mt-4 text-primary-400 border-2 border-primary-400 rounded hover:bg-primary-400 hover:text-white transition-all max-md:self-start">
-                Request More Information
-            </button>
         </a>
         </div>
     </div>
@@ -358,7 +346,9 @@
                                 />
                                 <span class="mb-5 text-xs">I agree to the terms and conditions</span>
                             </label>
-                            
+                            {#if showErrors && reason.length === 0}
+                            <span class="text-red-400 text-xs">Please select one of the following reasons and agree to the terms and conditions</span>
+                            {/if}
                             <input type="hidden" name="status" value="unread" />
 
                         </div>
