@@ -3,6 +3,7 @@
 	import { authedUser } from '$lib/stores/mainStores.js';
 	import { enhance, applyAction } from '$app/forms';
 	export let data;
+	const token = data?.token;
 
 	let email = '';
 	let password = '';
@@ -135,6 +136,7 @@
 				>
 					<p class=" text-center text-sm font-medium my-1 text-green-500">{data?.message || ''}</p>
 					<input type="hidden" name="userId" value={$authedUser.userId} />
+					<input type="hidden" name="email" value={token?.email} />
 					<label for="password" class=" text-xs font-medium md:text-sm">New Password</label>
 					<input
 						type="text"

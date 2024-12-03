@@ -14,7 +14,7 @@ import TokenVerification from '$lib/server/models/TokenVerification.js';
 import { redirect, error } from '@sveltejs/kit';
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from 'nodemailer';
-//import { lucia } from 'lucia';
+// import { lucia } from 'lucia';
 import {
 	APP_URL,
 	SENDER_EMAIL,
@@ -23,7 +23,7 @@ import {
 	MAIL_HOST
 } from '$env/static/private';
 import Return from '$lib/server/models/Return.js';
-// import { auth } from '$lib/server/lucia.js';
+import { auth } from '$lib/server/lucia.js';
 
 export const submitContactInfo = async (data) => {
 	try {
@@ -821,8 +821,8 @@ export const passwordVerificationToken = async (body, verifyType) => {
 };
 
 export const userUpdatePassword = async (body) => {
-	const { userId, newPassword } = body;
-	console.log(userId, newPassword);
+	const { userId, email, newPassword } = body;
+	console.log(email, newPassword);
 	//Initialize Lucia with Mongoose adapter
 	// const auth = new Lucia({
 	// 	adapter: 'mongoose',
@@ -831,7 +831,7 @@ export const userUpdatePassword = async (body) => {
 
 	try {
 		// Update the password using Lucia's built-in method
-		await auth.updateKeyPassword('email', userId, newPassword);
+		await auth.updateKeyPassword('email', email, newPassword);
 
 		// Optionally, invalidate any existing sessions after password change
 		await auth.invalidateSession(userId); // Optional, for security
@@ -951,68 +951,68 @@ export const getcancelreturnData = async ({ id }) => {
 
 export async function quickcheck(data) {
 	const { ProductId, quantity } = data;
-  
-	console.log("ProductId from actions:", ProductId);
-  
+
+	console.log('ProductId from actions:', ProductId);
+
 	if (!ProductId || !quantity) {
-	  return {
-		type: 'error',
-		message: 'Product ID and Quantity are required.',
-	  };
-	}
-  
-	const requestedQuantity = parseInt(quantity, 10);
-  
-	try {
-	  // Add a debug log for the query being run
-	  console.log(`Querying stock with ProductId: ${ProductId}`);
-  
-	  // Remove populate for simplicity
-	  const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
-  
-	  console.log("Stock Record:", stockRecord);
-  
-	  if (!stockRecord) {
-		console.log(`No stock record found for ProductId: ${ProductId}`);
 		return {
-		  message: 'Out of stock',
-		  stock: 'Unavailable',
-		  type: 'error',
-		};
-	  }
-  
-	  const stockQuantity = stockRecord.stock;
-  
-	  if (stockQuantity > 0) {
-		if (requestedQuantity <= stockQuantity) {
-		  return {
-			message: 'In Stock',
-			stock: 'Available',
-			type: 'success',
-		  };
-		} else {
-		  return {
-			message: `Only ${stockQuantity} units available.`,
-			stock: 'Limited Availability',
 			type: 'error',
-		  };
-		}
-	  } else {
-		return {
-		  message: 'Out of Stock',
-		  stock: 'Unavailable',
-		  type: 'error',
+			message: 'Product ID and Quantity are required.'
 		};
-	  }
-	} catch (error) {
-	  console.error('Error during stock check:', error);
-	  return {
-		message: 'Something went wrong with the stock check.',
-		stock: 'Unavailable',
-		type: 'error',
-	  };
 	}
-  }
+
+	const requestedQuantity = parseInt(quantity, 10);
+
+	try {
+		// Add a debug log for the query being run
+		console.log(`Querying stock with ProductId: ${ProductId}`);
+
+		// Remove populate for simplicity
+		const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
+
+		console.log('Stock Record:', stockRecord);
+
+		if (!stockRecord) {
+			console.log(`No stock record found for ProductId: ${ProductId}`);
+			return {
+				message: 'Out of stock',
+				stock: 'Unavailable',
+				type: 'error'
+			};
+		}
+
+		const stockQuantity = stockRecord.stock;
+
+		if (stockQuantity > 0) {
+			if (requestedQuantity <= stockQuantity) {
+				return {
+					message: 'In Stock',
+					stock: 'Available',
+					type: 'success'
+				};
+			} else {
+				return {
+					message: `Only ${stockQuantity} units available.`,
+					stock: 'Limited Availability',
+					type: 'error'
+				};
+			}
+		} else {
+			return {
+				message: 'Out of Stock',
+				stock: 'Unavailable',
+				type: 'error'
+			};
+		}
+	} catch (error) {
+		console.error('Error during stock check:', error);
+		return {
+			message: 'Something went wrong with the stock check.',
+			stock: 'Unavailable',
+			type: 'error'
+		};
+	}
+}
 
 export const validateProductDetails = async (productNumber, size, quantity) => {
 	try {
@@ -1086,59 +1086,58 @@ export const handleFileUpload = async (fileData) => {
 };
 
 //Myfavouries actions starts
-export const deleteFavoriteItem = async (itemId , userId) => {
-    try {
-        const updatedDoc = await MyFavourite.findOneAndDelete(
-            { userId : userId },
-            { $pull: { favorite: { id: itemId } } }, 
-            { new: true } 
-        );
-        if (!updatedDoc) {
-            throw new Error('User favorites not found');
-        }
-        return {
-            status: 'success',
-            message: 'Item deleted successfully',
-            favorite: updatedDoc.favorite 
-        };
-    } catch (error) {
-        console.error('Error deleting favorite item:', error);
-        throw error;
-    }
+export const deleteFavoriteItem = async (itemId, userId) => {
+	try {
+		const updatedDoc = await MyFavourite.findOneAndDelete(
+			{ userId: userId },
+			{ $pull: { favorite: { id: itemId } } },
+			{ new: true }
+		);
+		if (!updatedDoc) {
+			throw new Error('User favorites not found');
+		}
+		return {
+			status: 'success',
+			message: 'Item deleted successfully',
+			favorite: updatedDoc.favorite
+		};
+	} catch (error) {
+		console.error('Error deleting favorite item:', error);
+		throw error;
+	}
 };
 
-export const clearAllFavorites = async ( userId ) => {
-    try {
-        const updatedDoc = await MyFavourite.findOneAndDelete(
-            { userId : userId },
-            { $set: { favorite: [] } }, 
-            { new: true } 
-        );
-        if (!updatedDoc) {
-            throw new Error('User favorites not found');
-        }
-        return {
-            status: 'success',
-            message: 'All favorite items deleted successfully',
-            favorite: [] 
-        };
-    } catch (error) {
-        console.error('Error deleting all favorite items:', error);
-        throw error;
-    }
+export const clearAllFavorites = async (userId) => {
+	try {
+		const updatedDoc = await MyFavourite.findOneAndDelete(
+			{ userId: userId },
+			{ $set: { favorite: [] } },
+			{ new: true }
+		);
+		if (!updatedDoc) {
+			throw new Error('User favorites not found');
+		}
+		return {
+			status: 'success',
+			message: 'All favorite items deleted successfully',
+			favorite: []
+		};
+	} catch (error) {
+		console.error('Error deleting all favorite items:', error);
+		throw error;
+	}
 };
 //Myfavouries actions ends
 
 export const quicksearch = async ({ query }) => {
 	const queryFilter = { productNumber: { $regex: query, $options: 'i' } };
-  
+
 	const result = await Products.find(queryFilter)
-	  .limit(10)
-	 
-	  .exec();
-  console.log("i am actions",result);
-  
+		.limit(10)
+
+		.exec();
+	console.log('i am actions', result);
+
 	// Return the result as JSON
 	return JSON.parse(JSON.stringify(result));
-  
-  };
+};
