@@ -65,7 +65,7 @@
                     id="email"
                     bind:value={email}
                     placeholder="username@example.com"
-                    class="border border-gray-300 rounded p-2 w-full"
+                    class=" p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"
                 />
                 {#if errors.email}
                 <div class="text-red-500 text-xs mt-1 mb-3">{errors.email}</div>
@@ -77,7 +77,7 @@
                     id="password"
                     bind:value={password}
                     placeholder="*******"
-                    class="border border-gray-300 rounded p-2 w-full"
+                    class=" p-2 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 "
                 />
                 {#if errors.password}
                  <div class="text-red-500 text-xs mt-1">{errors.password}</div>

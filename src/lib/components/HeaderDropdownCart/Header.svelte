@@ -123,7 +123,7 @@
 	};
 </script>
 
-<nav class="my-3 bg-white">
+<nav class="bg-white">
 	<div
 		class={`fixed top-0 left-0 h-full bg-white transition-transform transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden z-50 w-full`}
 	>
