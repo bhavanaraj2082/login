@@ -228,7 +228,7 @@
 {#each data.records as product}
 	<div class="md:flex lg:flex bg-white shadow-sm rounded-lg m-10">
 		<div
-			class=" w-full shadow-sm rounded-sm p-3 flex space-x-4 justify-between items-center flex-col lg:flex-row m-3"
+			class=" w-full shadow-sm rounded-sm p-3 flex space-x-4 justify-between flex-col lg:flex-row m-3 gap-6"
 		>
 			<div class="flex flex-col space-y-4 lg:w-1/3">
 				<div class="mb-3 lg:h-80">
