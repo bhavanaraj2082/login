@@ -633,72 +633,87 @@ export async function getFavSavedData(id) {
 //Myfavourites loads ends
 
 
-//CompareSimilar I tems in product page
+//CompareSimilar Items in product page
 export async function CompareSimilarityData(productId) {
 	const product = await Product.findOne({ productNumber: productId }).populate('subsubCategory');
 	if (!product) {
-		return { error: 'Product not found' };
-	};
-    if(!product.subsubCategory._id){
-       return []
+			return { error: 'Product not found' };
 	}
-	else{
-		const compareSimilarity = await Product.aggregate([
-			{ $match: { subsubCategory: product.subsubCategory._id } },
-			{ $limit: 4 },
+
+	const subsubCategoryId = product.subsubCategory._id;
+
+	const compareSimilarity = await Product.aggregate([
 			{
-				$lookup: {
-					from: 'categories', 
-					localField: 'category',
-					foreignField: '_id',
-					as: 'category'
-				}
+					$match: { 'subsubCategory': subsubCategoryId } 
 			},
 			{
-				$lookup: {
-					from: 'subcategories', 
-					localField: 'subCategory',
-					foreignField: '_id',
-					as: 'subCategory'
-				}
+					$limit: 4
 			},
 			{
-				$lookup: {
-					from: 'manufacturers', 
-					localField: 'manufacturer',
-					foreignField: '_id',
-					as: 'manufacturer'
-				}
-			},
-			{
-				$lookup: {
-					from: 'subsubcategories', 
-					localField: 'subsubCategory',
-					foreignField: '_id',
-					as: 'subsubCategory'
-				}
-			},
-			{
-				$lookup: {
-					from: 'stocks', 
-					localField: 'productNumber',
-					foreignField: 'productNumber',
-					as: 'stock'
-				}
-			},
-			{
-				$addFields: {
-					stockQuantity: {
-						$ifNull: [{ $arrayElemAt: ['$stock.stockQuantity', 0] }, 0]
+					$lookup: {
+							from: 'categories', 
+							localField: 'category',
+							foreignField: '_id',
+							as: 'categoryInfo'
 					}
-				}
 			},
 			{
-				$project: {
-					stock: 0 
-				}
+					$lookup: {
+							from: 'subcategories', 
+							localField: 'subCategory',
+							foreignField: '_id',
+							as: 'subCategoryInfo'
+					}
+			},
+			{
+					$lookup: {
+							from: 'manufacturers', 
+							localField: 'manufacturer',
+							foreignField: '_id',
+							as: 'manufacturerInfo'
+					}
+			},
+			{
+					$lookup: {
+							from: 'subsubcategories', 
+							localField: 'subsubCategory',
+							foreignField: '_id',
+							as: 'subsubCategoryInfo'
+					}
+			},
+			{
+					$lookup: {
+							from: 'stocks', 
+							localField: 'productNumber',
+							foreignField: 'productNumber',
+							as: 'stockInfo'
+					}
+			},
+			{
+					$project: { 
+							_id: 1,
+							productName: 1,
+							prodDesc: 1,
+							properties:1,
+							'categoryInfo.urlName': 1,
+							'subCategoryInfo.urlName': 1,
+							'manufacturerInfo.name': 1,
+							'subsubCategoryInfo.urlName': 1,
+							stockQuantity: { $ifNull: [{ $arrayElemAt: ['$stockInfo.stock', 0] }, 0] }, 
+							stockPriceSize: { $ifNull: [{ $arrayElemAt: ['$stockInfo.pricing', 0] }, []] },
+							orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
+							priceSize: 1, 
+							imageSrc: 1,  
+							productUrl: 1, 
+							productNumber :1
+					}
 			}
-		]);
-		return  JSON.parse(JSON.stringify(compareSimilarity));
+	]);
+
+	if (compareSimilarity.length === 0) {
+			return { error: 'No related products found' };
 	}
+
+	const compareSimilarityJson = JSON.parse(JSON.stringify(compareSimilarity));
+	return compareSimilarityJson;
 }
