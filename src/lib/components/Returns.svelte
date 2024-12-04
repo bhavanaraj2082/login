@@ -66,7 +66,7 @@
 		<div class="flex flex-col md:flex-row w-full items-center">
 			<img
 				class="p-4 w-36 h-36 md:w-48 md:h-48"
-				src="/return1.jpg"
+				src="/return1.webp"
 				alt="Return Order Issue"
 			/>
 			<h2 class="text-2xl font-bold mb-4 md:mb-0 ml-4 text-center md:text-left text-heading">
@@ -98,7 +98,7 @@
 			<div class="flex-none w-full md:w-1/2 h-auto flex items-center justify-center mt-6 md:mt-0">
 				<img
 					class="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 object-contain"
-					src="/return3.png"
+					src="/return3.webp"
 					alt="Return page visual"/>
 			</div>
 		</div>
@@ -111,7 +111,7 @@
 			<div class="flex-none w-full md:w-1/3 h-auto flex items-center justify-center mb-4 md:mb-0">
 				<img
 					class="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 object-contain"
-					src="/return2.jpg"
+					src="/return2.webp"
 					alt="Policy illustration"
 				/>
 			</div>

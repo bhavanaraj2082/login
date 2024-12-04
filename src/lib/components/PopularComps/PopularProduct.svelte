@@ -6,16 +6,15 @@
 
 <section class="w-11/12 mx-auto py-12 max-w-7xl rounded-lg">
     <div class="flex flex-wrap w-full justify-between py-6">
-        <div class="sm:w-3/6 w-full">
-            <h1 class="text-xl font-bold pb-4">Most Popular Products</h1>
+        <div class="sm:w-3/6 w-full pb-4">
+            <h1 class="text-xl font-bold">Most Popular Products</h1>
             <p class="text-xs md:text-sm">
                 Choose Chemikart for your chemical needs and experience the
                 difference that quality and service can make in your scientific
                 endeavors.
             </p>
         </div>
-        <div
-            class="flex items-center gap-2">
+        <div class="flex items-center gap-2 mt-3">
             <a
                 href="/products"
                 class="flex text-sm justify-center items-center font-medium rounded-md bg-primary-400 text-gray-100 px-10 hover:bg-primary-500 p-2">

@@ -20,7 +20,7 @@
         </div>
             <div class="mx-4 w-7/12 md:w-5/12">
                 <img 
-                    src="/hero.png"
+                    src="/hero.webp"
                     class="w-full "  
                     alt="img" />
             </div>
