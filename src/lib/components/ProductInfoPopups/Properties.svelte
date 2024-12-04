@@ -4,7 +4,7 @@
 
 {#each data.records as product}
   {#if product.properties && Object.keys(product.properties).length > 0}
-    <div class="max-w-full md:flex lg:flex bg-white shadow-sm rounded-lg m-10">
+    <div class="max-w-full md:flex lg:flex bg-white shadow-sm rounded-lg m-10 mb-0">
       <div class="p-4 w-full">
         <div class="container mx-auto">
           <button type="button" class="w-full text-left pb-4">

@@ -509,8 +509,7 @@ export async function getreturnstatusdata(invoiceid) {
 //PRODUCT SIMILAR ITEMS , FINDING DIFFERENCES
 export async function DifferentProds(productId) {
 	// fething product
-	const product = JSON.parse(JSON.stringify(await Product.findOne({ productNumber: productId })));
-	const partNumber = product.productNumber;
+	const product = JSON.parse(JSON.stringify(await Product.findOne({ productNumber: productId }).populate('manufacturer')));	const partNumber = product.productNumber;
 	// products stocks
 	let stockQuantity = 0;
 	let orderMultiple = 0;
@@ -554,6 +553,7 @@ export async function DifferentProds(productId) {
 		productSynonym: product?.filteredProductData?.['Synonym(S)'] || '',
 		stockQuantity,
 		orderMultiple,
+		manufacturer:product?.manufacturer || {},
 		  variants: variantRecord.map((variant) => ({
 		    _id: variant?._id?.toString() || "",
 		    productName: variant?.productName || "Unknown Product",

@@ -2,7 +2,7 @@ import { DifferentProds } from "$lib/server/mongoLoads.js";
 import { RelatedProductData } from "$lib/server/mongoLoads.js";
 import { CreateProductQuote } from "$lib/server/mongoActions.js";
 import { CompareSimilarityData } from "$lib/server/mongoLoads.js";
-import { favorite } from "$lib/server/mongoActions.js";
+import { favorite,checkavailabilityproduct } from "$lib/server/mongoActions.js";
 
 export async function load({ params }) {
   try {
@@ -77,5 +77,19 @@ export const actions = {
     } catch (error) {
         console.error("Error creating quote:", error);
     }
+},
+checkavailabilityproduct: async ({ request }) => {
+  try {
+    const formData = Object.fromEntries(await request.formData());
+    // console.log("Formatted Data:", formData);
+    const record = await checkavailabilityproduct(formData);
+    return  record;
+  } catch (error) {
+    console.error("Error in action:", error);
+    return {
+      type: "error",
+      message: "An error occurred while processing the request.",
+    };
+  }
 }
 }
