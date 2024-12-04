@@ -341,76 +341,88 @@ export const loadProductsubcategory = async (suburl,pageNum) => {
 };
 
 export async function RelatedProductData(productId) {
+    // console.log("==", productId);
+    const product = await Product.findOne({ productNumber: productId }).populate('subsubCategory');
+    if (!product) {
+        return { error: 'Product not found' };
+    }
 
-	// console.log("==",productId);
-	const product = await Product.findOne({ productNumber: productId }).populate('subsubCategory');
-	if (!product) {
-		return { error: 'Product not found' };
-	};
+    const subsubCategoryId = product.subsubCategory._id;
 
-	// console.log("====",product.subCategory._id);
-    if(!product.subsubCategory._id){
-       return []
-	}
-	else{
-		const relatedProducts = await Product.aggregate([
-			{ $match: { subsubCategory: product.subsubCategory._id } },
-			{ $limit: 8 },
-			{
-				$lookup: {
-					from: 'categories', 
-					localField: 'category',
-					foreignField: '_id',
-					as: 'category'
-				}
-			},
-			{
-				$lookup: {
-					from: 'subcategories', 
-					localField: 'subCategory',
-					foreignField: '_id',
-					as: 'subCategory'
-				}
-			},
-			{
-				$lookup: {
-					from: 'manufacturers', 
-					localField: 'manufacturer',
-					foreignField: '_id',
-					as: 'manufacturer'
-				}
-			},
-			{
-				$lookup: {
-					from: 'subsubcategories', 
-					localField: 'subsubCategory',
-					foreignField: '_id',
-					as: 'subsubCategory'
-				}
-			},
-			{
-				$lookup: {
-					from: 'stocks', 
-					localField: 'productNumber',
-					foreignField: 'productNumber',
-					as: 'stock'
-				}
-			},
-			{
-				$addFields: {
-					stockQuantity: {
-						$ifNull: [{ $arrayElemAt: ['$stock.stockQuantity', 0] }, 0]
-					}
-				}
-			},
-			{
-				$project: {
-					stock: 0 
-				}
-			}
-		]);
-		return  JSON.parse(JSON.stringify(relatedProducts));
-	}
+    const relatedProducts = await Product.aggregate([
+        {
+            $match: { 'subsubCategory': subsubCategoryId } 
+        },
+        {
+            $limit: 8 
+        },
+        {
+            $lookup: {
+                from: 'categories', 
+                localField: 'category',
+                foreignField: '_id',
+                as: 'categoryInfo'
+            }
+        },
+        {
+            $lookup: {
+                from: 'subcategories', 
+                localField: 'subCategory',
+                foreignField: '_id',
+                as: 'subCategoryInfo'
+            }
+        },
+        {
+            $lookup: {
+                from: 'manufacturers', 
+                localField: 'manufacturer',
+                foreignField: '_id',
+                as: 'manufacturerInfo'
+            }
+        },
+        {
+            $lookup: {
+                from: 'subsubcategories', 
+                localField: 'subsubCategory',
+                foreignField: '_id',
+                as: 'subsubCategoryInfo'
+            }
+        },
+        {
+            $lookup: {
+                from: 'stocks', 
+                localField: 'productNumber',
+                foreignField: 'productNumber',
+                as: 'stockInfo'
+            }
+        },
+        {
+            $project: { 
+                _id: 1,
+                productName: 1,
+                prodDesc: 1,
+                'categoryInfo.urlName': 1,
+                'subCategoryInfo.urlName': 1,
+                'manufacturerInfo.name': 1,
+                'subsubCategoryInfo.urlName': 1,
+                stockQuantity: { $ifNull: [{ $arrayElemAt: ['$stockInfo.stock', 0] }, 0] }, 
+                stockPriceSize: { $ifNull: [{ $arrayElemAt: ['$stockInfo.pricing', 0] }, []] },
+                orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
+                priceSize: 1, 
+                imageSrc: 1,  
+                productUrl: 1, 
+				productNumber :1
+            }
+        }
+    ]);
+
+    if (relatedProducts.length === 0) {
+        return { error: 'No related products found' };
+    }
+
+    const relatedProductsJson = JSON.parse(JSON.stringify(relatedProducts));
+    // console.log("-------", relatedProductsJson);
+    return relatedProductsJson;
 }
 
 export async function RelatedApplicationData(name) {
