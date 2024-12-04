@@ -8,22 +8,11 @@
     import ProductFilter from '$lib/components/ProductsFilter/ProductFilter.svelte';
 
 	export let data;
-	$: ({manufacturers,products} = data)
+	$: ({manufacturers,products,productCount,subSubCategory} = data)
 	const handlePage = (e) =>{
 		console.log('object',e.detail);
 		invalidate('page:data')
 	}
-
-	//$:console.log(data.products,"======");
-	//$: upd = data
-	// $: {
-	// 	const query = $page.url.searchParams.get("page") || 1
-	// 	if(current !== query){
-	// 		current = query
-	// 		console.log('object');
-	// 		invalidateAll()
-	// 	}
-	// }
 
 
 </script>
@@ -31,6 +20,11 @@
 	<div class="px-4 max-w-7xl md:w-11/12 mx-auto">
 		<!-- <Subsubcategory data={data.productdata} count={data.count} />-->
 		<!-- <Filter {data} on:pageChange={handlePageChange} />  -->
-		 <ProductFilter on:onPageChange={(e)=>handlePage(e)} {manufacturers} {products} />
+		 <ProductFilter
+		  on:onPageChange={(e)=>handlePage(e)} 
+		  {manufacturers} 
+		  {products} 
+		  {productCount}
+		  {subSubCategory} />
 	</div>
 </section>
