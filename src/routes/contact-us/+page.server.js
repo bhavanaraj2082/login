@@ -1,4 +1,5 @@
 import { submitContactInfo } from "$lib/server/mongoActions.js";
+import { sendEmail } from '$lib/utils/sendEmail.js';
 
 export const actions = {
   contactus: async ({ request },event) => {
@@ -8,6 +9,9 @@ export const actions = {
       //console.log("addr",ip);
       const body = Object.fromEntries(await request.formData());
       await submitContactInfo(body);
+
+      await sendEmail(body);
+  
       return {
         type: "success",
         data: {
