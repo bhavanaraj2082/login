@@ -197,6 +197,7 @@
 					<Icon icon="material-symbols:chevron-backward" class=" w-5 h-5 " />
 					Back
 				</button>
+				{#if activeMenu.submenus && activeMenu.submenus.length > 0}
 				<div class="mt-2 pb-2">
 					{#each activeMenu.submenus as submenu}
 						<button
@@ -207,6 +208,7 @@
 						</button>
 					{/each}
 				</div>
+				{/if}
 			{/if}
 		</div>
 	</div>
@@ -329,7 +331,7 @@
 			{/if}
 		</div>
 	</div>
-	<div class="hidden bg-white md:flex mx-auto w-full border-y border-gray-200">
+	<div class="hidden md:flex mx-auto w-full border-y border-gray-200">
 		<!-- Menu Section -->
 		<div class="md:flex mx-auto justify-between w-11/12 max-w-7xl">
 		<div class="md:flex justify-around items-center lg:gap-2 hidden">
@@ -364,9 +366,9 @@
 									on:mouseleave={handleMouseLeaveSubmenu}>
 									<button
 										on:click={() => navigateTo(`${menu.href}${submenu.href}`)}
-										class="flex relative text-left mr-24 pl-4 py-1 md:text-xs lg:text-sm hover:bg-primary-50 w-full"
+										class="flex relative text-left mr-24 pl-4 py-1 px-4 md:text-xs lg:text-sm hover:bg-primary-50 w-full"
 										role="menuitem">
-										<span class={`absolute left-0 top-0 h-full w-1 transition-all duration-200 ${activeSubmenu === submenu ? 'opacity-100 text-gray-800' : 'opacity-0'}`}></span>
+										<span class={`absolute left-0 top-0 h-full w-1 bg-primary-400 transition-all duration-200 ${activeSubmenu === submenu ? 'opacity-100 text-gray-800' : 'opacity-0'}`}></span>
 										{submenu.title}
 										<Icon
 											icon="material-symbols:chevron-right"
