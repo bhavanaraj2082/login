@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
-import { SENDER_EMAIL, SENDER_PASSWORD, APP_URL } from "$env/static/private";
+import { SENDER_EMAIL, SENDER_PASSWORD, APP_URL, NOTIFICATION_EMAIL_ADDRESS  } from "$env/static/private";
 
-export async function sendEmail(body) {
+export async function sendEmail(subject,content) {
   const transporter = nodemailer.createTransport({
     host: APP_URL,
     port: 587,
@@ -12,26 +12,11 @@ export async function sendEmail(body) {
     },
   });
 
-  const emailContent = `
-    <h3>Thank you for contacting us!</h3>
-    <p>Dear ${body.name},</p>
-    
-    <p>We have received your message, and one of our team members will get back to you shortly.</p>
-    
-    <p>If your inquiry requires immediate assistance, please don't hesitate to contact our support team directly at <a href="mailto:chemikart@gmail.com">chemikart@gmail.com</a>.</p>
-    
-    <p>We appreciate your interest and look forward to assisting you.</p>
-    
-    <p>Best regards,<br>
-    ChemiKart Team<br>
-    <a href="tel:+917829922222">7829922222</a><br>
-    `;
-
   const mailOptions = {
     from: SENDER_EMAIL,
-    to: body.email,
-    subject: "Confirmation Mail",
-    html: emailContent,
+    to: NOTIFICATION_EMAIL_ADDRESS,
+    subject: subject,
+    html: content
   };
 
   try {
