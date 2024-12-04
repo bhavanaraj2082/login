@@ -65,7 +65,7 @@
                     id="email"
                     bind:value={email}
                     placeholder="username@example.com"
-                    class="border border-gray-300 rounded p-2 w-full"
+                    class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400"
                 />
                 {#if errors.email}
                 <div class="text-red-500 text-xs mt-1 mb-3">{errors.email}</div>
@@ -76,17 +76,17 @@
                     type="password"
                     id="password"
                     bind:value={password}
-                    placeholder="*******"
-                    class="border border-gray-300 rounded p-2 w-full"
+                    placeholder="********"
+                    class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400"
                 />
                 {#if errors.password}
                  <div class="text-red-500 text-xs mt-1">{errors.password}</div>
                 {/if}
                 <p class="mb-4">
-                    <a href="/reset-password" class="text-primary-400 hover:text-primary-500 underline">Forgot password?</a>
+                    <a href="/reset-password" class="text-primary-500 hover:text-primary-600 underline">Forgot password?</a>
                 </p>
 
-                <button type="submit" class="bg-primary-400 text-white rounded p-2 w-full text-center">
+                <button type="submit" class="bg-primary-400 hover:bg-primary-500 text-white rounded p-2 w-full text-center">
                     Login
                 </button>
             </form>

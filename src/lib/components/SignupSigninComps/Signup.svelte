@@ -64,7 +64,7 @@
 
     <div class="content w-full md:w-2/3 p-4 md:p-6 flex flex-col justify-center rounded-tr-lg rounded-b-lg md:rounded-l-lg md:rounded-tl-none">
         <h2 class="text-2xl font-bold text-primary-500">Sign Up</h2>
-        <p class="text-gray-500 mb-5">Already have an account? <a href='/login' class="underline text-primary-500">Login.</a></p>
+        <p class="text-gray-500 mb-5">Already have an account? <a href='/login' class="underline text-primary-500 hover:text-primary-600">Login.</a></p>
         
         <form 
         method="POST" action="?/register"
@@ -72,14 +72,14 @@
             <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
                 <div class="flex-1 mb-2 md:mb-0">
                     <label for="username" class="block text-sm font-medium text-gray-600">Username</label>
-                    <input type="text" id="username" name="username" bind:value={username} placeholder="Enter your username" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300" />
+                    <input type="text" id="username" name="username" bind:value={username} placeholder="Enter your username" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400" />
                     {#if errors.username}
                         <div class="text-red-500 text-xs mt-1">{errors.username}</div>
                     {/if}
                 </div>
                 <div class="flex-1 mb-2 md:mb-0">
                     <label for="email" class="block text-sm font-medium text-gray-600">Email</label>
-                    <input type="email" id="email" name="email" bind:value={email} placeholder="Enter your email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300" />
+                    <input type="email" id="email" name="email" bind:value={email} placeholder="Enter your email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400" />
                     {#if errors.email}
                         <div class="text-red-500 text-xs mt-1">{errors.email}</div>
                     {/if}
@@ -89,7 +89,7 @@
             <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
                 <div class="flex-1 mb-2 md:mb-0">
                     <label for="language" class="block text-sm font-medium text-gray-600">Language</label>
-                    <select id="language" name="language" bind:value={language} class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                    <select id="language" name="language" bind:value={language} class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 cursor-pointer">
                         <option value="" disabled selected>Select your language</option>
                         {#each languages as lang}
                             <option value={lang}>{lang}</option>
@@ -101,7 +101,7 @@
                 </div>
                 <div class="flex-1 mb-2 md:mb-0">
                     <label for="location" class="block text-sm font-medium text-gray-600">Location</label>
-                    <select id="location" name="location" bind:value={location} class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                    <select id="location" name="location" bind:value={location} class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 cursor-pointer">
                         <option value="" disabled selected>Select your location</option>
                         {#each locations as loc}
                             <option value={loc}>{loc}</option>
@@ -115,11 +115,11 @@
 
             <div class="mb-4">
                 <label for="password" class="block text-sm font-medium text-gray-600">Password</label>
-                <input type="password" id="password" name="password" bind:value={password} placeholder="Enter your password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300" />
+                <input type="password" id="password" name="password" bind:value={password} placeholder="Enter your password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400" />
                 {#if errors.password}
                     <div class="text-red-500 text-xs mt-1">{errors.password}</div>
                 {/if}
-                <div class="text-gray-400 text-sm">
+                <div class="text-gray-400 text-sm mt-1">
                     <p>*Contain at least 8 Characters</p>
                     <p>*Cannot contain common or guessable text</p>
                     <p>*Contain at least one number</p>
@@ -129,14 +129,14 @@
 
             <div class="mb-4">
                 <label for="passwordConfirm" class="block text-sm font-medium text-gray-600">Confirm Password</label>
-                <input type="password" id="passwordConfirm" name="confirmpassword" bind:value={passwordConfirm} placeholder="Confirm your password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring focus:ring-blue-300" />
+                <input type="password" id="passwordConfirm" name="confirmpassword" bind:value={passwordConfirm} placeholder="Confirm your password" class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400" />
                 {#if errors.passwordConfirm}
                     <div class="text-red-500 text-xs mt-1">{errors.passwordConfirm}</div>
                 {/if}
             </div>
 
             <div class="mb-4">
-                <div class="text-orange-500 font-semibold">TERMS AND CONDITION:</div>
+                <div class="text-primary-500 text-sm font-semibold">TERMS AND CONDITION:</div>
                 <p class="text-gray-500 text-sm">We will occasionally contact you with relevant updates about your account and our products and services. You may manage your account preferences in your account or unsubscribe at any time. We are committed to protecting the privacy of your personal data.</p>
             </div>
 
@@ -150,7 +150,7 @@
             </div>
             <div class="mb-4 hidden md:block text-gray-500">
                 <div class="flex flex-col md:flex-row items-start">
-                    <div class="font-semibold underline text-lg">Note:</div>
+                    <!-- <div class="font-semibold underline text-lg">Note:</div>
                     <div class="text-sm mt-1 md:mt-0 md:ml-2">
                         <p class="whitespace-normal max-w-full">
                             You can withdraw our consent at any time by clicking the unsubscribe link contained in every email or by sending an email to 
@@ -158,18 +158,18 @@
                             Detailed information is available in our 
                             <a href="/privacy" class="text-orange-500 underline">Privacy Statement</a>.
                         </p>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
-            <div class="mb-4 md:hidden text-sm text-gray-500">
+            <!-- <div class="mb-4 md:hidden text-sm text-gray-500">
                 <p class="whitespace-normal max-w-full">
                     Need to change your mind? Just hit unsubscribe in any email or email us at 
-                    <a href="mailto:privacy@chemikartgroup.com" class="text-orange-500 underline">privacy@chemikartgroup.com</a>.
+                    <a href="mailto:privacy@chemikartgroup.com" class="text-primary-500 underline">privacy@chemikartgroup.com</a>.
                 </p>
-            </div>
+            </div> -->
 
-            <button type="submit" class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-400 transition duration-200">Create Account</button>
+            <button type="submit" class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-500 transition duration-200">Create Account</button>
         </form>
     </div>
 </div>
