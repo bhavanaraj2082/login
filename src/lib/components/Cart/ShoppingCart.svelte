@@ -12,15 +12,27 @@
     
 	const dispatch = createEventDispatcher()
 
+	// let authedUser={
+	// 	email:""
+	// }
 
 	let timestamp
 	let loading = true
+	$:console.log($cartState);
+	
 	$: cartItems = $cartState;
 	let subtotal = 0;
 	let tax = 0;
 	let total = 0;
 	let totalPrice = 0
 	let order = ''
+	
+	let showModal = false; 
+
+
+const toggleModal = () => {
+  showModal = !showModal;
+};
 
 	$: if(!$cartState.length){
 		subtotal = 0
@@ -125,17 +137,17 @@ const printPDF = () => {
 		let ordernumber = Math.floor(Math.random() * 900000) + 100000
 		let products = []
 		let orderdetails = cartItems.map(item=>{
-            const {_id,name,partNumber,quantity,priceSize,stock} = item
+            const {id,name,partNumber,quantity,priceSize,stock} = item
 			const parsedPrice = parseFloat(priceSize.price)
 			const parsedQty = parseInt(quantity)
 			const parsedStock = parseInt(stock)
 
-			products.push(_id)
+			products.push(id)
 			totalPrice = parsedQty * parsedPrice
 			let backOrder = parsedQty > stock ? parsedQty - parsedStock : 0;
 			let readyToShip = parsedQty < stock ? parsedQty : stock;
 			return {
-				productId:_id,
+				productId:id,
 				productName:name,
 				productNumber:partNumber,
 				orderQty:parsedQty,
@@ -156,7 +168,7 @@ const printPDF = () => {
 			products,
 			orderdetails,
 			status:"pending",
-			dashuserprofileid:"6746cc82aa1141b2ca728ad4"
+			dashuserprofileid:$authedUser.userId
 		}
 
 	};
@@ -198,25 +210,6 @@ const printPDF = () => {
 		updateCartState(cartItems)
 	};
 
-	const handleSubmit = () =>{
-		return async ({result,update})=>{
-			console.log(result);
-			if(result.type === "success"){
-				if(result.data.success){
-					toast.success('',{description:result.data.message})
-				}else{
-					toast.error('',{description:result.data.message})
-				}
-			}
-			updateCartState([])
-			subtotal = 0
-			totalPrice =0
-			tax = 0
-			total = 0
-			subtotal = 0
-			await update()
-		}
-	}
 
 	onMount(() => {
 		calculateTotals();
@@ -320,23 +313,19 @@ const printPDF = () => {
 						<p>₹{total.toFixed(2)}</p>
 					</div>
 				</div>	
-			</div>
+			</div>	
 			{#if $cartState.length}
 			<div class="mt-4 grid grid-cols-2 gap-2">
-				{#if $authedUser.profileId}
-				<form method="POST" action="?/checkout" use:enhance={handleSubmit} class=" col-span-2">
-					<input type="hidden" name="order" value={JSON.stringify(order)}>
-					<button type="submit"
-					class="mt-4 w-full bg-primary-500 text-white py-2 rounded-lg font-semibold hover:bg-primary-600"
+				{#if authedUser.email}
+                 <a href="/checkout"
+					class="mt-4 w-full text-center bg-primary-500 text-white py-2 rounded-lg font-semibold col-span-2 hover:bg-primary-600"
 				>
-					Checkout
-				</button>
-				</form>
+					Checkout</a>
 				{:else}
-				<button type="button" on:click={()=>goto('/login')}
+				<button type="button" on:click={toggleModal}
 				class="flex col-span-2 items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
 			>
-				Login to Checkout
+			Checkout
 			</button>
 				{/if}
 
@@ -359,3 +348,25 @@ const printPDF = () => {
 		</div>
 	</div>
 </div>
+{#if showModal}
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white p-6 rounded-lg w-1/3">
+		<p class="text-xl font-bold mb-2">Please Log In</p>
+      <p class="text-sm mb-4">
+		You need to log in to continue. Click the button below to log in.</p>
+      <div class="flex gap-4 justify-between">
+        <button
+          class=" text-gray-500 border bottom-2 py-2 px-4 rounded hover:bg-gray-300"
+		  on:click={toggleModal}
+        >
+          Cancel
+        </button>
+        <a href="/login"
+          class="bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-700"
+        >
+          Login
+	   </a>
+      </div>
+    </div>
+  </div>
+{/if}
