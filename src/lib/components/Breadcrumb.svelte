@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';    
+	import { page } from '$app/stores';
 	let crumbs = [];
 	$: {
 		const tokens = $page.url.pathname.split('/').filter((t) => t !== '');
@@ -27,6 +27,7 @@
 		}
 	}
 </script>
+
 {#if crumbs.length > 0}
 	<div class="w-11/12 mx-auto max-w-7xl">
 		<div class="py-3 px-1 mx-auto lg:mx-0 w-full">
@@ -35,11 +36,7 @@
 					<span class="text-primary-400 font-bold text-xs">{crumbs[0].label}</span>
 				{:else}
 					<div class="flex flex-wrap items-center">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							class="mr-2 w-7 h-5"
-							>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-2 w-7 h-5">
 							<path
 								d="M12 3l10 9h-3v8h-5v-5h-4v5H5v-8H2l10-9z"
 								fill="none"
@@ -59,7 +56,6 @@
 								height="2em"
 								viewBox="0 0 30 30"
 								class="mt-2"
-                                
 							>
 								<path
 									d="M8.59 16.34L13.17 12 8.59 7.66 10 6.25l5.25 5.25L10 16.75z"
@@ -67,8 +63,7 @@
 								/>
 							</svg>
 						{/each}
-						<span class="text-primary-500 font-bold text-sm "
-							>{crumbs[crumbs.length - 1].label}</span
+						<span class="text-primary-500 font-bold text-sm">{crumbs[crumbs.length - 1].label}</span
 						>
 					</div>
 				{/if}
