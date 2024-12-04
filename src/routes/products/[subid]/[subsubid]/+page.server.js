@@ -8,7 +8,12 @@ export async function load({ params,url,depends }) {
 
 		// let productPage = 1;
 		// let productPageSize = 20;
-		const { products, manufacturers } = await loadProductsubcategory(params.subsubid,page);
+		return await loadProductsubcategory(params.subsubid,page);
+		// return {
+		// 	products,
+		// 	manufacturers,
+		// 	productCount
+		// };
 		// const fetchProductChunk = async () => {
 		// 	let allProducts = [];
 		// 	let moreDataAvailable = true;
@@ -37,10 +42,7 @@ export async function load({ params,url,depends }) {
 		//const data = await fetchProductChunk();
 		//console.log('i am srver', products, totalCount);
 
-		return {
-			products,
-			manufacturers
-		};
+		
 	} catch (error) {
 		console.error('Error loading product data:', error);
 		return {
