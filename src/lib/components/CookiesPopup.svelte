@@ -537,17 +537,17 @@
 				</button>
 				</div>
 		
-				<div class="flex space-x-2">
+				<div class="flex space-x-2 w-full sm:w-auto">
                     {#if showAllowAllButton}
 						<button
-							class="mt-5 py-2 px-4 bg-primary-400 text-xs sm:text-sm text-white rounded cursor-pointer font-medium hover:bg-primary-500 transition-all duration-300"
+							class="mt-5 py-2 px-3 bg-primary-400 text-xs sm:text-sm text-white rounded cursor-pointer font-medium hover:bg-primary-500 transition-all duration-300"
 							on:click={allowAllCookies}
 						>
 							Allow All
 						</button>
 					{/if}
 					<button
-						class="mt-5 py-2 px-3 bg-primary-400 text-xs sm:text-sm text-white rounded cursor-pointer font-medium hover:bg-primary-500 transition-all duration-300"
+						class="mt-5 py-2 px-3 bg-white text-xs sm:text-sm text-primary-400 border border-primary-400 hover:text-white rounded cursor-pointer font-medium hover:bg-primary-400 transition-all duration-300"
 						on:click={rejectAllCookies}
 					>
 						Reject All
