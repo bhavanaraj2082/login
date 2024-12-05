@@ -122,7 +122,7 @@
 						<p class=" text-xs md:text-sm text-red-500">{emailError}</p>
 						<button
 							type="submit"
-							class="w-full bg-primary-400 text-white py-2 mt-2 font-medium rounded hover:bg-primary-400 transition-colors"
+							class="w-full bg-primary-400 text-white py-2 mt-2 font-medium rounded hover:bg-primary-500 transition-colors"
 							>Submit</button
 						>
 					</form>
