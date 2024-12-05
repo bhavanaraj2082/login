@@ -10,7 +10,6 @@
 	export let data;
 	$: ({manufacturers,products,productCount,subSubCategory} = data)
 	const handlePage = (e) =>{
-		console.log('object',e.detail);
 		invalidate('page:data')
 	}
 

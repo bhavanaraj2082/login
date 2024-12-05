@@ -223,18 +223,65 @@ async function getMatchedSubCategories(search) {
 }
 
 
-export const loadProductsubcategory = async (suburl,pageNum) => {
+export const loadProductsubcategory = async (suburl,pageNum,manufacturer,search) => {
     const conversionRate = 90
 	const page = pageNum || 1 
     const pageSize = 10;
 	try {
+		let be = Date.now() 
 		const subcategory = await SubCategory.findOne({ urlName: suburl }).populate({path:"manufacturerIds",select:"-_id name"}).populate({path:"subSubCategoryIds",select:"-_id name urlName"})
-		console.log(subcategory.subSubCategoryIds,"+++---")
+		let af = Date.now() 
+		//console.log(af - be, "milliseconds");
+		const subCategoryDetails ={
+			name:subcategory.name,
+			urlName:subcategory.urlName
+		}
 		if (!subcategory) {
 			return { type: 'error', message: `Subcategory not found for URL: ${suburl}` };
 		}	   
 
-		const products = await Product.aggregate([		
+		const matchCondition = {
+            'subCategoryDetails.urlName': subcategory.urlName,
+            'inStock': { $exists: true, $gt: 0 }
+        };
+		
+        if (manufacturer) { matchCondition['manufacturerDetails.name'] = manufacturer;}
+		if (search) {
+			matchCondition.$or = [
+				{ CAS: { $regex: search, $options: 'i' } },
+				{ productNumber: { $regex: search, $options: 'i' } },
+				{ productName: { $regex: search, $options: 'i' } }
+			];
+		}
+        
+		const before = Date.now()
+		const products = await Product.aggregate([	
+			{ 
+				$lookup: { 
+				  from: 'subcategories', 
+				  localField: 'subCategory', 
+				  foreignField: '_id', 
+				  as: 'subCategoryDetails' 
+				} 
+			  },
+			  { 
+				$lookup: { 
+				  from: 'manufacturers', 
+				  localField: 'manufacturer', 
+				  foreignField: '_id', 
+				  as: 'manufacturerDetails' 
+				} 
+			  },
+			{$match: matchCondition},
+			{ 
+				$lookup: { 
+				  from: 'categories', 
+				  localField: 'category', 
+				  foreignField: '_id', 
+				  as: 'categoryDetails' 
+				} 
+			  },
+			 
 			{ 
 			  $lookup: { 
 				from: 'stocks', 
@@ -243,47 +290,9 @@ export const loadProductsubcategory = async (suburl,pageNum) => {
 				as: 'stockDetails' 
 			  } 
 			},
-			{ 
-			  $lookup: { 
-				from: 'manufacturers', 
-				localField: 'manufacturer', 
-				foreignField: '_id', 
-				as: 'manufacturerDetails' 
-			  } 
-			},
-			// { 
-			//   $lookup: { 
-			// 	from: 'distributors', 
-			// 	localField: 'distributor', 
-			// 	foreignField: '_id', 
-			// 	as: 'distributorDetails' 
-			//   } 
-			// },
-			{ 
-			  $lookup: { 
-				from: 'categories', 
-				localField: 'category', 
-				foreignField: '_id', 
-				as: 'categoryDetails' 
-			  } 
-			},
-			{ 
-			  $lookup: { 
-				from: 'subcategories', 
-				localField: 'subCategory', 
-				foreignField: '_id', 
-				as: 'subCategoryDetails' 
-			  } 
-			},
-			{
-			  $match: {
-				'subCategoryDetails.name': subcategory.name,
-				'inStock': { $exists: true, $gt: 0 }
-			  }
-			},
+			
 			{ $unwind: '$stockDetails' },
 			{ $unwind: '$manufacturerDetails' },
-			//{ $unwind: '$distributorDetails' },
 			{ $unwind: '$categoryDetails' },
 			{ $unwind: '$subCategoryDetails' },
 			{
@@ -292,11 +301,8 @@ export const loadProductsubcategory = async (suburl,pageNum) => {
 				'productName': 1,
 				'prodDesc': 1,
 				'imageSrc': 1,
-				'subCategoryDetails.name': 1,
 				'categoryDetails.name': 1,
 				'categoryDetails.urlName': 1,
-				'subCategoryDetails.urlName': 1,
-				//'distributorDetails.distributorName': 1,
 				'manufacturerDetails.name': 1,
 				'stockDetails.pricing': 1,
 				'stockDetails.stock': 1,
@@ -310,12 +316,18 @@ export const loadProductsubcategory = async (suburl,pageNum) => {
 			  $limit: Number(pageSize)
 			}
 		  ]);
-		  
-		  //console.log(products,"oooooo");
+		const after = Date.now()
+		//console.log(products);
+		console.log(after - before, "milliseconds");
+
 		  const filtered = products.map(product=>{
-			const {_id, productName,productNumber,prodDesc,imageSrc,stockDetails,manufacturerDetails,categoryDetails,subCategoryDetails} = product
+			const {_id, productName,productNumber,prodDesc,imageSrc,stockDetails,manufacturerDetails,categoryDetails} = product
 			const priceConversion = stockDetails.pricing.map(price=>{
-				return {...price,INR:price.USD*conversionRate}
+				if (Object.hasOwn(price, 'INR')) {
+					return {...price}
+				} else {
+				    return {...price,INR:price.USD*conversionRate}
+				}
 			})
 			 return {_id,productName,productNumber,prodDesc,imageSrc,pricing:priceConversion[0],totalPrice:priceConversion[0].INR,quantity:stockDetails.orderMultiple,orderMultiple:stockDetails.orderMultiple,categoryDetails,subCategoryDetails,manufacturerDetails}
 		  })
