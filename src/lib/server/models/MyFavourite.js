@@ -5,12 +5,13 @@ const { Schema } = mongoose;
 const myFavouritesSchema = new Schema(
   {
     favorite: {
-      type: Schema.Types.Mixed, 
+      type: Array, 
+      default: [], 
       required: false,
     },
     userId: {
-      type: Schema.Types.String, 
-      ref: "Profile", 
+      type: Schema.Types.ObjectId, 
+      ref: "profiles", 
       required: false, 
   }
 },
