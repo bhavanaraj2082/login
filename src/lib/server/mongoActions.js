@@ -75,15 +75,20 @@ export const submitContactInfo = async (data) => {
 };
 
 export const getOrderresultData = async (body) => {
-	const records = await Order.findOne({ ordernumber: body.orderNumber });
-	if (records) {
-		return {
-			success: true,
-			msg: 'Success',
-			order: JSON.parse(JSON.stringify(records))
-		};
-	} else {
-		return { success: false, message: 'Order not found' };
+	try {
+		const records = await Order.findOne({ orderid: body.orderNumber });
+		if (records) {
+			return {
+				success: true,
+				msg: 'Success',
+				order: JSON.parse(JSON.stringify(records))
+			};
+		} else {
+			return { success: false, message: 'Order not found' };
+		}
+	} catch (error) {
+		console.error('Error getting order data:', error);
+		throw new Error('Failed to get order information');
 	}
 };
 

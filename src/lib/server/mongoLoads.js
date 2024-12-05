@@ -35,13 +35,18 @@ export async function getSubCategoryDatas(subid) {
 }
 
 export async function getOrderStatusData(ordernumber) {
-	const records = await Order.findOne({ ordernumber: ordernumber })
-		.populate('products')
-		.populate('shipdetails');
-	if (records) {
-		return { order: JSON.parse(JSON.stringify(records)) };
-	} else {
-		return { error: 'Order not found' };
+	try {
+		const records = await Order.findOne({ orderid: ordernumber })
+			.populate('products')
+			.populate('shipdetails');
+		if (records) {
+			return { order: JSON.parse(JSON.stringify(records)) };
+		} else {
+			return { error: 'Order not found' };
+		}
+	} catch (e) {
+		console.error('Error fetching viewed products:', e);
+		throw new Error('Failed to fetch viewed products');
 	}
 }
 
@@ -222,30 +227,33 @@ async function getMatchedSubCategories(search) {
 	}
 }
 
-
-export const loadProductsubcategory = async (suburl,pageNum,manufacturer,search) => {
-    const conversionRate = 90
-	const page = pageNum || 1 
-    const pageSize = 10;
+export const loadProductsubcategory = async (suburl, pageNum, manufacturer, search) => {
+	const conversionRate = 90;
+	const page = pageNum || 1;
+	const pageSize = 10;
 	try {
-		let be = Date.now() 
-		const subcategory = await SubCategory.findOne({ urlName: suburl }).populate({path:"manufacturerIds",select:"-_id name"}).populate({path:"subSubCategoryIds",select:"-_id name urlName"})
-		let af = Date.now() 
+		let be = Date.now();
+		const subcategory = await SubCategory.findOne({ urlName: suburl })
+			.populate({ path: 'manufacturerIds', select: '-_id name' })
+			.populate({ path: 'subSubCategoryIds', select: '-_id name urlName' });
+		let af = Date.now();
 		//console.log(af - be, "milliseconds");
-		const subCategoryDetails ={
-			name:subcategory.name,
-			urlName:subcategory.urlName
-		}
+		const subCategoryDetails = {
+			name: subcategory.name,
+			urlName: subcategory.urlName
+		};
 		if (!subcategory) {
 			return { type: 'error', message: `Subcategory not found for URL: ${suburl}` };
-		}	   
+		}
 
 		const matchCondition = {
-            'subCategoryDetails.urlName': subcategory.urlName,
-            'inStock': { $exists: true, $gt: 0 }
-        };
-		
-        if (manufacturer) { matchCondition['manufacturerDetails.name'] = manufacturer;}
+			'subCategoryDetails.urlName': subcategory.urlName,
+			inStock: { $exists: true, $gt: 0 }
+		};
+
+		if (manufacturer) {
+			matchCondition['manufacturerDetails.name'] = manufacturer;
+		}
 		if (search) {
 			matchCondition.$or = [
 				{ CAS: { $regex: search, $options: 'i' } },
@@ -253,85 +261,112 @@ export const loadProductsubcategory = async (suburl,pageNum,manufacturer,search)
 				{ productName: { $regex: search, $options: 'i' } }
 			];
 		}
-        
-		const before = Date.now()
-		const products = await Product.aggregate([	
-			{ 
-				$lookup: { 
-				  from: 'subcategories', 
-				  localField: 'subCategory', 
-				  foreignField: '_id', 
-				  as: 'subCategoryDetails' 
-				} 
-			  },
-			  { 
-				$lookup: { 
-				  from: 'manufacturers', 
-				  localField: 'manufacturer', 
-				  foreignField: '_id', 
-				  as: 'manufacturerDetails' 
-				} 
-			  },
-			{$match: matchCondition},
-			{ 
-				$lookup: { 
-				  from: 'categories', 
-				  localField: 'category', 
-				  foreignField: '_id', 
-				  as: 'categoryDetails' 
-				} 
-			  },
-			 
-			{ 
-			  $lookup: { 
-				from: 'stocks', 
-				localField: '_id', 
-				foreignField: 'productid', 
-				as: 'stockDetails' 
-			  } 
+
+		const before = Date.now();
+		const products = await Product.aggregate([
+			{
+				$lookup: {
+					from: 'subcategories',
+					localField: 'subCategory',
+					foreignField: '_id',
+					as: 'subCategoryDetails'
+				}
 			},
-			
+			{
+				$lookup: {
+					from: 'manufacturers',
+					localField: 'manufacturer',
+					foreignField: '_id',
+					as: 'manufacturerDetails'
+				}
+			},
+			{ $match: matchCondition },
+			{
+				$lookup: {
+					from: 'categories',
+					localField: 'category',
+					foreignField: '_id',
+					as: 'categoryDetails'
+				}
+			},
+
+			{
+				$lookup: {
+					from: 'stocks',
+					localField: '_id',
+					foreignField: 'productid',
+					as: 'stockDetails'
+				}
+			},
+
 			{ $unwind: '$stockDetails' },
 			{ $unwind: '$manufacturerDetails' },
 			{ $unwind: '$categoryDetails' },
 			{ $unwind: '$subCategoryDetails' },
 			{
-			  $project: {
-				'productNumber': 1,
-				'productName': 1,
-				'prodDesc': 1,
-				'imageSrc': 1,
-				'categoryDetails.name': 1,
-				'categoryDetails.urlName': 1,
-				'manufacturerDetails.name': 1,
-				'stockDetails.pricing': 1,
-				'stockDetails.stock': 1,
-				'stockDetails.orderMultiple': 1
-			  }
+				$project: {
+					productNumber: 1,
+					productName: 1,
+					prodDesc: 1,
+					imageSrc: 1,
+					'categoryDetails.name': 1,
+					'categoryDetails.urlName': 1,
+					'manufacturerDetails.name': 1,
+					'stockDetails.pricing': 1,
+					'stockDetails.stock': 1,
+					'stockDetails.orderMultiple': 1
+				}
 			},
 			{
-			  $skip: (Number(page) - 1) * Number(pageSize)
+				$skip: (Number(page) - 1) * Number(pageSize)
 			},
 			{
-			  $limit: Number(pageSize)
+				$limit: Number(pageSize)
 			}
-		  ]);
-		const after = Date.now()
+		]);
+		const after = Date.now();
 		//console.log(products);
 		//console.log(after - before, "milliseconds");
 
-		  const filtered = products.map(product=>{
-			const {_id, productName,productNumber,prodDesc,imageSrc,stockDetails,manufacturerDetails,categoryDetails} = product
-			const priceConversion = stockDetails.pricing.map(price=>{
+		const filtered = products.map((product) => {
+			const {
+				_id,
+				productName,
+				productNumber,
+				prodDesc,
+				imageSrc,
+				stockDetails,
+				manufacturerDetails,
+				categoryDetails
+			} = product;
+			const priceConversion = stockDetails.pricing.map((price) => {
 				if (Object.hasOwn(price, 'INR')) {
-					return {...price}
+					return { ...price };
 				} else {
-				    return {...price,INR:price.USD*conversionRate}
+					return { ...price, INR: price.USD * conversionRate };
 				}
-			})
-			 return {_id,productName,productNumber,prodDesc,imageSrc,pricing:priceConversion[0],totalPrice:priceConversion[0].INR,quantity:stockDetails.orderMultiple,orderMultiple:stockDetails.orderMultiple,categoryDetails,subCategoryDetails,manufacturerDetails}
-		  })
-		return { products:JSON.parse(JSON.stringify(filtered)),manufacturers:JSON.parse(JSON.stringify(subcategory.manufacturerIds)),productCount:subcategory.productCount,subSubCategory:JSON.parse(JSON.stringify(subcategory.subSubCategoryIds))};
+			});
+			return {
+				_id,
+				productName,
+				productNumber,
+				prodDesc,
+				imageSrc,
+				pricing: priceConversion[0],
+				totalPrice: priceConversion[0].INR,
+				quantity: stockDetails.orderMultiple,
+				orderMultiple: stockDetails.orderMultiple,
+				categoryDetails,
+				subCategoryDetails,
+				manufacturerDetails
+			};
+		});
+		return {
+			products: JSON.parse(JSON.stringify(filtered)),
+			manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
+			productCount: subcategory.productCount,
+			subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds))
+		};
 	} catch (error) {
 		console.error('Error loading product subcategory:', error);
 		return { type: 'error', message: 'An error occurred while loading product data.' };
@@ -339,88 +374,88 @@ export const loadProductsubcategory = async (suburl,pageNum,manufacturer,search)
 };
 
 export async function RelatedProductData(productId) {
-    // console.log("==", productId);
-    const product = await Product.findOne({ productNumber: productId }).populate('subsubCategory');
-    if (!product) {
-        return { error: 'Product not found' };
-    }
+	// console.log("==", productId);
+	const product = await Product.findOne({ productNumber: productId }).populate('subsubCategory');
+	if (!product) {
+		return { error: 'Product not found' };
+	}
 
-    const subsubCategoryId = product.subsubCategory._id;
+	const subsubCategoryId = product.subsubCategory._id;
 
-    const relatedProducts = await Product.aggregate([
-        {
-            $match: { 'subsubCategory': subsubCategoryId } 
-        },
-        {
-            $limit: 8 
-        },
-        {
-            $lookup: {
-                from: 'categories', 
-                localField: 'category',
-                foreignField: '_id',
-                as: 'categoryInfo'
-            }
-        },
-        {
-            $lookup: {
-                from: 'subcategories', 
-                localField: 'subCategory',
-                foreignField: '_id',
-                as: 'subCategoryInfo'
-            }
-        },
-        {
-            $lookup: {
-                from: 'manufacturers', 
-                localField: 'manufacturer',
-                foreignField: '_id',
-                as: 'manufacturerInfo'
-            }
-        },
-        {
-            $lookup: {
-                from: 'subsubcategories', 
-                localField: 'subsubCategory',
-                foreignField: '_id',
-                as: 'subsubCategoryInfo'
-            }
-        },
-        {
-            $lookup: {
-                from: 'stocks', 
-                localField: 'productNumber',
-                foreignField: 'productNumber',
-                as: 'stockInfo'
-            }
-        },
-        {
-            $project: { 
-                _id: 1,
-                productName: 1,
-                prodDesc: 1,
-                'categoryInfo.urlName': 1,
-                'subCategoryInfo.urlName': 1,
-                'manufacturerInfo.name': 1,
-                'subsubCategoryInfo.urlName': 1,
-                stockQuantity: { $ifNull: [{ $arrayElemAt: ['$stockInfo.stock', 0] }, 0] }, 
-                stockPriceSize: { $ifNull: [{ $arrayElemAt: ['$stockInfo.pricing', 0] }, []] },
-                orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
-                priceSize: 1, 
-                imageSrc: 1,  
-                productUrl: 1, 
-				productNumber :1
-            }
-        }
-    ]);
+	const relatedProducts = await Product.aggregate([
+		{
+			$match: { subsubCategory: subsubCategoryId }
+		},
+		{
+			$limit: 8
+		},
+		{
+			$lookup: {
+				from: 'categories',
+				localField: 'category',
+				foreignField: '_id',
+				as: 'categoryInfo'
+			}
+		},
+		{
+			$lookup: {
+				from: 'subcategories',
+				localField: 'subCategory',
+				foreignField: '_id',
+				as: 'subCategoryInfo'
+			}
+		},
+		{
+			$lookup: {
+				from: 'manufacturers',
+				localField: 'manufacturer',
+				foreignField: '_id',
+				as: 'manufacturerInfo'
+			}
+		},
+		{
+			$lookup: {
+				from: 'subsubcategories',
+				localField: 'subsubCategory',
+				foreignField: '_id',
+				as: 'subsubCategoryInfo'
+			}
+		},
+		{
+			$lookup: {
+				from: 'stocks',
+				localField: 'productNumber',
+				foreignField: 'productNumber',
+				as: 'stockInfo'
+			}
+		},
+		{
+			$project: {
+				_id: 1,
+				productName: 1,
+				prodDesc: 1,
+				'categoryInfo.urlName': 1,
+				'subCategoryInfo.urlName': 1,
+				'manufacturerInfo.name': 1,
+				'subsubCategoryInfo.urlName': 1,
+				stockQuantity: { $ifNull: [{ $arrayElemAt: ['$stockInfo.stock', 0] }, 0] },
+				stockPriceSize: { $ifNull: [{ $arrayElemAt: ['$stockInfo.pricing', 0] }, []] },
+				orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
+				priceSize: 1,
+				imageSrc: 1,
+				productUrl: 1,
+				productNumber: 1
+			}
+		}
+	]);
 
-    if (relatedProducts.length === 0) {
-        return { error: 'No related products found' };
-    }
+	if (relatedProducts.length === 0) {
+		return { error: 'No related products found' };
+	}
 
-    const relatedProductsJson = JSON.parse(JSON.stringify(relatedProducts));
-    // console.log("-------", relatedProductsJson);
-    return relatedProductsJson;
+	const relatedProductsJson = JSON.parse(JSON.stringify(relatedProducts));
+	// console.log("-------", relatedProductsJson);
+	return relatedProductsJson;
 }
 
 export async function RelatedApplicationData(name) {
@@ -490,7 +525,9 @@ export async function getreturnstatusdata(invoiceid) {
 	try {
 		const records = await Order.findOne({
 			invoice: invoiceid
-		}).populate('dashuserprofileid').populate('shipdetails');
+		})
+			.populate('dashuserprofileid')
+			.populate('shipdetails');
 		if (records) {
 			return JSON.parse(JSON.stringify(records));
 		} else {
@@ -507,7 +544,10 @@ export async function getreturnstatusdata(invoiceid) {
 //PRODUCT SIMILAR ITEMS , FINDING DIFFERENCES
 export async function DifferentProds(productId) {
 	// fething product
-	const product = JSON.parse(JSON.stringify(await Product.findOne({ productNumber: productId }).populate('manufacturer')));	const partNumber = product.productNumber;
+	const product = JSON.parse(
+		JSON.stringify(await Product.findOne({ productNumber: productId }).populate('manufacturer'))
+	);
+	const partNumber = product.productNumber;
 	// products stocks
 	let stockQuantity = 0;
 	let orderMultiple = 0;
@@ -523,15 +563,15 @@ export async function DifferentProds(productId) {
 	// fetching varints stocks
 	const variants = product.variants || [];
 	const variantRecord = await Promise.all(
-	  variants.map(async (variantId) => {
-	    const variant = await Product.findById(variantId).lean();
-	    if (!variant) return {};
-	    const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
-	    return {
-	      ...variant,
-	      pricing: stock ? stock.pricing : []
-	    };
-	  })
+		variants.map(async (variantId) => {
+			const variant = await Product.findById(variantId).lean();
+			if (!variant) return {};
+			const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
+			return {
+				...variant,
+				pricing: stock ? stock.pricing : []
+			};
+		})
 	);
 	// formattedRecord
 	const formattedRecord = {
@@ -539,8 +579,8 @@ export async function DifferentProds(productId) {
 		productName: product?.productName || 'Unknown Product',
 		CAS: product?.CAS,
 		productNumber: product?.productNumber || 'N/A',
-		prodDesc: product?.prodDesc ,
-		returnPolicy:product?.returnPolicy,
+		prodDesc: product?.prodDesc,
+		returnPolicy: product?.returnPolicy,
 		imageSrc: product?.imageSrc || '',
 		safetyDatasheet: product?.safetyDatasheet || '',
 		priceSize,
@@ -551,18 +591,20 @@ export async function DifferentProds(productId) {
 		productSynonym: product?.filteredProductData?.['Synonym(S)'] || '',
 		stockQuantity,
 		orderMultiple,
-		manufacturer:product?.manufacturer || {},
-		  variants: variantRecord.map((variant) => ({
-		    _id: variant?._id?.toString() || "",
-		    productName: variant?.productName || "Unknown Product",
-		    prodDesc: variant?.prodDesc || "No description available",
-		    description: variant?.description || [],
-		    properties: variant?.properties || {},
-		    manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
-		    productNumber: variant?.productNumber || "N/A",
-		    imageSrc: variant?.imageSrc || "",
-		    pricing:variant?.pricing
-		  })),
+		manufacturer: product?.manufacturer || {},
+		variants: variantRecord.map((variant) => ({
+			_id: variant?._id?.toString() || '',
+			productName: variant?.productName || 'Unknown Product',
+			prodDesc: variant?.prodDesc || 'No description available',
+			description: variant?.description || [],
+			properties: variant?.properties || {},
+			manufacturerName: variant?.manufacturerName
+				? variant.manufacturerName.toString()
+				: 'Unknown Manufacturer',
+			productNumber: variant?.productNumber || 'N/A',
+			imageSrc: variant?.imageSrc || '',
+			pricing: variant?.pricing
+		}))
 	};
 
 	return { records: [formattedRecord] };
@@ -630,86 +672,85 @@ export async function getFavSavedData(id) {
 }
 //Myfavourites loads ends
 
-
 //CompareSimilar Items in product page
 export async function CompareSimilarityData(productId) {
 	const product = await Product.findOne({ productNumber: productId }).populate('subsubCategory');
 	if (!product) {
-			return { error: 'Product not found' };
+		return { error: 'Product not found' };
 	}
 
 	const subsubCategoryId = product.subsubCategory._id;
 
 	const compareSimilarity = await Product.aggregate([
-			{
-					$match: { 'subsubCategory': subsubCategoryId } 
-			},
-			{
-					$limit: 4
-			},
-			{
-					$lookup: {
-							from: 'categories', 
-							localField: 'category',
-							foreignField: '_id',
-							as: 'categoryInfo'
-					}
-			},
-			{
-					$lookup: {
-							from: 'subcategories', 
-							localField: 'subCategory',
-							foreignField: '_id',
-							as: 'subCategoryInfo'
-					}
-			},
-			{
-					$lookup: {
-							from: 'manufacturers', 
-							localField: 'manufacturer',
-							foreignField: '_id',
-							as: 'manufacturerInfo'
-					}
-			},
-			{
-					$lookup: {
-							from: 'subsubcategories', 
-							localField: 'subsubCategory',
-							foreignField: '_id',
-							as: 'subsubCategoryInfo'
-					}
-			},
-			{
-					$lookup: {
-							from: 'stocks', 
-							localField: 'productNumber',
-							foreignField: 'productNumber',
-							as: 'stockInfo'
-					}
-			},
-			{
-					$project: { 
-							_id: 1,
-							productName: 1,
-							prodDesc: 1,
-							properties:1,
-							'categoryInfo.urlName': 1,
-							'subCategoryInfo.urlName': 1,
-							'manufacturerInfo.name': 1,
-							'subsubCategoryInfo.urlName': 1,
-							stockQuantity: { $ifNull: [{ $arrayElemAt: ['$stockInfo.stock', 0] }, 0] }, 
-							stockPriceSize: { $ifNull: [{ $arrayElemAt: ['$stockInfo.pricing', 0] }, []] },
-							orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
-							priceSize: 1, 
-							imageSrc: 1,  
-							productUrl: 1, 
-							productNumber :1
-					}
+		{
+			$match: { subsubCategory: subsubCategoryId }
+		},
+		{
+			$limit: 4
+		},
+		{
+			$lookup: {
+				from: 'categories',
+				localField: 'category',
+				foreignField: '_id',
+				as: 'categoryInfo'
 			}
+		},
+		{
+			$lookup: {
+				from: 'subcategories',
+				localField: 'subCategory',
+				foreignField: '_id',
+				as: 'subCategoryInfo'
+			}
+		},
+		{
+			$lookup: {
+				from: 'manufacturers',
+				localField: 'manufacturer',
+				foreignField: '_id',
+				as: 'manufacturerInfo'
+			}
+		},
+		{
+			$lookup: {
+				from: 'subsubcategories',
+				localField: 'subsubCategory',
+				foreignField: '_id',
+				as: 'subsubCategoryInfo'
+			}
+		},
+		{
+			$lookup: {
+				from: 'stocks',
+				localField: 'productNumber',
+				foreignField: 'productNumber',
+				as: 'stockInfo'
+			}
+		},
+		{
+			$project: {
+				_id: 1,
+				productName: 1,
+				prodDesc: 1,
+				properties: 1,
+				'categoryInfo.urlName': 1,
+				'subCategoryInfo.urlName': 1,
+				'manufacturerInfo.name': 1,
+				'subsubCategoryInfo.urlName': 1,
+				stockQuantity: { $ifNull: [{ $arrayElemAt: ['$stockInfo.stock', 0] }, 0] },
+				stockPriceSize: { $ifNull: [{ $arrayElemAt: ['$stockInfo.pricing', 0] }, []] },
+				orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
+				priceSize: 1,
+				imageSrc: 1,
+				productUrl: 1,
+				productNumber: 1
+			}
+		}
 	]);
 
 	if (compareSimilarity.length === 0) {
-			return { error: 'No related products found' };
+		return { error: 'No related products found' };
 	}
 
 	const compareSimilarityJson = JSON.parse(JSON.stringify(compareSimilarity));
