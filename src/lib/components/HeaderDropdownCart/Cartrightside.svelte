@@ -179,8 +179,8 @@
         {#each cartItems as item}
           <div class="flex flex-col py-4 border-b">
             <div class="flex items-center space-x-4">
-              <div class="flex-shrink-0 w-28 h-28 bg-stone-300 rounded-md overflow-hidden">
-                <img src={item.image} alt="img" class="w-full h-full object-cover" />
+              <div class="flex-shrink-0 w-28 h-24 rounded-md overflow-hidden border">
+                <img src={item.image} alt="img" class="w-full h-full object-contain" />
               </div>
               <div class="flex-1">
 				<a
