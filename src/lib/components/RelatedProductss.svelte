@@ -1,6 +1,8 @@
 <script>
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
+  import { cartState } from '$lib/stores/cartStores.js'; 
+  import { toast } from 'svelte-sonner';
   import Icon from "@iconify/svelte";
   export let relatedProducts;
   const productsData = relatedProducts;
@@ -63,11 +65,11 @@
   let selectedPrice;
   let selectedPriceIndex = 0;
   let showModal = false;
-  let showCartMessage = false;
 
   function openModal(product) {
 
     selectedProduct = {
+    brand : product.brand,
 		description: product.description,
 		id:product.id,
 		name : product.name,
@@ -81,7 +83,6 @@
     selectedPrice = selectedProduct.priceSize[0];
     selectedPriceIndex = 0;
     showModal = true;
-    showCartMessage = false;
   }
 
   function closeModal() {
@@ -124,32 +125,53 @@
     return [];
   }
 
-  function addToCart(product) {
-    if (!browser) return;
-    const cart = getCart();
+function addToCart(product) {
+  if (!browser) return;
 
-    const existingProduct = cart.find(
-      (item) =>
-        item.partNumber === product.partNumber &&
-        item.priceSize.size === product.priceSize.size
-    );
+  const cart = getCart();
 
-    if (existingProduct) {
-      existingProduct.quantity += product.quantity;
-    } else {
-      cart.push({
-        ...product,
-      });
-    }
+  const existingProduct = cart.find(
+    (item) =>
+      item.partNumber === product.partNumber &&
+      item.priceSize.size === product.priceSize.size
+  );
 
-    localStorage.setItem("cart", JSON.stringify(cart));
+  if (existingProduct) {
 
-    popupQuantity = 1;
-    showCartMessage = true;
-    setTimeout(() => {
-      showModal = false;
-    }, 1000);
+    existingProduct.quantity += product.quantity;
+
+    cartState.update((currentCart) => {
+      const index = currentCart.findIndex(
+        (item) =>
+          item.partNumber === product.partNumber &&
+          item.priceSize.size === product.priceSize.size
+      );
+
+      if (index !== -1) {
+        currentCart[index].quantity += product.quantity;
+        toast.info("Item quantity updated!")
+      }
+      return currentCart; 
+    });
+    
+  } else {
+    cart.push({
+      ...product,
+    });
+
+    cartState.update((currentCart) => {
+      currentCart.push(product);
+      return currentCart;
+    });
+    toast.success("Item added to cart")
   }
+  localStorage.setItem("cart", JSON.stringify(cart));
+
+  setTimeout(() => {
+    showModal = false;
+    popupQuantity = 1;
+  }, 500);
+}
 </script>
 
 <div class="max-w-7xl mx-auto my-10">
@@ -243,11 +265,6 @@
     <div
       class="bg-white p-6 rounded-lg w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-5/12 relative"
     >
-      {#if showCartMessage}
-        <div class=" bg-green-400 text-white my-2 text-center">
-          Item added to cart!
-        </div>
-      {/if}
       <div class="mt-2 absolute right-6 top-1">
         <button
           on:click={closeModal}
