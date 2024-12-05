@@ -6,11 +6,13 @@
 
     export let products
     export let manufacturers
+    export let productCount
+    export let subSubCategory
 
     $: paginatedProducts = products.map(x=>x)
     let categoryName = products[0].categoryDetails.urlName
     let subCategoryName = products[0].subCategoryDetails.urlName
-//    console.log(data,"-----------------");
+    $:console.log(productCount,"-----------------");
 
     let searchManufacture = manufacturers
     
@@ -18,16 +20,17 @@
 	let showCategoryDropdown = false;
 	let showManufacturerDropdown = false;
 	let showSortByDropdown = false;
+    let toggleFilter = false
     let currentPage = parseInt($page.url.searchParams.get('page')) || 1;
-    let totalPages = products.length;
+    let totalPages = parseInt(productCount/10);
 
     const sortBy = (checked,sortType)=>{
         let sortedBy
         console.log(checked);
         
        if(checked === true){
-        if(sortType === "desc") sortedBy = products.sort((a, b) => b.pricing[0].USD - a.pricing[0].USD);
-        if(sortType === "asc") sortedBy = products.sort((a, b) => a.pricing[0].USD - b.pricing[0].USD);
+        if(sortType === "desc") sortedBy = products.sort((a, b) => b.pricing.INR - a.pricing.INR);
+        if(sortType === "asc") sortedBy = products.sort((a, b) => a.pricing.INR - b.pricing.INR);
         if(sortType == "name") sortedBy = products.sort((a, b) => a.productName.localeCompare(b.productName));
         }else{
             sortedBy = products.map(x=>x)
@@ -135,11 +138,14 @@
     <!-- filters -->
     <div class=" w-full h-fit sticky top-0 lg:w-1/4">
         <div class="p-4 border-1 bg-white border-gray-300 rounded space-y-3 mt-3">
-            <div  class=" flex gap-2 justify-center lg:justify-start items-center text-xl font-semibold font-montserrat">
+            
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <div on:click={()=>(toggleFilter = !toggleFilter)} class=" flex gap-2 justify-center lg:justify-start items-center text-xl font-semibold font-montserrat">
                 <Icon icon="ic:sharp-segment" class="text-3xl text-primary-500" />
                 <h1>Filter</h1>
             </div>
-            <div class=" space-y-3">
+            <div class=" space-y-3 {toggleFilter ? "block":" hidden lg:block"}">
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <!-- svelte-ignore a11y-no-static-element-interactions -->
              <div on:click={()=>showSearchDropdown = !showSearchDropdown} class=" cursor-pointer font-semibold text-sm flex items-center justify-between p-2 rounded border-1 border-gray-300 ">
@@ -149,7 +155,7 @@
                 </button>
             </div>
             <div class="p-3 border-1 rounded {showSearchDropdown ? "block" : "hidden"}">
-                <input type="text" placeholder="Search..." on:input={e=>handleManufacturer(e.target.value)} class=" w-full rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
+                <input type="text" placeholder="Search..." class=" w-full rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
              </div>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -177,7 +183,7 @@
             
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <!-- svelte-ignore a11y-no-static-element-interactions -->
-             <div on:click={()=>showCategoryDropdown = !showCategoryDropdown} class=" cursor-pointer font-semibold text-sm flex items-center justify-between p-2 rounded border-1 border-gray-300 ">
+             <div on:click={()=>showCategoryDropdown = !showCategoryDropdown} class=" {!subSubCategory.length ? "hidden" : "flex"} cursor-pointer font-semibold text-sm items-center justify-between p-2 rounded border-1 border-gray-300 ">
                 <span>Categories</span>
                 <button type="button" on:click={()=>showCategoryDropdown = !showCategoryDropdown}>
                      <Icon icon={showCategoryDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
@@ -240,8 +246,8 @@
                     <p>Category : <span class=" font-medium">{product?.categoryDetails.name || ""}</span></p>
                     <p>Sub Category : <span class=" font-medium">{product?.subCategoryDetails.name || ""}</span></p>
                     <p>Manufacturer : <span class=" font-medium">{product?.manufacturerDetails.name || ""}</span></p>
-                    <p>Price : <span class=" font-medium">₹{product?.pricing[0].INR || ""}</span></p>
-                    <p>Size : <span class=" font-medium">{product?.pricing[0].break || ""}</span></p>
+                    <p>Price : <span class=" font-medium">₹{product?.pricing.INR || ""}</span></p>
+                    <p>Size : <span class=" font-medium">{product?.pricing.break || ""}</span></p>
                     <div class=" hidden sm:flex items-center justify-between">
                         <p class=" font-bold text-sm">₹{product?.totalPrice}</p>
                         <div class="flex items-center">

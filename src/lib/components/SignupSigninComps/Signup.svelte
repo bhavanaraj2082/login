@@ -154,9 +154,9 @@
                     <div class="text-sm mt-1 md:mt-0 md:ml-2">
                         <p class="whitespace-normal max-w-full">
                             You can withdraw our consent at any time by clicking the unsubscribe link contained in every email or by sending an email to 
-                            <a href="mailto:privacy@chemikartgroup.com" class="text-orange-500 underline">privacy@chemikartgroup.com</a>. 
+                            <a href="mailto:privacy@chemikartgroup.com" class="text-primary-500 underline">privacy@chemikartgroup.com</a>. 
                             Detailed information is available in our 
-                            <a href="/privacy" class="text-orange-500 underline">Privacy Statement</a>.
+                            <a href="/privacy" class="text-primary-500 underline">Privacy Statement</a>.
                         </p>
                     </div> -->
                 </div>

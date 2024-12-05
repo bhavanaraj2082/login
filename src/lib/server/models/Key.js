@@ -9,4 +9,4 @@ const keySchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-export const Key = mongoose.model('Key', keySchema);
+export const Key = mongoose.models.Key || mongoose.model('Key', keySchema);

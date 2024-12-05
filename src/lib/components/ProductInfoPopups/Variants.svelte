@@ -1,7 +1,7 @@
 <script>
   export let record;
   const allVariants = record.variants;
-
+  const allManufacturer = record.manufacturer;
 </script>
 
 <!-- <main class="bg-gray-100 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
@@ -43,7 +43,7 @@
     {/each}
 </main> -->
 
-<div aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto rounded-t">
+<!-- <div aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto rounded-t">
   <div class="inline-block w-full">
     <button
       class="w-full py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300 bg-white text-primary-500 font-bold hover:bg-white hover:text-primary-500 whitespace-nowrap"
@@ -77,15 +77,19 @@
     <div class="h-0.5 bg-primary-300 w-0 transition-all duration-300 ease-in-out"></div>
   </div>
   
-</div>
+</div> -->
+
 
 <div class="container mx-auto px-4 py-6">
+  <h1 class="w-full text-left text-2xl text-primary-400 font-bold p-3">
+    Products
+    </h1>
   <!-- Products Table -->
   <div class="bg-white shadow-md rounded-lg overflow-hidden">
     <div class="overflow-x-auto">
       <table class="min-w-full text-sm text-left text-gray-500">
         <!-- Table Header -->
-        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+        <thead class="text-xs text-gray-700 uppercase bg-primary-50">
           <tr>
             <th scope="col" class="py-3 px-6">Image</th>
             <th scope="col" class="py-3 px-6">Product Number</th>
@@ -100,10 +104,10 @@
           {#each allVariants as variant}
             <tr class="bg-white border-b hover:bg-gray-50">
               <td class="py-4 px-6"><img src={variant.imageSrc} alt={variant.productNumber} class="w-20"></td>
-              <td class="py-4 px-6 text-blue-500 cursor-pointer"
+              <td class="py-4 px-6 text-primary-400 font-medium cursor-pointer"
                 >{variant.productNumber}</td
               >
-              <td class="py-4 px-6">{variant?.manufacturerName}</td>
+              <td class="py-4 px-6">{allManufacturer.name}</td>
               <td class="py-4 px-6">
                 <span
                   >Starts at <span class="font-semibold text-black"
@@ -111,12 +115,14 @@
                   ></span
                 >
               </td>
-              <td class="py-4 px-6">
-                <a href={variant.productNumber}
-                  class="bg-primary-400 text-white py-2 px-4 rounded hover:bg-primary-400"
-                  >View Product</a
+              <td class="py-4 px-6 text-center sm:py-3 sm:px-4">
+                <a
+                  href={variant.productNumber}
+                  class="bg-primary-400 text-white py-2 px-4 rounded hover:bg-primary-500 text-sm md:text-base block sm:inline-block"
                 >
-              </td>
+                  View Product
+                </a>
+              </td>              
             </tr>
           {/each}
         </tbody>

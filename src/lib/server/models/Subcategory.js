@@ -27,8 +27,10 @@ const subCategorySchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'SubSubCategory', // Reference to the Seller model
       default:[]
-    }]
-
+    }],
+    productCount:{
+      type:Number
+    }
   },
   {
     timestamps: true,       
