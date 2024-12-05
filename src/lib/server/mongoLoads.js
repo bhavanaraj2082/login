@@ -12,6 +12,7 @@ import Shipment from '$lib/server/models/Shipment.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import Return from '$lib/server/models/Return.js';
 import MyFavourite from '$lib/server/models/MyFavourite.js';
+import Curcurrency from '$lib/server/models/Curcurrency.js'
 
 export async function getProductdatas() {
 	const records = await Category.find();
@@ -505,68 +506,157 @@ export async function getreturnstatusdata(invoiceid) {
 // returns ends
 
 //PRODUCT SIMILAR ITEMS , FINDING DIFFERENCES
+export async function getCurrencyData(currency) {
+	try {
+	  const record = await Curcurrency.findOne({ currency }).lean();
+	  console.log("record>>", record); 
+	  return record || { currency: [] };
+	} catch (error) {
+	  console.error('Error fetching currency data:', error);
+	  return { currency: [] };
+	}
+  }
+
+export async function conversionRates() {
+	try {
+	  const records = await Curcurrency.find({}).lean();
+
+	  const rates = records.reduce((acc, record) => {
+		acc[record.currency] = record.rate;
+		return acc;
+	  }, {});
+  
+	//   console.log("rates...===>", rates); 
+	  return rates;
+	} catch (error) {
+	  console.error('Error fetching conversion rates:', error);
+	  return {};
+	}
+  }
+  
+export async function convertToINR(pricing) {
+	if (!Array.isArray(pricing)) return [];
+	const currentRates = await conversionRates();
+  
+	return pricing.map(priceItem => {
+	  const { break: breakPoint, offer, ...currencies } = priceItem;
+	  const newPriceItem = { 
+		break: breakPoint,
+		...(offer !== undefined && { offer })
+	  };
+
+	  if (currencies.INR) {
+		newPriceItem.INR = currencies.INR;
+		return newPriceItem;
+	  }
+  
+	  for (const [currency, amount] of Object.entries(currencies)) {
+		if (currentRates[currency]) {
+		  newPriceItem.INR = Number((amount * currentRates[currency]));
+		  return newPriceItem; 
+		}
+	  }
+	  return priceItem;
+	});
+  }
+
 export async function DifferentProds(productId) {
-	// fething product
-	const product = JSON.parse(JSON.stringify(await Product.findOne({ productNumber: productId }).populate('manufacturer')));	const partNumber = product.productNumber;
-	// products stocks
+	const product = JSON.parse(
+	  JSON.stringify(
+		await Product.findOne({ productNumber: productId }).populate('manufacturer')
+	  )
+	);
+  
+	const partNumber = product.productNumber;
+  
 	let stockQuantity = 0;
 	let orderMultiple = 0;
 	let priceSize = [];
+  
 	if (partNumber) {
-		const stockRecord = await Stock.findOne({ productNumber: partNumber }).exec();
-		if (stockRecord && typeof stockRecord.stock !== 'undefined') {
-			stockQuantity = stockRecord.stock;
-			orderMultiple = stockRecord.orderMultiple;
-			priceSize = stockRecord.pricing;
-		}
+	  const stockRecord = await Stock.findOne({ productNumber: partNumber }).exec();
+	  if (stockRecord && typeof stockRecord.stock !== 'undefined') {
+		stockQuantity = stockRecord.stock;
+		orderMultiple = stockRecord.orderMultiple;
+		// console.log("stocks=====before>>", stockRecord.pricing);
+
+		priceSize = await convertToINR(stockRecord.pricing);
+
+		// console.log("after==>>", priceSize);
+	  }
 	}
-	// fetching varints stocks
+  
 	const variants = product.variants || [];
 	const variantRecord = await Promise.all(
 	  variants.map(async (variantId) => {
-	    const variant = await Product.findById(variantId).lean();
-	    if (!variant) return {};
-	    const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
-	    return {
-	      ...variant,
-	      pricing: stock ? stock.pricing : []
-	    };
+		const variant = await Product.findById(variantId).lean();
+		if (!variant) return {};
+  
+		const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
+  
+		let variantPricing = [];
+		if (stock?.pricing) {
+		  // Await the result of convertToINR to get the actual pricing
+		  if (stock.pricing.length > 1) {
+			variantPricing = await convertToINR([stock.pricing[0]]);
+		  } else {
+			variantPricing = await convertToINR(stock.pricing);
+		  }
+		}
+  
+		return {
+		  _id: variant?._id?.toString() || "",
+		  productName: variant?.productName || "Unknown Product",
+		  prodDesc: variant?.prodDesc || "No description available",
+		  description: Array.isArray(variant?.description) ? variant.description : [],
+		  properties: variant?.properties || {},
+		  manufacturerName: variant?.manufacturerName 
+			? variant.manufacturerName.toString() 
+			: "Unknown Manufacturer",
+		  productNumber: variant?.productNumber || "N/A",
+		  imageSrc: variant?.imageSrc || "",
+		  pricing: variantPricing ? variantPricing : []
+		};
 	  })
 	);
-	// formattedRecord
+  
 	const formattedRecord = {
-		productId: product?._id?.toString() || '',
-		productName: product?.productName || 'Unknown Product',
-		CAS: product?.CAS,
-		productNumber: product?.productNumber || 'N/A',
-		prodDesc: product?.prodDesc ,
-		returnPolicy:product?.returnPolicy,
-		imageSrc: product?.imageSrc || '',
-		safetyDatasheet: product?.safetyDatasheet || '',
-		priceSize,
-		properties: product?.properties || {},
-		description: product?.description || {},
-		safetyInfo: product?.safetyInfo || {},
-		filteredProductData: product?.filteredProductData || {},
-		productSynonym: product?.filteredProductData?.['Synonym(S)'] || '',
-		stockQuantity,
-		orderMultiple,
-		manufacturer:product?.manufacturer || {},
-		  variants: variantRecord.map((variant) => ({
-		    _id: variant?._id?.toString() || "",
-		    productName: variant?.productName || "Unknown Product",
-		    prodDesc: variant?.prodDesc || "No description available",
-		    description: variant?.description || [],
-		    properties: variant?.properties || {},
-		    manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
-		    productNumber: variant?.productNumber || "N/A",
-		    imageSrc: variant?.imageSrc || "",
-		    pricing:variant?.pricing
-		  })),
+	  productId: product?._id?.toString() || '',
+	  productName: product?.productName || 'Unknown Product',
+	  CAS: product?.CAS,
+	  productNumber: product?.productNumber || 'N/A',
+	  prodDesc: product?.prodDesc,
+	  returnPolicy: product?.returnPolicy,
+	  imageSrc: product?.imageSrc || '',
+	  safetyDatasheet: product?.safetyDatasheet || '',
+	  priceSize,
+	  properties: product?.properties || {},
+	  description: product?.description || {},
+	  safetyInfo: product?.safetyInfo || {},
+	  filteredProductData: product?.filteredProductData || {},
+	  productSynonym: product?.filteredProductData?.['Synonym(S)'] || '',
+	  stockQuantity,
+	  orderMultiple,
+	  manufacturer: product?.manufacturer || {},
+	  variants: variantRecord.map((variant) => ({
+		_id: variant?._id?.toString() || "",
+		productName: variant?.productName || "Unknown Product",
+		prodDesc: variant?.prodDesc || "No description available",
+		description: variant?.description || [],
+		properties: variant?.properties || {},
+		manufacturerName: variant?.manufacturerName 
+		  ? variant.manufacturerName.toString() 
+		  : "Unknown Manufacturer",
+		productNumber: variant?.productNumber || "N/A",
+		imageSrc: variant?.imageSrc || "",
+		pricing: variant?.pricing
+	  }))
 	};
-
+  
 	return { records: [formattedRecord] };
-}
+  }
+  
+//productinfo ends
 
 export async function getReturnSavedData(invoiceid) {
 	try {

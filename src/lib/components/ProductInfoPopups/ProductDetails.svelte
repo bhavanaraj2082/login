@@ -47,17 +47,17 @@
 	let showLikedPopup = false;
 	let successMessage =""
 	let errorMessage=""
-	const conversionRate = 83;
+	// const conversionRate = 83;
   
-	$:{data.records.forEach((record, index) => {
-	  record.priceSize.forEach((priceItem, i) => {
-		if (!priceItem.hasOwnProperty("INR")) {
-		  const inrValue = Number(priceItem.USD * conversionRate);
-		  priceItem.INR = inrValue;
-		  delete priceItem.USD;
-		}
-	  });
-	})};
+	// $:{data.records.forEach((record, index) => {
+	//   record.priceSize.forEach((priceItem, i) => {
+	// 	if (!priceItem.hasOwnProperty("INR")) {
+	// 	  const inrValue = Number(priceItem.USD * conversionRate);
+	// 	  priceItem.INR = inrValue;
+	// 	  delete priceItem.USD;
+	// 	}
+	//   });
+	// })};
   
 	let orderMultiple = null;
 	let quantity = orderMultiple;
@@ -73,49 +73,68 @@
   let minPrice = Infinity;
   let maxPrice = -Infinity;
   
-  $: {
-	  // Reset the prices before recalculating
-	  minPrice = Infinity;
-	  maxPrice = -Infinity;
+//   $: {
+// 	  // Reset the prices before recalculating
+// 	  minPrice = Infinity;
+// 	  maxPrice = -Infinity;
 	  
-	  data.records.forEach((record) => {
-		if (record?.variants && record?.variants.length > 0) {
-		  record?.variants.forEach((variant) => {
-			let variantMinPrice = Infinity;
-			let variantMaxPrice = -Infinity;
+// 	  data.records.forEach((record) => {
+// 		if (record?.variants && record?.variants.length > 0) {
+// 		  record?.variants.forEach((variant) => {
+// 			let variantMinPrice = Infinity;
+// 			let variantMaxPrice = -Infinity;
   
-			if (variant?.pricing && variant?.pricing?.length > 0) {
-			  variant.pricing.forEach((priceItem) => {
-				if (priceItem.USD) {
-				  // Convert USD to INR
-				  const usdValue = priceItem.USD;
-				  const inrValue = usdValue * conversionRate;
-				  priceItem.INR = inrValue; 
-				  delete priceItem.USD; // Remove USD key
-				}
-			  });
+// 			if (variant?.pricing && variant?.pricing?.length > 0) {
+// 			  variant.pricing.forEach((priceItem) => {
+// 				if (priceItem.USD) {
+// 				  // Convert USD to INR
+// 				  const usdValue = priceItem.USD;
+// 				  const inrValue = usdValue * conversionRate;
+// 				  priceItem.INR = inrValue; 
+// 				  delete priceItem.USD; // Remove USD key
+// 				}
+// 			  });
   
-			  variant.pricing.forEach((priceItem) => {
-				if (priceItem.INR !== undefined) {
-				  variantMinPrice = Math.min(variantMinPrice, priceItem.INR);
-				  variantMaxPrice = Math.max(variantMaxPrice, priceItem.INR);
+// 			  variant.pricing.forEach((priceItem) => {
+// 				if (priceItem.INR !== undefined) {
+// 				  variantMinPrice = Math.min(variantMinPrice, priceItem.INR);
+// 				  variantMaxPrice = Math.max(variantMaxPrice, priceItem.INR);
   
-				  // Update the global min and max prices
-				  minPrice = Math.min(minPrice, priceItem.INR);
-				  maxPrice = Math.max(maxPrice, priceItem.INR);
-				}
-			  });
+// 				  // Update the global min and max prices
+// 				  minPrice = Math.min(minPrice, priceItem.INR);
+// 				  maxPrice = Math.max(maxPrice, priceItem.INR);
+// 				}
+// 			  });
   
-			  // Set the min/max price for the variant
-			  variant.minPriceINR = variantMinPrice;
-			  variant.maxPriceINR = variantMaxPrice;
-			}
-		  });
-		}
-	  });
-	}
+// 			  // Set the min/max price for the variant
+// 			  variant.minPriceINR = variantMinPrice;
+// 			  variant.maxPriceINR = variantMaxPrice;
+// 			}
+// 		  });
+// 		}
+// 	  });
+// 	}
   // console.log("data in componenet",data);
-  
+  $: {
+    // Reset the prices before recalculating
+    minPrice = Infinity;
+    maxPrice = -Infinity;
+
+    data.records.forEach((record) => {
+      if (record?.variants && record?.variants.length > 0) {
+        record?.variants.forEach((variant) => {
+          if (variant?.pricing && variant?.pricing?.length > 0) {
+            variant.pricing.forEach((priceItem) => {
+              if (priceItem.INR !== undefined) {
+                minPrice = Math.min(minPrice, priceItem.INR);
+                maxPrice = Math.max(maxPrice, priceItem.INR);
+              }
+            });
+          }
+        });
+      }
+    });
+  }
   
 	function handleThumbnailClick(selectedIndex) {
 	  index = selectedIndex;
@@ -226,13 +245,12 @@
   
   {#each data.records as product}
 	<div
-	  class="max-[991px]:block md:flex lg:flex bg-white shadow-sm rounded-lg m-10"
-	>
+	  class="md:w-11/12 md:flex lg:flex bg-white shadow-sm rounded-lg m-10 mx-auto">
 	  <div
-		class=" w-full p-3 flex space-x-4 justify-between gap-6 flex-col lg:flex-row m-3"
+		class="p-3 flex space-x-4 justify-between items-center flex-col lg:flex-row m-3"
 	  >
 		<div class="flex flex-col space-y-4 lg:w-1/3">
-		  <div class="mb-1 lg:h-80">
+		  <div class="mb-3 lg:h-80">
 			<button on:click={toggleImagePopup} class="w-full h-80">
 			  <!-- svelte-ignore a11y-img-redundant-alt -->
 			  <img
@@ -245,7 +263,7 @@
 			  <Imageinfo {data} ImageclosePopup={toggleImagePopup} />
 			{/if}
 		  </div>
-		  <div class="w-full !mt-0">
+		  <div class="w-full mb-4">
 			<button
 			  class="w-full text-left bg-white text-gray-900 font-medium p-2 pl-0"
 			>
@@ -255,7 +273,7 @@
 			  <!-- {#if showDropdown} -->
 			  <div class="text-primary-400 text-sm text-left cursor-pointer">
 				<a href={product?.safetyDatasheet} target="_blank">
-				  <Icon icon="ic:round-download" class="text-lg inline" />SDS
+				  <Icon icon="ic:round-download" class="text-md inline" />SDS
 				</a>
 			  </div>
 			  <!-- <div class="text-primary-400 text-sm text-left cursor-pointer">
@@ -309,7 +327,7 @@
 				<input type="hidden" name="productNumber" value={product?.productNumber} />
 				<input type="hidden" name="quantity" value={product?.quantity || 1} />
 				<input type="hidden" name="stock" value={product?.stockQuantity} />
-				<button type="submit" class="btn btn-primary pr-3" on:click={toggleLikedPopup}>
+				<button type="submit" class="btn btn-primary" on:click={toggleLikedPopup}>
 				  <!-- svelte-ignore a11y-click-events-have-key-events -->
 				  <!-- svelte-ignore a11y-no-static-element-interactions -->
 				  <Icon
@@ -356,7 +374,7 @@
 		  {#if product?.variants && product?.variants.length > 0}
 			<div class="flex justify-between !mt-3">
 			  <p class="text-gray-900 text-lg font-semibold text-start">
-				₹ {minPrice} - ₹ {maxPrice}
+				₹ {minPrice.toLocaleString()} - ₹{maxPrice.toLocaleString()}
 			  </p>
 			</div>
 		  {/if}
@@ -541,7 +559,7 @@
 							type="submit"
 							class="bg-primary-400 text-white p-2 rounded-lg flex items-center space-x-1"
 						  >
-						  <Icon icon="tabler:calendar-check" class="text-xl" />
+						  <Icon icon="tabler:calendar-check" class="text-sm" />
 							<span>Check Availability</span>
 						  </button>
 						</div>
@@ -571,7 +589,7 @@
 					  <div class="mt-6 flex justify-end">
 						<button
 						  on:click={() => addToCart(product, index)}
-						  class="bg-primary-400 text-white py-2 px-3 rounded-lg flex items-center space-x-1"
+						  class="bg-primary-400 text-white py-2 px-4 rounded-lg flex items-center space-x-1"
 						>
 						<Icon icon="ic:round-shopping-cart" class="text-2xl" />Add To
 						  Cart
@@ -583,7 +601,7 @@
 				<button
 				  on:click={toggleSharePopup}
 				  class="w-full text-sm font-semibold text-right text-primary-400"
-				  >Share <Icon icon="fluent:share-24-regular" class="text-lg inline" /></button
+				  >Share <Icon icon="fluent:share-24-regular" class="text-md inline" /></button
 				>
 				{#if showSharePopup}
 				  <div
@@ -605,7 +623,7 @@
   
 					  <div class="flex items-start space-x-4">
 						<div
-						  class="w-32 h-28 rounded-lg overflow-hidden flex items-center justify-center"
+						  class="w-32 h-20 rounded-lg overflow-hidden flex items-center justify-center"
 						>
 						  <!-- svelte-ignore a11y-img-redundant-alt -->
 						  <img
