@@ -1,8 +1,75 @@
 <script>
   export let record;
+  // console.log("=-==>>",record)
   const allVariants = record.variants;
   const allManufacturer = record.manufacturer;
+
+  function getMinMaxPrices(pricing) {
+    if (!pricing || !pricing.length) return { minPrice: 'N/A', maxPrice: 'N/A' };
+    
+    const prices = pricing.map(p => p.INR).filter(price => typeof price === 'number');
+    if (!prices.length) return { minPrice: 'N/A', maxPrice: 'N/A' };
+    
+    return {
+      minPrice: Math.min(...prices),
+      maxPrice: Math.max(...prices)
+    };
+  }
 </script>
+
+<div class="container mx-auto px-4 py-6">
+  <h1 class="w-full text-left text-2xl text-primary-400 font-bold p-3">
+    Products
+  </h1>
+  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm text-left text-gray-500">
+        <thead class="text-xs text-gray-700 uppercase bg-primary-50">
+          <tr>
+            <th scope="col" class="py-3 px-6">Image</th>
+            <th scope="col" class="py-3 px-6">Product Number</th>
+            <th scope="col" class="py-3 px-6">Manufacturer</th>
+            <th scope="col" class="py-3 px-6">Price Range</th>
+            <th scope="col" class="py-3 px-6"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each allVariants as variant}
+            {@const { minPrice, maxPrice } = getMinMaxPrices(variant.pricing)}
+            <tr class="bg-white border-b hover:bg-gray-50">
+              <td class="py-4 px-6">
+                <img src={variant.imageSrc} alt={variant.productNumber} class="w-20">
+              </td>
+              <td class="py-4 px-6 text-primary-400 font-medium cursor-pointer">
+                {variant.productNumber}
+              </td>
+              <td class="py-4 px-6">{allManufacturer.name}</td>
+              <td class="py-4 px-6">
+                <span>
+                  {#if minPrice === maxPrice}
+                    <span class="font-semibold text-black">₹ {minPrice.toLocaleString()}</span>
+                  {:else}
+                    <span class="font-semibold text-black">
+                      ₹ {minPrice.toLocaleString()} - ₹ {maxPrice.toLocaleString()}
+                    </span>
+                  {/if}
+                </span>
+              </td>
+              <td class="py-4 px-6 text-center sm:py-3 sm:px-4">
+                <a
+                  href={variant.productNumber}
+                  class="bg-primary-400 text-white py-2 px-4 rounded hover:bg-primary-500 text-sm md:text-base block sm:inline-block"
+                >
+                  View Product
+                </a>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <!-- <main class="bg-gray-100 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
     <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">Product Variants</h1>
@@ -78,58 +145,6 @@
   </div>
   
 </div> -->
-
-
-<div class="container mx-auto px-10 py-6">
-  <h1 class="w-full text-left text-2xl text-primary-400 font-bold p-3">
-    Products
-    </h1>
-  <!-- Products Table -->
-  <div class="bg-white shadow-md rounded-lg overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="min-w-full text-sm text-left text-gray-500">
-        <!-- Table Header -->
-        <thead class="text-xs text-gray-700 uppercase bg-primary-50">
-          <tr>
-            <th scope="col" class="py-3 px-6">Image</th>
-            <th scope="col" class="py-3 px-6">Product Number</th>
-            <th scope="col" class="py-3 px-6">Manufacturer</th>
-            <th scope="col" class="py-3 px-6">Price</th>
-            <th scope="col" class="py-3 px-6"></th>
-          </tr>
-        </thead>
-
-        <!-- Table Body -->
-        <tbody>
-          {#each allVariants as variant}
-            <tr class="bg-white border-b hover:bg-gray-50">
-              <td class="py-4 px-6"><img src={variant.imageSrc} alt={variant.productNumber} class="w-20"></td>
-              <td class="py-4 px-6 text-primary-400 font-medium cursor-pointer"
-                >{variant.productNumber}</td
-              >
-              <td class="py-4 px-6">{allManufacturer.name}</td>
-              <td class="py-4 px-6">
-                <span
-                  >Starts at <span class="font-semibold text-black"
-                    >₹ {variant.minPriceINR}</span
-                  ></span
-                >
-              </td>
-              <td class="py-4 px-6 text-center sm:py-3 sm:px-4">
-                <a
-                  href={variant.productNumber}
-                  class="bg-primary-400 text-white py-2 px-4 rounded hover:bg-primary-500 text-sm md:text-base block sm:inline-block"
-                >
-                  View Product
-                </a>
-              </td>              
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
 
 <!-- <div class="max-w-full bg-white shadow-sm rounded-lg m-7 !mt-0 p-3">
     <h3 class="text-2xl font-bold text-primary-400" data-svelte-h="svelte-2y5xqz">
