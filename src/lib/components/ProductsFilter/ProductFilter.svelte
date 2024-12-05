@@ -105,7 +105,7 @@
                 return {
                     ...product,
                     quantity:product.quantity - product.orderMultiple,
-                    totalPrice:product.pricing[0].INR*(product.quantity-product.orderMultiple)
+                    totalPrice:product.pricing.INR*(product.quantity-product.orderMultiple)
                     
                 };
             }
@@ -122,7 +122,7 @@
             return {
                 ...product, // Copy the product object
                 quantity: product.quantity + product.orderMultiple, // Increment the quantity
-                totalPrice:product.pricing[0].INR*(product.quantity+product.orderMultiple)
+                totalPrice:product.pricing.INR*(product.quantity+product.orderMultiple)
             };
         }
         return product; // Keep other products unchanged
@@ -160,19 +160,23 @@
   };
 
   const addToCart = (product) =>{
+    let priceSize = {
+        price:product.pricing.INR,
+        size:product.pricing.break
+    }
      const addCart = {
         description:product.prodDesc,
-        _id:product._id,
+        id:product._id,
         image:product.imageSrc,
         name:product.productName,
         partNumber:product.productNumber,
-        priceSize:product.pricing,
+        priceSize,
         quantity:product.quantity,
         stock:product.stock
      }
      if(!$cartState.length){
         updateCartState([addCart])
-        toast.success("Product added to Cart")
+        toast.success("Item added to Cart")
         return
      }
      const filtered = $cartState.find(cart=>(cart._id === product._id && cart.priceSize.break === product.pricing.break))
@@ -184,7 +188,7 @@
         filtered.priceSize = selectedPrice
      }
      updateCartState($cartState)
-     toast.success("Cart is updated Successfully")
+     toast.info("Item quantity updated")
   }
 
 let typingTimeout;

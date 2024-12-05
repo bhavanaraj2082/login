@@ -318,7 +318,7 @@ export const loadProductsubcategory = async (suburl,pageNum,manufacturer,search)
 		  ]);
 		const after = Date.now()
 		//console.log(products);
-		console.log(after - before, "milliseconds");
+		//console.log(after - before, "milliseconds");
 
 		  const filtered = products.map(product=>{
 			const {_id, productName,productNumber,prodDesc,imageSrc,stockDetails,manufacturerDetails,categoryDetails} = product
