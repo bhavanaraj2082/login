@@ -228,13 +228,20 @@ export const loadProductsubcategory = async (suburl,pageNum,manufacturer,search)
 	const page = pageNum || 1 
     const pageSize = 10;
 	try {
+		let be = Date.now() 
 		const subcategory = await SubCategory.findOne({ urlName: suburl }).populate({path:"manufacturerIds",select:"-_id name"}).populate({path:"subSubCategoryIds",select:"-_id name urlName"})
+		let af = Date.now() 
+		//console.log(af - be, "milliseconds");
+		const subCategoryDetails ={
+			name:subcategory.name,
+			urlName:subcategory.urlName
+		}
 		if (!subcategory) {
 			return { type: 'error', message: `Subcategory not found for URL: ${suburl}` };
 		}	   
 
 		const matchCondition = {
-            'subCategoryDetails.name': subcategory.name,
+            'subCategoryDetails.urlName': subcategory.urlName,
             'inStock': { $exists: true, $gt: 0 }
         };
 		
@@ -246,8 +253,35 @@ export const loadProductsubcategory = async (suburl,pageNum,manufacturer,search)
 				{ productName: { $regex: search, $options: 'i' } }
 			];
 		}
-
-		const products = await Product.aggregate([		
+        
+		const before = Date.now()
+		const products = await Product.aggregate([	
+			{ 
+				$lookup: { 
+				  from: 'subcategories', 
+				  localField: 'subCategory', 
+				  foreignField: '_id', 
+				  as: 'subCategoryDetails' 
+				} 
+			  },
+			  { 
+				$lookup: { 
+				  from: 'manufacturers', 
+				  localField: 'manufacturer', 
+				  foreignField: '_id', 
+				  as: 'manufacturerDetails' 
+				} 
+			  },
+			{$match: matchCondition},
+			{ 
+				$lookup: { 
+				  from: 'categories', 
+				  localField: 'category', 
+				  foreignField: '_id', 
+				  as: 'categoryDetails' 
+				} 
+			  },
+			 
 			{ 
 			  $lookup: { 
 				from: 'stocks', 
@@ -256,31 +290,7 @@ export const loadProductsubcategory = async (suburl,pageNum,manufacturer,search)
 				as: 'stockDetails' 
 			  } 
 			},
-			{ 
-			  $lookup: { 
-				from: 'manufacturers', 
-				localField: 'manufacturer', 
-				foreignField: '_id', 
-				as: 'manufacturerDetails' 
-			  } 
-			},
-			{ 
-			  $lookup: { 
-				from: 'categories', 
-				localField: 'category', 
-				foreignField: '_id', 
-				as: 'categoryDetails' 
-			  } 
-			},
-			{ 
-			  $lookup: { 
-				from: 'subcategories', 
-				localField: 'subCategory', 
-				foreignField: '_id', 
-				as: 'subCategoryDetails' 
-			  } 
-			},
-			{$match: matchCondition},
+			
 			{ $unwind: '$stockDetails' },
 			{ $unwind: '$manufacturerDetails' },
 			{ $unwind: '$categoryDetails' },
@@ -291,11 +301,8 @@ export const loadProductsubcategory = async (suburl,pageNum,manufacturer,search)
 				'productName': 1,
 				'prodDesc': 1,
 				'imageSrc': 1,
-				'subCategoryDetails.name': 1,
 				'categoryDetails.name': 1,
 				'categoryDetails.urlName': 1,
-				'subCategoryDetails.urlName': 1,
-				//'distributorDetails.distributorName': 1,
 				'manufacturerDetails.name': 1,
 				'stockDetails.pricing': 1,
 				'stockDetails.stock': 1,
@@ -309,15 +316,16 @@ export const loadProductsubcategory = async (suburl,pageNum,manufacturer,search)
 			  $limit: Number(pageSize)
 			}
 		  ]);
-		  
+		const after = Date.now()
+		//console.log(products);
+		console.log(after - before, "milliseconds");
+
 		  const filtered = products.map(product=>{
-			const {_id, productName,productNumber,prodDesc,imageSrc,stockDetails,manufacturerDetails,categoryDetails,subCategoryDetails} = product
+			const {_id, productName,productNumber,prodDesc,imageSrc,stockDetails,manufacturerDetails,categoryDetails} = product
 			const priceConversion = stockDetails.pricing.map(price=>{
 				if (Object.hasOwn(price, 'INR')) {
-					console.log('The object has the "name" key');
 					return {...price}
 				} else {
-					console.log('The object does not have the "name" key');
 				    return {...price,INR:price.USD*conversionRate}
 				}
 			})

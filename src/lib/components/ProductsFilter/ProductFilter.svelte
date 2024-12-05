@@ -10,9 +10,11 @@
     export let productCount
     export let subSubCategory
 
+    //console.log(products);
+
     $: paginatedProducts = products.map(x=>x)
-    let categoryName = products[0].categoryDetails.urlName
-    let subCategoryName = products[0].subCategoryDetails.urlName
+    let categoryName = products[0]?.categoryDetails.urlName
+    let subCategoryName = products[0]?.subCategoryDetails.urlName
 
     let searchManufacture = manufacturers
     
@@ -28,7 +30,7 @@
 
     let selectedSort =''
 
-const sortBy = (checked, sortType) => {
+    const sortBy = (checked, sortType) => {
     let sortedBy;
     selectedSort = sortType
     const productsCopy = [...products];
@@ -52,7 +54,7 @@ const sortBy = (checked, sortType) => {
     }
 
     paginatedProducts = sortedBy;
-};
+    };
 
     
     const handleManufacturer = (searchTerm) => {
@@ -219,6 +221,9 @@ const handleSearch = (searchName) => {
 
 </script>
 
+<!-- <div>
+    product filter
+</div> -->
 <section class=" space-y-3 lg:flex items-start gap-4">
     <!-- filters -->
     <div class=" w-full h-fit sticky top-0 lg:w-1/4">
