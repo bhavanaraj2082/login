@@ -229,10 +229,10 @@
 	  class="max-[991px]:block md:flex lg:flex bg-white shadow-sm rounded-lg m-10"
 	>
 	  <div
-		class=" w-full p-3 flex space-x-4 justify-between items-center flex-col lg:flex-row m-3"
+		class=" w-full p-3 flex space-x-4 justify-between gap-6 flex-col lg:flex-row m-3"
 	  >
 		<div class="flex flex-col space-y-4 lg:w-1/3">
-		  <div class="mb-3 lg:h-80">
+		  <div class="mb-1 lg:h-80">
 			<button on:click={toggleImagePopup} class="w-full h-80">
 			  <!-- svelte-ignore a11y-img-redundant-alt -->
 			  <img
@@ -245,7 +245,7 @@
 			  <Imageinfo {data} ImageclosePopup={toggleImagePopup} />
 			{/if}
 		  </div>
-		  <div class="w-full mb-4">
+		  <div class="w-full !mt-0">
 			<button
 			  class="w-full text-left bg-white text-gray-900 font-medium p-2 pl-0"
 			>
@@ -255,7 +255,7 @@
 			  <!-- {#if showDropdown} -->
 			  <div class="text-primary-400 text-sm text-left cursor-pointer">
 				<a href={product?.safetyDatasheet} target="_blank">
-				  <Icon icon="ic:round-download" class="text-md inline" />SDS
+				  <Icon icon="ic:round-download" class="text-lg inline" />SDS
 				</a>
 			  </div>
 			  <!-- <div class="text-primary-400 text-sm text-left cursor-pointer">
@@ -309,7 +309,7 @@
 				<input type="hidden" name="productNumber" value={product?.productNumber} />
 				<input type="hidden" name="quantity" value={product?.quantity || 1} />
 				<input type="hidden" name="stock" value={product?.stockQuantity} />
-				<button type="submit" class="btn btn-primary" on:click={toggleLikedPopup}>
+				<button type="submit" class="btn btn-primary pr-3" on:click={toggleLikedPopup}>
 				  <!-- svelte-ignore a11y-click-events-have-key-events -->
 				  <!-- svelte-ignore a11y-no-static-element-interactions -->
 				  <Icon
@@ -541,7 +541,7 @@
 							type="submit"
 							class="bg-primary-400 text-white p-2 rounded-lg flex items-center space-x-1"
 						  >
-						  <Icon icon="tabler:calendar-check" class="text-sm" />
+						  <Icon icon="tabler:calendar-check" class="text-xl" />
 							<span>Check Availability</span>
 						  </button>
 						</div>
@@ -571,7 +571,7 @@
 					  <div class="mt-6 flex justify-end">
 						<button
 						  on:click={() => addToCart(product, index)}
-						  class="bg-primary-400 text-white py-2 px-4 rounded-lg flex items-center space-x-1"
+						  class="bg-primary-400 text-white py-2 px-3 rounded-lg flex items-center space-x-1"
 						>
 						<Icon icon="ic:round-shopping-cart" class="text-2xl" />Add To
 						  Cart
@@ -583,7 +583,7 @@
 				<button
 				  on:click={toggleSharePopup}
 				  class="w-full text-sm font-semibold text-right text-primary-400"
-				  >Share <Icon icon="fluent:share-24-regular" class="text-md inline" /></button
+				  >Share <Icon icon="fluent:share-24-regular" class="text-lg inline" /></button
 				>
 				{#if showSharePopup}
 				  <div
@@ -605,7 +605,7 @@
   
 					  <div class="flex items-start space-x-4">
 						<div
-						  class="w-32 h-20 rounded-lg overflow-hidden flex items-center justify-center"
+						  class="w-32 h-28 rounded-lg overflow-hidden flex items-center justify-center"
 						>
 						  <!-- svelte-ignore a11y-img-redundant-alt -->
 						  <img

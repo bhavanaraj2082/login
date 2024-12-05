@@ -80,7 +80,7 @@
 </div> -->
 
 
-<div class="container mx-auto px-4 py-6">
+<div class="container mx-auto px-10 py-6">
   <h1 class="w-full text-left text-2xl text-primary-400 font-bold p-3">
     Products
     </h1>
