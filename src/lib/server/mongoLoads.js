@@ -223,16 +223,29 @@ async function getMatchedSubCategories(search) {
 }
 
 
-export const loadProductsubcategory = async (suburl,pageNum) => {
+export const loadProductsubcategory = async (suburl,pageNum,manufacturer,search) => {
     const conversionRate = 90
 	const page = pageNum || 1 
     const pageSize = 10;
 	try {
 		const subcategory = await SubCategory.findOne({ urlName: suburl }).populate({path:"manufacturerIds",select:"-_id name"}).populate({path:"subSubCategoryIds",select:"-_id name urlName"})
-		console.log(subcategory.subSubCategoryIds,"+++---")
 		if (!subcategory) {
 			return { type: 'error', message: `Subcategory not found for URL: ${suburl}` };
 		}	   
+
+		const matchCondition = {
+            'subCategoryDetails.name': subcategory.name,
+            'inStock': { $exists: true, $gt: 0 }
+        };
+		
+        if (manufacturer) { matchCondition['manufacturerDetails.name'] = manufacturer;}
+		if (search) {
+			matchCondition.$or = [
+				{ CAS: { $regex: search, $options: 'i' } },
+				{ productNumber: { $regex: search, $options: 'i' } },
+				{ productName: { $regex: search, $options: 'i' } }
+			];
+		}
 
 		const products = await Product.aggregate([		
 			{ 
@@ -251,14 +264,6 @@ export const loadProductsubcategory = async (suburl,pageNum) => {
 				as: 'manufacturerDetails' 
 			  } 
 			},
-			// { 
-			//   $lookup: { 
-			// 	from: 'distributors', 
-			// 	localField: 'distributor', 
-			// 	foreignField: '_id', 
-			// 	as: 'distributorDetails' 
-			//   } 
-			// },
 			{ 
 			  $lookup: { 
 				from: 'categories', 
@@ -275,15 +280,9 @@ export const loadProductsubcategory = async (suburl,pageNum) => {
 				as: 'subCategoryDetails' 
 			  } 
 			},
-			{
-			  $match: {
-				'subCategoryDetails.name': subcategory.name,
-				'inStock': { $exists: true, $gt: 0 }
-			  }
-			},
+			{$match: matchCondition},
 			{ $unwind: '$stockDetails' },
 			{ $unwind: '$manufacturerDetails' },
-			//{ $unwind: '$distributorDetails' },
 			{ $unwind: '$categoryDetails' },
 			{ $unwind: '$subCategoryDetails' },
 			{
@@ -311,11 +310,16 @@ export const loadProductsubcategory = async (suburl,pageNum) => {
 			}
 		  ]);
 		  
-		  //console.log(products,"oooooo");
 		  const filtered = products.map(product=>{
 			const {_id, productName,productNumber,prodDesc,imageSrc,stockDetails,manufacturerDetails,categoryDetails,subCategoryDetails} = product
 			const priceConversion = stockDetails.pricing.map(price=>{
-				return {...price,INR:price.USD*conversionRate}
+				if (Object.hasOwn(price, 'INR')) {
+					console.log('The object has the "name" key');
+					return {...price}
+				} else {
+					console.log('The object does not have the "name" key');
+				    return {...price,INR:price.USD*conversionRate}
+				}
 			})
 			 return {_id,productName,productNumber,prodDesc,imageSrc,pricing:priceConversion[0],totalPrice:priceConversion[0].INR,quantity:stockDetails.orderMultiple,orderMultiple:stockDetails.orderMultiple,categoryDetails,subCategoryDetails,manufacturerDetails}
 		  })

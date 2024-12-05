@@ -3,12 +3,15 @@ import { loadProductsubcategory } from '$lib/server/mongoLoads.js';
 export async function load({ params,url,depends }) {
 	try {
 		const page = parseInt(url.searchParams.get('page')) || 1
-		//console.log("]]]]",page);
+		const search = url.searchParams.get('search') || ""
+		const manufacturer = url.searchParams.get('manufacturer') || null
+
+		console.log("]]]]",search);
         depends("page:data")
 
 		// let productPage = 1;
 		// let productPageSize = 20;
-		return await loadProductsubcategory(params.subsubid,page);
+		return await loadProductsubcategory(params.subsubid,page,manufacturer,search);
 		// return {
 		// 	products,
 		// 	manufacturers,
