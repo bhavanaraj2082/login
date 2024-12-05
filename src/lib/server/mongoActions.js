@@ -12,7 +12,7 @@ import Products from '$lib/server/models/Product.js';
 import Helpsupport from '$lib/server/models/Helpsupport.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '../server/models/MyFavourites.js';
-import ChemiDashProfile from "$lib/server/models/ChemiDashProfile.js";
+import ChemiDashProfile from '$lib/server/models/ChemiDashProfile.js';
 import { redirect, error } from '@sveltejs/kit';
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from 'nodemailer';
@@ -26,6 +26,42 @@ import {
 } from '$env/static/private';
 import Return from '$lib/server/models/Return.js';
 import { auth } from '$lib/server/lucia.js';
+
+export const createOrder = async (body) => {
+	try {
+		const record = JSON.parse(JSON.stringify(await Order.create(body)));
+		console.log('Order created successfully:', record);
+		return record;
+	} catch (error) {
+		console.error('Error creating order:', error);
+		throw error;
+	}
+};
+export const updateTransactionDetails = async (body) => {
+	// console.log('------updateTransactionDetails-----', body, Number(body.productinfo), body.txnid);
+	try {
+		// Find the document and update it in one operation
+		const updatedOrder = JSON.parse(
+			JSON.stringify(
+				await Order.findOneAndUpdate(
+					{ orderid: Number(body.productinfo), transactionid: body.txnid }, // Query criteria
+					{ $set: { transdetails: body } }, // Update operation
+					{ new: true } // Return the updated document
+				)
+			)
+		);
+
+		// Check if the document was found and updated
+		if (!updatedOrder) {
+			return { success: false, message: 'Order not found or transaction ID mismatch.' };
+		}
+
+		return { success: true, updatedOrder };
+	} catch (error) {
+		console.error('Error updating transaction details:', error);
+		return { success: false, message: 'An error occurred while updating transaction details.' };
+	}
+};
 
 export const submitContactInfo = async (data) => {
 	try {
@@ -70,65 +106,63 @@ export async function checkavailabilityproduct(data) {
 	// console.log('stockRecord:', stockRecord);
 	const stockQuantity = stockRecord.stock;
 	// console.log(stockQuantity,"stockQuantity");
-	
+
 	if (!stockRecord) {
 		return { message: 'Out of stock', type: 'error' };
 	}
 
 	if (stockQuantity > 0) {
-			return { message: `${stockQuantity} Quantity is Available to ship.`, type: 'success'} 
+		return { message: `${stockQuantity} Quantity is Available to ship.`, type: 'success' };
 	} else {
 		return { message: `Out of Stock`, type: 'error' };
 	}
 }
 
 export async function favorite(favdata) {
-	const authedUser=favdata.authedEmail;
+	const authedUser = favdata.authedEmail;
 	// console.log(authedUser);
-	if(authedUser){
-	  const chemiDashProfileId= await ChemiDashProfile.findOne({email: authedUser});
-	  const userProfileId=chemiDashProfileId.id;
-	//   console.log(chemiDashProfileId,"chemiDashProfileId");
-	  const existingRecord = await MyFavourites.findOne({ userProfileId: userProfileId });
-	//   console.log("existingRecord", existingRecord);
-	  const favoriteItem = {
-		productDesc: favdata.productDesc,
-		id: favdata.id,
-		imgUrl: favdata.imgUrl,
-		productName: favdata.productName,
-		productNumber: favdata.productNumber,
-		priceSize: { price: favdata.price, size: favdata.size },
-		quantity: favdata.quantity,
-		stock: favdata.stock,
-	  };
-	  let updatedFavorites = [];
-	  let isFavorite = false;
-	  if (existingRecord && Array.isArray(existingRecord.favorite)) {
-		updatedFavorites = existingRecord.favorite.filter(
-		  (item) => item.id !== favdata.id
-		);
-		isFavorite = updatedFavorites.length !== existingRecord.favorite.length;
-	  }
-	  if (isFavorite) {
-		existingRecord.favorite = updatedFavorites;
-		await existingRecord.save();
-		return { type: 'success', message: 'Removed from favorites!' };
-	  } else {
-		updatedFavorites = existingRecord
-		  ? [...existingRecord.favorite, favoriteItem]
-		  : [favoriteItem];
-	
-		if (existingRecord) {
-		  existingRecord.favorite = updatedFavorites;
-		  await existingRecord.save();
-		} else {
-		  await MyFavourites.create({
-			userProfileId,
-			favorite: updatedFavorites,
-		  });
+	if (authedUser) {
+		const chemiDashProfileId = await ChemiDashProfile.findOne({ email: authedUser });
+		const userProfileId = chemiDashProfileId.id;
+		//   console.log(chemiDashProfileId,"chemiDashProfileId");
+		const existingRecord = await MyFavourites.findOne({ userProfileId: userProfileId });
+		//   console.log("existingRecord", existingRecord);
+		const favoriteItem = {
+			productDesc: favdata.productDesc,
+			id: favdata.id,
+			imgUrl: favdata.imgUrl,
+			productName: favdata.productName,
+			productNumber: favdata.productNumber,
+			priceSize: { price: favdata.price, size: favdata.size },
+			quantity: favdata.quantity,
+			stock: favdata.stock
+		};
+		let updatedFavorites = [];
+		let isFavorite = false;
+		if (existingRecord && Array.isArray(existingRecord.favorite)) {
+			updatedFavorites = existingRecord.favorite.filter((item) => item.id !== favdata.id);
+			isFavorite = updatedFavorites.length !== existingRecord.favorite.length;
 		}
-		return { type: 'success', message: 'Added to favorites!' };
-	  }
+		if (isFavorite) {
+			existingRecord.favorite = updatedFavorites;
+			await existingRecord.save();
+			return { type: 'success', message: 'Removed from favorites!' };
+		} else {
+			updatedFavorites = existingRecord
+				? [...existingRecord.favorite, favoriteItem]
+				: [favoriteItem];
+
+			if (existingRecord) {
+				existingRecord.favorite = updatedFavorites;
+				await existingRecord.save();
+			} else {
+				await MyFavourites.create({
+					userProfileId,
+					favorite: updatedFavorites
+				});
+			}
+			return { type: 'success', message: 'Added to favorites!' };
+		}
 	}
 }
 
@@ -1119,32 +1153,32 @@ export const quicksearch = async ({ query }) => {
 	return JSON.parse(JSON.stringify(result));
 };
 
-
 export const uploadFile = async ({ query }) => {
-	const queryFilter = { productNumber: { $in: query.map(pn => new RegExp(pn, 'i')) } };
-  
-	try {
-	  const result = await Products.find(queryFilter).exec();
-  
-	  const validationResults = query.map((productNumber) => {
-		const product = result.find((r) => r.productNumber.toLowerCase() === productNumber.toLowerCase());
-		return {
-		  productNumber,
-		  isValid: product ? true : false,
-		  message: product ? 'Product number is valid' : 'Product number is not valid',
-		};
-	  });
-  
-	  return validationResults;
-	} catch (error) {
-	//   console.error('Error checking product numbers in MongoDB:', error);
-	  return [];
-	}
-  };
+	const queryFilter = { productNumber: { $in: query.map((pn) => new RegExp(pn, 'i')) } };
 
-  
-  export const CreateProductQuote = async (formattedData) => {
+	try {
+		const result = await Products.find(queryFilter).exec();
+
+		const validationResults = query.map((productNumber) => {
+			const product = result.find(
+				(r) => r.productNumber.toLowerCase() === productNumber.toLowerCase()
+			);
+			return {
+				productNumber,
+				isValid: product ? true : false,
+				message: product ? 'Product number is valid' : 'Product number is not valid'
+			};
+		});
+
+		return validationResults;
+	} catch (error) {
+		//   console.error('Error checking product numbers in MongoDB:', error);
+		return [];
+	}
+};
+
+export const CreateProductQuote = async (formattedData) => {
 	const newQuote = new Quotes(formattedData);
-		await newQuote.save();
-		return { status: 200 };
+	await newQuote.save();
+	return { status: 200 };
 };
