@@ -215,7 +215,7 @@
 	});
 </script>
 
-<div class="min-h-screen mx-auto max-w-7xl bg-gray-100 p-4 sm:p-6">
+<div class="mx-auto bg-gray-50">
 	<!-- Main Cart Section -->
 	<div class=" flex flex-col xl:flex-row justify-between gap-6">
 		{#if loading}
@@ -233,7 +233,7 @@
 				<p class=" font-bold text-lg md:text-xl xl:text-2xl">Cart is Empty</p>
 			</div>
 		{:else}
-			<div class="w-full lg:w-4/4 xl:w-3/4 bg-white p-4 rounded-lg shadow-md h-fit">
+			<div class="w-full lg:w-4/4 xl:w-3/4 bg-white px-6 py-4 rounded-lg shadow-md h-fit">
 				<h2 class="text-xl mb-3 font-bold">
 					Cart Items <span class="text-red-500">({cartItems.length})</span>
 				</h2>
