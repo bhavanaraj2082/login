@@ -1,25 +1,6 @@
-import { quick } from '$lib/server/mongoLoads.js';
 
-export async function load() {
-    let data = [];
-    try {
-        const productNames = await quick();
-        
-        data = productNames;
-        // console.log('Data fetched from the server:', productNames.length);
-
-        return { data };
-    } catch (error) {
-        console.error('Error fetching chemical products:', error);
-        return { data };
-    }
-};
-
-
-import { quicksearch ,quickcheck} from '$lib/server/mongoActions';
-import fs from 'fs';
-import path from 'path';
-import { uploadFile  } from '$lib/server/mongoActions';
+import { parse } from 'csv-parse/sync';
+import { uploadFile ,quicksearch ,quickcheck} from '$lib/server/mongoActions';
 
 export const actions = {
 
@@ -47,82 +28,74 @@ export const actions = {
       };
     }
   },
-  quicksearch: async ({ request }) => {
-    const data = Object.fromEntries(await request.formData());
-    // console.log('Request body:', data);
-
-const { quickSearch } = data;
-
-if (quickSearch && quickSearch.length >= 2) {
-
-  const results = await quicksearch({ query: quickSearch });
-  // console.log(results, 'Results from database');
-
-
-  return results ;
-}
-  },
-
-uploadFile: async ({ request }) => {
-    try {
-      const data = await request.formData();
-      const file = data.get('file');
-
-      // console.log('Received file:', file);  
-
-      if (!file || file.size === 0) {
-        return {
-          body: { error: 'No file uploaded or file is empty' },
-        };
+quicksearch : async ({ request }) => {
+  const data = Object.fromEntries(await request.formData());
+  const { quickSearch } = data;
+  if (quickSearch && quickSearch.length >= 2) {
+      try {
+          const results = await quicksearch({ query: quickSearch });
+          const processedResults = results.map(product => {
+              if (product.pricing && Array.isArray(product.pricing)) {
+                  const formattedPricing = product.pricing.map(item => ({
+                      break: item.break,
+                      currency: item.currency || 'N/A', 
+                      price: item.price || 'N/A' 
+                  }));
+                  product.pricing = formattedPricing;
+              }
+              
+              return product;
+          });
+          // console.log("ia mfrom server",processedResults);
+          return processedResults; 
+      } catch (error) {
+          console.error('Error in quicksearch:', error);
+          return { error: 'An error occurred while fetching search results.' };
       }
+  } else {
+      return { error: 'Search query must be at least 2 characters.' };
+  }
+},
 
-      const tempDir = path.resolve('/tmp/uploads');
-      if (!fs.existsSync(tempDir)) {
-        fs.mkdirSync(tempDir, { recursive: true });
-      }
 
-      const filePath = path.join(tempDir, file.name);
-      const fileData = Buffer.from(await file.arrayBuffer());
-      fs.writeFileSync(filePath, fileData);
+  uploadFile :async ({ request }) => {
+  try {
+    const data = await request.formData();
+    const file = data.get('file');
 
-      let fileContent = '';
-      if (file.type === 'text/csv' || file.type === 'text/plain') {
-        fileContent = fileData.toString('utf8');
-      } else {
-        throw new Error('Unsupported file type');
-      }
-
-      const records = parse(fileContent, { columns: false, skip_empty_lines: true });
-      const productNumbers = records.map(([productNumberAndSize]) => {
-        const [productNumber] = productNumberAndSize.split('-');
-        return productNumber.trim();
-      });
-
-      // console.log('Extracted product numbers:', productNumbers);
-
-      const validationResults = await uploadFile({ query: productNumbers });
-
-      // console.log('Validation Results from server:', validationResults); 
-return {
-        body: validationResults,
-      };
-    } catch (error) {
-      console.error('File upload error:', error);
+    // console.log('Received file:', file);  
+    if (!file || file.size === 0) {
       return {
-        body: { error: 'Error processing the file' },
+        error: 'No file uploaded or file is empty',
       };
     }
-  },
+    const fileData = Buffer.from(await file.arrayBuffer());
+  
+
+    let fileContent = '';
+    if (file.type === 'text/csv' || file.type === 'text/plain') {
+      fileContent = fileData.toString('utf8');
+    } else {
+      throw new Error('Unsupported file type');
+    }
+    const records = parse(fileContent, { columns: false, skip_empty_lines: true });
+    const productNumbers = records.map(([productNumberAndSize]) => {
+      const [productNumber] = productNumberAndSize.split('-');
+      return productNumber.trim();
+    });
+
+    // console.log('Extracted product numbers:', productNumbers);
+
+    const validationResults = await uploadFile({ query: productNumbers });
+    
+    return validationResults;
+
+    
+  } catch (error) {
+    console.error('File upload error:', error);
+    return {
+      error: 'Error processing the file' ,
+    };
+  }
+ },
 };
-
-
-
-
-
-
-
-
-
-
-
-
