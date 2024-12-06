@@ -19,6 +19,6 @@ const curconversionSchema = new mongoose.Schema({
   collection: "currencyconversion"
 });
 
-const Curconversion = mongoose.models.Curconversion || mongoose.model('currencyconversion', curconversionSchema);
+const Curconversion = mongoose.models.Curconversion || mongoose.model('Curconversion', curconversionSchema);
 
 export default Curconversion;
