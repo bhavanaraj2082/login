@@ -247,7 +247,6 @@ export const loadProductsubcategory = async (
   manufacturer,
   search
 ) => {
-  const conversionRate = 90;
   const page = pageNum || 1;
   const pageSize = 10;
   try {
@@ -347,10 +346,9 @@ export const loadProductsubcategory = async (
       },
     ]);
     const after = Date.now();
-    //console.log(products);
-    //console.log(after - before, "milliseconds");
 
-    const filtered = products.map((product) => {
+
+    const filtered = await Promise.all( products.map(async(product) => {
       const {
         _id,
         productName,
@@ -361,13 +359,7 @@ export const loadProductsubcategory = async (
         manufacturerDetails,
         categoryDetails,
       } = product;
-      const priceConversion = stockDetails.pricing.map((price) => {
-        if (Object.hasOwn(price, "INR")) {
-          return { ...price };
-        } else {
-          return { ...price, INR: price.USD * conversionRate };
-        }
-      });
+      const priceConversion = await convertToINR(stockDetails.pricing) 
       return {
         _id,
         productName,
@@ -375,14 +367,15 @@ export const loadProductsubcategory = async (
         prodDesc,
         imageSrc,
         pricing: priceConversion[0],
-        totalPrice: priceConversion[0].INR,
+        totalPrice: priceConversion[0].INR*stockDetails.orderMultiple,
         quantity: stockDetails.orderMultiple,
         orderMultiple: stockDetails.orderMultiple,
         categoryDetails,
         subCategoryDetails,
         manufacturerDetails,
       };
-    });
+    })
+  )
     return {
       products: JSON.parse(JSON.stringify(filtered)),
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
