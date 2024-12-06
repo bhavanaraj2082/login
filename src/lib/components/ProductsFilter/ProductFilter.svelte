@@ -101,7 +101,7 @@
     const decrementQuantity = (id) => {
     products = products.map(product => {
         if (product._id === id) {
-            if (product.quantity > 1) {
+            if (product.quantity > product.orderMultiple) {
                 return {
                     ...product,
                     quantity:product.quantity - product.orderMultiple,
@@ -354,21 +354,23 @@ const handleSearch = (searchName) => {
         </div>
         {:else}
        {#each paginatedProducts as product}
-        <div class=" bg-white border-1 border-gray-300 p-4 space-y-2 rounded">
+        <div class=" bg-white border-1 border-gray-300 p-4 md:px-8 md:py-6 space-y-2 rounded">
             <div>
-                <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" text-sm font-semibold text-primary-500 hover:underline">{product?.productName  || ""}</a>
+                <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" text-md font-semibold text-primary-500 hover:underline">{product?.productName  || ""}</a>
             </div>
-            <div class=" flex items-start gap-3">
-                <img src={product?.imageSrc} class=" w-36 h-36 object-contain" alt="">
-                <div class=" text-xs md:text-sm space-y-1 grow font-semibold">
-                    <p>Product Number : <span class=" font-medium">{product?.productNumber || ""}</span></p>
-                    <p>Category : <span class=" font-medium">{product?.categoryDetails.name || ""}</span></p>
-                    <p>Sub Category : <span class=" font-medium">{product?.subCategoryDetails.name || ""}</span></p>
-                    <p>Manufacturer : <span class=" font-medium">{product?.manufacturerDetails.name || ""}</span></p>
-                    <p>Price : <span class=" font-medium">₹{product?.pricing.INR || ""}</span></p>
-                    <p>Size : <span class=" font-medium">{product?.pricing.break || ""}</span></p>
+            <div class=" flex items-start gap-4 md:gap-8">
+                <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`}>
+                <img src={product?.imageSrc} class=" w-40 h-40 object-contain" alt="">
+                </a>
+                <div class=" text-xs md:text-sm space-y-1 grow font-medium">
+                    <p>Product Number : <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.productNumber || ""}</a></p>
+                    <p>Category : <a href={`/products/${categoryName}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.categoryDetails.name || ""}</a></p>
+                    <p>Sub Category : <span class=" font-semibold ">{product?.subCategoryDetails.name || ""}</span></p>
+                    <p>Manufacturer : <span class=" font-semibold ">{product?.manufacturerDetails.name || ""}</span></p>
+                    <p>Price : <span class=" font-semibold">₹{product?.pricing.INR || ""}</span></p>
+                    <p>Size : <span class=" font-semibold">{product?.pricing.break || ""}</span></p>
                     <div class=" hidden sm:flex items-center justify-between">
-                        <p class=" font-bold text-sm">₹{product?.totalPrice}</p>
+                        <p class=" font-bold text-4s">₹{product?.totalPrice}</p>
                         <div class="flex items-center">
                             <div class="flex items-center border-1 rounded">
                                 <button on:click={() => decrementQuantity(product._id)} class=" border-r-1 p-2.5 text-primary-500"
