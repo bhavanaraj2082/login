@@ -246,11 +246,11 @@
                 <button on:click={()=>activeBook(2,"shipping")} class="{2 === active ? " border-b-2 border-primary-500 text-primary-500 transition duration-300 " :"border-white"} border-b-2 shrink-0 font-semibold px-4 py-1">Shipping</button>
                 <button on:click={()=>activeBook(3,"billing")} class="{3 === active ? " border-b-2 border-primary-500 text-primary-500 transition duration-300 " :"border-white"} border-b-2 shrink-0 font-semibold px-4 py-1">Billing</button>
             </section>
-            <div class=" w-full md:w-2/3 flex flex-col gap-3">
+            <div class=" w-full flex flex-col gap-3">
                 <div class=" w-full h-40 border-1 font-medium capitalize rounded border-gray-300 p-4 md:p-5 text-xs md:text-sm leading-5">
                    {activeAddress?.organizationName || ""} {activeAddress?.attentionTo || ""} {activeAddress?.department || "" } {activeAddress?.building || ""} {activeAddress?.street || ""} {activeAddress?.city || ""} {activeAddress?.state || ""} {activeAddress?.postalCode || ""} {activeAddress?.location || ""}
                 </div>
-                <button on:click={()=>toggleEdit = true} class=" w-20 rounded py-2 self-end font-medium text-xs md:text-sm text-white bg-primary-500 hover:bg-primary-600">Edit</button>
+                <button on:click={()=>toggleEdit = true} class=" w-20 rounded py-2 self-end font-medium text-xs md:text-sm text-white bg-primary-400 hover:bg-primary-500">Edit</button>
             </div>
         </div>
         {/if}
