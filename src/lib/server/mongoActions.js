@@ -237,8 +237,13 @@ export async function login(body, cookies) {
 				}
 			);
 
+			const redirectUrl = cookies.get('redirectUrl');
+			const targetUrl = redirectUrl ? decodeURIComponent(redirectUrl) : '/profile';
+			if (redirectUrl) {
+				cookies.delete('redirectUrl', { path: '/' });
+			}
 			// Redirect to the profile page
-			return redirect(302, '/profile');
+			return redirect(302, targetUrl);
 		} else {
 			return { success: false, message: 'Profile not found' };
 		}

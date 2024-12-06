@@ -9,7 +9,7 @@
 	import jsPDF from 'jspdf';
 	import { toast } from 'svelte-sonner';
 	import 'jspdf-autotable';
-
+	import { page } from '$app/stores';
 	const dispatch = createEventDispatcher();
 
 	// let authedUser={
@@ -208,6 +208,11 @@
 		updateCartState(cartItems);
 	};
 
+	function setRedirectUrl() {
+		const currentUrl = $page.url.href;
+		document.cookie = `redirectUrl=${encodeURIComponent(currentUrl)}; path=/;`;
+	}
+
 	onMount(() => {
 		calculateTotals();
 		functionDispatch();
@@ -383,7 +388,7 @@
 				>
 					Cancel
 				</button>
-				<a href="/login" class="bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-700">
+				<a href="/login" on:click={setRedirectUrl} class="bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-700">
 					Login
 				</a>
 			</div>
