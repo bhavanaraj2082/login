@@ -5,32 +5,246 @@
       "href": "/products",
       "submenus": [
         {
+          "title": "Molecular Biology Reagents and Kits",
+          "href": "/molecular-biology-reagents-and-kits",
+          "subSubmenus": [
+            {
+              "title": "Nucleic Acid Labeling and Detection",
+              "href": "/nucleic-acid-labeling-and-detection"
+            },
+            {
+              "title": "Gene Expression Screening Assays",
+              "href": "/gene-expression-screening-assays"
+            },
+            {
+              "title": "Miscellaneous Molecular Biology Reagents",
+              "href": "/miscellaneous-molecular-biology-reagents"
+            },
+            {
+              "title": "RNA Isolation and Purification Products",
+              "href": "/rna-isolation-and-purification-products"
+            },
+            {
+              "title": "DNA Extraction and Purification",
+              "href": "/dna-extraction-and-purification"
+            },
+            {
+              "title": "RNA Preparation and Purification",
+              "href": "/rna-preparation-and-purification"
+            },
+            {
+              "title": "Nucleic Acid Controls",
+              "href": "/nucleic-acid-controls"
+            },
+            {
+              "title": "DNA Vectors",
+              "href": "/dna-vectors"
+            },
+            {
+              "title": "Nucleic Acid Purification System Accessories",
+              "href": "/nucleic-acid-purification-system-accessories"
+            },
+            {
+              "title": "LAMP and Other Isothermal Amplification Technologies",
+              "href": "/lamp-and-other-isothermal-amplification-technologies"
+            },
+            {
+              "title": "DNA Gel Extraction",
+              "href": "/dna-gel-extraction"
+            },
+            {
+              "title": "Nucleic Acid Purification Systems",
+              "href": "/nucleic-acid-purification-systems"
+            }
+          ]
+        },
+        {
+          "title": "Nucleic Acid Synthesis",
+          "href": "/nucleic-acid-synthesis",
+          "subSubmenus": [
+            {
+              "title": "Nucleotides",
+              "href": "/nucleotides"
+            },
+            {
+              "title": "Nucleosides",
+              "href": "/nucleosides"
+            },
+            {
+              "title": "Nucleic Acid Synthesis Supports",
+              "href": "/nucleic-acid-synthesis-supports"
+            }
+          ]
+        },
+        {
+          "title": "Mixers",
+          "href": "/mixers",
+          "subSubmenus": [
+            {
+              "title": "Vortex Mixers",
+              "href": "/vortex-mixers"
+            },
+            {
+              "title": "Rotary Mixers",
+              "href": "/rotary-mixers"
+            }
+          ]
+        },
+        {
+          "title": "Pipette Products",
+          "href": "/pipette-products",
+          "subSubmenus": [
+            {
+              "title": "Pipette Tips",
+              "href": "/pipette-tips"
+            },
+            {
+              "title": "Pipettes",
+              "href": "/pipettes"
+            },
+            {
+              "title": "Pipetting Workstations",
+              "href": "/pipetting-workstations"
+            },
+            {
+              "title": "Pipette Product Accessories",
+              "href": "/pipette-product-accessories"
+            }
+          ]
+        },
+        {
+          "title": "Personal Protective Equipment",
+          "href": "/personal-protective-equipment",
+          "subSubmenus": [
+            {
+              "title": "Personal Protective Equipment Safety Kits",
+              "href": "/personal-protective-equipment-safety-kits"
+            },
+            {
+              "title": "Respiratory Protection",
+              "href": "/respiratory-protection"
+            },
+            {
+              "title": "Head Protection",
+              "href": "/head-protection"
+            },
+            {
+              "title": "Hand Protection",
+              "href": "/hand-protection"
+            },
+            {
+              "title": "Safety Clothing",
+              "href": "/safety-clothing"
+            },
+            {
+              "title": "Hearing Protection",
+              "href": "/hearing-protection"
+            }
+          ]
+        },
+        {
+          "title": "Vials",
+          "href": "/vials",
+          "subSubmenus": [
+            {
+              "title": "Sample Vials",
+              "href": "/sample-vials"
+            },
+            {
+              "title": "General and Autosampler Vial Accessories",
+              "href": "/general-and-autosampler-vial-accessories"
+            },
+            {
+              "title": "Autosampler Vials, Inserts, and Closures",
+              "href": "/autosampler-vials,-inserts,-and-closures"
+            },
+            {
+              "title": "Environmental Sampling Vials and Closures",
+              "href": "/environmental-sampling-vials-and-closures"
+            },
+            {
+              "title": "Cryogenic Storage Vials",
+              "href": "/cryogenic-storage-vials"
+            },
+            {
+              "title": "Scintillation Vials and Caps",
+              "href": "/scintillation-vials-and-caps"
+            },
+            {
+              "title": "Vial Capping and Decapping Equipment",
+              "href": "/vial-capping-and-decapping-equipment"
+            },
+            {
+              "title": "Micro Sampling Vials and Closures",
+              "href": "/micro-sampling-vials-and-closures"
+            },
+            {
+              "title": "Serum Vials and Closures",
+              "href": "/serum-vials-and-closures"
+            },
+            {
+              "title": "Ready-to-use (RTU) Fill Vials and Caps",
+              "href": "/ready-to-use-(rtu)-fill-vials-and-caps"
+            }
+          ]
+        },
+        {
+          "title": "Water Purification",
+          "href": "/water-purification",
+          "subSubmenus": [
+            {
+              "title": "Water Purification Filters and Cartridges",
+              "href": "/water-purification-filters-and-cartridges"
+            },
+            {
+              "title": "Water Purification Devices",
+              "href": "/water-purification-devices"
+            },
+            {
+              "title": "Water Purification Filter and Cartridge Accessories",
+              "href": "/water-purification-filter-and-cartridge-accessories"
+            },
+            {
+              "title": "Water Purification Accessories",
+              "href": "/water-purification-accessories"
+            },
+            {
+              "title": "Milli Q Consumables",
+              "href": "/milli-q-consumables"
+            },
+            {
+              "title": "Milli Q Accessories",
+              "href": "/milli-q-accessories"
+            }
+          ]
+        },
+        {
           "title": "Analytical Chemistry",
           "href": "/analytical-chemistry",
           "subSubmenus": [
+            {
+              "title": "Lab Safety",
+              "href": "/lab-safety"
+            },
             {
               "title": "Analytical Chromatography",
               "href": "/analytical-chromatography"
             },
             {
-              "title": "Analytical Reagents",
-              "href": "/analytical-reagents"
+              "title": "Reference Materials",
+              "href": "/reference-materials"
             },
             {
               "title": "Analytical Sample Preparation",
               "href": "/analytical-sample-preparation"
             },
             {
-              "title": "Lab Safety",
-              "href": "/lab-safety"
+              "title": "Analytical Reagents",
+              "href": "/analytical-reagents"
             },
             {
               "title": "Photometry And Rapid Chemical Testing",
               "href": "/photometry-and-rapid-chemical-testing"
-            },
-            {
-              "title": "Reference Materials",
-              "href": "/reference-materials"
             }
           ]
         },
@@ -39,214 +253,32 @@
           "href": "/cell-culture-and-analysis",
           "subSubmenus": [
             {
-              "title": "3d Cell Culture",
-              "href": "/3d-cell-culture"
+              "title": "Animal Component Free Cell Culture Reagents",
+              "href": "/animal-component-free-cell-culture-reagents"
             },
             {
-              "title": "Cell Analysis",
-              "href": "/cell-analysis"
+              "title": "3d Cell Culture",
+              "href": "/3d-cell-culture"
             },
             {
               "title": "Cell Culture Media And Buffers",
               "href": "/cell-culture-media-and-buffers"
             },
             {
+              "title": "Cell Analysis",
+              "href": "/cell-analysis"
+            },
+            {
               "title": "Cell Culture Supplements And Reagents",
               "href": "/cell-culture-supplements-and-reagents"
             },
             {
-              "title": "Cell Lines And Specialty Cell Culture",
-              "href": "/cell-lines-and-specialty-cell-culture"
-            },
-            {
               "title": "Sterile Lab Media Filtration And Cultureware",
               "href": "/sterile-lab-media-filtration-and-cultureware"
-            }
-          ]
-        },
-        {
-          "title": "Chemistry And Biochemicals",
-          "href": "/chemistry-and-biochemicals",
-          "subSubmenus": [
-            {
-              "title": "Biochemicals",
-              "href": "/biochemicals"
             },
             {
-              "title": "Building Blocks",
-              "href": "/building-blocks"
-            },
-            {
-              "title": "Catalysts",
-              "href": "/catalysts"
-            },
-            {
-              "title": "Chemical Biolog",
-              "href": "/chemical-biolog"
-            },
-            {
-              "title": "Chemical Synthesis",
-              "href": "/chemical-synthesis"
-            },
-            {
-              "title": "Formulation",
-              "href": "/formulation"
-            },
-            {
-              "title": "Lab Chemicals",
-              "href": "/lab-chemicals"
-            },
-            {
-              "title": "Lab Safety",
-              "href": "/lab-safety"
-            }
-          ]
-        },
-        {
-          "title": "Clinical Diagnostics",
-          "href": "/clinical-diagnostics",
-          "subSubmenus": [
-            {
-              "title": "Cell Marque",
-              "href": "/cell-marque"
-            },
-            {
-              "title": "Tissue Diagnostics",
-              "href": "/tissue-diagnostics"
-            }
-          ]
-        },
-        {
-          "title": "Filtration",
-          "href": "/filtration",
-          "subSubmenus": [
-            {
-              "title": "Filtration For Bioprocessing",
-              "href": "/filtration-for-bioprocessing"
-            },
-            {
-              "title": "Laboratory Filter Membranes",
-              "href": "/laboratory-filter-membranes"
-            },
-            {
-              "title": "Laboratory Syringe Filters",
-              "href": "/laboratory-syringe-filters"
-            },
-            {
-              "title": "Sterile Laboratory Filter Devices",
-              "href": "/sterile-laboratory-filter-devices"
-            }
-          ]
-        },
-        {
-          "title": "Materials Science",
-          "href": "/materials-science",
-          "subSubmenus": [
-            {
-              "title": "Electronic Materials",
-              "href": "/electronic-materials"
-            },
-            {
-              "title": "Energy Materials",
-              "href": "/energy-materials"
-            }
-          ]
-        },
-        {
-          "title": "Molecular Biology And Functional Genomics",
-          "href": "/molecular-biology-and-functional-genomics",
-          "subSubmenus": [
-            {
-              "title": "Gene Editing And Functional Genomics",
-              "href": "/gene-editing-and-functional-genomics"
-            },
-            {
-              "title": "Nucleic Acid Electrophoresis And Hybridization",
-              "href": "/nucleic-acid-electrophoresis-and-hybridization"
-            },
-            {
-              "title": "Nucleic Acid Purification",
-              "href": "/nucleic-acid-purification"
-            },
-            {
-              "title": "Oligos And Qpcr Probes",
-              "href": "/oligos-and-qpcr-probes"
-            },
-            {
-              "title": "Pcr And Amplification",
-              "href": "/pcr-and-amplification"
-            }
-          ]
-        },
-        {
-          "title": "Pharma And Biopharma Manufacturing",
-          "href": "/pharma-and-biopharma-manufacturing",
-          "subSubmenus": [
-            {
-              "title": "Bioprocessing Cell Culture",
-              "href": "/bioprocessing-cell-culture"
-            },
-            {
-              "title": "Bioprocessing Formulation Raw Materials",
-              "href": "/bioprocessing-formulation-raw-materials"
-            },
-            {
-              "title": "Bioprocessing Systems",
-              "href": "/bioprocessing-systems"
-            },
-            {
-              "title": "Buffer Media Prep",
-              "href": "/buffer-media-prep"
-            },
-            {
-              "title": "Chromatography Bioprocessing",
-              "href": "/chromatography-bioprocessing"
-            },
-            {
-              "title": "Clarification Harvest",
-              "href": "/clarification-harvest"
-            },
-            {
-              "title": "Fluid Management",
-              "href": "/fluid-management"
-            },
-            {
-              "title": "Formulation",
-              "href": "/formulation"
-            }
-          ]
-        },
-        {
-          "title": "Protein Biology",
-          "href": "/protein-biology",
-          "subSubmenus": [
-            {
-              "title": "Antibodies",
-              "href": "/antibodies"
-            },
-            {
-              "title": "Bioactive Small Molecules",
-              "href": "/bioactive-small-molecules"
-            },
-            {
-              "title": "Immunoassay Platform Solutions",
-              "href": "/immunoassay-platform-solutions"
-            },
-            {
-              "title": "Protein Electrophoresis And Western Blotting",
-              "href": "/protein-electrophoresis-and-western-blotting"
-            },
-            {
-              "title": "Protein Purification Chromatography",
-              "href": "/protein-purification-chromatography"
-            },
-            {
-              "title": "Protein Sample Prep",
-              "href": "/protein-sample-prep"
-            },
-            {
-              "title": "Proteins And Enzymes",
-              "href": "/proteins-and-enzymes"
+              "title": "Cell Lines And Specialty Cell Culture",
+              "href": "/cell-lines-and-specialty-cell-culture"
             }
           ]
         }
