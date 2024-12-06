@@ -373,7 +373,7 @@
 </div>
 {#if showModal}
 	<div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-		<div class="bg-white p-6 rounded-lg w-1/3">
+		<div class="bg-white p-6 rounded-lg w-full mx-2 md:w-1/3">
 			<p class="text-xl font-bold mb-2">Please Log In</p>
 			<p class="text-sm mb-4">You need to log in to continue. Click the button below to log in.</p>
 			<div class="flex gap-4 justify-between">
