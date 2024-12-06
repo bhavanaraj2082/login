@@ -1,21 +1,18 @@
 import mongoose from 'mongoose';
 const { Schema, Types } = mongoose;
 
-
 const stockSchema = new Schema(
     {
-        manufacturer: { type: Types.ObjectId, ref: 'Manufacturer', required: true },
+        productid:{ type: Types.ObjectId, ref: 'Product', required: true},
         productName: { type: String, required: true },
         productNumber: { type: String, required: true },
-        stock: { type: Number, default: 0 },
-        minqtypurchase: { type: Number, default: 1 },
-        buylinkurl: { type: String },
+        manufacturer: { type: Types.ObjectId, ref: 'Manufacturer', required: true },
         distributor: { type: Types.ObjectId, ref: 'distributors', required: true },
-        distibutorName: { type: String },
-        distributorAlias: { type: String },
         pricing: { type: Schema.Types.Mixed, default: [] },
+        stock: { type: Number, default: 0 },
         orderMultiple: { type: Number },
-        priceone: { type: Number }
+        specifications:{type: String},
+        sku:{type:String}
     },
     {
         timestamps: true,
