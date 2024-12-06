@@ -790,87 +790,91 @@ export async function CompareSimilarityData(productId) {
   if (!product) {
     return { error: "Product not found" };
   }
-
   const subsubCategoryId = product.subsubCategory._id;
-
-  const compareSimilarity = await Product.aggregate([
-    {
-      $match: { subsubCategory: subsubCategoryId },
-    },
-    {
-      $limit: 4,
-    },
-    {
-      $lookup: {
-        from: "categories",
-        localField: "category",
-        foreignField: "_id",
-        as: "categoryInfo",
+  if(subsubCategoryId){
+    const compareSimilarity = await Product.aggregate([
+      {
+        $match: { subsubCategory: subsubCategoryId },
       },
-    },
-    {
-      $lookup: {
-        from: "subcategories",
-        localField: "subCategory",
-        foreignField: "_id",
-        as: "subCategoryInfo",
+      {
+        $limit: 4,
       },
-    },
-    {
-      $lookup: {
-        from: "manufacturers",
-        localField: "manufacturer",
-        foreignField: "_id",
-        as: "manufacturerInfo",
-      },
-    },
-    {
-      $lookup: {
-        from: "subsubcategories",
-        localField: "subsubCategory",
-        foreignField: "_id",
-        as: "subsubCategoryInfo",
-      },
-    },
-    {
-      $lookup: {
-        from: "stocks",
-        localField: "productNumber",
-        foreignField: "productNumber",
-        as: "stockInfo",
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-        productName: 1,
-        prodDesc: 1,
-        properties: 1,
-        "categoryInfo.urlName": 1,
-        "subCategoryInfo.urlName": 1,
-        "manufacturerInfo.name": 1,
-        "subsubCategoryInfo.urlName": 1,
-        stockQuantity: {
-          $ifNull: [{ $arrayElemAt: ["$stockInfo.stock", 0] }, 0],
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "categoryInfo",
         },
-        stockPriceSize: {
-          $ifNull: [{ $arrayElemAt: ["$stockInfo.pricing", 0] }, []],
-        },
-        orderMultiple: {
-          $ifNull: [{ $arrayElemAt: ["$stockInfo.orderMultiple", 0] }, 1],
-        },
-        priceSize: 1,
-        imageSrc: 1,
-        productUrl: 1,
-        productNumber: 1,
       },
-    },
-  ]);
-
-  if (compareSimilarity.length === 0) {
-    return { error: "No related products found" };
+      {
+        $lookup: {
+          from: "subcategories",
+          localField: "subCategory",
+          foreignField: "_id",
+          as: "subCategoryInfo",
+        },
+      },
+      {
+        $lookup: {
+          from: "manufacturers",
+          localField: "manufacturer",
+          foreignField: "_id",
+          as: "manufacturerInfo",
+        },
+      },
+      {
+        $lookup: {
+          from: "subsubcategories",
+          localField: "subsubCategory",
+          foreignField: "_id",
+          as: "subsubCategoryInfo",
+        },
+      },
+      {
+        $lookup: {
+          from: "stocks",
+          localField: "productNumber",
+          foreignField: "productNumber",
+          as: "stockInfo",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          productName: 1,
+          prodDesc: 1,
+          properties: 1,
+          "categoryInfo.urlName": 1,
+          "subCategoryInfo.urlName": 1,
+          "manufacturerInfo.name": 1,
+          "subsubCategoryInfo.urlName": 1,
+          stockQuantity: {
+            $ifNull: [{ $arrayElemAt: ["$stockInfo.stock", 0] }, 0],
+          },
+          stockPriceSize: {
+            $ifNull: [{ $arrayElemAt: ["$stockInfo.pricing", 0] }, []],
+          },
+          orderMultiple: {
+            $ifNull: [{ $arrayElemAt: ["$stockInfo.orderMultiple", 0] }, 1],
+          },
+          priceSize: 1,
+          imageSrc: 1,
+          productUrl: 1,
+          productNumber: 1,
+        },
+      },
+    ]);
+    let compareSimilarityJson = await Promise.all(compareSimilarity.map(async (items) => {
+			let convertedPrice = await convertToINR(items.stockPriceSize);   
+			return {
+				...items,  
+				stockPriceSize: convertedPrice  
+			};
+		}));
+        return JSON.parse(JSON.stringify(compareSimilarityJson));
   }
-
-  const compareSimilarityJson = JSON.parse(JSON.stringify(compareSimilarity));
-  return compareSimilarityJson;
+  else{
+    return []
+  }
 }

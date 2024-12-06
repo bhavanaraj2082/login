@@ -221,9 +221,11 @@
 
 
 
-  <div class="relative mt-1 mx-8">
+  <div class="relative mt-1 mx-0 lg:mx-8">
     <div class="flex items-center">
-
+      <button on:click={prevSlide} class="text-primary-500 lg:hidden">
+        <Icon class="text-3xl" icon="ion:chevron-back" />
+      </button>
 
       <div class="overflow-hidden flex-1">
         <div
@@ -310,15 +312,11 @@
           {/each}
         </div>
       </div>
+      
+      <button on:click={nextSlide} class="text-primary-500 lg:hidden">
+        <Icon class="text-4xl" icon="ion:chevron-forward" />
+      </button>
     </div>
-  </div>
-	<div class="flex justify-between mb-2 lg:hidden mx-10">
-    <button on:click={prevSlide} class="text-primary-500">
-      <Icon class="text-3xl" icon="ion:chevron-back" />
-    </button>
-    <button on:click={nextSlide} class="text-primary-500">
-      <Icon class="text-4xl" icon="ion:chevron-forward" />
-    </button>
   </div>
 </div>
 {#if showModal}
