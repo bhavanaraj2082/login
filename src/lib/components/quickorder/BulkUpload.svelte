@@ -16,41 +16,107 @@
     rawFileData = event.target.value;
   }
 
+  // function handleFileInputChange(event) {
+  //   const file = event.target.files[0];
+
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = function (e) {
+  //       rawFileData = e.target.result;  
+  //     };
+
+  //     reader.onerror = function () {
+  //       fileError = 'Error reading the file. Please try again.';
+  //     };
+
+  //     reader.readAsText(file); 
+  //   } else {
+  //     fileError = 'No file selected.';
+  //   }
+  // }
+
+
   function handleFileInputChange(event) {
-    const file = event.target.files[0];
+  const file = event.target.files[0];
 
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        rawFileData = e.target.result;  
-      };
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      rawFileData = e.target.result; // Store the file data
+      fileError = ""; // Clear any previous error
 
-      reader.onerror = function () {
-        fileError = 'Error reading the file. Please try again.';
-      };
+      // Automatically submit the form after file is processed
+      const form = event.target.closest("form");
+      if (form) {
+        form.requestSubmit();
+      }
+    };
 
-      reader.readAsText(file); 
-    } else {
-      fileError = 'No file selected.';
-    }
+    reader.onerror = function () {
+      fileError = "Error reading the file. Please try again.";
+    };
+
+    reader.readAsText(file); // Read the file content
+  } else {
+    fileError = "No file selected.";
   }
+}
+
+
+// function addToCart(product) {
+//     try {
+//         let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
+//         if (product.stockMessage === "Stock is sufficient for all uploaded quantities") {
+//         } else {
+          
+//             const isValidProduct = product &&
+//                 product.productNumber && 
+//                 product.productName && 
+//                 product.pricing && product.pricing[0] && 
+//                 product.pricing[0].break && 
+//                 product.stock > 0; 
+//             if (!isValidProduct) {
+//                 return; 
+//             }
+//         }
+//         const existingProductIndex = currentCart.findIndex(item => item.productNumber === product.productNumber);
+        
+//         if (existingProductIndex >= 0) {
+//             currentCart[existingProductIndex].quantity += 1; 
+//         } else {
+//             const newProduct = { ...product, quantity: 1 }; 
+//             currentCart.push(newProduct);
+//         }
+//         localStorage.setItem('cart', JSON.stringify(currentCart));
+//         cartState.set(currentCart);
+//         toast.success("Items added to cart.");
+
+//     } catch (err) {
+        
+//         console.error('Error saving to localStorage:', err);
+//     }
+// }
+
 
 function addToCart(product) {
     try {
         let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
+        
         if (product.stockMessage === "Stock is sufficient for all uploaded quantities") {
+            // No action needed, proceed to adding item to cart
         } else {
-          
             const isValidProduct = product &&
                 product.productNumber && 
                 product.productName && 
                 product.pricing && product.pricing[0] && 
                 product.pricing[0].break && 
                 product.stock > 0; 
+                
             if (!isValidProduct) {
                 return; 
             }
         }
+
         const existingProductIndex = currentCart.findIndex(item => item.productNumber === product.productNumber);
         
         if (existingProductIndex >= 0) {
@@ -59,15 +125,20 @@ function addToCart(product) {
             const newProduct = { ...product, quantity: 1 }; 
             currentCart.push(newProduct);
         }
+
         localStorage.setItem('cart', JSON.stringify(currentCart));
         cartState.set(currentCart);
-        toast.success("Items added to cart.");
+        
+
+        setTimeout(() => {
+            toast.success("Items added to cart.");
+        }, 2000); 
 
     } catch (err) {
-        
         console.error('Error saving to localStorage:', err);
     }
 }
+
 
 
 
@@ -144,17 +215,25 @@ if (Array.isArray(pricing) && pricing.length > 0) {
           <Icon icon="pajamas:download" class="text-lg" /> Download Template
         </a>
       </div>
-      <div class="w-full flex flex-col justify-center bg-white items-center rounded h-56 mt-3 space-y-2 py-10 border border-dashed">
-        <Icon icon="uil:upload" class="text-3xl text-primary-500 -ml-4" />
-        <p class="text-xs">Drag and Drop your CSV or XLS file to upload or</p>
-        <label for="bulkupload" class="text-xs mr-3">
-          <input type="file"  id="bulkupload"
-          name="file" accept=".xlsx, .xls, .csv, .txt" on:change={handleFileInputChange} />
-          <button type="submit"   id="bulkupload"
-           >Upload</button>
-        
+<div class="w-full flex flex-col justify-center bg-white items-center rounded h-56 mt-3 space-y-2 py-10 border border-dashed">
+        <Icon icon="uil:upload" class="text-7xl text-primary-500 -ml-4" />
+        <p class="text-sm">Drag and Drop your CSV or XLS file to upload or</p>
+      
+        <!-- This label will trigger the file input when the user clicks anywhere on the div -->
+        <label for="bulkupload" class="w-full h-full cursor-pointer flex flex-col justify-center items-center">
+          <input 
+            type="file" 
+            id="bulkupload"
+            name="file" 
+            accept=".xlsx, .xls, .csv, .txt" 
+            on:change={handleFileInputChange} 
+            class="hidden" 
+          />
         </label>
       </div>
+      
+   
+   
     </section>
   </section>
 

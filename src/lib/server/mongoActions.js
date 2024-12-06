@@ -13,7 +13,9 @@ import Helpsupport from '$lib/server/models/Helpsupport.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '$lib/server/models/MyFavourite.js';
 import ChemiDashProfile from '$lib/server/models/ChemiDashProfile.js';
+import Curcurrency from "$lib/server/models/Curcurrency.js";
 import { redirect, error } from '@sveltejs/kit';
+
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from 'nodemailer';
 // import { lucia } from 'lucia';
@@ -26,6 +28,42 @@ import {
 } from '$env/static/private';
 import Return from '$lib/server/models/Return.js';
 import { auth } from '$lib/server/lucia.js';
+
+
+async function conversionRates() {
+	const rates = await Curcurrency.find().exec();
+	const currentRates = {};
+	rates.forEach(rate => {
+	  currentRates[rate.currency] = rate.rate;
+	});
+	return currentRates;
+  }
+  
+  export async function convertToINR(pricing) {
+	if (!Array.isArray(pricing)) return [];
+	const currentRates = await conversionRates();
+  
+	return pricing.map((priceItem) => {
+	  const { break: breakPoint, offer, ...currencies } = priceItem;
+	  const newPriceItem = {
+		break: breakPoint,
+		...(offer !== undefined && { offer }),
+	  };
+  
+	  if (currencies.INR) {
+		newPriceItem.INR = currencies.INR;
+		return newPriceItem;
+	  }
+  
+	  for (const [currency, amount] of Object.entries(currencies)) {
+		if (currentRates[currency]) {
+		  newPriceItem.INR = Number(amount * currentRates[currency]);
+		  return newPriceItem;
+		}
+	  }
+	  return priceItem;
+	});
+  }
 
 export const createOrder = async (body) => {
 	try {
@@ -1154,40 +1192,38 @@ export const clearAllFavorites = async (userId) => {
 
 export const quicksearch = async ({ query }) => {
 	try {
-	//   console.log('Received query:', query);
+   
 	  const queryFilter = { productNumber: { $regex: query, $options: 'i' } };
-	  const products = await Products.find(queryFilter).select('productName productNumber prodDesc _id  imageSrc ').limit(30).exec();
+	  const products = await Product.find(queryFilter)
+		.select('productName productNumber prodDesc _id imageSrc')
+		.limit(20)
+		.exec();
   
 	  const enrichedProducts = [];
 	  for (let product of products) {
 		const stockInfo = await Stock.findOne({ productNumber: product.productNumber }).select('stock pricing');
-		// console.log('Stock info:', stockInfo);
-		const formattedPricing = (stockInfo?.pricing || []).map(item => {
-		  const currency = item.INR ? 'INR' : item.USD ? 'USD' : 'N/A'; 
-		  const price = item.INR || item.USD || 'N/A'; 
-		  return {
-			break: item.break || 'N/A', 
-			currency, 
-			price, 
-		  };
-		});
+		const convertedPricing = await convertToINR(stockInfo?.pricing || []);
+  
+		
+  
 		const enrichedProduct = {
-			id: product._id.toString(),
-			image:product.imageSrc,
-			description:product.prodDesc,
+		  id: product._id.toString(),
+		  image: product.imageSrc,
+		  description: product.prodDesc,
 		  productName: product.productName,
 		  productNumber: product.productNumber,
-			stock: stockInfo?.stock || 0, 
-		  pricing: formattedPricing, 
+		  stock: stockInfo?.stock || 0,
+		  pricing: convertedPricing,
 		};
   
 		enrichedProducts.push(enrichedProduct);
 	  }
-  
+	//   console.log(enrichedProducts);
 	  
-	//   console.log('Enriched product data:', enrichedProducts);
+  
 	  return enrichedProducts;
 	} catch (error) {
+	  // console.error('An error occurred while processing the quicksearch:', error);
 	  throw new Error('An error occurred while processing the quicksearch.');
 	}
   };
@@ -1195,84 +1231,129 @@ export const quicksearch = async ({ query }) => {
 
 
 
-export const uploadFile = async ({ query, uploadedQuantities }) => {
-	const validQueries = query.filter((pn) => pn && pn.trim() !== "");
+  export const uploadFile = async ({ query }) => {
+	// console.log("Received queries:", query);
+  
+	const validQueries = query.filter(([productNumberAndSize, quantity]) =>
+	  productNumberAndSize?.trim() && quantity?.trim()
+	);
   
 	if (validQueries.length === 0) {
-	//   console.error("No valid product numbers found in the query.");
-	  return validQueries.map((pn) => ({
+	  return validQueries.map(() => ({
 		productNumber: "Unknown",
 		isValid: false,
 		message: "Product number is invalid",
 	  }));
 	}
+  
 	const queryFilter = {
-	  productNumber: { $in: validQueries.map((pn) => new RegExp(pn, "i")) },
+	  productNumber: { $in: validQueries.map(([productNumberAndSize]) => new RegExp(productNumberAndSize.split('-')[0], "i")) },
 	};
   
 	try {
-	  const result = await Products.find(queryFilter).exec();
-	  const validationResults = validQueries.map(async (productNumber) => {
-		const product = result.find(
-		  (r) => r.productNumber.toLowerCase() === productNumber.toLowerCase()
+	  const products = await Product.find(queryFilter).exec();
+	  const results = [];
+  
+	  for (const [productNumberAndSize, quantity] of validQueries) {
+		const [productNumber, size] = productNumberAndSize.split('-');
+		const product = products.find(
+		  (p) => p.productNumber.toLowerCase() === productNumber.toLowerCase()
 		);
   
 		if (product) {
-		  const stockInfo = await Stock.findOne({ productNumber: product.productNumber }).select('stock pricing');
-		  
+		//   console.log("Searching for stock for product number:", product.productNumber); 
+  
+		  const stockInfo = await Stock.findOne({
+			productNumber: product.productNumber,
+		  }).select("stock pricing");
+  
+		//   console.log("Found stock info:", stockInfo); // Log the found stock info
+  
 		  if (!stockInfo) {
-			// console.error(`Stock information not found for product: ${productNumber}`);
-			return {
-			  productNumber: productNumber,
+			results.push({
+			  productNumber,
 			  isValid: false,
 			  message: "Stock information missing",
-			};
+			});
+			continue;
 		  }
-		  let stockMessage = '';
-		  const formattedPricing = (stockInfo?.pricing || []).map(item => {
-			const size = item?.break || 'N/A';  
-			const sizeStock = stockInfo?.stock || 0;  
-			const uploadedQuantity = uploadedQuantities?.[productNumber]?.[size] || 0;
   
-			if (uploadedQuantity > sizeStock) {
-			  stockMessage = stockMessage || `Available stock for size ${size}: ${sizeStock}`;
-			}
+		  let stockMessage = "";
+		  let availableStock = Number(stockInfo.stock) || 0; 
+		  let sizeFound = false;
+		  const normalizedSize = size.replace(/\s+/g, '').toUpperCase();
   
-			const currency = item.INR ? 'INR' : item.USD ? 'USD' : 'N/A'; 
-			const price = item.INR || item.USD || 'N/A'; 
-			return {
-			  break: size, 
-			  currency, 
-			  price, 
-			};
-		  });
-		  return {
+
+		  const convertedPricing = await convertToINR(stockInfo.pricing || []);
+		  const validSizePrice = convertedPricing.find(item => 
+			item.break.replace(/\s+/g, '').toUpperCase() === normalizedSize
+		  );
+  
+		  if (!validSizePrice) {
+			results.push({
+			  productNumber,
+			  isValid: false,
+			  message: `Size ${size} is invalid or not available for product ${productNumber}`,
+			});
+			continue;
+		  }
+
+		  const uploadedQuantity = parseInt(quantity);  // Directly use quantity from query
+		//   console.log("Uploaded Quantity for", productNumberAndSize, ":", uploadedQuantity); // Debugging uploaded quantity
+  
+		 
+		//   console.log(`Comparing uploadedQuantity (${uploadedQuantity}) with availableStock (${availableStock}) for product ${productNumber}`);
+  
+		  if (uploadedQuantity > availableStock) {
+			stockMessage = `Only ${availableStock} units are available for product ${productNumber}. Uploaded quantity: ${uploadedQuantity}`;
+			results.push({
+			  productNumber,
+			  isValid: false,
+			  message: stockMessage,  
+			});
+			continue;
+		  } else if (availableStock === 0) {
+			stockMessage = `No stock available for product ${productNumber}. Available stock: ${availableStock}`;
+			results.push({
+			  productNumber,
+			  isValid: false,
+			  message: stockMessage,  
+			});
+			continue;
+		  } else {
+			stockMessage = `Stock is sufficient for product ${productNumber}. Uploaded quantity: ${uploadedQuantity}, Available stock: ${availableStock}`;
+		  }
+
+		  results.push({
 			id: product._id.toString(),
 			image: product.imageSrc || "No image available",
 			description: product.prodDesc || "No description available",
 			productName: product.productName || "No product name available",
-			productNumber: product.productNumber,
+			productNumber,
 			isValid: true,
 			message: "Product number is valid",
-			stock: stockInfo?.stock || 0, 
-			pricing: formattedPricing,
-			stockMessage: stockMessage || 'Stock is sufficient for all uploaded quantities', 
-		  };
+			stock: availableStock,
+			pricing: [{
+			  break: validSizePrice.break,
+			  price: validSizePrice.INR || "N/A",  
+			}],
+			stockMessage: stockMessage, 
+		  });
 		} else {
-		  return {
-			productNumber: productNumber,
+		  results.push({
+			productNumber,
 			isValid: false,
 			message: "Product number is invalid",
-		  };
+		  });
 		}
-	  });
-	  const results = await Promise.all(validationResults);
-//   console.log(results);
+	  }
+  
+	//   console.log("Final Results:", results); 
 	  return results;
 	} catch (error) {
-	  console.error("Error fetching products or stock/pricing:", error);
-	  return query.map((productNumber) => ({
-		productNumber: productNumber || "Unknown",
+	//   console.error("Error fetching products or stock/pricing:", error);
+	  return query.map(() => ({
+		productNumber: "Unknown",
 		isValid: false,
 		message: "Error processing the product",
 	  }));

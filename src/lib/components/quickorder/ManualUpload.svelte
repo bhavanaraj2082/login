@@ -62,7 +62,7 @@ let debounceTimeout;
 function handleInput(event, sku, index) {
   const value = event.target.value;
   searchQuery = value;
-  if (products.length > 0 && value.length >= 2) {
+  if (value.length >= 2) {
     clearTimeout(debounceTimeout);
         if (value.length >= 2) { 
             debounceTimeout = setTimeout(() => {
@@ -221,10 +221,10 @@ function addManualEntriesToCart() {
             );
   
             if (existingItem) {
-                console.log(`Updating quantity for: ${newItem.partNumber}`);
+                // console.log(`Updating quantity for: ${newItem.partNumber}`);
                 existingItem.quantity += newItem.quantity;
             } else {
-                console.log(`Adding new item to cart: ${newItem.partNumber}`);
+                // console.log(`Adding new item to cart: ${newItem.partNumber}`);
                 currentCart.push(newItem);
             }
         });
@@ -432,11 +432,10 @@ function hideDetails() {
             use:enhance={() => {
               return async ({ result }) => {
                   products = result.data;
-                  // console.log("i am manual",products);
+                  //console.log("i am manual",products);
         if (result && result.data) {
           productNumbers = result.data.map(record => record.productNumber);
           } else {
-        // console.error("Error: result or result.data is undefined", result);
             productNumbers = [];
           }
         
@@ -576,19 +575,15 @@ function hideDetails() {
       <div class="w-full mt-3 flex  ml-5 gap-4 items-center hidden md:flex lg:flex xl:flex">
     <span class="font-semibold">{selectedProduct.productName}</span>
     <span>Size: {selectedProduct.pricing?.[0]?.break || 'No Size Available'}</span>
-  <span>
-    {#if selectedProduct.pricing?.[0]}
-    {#if selectedProduct.pricing[0].currency === 'USD'}
-    ${selectedProduct.pricing[0].price}
-  {:else if selectedProduct.pricing[0].currency === 'INR'}
-    ₹{selectedProduct.pricing[0].price}
-  {:else}
-    <a href="/quotes" class="text-primary-400 hover:underline">Request a Quote</a>
-  {/if}
-{:else}
-  <a href="/quotes" class="text-primary-400 hover:underline">Request a Quote</a>
-{/if}
- </span> <span>
+    <span>
+      {#if selectedProduct.pricing?.[0]?.price}
+        ₹{selectedProduct.pricing[0].price} 
+      {:else}
+        <a href="/quotes" class="text-primary-400 hover:underline">Request a Quote</a>
+      {/if}
+    </span>
+    
+ <span>
         1 Estimated to ship on {estimatedShipDate} 
     </span>
     <button class="p-2 text-primary-400 rounded" on:click={showDetails}>
