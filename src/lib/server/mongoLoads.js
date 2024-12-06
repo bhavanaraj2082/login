@@ -247,7 +247,6 @@ export const loadProductsubcategory = async (
   manufacturer,
   search
 ) => {
-  const conversionRate = 90;
   const page = pageNum || 1;
   const pageSize = 10;
   try {
@@ -347,10 +346,9 @@ export const loadProductsubcategory = async (
       },
     ]);
     const after = Date.now();
-    //console.log(products);
-    //console.log(after - before, "milliseconds");
 
-    const filtered = products.map((product) => {
+
+    const filtered = await Promise.all( products.map(async(product) => {
       const {
         _id,
         productName,
@@ -361,13 +359,7 @@ export const loadProductsubcategory = async (
         manufacturerDetails,
         categoryDetails,
       } = product;
-      const priceConversion = stockDetails.pricing.map((price) => {
-        if (Object.hasOwn(price, "INR")) {
-          return { ...price };
-        } else {
-          return { ...price, INR: price.USD * conversionRate };
-        }
-      });
+      const priceConversion = await convertToINR(stockDetails.pricing) 
       return {
         _id,
         productName,
@@ -375,14 +367,15 @@ export const loadProductsubcategory = async (
         prodDesc,
         imageSrc,
         pricing: priceConversion[0],
-        totalPrice: priceConversion[0].INR,
+        totalPrice: priceConversion[0].INR*stockDetails.orderMultiple,
         quantity: stockDetails.orderMultiple,
         orderMultiple: stockDetails.orderMultiple,
         categoryDetails,
         subCategoryDetails,
         manufacturerDetails,
       };
-    });
+    })
+  )
     return {
       products: JSON.parse(JSON.stringify(filtered)),
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
@@ -407,88 +400,90 @@ export async function RelatedProductData(productId) {
     return { error: "Product not found" };
   }
 
-  const subsubCategoryId = product.subsubCategory._id;
+    const subsubCategoryId = product.subsubCategory._id;
+	if(subsubCategoryId){
+		const relatedProducts = await Product.aggregate([
+			{
+				$match: { 'subsubCategory': subsubCategoryId } 
+			},
+			{
+				$limit: 8 
+			},
+			{
+				$lookup: {
+					from: 'categories', 
+					localField: 'category',
+					foreignField: '_id',
+					as: 'categoryInfo'
+				}
+			},
+			{
+				$lookup: {
+					from: 'subcategories', 
+					localField: 'subCategory',
+					foreignField: '_id',
+					as: 'subCategoryInfo'
+				}
+			},
+			{
+				$lookup: {
+					from: 'manufacturers', 
+					localField: 'manufacturer',
+					foreignField: '_id',
+					as: 'manufacturerInfo'
+				}
+			},
+			{
+				$lookup: {
+					from: 'subsubcategories', 
+					localField: 'subsubCategory',
+					foreignField: '_id',
+					as: 'subsubCategoryInfo'
+				}
+			},
+			{
+				$lookup: {
+					from: 'stocks', 
+					localField: 'productNumber',
+					foreignField: 'productNumber',
+					as: 'stockInfo'
+				}
+			},
+			{
+				$project: { 
+					_id: 1,
+					productName: 1,
+					prodDesc: 1,
+					'categoryInfo.urlName': 1,
+					'subCategoryInfo.urlName': 1,
+					'manufacturerInfo.name': 1,
+					'subsubCategoryInfo.urlName': 1,
+					stockQuantity: { $ifNull: [{ $arrayElemAt: ['$stockInfo.stock', 0] }, 0] }, 
+					stockPriceSize: { $ifNull: [{ $arrayElemAt: ['$stockInfo.pricing', 0] }, []] },
+					orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
+					priceSize: 1, 
+					imageSrc: 1,  
+					productUrl: 1, 
+					productNumber :1
+				}
+			}
+		]);
+		
+		let relatedProductsJson = await Promise.all(relatedProducts.map(async (items) => {
+		
+			let convertedPrice = await convertToINR(items.stockPriceSize);   
+			return {
+				...items,  
+				stockPriceSize: convertedPrice  
+			};
+		}));
+ 
+        return JSON.parse(JSON.stringify(relatedProductsJson));
+	} 
+	else{
 
-  const relatedProducts = await Product.aggregate([
-    {
-      $match: { subsubCategory: subsubCategoryId },
-    },
-    {
-      $limit: 8,
-    },
-    {
-      $lookup: {
-        from: "categories",
-        localField: "category",
-        foreignField: "_id",
-        as: "categoryInfo",
-      },
-    },
-    {
-      $lookup: {
-        from: "subcategories",
-        localField: "subCategory",
-        foreignField: "_id",
-        as: "subCategoryInfo",
-      },
-    },
-    {
-      $lookup: {
-        from: "manufacturers",
-        localField: "manufacturer",
-        foreignField: "_id",
-        as: "manufacturerInfo",
-      },
-    },
-    {
-      $lookup: {
-        from: "subsubcategories",
-        localField: "subsubCategory",
-        foreignField: "_id",
-        as: "subsubCategoryInfo",
-      },
-    },
-    {
-      $lookup: {
-        from: "stocks",
-        localField: "productNumber",
-        foreignField: "productNumber",
-        as: "stockInfo",
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-        productName: 1,
-        prodDesc: 1,
-        "categoryInfo.urlName": 1,
-        "subCategoryInfo.urlName": 1,
-        "manufacturerInfo.name": 1,
-        "subsubCategoryInfo.urlName": 1,
-        stockQuantity: {
-          $ifNull: [{ $arrayElemAt: ["$stockInfo.stock", 0] }, 0],
-        },
-        stockPriceSize: {
-          $ifNull: [{ $arrayElemAt: ["$stockInfo.pricing", 0] }, []],
-        },
-        orderMultiple: {
-          $ifNull: [{ $arrayElemAt: ["$stockInfo.orderMultiple", 0] }, 1],
-        },
-        priceSize: 1,
-        imageSrc: 1,
-        productUrl: 1,
-        productNumber: 1,
-      },
-    },
-  ]);
-
-  if (relatedProducts.length === 0) {
-    return { error: "No related products found" };
-  }
-
-  const relatedProductsJson = JSON.parse(JSON.stringify(relatedProducts));
-  // console.log("-------", relatedProductsJson);
-  return relatedProductsJson;
+		return []
+	}
 }
 
 export async function RelatedApplicationData(name) {
