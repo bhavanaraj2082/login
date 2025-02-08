@@ -18,17 +18,17 @@
 	<div class="mx-auto">
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mt-4 w-11/12 mx-auto max-w-7xl">
 			<div class="flex flex-col items-center md:items-start text-center md:text-left">
-				<a href="/" aria-label="Go to homepage" class="text-2xl font-bold text-gray-50">
+				<a href="/" aria-label="Go to homepage" class="text-white font-semibold sm:text-md text-sm uppercase">
 					Chemikart
 				</a>
-				<div class="mt-2 text-sm text-gray-50">
+				<div class="mt-2 font-medium sm:text-sm text-xs text-gray-50">
 					No. 206, Vinni Arcade 100<br />
-					Feet Ring Road, Kathriguppe<br />
+					Feet Ring Road, Kathriguppe<br /> 
 					Main Rd, Bengaluru,<br />
 					Karnataka 560085
 				</div>
 				<div class="mt-4">
-					<h3 class="font-bold text-lg text-gray-50">Follow us</h3>
+					<h3 class="text-white font-semibold sm:text-md text-sm uppercase">Follow us</h3>
 					<div class="my-2 flex justify-center space-x-4">
 						<a
 							href="https://facebook.com/chemikart"
@@ -66,28 +66,28 @@
 				</div>
 			</div>
 			<div class="flex flex-col items-center md:items-start text-center md:text-left">
-				<h3 class="font-bold text-lg text-gray-50">Information</h3>
+				<h3 class="text-white font-semibold sm:text-md text-sm uppercase">Information</h3>
 				<ul class="mt-2 space-y-2 text-sm text-gray-50">
-					<li><a href="/about-us" class="hover:underline">About Us</a></li>
-					<li><a href="/sitemap" class="hover:underline">Site Map</a></li>
-					<li><a href="/copy-consent" class="hover:underline">Copyright Consent</a></li>
+					<li><a href="/about-us" class="font-medium sm:text-sm text-xs hover:underline">About Us</a></li>
+					<li><a href="/sitemap" class="font-medium sm:text-sm text-xs hover:underline">Site Map</a></li>
+					<li><a href="/copy-consent" class="font-medium sm:text-sm text-xs hover:underline">Copyright Consent</a></li>
 				</ul>
 			</div>
 			<div class="flex flex-col items-center md:items-start text-center md:text-left">
-				<h3 class="font-bold text-lg text-gray-50">Help & Support</h3>
+				<h3 class="text-white font-semibold sm:text-md text-sm uppercase">Help & Support</h3>
 				<ul class="mt-2 space-y-2 text-sm text-gray-50">
-					<li><a href="/contact-us" class="hover:underline">Contact Us</a></li>
-					<li><a href="/help-support" class="hover:underline">Customer Support</a></li>
-					<li><a href="/faq" class="hover:underline">FAQs</a></li>
+					<li><a href="/contact-us" class="font-medium sm:text-sm text-xs hover:underline">Contact Us</a></li>
+					<li><a href="/help-support" class="font-medium sm:text-sm text-xs hover:underline">Customer Support</a></li>
+					<li><a href="/faq" class="font-medium sm:text-sm text-xs hover:underline">FAQs</a></li>
 				</ul>
 			</div>
 			<div class="flex flex-col items-center md:items-start text-center md:text-left lg:mr-12">
-				<h3 class="font-bold text-lg text-gray-50">Orders</h3>
+				<h3 class="text-white font-semibold sm:text-md text-sm uppercase">Orders</h3>
 				<ul class="mt-2 space-y-2 text-sm text-gray-50">
-					<li><a href="/ecom-solutions" class="hover:underline">Chemikart Solutions</a></li>
-					<li><a href="/quick-order" class="hover:underline">Quick Order</a></li>
-					<li><a href="/quotes" class="hover:underline">Quotes</a></li>
-					<li><a href="/returns" class="hover:underline">Returns & its Status</a></li>
+					<li><a href="/ecom-solutions" class="font-medium sm:text-sm text-xs hover:underline">Chemikart Solutions</a></li>
+					<li><a href="/quick-order" class="font-medium sm:text-sm text-xs hover:underline">Quick Order</a></li>
+					<li><a href="/quotes" class="font-medium sm:text-sm text-xs hover:underline">Quotes</a></li>
+					<li><a href="/returns" class="font-medium sm:text-sm text-xs hover:underline">Returns & its Status</a></li>
 				</ul>
 			</div>
 		</div>
@@ -99,13 +99,13 @@
 					&copy; {currentYear} Chemikart. All Rights Reserved.
 				</p>
 				<div class="flex flex-col md:flex-row items-center gap-0 md:gap-4 lg:gap-6 mt-2 md:mt-0 space-y-1 md:space-y-0">
-					<a href="/" class="hover:underline text-xs font-medium" on:click={togglePopup}>Cookies Settings</a>
+					<a href="/" class="hover:text-primary-700 transition-colors duration-200 font-medium sm:text-sm text-xs" on:click={togglePopup}>Cookies Settings</a>
 					<span class="hidden md:block lg:inline-block footer-separator">|</span>
-					<a href="/terms/privacy-notice" class="hover:underline text-xs font-medium">Privacy Notice</a>
+					<a href="/terms/privacy-notice" class="hover:text-primary-700 transition-colors duration-200 font-medium sm:text-sm text-xs">Privacy Notice</a>
 					<span class="hidden md:block lg:inline-block footer-separator">|</span>
-					<a href="/safety" class="hover:underline text-xs font-medium">Product Safety</a>
+					<a href="/safety" class="hover:text-primary-700 transition-colors duration-200 font-medium sm:text-sm text-xs">Product Safety</a>
 					<span class="hidden md:block lg:inline-block footer-separator">|</span>
-					<a href="/terms/site-and-terms" class="hover:underline text-xs font-medium">Site-Terms</a>
+					<a href="/terms/site-and-terms" class="hover:text-primary-700 transition-colors duration-200 font-medium sm:text-sm text-xs">Site-Terms</a>
 					<!-- <span class="hidden md:block lg:inline-block footer-separator">|</span>
 					<a href="/terms/conditions" class="hover:underline text-xs font-medium">General Terms and Conditions</a> -->
 				</div>

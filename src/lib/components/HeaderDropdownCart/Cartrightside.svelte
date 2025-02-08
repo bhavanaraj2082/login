@@ -144,7 +144,7 @@
 			<!-- Shopping Cart Icon -->
 			<Icon
 				icon="eva:shopping-cart-fill"
-				class=" text-lg sm:text-2xl hover:text-primary-400 shrink-0"
+				class=" text-lg sm:text-2xl hover:text-primary-100 hover:scale-105 text-white shrink-0"
 			/>
 			<!-- Badge -->
 			<span
@@ -158,15 +158,26 @@
 </button>
 
 {#if cartOpen}
-  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-50"></div>
+
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div class="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm transition-opacity z-50"
+  on:click={(e) => {
+	if (e.target === e.currentTarget) {
+		cartOpen = false;
+	}
+}}
+></div>
   <div class="fixed top-0 right-0 h-full w-full sm:w-1/2 lg:w-2/5 z-50">
     <div class="w-full h-full bg-white shadow-lg flex flex-col">
       <div class="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
         <h1 class="text-xl font-semibold">
           CART ITEMS <span class="text-primary-400">({cartItems.length})</span>
         </h1>
-        <button class="text-primary-400" on:click={toggleCart}>
-          <Icon icon="cuida:x-outline" class="text-2xl" />
+		<button
+          class="p-1 hover:bg-gray-200 rounded transition-colors duration-200 text-end"
+          on:click={toggleCart}>
+          <Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
         </button>
       </div>
       <div class="px-4 py-2 overflow-y-auto scroll flex-1">
