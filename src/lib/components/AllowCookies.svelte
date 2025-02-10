@@ -52,8 +52,22 @@
     showBanner = false;
   }
 
+  function handleClickOutside(event) {
+    const popup = document.querySelector('.cookie-banner-container');
+    // Close the banner if the click is outside the popup
+    if (popup && !popup.contains(event.target)) {
+      closeBanner();
+    }
+  }
+
   onMount(() => {
     showBanner = synchronizeCookiesAndLocalStorage();
+    // Add event listener for clicks outside the popup
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      // Cleanup the event listener when component is destroyed
+      document.removeEventListener('click', handleClickOutside);
+    };
   });
 </script>
 
@@ -62,7 +76,7 @@
   class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-end pb-4 transition-opacity transition-visibility z-50"
   role="dialog"
   aria-label="Cookie Banner">
-  <div class="w-full max-w-7xl mx-4 bg-white shadow rounded relative overflow-hidden">
+  <div class="cookie-banner-container w-full max-w-7xl mx-4 bg-white shadow rounded relative overflow-hidden">
     <button
       on:click={closeBanner}
       class="absolute top-2 right-2 text-gray-500 hover:text-primary-600 p-2 sm:pl-2 sm:pb-2 rounded-full hover:bg-gray-100 transition duration-100"

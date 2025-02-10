@@ -482,7 +482,7 @@
 						>
 							<button
 								on:click={() => navigateTo(menu.href)}
-								class={`flex items-center hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-primary-100 scale-105' : 'text-white'}`}
+								class={`flex items-center hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-white scale-105' : 'text-white'}`}
 								role="menuitem"
 							>
 								{menu.title}
@@ -558,7 +558,7 @@
 			</div>
 			<div class="flex gap-4 text-gray-600 items-center ">
 				<a href="/quick-order">
-					<button class="hover:bg-[rgba(0,0,0,0.1)] p-2 cursor-pointer rounded-t-md hover:scale-105">
+					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md hover:scale-105">
 						<span class="text-white font-medium text-xs lg:text-sm">
 							Quick Order
 						</span>
@@ -566,7 +566,7 @@
 				</a>
 				
 				<a href="/order-status">
-					<button class="hover:bg-[rgba(0,0,0,0.1)] p-2 cursor-pointer rounded-t-md hover:scale-105">
+					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md hover:scale-105">
 						<span class="text-white font-medium text-xs lg:text-sm">
 							Order Status
 						</span>

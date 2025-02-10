@@ -1,6 +1,7 @@
 <script>
 	import Icon from '@iconify/svelte';
 	import CookiesPopup from "$lib/components/CookiesPopup.svelte";
+	import Scroller from '$lib/components/Scroller.svelte';
 	let isPopupOpen = false;
 
 	const togglePopup = (event) => {
@@ -16,9 +17,34 @@
 </script>
 <footer class="w-full bg-primary-400 p-6">
 	<div class="mx-auto">
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mt-4 w-11/12 mx-auto max-w-7xl">
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mt-4 w-11/12 mx-auto max-w-7xl">
 			<div class="flex flex-col items-center md:items-start text-center md:text-left">
-				<a href="/" aria-label="Go to homepage" class="text-white font-semibold sm:text-md text-sm uppercase">
+				<p class="text-white font-semibold sm:text-lg text-md uppercase">Information</p>
+				<ul class="mt-2 space-y-2 text-sm text-gray-50">
+					<li><a href="/about-us" class="font-medium sm:text-sm text-xs hover:underline">About Us</a></li>
+					<li><a href="/sitemap" class="font-medium sm:text-sm text-xs hover:underline">Site Map</a></li>
+					<li><a href="/copy-consent" class="font-medium sm:text-sm text-xs hover:underline">Copyright Consent</a></li>
+				</ul>
+			</div>
+			<div class="flex flex-col items-center md:items-start text-center md:text-left">
+				<p class="text-white font-semibold sm:text-lg text-md uppercase">Help & Support</p>
+				<ul class="mt-2 space-y-2 text-sm text-gray-50">
+					<li><a href="/contact-us" class="font-medium sm:text-sm text-xs hover:underline">Contact Us</a></li>
+					<li><a href="/help-support" class="font-medium sm:text-sm text-xs hover:underline">Customer Support</a></li>
+					<li><a href="/faq" class="font-medium sm:text-sm text-xs hover:underline">FAQs</a></li>
+				</ul>
+			</div>
+			<div class="flex flex-col items-center md:items-start text-center md:text-left lg:mr-12">
+				<p class="text-white font-semibold sm:text-lg text-md uppercase">Orders</p>
+				<ul class="mt-2 space-y-2 text-sm text-gray-50">
+					<li><a href="/ecom-solutions" class="font-medium sm:text-sm text-xs hover:underline">Chemikart Solutions</a></li>
+					<li><a href="/quick-order" class="font-medium sm:text-sm text-xs hover:underline">Quick Order</a></li>
+					<li><a href="/quotes" class="font-medium sm:text-sm text-xs hover:underline">Quotes</a></li>
+					<li><a href="/returns" class="font-medium sm:text-sm text-xs hover:underline">Returns & its Status</a></li>
+				</ul>
+			</div>
+			<div class="flex flex-col items-center md:items-start text-center md:text-left">
+				<a href="/" aria-label="Go to homepage" class="text-white font-bold sm:text-xl text-lg uppercase">
 					Chemikart
 				</a>
 				<div class="mt-2 font-medium sm:text-sm text-xs text-gray-50">
@@ -28,7 +54,7 @@
 					Karnataka 560085
 				</div>
 				<div class="mt-4">
-					<h3 class="text-white font-semibold sm:text-md text-sm uppercase">Follow us</h3>
+					<p class="text-white font-semibold sm:text-md text-sm uppercase">Follow us</p>
 					<div class="my-2 flex justify-center space-x-4">
 						<a
 							href="https://facebook.com/chemikart"
@@ -65,34 +91,9 @@
 					</div>
 				</div>
 			</div>
-			<div class="flex flex-col items-center md:items-start text-center md:text-left">
-				<h3 class="text-white font-semibold sm:text-md text-sm uppercase">Information</h3>
-				<ul class="mt-2 space-y-2 text-sm text-gray-50">
-					<li><a href="/about-us" class="font-medium sm:text-sm text-xs hover:underline">About Us</a></li>
-					<li><a href="/sitemap" class="font-medium sm:text-sm text-xs hover:underline">Site Map</a></li>
-					<li><a href="/copy-consent" class="font-medium sm:text-sm text-xs hover:underline">Copyright Consent</a></li>
-				</ul>
-			</div>
-			<div class="flex flex-col items-center md:items-start text-center md:text-left">
-				<h3 class="text-white font-semibold sm:text-md text-sm uppercase">Help & Support</h3>
-				<ul class="mt-2 space-y-2 text-sm text-gray-50">
-					<li><a href="/contact-us" class="font-medium sm:text-sm text-xs hover:underline">Contact Us</a></li>
-					<li><a href="/help-support" class="font-medium sm:text-sm text-xs hover:underline">Customer Support</a></li>
-					<li><a href="/faq" class="font-medium sm:text-sm text-xs hover:underline">FAQs</a></li>
-				</ul>
-			</div>
-			<div class="flex flex-col items-center md:items-start text-center md:text-left lg:mr-12">
-				<h3 class="text-white font-semibold sm:text-md text-sm uppercase">Orders</h3>
-				<ul class="mt-2 space-y-2 text-sm text-gray-50">
-					<li><a href="/ecom-solutions" class="font-medium sm:text-sm text-xs hover:underline">Chemikart Solutions</a></li>
-					<li><a href="/quick-order" class="font-medium sm:text-sm text-xs hover:underline">Quick Order</a></li>
-					<li><a href="/quotes" class="font-medium sm:text-sm text-xs hover:underline">Quotes</a></li>
-					<li><a href="/returns" class="font-medium sm:text-sm text-xs hover:underline">Returns & its Status</a></li>
-				</ul>
-			</div>
 		</div>
 		<div class="w-full">
-			<hr class="border-gray-50 m-4" />
+			<hr class="border-gray-50 m-4 border-1" />
 			<div
 				class="flex flex-col md:flex-row justify-center md:justify-between items-center text-gray-50 mx-auto w-11/12 mt-4 max-w-7xl">
 				<p class="text-xs text-center font-medium">
@@ -108,6 +109,7 @@
 					<a href="/terms/site-and-terms" class="hover:text-primary-700 transition-colors duration-200 font-medium sm:text-sm text-xs">Site-Terms</a>
 					<!-- <span class="hidden md:block lg:inline-block footer-separator">|</span>
 					<a href="/terms/conditions" class="hover:underline text-xs font-medium">General Terms and Conditions</a> -->
+					<Scroller />
 				</div>
 			</div>
 		</div>

@@ -218,6 +218,17 @@
 		functionDispatch();
 		loading = false;
 	});
+
+	let selectedImage = null;
+	let showimage=false;
+	function imagemodal(imageSrc) {
+		selectedImage = imageSrc;
+		showimage=true;
+	}
+	function closePopup() {
+		showimage = false;
+		selectedImage = null;
+	}
 </script>
 
 <div class="mx-auto bg-gray-50">
@@ -256,7 +267,12 @@
 							<!-- Product Image and Details -->
 							<h3 class=" lg:hidden mt-3 font-medium text-sm">Product</h3>
 							<div class="flex items-center w-full md:w-6/12">
-								<img src={item.image} alt={item.name} class="w-16 h-16 object-cover rounded-md" />
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+								<img src={item.image} alt={item.name} class="w-16 h-16 object-cover rounded-md" on:click={() => {
+									const imageUrl = item.image;
+									imagemodal(imageUrl);
+								}}/>
 								<div class="ml-2">
 									<p class="text-sm text-red-500 font-semibold">{item.partNumber}</p>
 									<p class=" text-gray-800">{item.name}</p>
@@ -394,4 +410,23 @@
 			</div>
 		</div>
 	</div>
+{/if}
+{#if showimage}
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div on:click={(e) => {
+	if (e.target === e.currentTarget) {
+	showimage = false;}
+	}} class="fixed inset-0 shadow-xl bg-opacity-75 flex items-center justify-center z-50">
+	<div class="bg-white rounded-lg shadow-lg p-6 mx-4 w-full md:w-1/2 lg:w-1/3">
+	<div class="flex justify-end items-center mb-2">
+		<button
+		class="p-1 hover:bg-gray-100 rounded transition-colors duration-200"
+		on:click={closePopup}>
+		<Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
+	  </button>
+</div>
+<!-- svelte-ignore a11y-img-redundant-alt -->
+<img src={selectedImage} alt="image" class="" /></div>
+</div>
 {/if}
