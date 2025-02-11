@@ -644,24 +644,37 @@ export async function DifferentProds(productId) {
   );
   const partNumber = product.productNumber;
   // products stocks
-  let stockQuantity = 0;
-  let orderMultiple = 0;
-  let priceSize = [];
+  let stockDetails = [];
 
-  if (partNumber) {
-    const stockRecord = await Stock.findOne({
-      productNumber: partNumber,
-    }).exec();
-    if (stockRecord && typeof stockRecord.stock !== "undefined") {
-      stockQuantity = stockRecord.stock;
-      orderMultiple = stockRecord.orderMultiple;
-      // console.log("stocks=====before>>", stockRecord.pricing);
+if (partNumber) {
+  // Fetch all stock records matching the partNumber
+  const stockRecords = await Stock.find({
+    productNumber: partNumber,
+  }).exec();
 
-      priceSize = await convertToINR(stockRecord.pricing);
+  if (stockRecords.length > 0) {
+    // Iterate over each stock record
+    for (const stockRecord of stockRecords) {
+      if (stockRecord && typeof stockRecord.stock !== "undefined") {
+        const { stock, orderMultiple, pricing } = stockRecord;
 
-      // console.log("after==>>", priceSize);
+        // Convert the pricing to INR for this stock record
+        const convertedPrices = await convertToINR(pricing);
+
+        // Store separate stock quantity for each stock record
+        stockDetails.push({
+          stockQuantity: stock,  // Stock quantity for this specific record
+          orderMultiple: orderMultiple,  // Order multiple for this specific stock record
+          pricing: convertedPrices,  // Converted prices for this stock
+        });
+      }
     }
   }
+}
+console.log("stockDetails",stockDetails);
+
+// After processing, stockDetails will contain individual stock details for each record
+
 
   const variants = product.variants || [];
   const variantRecord = await Promise.all(
