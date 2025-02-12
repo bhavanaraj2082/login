@@ -7,7 +7,6 @@
 	export let tog4;
 	let errorMessage = '';
 	$: isFormData =
-		$Cusdetails.Title &&
 		$Cusdetails.FirstName &&
 		$Cusdetails.LastName &&
 		$Cusdetails.Organisation &&
@@ -16,7 +15,7 @@
 		$Cusdetails.Number;
 	
 	const titles = ['Dr', 'Miss', 'Mr', 'Ms', 'Mrs', 'Prof'];
-	const countries = [
+    const countries = [
 		{ name: 'Afghanistan', code: '+93' },
 		{ name: 'Albania', code: '+355' },
 		{ name: 'Algeria', code: '+213' },
@@ -210,38 +209,288 @@
 		{ name: 'Zambia', code: '+260' },
 		{ name: 'Zimbabwe', code: '+263' }
 	];
-	let emailError = '';
-	let phoneError = '';
-	
-	const cust = () => {
-	console.log("@@@@@@",$Cusdetails.FirstName);
-	
-		console.log("$$$",isFormData);
+    const phoneNumberPatterns = {
+		Afghanistan: /^[7-9]\d{8}$/,
+		Algeria: /^[5-9]\d{8}$/,
+		Andorra: /^\+376[0-9]{6}$/,
+		Angola: /^(\+244|0)9\d{8}$/,
+		'Antigua and Barbuda': /^\+1[2689]\d{7}$/,
+		Armenia: /^(\+374|0)(10|20|30|40|50|60|70|80)\d{6}$/,
+		Austria: /^\+43\d{1,12}$/,
+		Azerbaijan: /^(\+994|0)5[0-9]\d{7}$/,
+		Bahamas: /^\+1[242]\d{7}$/,
+		Bangladesh: /^(\+8801|01)\d{9}$/,
+		Belarus: /^(\+375|0)29\d{7}$/,
+		Belgium: /^(\+32|0)4\d{8}$/,
+		Belize: /^(\+501|0)\d{7}$/,
+		Benin: /^(\+229|0)\d{8}$/,
+		Bolivia: /^(\+591|0)\d{8}$/,
+		'Bosnia and Herzegovina': /^(\+387|0)\d{8}$/,
+		'Burkina Faso': /^(\+226|0)\d{8}$/,
+		Burundi: /^(\+257|0)\d{8}$/,
+		'Cabo Verde': /^(\+238|0)\d{7}$/,
+		Cambodia: /^(\+855|0)\d{8,9}$/,
+		Cameroon: /^(\+237|0)\d{8}$/,
+		'Central African Republic': /^(\+236|0)\d{8}$/,
+		Chad: /^(\+235|0)\d{8}$/,
+		Comoros: /^(\+269|0)\d{7}$/,
+		'Congo, Republic of the': /^(\+242|0)\d{7}$/,
+		'Congo, Democratic Republic of the': /^(\+243|0)\d{9}$/,
+		'Costa Rica': /^(\+506|0)\d{8}$/,
+		Croatia: /^(\+385|0)9\d{8}$/,
+		Cyprus: /^(\+357|0)\d{8}$/,
+		'Czech Republic': /^(\+420|0)\d{9}$/,
+		Djibouti: /^(\+253|0)\d{7}$/,
+		Dominica: /^(\+1[7678]|0)\d{7}$/,
+		'Dominican Republic': /^(\+1[809]|0)\d{7}$/,
+		Ecuador: /^(\+593|0)\d{9}$/,
+		'El Salvador': /^(\+503|0)\d{8}$/,
+		'Equatorial Guinea': /^(\+240|0)\d{8}$/,
+		Eritrea: /^(\+291|0)\d{7}$/,
+		Estonia: /^(\+372|0)\d{7}$/,
+		Eswatini: /^(\+268|0)\d{8}$/,
+		Finland: /^(\+358|0)\d{9}$/,
+		France: /^(\+33|0)\d{9}$/,
+		Gabon: /^(\+241|0)\d{7}$/,
+		Gambia: /^(\+220|0)\d{7}$/,
+		Georgia: /^(\+995|0)\d{9}$/,
+		Germany: /^(\+49|0)\d{10}$/,
+		Greece: /^(\+30|0)\d{10}$/,
+		Grenada: /^(\+1[473]|0)\d{7}$/,
+		Guatemala: /^(\+502|0)\d{8}$/,
+		Guinea: /^(\+224|0)\d{9}$/,
+		'Guinea-Bissau': /^(\+245|0)\d{7}$/,
+		Guyana: /^(\+592|0)\d{7}$/,
+		Honduras: /^(\+504|0)\d{8}$/,
+		Iran: /^(\+98|0)\d{10}$/,
+		Iraq: /^(\+964|0)\d{9}$/,
+		Ireland: /^(\+353|0)\d{9}$/,
+		Italy: /^(\+39|0)\d{10}$/,
+		Jamaica: /^(\+1[876]|0)\d{7}$/,
+		Kenya: /^(\+254|0)\d{9}$/,
+		Kiribati: /^(\+686|0)\d{4}$/,
+		Laos: /^(\+856|0)\d{8}$/,
+		Latvia: /^(\+371|0)\d{8}$/,
+		Lebanon: /^(\+961|0)\d{8}$/,
+		Lesotho: /^(\+266|0)\d{8}$/,
+		Liechtenstein: /^(\+423|0)\d{7}$/,
+		Lithuania: /^(\+370|0)\d{8}$/,
+		Luxembourg: /^(\+352|0)\d{6}$/,
+		Malawi: /^(\+265|0)\d{9}$/,
+		Maldives: /^(\+960|0)\d{7}$/,
+		Mali: /^(\+223|0)\d{8}$/,
+		Malta: /^(\+356|0)\d{8}$/,
+		'Marshall Islands': /^(\+692|0)\d{7}$/,
+		Mauritania: /^(\+222|0)\d{8}$/,
+		Micronesia: /^(\+691|0)\d{7}$/,
+		Monaco: /^(\+377|0)\d{8}$/,
+		Mongolia: /^(\+976|0)\d{8}$/,
+		Montenegro: /^(\+382|0)\d{8}$/,
+		Mozambique: /^(\+258|0)\d{9}$/,
+		Myanmar: /^(\+95|0)\d{9}$/,
+		Nauru: /^(\+674|0)\d{4}$/,
+		Netherlands: /^(\+31|0)\d{9}$/,
+		'New Zealand': /^(\+64|0)\d{9}$/,
+		Niger: /^(\+227|0)\d{8}$/,
+		Nigeria: /^(\+234|0)\d{10}$/,
+		'North Macedonia': /^(\+389|0)\d{9}$/,
+		Oman: /^(\+968|0)\d{8}$/,
+		Palau: /^(\+680|0)\d{7}$/,
+		Palestine: /^(\+970|0)\d{9}$/,
+		Panama: /^(\+507|0)\d{7}$/,
+		'Papua New Guinea': /^(\+675|0)\d{7}$/,
+		Paraguay: /^(\+595|0)\d{9}$/,
+		Poland: /^(\+48|0)\d{9}$/,
+		Portugal: /^(\+351|0)\d{9}$/,
+		Romania: /^(\+40|0)\d{9}$/,
+		'Saint Kitts and Nevis': /^(\+1[869]|0)\d{7}$/,
+		'Saint Lucia': /^(\+1[758]|0)\d{7}$/,
+		'Saint Vincent and the Grenadines': /^(\+1[784]|0)\d{7}$/,
+		Samoa: /^(\+685|0)\d{5}$/,
+		'San Marino': /^(\+378|0)\d{7}$/,
+		'Sao Tome and Principe': /^(\+239|0)\d{7}$/,
+		'Saudi Arabia': /^(\+966|0)\d{9}$/,
+		Senegal: /^(\+221|0)\d{9}$/,
+		Seychelles: /^(\+248|0)\d{7}$/,
+		'Sierra Leone': /^(\+232|0)\d{8}$/,
+		Slovakia: /^(\+421|0)\d{9}$/,
+		Slovenia: /^(\+386|0)\d{8}$/,
+		'Solomon Islands': /^(\+677|0)\d{5}$/,
+		Somalia: /^(\+252|0)\d{8}$/,
+		'South Africa': /^(\+27|0)\d{9}$/,
+		'South Korea': /^(\+82|0)\d{9}$/,
+		Spain: /^(\+34|0)\d{9}$/,
+		'Sri Lanka': /^(\+94|0)\d{9}$/,
+		Syria: /^(\+963|0)\d{9}$/,
+		Togo: /^(\+228|0)\d{8}$/,
+		'Trinidad and Tobago': /^(\+1[868]|0)\d{7}$/,
+		Tuvalu: /^(\+688|0)\d{4}$/,
+		Uganda: /^(\+256|0)\d{9}$/,
+		Ukraine: /^(\+380|0)\d{9}$/,
+		'United Arab Emirates': /^(\+971|0)\d{9}$/,
+		'United Kingdom': /^(\+44|0)\d{10}$/,
+		'United States': /^(\+1|0)\d{10}$/,
+		Uruguay: /^(\+598|0)\d{8}$/,
+		Uzbekistan: /^(\+998|0)\d{9}$/,
+		Vanuatu: /^(\+678|0)\d{5}$/,
+		'Vatican City': /^(\+379|0)\d{7}$/,
+		Venezuela: /^(\+58|0)\d{10}$/,
+		Yemen: /^(\+967|0)\d{9}$/,
+		Zimbabwe: /^(\+263|0)\d{9}$/,
 
-		if (!isFormData) {
-			errorMessage = 'Please fill all the details';
-			return;
-		} else {
-			errorMessage = '';
-		}
-		const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!emailPattern.test($Cusdetails.Email)) {
-			emailError = 'Please enter a valid email address.';
-			return;
-		} 
-		else {
-			emailError = '';
-		}
-		const phonePattern = /^\d{10}$/;
-		if (!phonePattern.test($Cusdetails.Number)) {
-			phoneError = 'Please enter a valid  phone number (10 digits).';
-			return;
-		}
-		else{
-		phoneError = '';
-		}
-		tog4();
+		Albania: /^\d{9}$/,
+		USA: /^[2-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}$/,
+		UK: /^\d{4}[\s-]?\d{6}$/,
+		Eurozone: /^\d{8,15}$/,
+		Japan: /^\d{10,11}$/,
+		Canada: /^[2-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}$/,
+		Australia: /^[4-5]\d{8}$/,
+		Switzerland: /^\d{9}$/,
+		China: /^[1-9]\d{10}$/,
+		Sweden: /^\d{6,13}$/,
+		NewZealand: /^[2-9]\d{7,9}$/,
+		Singapore: /^[8-9]\d{7}$/,
+		HongKong: /^[5-9]\d{7}$/,
+		Norway: /^\d{8}$/,
+		Mexico: /^\d{10}$/,
+		India: /^[6-9]\d{9}$/,
+		Brazil: /^\d{10,11}$/,
+		Russia: /^[1-9]\d{9}$/,
+		SouthAfrica: /^\d{10}$/,
+		Israel: /^[5-7]\d{8}$/,
+		Thailand: /^[6-9]\d{8}$/,
+		Malaysia: /^[1-9]\d{7,9}$/,
+		Philippines: /^[8-9]\d{9}$/,
+		UAE: /^[5-9]\d{8}$/,
+		Colombia: /^\d{10}$/,
+		Pakistan: /^[3-9]\d{9}$/,
+		CzechRepublic: /^\d{9}$/,
+		Argentina: /^\d{10,11}$/,
+		Denmark: /^\d{8}$/,
+		Hungary: /^\d{9}$/,
+		Turkey: /^[5-9]\d{9}$/,
+		Chile: /^\d{9}$/,
+		SaudiArabia: /^[5-9]\d{8}$/,
+		Taiwan: /^[9]\d{8}$/,
+		Indonesia: /^[8-9]\d{9,10}$/,
+		Vietnam: /^[3-9]\d{8,9}$/,
+		Egypt: /^[1-9]\d{9}$/,
+		Bahrain: /^\d{8}$/,
+		Qatar: /^\d{8}$/,
+		Kuwait: /^\d{8}$/,
+		Morocco: /^[5-9]\d{8}$/,
+		Jordan: /^\d{8,9}$/,
+		Kazakhstan: /^\d{10}$/,
+		Serbia: /^\d{9}$/,
+		Peru: /^\d{9}$/,
+		Tunisia: /^\d{8}$/,
+		WestAfrica: /^\d{8}$/,
+		CentralAfrica: /^\d{8}$/,
+		Zambia: /^\d{9}$/,
+		Nepal: /^[9]\d{9}$/,
+		SriLanka: /^[7]\d{8}$/,
+		Turkmenistan: /^\d{8}$/,
+		Moldova: /^\d{8}$/,
+		Ethiopia: /^\d{9}$/,
+		Tanzania: /^\d{9}$/,
+		Ghana: /^[2-9]\d{8}$/,
+		Nicaragua: /^\d{8}$/,
+		Bulgaria: /^\d{8,10}$/,
+		BosniaHerzegovina: /^\d{8,9}$/,
+		Namibia: /^\d{9}$/,
+		CaymanIslands: /^\d{7}$/,
+		Fiji: /^\d{7}$/,
+		Macau: /^\d{8}$/,
+		Mauritius: /^\d{8}$/,
+		Tajikistan: /^\d{9}$/,
+		Aruba: /^\d{7}$/,
+		Suriname: /^\d{7}$/,
+		Iceland: /^\d{7}$/,
+		SierraLeone: /^\d{8}$/,
+		Madagascar: /^\d{8,9}$/,
+		EastCaribbean: /^\d{7}$/,
+		Barbados: /^\d{7}$/,
+		CFPFranc: /^\d{6,9}$/,
+		PapuaNewGuinea: /^\d{8}$/,
+		ElSalvador: /^\d{8}$/,
+		Gibraltar: /^\d{8}$/,
+		Liberia: /^\d{7}$/,
+		Rwanda: /^\d{9}$/,
+		Botswana: /^\d{7,8}$/,
+		Kyrgyzstan: /^\d{9}$/,
+		Brunei: /^\d{7}$/,
+		Sudan: /^\d{9}$/,
+		Libya: /^\d{8,9}$/,
+		Cuba: /^\d{8}$/,
+		Bhutan: /^\d{8}$/,
+		DominicanRepublic: /^\d{10}$/,
+		Haiti: /^\d{8}$/,
+		Tonga: /^\d{7}$/
 	};
+    let errorMessage1, errorMessage2,errorMessage3,errorMessage4;	
+	
+    //VALIDATIONS
+    function validateFirstName(event) {
+    const input = event.target.value;
+    const regex = /^[A-Za-z\s]*$/; 
+    if (!regex.test(input)) {
+        errorMessage1 = 'Name cannot contain numbers or special characters';
+    } else {
+        errorMessage1 = '';
+    }
+}
+function validateLastName(event) {
+    const input = event.target.value;
+    const regex = /^[A-Za-z\s]*$/; 
+    if (!regex.test(input)) {
+        errorMessage2 = 'Name cannot contain numbers or special characters';
+    } else {
+        errorMessage2 = '';
+    }
+}
+function validateEmail(event) {
+    const input = event.target.value;
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!regex.test(input)) {
+        errorMessage3 = 'Please enter a valid email address';
+    } else {
+        errorMessage3 = '';
+    }
+}
+function validatePhNo(country, number) {
+    const pattern = phoneNumberPatterns[country];
+    if (!pattern) {
+        errorMessage4 = 'No validation pattern found for this country';
+    } else if (!pattern.test(number)) { 
+        errorMessage4 = 'Please enter a valid phone number for ${country}';
+    } else {
+        errorMessage4 = ''; 
+    }
+}
+
+
+const validateAll = (country, number) => {
+if (!isFormData) {
+    errorMessage = 'Please fill all the required fields'; 
+	setTimeout(() => {
+	errorMessage = '';
+}, 5000);
+    return false; 
+} else {
+    errorMessage = ''; 
+}
+validateFirstName({ target: { value: $Cusdetails.FirstName } });
+validateLastName({ target: { value: $Cusdetails.LastName } });
+validateEmail({ target: { value: $Cusdetails.Email } });
+validatePhNo(country, number);
+return !errorMessage1 && !errorMessage2 && !errorMessage3 && !errorMessage4;
+};
+const cust = () => {
+if (!validateAll($Cusdetails.Country, $Cusdetails.Number)) {
+    return;
+}
+tog4();
+};
 </script>
 
 <div class="py-10 bg-white  flex justify-between">
@@ -294,8 +543,13 @@
 			bind:value={$Cusdetails.FirstName}
 			name="Firstname"
 			id="firstname"
+            on:input={validateFirstName}
 			required
 		/>
+        {#if errorMessage && !$Cusdetails.FirstName}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			FirstName is required</div>
+		{/if}
 		  </div>
 		</div>
 		<div class="sm:col-span-2">
@@ -308,22 +562,24 @@
 					id="lastname"
 					bind:value={$Cusdetails.LastName}
 					required
+                    on:input={validateLastName}
 				/>
+                {#if errorMessage && !$Cusdetails.LastName}
+                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                    LastName is required</div>
+                {/if}
 		  </div>
 		</div>
 	  </div>
 	<div class="mt-2 mb-2">
-		<label for="" class="text-sm">Organisation name <span class="text-primary-500"> *</span></label>
-		<br />
-		<input
-			type="text"
-			name="organisation"
-			id=""
-			bind:value={$Cusdetails.Organisation}
-			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-		/>
-	</div>
-	<div class="">
+		{#if errorMessage1}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			{errorMessage1}</div>
+		{/if}
+		{#if errorMessage2}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			{errorMessage2}</div>
+		{/if}
 		<label for="" class="text-sm">Country <span class="text-primary-500"> *</span></label>
 		<br />
 		<select
@@ -334,34 +590,13 @@
 		>
 			<option value="" disabled selected>Select your country</option>
 			{#each countries as country}
-				<option value={`${country.name},${country.code}`}>{country.name} ({country.code})</option>
+				<option value={`${country.name}`}>{country.name} ({country.code})</option>
 			{/each}
 		</select>
-	</div>
-	<div class="mt-2 mb-2">
-		<label for="" class="text-sm">Invoice number</label>
-		<br />
-		<input
-			type="text"
-			name="lgcnumber"
-			id=""
-			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-			bind:value={$Cusdetails.LGC}
-		/>
-	</div>
-	<div class="mt-2 mb-2">
-		<label for="" class="text-sm">Email address <span class="text-primary-500"> *</span></label>
-		<br />
-		<input
-			type="text"
-			name="email"
-			id=""
-			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-			bind:value={$Cusdetails.Email}
-		/>
-		{#if emailError}
-			<p class="text-red-500 text-sm font-medium">{emailError}</p>
-		{/if}
+        {#if errorMessage && !$Cusdetails.Country}
+                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                    Country is required</div>
+                {/if}
 	</div>
 	<div class="mt-2 mb-2">
 		<label for="" class="text-sm">Phone number <span class="text-primary-500"> *</span></label>
@@ -374,17 +609,65 @@
 			bind:value={$Cusdetails.Number}
 			placeholder="Enter your number"
 			required
-		/>
-		{#if phoneError}
-			<p class="text-red-500 text-sm font-medium">{phoneError}</p>
-		{/if}
-		
-		{#if errorMessage}
-		<div class="text-red-500 ml-1 mt-1 text-sm font-medium">
-			{errorMessage}</div>
+            on:input={() => validatePhNo($Cusdetails.Country, $Cusdetails.Number)}	
+            />
+		{#if errorMessage4}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			Please enter a valid phone number for {$Cusdetails.Country}</div>
 		{/if}
 	</div>
-	<div class="flex space-x-4 mt-5">
+	<div class="mt-2 mb-2">
+		<label for="" class="text-sm">Email address <span class="text-primary-500"> *</span></label>
+		<br />
+		<input
+			type="text"
+			name="email"
+			id=""
+			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			bind:value={$Cusdetails.Email}
+            on:input={validateEmail}
+		/>
+        {#if errorMessage3}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			{errorMessage3}</div>
+		{/if}
+        {#if errorMessage && !$Cusdetails.Email}
+                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                    Email is required</div>
+                {/if}
+		
+	</div>
+	<div class="mt-2 mb-2">
+		<label for="" class="text-sm">Company name <span class="text-primary-500"> *</span></label>
+		<br />
+		<input
+			type="text"
+			name="organisation"
+			id=""
+			bind:value={$Cusdetails.Organisation}
+			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+		/>
+        {#if errorMessage && !$Cusdetails.Organisation}
+                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                    Company name is required</div>
+                {/if}
+	</div>
+	<div class="mt-2 mb-2">
+		<label for="" class="text-sm">Invoice number</label>
+		<br />
+		<input
+			type="text"
+			name="lgcnumber"
+			id=""
+			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			bind:value={$Cusdetails.LGC}
+		/>
+	</div>
+    {#if errorMessage}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			{errorMessage}</div>
+		{/if}
+	<div class="flex space-x-4">
 		<button
 			type="button"
 			on:click={cust}

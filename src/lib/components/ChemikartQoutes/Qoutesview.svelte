@@ -2,6 +2,7 @@
 	import { tick } from 'svelte';
 	import { derived } from 'svelte/store'
 	import { resetFormData } from  '$lib/stores/solution_stores.js';
+  import { toast, Toaster } from "svelte-sonner";
 		let successMessage = '';
 		let errorMessage = '';
 		let messageContainer;
@@ -45,17 +46,19 @@
     keywordError = result.data.type;
     if (keywordError === "success") {
       message1 = result.data.data.message; 
+      toast.success(message1);
       setTimeout(() => {
         location.reload();
       }, 2000)
     } else if (keywordError === "error") {
-      message1 = result.data.data.error; 
+      message1 = result.data.data.error;
+      toast.error(message1); 
     }
     showMessage(message1, keywordError);
   };
 }}>
 
-<div class="mt-3" bind:this={messageContainer}>
+<!-- <div class="mt-3" bind:this={messageContainer}>
   {#if errorMessage === "success"}
     <div class="text-center bg-green-100 text-green-700 py-2 mb-4 rounded-md">
       {successMessage}
@@ -65,7 +68,7 @@
       {successMessage}
     </div>
   {/if}
-</div>
+</div> -->
 
   <!-- Custom solution type -->
   <div class="sm:flex justify-between items-center">
@@ -149,12 +152,20 @@
     <div>
       <h1 class="font-semibold text-lg mb-3">Customer details:</h1>
       <div class="space-y-4">
-        {#each Object.entries($Cusdetails) as [key, value]}
+        <!-- {#each Object.entries($Cusdetails) as [key, value]}
           <div class="lg:flex md:flex items-center">
             <label for={key} class="text-black text-base font-medium ml-1">{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
             <p class="ml-2 text-gray-600">{value}</p>
           </div>
-        {/each}
+        {/each} -->
+        {#each Object.entries($Cusdetails) as [key, value]}
+  <div class="lg:flex md:flex items-center">
+    <label for={key} class="text-black text-base font-medium ml-1">
+      {key === 'LGC' ? 'Invoice Number' : key.charAt(0).toUpperCase() + key.slice(1)}:
+    </label>
+    <p class="ml-2 text-gray-600">{value}</p>
+  </div>
+{/each}
       </div>
     </div>
     <button type="button" class="font-semibold lg:ml-2 sm:ml-0 text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog4}>Edit</button>
@@ -165,12 +176,22 @@
     <div>
       <h1 class="font-semibold text-lg mb-3">Delivery Details:</h1>
       <div class="space-y-4">
-        {#each Object.entries($Delivery) as [key, value]}
+        <!-- {#each Object.entries($Delivery) as [key, value]}
           <div class="lg:flex md:flex items-center">
             <label for={key} class="text-black text-base font-medium ml-1">{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
             <p class="ml-2 text-gray-600">{value}</p>
           </div>
-        {/each}
+        {/each} -->
+        {#each Object.entries($Delivery) as [key, value]}
+  <div class="lg:flex md:flex items-center">
+    <label for={key} class="text-black text-base font-medium ml-1">
+      {key === 'Country' ? 'State' : 
+       key === 'County' ? 'GST' : 
+       key.charAt(0).toUpperCase() + key.slice(1)}:
+    </label>
+    <p class="ml-2 text-gray-600">{value}</p>
+  </div>
+{/each}
       </div>
     </div>
     <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 lg:ml-2 sm:ml-0 sm:mt-0 mt-5" on:click={tog5}>Edit</button>
@@ -213,3 +234,4 @@
     </button> -->
   </div>
 </form> 
+<Toaster position="bottom-right" richColor/>
