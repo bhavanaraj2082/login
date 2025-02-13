@@ -12,7 +12,7 @@ import Shipment from "$lib/server/models/Shipment.js";
 import TokenVerification from "$lib/server/models/TokenVerification.js";
 import Return from "$lib/server/models/Return.js";
 import MyFavourite from "$lib/server/models/MyFavourite.js";
-import Curcurrency from "$lib/server/models/Curcurrency.js";
+import Curconversion from "$lib/server/models/Curconversion.js";
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -575,30 +575,28 @@ export async function getreturnstatusdata(invoiceid) {
     return { error: "Error in fetching orderStatus Data" };
   }
 }
-
-// returns ends
-
-//PRODUCT SIMILAR ITEMS , FINDING DIFFERENCES
-export async function getCurrencyData(currency) {
+export async function getReturnSavedData(invoiceid) {
   try {
-    const record = await Curcurrency.findOne({ currency }).lean();
-    console.log("record>>", record);
-    return record || { currency: [] };
+    const records = await Return.find({ invoiceNumber: invoiceid });
+    return JSON.parse(JSON.stringify(records));
   } catch (error) {
-    console.error("Error fetching currency data:", error);
-    return { currency: [] };
+    console.error("Error fetching saved returns:", error);
+    return { error: "Error fetching saved returns data" };
   }
 }
+// returns ends
 
+//CurrencyConversion Starts
 export async function conversionRates() {
   try {
-    const records = await Curcurrency.find({}).lean();
+    const records = await Curconversion.find({})
+		.sort({ updatedAt: 1 })  
+		.lean();;
 
     const rates = records.reduce((acc, record) => {
       acc[record.currency] = record.rate;
       return acc;
     }, {});
-
     //   console.log("rates...===>", rates);
     return rates;
   } catch (error) {
@@ -608,31 +606,32 @@ export async function conversionRates() {
 }
 
 export async function convertToINR(pricing) {
-  if (!Array.isArray(pricing)) return [];
+  if (typeof pricing !== 'object' || pricing === null) return {}; 
+
   const currentRates = await conversionRates();
 
-  return pricing.map((priceItem) => {
-    const { break: breakPoint, offer, ...currencies } = priceItem;
-    const newPriceItem = {
-      break: breakPoint,
-      ...(offer !== undefined && { offer }),
-    };
+  const newPriceItem = { ...pricing }; 
 
-    if (currencies.INR) {
-      newPriceItem.INR = currencies.INR;
-      return newPriceItem;
-    }
+  const { break: breakPoint, offer, ...currencies } = pricing;
 
-    for (const [currency, amount] of Object.entries(currencies)) {
-      if (currentRates[currency]) {
-        newPriceItem.INR = Number(amount * currentRates[currency]);
-        return newPriceItem;
-      }
+  newPriceItem.break = breakPoint;
+  if (offer !== undefined) newPriceItem.offer = offer;
+
+  if (currencies.INR) {
+    newPriceItem.INR = currencies.INR;
+    return newPriceItem;
+  }
+
+  for (const [currency, amount] of Object.entries(currencies)) {
+    if (currentRates[currency]) {
+      newPriceItem.INR = Number(amount * currentRates[currency]);
+      return newPriceItem; 
     }
-    return priceItem;
-  });
+  }
+  return pricing; 
 }
 
+//Product info starts
 export async function DifferentProds(productId) {
   // fething product
   const product = JSON.parse(
@@ -677,19 +676,38 @@ console.log("stockDetails",stockDetails);
 
 
   const variants = product.variants || [];
-  const variantRecord = await Promise.all(
-    variants.map(async (variantId) => {
-      const variant = await Product.findById(variantId).lean();
-      if (!variant) return {};
-      const stock = await Stock.findOne({
-        productNumber: variant.productNumber,
-      }).lean();
-      return {
-        ...variant,
-        pricing: stock ? stock.pricing : [],
-      };
-    })
-  );
+	const variantRecord = await Promise.all(
+	  variants.map(async (variantId) => {
+		const variant = await Product.findById(variantId).lean();
+		if (!variant) return {};
+  
+		const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
+  
+		let variantPricing = [];
+		if (stock?.pricing) {
+		  // Await the result of convertToINR to get the actual pricing
+		  if (stock.pricing.length > 1) {
+			variantPricing = await convertToINR([stock.pricing[0]]);
+		  } else {
+			variantPricing = await convertToINR(stock.pricing);
+		  }
+		}
+  
+		return {
+		  _id: variant?._id?.toString() || "",
+		  productName: variant?.productName || "Unknown Product",
+		  prodDesc: variant?.prodDesc || "No description available",
+		  description: Array.isArray(variant?.description) ? variant.description : [],
+		  properties: variant?.properties || {},
+		  manufacturerName: variant?.manufacturerName 
+			? variant.manufacturerName.toString() 
+			: "Unknown Manufacturer",
+		  productNumber: variant?.productNumber || "N/A",
+		  imageSrc: variant?.imageSrc || "",
+		  pricing: variantPricing ? variantPricing : []
+		};
+	  })
+	);
 
   const formattedRecord = {
     productId: product?._id?.toString() || "",
@@ -726,19 +744,7 @@ console.log("stockDetails",stockDetails);
 
   return { records: [formattedRecord] };
 }
-
-//productinfo ends
-
-export async function getReturnSavedData(invoiceid) {
-  try {
-    const records = await Return.find({ invoiceNumber: invoiceid });
-    return JSON.parse(JSON.stringify(records));
-  } catch (error) {
-    console.error("Error fetching saved returns:", error);
-    return { error: "Error fetching saved returns data" };
-  }
-}
-// returns ends
+//Product info ends
 
 //////Quick Order//////////
 
@@ -803,87 +809,91 @@ export async function CompareSimilarityData(productId) {
   if (!product) {
     return { error: "Product not found" };
   }
-
   const subsubCategoryId = product.subsubCategory._id;
-
-  const compareSimilarity = await Product.aggregate([
-    {
-      $match: { subsubCategory: subsubCategoryId },
-    },
-    {
-      $limit: 4,
-    },
-    {
-      $lookup: {
-        from: "categories",
-        localField: "category",
-        foreignField: "_id",
-        as: "categoryInfo",
+  if(subsubCategoryId){
+    const compareSimilarity = await Product.aggregate([
+      {
+        $match: { subsubCategory: subsubCategoryId },
       },
-    },
-    {
-      $lookup: {
-        from: "subcategories",
-        localField: "subCategory",
-        foreignField: "_id",
-        as: "subCategoryInfo",
+      {
+        $limit: 4,
       },
-    },
-    {
-      $lookup: {
-        from: "manufacturers",
-        localField: "manufacturer",
-        foreignField: "_id",
-        as: "manufacturerInfo",
-      },
-    },
-    {
-      $lookup: {
-        from: "subsubcategories",
-        localField: "subsubCategory",
-        foreignField: "_id",
-        as: "subsubCategoryInfo",
-      },
-    },
-    {
-      $lookup: {
-        from: "stocks",
-        localField: "productNumber",
-        foreignField: "productNumber",
-        as: "stockInfo",
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-        productName: 1,
-        prodDesc: 1,
-        properties: 1,
-        "categoryInfo.urlName": 1,
-        "subCategoryInfo.urlName": 1,
-        "manufacturerInfo.name": 1,
-        "subsubCategoryInfo.urlName": 1,
-        stockQuantity: {
-          $ifNull: [{ $arrayElemAt: ["$stockInfo.stock", 0] }, 0],
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "categoryInfo",
         },
-        stockPriceSize: {
-          $ifNull: [{ $arrayElemAt: ["$stockInfo.pricing", 0] }, []],
-        },
-        orderMultiple: {
-          $ifNull: [{ $arrayElemAt: ["$stockInfo.orderMultiple", 0] }, 1],
-        },
-        priceSize: 1,
-        imageSrc: 1,
-        productUrl: 1,
-        productNumber: 1,
       },
-    },
-  ]);
-
-  if (compareSimilarity.length === 0) {
-    return { error: "No related products found" };
+      {
+        $lookup: {
+          from: "subcategories",
+          localField: "subCategory",
+          foreignField: "_id",
+          as: "subCategoryInfo",
+        },
+      },
+      {
+        $lookup: {
+          from: "manufacturers",
+          localField: "manufacturer",
+          foreignField: "_id",
+          as: "manufacturerInfo",
+        },
+      },
+      {
+        $lookup: {
+          from: "subsubcategories",
+          localField: "subsubCategory",
+          foreignField: "_id",
+          as: "subsubCategoryInfo",
+        },
+      },
+      {
+        $lookup: {
+          from: "stocks",
+          localField: "productNumber",
+          foreignField: "productNumber",
+          as: "stockInfo",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          productName: 1,
+          prodDesc: 1,
+          properties: 1,
+          "categoryInfo.urlName": 1,
+          "subCategoryInfo.urlName": 1,
+          "manufacturerInfo.name": 1,
+          "subsubCategoryInfo.urlName": 1,
+          stockQuantity: {
+            $ifNull: [{ $arrayElemAt: ["$stockInfo.stock", 0] }, 0],
+          },
+          stockPriceSize: {
+            $ifNull: [{ $arrayElemAt: ["$stockInfo.pricing", 0] }, []],
+          },
+          orderMultiple: {
+            $ifNull: [{ $arrayElemAt: ["$stockInfo.orderMultiple", 0] }, 1],
+          },
+          priceSize: 1,
+          imageSrc: 1,
+          productUrl: 1,
+          productNumber: 1,
+        },
+      },
+    ]);
+    let compareSimilarityJson = await Promise.all(compareSimilarity.map(async (items) => {
+			let convertedPrice = await convertToINR(items.stockPriceSize);   
+			return {
+				...items,  
+				stockPriceSize: convertedPrice  
+			};
+		}));
+        return JSON.parse(JSON.stringify(compareSimilarityJson));
   }
-
-  const compareSimilarityJson = JSON.parse(JSON.stringify(compareSimilarity));
-  return compareSimilarityJson;
+  else{
+    return []
+  }
 }

@@ -1,10 +1,8 @@
-
-import { parse } from 'csv-parse/sync';
-import { uploadFile ,quicksearch ,quickcheck} from '$lib/server/mongoActions';
+import Papa from 'papaparse'; // Importing PapaParse instead of csv-parse
+import { uploadFile, quicksearch, quickcheck } from '$lib/server/mongoActions';
 
 export const actions = {
-
-    quickcheck: async ({ request }) => {
+  quickcheck: async ({ request }) => {
     try {
       const formData = Object.fromEntries(await request.formData());
       const { ProductId, quantity } = formData;
@@ -28,74 +26,72 @@ export const actions = {
       };
     }
   },
-quicksearch : async ({ request }) => {
-  const data = Object.fromEntries(await request.formData());
-  const { quickSearch } = data;
-  if (quickSearch && quickSearch.length >= 2) {
+  quicksearch: async ({ request }) => {
+    const data = Object.fromEntries(await request.formData());
+    const { quickSearch } = data;
+
+    if (quickSearch && quickSearch.length >= 0) {
       try {
-          const results = await quicksearch({ query: quickSearch });
-          const processedResults = results.map(product => {
-              if (product.pricing && Array.isArray(product.pricing)) {
-                  const formattedPricing = product.pricing.map(item => ({
-                      break: item.break,
-                      currency: item.currency || 'N/A', 
-                      price: item.price || 'N/A' 
-                  }));
-                  product.pricing = formattedPricing;
-              }
-              
-              return product;
-          });
-          // console.log("ia mfrom server",processedResults);
-          return processedResults; 
+        const results = await quicksearch({ query: quickSearch });
+        const processedResults = results.map(product => {
+          if (product.pricing && Array.isArray(product.pricing)) {
+            product.pricing = product.pricing.map(item => ({
+              break: item.break || 'N/A',
+              price: item.INR || 'N/A', 
+            }));
+          }
+      return {
+            id: product.id,
+            image: product.image,
+            description: product.description,
+            productName: product.productName,
+            productNumber: product.productNumber,
+            stock: product.stock || 0,
+            pricing: product.pricing,
+          };
+        });
+     return processedResults;
       } catch (error) {
-          console.error('Error in quicksearch:', error);
-          return { error: 'An error occurred while fetching search results.' };
+        console.error('Error in quicksearch action:', error);
+        return { error: 'An error occurred while fetching search results.' };
       }
-  } else {
+    } else {
       return { error: 'Search query must be at least 2 characters.' };
-  }
-},
-
-
-  uploadFile :async ({ request }) => {
+    }
+  },
+ 
+uploadFile: async ({ request }) => {
   try {
-    const data = await request.formData();
-    const file = data.get('file');
 
-    // console.log('Received file:', file);  
+    const data = await request.formData();
+
+    const file = data.get('file');
     if (!file || file.size === 0) {
       return {
         error: 'No file uploaded or file is empty',
       };
     }
-    const fileData = Buffer.from(await file.arrayBuffer());
-  
 
+    const fileData = Buffer.from(await file.arrayBuffer());
     let fileContent = '';
     if (file.type === 'text/csv' || file.type === 'text/plain') {
       fileContent = fileData.toString('utf8');
-    } else {
+} else {
       throw new Error('Unsupported file type');
     }
-    const records = parse(fileContent, { columns: false, skip_empty_lines: true });
-    const productNumbers = records.map(([productNumberAndSize]) => {
-      const [productNumber] = productNumberAndSize.split('-');
-      return productNumber.trim();
+    const results = Papa.parse(fileContent, { header: false, skipEmptyLines: true });
+    const records = results.data;  
+    const validationResults = await uploadFile({
+      query: records,  
+      uploadedQuantities: {}, 
     });
+   return validationResults;
 
-    // console.log('Extracted product numbers:', productNumbers);
-
-    const validationResults = await uploadFile({ query: productNumbers });
-    
-    return validationResults;
-
-    
   } catch (error) {
     console.error('File upload error:', error);
     return {
-      error: 'Error processing the file' ,
+      error: 'Error processing the file',
     };
   }
- },
+},
 };

@@ -47,7 +47,7 @@
         <div class=" border shadow-sm rounded-md px-5 py-6 bg-white">
             <div class=" flex items-center gap-2 text-primary-500 mb-2">
                 <Icon icon={logo} class=" text-xl md:text-2xl" />
-                <button on:click={changeTabs(index)} class=" hover:underline font-bold text-4s lg:text-lg text-primary-500">{title}</button>
+                <button on:click={changeTabs(index)} class=" hover:underline font-bold text-4s lg:text-lg text-primary-500 text-left">{title}</button>
             </div>
             <p class=" text-xs md:text-sm text-content">{desc}</p>
         </div>

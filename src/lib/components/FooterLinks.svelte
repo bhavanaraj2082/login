@@ -43,11 +43,11 @@
         contentComponent = component;
     }
 </script>
-<div class="lg:w-11/12 mx-auto max-w-7xl px-6 sm:px-8 md:px-10">
+<div class="lg:w-11/12 mx-auto max-w-7xl ">
 
-<div class="flex flex-col md:flex-row lg:p-6 ">
-    <aside class="w-full lg:w-1/3 lg:p-4">
-        <h1 class="text-3xl font-semibold mb-8">
+<div class="flex flex-col  md:flex-row lg:p-6 p-4 ">
+    <aside class="w-full md:w-1/3 lg:p-4">
+        <h1 class="text-3xl font-semibold mb-4">
             {#if contentComponent === Terms}
                 Site Use Terms
             {:else if contentComponent === ProductLicense}
@@ -61,7 +61,7 @@
 
         <hr class="border-t-1 border-gray-400 mb-2 mt-12" />
 
-        <!-- Sidebar Buttons -->
+
         <button 
             class={`text-xl font-semibold mb-2 ${contentComponent === Terms ? 'text-primary-400' : 'text-black'}`} 
             on:click={() => showSection('siteTerms')}
@@ -96,7 +96,7 @@
     </aside> 
 
     <!-- Content Section -->
-    <div class="w-full md:w-3/4 lg:p-4">
+    <div class="w-full md:w-3/4 lg:p-2">
         {#if contentComponent}
             <svelte:component this={contentComponent} />
         {:else}
