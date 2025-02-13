@@ -138,6 +138,8 @@
 				isLoading = false;
 			}
 			searchResults = result?.data?.responce;
+			console.log(searchResults);
+			
 		};
 	}
 	const handleSubmitBtn = () => {
@@ -361,9 +363,11 @@
 							>
 								<a
 									href={`/products/${product?.category?.urlName}/${product?.subCategory?.urlName}/${product?.productNumber}`}
-									class="block w-full text-sm text-gray-800 px-4 py-2"
+									class="block w-full text-sm text-gray-900 px-4 py-2"
 								>
-									{product?.productName}
+									<p class="text-md">{product?.productName}</p>
+									<p class="text-sm text-gray-400">{product?.manufacturerName}</p>
+									
 								</a>
 							</li>
 						{/each}

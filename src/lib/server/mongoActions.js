@@ -13,7 +13,7 @@ import Helpsupport from '$lib/server/models/Helpsupport.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '$lib/server/models/MyFavourite.js';
 import ChemiDashProfile from '$lib/server/models/ChemiDashProfile.js';
-import Curcurrency from "$lib/server/models/Curcurrency.js";
+import Curcurrency from "$lib/server/models/Curconversion.js";
 import { redirect, error } from '@sveltejs/kit';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -554,17 +554,21 @@ export async function editProfileEmailPreferences(body) {
 }
 
 export const searchByQuery = async (body) => {
+	// console.log("body.query",body.query);
+let cleanedQuery = body.query.replace(/[^\w]/g, "").toLowerCase();;
+// console.log("body.query",body.query);
+
 	const queryFilter = {
 		$or: [
-			{ productName: { $regex: body.query, $options: 'i' } },
-			{ productNumber: { $regex: body.query, $options: 'i' } },
-			{ CAS: { $regex: body.query, $options: 'i' } }
+		{ cleanedName: { $eq: cleanedQuery } },
+		{ $text: { $search: cleanedQuery } },
+		{ CAS: { $eq: body.query } }
 		]
-	};
-
+	  };
+	  
 	try {
 		const result = await Product.find(queryFilter)
-			.limit(5)
+			.limit(10)
 			.populate('category')
 			.populate('subCategory')
 			.exec();

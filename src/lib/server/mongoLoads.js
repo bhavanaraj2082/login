@@ -187,17 +187,18 @@ export async function getSearchData(search) {
 }
 
 async function getMatchedComponents(search) {
+  let cleanedQuery = search.replace(/[^\w]/g, "");
   try {
     const queryFilter = {
       $or: [
-        { productName: { $regex: search, $options: "i" } },
-        { productNumber: { $regex: search, $options: "i" } },
-        { CAS: { $regex: search, $options: "i" } },
+        { cleanedName: { $eq: cleanedQuery } },
+        { $text: { $search: cleanedQuery } },
+        { CAS: { $eq: search } }
       ],
     };
 
     const components = await Product.find(queryFilter)
-      .limit(6)
+      .limit(9)
       .populate("category")
       .populate("subCategory")
       .exec();
