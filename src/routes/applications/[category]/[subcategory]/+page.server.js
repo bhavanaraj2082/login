@@ -23,6 +23,8 @@ export async function load({ params }) {
     let relatedProducts = [];
     if (subsubcategories.length ===0) {
      relatedProducts = await RelatedApplicationData(subcategoryData.name);
+    //  console.log(relatedProducts);
+     
     }
 
     return {

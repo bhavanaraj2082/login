@@ -15,7 +15,7 @@ import MyFavourites from '$lib/server/models/MyFavourite.js';
 import ChemiDashProfile from '$lib/server/models/ChemiDashProfile.js';
 import Curcurrency from "$lib/server/models/Curconversion.js";
 import { redirect, error } from '@sveltejs/kit';
-
+import SearchQueries from '$lib/server/models/SearchQueries.js';
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from 'nodemailer';
 // import { lucia } from 'lucia';
@@ -1367,5 +1367,15 @@ export const quicksearch = async ({ query }) => {
 export const CreateProductQuote = async (formattedData) => {
 	const newQuote = new Quotes(formattedData);
 	await newQuote.save();
+	return { status: 200 };
+};
+
+export const saveMailId = async (body) => {
+	// console.log(body);
+	
+	const newSearchQuery = new SearchQueries(body);
+	// console.log(newSearchQuery);
+	
+	await newSearchQuery.save();
 	return { status: 200 };
 };

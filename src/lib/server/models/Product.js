@@ -35,7 +35,9 @@ const productSchema = new Schema({
     encompass: { type: String, default: null },
     CAS:{ type: String, default: null },
     currency: { type: String, default: 'USD' },
-    variants: [{ type: Schema.Types.ObjectId, ref: 'Product' }]
+    variants: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
+    prefixes: { type: Schema.Types.Mixed, required:false },
+    cleanedName: { type: String, required: false },
 }, { timestamps: false, collection: "products" });
 
 productSchema.index({ productName: 1 }); // Matches PocketBase index
