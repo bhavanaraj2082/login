@@ -33,6 +33,8 @@ export async function load({ params }) {
     return {
       subsubcategoryData,
       relatedProducts,
+      category,
+      subcategory,
     };
   } catch (error) {
     console.error('Error loading data:', error);

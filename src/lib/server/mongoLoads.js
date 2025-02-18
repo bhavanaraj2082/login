@@ -490,7 +490,7 @@ export async function RelatedProductData(productId) {
 }
 
 export async function RelatedApplicationData(name) {
-  console.log("name",name);
+  // console.log("name",name);
   
   try {
     const queryFilter = {

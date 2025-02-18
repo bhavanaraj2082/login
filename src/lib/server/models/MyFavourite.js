@@ -5,14 +5,13 @@ const { Schema } = mongoose;
 const myFavouritesSchema = new Schema(
   {
     favorite: {
-      type: Array, 
-      default: [], 
-      required: false,
+        type: mongoose.Schema.Types.ObjectId,
+          ref: 'Product',
+          default:[]
     },
     userId: {
-      type: Schema.Types.ObjectId, 
-      ref: "profiles", 
-      required: false, 
+      type: String, 
+      required:true
   }
 },
   {
