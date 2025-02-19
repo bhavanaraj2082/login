@@ -6,6 +6,7 @@ import {
   MONGO_DATABASE,
 } from "$env/static/private";
 import mongoose from "mongoose";
+import { auth } from '$lib/server/lucia.js';
 
 let isConnected = false;
 const MONGODB_URI = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DATABASE}?authSource=${MONGO_DATABASE}`;
@@ -21,6 +22,33 @@ export const handle = async ({ event, resolve }) => {
       throw new Error("Failed to connect to the database");
     }
   }
+
+  const sessionId = event.cookies.get('auth_session') || null;
+
+	let user = null;
+	let session = null;
+
+	if (sessionId) {
+		try {
+			session = await auth.validateSession(sessionId);
+			user = session?.user || null;
+		} catch (error) {
+			console.error('Failed to validate session:', error);
+			event.cookies.delete('auth_session', { path: '/' });
+		}
+	}
+	event.locals.user = user;
+	event.locals.session = session;
+
+	// const path = event.url.pathname;
+
+	if (event.locals.user) {
+		event.locals.authedUser = {
+			id: event.locals.user?.userId,
+			email: event.locals.user?.email,
+			username: event.locals.user?.username
+		};
+	}
 
   const response = await resolve(event);
 

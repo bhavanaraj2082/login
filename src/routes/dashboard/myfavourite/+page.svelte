@@ -3,4 +3,6 @@
     export let data;
 </script>
 
-<Favourites {data}/>
+<div class="bg-gray-50">
+    <Favourites {data}/>
+</div>

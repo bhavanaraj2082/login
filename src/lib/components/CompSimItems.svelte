@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
   import Icon from "@iconify/svelte";
-  import { cartState } from '$lib/stores/cartStores.js'; 
+  // import { cartState } from '$lib/stores/cartStores.js'; 
   import { toast } from 'svelte-sonner';
 
   export let compareSimilarity;

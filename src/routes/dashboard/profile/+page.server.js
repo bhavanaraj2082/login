@@ -9,10 +9,12 @@ import {
   emailVerificationToken
 } from "$lib/server/mongoActions.js";
  
-export const load = async ({cookies}) => {
+export const load = async ({locals}) => {
   try {
     //authedUser.email is the parameter for getProfileDetails
-     return await getProfileDetails("")  
+    // const {userId} = JSON.parse(cookies.get("token"))
+    console.log('=======...>',locals)
+    return await getProfileDetails(locals.authedUser.id)
   } catch (error) {
     console.log('error',error);
       return { 

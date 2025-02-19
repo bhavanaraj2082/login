@@ -30,6 +30,10 @@ const chemiDashProfileSchema = new mongoose.Schema({
     type:Boolean,
     default:false
   },
+  isPhoneVerified:{
+    type:Boolean,
+    default:false
+  },
   userId: {
     type: String,
     required: true
@@ -47,10 +51,10 @@ const chemiDashProfileSchema = new mongoose.Schema({
   collection:"profiles"
 });
 
-if(mongoose.models.Profile){
-  delete mongoose.models.Profile
-}
-
+// if(mongoose.models.Profile){
+//   delete mongoose.models.Profile
+// }
+delete mongoose.models.Profile
 const Profile = mongoose.models.Profile || mongoose.model('Profile', chemiDashProfileSchema);
 
 export default Profile

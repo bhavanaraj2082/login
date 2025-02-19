@@ -3,7 +3,7 @@
     import Icon from "@iconify/svelte";
     import {enhance} from "$app/forms"
     import { authedUser } from '$lib/stores/filter.js';
-    import { cartState } from '$lib/stores/cartStores.js';
+    // import { cartState } from '$lib/stores/cart.js';
     import Bulkupload from './Bulkupload.svelte';
     import {toast} from 'svelte-sonner'
     let uploadedRows=[];

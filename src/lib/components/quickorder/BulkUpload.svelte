@@ -1,7 +1,7 @@
 <script>
   import Icon from "@iconify/svelte";
   import { enhance } from "$app/forms";
-  import { cartState } from '$lib/stores/cartStores.js';
+  // import { cartState } from '$lib/stores/cart.js';
   import {toast } from 'svelte-sonner'
 
   let validationMessages = [];

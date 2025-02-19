@@ -26,9 +26,9 @@
 	const validateForm = ()=>{
 		errors={}
             if(!firstName || !/^[A-Za-z\s]+$/.test(firstName)) errors.firstName="First name is required and valid"
-            if(!/^[A-Za-z\s]+$/.test(lastName)) errors.lastName="Last name must be valid"
+            // if(!/^[A-Za-z\s]+$/.test(lastName)) errors.lastName="Last name must be valid"
             if(!primaryPhone || !/^\d{10}$/.test(primaryPhone)) errors.primaryPhone="Primary phone number is required and valid"
-            if(!cellPhone || !/^\d{10}$/.test(cellPhone)) errors.cellPhone="Cell phone number is required and valid"
+            // if(!cellPhone || !/^\d{10}$/.test(cellPhone)) errors.cellPhone="Cell phone number is required and valid"
 		if(Object.keys(errors).length >0){
 			return false
 		}else{
@@ -51,10 +51,10 @@
 }
 </script>
 
-<div class="border shadow-sm md:w-11/12 max-w-7xl mx-auto rounded-md p-5 bg-white">
+<div class="shadow max-w-7xl rounded p-5 bg-white">
     {#if toggleEdit}
     <!-- edit form for contact information -->
-    <div class=" max-w-2xl">
+    <div class="">
         <h1 class=" text-xl font-bold"> Edit Contact Information <span class=" text-xs font-normal"> <span class=" text-sm font-bold text-red-500">*</span>Represent required fields</span></h1>
         <form class="my-3 flex flex-col sm:flex-row flex-wrap gap-y-3"
         method="POST" action="?/editContact" use:enhance={handleSubmit}>
@@ -80,9 +80,9 @@
                         Last Name</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
                     type="text" name="lastName" bind:value={lastName}/>
-                    {#if errors?.lastName}
+                    <!-- {#if errors?.lastName}
 					<span class="text-red-400 text-xs">{errors.lastName}</span>
-				    {/if}
+				    {/if} -->
                 </div>
             </div>
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
@@ -96,12 +96,12 @@
             </div>
             
             <div class=" w-full">
-                <label class=" text-xs md:text-sm font-medium" for="cellPhone"><span class=" text-sm font-bold text-red-500">*</span>cell Phone</label><br>
+                <label class=" text-xs md:text-sm font-medium" for="cellPhone"><span class=" text-sm font-bold text-red-500"></span>Alternative Phone </label><br>
                 <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
                 type="text" name="cellPhone" bind:value={cellPhone}/>
-                {#if errors?.cellPhone}
+                <!-- {#if errors?.cellPhone}
 				<span class="text-red-400 text-xs">{errors.cellPhone}</span>
-			    {/if}
+			    {/if} -->
             </div>
             
             </div>
@@ -121,7 +121,7 @@
 
     {#if !toggleEdit}
     <!-- contact inforation -->
-    <div class=" max-w-3xl">
+    <div class="">
         <h1 class=" font-bold text-4s md:text-lg mb-2">
             Manage Your Personal Information
         </h1>
@@ -131,30 +131,30 @@
                 <button on:click={()=>toggleEdit = true} class=" w-20 rounded py-1.5 font-medium text-xs md:text-sm text-white bg-primary-500 hover:bg-primary-600">Edit</button>
             </div>
             <section class=" w-full flex flex-col sm:flex-row flex-wrap gap-y-3 py-3">
-                <div class=" text-sm md:text-4s w-full sm:w-1/2">
-                    <h4 class="font-medium">Name</h4>
-                    <p class=" text-sm">{firstName || "NA"} {lastName || ""}</p>
+                <div class="flex sm:flex-row items-center text-sm md:text-4s w-full sm:w-1/2">
+                    <h4 class="font-medium">Name :</h4>
+                    <p class="ml-2 text-sm">{firstName || "NA"} {lastName || ""}</p>
                 </div>
-                <div class=" w-full sm:w-1/2">
-                    <h4 class="font-medium">Primary Phone</h4>
-                    <p class=" text-sm">{primaryPhone || "NA"}</p>
+                <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
+                    <h4 class="font-medium">Primary Phone :</h4>
+                    <p class=" text-sm ml-2">{primaryPhone || "NA"}</p>
                 </div>
-                <div class=" w-full sm:w-1/2">
-                    <h4 class="font-medium">Cell Phone</h4>
-                    <p class=" text-sm">{cellPhone || "NA"}</p>
+                <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
+                    <h4 class="font-medium">Alternative Phone :</h4>
+                    <p class=" text-sm ml-2">{cellPhone || "--"}</p>
                 </div>
-                <div class=" w-full sm:w-1/2">
-                    <div class=" flex items-center gap-2">
-                    <h4 class="font-medium">Email </h4>
-                    <Icon icon="tdesign:verified-filled" class=" text-xl {isEmailVerified ? "text-green-500":"text-gray-400"}"/>
-                    </div>
-                    <p class=" text-sm">{email || "NA"}</p>
+                <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
+                    <div class="flex items-center gap-2">
+                    <h4 class="font-medium">Email:</h4>
                 </div>
-                <div class=" w-full sm:w-1/2">
-                    <h4 class="font-medium">Password</h4>
+                <p class=" text-sm ml-2">{email || "N/A"}</p>
+                <Icon icon="tdesign:verified-filled" class=" text-xl ml-2 {isEmailVerified ? "text-green-500":"text-gray-400"}"/>
+                </div>
+                <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
+                    <h4 class="font-medium">Password :</h4>
+                    <a href="/reset-password" class="text-xs text-primary-500 font-semibold ml-2">Reset Password</a>
                     <div class=" flex items-center gap-2 -mt-1.5">
-                        <p class="pt-2 text-lg">*********</p>
-                        <a href="/reset-password" class=" text-xs text-primary-500 font-semibold">Reset Password</a>
+                        <!-- <p class="pt-2 text-lg ml-2">*******</p> -->
                     </div>
                 </div>
             </section>

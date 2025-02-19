@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
-  import { cartState } from '$lib/stores/cartStores.js'; 
+  // import { cartState } from '$lib/stores/cartStores.js'; 
   import { toast } from 'svelte-sonner';
   import Icon from "@iconify/svelte";
   export let relatedProducts;

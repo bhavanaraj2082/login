@@ -10,14 +10,16 @@ import Solution from '$lib/server/models/Solution.js';
 import Quotes from '$lib/server/models/Quotes.js';
 import Products from '$lib/server/models/Product.js';
 import Helpsupport from '$lib/server/models/Helpsupport.js';
+import Cart from '$lib/server/models/cart.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '$lib/server/models/MyFavourite.js';
 import ChemiDashProfile from '$lib/server/models/ChemiDashProfile.js';
-import Curcurrency from "$lib/server/models/Curcurrency.js";
+import Curconversion from "$lib/server/models/Curconversion.js";
 import { redirect, error } from '@sveltejs/kit';
-
 import { v4 as uuidv4 } from 'uuid';
+import { auth, authErrorMessages } from '$lib/server/lucia.js';
 import nodemailer from 'nodemailer';
+import { nanoid } from 'nanoid';
 // import { lucia } from 'lucia';
 import {
 	APP_URL,
@@ -196,7 +198,7 @@ export async function favorite(favdata) {
 		  if (isFavorite) {
 			existingRecord.favorite = updatedFavorites;
 			await existingRecord.save();
-			return { type: "success", message: "Removed from favorites!" };
+			return { success: true, type: "success", message: "Product Removed from favorites!" };
 		  } else {
 			updatedFavorites = [...existingRecord.favorite, favoriteItem];
 			existingRecord.favorite = updatedFavorites;
@@ -208,8 +210,11 @@ export async function favorite(favdata) {
 			favorite: [favoriteItem],
 		  });
 		}
-		return { type: "success", message: "Added to favorites!" };
-	}
+		return { success: true, type: "success", message: "Product Added to favorites!" };
+	} 
+	// else {
+	// 	return { success: false, type: "error", message: "Something went wrong please try again later!" };
+	// }
 }
 
 export const checkoutOrder = async (order) => {
@@ -276,7 +281,7 @@ export async function login(body, cookies) {
 			);
 
 			const redirectUrl = cookies.get('redirectUrl');
-			const targetUrl = redirectUrl ? decodeURIComponent(redirectUrl) : '/profile';
+			const targetUrl = redirectUrl ? decodeURIComponent(redirectUrl) : '/dashboard/profile';
 			if (redirectUrl) {
 				cookies.delete('redirectUrl', { path: '/' });
 			}
@@ -293,66 +298,378 @@ export async function login(body, cookies) {
 	}
 }
 
-export async function register(body, cookies) {
-	const data = body;
-	let isRedirect = false;
+// export async function register(body, cookies) {
+// 	const data = body;
+// 	let isRedirect = false;
 
-	// Default site preferences
-	let sitePreferences = {
-		noOfOrdersPerPage: 3,
-		noOfQuickOrderFields: 3,
-		noOfQuotesPerPage: 3,
-		productEntryType: 'Manual Entry'
+// 	// Default site preferences
+// 	let sitePreferences = {
+// 		noOfOrdersPerPage: 3,
+// 		noOfQuickOrderFields: 3,
+// 		noOfQuotesPerPage: 3,
+// 		productEntryType: 'Manual Entry'
+// 	};
+
+// 	try {
+// 		const findUser = await Register.findOne({
+// 			email: data.email,
+// 			password: data.password
+// 		});
+// 		if (findUser !== null) {
+// 			return { success: false, message: 'User already exist' };
+// 		}
+
+// 		const user = await Register.create(data);
+// 		const profile = await Profile.create({
+// 			userId: user._id,
+// 			email: user.email,
+// 			sitePreferences
+// 		});
+
+// 		user.chemiDashProfileId = profile._id;
+// 		await user.save();
+
+// 		cookies.set(
+// 			'token',
+// 			JSON.stringify({
+// 				email: user.email,
+// 				profileId: profile._id,
+// 				userId: user._id
+// 			}),
+// 			{
+// 				path: '/',
+// 				httpOnly: true,
+// 				sameSite: 'strict',
+// 				maxAge: 60 * 60 * 24 * 1000 // 1 day
+// 			}
+// 		);
+// 		isRedirect = true;
+
+// 		// if (verificationResult.success) {
+// 		//     return { success: true, message: "Check your email to verify your email address" };
+// 		// } else {
+// 		//     return { success: false, message: "Verification email was not sent" };
+// 		// }
+// 	} catch (error) {
+// 		console.log('Error during registration:', error);
+// 		return { success: false, message: 'An error occurred during registration' };
+// 	}
+// 	if (isRedirect) {
+// 		return redirect(302, '/profile');
+// 	}
+// }
+
+
+export const signUp = async (body, cookies) => {
+	// console.log(body, "bodysignUp");
+	const existingUser = await auth.getKey("email", body.email).catch(() => null);
+	const existingPhoneKey = await auth
+	  .getKey("phone", body.phone)
+	  .catch(() => null);
+  
+	if (existingUser) {
+	  return {
+		success: false,
+		message: "This email already exists. Please login or try with another.",
+	  };
+	}
+  
+	if (existingPhoneKey) {
+	  return {
+		success: false,
+		message: "This phone already exists. Please login or try with another.",
+	  };
+	}
+  
+	const luciaUser = await auth.createUser({
+	  key: {
+		providerId: "email",
+		providerUserId: body.email,
+		password: body.password,
+	  },
+	  attributes: {
+		username: body.username,
+		email: body.email,
+		phone: body.phone,
+	  },
+	});
+  
+	if (!existingPhoneKey) {
+	  await auth.createKey({
+		userId: luciaUser.userId,
+		providerId: "phone",
+		providerUserId: body.phone,
+		password: "Password123",
+	  });
+	}
+	console.log(luciaUser, "luciaUser");
+  
+	const newProfile = new Profile({
+	  userId: luciaUser.userId,
+	  cellPhone: body.phone,
+	  email: body.email,
+	  isPhoneVerified: body.isPhoneVerified,
+	  isEmailVerified: body.isEmailVerified,
+	  phone: body.phone,
+	  country: body.country,
+	  currency: body.currency,
+	});
+  
+	const savedProfile = JSON.parse(JSON.stringify(await newProfile.save()));
+	console.log(savedProfile, "savedProfile");
+  
+	const key = await auth.useKey("phone", body.phone, "Password123");
+	const user = await auth.getUser(key.userId);
+	const session = await auth.createSession({
+	  userId: user.userId,
+	  attributes: {},
+	});
+  
+	const sessionCookie = auth.createSessionCookie(session);
+	cookies.set(
+	  sessionCookie.name,
+	  sessionCookie.value,
+	  sessionCookie.attributes
+	);
+	console.log("Session created successfully");
+  
+	return {
+	  success: true,
+	  message: "Signup successful",
+	};
+  };
+
+export const loginWithLinkedIn = async (userData, cookies) => {
+	console.log(userData, 'linkedinluciauser');
+	try {
+		const existingUser = await auth.getKey('email', userData.email);
+		if (existingUser) {
+			// Log the existing user's details
+			console.log('Existing Lucia user found:', existingUser);
+
+			// Optionally, retrieve the full user profile
+			let existingUserProfile;
+			try {
+				existingUserProfile = await auth.getUser(existingUser.userId);
+				console.log('Existing Lucia user profile:', existingUserProfile);
+			} catch (userProfileError) {
+				console.error("Error retrieving the existing user's profile:", userProfileError);
+				throw new Error('Failed to fetch user profile.');
+			}
+
+			// Step 3: Create a session for the user
+			let session;
+			try {
+				session = await auth.createSession({
+					userId: existingUser.userId, // Use the user ID from the existing Lucia user
+					attributes: {} // Add any additional session attributes if needed
+				});
+				console.log('Session created:', session);
+			} catch (sessionError) {
+				console.error('Error creating session:', sessionError);
+				throw new Error('Failed to create session for the user.');
+			}
+
+			// Step 4: Create and set the session cookie
+			try {
+				if (!cookies || typeof cookies.set !== 'function') {
+					console.error('Cookies object is not defined or invalid.');
+					throw new Error('Cookies object is undefined or does not have a set method.');
+				}
+
+				const sessionCookie = auth.createSessionCookie(session);
+				cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+
+				console.log('Session cookie set:', sessionCookie);
+			} catch (cookieError) {
+				console.error('Error setting session cookie:', cookieError);
+				// throw redirect(302, '/dashboard');
+			}
+		}
+	} catch (error) {
+		console.error('Existing Lucia user not found:', error.code === 'AUTH_INVALID_KEY_ID');
+		console.log('error in new user:', error);
+
+		const luciaUser = await auth.createUser({
+			key: {
+				providerId: 'email',
+				providerUserId: userData.email,
+				password: 'Password123'
+			},
+			attributes: {
+				username: userData.username,
+				email: userData.email,
+				phone: 'N/A'
+			}
+		});
+
+		// Step 3: Add another key for phone-based login
+		await auth.createKey({
+		userId: luciaUser.userId, 
+		providerId: 'phone', 
+		providerUserId: 'N/A', 
+		password: 'Password123', // Use the same password or leave null for OTP-based login
+		});
+		console.log('Lucia user created:', luciaUser);
+
+		const newProfile = new Profile({
+			userId: luciaUser.userId,
+			firstName: userData.firstname,
+			lastName: userData.lastname,
+			email: userData.email,
+			isEmailVerified: userData.isEmailVerified,
+			country: 'N/A',
+			phone:'N/A'
+		});
+		console.log('New Profile:', newProfile);
+
+		const savedProfile = JSON.parse(JSON.stringify(await newProfile.save()));
+		console.log('Saved Profile:', savedProfile);
+
+		const session = await auth.createSession({
+			userId: luciaUser.userId,
+			attributes: {}
+		});
+
+		// Step 4: Create and set the session cookie
+		const sessionCookie = auth.createSessionCookie(session);
+		cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+
+		console.log('Signup successful');
+		// throw redirect(302, '/dashboard');
+	}
+};
+
+const sendVerificationEmailSignup = async (email, verificationUrl) => {
+	const transporter = nodemailer.createTransport({
+		service: 'partskeys',
+		host: MAIL_HOST,
+		port: 587,
+		secure: false,
+		auth: {
+			user: SENDER_EMAIL,
+			pass: SENDER_PASSWORD
+		}
+	});
+
+	const mailOptions = {
+		from: SENDER_EMAIL,
+		to: email,
+		subject: 'Email Verification for Your Account',
+		html: `
+		<html>
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+				<div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+					<h2 style="color: #333333; text-align: center; font-size: 24px;">Verify Your Email Address</h2>
+					<p style="font-size: 16px; color: #555555; line-height: 1.5; text-align: center;">
+						Hi there,<br/><br/>
+						Welcome to ${PUBLIC_WEBSITE_NAME}! Please verify your email address by using the OTP below.
+					</p>
+					<div style="text-align: center; margin: 20px 0;">
+						<span style="display: inline-block; font-size: 20px; font-weight: bold; color: #333333; padding: 10px 20px; background-color: #f0f0f0; border-radius: 4px;">
+							${verificationUrl}
+						</span>
+					</div>
+					<p style="font-size: 14px; color: #777777; text-align: center; margin-top: 30px;">
+						If you didn't sign up for this account, you can ignore this email.
+					</p>
+					<p style="font-size: 14px; color: #777777; text-align: center;">
+						Thanks,<br/>
+						The ${PUBLIC_WEBSITE_NAME} Team
+					</p>
+				</div>
+			</body>
+		</html>
+		`
 	};
 
 	try {
-		const findUser = await Register.findOne({
-			email: data.email,
-			password: data.password
-		});
-		if (findUser !== null) {
-			return { success: false, message: 'User already exist' };
-		}
-
-		const user = await Register.create(data);
-		const profile = await Profile.create({
-			userId: user._id,
-			email: user.email,
-			sitePreferences
-		});
-
-		user.chemiDashProfileId = profile._id;
-		await user.save();
-
-		cookies.set(
-			'token',
-			JSON.stringify({
-				email: user.email,
-				profileId: profile._id,
-				userId: user._id
-			}),
-			{
-				path: '/',
-				httpOnly: true,
-				sameSite: 'strict',
-				maxAge: 60 * 60 * 24 * 1000 // 1 day
-			}
-		);
-		isRedirect = true;
-
-		// if (verificationResult.success) {
-		//     return { success: true, message: "Check your email to verify your email address" };
-		// } else {
-		//     return { success: false, message: "Verification email was not sent" };
-		// }
+		const result = await transporter.sendMail(mailOptions);
+		console.log('Verification email sent: ', result);
+		return true;
 	} catch (error) {
-		console.log('Error during registration:', error);
-		return { success: false, message: 'An error occurred during registration' };
+		console.error('Error sending verification email:', error);
+		return false;
 	}
-	if (isRedirect) {
-		return redirect(302, '/profile');
+};
+
+export const sendemailOtp = async (email) => {
+	const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // const token = uuidv4();
+	const expiry = new Date(Date.now() + 5 * 60 * 1000);
+    const existingRecord = await TokenVerification.findOne({ email });
+
+    if (existingRecord) {
+        existingRecord.token = otp;
+        existingRecord.expiry = expiry;
+        await existingRecord.save(); 
+    } else {
+        await TokenVerification.create({
+            email,
+            token: otp,
+            verificationType: 'Non-Registered Users',
+            expiry
+        });
+    }
+
+    const verificationUrl = otp;
+    const emailSent = await sendVerificationEmailSignup(email, verificationUrl);
+    return emailSent ? verificationUrl : null;
+};
+
+export async function verifyemailOtp(email, enteredOtp) {
+	try {
+	  const tokenVerificationRecord = await TokenVerification.findOne({ email, token: enteredOtp });
+	  console.log(tokenVerificationRecord, "tokenVerificationRecord");
+  
+	  if (!tokenVerificationRecord) {
+		console.log("Invalid OTP or email.");
+		return { success: false, message: "The OTP entered is incorrect or has expired. Please try again." };
+	  }
+  
+	  if (Date.now() >= tokenVerificationRecord.expiry.getTime()) {
+		console.log("Token has expired.");
+		return { success: false, message: "Token has expired. Please verify your email again." };
+	  }
+  
+	  const profileRecord = await Profile.findOne({ email });
+  
+	  if (profileRecord) {
+		if (!profileRecord.isEmailVerified) {
+		  const profileUpdate = await Profile.updateOne(
+			{ email },
+			{ $set: { isEmailVerified: true } }
+		  );
+		  console.log(profileUpdate, "profileUpdate");
+  
+		  if (profileUpdate.matchedCount === 0) {
+			console.log("Failed to update the Profile record.");
+			return { success: false, message: "Failed to update the Profile record." };
+		  }
+  
+		  return { success: true, message: "Email verified successfully in Profile." };
+		} else {
+		  return { success: true, message: "Email is already verified in Profile." };
+		}
+	  } else {
+		const tokenUpdate = await TokenVerification.updateOne(
+		  { email, token: enteredOtp },
+		  { $set: { isEmailVerified: true } }
+		);
+		console.log(tokenUpdate, "tokenUpdate");
+  
+		if (tokenUpdate.matchedCount === 0) {
+		  console.log("Failed to update the TokenVerification record.");
+		  return { success: false, message: "Failed to update the TokenVerification record." };
+		}
+  
+		return { success: true, message: "Email verified successfully" };
+	  }
+	} catch (error) {
+	  console.error("Error verifying OTP:", error);
+	  return { success: false, message: "An unexpected error occurred while verifying the OTP." };
 	}
-}
+};
 
 // profile action functions
 export async function editProfileContact(body) {
@@ -1365,3 +1682,283 @@ export const CreateProductQuote = async (formattedData) => {
 	await newQuote.save();
 	return { status: 200 };
 };
+
+export const addToCart = async(item,userId,userEmail)=>{
+    const search = await Cart.findOne({userId,userEmail,isActiveCart:true}).lean()
+    // const id = await Stock.findOne({productid:item.productId,manufacturer:item.manufacturerId},{distributor:1})
+    // item.distributorId = id.distributor
+    let cart
+    if(search === null){
+        cart = await Cart.create({cartId:nanoid(8),cartName:"mycart",cartItems:item,userId,userEmail,isActiveCart:true})
+        return {success:true,message:"Product is added to cart"}
+    }else{
+        const findItem = search.cartItems.find(x=>x.productId.toString() === item.productId)
+        //console.log(searchsssss,"sdffffffffff");
+        if(findItem === undefined){
+        cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$push:{cartItems:item}},{new:true})
+        return {success:true,message:"Product is added to cart"}
+        }else{
+        cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$set:{cartItems:item}},{new:true})
+        return {success:true,message:"Product quantity is updated in cart"}
+        }
+    }
+}
+
+ 
+
+export const updateItemQty = async(body,userId)=>{
+    const {quantity,_id,cartId,stock} = body
+    const backOrder = quantity > stock ? quantity - stock : 0;
+    const cart = await Cart.findOneAndUpdate(
+        {userId,cartId,isActiveCart:true,'cartItems._id': _id},
+        { $set: { 'cartItems.$.quantity': quantity, 'cartItems.$.backOrder': backOrder }},
+        {new:true}
+    )
+    return {success:true}
+}
+
+ 
+
+export const deleteAllFromCart = async (body, userId) => {
+    const { cartId } = body;
+    const result = await Cart.findOneAndUpdate(
+        { userId, cartId,isActiveCart:true },
+        { $set: { cartItems: [] } },
+        { new: true }
+    );
+    console.log(result);
+    return { success:true, message: `All components are deleted` };
+};
+
+ 
+
+export const deleteOneFromCart = async (body, userId) => {
+    const {productNumber,_id,cartId} = body;
+    const result = await Cart.findOneAndUpdate(
+        { userId, cartId },
+        { $pull: { cartItems: { _id }}},
+        { new: true }
+    );
+    console.log(result);
+    return {success:true, message: `${productNumber} is removed from Cart` };
+};
+
+ 
+
+export const getGuestCart = async(body)=>{
+    const arr = []
+    for(let {productId,manufacturerId,distributorId,quantity} of body){
+    const productDetails = await Product.findOne({_id:productId},{imageSrc:1,productName:1,productNumber:1,_id:0})
+    const stockDetails = await Stock.findOne({productid:productId,distributor:distributorId},{_id:0,stock:1,orderMultiple:1,pricing:1})
+    const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+    let pricing = stockDetails.pricing
+    if(pricing.INR !== undefined && pricing.INR !== null){
+        pricing.USD = pricing.INR/currency.rate
+      }else{
+       pricing.INR = pricing.USD * currency.rate;
+      }
+
+ 
+
+     let totalINR = pricing.INR * quantity;
+     let totalUSD = pricing.USD * quantity;
+
+ 
+
+      let result ={
+        productDetails,
+        stockDetails,
+        manufacturerId,
+        quantity,
+        pricing,
+        itemTotalPrice:{totalINR,totalUSD}
+      }
+      arr.push(result)
+    }
+    console.log(arr);
+    return {cart:JSON.parse(JSON.stringify(arr))}
+}
+
+ 
+
+export const addItemsToExistingCart = async(body,cartId)=>{
+    const updatedCart = await Cart.findOneAndUpdate(
+        { cartId:cartId },  // Find the cart by its ID
+        {
+          $addToSet: {
+            cartItems: { $each: body }  // Add multiple items only if they don't already exist in the array
+          }
+        },
+        { new: true }  // Return the updated document
+    )
+    console.log(updatedCart);
+    return { success:true}
+}
+
+ 
+
+export const addItemsToNewCart = async(body,userId,userEmail)=>{
+        const cartId = nanoid(8)
+        const cartName = ""
+        await Cart.updateMany(
+            { userId: userId },    
+            { $set: { isActiveCart: false } }
+        );
+        const newCart = await Cart.create({
+            userId,
+            userEmail,
+            cartId,
+            cartName,
+            isActiveCart:true,
+            cartItems:body
+        })
+    return { success:true}
+}
+
+ 
+
+export const updateShippingAddress = async (body) => {
+    const { userId, addAlternate, ...shippingDetails } = body;
+    shippingDetails.isDefault = shippingDetails.isDefault === 'true';
+    const addAlternateBoolean = addAlternate === 'true';
+    console.log(shippingDetails,"details");
+    try {
+        const userProfile = await Profile.findById(userId).select('shippingAddress');
+        if (!userProfile) {
+            return { field: 'shipping', success: false, message: 'User not found' };
+        }
+        let shippingAddressArray;
+        if (addAlternateBoolean) {
+            if (!userProfile.shippingAddress || userProfile.shippingAddress.length === 0) {
+                const newAddress = {
+                    ...shippingDetails,
+                    addressId: nanoid(8),
+                    isDefault: true
+                };
+                shippingAddressArray = [newAddress];
+            } else {
+                shippingAddressArray = [...userProfile.shippingAddress];
+                const newAddress = {
+                    ...shippingDetails,
+                    addressId: nanoid(8),
+                    isDefault: shippingDetails.isDefault
+                };
+                if (newAddress.isDefault) {
+                    shippingAddressArray = shippingAddressArray.map((addr) => ({
+                        ...addr,
+                        isDefault: false
+                    }));
+                }
+                shippingAddressArray.push(newAddress);
+            }
+        } else {
+            shippingAddressArray = userProfile.shippingAddress.map((adr) => {
+                if (adr.addressId === shippingDetails.addressId) {
+                    return { ...shippingDetails, isDefault: shippingDetails.isDefault };
+                } else if (shippingDetails.isDefault) {
+                    return { ...adr, isDefault: false };
+                }
+                return adr;
+            });
+        }
+        userProfile.shippingAddress = shippingAddressArray;
+        await userProfile.save();
+        return {
+            field: 'shipping',
+            success: true,
+            message: addAlternateBoolean ? 'Added address successfully' : 'Updated successfully'
+        };
+    } catch (error) {
+        console.error('Error updating shipping address:', error);
+        return { field: 'shipping', success: false, message: 'Something went wrong' };
+    }
+};
+
+ 
+
+export const updateBillingAddress = async (body) => {
+    const { userId, addAlternate, ...billingDetails } = body;
+    billingDetails.isDefault = billingDetails.isDefault === 'true';
+    const addAlternateBoolean = addAlternate === 'true';
+    try {
+        const userProfile = await Profile.findById(userId).select('billingAddress');
+        if (!userProfile) {
+            return { field: 'billing', success: false, message: 'User not found' };
+        }
+        let billingAddressArray;
+        if (addAlternateBoolean) {
+            if (!userProfile.billingAddress || userProfile.billingAddress.length === 0) {
+                const newAddress = { ...billingDetails, addressId: nanoid(8),isDefault:true};
+                billingAddressArray = [newAddress];
+            } else {
+                billingAddressArray = [...userProfile.billingAddress];
+                const newAddress = { ...billingDetails, addressId: nanoid(8),isDefault:billingDetails.isDefault };
+                if (newAddress.isDefault) {
+                    billingAddressArray = billingAddressArray.map((addr) => ({
+                        ...addr,
+                        isDefault: false
+                    }));
+                }
+                billingAddressArray.push(newAddress);
+            }
+        } else {
+            billingAddressArray = userProfile.billingAddress.map((adr) => {
+                if (adr.addressId === billingDetails.addressId) {
+                    return { ...billingDetails, isDefault: billingDetails.isDefault };
+                } else if (billingDetails.isDefault) {
+                    return { ...adr, isDefault: false };
+                }
+                return adr;
+            });
+        }
+        console.log('object',billingAddressArray);
+        userProfile.billingAddress = billingAddressArray;
+        await userProfile.save();
+        return {
+            field: 'billing',
+            success: true,
+            message: addAlternateBoolean ? 'Added address successfully' : 'Updated successfully'
+        };
+    } catch (error) {
+        console.error('Error updating billing address:', error);
+        return { field: 'billing', success: false, message: 'Something went wrong' };
+    }
+};
+
+ 
+
+export const addRecurrence = async (body, userId) => {
+    const { cartId,recurring, startingDate,recurringDate } = body;
+    let recurrence = {}
+    const search = await Cart.findOne({userId,cartId,recurrence:{$exists:true}})
+    const tog = search?.recurrence ? 'updated' : 'added';
+    if(search === null){
+        recurrence = {
+            recurring,
+            recurringDate,
+            previousRecurringDate:startingDate,
+            addedDate: startingDate
+        }
+    }else{
+        recurrence = {
+            recurring,
+            recurringDate,
+            previousRecurringDate:startingDate,
+            addedDate: search.recurrence.addedDate
+        }
+    }
+    const recure = await Cart.findOneAndUpdate({ userId, cartId },{ $set: { recurrence }});
+   
+    if (recure) {
+        return { success: true, msg: `Recurrence is ${tog} successfully` };
+    }
+};
+
+ 
+
+export const deleteRecurrence = async(body)=>{
+    const {cartId} = body
+    const deleteRecurrence =  await Cart.updateOne({ cartId },{ $unset: { recurrence: 1 } });
+    console.log(deleteRecurrence,"fff");  
+    return { success: true, msg: `Recurrence deleted successfully` };
+}

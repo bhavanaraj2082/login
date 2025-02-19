@@ -13,6 +13,10 @@ import TokenVerification from "$lib/server/models/TokenVerification.js";
 import Return from "$lib/server/models/Return.js";
 import MyFavourite from "$lib/server/models/MyFavourite.js";
 import Curconversion from "$lib/server/models/Curconversion.js";
+import User from "$lib/server/models/User.js";
+import Quotes from "$lib/server/models/Quotes.js";
+import Cart from "$lib/server/models/Cart.js";
+
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -124,7 +128,7 @@ export const isProductFavorite = async (productNumber, cookies) => {
   }
   const parsedCookie = JSON.parse(cookieValue);
   const userProfileId = parsedCookie.profileId;
-  const existingRecord = await MyFavourites.findOne({
+  const existingRecord = await MyFavourite.findOne({
     userProfileId: userProfileId,
   });
   if (existingRecord && Array.isArray(existingRecord.favorite)) {
@@ -134,23 +138,6 @@ export const isProductFavorite = async (productNumber, cookies) => {
   }
   return isFavorite;
 };
-
-export async function getProfileDetails(userId) {
-  try {
-    const record = await Profile.findOne({ userId });
-    if (record) {
-      return { profileData: JSON.parse(JSON.stringify(record)) };
-    } else {
-      return { success: false, message: "Profile not found" };
-    }
-  } catch (error) {
-    return {
-      success: false,
-      message: "Something went wrong",
-      error: error.message,
-    };
-  }
-}
 
 export async function popularProducts() {
   const records = await PopularProduct.find({}, { _id: 0 })
@@ -241,6 +228,156 @@ async function getMatchedSubCategories(search) {
   }
 }
 
+// export const loadProductsubcategory = async (
+//   suburl,
+//   pageNum,
+//   manufacturer,
+//   search
+// ) => {
+//   const page = pageNum || 1;
+//   const pageSize = 10;
+//   try {
+//     let be = Date.now();
+//     const subcategory = await SubCategory.findOne({ urlName: suburl })
+//       .populate({ path: "manufacturerIds", select: "-_id name" })
+//       .populate({ path: "subSubCategoryIds", select: "-_id name urlName" });
+//     let af = Date.now();
+//     //console.log(af - be, "milliseconds");
+//     const subCategoryDetails = {
+//       name: subcategory.name,
+//       urlName: subcategory.urlName,
+//     };
+//     if (!subcategory) {
+//       return {
+//         type: "error",
+//         message: `Subcategory not found for URL: ${suburl}`,
+//       };
+//     }
+
+//     const matchCondition = {
+//       "subCategoryDetails.urlName": subcategory.urlName,
+//       inStock: { $exists: true, $gt: 0 },
+//     };
+
+//     if (manufacturer) {
+//       matchCondition["manufacturerDetails.name"] = manufacturer;
+//     }
+//     if (search) {
+//       matchCondition.$or = [
+//         { CAS: { $regex: search, $options: "i" } },
+//         { productNumber: { $regex: search, $options: "i" } },
+//         { productName: { $regex: search, $options: "i" } },
+//       ];
+//     }
+
+//     const before = Date.now();
+//     const products = await Product.aggregate([
+//       {
+//         $lookup: {
+//           from: "subcategories",
+//           localField: "subCategory",
+//           foreignField: "_id",
+//           as: "subCategoryDetails",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "manufacturers",
+//           localField: "manufacturer",
+//           foreignField: "_id",
+//           as: "manufacturerDetails",
+//         },
+//       },
+//       { $match: matchCondition },
+//       {
+//         $lookup: {
+//           from: "categories",
+//           localField: "category",
+//           foreignField: "_id",
+//           as: "categoryDetails",
+//         },
+//       },
+
+//       {
+//         $lookup: {
+//           from: "stocks",
+//           localField: "_id",
+//           foreignField: "productid",
+//           as: "stockDetails",
+//         },
+//       },
+
+//       { $unwind: "$stockDetails" },
+//       { $unwind: "$manufacturerDetails" },
+//       { $unwind: "$categoryDetails" },
+//       { $unwind: "$subCategoryDetails" },
+//       {
+//         $project: {
+//           productNumber: 1,
+//           productName: 1,
+//           prodDesc: 1,
+//           imageSrc: 1,
+//           "categoryDetails.name": 1,
+//           "categoryDetails.urlName": 1,
+//           "manufacturerDetails.name": 1,
+//           "stockDetails.pricing": 1,
+//           "stockDetails.stock": 1,
+//           "stockDetails.orderMultiple": 1,
+//         },
+//       },
+//       {
+//         $skip: (Number(page) - 1) * Number(pageSize),
+//       },
+//       {
+//         $limit: Number(pageSize),
+//       },
+//     ]);
+//     const after = Date.now();
+
+
+//     const filtered = await Promise.all( products.map(async(product) => {
+//       const {
+//         _id,
+//         productName,
+//         productNumber,
+//         prodDesc,
+//         imageSrc,
+//         stockDetails,
+//         manufacturerDetails,
+//         categoryDetails,
+//       } = product;
+//       const priceConversion = await convertToINR(stockDetails.pricing) 
+//       return {
+//         _id,
+//         productName,
+//         productNumber,
+//         prodDesc,
+//         imageSrc,
+//         pricing: priceConversion[0],
+//         totalPrice: priceConversion[0].INR*stockDetails.orderMultiple,
+//         quantity: stockDetails.orderMultiple,
+//         orderMultiple: stockDetails.orderMultiple,
+//         categoryDetails,
+//         subCategoryDetails,
+//         manufacturerDetails,
+//       };
+//     })
+//   )
+//     return {
+//       products: JSON.parse(JSON.stringify(filtered)),
+//       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
+//       productCount: subcategory.productCount,
+//       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
+//     };
+//   } catch (error) {
+//     console.error("Error loading product subcategory:", error);
+//     return {
+//       type: "error",
+//       message: "An error occurred while loading product data.",
+//     };
+//   }
+// };
+
 export const loadProductsubcategory = async (
   suburl,
   pageNum,
@@ -267,10 +404,14 @@ export const loadProductsubcategory = async (
       };
     }
 
+ 
+
     const matchCondition = {
       "subCategoryDetails.urlName": subcategory.urlName,
       inStock: { $exists: true, $gt: 0 },
     };
+
+ 
 
     if (manufacturer) {
       matchCondition["manufacturerDetails.name"] = manufacturer;
@@ -283,7 +424,78 @@ export const loadProductsubcategory = async (
       ];
     }
 
+ 
+
     const before = Date.now();
+    // const products = await Product.aggregate([
+    //   {
+    //     $lookup: {
+    //       from: "subcategories",
+    //       localField: "subCategory",
+    //       foreignField: "_id",
+    //       as: "subCategoryDetails",
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "manufacturers",
+    //       localField: "manufacturer",
+    //       foreignField: "_id",
+    //       as: "manufacturerDetails",
+    //     },
+    //   },
+    //   { $match: matchCondition },
+    //   {
+    //     $lookup: {
+    //       from: "categories",
+    //       localField: "category",
+    //       foreignField: "_id",
+    //       as: "categoryDetails",
+    //     },
+    //   },
+
+ 
+
+    //   {
+    //     $lookup: {
+    //       from: "stocks",
+    //       localField: "_id",
+    //       foreignField: "productid",
+    //       as: "stockDetails",
+    //     },
+    //   },
+
+ 
+
+    //   { $unwind: "$stockDetails" },
+    //   { $unwind: "$manufacturerDetails" },
+    //   { $unwind: "$categoryDetails" },
+    //   { $unwind: "$subCategoryDetails" },
+    //   {
+    //     $project: {
+    //       productNumber: 1,
+    //       productName: 1,
+    //       prodDesc: 1,
+    //       imageSrc: 1,
+    //       "categoryDetails.name": 1,
+    //       "categoryDetails.urlName": 1,
+    //       "manufacturerDetails.name": 1,
+    //       "manufacturerDetails._id": 1,
+    //       "stockDetails._id": 1,
+    //       "stockDetails.pricing": 1,
+    //       "stockDetails.stock": 1,
+    //       "stockDetails.orderMultiple": 1,
+    //       "stockDetails.distributor": 1,
+    //     },
+    //   },
+    //   {
+    //     $skip: (Number(page) - 1) * Number(pageSize),
+    //   },
+    //   {
+    //     $limit: Number(pageSize),
+    //   },
+    // ]);
+   
     const products = await Product.aggregate([
       {
         $lookup: {
@@ -310,7 +522,6 @@ export const loadProductsubcategory = async (
           as: "categoryDetails",
         },
       },
-
       {
         $lookup: {
           from: "stocks",
@@ -319,36 +530,56 @@ export const loadProductsubcategory = async (
           as: "stockDetails",
         },
       },
-
       { $unwind: "$stockDetails" },
       { $unwind: "$manufacturerDetails" },
       { $unwind: "$categoryDetails" },
       { $unwind: "$subCategoryDetails" },
       {
-        $project: {
-          productNumber: 1,
-          productName: 1,
-          prodDesc: 1,
-          imageSrc: 1,
-          "categoryDetails.name": 1,
-          "categoryDetails.urlName": 1,
-          "manufacturerDetails.name": 1,
-          "stockDetails.pricing": 1,
-          "stockDetails.stock": 1,
-          "stockDetails.orderMultiple": 1,
+        $facet: {
+          data: [
+            {
+              $project: {
+                productNumber: 1,
+                productName: 1,
+                prodDesc: 1,
+                imageSrc: 1,
+                "categoryDetails.name": 1,
+                "categoryDetails.urlName": 1,
+                "manufacturerDetails.name": 1,
+                "manufacturerDetails._id": 1,
+                "stockDetails._id": 1,
+                "stockDetails.pricing": 1,
+                "stockDetails.stock": 1,
+                "stockDetails.orderMultiple": 1,
+                "stockDetails.distributor": 1,
+              },
+            },
+            {
+              $skip: (Number(page) - 1) * Number(pageSize),
+            },
+            {
+              $limit: Number(pageSize),
+            },
+          ],
+          totalCount: [
+            {
+              $count: "total",
+            },
+          ],
         },
       },
-      {
-        $skip: (Number(page) - 1) * Number(pageSize),
-      },
-      {
-        $limit: Number(pageSize),
-      },
     ]);
+   
     const after = Date.now();
 
+ 
 
-    const filtered = await Promise.all( products.map(async(product) => {
+   // console.log(JSON.stringify(products[0].total,null,2));
+
+
+ 
+
+    const filtered = await Promise.all(products[0].data.map(async(product) => {
       const {
         _id,
         productName,
@@ -359,17 +590,20 @@ export const loadProductsubcategory = async (
         manufacturerDetails,
         categoryDetails,
       } = product;
-      const priceConversion = await convertToINR(stockDetails.pricing) 
+      const priceConversion = await convertToINR(stockDetails.pricing)
       return {
         _id,
         productName,
         productNumber,
         prodDesc,
         imageSrc,
-        pricing: priceConversion[0],
-        totalPrice: priceConversion[0].INR*stockDetails.orderMultiple,
+        pricing: priceConversion,
+        totalPrice: priceConversion.INR*stockDetails.orderMultiple,
         quantity: stockDetails.orderMultiple,
         orderMultiple: stockDetails.orderMultiple,
+        distributorId: stockDetails.distributor,
+        stock: stockDetails.stock,
+        stockId: stockDetails._id,
         categoryDetails,
         subCategoryDetails,
         manufacturerDetails,
@@ -379,7 +613,7 @@ export const loadProductsubcategory = async (
     return {
       products: JSON.parse(JSON.stringify(filtered)),
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
-      productCount: subcategory.productCount,
+      productCount: products[0].totalCount[0].total,
       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
     };
   } catch (error) {
@@ -883,4 +1117,347 @@ export async function CompareSimilarityData(productId) {
   else{
     return []
   }
+}
+
+// export async function getProfileDetails(userId) {
+//   try {
+//     if (!userId || typeof userId !== 'string') {
+//       throw new Error('Invalid userId provided');
+//     }
+
+//     const record = await Profile.findOne({ userId }).lean();
+    
+//     if (record) {
+//       return { 
+//         success: true,
+//         profileData: record 
+//       };
+//     }
+    
+//     return { 
+//       success: false, 
+//       message: "Profile not found" 
+//     };
+//   } catch (error) {
+//     console.error('getProfileDetails error:', error);
+//     return {
+//       success: false,
+//       message: "Something went wrong",
+//       error: error.message,
+//     };
+//   }
+// }
+
+// export async function getUserProfileData(userId) {
+//   try {
+//     const profile = await Profile.findOne({ userId }).lean();
+    
+//     if (!profile) {
+//       return { success: false, message: "Profile not found" };
+//     }
+
+//     const orders = await Order.find({ userId: profile.userId })
+//       .sort({ createdAt: -1 })
+//       .limit(10)
+//       .populate({
+//         path: 'products',
+//         select: 'productName manufacturerName partNumber description specifications price'
+//       })
+//       .lean();
+
+//     const quotes = await Quotes.find({ userId: profile.userId })
+//       .sort({ createdAt: -1 })
+//       .lean();
+
+//     const cart = await Cart.findOne({ userId: profile.userId, isActiveCart: true })
+//       .populate('cartItems.productId', 'productName manufacturerName price')
+//       .lean();
+
+//     const data = {
+//       profile,
+//       orders,
+//       quotes,
+//       cart
+//     };
+
+//     return JSON.parse(JSON.stringify(data));
+
+//   } catch (error) {
+//     return {
+//       success: false,
+//       message: "Something went wrong",
+//       error: error.message,
+//     };
+//   }
+// }
+
+export async function getProfileDetails(userId) {
+  try {
+    const record = await Profile.findOne({ userId });
+    if (record) {
+      return { profileData: JSON.parse(JSON.stringify(record)) };
+    } else {
+      return { success: false, message: "Profile not found" };
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: "Something went wrong",
+      error: error.message,
+    };
+  }
+}
+
+
+export async function getUserProfileData(userId) {
+  try {
+    if (!userId || typeof userId !== 'string') {
+      throw new Error('Invalid userId provided');
+    }
+
+    const profile = await Profile.findOne({ userId }).lean();
+    
+    if (!profile) {
+      return { 
+        success: false, 
+        message: "Profile not found" 
+      };
+    }
+    const orders = await Order.find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .populate({
+        path: 'products',
+        select: 'productName manufacturerName partNumber description specifications price'
+      })
+      .lean();
+    const quotes = await Quotes.find({ userId })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const cart = await Cart.find({ 
+      userId, 
+      isActiveCart: true 
+    })
+    .populate('cartItems.productId', 'productName manufacturerName price')
+    .lean();
+    return {
+      success: true,
+      profile,
+      orders,
+      quotes,
+      cart
+    };
+  } catch (error) {
+    console.error('getUserProfileData error:', error);
+    return {
+      success: false,
+      message: "Something went wrong",
+      error: error.message,
+    };
+  }
+}
+
+export const getSingleCartDetails = async (userId) => {
+	try {
+	  const carts = await Cart.find({ userId })
+		.sort({ createdAt: -1 }) // Sort by createdAt in descending order
+		.exec();
+	  return carts;
+	} catch (error) {
+	  console.error('Error fetching cart details:', error);
+	  throw error;
+	}
+};
+
+
+export const getCart = async(userId)=>{
+    if(!userId) return { cart:[]}
+   const cart = await Cart.aggregate([
+     // Match the specific cart by cartId
+     { $match: { userId,isActiveCart:true } },
+     { $unwind: '$cartItems' },
+ 
+  
+ 
+     // Lookup components with only required fields
+     {
+       $lookup: {
+         from: 'products',
+         localField: 'cartItems.productId',
+         foreignField: '_id',
+         as: 'productDetails',
+         pipeline: [
+           {
+             $project: {
+               _id: 0,
+               productName: 1,
+               productNumber: 1,
+               imageSrc: 1,
+             }
+           }
+         ]
+       }
+     },
+     {
+       $lookup: {
+         from: 'manufacturers',
+         localField: 'cartItems.manufacturerId',
+         foreignField: '_id',
+         as: 'mfrDetails',
+         pipeline: [
+           {
+             $project: {
+               _id: 0,
+               name:1
+             }
+           }
+         ]
+       }
+     },
+ 
+ 
+  
+ 
+     // Lookup stocks with productName and distributorId conditions
+     {
+       $lookup: {
+         from: 'stocks',
+         localField:"cartItems.stockId",
+         foreignField:"_id",
+         pipeline:[
+           {
+             $project: {
+               _id: 0,
+               stock: 1,
+               orderedQty:1,
+               pricing: 1,
+               ordermultiple: 1,
+             }
+           }
+         ],
+         as: 'stockDetails'
+       }
+     },
+ 
+  
+ 
+     // Lookup distributors with only required fields
+     // {
+     //   $lookup: {
+     //     from: 'distributors',
+     //     localField: 'cartItems.distributorId',
+     //     foreignField: '_id',
+     //     as: 'distributorDetails',
+     //     pipeline: [
+     //       {
+     //         $project: {
+     //           _id: 0,
+     //           distributorname: 1,
+     //           aliasname: 1,
+     //           distributoremail: 1
+     //         }
+     //       }
+     //     ]
+     //   }
+     // },
+     // Project the required fields
+     {
+       $project: {
+         _id: 1,
+         cartId:1,
+         cartName: 1,
+         userId:1,
+         userEmail:1,
+         recurrence:1,
+         isActiveCart: 1,
+         cartItems: {
+           _id:"$cartItems._id",
+           quantity: '$cartItems.quantity',
+           backOrder: '$cartItems.backOrder',
+           cartOfferPrice: '$cartItems.cartOfferPrice',
+           quoteOfferPrice: '$cartItems.quoteOfferPrice',
+           isQuote: '$cartItems.isQuote',
+           isCart: '$cartItems.isCart',
+           cartExpiryTime: '$cartItems.cartExpiryTime',
+           quoteExpiryTime: '$cartItems.quoteExpiryTime',
+           distributorId: '$cartItems.distributorId',
+           productId: '$cartItems.productId',
+           manufacturerId: '$cartItems.manufacturerId',
+           productDetails: { $arrayElemAt: ['$productDetails', 0] },
+           stockDetails: { $arrayElemAt: ['$stockDetails', 0] },
+           mfrDetails: { $arrayElemAt: ['$mfrDetails', 0] },
+         }
+       }
+     },
+ 
+     // Group by cartId and rebuild the cartItems array
+     {
+       $group: {
+         _id: '$_id',
+         cartName: { $first: '$cartName' },
+         cartId: { $first: '$cartId' },
+         isActiveCart: { $first: '$isActiveCart' },
+         cartItems: { $push: '$cartItems' },
+         userId: { $first: '$userId' },
+         userEmail: { $first: '$userEmail' },
+         recurrence: { $first: '$recurrence' }
+       }
+     }
+   ]);
+ 
+   if(cart.length === 0){
+     //const cartData = await Cart.findOne({ userId: userId, isActiveCart: true })
+    //return {cart:JSON.parse(JSON.stringify([cartData]))};
+    return {cart:[]};
+   }
+   const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+  // console.log(JSON.stringify(cartData,null,2));
+   const updatedcart = cart[0]?.cartItems?.map((crt) => {
+
+     let { ...cartItemsData } = crt;
+     let pricing = crt.stockDetails.pricing;
+    
+   //  if(crt.stockDetails.orderedQty !== undefined){
+   //  crt.stockDetails.stock = crt.stockDetails.orderedQty > crt.stockDetails.stock ? 0 : crt.stockDetails.stock - crt.stockDetails.orderedQty
+   //  }
+   console.log('before',pricing);
+    if(pricing.INR !== undefined && pricing.INR !== null){
+      pricing.USD = pricing.INR/currency.rate
+    }else{
+     pricing.INR = pricing.USD * currency.rate;
+    }
+
+     let totalINR,totalUSD
+     const {INR,USD} = pricing
+
+     if(cartItemsData.isQuote){
+        totalINR = cartItemsData.quoteOfferPrice.INR * cartItemsData.quantity;
+        totalUSD = cartItemsData.quoteOfferPrice.USD * cartItemsData.quantity;
+     }else if(cartItemsData.isCart){
+        totalINR = cartItemsData.cartOfferPrice.INR * cartItemsData.quantity;
+        totalUSD = cartItemsData.cartOfferPrice.USD * cartItemsData.quantity;
+     }else{
+        totalINR = INR * cartItemsData.quantity;
+        totalUSD = USD * cartItemsData.quantity;
+     }
+
+     let itemTotalPrice = {totalINR,totalUSD}
+      
+     const quoteExpiryDate = cartItemsData?.quoteExpiryTime ? cartItemsData?.quoteExpiryTime.getTime() : Date.now()+1000
+     const cartExpiryDate = cartItemsData?.cartExpiryTime ? cartItemsData?.cartExpiryTime.getTime() : Date.now()+1000
+     if(cartItemsData.isQuote && Date.now() > quoteExpiryDate){
+      cartItemsData.isQuote = false
+      //updateIsQuote(cartId,cartItemsData.componentId,"quote")
+     }
+     if(cartItemsData.isCart && Date.now() > cartExpiryDate){
+    cartItemsData.isCart = false
+    //updateIsQuote(cartId,cartItemsData.componentId,"cart")
+    }
+  
+     return { ...cartItemsData, pricing, currentPrice:{INR,USD}, itemTotalPrice };
+   });
+   cart[0].cartItems = updatedcart
+  // console.log(updatedcart,"result");
+   return {cart:JSON.parse(JSON.stringify(cart))}
 }
