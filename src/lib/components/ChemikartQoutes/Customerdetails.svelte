@@ -1,10 +1,13 @@
 <script>
 	import { Cusdetails } from '$lib/stores/solution_stores.js';
+	import Icon from '@iconify/svelte';
 	export let tog;
 	export let tog1;
 	export let tog2;
 	export let tog3;
 	export let tog4;
+	let errors={};
+	let country;
 	let errorMessage = '';
 	$: isFormData =
 		$Cusdetails.FirstName &&
@@ -469,6 +472,7 @@ function validatePhNo(country, number) {
 }
 
 
+
 const validateAll = (country, number) => {
 if (!isFormData) {
     errorMessage = 'Please fill all the required fields'; 
@@ -482,7 +486,7 @@ if (!isFormData) {
 validateFirstName({ target: { value: $Cusdetails.FirstName } });
 validateLastName({ target: { value: $Cusdetails.LastName } });
 validateEmail({ target: { value: $Cusdetails.Email } });
-validatePhNo(country, number);
+// validatePhNo(country, number);
 return !errorMessage1 && !errorMessage2 && !errorMessage3 && !errorMessage4;
 };
 const cust = () => {
@@ -491,55 +495,112 @@ if (!validateAll($Cusdetails.Country, $Cusdetails.Number)) {
 }
 tog4();
 };
+
+
+
+
+
+
+let searchTerm = "";
+    let showDropdown = false;
+    let filteredCountries = countries;
+
+	function filterCountries() {
+		filteredCountries = countries.filter(
+			(country) =>
+				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				country.code
+					.replace("+", "")
+					.includes(searchTerm.replace("+", "").toLowerCase()),
+		);
+		if (
+			filteredCountries.length === 1 &&
+			(filteredCountries[0].name.toLowerCase() ===
+				searchTerm.toLowerCase() ||
+				filteredCountries[0].code.replace("+", "").toLowerCase() ===
+					searchTerm.replace("+", "").toLowerCase())
+		) {
+			selectCountry(filteredCountries[0]);
+		} else {
+			showDropdown = filteredCountries.length > 0; 
+		}
+	}
+	function selectCountry(selectedCountry) {
+		$Cusdetails.Country = selectedCountry.name;
+		searchTerm = `${selectedCountry.name} `;
+		showDropdown = false;
+		// validatePhoneNumber(country, phone);
+		validatePhNo($Cusdetails.Country, number);
+		delete errors.$Cusdetails.Country;
+	}
+
+	function handleInputChange(event) {
+    searchTerm = event.target.value;
+    filterCountries();
+}
+
+
+    function toggleDropdown() {
+        showDropdown = !showDropdown;
+    }
+
+	// function validatePhoneNumber(country, phone) {
+	// const pattern = phoneNumberPatterns[country];
+	// if (!pattern) {
+	// throw new Error(`No validation pattern found for country: ${country}`);
+	// }
+	// return pattern.test(phone);
+	// }
 </script>
 
 <div class="py-10 bg-white  flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 1: Select custom solution type</h1>
-	<button type="button" class="font-semibold text-primary-500" on:click={tog()}>Edit</button>
+	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 1: Select custom solution type</h1>
+	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog()}>Edit</button>
 </div>
 <hr />
 <div class="py-10 bg-white  flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 2: Select custom format</h1>
-	<button type="button" class="font-semibold text-primary-500" on:click={tog1()}>Edit</button>
+	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 2: Select custom format</h1>
+	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog1()}>Edit</button>
 </div>
-<hr />
+<hr /><hr />
 <div class="py-10 bg-white  flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 3: Configure custom solution</h1>
-	<button type="button" class="font-semibold text-primary-500" on:click={tog2()}>Edit</button>
+	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 3: Configure custom solution</h1>
+	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog2()}>Edit</button>
 </div>
-<hr />
+<hr /><hr />
 <div class="py-10 bg-white  flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 4: Additional notes</h1>
-	<button type="button" class="font-semibold text-primary-500" on:click={tog3()}>Edit</button>
+	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 4: Additional notes</h1>
+	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog3()}>Edit</button>
 </div>
-<hr />
+<hr /><hr />
 <div class="bg-white ">
-	<h1 class="font-bold text-2xl py-10">Step 5: Customer details</h1>
-	<hr />
-	<h1 class="font-semibold py-5 text-primary-500 ">Log in to auto fill</h1>
+	<h1 class="font-bold sm:text-2xl text-sm pt-10">Step 5: Customer details</h1>
+	<div class="sm:ml-10 ml-0">
+	<h1 class="font-semibold py-5 text-primary-500 sm:text-md text-sm ">Please fill the details</h1>
 	<div class="grid grid-cols-1 gap-x-6 gap-y-1 md:w-3/4 lg:w-1/2 sm:grid-cols-6">
 		<div class="sm:col-span-2  sm:col-start-1">
-			<label for="title" class="text-sm">Title</label>
-		  <div class="mt-2">
+				<label for="title" class="sm:text-sm text-xs">Title</label>
+		  <div class="">
 			<select
 				id="title"
 				name="title"
-				class="block w-full rounded-md py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
+				placeholder="title"
+				class="block w-full sm:text-sm text-xs rounded py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1  focus:border-primary-500 bg-white"
 				bind:value={$Cusdetails.Title}
 			>
 				<option value="" disabled selected>Title</option>
 				{#each titles as title}
-					<option value={title}>{title}</option>
+					<option value={title} class="sm:text-sm text-xs">{title}</option>
 				{/each}
 			</select>
 		  </div>
 		</div>
 		<div class="sm:col-span-2">
-			<label for="" class="text-sm">First name <span class="text-primary-500"> *</span></label>
-			<div class="mt-2">
+			<label for="" class="sm:text-sm text-xs">First name <span class="text-primary-500"> *</span></label>
+			<div class="">
 			<input
 			type="text"
-			class="block w-full rounded-md py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			class="block w-full rounded py-1.5 sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 			bind:value={$Cusdetails.FirstName}
 			name="Firstname"
 			id="firstname"
@@ -553,12 +614,12 @@ tog4();
 		  </div>
 		</div>
 		<div class="sm:col-span-2">
-			<label for="" class="text-sm">Last name <span class="text-primary-500"> *</span></label>
-			<div class="mt-2">
+			<label for="" class="sm:text-sm text-xs">Last name <span class="text-primary-500"> *</span></label>
+			<div class="">
 			<input
 					type="text"
 					name="lastname"
-					class="block w-full rounded-md py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+					class="block w-full sm:text-sm text-xs rounded py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 					id="lastname"
 					bind:value={$Cusdetails.LastName}
 					required
@@ -571,7 +632,7 @@ tog4();
 		  </div>
 		</div>
 	  </div>
-	<div class="mt-2 mb-2">
+	<div class=" mb-2">
 		{#if errorMessage1}
 		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
 			{errorMessage1}</div>
@@ -580,50 +641,84 @@ tog4();
 		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
 			{errorMessage2}</div>
 		{/if}
-		<label for="" class="text-sm">Country <span class="text-primary-500"> *</span></label>
+		<label for="" class="sm:text-sm text-xs">Country <span class="text-primary-500"> *</span></label>
 		<br />
-		<select
-			class="block md:w-3/4 sm:2/5 lg:w-1/2 w-full rounded-md p-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
-			name="country"
-			id="country"
-			bind:value={$Cusdetails.Country}
-		>
-			<option value="" disabled selected>Select your country</option>
-			{#each countries as country}
-				<option value={`${country.name}`}>{country.name} ({country.code})</option>
-			{/each}
-		</select>
+		<div class="flex-1 mb-4 relative w-full">
+			<div class="relative w-full md:w-3/4 sm:2/5 lg:w-1/2">
+    <input
+        type="text"
+        id="country"
+        name="country"
+        bind:value={$Cusdetails.Country}
+        placeholder="Select your Country"
+        on:input={handleInputChange}
+        on:click={toggleDropdown}
+        class="block w-full sm:text-sm text-xs rounded p-1.5 pr-8 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
+        required
+    />
+    <Icon
+        icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
+        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+        on:click={toggleDropdown}
+    />
+			</div>
+			{#if showDropdown}
+				<div class="absolute md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs bg-white border border-gray-300 rounded-md shadow-lg z-10 mt-1">
+					<ul class="max-h-60 overflow-y-auto text-sm">
+						{#each filteredCountries as country (country.name)}
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+							<li
+								on:click={() => selectCountry(country)}
+								class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+							>
+								{country.name} ({country.code})
+							</li>
+						{/each}
+						{#if filteredCountries.length === 0}
+							<div class="px-4 py-2 text-gray-600 text-xs">No matching countries found!</div>
+						{/if}
+					</ul>
+				</div>
+			{/if}
+		
+			
+		</div>
         {#if errorMessage && !$Cusdetails.Country}
                 <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
                     Country is required</div>
                 {/if}
 	</div>
 	<div class="mt-2 mb-2">
-		<label for="" class="text-sm">Phone number <span class="text-primary-500"> *</span></label>
+		<label for="" class="sm:text-sm text-xs">Phone number <span class="text-primary-500"> *</span></label>
 		<br />
 		<input
-			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 placeholder:text-sm"
 			type="tel"
 			name="phone"
 			id="phone"
 			bind:value={$Cusdetails.Number}
-			placeholder="Enter your number"
+			placeholder=""
 			required
             on:input={() => validatePhNo($Cusdetails.Country, $Cusdetails.Number)}	
             />
+			{#if errorMessage && !$Cusdetails.Number}
+			<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+				Phone number is required</div>
+			{/if}
 		{#if errorMessage4}
 		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
 			Please enter a valid phone number for {$Cusdetails.Country}</div>
 		{/if}
 	</div>
 	<div class="mt-2 mb-2">
-		<label for="" class="text-sm">Email address <span class="text-primary-500"> *</span></label>
+		<label for="" class="sm:text-sm text-xs">Email address <span class="text-primary-500"> *</span></label>
 		<br />
 		<input
 			type="text"
 			name="email"
 			id=""
-			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 			bind:value={$Cusdetails.Email}
             on:input={validateEmail}
 		/>
@@ -638,14 +733,14 @@ tog4();
 		
 	</div>
 	<div class="mt-2 mb-2">
-		<label for="" class="text-sm">Company name <span class="text-primary-500"> *</span></label>
+		<label for="" class="sm:text-sm text-xs">Company name <span class="text-primary-500"> *</span></label>
 		<br />
 		<input
 			type="text"
 			name="organisation"
 			id=""
 			bind:value={$Cusdetails.Organisation}
-			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 		/>
         {#if errorMessage && !$Cusdetails.Organisation}
                 <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
@@ -653,31 +748,31 @@ tog4();
                 {/if}
 	</div>
 	<div class="mt-2 mb-2">
-		<label for="" class="text-sm">Invoice number</label>
+		<label for="" class="sm:text-sm text-xs">Invoice number</label>
 		<br />
 		<input
 			type="text"
 			name="lgcnumber"
 			id=""
-			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 			bind:value={$Cusdetails.LGC}
 		/>
 	</div>
-    {#if errorMessage}
+    <!-- {#if errorMessage}
 		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
 			{errorMessage}</div>
-		{/if}
+		{/if} -->
 	<div class="flex space-x-4">
 		<button
 			type="button"
 			on:click={cust}
-			class="text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-500 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
+			class="text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded sm:text-sm text-xs sm:px-5 px-2 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-500 focus:outline-none dark:focus:ring-primary-500 my-5"
 			>Save & continue</button
 		>
 	</div>
 </div>
-<hr />
+</div>
 <div class="py-10 bg-white  flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 6: Delivery information</h1>
+	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">Step 6: Delivery information</h1>
 </div>
 <hr />

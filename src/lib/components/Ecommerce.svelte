@@ -453,13 +453,18 @@
     role='';
     selectedNames=[];
     }
+	let errors={};
     function handleSubmit(event) {
         if (number.length === 0 || email.length === 0 || fname.length === 0 || company.length === 0 || details.length === 0 || role.length===0 || lname.length === 0 || reason.length === 0 || !isChecked) {
             console.log('Validation failed: Missing required fields');
             event.preventDefault();
             formValid = false;
             showErrors = true;
-        } else {
+        } 
+		else if (fname.length > 0 && !/^[A-Za-z\s]+$/.test(fname) || lname.length > 0 && !/^[A-Za-z\s]+$/.test(lname) || email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)) {
+			formValid = false;
+		}
+		else {
             formValid = true;
             formSubmitted = true;
             showErrors = false;
@@ -483,6 +488,49 @@
         }, 2000);
     }
 }
+
+
+let searchTerm = "";
+    let showDropdown = false;
+    let filteredCountries = [];
+
+	function filterCountries() {
+		filteredCountries = countries.filter(
+			(location) =>
+				location.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				location.code
+					.replace("+", "")
+					.includes(searchTerm.replace("+", "").toLowerCase()),
+		);
+		if (
+			filteredCountries.length === 1 &&
+			(filteredCountries[0].name.toLowerCase() ===
+				searchTerm.toLowerCase() ||
+				filteredCountries[0].code.replace("+", "").toLowerCase() ===
+					searchTerm.replace("+", "").toLowerCase())
+		) {
+			selectlocation(filteredCountries[0]);
+		} else {
+			showDropdown = filteredCountries.length > 0; 
+		}
+	}
+	function selectlocation(selectedlocation) {
+		location = selectedlocation.name;
+		searchTerm = `${selectedlocation.name} `;
+		showDropdown = false;
+		validatePhoneNumber(location, number);
+		delete errors.location;
+	}
+
+    function handleInputChange(event) {
+        searchTerm = event.target.value;
+        filterCountries();
+    }
+
+    function toggleDropdown() {
+        showDropdown = !showDropdown;
+    }
+
 function validatePhoneNumber(location, number) {
 	const pattern = phoneNumberPatterns[location];
 	if (!pattern) {
@@ -493,36 +541,36 @@ function validatePhoneNumber(location, number) {
 </script>
 <section class="md:w-11/12 mx-auto max-w-7xl px-6 md:px-2 bg-gray-50">
 <section class="mt-6">
-    <div class="text-primary-400 text-2xl font-semibold mb-7">Chemikart Solutions</div>
-        <p class="leading-6 text-content mx-auto text-justify-center">
+    <div class="font-bold text-lg md:text-2xl py-4">Chemikart Solutions</div>
+        <p class="leading-6 sm:text-sm text-xs text-content mx-auto text-justify-center">
         We offer a full range of e-Commerce tools designed to enable greater spend control for your procurement staff, providing your researchers with ease of access to the products they've come to rely on.
         </p>
-        <p class="leading-6 text-content mx-auto text-justify-center mt-2">
+        <p class="leading-6 sm:text-sm text-xs text-content mx-auto text-justify-center mt-2">
         We have three solutions available to help you save time and cost in procurement management. Read further for more details of each solution, or fill out our contact form and our team will reach out to you to answer any questions.
         </p>      
-        <div class="mt-12 mx-auto">
+        <div class="md:mt-12 mt-2 mx-auto">
             <div class="flex gap-5 flex-wrap lg:flex-nowrap max-md:flex-col">
                 <div class="w-full lg:w-3/5">
                     <div class="space-y-10 md:space-y-8 max-md:space-y-6">
                         <div class="flex flex-col md:flex-row items-start gap-4">
                             <Icon icon="game-icons:on-target" class="w-10 h-10 text-primary-400 flex-shrink-0" />
                             <div class="flex-auto">
-                                <h2 class="font-semibold text-lg font-worksans text-primary-400">The One-to-One Solution: E-Procurement</h2>
-                                <p class="text-content mt-4">e-Procurement provides seamless system-to-system connectivity of your existing spend management system.</p>
+                                <h2 class="font-semibold font-worksans sm:text-base text-sm text-heading">The One-to-One Solution: E-Procurement</h2>
+                                <p class="sm:text-sm text-xs text-content mt-4">e-Procurement provides seamless system-to-system connectivity of your existing spend management system.</p>
                             </div>
                         </div>
                         <div class="flex flex-col md:flex-row items-start gap-4">
                             <Icon icon="mdi:family-tree" class="w-10 h-8 text-primary-400 flex-shrink-0" />
                             <div class="flex-auto">
-                                <h2 class="font-semibold text-lg font-worksans text-primary-400">The Customized Solution: Pipeline®</h2>
-                                <p class="text-content mt-4">This customized service balances your organization's business needs with the product requirements of your researchers.</p>
+                                <h2 class="font-semibold font-worksans sm:text-base text-sm text-heading">The Customized Solution: Pipeline®</h2>
+                                <p class="sm:text-sm text-xs text-content mt-4">This customized service balances your organization's business needs with the product requirements of your researchers.</p>
                             </div>
                         </div>
                         <div class="flex flex-col md:flex-row items-start gap-4">
                             <Icon icon="fluent-mdl2:text-document-shared" class="w-10 h-8 text-primary-400 flex-shrink-0" />
                             <div class="flex-auto">
-                                <h2 class="font-semibold text-lg font-worksans text-primary-400">The Simple Solution: Chemikart E-Shop</h2>
-                                <p class="text-content mt-4">Your procurement staff can access our products simply, easily, and securely through chemikart.com.</p>
+                                <h2 class="font-semibold font-worksans sm:text-base text-sm text-heading">The Simple Solution: Chemikart E-Shop</h2>
+                                <p class="sm:text-sm text-xs text-content mt-4">Your procurement staff can access our products simply, easily, and securely through chemikart.com.</p>
                             </div>
                         </div>
                     </div>
@@ -530,7 +578,7 @@ function validatePhoneNumber(location, number) {
                 <aside class="w-full lg:w-1/3 md:ml-0 lg:ml-8 max-md:w-full">
                     <div class="flex flex-col items-start space-y-5 text-black">
                         <Icon icon="game-icons:chemical-drop" class="w-20 h-24 text-primary-400" />
-                        <p class="text-content">Discover our latest website features and enhance your experience with Chemikart.<br>Find information regarding new features as well as tips and tricks with Get Site Smart.</p>
+                        <p class="sm:text-sm text-xs text-content">Discover our latest website features and enhance your experience with Chemikart.<br>Find information regarding new features as well as tips and tricks with Get Site Smart.</p>
                         <div class="mt-8">
                         </div>
                     </div>
@@ -539,30 +587,30 @@ function validatePhoneNumber(location, number) {
         </div>
 </section>
 <section class="mx-1 md:mx-1">
-    <hr class="self-center mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-10" />
+    <hr class="self-center mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-0" />
 </section>
-<section class="px-4 mt-8">
+<section class="px-4 md:mt-8 mt-0">
     <div class="flex gap-8 max-md:flex-col">
         <div class="flex flex-col w-2/3 max-md:w-full">
-            <div class="flex flex-col text-sm leading-6 text-black max-md:mt-6">
-                <h3 class="font-semibold text-lg font-worksans mt-8 text-primary-400">The One-to-One Solution: E-Procurement</h3>
-                <p class="mt-4 text-content">
+            <div class="flex flex-col text-sm leading-6 text-black max-md:mt-0">
+                <h3 class="font-semibold font-worksans mt-8 sm:text-base text-sm text-heading">The One-to-One Solution: E-Procurement</h3>
+                <p class="mt-4 sm:text-sm text-xs text-content">
                     Chemikart is your source for procurement optimization. If you are already using an electronic spend management solution, leverage your investment to generate even greater savings by automating Chemikart's purchases and link your current buying platform to us.
                 </p>
-                <p class="mt-4 text-content">
+                <p class="mt-4 sm:text-sm text-xs text-content">
                     We support all major e-Procurement providers and have a dedicated technical team available to work with your organization or platform provider and install customized, scalable, all-in-one procurement solutions. e-Procurement offers efficiencies across the purchasing cycle, enabling product selection through e-Catalogs, both punchout or hosted file, accepting e-Purchase orders, sending electronic invoices, order confirmations, and advanced shipping notices, and more.
                 </p>
-                <h4 class="mt-6 font-semibold text-lg font-worksans text-primary-400">Three Steps to Install e-Procurement</h4>
-                <ol class="list-decimal list-inside mt-4 space-y-3 text-content">
+                <h4 class="mt-6 font-semibold font-worksans sm:text-base text-sm text-heading">Three Steps to Install e-Procurement</h4>
+                <ol class="list-decimal list-inside mt-4 space-y-3 sm:text-sm text-xs text-content">
                     <li>Create a Project Plan: We will partner with you to gather requirements, provide detailed analysis, then implement a project plan with milestones.</li>
                     <li>Setup & Testing: We will work through setup and testing to ensure end-to-end processes are in place.</li>
                     <li>Launch and Go-Live Monitoring: After testing, we provide post-go-live monitoring to ensure the solution meets your expectations.</li>
                 </ol>
             </div>
         </div>
-        <div class="flex flex-col w-1/3 max-md:w-full max-md:mt-6">
-            <h3 class="font-semibold text-lg font-worksans mt-8 text-primary-400">Benefits to e-Procurement</h3>
-            <ol class="list-decimal list-inside mt-4 space-y-3 text-content">
+        <div class="flex flex-col w-1/3 max-md:w-full max-md:mt-0">
+            <h3 class="font-semibold font-worksans md:mt-8 mt-0 sm:text-base text-sm text-heading">Benefits to e-Procurement</h3>
+            <ol class="list-decimal list-inside mt-4 space-y-3 sm:text-sm text-xs text-content">
                 <li>Process efficiency from end-to-end driven by real-time data exchange, speed, and transaction efficiency.</li>
                 <li>Cost Reduction via reduced transaction costs and administrative overhead.</li>
                 <li>A variety of spend analysis options and direct spend control.</li>
@@ -573,22 +621,22 @@ function validatePhoneNumber(location, number) {
         </a>
         </div>
     </div>
-    <div class="flex gap-8 max-md:flex-col mt-12">
+    <div class="flex gap-8 max-md:flex-col md:mt-12 mt-3">
         <div class="flex flex-col w-2/3 max-md:w-full">
-            <h3 class="font-semibold text-lg font-worksans mt-8 text-primary-400">The Customized Solution: Pipeline®</h3>
-            <p class="mt-4 text-content">
+            <h3 class="font-semibold font-worksans md:mt-8 mt-0 sm:text-base text-sm text-heading">The Customized Solution: Pipeline®</h3>
+            <p class="mt-4 sm:text-sm text-xs text-content">
                 An advanced ordering process customized to meet your business needs. PIPELINE® delivers options and benefits beyond simple ordering, providing direct, private connection to our order processing and fulfillment system. Flexible ordering processes are customized to meet your organization's requirements.
             </p>
-            <p class="mt-4 text-content">
+            <p class="mt-4 sm:text-sm text-xs text-content">
                 When you create your order through PIPELINE®, you see the exact purchase total. In addition, it provides a portal to information and special offers that have been tailored specifically for your organization.
             </p>
-            <p class="mt-4 text-content">
+            <p class="mt-4 sm:text-sm text-xs text-content">
                 To learn more about creating your PIPELINE® experience, submit the form to have one of our team members reach out.
             </p>
         </div>
-        <div class="flex flex-col w-1/3 max-md:w-full max-md:mt-6">
-            <h4 class="font-semibold text-lg font-worksans mt-8 text-primary-400">Benefits of PIPELINE®</h4>
-            <ul class="list-disc list-inside mt-4 space-y-2 text-content">
+        <div class="flex flex-col w-1/3 max-md:w-full max-md:mt-0">
+            <h4 class="font-semibold font-worksans md:mt-8 mt-0 sm:text-base text-sm text-heading">Benefits of PIPELINE®</h4>
+            <ul class="list-disc list-inside md:mt-4 mt-3 space-y-2 sm:text-sm text-xs text-content">
                 <li>Elimination of paper transactions</li>
                 <li>No IT investment required</li>
                 <li>Support of procurement approval levels</li>
@@ -600,19 +648,19 @@ function validatePhoneNumber(location, number) {
         </a>
         </div>
     </div>
-    <div class="flex gap-8 max-md:flex-col mt-12">
+    <div class="flex gap-8 max-md:flex-col md:mt-12 mt-0">
         <div class="flex flex-col w-2/3 max-md:w-full">
-            <h3 class="font-semibold text-lg font-worksans mt-8 text-primary-400">The Simple Solution: Chemikart E-Shop</h3>
-            <p class="mt-4 text-content">
+            <h3 class="font-semibold font-worksans mt-8 sm:text-base text-sm text-heading">The Simple Solution: Chemikart E-Shop</h3>
+            <p class="mt-4 sm:text-sm text-xs text-content">
                 Your online order is integrated with our fulfillment systems, allowing for rapid processing. You can request quotes, place orders, and track deliveries all in one place.
             </p>
-            <p class="mt-4 text-content">
+            <p class="mt-4 sm:text-sm text-xs text-content">
                 With Chemikart.com as the leading Web site in the industry, you can rest assured you're getting the most competitive service available.
             </p>
         </div>
-        <div class="flex flex-col w-1/3 max-md:w-full max-md:mt-6">
-            <h4 class="font-semibold text-lg font-worksans mt-8 text-primary-400">Benefits of the Chemikart e-Shop:</h4>
-            <ul class="list-disc list-inside mt-4 space-y-2 text-content">
+        <div class="flex flex-col w-1/3 max-md:w-full max-md:mt-0">
+            <h4 class="font-semibold font-worksans md:mt-8 mt-0 sm:text-base text-sm text-heading">Benefits of the Chemikart e-Shop:</h4>
+            <ul class="list-disc list-inside md:mt-4 mt-3 space-y-2 sm:text-sm text-xs text-content">
                 <li>Your information is safe and secure</li>
                 <li>Advanced tools and product searches</li>
                 <li>Account-specific pricing</li>
@@ -624,11 +672,11 @@ function validatePhoneNumber(location, number) {
     </div>
 </section>
 <section class="mx-1 md:mx-1">
-<hr class="self-center mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-10" />
+<hr class="self-center md:mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-3" />
 </section>
-<section id="contact-team" class="flex flex-col items-start py-6 w-full max-md:px-2 md:mt-10 scroll-smooth">
-<h2 class="font-semibold text-2xl font-worksans text-primary-400 ml-3">Contact Our Team</h2>
-<form method="POST" action="?/contactus" class="w-full mt-3 max-w-3xl ml-3" use:enhance={() => {
+<section id="contact-team" class="flex flex-col items-start py-6 w-full max-md:px-2 md:mt-3 scroll-smooth">
+<h2 class="font-semibold font-worksans sm:text-lg text-md text-heading sm:ml-3 ml-0">Contact Our Team</h2>
+<form method="POST" action="?/contactus" class="w-full md:mt-3 mt-0 max-w-3xl sm:ml-3 ml-0" use:enhance={() => {
     return async({ result }) => {
     let message1 = '';
     let keywordError = '';
@@ -660,7 +708,7 @@ function validatePhoneNumber(location, number) {
             {/if}
     </div> -->
             <div>
-                <p class="mb-5 mt-6 text-bold font-semibold text-primary-400">Select all that apply</p>
+                <p class="mb-5 mt-6 text-bold font-semibold sm:text-base text-sm text-heading">Select all that apply</p>
             </div>
             <div>
                 <label class="flex items-center space-x-2 text-lg">
@@ -691,45 +739,94 @@ function validatePhoneNumber(location, number) {
                         <div class="flex-1 mb-4 sm:w-full">
                             <input type="text" name="fname" id="fname" bind:value={fname} class="flex text-sm w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="First Name*" />
                             {#if showErrors && fname.length === 0}
-                                <span class="text-red-400 text-xs">First Name is required</span>
+                                <span class="text-red-500 text-xs font-medium">First Name is required</span>
                             {/if}
                             {#if fname.length > 0 && !/^[A-Za-z\s]+$/.test(fname)}
-                                <span class="text-red-400 text-xs">First Name cannot contain numbers or special characters</span>
+                                <span class="text-red-500 text-xs font-medium">First Name cannot contain numbers or special characters</span>
                             {/if}
                             </div>
                             <div class="flex-1 mb-4 sm:w-full" >
                                 <input type="text" name="lname" id="lname" bind:value={lname} class="flex w-full border border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Last Name*" />
                                 {#if showErrors && lname.length === 0}
-                                    <span class="text-red-400 text-xs">Last Name is required</span>
+                                    <span class="text-red-500 text-xs font-medium">Last Name is required</span>
                                 {/if}
                                 {#if lname.length > 0 && !/^[A-Za-z\s]+$/.test(lname)}
-                                    <span class="text-red-400 text-xs">Last Name cannot contain numbers or special characters</span>
+                                    <span class="text-red-500 text-xs font-medium">Last Name cannot contain numbers or special characters</span>
                                 {/if}
                             </div>
                         </div>
                         <div class="flex flex-col md:flex-row md:space-x-4">
-                            <div class="flex-1 mb-4 sm:w-full" >
+                            <!-- <div class="flex-1 mb-4 sm:w-full" >
                                 <select id="location" name="location" bind:value={location} required
                                 class="block w-full border border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"style="background-color: white;">
-                                    <option value="" disabled selected>Select your Country*</option>
+                                    <option value="" disabled selected>Select your location*</option>
                                     {#each countries as { code, name }}
                                     <option value={name}>{name}({code})</option>
                                   {/each}
                                   {#if showErrors && location.length === 0}
-                                  <span class="text-red-400 text-xs">Country is required</span>
+                                  <span class="text-red-500 text-xs font-medium">location is required</span>
                                   {/if}
                                 </select>
-                            </div> 
-                            <div class="flex-1 mb-4 sm:w-full" >
+                            </div>  -->
+							<div class="flex-1 mb-4 relative w-full">
+								<div class="relative">
+								<input
+									type="text"
+									id="location" 
+									name="location"
+									bind:value={location}
+									placeholder="Location"
+									on:input={handleInputChange}
+									on:click={toggleDropdown}
+									class="w-full text-sm px-2 py-2 placeholder-gray-400 rounded  border border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
+									required
+								/>
+							
+								<Icon
+									icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
+									class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+									on:click={toggleDropdown}
+								/>
+								</div>
+							
+								<!-- Dropdown Suggestions -->
+								{#if showDropdown}
+									<div class="absolute w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 mt-1">
+										<ul class="max-h-60 overflow-y-auto text-sm">
+											{#each filteredCountries as location (location.name)}
+												<!-- svelte-ignore a11y-click-events-have-key-events -->
+												<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+												<li
+													on:click={() => selectlocation(location)}
+													class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+												>
+													{location.name} ({location.code})
+												</li>
+											{/each}
+											{#if filteredCountries.length === 1}
+												<div class="px-4 py-2 text-gray-600 text-xs">No matching countries found!</div>
+											{/if}
+										</ul>
+									</div>
+								{/if}
+							
+								<!-- Validation Message -->
+								{#if showErrors && location.length === 0}
+									<span class="text-red-500 text-xs font-medium">location is required</span>
+								{/if}
+							</div>
+							
+							
+							<div class="flex-1 mb-4 sm:w-full" >
                                 <input type="tel" name="number" id="number" bind:value={number} class="block w-full border border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Phone Number*" />
                                 {#if showErrors && number.length === 0}
-                                    <span class="text-red-400 text-xs">Number is required</span>
+                                    <span class="text-red-500 text-xs font-medium">Number is required</span>
                                 {/if}
                                 <!-- {#if number.length > 0 && !/^\+?[0-9]{10}$/.test(number)}
-                                    <span class="text-red-400 text-xs">Please enter a valid number number.</span>
+                                    <span class="text-red-500 text-xs font-medium">Please enter a valid number number.</span>
                                 {/if} -->
                                 {#if number.length > 0 && !validatePhoneNumber( location, number)}
-    							<span class="text-red-400 text-xs">Please enter a valid phone number for {location}</span>
+    							<span class="text-red-500 text-xs font-medium">Please enter a valid phone number for {location}</span>
 								{/if}
                             </div>
                         </div>
@@ -737,13 +834,13 @@ function validatePhoneNumber(location, number) {
                             <div class="flex-1 mb-4 sm:w-full" >
                                 <input type="text" name="company" id="company" bind:value={company} class="block w-full border border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Company Name*" />
                                 {#if showErrors && company.length === 0}
-                                    <span class="text-red-400 text-xs">Company Name is required</span>
+                                    <span class="text-red-500 text-xs font-medium">Company Name is required</span>
                                 {/if}
                             </div>
                                 <div class="flex-1 mb-4 sm:w-full" >
                                 <input type="text" name="role" id="role" bind:value={role} class="block w-full border border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Role*" />
                                 {#if showErrors && role.length === 0}
-                                    <span class="text-red-400 text-xs">Role is required</span>
+                                    <span class="text-red-500 text-xs font-medium">Role is required</span>
                                 {/if}
                             </div>
                         </div>
@@ -751,17 +848,17 @@ function validatePhoneNumber(location, number) {
                             <div class="flex-1 mb-4 sm:w-full" >
                                 <input type="text" name="email" id="email" bind:value={email} class="block w-full border border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email Address*" />
                                 {#if showErrors && email.length === 0}
-                                    <span class="text-red-400 text-xs">Email is required</span>
+                                    <span class="text-red-500 text-xs font-medium">Email is required</span>
                                 {/if}
                                 {#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
-                                    <span class="text-red-400 text-xs">Please enter a valid email address.</span>
+                                    <span class="text-red-500 text-xs font-medium">Please enter a valid email address.</span>
                                 {/if}
                             </div>
                         </div>                                    
                         <div class="flex-1 mb-4 sm:w-full">
                             <textarea name="details" id="details" bind:value={details} class="w-full text-sm p-2 border border-gray-300 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 mb-4 h-32" placeholder="Additional Details*"></textarea>
                             {#if showErrors && details.length === 0}
-                                <span class="text-red-400 text-xs">Additional Details are required</span>
+                                <span class="text-red-500 text-xs font-medium">Additional Details are required</span>
                             {/if}
                         </div>
                         <div>
@@ -777,15 +874,15 @@ function validatePhoneNumber(location, number) {
                                 <span class="mb-5 text-xs">I confirm that I have selected the correct queries</span>
                             </label>
                             {#if showErrors && reason.length === 0}
-                            <span class="text-red-400 text-xs">Please select one of the above reasons</span>
+                            <span class="text-red-500 text-xs font-medium">Please select atleast one of the above reasons</span>
                             {/if}
 							{#if showErrors && !isChecked}
-							<span class="text-red-400 text-xs">confirm the above statement</span>
+							<span class="text-red-500 text-xs font-medium">confirm the above statement</span>
 						{/if}
                             <input type="hidden" name="status" value="unread" />
 
                         </div>
-                        <div class="flex-1 mb-4 sm:mt-0">
+                        <div class="flex-1 mb-4 md:mt-0">
                             <button type="submit" on:click={handleSubmit} class="px-5 py-2 bg-primary-400 text-white rounded transition duration-300 hover:bg-primary-500 sm:w-auto">Send Message</button>
                         </div>
                 </div>

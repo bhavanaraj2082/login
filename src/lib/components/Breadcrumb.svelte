@@ -31,12 +31,12 @@
 {#if crumbs.length > 0}
 	<div class="w-11/12 mx-auto max-w-7xl">
 		<div class="py-3 px-1 mx-auto lg:mx-0 w-full">
-			<div class="flex flex-wrap text-primary-400 items-center space-x-0">
+			<div class="flex flex-wrap text-primary-400 sm:text-sm text-2s items-center space-x-0">
 				{#if crumbs.length === 1}
 					<span class="text-primary-400 font-bold text-xs">{crumbs[0].label}</span>
 				{:else}
 					<div class="flex flex-wrap items-center">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="mr-2 w-7 h-5">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-7 sm:h-5 h-3">
 							<path
 								d="M12 3l10 9h-3v8h-5v-5h-4v5H5v-8H2l10-9z"
 								fill="none"
@@ -47,7 +47,7 @@
 						{#each crumbs.slice(0, -1) as c}
 							<a
 								href={c.href}
-								class="text-primary-400 text-sm hover:underline hover:underline-offset-4 hover:decoration-primary-600 transition-colors"
+								class="text-primary-400 sm:text-sm text-2s hover:underline hover:underline-offset-4 hover:decoration-primary-600 transition-colors"
 								>{c.label}</a
 							>
 							<svg
@@ -63,7 +63,7 @@
 								/>
 							</svg>
 						{/each}
-						<span class="text-primary-500 font-bold text-sm">{crumbs[crumbs.length - 1].label}</span
+						<span class="text-primary-500 font-bold sm:text-sm text-2s">{crumbs[crumbs.length - 1].label}</span
 						>
 					</div>
 				{/if}
