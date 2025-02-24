@@ -14,7 +14,7 @@
       showTooltip = false;
     }
   </script>
-  <div class="absolute z-30 md:right-4 lg:right-1 right-1 p-4 mt-[980px] sm:mt-80">
+  <div class="absolute z-30 md:right-4 lg:right-1 right-1 mt-[980px] sm:mt-80">
     <div class="">
       <button
         class="font-semibold rounded flex flex-col items-center p-2 gap-2 text-white transition-opacity duration-300 transform"

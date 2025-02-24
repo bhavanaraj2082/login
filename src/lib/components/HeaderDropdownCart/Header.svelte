@@ -148,7 +148,7 @@
 		}
 	};
 </script>
-<nav class="bg-primary-400">
+<nav class="bg-primary-400 font-workSans">
 	{#if isOpen}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -309,12 +309,12 @@
 						  
 							  <button
 								on:click={() => navigateTo('/login')}
-								class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+								class="block px-4 font-workSans py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
 								Login
 							  </button>
 							  <button
 								on:click={() => navigateTo('/signup')}
-								class="loginbtn block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+								class="loginbtn block px-4 font-workSans py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
 								Register
 							  </button>
 							</div>
@@ -323,7 +323,7 @@
 				</div>
 				</div>
 			{/if}
-			<a href="/my-favourite">
+			<a href="/dashboard/myfavourite">
 				<button
 					on:click={toggleLike}
 					aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
@@ -450,7 +450,7 @@
 						on:click={() => {
 							navigateTo('/login');
 						}}
-						class="  loginbtn text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
+						class="  loginbtn  font-workSans text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
 						>Login</button
 					>
 					<Icon icon="vaadin:line-v" class="mr-0 text-white font-semibold" />
@@ -458,7 +458,7 @@
 						on:click={() => {
 							navigateTo('/signup');
 						}}
-						class=" registerbtn pr-2  text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
+						class=" registerbtn font-workSans pr-2  text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
 						>Register</button
 					>
 				</div>
@@ -558,7 +558,8 @@
 			</div>
 			<div class="flex gap-4 text-gray-600 items-center ">
 				<a href="/quick-order">
-					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md hover:scale-105">
+					<button 
+					class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium">
 						<span class="text-white font-medium text-xs lg:text-sm">
 							Quick Order
 						</span>
@@ -566,7 +567,7 @@
 				</a>
 				
 				<a href="/order-status">
-					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md hover:scale-105">
+					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium">
 						<span class="text-white font-medium text-xs lg:text-sm">
 							Order Status
 						</span>
@@ -575,7 +576,7 @@
 				
 				
 				<div class="md:flex hidden items-center justify-center">
-					<a href="/my-favourite">
+					<a href="/dashboard/myfavourite">
 						<button
 							on:click={toggleLike}
 							aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}

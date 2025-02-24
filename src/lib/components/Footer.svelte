@@ -2,6 +2,10 @@
 	import Icon from '@iconify/svelte';
 	import CookiesPopup from "$lib/components/CookiesPopup.svelte";
 	import Scroller from '$lib/components/Scroller.svelte';
+	import Helpsection from '$lib/components/Helpsection.svelte';
+	import Helpsection1 from '$lib/components/Helpsection1.svelte';
+	import Helpsection2 from '$lib/components/Helpsection2.svelte';
+
 	let isPopupOpen = false;
 
 	const togglePopup = (event) => {
@@ -14,8 +18,13 @@
 	};
 
 	const currentYear = new Date().getFullYear();
+	let footer;
 </script>
-<footer class="w-full bg-primary-400 p-6">
+<Helpsection1 />
+<Helpsection2 />
+<footer class="w-full bg-primary-400 p-6 font-workSans" bind:this={footer}>
+	<Helpsection {footer} />
+
 	<div class="mx-auto">
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mt-4 w-11/12 mx-auto max-w-7xl">
 			<div class="flex flex-col items-center md:items-start text-center md:text-left">
