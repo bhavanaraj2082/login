@@ -6,6 +6,7 @@ import Register from '$lib/server/models/Register.js';
 import Profile from '$lib/server/models/Profile.js';
 import MyFavourite from '$lib/server/models/MyFavourite.js';
 import Stock from '$lib/server/models/Stock.js';
+import StockLog from '$lib/server/models/StockLog.js';
 import Solution from '$lib/server/models/Solution.js';
 import Quotes from '$lib/server/models/Quotes.js';
 import Products from '$lib/server/models/Product.js';
@@ -13,11 +14,13 @@ import Helpsupport from '$lib/server/models/Helpsupport.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '$lib/server/models/MyFavourite.js';
 import ChemiDashProfile from '$lib/server/models/ChemiDashProfile.js';
-import Curcurrency from "$lib/server/models/Curcurrency.js";
+import Curconversion from "$lib/server/models/Curconversion.js";
 import { redirect, error } from '@sveltejs/kit';
-
+import Cart from "$lib/server/models/Cart.js"
+import Distributor from "$lib/server/models/Distributor.js"
 import { v4 as uuidv4 } from 'uuid';
 import nodemailer from 'nodemailer';
+import { nanoid } from 'nanoid';
 // import { lucia } from 'lucia';
 import {
 	APP_URL,
@@ -31,7 +34,7 @@ import { auth } from '$lib/server/lucia.js';
 
 
 async function conversionRates() {
-	const rates = await Curcurrency.find().exec();
+	const rates = await Curconversion.find().exec();
 	const currentRates = {};
 	rates.forEach(rate => {
 	  currentRates[rate.currency] = rate.rate;
@@ -215,7 +218,21 @@ export async function favorite(favdata) {
 export const checkoutOrder = async (order) => {
 	try {
 		const newOrder = await Order.create(order);
-
+        for(let rec of order.orderdetails){
+			const stock = await Stock.findOneAndUpdate({_id:rec.stockId},{$inc:{orderedQty:rec.orderQty}},{new:true})
+			console.log(stock);
+			await StockLog.create({
+                 productId:rec.productId,
+				 manufacturerId:rec.manufacturerId,
+				 distributorId:rec.distributorId,
+				 quantity:rec.orderQty,
+				 totalStock:stock.stock - rec.orderQty,
+				 actionType:"-",
+				 actionName:"Ordered"
+			})
+		}
+		await Cart.findOneAndUpdate({userId:order.userId,isActiveCart:true},{isActiveCart:false})
+		
 		if (newOrder._id) {
 			return { success: true, message: 'Successfully Ordered' };
 		} else {
@@ -1365,3 +1382,259 @@ export const CreateProductQuote = async (formattedData) => {
 	await newQuote.save();
 	return { status: 200 };
 };
+
+export const addToCart = async(item,userId,userEmail)=>{
+	const search = await Cart.findOne({userId,userEmail,isActiveCart:true}).lean()
+	// const id = await Stock.findOne({productid:item.productId,manufacturer:item.manufacturerId},{distributor:1})
+    // item.distributorId = id.distributor
+	let cart
+	if(search === null){
+		cart = await Cart.create({cartId:nanoid(8),cartName:"mycart",cartItems:item,userId,userEmail,isActiveCart:true})
+		return {success:true,message:"Product is added to cart"}
+	}else{
+		const findItem = search.cartItems.find(x=>x.productId.toString() === item.productId)
+		//console.log(searchsssss,"sdffffffffff");
+		if(findItem === undefined){
+		cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$push:{cartItems:item}},{new:true})
+		return {success:true,message:"Product is added to cart"}
+		}else{
+		cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$set:{cartItems:item}},{new:true})
+		return {success:true,message:"Product quantity is updated in cart"}
+		}
+	}
+} 
+
+export const updateItemQty = async(body,userId)=>{
+	const {quantity,_id,cartId,stock} = body
+	const backOrder = quantity > stock ? quantity - stock : 0;
+	const cart = await Cart.findOneAndUpdate(
+		{userId,cartId,isActiveCart:true,'cartItems._id': _id},
+		{ $set: { 'cartItems.$.quantity': quantity, 'cartItems.$.backOrder': backOrder }},
+		{new:true}
+	)
+	return {success:true}
+}
+
+export const deleteAllFromCart = async (body, userId) => {
+	const { cartId } = body;
+	const result = await Cart.findOneAndUpdate(
+		{ userId, cartId,isActiveCart:true },
+		{ $set: { cartItems: [] } },
+		{ new: true }
+	);
+	console.log(result);
+	return { success:true, message: `All components are deleted` };
+};
+
+export const deleteOneFromCart = async (body, userId) => {
+	const {productNumber,_id,cartId} = body;
+	const result = await Cart.findOneAndUpdate(
+		{ userId, cartId },
+		{ $pull: { cartItems: { _id }}},
+		{ new: true }
+	);
+	console.log(result);
+	return {success:true, message: `${productNumber} is removed from Cart` };
+};
+
+export const getGuestCart = async(body)=>{
+	const arr = []
+	for(let {productId,manufacturerId,distributorId,quantity} of body){
+	const productDetails = await Product.findOne({_id:productId},{imageSrc:1,productName:1,productNumber:1,_id:0})
+	const stockDetails = await Stock.findOne({productid:productId,distributor:distributorId},{_id:0,stock:1,orderMultiple:1,pricing:1})
+	const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+	let pricing = stockDetails.pricing
+	if(pricing.INR !== undefined && pricing.INR !== null){
+		pricing.USD = pricing.INR/currency.rate
+	  }else{
+	   pricing.INR = pricing.USD * currency.rate;
+	  }
+
+	 let totalINR = pricing.INR * quantity;
+	 let totalUSD = pricing.USD * quantity;
+
+	  let result ={
+		productDetails,
+		stockDetails,
+		manufacturerId,
+		quantity,
+		pricing,
+		itemTotalPrice:{totalINR,totalUSD}
+	  }
+      arr.push(result)
+	}
+	console.log(arr);
+	return {cart:JSON.parse(JSON.stringify(arr))}
+}
+
+export const addItemsToExistingCart = async(body,cartId)=>{
+	const updatedCart = await Cart.findOneAndUpdate(
+		{ cartId:cartId },  // Find the cart by its ID
+		{
+		  $addToSet: {
+			cartItems: { $each: body }  // Add multiple items only if they don't already exist in the array
+		  }
+		},
+		{ new: true }  // Return the updated document
+	)
+	console.log(updatedCart);
+	return { success:true}
+}
+
+export const addItemsToNewCart = async(body,userId,userEmail)=>{
+		const cartId = nanoid(8)
+		const cartName = ""
+		await Cart.updateMany(
+			{ userId: userId }, 	
+			{ $set: { isActiveCart: false } } 
+		);
+		const newCart = await Cart.create({
+			userId,
+			userEmail,
+			cartId,
+			cartName,
+			isActiveCart:true,
+			cartItems:body
+		})
+	return { success:true}
+}
+
+export const updateShippingAddress = async (body) => {
+	const { userId, addAlternate, ...shippingDetails } = body;
+	shippingDetails.isDefault = shippingDetails.isDefault === 'true';
+	const addAlternateBoolean = addAlternate === 'true';
+	console.log(shippingDetails,"details");
+	try {
+		const userProfile = await Profile.findById(userId).select('shippingAddress');
+		if (!userProfile) {
+			return { field: 'shipping', success: false, message: 'User not found' };
+		}
+		let shippingAddressArray;
+		if (addAlternateBoolean) {
+			if (!userProfile.shippingAddress || userProfile.shippingAddress.length === 0) {
+				const newAddress = {
+					...shippingDetails,
+					addressId: nanoid(8),
+					isDefault: true
+				};
+				shippingAddressArray = [newAddress];
+			} else {
+				shippingAddressArray = [...userProfile.shippingAddress];
+				const newAddress = {
+					...shippingDetails,
+					addressId: nanoid(8),
+					isDefault: shippingDetails.isDefault
+				};
+				if (newAddress.isDefault) {
+					shippingAddressArray = shippingAddressArray.map((addr) => ({
+						...addr,
+						isDefault: false
+					}));
+				}
+				shippingAddressArray.push(newAddress);
+			}
+		} else {
+			shippingAddressArray = userProfile.shippingAddress.map((adr) => {
+				if (adr.addressId === shippingDetails.addressId) {
+					return { ...shippingDetails, isDefault: shippingDetails.isDefault };
+				} else if (shippingDetails.isDefault) {
+					return { ...adr, isDefault: false };
+				}
+				return adr;
+			});
+		}
+		userProfile.shippingAddress = shippingAddressArray;
+		await userProfile.save();
+		return {
+			field: 'shipping',
+			success: true,
+			message: addAlternateBoolean ? 'Added address successfully' : 'Updated successfully'
+		};
+	} catch (error) {
+		console.error('Error updating shipping address:', error);
+		return { field: 'shipping', success: false, message: 'Something went wrong' };
+	}
+};
+
+export const updateBillingAddress = async (body) => {
+	const { userId, addAlternate, ...billingDetails } = body;
+	billingDetails.isDefault = billingDetails.isDefault === 'true';
+	const addAlternateBoolean = addAlternate === 'true';
+	try {
+		const userProfile = await Profile.findById(userId).select('billingAddress');
+		if (!userProfile) {
+			return { field: 'billing', success: false, message: 'User not found' };
+		}
+		let billingAddressArray;
+		if (addAlternateBoolean) {
+			if (!userProfile.billingAddress || userProfile.billingAddress.length === 0) {
+				const newAddress = { ...billingDetails, addressId: nanoid(8),isDefault:true};
+				billingAddressArray = [newAddress];
+			} else {
+				billingAddressArray = [...userProfile.billingAddress];
+				const newAddress = { ...billingDetails, addressId: nanoid(8),isDefault:billingDetails.isDefault };
+				if (newAddress.isDefault) {
+					billingAddressArray = billingAddressArray.map((addr) => ({
+						...addr,
+						isDefault: false
+					}));
+				}
+				billingAddressArray.push(newAddress);
+			}
+		} else {
+			billingAddressArray = userProfile.billingAddress.map((adr) => {
+				if (adr.addressId === billingDetails.addressId) {
+					return { ...billingDetails, isDefault: billingDetails.isDefault };
+				} else if (billingDetails.isDefault) {
+					return { ...adr, isDefault: false };
+				}
+				return adr;
+			});
+		}
+		console.log('object',billingAddressArray);
+		userProfile.billingAddress = billingAddressArray;
+		await userProfile.save();
+		return {
+			field: 'billing',
+			success: true,
+			message: addAlternateBoolean ? 'Added address successfully' : 'Updated successfully'
+		};
+	} catch (error) {
+		console.error('Error updating billing address:', error);
+		return { field: 'billing', success: false, message: 'Something went wrong' };
+	}
+};
+
+export const addRecurrence = async (body, userId) => {
+	const { cartId,recurring, startingDate,recurringDate } = body;
+    let recurrence = {} 
+	const search = await Cart.findOne({userId,cartId,recurrence:{$exists:true}})
+	const tog = search?.recurrence ? 'updated' : 'added';
+	if(search === null){
+		recurrence = {
+			recurring,
+			recurringDate,
+			previousRecurringDate:startingDate,
+			addedDate: startingDate
+		}
+	}else{
+		recurrence = {
+			recurring,
+			recurringDate,
+			previousRecurringDate:startingDate,
+			addedDate: search.recurrence.addedDate
+		}
+	}
+	const recure = await Cart.findOneAndUpdate({ userId, cartId },{ $set: { recurrence }});
+	
+	if (recure) {
+		return { success: true, msg: `Recurrence is ${tog} successfully` };
+	}
+};
+
+export const deleteRecurrence = async(body)=>{
+	const {cartId} = body
+	const deleteRecurrence =  await Cart.updateOne({ cartId },{ $unset: { recurrence: 1 } });
+	console.log(deleteRecurrence,"fff");   
+	return { success: true, msg: `Recurrence deleted successfully` };
+}

@@ -69,7 +69,10 @@
     "js-cookie": "^3.0.5",
     "lucia": "^2.7.7",
     "mongoose": "^8.8.4",
+    "mongoose-increment": "^2.0.0",
+    "mongoose-sequence": "^6.0.1",
     "mongose": "^0.0.2-security",
+    "nanoid": "^5.0.9",
     "papaparse": "^5.4.1"
   }
 }

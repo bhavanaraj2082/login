@@ -6,11 +6,11 @@ const jsonSchema = {
 };
 
 const chemiDashProfileSchema = new mongoose.Schema({
-  firstName: {
+  firstname: {
     type: String,
     required: false
   },
-  lastName: {
+  lastname: {
     type: String,
     required: false
   },

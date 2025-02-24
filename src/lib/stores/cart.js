@@ -5,39 +5,40 @@ const initialCart =
 		? JSON.parse(localStorage.getItem('cart'))
 		: [];
 
-export const cart = writable(initialCart);
+export const cart = writable([]);
+export const guestCart = writable(initialCart);
 
 export const checkoutError = writable('');
 
 if (typeof window !== 'undefined') {
-	cart.subscribe((items) => {
+	guestCart.subscribe((items) => {
 		localStorage.setItem('cart', JSON.stringify(items));
 	});
 }
 
 // Function to add item to cart
-export function addToCart(item) {
-	cart.update((items) => {
+export function addItemToCart(item) {
+	guestCart.update((items) => {
 		// ('3553', Array.isArray(item));
 		if (Array.isArray(item)) {
 			if (!items.length) return item;
 
-			const inCart = item.filter((item1) => items.some((item2) => item2.id === item1.id));
+			const inCart = item.filter((item1) => items.some((item2) => item2.productId === item1.productId));
 			//console.log('add to cart',inCart);
 			if (inCart.length) {
 				inCart.forEach((obj) => {
-					const search = items.find((item) => item.id === obj.id);
+					const search = items.find((item) => item.productId === obj.productId);
 					if (search !== undefined) Object.assign(search, obj);
 				});
 			}
-			const notInCart = item.filter((item1) => !items.some((item2) => item2.id === item1.id));
+			const notInCart = item.filter((item1) => !items.some((item2) => item2.productId === item1.productId));
 			notInCart.forEach((obj) => {
 				items.push(obj);
 			});
 			return items;
 		} else {
 			if (!items.length) return [item];
-			const search = items.find((itm) => itm.id === item.id);
+			const search = items.find((itm) => itm.productId === item.productId);
 			if (search === undefined) {
 				items.push(item);
 			} else {
@@ -57,6 +58,12 @@ export function addToCart(item) {
 }
 
 // Function to remove item from cart
-// export function removeFromCart(id) {
-// 	cart.update((items) => items.filter((item) => item.id !== id));
-// }
+export function removeFromCart(id) {
+	if(id === undefined) {
+		console.log('fdssssssd',id);
+		cart.update(items => items = [])
+		guestCart.update(items => items = [])
+	}
+	cart.update((items) => items.filter((item,inx) => inx !== id));
+	guestCart.update((items) => items.filter((item,inx) => inx !== id));
+}

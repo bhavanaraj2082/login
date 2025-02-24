@@ -7,9 +7,9 @@
     // console.log("Data relatedProducts===>:", data);    
 </script>
 <ProductDetails data = {data.productData}/>
- {#if data.relatedProducts.length !== 0}
+ <!-- {#if data.relatedProducts.length !== 0}
  <RelatedProductss relatedProducts={data.relatedProducts}/>  
 {/if} 
 {#if data.relatedProducts.length !== 0}
 <CompSimItems compareSimilarity={data.compareSimilarity}/>
-{/if} 
+{/if}  -->

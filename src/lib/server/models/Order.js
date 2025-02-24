@@ -1,14 +1,60 @@
 import mongoose from 'mongoose';
+import mongooseSequence from 'mongoose-sequence';
+
+const AutoIncrement = mongooseSequence(mongoose);
+
+const orderDetailsSchema = new mongoose.Schema({
+
+	productId:{
+		type:mongoose.Schema.Types.ObjectId,
+		ref:"Product"
+	},
+  stockId:{
+		type:mongoose.Schema.Types.ObjectId,
+		ref:"Stock"
+	},
+  manufacturerId:{
+		type:mongoose.Schema.Types.ObjectId,
+		ref:"Manufacturer"
+	},
+  distributorId:{
+		type:mongoose.Schema.Types.ObjectId,
+		ref:"Distributor"
+	},
+  backOrder:{
+		type:Number
+	},
+	orderQty:{
+		type:Number,
+	},
+	readyToShip:{
+		type:Number,
+	},
+	unitPrice:{
+		type:Number,
+	},
+  extendedPrice:{
+		type:Number,
+	},
+	productName:{
+		type:String
+	},
+	manufacturerName:{
+		type:String
+	},
+	
+	_id:false
+})
 
 const orderSchema = new mongoose.Schema(
   {
-    ordernumber: {
+    orderid: {
       type: Number,
       required: false,
-      unique: false,
+      unique: true,
     },
     invoice: {
-      type: Number,
+      type: String,
       required: false,
       unique: false,
     },
@@ -32,10 +78,7 @@ const orderSchema = new mongoose.Schema(
       ref: 'Product',  // Replace 'Product' with the appropriate model name for the product collection
       required: false,
     }],
-    orderdetails: {
-      type: mongoose.Schema.Types.Mixed, // For JSON type fields
-      required: false,
-    },
+    orderdetails:[orderDetailsSchema],
     shipdetails: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Shipment', // Replace 'ShipDetail' with the appropriate model name for the ship details collection
@@ -46,12 +89,13 @@ const orderSchema = new mongoose.Schema(
       enum: ['USD', 'EUR', 'INR', 'JPY', 'GBP', 'CHF', 'CAD', 'AUD', 'CNY', 'HKD', 'NZD'],
       required: false,
     },
-    dashuserprofileid: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Profile', // Replace 'UserProfile' with the appropriate model name for the user profile collection
-      required: false,
+    userId: {
+      type:String
     },
-    deliveryaddress: {
+    userEmail: {
+      type:String
+    },
+    shippingaddress: {
       type: String,
       required: false,
     },
@@ -70,8 +114,12 @@ const orderSchema = new mongoose.Schema(
     collection:"orders"
   }
 );
+//delete mongoose.models.Order
 
 // Create a model based on the schema
+if (!mongoose.models.Order && !orderSchema.paths.orderid.options.autoIncrement) {
+	orderSchema.plugin(AutoIncrement, { inc_field: 'orderid' });
+}
 
 const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 

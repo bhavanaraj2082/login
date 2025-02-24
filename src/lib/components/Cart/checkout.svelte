@@ -1,104 +1,221 @@
 <script>
-	import { sendMessage } from '$lib/utils.js';
+	import { goto } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
+	import { cart } from '$lib/stores/cart.js';
+	import { sendMessage,generateInvoiceNumber } from '$lib/utils.js';
 	import { enhance } from '$app/forms';
 	import { authedUser } from '$lib/stores/mainStores.js';
 	import Icon from '@iconify/svelte';
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { cartState } from '$lib/stores/cartStores.js';
 	import { shippingAddress, billingAddress } from '$lib/stores/mainStores.js';
+	import AddressForm from '$lib/components/Cart/AddressForm.svelte';
 
 	export let data;
-	const userData = data.profileData;
-	let shipping = userData.shippingAddress;
-	let billing = userData.billingAddress;
+	$: userData = data.result.profileData;
+	$: shipping = userData?.shippingAddress;
+	$: billing = userData?.billingAddress;
+	let loading = false;
+	let priceINR = 0
+	let priceUSD = 0
+	let isForm = false
+	let actionName
+	let formData
+	let isShowbox = true
+	let order = ''
+	let checkout
 
-	function createAddressString(address) {
-		if (!address) return '';
-		return Object.values(address)
-			.filter((field) => field && field.trim() !== '')
-			.join(', ')
-			.replace(/\s+/g, ' ')
-			.trim();
+	let cartdata = data?.cart?.cart[0]?.cartItems || []
+
+	cart.set(cartdata)
+
+	const calculateTotalPrice = (cart)=>{
+       priceINR = cart.reduce((sum,crt)=> sum + crt.pricing.INR* (1 + (18 / 100))*crt.quantity,0)
+       priceUSD = cart.reduce((sum,crt)=> sum + crt.pricing.USD * (1 + (18 / 100))*crt.quantity,0)
 	}
 
-	let shippingAddressString = shipping ? createAddressString(shipping) : '';
-	let billingAddressString = billing ? createAddressString(billing) : '';
+	calculateTotalPrice($cart)
 
-	$: shippingAddress.set(shippingAddressString);
-	$: billingAddress.set(billingAddressString);
+	const downloadExcel = () => {
+    // Define the data (same as the original CSV content)
+    const headers = [
+        'Product Name',
+        'Manufacturer',
+        'Quantity',
+        'Back Order',
+        'Price',
+        'Total Price'
+    ];
 
+    console.log($cart);
+
+    const data = $cart.map((item) => [
+        item.productDetails.productName,
+        item.mfrDetails.name,
+        item.quantity,
+        item.quantity - item.stockDetails.stock < 0 ? 0 : item.quantity - item.stockDetails.stock,
+        "₹ " + item.pricing.INR.toLocaleString("en-IN"),
+        "₹ " + (item.pricing.INR * item.quantity).toLocaleString("en-IN"),
+    ]);
+
+    // Calculate total price (sum of the last column - 'Extended Price')
+    const totalPrice = $cart.reduce((total, item) => {
+        return total + item.pricing.INR * item.quantity;
+    }, 0);
+
+    // Add a new row for the total price at the bottom
+    const totalRow = [
+        '', '', '', '', 'Total Price', "₹ "+totalPrice.toLocaleString("en-IN")
+    ];
+
+    // Prepare the data for SheetJS
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data, totalRow]); // AoA = Array of Arrays
+    const workbook = XLSX.utils.book_new(); // Create a new workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Cart Details'); // Append the sheet
+
+    // Apply styles to the header row
+    const headerStyle = {
+        font: { bold: true, color: { rgb: 'FFFFFF' } }, // Bold white text
+        fill: { fgColor: { rgb: '4F81BD' } }, // Blue background
+        alignment: { horizontal: 'center', vertical: 'center' }, // Center text
+        border: {
+            top: { style: 'thin', color: { rgb: '000000' } },
+            bottom: { style: 'thin', color: { rgb: '000000' } },
+            left: { style: 'thin', color: { rgb: '000000' } },
+            right: { style: 'thin', color: { rgb: '000000' } }
+        }
+    };
+
+    // Apply styles for header row cells
+    for (let c = 0; c < headers.length; c++) {
+        const cell = worksheet[XLSX.utils.encode_cell({ r: 0, c: c })];
+        if (!cell) worksheet[XLSX.utils.encode_cell({ r: 0, c: c })] = {}; // Ensure cell exists
+        worksheet[XLSX.utils.encode_cell({ r: 0, c: c })].s = headerStyle;
+    }
+
+    // Apply column width (optional)
+    worksheet['!cols'] = headers.map(() => ({ width: 20 })); // Set column width
+
+    // Apply styles to the data rows (optional)
+    const dataStyle = {
+        alignment: { horizontal: 'center', vertical: 'center' }, // Center text
+        border: {
+            top: { style: 'thin', color: { rgb: '000000' } },
+            bottom: { style: 'thin', color: { rgb: '000000' } },
+            left: { style: 'thin', color: { rgb: '000000' } },
+            right: { style: 'thin', color: { rgb: '000000' } }
+        }
+    };
+
+    // Apply styles to all data rows
+    for (let r = 1; r < data.length + 2; r++) { // Include the total row
+        for (let c = 0; c < headers.length; c++) {
+            const cell = worksheet[XLSX.utils.encode_cell({ r: r, c: c })];
+            if (!cell) worksheet[XLSX.utils.encode_cell({ r: r, c: c })] = {}; // Ensure the cell exists
+            worksheet[XLSX.utils.encode_cell({ r: r, c: c })].s = dataStyle;
+        }
+    }
+
+    // Generate Excel file and trigger download
+    XLSX.writeFile(workbook, 'cart_details.xlsx');
+    };
+
+	let filteredBillingAddress
+     let filteredShippingAddress
+     let profileAddress
+	 $:{
+	 filteredBillingAddress = billing !== null ? billing.find(x=>x.isDefault === true) : undefined
+	 filteredShippingAddress = shipping !== null ? shipping.find(x=>x.isDefault === true) : undefined
+	// profileAddress = `${profile?.firstname} ${profile?.lastName || ''}, ${profile?.address1}, ${profile?.city}, ${profile?.country}, ${profile?.state}, ${profile?.postalcode}`;
+   
+	if (filteredBillingAddress !== undefined) {
+		const { firstname, lastname, address, city, state, country, postalcode } =
+			filteredBillingAddress;
+
+		$billingAddress = [firstname, lastname, address, city, state, country, postalcode]
+			.filter(Boolean)
+			.join(', ');
+	} else {
+		$billingAddress = '';
+	}
+
+	if (filteredShippingAddress !== undefined) {
+		const { firstname, lastname, address, city, state, country, postalcode } =
+			filteredShippingAddress;
+
+		$shippingAddress = [firstname, lastname, address, city, state, country, postalcode]
+			.filter(Boolean)
+			.join(', ');
+	} else {
+		$shippingAddress = '';
+	}
+   }
+  
 	const dispatch = createEventDispatcher();
 
-	// let authedUser = {
-	//     email: "",
-	// };
-
-	let loading = true;
-	$: cartItems = $cartState;
-	let subtotal = 0;
-	let tax = 0;
-	let total = 0;
-	let totalPrice = 0;
-	let order = '';
-
-	$: if (!$cartState.length) {
-		subtotal = 0;
-		totalPrice = 0;
-		tax = 0;
-		total = 0;
-		subtotal = 0;
-	}
-
-	const calculateTotals = () => {
-		subtotal = cartItems.reduce(
-			(sum, item) => sum + parseFloat(item.priceSize.price) * parseInt(item.quantity),
-			0
-		);
-		tax = subtotal * 0;
-		total = subtotal + tax;
-
-		// let ordernumber = Math.floor(Math.random() * 900000) + 100000;
+	function handleCheckout(carts) {
+		//let hash = Math.random(2).toString(20).substring(2, 20);
+		//console.log(isGST,"gst");
 		let products = [];
-		let orderdetails = cartItems.map((item) => {
-			const { id, name, partNumber, quantity, priceSize, stock } = item;
-			const parsedPrice = parseFloat(priceSize.price);
-			const parsedQty = parseInt(quantity);
-			const parsedStock = parseInt(stock);
-
-			products.push(id);
-			totalPrice = parsedQty * parsedPrice;
-			let backOrder = parsedQty > stock ? parsedQty - parsedStock : 0;
-			let readyToShip = parsedQty < stock ? parsedQty : stock;
-			return {
-				productId: id,
-				productName: name,
-				productNumber: partNumber,
-				orderQty: parsedQty,
-				unitPrice: parsedPrice,
+		let orderdetails = [];
+		if (carts?.length === 0) {
+			return;
+		}
+		carts?.map((cart) => {
+			products.push(cart.productId);
+			let backOrder = cart.quantity > cart.stockDetails.stock ? parseInt(cart.quantity) - parseInt(cart.stockDetails.stock) : 0;
+			let price = cart.isQuote ? (cart.quoteOfferPrice.INR * (1 + (18 / 100))) :(cart.isCart ? (cart.cartOfferPrice.INR * (1 + (18 / 100))) :(cart.pricing.INR * (1 + (18 / 100))))
+			  
+			orderdetails.push({
 				backOrder,
-				extendedPrice: totalPrice,
-				readyToShip,
-				supplierId: '',
-				availableStock: parsedStock
-			};
+				productId: cart.productId,
+				extendedPrice: price * parseInt(cart.quantity),
+				orderQty: cart.quantity,
+				readyToShip: cart.quantity - backOrder,
+				distributorId: cart.distributorId,
+				manufacturerId: cart.manufacturerId,
+				stockId: cart.stockId,
+				unitPrice: price,
+				productName:cart.productDetails.productName,
+				manufacturerName:cart.mfrDetails.name,
+				//distributorAlias:cart.distributorDetails.aliasname
+			});
 		});
-		order = {
-			// ordernumber,
-			invoice: 0,
-			totalprice: total,
-			subtotalprice: subtotal,
-			shippingprice: tax,
+
+		let order = {
+			invoice:generateInvoiceNumber(),
+			subtotalprice: priceINR,
+			shippingprice: 0,
+			totalprice: priceINR,
 			products,
 			orderdetails,
-			status: 'pending'
-			// dashuserprofileid: $authedUser.userId,
+			billingaddress:$billingAddress,
+			shippingaddress:$shippingAddress,
+			//carrier:{carrier,accountNumber},
+			currency: "INR",
 		};
-	};
+		checkout = order;
+	   // console.log(checkout,"checkout");
+	}
+	$: handleCheckout($cart);
 
-	onMount(() => {
-		calculateTotals();
-		loading = false;
-	});
+	const handleDispatchEvent =(e)=>{
+		console.log(e.detail,"detail");
+		//if(e.detail.success){
+			invalidate("data:checkout")
+		//}
+	}
+
+	const handleSubmit = ()=>{
+		return async({result})=>{
+			console.log(result);
+			if(result.data.success){
+				goto('checkout/success')
+			}else{
+				goto('checkout/failure')
+			}
+		}
+	}
 
 	const handlePayment = () => {
 		console.log('clicked');
@@ -106,138 +223,110 @@
 	};
 </script>
 
-<div class="mx-auto w-full md:flex md:w-11/12 gap-6">
-	<div class="md:w-8/12">
-		<div class=" flex flex-col xl:flex-row justify-between gap-6">
-			{#if loading}
-				<div
-					class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded shadow-md"
-				>
-					<p class=" font-medium text-lg md:text-xl xl:text-2xl">Loading...</p>
-				</div>
-			{:else if !$cartState.length || $cartState === null}
-				<div
-					class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded shadow-md"
-				>
-					<Icon icon="typcn:shopping-cart" class="text-5xl text-primary-500 md:text-8xl" />
-					<p class=" font-bold text-lg md:text-xl xl:text-2xl">Cart is Empty</p>
-				</div>
-			{:else}
-				<div class="w-full bg-white p-4 rounded-lg shadow-md h-fit mx-auto">
-					<h2 class="text-xl mb-3 font-bold">
-						Cart Items <span class="text-red-500">({cartItems.length})</span>
-					</h2>
 
-					<div class="hidden lg:flex text-gray-500 font-semibold mb-2">
-						<p class=" w-6/12">Product</p>
-						<p class=" w-2/12">Price</p>
-						<p class=" w-2/12">Quantity</p>
-						<p class=" w-2/12">Total</p>
-					</div>
+{#if isForm}
+	<AddressForm
+	on:onSubmit={handleDispatchEvent}
+	formdata={formData}
+	handlePopupAddress = {()=>isForm = false}
+	{actionName}
+	firstname={userData?.firstname} 
+	lastname={userData?.lastname} 
+	{isShowbox}
+	/>
+{/if}
 
-					<ul class="">
-						{#each cartItems as item}
-							<li class="flex flex-col lg:flex-row lg:items-center py-3 lg:py-5 border-b-1">
-								<!-- Product Image and Details -->
-								<h3 class=" lg:hidden mt-3 font-medium text-sm">Product</h3>
-								<div class="flex items-center w-full md:w-6/12">
-									<img src={item.image} alt={item.name} class="w-16 h-16 object-cover rounded-md" />
-									<div class="ml-2">
-										<p class="text-sm text-red-500 font-semibold">
-											{item.partNumber}
-										</p>
-										<p class=" text-gray-800">{item.name}</p>
-										<p class=" text-gray-800 text-sm font-semibold">
-											{item.priceSize.size}
-										</p>
-									</div>
-								</div>
-
-								<!-- Price -->
-								<h3 class=" lg:hidden mt-3 font-medium text-sm">Price</h3>
-								<p class="text-md w-full md:w-2/12 font-semibold text-content">
-									{item.priceSize.price}
-								</p>
-
-								<!-- Quantity Control -->
-								<h3 class=" lg:hidden mt-3 font-medium text-sm">Quantity</h3>
-								<div class="flex items-center w-60 md:w-2/12">
-									<p class="w-fit mx-3 text-md font-medium outline-none text-center">
-										{item.quantity}
-									</p>
-								</div>
-
-								<!-- Total Price & Delete Icon -->
-								<h3 class=" lg:hidden mt-3 text-sm">Total</h3>
-								<div class=" w-full lg:w-2/12 flex justify-between items-center">
-									<p class="text-md font-semibold">
-										₹{(parseFloat(item.priceSize.price) * item.quantity).toFixed(2)}
-									</p>
-								</div>
-							</li>
-						{/each}
-					</ul>
+<section class=" mx-auto mb-4 w-11/12 sm:flex gap-4 sm:items-start space-y-4 sm:space-y-0">
+	<div class="p-3 lg:p-4 sm:w-1/2 md:w-3/5 lg:w-3/4 bg-white shadow-sm rounded">
+		<!-- <h3 class="text-md font-semibold text-gray-600">Address Selection</h3> -->
+		 <div class=" flex flex-col md:flex-row gap-4 mb-1">
+			<label for="" class=" w-full font-medium text-sm text-gray-600"> Email <br>
+			    <input class=" w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+			</label>
+			<label for="" class=" w-full font-medium text-sm text-gray-600"> GST Number <br>
+				<input class=" w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+			</label>
+		 </div>
+		<div class=" lg:flex gap-4">
+			<div class=" w-full ">
+				<div class="flex justify-between items-center my-2">
+					<label for="billing-address" class="block font-medium text-sm text-gray-600">Billing Address</label>
+					<button on:click={()=>{
+						formData ={}
+				        isForm = true
+				        actionName = "billingaddress"
+				        let address = filteredBillingAddress === undefined ? '' : filteredBillingAddress
+				        formData = {userId:userData?._id,addAlternate:false,...address}
+				    }} 
+				    class=" p-1.5 bg-gray-200 hover:text-white hover:bg-primary-500 rounded">
+					    <Icon icon="ic:round-mode-edit" class=" text-lg" />
+					</button>
 				</div>
-			{/if}
-		</div>
-		<div class="pt-6 pb-4 px-6 gap-3 bg-white mt-10 shadow-md rounded">
-			<h3 class="text-xl font-bold text-gray-600">Address Selection</h3>
-			<div class="flex gap-6">
-				<div class=" w-full md:w-6/12">
-					<label for="billing-address" class="block font-bold text-base my-2 text-gray-600"
-						>Billing Address</label
-					>
-					<textarea
-						id="billing-address"
-						class="w-full mb-4 p-2 h-20 rounded border-gray-200 border"
-						placeholder="Enter your billing address here..."
-						bind:value={$billingAddress}
-					/>
+				<textarea
+					id="billing-address"
+					disabled
+					class="w-full p-2 h-16 lg:h-20 text-sm rounded border-gray-200 border focus:ring-0 focus:border-primary-500"
+					placeholder=""
+					bind:value={$billingAddress}
+				/>
+			</div>
+			<div class="w-full ">
+				<div class=" flex justify-between items-center my-2">
+				    <label for="shipping-address" class="block font-medium text-sm text-gray-600">Shipping Address</label>
+				    <button on:click={()=>{
+						formData ={}
+				        isForm = true
+				        actionName = "shippingaddress"
+				        let address = filteredShippingAddress === undefined ? '' : filteredShippingAddress
+				        formData = {userId:userData?._id,addAlternate:false,...address}
+				    }} 
+					class="  p-1.5 bg-gray-200 hover:text-white hover:bg-primary-500 rounded">
+					    <Icon icon="ic:round-mode-edit" class=" text-lg" />
+					</button>
 				</div>
-				<div class="w-full md:w-6/12">
-					<label for="shipping-address" class="block font-bold text-base my-2 text-gray-600"
-						>Shipping Address</label
-					>
-					<textarea
-						id="shipping-address"
-						class="w-full p-2 h-20 rounded border-gray-200 border"
-						placeholder="Enter your shipping address here..."
-						bind:value={$shippingAddress}
-					/>
-				</div>
+				<textarea
+					id="shipping-address"
+					disabled
+					class="w-full p-2 h-16 lg:h-20 text-sm rounded border-gray-200 border focus:ring-0 focus:border-primary-500"
+					placeholder=""
+					bind:value={$shippingAddress}
+				/>
 			</div>
 		</div>
 	</div>
-	<div class="md:w-4/12">
-		<div class="mt-2 bg-white mx-auto p-4 rounded-lg shadow-md">
-			<div>
-				<h2 class="text-xl font-bold mb-4">Your Order</h2>
+   
+	<div class="w-full sm:w-1/2 md:w-2/5 lg:w-1/4 bg-white rounded shadow-sm">
+		<div class=" bg-white mx-auto p-4 ">
+			<div class=" space-y-2">
+				<h2 class=" text-lg lg:text-xl font-bold">Your Order</h2>
 				<div class="space-y-2">
-					<div class="flex justify-between text-lg">
+					<div class="flex justify-between font-medium text-sm">
 						<p>Subtotal</p>
-						<p>₹{subtotal.toFixed(2)}</p>
+						<div class=" flex flex-col items-end">
+						<p class=" font-semibold">₹{priceINR.toLocaleString("en-IN")}</p>
+                         <span class=" text-xs">including GST</span>
+						</div>
 					</div>
-					<div class="flex justify-between text-lg">
+					<div class="flex justify-between font-medium text-sm">
 						<p>Tax</p>
-						<p>₹{tax.toFixed(2)}</p>
+						<p class=" text-2s">charges apply</p>
 					</div>
-					<div class="flex justify-between text-lg font-bold">
+					<div class="flex border-t-1 pt-2 justify-between text-sm font-bold">
 						<p>Total</p>
-						<p>₹{total.toFixed(2)}</p>
+						<p>₹{priceINR.toLocaleString("en-IN")}</p>
 					</div>
 				</div>
 			</div>
-			{#if $cartState.length}
+			{#if $cart.length}
 				<div class=" mt-4 grid grid-cols-2 gap-2">
-					{#if $authedUser.email}
-						<form method="POST" class=" col-span-2">
-							<input type="text" hidden />
+					{#if !$authedUser.email}
+						<form method="POST" action="?/checkout" use:enhance={handleSubmit} class=" col-span-2">
+							<input type="hidden" name="order" value={JSON.stringify(checkout)}/>
 							<button
-								type="button"
-								on:click={handlePayment}
-								class="mt-4 w-full bg-primary-500 text-white py-2 rounded-lg font-semibold hover:bg-primary-600"
+								type="submit"
+								class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
 							>
-								Proceed to Payment
+								Proceed to Order
 							</button>
 						</form>
 					{/if}
@@ -245,4 +334,112 @@
 			{/if}
 		</div>
 	</div>
+
+</section>
+
+<div class="mx-auto w-11/12 mb-5">
+	<div class=" w-full space-y-4">
+		{#if loading}
+			<div
+				class="w-full h-72 flex flex-col gap-2 items-center justify-center bg-white p-4 rounded shadow-sm"
+			>
+				<p class=" font-medium text-lg md:text-xl xl:text-2xl">Loading...</p>
+			</div>
+		{:else if !$cart.length}
+			<div class="w-full flex flex-col gap-2 items-center justify-center bg-white py-5 rounded shadow-sm">
+				<Icon icon="ic:outline-shopping-cart" class="text-5xl text-primary-400 md:text-6xl" />
+				<p class=" font-bold text-lg md:text-xl">Cart is Empty</p>
+			</div>
+		{:else}
+			<div class="w-full bg-white p-3 sm:px-4 sm:py-3 rounded shadow-sm h-fit">
+				<div class=" w-full flex items-center justify-between mb-4">
+					<h2 class=" text-sm sm:text-lg lg:mb-3 font-semibold">
+						Cart Items <span class="text-red-500">({$cart.length})</span>
+					</h2>
+					<div class="flex items-center gap-2">
+						<button
+					        type="button"
+					        on:click={downloadExcel}
+					        class=" text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-medium">
+							<Icon icon="mdi:file-download" class="text-lg sm:text-xl rounded text-white"/>
+					        <span class="hidden sm:block">Download</span>
+						</button>
+					</div>
+				</div>
+				
+
+				<div class="hidden lg:flex text-gray-500 text-sm pb-2 font-semibold">
+					<p class=" w-6/12">Product</p>
+					<p class=" w-2/12">Price</p>
+					<p class=" w-2/12">Quantity</p>
+					<p class=" w-2/12">Total</p>
+				</div>
+
+				<ul class="">
+					{#each $cart as item,index}
+						<li class="flex flex-col lg:flex-row lg:items-center py-2 border-t-1">
+					
+							<h3 class=" lg:hidden font-medium text-xs sm:text-sm">Product</h3>
+							<div class="flex items-center w-full md:w-6/12 md:pr-2">
+								<img src={item.productDetails.imageSrc} alt={item.productDetails.productName} class="w-20 h-20 shrink-0 object-cover rounded-md" />
+								<div class="ml-2">
+									<p class="text-sm text-red-500 font-semibold">{item.productDetails.productNumber}</p>
+									<p class=" text-gray-800 text-xs lg:text-3s">{item.productDetails.productName}</p>
+									<p class=" text-gray-800 text-xs font-semibold">{item.pricing.break}</p>
+								</div>
+							</div>
+                            <div class=" lg:w-6/12 sm:flex justify-between items-center">
+							    
+								 <div class=" lg:w-2/6">
+									<h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Price</h3>
+									<div class="text-xs w-full font-semibold">
+									    <p>₹{(item.pricing.INR * (1 + (18 / 100))).toLocaleString("en-IN")} with GST</p>
+									    <p class=" text-2s text-gray-400">₹{item.pricing.INR.toLocaleString("en-IN")} without GST</p>
+									</div>
+								 </div>
+							
+								<div class=" lg:w-2/6">
+							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Quantity</h3>
+							        <div class="flex items-center md:w-2/12">
+							        	<div class="flex items-center rounded">
+							        		<!-- <button
+							        			on:click={() => decrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}
+							        			class=" border-r-1 p-1.5 text-primary-500"
+							        			><Icon icon="rivet-icons:minus" class="text-xs" /></button
+							        		> -->
+							        		<p class="w-fit mx-3 text-xs font-medium outline-none text-center">
+							        			{item.quantity}
+							        		</p>
+							        		<!-- <button
+							        			on:click={() => incrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}
+							        			class=" border-l-1 p-1.5  text-primary-500">
+												<Icon icon="rivet-icons:plus" class="text-xs" />
+											</button> -->
+							        	</div>
+							        </div>
+							    </div>
+							
+								<div class=" lg:w-2/6">
+							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Total</h3>
+							        <div class=" w-full flex justify-start items-center">
+										<div class="text-xs w-full font-semibold">
+											<p>₹{(item.pricing.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST</p>
+											<p class=" text-2s text-gray-400">₹{(item.pricing.INR * item.quantity).toLocaleString("en-IN")} without GST</p>
+										</div>
+							        	<div class="text-xs font-semibold">
+							        		
+										</div>
+							        </div>
+								</div>
+						    </div>
+						</li>
+					{/each}
+				</ul>
+			</div>
+		
+		{/if}
+
+
+	</div>
+	
 </div>

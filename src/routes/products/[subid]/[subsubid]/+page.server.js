@@ -1,4 +1,5 @@
 import { loadProductsubcategory } from '$lib/server/mongoLoads.js';
+import { addToCart } from '$lib/server/mongoActions.js';
 
 export async function load({ params,url,depends }) {
 	try {
@@ -31,6 +32,19 @@ export const actions = {
 				status: 500,
 				body: { message: 'Failed to get data' }
 			};
+		}
+	},
+	addtocart:async({request,locals})=>{
+		try {
+			const userId = locals?.authedUser?.id || "67af35cb27b8020af0d7aab7"
+			const userEmail = locals?.authedUser?.email || "yusuf@partskeys.com"
+			const body = Object.fromEntries(await request.formData())
+			const data = JSON.parse(body.item)
+			//console.log(data);
+			return await addToCart(data,userId,userEmail)
+		} catch (error) {
+			console.log(error);
+			return {success:false,message:"Something went wrong"}
 		}
 	}
 };
