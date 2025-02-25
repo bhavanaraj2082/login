@@ -10,6 +10,7 @@ const stockSchema = new Schema(
         distributor: { type: Types.ObjectId, ref: 'distributors', required: true },
         pricing: { type: Schema.Types.Mixed, default: [] },
         stock: { type: Number, default: 0 },
+        orderedQty: { type: Number, default: 0 },
         orderMultiple: { type: Number },
         specifications:{type: String},
         sku:{type:String}
@@ -19,6 +20,6 @@ const stockSchema = new Schema(
         collection: 'stocks'
     }
 );
-
+//delete mongoose.models.Stock
 export const Stock = mongoose.models.Stock || mongoose.model('Stock', stockSchema);
 export default Stock;

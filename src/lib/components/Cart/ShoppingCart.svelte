@@ -1,249 +1,384 @@
 <script>
-	import { goto } from '$app/navigation';
+	import { sendMessage } from '$lib/utils.js';
+	import { goto,invalidate } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
 	import { authedUser } from '$lib/stores/mainStores.js';
 	import Icon from '@iconify/svelte';
 	import { onMount, createEventDispatcher } from 'svelte';
-	import { cartState, updateCartState } from '$lib/stores/cartStores.js';
-	import jsPDF from 'jspdf';
+	import RecurrencePopup from '$lib/components/Cart/RecurrencePopup.svelte';
+	import { cart, guestCart,removeFromCart } from '$lib/stores/cart.js';
 	import { toast } from 'svelte-sonner';
-	import 'jspdf-autotable';
 	import { page } from '$app/stores';
+	import * as XLSX from 'xlsx';
+
 	const dispatch = createEventDispatcher();
 
-	// let authedUser={
-	// 	email:""
-	// }
+	export let data
 
-	let timestamp;
-	let loading = true;
-	$: console.log($cartState);
-
-	$: cartItems = $cartState;
-	let subtotal = 0;
-	let tax = 0;
-	let total = 0;
+    console.log('first',$authedUser)
+	let loading = false;
+	let isLoggedIn = $authedUser?.id ? true : false
 	let totalPrice = 0;
 	let order = '';
+	let filteredGuestCart = ''
+	let container
+	let addToCartModal = false
+	let recureModal = false
+	let timeout
+	let priceINR = 0
+	let priceUSD = 0
 
+	$: cartData = data?.cart[0]?.cartItems || [];
+	$: cart.set(cartData);
+	$: cartId = data?.cart[0]?.cartId || '';
+	$: cartName = data?.cart[0]?.cartName || '';
+	$: recurrence = data?.cart[0]?.recurrence || '';
+	//$: console.log(data,"forntend");
+
+	const calculateTotalPrice = (cart)=>{
+       priceINR = cart.reduce((sum,crt)=> sum + crt.pricing.INR*crt.quantity,0)
+       priceUSD = cart.reduce((sum,crt)=> sum + crt.pricing.USD*crt.quantity,0)
+	}
+	const guestCartFetch = () => {
+		const formdata = new FormData();
+		formdata.append('guestCart', JSON.stringify($guestCart));
+		sendMessage('?/guestCart', formdata, async (result) => {
+		    //console.log("guest cart in coponent",result);
+			cart.set(result.cart);
+			calculateTotalPrice($cart);
+		});
+	};
+
+	onMount(() => {
+		filteredGuestCart = $guestCart.filter(guestItem => 
+            !$cart.some(cartItem => cartItem.productId === guestItem.productId)
+        );
+		//console.log('object',filteredGuestCart);
+
+		if (!isLoggedIn) {
+			if ($guestCart.length) {
+				guestCartFetch();
+			} else {
+				cart.set([]);
+			}
+		} else {
+			cartData = data?.cart[0]?.cartItems || [];
+			cart.set(cartData);
+		    calculateTotalPrice($cart);
+		}
+
+	});
+	
+	//$:calculateTotalPrice($cart)
 	let showModal = false;
 
 	const toggleModal = () => {
 		showModal = !showModal;
 	};
 
-	$: if (!$cartState.length) {
-		subtotal = 0;
-		totalPrice = 0;
-		tax = 0;
-		total = 0;
-		subtotal = 0;
+	const handleClick = (e) => {
+		if (!container.contains(e.target)) {
+			addToCartModal = !addToCartModal;
+		}
+	};
+
+	const downloadExcel = () => {
+    // Define the data (same as the original CSV content)
+    const headers = [
+        'Product Name',
+        'Manufacturer',
+        'Quantity',
+        'Back Order',
+        'Price',
+        'Total Price'
+    ];
+
+    console.log($cart);
+
+    const data = $cart.map((item) => [
+        item.productDetails.productName,
+        item.mfrDetails.name,
+        item.quantity,
+        item.quantity - item.stockDetails.stock < 0 ? 0 : item.quantity - item.stockDetails.stock,
+        "₹ " + item.pricing.INR.toLocaleString("en-IN"),
+        "₹ " + (item.pricing.INR * item.quantity).toLocaleString("en-IN"),
+    ]);
+
+    // Calculate total price (sum of the last column - 'Extended Price')
+    const totalPrice = $cart.reduce((total, item) => {
+        return total + item.pricing.INR * item.quantity;
+    }, 0);
+
+    // Add a new row for the total price at the bottom
+    const totalRow = [
+        '', '', '', '', 'Total Price', "₹ "+totalPrice.toLocaleString("en-IN")
+    ];
+
+    // Prepare the data for SheetJS
+    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data, totalRow]); // AoA = Array of Arrays
+    const workbook = XLSX.utils.book_new(); // Create a new workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Cart Details'); // Append the sheet
+
+    // Apply styles to the header row
+    const headerStyle = {
+        font: { bold: true, color: { rgb: 'FFFFFF' } }, // Bold white text
+        fill: { fgColor: { rgb: '4F81BD' } }, // Blue background
+        alignment: { horizontal: 'center', vertical: 'center' }, // Center text
+        border: {
+            top: { style: 'thin', color: { rgb: '000000' } },
+            bottom: { style: 'thin', color: { rgb: '000000' } },
+            left: { style: 'thin', color: { rgb: '000000' } },
+            right: { style: 'thin', color: { rgb: '000000' } }
+        }
+    };
+
+    // Apply styles for header row cells
+    for (let c = 0; c < headers.length; c++) {
+        const cell = worksheet[XLSX.utils.encode_cell({ r: 0, c: c })];
+        if (!cell) worksheet[XLSX.utils.encode_cell({ r: 0, c: c })] = {}; // Ensure cell exists
+        worksheet[XLSX.utils.encode_cell({ r: 0, c: c })].s = headerStyle;
+    }
+
+    // Apply column width (optional)
+    worksheet['!cols'] = headers.map(() => ({ width: 20 })); // Set column width
+
+    // Apply styles to the data rows (optional)
+    const dataStyle = {
+        alignment: { horizontal: 'center', vertical: 'center' }, // Center text
+        border: {
+            top: { style: 'thin', color: { rgb: '000000' } },
+            bottom: { style: 'thin', color: { rgb: '000000' } },
+            left: { style: 'thin', color: { rgb: '000000' } },
+            right: { style: 'thin', color: { rgb: '000000' } }
+        }
+    };
+
+    // Apply styles to all data rows
+    for (let r = 1; r < data.length + 2; r++) { // Include the total row
+        for (let c = 0; c < headers.length; c++) {
+            const cell = worksheet[XLSX.utils.encode_cell({ r: r, c: c })];
+            if (!cell) worksheet[XLSX.utils.encode_cell({ r: r, c: c })] = {}; // Ensure the cell exists
+            worksheet[XLSX.utils.encode_cell({ r: r, c: c })].s = dataStyle;
+        }
+    }
+
+    // Generate Excel file and trigger download
+    XLSX.writeFile(workbook, 'cart_details.xlsx');
+    };
+
+	const recurrencePeriod =(recurring)=>{
+		if(recurring === 1){
+       return "Monthly" 
+	}else if(recurring === 3){
+      return "Quarterly"
+	}else if(recurring === 6){
+       return "Semi Annual"
+	}else if(recurring === 12){
+       return "Annual"
+	}else{
+		return recurring + " Months"
+	}
 	}
 
-	const generatePDFDocument = () => {
-		const total = $cartState.reduce(
-			(sum, item) => sum + parseFloat(item.priceSize.price) * item.quantity,
-			0
-		);
-		const doc = new jsPDF();
+	const incrementQuantity = (quantity,stock,_id,indx) => {
+		clearTimeout(timeout)
 
-		doc.setFontSize(18);
-		doc.text('Chemikart Cart Summary', 14, 20);
-
-		doc.setFont('helvetica');
-
-		const tableColumns = ['Products', 'Price', 'Quantity', 'Total'];
-		const tableData = $cartState.map((item) => [
-			`${item.partNumber}\n${item.name}\n${item.priceSize.size}`,
-			`${parseFloat(item.priceSize.price)}`, // Use the ₹ symbol here
-			`${item.quantity}`,
-			`${parseFloat(item.priceSize.price) * item.quantity}` // Use the ₹ symbol for total as well
-		]);
-
-		tableData.push(['Total Price', '', '', `${total}`]);
-
-		doc.autoTable({
-			head: [tableColumns],
-			body: tableData,
-			startY: 30,
-			margin: { top: 10 },
-			styles: {
-				fontSize: 12,
-				cellPadding: 5,
-				halign: 'left',
-				lineWidth: 0
-			},
-			headStyles: {
-				fillColor: [255, 229, 204],
-				textColor: [0, 0, 0],
-				fontSize: 12,
-				cellPadding: 5
-			},
-			theme: 'striped',
-			tableLineWidth: 0,
-			tableLineColor: [255, 255, 255],
-			rowStyles: (rowIndex) => ({
-				fillColor: rowIndex % 2 === 0 ? [245, 245, 245] : [255, 255, 255]
+		if(!isLoggedIn){
+			cart.update(item=>{
+				item[indx].quantity += 1
+				return item
 			})
-		});
-
-		return doc;
-	};
-
-	const downloadPDF = () => {
-		const doc = generatePDFDocument();
-		doc.save('cart-summary.pdf');
-	};
-
-	const printPDF = () => {
-		const doc = generatePDFDocument();
-		doc.autoPrint();
-		window.open(doc.output('bloburl'), '_blank');
-	};
-
-	const functionDispatch = () => {
-		let expireTime = 12 * 60 * 60 * 1000;
-		if (!$cartState.length) {
-			console.log('cart empty');
-			return;
+			guestCart.update(item=>{
+			item[indx].quantity += 1
+			return item
+		    })
+			calculateTotalPrice($cart)
+			return
 		}
-		if (browser) {
-			timestamp = browser ? JSON.parse(localStorage.getItem('cartTimeStamp')) : null;
 
-			if (timestamp === null) {
-				timestamp = Date.now();
-				localStorage.setItem('cartTimeStamp', timestamp);
-			}
-			if (Date.now() > timestamp + expireTime) {
-				console.log('items has expired');
-				dispatch('onCart', { isExpired: true });
-			} else {
-				dispatch('onCart', { isExpired: false });
-				console.log('item is still valid');
-			}
-		}
-	};
-
-	const calculateTotals = () => {
-		subtotal = cartItems.reduce(
-			(sum, item) => sum + parseFloat(item.priceSize.price) * parseInt(item.quantity),
-			0
-		);
-		tax = subtotal * 0;
-		total = subtotal + tax;
-
-		let ordernumber = Math.floor(Math.random() * 900000) + 100000;
-		let products = [];
-		let orderdetails = cartItems.map((item) => {
-			const { id, name, partNumber, quantity, priceSize, stock } = item;
-			const parsedPrice = parseFloat(priceSize.price);
-			const parsedQty = parseInt(quantity);
-			const parsedStock = parseInt(stock);
-
-			products.push(id);
-			totalPrice = parsedQty * parsedPrice;
-			let backOrder = parsedQty > stock ? parsedQty - parsedStock : 0;
-			let readyToShip = parsedQty < stock ? parsedQty : stock;
-			return {
-				productId: id,
-				productName: name,
-				productNumber: partNumber,
-				orderQty: parsedQty,
-				unitPrice: parsedPrice,
-				backOrder,
-				extendedPrice: totalPrice,
-				readyToShip,
-				supplierId: '',
-				availableStock: parsedStock
-			};
-		});
-		order = {
-			ordernumber,
-			invoice: 0,
-			totalprice: total,
-			subtotalprice: subtotal,
-			shippingprice: tax,
-			products,
-			orderdetails,
-			status: 'pending',
-			dashuserprofileid: $authedUser.userId
-		};
-	};
-
-	const incrementQuantity = (size, id) => {
-		const index = cartItems.findIndex((item) => item.priceSize.size === size && item.id === id);
+	    const index = $cart.findIndex((item) =>item._id === _id);
 		if (index !== -1) {
-			cartItems[index].quantity += 1;
-			cartItems = [...cartItems];
-			updateCartState(cartItems);
-			calculateTotals();
+			cart.update(item=>{
+				item[index].quantity += 1
+				return item
+			})
 		}
+
+		timeout = setTimeout(()=>{
+		  const formdata = new FormData()
+		  formdata.append("_id",_id)
+		  formdata.append("stock",stock)
+		  formdata.append("quantity",$cart[index]?.quantity)
+		  formdata.append("cartId",cartId)
+		  sendMessage("?/updateQty",formdata,async(result)=>{
+			calculateTotalPrice($cart)
+		  })
+	  },1000)
+
 	};
 
-	const decrementQuantity = (size, id) => {
-		const index = cartItems.findIndex((item) => item.priceSize.size === size && item.id === id);
-		if (index !== -1 && cartItems[index].quantity > 1) {
-			cartItems[index].quantity -= 1;
-			cartItems = [...cartItems];
-			updateCartState(cartItems);
-			calculateTotals();
+	const decrementQuantity = (quantity,stock,_id,indx) => {
+		clearTimeout(timeout)
+		if(!isLoggedIn){
+			cart.update(item=>{
+				item[indx].quantity -= 1
+				return item
+			})
+			guestCart.update(item=>{
+			item[indx].quantity -= 1
+			return item
+		    })
+			calculateTotalPrice($cart)
+			return
 		}
+	    const index = $cart.findIndex((item) =>item._id === _id);
+		if (index !== -1) {
+			if($cart[index]?.quantity !== 1){
+				cart.update(item=>{
+					item[index].quantity -= 1
+					return item
+			    })
+			}
+		}
+		timeout = setTimeout(()=>{
+		  const formdata = new FormData()
+		  formdata.append("_id",_id)
+		  formdata.append("stock",stock)
+		  formdata.append("quantity",$cart[index].quantity)
+		  formdata.append("cartId",cartId)
+		  sendMessage("?/updateQty",formdata,async(result)=>{
+			calculateTotalPrice($cart)
+		  })
+	  },1000)
 	};
 
-	const removeItem = (size, id) => {
-		cartItems = cartItems.filter((item) => !(item.id === id && item.priceSize.size === size));
-		console.log('remove item', cartItems);
-		updateCartState(cartItems);
-		calculateTotals();
+	const removeItem = (productNumber,_id,index) => {
+		if(!isLoggedIn){
+			removeFromCart(index)
+			toast.success(`${productNumber} is deleted successfully`);
+			return
+		}
+		const formdata = new FormData()
+		formdata.append("cartId",cartId)
+		formdata.append("productNumber",productNumber)
+		formdata.append("_id",_id)
+	    sendMessage("?/deleteOne",formdata,async(result)=>{
+			console.log(result);
+			if(result.success){
+				toast.success(result.message)
+			}else{
+				toast.error(result.message)
+			}
+			invalidate("data:cart")
+
+		})
 	};
 
 	const emptyCart = () => {
-		cartItems = [];
-		subtotal = 0;
-		totalPrice = 0;
-		tax = 0;
-		total = 0;
-		subtotal = 0;
-		updateCartState(cartItems);
+		if(!isLoggedIn){
+			removeFromCart()
+			toast.success(`All products are deleted successfully`);
+			return
+		}
+		const formdata = new FormData()
+		formdata.append("cartId",cartId)
+	    sendMessage("?/deleteAll",formdata,async(result)=>{
+			console.log(result);
+			if(result.success){
+				toast.success(result.message)
+			}else{
+				toast.error(result.message)
+			}
+			invalidate("data:cart")
+
+		})
 	};
 
 	function setRedirectUrl() {
 		const currentUrl = $page.url.href;
 		document.cookie = `redirectUrl=${encodeURIComponent(currentUrl)}; path=/;`;
 	}
-
 	onMount(() => {
 		calculateTotals();
 		functionDispatch();
 		loading = false;
 	});
+
+	let selectedImage = null;
+	let showimage=false;
+	function imagemodal(imageSrc) {
+		selectedImage = imageSrc;
+		showimage=true;
+	}
+	function closePopup() {
+		showimage = false;
+		selectedImage = null;
+	}
+
+	function handleCart({ cancel }) {
+		return async ({ result }) => {
+			console.log(result);
+			addToCartModal = !addToCartModal;
+			removeFromCart();
+			calculateTotalPrice($cart)
+			toast.success('Components are added to cart');
+			invalidate('data:cart');
+		};
+	}
 </script>
 
-<div class="mx-auto bg-gray-50">
-	<!-- Main Cart Section -->
-	<div class=" flex flex-col xl:flex-row justify-between gap-6">
+<div class="mx-auto bg-gray-50 mb-5">
+
+	<div class=" w-11/12 mx-auto flex flex-col xl:flex-row justify-between gap-4">
 		{#if loading}
 			<div
 				class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded shadow-md"
 			>
 				<p class=" font-medium text-lg md:text-xl xl:text-2xl">Loading...</p>
 			</div>
-			<!-- Left Side: Cart Items -->
-		{:else if !$cartState.length || $cartState === null}
-			<div
-				class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded shadow-md"
-			>
-				<Icon icon="typcn:shopping-cart" class="text-5xl text-primary-500 md:text-8xl" />
-				<p class=" font-bold text-lg md:text-xl xl:text-2xl">Cart is Empty</p>
+		{:else if !$cart.length}
+			<div class="w-full flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white py-5 rounded shadow-sm">
+				<Icon icon="ic:outline-shopping-cart" class="text-5xl text-primary-400 md:text-6xl" />
+				<p class=" font-bold text-lg md:text-xl">Cart is Empty</p>
 			</div>
 		{:else}
-			<div class="w-full lg:w-4/4 xl:w-3/4 bg-white px-6 py-4 rounded-lg shadow-md h-fit">
-				<h2 class="text-xl mb-3 font-bold">
-					Cart Items <span class="text-red-500">({cartItems.length})</span>
-				</h2>
+			<div class="w-full lg:w-4/4 xl:w-3/4 bg-white p-3 sm:px-4 sm:py-3 rounded-lg shadow-sm h-fit">
+				<div class=" w-full flex items-center justify-between mb-4 sm:space-y-1">
+					<div>
+						<h2 class=" text-xs sm:text-4s font-semibold">
+							Cart Items <span class="text-red-500">({$cart.length})</span>
+						</h2>
+						<p class="{ isLoggedIn && recurrence?.recurring ? "" :"hidden"} text-2s sm:text-xs font-medium">Recurring: <span class=" font-semibold text-2s sm:text-sm ">{recurrencePeriod(recurrence.recurring)}</span></p>
+					</div>
+					
+					<div class="flex items-center gap-2">
+						<button
+					        type="button"
+					        on:click={()=>recureModal = true}
+					        class="{isLoggedIn ? "" : "hidden"} text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-medium">
+							<Icon icon="iconoir:calendar-rotate-solid" class=" text-lg sm:text-xl rounded text-white"/>
+					        <span class="hidden sm:block">{recurrence?.recurring ? "Edit" : "Recurrence"}</span>
+						</button>
+						<button
+					        type="button"
+					        on:click={downloadExcel}
+					        class=" text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-medium">
+							<Icon icon="mdi:file-download" class="text-lg sm:text-xl rounded text-white"/>
+					        <span class="hidden sm:block">Download</span>
+						</button>
+				        <button
+					        type="button"
+					        on:click={emptyCart}
+					        class=" text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-medium">
+							<Icon icon="material-symbols:delete" class="text-lg sm:text-xl rounded text-white"/>
+							<span class="hidden sm:block">Delete All</span>
+						</button>
+					</div>
+				</div>
+				
 
-				<div class="hidden lg:flex text-gray-500 font-semibold mb-2">
+				<div class="hidden lg:flex text-gray-500 text-sm pb-2 font-semibold">
 					<p class=" w-6/12">Product</p>
 					<p class=" w-2/12">Price</p>
 					<p class=" w-2/12">Quantity</p>
@@ -251,131 +386,169 @@
 				</div>
 
 				<ul class="">
-					{#each cartItems as item}
-						<li class="flex flex-col lg:flex-row lg:items-center py-3 lg:py-5 border-b-1">
-							<!-- Product Image and Details -->
-							<h3 class=" lg:hidden mt-3 font-medium text-sm">Product</h3>
-							<div class="flex items-center w-full md:w-6/12">
-								<img src={item.image} alt={item.name} class="w-16 h-16 object-cover rounded-md" />
+					{#each $cart as item,index}
+						<li class="flex flex-col lg:flex-row lg:items-center py-2 border-t-1">
+					
+							<h3 class=" lg:hidden font-medium text-xs sm:text-sm">Product</h3>
+							<div class="flex items-center w-full md:w-6/12 md:pr-2">
+								<img src={item.productDetails.imageSrc} alt={item.productDetails.productName} class="w-20 h-20 shrink-0 object-cover rounded-md" />
 								<div class="ml-2">
-									<p class="text-sm text-red-500 font-semibold">{item.partNumber}</p>
-									<p class=" text-gray-800">{item.name}</p>
-									<p class=" text-gray-800 text-sm font-semibold">{item.priceSize.size}</p>
+									<p class="text-sm text-red-500 font-semibold">{item.productDetails.productNumber}</p>
+									<p class=" text-gray-800 text-xs lg:text-3s">{item.productDetails.productName}</p>
+									<p class=" text-gray-800 text-xs font-semibold">{item.pricing.break}</p>
 								</div>
 							</div>
-
-							<!-- Price -->
-							<h3 class=" lg:hidden mt-3 font-medium text-sm">Price</h3>
-							<p class="text-md w-full md:w-2/12 font-semibold text-content">
-								{item.priceSize.price}
-							</p>
-
-							<!-- Quantity Control -->
-							<h3 class=" lg:hidden mt-3 font-medium text-sm">Quantity</h3>
-							<div class="flex items-center w-60 md:w-2/12">
-								<div class="flex items-center border-1 rounded">
-									<button
-										on:click={() => decrementQuantity(item.priceSize.size, item.id)}
-										class=" border-r-1 p-2.5 text-primary-500"
-										><Icon icon="rivet-icons:minus" class="text-sm" /></button
-									>
-									<p class="w-fit mx-3 text-sm font-medium outline-none text-center">
-										{item.quantity}
+                            <div class=" lg:w-6/12 sm:flex justify-between items-center">
+							    
+								 <div class=" lg:w-2/6">
+									<h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Price</h3>
+									<p class="text-xs w-full font-semibold text-content">
+										₹{item.pricing.INR.toLocaleString("en-IN")}
 									</p>
-									<button
-										on:click={() => incrementQuantity(item.priceSize.size, item.id)}
-										class=" border-l-1 p-2.5 text-primary-500"
-										><Icon icon="rivet-icons:plus" class="text-sm" /></button
-									>
+								 </div>
+							
+								<div class=" lg:w-2/6">
+							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Quantity</h3>
+							        <div class="flex items-center md:w-2/12">
+							        	<div class="flex items-center border-1 rounded">
+							        		<button
+							        			on:click={() => decrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}
+							        			class=" border-r-1 p-1.5 text-primary-500"
+							        			><Icon icon="rivet-icons:minus" class="text-xs" /></button
+							        		>
+							        		<p class="w-fit mx-3 text-xs font-medium outline-none text-center">
+							        			{item.quantity}
+							        		</p>
+							        		<button
+							        			on:click={() => incrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}
+							        			class=" border-l-1 p-1.5  text-primary-500">
+												<Icon icon="rivet-icons:plus" class="text-xs" />
+											</button>
+							        	</div>
+							        </div>
+							    </div>
+							
+								<div class=" lg:w-2/6">
+							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Total</h3>
+							        <div class=" w-full flex justify-between items-center">
+							        	<p class="text-xs font-semibold">
+							        		₹{(item.pricing.INR * item.quantity).toLocaleString("en-IN")}
+							        	</p>
+							        	<button
+							        		type="button"
+							        		on:click={() => removeItem(item.productDetails.productNumber,item._id,index)}
+							        		class=" text-lg sm:hidden text-primary-600"
+							        	>
+							        		<Icon icon="fluent-mdl2:delete" class=" text-xl" />
+							        	</button>
+							        </div>
 								</div>
-							</div>
-
-							<!-- Total Price & Delete Icon -->
-							<h3 class=" lg:hidden mt-3 text-sm">Total</h3>
-							<div class=" w-full lg:w-2/12 flex justify-between items-center">
-								<p class="text-md font-semibold">
-									₹{(parseFloat(item.priceSize.price) * item.quantity).toFixed(2)}
-								</p>
 								<button
-									type="button"
-									on:click={() => removeItem(item.priceSize.size, item.id)}
-									class=" text-lg text-primary-600"
-								>
-									<Icon icon="fluent-mdl2:delete" class=" text-2xl" />
-								</button>
-							</div>
+							        type="button" on:click={() => removeItem(item.productDetails.productNumber,item._id,index)}
+							        class=" text-lg hidden sm:block text-primary-600">
+							        <Icon icon="fluent-mdl2:delete" class=" text-lg" />
+							    </button>
+						    </div>
 						</li>
 					{/each}
 				</ul>
-				<button
-					type="button"
-					on:click={emptyCart}
-					class="mt-4 text-sm w-32 sm:w-36 md:w-40 lg:w-48 py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-semibold"
-					>Clear Cart</button
-				>
 			</div>
+		
 		{/if}
 
-		<!-- Right Side: Order Summary -->
-		<div class="w-full lg:w-2/4 xl:w-1/4 self-end xl:self-start bg-white p-4 rounded-lg shadow-md">
-			<div>
-				<h2 class="text-xl font-bold mb-4">Your Order</h2>
+		
+		 <div class="w-full sm:w-2/4 md:w-2/5 lg:w-2/6 xl:w-1/4 self-end xl:self-start bg-white p-3 rounded-lg shadow-sm">
+			<div class=" space-y-2">
+				<h2 class=" text-sm lg:text-lg font-bold">Your Order</h2>
 				<div class="space-y-2">
-					<div class="flex justify-between text-lg">
+					<div class="flex justify-between font-medium text-sm">
 						<p>Subtotal</p>
-						<p>₹{subtotal.toFixed(2)}</p>
+						<p>₹{priceINR.toLocaleString("en-IN")}</p>
 					</div>
-					<div class="flex justify-between text-lg">
+					<div class="flex justify-between font-medium text-sm">
 						<p>Tax</p>
-						<p>₹{tax.toFixed(2)}</p>
+						<p>charges apply</p>
 					</div>
-					<div class="flex justify-between text-lg font-bold">
+					<div class="flex border-t-1 pt-2 justify-between text-sm font-bold">
 						<p>Total</p>
-						<p>₹{total.toFixed(2)}</p>
+						<p>₹{priceINR.toLocaleString("en-IN")}</p>
 					</div>
 				</div>
 			</div>
-			{#if $cartState.length}
-				<div class="mt-4 grid grid-cols-2 gap-2">
-					{#if $authedUser.email}
-						<a
-							href="/checkout"
-							class="mt-4 w-full text-center bg-primary-500 text-white py-2 rounded-lg font-semibold col-span-2 hover:bg-primary-600"
-						>
-							Checkout</a
-						>
+			{#if $cart.length}
+				<div class="mt-4 w-full gap-2">
+					{#if isLoggedIn}
+						<button
+							on:click={()=>goto('/checkout')}
+							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold">
+							Checkout
+				        </button>
 					{:else}
 						<button
 							type="button"
-							on:click={toggleModal}
-							class="flex col-span-2 items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
+							on:click={()=>goto('/login')}
+							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
 						>
-							Checkout
+							Login to Proceed
 						</button>
-					{/if}
-
-					<!-- Download Button -->
-					<button
-						type="button"
-						on:click={downloadPDF}
-						class="flex items-center justify-center gap-2 bg-white text-primary-500 border border-primary-500 py-2 rounded font-semibold hover:bg-primary-100"
-					>
-						Download
-					</button>
-
-					<!-- Print Button -->
-					<button
-						type="button"
-						on:click={printPDF}
-						class="flex items-center justify-center gap-2 bg-white text-primary-500 border border-primary-500 py-2 rounded font-semibold hover:bg-primary-100"
-					>
-						Print
-					</button>
+					{/if}					
 				</div>
 			{/if}
 		</div>
+	 
 	</div>
+
 </div>
+
+{#if isLoggedIn  && filteredGuestCart.length}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		on:click={handleClick}
+		class="fixed {addToCartModal ? 'hidden' : ''} inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+	>
+		<div bind:this={container} class="bg-white relative p-6 rounded shadow-lg w-11/12 sm:w-3/5 md:w-2/5 2xl:w-2/6 space-y-2">
+            <button on:click={()=>{
+				addToCartModal = !addToCartModal
+				browser ? localStorage.clear() : ""
+				invalidate("data:cart")
+			}} class=" absolute right-5 top-5">
+				<Icon icon="maki:cross" class=" text-lg sm:text-xl"/>
+			</button>
+			<Icon
+				icon="fa-solid:cart-plus"
+				width="60"
+				height="60"
+				class=" w-full text-center text-primary-600"
+			/>
+			<h1 class=" font-medium pt-2">You have added components to cart before Login</h1>
+			<p class=" text-sm">{cartId.length ? "Are you willing to add in existing cart or create a new cart": "Create a new cart"}</p>
+			<form method="POST" use:enhance={handleCart} class=" w-full flex items-center gap-6">
+				{#if isLoggedIn && filteredGuestCart.length}
+					<input type="hidden" name="cartId" value={cartId} />
+				{/if}
+				<input type="hidden" name="guestCart" value={JSON.stringify(filteredGuestCart)} />
+				{#if cartId.length}
+					<button
+						type="submit"
+						formaction="?/existingcart"
+						class=" py-2 bg-primary-600 w-full rounded text-white font-medium text-sm"
+						>Existing Cart</button
+					>
+				{/if}
+				<button
+					type="submit"
+					formaction="?/newcart"
+					class=" py-2 bg-primary-600 w-full rounded text-white font-medium text-sm"
+					>New Cart</button
+				>
+			</form>
+		</div>
+	</div>
+{/if}
+
+<RecurrencePopup {recureModal} {recurrence} {cartId} togglePopup={() => (recureModal = !recureModal)} />
+	
 {#if showModal}
 	<div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
 		<div class="bg-white p-6 rounded-lg w-full mx-2 md:w-1/3">
@@ -394,4 +567,24 @@
 			</div>
 		</div>
 	</div>
+
+{/if}
+{#if showimage}
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div on:click={(e) => {
+	if (e.target === e.currentTarget) {
+	showimage = false;}
+	}} class="fixed inset-0 shadow-xl bg-opacity-75 flex items-center justify-center z-50">
+	<div class="bg-white rounded-lg shadow-lg p-6 mx-4 w-full md:w-1/2 lg:w-1/3">
+	<div class="flex justify-end items-center mb-2">
+		<button
+		class="p-1 hover:bg-gray-100 rounded transition-colors duration-200"
+		on:click={closePopup}>
+		<Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
+	  </button>
+</div>
+<!-- svelte-ignore a11y-img-redundant-alt -->
+<img src={selectedImage} alt="image" class="" /></div>
+</div>
 {/if}

@@ -70,57 +70,62 @@
           </p>
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="">
+        <div class="">
+          <a href="/safety/understanding-product-labels" 
+              class="text-xl font-bold mb-2 py-1 w-full text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:underline decoration-2 underline-offset-4"
+              class:text-primary-500={$page.url.pathname === "/safety/understanding-product-labels"}
+              class:font-semibold={$page.url.pathname === "/safety/understanding-product-labels"}>
             <img src="/productsafety/Understanding Product Labels.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-52" />
-              <a href="/safety/understanding-product-labels" 
-                  class="text-xl font-bold mb-2 py-1 w-full text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:underline decoration-2 underline-offset-4"
-                  class:text-primary-500={$page.url.pathname === "/safety/understanding-product-labels"}
-                  class:font-semibold={$page.url.pathname === "/safety/understanding-product-labels"}>
-                  Understanding Product Labels
-              </a>
-              <p class="text-gray-700">
-                  Our product labels are designed to provide complete, up-to-date information on our products. 
-                  Information available when and where you need it most.
-              </p>
-          </div>
-          <div class="">
+            Understanding Product Labels
+          </a>
+          <p class="text-gray-700">
+            Our product labels are designed to provide complete, up-to-date information on our products. 
+            Information available when and where you need it most.
+        </p>
+        </div>
+        
+        <div class="">
+          <a href="/safety/globally-harmonized-system" 
+              class="py-1 w-full text-xl font-bold mb-2 text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:underline decoration-2 underline-offset-4"
+              class:text-primary-500={$page.url.pathname === "/safety/globally-harmonized-system"}
+              class:font-semibold={$page.url.pathname === "/safety/globally-harmonized-system"}>
             <img src="/productsafety/GHS.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-52" />
-              <a href="/safety/globally-harmonized-system" 
-                  class="py-1 w-full text-xl font-bold mb-2 text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:underline decoration-2 underline-offset-4"
-                  class:text-primary-500={$page.url.pathname === "/safety/globally-harmonized-system"}
-                  class:font-semibold={$page.url.pathname === "/safety/globally-harmonized-system"}>
-                  Globally Harmonized System
-              </a>
-              <p class="text-gray-700">
-                  GHS harmonizes most classification criteria for supply and transportation and is based on the intrinsic properties of substances. 
-                  GHS allows individual countries or regions to implement building blocks at their own discretion.
-              </p>
-          </div>
-          <div class="">
-          <img src="/productsafety/TSCA.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-52"/>
-              <a href="/safety/tsca-8-notification" 
-                  class="py-1 w-full text-xl font-bold mb-2 text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:underline decoration-2 underline-offset-4"
-                  class:text-primary-500={$page.url.pathname === "/safety/tsca-8-notification"}
-                  class:font-semibold={$page.url.pathname === "/safety/tsca-8-notification"}>
-                  TSCA 8 Notification
-              </a>
-              <p class="text-gray-700">
-                  SDS provide essential information for anyone handling laboratory chemicals, including all of the dangerous 
-                  and most non-dangerous products.
-              </p>
-          </div>
-          <div class="">
-            <img src="/productsafety/Hazard_Precaution.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-28 mt-5"/>
-              <a href="/safety/hazard-and-precautionary-statements" 
-                  class="py-1 w-full text-xl font-bold mb-2 text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:underline decoration-2 underline-offset-4"
-                  class:text-primary-500={$page.url.pathname === "/safety/hazard-and-precautionary-statements"}
-                  class:font-semibold={$page.url.pathname === "/safety/hazard-and-precautionary-statements"}>
-                  Hazard and Precautionary Statements
-              </a>
-              <p class="text-gray-700">
-                  These statements provide critical guidance on hazards and proper precautions to ensure safe handling and use of chemicals.
-              </p>
-          </div>
+            Globally Harmonized System
+          </a>
+          <p class="text-gray-700">
+            GHS harmonizes most classification criteria for supply and transportation and is based on the intrinsic properties of substances. 
+            GHS allows individual countries or regions to implement building blocks at their own discretion.
+        </p>
+        </div>
+        
+
+        <div class="">
+          <a href="/safety/tsca-8-notification" 
+              class="py-1 w-full text-xl font-bold mb-2 text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:underline decoration-2 underline-offset-4"
+              class:text-primary-500={$page.url.pathname === "/safety/tsca-8-notification"}
+              class:font-semibold={$page.url.pathname === "/safety/tsca-8-notification"}>
+            <img src="/productsafety/TSCA.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-52" />
+            TSCA 8 Notification
+          </a>
+          <p class="text-gray-700">
+            SDS provide essential information for anyone handling laboratory chemicals, including all of the dangerous 
+            and most non-dangerous products.
+        </p>
+        </div>
+
+        <div class="">
+          <a href="/safety/hazard-and-precautionary-statements" 
+              class="py-1 w-full text-xl font-bold mb-2 text-left cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:underline decoration-2 underline-offset-4"
+              class:text-primary-500={$page.url.pathname === "/safety/hazard-and-precautionary-statements"}
+              class:font-semibold={$page.url.pathname === "/safety/hazard-and-precautionary-statements"}>
+            <img src="/productsafety/Hazard_Precaution.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-28 mt-5" />
+            Hazard and Precautionary Statements
+          </a>
+          <p class="text-gray-700">
+            These statements provide critical guidance on hazards and proper precautions to ensure safe handling and use of chemicals.
+        </p>
+        </div>
+
       </div>
   </div>
   {/if}

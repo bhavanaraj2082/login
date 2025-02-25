@@ -9,24 +9,27 @@
   const productsData = compareSimilarity;
 
   let CompareSimilarityData = productsData.map((product) => ({
-    productId: product._id,
-    prodDesc: product.prodDesc,
-    productName: product.productName,
-    priceSize: product.stockPriceSize.map((size) => ({
-      size: size.break,
-      price: size.INR,
-    })),
-    image: product.imageSrc,
-    manufacturer: product.manufacturerInfo[0]?.name,
-    stock: product.stockQuantity,
-    category: product.categoryInfo[0]?.urlName,
-    subCategory: product.subCategoryInfo[0]?.urlName,
-    subsubCategory: product.subsubCategoryInfo[0]?.urlName,
-    productUrl: product.productUrl,
-    productNumber: product.productNumber,
-		properties:product.properties
-
-  }));
+  productId: product._id,
+  prodDesc: product.prodDesc,
+  productName: product.productName,
+  image: product.imageSrc,
+  manufacturer: product.manufacturerInfo?.[0]?.name || "Unknown",
+  stock: product.stockQuantity,
+  category: product.categoryInfo?.[0]?.urlName || "Uncategorized",
+  subCategory: product.subCategoryInfo?.[0]?.urlName || "Uncategorized",
+  subsubCategory: product.subsubCategoryInfo?.[0]?.urlName || "Uncategorized",
+  productUrl: product.productUrl,
+  productNumber: product.productNumber,
+  properties: product.properties || {},
+  priceSize: Array.isArray(product.stockPriceSize) && product.stockPriceSize.length > 0 
+    ? product.stockPriceSize.map(size => ({
+        size: size.break || "N/A", 
+        price: size.INR || 0, 
+        offer: size.offer || "0"
+      }))
+    : [],
+}));
+// console.log(CompareSimilarityData, "CompareSimilarityData*****");
 
   let currentIndex = 0;
   let logosPerSlide = 4;
@@ -198,10 +201,10 @@
 </script>
 
 <div class="max-w-7xl mx-auto my-10">
-	<div class="flex justify-between items-center mb-4 mx-9">
-		<div class="font-bold text-primary-500">Compare Similar Items</div>
-		<div class="flex items-center space-x-2">
-				<div class="font-bold text-primary-500">Show Difference</div>
+	<div class="flex justify-between items-center mb-4 md:w-11/12 mx-auto">
+		<h3 class="text-xl font-bold text-primary-400 p-1">Compare Similar Items</h3>
+		<div class="flex items-center space-x-2 p-1">
+				<h3 class="text-xl font-bold text-primary-400">Show Difference</h3>
 				<label class="relative inline-flex items-center cursor-pointer">
 						<input
 								type="checkbox"
@@ -221,10 +224,10 @@
 
 
 
-  <div class="relative mt-1 mx-0 lg:mx-8">
+  <div class="relative md:w-11/12 mx-auto">
     <div class="flex items-center">
-      <button on:click={prevSlide} class="text-primary-500 lg:hidden">
-        <Icon class="text-3xl" icon="ion:chevron-back" />
+      <button on:click={prevSlide} class="text-primary-500 p-1 pl-0.5 hover:bg-primary-100 hover:rounded-full lg:hidden">
+        <Icon class="text-2xl" icon="ion:chevron-back" />
       </button>
 
       <div class="overflow-hidden flex-1">
@@ -287,7 +290,7 @@
 								<div class="px-3 mb-3">
 									<h3 class="text-gray-600 text-xs font-semibold">
 											{#each specificKeys as key}
-													<div class="grid grid-cols-2 gap-4 mb-2 mt-2 pb-2 {showDifference && isUnique(product.properties[key], key) ? 'bg-primary-300' : 'bg-white'}">
+													<div class="grid grid-cols-2 gap-4 mb-2 mt-2 rounded-sm p-2 {showDifference && isUnique(product.properties[key], key) ? 'bg-primary-100' : 'bg-white'}">
 															<span class="font-bold text-left">{key}:</span>
 															<span class="text-gray-500 text-right">
 																	{#if product.properties && product.properties[key]}
@@ -301,7 +304,7 @@
 																	{/if}
 															</span>
 													</div>
-													<hr class="border-t-2 border-gray-300" />
+													<hr class="border-t border-gray-300" />
 											{/each}
 									</h3>
 							</div>
@@ -313,18 +316,23 @@
         </div>
       </div>
       
-      <button on:click={nextSlide} class="text-primary-500 lg:hidden">
-        <Icon class="text-4xl" icon="ion:chevron-forward" />
+      <button on:click={nextSlide} class="text-primary-500 p-1 pr-0.5 hover:bg-primary-100 hover:rounded-full lg:hidden">
+        <Icon class="text-2xl" icon="ion:chevron-forward" />
       </button>
     </div>
   </div>
 </div>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 {#if showModal}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
     class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
+    on:click={() => (showModal = false)}
   >
     <div
       class="bg-white p-6 rounded-lg w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-5/12 relative"
+      on:click|stopPropagation
     >
       <!-- {#if showCartMessage}
         <div class=" bg-green-400 text-white my-2 text-center">
@@ -336,7 +344,7 @@
           on:click={closeModal}
           class="text-primary-500 hover:text-primary-500 hover:scale-110"
         >
-          <Icon icon="ion:close" class="text-2xl"></Icon>
+          <Icon icon="ion:close" class="text-xl font-bold hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"></Icon>
         </button>
       </div>
       <div class="flex flex-row sm:flex-row gap-4 mb-3">

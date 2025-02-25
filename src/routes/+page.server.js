@@ -6,6 +6,8 @@ import { MAILCHIMP_API_KEY,MAILCHIMP_LIST_ID,MAILCHIMP_SERVER_PREFIX } from '$en
 export async function load() {
     try {
         const PopularProductsData = await popularProducts()
+        // const foolterinksdata = await getFooterLinks()
+        
         return { PopularProductsData }
     }
     catch (error) {
@@ -13,6 +15,20 @@ export async function load() {
         return {success:false,message:"Error loading products"}
     };
 }
+
+// const getFooterLinks = async () => {
+// 	try {
+// 		const footerLinks = await FooterLink.find().sort({ name: 1 }).lean();
+
+// 		if (footerLinks) {
+// 			return footerLinks;
+// 		} else {
+// 			return [];
+// 		}
+// 	} catch (error) {
+// 		console.error("Error fetching footer links");
+// 	}
+// };
 
 export const actions = {
     search: async ({ request }) => {

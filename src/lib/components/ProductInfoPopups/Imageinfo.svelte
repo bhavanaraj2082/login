@@ -4,55 +4,49 @@
   let product = data.records;
   // console.log("ImageclosePopup",data);
   export let ImageclosePopup;
+  let isZoomed = false;
+
+  function toggleZoom() {
+    isZoomed = !isZoomed;
+  }
 </script>
 
-
-
 {#each data.records as product}
-<div
-class="fixed inset-0 flex items-center justify-center z-50 p-4 md:p-6 lg:p-8 overflow-y-auto bg-neutral-500 bg-opacity-30"
->
-<div
-  class="max-w-full md:max-w-2xl lg:max-w-4xl w-full bg-white rounded-md shadow-md p-4 md:p-6 lg:p-8"
->
-  <div class="flex justify-between items-center mb-4">
-    <h2
-      class="text-sm md:text-base lg:text-xl font-semibold text-primary-400"
-    >
-      Product Image
-    </h2>
-    <button
-      on:click={ImageclosePopup}
-      class="text-primary-400 p-2 rounded-md"
-    >
-    <Icon icon="mdi:close" class="text-2xl font-bold text-primary-400" />
-    </button>
-  </div>
-
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="flex flex-col lg:flex-row gap-4 lg:gap-8 items-start"
+    class="fixed inset-0 flex items-center justify-center z-50 overflow-y-auto bg-neutral-500 bg-opacity-30"
+    on:click={ImageclosePopup}
   >
-    <div class="w-full md:w-3/4 lg:w-1/3 h-auto">
-      <img
-        src={product.imageSrc}
-        alt="Product Image"
-        class="w-full h-auto object-cover rounded-md"
-      />
-    </div>
-
     <div
-      class="space-y-2 md:space-y-3 lg:space-y-4 w-full lg:w-2/3"
+      class="w-full md:max-w-lg bg-white rounded-md shadow-md p-4 relative"
+      on:click|stopPropagation
     >
-      <h2
-        class="text-sm md:text-base lg:text-xl font-semibold text-gray-800"
-      >
-        {product.productName}
-      </h2>
-      <p class="text-xs md:text-sm lg:text-base text-gray-600">
-        {product.prodDesc}
-      </p>
+      <div class="flex justify-end">
+        <button
+          on:click={ImageclosePopup}
+          class="text-primary-400 p-2 rounded-md"
+        >
+          <Icon
+            icon="mdi:close"
+            class="text-2xl font-bold text-primary-400 hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"
+          />
+        </button>
+      </div>
+
+      <div class="flex justify-center items-center">
+        <div class="w-full h-96 overflow-hidden" on:click={toggleZoom}>
+          <!-- svelte-ignore a11y-img-redundant-alt -->
+          <img
+            src={product.imageSrc}
+            alt="Product Image"
+            class="w-full h-96 rounded-md transition-transform duration-300"
+            class:scale-150={isZoomed}
+            class:cursor-zoom-in={!isZoomed}
+            class:cursor-zoom-out={isZoomed}
+          />
+        </div>
+      </div>
     </div>
   </div>
-</div>
-</div>
 {/each}

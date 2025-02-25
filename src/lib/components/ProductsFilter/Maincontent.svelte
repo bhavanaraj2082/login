@@ -4,7 +4,7 @@
 	import { enhance } from '$app/forms';
 
 	import Icon from '@iconify/svelte';
-	import { cartState } from '$lib/stores/cartStores.js';
+	// import { cartState } from '$lib/stores/cart.js';
 	import { convertUsdToInr } from '$lib/stores/priceconversion.js';
 	import { allProducts } from '$lib/stores/filter.js';
 

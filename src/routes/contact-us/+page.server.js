@@ -1,13 +1,14 @@
 import { submitContactInfo } from "$lib/server/mongoActions.js";
 import { sendEmail } from "$lib/utils/sendEmail.js";
+import { sanitizeFormData } from '$lib/utils/sanitize.js';
 
 export const actions = {
   contactus: async ({ request },event) => {
     try {
-      // console.log("x-forward",event.getClientAddress());
-      //let ip = request.headers.get('x-forwarded-for') || request.connection.remoteAddress || request.socket.remoteAddress;
-      //console.log("addr",ip);
-      const body = Object.fromEntries(await request.formData());
+      const rawData = Object.fromEntries(await request.formData());
+      const body = sanitizeFormData(rawData);
+      // console.log("body",body);
+      
       await submitContactInfo(body);
 
       const subject = `New contact from ${body.name}`;
@@ -15,6 +16,7 @@ export const actions = {
                 <h2>New Contact Information</h2>
                 <p><strong>Name:</strong> ${body.name}</p>
                 <p><strong>Email:</strong> ${body.email}</p>
+                <p><strong>country:</strong> ${body.country}</p>
                 <p><strong>Phone:</strong> ${body.phone}</p>
                 <p><strong>Subject:</strong> ${body.subject}</p>
                 <p><strong>Message:</strong> ${body.message}</p>
@@ -28,7 +30,7 @@ export const actions = {
         },
       };
     } catch (error) {
-      console.error("Error creating contact:", error);
+      // console.error("Error creating contact:", error);
       return {
         type: "error",
         data: {

@@ -1,241 +1,361 @@
 <script>
-    import { authedUser } from "$lib/stores/mainStores.js";
-    import { enhance, applyAction } from '$app/forms';
-    import { onMount } from "svelte";
-    import { toast } from "svelte-sonner";
+    import { onMount } from 'svelte';
+    import { enhance } from '$app/forms';
+    import { toast, Toaster } from "svelte-sonner";
+    import { writable } from 'svelte/store';
+    import { authedUser } from '$lib/stores/mainStores.js'
     import Icon from "@iconify/svelte";
-    import { browser } from '$app/environment';
+    import Calender from '$lib/components/Calender.svelte';
 
     export let data;
-    const user = $authedUser?.email;
-    $: isAuthenticated = !!data?.user?.email;
+    // console.log("favData--",data)
+    
+    $: isAuthenticated = !!data?.locals?.user?.email;
+    // $: isAuthenticated = !!authedUser.email;
 
-    let favData = (data?.favData?.favorite || []).map(item => ({
-        id: item.id,
-        name: item.productName,
-        description: item.productDesc,
-        partNumber: item.productNumber,
-        image: item.imgUrl,
-        priceSize: {
-            price: item.priceSize.price,
-            size: item.priceSize.size
-        },
-        quantity: parseInt(item.quantity) || 1,
-        stock: parseInt(item.stock) || 0
-    }));
+    $: favData = data?.favorites?.length ? data.favorites.map(item => {
+    if (!item?.productInfo?.productId) return null;
+        return {
+            id: item.productInfo.productId,
+            name: item.productInfo.productName,
+            description: Array.isArray(item.productInfo.description) 
+                ? item.productInfo.description[0] 
+                : typeof item.productInfo.description === 'string'
+                ? item.productInfo.description
+                : 'No description available',
+            partNumber: item.productInfo.productNumber,
+            image: item.productInfo.imageSrc || '/default-product-image.jpg',
+            manufacturerName: item.manufacturerInfo?.name || 'Unknown Manufacturer',
+            distributorName: item.distributorInfo?.aliasName || 'Direct Supply',
+            stockInfo: {
+                id: item.stockInfo?.stockId,
+                pricing: item.stockInfo?.pricing,
+                specification: item.stockInfo?.specification,
+                orderMultiple: item.stockInfo?.orderMultiple || 1,
+                stock: parseInt(item.stockInfo?.stock) || 0
+            },
+            manufacturerInfo: {
+                id: item.manufacturerInfo?.manufacturerId
+            },
+            distributorInfo: {
+                id: item.distributorInfo?.distributorId,
+            },
+            quantity: parseInt(item.quantity) || 1,
+        };
+    }).filter(Boolean) : [];
 
-    let cartItems = [];
-    let cart = browser? localStorage.getItem('cart') : []
-    // console.log('you existing cart',cart);
+    // $:console.log("favData====>",favData)
 
-    onMount(() => {
-        if (browser) {
-            try {
-                const storedCart = localStorage.getItem("cart");
-                cartItems = storedCart ? JSON.parse(storedCart) : [];
-            } catch (error) {
-                console.error("Error loading cart from localStorage:", error);
-                cartItems = [];
-            }
+    let calendarComponent;
+
+    let currentPage = writable(1);
+    let itemsPerPage = writable(10);
+    const DOTS = '...';
+    const VISIBLE_PAGES = 7;
+
+    let filters = {
+        searchTerm: '',
+        dateFrom: '',
+        dateTo: ''
+    };
+
+
+function filterFavorites(items, filterCriteria) {
+    return items.filter((item) => {
+        const searchTerm = filterCriteria.searchTerm.toLowerCase().trim();
+        const matchesSearch =
+            !searchTerm ||
+            item.name.toLowerCase().includes(searchTerm) ||
+            item.partNumber.toLowerCase().includes(searchTerm) ||
+            item.manufacturerName.toLowerCase().includes(searchTerm);
+
+        const createdDate = new Date(item.createdAt);
+        createdDate.setHours(0, 0, 0, 0);
+
+        let matchesDateRange = true;
+
+        if (filterCriteria.dateFrom) {
+            const fromDate = new Date(filterCriteria.dateFrom);
+            fromDate.setHours(0, 0, 0, 0);
+            matchesDateRange = matchesDateRange && createdDate >= fromDate;
         }
-    });
 
-    function calculateTotalPrice(price, quantity) {
-        const numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
-        return (numericPrice * quantity).toFixed(2);
+        if (filterCriteria.dateTo) {
+            const toDate = new Date(filterCriteria.dateTo);
+            toDate.setHours(23, 59, 59, 999);
+            matchesDateRange = matchesDateRange && createdDate <= toDate;
+        }
+
+        return matchesSearch && matchesDateRange;
+    });
+}
+
+function getEarliestFavoriteDate(items) {
+    if (!items || items.length === 0) {
+        return new Date('2024-01-01');
     }
 
+    const earliestDate = items.reduce((earliest, current) => {
+        const currentDate = new Date(current.createdAt);
+        return !earliest || currentDate < earliest ? currentDate : earliest;
+    }, null);
+
+    if (earliestDate) {
+        earliestDate.setHours(0, 0, 0, 0);
+    }
+    return earliestDate;
+}
+
+function handleDateChange(event) {
+    const { dates, filters: eventFilters } = event.detail;
+    updateFilters('dateFrom', dates.from);
+    updateFilters('dateTo', dates.to);
+}
+
+function updateFilters(key, value) {
+    if (!value) {
+        filters[key] = '';
+        currentPage.set(1);
+        return;
+    }
+
+    if (key === 'dateFrom' && filters.dateTo) {
+        const fromDate = new Date(value);
+        const toDate = new Date(filters.dateTo);
+        if (fromDate > toDate) {
+            toast.error('From date cannot be later than To date');
+            return;
+        }
+    }
+
+    if (key === 'dateTo' && filters.dateFrom) {
+        const fromDate = new Date(filters.dateFrom);
+        const toDate = new Date(value);
+        if (toDate < fromDate) {
+            toast.error('To date cannot be earlier than From date');
+            return;
+        }
+    }
+
+    filters[key] = value;
+    currentPage.set(1);
+}
+
+function handleSearch(event) {
+    const searchValue = event.target.value.trim() || '';
+    filters.searchTerm = searchValue;
+    currentPage.set(1);
+}
+
+function clearSearch() {
+    filters.searchTerm = '';
+    currentPage.set(1);
+}
+
+function getPageRange(current, total) {
+    const range = [];
+    const totalPages = Math.ceil(total / $itemsPerPage);
+
+    if (totalPages <= VISIBLE_PAGES) {
+        return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    range.push(1);
+    let start = Math.max(2, current - Math.floor(VISIBLE_PAGES / 2));
+    let end = Math.min(totalPages - 1, start + VISIBLE_PAGES - 3);
+
+    if (current > totalPages - 2) {
+        start = totalPages - VISIBLE_PAGES + 1;
+        end = totalPages - 1;
+    }
+    if (current <= 2) {
+        start = 2;
+        end = Math.min(VISIBLE_PAGES - 1, totalPages - 1);
+    }
+
+    if (start > 2) {
+        range.push(DOTS);
+    }
+    for (let i = start; i <= end; i++) {
+        range.push(i);
+    }
+    if (end < totalPages - 1) {
+        range.push(DOTS);
+    }
+    if (totalPages > 1) {
+        range.push(totalPages);
+    }
+    return range;
+}
+
+function getPaginatedData(items, currentPageNum, itemsPerPageNum) {
+    const startIndex = (currentPageNum - 1) * itemsPerPageNum;
+    const endIndex = startIndex + itemsPerPageNum;
+    return items.slice(startIndex, endIndex);
+}
+
+function handlePageChange(page) {
+    if (page >= 1 && page <= totalPages && page !== $currentPage) {
+        currentPage.set(page);
+    }
+}
+
+function handleKeyDown(event) {
+    if (event.key === 'ArrowLeft' && $currentPage > 1) {
+        handlePageChange($currentPage - 1);
+    } else if (event.key === 'ArrowRight' && $currentPage < totalPages) {
+        handlePageChange($currentPage + 1);
+    }
+}
+
+$: filteredFavorites = filterFavorites(favData, filters);
+$: totalPages = Math.ceil(filteredFavorites.length / $itemsPerPage);
+$: pageNumbers = getPageRange($currentPage, filteredFavorites.length);
+$: paginatedFavorites = getPaginatedData(filteredFavorites, $currentPage, $itemsPerPage);
+
+function calculateTotalPrice(price, quantity) {
+    if (!price || price === 'Price not available') return 'N/A';
+    const numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
+    return isNaN(numericPrice) ? 'N/A' : (numericPrice * quantity).toFixed(2);
+}
+
+    // function calculateTotalPrice(price, quantity) {
+    //     if (!price || price === 'Price not available') return 'N/A';
+    //     const numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
+    //     return isNaN(numericPrice) ? 'N/A' : (numericPrice * quantity).toFixed(2);
+    // }
+
     function increaseQuantity(item) {
-        if (item.quantity < item.stock) {
-            item.quantity += 1;
+        const maxQuantity = Math.floor(item.stockInfo.stock / item.stockInfo.orderMultiple) * item.stockInfo.orderMultiple;
+        if (item.quantity + item.stockInfo.orderMultiple <= maxQuantity) {
+            item.quantity += item.stockInfo.orderMultiple;
             favData = [...favData];
         } else {
             toast.warning("Maximum stock reached", { 
-                description: `Only ${item.stock} items available` 
+                description: `Only ${maxQuantity} items available in multiples of ${item.stockInfo.orderMultiple}` 
             });
         }
     }
 
     function decreaseQuantity(item) {
-        if (item.quantity > 1) {
-            item.quantity -= 1;
+        if (item.quantity > item.stockInfo.orderMultiple) {
+            item.quantity -= item.stockInfo.orderMultiple;
             favData = [...favData];
         }
     }
 
-    function addToCart(item) {
-           if (!item || item.stock <= 0) {
-        toast.error('Item unavailable', { description: 'This item is out of Stock ' });
+    function handleAddToCart(item) {
+    if (!item || item.stockInfo.stock <= 0) {
+        toast.error('Item unavailable', { 
+            description: 'This item is out of stock' 
+        });
         return;
     }
-        const cartItem = {
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            partNumber: item.partNumber,
-            image: item.image,
-            priceSize: item.priceSize,
-            quantity: Math.min(item.quantity, item.stock),
-            stock: item.stock
-        };
 
+    return async ({ result, update }) => {
         try {
-            const existingItemIndex = cartItems.findIndex(cart => cart.id === item.id);
-            
-            if (existingItemIndex !== -1) {
-                const existingItem = cartItems[existingItemIndex];
-                const newQuantity = Math.min(
-                    existingItem.quantity + cartItem.quantity, 
-                    cartItem.stock
-                );
-                cartItems[existingItemIndex] = {
-                    ...existingItem,
-                    quantity: newQuantity
-                };
+            if (result.type === 'success') {
+                toast.success("Added to Cart", { 
+                    description: `${item.name} added successfully` 
+                });
             } else {
-                cartItems.push(cartItem);
+                location.reload();
+                toast.success("Added to Cart", { 
+                    description: `${item.name} added successfully` 
+                    // description: result.data?.message || "Failed to add item to cart" 
+                });
             }
-
-            updateCart(cartItems);
-            toast.success("Added to Cart", { 
-                description: `${item.name} added successfully` 
-            });
+        await update();
         } catch (error) {
-            console.error("Error updating cart:", error);
+            console.error('Error handling cart update:', error);
             toast.error("Cart Error", { 
-                description: "Failed to update cart" 
+                description: result.data?.message || "Failed to add item to cart" 
+                // description: "Failed to process cart update" 
             });
         }
-    }
+    };
+}
 
-    function updateCart(updatedCart) {
-        try {
-            localStorage.setItem("cart", JSON.stringify(updatedCart));
-            window.dispatchEvent(new CustomEvent("cartUpdated", {
-                detail: {
-                    items: updatedCart,
-                    totalItems: updatedCart.reduce((sum, i) => sum + i.quantity, 0),
-                    totalValue: updatedCart.reduce((sum, i) => {
-                        const price = parseFloat(i.priceSize.price.replace(/[^\d.]/g, ''));
-                        return sum + (price * i.quantity);
-                    }, 0)
-                }
-            }));
-        } catch (error) {
-            console.error("Error updating localStorage:", error);
+    function handleAddAllToCart() {
+        const availableItems = favData.filter(item => item.stockInfo.stock > 0);
+        
+        if (availableItems.length === 0) {
+            toast.info("No Available Items", { 
+                description: "All favourite items are out of stock" 
+            });
+            return;
         }
-    }
 
-    function addAllToCart() {
-    const availableItems = favData.filter(item => item.stock > 0);
-    
-    if (availableItems.length === 0) {
-        toast.info("No Available Items", { 
-            description: "All favourite items are out of stock" 
-        });
-        return;
-    }
-
-    const updatedCart = [...cartItems];
-    
-    availableItems.forEach(item => {
-        if (item.stock <= 0) return;
-
-        const existingItemIndex = updatedCart.findIndex(cart => cart.id === item.id);
-        const cartItem = {
-            id: item.id,
-            name: item.name,
-            description: item.description,
-            partNumber: item.partNumber,
-            image: item.image,
-            priceSize: item.priceSize,
-            quantity: Math.min(item.quantity, item.stock),
-            stock: item.stock
+        return async ({ result, update }) => {
+            await update();
+            
+            if (result.type === 'success') {
+                location.reload();
+                toast.success("All available items added to cart", { 
+                    description: "Added all items that are in stock to your cart" 
+                });
+            } else {
+                location.reload();
+                toast.error("Cart Error", { 
+                    description: result.data?.message || "Failed to add items to cart" 
+                });
+            }
         };
-
-        if (existingItemIndex !== -1) {
-            updatedCart[existingItemIndex] = {
-                ...updatedCart[existingItemIndex],
-                quantity: Math.min(
-                    updatedCart[existingItemIndex].quantity + item.quantity,
-                    item.stock
-                )
-            };
-        } else {
-            updatedCart.push(cartItem);
-        }
-    });
-    updateCart(updatedCart);
-    cartItems = updatedCart;
-    
-     toast.success("All available items added to cart", { 
-        description: "Added all items that are in stock to your cart" 
-        });
     }
 
     function handleRemoveItem(item) {
-        return async ({ result, update  }) => {
-            await update();
-            if (result.type === 'success') {
-                favData = favData.filter(fav => fav.id !== item.id);
-                cartItems = cartItems.filter(cart => cart.id !== item.id);
-                if (browser) {
-                    try {
-                        const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
-                        const updatedCart = currentCart.filter(cartItem => 
-                            cartItem.id !== item.id && 
-                            cartItem.partNumber !== item.partNumber
-                        );
-                        updateCart(updatedCart);
-                        cartItems = updatedCart;
-                    } catch (error) {
-                        console.error('Error updating localStorage:', error);
-                    }
-                }
-                toast.success('Item removed', { 
-                    description: `${item.name} removed from favourites` 
-                });
-            } else {
-                toast.error('Remove Failed', { 
-                    description: result.data?.message || 'Failed to remove item' 
-                });
-            }
-        };
+    return async ({ result, update }) => {
+        await update();
+        try{
+        if (result.type === 'success') {
+            favData = favData.filter(fav => fav.id !== item.id);
+            toast.success('Item removed', {
+                description: `${item.name} removed from favourites`
+            });
+        } else {
+            location.reload();
+            toast.success('Item removed', {
+                description: `${item.name} removed from favourites`
+            });
+            // toast.error('Remove Failed', {
+            //     description: result.data?.message || 'Failed to remove item'
+            // });
+        }
     }
+        catch (error) {
+            console.error('Error handling cart update:', error);
+            toast.error("Cart Error", { 
+                description: result.data?.message || "Failed to add item to cart" 
+                // description: "Failed to process cart update" 
+            });
+        }
+    };
+}
 
-    function handleClearAll() {
-        return async ({ result, update  }) => {
-            await update();
-            if (result.type === 'success') {
-                favData = [];
-                cartItems = [];
-                if (browser) {
-                    try {
-                        localStorage.removeAllItem('cart');
-                        window.dispatchEvent(new CustomEvent('cartUpdated', {
-                            detail: {
-                                items: [],
-                                totalItems: 0,
-                                totalValue: 0
-                            }
-                        }));
-                        cartItems = [];
-                    } catch (error) {
-                        console.error('Error clearing localStorage:', error);
-                    }
-                }
-                toast.success('Favourites cleared', {
-                    description: 'All items removed from favourites and cart'
-                });
-            } else {
-                toast.error('Clear Failed', {
-                    description: result.data?.message || 'Failed to clear favourites'
-                });
-            }
-        };
-    }
-</script>
-{#if !isAuthenticated}
+function handleClearAll() {
+    return async ({ result, update }) => {
+        await update();
+        
+        if (result.type === 'success') {
+            favData = [];
+            toast.success('Favourites cleared', {
+                description: 'All items removed from favourites'
+            });
+        } else {
+            toast.error('Clear Failed', {
+                description: result.data?.message || 'Failed to clear favourites'
+            });
+        }
+    };
+}
+
+onMount(() => {
+    const earliestDate = getEarliestFavoriteDate(favData);
+});
+
+</script> 
+
+<!-- {#if !isAuthenticated}
 <div class="p-6 max-w-7xl mx-auto w-11/12">
     <div class="bg-primary-50 border-l-4 border-primary-500 p-4 rounded-lg shadow-sm">
         <div class="flex items-center">
@@ -247,7 +367,7 @@
                     Please login to view and manage your favorites list.
                 </p>
                 <div class="mt-4">
-                    <a href="/login?redirectTo=/my-favourite"
+                    <a href="/login"
                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
                         Login to continue
                     </a>
@@ -255,119 +375,271 @@
             </div>
         </div>
     </div>
-</div> 
-{:else}
-<div class="p-6 max-w-7xl mx-auto w-11/12">
-    <h1 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6">My Favourites</h1>
-    {#if favData.length > 0}
-        <div class="flex space-x-4 items-center text-primary-400 overflow-hidden font-semibold mb-6">
+</div>
+{:else} -->
+<div class="pb-4 max-w-7xl mx-auto w-11/12">
+    <h1 class="sm:text-2xl text-xl font-bold mb-4 md:mb-6">My Favourites</h1>
+    {#if !favData || favData.length === 0}
+    <div class="flex flex-col items-center justify-center py-12 px-4 border bg-white border-primary-200 rounded-md">
+        <Icon icon="bi:calendar-heart-fill" class="text-primary-300 mb-4 sm:text-5xl font-bold text-3xl" />
+        <h2 class="sm:text-xl text-base font-semibold flex justify-center items-center text-gray-700 mb-2">
+            Your favourites list is empty
+        </h2>
+        <p class="text-gray-500 sm:text-sm text-xs text-center mb-6">
+            Browse our products and add items to your favourites to see them here.
+        </p>
+        <a href="/products" 
+           class="flex items-center justify-center sm:px-4 sm:py-2 px-2 py-1 sm:text-sm text-xs bg-primary-500 text-white rounded hover:bg-primary-600 transition-colors">
+            <Icon icon="game-icons:chemical-tank" class="mr-2 sm:text-xl text-xs" />
+            Browse Products
+        </a>
+    </div>
+    {:else}
+    <div class="flex flex-col lg:flex-row lg:gap-6 gap-4 mb-6 w-full">
+        <div class="w-full relative">
+            <Icon icon="ri:search-line" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="20" height="20"/>
+            <input 
+                type="text" 
+                placeholder="Search by Name, Part Number, or Manufacturer" 
+                class="w-full h-10 border border-gray-400 focus:ring-0 focus:border-primary-500 rounded px-4 py-2 pl-10 text-sm outline-none transition-all duration-200" 
+                value={filters.searchTerm} 
+                on:input={handleSearch}/>
+            {#if filters.searchTerm}
+                <button 
+                    type="button" 
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded" 
+                    style="color: #cb1919" 
+                    on:click={clearSearch}>
+                    <Icon icon="oui:cross" width="16" height="16" class="font-bold" />
+                </button>
+            {/if}
+        </div>
+        <div class="flex flex-col lg:flex-row w-full lg:w-2/3 sm:flex-row gap-2 lg:items-center">
+            <div class="relative w-full">
+                <Calender
+                    bind:this={calendarComponent}
+                    minDate={getEarliestFavoriteDate(favData)}
+                    on:dateChange={handleDateChange}
+                    initialFilters={{
+                        firstTimeOnly: false,
+                        dateRange: 'custom'
+                    }}/>
+            </div>
+        </div>
+    </div>
+    <div class="flex space-x-4 items-center text-primary-400 overflow-hidden font-semibold mb-6">
+        <form 
+            method="POST" 
+            action="?/addAllToCart"
+            use:enhance={handleAddAllToCart}>
+            <input type="hidden" name="items" value={JSON.stringify(
+                favData
+                    .filter(item => item.stockInfo.stock > 0)
+                    .map(item => ({
+                        productId: item.id,
+                        stockId: item.stockInfo.id,
+                        manufacturerId: item.manufacturerInfo.id,
+                        distributorId: item.distributorInfo.id,
+                        quantity: item.quantity
+                    })))} />
             <button 
-                on:click={addAllToCart} 
-                class="flex items-center space-x-1 text-primary-500 hover:text-primary-600">
+                type="submit"
+                class="flex bg-primary-400 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 p-2 rounded">
                 <span>Add all to</span>
                 <Icon icon="heroicons-solid:shopping-cart" width="18" />
             </button>
-            <form 
-                method="POST" 
-                action="?/removeAllItem"
-                use:enhance={handleClearAll}>
-                <button 
-                    type="submit" 
-                    class="flex items-center space-x-1 pr-6 text-primary-500 hover:text-primary-600">
-                    <span>Clear all</span>
-                    <Icon icon="mdi:delete" width="18" />
-                </button>
-            </form>   
-        </div>
-        <div class="space-y-6">
-            {#each favData as item (item.id)}
-                <div class="flex flex-col md:flex-row items-center justify-between p-6 border border-gray-200 rounded-lg w-full shadow">
-                    <img 
-                        src={item.image} 
-                        alt={item.name} 
-                        class="w-32 h-32 object-cover rounded-md mb-4 md:mb-0 md:mr-6"/>
-                    <div class="flex-1 text-center md:text-left space-y-2">
-                        <h2 class="text-lg font-bold text-gray-800">{item.name}</h2>
-                        <p class="text-sm">{item.description}</p>
-                        <p class="text-sm font-semibold">
-                            Price: <span class="text-black">{item.priceSize.price}</span>
+        </form>
+        <form 
+            method="POST" 
+            action="?/removeAllItem"
+            use:enhance={handleClearAll}>
+            <button 
+                type="submit" 
+                class="flex bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 p-2 rounded">
+                <span>Clear all</span>
+                <Icon icon="mdi:delete" width="18" />
+            </button>
+        </form>
+    </div>
+    <div class="space-y-2">
+        {#if !paginatedFavorites.length}
+            <div class="w-full md:w-full border rounded border-primary-400 bg-white items-center px-4 py-8 md:col-span-2">
+                <p class="text-center text-gray-500">No related items found</p>
+            </div>
+		{:else}
+            {#each paginatedFavorites as item (item.id)}
+                <div class="flex flex-col md:flex-row items-center justify-between p-6 border bg-white border-gray-200 rounded w-full shadow">
+                <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    class="w-32 h-32 object-cover rounded-md mb-4 md:mb-0 md:mr-6"/>
+                
+                <div class="flex-1 text-center md:text-left space-y-2">
+                    <h2 class="text-sm font-bold text-gray-800">{item?.name || ''}</h2>
+                    <p class="text-sm">
+                        <span class="font-semibold">Product Number:</span> {item?.partNumber || ''}
+                    </p>
+                    <p class="text-sm">
+                        <span class="font-semibold">Manufacturer:</span> {item?.manufacturerName || ''}
+                    </p>
+                    <p class="text-sm">
+                        <span class="font-semibold">Distributor:</span> {item?.distributorName || ''}
+                    </p>
+                    <p class="text-sm font-semibold">
+                        Price: <span class="text-black">
+                            {item.stockInfo.pricing?.USD 
+                                ? `$${item.stockInfo.pricing.USD.toFixed(2)}` 
+                                : item.stockInfo.pricing?.INR 
+                                    ? `₹${item.stockInfo.pricing.INR.toFixed(2)}` 
+                                    : 'Price not available'}
+                        </span>
+                    </p>
+                    {#if item.stockInfo.specification}
+                        <p class="text-xs">
+                            Specification: {item.stockInfo.specification}
                         </p>
-                        <p class="text-xs">Size: {item.priceSize.size}</p>
-                    </div>
-                    <div class="flex pl-2 justify-start md:w-1/4 sm:items-center m-1 p-2 rounded sm:justify-center">
+                    {/if}
+                </div>
+                <div class="flex pl-2 justify-start md:w-1/4 sm:items-center m-1 p-2 rounded sm:justify-center">
+                    <div class="flex flex-col items-center">
                         <p class="font-semibold text-center" 
-                           class:text-green-600={item.stock > 0} 
-                           class:text-red-600={item.stock === 0}>
-                            <span class="text-gray-500 text-xs">Available Stock:</span> {item.stock}
+                           class:text-green-600={item.stockInfo.stock > 0} 
+                           class:text-red-600={item.stockInfo.stock === 0}>
+                            <span class="text-gray-500 text-xs">Available Stock:</span> {item.stockInfo?.stock || 0}
                         </p>
+                        {#if item.stockInfo.orderMultiple > 1}
+                            <p class="text-xs text-gray-500">
+                                Order Multiple: {item.stockInfo.orderMultiple}
+                            </p>
+                        {/if}
                     </div>
-                    <div class="flex flex-col md:items-end items-center mt-4 md:mt-0 space-y-4">
-                        <div class="flex space-x-4 relative">
+                </div>
+                <div class="flex flex-col md:items-end items-center mt-4 md:mt-0 space-y-4">
+                    <div class="flex space-x-4 relative">
+                     {#if item.stockInfo.stock > 0}
+                        <form 
+                        method="POST" 
+                        action="?/addItemToCart"
+                        use:enhance={handleAddToCart(item)}>
+                        <input type="hidden" name="itemData" value={JSON.stringify(favData.filter(item => item.stockInfo.stock > 0)
+                    .map(item => ({
+                        productId: item.id,
+                        stockId: item.stockInfo.id,
+                        manufacturerId: item.manufacturerInfo.id,
+                        distributorId: item.distributorInfo.id,
+                        quantity: item.quantity
+                    })))} />
+                        <button 
+                            type="submit" 
+                            class="flex bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-primary-500 p-2 rounded"
+                            disabled={item.stockInfo.stock <= 0}>
+                            <span class="hidden md:inline">Add to</span>
+                            <Icon 
+                                icon="heroicons-solid:shopping-cart" 
+                                class="w-6 h-6 md:w-5 md:h-5 lg:w-6 lg:h-6" 
+                                aria-label="Add to Cart Icon" />
+                        </button>
+                    </form>
+                        {/if}
+                        <form 
+                            method="POST" 
+                            action="?/removeItem"
+                            use:enhance={() => handleRemoveItem(item)}>
+                            <input type="hidden" name="itemId" value={item.id} />
                             <button 
-                                on:click={() => addToCart(item)} 
-                                class="flex items-center space-x-1 text-primary-500 hover:text-primary-600 relative group">
-                                <span class="hidden md:inline">Add to</span>
-                                <Icon 
-                                    icon="heroicons-solid:shopping-cart" 
-                                    class="w-6 h-6 md:w-5 md:h-5 lg:w-6 lg:h-6" 
-                                    aria-label="Add to Cart Icon" />
-                                <span class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 text-xs bg-primary-200 text-white px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 md:hidden">
-                                    Add to Cart
-                                </span>
-                            </button>  
-                            <form 
-                                method="POST" 
-                                action="?/removeItem"
-                                use:enhance={() => handleRemoveItem(item)}
-                                class="relative group">
-                                <input type="hidden" name="itemId" value={item.id} />
-                                <button 
-                                    type="submit" 
-                                    class="flex items-center space-x-1 text-primary-500 hover:text-primary-600 relative group">
-                                    <span class="hidden md:inline">Remove</span>
-                                    <Icon 
-                                        icon="mdi:delete" 
-                                        class="w-6 h-6 md:w-5 md:h-5 lg:w-6 lg:h-6" 
-                                        aria-label="Remove Icon" />
-                                    <span class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 text-xs bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 md:hidden">
-                                        Remove Item
-                                    </span>
-                                </button>
-                            </form>
-                        </div>
-                        
-                        <div class="flex items-center justify-center md:justify-start space-x-4">
-                            <button 
-                                on:click={() => decreaseQuantity(item)} 
-                                class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                                disabled={item.quantity <= 1}>
-                                -
+                                type="submit" 
+                                class="flex bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-primary-500 p-2 rounded">
+                                <span class="hidden md:inline">Remove</span>
+                                <Icon icon="mdi:delete" class="w-6 h-6 md:w-5 md:h-5 lg:w-6 lg:h-6" aria-label="Remove Icon" />
                             </button>
-                            <span class="text-sm font-medium">{item.quantity}</span>
-                            <button 
-                                on:click={() => increaseQuantity(item)} 
-                                class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                                disabled={item.quantity >= item.stock}>
-                                +
-                            </button>
-                        </div>
+                        </form>
+                    </div>
+                    <div class="flex items-center justify-center md:justify-start space-x-4">
+                        <button 
+                            on:click={() => decreaseQuantity(item)} 
+                            class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                            disabled={item.quantity <= item.stockInfo.orderMultiple}>
+                            -
+                        </button>
+                        <span class="text-sm font-medium">{item.quantity}</span>
+                        <button 
+                            on:click={() => increaseQuantity(item)} 
+                            class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                            disabled={item.quantity >= (Math.floor(item.stockInfo.stock / item.stockInfo.orderMultiple) * item.stockInfo.orderMultiple)}>
+                            +
+                        </button>
+                    </div>
+                    {#if item.stockInfo.pricing}
                         <p class="text-sm font-semibold text-gray-800">
-                            Total: {calculateTotalPrice(item.priceSize.price, item.quantity)}
+                            Total: {item.stockInfo.pricing.USD 
+                                ? `$${(item.stockInfo.pricing.USD * item.quantity).toFixed(2)}`
+                                : `₹${(item.stockInfo.pricing.INR * item.quantity).toFixed(2)}`}
                         </p>
-                    </div>
+                    {:else}
+                        <p class="text-sm font-semibold text-gray-800">
+                            Total: Price not available
+                        </p>
+                    {/if}
+                </div>
                 </div> 
             {/each}
+        {/if}
+    </div>
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div
+        class="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-around border bg-white shadow px-4 py-4 rounded-b-md md:mt-2 my-1 md:m-0"
+        aria-label="pagination"
+        on:keydown={handleKeyDown}>
+        <div class="flex items-center justify-center gap-2 flex-wrap">
+            <button
+                class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                on:click={() => handlePageChange(1)}
+                disabled={$currentPage === 1}
+                aria-label="First page">
+                <Icon icon="charm:chevrons-left" class="w-4 h-4" />
+            </button>
+            <button
+                class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                on:click={() => handlePageChange($currentPage - 1)}
+                disabled={$currentPage === 1}
+                aria-label="Previous page">
+                <Icon icon="charm:chevron-left" class="w-4 h-4" />
+            </button>
+            {#each pageNumbers as page}
+                {#if page === DOTS}
+                    <span class="px-2 text-gray-500 text-sm font-medium">{DOTS}</span>
+                {:else}
+                    <button
+                        class={`inline-flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-sm shadow-sm border transition-all duration-200 transform ${
+                            page === $currentPage
+                                ? 'bg-primary-500 text-white border-primary-500 hover:bg-primary-600'
+                                : 'bg-white text-primary-700 border-gray-300 hover:bg-primary-500 hover:text-white active:scale-110'
+                        }`}
+                        on:click={() => handlePageChange(page)}
+                        disabled={page === $currentPage}
+                        aria-label="Go to page {page}"
+                        aria-current={page === $currentPage ? 'page' : undefined}>
+                        {page}
+                    </button>
+                {/if}
+            {/each}
+            <button
+				class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+				on:click={() => handlePageChange($currentPage + 1)}
+				disabled={$currentPage === totalPages}
+				aria-label="Next page">
+				<Icon icon="charm:chevron-right" class="w-4 h-4" />
+			</button>
+			<button
+				class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+				on:click={() => handlePageChange(totalPages)}
+				disabled={$currentPage === totalPages}
+				aria-label="Last page">
+				<Icon icon="charm:chevrons-right" class="w-4 h-4" />
+			</button>
         </div>
-    {:else}
-        <div class="flex flex-col items-center justify-center py-12 px-4 border border-primary-200 rounded-lg">
-            <Icon icon="mdi:heart-outline" width="64" class="text-primary-300 mb-4" />
-            <h2 class="text-xl font-semibold text-gray-700 mb-2">Your favourites list is empty</h2>
-            <p class="text-gray-500 text-center mb-6">Browse our products and add items to your favourites to see them here.</p>
-            <a href="/products" class="inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors">
-                <Icon icon="game-icons:chemical-tank" width="20" class="mr-2" />
-                Browse Products
-            </a>
-        </div>
+     </div>
     {/if}
+    <Toaster position="bottom-right" richColors />
 </div>
-{/if}
+<!-- {/if} -->

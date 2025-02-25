@@ -124,7 +124,7 @@
     }
 }
  </script>
- <div class="border shadow-sm md:w-11/12 max-w-7xl mx-auto rounded-md p-5 bg-white">
+ <div class="shadow  rounded p-5 bg-white">
     {#if toggleEdit}
       <!-- address edit form -->
         <div class=" max-w-2xl">

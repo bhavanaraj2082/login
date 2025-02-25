@@ -1,5 +1,6 @@
 <script>
-import CopyRightConsent from '$lib/components/CopyRightConsent.svelte';
-</script>
-
-<CopyRightConsent/>
+    import CopyRightConsent from '$lib/components/CopyRightConsent.svelte';
+    export let data;
+    </script>
+    
+    <CopyRightConsent {data}/>

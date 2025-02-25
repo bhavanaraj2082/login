@@ -57,9 +57,9 @@
     }
 </script>
 
-<div class="border shadow-sm md:w-11/12 max-w-7xl mx-auto rounded-md p-5 bg-white">
+<div class="shadow rounded p-5 bg-white">
     {#if toggleEdit}
-        <div class=" max-w-2xl">
+        <div class="">
     <h1 class=" text-xl font-bold"> Manage your Email Preferences</h1>
         <p class=" font-bold text-sm mt-2">Order Confirmation Options</p>
         <form class="my-3 flex flex-col sm:flex-row flex-wrap gap-y-3" 
@@ -101,7 +101,7 @@
 
     {#if !toggleEdit}
     
-        <div class=" space-y-5 flex flex-col max-w-2xl">
+        <div class=" space-y-5 flex flex-col">
             <h1 class=" text-xl font-bold">Email Preferences</h1>
             {#if emailPreferences === null}
         <div class=" space-y-3">
