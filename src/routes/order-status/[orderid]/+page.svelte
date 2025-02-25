@@ -6,12 +6,10 @@
     <OrderStatusResult {data}/>
 </div> -->
 
-
-
 <script>
     import OrderStatusResult from "$lib/components/OrderStatus/OrderStatusResult.svelte";
     export let data;
-    // console.log(data);
+    console.log("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=->",data);
 </script>
 <div>
     {#if data?.error}

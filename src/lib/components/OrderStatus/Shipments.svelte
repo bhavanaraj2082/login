@@ -31,7 +31,6 @@
     }),
   }));
 
-  // console.log("shipmentdetails :", shipmentdetails);
   function formatDate(dateString) {
     const date = new Date(dateString);
     const options = {
@@ -44,13 +43,14 @@
     }
     return date.toLocaleDateString("en-US", options);
   }
+  // console.log("shipmenet ---->",shipmentdetails);
 </script>
 
 <div class="col-span-2 mt-2">
   {#if !shipmentdetails.length > 0}
-  <div class="flex justify-center mt-8">
-    <p class="text-content font-light">No products have been shipped yet.</p>
-  </div>  
+    <div class="flex justify-center mt-8">
+      <p class="text-content font-light">No products have been shipped yet.</p>
+    </div>
   {/if}
   {#each shipmentdetails as shipment, index}
     <div class="mb-5">
@@ -116,7 +116,9 @@
                       icon="pajamas:canceled-circle"
                       class="text-primary-500 text-xl"
                     />
-                    <h3 class="font-semibold text-sm text-gray-500">Cancelled</h3>
+                    <h3 class="font-semibold text-sm text-gray-500">
+                      Cancelled
+                    </h3>
                   </div>
                 {/if}
               </div>
@@ -145,4 +147,14 @@
       {/each}
     </div>
   {/each}
+  {#if shipmentdetails.length > 0}
+    <button
+      class="sticky bottom-0 left-3/4 z-10 rounded border shrink-0 p-1.5 bg-primary-100 hover:text-white hover:bg-primary-600"
+      on:click={() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }}
+    >
+      <Icon icon="zondicons:cheveron-up" class="text-2xl" />
+    </button>
+  {/if}
 </div>
