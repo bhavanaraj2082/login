@@ -556,9 +556,6 @@ export const loadProductsubcategory = async (
     //       as: "categoryDetails",
     //     },
     //   },
-
- 
-
     //   {
     //     $lookup: {
     //       from: "stocks",
@@ -567,8 +564,6 @@ export const loadProductsubcategory = async (
     //       as: "stockDetails",
     //     },
     //   },
-
- 
 
     //   { $unwind: "$stockDetails" },
     //   { $unwind: "$manufacturerDetails" },
@@ -598,7 +593,6 @@ export const loadProductsubcategory = async (
     //     $limit: Number(pageSize),
     //   },
     // ]);
-   
     const products = await Product.aggregate([
       {
         $lookup: {
@@ -658,6 +652,9 @@ export const loadProductsubcategory = async (
               },
             },
             {
+              $sort:{productName:1}
+            },
+            {
               $skip: (Number(page) - 1) * Number(pageSize),
             },
             {
@@ -672,15 +669,18 @@ export const loadProductsubcategory = async (
         },
       },
     ]);
-   
+    
     const after = Date.now();
 
- 
-
-   // console.log(JSON.stringify(products[0].total,null,2));
-
-
- 
+   console.log(products);
+   if(!products[0].data.length && !products[0].totalCount.length ){
+    return {
+      products: [],
+      manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
+      productCount: [],
+      subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
+    };
+   }
 
     const filtered = await Promise.all(products[0].data.map(async(product) => {
       const {
@@ -1148,6 +1148,193 @@ export async function CompareSimilarityData(productId) {
   } else { return [] }
 }
 
+export const getCart = async(userId)=>{
+   //if(!userId) return { cart:[]}
+  const cart = await Cart.aggregate([
+    // Match the specific cart by cartId
+    { $match: { userId,isActiveCart:true } },
+    { $unwind: '$cartItems' },
+
+    // Lookup components with only required fields
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'cartItems.productId',
+        foreignField: '_id',
+        as: 'productDetails',
+        pipeline: [
+          {
+            $project: {
+              _id: 0,
+              productName: 1,
+              productNumber: 1,
+              imageSrc: 1,
+            }
+          }
+        ]
+      }
+    },
+    {
+      $lookup: {
+        from: 'manufacturers',
+        localField: 'cartItems.manufacturerId',
+        foreignField: '_id',
+        as: 'mfrDetails',
+        pipeline: [
+          {
+            $project: {
+              _id: 0,
+              name:1
+            }
+          }
+        ]
+      }
+    },
+
+
+    // Lookup stocks with productName and distributorId conditions
+    {
+      $lookup: {
+        from: 'stocks',
+        localField:"cartItems.stockId",
+        foreignField:"_id",
+        pipeline:[
+          {
+            $project: {
+              _id: 0,
+              stock: 1,
+              orderedQty:1,
+              pricing: 1,
+              ordermultiple: 1,
+            }
+          }
+        ],
+        as: 'stockDetails'
+      }
+    },
+
+    // Lookup distributors with only required fields
+    // {
+    //   $lookup: {
+    //     from: 'distributors',
+    //     localField: 'cartItems.distributorId',
+    //     foreignField: '_id',
+    //     as: 'distributorDetails',
+    //     pipeline: [
+    //       {
+    //         $project: {
+    //           _id: 0,
+    //           distributorname: 1,
+    //           aliasname: 1,
+    //           distributoremail: 1
+    //         }
+    //       }
+    //     ]
+    //   }
+    // },
+    // Project the required fields
+    {
+      $project: {
+        _id: 1,
+        cartId:1,
+        cartName: 1,
+        userId:1,
+        userEmail:1,
+        recurrence:1,
+        isActiveCart: 1,
+        cartItems: {
+          _id:"$cartItems._id",
+          quantity: '$cartItems.quantity',
+          backOrder: '$cartItems.backOrder',
+          cartOfferPrice: '$cartItems.cartOfferPrice',
+          quoteOfferPrice: '$cartItems.quoteOfferPrice',
+          isQuote: '$cartItems.isQuote',
+          isCart: '$cartItems.isCart',
+          cartExpiryTime: '$cartItems.cartExpiryTime',
+          quoteExpiryTime: '$cartItems.quoteExpiryTime',
+          distributorId: '$cartItems.distributorId',
+          productId: '$cartItems.productId',
+          stockId: '$cartItems.stockId',
+          manufacturerId: '$cartItems.manufacturerId',
+          productDetails: { $arrayElemAt: ['$productDetails', 0] },
+          stockDetails: { $arrayElemAt: ['$stockDetails', 0] },
+          mfrDetails: { $arrayElemAt: ['$mfrDetails', 0] },
+        }
+      }
+    },
+
+    // Group by cartId and rebuild the cartItems array
+    {
+      $group: {
+        _id: '$_id',
+        cartName: { $first: '$cartName' },
+        cartId: { $first: '$cartId' },
+        isActiveCart: { $first: '$isActiveCart' },
+        cartItems: { $push: '$cartItems' },
+        userId: { $first: '$userId' },
+        userEmail: { $first: '$userEmail' },
+        recurrence: { $first: '$recurrence' }
+      }
+    }
+  ]);
+  // console.log(cart.length,"OOOO");
+  if(cart.length === 0){
+  //   const cartData = await Cart.findOne({ userId: userId, isActiveCart: true })
+  //  return {cart:JSON.parse(JSON.stringify([cartData]))};
+   return {cart:[]}
+  }
+  const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+ // console.log(JSON.stringify(cartData,null,2));
+  const updatedcart = cart[0]?.cartItems?.map((crt) => {
+
+    let { ...cartItemsData } = crt;
+    let pricing = crt.stockDetails.pricing;
+    
+   if(crt.stockDetails.orderedQty !== undefined){
+   crt.stockDetails.stock = crt.stockDetails.orderedQty > crt.stockDetails.stock ? 0 : crt.stockDetails.stock - crt.stockDetails.orderedQty
+   }
+ // console.log('before',pricing);
+   if(pricing.INR !== undefined && pricing.INR !== null){
+     pricing.USD = pricing.INR/currency.rate
+   }else{
+    pricing.INR = pricing.USD * currency.rate;
+   }
+
+    let totalINR,totalUSD
+    const {INR,USD} = pricing
+
+    if(cartItemsData.isQuote){
+       totalINR = cartItemsData.quoteOfferPrice.INR * cartItemsData.quantity;
+       totalUSD = cartItemsData.quoteOfferPrice.USD * cartItemsData.quantity;
+    }else if(cartItemsData.isCart){
+       totalINR = cartItemsData.cartOfferPrice.INR * cartItemsData.quantity;
+       totalUSD = cartItemsData.cartOfferPrice.USD * cartItemsData.quantity; 
+    }else{
+       totalINR = INR * cartItemsData.quantity;
+       totalUSD = USD * cartItemsData.quantity;
+    }
+
+    let itemTotalPrice = {totalINR,totalUSD}
+     
+    const quoteExpiryDate = cartItemsData?.quoteExpiryTime ? cartItemsData?.quoteExpiryTime.getTime() : Date.now()+1000
+    const cartExpiryDate = cartItemsData?.cartExpiryTime ? cartItemsData?.cartExpiryTime.getTime() : Date.now()+1000
+    if(cartItemsData.isQuote && Date.now() > quoteExpiryDate){
+     cartItemsData.isQuote = false
+     //updateIsQuote(cartId,cartItemsData.componentId,"quote")
+    }
+    if(cartItemsData.isCart && Date.now() > cartExpiryDate){
+   cartItemsData.isCart = false
+   //updateIsQuote(cartId,cartItemsData.componentId,"cart")
+   }
+
+    return { ...cartItemsData, pricing, currentPrice:{INR,USD}, itemTotalPrice };
+  });
+  cart[0].cartItems = updatedcart
+ // console.log(cart,"+++++");
+ // console.log(updatedcart,"result");
+  return {cart:JSON.parse(JSON.stringify(cart))}
+}
+
 export async function getProfileDetails(userId) {
   try {
     const record = await Profile.findOne({ userId });
@@ -1514,194 +1701,3 @@ export const getSingleCartDetails = async (userId) => {
 	}
 };
 
-
-export const getCart = async(userId)=>{
-    if(!userId) return { cart:[]}
-   const cart = await Cart.aggregate([
-     // Match the specific cart by cartId
-     { $match: { userId,isActiveCart:true } },
-     { $unwind: '$cartItems' },
- 
-  
- 
-     // Lookup components with only required fields
-     {
-       $lookup: {
-         from: 'products',
-         localField: 'cartItems.productId',
-         foreignField: '_id',
-         as: 'productDetails',
-         pipeline: [
-           {
-             $project: {
-               _id: 0,
-               productName: 1,
-               productNumber: 1,
-               imageSrc: 1,
-             }
-           }
-         ]
-       }
-     },
-     {
-       $lookup: {
-         from: 'manufacturers',
-         localField: 'cartItems.manufacturerId',
-         foreignField: '_id',
-         as: 'mfrDetails',
-         pipeline: [
-           {
-             $project: {
-               _id: 0,
-               name:1
-             }
-           }
-         ]
-       }
-     },
- 
- 
-  
- 
-     // Lookup stocks with productName and distributorId conditions
-     {
-       $lookup: {
-         from: 'stocks',
-         localField:"cartItems.stockId",
-         foreignField:"_id",
-         pipeline:[
-           {
-             $project: {
-               _id: 0,
-               stock: 1,
-               orderedQty:1,
-               pricing: 1,
-               ordermultiple: 1,
-             }
-           }
-         ],
-         as: 'stockDetails'
-       }
-     },
- 
-  
- 
-     // Lookup distributors with only required fields
-     // {
-     //   $lookup: {
-     //     from: 'distributors',
-     //     localField: 'cartItems.distributorId',
-     //     foreignField: '_id',
-     //     as: 'distributorDetails',
-     //     pipeline: [
-     //       {
-     //         $project: {
-     //           _id: 0,
-     //           distributorname: 1,
-     //           aliasname: 1,
-     //           distributoremail: 1
-     //         }
-     //       }
-     //     ]
-     //   }
-     // },
-     // Project the required fields
-     {
-       $project: {
-         _id: 1,
-         cartId:1,
-         cartName: 1,
-         userId:1,
-         userEmail:1,
-         recurrence:1,
-         isActiveCart: 1,
-         cartItems: {
-           _id:"$cartItems._id",
-           quantity: '$cartItems.quantity',
-           backOrder: '$cartItems.backOrder',
-           cartOfferPrice: '$cartItems.cartOfferPrice',
-           quoteOfferPrice: '$cartItems.quoteOfferPrice',
-           isQuote: '$cartItems.isQuote',
-           isCart: '$cartItems.isCart',
-           cartExpiryTime: '$cartItems.cartExpiryTime',
-           quoteExpiryTime: '$cartItems.quoteExpiryTime',
-           distributorId: '$cartItems.distributorId',
-           productId: '$cartItems.productId',
-           manufacturerId: '$cartItems.manufacturerId',
-           productDetails: { $arrayElemAt: ['$productDetails', 0] },
-           stockDetails: { $arrayElemAt: ['$stockDetails', 0] },
-           mfrDetails: { $arrayElemAt: ['$mfrDetails', 0] },
-         }
-       }
-     },
- 
-     // Group by cartId and rebuild the cartItems array
-     {
-       $group: {
-         _id: '$_id',
-         cartName: { $first: '$cartName' },
-         cartId: { $first: '$cartId' },
-         isActiveCart: { $first: '$isActiveCart' },
-         cartItems: { $push: '$cartItems' },
-         userId: { $first: '$userId' },
-         userEmail: { $first: '$userEmail' },
-         recurrence: { $first: '$recurrence' }
-       }
-     }
-   ]);
- 
-   if(cart.length === 0){
-     //const cartData = await Cart.findOne({ userId: userId, isActiveCart: true })
-    //return {cart:JSON.parse(JSON.stringify([cartData]))};
-    return {cart:[]};
-   }
-   const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
-  // console.log(JSON.stringify(cartData,null,2));
-   const updatedcart = cart[0]?.cartItems?.map((crt) => {
-
-     let { ...cartItemsData } = crt;
-     let pricing = crt.stockDetails.pricing;
-    
-   //  if(crt.stockDetails.orderedQty !== undefined){
-   //  crt.stockDetails.stock = crt.stockDetails.orderedQty > crt.stockDetails.stock ? 0 : crt.stockDetails.stock - crt.stockDetails.orderedQty
-   //  }
-   console.log('before',pricing);
-    if(pricing.INR !== undefined && pricing.INR !== null){
-      pricing.USD = pricing.INR/currency.rate
-    }else{
-     pricing.INR = pricing.USD * currency.rate;
-    }
-
-     let totalINR,totalUSD
-     const {INR,USD} = pricing
-
-     if(cartItemsData.isQuote){
-        totalINR = cartItemsData.quoteOfferPrice.INR * cartItemsData.quantity;
-        totalUSD = cartItemsData.quoteOfferPrice.USD * cartItemsData.quantity;
-     }else if(cartItemsData.isCart){
-        totalINR = cartItemsData.cartOfferPrice.INR * cartItemsData.quantity;
-        totalUSD = cartItemsData.cartOfferPrice.USD * cartItemsData.quantity;
-     }else{
-        totalINR = INR * cartItemsData.quantity;
-        totalUSD = USD * cartItemsData.quantity;
-     }
-
-     let itemTotalPrice = {totalINR,totalUSD}
-      
-     const quoteExpiryDate = cartItemsData?.quoteExpiryTime ? cartItemsData?.quoteExpiryTime.getTime() : Date.now()+1000
-     const cartExpiryDate = cartItemsData?.cartExpiryTime ? cartItemsData?.cartExpiryTime.getTime() : Date.now()+1000
-     if(cartItemsData.isQuote && Date.now() > quoteExpiryDate){
-      cartItemsData.isQuote = false
-      //updateIsQuote(cartId,cartItemsData.componentId,"quote")
-     }
-     if(cartItemsData.isCart && Date.now() > cartExpiryDate){
-    cartItemsData.isCart = false
-    //updateIsQuote(cartId,cartItemsData.componentId,"cart")
-    }
-  
-     return { ...cartItemsData, pricing, currentPrice:{INR,USD}, itemTotalPrice };
-   });
-   cart[0].cartItems = updatedcart
-  // console.log(updatedcart,"result");
-   return {cart:JSON.parse(JSON.stringify(cart))}
-}

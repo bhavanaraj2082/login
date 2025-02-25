@@ -23,7 +23,7 @@
 		});
 	};
 
-    $: paginatedProducts = products.map(x=>x)
+    $: paginatedProducts = products.length ? products.map(x=>x) : []
     let categoryName = products[0]?.categoryDetails.urlName
     let subCategoryName = products[0]?.subCategoryDetails.urlName
 
@@ -35,7 +35,7 @@
 	let showSortByDropdown = false;
     let toggleFilter = false
     let currentPage = parseInt($page.url.searchParams.get('page')) || 1;
-    let search = parseInt($page.url.searchParams.get('search')) || null
+    let search = $page.url.searchParams.get('search') || null
     let selectedManufacturer = $page.url.searchParams.get('manufacturer') || null;
     let totalPages = parseInt(productCount/10);
 
@@ -266,7 +266,7 @@ const handleSearch = (searchName) => {
                 </button>
             </div>
             <div class=" p-2  border-1 rounded {showSearchDropdown ? "block" : "hidden"}">
-                <input type="text" placeholder="Search..." on:input={e=>handleSearch(e.target.value)} class=" w-full text-sm font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
+                <input type="text" placeholder="Search..." bind:value={search} on:input={e=>handleSearch(e.target.value)} class=" w-full text-sm font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
              </div>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -285,7 +285,7 @@ const handleSearch = (searchName) => {
                </button>
            </div>
            <div class="p-3 border-1 rounded {showManufacturerDropdown ? 'block' : 'hidden'}">
-               <input type="text" 
+               <input type="text" bind:value={selectedManufacturer}
                       placeholder="Search manufacturers..." 
                       on:input={e => handleManufacturer(e.target.value)} 
                       class="w-full text-sm rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
@@ -294,14 +294,15 @@ const handleSearch = (searchName) => {
                        <p class="text-sm text-center">No manufacturer found</p>
                    {:else}
                        {#each searchManufacture as {name}}
-                           <div class="flex items-center gap-2 text-xs font-medium">
+                           <label for={name} class="flex cursor-pointer items-center gap-2 text-xs font-medium">
                                <input 
+                                   id={name}
                                    type="checkbox" 
                                    checked={name === selectedManufacturer}
                                    on:change={(e) => handleManufacturerSelect(name, e.target.checked)}
                                    class="cursor-pointer text-primary-500 focus:ring-0">
-                               <p>{name}</p>
-                           </div>
+                               {name}
+                           </label>
                        {/each}
                    {/if}
                </div>
@@ -341,18 +342,14 @@ const handleSearch = (searchName) => {
              </div>
              <div class="p-3 border-1 rounded {showSortByDropdown ? "block" : "hidden"}">
                 <div class=" space-y-2.5 py-2.5 h-auto">
-                    <div class=" flex items-center gap-2 text-xs font-medium">
-                        <input type="checkbox" on:change={(e)=>sortBy(e.target.checked,"name")} checked={selectedSort === "name"} class=" cursor-pointer text-primary-500 focus:ring-0">
-                        <p>Product Name</p>
-                    </div>
-                    <div class=" flex items-center gap-2 text-xs font-medium">
-                        <input type="checkbox" on:change={(e)=>sortBy(e.target.checked,"asc")} checked={selectedSort === "asc"} class=" cursor-pointer text-primary-500 focus:ring-0">
+                    <label for="asc" class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
+                        <input type="checkbox" id='asc' on:change={(e)=>sortBy(e.target.checked,"asc")} checked={selectedSort === "asc"} class=" cursor-pointer text-primary-500 focus:ring-0">
                         <p>Price Ascending </p>
-                    </div>
-                    <div class=" flex items-center gap-2 text-xs font-medium">
-                        <input type="checkbox" on:change={(e)=>sortBy(e.target.checked,"desc")} checked={selectedSort === "desc"} class=" cursor-pointer text-primary-500 focus:ring-0">
+                    </label>
+                    <label for="desc" class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
+                        <input type="checkbox" id="desc" on:change={(e)=>sortBy(e.target.checked,"desc")} checked={selectedSort === "desc"} class=" cursor-pointer text-primary-500 focus:ring-0">
                         <p>Price Descending </p>
-                    </div>
+                    </label>
                 </div>
              </div>
             </div>
@@ -362,7 +359,7 @@ const handleSearch = (searchName) => {
     <div class=" w-full h-auto space-y-3 lg:w-3/4">
         {#if paginatedProducts.length === 0}
         <div>
-            <p class=" text-center font-medium">No Product Found</p>
+            <p class=" text-center font-medium pt-10">No Product Found</p>
         </div>
         {:else}
        {#each paginatedProducts as product}

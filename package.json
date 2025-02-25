@@ -68,8 +68,10 @@
     "csv-parse": "^5.6.0",
     "js-cookie": "^3.0.5",
     "lucia": "^2.7.7",
-    "mongoose": "^8.10.1",
+    "mongoose-sequence": "^6.0.1",
     "mongose": "^0.0.2-security",
+    "nanoid": "^5.0.9",
+    "mongoose": "^8.10.1",
     "papaparse": "^5.4.1",
     "sanitize-html": "^2.14.0"
   }

@@ -12,6 +12,7 @@
 	import AddressForm from '$lib/components/Cart/AddressForm.svelte';
 
 	export let data;
+	console.log(data);
 	$: userData = data.result.profileData;
 	$: shipping = userData?.shippingAddress;
 	$: billing = userData?.billingAddress;
@@ -24,12 +25,13 @@
 	let isShowbox = true
 	let order = ''
 	let checkout
+	let cartdata = data?.cart?.cart[0]?.cartItems || []
 
-	cart.set(data.cart.cart[0].cartItems)
+	cart.set(cartdata)
 
 	const calculateTotalPrice = (cart)=>{
-       priceINR = cart.reduce((sum,crt)=> sum + crt.pricing.INR*crt.quantity,0)
-       priceUSD = cart.reduce((sum,crt)=> sum + crt.pricing.USD*crt.quantity,0)
+       priceINR = cart.reduce((sum,crt)=> sum + crt.pricing.INR* (1 + (18 / 100))*crt.quantity,0)
+       priceUSD = cart.reduce((sum,crt)=> sum + crt.pricing.USD * (1 + (18 / 100))*crt.quantity,0)
 	}
 
 	calculateTotalPrice($cart)
@@ -167,12 +169,14 @@
 			orderdetails.push({
 				backOrder,
 				productId: cart.productId,
-				totalPrice: price * parseInt(cart.quantity),
+				extendedPrice: price * parseInt(cart.quantity),
 				orderQty: cart.quantity,
 				readyToShip: cart.quantity - backOrder,
-				distributirId: cart.distributorId,
-				price: price,
-				ProductName:cart.productDetails.productName,
+				distributorId: cart.distributorId,
+				manufacturerId: cart.manufacturerId,
+				stockId: cart.stockId,
+				unitPrice: price,
+				productName:cart.productDetails.productName,
 				manufacturerName:cart.mfrDetails.name,
 				//distributorAlias:cart.distributorDetails.aliasname
 			});
@@ -191,7 +195,6 @@
 			currency: "INR",
 		};
 		checkout = order;
-	    console.log(checkout,"checkout");
 	}
 	$: handleCheckout($cart);
 
@@ -235,6 +238,14 @@
 <section class=" mx-auto mb-4 w-11/12 sm:flex gap-4 sm:items-start space-y-4 sm:space-y-0">
 	<div class="p-3 lg:p-4 sm:w-1/2 md:w-3/5 lg:w-3/4 bg-white shadow-sm rounded">
 		<h3 class="text-md font-semibold text-gray-600">Address Selection</h3>
+		 <div class=" flex flex-col md:flex-row gap-4 mb-1">
+			<label for="" class=" w-full font-medium text-sm text-gray-600"> Email <br>
+			    <input value={$authedUser.email} class="mt-2 w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+			</label>
+			<label for="" class=" w-full font-medium text-sm text-gray-600"> GST Number <br>
+				<input value={userData.gstNumber} class="mt-2 w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+			</label>
+		 </div>
 		<div class=" lg:flex gap-4">
 			<div class=" w-full ">
 				<div class="flex justify-between items-center my-2">
@@ -253,7 +264,7 @@
 				<textarea
 					id="billing-address"
 					disabled
-					class="w-full p-2 h-16 lg:h-24 text-sm rounded border-gray-200 border focus:ring-0 focus:border-primary-500"
+					class="w-full p-2 h-16 lg:h-20 text-sm rounded border-gray-200 border focus:ring-0 focus:border-primary-500"
 					placeholder=""
 					bind:value={$billingAddress}
 				/>
@@ -275,7 +286,7 @@
 				<textarea
 					id="shipping-address"
 					disabled
-					class="w-full p-2 h-16 lg:h-24 text-sm rounded border-gray-200 border focus:ring-0 focus:border-primary-500"
+					class="w-full p-2 h-16 lg:h-20 text-sm rounded border-gray-200 border focus:ring-0 focus:border-primary-500"
 					placeholder=""
 					bind:value={$shippingAddress}
 				/>
@@ -290,11 +301,14 @@
 				<div class="space-y-2">
 					<div class="flex justify-between font-medium text-sm">
 						<p>Subtotal</p>
-						<p>₹{priceINR.toLocaleString("en-IN")}</p>
+						<div class=" flex flex-col items-end">
+						<p class=" font-semibold">₹{priceINR.toLocaleString("en-IN")}</p>
+                         <span class=" text-xs">including GST</span>
+						</div>
 					</div>
 					<div class="flex justify-between font-medium text-sm">
 						<p>Tax</p>
-						<p>charges apply</p>
+						<p class=" text-2s">charges apply</p>
 					</div>
 					<div class="flex border-t-1 pt-2 justify-between text-sm font-bold">
 						<p>Total</p>
@@ -304,7 +318,7 @@
 			</div>
 			{#if $cart.length}
 				<div class=" mt-4 grid grid-cols-2 gap-2">
-					{#if !$authedUser.email}
+					{#if $authedUser.email}
 						<form method="POST" action="?/checkout" use:enhance={handleSubmit} class=" col-span-2">
 							<input type="hidden" name="order" value={JSON.stringify(checkout)}/>
 							<button
@@ -341,12 +355,13 @@
 					<h2 class=" text-sm sm:text-lg lg:mb-3 font-semibold">
 						Cart Items <span class="text-red-500">({$cart.length})</span>
 					</h2>
-					<div class="flex w-1/2 sm:w-1/3 lg:w-1/6 items-center gap-2">
+					<div class="flex items-center gap-2">
 						<button
 					        type="button"
 					        on:click={downloadExcel}
-					        class=" text-2s sm:text-xs w-full py-1.5 md:py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-medium">
-					        Download
+					        class=" text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-medium">
+							<Icon icon="mdi:file-download" class="text-lg sm:text-xl rounded text-white"/>
+					        <span class="hidden sm:block">Download</span>
 						</button>
 					</div>
 				</div>
@@ -376,14 +391,14 @@
 							    
 								 <div class=" lg:w-2/6">
 									<h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Price</h3>
-									<p class="text-xs w-full font-semibold text-content">
-										₹{item.pricing.INR.toLocaleString("en-IN")}
-									</p>
-								 </div>
-							
+									<div class="text-xs w-full font-semibold">
+									    <p>₹{(item.pricing.INR * (1 + (18 / 100))).toLocaleString("en-IN")} with GST</p>
+									    <p class=" text-2s text-gray-400">₹{item.pricing.INR.toLocaleString("en-IN")} without GST</p>
+									</div>
+								
+							    </div>
 								<div class=" lg:w-2/6">
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Quantity</h3>
-							        <div class="flex items-center md:w-2/12">
 							        	<div class="flex items-center rounded">
 							        		<!-- <button
 							        			on:click={() => decrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}
@@ -400,14 +415,16 @@
 											</button> -->
 							        	</div>
 							        </div>
-							    </div>
-							
 								<div class=" lg:w-2/6">
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Total</h3>
 							        <div class=" w-full flex justify-start items-center">
-							        	<p class="text-xs font-semibold">
-							        		₹{(item.pricing.INR * item.quantity).toLocaleString("en-IN")}
-							        	</p>
+										<div class="text-xs w-full font-semibold">
+											<p>₹{(item.pricing.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST</p>
+											<p class=" text-2s text-gray-400">₹{(item.pricing.INR * item.quantity).toLocaleString("en-IN")} without GST</p>
+										</div>
+							        	<div class="text-xs font-semibold">
+							        		
+										</div>
 							        </div>
 								</div>
 						    </div>

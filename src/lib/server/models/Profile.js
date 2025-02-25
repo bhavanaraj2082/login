@@ -83,7 +83,6 @@ if (mongoose.models.Profile) {
   delete mongoose.models.Profile;
 }
 
-const Profile =
-  mongoose.models.Profile || mongoose.model("Profile", chemiDashProfileSchema);
+const Profile = mongoose.models.Profile || mongoose.model("Profile", chemiDashProfileSchema);
 
 export default Profile;

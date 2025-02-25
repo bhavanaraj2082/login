@@ -69,7 +69,6 @@ export const actions = {
 		try {
 		const body = Object.fromEntries(await request.formData());
 		const parsedBody = JSON.parse(body.guestCart);
-		console.log(parsedBody);
 		return await addItemsToExistingCart(parsedBody,body.cartId)
 		} catch (error) {
 			console.log(error);
@@ -78,6 +77,7 @@ export const actions = {
 	},
 	newcart:async({request,locals})=>{
 		try {
+
 			const userId = locals?.authedUser?.id || ""
 			const userEmail = locals?.authedUser?.email || ""
 			const body = Object.fromEntries(await request.formData());

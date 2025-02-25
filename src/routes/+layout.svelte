@@ -52,4 +52,3 @@
 <slot />
  <Toaster position="bottom-right" richColors />
 <Footer />
-<!-- <AllowCookies /> -->

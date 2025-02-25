@@ -1,99 +1,20 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const cartItemSchema = mongoose.Schema({
-   productId:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Product"
-   },
-   stockId:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Stock"
-   },
-   manufacturerId:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Manufacturer"
-   },
-   distributorId:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"Distributor"
-   },
-   quantity:{
-    type:Number,
-    default:1
-   },
-   backOrder:{
-    type:Number,
-    default:0
-   },
-   isCart:{
-    type:Boolean,
-    default:false
-   },
-   isQuote:{
-    type:Boolean,
-    default:false
-   },
-   quoteExpiryTime:{
-    type:Date
-   },
-   cartExpiryTime:{
-    type:Date
-   },
-   quoteOfferPrice:{
-    INR:{
-        type:Number,
-        default:0
-    },
-    USD:{
-        type:Number,
-        default:0
-    }
-   },
-   cartOfferPrice:{
-    INR:{
-        type:Number,
-        default:0
-    },
-    USD:{
-        type:Number,
-        default:0
-    }
-   }
-})
-
-const cartSchema = new mongoose.Schema({
-    cartId:{
-        type:String
-    },
-    cartName:{
-        type:String
-    },
-    cartItems:[cartItemSchema],
-    userId:{
-        type:String
-    },
-    userEmail:{
-        type:String
-    },
-    isDeleted:{
-        type:Boolean,
-        default:false
-    },
-    isActiveCart:{
-        type:Boolean,
-        default:false
-    },
-    recurrence:{
-        recurring:Number,
-        addedDate:Date,
-        previousRecurringDate:Date,
-        recurringDate:Date,
-    }
+const emailVerificationSchema = new mongoose.Schema({
+    email: { type: String, required: true },
+    token: { type: String, required: true },
+    expiry: { type: Date, required: true },
+    isEmailVerified: { type: Boolean, default: false },
+    isPhoneVerified: { type: Boolean, default: false },
+    verificationType: { type: String, required: true },
+    userId: { type: String }
 },
-{
-    collection:"carts",
-    timestamps:true
-})
-delete mongoose.models.Cart
-const Cart = mongoose.models.Cart || mongoose.model("Cart",cartSchema)
-export default Cart
+    {
+        timestamps: true,
+        collection: "tokenverifications"
+    }
+);
+delete mongoose.models.TokenVerification
+const TokenVerification = mongoose.models.TokenVerification || mongoose.model('TokenVerification', emailVerificationSchema);
+
+export default TokenVerification;

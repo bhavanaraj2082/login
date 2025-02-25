@@ -66,8 +66,26 @@
 	let loginSuccessmsg = "";
 	let loginSuccesstype = "";
 	let showLikedPopup = false;
+<<<<<<< HEAD
+	let successMessage =""
+	let errorMessage=""
+	// const conversionRate = 83;
+	console.log(product,"product");
+  
+	// $:{data.records.forEach((record, index) => {
+	//   record.priceSize.forEach((priceItem, i) => {
+	// 	if (!priceItem.hasOwnProperty("INR")) {
+	// 	  const inrValue = Number(priceItem.USD * conversionRate);
+	// 	  priceItem.INR = inrValue;
+	// 	  delete priceItem.USD;
+	// 	}
+	//   });
+	// })};
+  
+=======
 	let successMessage = "";
 	let errorMessage = "";
+>>>>>>> 1e352d1e0985b64d9e97a8bcbeccc6fce9617fc4
 	let orderMultiple = null;
 	let quantity = orderMultiple;
 	$: {
@@ -544,11 +562,19 @@
 		  {#if product?.variants && product?.variants.length > 0 && product.variants.some((variant) => variant.pricing?.length > 0)}
 			<div class="flex justify-between !mt-3">
 			  <p class="text-gray-900 text-lg font-semibold text-start">
+<<<<<<< HEAD
+				₹ {minPrice?.toLocaleString()} - ₹{maxPrice?.toLocaleString()}
+			  </p>
+			</div>
+		  {/if}
+		  <!-- {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)} -->
+=======
 				₹ {minPrice.toLocaleString()} - ₹ {maxPrice.toLocaleString()}
 			  </p>
 			</div>
 		  {/if}
 		  {#if screenWidth >= 640 && !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
+>>>>>>> 1e352d1e0985b64d9e97a8bcbeccc6fce9617fc4
 			<div class="">
 			  <h2 class="bg-white font-semibold text-left">SELECT A SIZE</h2>
 			  <div
@@ -566,7 +592,7 @@
 					class={`w-full grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-500 cursor-pointer transition-transform border border-gray-300 rounded-sm ${index === i ? "border md:border-l-6 lg:border bg-primary-50" : "border-none"}`}
 					on:click={() => handleThumbnailClick(i)}
 				  >
-					<div class="col-span-1 p-2 text-left">{priceItem?.break}</div>
+					<div class="col-span-1 p-2 text-left">{JSON.stringify(product?.priceSize)}</div>
 					<div class="col-span-1 p-2 text-left">
 					  {product?.productNumber}-{priceItem?.break}
 					</div>
@@ -594,6 +620,10 @@
 				</div>
 			  {/each}
 			</div>
+<<<<<<< HEAD
+		  <!-- {/if} -->
+		  <!-- {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length > 0)}
+=======
 		  {/if}
   
 		  {#if screenWidth < 640}
@@ -617,6 +647,7 @@
 			</div>
 		  {/if}
 		  {#if !((product?.variants && product?.variants.length > 0 && product.variants.some((variant) => variant.pricing?.length > 0)) || product?.priceSize?.length > 0)}
+>>>>>>> 1e352d1e0985b64d9e97a8bcbeccc6fce9617fc4
 			<div>
 			  <p>Price not available for this product, request Quote</p>
 			  <button
@@ -625,7 +656,7 @@
 				>Request Quote</button
 			  >
 			</div>
-		  {/if}
+		  {/if} -->
 		</div>
 	  </div>
 	  {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
@@ -638,12 +669,22 @@
 				class="items-center justify-between border-dotted border-b-2 border-gray-300 pb-2"
 			  >
 				<div class="text-lg font-semibold relative">
+<<<<<<< HEAD
+				  {product?.productNumber}-{product?.priceSize?.break}
+				  <button on:click={toggleModal} class="ml-1 text-primary-400"
+					> <Icon icon="material-symbols:info-outline" class="text-md" /></button
+				  >
+				  {#if showModal}
+					<div
+					  class="absolute bottom-full mb-px left-0 bg-white p-2 rounded-lg shadow-lg w-52 border border-primary-400"
+=======
 				  {product?.productNumber} - {product?.priceSize[index]?.break}
 				  <div class="relative inline-block tooltip-container">
 					<!-- Button to toggle tooltip -->
 					<button
 					  on:click={toggleTooltip}
 					  class="ml-1 text-primary-400"
+>>>>>>> 1e352d1e0985b64d9e97a8bcbeccc6fce9617fc4
 					>
 					  <Icon icon="akar-icons:info-fill" class="text-md" />
 					</button>
@@ -683,7 +724,11 @@
 				  </div>
 				</div>
 				<span class="text-lg font-semibold">
+<<<<<<< HEAD
+				  ₹ {product?.priceSize?.INR.toFixed(2)}
+=======
 				  ₹ {product?.priceSize[index]?.INR.toLocaleString("en-IN")}
+>>>>>>> 1e352d1e0985b64d9e97a8bcbeccc6fce9617fc4
 				</span>
 			  </div>
 			</div>

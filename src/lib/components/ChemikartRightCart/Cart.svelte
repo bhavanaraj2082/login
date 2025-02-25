@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import cartData from '$lib/data/cart.json'; 
   
-    let cartOpen = false;
+    let cartOpen = true;
     let cartItems = [];
     let subtotal = 0;
   
@@ -73,7 +73,7 @@
                     <div class="flex h-full flex-col bg-white shadow-xl">
                         <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
                             <div class="flex justify-between items-center pb-4 border-b">
-                                <h1 class="text-xl font-semibold">CART ITEMS <span class="text-red-500">({cartItems.length})</span></h1>
+                                <h1 class="text-xl font-semibold">CART <span class="text-red-500">({cartItems.length})</span></h1>
                                 <button class="text-orange-600" on:click={toggleCart}>
                                   <i class="fa-solid fa-xmark fa-xl" style="color: #ff8000;"></i>
                                 </button>
