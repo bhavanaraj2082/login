@@ -5,7 +5,7 @@
   // console.log("orderProduct====>", orderedproduct);
 </script>
 
-<div class="col-span-2 mt-2"> 
+<div class="col-span-2 mt-2">
   <div class="mb-5">
     <div class="mb-3">
       <h1 class="text-base text-gray-600 font-semibold">All Products</h1>
@@ -29,7 +29,7 @@
                 >
               </p>
               <p class="font-medium text-sm text-gray-700">
-                &#8377; <span>{product.unitPrice || "--"}</span>
+                &#8377; <span>{product.unitPrice.toFixed(3) || "--"}</span>
               </p>
             </div>
           </div>
