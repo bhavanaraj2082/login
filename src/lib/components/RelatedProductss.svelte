@@ -5,8 +5,10 @@
   import { toast } from 'svelte-sonner';
   import Icon from "@iconify/svelte";
   export let relatedProducts;
+  console.log("relatedProducts",relatedProducts);
   const productsData = relatedProducts;
-
+  // console.log("productsDataproductsDataproductsDataproductsDataproductsData",productsData);
+  
   let RelatedProductData = productsData.map((product) => ({
     productId: product._id,
     prodDesc: product.prodDesc,
@@ -22,6 +24,7 @@
         offer: size.offer || "0"
       }))
     : [],
+
     image: product.imageSrc,
     manufacturer: product.manufacturerInfo[0]?.name,
     stock: product.stockQuantity,

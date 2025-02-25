@@ -12,14 +12,9 @@ import {
 export const load = async ({locals}) => {
   try {
     //authedUser.email is the parameter for getProfileDetails
-<<<<<<< HEAD:src/routes/profile/+page.server.js
-    //const {userId} = JSON.parse(cookies.get("token"))
-    return await getProfileDetails('')  
-=======
     // const {userId} = JSON.parse(cookies.get("token"))
     // console.log('=======...>',locals)
     return await getProfileDetails(locals.authedUser.id)
->>>>>>> 1e352d1e0985b64d9e97a8bcbeccc6fce9617fc4:src/routes/dashboard/profile/+page.server.js
   } catch (error) {
     console.log('error',error);
       return { 

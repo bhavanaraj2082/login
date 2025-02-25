@@ -14,9 +14,9 @@ import Helpsupport from '$lib/server/models/Helpsupport.js';
 import Cart from '$lib/server/models/cart.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '$lib/server/models/MyFavourite.js';
+import SearchQueries from '$lib/server/models/SearchQueries.js';
 import Curconversion from "$lib/server/models/Curconversion.js";
 import { redirect, error } from '@sveltejs/kit';
-import Cart from "$lib/server/models/Cart.js"
 import Distributor from "$lib/server/models/Distributor.js"
 import { v4 as uuidv4 } from 'uuid';
 import { auth, authErrorMessages } from '$lib/server/lucia.js';
@@ -1081,17 +1081,21 @@ export async function editProfileEmailPreferences(body) {
 }
 
 export const searchByQuery = async (body) => {
+	// console.log("body.query",body.query);
+let cleanedQuery = body.query.replace(/[^\w]/g, "").toLowerCase();;
+// console.log("body.query",body.query);
+
 	const queryFilter = {
 		$or: [
-			{ productName: { $regex: body.query, $options: 'i' } },
-			{ productNumber: { $regex: body.query, $options: 'i' } },
-			{ CAS: { $regex: body.query, $options: 'i' } }
+		{ cleanedName: { $eq: cleanedQuery } },
+		{ $text: { $search: cleanedQuery } },
+		{ CAS: { $eq: body.query } }
 		]
-	};
-
+	  };
+	  
 	try {
 		const result = await Product.find(queryFilter)
-			.limit(5)
+			.limit(10)
 			.populate('category')
 			.populate('subCategory')
 			.exec();
@@ -2349,6 +2353,17 @@ export const CreateProductQuote = async (formattedData) => {
 	return { status: 200 };
 };
 
+
+export const saveMailId = async (body) => {
+	// console.log(body);
+	
+	const newSearchQuery = new SearchQueries(body);
+	// console.log(newSearchQuery);
+	
+	await newSearchQuery.save();
+	return { status: 200 };
+};
+
 export const addToCart = async(item,userId,userEmail)=>{
 	const search = await Cart.findOne({userId,userEmail,isActiveCart:true}).lean()
 	// const id = await Stock.findOne({productid:item.productId,manufacturer:item.manufacturerId},{distributor:1})
@@ -2857,3 +2872,16 @@ export const updateRecurrence = async (body) => {
 		};
 	}
 };
+
+export const submitFeedback = async (data) => {
+    try {
+      const newFeedback = new Feedback(data); // Use the Feedback model here
+      const savedFeedback = await newFeedback.save();
+      console.log("savedFeedback",savedFeedback);
+
+      return savedFeedback;
+    } catch (error) {
+    //   console.error('Error saving feedback:', error);
+      throw new Error('Failed to save feedback information');
+    }
+  };

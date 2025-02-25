@@ -4,18 +4,21 @@
     "description": "The science of analyzing substances to understand their composition and structure.",
     "image": "/applications/analytical-chemistry.webp",
     "url": "analytical-chemistry",
+    "keywords": ["Substance Analysis", "Chemical Composition", "Structural Chemistry", "Analytical Methods", "Chemistry Techniques"],
     "subcategories": [
       {
         "name": "Sample Preparation",
         "description": "Sample preparation is a critical step in analytical chemistry, ensuring the sample is in the optimal condition for analysis. This step includes cleaning, concentrating, and isolating specific components to ensure accurate results. Effective sample preparation enhances the reliability of analytical outcomes.",
         "image": "/applications/sample-preparation.webp",
         "url": "sample-preparation",
+        "keywords": ["Sample Conditioning", "Component Isolation", "Chemical Preparation", "Analytical Accuracy", "Sample Concentration"],
         "subsubcategories": [
           {
             "name": "Solid Phase Extraction (SPE)",
             "description": "Solid Phase Extraction (SPE) is an advanced and efficient technique used for rapid, selective sample preparation and purification before chromatographic analysis, including methods such as High-Performance Liquid Chromatography (HPLC), Gas Chromatography (GC), or Thin-Layer Chromatography (TLC). This technique involves isolating one or more target analytes from a liquid sample by utilizing a solid stationary phase, where the compounds are extracted, partitioned, and/or adsorbed. By selectively capturing the analytes of interest while removing interfering substances, SPE enhances the sensitivity, accuracy, and reproducibility of subsequent chromatographic procedures, ensuring a cleaner, more concentrated sample for detailed analysis.",
             "image": "/applications/solid-phase-extraction-spe.webp",
             "url": "solid-phase-extraction",
+            "keywords": ["Selective Extraction", "Chromatographic Purification", "Analyte Isolation", "Sample Concentration", "Analytical Sensitivity"],
             "additionalInfo": [
               {
                 "title": "Benefits of Solid Phase Extraction",
@@ -48,6 +51,7 @@
             "description": "Solid Phase Microextraction (SPME) is an innovative and highly sensitive solvent-free sample preparation technique that offers exceptional efficiency for analyzing volatile and semi-volatile compounds. The process is based on the principles of adsorption/absorption and desorption, where a coated fiber is employed to concentrate target compounds directly from the sample. By capturing these compounds onto the fiber's surface, SPME eliminates the need for solvents, making it an environmentally friendly and cost-effective alternative. This technique is widely valued for its ability to provide rapid, accurate, and reproducible results in various analytical applications.",
             "image": "/applications/solid-phase-microextraction-spme.webp",
             "url": "solid-phase-microextraction",
+            "keywords": ["Solvent-Free Extraction", "Volatile Compound Analysis", "Fiber Coating", "Target Compound Concentration", "Environmental Sample Preparation"],
             "additionalInfo": [
               {
                 "title": "Solid Phase Microextraction (SPME) Overview",
@@ -68,6 +72,7 @@
             "description": "QuEChERS is a highly efficient type of dispersive solid phase extraction (dSPE) used for sample preparation, designed to be quick, easy, cheap, effective, rugged, and safe. Originally developed in 2002 for the preparation of fruit and vegetable samples for pesticide residue analysis, QuEChERS has since been expanded to accommodate a wide range of chemical classes. These include polycyclic aromatic hydrocarbons (PAHs), polychlorinated biphenyls (PCBs), polybrominated diphenyl ethers (PBDEs), and various flame retardants. The method has become widely adopted and is now specified in the official methods of the Association of Analytical Communities (AOAC 2007.01) and the European Committee for Standardization (EN 15662:2008), making it a standard approach in analytical laboratories worldwide.",
             "image": "/applications/quechers-sample-preparation-method.webp",
             "url": "quechers-sample-preparation",
+            "keywords": ["Dispersive Solid Phase Extraction", "Sample Preparation", "Pesticide Residue Analysis", "Chemical Analysis", "AOAC Standard Method"],
             "additionalInfo": [
               {
                 "title": "QuEChERS Sample Extraction",
@@ -86,12 +91,14 @@
         "description": "Liquid chromatography is a powerful technique for separating and analyzing compounds dissolved in a liquid. The technique uses a column filled with a stationary phase, and the components of the mixture are separated as they interact differently with the stationary phase.",
         "image": "/applications/liquid-chromatography.webp",
         "url": "liquid-chromatography",
+        "keywords": ["Chromatography", "Separation Technique", "Compound Analysis", "Stationary Phase", "Liquid Separation"],
         "subsubcategories": [
           {
             "name": "Small Molecule HPLC",
             "description": "Analysis of small molecules involves studying compounds with low molecular weights, typically less than 900 daltons. Common examples of small molecules include amino acids, lipids, sugars, fatty acids, alkaloids, and various other biological and chemical substances. Several techniques are employed for the separation of small molecules, such as High-Performance Liquid Chromatography (HPLC), Liquid Chromatography (LC), Gas Chromatography (GC), Thin-Layer Chromatography (TLC), and Capillary Electrophoresis (CE). For their identification, techniques like Nuclear Magnetic Resonance Spectroscopy (NMR) and Mass Spectrometry (MS) are commonly used. In recent years, Liquid Chromatography coupled with Mass Spectrometry (LC-MS) has become a critical method for identifying small molecules due to its sensitivity and versatility. Achieving optimal results in HPLC, UHPLC, or LC-MS analysis of small molecules relies heavily on the careful selection of the appropriate stationary phase and mobile phase conditions. The chemistry of the analyte is essential in determining the most suitable column chemistry. Factors such as analysis speed, sample matrix, and the number of compounds also play significant roles in choosing the ideal stationary phase base material to ensure accurate and effective analysis.",
             "image": "/applications/small-molecule-hplc.webp",
             "url": "small-molecule-hplc",
+            "keywords": ["Small Molecule Analysis", "HPLC", "LC-MS", "Chromatography Techniques", "Molecular Identification"],
             "additionalInfo": [
               {
                 "title": "HPLC of Small Molecules",
@@ -112,6 +119,7 @@
             "description": "Biomolecules are large, complex, polymeric chemical compounds produced by living cells that play a critical role as the fundamental building blocks of living organisms. These molecules are responsible for carrying out a wide range of biological processes essential to life. The major types of biomolecules include proteins, peptides, polynucleotides, carbohydrates, lipids, vitamins, and coenzymes. Due to their large size, structural complexity, chemical diversity, and their importance in biological activity, the characterization of biomolecules requires highly efficient and precise techniques. While many separation and analysis methods are available, High-Performance Liquid Chromatography (HPLC) is the most widely used technique for biomolecule analysis. HPLC allows the separation of biomolecules based on different modes, such as reversed phase, size-exclusion, or ion exchange, to address their numerous functional groups and conformational variations. Regardless of the chosen separation mode, achieving accurate and reliable results in biomolecule analysis depends heavily on efficient column packing and consistent stationary phase particle chemistry, which are essential for optimal separation performance.",
             "image": "/applications/large-molecule-hplc.webp",
             "url": "large-molecule-hplc",
+            "keywords": ["Biomolecule Analysis", "HPLC", "Proteins", "Peptides", "Size-Exclusion Chromatography"],
             "additionalInfo": [
               {
                 "title": "Reversed-phase biomolecule HPLC",
@@ -140,6 +148,7 @@
             "description": "Low-pressure liquid chromatography (LPLC) is an analytical technique that utilizes low pressure to propel a mobile phase through a column packed with a stationary phase, allowing for the separation of complex mixtures based on differential partitioning. Initially performed using open columns that relied on gravity to move the sample through the packing bed, this method is also known as 'open column liquid chromatography.' The different modes of LPLC enable the precise purification of compounds by separating them according to their chemical properties, such as size, charge, or affinity. LPLC is primarily used for studying biomolecules such as proteins, peptides, and monoclonal antibodies due to its non-destructive preparative nature, which allows the sample to be retained for further analysis. The technique is advantageous due to its simple design, efficient siphon action, and relatively low instrumentation requirements, including detectors, low-pressure pumps, and fraction collectors. Its versatility makes it essential across industries such as pharmaceuticals, biotechnology, food and beverage, environmental monitoring, and scientific research. Additionally, by operating at lower pressures and requiring less solvent, LPLC aligns with green chemistry principles, making it an environmentally sustainable method.",
             "image": "/applications/low-pressure-liquid-chromatography-lplc.webp",
             "url": "low-pressure-liquid-chromatography",
+            "keywords": ["LPLC", "Biomolecule Purification", "Open Column Chromatography", "Green Chemistry", "Preparative Chromatography"],
             "additionalInfo": [
               {
                 "title": "Adsorption Chromatography",
@@ -178,6 +187,7 @@
         "description": "Gas chromatography (GC) is a widely used analytical technique that separates and analyzes volatile and semi-volatile compounds within a mixture. Known for its exceptional resolving power, speed, and sensitivity, GC has become a popular choice in a variety of analytical applications. It is particularly effective in identifying and quantifying individual components in complex mixtures. Due to these advantages, GC is employed across numerous industries, including environmental monitoring, petroleum, chemicals, food and beverage, and pharmaceuticals, making it an essential tool for quality control, research, and regulatory analysis.",
         "image": "/applications/gas-chromatography-gc.webp",
         "url": "gas-chromatography",
+        "keywords": ["Gas Chromatography", "Volatile Compounds", "Analytical Technique", "Separation Technology", "Industrial Applications"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -203,6 +213,7 @@
         "description": "Mass spectrometry (MS) is a powerful analytical technique that identifies compounds in a sample by measuring their mass-to-charge (m/z) ratios. The method works by determining the molecular weight of a compound and analyzing the isotopic abundance of its elements. In mass spectrometry, the sample is ionized into gaseous ions, which are then separated and identified based on their mass-to-charge ratios and relative abundances. This allows for the precise identification and structural characterization of a wide range of compounds, making MS an indispensable tool in fields such as chemistry, biology, and pharmaceuticals.",
         "image": "/applications/mass-spectrometry.webp",
         "url": "mass-spectrometry",
+        "keywords": ["Mass Spectrometry", "Ionization", "Compound Identification", "Structural Characterization", "Molecular Weight"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -224,6 +235,7 @@
         "description": "Nuclear Magnetic Resonance (NMR) spectroscopy is a highly valuable analytical technique used to determine the molecular structure and chemical composition of a sample. The technique operates by analyzing the interaction between spinning nuclei and a strong external magnetic field. In NMR spectroscopy, the application of this magnetic field causes specific nuclei within a molecule to absorb particular radiofrequency radiation. The energy absorbed results in a transition in the nuclear spins, which can then be detected and recorded, producing a detailed NMR spectrum. This allows for the identification of molecular structures, functional groups, and even the dynamics of the sample, making NMR an essential tool in fields such as chemistry, biochemistry, and pharmacology.",
         "image": "/applications/nuclear-magnetic-resonance-nmr.webp",
         "url": "nmr",
+        "keywords": ["NMR Spectroscopy", "Molecular Structure", "Chemical Composition", "Functional Groups", "Nuclear Spins"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -247,18 +259,21 @@
     "description": "Cell culture and cell culture analysis involve growing cells in a controlled environment for research, production, and analysis. This technique is widely used in areas like biotechnology, pharmaceutical development, and medical research.",
     "image": "/applications/cell-culture-cell-culture-analysis.webp",
     "url": "cell-culture-cell-culture-analysis",
+    "keywords": ["Cell Culture", "Biotechnology", "Pharmaceutical Development", "Medical Research", "Cell Analysis"],
     "subcategories": [
       {
         "name": "Cell Culture by Cell Type",
         "description": "Both immortalized cell lines and cells from primary explants of a variety of organisms including plants, insects, mammals, bacteria, fungi, and yeast can be cultured in vitro. Cell culture conditions vary widely by cell type. From plant tissue culture to microbial culture, insect cell culture, and mammalian cell culture, cells have specific requirements for proper growth and maintenance.",
         "image": "/applications/cell-culture-by-cell-type.webp",
         "url": "cell-culture-by-cell-type",
+        "keywords": ["Cell Culture", "Immortalized Cell Lines", "Primary Explants", "Microbial Culture", "Mammalian Cell Culture"],
         "subsubcategories": [
           {
             "name": "Mammalian Cell Culture",
             "description": "Mammalian cell culture is a vital tool used in a wide range of research, clinical, and pharmaceutical applications. Cells that are isolated from animal tissues can be cultured and expanded to study various aspects of cell biology and disease mechanisms, or they can be utilized for the production of important biological products such as antibodies, proteins, and vaccines. Immortalized mammalian cell lines, which are genetically modified to grow indefinitely in vitro, are especially valuable as they can be maintained for extended periods and serve as simplified models to investigate complex biological processes. These cell lines provide a consistent and reproducible system for studying cellular behavior, drug interactions, and disease models, making them indispensable in biomedical research and pharmaceutical development.",
             "image": "/applications/mammalian-cell-culture.webp",
             "url": "mammalian-cell-culture",
+            "keywords": ["Mammalian Cell Culture", "Immortalized Cell Lines", "Cell Biology", "Disease Mechanisms", "Biopharmaceutical Production"],
             "additionalInfo": [
               {
                 "title": "Growing Mammalian Cells In Vitro",
@@ -275,6 +290,7 @@
             "description": "Microbial cell cultures are essential tools in molecular biology for applications such as cloning and recombinant protein expression. They are also widely used in clinical settings for isolating, detecting, and identifying disease-causing microbes. Microbial culturing provides a controlled environment that supports the growth and division of cells, allowing researchers to study microorganisms in detail. Bacteria and other microbes can be cultured in liquid broth or on solid nutrient agar media, using aseptic techniques to maintain sterile conditions and prevent contamination. This process is critical for a variety of research and diagnostic applications, enabling the study of microbial behavior, pathogenicity, and the development of new treatments.",
             "image": "/applications/microbial-cell-culture.webp",
             "url": "microbial-cell-culture",
+            "keywords": ["Microbial Cell Culture", "Recombinant Protein Expression", "Cloning", "Aseptic Techniques", "Pathogenicity"],
             "additionalInfo": [
               {
                 "title": "Cloning and Recombinant Protein Expression",
@@ -291,6 +307,7 @@
             "description": "Plant tissue and cell culture refers to the sterile growth and multiplication of plant cells, tissues, and organs in vitro, providing an efficient method for the propagation of plants under controlled conditions. By culturing plant cells with nutrient media in an artificial environment, it is possible to clonally propagate plants at scale, producing mature, disease-free specimens in a fraction of the time compared to traditional methods. This technique allows for the rapid generation of high-quality, uniform planting materials, which are invaluable for applications in molecular genetic engineering, plant breeding, horticultural production, and environmental conservation. Furthermore, plant tissue culture is also widely used in plant science, phycology, and pharmaceutical research. Common plant cell culture processes, such as seed culture, meristem culture, callus culture, and bud culture, typically involve placing tissues on a gel substrate, such as Murashige and Skoog (MS) media or Gamborg B5 medium. In some cases, plant tissues are grown in liquid media, as seen in cell suspension cultures. The formulation of plant culture media is tailored to the specific needs of the plant and typically includes macronutrients, micronutrients, vitamins, amino acids, nitrogen supplements, plant growth hormones, and plant growth regulators (PGRs). Advances in bioengineering and plant science have significantly improved the efficiency and outcomes of plant tissue and cell culture processes, opening new possibilities for plant research and cultivation.",
             "image": "/applications/plant-tissue-culture.webp",
             "url": "plant-tissue-culture",
+            "keywords": ["Plant Tissue Culture", "Clonal Propagation", "Genetic Engineering", "Plant Growth Regulators", "Horticultural Production"],
             "additionalInfo": [
               {
                 "title": "Plant pathogen screening for species conservation",
@@ -311,6 +328,7 @@
             "description": "Primary cells are mammalian cells that are directly harvested from living human or animal tissues. Unlike stem cells, primary cells are typically terminally differentiated, meaning they closely resemble the tissue from which they were isolated. This makes them highly representative of normal biological systems, especially when compared to cancer cell lines, which may be less predictive due to the alterations associated with cancer biology. Primary cells are valuable models for studying a range of physiological and pathological conditions. Common primary cell types include epithelial cells, endothelial cells, keratinocytes, melanocytes, fibroblasts, osteoblasts, myocytes, and hepatocytes, each with distinct roles and characteristics that reflect the diverse functions of human and animal tissues.",
             "image": "/applications/primary-cell-culture.webp",
             "url": "primary-cell-culture",
+            "keywords": ["Primary Cell Culture", "Terminally Differentiated Cells", "Physiological Models", "Epithelial Cells", "Hepatocytes"],
             "additionalInfo": [
               {
                 "title": "How Primary Cells Differ from Immortalized Cell Lines",
@@ -327,6 +345,7 @@
             "description": "Stem cells possess the unique ability to self-renew and differentiate into various specialized cell types in response to specific signals. These remarkable properties make stem cells crucial for tissue repair, regeneration, and replacement, as they can generate the diverse cells needed to restore damaged tissues. Due to their potential for therapeutic applications, stem cells are invaluable tools in regenerative medicine, enabling the development of innovative therapies for a range of conditions, including degenerative diseases, injury recovery, and various forms of tissue damage. Their versatility and regenerative capabilities continue to drive significant advances in stem cell research and treatment strategies.",
             "image": "/applications/stem-cell-culture.webp",
             "url": "stem-cell-culture",
+            "keywords": ["Stem Cell Culture", "Self-Renewal", "Tissue Regeneration", "Regenerative Medicine", "Therapeutic Applications"],
             "additionalInfo": [
               {
                 "title": "Types and Features of Stem Cells",
@@ -349,12 +368,14 @@
         "description": "Cell culture methods are vital to broad areas of life science research, clinical research, drug discovery and development, and therapeutics manufacturing. Cultured cells require a sterile environment, a supply of nutrients, and specific handling techniques for optimal growth. Here we explore common cell culture techniques from media preparation, to cell growth and maintenance, to transfection and gene editing.",
         "image": "/applications/cell-culture-by-technique.webp",
         "url": "cell-culture-by-technique",
+        "keywords": ["Cell Culture Techniques", "Transfection", "Gene Editing", "Media Preparation", "Cell Maintenance"],
         "subsubcategories": [
           {
             "name": "Media Preparation",
             "description": "The preparation of cell culture media plays a crucial role in supporting mammalian cell growth and influencing experimental outcomes. Likewise, there are specially formulated media designed to cultivate microorganisms in vitro. These media provide essential nutrients, energy sources, and compounds that regulate key cellular processes, ensuring healthy growth and functionality. Both prokaryotic and eukaryotic cell cultures may have unique growth requirements depending on the type of culture, the intended purpose of cultivation, and the specific needs of the cells, including cell density. Selecting the appropriate culture media is vital for optimizing cell growth and achieving reliable results in various research and industrial applications.",
             "image": "/applications/media-preparation.webp",
             "url": "media-preparation",
+            "keywords": ["Cell Culture Media", "Media Formulation", "Nutrient Requirements", "Cell Growth", "Microbial Culture"],
             "additionalInfo": [
               {
                 "title": "Media Preparation",
@@ -379,6 +400,7 @@
             "description": "Cell culture is a foundational technique in life science research, widely used to establish relevant biological models or produce recombinant proteins, virus particles, and biological therapies. The growth and maintenance of cultured cells, including bacteria, yeast, and mammalian cells, are carried out in a biosafety cabinet, also known as a cell or tissue culture hood, to ensure sterile conditions and prevent microbial or chemical contamination. There are two primary types of cell culture: primary culture and continuous culture. Primary cultures are directly derived from human or animal tissues and have a limited lifespan due to cellular senescence. In contrast, continuous cultures are considered 'immortal' as they are often derived from patient cancer tissues and can be maintained in culture indefinitely. Additionally, cell lines can be created by immortalizing cells, allowing them to be serially propagated or passaged for numerous cycles of division, making them invaluable for long-term studies and experiments.",
             "image": "/applications/cell-growth-maintenance.webp",
             "url": "cell-growth-maintenance",
+            "keywords": ["Cell Culture", "Cell Maintenance", "Primary Culture", "Continuous Culture", "Immortalized Cell Lines"],
             "additionalInfo": [
               {
                 "title": "Cell Culture Methods",
@@ -411,6 +433,7 @@
             "description": "Transfection is the process of introducing nucleic acids, such as DNA or RNA, into eukaryotic cells, allowing for the manipulation of gene expression within a cellular environment. This can be achieved through stable transfection, where the DNA is integrated into the cell's genome, or transient transfection, where protein expression occurs for a limited time. Various methods, including chemical, physical, and biological techniques, are employed to transfect cells, enabling researchers to study gene function and expression. Transfection has a broad range of applications, including gene therapy, the generation of induced pluripotent stem cells (iPSCs), gene silencing through RNA interference (RNAi), and the production of therapeutic antibodies and proteins. These applications make transfection a crucial tool in both basic research and clinical development.",
             "image": "/applications/transfection-gene-editing.webp",
             "url": "transfection-gene-editing",
+            "keywords": ["Transfection", "Gene Editing", "Gene Therapy", "RNAi", "iPSCs"],
             "additionalInfo": [
               {
                 "title": "Common Transfection Methods",
@@ -431,6 +454,7 @@
             "description": "3D human liver tissue bioprinted on Corning Transwell permeable supports represents a significant advancement in cell culture technology. Traditional cell culture has primarily relied on two-dimensional (2D) surfaces, which, while essential for cell expansion, do not fully replicate the complex, three-dimensional interactions that occur in vivo. As a result, 3D cell culture tools, reagents, and techniques have been developed to create more accurate and predictive in vitro models. These models are particularly valuable in fields such as cancer research, drug discovery, neuroscience, and regenerative medicine. 3D cell culture models can generally be divided into two main categories: 1) scaffold-based methods, which use hydrogels or structural scaffolds to support cell growth, and 2) scaffold-free methods, which involve the use of freely floating cell aggregates, commonly known as spheroids. The selection of the method depends on the specific properties of the cells being cultured and the intended purpose of the 3D culture, making it a versatile and essential tool for modern biomedical research.",
             "image": "/applications/3d-cell-culture.webp",
             "url": "3d-cell-culture",
+            "keywords": ["3D Cell Culture", "Bioprinting", "Spheroids", "Cancer Research", "Drug Discovery"],
             "additionalInfo": [
               {
                 "title": "Scaffold-based 3D Cell Culture Techniques",
@@ -453,6 +477,7 @@
         "description": "Cell analysis focuses on the study of cells to understand their morphology, behavior, and functions using various techniques such as microscopy, flow cytometry, and gene expression analysis.",
         "image": "/applications/cell-analysis.webp",
         "url": "cell-analysis",
+        "keywords": ["Cell Morphology", "Flow Cytometry", "Gene Expression", "Microscopy", "Cell Behavior"],
         "subsubcategories": [
           {
             "name": "Cell-Based Assays",
@@ -499,6 +524,7 @@
             "description": "Cell counting is an essential process in cell culture, enabling researchers to monitor cell doubling time and quantify cells prior to experiments or manufacturing processes. Routine monitoring of cultured cells is necessary not only to assess proliferation, but also to evaluate cell viability, cytotoxicity, and other key indicators of cell health. The selection of an appropriate assay for counting cells depends on factors such as the type of cells in culture, the specific application of the study, and the required throughput. Accurate quantification of cultured cells is critical before sub-culturing, transfections, genomic studies, cryopreservation, or any other manipulations, ensuring reliable results and maintaining cell integrity throughout the experimental process.",
             "image": "/applications/cell-counting-health-analysis.webp",
             "url": "cell-counting-health-analysis",
+            "keywords": ["Cell Counting", "Cell Viability", "Cytotoxicity", "Cell Proliferation", "Health Analysis"],
             "additionalInfo": [
               {
                 "title": "Manual Cell Counting",
@@ -531,6 +557,7 @@
             "description": "Live-cell imaging and analysis offer scientists the ability to study dynamic cellular events in real time, providing unique insights into cellular processes that traditional methods, such as PCR, flow cytometry, immunocytochemistry, and tissue staining with antibodies, cannot capture. Unlike these techniques, which provide static snapshots of cellular events, live-cell imaging allows for continuous observation of cellular behaviors, interactions, and changes over time. Recent advancements in camera technology, live-cell fluorescent dyes, fluorescent proteins, video compression, and time-lapse microscopy have greatly enhanced our capacity to visualize and analyze living cells, as well as their intercellular interactions and subcellular processes, with exceptional detail and precision. These advancements have revolutionized the study of cellular dynamics in a variety of research fields.",
             "image": "/applications/imaging-analysis-live-cell-imaging.webp",
             "url": "imaging-analysis-live-cell-imaging",
+            "keywords": ["live-cell imaging", "cell analysis", "dynamic cellular events", "microscopy", "fluorescent dyes", "time-lapse imaging"],
             "additionalInfo": [
               {
                 "title": "Live-cell Imaging Systems",
@@ -553,6 +580,7 @@
         "description": "Cell culture has become an essential and foundational technique in biological system modeling, playing a crucial role in biotechnology, pharmaceutical industries, and life science research labs. While the technique is widely accessible, successful propagation of cells for stock expansion or experimental modeling can be hindered by contamination or other factors that affect cell viability. The widespread practice of sharing cell lines has led to documented cases of cross-contamination, which has compromised the integrity of previously trusted cell stocks. Understanding the common and less frequent reasons for cell culture failure is vital for improving laboratory efficiency, boosting the yield of cellular products, and ensuring the reliability and accuracy of downstream data from in vitro models.",
         "image": "/applications/cell-culture-troubleshooting.webp",
         "url": "cell-culture-troubleshooting",
+        "keywords": ["cell culture", "cell viability", "contamination", "cross-contamination", "biotechnology", "pharmaceutical research"],
         "additionalInfo": [
           {
             "title": "Cell Line Misidentification",
@@ -589,6 +617,7 @@
         "description": "Cultured cells play a crucial role in the manufacturing of biologics, including vaccines, therapeutic proteins, antibodies, and cell therapy products. With the growing demand for biologic therapies and vaccines, there is a heightened interest in developing more efficient cell culture processes. This has led to advancements in several key areas: 1) the creation of cell lines and cell cultures optimized for higher yields, 2) the formulation of specialized cell culture media designed to enhance cell expansion and production, and 3) the use of bioreactors that support enhanced cell growth and scalability. These developments are driving improvements in the production capacity and efficiency of biologics, ensuring that the growing global demand for these therapies can be met more effectively.",
         "image": "/applications/cell-culture-for-manufacturing.webp",
         "url": "cell-culture-for-manufacturing",
+        "keywords": ["cell culture", "biologics", "vaccines", "bioreactors", "therapeutic proteins"],
         "additionalInfo": [
           {
             "title": "Cell Culture Systems for Manufacturing",
@@ -611,6 +640,7 @@
     "description": "Chemistry & Synthesis is the field of science that involves the design, synthesis, and analysis of chemical compounds. It includes ADC & Bioconjugation, Lead Discovery, Peptide Synthesis, Reaction Design & Optimization, Synthetic Methods, and Targeted Protein Degradation, all of which play a pivotal role in advancing pharmaceutical and chemical sciences.",
     "image": "/applications/chemistry-synthesis.webp",
     "url": "chemistry-synthesis",
+    "keywords": ["chemistry", "synthesis", "peptide synthesis", "lead discovery", "bioconjugation"],
     "subcategories": [
       {
         "name": "ADC & Bioconjugation",
@@ -650,6 +680,7 @@
         "description": "Once a target protein, which is implicated in a disease, has been identified and validated, compound screening is conducted to assess how small molecules interact with that particular target protein. This interaction may involve either activation or inhibition of the target protein, a critical process for lead identification in drug discovery. Compound screening enables researchers to discover potential drug candidates that can modulate the target protein's activity, providing a foundation for further drug development and therapeutic intervention.",
         "image": "/applications/lead-discovery.webp",
         "url": "lead-discovery",
+        "keywords": ["lead discovery", "compound screening", "drug candidates", "target protein", "drug development"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -675,6 +706,7 @@
         "description": "A peptide is composed of two or more amino acids linked by an amide bond, forming a chain typically ranging from 2 to 70 amino acids in length. Unlike proteins, peptides do not require folding to be biologically active. Peptides are naturally occurring as peptide hormones such as angiotensin, LHRH, and enkephalin, and as toxins in plants and animals. They are of significant interest in drug discovery as potential lead compounds, and also serve as drugs themselves. In addition, peptides are widely used in vaccines, biomaterials, histological probes, and as antigens to generate antibodies. Peptides can be synthesized chemically either in solution or via solid-phase synthesis, where the process involves the selective formation of amide bonds between protected amino acids. In solid-phase synthesis, the carboxyl group is protected and linked to a polymer support. After bond formation, the amino-protecting group of the dipeptide is removed, and the next N-protected amino acid is coupled to the growing chain.",
         "image": "/applications/peptide-synthesis.webp",
         "url": "peptide-synthesis",
+        "keywords": ["peptide synthesis", "amide bond", "drug discovery", "vaccines", "solid-phase synthesis"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -708,6 +740,7 @@
         "description": "Chemical reaction design and optimization is crucial in organic synthesis research. By modifying reaction parameters such as catalyst, pH, solvent, temperature, or time, specific outputs like cost savings, purity, selectivity, or yield can be achieved. In optimizing chemical reactions, tools used must offer flexibility, precision, and reproducibility. Reaction design typically involves creating a synthetic pathway to a target molecule using commercially available starting materials, often using a ‘disconnected approach’ that focuses on key bond formation. Chemists break down the process into simple steps, working backwards from the target molecule. While experience plays a significant role in this process, modern software tools like SYNTHIA™ allow users to analyze synthetic pathways for both known and novel molecules. Experimental methodologies for reaction optimization include trial and error (one variable at a time), where one input is varied while others are kept constant until optimal conditions are found, and multi-parameter design of experiments (DoE), where factors are varied simultaneously across a range of values to find the most efficient conditions. The DoE approach involves running combinations of different conditions and analyzing them for intrinsic variability. Successful optimization requires careful attention to reproducibility and systematic experimentation. After the initial synthetic pathway is identified, additional efforts are put into optimizing each reaction to improve efficiency and yield, driving faster scientific breakthroughs in chemical synthesis.",
         "image": "/applications/reaction-design-optimization.webp",
         "url": "reaction-design-optimization",
+        "keywords": ["reaction design", "organic synthesis", "optimization", "synthetic pathway", "DoE"],
         "subsubcategories": []
       },
       {
@@ -715,24 +748,28 @@
         "description": "Synthetic methods refer to the various chemical techniques used to build complex molecules, such as organic synthesis, polymer synthesis, and materials chemistry. We provide organic chemists with the tools needed to design and control small molecule synthesis, including techniques for creating carbon-carbon, carbon-oxygen, and carbon-nitrogen bonds.",
         "image": "/applications/synthetic-methods.webp",
         "url": "synthetic-methods",
+        "keywords": ["synthetic methods", "organic synthesis", "polymer synthesis", "small molecule synthesis", "materials chemistry"],
         "subsubcategories": [
           {
             "name": "C-H Functionalization",
             "description": "C–H functionalization is often regarded as the 'holy grail' of synthetic organic chemistry. Recent advancements in organic chemistry, organometallics, and catalysis have led to significant progress in understanding the reactivity of C–H bonds and in developing robust reactions that capitalize on this knowledge. This progress suggests that the time is ripe to integrate C–H functionalization strategies into the broader retrosynthetic framework. The ability to reliably and predictably convert a C–H bond into C–C, C–N, C–O, or C–X bonds in a selective and controlled manner is beneficial, as it enhances step economy and reduces waste in chemical processes. New methods of C–H activation have expanded the range of sites that can be targeted on a molecule, providing more opportunities for its transformation into more complex structures. This approach also allows for the targeting of a variety of chemical bonds with high chemoselectivity, further enhancing the versatility of organic synthesis. When combined with traditional functional-group chemistry, C–H functionalization significantly simplifies the synthesis of complex natural products and pharmaceutical compounds. Despite its clear advantages, many organic chemistry curricula have not yet incorporated this approach, but further details are available in the C-H Functionalization Manual.",
             "image": "/applications/c-h-functionalization.webp",
-            "url": "c-h-functionalization"
+            "url": "c-h-functionalization",
+            "keywords": ["C-H functionalization", "organometallics", "catalysis", "synthetic organic chemistry", "retrosynthetic framework"]
           },
           {
             "name": "Cross-Coupling",
             "description": "A cross-coupling reaction in organic synthesis occurs when two molecular fragments are joined together with the assistance of a metal catalyst. This type of reaction has been a cornerstone in catalytic chemistry for the past three decades, beginning with the pioneering work of Heck, Negishi, and Suzuki, who were awarded the Nobel Prize in Chemistry in 2010 for their contributions to palladium-catalyzed cross-coupling. As one of the most versatile and powerful methods for bond formation in synthetic organic chemistry, cross-coupling has evolved to a point where nearly any two fragments can be coupled using the appropriate catalyst. With its rapid growth, the field now includes various strategies for forming carbon-carbon, carbon-nitrogen, and carbon-oxygen bonds. Notable reactions in this category include: 1) Buchwald-Hartwig amination, which involves the cross-coupling of an aryl (pseudo)halide with an amine and is widely used in many chemical disciplines; 2) Heck coupling, where an unsaturated halide reacts with an alkene to produce substituted alkenes; 3) Negishi coupling, which couples an aryl (pseudo)halide with an organozinc nucleophile to form carbon-carbon bonds; 4) Sonogashira coupling, the cross-coupling of an aryl (pseudo)halide with a terminal alkyne to form disubstituted acetylenes; 5) Stille coupling, which involves the cross-coupling of an aryl (pseudo)halide with stannane for carbon-carbon bond formation, with few limitations on substituent groups; and 6) Suzuki-Miyaura coupling, a versatile reaction for carbon-carbon bond formation between an aryl (pseudo)halide and an organoborate. These reactions have greatly advanced the ability to construct complex organic molecules efficiently.",
             "image": "/applications/cross-coupling.webp",
-            "url": "cross-coupling"
+            "url": "cross-coupling",
+            "keywords": ["cross-coupling", "palladium-catalyzed", "Heck reaction", "Suzuki-Miyaura", "carbon-carbon bonds"]
           },
           {
             "name": "Fluorination",
             "description": "Fluorination, the process of introducing fluorine into a compound, has a significant impact on the compound's biological properties due to the electronegativity and small size of fluorine. In pharmaceutical research, the incorporation of fluorine is often used to improve bioavailability and enhance the metabolic stability of target compounds. Over time, the field of fluorination has expanded to include a variety of strategies for introducing fluorine, with several key reactions now available for this purpose. These techniques play a crucial role in the development of pharmaceuticals, contributing to the optimization of drug efficacy and stability in the body.",
             "image": "/applications/fluorination.webp",
             "url": "fluorination",
+            "keywords": ["fluorination", "fluorine incorporation", "bioavailability", "pharmaceutical development", "drug stability"],
             "additionalInfo": [
               {
                 "title": "Nucleophilic Fluorination",
@@ -768,19 +805,22 @@
             "name": "Metathesis",
             "description": "Olefin metathesis is an organic reaction that involves the rearrangement of carbon-carbon double bonds by redistributing alkene fragments. This reaction has revolutionized organic synthesis by revealing new disconnections, opening up opportunities for advancements in polymer chemistry, drug discovery, and natural product synthesis. There are three primary types of metathesis reactions: ring-closing metathesis (RCM) and cross metathesis, which are commonly used for small molecule organic synthesis, and ring-opening metathesis, which is mainly applied in polymerization processes. The most notable and widely used application of olefin metathesis in organic synthesis is ring-closing metathesis (RCM), an intramolecular reaction of an acyclic diene to form a ring. This methodology enables the construction of both all-carbon and heteroatom-containing rings rich in sp3-centers, a key feature in modern medicinal chemistry. Cross metathesis involves the reaction of two olefins in an intermolecular manner, resulting in a product containing substituents from each starting olefin. The reaction is notable for its excellent functional group compatibility and tolerance to residual moisture and oxygen, making it highly effective for ruthenium-catalyzed macrocyclization to form large rings (≥12 atoms). Ring-opening metathesis polymerization (ROMP) is another important application of olefin metathesis, used to design polymers with tunable properties. ROMP has become a significant technological advancement in polymer synthesis, enabling the large-scale production of polymers due to its use of low-cost, readily available starting materials.",
             "image": "/applications/metathesis.webp",
-            "url": "metathesis"
+            "url": "metathesis",
+            "keywords": ["olefin metathesis", "ring-closing metathesis", "cross metathesis", "polymer synthesis", "ruthenium catalysis"]
           },
           {
             "name": "Organic Reaction Toolbox",
             "description": "The organic reaction toolbox includes a variety of fundamental chemical reactions, reagents, and techniques used in organic synthesis. This toolset is crucial for chemists to design and execute synthetic routes.",
             "image": "/applications/organic-reaction-toolbox.webp",
-            "url": "organic-reaction-toolbox"
+            "url": "organic-reaction-toolbox",
+            "keywords": ["organic synthesis", "chemical reactions", "reagents", "synthetic routes", "chemistry toolbox"]
           },
           {
             "name": "Photocatalysis",
             "description": "Photocatalysis involves the use of light to drive chemical reactions, particularly in the formation of new bonds. This method is a powerful tool in green chemistry and sustainable synthesis.",
             "image": "/applications/photocatalysis.webp",
-            "url": "photocatalysis"
+            "url": "photocatalysis",
+            "keywords": ["photocatalysis", "light-driven reactions", "green chemistry", "sustainable synthesis", "bond formation"]
           }
         ]
       },
@@ -789,6 +829,7 @@
         "description": "Targeted protein degradation (TPD) is an innovative drug discovery strategy that eliminates problematic proteins from cells by exploiting cellular degradation pathways with small molecules. A key mechanism in TPD is the ubiquitin-proteasome pathway, an intracellular quality control system that uses E3 ubiquitin ligases and their partners to recognize and degrade damaged or misfolded proteins through the proteasome, often referred to as the 'cellular trash can.' Proteolysis-targeting chimeras (PROTAC® degraders) are a type of heterobifunctional molecule that consist of two key components: a disease target warhead and an E3 ligase ligand, connected by a linker. Upon introduction into cells, PROTACs recruit the target protein to the E3 ligase, effectively hijacking the native degradation machinery to remove the disease-causing protein. This method of protein silencing has been likened to the chemical equivalent of CRISPR, offering precise, small-molecule-based control over protein levels in cells.",
         "image": "/applications/targeted-protein-degradation.webp",
         "url": "targeted-protein-degradation",
+        "keywords": ["protein degradation", "ubiquitin-proteasome", "PROTACs", "targeted therapy", "drug discovery"],
         "subsubcategories": []
       }
     ]
@@ -798,12 +839,14 @@
     "description": "We are dedicated to advancing the development and practice of clinical diagnostics. Our scientific and regulatory experts have created a library of resources on research and protocols associated with cell and tissue staining that supports diagnostics. We also provide technical resources for your in vitro diagnostic (IVD) assay development or manufacturing needs.",
     "image": "/applications/clinical-testing-diagnostics-manufacturing.webp",
     "url": "clinical-testing-diagnostics-manufacturing",
+    "keywords": ["clinical diagnostics", "IVD assays", "tissue staining", "diagnostic protocols", "assay development"],
     "subcategories": [
       {
         "name": "Bacteriology",
         "description": "Bacteriology is the scientific field focused on the study of all aspects related to bacteria, including genetics, structure, physiology, behavior, pathogenicity, ecology, and evolution. It plays a crucial role in clinical diagnostics, as well as in industrial quality control. Microscopy is a fundamental tool in bacteriology, where techniques like staining, such as the Gram stain, are used to classify bacteria or detect specific types, like mycobacteria. These investigations help to identify bacterial species, understand their properties, and determine their role in diseases or other applications.",
         "image": "/applications/bacteriology.webp",
         "url": "bacteriology",
+        "keywords": ["bacteria", "genetics", "pathogenicity", "microscopy", "Gram stain"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -833,6 +876,7 @@
         "description": "Blood typing, also known as blood grouping, is the process of classifying blood based on the detection of antigens on the surface of red blood cells (RBCs). This is crucial for ensuring the safe transfusion or transplantation of blood, blood components, or organs and tissues. Blood typing involves using regulated reagents or devices in tests with blood samples to determine the correct blood type. The International Society of Blood Transfusion (ISBT) recognizes thirty-nine major blood typing systems, with the ABO and Rh systems being the most common. The process relies on antigen-antibody reactions that cause hemagglutination or RBC clumping, allowing for identification of the blood group.",
         "image": "/applications/blood-typing.webp",
         "url": "blood-typing",
+        "keywords": ["blood grouping", "ABO system", "Rh system", "hemagglutination", "antigen-antibody reactions"],
         "subsubcategories": []
       },
       {
@@ -840,6 +884,7 @@
         "description": "This involves the preparation of biological or clinical samples for Liquid Chromatography-Mass Spectrometry (LC-MS) analysis, a method used for detecting specific compounds in complex biological matrices.",
         "image": "/applications/tray-of-samples-for-lcms-analysis.webp",
         "url": "tray-of-samples-lcms-analysis",
+        "keywords": ["LC-MS analysis", "biological samples", "clinical samples", "compound detection", "chromatography"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -865,6 +910,7 @@
         "description": "As a partner in clinical testing, we recognize the critical role accuracy and speed play in healthcare, research, and scientific decisions. Our comprehensive portfolio of analytical solutions offers guaranteed quality and reliable delivery, supporting every stage of your workflow. With application-optimized reagents, reference materials, and tools, we empower you to enhance precision in LC-MS, PCR, and ELISA testing methods. Our expert technical assistance also aids in the design and execution of lab-developed tests (LDTs) for clinical diagnostics, ensuring healthcare professionals can trust their decisions",
         "image": "/applications/clinical-and-forensics-testing.webp",
         "url": "clinical-forensics-testing",
+        "keywords": ["clinical testing", "forensics testing", "LC-MS", "PCR", "ELISA"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -914,6 +960,7 @@
         "description": "Cytology is the scientific study of the structure, function, and behavior of individual cells, focusing on their characteristics to understand various cellular processes. Cytodiagnosis, on the other hand, applies cytology as a diagnostic tool to identify abnormalities in cells that may indicate disease. This process involves using well-established, highly specific stains and protocols to enhance the visibility and identification of abnormal cell features under a microscope. Cytodiagnosis plays a crucial role in both gynecological and non-gynecological fields, where samples are carefully examined for the presence of malignant, premalignant, or other disease-related cellular changes, helping in the early detection of conditions like cancer and other cell-related disorders.",
         "image": "/applications/cytology-cytodiagnosis.webp",
         "url": "cytology-cytodiagnosis",
+        "keywords": ["cytology", "cytodiagnosis", "cell structure", "cell abnormalities", "disease detection"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -939,6 +986,7 @@
         "image": "/applications/hematology.webp",
         "description": "Hematology (or haematology) is the clinical study of blood, blood-forming organs, and blood-related diseases. Blood is composed of approximately 45% cellular components, such as red blood cells (RBCs, erythrocytes), white blood cells (WBCs, leukocytes), and platelets, and about 55% plasma, playing a crucial role in oxygen transportation, body temperature regulation, and immune system support. The cellular components of blood are key to understanding, diagnosing, predicting, and treating a wide range of hematologic diseases and disorders, including blood infections, blood cell cancers, genetic blood disorders, autoimmune conditions, and complications arising from transfusions and treatments such as chemotherapy, which can affect blood cells. Hematology is essential for evaluating and managing conditions that impact the blood and its associated functions in the body.",
         "url": "hematology",
+        "keywords": ["hematology", "blood components", "blood diseases", "red blood cells", "immune system"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -956,6 +1004,7 @@
         "description": "Histology is a branch of biology and medicine focused on studying tissue structure, function, and disease states at the microscopic level. It involves the examination of tissue samples from a variety of organisms, including single-celled organisms, plants, fungi, and animals, using specialized chemical stains that are tailored to highlight specific tissue features. Histopathology, a clinical application of histology, applies these techniques to analyze diseased cells and tissues, aiding in the diagnostic and prognostic assessment of various medical conditions such as cancer and multi-organ diseases. Additionally, histopathology is instrumental in identifying pathogens like bacteria, fungi, and parasites, and in detecting the presence of heavy metals and other toxins, thereby contributing to a better understanding of health conditions and their causes.",
         "image": "/applications/histology.webp",
         "url": "histology",
+        "keywords": ["histology", "tissue structure", "histopathology", "disease diagnosis", "microscopic analysis"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -973,6 +1022,7 @@
         "description": "Diagnostic immunohistochemistry (IHC) is a group of techniques designed to detect tissue abnormalities, establish prognostic markers, and suggest potential therapeutic options. The core principle of diagnostic IHC involves an antigen-antibody binding reaction, where an antibody, conjugated with an enzyme or fluorescent dye, binds to a specific antigen within tissue samples or tissue sections, allowing the visualization of its localization and distribution. While histological staining has been a primary analytical tool for over a century, advancements in diagnostic immunohistochemistry and molecular analysis techniques have significantly transformed modern clinical pathology, enabling more precise and effective diagnoses, prognosis assessments, and the identification of targeted therapeutic strategies.",
         "image": "/applications/immunohistochemistry.webp",
         "url": "immunohistochemistry",
+        "keywords": ["immunohistochemistry", "diagnostic techniques", "antigen-antibody binding", "tissue abnormalities", "therapeutic options"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -994,6 +1044,7 @@
         "description": "In vitro diagnostics (IVD) refers to a wide range of testing methods used to analyze samples, such as blood, urine, or tissue, outside the body in a laboratory setting. These tests are crucial for detecting diseases, monitoring health conditions, and guiding treatment decisions. IVD is instrumental in diagnosing a variety of diseases, including infections, cancers, and genetic disorders, by providing valuable insights into a patient's condition. Additionally, IVD can be used to assess a person's overall health and to track the effectiveness of treatments, making it an essential tool in preventive care and disease management.",
         "image": "/applications/ivd-manufacturing.webp",
         "url": "ivd-manufacturing",
+        "keywords": ["in vitro diagnostics", "disease detection", "health monitoring", "preventive care", "treatment effectiveness"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1021,12 +1072,14 @@
     "description": "Our regulatory and scientific experts have developed an extensive library of protocols and technical articles relating to the testing of air, water, soil, and solid waste according to a variety of analytical techniques. Many of these are step-by-step guides for the collection and analysis of specific chemical or microbial contaminants according to regulatory agency methods.",
     "image": "/applications/environmental-testing-industrial-hygiene.webp",
     "url": "environmental-testing-industrial-hygiene",
+    "keywords": ["environmental testing", "industrial hygiene", "contaminant analysis", "regulatory protocols", "chemical testing"],
     "subcategories": [
       {
         "name": "Air Sampling & Monitoring",
         "description": "Air sampling and monitoring is a critical process for assessing air quality by measuring pollutants and particulates in the air. In industrial environments, this practice is essential to ensure the safety of workers, prevent environmental degradation, and avoid contamination of products. The assessment of air contaminants requires careful consideration of the sampling method, as well as the phase and identity of the pollutants or particulates being measured. Proper air monitoring techniques help identify potential hazards, ensure compliance with safety regulations, and safeguard both human health and the surrounding environment.",
         "image": "/applications/air-sampling-monitoring.webp",
         "url": "air-sampling-monitoring",
+        "keywords": ["air quality", "pollutant monitoring", "industrial safety", "environmental assessment", "health protection"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1052,6 +1105,7 @@
         "description": "Clean water is crucial not only for drinking but also for food and beverage production. Although only 3% of the world's water is fresh, even these sources can be contaminated with harmful chemical substances such as perfluorooctanoic acid (PFAS) and arsenic, as well as microbiological contaminants and pathogens. After water treatment, residual contaminants may still exceed safety and legal limits. To ensure water quality and compliance with regulatory standards, municipalities, private water treatment facilities, and food and beverage production plants must regularly test their water supplies for chemical and microbiological contaminants. As the global population grows, the demand for fresh water is expected to increase by 40% by 2030, making the challenge of maintaining accurate and efficient water testing methods even more critical.",
         "image": "/applications/drinking-water-testing.webp",
         "url": "drinking-water-testing",
+        "keywords": ["water quality", "chemical contaminants", "microbiological testing", "PFAS detection", "water safety"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1081,6 +1135,7 @@
         "description": "The treatment of wastewater and process water is essential for safeguarding public health, protecting the environment, and ensuring the efficiency of industrial processes. Regulatory bodies require regular analytical testing of wastewater effluents at different stages of the treatment process to ensure compliance with safety standards. Additionally, the chemical composition of process water used in systems like boilers and coolers must be routinely analyzed to prevent contamination, maintain system performance, and avoid potential environmental and operational risks.",
         "image": "/applications/waste-water-process-water-testing.webp",
         "url": "waste-water-process-water-testing",
+        "keywords": ["wastewater treatment", "process water analysis", "effluent testing", "chemical composition", "industrial water safety"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1102,6 +1157,7 @@
         "description": "Soil and groundwater testing are essential practices for monitoring industrial discharges and ensuring they do not negatively impact the environment or pose risks to human health. Various technical articles, protocols, and approved analytical methods are available to guide the testing and management of solid waste, particularly for the detection of heavy metals and other environmental pollutants. These methods play a critical role in safeguarding natural resources and maintaining environmental safety standards.",
         "image": "/applications/soil-solid-waste-groundwater-testing.webp",
         "url": "soil-solid-waste-groundwater-testing",
+        "keywords": ["soil testing", "groundwater monitoring", "solid waste management", "heavy metal detection", "environmental safety"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1127,6 +1183,7 @@
         "description": "Cannabinoid analysis involves testing cannabis and hemp for the presence of active compounds like THC and CBD using techniques like High-Performance Liquid Chromatography (HPLC) and Gas Chromatography (GC).",
         "image": "/applications/cannabinoids-analysis-in-cannabis-and-hemp-using-hplc-and-gc-techniques.webp",
         "url": "cannabinoids-analysis-cannabis-hemp",
+        "keywords": ["cannabinoid analysis", "HPLC techniques", "GC techniques", "THC detection", "CBD testing"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1160,6 +1217,7 @@
         "description": "Cannabis testing involves a range of analyses to evaluate the safety, potency, and purity of cannabis products, including testing for microbial contaminants, pesticides, and cannabinoid content.",
         "image": "/applications/cannabis-testing.webp",
         "url": "cannabis-testing",
+        "keywords": ["cannabis testing", "microbial contaminants", "pesticide testing", "potency analysis", "cannabinoid content"],
         "subsubcategories": [
           {
             "name": "Cannabinoid Profiling and Potency Testing of Cannabis and Cannabis Products",
@@ -1202,6 +1260,7 @@
             "description": "Cannabis and hemp concentrate products, including edibles, tinctures, extracts, and oils, have gained widespread popularity in the market. As the use of these products increases, the testing for pesticides and mycotoxins has become a critical regulatory requirement imposed by various state and national authorities. Pesticides are classified into seven major categories based on their intended field of use, including insecticides, herbicides, fungicides, rodenticides, acaricides, molluscicides, and nematocides. Given the harmful health and environmental impacts of most pesticides, their use is often highly restricted or banned. Mycotoxins, which are toxic secondary metabolites produced by certain fungi and molds, frequently contaminate agricultural crops, including cannabis. Therefore, reliable and accurate methods for the identification and quantification of pesticides and mycotoxins in cannabis products are essential to ensure consumer safety and compliance with regulations.",
             "image": "/applications/pesticides-and-mycotoxins-in-cannabis-and-hemp.webp",
             "url": "pesticides-mycotoxins-cannabis-hemp",
+            "keywords": ["pesticide testing", "mycotoxin analysis", "cannabis safety", "cannabis regulation", "hemp contamination"],
             "subsubcategories": [],
             "additionalInfo": [
               {
@@ -1239,12 +1298,14 @@
     "description": "We are committed to advancing food and beverage safety and quality throughout the world. Our scientific and regulatory experts have developed an extensive library of articles and protocols for the determination of chemical composition and microbiological contamination in food and beverage products. Many of these are detailed, step-by-step guides for performing specific regulatory methods.",
     "image": "/applications/food-beverage-testing-manufacturing.webp",
     "url": "food-beverage-testing-manufacturing",
+    "keywords": ["food safety", "beverage testing", "microbiological contamination", "chemical composition", "regulatory compliance"],
     "subcategories": [
       {
         "name": "Chemical Analysis",
         "description": "Chemical analysis of foods and beverages is conducted to ensure their safety, quality, and integrity for consumer consumption. This analysis is crucial for accurate food labeling and for preventing issues such as food adulteration, misbranding, and unsafe beverages. Achieving these objectives requires a multi-faceted approach, including appropriate food legislation, stringent controls by food authorities, ongoing research by food safety agencies and academic institutions, and an increased sense of responsibility within the food industry.",
         "image": "/applications/chemical-analysis.webp",
         "url": "chemical-analysis",
+        "keywords": ["food safety", "food labeling", "adulteration prevention", "misbranding", "beverage quality"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1270,6 +1331,7 @@
         "description": "Microbial food and beverage testing is the process of determining microorganism contamination levels during the manufacturing process and in final consumer products. This testing involves the use of biochemical and molecular methods to detect, identify, or quantify microorganisms present in food and beverage items. It plays a vital role in ensuring food safety and maintaining product quality by preventing microbial contamination that could lead to foodborne illnesses.",
         "image": "/applications/microbiological-analysis.webp",
         "url": "microbiological-analysis",
+        "keywords": ["microbial contamination", "food safety", "biochemical methods", "molecular methods", "foodborne illnesses"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1299,6 +1361,7 @@
         "description": "Flavor and fragrance formulations are crucial in enhancing the taste and scent of various products such as foods, beverages, cosmetics, pharmaceuticals, personal care, and home care items. These formulations consist of either single compounds or a mixture of small chemical compounds carefully selected to improve the sensory attributes of a product. Natural flavors and fragrances are derived from plant materials or animal products, while artificial versions are synthesized in laboratories using molecules that are chemically identical to those found in nature. These ingredients are obtained through processes like distillation, fermentation, and extraction, or through chemical synthesis and biotechnology using genetically engineered microbes, and are blended together to create desired flavor or fragrance profiles for a wide range of consumer goods.",
         "image": "/applications/flavor-fragrance-formulation.webp",
         "url": "flavor-fragrance-formulation",
+        "keywords": ["flavor formulation", "fragrance formulation", "sensory attributes", "natural flavors", "chemical synthesis"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1316,10 +1379,11 @@
         ]
       },
       {
-        "name": "Regulatory Compliance",
-        "description": "In the food industry, stringent regulatory standards are in place to ensure consumer safety and the quality control of food products and ingredients. These standards are shaped by both local requirements and international regulations, which aim to improve quality and efficiency in food production. Regulatory bodies are also influenced by consumer demand, as demonstrated by public pressure to reduce salt and sugar levels in food products and encourage more sustainable food production practices. International standards, such as those from ISO, FDA, and USDA, help food producers meet legal requirements and maintain product safety. In regions where these standards are not followed, countries may have developed their own guidelines. A food safety management system compliant with ISO standards ensures the identification and control of potential food safety hazards across the entire food production process, benefiting industries throughout the food supply chain, consumers, and regulatory bodies.",
-        "image": "/applications/regulatory-compliance.webp",
-        "url": "regulatory-compliance",
+          "name": "Regulatory Compliance",
+          "description": "In the food industry, stringent regulatory standards are in place to ensure consumer safety and the quality control of food products and ingredients. These standards are shaped by both local requirements and international regulations, which aim to improve quality and efficiency in food production. Regulatory bodies are also influenced by consumer demand, as demonstrated by public pressure to reduce salt and sugar levels in food products and encourage more sustainable food production practices. International standards, such as those from ISO, FDA, and USDA, help food producers meet legal requirements and maintain product safety. In regions where these standards are not followed, countries may have developed their own guidelines. A food safety management system compliant with ISO standards ensures the identification and control of potential food safety hazards across the entire food production process, benefiting industries throughout the food supply chain, consumers, and regulatory bodies.",
+          "image": "/applications/regulatory-compliance.webp",
+          "url": "regulatory-compliance",
+          "keywords": ["food safety", "regulatory standards", "ISO standards", "FDA regulations", "consumer safety"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1339,12 +1403,14 @@
     "description": "The ability to manipulate and read the composition of DNA, RNA, and proteins is critical for understanding modern genetics, molecular and cellular biology research, and numerous fields that are essential for disease research. Our genomics application resources and products provide researchers with powerful tools and technologies to drive their research forward. From advanced gene editing, gene expression and silencing, to PCR, qPCR and the critical steps in between, explore our portfolio of genomic resources for reliable protocols, reagents, and technical information that you require for your next breakthrough.",
     "image": "/applications/genomics.webp",
     "url": "genomics",
+    "keywords": ["gene editing", "DNA manipulation", "PCR", "qPCR", "molecular biology"],
     "subcategories": [
       {
         "name": "Advanced Gene Editing",
         "description": "Targeted genome editing has emerged as a crucial tool in research, bridging the gap between discovery and therapeutic applications. This technology allows scientists to selectively disrupt, recover, repress, or activate gene expression, offering an unparalleled ability to explore and manipulate genetic mechanisms that govern biological processes. The applications of genome engineering are vast, ranging from curing genetic and developmental disorders to the creation of disease-resistant crops, revolutionizing both medical and agricultural fields.",
         "image": "/applications/advanced-gene-editing.webp",
         "url": "advanced-gene-editing",
+        "keywords": ["genome editing", "gene therapy", "genetic engineering", "CRISPR", "genetic disorders"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1370,6 +1436,7 @@
         "description": "Cloning and gene expression technologies play a pivotal role in research across various scientific disciplines, enabling the investigation of a broad spectrum of biological questions. These technologies help in understanding gene function, analyzing molecular pathways, studying embryonic development, exploring disease mechanisms, and facilitating the bioprocessing of biologics and therapeutics. Once a gene or genetic sequence is identified, researchers must carefully select the most appropriate molecular cloning strategy and cell-based protein expression system tailored to the specific needs of their application. For more insights on gene expression using CRISPR technology or gene silencing with RNAi reagents, please visit our dedicated gene expression and gene silencing page.",
         "image": "/applications/cloning-expression.webp",
         "url": "cloning-expression",
+        "keywords": ["gene cloning", "gene expression", "CRISPR", "RNAi", "biologics"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1395,6 +1462,7 @@
         "description": "Extraction of DNA and RNA is a fundamental technique in molecular biology, serving as the basis for a variety of research and clinical applications. High-quality, highly pure nucleic acids are essential for accurate and reliable results in numerous genomic and molecular biology workflows. Nucleic acid purification is typically one of the first steps in these processes, ensuring that the extracted genetic material is free from contaminants, which is critical for downstream analyses such as PCR, sequencing, and gene expression studies.",
         "image": "/applications/dna-rna-purification.webp",
         "url": "dna-rna-purification",
+        "keywords": ["DNA extraction", "RNA extraction", "molecular biology", "PCR", "sequencing"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1416,6 +1484,7 @@
         "description": "Epigenetics is a crucial field of study, particularly in cancer, neurodegenerative disease, and addiction research. It focuses on temporary changes in gene expression regulation without altering the DNA sequence itself. These reversible modifications can be inherited across generations, making epigenetic mechanisms a vital component in understanding disease progression and inheritance. The three primary mechanisms of epigenetics include DNA methylation, histone modification, and RNA regulation, which collectively influence gene activity and cellular functions.",
         "image": "/applications/epigenetics.webp",
         "url": "epigenetics",
+        "keywords": ["gene expression", "DNA methylation", "histone modification", "RNA regulation", "disease progression"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1437,6 +1506,7 @@
         "description": "Functional genomics enables the identification and understanding of gene functions and their involvement in various biochemical, cellular, and physiological pathways. With the availability of complete genome sequences and advanced genome-editing tools, functional genomics allows large-scale analysis of gene function. By performing genomic screens, researchers can systematically alter gene activity to observe resulting phenotypic changes, helping to unravel complex biological pathways and disease mechanisms. This approach facilitates the discovery of novel drug targets and therapeutic interventions. Two key methods in functional genomics are forward genetic screening, where genes are modified to select for desired phenotypes, and reverse genetic screening, which analyzes the effects of disrupting specific genes or gene combinations on cellular or organismal traits.",
         "image": "/applications/functional-genomics-screening.webp",
         "url": "functional-genomics-screening",
+        "keywords": ["gene function", "genome-editing", "genomic screens", "drug targets", "genetic screening"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1458,6 +1528,7 @@
         "description": "Modulating gene expression is a vital technique in research to understand and manipulate the complex genetic networks that control biological processes. This approach is particularly valuable in identifying potential therapeutics for diseases such as cancer, neurodegenerative disorders, and developmental conditions. Various technologies, including RNA interference (RNAi), CRISPR inhibition (CRISPRi), and CRISPR activation (CRISPRa), are employed for precise regulation of gene expression in cells and tissues. RNAi, utilizing siRNA duplexes, provides targeted and potent inhibition of gene expression. Meanwhile, CRISPR technologies offer researchers the flexibility to regulate genes by either silencing or activating them, enabling a broad range of genetic modifications. SigmaAldrich® Advanced Genomics leads in providing cutting-edge tools and products for these gene modulation strategies, enhancing the ability of researchers to explore gene functions and develop new treatments.",
         "image": "/applications/gene-expression-silencing.webp",
         "url": "gene-expression-silencing",
+        "keywords": ["gene modulation", "RNA interference", "CRISPRi", "CRISPRa", "gene silencing"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1475,6 +1546,7 @@
         "description": "Next-generation sequencing (NGS) refers to a group of advanced technologies that enable massively parallel or deep sequencing of selected regions or entire genomes. These sequencing methods have revolutionized genomics-based research, providing enhanced sequencing coverage and robust data analysis tools while significantly reducing costs. Although sequencing technologies have been in use for decades, the rapid advancements in NGS have expanded the possibilities for genome-wide analysis. NGS is now a key technology in both fundamental genomics research and disease studies, offering profound implications for a wide range of applications, including genetic variant detection, transcriptome analysis, and personalized medicine.",
         "image": "/applications/next-gen-sequencing.webp",
         "url": "next-gen-sequencing",
+        "keywords": ["genomics", "sequencing technologies", "NGS", "genetic variants", "personalized medicine"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1492,6 +1564,7 @@
         "description": "Nucleic acid gel electrophoresis is a widely used molecular biology technique employed for the separation, identification, and purification of DNA and RNA fragments according to their size and charge. In this method, an electric field is applied to move negatively charged nucleic acids through an agarose or polyacrylamide gel matrix. The fragments travel at different rates, allowing researchers to analyze the size distribution of DNA or RNA samples. This technique is essential for applications such as PCR product analysis, DNA sequencing, and genetic fingerprinting, providing critical insights into the structure and function of genetic material.",
         "image": "/applications/nucleic-acid-gel-electrophoresis.webp",
         "url": "nucleic-acid-gel-electrophoresis",
+        "keywords": ["gel electrophoresis", "DNA analysis", "RNA analysis", "PCR", "genetic fingerprinting"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1513,6 +1586,7 @@
         "description": "Labeling and detection methods for nucleic acids, PCR products, and oligonucleotides vary widely depending on the specific requirements of the experiment. The choice of reagents and methods is influenced by several factors, including the type of molecule being labeled and the downstream application. Both enzymatic and chemical techniques are commonly used to label nucleic acids, allowing for the incorporation of various molecules, such as fluorophores, enzymes, and radioactive elements. These labeling methods are crucial for enabling sensitive detection and quantification of nucleic acids in applications like gene expression analysis, diagnostics, and molecular research.",
         "image": "/applications/nucleic-acid-labeling-detection.webp",
         "url": "nucleic-acid-labeling-detection",
+        "keywords": ["nucleic acid labeling", "PCR products", "fluorophores", "gene expression analysis", "molecular research"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1534,6 +1608,7 @@
         "description": "Polymerase chain reaction (PCR) is a widely used and powerful molecular biology technique that enables the rapid and efficient amplification of specific DNA or RNA sequences from a variety of sources. PCR typically involves target DNA, a pair of synthetic oligonucleotide primers that flank the desired sequence, a thermostable DNA polymerase (such as Taq polymerase), and nucleotides. The process occurs in a thermal cycler and is divided into three main stages during each amplification cycle: denaturation, where double-stranded DNA (dsDNA) is separated into single strands; annealing, where the primers bind to the target sequence; and extension, where the DNA polymerase synthesizes new strands of DNA, effectively creating a copy of the target sequence. After just 20 cycles, this process can produce millions of copies of the original DNA sequence, making PCR a fundamental tool in genetic research, diagnostics, and forensic science.",
         "image": "/applications/pcr-applications.webp",
         "url": "pcr-applications",
+        "keywords": ["PCR", "DNA amplification", "RNA sequences", "genetic research", "diagnostics"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1555,6 +1630,7 @@
         "description": "Quantitative Real-Time PCR (qPCR) is an advanced PCR technique that utilizes fluorescent reporter molecules to monitor the amplification of DNA, cDNA, or RNA in real-time, enabling the quantification of amplified products during each cycle. Unlike conventional PCR, where only the presence or absence of the target is detected, qPCR provides quantitative data through the measurement of fluorescent signals, allowing for both relative and absolute quantification of the target. This powerful technique is widely used in various fields of research, including gene expression analysis, genotyping, microRNA analysis, genetic variation studies, and protein analysis, providing crucial insights into the regulation and function of genes and proteins.",
         "image": "/applications/qpcr.webp",
         "url": "qpcr",
+        "keywords": ["qPCR", "quantitative PCR", "gene expression", "real-time PCR", "fluorescent signals"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1576,6 +1652,7 @@
         "description": "The ability to sequence nucleic acids, including DNA and RNA, has revolutionized our understanding of genetics and has vast implications across numerous scientific disciplines, particularly in disease research and organismal biology. By determining the composition and order of nucleic acids, researchers can gain profound insights into an organism's genetic makeup. Sequencing not only decodes the genetic instructions that guide protein synthesis but also enables scientists to manipulate and verify DNA sequences through various molecular technologies. This capability allows for the design of custom recombinant proteins with specific functional elements, which are widely used to explore critical biological processes and answer a broad array of research questions. For more information on whole-genome sequencing reagents and resources, please visit the Next-Generation Sequencing page.",
         "image": "/applications/sequencing.webp",
         "url": "sequencing",
+        "keywords": ["DNA sequencing", "RNA sequencing", "genetic research", "next-generation sequencing", "molecular biology"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1595,12 +1672,14 @@
     "description": "Materials matter in science and engineering. Our comprehensive portfolio is used in the design and discovery of new materials with specific properties for biomedical, electronics, engineering, energy, and other cutting-edge applications. These novel materials range from biomaterials used in 3D bioprinting and tissue engineering, to composite materials attained via polymer synthesis and solid state synthesis, to nanomaterials used in drug delivery, microelectronics and nanoelectronics, and conductive materials used in organic electronics, biosensors and imaging, photovoltaics, solar cells, batteries, supercapacitors and fuel cells.",
     "image": "/applications/materials-science-and-engineering.webp",
     "url": "materials-science-engineering",
+    "keywords": ["biomaterials", "nanomaterials", "composite materials", "organic electronics", "energy storage"],
     "subcategories": [
       {
         "name": "3D Bioprinting",
         "description": "3D bioprinting is an advanced additive manufacturing technique that utilizes biomaterials, living cells, and active biomolecules to create structures that replicate the properties of natural tissues. Unlike traditional 3D printing, bioprinting integrates living cells with non-toxic hydrogels that mimic the extracellular matrix, promoting cell adhesion, proliferation, and differentiation post-printing. The process starts with 3D imaging to capture the precise dimensions of the tissue to be printed, followed by creating a digital model for layer-by-layer construction of a physical object. To maintain high cell viability and resolution, sterile conditions are essential. Biomaterials such as alginate, collagen, and gelatin are combined with living cells to form bioink, which is then deposited using extrusion, inkjet, or laser-based printing techniques. The 3D tissue constructs solidify through UV light, chemical stimulation, or heat, providing a stable environment for cell growth. 3D bioprinting has become an invaluable tool in drug testing, clinical trials, functional organ replacement, regenerative medicine, and the development of bio-printed applications in cosmetics and personal care. Ongoing research aims to refine materials and techniques to closely replicate the mechanical properties of various tissues, including skin, bone, cartilage, neural, cardiac, muscular, and dental tissues.",
         "image": "/applications/3d-bioprinting.webp",
         "url": "3d-bioprinting",
+        "keywords": ["biomaterials", "bioink", "tissue engineering", "regenerative medicine", "3D printing"],
         "subsubcategories": []
       },
       {
@@ -1608,6 +1687,7 @@
         "description": "3D printing, also known as additive manufacturing, is a process used to create three-dimensional objects from a digital model by adding material layer-by-layer. The process begins with a virtual 3D representation of the object designed using computer-aided design (CAD). The model is then sliced into horizontal layers to convert it into an STL (standard tessellation language) file that is readable by the 3D printer. After transferring the data to the printer, the necessary settings are defined, and the printer produces the object one layer at a time, with each layer bonding and building upon the previous one. 3D printing enables the creation of highly intricate shapes and structures with high precision and repeatability, making it suitable for applications in aerospace, automotive, construction, fashion, food, jewelry, manufacturing, and medical sectors. Multiple techniques exist to print objects with diverse mechanical, thermal, and chemical properties from materials in molten, liquid, or powder states. Popular 3D printing technologies include VAT Polymerization, Fused Deposition Modeling, Powder Bed Fusion, and Jetting. For more information on how 3D printing can help minimize carbon footprints and contribute to sustainability, explore our 3D to 4D Printing for Added Sustainability Brochure.",
         "image": "/applications/3d-printing.webp",
         "url": "3d-printing",
+        "keywords": ["additive manufacturing", "CAD design", "Fused Deposition Modeling", "3D printing technologies", "sustainability"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1633,6 +1713,7 @@
         "description": "Batteries, fuel cells, and supercapacitors are energy storage and conversion systems that employ different electrochemical mechanisms but share common electrochemical features, enabling them to provide high energy and high-power density for various applications. These systems are essential for powering a wide range of modern technologies, from portable devices to electric vehicles, and are critical for advancing renewable energy solutions. Batteries, fuel cells, and supercapacitors each offer distinct advantages, making them integral to the development of efficient, sustainable energy systems for both everyday use and specialized applications.",
         "image": "/applications/batteries-supercapacitors-fuel-cells.webp",
         "url": "batteries-supercapacitors-fuel-cells",
+        "keywords": ["energy storage", "fuel cells", "supercapacitors", "electric vehicles", "renewable energy"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1654,6 +1735,7 @@
         "description": "Bioelectronics is a multidisciplinary field that merges biology and electronics to develop innovative diagnostic and therapeutic solutions for healthcare treatments. By integrating electronic technologies with biological systems, bioelectronic devices enable the monitoring and regulation of the nervous system's regulatory activities, which can influence specific molecular processes in neural signaling. Bioelectronic medicine has the potential to address a wide range of medical conditions and disabilities, including blindness, cardiovascular disease, diabetes, inflammatory and neurodegenerative disorders, as well as paralysis.Bioelectronic devices work by stimulating, regulating, or blocking specific electronic signals between the brain and the body's functions, allowing for personalized, precision medical treatments. Common examples include cardiac pacemakers, which regulate heart rate, and robotic prostheses that replicate human movement. Biosensors, such as blood glucose monitors, are used to detect enzymes, pathogens, or toxins in the body. Wearable bioelectronic devices are becoming increasingly capable of monitoring vital signs, detecting biomarkers, and even harvesting energy from the skin's surface. Advanced bioelectronic implants are being developed to function without the need for wires or batteries, and are designed to be minimally invasive, ingestible, and fully resorbable, depending on their intended medical application",
         "image": "/applications/bioelectronics.webp",
         "url": "bioelectronics",
+        "keywords": ["bioelectronic medicine", "biosensors", "neural signaling", "wearable devices", "cardiac pacemakers"],
         "subsubcategories": []
       },
       {
@@ -1661,6 +1743,7 @@
         "description": "Biosensing and bioimaging enable the study of biological and pathological processes in living systems at the molecular level. A biosensor is a device designed to detect the presence or concentration of a biological analyte, structure, or microorganism. Biosensors are widely used in bioelectronics, food and environmental monitoring, and biomedical applications to detect pathogens, food toxins, and disease biomarkers",
         "image": "/applications/biosensors-bioimaging.webp",
         "url": "biosensors-bioimaging",
+        "keywords": ["biosensors", "bioimaging", "biomarkers", "pathological processes", "disease detection"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1682,6 +1765,7 @@
         "description": "Chemical Vapor Deposition (CVD) is a process used to epitaxially deposit films of solid materials onto the surface of a substrate during a controlled chemical reaction in the vapor phase. Also known as thin-film deposition, CVD is widely applied in electronics, optoelectronics, catalysis, and energy sectors, including uses in semiconductors, silicon wafer preparation, and the development of printable solar cells",
         "image": "/applications/chemical-vapor-deposition.webp",
         "url": "chemical-vapor-deposition",
+        "keywords": ["CVD", "thin-film deposition", "semiconductors", "solar cells", "electronics"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1695,6 +1779,7 @@
         "description": "The manufacturing of contact lenses and dental materials is an increasingly dynamic field, driven by continuous innovations in materials and production techniques aimed at enhancing both ophthalmic and oral health. By partnering with us, you gain access to high-quality raw materials, ensuring robust supply chain security from the initial scale-up phase through to full production. We offer flexible options for bulk supply and customization, tailored to meet the specific needs of your projects, helping to streamline the development process and ensure the delivery of superior products.",
         "image": "/applications/contact-lens-dental-manufacturing.webp",
         "url": "contact-lens-dental-manufacturing",
+        "keywords": ["contact lenses", "dental materials", "ophthalmic health", "oral health", "production techniques"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1712,6 +1797,7 @@
         "description": "Drug delivery refers to the process and methods involved in administering drugs, pharmaceuticals, and other xenobiotics to achieve specific therapeutic effects in humans or animals. A wide range of drug delivery technologies are employed to enhance the therapeutic effects of a drug at its intended site of action, while minimizing potential adverse effects. These technologies work by influencing the absorption, distribution, metabolism, and elimination (ADME) of the drug compound, ensuring it reaches the target site effectively and safely.",
         "image": "/applications/drug-delivery.webp",
         "url": "drug-delivery",
+        "keywords": ["drug delivery", "pharmaceuticals", "therapeutic effects", "ADME", "xenobiotics"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1729,6 +1815,7 @@
         "description": "Electron microscopy is a powerful imaging technique that enables the capture of ultra-high resolution images of individual atoms in materials and the internal structures of cells. These images, which can provide detailed atomic-level, micro- and meso-structural information, are essential for studying the properties and behavior of various samples. Widely utilized in fields such as materials science, biomedical research, quality control, and failure analysis, electron microscopy offers superior spatial resolution—on the scale of tens of picometers—compared to the resolution achievable with photon-based optical microscopy (~200 nanometers). Beyond surface topography, it provides valuable insights into crystalline structures, chemical compositions, and electrical properties. Electron microscopy is primarily divided into two types: scanning electron microscopy (SEM) and transmission electron microscopy (TEM).",
         "image": "/applications/electron-microscopy.webp",
         "url": "electron-microscopy",
+        "keywords": ["electron microscopy", "SEM", "TEM", "atomic-level imaging", "materials science"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1750,6 +1837,7 @@
         "description": "Microelectronics and nanoelectronics are specialized subfields within electronics focused on creating electronic components with feature sizes ranging from 100 micrometers to 0.1 micrometers (microelectronics), and 100 nanometers or smaller (nanoelectronics). The remarkable memory storage capabilities of modern electronic devices have been made possible by significantly increasing the density of microchips. By shrinking the size of field-effect transistors, more components can be integrated into a single circuit, resulting in more powerful, energy-efficient devices that are lighter and consume less power. According to Moore's Law, the number of transistors on a chip is expected to double approximately every two years, a trend that has held true since it was first predicted in 1965, driving rapid advancements in semiconductor fabrication technology. However, the pace of shrinking component dimensions is now slowing, and a significant challenge in creating electronic components in the sub-micrometer range is the design of the transistor gate, which regulates current flow through the channel. As electronic components become smaller, they also become more difficult to manufacture, as physical and quantum effects alter material properties at the nanoscale, influencing atomic interactions and quantum mechanical behaviors.",
         "image": "/applications/microelectronics-nanoelectronics.webp",
         "url": "microelectronics-nanoelectronics",
+        "keywords": ["microelectronics", "nanoelectronics", "semiconductors", "transistors", "Moore's Law"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1767,6 +1855,7 @@
         "description": "Nanoparticles and microparticles represent a unique class of materials with vast technological potential in fields such as energy, imaging, medicine, and environmental applications. Nanoparticles are defined as having at least one physical dimension smaller than 100 nanometers, while microparticles range from approximately 1 to 1000 micrometers in size. Despite sharing the same composition as their bulk counterparts, these particles exhibit exceptional optical, electrical, thermal, and magnetic properties due to their small size. Researchers have developed advanced synthesis methods to precisely control the properties, shape, composition, and size distribution of these particles, tailoring them for specific applications. The synthesis of nanoparticles and microparticles can be categorized into physical, chemical, and biological techniques, utilizing both bottom-up and top-down approaches. In physical methods, particles are created by reducing the size of source materials through top-down processes like milling, gas condensation, electro-spraying, lithography, and thermal decomposition. In contrast, chemical methods involve nucleating and growing particles from atomic or molecular precursors, typically in the liquid or vapor phase, in a bottom-up fashion. These chemical processes include microemulsion, hydrothermal, microfluidic, chemical vapor deposition, pyrolysis, and sol-gel techniques. Chemical synthesis allows for the production of nanostructures with fewer defects, more complex and homogeneous compositions, and scalable, cost-effective production. However, as many of these techniques can be labor-intensive and produce toxic byproducts, biological or 'green' methods have emerged, such as biogenesis using microorganisms and plant extracts. These eco-friendly methods offer a sustainable approach to producing non-toxic particles suitable for biomedical and environmental applications.",
         "image": "/applications/nanoparticle-microparticle-synthesis.webp",
         "url": "nanoparticle-microparticle-synthesis",
+        "keywords": ["nanoparticles", "microparticles", "nanostructures", "chemical synthesis", "green methods"],
         "subsubcategories": []
       },
       {
@@ -1774,6 +1863,7 @@
         "description": "Organic electronics involve the use of organic polymers or small molecules to create electronic components for a variety of innovative applications. These organic electronic materials are lighter, more flexible, and less expensive compared to traditional silicon-based inorganic materials. Additionally, organic electronics offer advantages in terms of energy efficiency and resource sustainability throughout their production, use, and disposal. Small molecule organic electronics are typically fabricated through vacuum-based deposition techniques, which transfer thin films of organic materials onto substrate surfaces. Alternatively, organic electronics can also be produced using conductive polymers through low-cost solution processing methods. Semiconductor polymers can be made soluble and transformed into ink, enabling the direct printing of electronic circuits onto large plastic sheets. This method is compatible with large-area, roll-to-roll manufacturing processes, making it scalable for rapid, cost-effective production. Organic conductive materials are commonly used in a variety of applications, including Organic Light-Emitting Diodes (OLEDs), Organic Field-Effect Transistors (OFETs), Organic Thin-Film Transistors (OTFTs), and Organic Photovoltaics (OPVs).",
         "image": "/applications/organic-electronics.webp",
         "url": "organic-electronics",
+        "keywords": ["organic electronics", "OLEDs", "OFETs", "OTFTs", "OPVs"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1795,6 +1885,7 @@
         "description": "Solar photovoltaic technology is a method of converting light into electricity at the atomic level through the photoelectric effect. In this process, certain semiconductor materials absorb photons, or particles of sunlight, and release electrons. A photovoltaic cell, which produces electricity from visible light, absorbs the entire spectrum of light frequencies, not just visible light, converting solar radiation into useful energy. Photovoltaic and solar cell systems are safe, sustainable, and efficient sources of energy, widely used in applications ranging from electric vehicles (EVs) and solar roofs to water pumping and desalination systems. Photovoltaic cells typically utilize layered semiconductor materials in a PN junction configuration to convert light energy into electric current. The PN junction consists of a p-type semiconductor (electron acceptor) and an n-type semiconductor (electron donor). When sunlight strikes the n-type material, it dislodges an electron, generating a free electron and an electron-hole pair. The free electron is attracted to the p-type material, while the positively charged hole moves towards the n-type material. If a circuit is completed through electrodes, the free electron flows through the circuit, generating electricity until it recombines with the hole in the p-type material. The efficiency of photovoltaic systems depends on the type of solar cell technology and semiconductor materials used. Early solar cells were made from inorganic polycrystalline and single-crystalline materials. Significant progress has been made with advancements in organic electronics and materials. Organic solar cells are lightweight, flexible, and can be produced cost-effectively with high-performance polymeric donors, fullerene, and non-fullerene acceptors (NFAs), using low-temperature solution processing on transparent conductors like indium tin oxide (ITO) or fluorine-doped tin oxide (FTO). The development of organic hole-transport materials (HTMs) has enabled the creation of high-performance perovskite solar cells, which offer an alternative, more efficient method for harvesting solar energy. Perovskite solar cells typically use a hybrid inorganic-organic material as the light-harvesting layer and benefit from high conversion efficiency, low production costs, and simple manufacturing processes, making them the fastest-growing solar technology for commercial use. Lead halide perovskites, in particular, have the highest conversion efficiency, making them the most rapidly advancing solar cell technology.",
         "image": "/applications/photovoltaics-solar-cells.webp",
         "url": "photovoltaics-solar-cells",
+        "keywords": ["photovoltaics", "solar cells", "organic solar cells", "perovskite solar cells", "solar technology"],
         "subsubcategories": []
       },
       {
@@ -1802,6 +1893,7 @@
         "description": "Polymers are a unique class of materials composed of small, repeating chemical units known as monomers. Polymerization, also referred to as polymer synthesis, is a chemical process in which these monomers are chemically bonded by covalent bonds to form long polymer chains. The length of these polymer chains is determined by the number of repeating units, a property referred to as the degree of polymerization (DP). The molecular weight of a polymer is the product of the molecular weight of the monomer and the degree of polymerization. The inherent properties of polymers, including their strength, flexibility, and durability, are significantly influenced by factors such as molecular weight, chain structure (whether linear or branched), and the degree of polymerization.",
         "image": "/applications/polymer-synthesis.webp",
         "url": "polymer-synthesis",
+        "keywords": ["polymer synthesis", "monomers", "polymerization", "degree of polymerization", "molecular weight"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1823,6 +1915,7 @@
         "description": "Solid-state synthesis, also known as the ceramic method, is a widely used process that involves initiating a chemical reaction from solid starting materials to form a new solid with a well-defined structure. This method is used to produce a variety of materials, including polycrystalline substances, single crystals, glasses, and thin films, which find extensive applications in energy and electronic technologies. In this process, fine-grain metal compounds are mixed together, pelletized, and heated under controlled temperature conditions for a specified time. Certain metal compounds, like metal oxides or salts, require extreme conditions—such as high temperatures and pressures—to trigger reactions, often in a molten flux or rapidly condensing vapor phase. This process is sometimes informally called 'shake and bake' or 'heat and beat' chemistry. A crucial aspect of solid-state synthesis is the reaction rate, as the reaction must go to completion due to the limited ability to purify the formed solids. The rate at which the reaction occurs is influenced by various factors, including the structural properties, shape, and surface area of the reactants, as well as the diffusion rate and thermodynamic properties related to nucleation and reaction. The chemical and physical characteristics of the final material are determined by the choice of chemical precursors and the specific preparation techniques used during synthesis.",
         "image": "/applications/solid-state-synthesis.webp",
         "url": "solid-state-synthesis",
+        "keywords": ["solid-state synthesis", "ceramic method", "polycrystalline", "metal oxides", "thin films"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1836,6 +1929,7 @@
         "description": "Tissue engineering and regenerative medicine are interdisciplinary fields focused on developing biological substitutes to restore, maintain, or enhance tissue function, or to replace diseased and damaged tissues. These fields are applicable to both hard tissues, such as bone and cartilage, and soft tissues, like skin and cardiovascular valves. The process of tissue engineering involves three key components: cells, scaffolds, and growth-stimulating signals, which work together to create functional tissue substitutes. While tissue engineering primarily focuses on culturing tissues in vitro, regenerative medicine expands on this by combining tissue engineering techniques with additional strategies such as cell-based therapies, gene therapy, and immunomodulation, all aimed at promoting tissue regeneration within the body (in vivo). Biomimetic tissue constructs are also developed as in vitro models for drug screening and disease modeling, helping to better understand biological processes and test new treatments. The core principle of tissue engineering involves growing new tissue in the laboratory by combining scaffolds, native tissue cells, and bioactive molecules to mimic the body’s natural biological processes and regenerate healthy tissue.",
         "image": "/applications/tissue-engineering.webp",
         "url": "tissue-engineering",
+        "keywords": ["tissue engineering", "regenerative medicine", "biomimetic tissue", "scaffolds", "cell-based therapies"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1855,12 +1949,14 @@
     "description": "Microbiological testing is used in pharmaceutical, cosmetic, municipal water, and food and beverage industries to provide safe products for consumption. From bioburden testing to mycoplasma detection, pathogen and spoilage testing, pyrogen testing, sterility testing, air monitoring, and surface testing, a variety of techniques are routinely employed to ensure safety and regulatory compliance.",
     "image": "/applications/microbiological-testing.webp",
     "url": "microbiological-testing",
+    "keywords": ["microbiological testing", "bioburden testing", "pathogen detection", "sterility testing", "regulatory compliance"],
     "subcategories": [
       {
         "name": "Bioburden Testing",
         "description": "Bioburden refers to the presence of viable microorganisms on a surface, within a device, or in a portion of liquid before the sterilization process is carried out. This microbial contamination can be introduced through various sources, including raw materials used in manufacturing, the workforce in the production environment, or during the packaging of finished products. Given the numerous potential contamination sources, the bioburden levels of a product can vary from batch to batch. As a result, routine testing is essential and implemented as part of a comprehensive quality control program to monitor and ensure that the microbial load is within acceptable limits before sterilization is performed.",
         "image": "/applications/bioburden-testing.webp",
         "url": "bioburden-testing",
+        "keywords": ["bioburden testing", "microbial contamination", "sterilization process", "quality control", "microbial load"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1878,6 +1974,7 @@
         "description": "A media fill, also known as a process simulation test, is an essential microbiological procedure used to evaluate the performance of an aseptic manufacturing process. In this test, the pharmaceutical or beverage product is replaced with a sterile culture media to simulate the actual production environment. Aseptic manufacturing, a complex process prevalent in industries such as pharmaceuticals, food, and beverages, must adhere to strict guidelines to ensure sterility and product safety. Good manufacturing practices (GMP) require that pharmaceutical and beverage companies routinely perform media fill tests to verify the microbiological integrity of their aseptic production processes. The nutrient medium selected for the test depends on factors such as the product's volume, the selectivity, clarity, concentration, and the medium’s ability to undergo sterilization. To ensure the test's effectiveness, the process simulation should replicate, as closely as possible, the regular aseptic manufacturing process, including all critical subsequent steps in production.",
         "image": "/applications/media-fills.webp",
         "url": "media-fills",
+        "keywords": ["media fills", "aseptic manufacturing", "process simulation", "microbiological procedure", "good manufacturing practices"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1903,6 +2000,7 @@
         "description": "Microbial culture media preparation involves the process of combining nutrients, buffering agents, osmotic balance regulators, and selective inhibitors or indicators to create either agar or broth media that supports the growth and differentiation of microorganisms. This preparation is a critical and routine task in microbiological testing, particularly for monitoring spoilage and pathogenic microbes. The media is specifically formulated to foster the growth of target microorganisms, while also providing the necessary conditions for differentiation or identification, making it an essential step in routine microbiological quality control and research applications.",
         "image": "/applications/microbial-culture-media-preparation.webp",
         "url": "microbial-culture-media-preparation",
+        "keywords": ["microbial culture media", "agar media", "broth media", "microbiological testing", "quality control"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1932,6 +2030,7 @@
         "description": "Mycoplasma contamination is a pervasive and recurring issue in many cell culture systems used in life science research and the pharmaceutical industry. Mycoplasmas are capable of growing to high concentrations in culture media without showing typical signs of bacterial contamination, such as turbidity. The presence of Mycoplasma in cultured cells can result in a range of detrimental effects, including altered cellular metabolism, inhibited cell proliferation, and chromosomal aberrations. As a result, Mycoplasma contamination significantly compromises the validity of experimental data derived from affected cell lines, potentially impacting the outcomes of life science research. Given these risks, Mycoplasma testing is essential for ensuring the maintenance of contamination-free cell cultures, which is crucial for both the integrity of research and the safety of products in industries where consumer health is a primary concern.",
         "image": "/applications/mycoplasma-testing.webp",
         "url": "mycoplasma-testing",
+        "keywords": ["Mycoplasma contamination", "cell culture systems", "life science research", "pharmaceutical industry", "cell proliferation"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1957,6 +2056,7 @@
         "description": "Pathogen testing is a critical process used to identify harmful pathogenic organisms in manufacturing environments, ingredients, or finished products that could pose a risk to consumer health. These pathogens include specific strains of bacteria, viruses, fungi, or parasites that have the potential to cause illness in humans or animals. Pathogen testing is conducted throughout the entire production process, from raw materials through to finished product screening, to ensure that the end product is free from harmful microorganisms. This ongoing testing is crucial for maintaining consumer safety and is strictly governed by food safety regulatory guidelines to meet the necessary standards for health and quality assurance.",
         "image": "/applications/pathogen-spoilage-testing.webp",
         "url": "pathogen-spoilage-testing",
+        "keywords": ["pathogen testing", "food safety", "microorganisms", "consumer health", "quality assurance"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -1978,6 +2078,7 @@
         "description": "Pyrogen testing is a critical process used to detect the presence of pyrogens in parenteral pharmaceutical products, ensuring that they do not cause febrile reactions in patients. This testing is regulated by various standards set by organizations such as the Food and Drug Administration (FDA), United States Pharmacopeia (USP), and European Pharmacopeia (EP). It is important to note that sterility alone does not guarantee the absence of pyrogens, which is why drugs that are intended to be sterile must also undergo pyrogen testing. Pyrogen contamination can occur during the manufacturing process or the administration of pharmaceuticals, biotherapeutics, and medical devices. Additionally, pyrogens can be an inherent component of certain products, such as adjuvants in vaccines or synthetic lipopeptides, making pyrogen testing a fundamental part of ensuring patient safety and product quality.",
         "image": "/applications/pyrogen-testing.webp",
         "url": "pyrogen-testing",
+        "keywords": ["pyrogen testing", "pharmaceutical products", "febrile reactions", "FDA", "patient safety"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2011,6 +2112,7 @@
         "description": "Sterility testing is an essential requirement in Good Manufacturing Practices (GMP) microbiology to ensure that sterile products are free from viable microorganisms before they are released for patient use or administration. Given the critical nature of sterility, testing methods must be highly accurate and reliable to confirm that medical devices, pharmaceutical products, formulations, tissue materials, and other products that are intended to be sterile meet the necessary standards for safety and quality. This testing is vital to prevent contamination and protect patients from potential infections caused by microorganisms in products that claim to be sterile or free from viable organisms.",
         "image": "/applications/sterility-testing.webp",
         "url": "sterility-testing",
+        "keywords": ["sterility testing", "GMP", "microorganisms", "pharmaceutical products", "patient safety"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2040,6 +2142,7 @@
         "description": "Surface and personnel testing are essential methods used to collect, detect, and assess the levels of various microorganisms in order to evaluate the effectiveness of disinfection routines in both critical and non-critical manufacturing areas. The hygiene standards maintained in a production environment are directly linked to the microbiological safety and overall quality of the finished products. To ensure consumer protection, several regulatory agencies, including the European Union’s cGMP, U.S. FDA Aseptic Guidance, and USP <1116>, have developed standardized methods to monitor and control microbial contamination. These guidelines are applied to industries such as pharmaceuticals, cosmetics, food, and beverages, ensuring that manufacturing practices adhere to strict microbial safety protocols to safeguard public health.",
         "image": "/applications/surface-personnel-testing.webp",
         "url": "surface-personnel-testing",
+        "keywords": ["surface testing", "personnel testing", "microbial contamination", "disinfection routines", "regulatory agencies"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2061,6 +2164,7 @@
         "description": "Microbial air monitoring is the process of sampling and analyzing microbial contamination present in the air, a crucial component of quality control in the manufacturing sectors, including pharmaceuticals, cosmetics, food, and beverages. Air quality is of paramount importance in aseptic environments, cleanrooms, and production areas, as microorganisms in the air can pose a significant risk for cross-contamination of raw materials and final products. Regular microbial air monitoring helps to ensure that air quality meets strict standards, preventing contamination and ensuring the safety and integrity of the products being manufactured.",
         "image": "/applications/viable-air-monitoring.webp",
         "url": "viable-air-monitoring",
+        "keywords": ["microbial air monitoring", "contamination prevention", "cleanrooms", "air quality standards", "quality control"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2080,12 +2184,14 @@
     "description": "Explore our robust application data for pharma and biopharma manufacturing including classic pharma, mAb, gene therapy, cell therapy, antibody drug conjugate (ADC), vaccine and plasma. Learn more about next generation bioprocessing applications. Biotech start-ups will find faster, better solutions to their toughest development challenges and accelerate the path to commercialization.",
     "image": "/applications/pharmaceutical-biopharmaceutical-manufacturing.webp",
     "url": "pharmaceutical-biopharmaceutical-manufacturing",
+    "keywords": ["pharmaceutical manufacturing", "biopharmaceuticals", "gene therapy", "biotech start-ups", "bioprocessing applications"],
     "subcategories": [
       {
         "name": "Blood Plasma Fractionation",
         "description": "Plasma fractionators are essential in providing treatments for rare, life-threatening medical conditions. Their consistent and reliable performance is crucial in ensuring effective plasma fractionation, a process that involves numerous challenges. These challenges must be addressed to improve outcomes for patients worldwide, including enhancing yield, optimizing process economics, and navigating the growing complexity of regulatory requirements. Selecting the right partner with a deep understanding of these challenges is critical for fractionators. Such partnerships offer access to innovative solutions and valuable resources, ultimately improving the entire range of blood plasma products that can be offered to patients in need",
         "image": "/applications/blood-plasma-fractionation.webp",
         "url": "blood-plasma-fractionation",
+        "keywords": ["plasma fractionation", "life-threatening conditions", "process optimization", "regulatory challenges", "blood plasma products"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2107,6 +2213,7 @@
         "description": "Gene therapies present an extraordinary opportunity to treat and potentially cure a wide range of diseases and conditions that currently have no effective treatment or very limited options available for patients. With hundreds of gene therapies under development globally, both emerging companies and established industry leaders are working tirelessly to bring these groundbreaking therapies to market. Developing a successful gene therapy requires highly specialized expertise that differs significantly from the production of other biologics, such as monoclonal antibodies. Areas like viral vector manufacturing and specialized testing capabilities are crucial for success, as they are unique to gene therapy and can directly impact the outcome of a candidate therapy. The absence of well-established process templates, constantly changing regulatory guidelines, and the pressure of meeting accelerated development timelines add additional complexity for gene therapy manufacturers. Given the remarkable promise and associated challenges of gene therapies, forming strategic partnerships with experienced technology providers or contract development and manufacturing organizations (CDMOs) is essential. These partnerships help ensure the successful development, scaling, manufacturing, and regulatory compliance of gene therapies, ultimately paving the way for breakthroughs in patient care",
         "image": "/applications/gene-therapy-manufacturing.webp",
         "url": "gene-therapy-manufacturing",
+        "keywords": ["gene therapies", "viral vector manufacturing", "specialized testing", "regulatory compliance", "strategic partnerships"],
         "subsubcategories": []
       }
     ]
@@ -2116,12 +2223,14 @@
     "description": "Protein biology application and workflows require reliable reagents, high-precision protein detection and quantification, as well as thorough protocols and technical information. Our team of scientists understand that your research and precious samples require world-class support. Our comprehensive offering of protein biology-related applications include support for western blotting, ELISA, protein labeling, protein detection, and protein quantification. Explore our powerful protein and immunoassay applications protocols, and resources to drive your research forward.",
     "image": "/applications/protein-biology.webp",
     "url": "protein-biology",
+    "keywords": ["protein biology", "western blotting", "ELISA", "protein labeling", "protein quantification"],
     "subcategories": [
       {
         "name": "ELISA",
         "description": "Typically performed in multi-well microtiter plates, ELISAs are a molecular biology assay commonly used for the detection and quantification of diverse molecules, including peptides, proteins, and antibodies. Such assays can detect molecules of interest at the pg/mL level and are critical for both basic research and disease research application needs. ELISA assays typically involve the use of antibody conjugated to an enzyme, an immobilized molecule(s) of interest, and a detection substrate. A critical aspect that determines the success and quality of data obtained from an ELISA is dependent on the affinity and specificity of antibody-antigen interactions. Antigen-antibody interactions are influenced by numerous factors, including pH, temperature, and ionic strength",
         "image": "/applications/elisa.webp",
         "url": "elisa",
+        "keywords": ["ELISA", "antibody-antigen interaction", "protein detection", "peptide detection", "disease research"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2147,6 +2256,7 @@
         "description": "Enzymatic activity assays are primarily conducted by researchers to detect and measure the presence or quantity of a specific enzyme within an organism, tissue, or sample. Common examples of such enzymes include α-amylase, catalase, laccase, peroxidase, lysozyme, and reporter enzymes like alkaline phosphatase and luciferase. Various reagents and methodologies are widely accessible, enabling the exploration of specific enzyme-substrate interactions. The choice of an appropriate workflow solution depends on the required sensitivity for the particular research study. While colorimetric solutions are effective for detection purposes, fluorescence-based reagents are preferred for the quantification of enzyme activity",
         "image": "/applications/enzyme-activity-assays.webp",
         "url": "enzyme-activity-assays",
+        "keywords": ["enzymes", "activity assays", "enzyme detection", "fluorescence-based assays", "colorimetric assays"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2172,6 +2282,7 @@
         "description": "Flow cytometry is a technology that uses single or multiple lasers to provide a multi-parametric analysis of single cells. Each cell or particle is analyzed by visible light scatter or by fluorescence as cells rapidly flow past each laser. Independent of light scatter analysis, fluorescence measurements are achieved by transfection and expression of common fluorescent proteins (e.g. Green Fluorescent Protein, GFP) and staining with fluorescently conjugated antibodies or fluorescent dyes. Flow cytometry is a powerful technology that is commonly used in molecular and cellular biology research applications, including immunology, cancer biology, and disease research",
         "image": "/applications/flow-cytometry.webp",
         "url": "flow-cytometry",
+        "keywords": ["cell analysis", "laser", "fluorescence", "immunology", "cancer biology", "disease research"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2197,6 +2308,7 @@
         "description": "Protein gel electrophoresis is a widely used laboratory technique that allows for the separation of proteins for various purposes, including purification, characterization, and expression analysis. In this method, charged protein molecules are subjected to an electrical field, causing them to migrate through a gel. The rate at which proteins move through the gel depends on several factors, including their size, shape, and charge. Both polyacrylamide and agarose gels are commonly used in protein electrophoresis, each serving as a matrix to separate proteins based on their mobility. These matrices function like a sieve, with smaller proteins moving faster than larger ones. Agarose gels, which have a larger pore size, are typically used to separate proteins with a radius larger than 5-10 nm, such as large protein complexes. Polyacrylamide gels, with smaller pore sizes, are more versatile and are used to separate proteins ranging in size from 5 kDa to 2,000 kDa. Polyacrylamide gel electrophoresis is the most frequently employed method for separating proteins in molecular biology and biochemistry research,",
         "image": "/applications/gel-electrophoresis.webp",
         "url": "gel-electrophoresis",
+        "keywords": ["protein separation", "electrical field", "polyacrylamide", "agarose gels", "molecular biology", "biochemistry"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2222,6 +2334,7 @@
         "description": "Immunohistochemistry (IHC) is a biochemical technique that utilizes antibodies to bind specifically to antigens within tissue sections, allowing for the detection of these antigens. Similarly, immunocytochemistry (ICC) is employed to identify antigens within individual cell layers. IHC is widely used in both research and clinical settings to visualize proteins, carbohydrates, and lipids of interest within tissues, including those found in cancerous tumors. IHC helps to identify specific molecular markers that indicate key cellular processes, such as proliferation or apoptosis (cell death). This technique is also extensively used in basic research to explore the distribution and localization of biomarkers, as well as differentially expressed proteins within various regions of biological tissue,",
         "image": "/applications/immunohistochemistry.webp",
         "url": "immunohistochemistry",
+        "keywords": ["antibody", "antigen", "tissue sections", "biochemical technique", "cancer research", "molecular markers"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2239,6 +2352,7 @@
         "description": "Biochemical and environmental signals in the body regulate both intracellular processes and the interactions between cells, tissues, and organs. These signals are transmitted through a complex network of proteins, enzymes, and receptors, forming intricate signaling pathways. Protein pathway analysis plays a crucial role in understanding cellular and biological processes and their effects on physiology, dysfunction, and disease. Small-molecule compounds, such as inhibitors, activators, and other modulators of these pathways, are essential tools for researchers investigating cell signaling and the mechanisms that govern cell fate, function, and phenotype,",
         "image": "/applications/interrogation-of-protein-pathways.webp",
         "url": "interrogation-protein-pathways",
+        "keywords": ["protein pathways", "cell signaling", "biochemical signals", "enzymes", "disease mechanisms", "small-molecule compounds"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2260,6 +2374,7 @@
         "description": "When purifying proteins for functional or structural studies, or for preparative processing and production, the first crucial step involves disrupting the cells or tissue to access the target proteins. Cell lysis and protein solubilization are fundamental to achieving effective analysis and ensuring efficient processing. The extraction method selected can vary, and may involve enzymatic, chemical, mechanical techniques, or a combination of these approaches, depending on the specific requirements of the process,",
         "image": "/applications/lysis-protein-extraction.webp",
         "url": "lysis-protein-extraction",
+        "keywords": ["protein extraction", "cell lysis", "protein solubilization", "enzymatic techniques", "mechanical techniques"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2297,6 +2412,7 @@
         "description": "Proteins serve as the fundamental molecules within a cell, driving a wide range of biological activities essential for cellular function and survival. Interestingly, a variety of proteins also interact with DNA. Within our chromosomes, DNA is often tightly coiled around proteins known as chromatin, which form the structural backbone of the chromosome. These protein-DNA complexes play a crucial role in packaging the DNA into a more compact structure within the cell nucleus. Researchers have developed powerful molecular tools and techniques to isolate these protein-DNA complexes, as well as other DNA-binding protein complexes, for further downstream applications,",
         "image": "/applications/protein-nucleic-acid-interactions.webp",
         "url": "protein-nucleic-acid-interactions",
+        "keywords": ["protein-DNA interaction", "chromatin", "DNA-binding proteins", "protein complexes", "molecular tools"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2314,6 +2430,7 @@
         "description": "Protein concentration and buffer exchange are widely employed in various processes, including protein and antibody purification, bioprocessing, and proteomic analysis workflows. During the preparation of macromolecular solutions, such as proteins, enzymes, antibodies, and viruses, large volumes of diluted proteins and other biomolecules are often generated, typically in buffers that are not compatible with downstream processes or detection methods. After sample extraction, it is often necessary to concentrate and clarify the diluted proteins before they can be analyzed or used in further applications,",
         "image": "/applications/protein-concentration-buffer-exchange.webp",
         "url": "protein-concentration-buffer-exchange",
+        "keywords": ["protein purification", "bioprocessing", "buffer exchange", "proteomics", "antibody purification"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2335,6 +2452,7 @@
         "description": "Advancements in genomics, cloning, and a wide array of molecular biology techniques have enabled researchers to express heterologous proteins in various biological systems. The ability to express recombinant proteins has opened up numerous powerful downstream applications, providing researchers with valuable tools for further research studies. At small scales, overexpression of proteins can facilitate studies focused on understanding protein function, while large-scale protein production is essential for the manufacturing of enzymes, antibodies, and vaccines. Identifying optimal conditions for cellular growth and protein expression is critical for both small- and large-scale protein expression systems. Whether a prokaryotic or eukaryotic expression system is required for post-translational modifications, the choice of cell type will largely determine the tools and reagents needed to achieve optimal protein expression,",
         "image": "/applications/protein-expression.webp",
         "url": "protein-expression",
+        "keywords": ["protein expression", "genomics", "recombinant proteins", "antibody production", "protein production"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2356,6 +2474,7 @@
         "description": "Proteins are made up of polypeptide chains, and their biological functions are largely determined by the correct folding, size, and the presence of reactive functional groups throughout the polypeptide chain. The ability to make site-specific protein modifications allows researchers to explore a wide array of protein properties and their biological functions. Technologies for protein labeling and modification include the addition of fluorophores, biotin, and other small molecules, which are used to study protein-protein interactions, protein folding, overall protein structure, and their biological roles in cellular processes,",
         "image": "/applications/protein-labeling-modification.webp",
         "url": "protein-labeling-modification",
+        "keywords": ["protein labeling", "protein modification", "fluorophores", "protein-protein interactions", "biotin"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2377,6 +2496,7 @@
         "description": "Protein mass spectrometry is a widely used technique for analyzing biological samples in various fields, including biomarker discovery, proteomics research, and clinical applications. Compared to other methods employed for large-scale protein characterization, mass spectrometry has become a leading tool in proteomics due to its ability to handle complex analyses. This technique is utilized to quantitatively identify and characterize proteins based on their structure, post-translational modifications, and interactions. Protein identification often involves the chemical or enzymatic digestion of proteins into smaller peptides, which are then analyzed by mass spectrometry and identified through computational methods or sequencing. Post-translational modifications are detected by observing changes in the mass of amino acid residues, with the modification sites mapped using sequencing or computational techniques. In glycan analysis and profiling, enzymatic or chemical methods are used to release glycan moieties from glycoproteins, followed by their derivatization for subsequent mass spectrometry analysis. Protein interactions can be studied by affinity co-purification, isolating a specific target protein and its interacting partners, or through global analysis using techniques like size exclusion or ion exchange chromatography before mass spectrometry analysis,",
         "image": "/applications/protein-mass-spectrometry.webp",
         "url": "protein-mass-spectrometry",
+        "keywords": ["mass spectrometry", "proteomics", "biomarker discovery", "post-translational modifications", "protein interactions", "glycan analysis"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2402,6 +2522,7 @@
         "description": "The pull-down assay is a technique designed to investigate the interaction between two or more proteins. In affinity pull-down assays, a 'bait' protein is tagged and captured on an immobilized ligand, such as support beads, either through covalent attachment or via an affinity tag, like immobilized metal affinity chromatography (IMAC). Common bait protein fusion tags include Glutathione S-transferase (GST) and histidine-tagged proteins. The bait protein forms a complex, which is then incubated with a protein source, such as a cell or tissue lysate. After incubation, the proteins of interest are eluted from the support beads through a series of washes and collected by centrifugation. The affinity pull-down method of purification and detection differs from immunoprecipitation (IP) and Co-IP assays in that it does not rely on antibody-antigen interactions. For further downstream analysis, the purified sample is often analyzed using techniques such as SDS-PAGE, mass spectrometry, and western blot detection,",
         "image": "/applications/protein-pull-down.webp",
         "url": "protein-pull-down",
+        "keywords": ["pull-down assay", "protein interactions", "GST tag", "affinity pull-down", "SDS-PAGE"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2419,6 +2540,7 @@
         "description": "Numerous protein purification techniques are widely utilized in both biological and biomedical research. The workflows involved in recombinant protein expression and purification rely on many factors and variables, including, but not limited to, the physical properties, biological function of the protein, and the decision of whether to use a bacterial or eukaryotic cell line for expressing the protein of interest. Significant advancements have been made in the field of recombinant protein expression and purification methodologies, alongside the availability of a wide range of commercially available systems and kits. However, proteins are complex macromolecules, and as such, optimal strategies for protein expression and purification must often be determined empirically, based on the specific characteristics of the target protein and the desired outcome,",
         "image": "/applications/protein-purification.webp",
         "url": "protein-purification",
+        "keywords": ["protein purification", "recombinant protein", "protein expression", "biomedical research", "purification techniques"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2436,6 +2558,7 @@
         "description": "Protein quantitation and protein assays are essential for accurately determining the concentration of proteins in a sample. There are a variety of protein quantitation methods available, including UV absorbance assays, reagent-based assays, and immunoassay technologies. Each of these techniques offers unique benefits, and the choice of the most suitable assay depends on factors such as the sample type and the available sample volume. For instance, some dye-based assays may be interfered with by chemicals present in buffer preparations, making an alternative assay more appropriate for certain applications. It is crucial for scientists to carefully consider the limitations of each assay in order to determine the best option for their specific sample and analysis needs,",
         "image": "/applications/protein-quantitation.webp",
         "url": "protein-quantitation",
+        "keywords": ["protein quantitation", "protein assays", "UV absorbance assays", "immunoassays", "reagent-based assays"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2457,6 +2580,7 @@
         "description": "The function of a protein is directly influenced by its three-dimensional structure, its interactions with other proteins, and its specific location within cells, tissues, and organs. The study of protein structure and function, known as proteomics, is conducted on a large scale and is essential for identifying protein biomarkers that are linked to specific disease states, offering potential targets for therapeutic interventions. Gaining a deeper understanding of protein structure, as well as mapping protein locations, expression levels, and their interactions, provides valuable insights that can be used to infer their biological function and role in cellular processes,",
         "image": "/applications/protein-structural-analysis.webp",
         "url": "protein-structural-analysis",
+        "keywords": ["protein structure", "proteomics", "protein biomarkers", "protein interactions", "biological function"],
         "subsubcategories": [],
         "additionalInfo": [
           {
@@ -2478,6 +2602,7 @@
         "description": "Western blotting is a well-established and widely used analytical technique for detecting, analyzing, and quantifying proteins in complex biological samples. This method is commonly employed to detect specific protein molecules in samples such as tissue homogenates and cell lysates. The process typically involves the separation of proteins by gel electrophoresis, followed by the transfer of the proteins onto a polyvinylidene difluoride (PVDF) or nitrocellulose membrane. Once the proteins have been successfully transferred, they can be stained for visualization and subsequently identified through various methods, including N-terminal sequencing, mass spectrometry, or immunodetection techniques,",
         "image": "/applications/western-blotting.webp",
         "url": "western-blotting",
+        "keywords": ["protein detection", "gel electrophoresis", "PVDF membrane", "protein quantification", "immunodetection"],
         "subsubcategories": [],
         "additionalInfo": [
           {

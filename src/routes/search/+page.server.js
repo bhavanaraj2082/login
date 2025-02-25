@@ -1,5 +1,6 @@
 
 import { getSearchData } from '$lib/server/mongoLoads.js'
+import { saveMailId } from '$lib/server/mongoActions.js';
 
 export const load = async ({url}) => {
   try {
@@ -10,4 +11,14 @@ export const load = async ({url}) => {
     console.log(error)
     return {message:error.response.message}
   } 
+}
+
+export const actions = {
+	noresults:async({request})=>{
+		const body = Object.fromEntries(await request.formData());
+		// console.log(body,"***********************");
+
+		const result = await saveMailId(body);
+		return  result ;
+	}
 }

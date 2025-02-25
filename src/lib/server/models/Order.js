@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
-import mongooseSequence from 'mongoose-sequence';
+// import mongooseSequence from 'mongoose-sequence';
 
-const AutoIncrement = mongooseSequence(mongoose);
+// const AutoIncrement = mongooseSequence(mongoose);
 
 const orderDetailsSchema = new mongoose.Schema({
 
@@ -114,9 +114,9 @@ const orderSchema = new mongoose.Schema(
 //delete mongoose.models.Order
 
 // Create a model based on the schema
-if (!mongoose.models.Order && !orderSchema.paths.orderid.options.autoIncrement) {
-	orderSchema.plugin(AutoIncrement, { inc_field: 'orderid' });
-}
+// if (!mongoose.models.Order && !orderSchema.paths.orderid.options.autoIncrement) {
+// 	orderSchema.plugin(AutoIncrement, { inc_field: 'orderid' });
+// }
 
 const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 

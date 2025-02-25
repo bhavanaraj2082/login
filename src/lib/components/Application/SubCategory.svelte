@@ -3,11 +3,14 @@
   import Card from "$lib/components/Application/Card.svelte";
   export let data;
 
-  let categoryData = data.categoryData;
-  let subcategoryData = data.subcategoryData;
-  let subsubcategories = data.subsubcategories || {};
-  let relatedProducts = data?.relatedProducts;
- // console.log("form subcategory",relatedProducts);
+  let categoryData = data?.categoryData ||{};
+  let subcategoryData = data?.subcategoryData||{};
+  let subsubcategories = data?.subsubcategories || [];
+  let relatedProducts = data?.relatedProducts ||{};
+//  console.log("categoryData",categoryData);
+//  console.log("subcategoryData",subcategoryData);
+//  console.log("subsubcategories",subsubcategories);
+//  console.log("relatedProducts",relatedProducts);
 </script>
 
 <section class="w-11/12 mx-auto my-3 max-w-7xl">

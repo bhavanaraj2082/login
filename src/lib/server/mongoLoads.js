@@ -13,10 +13,10 @@ import TokenVerification from "$lib/server/models/TokenVerification.js";
 import Return from "$lib/server/models/Return.js";
 import MyFavourite from "$lib/server/models/MyFavourite.js";
 import Curconversion from "$lib/server/models/Curconversion.js";
+import Newsroom from '$lib/server/models/Newsroom';
 import User from "$lib/server/models/User.js";
 import Quotes from "$lib/server/models/Quotes.js";
 import Cart from "$lib/server/models/Cart.js";
-
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -267,6 +267,7 @@ export async function getSearchData(search) {
       components,
       categories,
       subcategories,
+      search
     };
 
     return JSON.parse(JSON.stringify(allData));
@@ -277,17 +278,18 @@ export async function getSearchData(search) {
 }
 
 async function getMatchedComponents(search) {
+  let cleanedQuery = search.replace(/[^\w]/g, "");
   try {
     const queryFilter = {
       $or: [
-        { productName: { $regex: search, $options: "i" } },
-        { productNumber: { $regex: search, $options: "i" } },
-        { CAS: { $regex: search, $options: "i" } },
+        { cleanedName: { $eq: cleanedQuery } },
+        { $text: { $search: cleanedQuery } },
+        { CAS: { $eq: search } }
       ],
     };
 
     const components = await Product.find(queryFilter)
-      .limit(6)
+      .limit(9)
       .populate("category")
       .populate("subCategory")
       .exec();
@@ -729,24 +731,106 @@ export const loadProductsubcategory = async (
 };
 
 export async function RelatedApplicationData(name) {
+  // console.log("name",name);
+  
   try {
     const queryFilter = {
       $or: [
-        { description: { $regex: name, $options: "i" } },
+        {
+          description: {
+            $elemMatch: {
+              $regex: name, // Match the value inside each object
+              $options: "i" // Case-insensitive search
+            }
+          }
+        },
         { "subsubCategory.name": { $regex: name, $options: "i" } },
         { "subCategory.name": { $regex: name, $options: "i" } },
       ],
     };
 
-    const relatedProducts = await Product.find(queryFilter)
-      .limit(8)
-      .populate("subCategory")
-      .populate("subsubCategory")
-      .populate("category")
-      .populate("manufacturerName")
-      .exec();
+    const relatedProducts = await Product.aggregate([
+      {
+          $match: queryFilter // Match the query filter for relevant products
+      },
+      {
+          $limit: 8 // Limit the number of products returned
+      },
+      {
+          $lookup: {
+              from: 'categories', // Assuming your category data is in 'categories' collection
+              localField: 'category', // The category field in the product collection
+              foreignField: '_id', // Match the _id from the 'categories' collection
+              as: 'categoryInfo' // Store the matched data in 'categoryInfo'
+          }
+      },
+      {
+          $lookup: {
+              from: 'subcategories',
+              localField: 'subCategory',
+              foreignField: '_id',
+              as: 'subCategoryInfo'
+          }
+      },
+      {
+          $lookup: {
+              from: 'manufacturers',
+              localField: 'manufacturer',
+              foreignField: '_id',
+              as: 'manufacturerInfo'
+          }
+      },
+      {
+          $lookup: {
+              from: 'subsubcategories',
+              localField: 'subsubCategory',
+              foreignField: '_id',
+              as: 'subsubCategoryInfo'
+          }
+      },
+      {
+          $lookup: {
+              from: 'stocks',
+              localField: 'productNumber',
+              foreignField: 'productNumber',
+              as: 'stockInfo'
+          }
+      },
+      {
+          $project: {
+              _id: 1,
+              productName: 1,
+              prodDesc: 1,
+              'categoryInfo.urlName': 1,
+              'subCategoryInfo.urlName': 1,
+              'manufacturerInfo.name': 1,
+              'subsubCategoryInfo.urlName': 1,
+              stockQuantity: { $ifNull: [{ $arrayElemAt: ['$stockInfo.stock', 0] }, 0] },
+              stockPriceSize: { $ifNull: [{ $arrayElemAt: ['$stockInfo.pricing', 0] }, []] },
+              orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
+              priceSize: 1,
+              imageSrc: 1,
+              productUrl: 1,
+              productNumber: 1
+          }
+      }
+  ]);
+  
+  // Now, you can perform the conversion for stockPriceSize to INR
+  let relatedProductsJson = await Promise.all(relatedProducts.map(async (items) => {
+    let convertedPrice = await convertToINR(items.stockPriceSize);
+    return {
+        ...items,
+        stockPriceSize: convertedPrice
+    };
+}));
+  
+let serializedData = JSON.stringify(relatedProductsJson);
 
-    return JSON.parse(JSON.stringify(relatedProducts));
+// Parse the JSON string back into an object
+let parsedData = JSON.parse(serializedData);
+return parsedData
+  
   } catch (error) {
     console.error("Error fetching related products:", error);
     return { success: false, message: "Error fetching related products" };
@@ -1007,6 +1091,7 @@ export async function DifferentProds(productId) {
   return { records: [formattedRecord] };
 }
 //Product info ends
+
 
 //////Quick Order//////////
 
@@ -1354,6 +1439,17 @@ export async function getProfileDetails(userId) {
     };
   }
 }
+
+
+export const newsroom = async () => {
+  const records = await Newsroom.find({});
+  return JSON.parse(JSON.stringify(records));
+};
+
+export const singleNews = async (newsLink) => {
+  const newsItem = await Newsroom.findOne({ newsLink });
+  return JSON.parse(JSON.stringify(newsItem));
+};
 
 export async function getUserMycart(userId) {
   try {

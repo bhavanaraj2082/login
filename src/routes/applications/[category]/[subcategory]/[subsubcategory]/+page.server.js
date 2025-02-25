@@ -28,10 +28,13 @@ export async function load({ params }) {
 
     const subsubcategoryData = await findSubcategoryData(categoryData, subcategory, subsubcategory);
     const relatedProducts = await RelatedApplicationData(subsubcategoryData.name);
-
+    // console.log("relatedProducts",relatedProducts);
+    
     return {
       subsubcategoryData,
       relatedProducts,
+      category,
+      subcategory,
     };
   } catch (error) {
     console.error('Error loading data:', error);
