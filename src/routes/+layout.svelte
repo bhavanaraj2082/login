@@ -11,12 +11,14 @@
     import { onMount } from 'svelte';
 
 	export let data;
-	//console.log(data,"data");
 	let cartData;
-	let isLoggedIn = true
-	// userData = data?.cart?.cart[0].cartItems ||[]
+	console.log(data,"---------")
+    cartData = data?.cart?.cart[0]?.cartItems ||[]
+	authedUser.set(data.locals.authedUser)
+	let isLoggedIn = $authedUser?.id ? true : false
+
 	
-	// $:cart.set(userData)
+	$:cart.set(cartData)
 
 	const guestCartFetch = () => {
 		const formdata = new FormData();
@@ -41,7 +43,6 @@
 		}
 
 	});
-	//console.log($cart,"cart");
 
 </script>
 

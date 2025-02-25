@@ -11,17 +11,19 @@ import Solution from '$lib/server/models/Solution.js';
 import Quotes from '$lib/server/models/Quotes.js';
 import Products from '$lib/server/models/Product.js';
 import Helpsupport from '$lib/server/models/Helpsupport.js';
+import Cart from '$lib/server/models/cart.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '$lib/server/models/MyFavourite.js';
-import ChemiDashProfile from '$lib/server/models/ChemiDashProfile.js';
 import Curconversion from "$lib/server/models/Curconversion.js";
 import { redirect, error } from '@sveltejs/kit';
 import Cart from "$lib/server/models/Cart.js"
 import Distributor from "$lib/server/models/Distributor.js"
 import { v4 as uuidv4 } from 'uuid';
+import { auth, authErrorMessages } from '$lib/server/lucia.js';
 import nodemailer from 'nodemailer';
 import { nanoid } from 'nanoid';
 // import { lucia } from 'lucia';
+import { LuciaError } from 'lucia';
 import {
 	APP_URL,
 	SENDER_EMAIL,
@@ -29,8 +31,8 @@ import {
 	WEBSITE_NAME,
 	MAIL_HOST
 } from '$env/static/private';
+import { PUBLIC_WEBSITE_NAME } from '$env/static/public'; 
 import Return from '$lib/server/models/Return.js';
-import { auth } from '$lib/server/lucia.js';
 
 
 async function conversionRates() {
@@ -168,52 +170,130 @@ export async function favorite(favdata) {
 	const authedUser = favdata.authedEmail;
   
 	if (authedUser) {
-		const chemiDashProfileId = await Profile.findOne({ email: authedUser });
-		const userId = chemiDashProfileId.userId;
-		// console.log(userId, "userId");
-		const existingRecord = await MyFavourite.findOne({ userId: userId });
-		// console.log("existingRecord", existingRecord);
+	  const chemiDashProfileId = await Profile.findOne({ email: authedUser });
+	  const userId = chemiDashProfileId.userId;
+	  
+	  const existingRecord = await MyFavourite.findOne({ userId: userId });
   
-		const favoriteItem = {
-		  productDesc: favdata.productDesc,
-		  id: favdata.id,
-		  imgUrl: favdata.imgUrl,
-		  productName: favdata.productName,
-		  productNumber: favdata.productNumber,
-		  priceSize: { price: favdata.price, size: favdata.size },
-		  quantity: favdata.quantity,
-		  stock: favdata.stock,
-		};
-		let updatedFavorites = [];
-		let isFavorite = false;
-		if (existingRecord) {
-		  if (!Array.isArray(existingRecord.favorite)) {
-			existingRecord.favorite = [];
-		  }
-		  updatedFavorites = existingRecord.favorite.filter(
-			(item) => item.id !== favdata.id
-		  );
-		  isFavorite =
-			updatedFavorites.length !== existingRecord.favorite.length;
+	  // Initialize favoriteItem object
+	  const favoriteItem = {
+		productId: favdata.productId,
+		manufacturerId: favdata.manufacturerId,
+		stockId: favdata.stockId,
+		distributorId: favdata.distributorId,
+		productNumber: favdata.productNumber,
+		quantity: favdata.quantity,
+		stock: favdata.stock,
+	  };
   
-		  if (isFavorite) {
-			existingRecord.favorite = updatedFavorites;
-			await existingRecord.save();
-			return { type: "success", message: "Removed from favorites!" };
-		  } else {
-			updatedFavorites = [...existingRecord.favorite, favoriteItem];
-			existingRecord.favorite = updatedFavorites;
-			await existingRecord.save();
-		  }
-		} else {
-		  await MyFavourite.create({
-			userId: chemiDashProfileId.userId,
-			favorite: [favoriteItem],
-		  });
+	  if (existingRecord) {
+		if (!Array.isArray(existingRecord.favorite)) {
+		  existingRecord.favorite = [];
 		}
-		return { type: "success", message: "Added to favorites!" };
+  
+		// Check if product already exists in favorites
+		const productIndex = existingRecord.favorite.findIndex(
+		  (item) => item.productId.toString() === favdata.productId
+		);
+  
+		if (productIndex !== -1) {
+		  // Product exists, remove it
+		  existingRecord.favorite.splice(productIndex, 1);
+		  await existingRecord.save();
+		  return {
+			success: true,
+			type: "success",
+			message: "Product Removed from favorites!",
+		  };
+		} else {
+		  // Product does not exist, add it
+		  existingRecord.favorite.push(favoriteItem);
+		  await existingRecord.save();
+		  return {
+			success: true,
+			type: "success",
+			message: "Product Added to favorites!",
+		  };
+		}
+	  } else {
+		// If no existing favorite list, create a new record
+		await MyFavourite.create({
+		  userId: chemiDashProfileId.userId,
+		  userEmail: chemiDashProfileId.email,
+		  favorite: [favoriteItem],
+		});
+  
+		return {
+		  success: true,
+		  type: "success",
+		  message: "Product Added to favorites!",
+		};
+	  }
 	}
 }
+
+
+
+// export async function register(body, cookies) {
+// 	const data = body;
+// 	let isRedirect = false;
+
+// 	// Default site preferences
+// 	let sitePreferences = {
+// 		noOfOrdersPerPage: 3,
+// 		noOfQuickOrderFields: 3,
+// 		noOfQuotesPerPage: 3,
+// 		productEntryType: 'Manual Entry'
+// 	};
+
+// 	try {
+// 		const findUser = await Register.findOne({
+// 			email: data.email,
+// 			password: data.password
+// 		});
+// 		if (findUser !== null) {
+// 			return { success: false, message: 'User already exist' };
+// 		}
+
+// 		const user = await Register.create(data);
+// 		const profile = await Profile.create({
+// 			userId: user._id,
+// 			email: user.email,
+// 			sitePreferences
+// 		});
+
+// 		user.chemiDashProfileId = profile._id;
+// 		await user.save();
+
+// 		cookies.set(
+// 			'token',
+// 			JSON.stringify({
+// 				email: user.email,
+// 				profileId: profile._id,
+// 				userId: user._id
+// 			}),
+// 			{
+// 				path: '/',
+// 				httpOnly: true,
+// 				sameSite: 'strict',
+// 				maxAge: 60 * 60 * 24 * 1000 // 1 day
+// 			}
+// 		);
+// 		isRedirect = true;
+
+// 		// if (verificationResult.success) {
+// 		//     return { success: true, message: "Check your email to verify your email address" };
+// 		// } else {
+// 		//     return { success: false, message: "Verification email was not sent" };
+// 		// }
+// 	} catch (error) {
+// 		console.log('Error during registration:', error);
+// 		return { success: false, message: 'An error occurred during registration' };
+// 	}
+// 	if (isRedirect) {
+// 		return redirect(302, '/profile');
+// 	}
+// }
 
 export const checkoutOrder = async (order) => {
 	try {
@@ -293,7 +373,7 @@ export async function login(body, cookies) {
 			);
 
 			const redirectUrl = cookies.get('redirectUrl');
-			const targetUrl = redirectUrl ? decodeURIComponent(redirectUrl) : '/profile';
+			const targetUrl = redirectUrl ? decodeURIComponent(redirectUrl) : '/dashboard/profile';
 			if (redirectUrl) {
 				cookies.delete('redirectUrl', { path: '/' });
 			}
@@ -310,66 +390,496 @@ export async function login(body, cookies) {
 	}
 }
 
-export async function register(body, cookies) {
-	const data = body;
-	let isRedirect = false;
+// export async function register(body, cookies) {
+// 	const data = body;
+// 	let isRedirect = false;
 
-	// Default site preferences
-	let sitePreferences = {
-		noOfOrdersPerPage: 3,
-		noOfQuickOrderFields: 3,
-		noOfQuotesPerPage: 3,
-		productEntryType: 'Manual Entry'
+// 	// Default site preferences
+// 	let sitePreferences = {
+// 		noOfOrdersPerPage: 3,
+// 		noOfQuickOrderFields: 3,
+// 		noOfQuotesPerPage: 3,
+// 		productEntryType: 'Manual Entry'
+// 	};
+
+// 	try {
+// 		const findUser = await Register.findOne({
+// 			email: data.email,
+// 			password: data.password
+// 		});
+// 		if (findUser !== null) {
+// 			return { success: false, message: 'User already exist' };
+// 		}
+
+// 		const user = await Register.create(data);
+// 		const profile = await Profile.create({
+// 			userId: user._id,
+// 			email: user.email,
+// 			sitePreferences
+// 		});
+
+// 		user.chemiDashProfileId = profile._id;
+// 		await user.save();
+
+// 		cookies.set(
+// 			'token',
+// 			JSON.stringify({
+// 				email: user.email,
+// 				profileId: profile._id,
+// 				userId: user._id
+// 			}),
+// 			{
+// 				path: '/',
+// 				httpOnly: true,
+// 				sameSite: 'strict',
+// 				maxAge: 60 * 60 * 24 * 1000 // 1 day
+// 			}
+// 		);
+// 		isRedirect = true;
+
+// 		// if (verificationResult.success) {
+// 		//     return { success: true, message: "Check your email to verify your email address" };
+// 		// } else {
+// 		//     return { success: false, message: "Verification email was not sent" };
+// 		// }
+// 	} catch (error) {
+// 		console.log('Error during registration:', error);
+// 		return { success: false, message: 'An error occurred during registration' };
+// 	}
+// 	if (isRedirect) {
+// 		return redirect(302, '/profile');
+// 	}
+// }
+
+
+export const signUp = async (body, cookies) => {
+	// console.log(body, "bodysignUp");
+	const existingUser = await auth.getKey("email", body.email).catch(() => null);
+	const existingPhoneKey = await auth
+	  .getKey("phone", body.phone)
+	  .catch(() => null);
+  
+	if (existingUser) {
+	  return {
+		success: false,
+		message: "This email already exists. Please login or try with another.",
+	  };
+	}
+  
+	if (existingPhoneKey) {
+	  return {
+		success: false,
+		message: "This phone already exists. Please login or try with another.",
+	  };
+	}
+  
+	const luciaUser = await auth.createUser({
+	  key: {
+		providerId: "email",
+		providerUserId: body.email,
+		password: body.password,
+	  },
+	  attributes: {
+		username: body.username,
+		email: body.email,
+		phone: body.phone,
+	  },
+	});
+  
+	if (!existingPhoneKey) {
+	  await auth.createKey({
+		userId: luciaUser.userId,
+		providerId: "phone",
+		providerUserId: body.phone,
+		password: "Password123",
+	  });
+	}
+	console.log(luciaUser, "luciaUser");
+  
+	const newProfile = new Profile({
+		userId: luciaUser.userId,
+        account: body.account,
+        cellPhone: body.phone,
+        companyname: body.companyname,
+        companytype: body.companytype,
+        jobTitle: body.jobTitle,
+        email: body.email,
+        isPhoneVerified: body.isPhoneVerified,
+        isEmailVerified: body.isEmailVerified,
+        gstNumber: body.gstNumber,
+        tanNumber: body.tanNumber,
+        phone: body.phone,
+        country: body.country,
+        currency: body.currency,
+	});
+  
+	const savedProfile = JSON.parse(JSON.stringify(await newProfile.save()));
+	console.log(savedProfile, "savedProfile");
+  
+	const key = await auth.useKey("phone", body.phone, "Password123");
+	console.log("key.userId",key);
+	
+	const user = await auth.getUser(key.userId);
+	const session = await auth.createSession({
+	  userId: user.userId,
+	  attributes: {},
+	});
+  
+	const sessionCookie = auth.createSessionCookie(session);
+	cookies.set(
+	  sessionCookie.name,
+	  sessionCookie.value,
+	  sessionCookie.attributes
+	);
+	console.log("Session created successfully");
+  
+	return {
+	  success: true,
+	  message: "Signup successful",
+	};
+  };
+
+  export const loginWithLinkedIn = async (userData, cookies) => {
+	console.log(userData, 'linkedinluciauser');
+	try {
+		const existingUser = await auth.getKey('email', userData.email);
+		if (existingUser) {
+			// Log the existing user's details
+			console.log('Existing Lucia user found:', existingUser);
+
+			// Optionally, retrieve the full user profile
+			let existingUserProfile;
+			try {
+				existingUserProfile = await auth.getUser(existingUser.userId);
+				console.log('Existing Lucia user profile:', existingUserProfile);
+			} catch (userProfileError) {
+				console.error("Error retrieving the existing user's profile:", userProfileError);
+				throw new Error('Failed to fetch user profile.');
+			}
+
+			// Step 3: Create a session for the user
+			let session;
+			try {
+				session = await auth.createSession({
+					userId: existingUser.userId, // Use the user ID from the existing Lucia user
+					attributes: {} // Add any additional session attributes if needed
+				});
+				console.log('Session created:', session);
+			} catch (sessionError) {
+				console.error('Error creating session:', sessionError);
+				throw new Error('Failed to create session for the user.');
+			}
+
+			// Step 4: Create and set the session cookie
+			try {
+				if (!cookies || typeof cookies.set !== 'function') {
+					console.error('Cookies object is not defined or invalid.');
+					throw new Error('Cookies object is undefined or does not have a set method.');
+				}
+
+				const sessionCookie = auth.createSessionCookie(session);
+				cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+
+				console.log('Session cookie set:', sessionCookie);
+			} catch (cookieError) {
+				console.error('Error setting session cookie:', cookieError);
+				// throw redirect(302, '/dashboard');
+			}
+		}
+	} catch (error) {
+		console.error('Existing Lucia user not found:', error.code === 'AUTH_INVALID_KEY_ID');
+		console.log('error in new user:', error);
+
+		const luciaUser = await auth.createUser({
+			key: {
+				providerId: 'email',
+				providerUserId: userData.email,
+				password: 'Password123'
+			},
+			attributes: {
+				username: userData.username,
+				email: userData.email,
+				phone: 'N/A'
+			}
+		});
+
+		// Step 3: Add another key for phone-based login
+		await auth.createKey({
+		userId: luciaUser.userId, 
+		providerId: 'phone', 
+		providerUserId: 'N/A', 
+		password: 'Password123', // Use the same password or leave null for OTP-based login
+		});
+		console.log('Lucia user created:', luciaUser);
+
+		const newProfile = new Profile({
+			userId: luciaUser.userId,
+			firstName: userData.firstname,
+			lastName: userData.lastname,
+			email: userData.email,
+			isEmailVerified: userData.isEmailVerified,
+			country: 'N/A',
+			phone:'N/A'
+		});
+		console.log('New Profile:', newProfile);
+
+		const savedProfile = JSON.parse(JSON.stringify(await newProfile.save()));
+		console.log('Saved Profile:', savedProfile);
+
+		const session = await auth.createSession({
+			userId: luciaUser.userId,
+			attributes: {}
+		});
+
+		// Step 4: Create and set the session cookie
+		const sessionCookie = auth.createSessionCookie(session);
+		cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+
+		console.log('Signup successful');
+		// throw redirect(302, '/dashboard');
+	}
+};
+
+const sendVerificationEmail = async (email, verificationUrl) => {
+	const transporter = nodemailer.createTransport({
+		service: 'partskeys',
+		host: MAIL_HOST,
+		port: 587,
+		secure: false,
+		auth: {
+			user: SENDER_EMAIL,
+			pass: SENDER_PASSWORD
+		}
+	});
+
+	const mailOptions = {
+		from: SENDER_EMAIL,
+		to: email,
+		subject: 'Email Verification for Your Account',
+		html: `
+		<html>
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+				<div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+					<h2 style="color: #333333; text-align: center; font-size: 24px;">Verify Your Email Address</h2>
+					<p style="font-size: 16px; color: #555555; line-height: 1.5; text-align: center;">
+						Hi there,<br/><br/>
+						Welcome to ${PUBLIC_WEBSITE_NAME}! Please verify your email address by clicking the button below.
+					</p>
+					<div style="text-align: center;">
+						<a href="${APP_URL}/verify-email?token=${verificationUrl}" style="display: inline-block; background-color: #6c67f4; color: #ffffff; padding: 15px 30px; font-size: 16px; text-decoration: none; border-radius: 5px; text-transform: uppercase; font-weight: bold; margin-top: 20px;">
+							Verify Email
+						</a>
+					</div>
+					<p style="font-size: 14px; color: #777777; text-align: center; margin-top: 30px;">
+						If you didn't sign up for this account, you can ignore this email.
+					</p>
+					<p style="font-size: 14px; color: #777777; text-align: center;">
+						Thanks,<br/>
+						The ${PUBLIC_WEBSITE_NAME} Team
+					</p>
+				</div>
+			</body>
+		</html>
+		`
 	};
 
 	try {
-		const findUser = await Register.findOne({
-			email: data.email,
-			password: data.password
-		});
-		if (findUser !== null) {
-			return { success: false, message: 'User already exist' };
-		}
-
-		const user = await Register.create(data);
-		const profile = await Profile.create({
-			userId: user._id,
-			email: user.email,
-			sitePreferences
-		});
-
-		user.chemiDashProfileId = profile._id;
-		await user.save();
-
-		cookies.set(
-			'token',
-			JSON.stringify({
-				email: user.email,
-				profileId: profile._id,
-				userId: user._id
-			}),
-			{
-				path: '/',
-				httpOnly: true,
-				sameSite: 'strict',
-				maxAge: 60 * 60 * 24 * 1000 // 1 day
-			}
-		);
-		isRedirect = true;
-
-		// if (verificationResult.success) {
-		//     return { success: true, message: "Check your email to verify your email address" };
-		// } else {
-		//     return { success: false, message: "Verification email was not sent" };
-		// }
+		const result = await transporter.sendMail(mailOptions);
+		console.log('Verification email sent: ', result);
+		return true;
 	} catch (error) {
-		console.log('Error during registration:', error);
-		return { success: false, message: 'An error occurred during registration' };
+		console.error('Error sending verification email:', error);
+		return false;
 	}
-	if (isRedirect) {
-		return redirect(302, '/profile');
+};
+
+
+const sendVerificationEmailSignup = async (email, verificationUrl) => {
+	const transporter = nodemailer.createTransport({
+		service: 'partskeys',
+		host: MAIL_HOST,
+		port: 587,
+		secure: false,
+		auth: {
+			user: SENDER_EMAIL,
+			pass: SENDER_PASSWORD
+		}
+	});
+
+	const mailOptions = {
+		from: SENDER_EMAIL,
+		to: email,
+		subject: 'Email Verification for Your Account',
+		html: `
+		<html>
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+				<div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+					<h2 style="color: #333333; text-align: center; font-size: 24px;">Verify Your Email Address</h2>
+					<p style="font-size: 16px; color: #555555; line-height: 1.5; text-align: center;">
+						Hi there,<br/><br/>
+						Welcome to ${PUBLIC_WEBSITE_NAME}! Please verify your email address by using the OTP below.
+					</p>
+					<div style="text-align: center; margin: 20px 0;">
+						<span style="display: inline-block; font-size: 20px; font-weight: bold; color: #333333; padding: 10px 20px; background-color: #f0f0f0; border-radius: 4px;">
+							${verificationUrl}
+						</span>
+					</div>
+					<p style="font-size: 14px; color: #777777; text-align: center; margin-top: 30px;">
+						If you didn't sign up for this account, you can ignore this email.
+					</p>
+					<p style="font-size: 14px; color: #777777; text-align: center;">
+						Thanks,<br/>
+						The ${PUBLIC_WEBSITE_NAME} Team
+					</p>
+				</div>
+			</body>
+		</html>
+		`
+	};
+
+	try {
+		const result = await transporter.sendMail(mailOptions);
+		console.log('Verification email sent: ', result);
+		return true;
+	} catch (error) {
+		console.error('Error sending verification email:', error);
+		return false;
 	}
-}
+};
+
+
+const sendVerificationEmailform = async (email, verificationUrl) => {
+	const transporter = nodemailer.createTransport({
+		service: 'partskeys',
+		host: MAIL_HOST,
+		port: 587,
+		secure: false,
+		auth: {
+			user: SENDER_EMAIL,
+			pass: SENDER_PASSWORD
+		}
+	});
+
+	const mailOptions = {
+		from: SENDER_EMAIL,
+		to: email,
+		subject: 'Email Verification for Your Account',
+		html: `
+		<html>
+			<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+				<div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+					<h2 style="color: #333333; text-align: center; font-size: 24px;">Verify Your Email Address</h2>
+					<p style="font-size: 16px; color: #555555; line-height: 1.5; text-align: center;">
+						Hi there,<br/><br/>
+						Welcome to ${PUBLIC_WEBSITE_NAME}! Please verify your email address by using the OTP below.
+					</p>
+					<div style="text-align: center; margin: 20px 0;">
+						<span style="display: inline-block; font-size: 20px; font-weight: bold; color: #333333; padding: 10px 20px; background-color: #f0f0f0; border-radius: 4px;">
+							${verificationUrl}
+						</span>
+					</div>
+					<p style="font-size: 14px; color: #777777; text-align: center; margin-top: 30px;">
+						If you didn't sign up for this account, you can ignore this email.
+					</p>
+					<p style="font-size: 14px; color: #777777; text-align: center;">
+						Thanks,<br/>
+						The ${PUBLIC_WEBSITE_NAME} Team
+					</p>
+				</div>
+			</body>
+		</html>
+		`
+	};
+
+	try {
+		const result = await transporter.sendMail(mailOptions);
+		console.log('Verification email sent: ', result);
+		return true;
+	} catch (error) {
+		console.error('Error sending verification email:', error);
+		return false;
+	}
+};
+
+export const sendemailOtp = async (email) => {
+	const otp = Math.floor(100000 + Math.random() * 900000).toString();
+	console.log(otp,"OTP");
+	
+    // const token = uuidv4();
+	const expiry = new Date(Date.now() + 5 * 60 * 1000);
+    const existingRecord = await TokenVerification.findOne({ email });
+
+    if (existingRecord) {
+        existingRecord.token = otp;
+        existingRecord.expiry = expiry;
+        await existingRecord.save(); 
+    } else {
+        await TokenVerification.create({
+            email,
+            token: otp,
+            verificationType: 'Non-Registered Users',
+            expiry
+        });
+    }
+
+    const verificationUrl = otp;
+    const emailSent = await sendVerificationEmailform(email, verificationUrl);
+    return emailSent ? verificationUrl : null;
+};
+
+export async function verifyemailOtp(email, enteredOtp) {
+	try {
+	  const tokenVerificationRecord = await TokenVerification.findOne({ email, token: enteredOtp });
+	  console.log(tokenVerificationRecord, "tokenVerificationRecord");
+  
+	  if (!tokenVerificationRecord) {
+		console.log("Invalid OTP or email.");
+		return { success: false, message: "The OTP entered is incorrect or has expired. Please try again." };
+	  }
+  
+	  if (Date.now() >= tokenVerificationRecord.expiry.getTime()) {
+		console.log("Token has expired.");
+		return { success: false, message: "Token has expired. Please verify your email again." };
+	  }
+  
+	  const profileRecord = await Profile.findOne({ email });
+  
+	  if (profileRecord) {
+		if (!profileRecord.isEmailVerified) {
+		  const profileUpdate = await Profile.updateOne(
+			{ email },
+			{ $set: { isEmailVerified: true } }
+		  );
+		  console.log(profileUpdate, "profileUpdate");
+  
+		  if (profileUpdate.matchedCount === 0) {
+			console.log("Failed to update the Profile record.");
+			return { success: false, message: "Failed to update the Profile record." };
+		  }
+  
+		  return { success: true, message: "Email verified successfully in Profile." };
+		} else {
+		  return { success: true, message: "Email is already verified in Profile." };
+		}
+	  } else {
+		const tokenUpdate = await TokenVerification.updateOne(
+		  { email, token: enteredOtp },
+		  { $set: { isEmailVerified: true } }
+		);
+		console.log(tokenUpdate, "tokenUpdate");
+  
+		if (tokenUpdate.matchedCount === 0) {
+		  console.log("Failed to update the TokenVerification record.");
+		  return { success: false, message: "Failed to update the TokenVerification record." };
+		}
+  
+		return { success: true, message: "Email verified successfully" };
+	  }
+	} catch (error) {
+	  console.error("Error verifying OTP:", error);
+	  return { success: false, message: "An unexpected error occurred while verifying the OTP." };
+	}
+};
 
 // profile action functions
 export async function editProfileContact(body) {
@@ -594,15 +1104,16 @@ export const searchByQuery = async (body) => {
 
 export async function submitForm(data) {
 	try {
-		const formData = await data.formData();
-		const formEntries = Object.fromEntries(formData.entries());
-		const response = await CopyConsent.create(formEntries);
-		return { status: 200, body: { success: true, response } };
+
+	  const formEntries = data;  
+	  const response = await CopyConsent.create(formEntries);
+
+	  return { status: 200, success: true };
 	} catch (error) {
-		console.error('Error saving form data:', error);
-		return { status: 500, body: { success: false, error: error.message } };
+	  console.error("Error saving form data:", error);
+	  return { status: 500, body: { success: false, error: error.message } };
 	}
-}
+  }
 
 //CHEMIKART SOLUTIONS
 export const submitContactData = async (data) => {
@@ -618,47 +1129,53 @@ export const submitContactData = async (data) => {
 
 //CHEMIKART QUOTES
 export const Addquotes = async (data) => {
-	const components = JSON.parse(data.components);
-	const formattedData = {
-		Custom_solution_type: data.solutionValue,
-		Custom_format: data.selectedColor,
-		Configure_custom_solution: {
-			components: components,
-			solvent: data.solvent,
-			packagingType: data.packagingType,
-			volume: data.volume,
-			units: data.units,
-			qualityLevel: data.qualityLevel,
-			analyticalTechnique: data.analyticalTechnique
-		},
-		Additional_notes: data.futherdetails,
-		status: data.status,
-		Customer_details: {
-			Title: data.title,
-			Firstname: data.first,
-			Lastname: data.last,
-			organisation: data.organisation,
-			country: data.country,
-			lgc: data.lgc,
-			email: data.email,
-			number: data.number
-		},
-		Delivery_information: {
-			Address1: data.address1,
-			Address2: data.address2,
-			Country1: data.country1,
-			County: data.county,
-			City: data.city,
-			Post: data.post
-		}
-	};
-	const newQuote = new Quotes(formattedData);
-	try {
-		await newQuote.save();
-		return { success: true, message: 'Quote added successfully' };
-	} catch (error) {
-		return { success: false, message: error.message };
-	}
+    const components = JSON.parse(data.components);
+    const formattedData = {
+        Custom_solution_type: data.solutionValue,
+        Custom_format: data.selectedColor,
+        Configure_custom_solution: {
+            components: components,
+            solvent: data.solvent,
+            packagingType: data.packagingType,
+            volume: data.volume,
+            units: data.units,
+            qualityLevel: data.qualityLevel,
+            analyticalTechnique: data.analyticalTechnique
+        },
+        Additional_notes: data.futherdetails,
+        status: data.status,
+        Customer_details: {
+            Title: data.title,
+            Firstname: data.first,
+            Lastname: data.last,
+            organisation: data.organisation,
+            country: data.country,
+            lgc: data.lgc,
+            email: data.email,
+            number: data.number
+        },
+        Delivery_information: {
+            Address1: data.address1,
+            Address2: data.address2,
+            Country1: data.country1,
+            County: data.county,
+            City: data.city,
+            Post: data.post
+        }
+    };
+    const quoteCount = await Quotes.countDocuments();
+    formattedData.quoteId = quoteCount + 1;  
+    const newQuote = new Quotes(formattedData);
+    console.log("mongoactions newQuote",newQuote);
+    try {
+        await newQuote.save();
+
+ 
+
+        return { success: true, message: 'Quote added successfully', quoteId: formattedData.quoteId };
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
 };
 
 //CHEMIKART DOCUMENTS
@@ -829,35 +1346,43 @@ export const emailVerificationToken = async (body, verifyType) => {
 
 export const passwordVerificationToken = async (body, verifyType) => {
 	const { email, userId } = body;
-	//console.log(email);
+	// console.log(body, 'Body from actions');
+	// console.log(email, 'Email received');
+	const user = await User.findOne({ email });
+	if (!user) {
+		return {
+			success: false,
+			message: 'Please provide your registered email address to proceed with resetting your password'
+		};
+	}
+
+	console.log(user, 'User fetched');
 	const token = uuidv4();
-	// Set the expiry time (5 minutes from now)
 	const expiry = new Date(Date.now() + 15 * 60 * 1000);
-	//console.log(token,expiry);
-	// Store the token and expiry in the database
+	console.log(token,expiry);
 	const verification = await TokenVerification.create({
 		email,
 		token,
 		expiry,
-		verificationType: verifyType,
+		verificationType: 'reset',
 		userId
 	});
-	console.log('-------', verification, body);
-	// Send the email with the verification link
+	console.log('-------', verification);
 	const transporter = nodemailer.createTransport({
-		host: MAIL_HOST, // Replace with your email provider's SMTP host
-		port: 587, // Typically 587 for TLS, or 465 for SSL
-		secure: false, // Set true for port 465 (SSL), false for other ports
+		service: 'partskeys', 
+		host: 'mail.partskeys.com',
+		port: 587, 
+		secure: false,
 		auth: {
-			user: SENDER_EMAIL, // Replace with your email address
-			pass: SENDER_PASSWORD // Replace with your email account's password
+			user: SENDER_EMAIL, 
+			pass: SENDER_PASSWORD 
 		}
 	});
-	//console.log('=======',transporter);
+	console.log('=======',transporter);
 	const mailOptions = {
 		from: SENDER_EMAIL,
 		to: email,
-		subject: `Password Reset Request for Your ${WEBSITE_NAME} Account `,
+		subject: `Password Reset Request for Your ${PUBLIC_WEBSITE_NAME} Account `,
 		html: `
 	  <html>
 		<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
@@ -868,7 +1393,7 @@ export const passwordVerificationToken = async (body, verifyType) => {
 			  We received a request to reset your password. To proceed, please click the button below to reset your password.
 			</p>
 			<div style="text-align: center;">
-			  <a href="${APP_URL}/reset-password?token=${token}" style="display: inline-block; background-color: #fe5939; color: #ffffff; padding: 15px 30px; font-size: 16px; text-decoration: none; border-radius: 5px; text-transform: uppercase; font-weight: bold; margin-top: 20px;">
+			  <a href="${APP_URL}/reset-password?token=${token}" style="display: inline-block; background-color: #5d1ffb; color: #ffffff; padding: 15px 30px; font-size: 16px; text-decoration: none; border-radius: 5px; text-transform: uppercase; font-weight: bold; margin-top: 20px;">
 				Reset Password
 			  </a>
 			</div>
@@ -877,49 +1402,144 @@ export const passwordVerificationToken = async (body, verifyType) => {
 			</p>
 			<p style="font-size: 14px; color: #777777; text-align: center;">
 			  Thanks,<br/>
-			  The ${WEBSITE_NAME} Team
+			  The ${PUBLIC_WEBSITE_NAME} Team
 			</p>
 		  </div>
 		</body>
 	  </html>
 	`
 	};
-
-	//console.log("+++++++",mailOptions);
+	console.log("+++++++",mailOptions);
 	try {
 		const res = await transporter.sendMail(mailOptions);
-		//console.log("mail response",res);
+		console.log('mail response', res);
 		return {
 			success: true,
 			message: 'Password verification token is sent to your email. Please verify.'
 		};
 	} catch (err) {
+		// return {
+		// 	success: false,
+		// 	message: 'Something went wrong. try again later:',err
+		// };
 		console.error(err);
 		throw error(500, { message: 'Something went wrong. try again later' });
 	}
 };
 
+
 export const userUpdatePassword = async (body) => {
 	const { userId, email, newPassword } = body;
-	console.log(email, newPassword);
-	//Initialize Lucia with Mongoose adapter
-	// const auth = new Lucia({
-	// 	adapter: 'mongoose',
-	// 	database: '' // MongoDB URL
-	// });
+	console.log(body);
 
 	try {
-		// Update the password using Lucia's built-in method
 		await auth.updateKeyPassword('email', email, newPassword);
 
-		// Optionally, invalidate any existing sessions after password change
-		await auth.invalidateSession(userId); // Optional, for security
+		await auth.invalidateSession(userId);
+
 		console.log('Password updated successfully.');
-		throw redirect(302, '/profile');
+
+		return { success: true, message: 'Password reset successfully.' };
+
+		// throw redirect(302, '/dashboard'); // You can return a redirect message here if needed
 	} catch (error) {
 		console.error('Error updating password:', error);
+
+		if (error instanceof LuciaError) {
+			return { success: false, message: 'Failed to update password: ' + error.message };
+		} else {
+			return { success: false, message: 'An unexpected error occurred.' };
+		}
 	}
 };
+
+
+
+
+
+export const ResetPassword = async (body) => {
+	try {
+	  const { userId, newPassword, token } = body;
+	  console.log("Request body:", body); // Log the incoming body
+  
+	  // Step 1: Verify the token
+	  const tokenRecord = await TokenVerification.findOne({ token });
+	  console.log("Token verification record found:", tokenRecord);
+  
+	  if (!tokenRecord) {
+		console.log("No token record found. Invalid or expired token.");
+		return { success: false, message: 'Invalid or expired token.' };
+	  }
+  
+	  const currentTime = new Date();
+	  console.log("Current time:", currentTime);
+	  console.log("Token expiry time:", tokenRecord.expiry);
+  
+	  // Step 2: Check token expiry
+	  if (currentTime > tokenRecord.expiry) {
+		await TokenVerification.deleteOne({ token });
+		console.log("Token expired, deleted from DB.");
+		return { success: false, message: 'Token has expired' };
+	  }
+  
+	  // Step 3: Check if the token has already been used
+	  if (tokenRecord.used) {
+		console.log("Token already used.");
+		return { success: false, message: 'Token has already been used' };
+	  }
+  
+	  // Step 4: Mark token as used
+	  await TokenVerification.updateOne({ token }, { $set: { used: true } });
+	  console.log("Token marked as used in DB.");
+  
+	  const email = tokenRecord.email;
+	  console.log("Email associated with the token:", email);
+  
+	  // Step 5: Update the password
+	  await auth.updateKeyPassword('email', email, newPassword);
+	  console.log("Password updated for email:", email);
+  
+	  // Step 6: Invalidate the user session
+	  await auth.invalidateSession(userId);
+	  console.log("User session invalidated for userId:", userId);
+  
+	  // Step 7: Delete the token record from DB
+	  await TokenVerification.deleteOne({ token });
+	  console.log("Token deleted from DB after successful password reset.");
+  
+	  return { success: true, message: 'Password reset successfully.' };
+	} catch (error) {
+	  console.log("Error occurred during password reset:", error);
+  
+	  // Handling LuciaError specifically
+	  if (error instanceof LuciaError) {
+		console.log("LuciaError:", error.message);
+		return { success: false, message: 'Failed to update password: ' + error.message };
+	  } else {
+		console.log("Generic error:", error);
+		return { success: false, message: 'Failed to reset the password' };
+	  }
+	}
+  };
+
+  export const generateVerificationUrl = async (email, userId) => {
+	const token = uuidv4();
+
+	await TokenVerification.create({
+		email,
+		token,
+		verificationType: 'email',
+		userId: userId,
+		expiry: new Date(Date.now() + 24 * 60 * 60 * 1000)
+	});
+
+	const verificationUrl = token;
+
+	const emailSent = await sendVerificationEmail(email, verificationUrl);
+
+	return emailSent ? verificationUrl : null;
+};
+
 
 //returns starts
 export const getReturnresultData = async (body) => {
@@ -1017,6 +1637,20 @@ export const getreturnsOrderData = async ({ body }) => {
 export const getcancelreturnData = async ({ id }) => {
 	try {
 		const deletedRecord = await Return.findByIdAndDelete(id);
+		if (!deletedRecord) {
+			return { status: 404, message: 'Return order not found.' };
+		}
+		return { status: 200, message: 'Return order cancelled successfully.' };
+	} catch (error) {
+		console.error('Error deleting return order:', error);
+		return { status: 500, message: 'An error occurred while canceling the return.' };
+	}
+};
+
+export const getcancelreturn = async (id) => {
+	try {
+		const deletedRecord = await Return.deleteOne({ _id: id });
+		// console.log("Delete operation result:", deletedRecord);
 		if (!deletedRecord) {
 			return { status: 404, message: 'Return order not found.' };
 		}
@@ -1164,218 +1798,550 @@ export const handleFileUpload = async (fileData) => {
 };
 
 //Myfavouries actions starts
+// export const deleteFavoriteItem = async (itemId, userId) => {
+// 	try {
+// 		const updatedDoc = await MyFavourites.findOneAndDelete(
+// 			{ userId: userId },
+// 			{ $pull: { favorite: { id: itemId } } },
+// 			{ new: true }
+// 		);
+// 		if (!updatedDoc) {
+// 			throw new Error('User favorites not found');
+// 		}
+// 		return {
+// 			status: 'success',
+// 			message: 'Item deleted successfully',
+// 			favorite: updatedDoc.favorite
+// 		};
+// 	} catch (error) {
+// 		console.error('Error deleting favorite item:', error);
+// 		throw error;
+// 	}
+// };
+
+// export const clearAllFavorites = async (userId) => {
+// 	try {
+// 		const updatedDoc = await MyFavourites.findOneAndDelete(
+// 			{ userId: userId },
+// 			{ $set: { favorite: [] } },
+// 			{ new: true }
+// 		);
+// 		if (!updatedDoc) {
+// 			throw new Error('User favorites not found');
+// 		}
+// 		return {
+// 			status: 'success',
+// 			message: 'All favorite items deleted successfully',
+// 			favorite: []
+// 		};
+// 	} catch (error) {
+// 		console.error('Error deleting all favorite items:', error);
+// 		throw error;
+// 	}
+// };
+
+// export const deleteFavoriteItem = async (itemId, userId) => {
+//     try {
+//         const updatedDoc = await MyFavourites.findOne(
+//             { userId: userId },
+//             { $pull: { favorite: { productId: itemId } } },
+//             { new: true }
+//         );
+        
+//         if (!updatedDoc) {
+//             throw new Error('User favorites not found');
+//         }
+        
+//         return {
+//             status: 'success',
+//             message: 'Item deleted successfully',
+//             favorite: updatedDoc.favorite
+//         };
+//     } catch (error) {
+//         console.error('Error deleting favorite item:', error);
+//         throw error;
+//     }
+// };
 export const deleteFavoriteItem = async (itemId, userId) => {
-	try {
-		const updatedDoc = await MyFavourite.findOneAndDelete(
-			{ userId: userId },
-			{ $pull: { favorite: { id: itemId } } },
-			{ new: true }
-		);
-		if (!updatedDoc) {
-			throw new Error('User favorites not found');
-		}
-		return {
-			status: 'success',
-			message: 'Item deleted successfully',
-			favorite: updatedDoc.favorite
-		};
-	} catch (error) {
-		console.error('Error deleting favorite item:', error);
-		throw error;
-	}
+    try {
+        const existingFavorites = await MyFavourites.findOne({ userId });
+        
+        if (!existingFavorites) {
+            return {
+                status: 'error',
+                message: 'No favorites found for this user'
+            };
+        }
+
+        const updatedDoc = await MyFavourites.findOneAndUpdate(
+            { userId },
+            { $pull: { favorite: { productId: itemId } } },
+            { new: true }
+        );
+        
+        if (!updatedDoc) {
+            return {
+                status: 'error',
+                message: 'Failed to remove item from favorites'
+            };
+        }
+        
+        return {
+            status: 'success',
+            message: 'Item removed successfully',
+            favorite: updatedDoc.favorite
+        };
+    } catch (error) {
+        console.error('Error deleting favorite item:', error);
+        return {
+            status: 'error',
+            message: 'An error occurred while removing the item'
+        };
+    }
 };
 
+
+// export const clearAllFavorites = async (userId) => {
+//     try {
+//         const updatedDoc = await MyFavourites.findOneAndUpdate(
+//             { userId: userId },
+//             { $set: { favorite: [] } },
+//             { new: true }
+//         );
+        
+//         if (!updatedDoc) {
+//             throw new Error('User favorites not found');
+//         }
+        
+//         return {
+//             status: 'success',
+//             message: 'All favorite items deleted successfully',
+//             favorite: []
+//         };
+//     } catch (error) {
+//         console.error('Error deleting all favorite items:', error);
+//         throw error;
+//     }
+// };
+
 export const clearAllFavorites = async (userId) => {
-	try {
-		const updatedDoc = await MyFavourite.findOneAndDelete(
-			{ userId: userId },
-			{ $set: { favorite: [] } },
-			{ new: true }
-		);
-		if (!updatedDoc) {
-			throw new Error('User favorites not found');
-		}
-		return {
-			status: 'success',
-			message: 'All favorite items deleted successfully',
-			favorite: []
-		};
-	} catch (error) {
-		console.error('Error deleting all favorite items:', error);
-		throw error;
-	}
+    try {
+        const existingFavorites = await MyFavourites.findOne({ userId });
+        
+        if (!existingFavorites) {
+            return {
+                status: 'error',
+                message: 'No favorites found for this user'
+            };
+        }
+
+        const updatedDoc = await MyFavourites.findOneAndUpdate(
+            { userId },
+            { $set: { favorite: [] } },
+            { new: true }
+        );
+        
+        if (!updatedDoc) {
+            return {
+                status: 'error',
+                message: 'Failed to clear favorites'
+            };
+        }
+        
+        return {
+            status: 'success',
+            message: 'All favorites cleared successfully',
+            favorite: []
+        };
+    } catch (error) {
+        console.error('Error clearing favorites:', error);
+        return {
+            status: 'error',
+            message: 'An error occurred while clearing favorites'
+        };
+    }
 };
+
+// export const favaddToCart = async (cartData, userId, userEmail) => {
+//     try {
+//         if (!cartData || !userId || !userEmail) {
+//             throw new Error('Missing required data for cart operation');
+//         }
+
+//         const cartItem = {
+//             productId: cartData.productId,
+//             stockId: cartData.stockId,
+//             manufacturerId: cartData.manufacturerId,
+//             distributorId: cartData.distributorId,
+//             quantity: parseInt(cartData.quantity) || 1,
+//             backOrder: 0,
+//             isCart: false, 
+//             isQuote: false,
+//             quoteOfferPrice: {
+//                 INR: 0,
+//                 USD: 0
+//             },
+//             cartOfferPrice: {
+//                 INR: 0,
+//                 USD: 0
+//             }
+//         };
+
+//         let existingCart = await Cart.findOne({
+//             userId: userId,
+//             isActiveCart: true,
+//             isDeleted: false
+//         });
+
+//         if (existingCart) {
+//             const itemIndex = existingCart.cartItems.findIndex(
+//                 item => item.productId.toString() === cartData.productId.toString()
+//             );
+
+//             if (itemIndex > -1) {
+//                 existingCart.cartItems[itemIndex].quantity += parseInt(cartData.quantity) || 1;
+//                 const updatedCart = await existingCart.save();
+//                 return {
+//                     status: 'success',
+//                     message: 'Cart item quantity updated successfully',
+//                     cart: updatedCart
+//                 };
+//             } else {
+//                 existingCart.cartItems.push(cartItem);
+//                 const updatedCart = await existingCart.save();
+//                 return {
+//                     status: 'success',
+//                     message: 'Item added to cart successfully',
+//                     cart: updatedCart
+//                 };
+//             }
+//         } else {
+//             const newCart = await Cart.create({
+//                 cartId: nanoid(8),
+//                 cartName: `mycart`,
+//                 cartItems: [cartItem],
+//                 userId: userId,
+//                 userEmail: userEmail,
+//                 isDeleted: false,
+//                 isActiveCart: true
+//             });
+
+//             return {
+//                 status: 'success',
+//                 message: 'New cart created with item successfully',
+//                 cart: newCart
+//             };
+//         }
+//     } catch (error) {
+//         console.error('Error adding item to cart:', error);
+//         throw new Error(`Failed to add item to cart: ${error.message}`);
+//     }
+// };
+
+export const favaddToCart = async (cartData, userId, userEmail) => {
+    try {
+        if (!cartData || !userId || !userEmail) {
+            return {
+                status: 'error',
+                message: 'Missing required data for cart operation'
+            };
+        }
+
+        const existingCart = await Cart.findOne({
+            userId,
+            isActiveCart: true,
+            isDeleted: false
+        });
+
+        const cartItem = {
+            productId: cartData.productId,
+            stockId: cartData.stockId,
+            manufacturerId: cartData.manufacturerId,
+            distributorId: cartData.distributorId,
+            quantity: parseInt(cartData.quantity) || 1,
+            backOrder: 0,
+            isCart: false,
+            isQuote: false,
+            quoteOfferPrice: { INR: 0, USD: 0 },
+            cartOfferPrice: { INR: 0, USD: 0 }
+        };
+
+        if (existingCart) {
+            const itemIndex = existingCart.cartItems.findIndex(
+                item => item.productId.toString() === cartData.productId.toString()
+            );
+
+            if (itemIndex > -1) {
+                existingCart.cartItems[itemIndex].quantity += parseInt(cartData.quantity) || 1;
+                await existingCart.save();
+                return {
+                    status: 'success',
+                    message: 'Item quantity updated in cart'
+                };
+            } else {
+                existingCart.cartItems.push(cartItem);
+                await existingCart.save();
+                return {
+                    status: 'success',
+                    message: 'Item added to cart'
+                };
+            }
+        } else {
+            await Cart.create({
+                cartId: nanoid(8),
+                cartName: 'mycart',
+                cartItems: [cartItem],
+                userId,
+                userEmail,
+                isDeleted: false,
+                isActiveCart: true
+            });
+
+            return {
+                status: 'success',
+                message: 'Item added to new cart'
+            };
+        }
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        return {
+            status: 'error',
+            message: 'Failed to add item to cart'
+        };
+    }
+};
+
+export const addAllToCart = async (items, userId, userEmail) => {
+    try {
+        const cartItems = items.map(item => ({
+            productId: item.productId,
+            stockId: item.stockId,
+            manufacturerId: item.manufacturerId,
+            distributorId: item.distributorId,
+            quantity: item.quantity,
+            backOrder: 0,
+            isCart: false,
+            isQuote: false,
+            quoteOfferPrice: { INR: 0, USD: 0 },
+            cartOfferPrice: { INR: 0, USD: 0 }
+        }));
+
+        const existingCart = await Cart.findOne({
+            userId: userId,
+            isActiveCart: true,
+            isDeleted: false
+        });
+
+        if (existingCart) {
+            for (const newItem of cartItems) {
+                const existingItemIndex = existingCart.cartItems.findIndex(
+                    item => item.productId.toString() === newItem.productId.toString()
+                );
+
+                if (existingItemIndex > -1) {
+                    existingCart.cartItems[existingItemIndex].quantity += newItem.quantity;
+                } else {
+                    existingCart.cartItems.push(newItem);
+                }
+            }
+
+            const updatedCart = await existingCart.save();
+            return {
+                status: 'success',
+                message: 'All items added to existing cart',
+                cart: updatedCart
+            };
+        } else {
+            const newCart = await Cart.create({
+                cartId: nanoid(8),
+                cartName: `mycart`,
+                cartItems: cartItems,
+                userId: userId,
+                userEmail: userEmail,
+                isDeleted: false,
+                isActiveCart: true
+            });
+
+            return {
+                status: 'success',
+                message: 'New cart created with all items',
+                cart: newCart
+            };
+        }
+    } catch (error) {
+        console.error('Error adding all items to cart:', error);
+        throw error;
+    }
+};
+
 //Myfavouries actions ends
 
 export const quicksearch = async ({ query }) => {
 	try {
-   
-	  const queryFilter = { productNumber: { $regex: query, $options: 'i' } };
-	  const products = await Product.find(queryFilter)
-		.select('productName productNumber prodDesc _id imageSrc')
-		.limit(20)
-		.exec();
-  
-	  const enrichedProducts = [];
-	  for (let product of products) {
-		const stockInfo = await Stock.findOne({ productNumber: product.productNumber }).select('stock pricing');
-		const convertedPricing = await convertToINR(stockInfo?.pricing || []);
-  
-		
-  
-		const enrichedProduct = {
-		  id: product._id.toString(),
-		  image: product.imageSrc,
-		  description: product.prodDesc,
-		  productName: product.productName,
-		  productNumber: product.productNumber,
-		  stock: stockInfo?.stock || 0,
-		  pricing: convertedPricing,
-		};
-  
-		enrichedProducts.push(enrichedProduct);
-	  }
-	//   console.log(enrichedProducts);
-	  
-  
-	  return enrichedProducts;
+		//   console.log('Received query:', query);
+
+		const queryFilter = { productNumber: { $regex: query, $options: 'i' } };
+
+		const products = await Product.find(queryFilter)
+			.select('productName productNumber prodDesc imageSrc ')
+			.limit(20)
+			.exec();
+
+		const enrichedProducts = [];
+
+		for (let product of products) {
+			const stockInfos = await Stock.find({ productNumber: product.productNumber }).select('id stock pricing distributor manufacturer');
+			console.log(stockInfos, "asadsdsfsdfxdrdr********************8");
+
+			let convertedPricing = [];
+			for (let stockInfo of stockInfos) {
+				const { pricing = [], distributor, manufacturer } = stockInfo || []; // Extract distributor and manufacturer
+
+				if (pricing && pricing[0] && pricing[0].INR) {
+					convertedPricing = convertedPricing.concat(pricing);
+				} else {
+					const converted = await convertToINR([pricing] || []);
+					convertedPricing = convertedPricing.concat(converted);
+				}
+
+				// Ensure you are accessing 'distributor' and 'manufacturer' correctly
+				console.log('Distributor:', distributor);
+				console.log('Manufacturer:', manufacturer);
+			}
+
+			const enrichedProduct = {
+				id: product._id.toString(),
+				image: product.imageSrc,
+				description: product.prodDesc,
+				productName: product.productName,
+				productNumber: product.productNumber,
+				stockId: stockInfos[0]?.id.toString() || null,
+
+				manufacturer: stockInfos[0]?.manufacturer.toString() || null,
+				distributer: stockInfos[0]?.distributor.toString() || null,
+
+				stock: stockInfos.reduce((total, stockInfo) => total + (stockInfo.stock || 0), 0),
+				pricing: convertedPricing,
+			};
+
+			// console.log('Enriched product:', enrichedProduct);
+
+			enrichedProducts.push(enrichedProduct);
+		}
+
+		return enrichedProducts;
 	} catch (error) {
-	  // console.error('An error occurred while processing the quicksearch:', error);
-	  throw new Error('An error occurred while processing the quicksearch.');
+		console.error('Error during quicksearch function call:', error);
+		throw new Error('An error occurred while processing the quicksearch.');
 	}
-  };
+};
 
 
 
 
-  export const uploadFile = async ({ query }) => {
-	// console.log("Received queries:", query);
-  
+export const uploadFile = async ({ query }) => {
 	const validQueries = query.filter(([productNumberAndSize, quantity]) =>
-	  productNumberAndSize?.trim() && quantity?.trim()
+		productNumberAndSize?.trim() && String(quantity)?.trim()
 	);
-  
+	console.log(validQueries, "validone");
+
 	if (validQueries.length === 0) {
-	  return validQueries.map(() => ({
-		productNumber: "Unknown",
-		isValid: false,
-		message: "Product number is invalid",
-	  }));
-	}
-  
-	const queryFilter = {
-	  productNumber: { $in: validQueries.map(([productNumberAndSize]) => new RegExp(productNumberAndSize.split('-')[0], "i")) },
-	};
-  
-	try {
-	  const products = await Product.find(queryFilter).exec();
-	  const results = [];
-  
-	  for (const [productNumberAndSize, quantity] of validQueries) {
-		const [productNumber, size] = productNumberAndSize.split('-');
-		const product = products.find(
-		  (p) => p.productNumber.toLowerCase() === productNumber.toLowerCase()
-		);
-  
-		if (product) {
-		//   console.log("Searching for stock for product number:", product.productNumber); 
-  
-		  const stockInfo = await Stock.findOne({
-			productNumber: product.productNumber,
-		  }).select("stock pricing");
-  
-		//   console.log("Found stock info:", stockInfo); // Log the found stock info
-  
-		  if (!stockInfo) {
-			results.push({
-			  productNumber,
-			  isValid: false,
-			  message: "Stock information missing",
-			});
-			continue;
-		  }
-  
-		  let stockMessage = "";
-		  let availableStock = Number(stockInfo.stock) || 0; 
-		  let sizeFound = false;
-		  const normalizedSize = size.replace(/\s+/g, '').toUpperCase();
-  
-
-		  const convertedPricing = await convertToINR(stockInfo.pricing || []);
-		  const validSizePrice = convertedPricing.find(item => 
-			item.break.replace(/\s+/g, '').toUpperCase() === normalizedSize
-		  );
-  
-		  if (!validSizePrice) {
-			results.push({
-			  productNumber,
-			  isValid: false,
-			  message: `Size ${size} is invalid or not available for product ${productNumber}`,
-			});
-			continue;
-		  }
-
-		  const uploadedQuantity = parseInt(quantity);  // Directly use quantity from query
-		//   console.log("Uploaded Quantity for", productNumberAndSize, ":", uploadedQuantity); // Debugging uploaded quantity
-  
-		 
-		//   console.log(`Comparing uploadedQuantity (${uploadedQuantity}) with availableStock (${availableStock}) for product ${productNumber}`);
-  
-		  if (uploadedQuantity > availableStock) {
-			stockMessage = `Only ${availableStock} units are available for product ${productNumber}. Uploaded quantity: ${uploadedQuantity}`;
-			results.push({
-			  productNumber,
-			  isValid: false,
-			  message: stockMessage,  
-			});
-			continue;
-		  } else if (availableStock === 0) {
-			stockMessage = `No stock available for product ${productNumber}. Available stock: ${availableStock}`;
-			results.push({
-			  productNumber,
-			  isValid: false,
-			  message: stockMessage,  
-			});
-			continue;
-		  } else {
-			stockMessage = `Stock is sufficient for product ${productNumber}. Uploaded quantity: ${uploadedQuantity}, Available stock: ${availableStock}`;
-		  }
-
-		  results.push({
-			id: product._id.toString(),
-			image: product.imageSrc || "No image available",
-			description: product.prodDesc || "No description available",
-			productName: product.productName || "No product name available",
-			productNumber,
-			isValid: true,
-			message: "Product number is valid",
-			stock: availableStock,
-			pricing: [{
-			  break: validSizePrice.break,
-			  price: validSizePrice.INR || "N/A",  
-			}],
-			stockMessage: stockMessage, 
-		  });
-		} else {
-		  results.push({
-			productNumber,
+		return validQueries.map(() => ({
+			productNumber: "Unknown",
 			isValid: false,
 			message: "Product number is invalid",
-		  });
-		}
-	  }
-  
-	//   console.log("Final Results:", results); 
-	  return results;
-	} catch (error) {
-	//   console.error("Error fetching products or stock/pricing:", error);
-	  return query.map(() => ({
-		productNumber: "Unknown",
-		isValid: false,
-		message: "Error processing the product",
-	  }));
+		}));
 	}
-  };
+
+	const results = [];
+
+	for (const [productNumberAndSize, quantity] of validQueries) {
+		const parts = productNumberAndSize.split('-');
+		const productNumber = parts.slice(0, parts.length - 1).join('-');
+		const size = parts[parts.length - 1];
+
+		const product = await Product.findOne({ productNumber }).exec();
+
+		if (product) {
+			const stockInfo = await Stock.find({ productNumber: product.productNumber }).select('id stock pricing distributor manufacturer');
+			console.log(stockInfo, "asadsdsfsdfxdrdr********************8");
+
+			let convertedPricing = [];
+			for (let stock of stockInfo) {
+				const { pricing = [], distributor, manufacturer } = stock || [];
+
+				if (pricing && pricing[0] && pricing[0].INR) {
+					convertedPricing = convertedPricing.concat(pricing);
+				} else {
+					const converted = await convertToINR([pricing] || []);
+					convertedPricing = convertedPricing.concat(converted);
+				}
+
+				console.log('Distributor:', distributor);
+				console.log('Manufacturer:', manufacturer);
+			}
+
+			if (stockInfo.length === 0) {
+				results.push({
+					productNumber,
+					quantity: parseInt(quantity), // Add quantity to invalid result
+					isValid: false,
+					message: "Stock information missing",
+				});
+				continue;
+			}
+
+			const normalizedSize = size.replace(/\s+/g, '').toUpperCase();
+			const validSizePrice = convertedPricing.find(item =>
+				item.break.replace(/\s+/g, '').toUpperCase() === normalizedSize
+			);
+
+			if (!validSizePrice) {
+				console.log(`Size ${size} is invalid or not available for product ${productNumber}`);
+				results.push({
+					productNumber,
+					quantity: parseInt(quantity), // Add quantity to invalid size result
+					isValid: false,
+					message: `Size ${size} is invalid or not available for product ${productNumber}`,
+				});
+				continue;
+			}
+
+			let availableStock = Number(stockInfo[0]?.stock) || 0;
+
+			// Return valid product with quantity included
+			results.push({
+				id: product._id.toString(),
+				image: product.imageSrc || "No image available",
+				description: product.prodDesc || "No description available",
+				productName: product.productName || "No product name available",
+				productNumber,
+				quantity: parseInt(quantity), // Add quantity to valid result
+				stockId: stockInfo[0]?.id.toString() || null,
+				stock: availableStock,
+				manufacturer: stockInfo[0]?.manufacturer?.toString() || null,
+				distributer: stockInfo[0]?.distributor?.toString() || null,
+				isValid: true,
+				message: "Product number and size are valid",
+				pricing: [{
+					break: validSizePrice.break,
+					price: validSizePrice.INR || "N/A",
+				}],
+			});
+		} else {
+			results.push({
+				productNumber: productNumberAndSize,
+				quantity: parseInt(quantity), // Add quantity to not found result
+				isValid: false,
+				message: "Product number is invalid",
+			});
+		}
+	}
+	console.log(results, "results");
+
+
+	return results;
+};
 
 export const CreateProductQuote = async (formattedData) => {
 	const newQuote = new Quotes(formattedData);
@@ -1638,3 +2604,256 @@ export const deleteRecurrence = async(body)=>{
 	console.log(deleteRecurrence,"fff");   
 	return { success: true, msg: `Recurrence deleted successfully` };
 }
+
+export const addToCartquick = async (item, userId, userEmail) => {
+	try {
+		console.log('Attempting to add item to cart:', { item, userId, userEmail });
+
+		// Search for an active cart associated with the user
+		const search = await Cart.findOne({ userId, userEmail, isActiveCart: true }).lean();
+		console.log('Cart search result:', search);
+
+		let cart;
+
+		// If no active cart is found, create a new cart
+		if (search === null) {
+			console.log('No active cart found. Creating a new cart...');
+			cart = await Cart.create({ cartId: nanoid(8), cartName: "mycart", cartItems: [item], userId, userEmail, isActiveCart: true });
+			console.log('New cart created:', cart);
+			return { success: true, message: "Product is added to cart" };
+		} else {
+			// If an active cart is found, check for the item's productId
+			if (!item.productId) {
+				console.error('Item does not have a valid productId:', item);
+				return { success: false, message: 'Invalid productId' };
+			}
+
+			// Check if the item already exists in the cart
+			const findItem = search.cartItems.find(x => x.productId && x.productId.toString() === item.productId.toString());
+			console.log('findItem:', findItem);
+
+			// If the item isn't found, add it to the cart
+			if (findItem === undefined) {
+				console.log('Item not found in cart. Adding new item...');
+				cart = await Cart.findOneAndUpdate(
+					{ userId, userEmail, isActiveCart: true },
+					{ $push: { cartItems: item } },
+					{ new: true }
+				);
+				console.log('Cart after adding item:', cart);
+				return { success: true, message: "Product is added to cart" };
+			} else {
+				// If the item is found, update the quantity
+				console.log('Item found in cart. Updating quantity...');
+				cart = await Cart.findOneAndUpdate(
+					{ userId, userEmail, isActiveCart: true },
+					{ $set: { 'cartItems.$[elem]': item } },
+					{
+						arrayFilters: [{ 'elem.productId': item.productId }],
+						new: true
+					}
+				);
+				console.log('Cart after updating item:', cart);
+				return { success: true, message: "Product quantity is updated in cart" };
+			}
+		}
+	} catch (err) {
+		console.error('Error adding to cart:', err);
+		return { success: false, message: 'Failed to add product to cart' };
+	}
+};
+
+export const resumeCart = async (cartId, userId) => {
+	if (!cartId || !userId) {
+		throw new Error('Cart ID and User ID are required');
+	}
+	try {
+		const result = await Cart.findOneAndUpdate(
+			{ _id: cartId, userId: userId },
+			{
+				$set: {
+					isActiveCart: true,
+					updatedAt: new Date()
+				}
+			},
+			{ new: true }
+		).lean();
+
+		if (!result) {
+			throw new Error('Cart not found or unauthorized');
+		}
+
+		await Cart.updateMany(
+			{ userId: userId, _id: { $ne: cartId } },
+			{ $set: { isActiveCart: false } }
+		);
+
+		return { status: 200, result };
+	} catch (error) {
+		console.error('Error resuming cart:', error);
+		throw error;
+	}
+};
+
+export const updateCart = async (cartId) => {
+	try {
+		const result = await Cart.findByIdAndUpdate(
+			cartId,
+			{
+				$set: {
+					isDeleted: true,
+					isActiveCart: false,
+					updatedAt: new Date()
+				}
+			},
+			{ new: true }
+		);
+
+		if (!result) {
+			throw new Error('Cart not found');
+		}
+
+		return result;
+	} catch (error) {
+		console.error('Error updating cart status:', error);
+		throw error;
+	}
+};
+
+export const updateCartName = async (cartId, cartName) => {
+	try {
+	  const result = await Cart.findByIdAndUpdate(
+		cartId,
+		{
+		  $set: {
+			cartName: cartName,
+			updatedAt: new Date()
+		  }
+		},
+		{ new: true }
+	  );
+	   
+	  if (!result) {
+		throw new Error('Cart not found');
+	  }
+  
+	  return result;
+	} catch (error) {
+	  console.error('Error updating cart name:', error);
+	  throw error;
+	}
+};
+export const createNewCart = async (body) => {
+    try {
+        const { userId, userEmail, customCartName } = body;
+
+        if (!userId || !userEmail) {
+            return { 
+                success: false, 
+                error: 'Missing required fields: userId or userEmail.' 
+            };
+        }
+
+        const updateResult = await Cart.updateMany(
+            { userId, isActiveCart: true }, 
+            { $set: { isActiveCart: false } }
+        );
+        // console.log(`Deactivated ${updateResult.modifiedCount} cart(s)`);
+
+        const cartId = nanoid(8);
+
+        const cartName = customCartName && customCartName.length > 0 
+		? customCartName 
+		: `MyCart`;
+
+        const newCart = await Cart.create({
+            userId,
+            userEmail,
+            cartId,
+            cartName,
+            isActiveCart: true
+        });
+
+        return { 
+            success: true, 
+            cartId: newCart.cartId, 
+            message: 'Cart created successfully.' 
+        };
+    } catch (err) {
+        console.error('Error creating new cart:', err);
+        return { 
+            success: false, 
+            error: 'Failed to create new cart. Please try again later.' 
+        };
+    }
+};
+
+export const updateRecurrence = async (body) => {
+	const { cartId, recurring } = body;
+
+	const calculateNextRecurringDate = (recurringType) => {
+		const today = new Date();
+		const type = recurringType.toLowerCase();
+
+		switch (type) {
+			case 'monthly':
+				return new Date(today.setMonth(today.getMonth() + 1));
+			case 'quarterly':
+				return new Date(today.setMonth(today.getMonth() + 3));
+			case 'semi annual':
+				return new Date(today.setMonth(today.getMonth() + 6));
+			case 'annual':
+				return new Date(today.setFullYear(today.getFullYear() + 1));
+			default:
+				if (recurringType.includes('Months')) {
+					const months = parseInt(recurringType.split(' ')[0]);
+					return new Date(today.setMonth(today.getMonth() + (months || 1)));
+				}
+				return new Date(today.setMonth(today.getMonth() + 1));
+		}
+	};
+
+	try {
+		const existingCart = await Cart.findOne({ _id: cartId });
+
+		if (!existingCart) {
+			return {
+				success: false,
+				msg: 'Cart not found'
+			};
+		}
+
+		const recurringDate = calculateNextRecurringDate(recurring);
+
+		const recurrenceData = {
+			recurring: recurring,
+			recurringDate: recurringDate,
+			addedDate: new Date()
+		};
+
+		const updatedCart = await Cart.findOneAndUpdate(
+			{ _id: cartId },
+			{ $set: { recurrence: recurrenceData } },
+			{ new: true }
+		);
+
+		if (!updatedCart) {
+			return {
+				success: false,
+				msg: 'Failed to update recurrence'
+			};
+		}
+		const action = existingCart.recurrence ? 'updated' : 'added';
+		return {
+			success: true,
+			msg: `Recurrence ${action} successfully`,
+			data: updatedCart.recurrence
+		};
+	} catch (error) {
+		console.error('Error in addRecurrence:', error);
+		return {
+			success: false,
+			msg: 'An error occurred while processing recurrence'
+		};
+	}
+};

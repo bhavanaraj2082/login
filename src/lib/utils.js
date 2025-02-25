@@ -35,4 +35,4 @@ export function generateInvoiceNumber() {
     const randomComponent = Math.floor(Math.random() * 100);
     const invoiceNumber = `${todayDate}${currentTime.toString().slice(-4)}-${String(randomComponent).padStart(2, '0')}`;
     return invoiceNumber;
-  }
+}

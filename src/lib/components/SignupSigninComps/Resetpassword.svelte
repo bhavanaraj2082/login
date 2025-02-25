@@ -1,184 +1,376 @@
 <script>
-	import { goto } from '$app/navigation';
-	import { authedUser } from '$lib/stores/mainStores.js';
+	import { createEventDispatcher } from 'svelte';
 	import { enhance, applyAction } from '$app/forms';
+	// import PageNtFnd from './PageNtFnd.svelte';
+	import { authedUser } from '$lib/stores/mainStores.js';
 	import { toast } from 'svelte-sonner';
-	export let data;
-	const token = data?.token;
+	import { Toaster } from 'svelte-sonner';
+	export let token = '';
+	let message = '';
+	let flag = false;
+	const dispatch = createEventDispatcher();
+	import Icon from '@iconify/svelte';
+	import { goto } from '$app/navigation';
+	// $: console.log($authedUser.userId, "authedUser.userId");	
+	// export let data;
+	// const token = data.token;
 
-	let email = '';
-	let password = '';
-	let passwordConfirm = '';
-	let emailError = '';
-	$: stepTwo = data?.success === null ? null : data?.message;
-	let responseMsg = null;
-	let errors = {};
+	// async function handleSubmit(event) {
+	// 	event.preventDefault();
 
-	// console.log('-----responseMsg----', responseMsg, stepTwo);
+	// 	console.log('Submitting:', { token, newPassword, confirmPassword });
 
-	const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%_\-*])[A-Za-z\d!@#$%_\-*]{8,}$/;
+	// 	if (newPassword !== confirmPassword) {
+	// 		message = 'Passwords do not match.';
+	// 		return;
+	// 	}
 
-	const validatePassword = () => {
-		errors = {};
-		if (!password) errors.password = 'Password is required.';
-		if (!passwordRegex.test(password))
-			errors.password =
-				'Password must contain at least 8 characters, one number, and one special character.';
-		if (!passwordConfirm) errors.passwordConfirm = 'Please confirm your password.';
-		if (passwordConfirm !== password) errors.passwordConfirm = 'Passwords do not match.';
-		if (Object.keys(errors).length > 0) {
+	// 	// Change the URL to your actual server endpoint
+	// 	const response = await fetch('https://betapb.partskeys.com/resetpassword', {
+	// 		method: 'POST',
+	// 		headers: { 'Content-Type': 'application/json' },
+	// 		body: JSON.stringify({ token, newPassword, confirmPassword })
+	// 	});
+
+	// 	console.log(response);
+
+	// 	if (response.ok) {
+	// 		message = 'Password reset succesfully';
+	// 		flag = true;
+	// 		dispatch('resetSuccess', { message });
+	// 	} else {
+	// 		const error = await response.json();
+	// 		message = `Error: ${error.message}`;
+	// 	}
+	// }
+
+	$: successMessage = '';
+	$: errorMessage = '';
+
+	let hide = true;
+
+	let error = {};
+	let newPassword = '';
+	let confirmPassword = '';
+	const validation = () => {
+		error = {};
+		if (!newPassword) {
+			error.password =
+				'*Required';
+		} else if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(newPassword)){
+			error.password =
+				'Password must be at least 8 characters with an uppercase letter, a lowercase letter, a digit, and a special symbol';
+		}
+
+		if (!confirmPassword ){
+			error.passwordConfirm = '*Required';
+		}else if(confirmPassword !== newPassword){
+			error.passwordConfirm = 'Current password does not match the entered password';
+		}
+
+		if (Object.keys(error).length > 0) {
 			return false;
 		} else {
 			return true;
 		}
 	};
-
-	function validateEmail(email) {
-		const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		return emailPattern.test(email);
-	}
-
-	function handleSubmit({ cancel, action }) {
-		const url = new URL(action);
-		const actionName = url.search.replace('?/', '');
-		if (actionName === 'updatePassword') {
-			if (!validatePassword()) {
-				console.log('object');
-				cancel();
-			}
-		} else {
-			if (!email || !validateEmail(email)) {
-				emailError = 'Please enter a valid email address.';
-				cancel();
-			} else {
-				emailError = '';
-			}
-		}
-
-		return async ({ result }) => {
-			console.log(result);
-			
-			if(result.type === "success"){
-				toast.success(result.success.message)
-				}else{
-				toast.error(result.error.message)
-			}
-
-			if (result.type === 'success') {
-				if (result.data.success) responseMsg = result.data;
-			}
-			if (result.type === 'redirect') {
-				await applyAction(result);
-			}
-		};
-	}
+	let showNewPassword = false;
+  let showConfirmPassword = false;
+  
+  function toggleNewPasswordVisibility() {
+    showNewPassword = !showNewPassword;
+  }
+  
+  function toggleConfirmPasswordVisibility() {
+    showConfirmPassword = !showConfirmPassword;
+  }
 </script>
 
-<div class="bg-white mx-auto flex items-center justify-center py-10">
-	<div class="flex w-11/12 sm:w-2/3 md:w-2/4 lg:h-2/5 justify-center space-x-10">
-		<!-- Step 1: Forgot Password Form -->
-		<div class="bg-white p-8 shadow-lg rounded-lg border border-gray-200 space-y-3">
-			<h2 class=" text-lg md:text-2xl font-bold text-center">Reset Password</h2>
-			<div class="flex justify-center">
-				<div class="w-2/5 flex items-center">
-					<div
-						class="h-7 w-7 px-3 bg-primary-400 text-white text-xs rounded-full flex justify-center items-center"
-					>
-						1
-					</div>
-					{#if stepTwo !== null}
-						<div class="w-full h-1 bg-primary-400"></div>
-						<div
-							class="h-7 w-7 px-3 text-xs bg-primary-400 text-white font-medium rounded-full flex justify-center items-center"
-						>
-							2
-						</div>
-					{:else}
-						<div class="w-full h-1 bg-gray-200"></div>
-						<div
-							class="h-7 w-7 px-3 text-xs bg-gray-200 text-black font-medium rounded-full flex justify-center items-center"
-						>
-							2
-						</div>
-					{/if}
+{#if token}
+	<div
+		class="max-w-80 sm:max-w-xs md:max-w-sm lg:max-w-sm border-2 rounded-md shadow-lg bg-white mx-auto mt-10"
+	>
+		<h1 class="text-center text-xl lg:text-2xl text-white bg-primary-300 py-2 rounded-t-sm">
+			Password Reset
+		</h1>
+		<div class="px-10 py-6">
+			<div class="flex items-center justify-center">
+				<p class="text-black text-sm font-bold">Recover</p>
+			</div>
+			<div class="flex items-center justify-center py-5 text-gray-400">
+				<div class="flex flex-row items-center justify-center">
+					<Icon icon={'ep:success-filled'} class=" text-primary-600 text-3xl" />
+					<hr class="bg-primary-600 text-3xl lg:w-16 md:w-24 w-5 xs:w-5 h-1 rounded" />
+				</div>
+
+				<div class="flex flex-row">
+					<Icon icon={'ep:success-filled'} class="  text-primary-600 text-3xl " />
+					<hr
+						class={`${flag ? 'bg-primary-600 mt-3.5' : 'mt-3.5'} lg:w-14 md:w-24 w-5 xs:w-5 h-1 bg-primary-200 rounded text-lg`}
+					/>
+				</div>
+
+				<div class=" flex flex-row">
+					<Icon
+						icon={flag ? 'ep:success-filled' : 'bi:3-circle'}
+						class={` ${flag ? ' text-primary-600 text-3xl' : ''} text-2xl`}
+					/>
 				</div>
 			</div>
-			<h3 class="text-center text-gray-600 font-semibold">Step {!stepTwo ? 1 : 2}</h3>
-			{#if !stepTwo}
-				{#if responseMsg === null}
-					<p class="text-gray-500 text-sm text-left font-semibold">Forgot Password?</p>
-					<p class="text-gray-500 text-sm text-left">
-						Enter your email to receive a link to reset your password
-					</p>
-					<form method="POST" action="?/resetpassword" use:enhance={handleSubmit}>
-						<input type="hidden" name="userId" value={$authedUser.userId} />
-						<input
-							class="border-1 border-gray-200 p-2 w-full text-sm rounded mb-2 focus:ring-0 focus:border-primary-400"
-							name="email"
-							type="text"
-							placeholder="example@gmail.com"
-							bind:value={email}
-						/>
-						<p class=" text-xs md:text-sm text-red-500">{emailError}</p>
-						<button
-							type="submit"
-							class="w-full bg-primary-400 text-white py-2 mt-2 font-medium rounded hover:bg-primary-500 transition-colors"
-							>Submit</button
-						>
-					</form>
-				{:else}
-					<p
-						class="text-sm md:text-4s font-medium {responseMsg.success
-							? ' text-green-500'
-							: ' text-red-500'}"
-					>
-						{responseMsg.message}
-					</p>
-				{/if}
-			{:else if data?.success === true}
-				<form
-					method="POST"
-					action="?/updatePassword"
-					use:enhance={handleSubmit}
-					class=" w-72 md:w-96"
-				>
-					<p class=" text-center text-sm font-medium my-1 text-green-500">{data?.message || ''}</p>
-					<input type="hidden" name="userId" value={$authedUser.userId} />
-					<input type="hidden" name="email" value={token?.email} />
-					<label for="password" class=" text-xs font-medium md:text-sm">New Password</label>
-					<input
-						type="text"
-						bind:value={password}
-						class="border-1 border-gray-200 p-2 w-full text-sm rounded mb-2 focus:ring-0 focus:border-primary-400"
-					/>
-					<p class=" text-xs md:text-sm text-red-500">{errors?.password || ''}</p>
-					<label for="password" class=" text-xs font-medium md:text-sm">Confirm Password</label>
-					<input
-						type="text"
-						name="newPassword"
-						bind:value={passwordConfirm}
-						class="border-1 border-gray-200 p-2 w-full text-sm rounded mb-2 focus:ring-0 focus:border-primary-400"
-					/>
-					<p class=" text-xs md:text-sm text-red-500">{errors?.passwordConfirm || ''}</p>
-					<button
-						type="submit"
-						class="w-full bg-primary-400 text-white py-2 mt-2 font-medium rounded hover:bg-primary-400 transition-colors"
-						>Submit</button
-					>
-				</form>
-			{:else}
-				<div class="w-72 md:w-96 flex items-center justify-center">
-					<div>
-						<p class=" text-center text-sm font-medium my-1 text-red-500">{data?.message || ''}</p>
-						<button
-							type="button"
-							on:click={() => goto('/reset-password')}
-							class="w-full bg-primary-400 text-white py-2 mt-2 font-medium rounded hover:bg-primary-400 transition-colors"
-							>OK</button
-						>
-					</div>
+			{#if successMessage}
+				<div class="mt-4 p-4 bg-green-100 text-xs text-green-800 rounded-md">
+					{successMessage}
 				</div>
 			{/if}
+
+			{#if errorMessage}
+				<div class="mt-4 p-4 bg-red-100 text-xs text-red-800 rounded-md">
+					{errorMessage}
+				</div>
+			{/if}
+			<!-- <form
+				action="?/updatePassword"
+				method="POST"
+				use:enhance={({ cancel }) => {
+					if (!validation()) {
+						// errorMessage = Object.values(error).join(' , ');
+						successMessage = '';
+						cancel();
+						return;
+					}
+
+					return async ({ result }) => {
+						console.log('result', result);
+						if (result.data.success === true) {
+							// successMessage = result.data.message;
+							toast.success(result.data.message);
+							errorMessage = '';
+							flag = true;
+							hide = false;
+							setTimeout(() => {
+								goto('/login');
+							}, 3000);
+						}
+						if (result.data.success === false) {
+							successMessage = '';
+							// errorMessage = result.data.message;
+							toast.error(result.data.message);
+						}
+						await applyAction(result);
+					};
+				}}
+			>
+				{#if hide}
+					<label class="block mb-4">
+						<input
+							name="newPassword"
+							type="password"
+							bind:value={newPassword}
+							placeholder="Enter new password"
+							class="mt-1 block w-full border border-gray-300 rounded-md p-1.5 focus:ring-0 focus:border-black text-xs"
+							on:input={() => {
+								error.password = !newPassword 
+								? '*Required'
+								:!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(newPassword)
+								? 'Password must be at least 8 characters with an uppercase letter, a lowercase letter, a digit, and a special symbol'
+								: '';
+							}}
+						/>
+						{#if error.password}
+						<p class="text-red-500 text-xs">{error.password}</p>
+						{/if}
+					</label>
+					<label class="block mb-4">
+						<input
+							name="confirmPassword"
+							type="password"
+							bind:value={confirmPassword}
+							placeholder="Confirm new password"
+							class="mt-1 block w-full border border-gray-300 rounded-md p-1.5 focus:ring-0 focus:border-black text-xs"
+							on:input={() => {
+								error.passwordConfirm = !confirmPassword 
+								? '*Required'
+								:confirmPassword !== newPassword
+								? 'Current password does not match the entered password'
+								: '';
+							}}
+						/>
+						{#if error.passwordConfirm}
+						<p class="text-red-500 text-xs">{error.passwordConfirm}</p>
+						{/if}
+					</label>
+					<input type="hidden" name="token" value={token} />
+					<input type="hidden" name="userId" value={$authedUser.id} />
+					<input type="hidden" name="email" value={$authedUser.email} />
+					<button
+						type="submit"
+						class="w-1/3 bg-primary-600 text-white rounded-md p-2 hover:bg-primary-800 transition text-xs"
+					>
+						Reset
+					</button>
+				{/if}
+				{#if message}
+					{#if message === 'Password reset succesfully'}
+						<p class="py-2 text-xs text-center bg-green-300">{message}</p>
+					{:else}
+						<br />
+						<Icon icon={'typcn:warning'} class=" w-5 h-5 text-red-500 inline pr-1" />
+						<p class=" text-black text-xs py-0.5 inline">{message}</p>
+					{/if}
+				{/if}
+			</form> -->
+		
+				
+			<form
+			action="?/updatePassword"
+			method="POST"
+			use:enhance={({ cancel }) => {
+			  if (!validation()) {
+				successMessage = '';
+				cancel();
+				return;
+			  }
+		  
+			  return async ({ result }) => {
+				// console.log('result', result);
+				if (result.data.success === true) {
+				  toast.success(result.data.message);
+				  errorMessage = '';
+				  flag = true;
+				  hide = false;
+				  setTimeout(() => {
+					goto('/login');
+				  }, 3000);
+				}
+				if (result.data.success === false) {
+				  successMessage = '';
+				  toast.error(result.data.message);
+				}
+				await applyAction(result);
+			  };
+			}}
+		  >
+			{#if hide}
+			  <div class="mb-4">
+				<div class="relative">
+				  {#if showNewPassword}
+					<input
+					  type="text"
+					  name="newPassword"
+					  placeholder="Enter new password"
+					  class="w-full px-4 py-2 pr-10 border border-gray-300 text-xs sm:text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-violet-500"
+					  bind:value={newPassword}
+					  on:input={() => {
+						error.password = !newPassword ? '*Required' : !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(newPassword) ? 'Password must be at least 8 characters with an uppercase letter, a lowercase letter, a digit, and a special symbol' : '';
+					  }}
+					/>
+				  {:else}
+					<input
+					  type="password"
+					  name="newPassword"
+					  placeholder="Enter new password"
+					  class="w-full px-4 py-2 pr-10 border border-gray-300 text-xs sm:text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-violet-500"
+					  bind:value={newPassword}
+					  on:input={() => {
+						error.password = !newPassword ? '*Required' : !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(newPassword) ? 'Password must be at least 8 characters with an uppercase letter, a lowercase letter, a digit, and a special symbol' : '';
+					  }}
+					/>
+				  {/if}
+		  
+				  <button
+					type="button"
+					class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+					on:click={toggleNewPasswordVisibility}
+				  >
+					{#if showNewPassword}
+					  <Icon icon="mdi:eye-off-outline" class="w-5 h-5" />
+					{:else}
+					  <Icon icon="mdi:eye-outline" class="w-5 h-5" />
+					{/if}
+				  </button>
+				</div>
+				{#if error.password}
+				  <p class="text-red-500 text-xs">{error.password}</p>
+				{/if}
+			  </div>
+
+			  <div class="mb-4">
+				<div class="relative">
+				  {#if showConfirmPassword}
+					<input
+					  type="text"
+					  name="confirmPassword"
+					  placeholder="Confirm new password"
+					  class="w-full px-4 py-2 pr-10 border border-gray-300 text-xs sm:text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-violet-500"
+					  bind:value={confirmPassword}
+					  on:input={() => {
+						error.passwordConfirm = !confirmPassword ? '*Required' : confirmPassword !== newPassword ? 'Current password does not match the entered password' : '';
+					  }}
+					/>
+				  {:else}
+					<input
+					  type="password"
+					  name="confirmPassword"
+					  placeholder="Confirm new password"
+					  class="w-full px-4 py-2 pr-10 border border-gray-300 text-xs sm:text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-violet-500"
+					  bind:value={confirmPassword}
+					  on:input={() => {
+						error.passwordConfirm = !confirmPassword ? '*Required' : confirmPassword !== newPassword ? 'Current password does not match the entered password' : '';
+					  }}
+					/>
+				  {/if}
+		  
+				  <button
+					type="button"
+					class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+					on:click={toggleConfirmPasswordVisibility}
+				  >
+					{#if showConfirmPassword}
+					  <Icon icon="mdi:eye-off-outline" class="w-5 h-5" />
+					{:else}
+					  <Icon icon="mdi:eye-outline" class="w-5 h-5" />
+					{/if}
+				  </button>
+				</div>
+				{#if error.passwordConfirm}
+				  <p class="text-red-500 text-xs">{error.passwordConfirm}</p>
+				{/if}
+			  </div>
+		  
+			  <input type="hidden" name="token" value={token} />
+			  <input type="hidden" name="userId" value={$authedUser.id} />
+			  <input type="hidden" name="email" value={$authedUser.email} />
+			  <button
+				type="submit"
+				class="w-1/3 bg-primary-600 text-white rounded-md p-2 hover:bg-primary-800 transition text-xs"
+			  >
+				Reset
+			  </button>
+			{/if}
+		  
+			{#if message}
+			  {#if message === 'Password reset succesfully'}
+				<p class="py-2 text-xs text-center bg-green-300">{message}</p>
+			  {:else}
+				<br />
+				<Icon icon={'typcn:warning'} class=" w-5 h-5 text-red-500 inline pr-1" />
+				<p class=" text-black text-xs py-0.5 inline">{message}</p>
+			  {/if}
+			{/if}
+		  </form>
+		
+		
 		</div>
 	</div>
-</div>
+{:else}
+<div class="mt-4 p-4 bg-red-200 text-sm text-red-900 border border-red-300 rounded-md shadow-md flex items-center justify-between">
+	<div>
+	  <strong class="font-semibold">Invalid or Expired Token</strong>
+	  <p class="mt-1">Your password reset token has either expired or is invalid. Please request a new password reset email.</p>
+	</div>
+	<a href="/forgot" class="ml-4 bg-red-500 text-white text-xs py-1 px-3 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400">
+		Resend Email
+	  </a>
+  </div>
+{/if}
+<Toaster position="bottom-right" richColors />

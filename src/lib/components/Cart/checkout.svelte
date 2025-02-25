@@ -24,7 +24,6 @@
 	let isShowbox = true
 	let order = ''
 	let checkout
-
 	let cartdata = data?.cart?.cart[0]?.cartItems || []
 
 	cart.set(cartdata)
@@ -195,7 +194,6 @@
 			currency: "INR",
 		};
 		checkout = order;
-	   // console.log(checkout,"checkout");
 	}
 	$: handleCheckout($cart);
 
@@ -238,7 +236,7 @@
 
 <section class=" mx-auto mb-4 w-11/12 sm:flex gap-4 sm:items-start space-y-4 sm:space-y-0">
 	<div class="p-3 lg:p-4 sm:w-1/2 md:w-3/5 lg:w-3/4 bg-white shadow-sm rounded">
-		<!-- <h3 class="text-md font-semibold text-gray-600">Address Selection</h3> -->
+		<h3 class="text-md font-semibold text-gray-600">Address Selection</h3>
 		 <div class=" flex flex-col md:flex-row gap-4 mb-1">
 			<label for="" class=" w-full font-medium text-sm text-gray-600"> Email <br>
 			    <input class=" w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
@@ -396,11 +394,8 @@
 									    <p>₹{(item.pricing.INR * (1 + (18 / 100))).toLocaleString("en-IN")} with GST</p>
 									    <p class=" text-2s text-gray-400">₹{item.pricing.INR.toLocaleString("en-IN")} without GST</p>
 									</div>
-								 </div>
-							
 								<div class=" lg:w-2/6">
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Quantity</h3>
-							        <div class="flex items-center md:w-2/12">
 							        	<div class="flex items-center rounded">
 							        		<!-- <button
 							        			on:click={() => decrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}

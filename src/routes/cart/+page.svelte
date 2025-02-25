@@ -1,5 +1,5 @@
 <script>
-	import { cartState,updateCartState } from '$lib/stores/cartStores.js';
+	// import { cartState,updateCartState } from '$lib/stores/cart.js';
     import ShoppingCart from '$lib/components/Cart/ShoppingCart.svelte'
     export let data
     

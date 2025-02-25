@@ -2,20 +2,21 @@
 	import { sendMessage } from '$lib/utils.js';
 	import { cart,guestCart,removeFromCart } from '$lib/stores/cart.js';
 	import { goto,invalidate } from '$app/navigation';
-	import { updateCartState } from '$lib/stores/cartStores.js';
+
+	export let cartId
+	// import { updateCartState } from '$lib/stores/cart.js';
 	import { onMount, onDestroy } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { toast } from 'svelte-sonner';
-
-	export let cartId
+	import {authedUser} from '$lib/stores/mainStores.js'
   
 	let cartOpen = false;
 	let cartItems = [];
 	let subtotal = 0;
 	let priceINR = 0
 	let priceUSD = 0
-	let isLoggedIn = false;
 
+	let isLoggedIn = $authedUser?.id ? true : false
   
 	function formatPriceToNumber(priceString) {
 	  if (!priceString) return 0;

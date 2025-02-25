@@ -311,7 +311,7 @@
 				</div>
 				</div>
 			{/if}
-			<a href="/my-favourite">
+			<a href="/dashboard/myfavourite">
 				<button
 					on:click={toggleLike}
 					aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
@@ -541,7 +541,7 @@
 					>Order Status</a
 				>
 				<div class="md:flex hidden items-center justify-center">
-					<a href="/my-favourite">
+					<a href="/dashboard/myfavourite">
 						<button
 							on:click={toggleLike}
 							aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}

@@ -1,8 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import { getCart } from "$lib/server/mongoLoads.js"
 
-export const load = async({ url, cookies,depends }) => {
-	//console.log(cookies.get("email"));
+export const load = async({ url, cookies, locals }) => {
     try {
 	    if (url.pathname === '/logout') {
 			cookies.delete('token', { path: '/' });
@@ -20,5 +19,4 @@ export const load = async({ url, cookies,depends }) => {
 	} catch (error) {
 		console.log(error);
 	}
-	
 };

@@ -1,14 +1,13 @@
 <script>
   export let data;
-
 </script>
 
 {#each data.records as product}
-  {#if product.description && (
-    (Array.isArray(product.description) && product.description.length > 0) || 
-    (typeof product.description === 'object' && Object.keys(product.description).length > 0)
-  )}
-    <div class="max-w-full bg-white shadow-sm rounded-lg m-10 p-3" id="des">
+  {#if product.description && ((Array.isArray(product.description) && product.description.length > 0) || (typeof product.description === "object" && Object.keys(product.description).length > 0))}
+    <div
+      class="md:w-11/12 max-w-7xl p-4 mx-auto bg-white shadow-md border border-gray-200 rounded-lg m-10"
+      id="des"
+    >
       <h3 class="text-2xl font-bold text-primary-400">Description</h3>
 
       <!-- Check if description is an array -->
@@ -19,13 +18,16 @@
             <li class="text-gray-700 text-md mt-2">{item}</li>
           {/each}
         </ul>
-      
-      <!-- Else, assume description is an object -->
+
+        <!-- Else, assume description is an object -->
       {:else}
         <!-- If it's an object, display key-value pairs -->
         <ul>
           {#each Object.entries(product.description) as [key, value]}
-            <li class="text-gray-700 text-md mt-2"><strong>{key}:</strong> {value}</li>
+            <li class="text-gray-700 text-md mt-2">
+              <strong>{key}:</strong>
+              {value}
+            </li>
           {/each}
         </ul>
       {/if}

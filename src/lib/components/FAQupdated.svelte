@@ -44,7 +44,9 @@
           {#if sections[activeIndex]}
             <div class="space-y-3">
               {#each sections[activeIndex].faqs as { question, answer1, answer2 }, index}
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <div class="relative shadow-md rounded-md p-4">
+                  <!-- svelte-ignore a11y-click-events-have-key-events -->
                   <div
                     class="flex items-center justify-between cursor-pointer p-1 ps-3 mx-auto"
                     on:click={() => toggleFAQ(index)}>

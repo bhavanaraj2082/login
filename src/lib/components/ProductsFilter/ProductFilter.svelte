@@ -5,14 +5,21 @@
 	import { goto,invalidate } from '$app/navigation';
     import { toast } from 'svelte-sonner';
     import Icon from "@iconify/svelte";
+	import { authedUser } from '$lib/stores/mainStores.js';
+
 
     export let products
     export let manufacturers
     export let productCount
     export let subSubCategory
 
+<<<<<<< HEAD
     console.log(products,manufacturers,productCount,subSubCategory);
     let isLoggedIn = true
+=======
+	let isLoggedIn = $authedUser?.id ? true : false
+    
+>>>>>>> 1e352d1e0985b64d9e97a8bcbeccc6fce9617fc4
     const guestCartFetch = () => {
 		const formdata = new FormData();
 		formdata.append('guestCart', JSON.stringify($guestCart));
@@ -264,7 +271,11 @@ const handleSearch = (searchName) => {
                 </button>
             </div>
             <div class=" p-2  border-1 rounded {showSearchDropdown ? "block" : "hidden"}">
+<<<<<<< HEAD
                 <input type="text" placeholder="Search..." bind:value={search} on:input={e=>handleSearch(e.target.value)} class=" w-full text-sm font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
+=======
+                <input type="text" placeholder="Search..." on:input={e=>handleSearch(e.target.value)} class=" w-full text-sm font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
+>>>>>>> 1e352d1e0985b64d9e97a8bcbeccc6fce9617fc4
              </div>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->

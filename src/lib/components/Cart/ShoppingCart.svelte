@@ -7,11 +7,8 @@
 	import Icon from '@iconify/svelte';
 	import { onMount, createEventDispatcher } from 'svelte';
 	import RecurrencePopup from '$lib/components/Cart/RecurrencePopup.svelte';
-	import { cartState, updateCartState } from '$lib/stores/cartStores.js';
 	import { cart, guestCart,removeFromCart } from '$lib/stores/cart.js';
-	import jsPDF from 'jspdf';
 	import { toast } from 'svelte-sonner';
-	import 'jspdf-autotable';
 	import { page } from '$app/stores';
 	import * as XLSX from 'xlsx';
 
@@ -19,9 +16,9 @@
 
 	export let data
 
+    console.log('first',$authedUser)
 	let loading = false;
-	let isLoggedIn = true;
-
+	let isLoggedIn = $authedUser?.id ? true : false
 	let totalPrice = 0;
 	let order = '';
 	let filteredGuestCart = ''

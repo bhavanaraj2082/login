@@ -218,7 +218,7 @@
     }
     
     $: calendarDays = generateCalendarDays(currentMonth);
-    $: monthName = `${currentMonth.toLocaleString('default', { month: 'long' })} ${currentMonth.getFullYear()}`;
+    // $: monthName = `${currentMonth.toLocaleString('default', { month: 'long' })} ${currentMonth.getFullYear()}`;
   </script>
     
   <div class="relative date-dropdown-container">

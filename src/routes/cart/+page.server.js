@@ -12,7 +12,7 @@ import {
 import { getCart } from "$lib/server/mongoLoads.js";
 
 export const load = async({locals,depends})=>{
-    const userId = locals?.authedUser?.id || "67af35cb27b8020af0d7aab7"
+    const userId = locals?.authedUser?.id || ""
     depends("data:cart")
     return await getCart(userId)
 }
@@ -29,7 +29,7 @@ export const actions = {
     },
     updateQty:async({request,locals})=>{
         try {
-           const userId = locals?.authedUser?.id || "67af35cb27b8020af0d7aab7"
+           const userId = locals?.authedUser?.id || ""
            const body = Object.fromEntries(await request.formData())
            return await updateItemQty(body,userId)
         } catch (error) {
@@ -38,7 +38,7 @@ export const actions = {
     },
     deleteOne:async({request,locals})=>{
         try {
-            const userId = locals?.authedUser?.id || "67af35cb27b8020af0d7aab7"
+            const userId = locals?.authedUser?.id || ""
             const body = Object.fromEntries(await request.formData())
             return await deleteOneFromCart(body,userId)
         } catch (error) {
@@ -47,7 +47,7 @@ export const actions = {
     },
     deleteAll:async({request,locals})=>{
         try {
-            const userId = locals?.authedUser?.id || "67af35cb27b8020af0d7aab7"
+            const userId = locals?.authedUser?.id || ""
             const body = Object.fromEntries(await request.formData())
             return await deleteAllFromCart(body,userId)
         } catch (error) {
@@ -78,8 +78,9 @@ export const actions = {
 	},
 	newcart:async({request,locals})=>{
 		try {
-			const userId = locals?.authedUser?.id || "67af35cb27b8020af0d7aab7"
-			const userEmail = locals?.authedUser?.email || "yusuf@partskeys.com"
+
+			const userId = locals?.authedUser?.id || ""
+			const userEmail = locals?.authedUser?.email || ""
 			const body = Object.fromEntries(await request.formData());
 			const parsedBody = JSON.parse(body.guestCart);
 			return await addItemsToNewCart(parsedBody,userId,userEmail)
@@ -89,8 +90,8 @@ export const actions = {
 	},
     recurrence:async({request,locals})=>{
 		try {
-			const userId = locals?.authedUser?.id || "67af35cb27b8020af0d7aab7"
-			const userEmail = locals?.authedUser?.email || "yusuf@partskeys.com"
+			const userId = locals?.authedUser?.id || ""
+			const userEmail = locals?.authedUser?.email || ""
 			const body = Object.fromEntries(await request.formData());
 		    const parsedBody = JSON.parse(body.dates);
 			return await addRecurrence(parsedBody,userId,userEmail)
