@@ -299,6 +299,22 @@
 		const currentUrl = $page.url.href;
 		document.cookie = `redirectUrl=${encodeURIComponent(currentUrl)}; path=/;`;
 	}
+	onMount(() => {
+		calculateTotals();
+		functionDispatch();
+		loading = false;
+	});
+
+	let selectedImage = null;
+	let showimage=false;
+	function imagemodal(imageSrc) {
+		selectedImage = imageSrc;
+		showimage=true;
+	}
+	function closePopup() {
+		showimage = false;
+		selectedImage = null;
+	}
 
 	function handleCart({ cancel }) {
 		return async ({ result }) => {
@@ -532,9 +548,8 @@
 {/if}
 
 <RecurrencePopup {recureModal} {recurrence} {cartId} togglePopup={() => (recureModal = !recureModal)} />
-
-
-<!-- {#if showModal}
+	
+{#if showModal}
 	<div class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
 		<div class="bg-white p-6 rounded-lg w-full mx-2 md:w-1/3">
 			<p class="text-xl font-bold mb-2">Please Log In</p>
@@ -552,4 +567,24 @@
 			</div>
 		</div>
 	</div>
-{/if} -->
+
+{/if}
+{#if showimage}
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div on:click={(e) => {
+	if (e.target === e.currentTarget) {
+	showimage = false;}
+	}} class="fixed inset-0 shadow-xl bg-opacity-75 flex items-center justify-center z-50">
+	<div class="bg-white rounded-lg shadow-lg p-6 mx-4 w-full md:w-1/2 lg:w-1/3">
+	<div class="flex justify-end items-center mb-2">
+		<button
+		class="p-1 hover:bg-gray-100 rounded transition-colors duration-200"
+		on:click={closePopup}>
+		<Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
+	  </button>
+</div>
+<!-- svelte-ignore a11y-img-redundant-alt -->
+<img src={selectedImage} alt="image" class="" /></div>
+</div>
+{/if}

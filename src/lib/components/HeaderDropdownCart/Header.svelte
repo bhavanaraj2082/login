@@ -6,6 +6,7 @@
 	import menusdata from '$lib/data/chemicalProducts.json';
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { slide, fade } from 'svelte/transition';
 
 	export let data
 
@@ -27,7 +28,7 @@
 	const heartFilled = 'mdi:heart';
 	// $authedUser.email="rukhiyasameen@gmail.com"
 	// $authedUser.username="Sameena"
-	// let userEmail = $authedUser.email;
+	let userEmail = $authedUser.email;
 	let userName = $authedUser.username;
 	
 	$: showUserOptions = false;
@@ -67,7 +68,7 @@
 	function handleMouseLeave() {
 		subSubmenuLeaveTimeoutId = setTimeout(() => {
 			hoveredSubSubmenu = null;
-		}, 800);
+		}, 5000);
 	}
 	let menuTimeoutId;
 	function toggleMenu(menu) {
@@ -85,7 +86,7 @@
 		menuTimeoutId = setTimeout(() => {
 			activeMenu = null;
 			activeSubmenu = null;
-		}, 1000);
+		}, 300);
 	}
 
 	function handleMouseEnterSubmenu(submenu) {
@@ -95,7 +96,7 @@
 	function handleMouseLeaveSubmenu() {
 		submenuLeaveTimeoutId = setTimeout(() => {
 			activeSubmenu = null;
-		}, 10000);
+		}, 50000);
 	}
 	function navigateTo(url) {
 		window.location.href = url;
@@ -151,28 +152,31 @@
 		}
 	};
 </script>
-<nav class="bg-white">
+<nav class="bg-primary-400 font-workSans">
 	{#if isOpen}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
 		on:click={closeSidebar}
-		class="fixed top-0 left-0 w-full h-full z-40"
+		class="fixed top-0 left-0 w-full h-full bg-gray-300/60 z-40 backdrop-blur-sm"
 	></div>
 {/if}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
-		class={`fixed top-0 left-0 h-full bg-white shadow-xl  border-r  transition-transform transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden z-50 w-9/12 overflow-y-auto`}
+		class={`fixed top-0 left-0 h-full bg-primary-400 bg-opacity-70 transition-transform transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden z-50 w-9/12 overflow-y-auto`}
 		on:click={(e) => e.stopPropagation()}
 	>
+	<!-- <div
+	class={`fixed top-0 left-0 h-full bg-primary-950 bg-opacity-70 transition-transform transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden z-50 w-9/12 overflow-y-auto`}
+> -->
 		<div class="flex flex-col h-full p-10 font-medium text-gray-600">
 			<div class="flex justify-between mb-2">
 				<button
 				on:click={() => {
 					navigateTo('/');
 				}}
-				class="text-xl text-primary-400 font-semibold"
+				class="text-xl text-white font-semibold"
 			>
 				Chemikart
 			</button>
@@ -180,7 +184,7 @@
 					on:click={toggleLogoMenu}
 					class="self-end text-primary-400 text-2xl hover:text-primary-400 transition duration-200"
 				>
-					<Icon icon="cuida:x-outline" class="w-10 h-5 text-gray-600 mb-1" />
+					<Icon icon="cuida:x-outline" class="w-10 h-5 hover:text-primary-600 text-white mb-1" />
 				</button>
 			</div>
 			{#if activeMenu === null}
@@ -193,13 +197,13 @@
 						menu.submenus
 							? toggleMenu(menu)
 							: navigateTo(menu.href)}
-					class="flex justify-between text-left hover:text-primary-400 text-gray-800 transition duration-200 w-full py-2 px-2 ml-2"
+					class="flex justify-between text-left  text-white transition duration-200 w-full py-2 px-2 ml-2"
 				>
 					{menu.title}
 					{#if menu.submenus && menu.submenus.length > 0}
 						<Icon
 							icon="prime:chevron-down"
-							class="w-5 h-5 mr-2 text-gray-800 hover:text-primary-400"
+							class="w-5 h-5 mr-2 text-white "
 						/>
 					{/if}
 				</button>
@@ -207,13 +211,13 @@
 			<div class="flex flex-col font-semibold">
 				<button
 					on:click={() => navigateTo('/quick-order')}
-					class="text-left hover:text-primary-400 text-gray-800 text-md transition duration-200 w-full py-2 px-4 font-medium"
+					class="text-left text-white text-md transition duration-200 w-full py-2 px-4 font-medium"
 				>
 					Quick Order
 				</button>
 				<button
 					on:click={() => navigateTo('/order-status')}
-					class="text-left hover:text-primary-400 text-gray-800 text-md transition duration-200 w-full py-2 px-4 font-medium"
+					class="text-left text-white text-md transition duration-200 w-full py-2 px-4 font-medium"
 				>
 					Order Status
 				</button>
@@ -247,19 +251,20 @@
 				on:click={toggleLogoMenu}
 				class="flex items-center text-gray-600 focus:outline-none"
 			>
-				<Icon icon="fa6-solid:bars" class=" text-2xl text-gray-600" />
+				<Icon icon="fa6-solid:bars" class=" text-md text-white" />
 			</button>
 		</div>
-		<div class="text-center pl-10">
+		<div class="text-center pl-3 w-1/10">
 			<button
 				on:click={() => {
 					navigateTo('/');
 				}}
-				class="flex items-center text-primary-400 text-2xl md:text-3xl lg:text-3xl sm:text-2xl font-poppins md:mb-0 py-2 font-roboto font-bold"
+				class="flex items-center hover:text-primary-100 hover:scale-105 text-white text-2xl md:text-3xl lg:text-3xl sm:text-2xl font-poppins md:mb-0 py-2 font-roboto font-bold"
 			>
 				Chemikart
 			</button>
 		</div>
+		<!-- SMALL -->
 		<div class="md:hidden flex items-center gap-1">
 			{#if $authedUser.email}
 						<div class="relative bg-white" bind:this={dropdown}>
@@ -269,44 +274,55 @@
 						{getInitial(userName)}
 				</button>
 				{#if showUserOptions}
-					<div class="absolute left-0 mt-2 w-16 bg-white rounded-md shadow-lg z-20">
-						<button
-							on:click={() => navigateTo('/profile')}
-							class="block py-1 text-xs text-gray-700 hover:bg-gray-100 w-full text-left">
-							My Profile
-						</button>
-						<button
-								on:click={() => navigateTo('/logout')}
-								class="loginbtn block px-1 py-2 text-xs text-gray-700 hover:bg-gray-100 w-full text-left">
-								Logout
-						</button>
+				<div class="relative">
+					<div class="absolute right-0 top-2 w-32 bg-white rounded-md shadow-lg z-20 pb-1 pt-1" transition:fade>
+					  <!-- Triangle -->
+					  <div class="absolute top-[-7px] right-1 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white transform rotate-180"></div>
+				  
+					  <button
+						on:click={() => navigateTo('/profile')}
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						My Profile
+					  </button>
+					  <button
+						on:click={() => navigateTo('/logout')}
+						class="loginbtn block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						Logout
+					  </button>
 					</div>
+				  </div>
+				  
 				{/if}
 		</div>
 		{:else}
 				<div class="flex items-center justify-between">
-					<div class="relative bg-white" bind:this={dropdown}>
+					<div class="relative bg-primary-400" bind:this={dropdown}>
 						<button
 								class="w-4 h-4 flex items-center justify-center bg-primary-400 text-white rounded-full"
 								on:click={handleProfile}>
 								<Icon 
 					icon="tdesign:user-filled" 
-					class="w-4 h-4 flex items-center justify-center bg-primary-400 text-white rounded-full p-1"
+					class="w-4 h-4 flex items-center justify-center bg-white text-primary-400 rounded-full p-1"
 				/>
 						</button>
 						{#if showUserOptions}
-							<div class="absolute left-0 mt-2 w-16 bg-white rounded-md shadow-lg z-20">
-								<button
-									on:click={() => navigateTo('/login')}
-									class="block px-2 py-2 text-xs text-gray-700 hover:bg-gray-100 w-full text-left">
-									Login
-								</button>
-								<button
-										on:click={() => navigateTo('/signup')}
-										class="loginbtn block px-2 py-2 text-xs text-gray-700 hover:bg-gray-100 w-full text-left">
-										Register
-								</button>
+						<div class="relative">
+							<div class="absolute right-0 top-2 w-32 bg-white rounded-md shadow-lg z-20 pb-1 pt-1" transition:fade>
+							  <!-- Triangle -->
+							  <div class="absolute top-[-7px] right-1 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white transform rotate-180"></div>
+						  
+							  <button
+								on:click={() => navigateTo('/login')}
+								class="block px-4 font-workSans py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+								Login
+							  </button>
+							  <button
+								on:click={() => navigateTo('/signup')}
+								class="loginbtn block px-4 font-workSans py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+								Register
+							  </button>
 							</div>
+						  </div>
 						{/if}
 				</div>
 				</div>
@@ -319,14 +335,14 @@
 				>
 					<Icon
 						icon={isLiked ? heartFilled : heartOutline}
-						class={`text-lg transition-colors duration-300 hover:text-primary-400 ease-in-out ${isLiked ? 'text-primary-400' : 'text-gray-600'}`}
+						class={`text-lg transition-colors duration-300 hover:text-primary-400 ease-in-out ${isLiked ? 'text-white' : 'text-primary-100'}`}
 					/>
 				</button>
 			</a>
 			<Cartrightside {cartId}/>
 		</div>
 		<!-- Searchbar functionality -->
-		<div class="relative w-full md:max-w-sm lg:max-w-lg md:mx-4 lg:mx-8 sm:mt-2">
+		<div class="relative sm:max-w-3xl md:max-w-sm lg:max-w-md xl:max-w-xl  sm:mt-2 w-full sm:pb-0 pb-2 mx-auto">
 			<form action="/?/search" method="post" bind:this={form} use:enhance={handleData}>
 				<div class=" w-full flex items-center">
 					<input
@@ -346,7 +362,7 @@
 						</div>
 					{/if}
 					<button
-						class="absolute right-1 top-1/2 transform -translate-y-1/2 bg-primary-400 text-white w-10 h-10 flex items-center justify-center rounded-md"
+						class="absolute right-1 sm:top-1/2 top-[42%] transform -translate-y-1/2 bg-primary-400 text-white w-10 h-10 flex items-center justify-center rounded-md"
 						on:click={handleSubmitBtn}
 					>
 						<Icon icon="feather:search" style="width: 25px; height: 25px;" />
@@ -391,10 +407,13 @@
 				{/if}
 			</form>
 		</div>
-		<!-- Searchbar functionality ends-->
-		<div class="md:flex hidden">
+		<!-- big-->
+		<div class="md:flex hidden w-1/10">
 			{#if $authedUser.email}
-			<div class="relative px-2 bg-white hidden md:block" bind:this={dropdown}>
+			
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-static-element-interactions -->
+			<div class="relative p-2 bg-primary-200 hidden md:block cursor-pointer rounded-md" on:click={handleProfile} bind:this={dropdown}>
 				<button
 						class="mr-2 flex flex-row justify-center cursor-pointer z-30 gap-2">
 						<p class="w-7 h-7 flex items-center justify-center bg-primary-400 text-white rounded-full text-lg"
@@ -402,23 +421,31 @@
 					</p>
 						<h2 class="text-sm text-primary-500 mt-1">{userName}</h2>
 						<button on:click={handleProfile}>
-						<Icon icon="ion:chevron-down" class="text-primary-500 mt-2" />
+							<Icon
+								icon={showUserOptions ? 'ion:chevron-up' : 'ion:chevron-down'}
+								class="text-primary-500 mt-0.5"
+							/>
 					</button>
 				</button>
 		
 				{#if showUserOptions}
-				<div class="absolute top-full left-0 mt-2 w-36 rounded-md shadow-lg z-40 bg-white border border-gray-200">
-						<button
-								on:click={() => navigateTo('/profile')}
-								class="block px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-								My Profile
-						</button>
-						<button
-								on:click={() => navigateTo('/logout')}
-								class="loginbtn block px-4 py-1 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-								Logout
-						</button>
-				</div>
+				<div class="relative">
+					<div class="absolute right-0 top-2 w-32 bg-white rounded-md shadow-lg z-20 pb-1 pt-1" transition:fade>
+					  <!-- Triangle -->
+					  <div class="absolute top-[-7px] right-1 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white transform rotate-180"></div>
+				  
+					  <button
+						on:click={() => navigateTo('/profile')}
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						My Profile
+					  </button>
+					  <button
+						on:click={() => navigateTo('/logout')}
+						class="loginbtn block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						Logout
+					  </button>
+					</div>
+				  </div>
 				{/if}
 		</div>
 			{:else}
@@ -427,22 +454,22 @@
 						on:click={() => {
 							navigateTo('/login');
 						}}
-						class="  loginbtn text-sm font-medium border-b-2 border-b-transparent hover:text-primary-400 text-primary-400"
+						class="  loginbtn  font-workSans text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
 						>Login</button
 					>
-					<Icon icon="vaadin:line-v" class="mr-0 text-primary-400 font-semibold" />
+					<Icon icon="vaadin:line-v" class="mr-0 text-white font-semibold" />
 					<button
 						on:click={() => {
 							navigateTo('/signup');
 						}}
-						class=" registerbtn pr-2 text-primary-400 text-sm font-medium border-b-2 border-b-transparent hover:text-primary-400"
+						class=" registerbtn font-workSans pr-2  text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
 						>Register</button
 					>
 				</div>
 			{/if}
 		</div>
 	</div>
-	<div class="hidden md:flex mx-auto w-full border-y border-gray-200">
+	<div class="hidden md:flex mx-auto w-full">
 		<!-- Menu Section -->
 		<div class="md:flex mx-auto justify-between w-11/12 max-w-7xl">
 			<div class="md:flex justify-around items-center lg:gap-2 hidden">
@@ -455,11 +482,11 @@
 						on:mouseleave={handleMouseLeaveMenu}
 					>
 						<div
-							class={`py-2 pr-2 pl-3 ${activeMenu === menu ? 'text-orange-500' : 'text-gray-600'}`}
+							class={`py-0 pr-2 pl-3 ${activeMenu === menu ? 'text-orange-500' : 'text-gray-600'}`}
 						>
 							<button
 								on:click={() => navigateTo(menu.href)}
-								class={`flex items-center text-nowrap text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-primary-400' : 'text-gray-700'}`}
+								class={`flex items-center hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-white scale-105' : 'text-white'}`}
 								role="menuitem"
 							>
 								{menu.title}
@@ -471,7 +498,7 @@
 
 						{#if menu.submenus && menu.submenus.length > 0}
 							<div
-								class={`absolute shadow-sm z-20 rounded-sm mt-0.5 bg-white transition-opacity duration-200 ${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+								class={`absolute shadow-md z-20 rounded-sm mt-0 ml-2 bg-white transition-opacity duration-200 ${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
 								role="menu"
 							>
 								{#each menu.submenus as submenu}
@@ -533,13 +560,25 @@
 					</div>
 				{/each}
 			</div>
-			<div class="flex gap-4 text-gray-600 items-center">
-				<a href="/quick-order" class="hover:text-primary-400 font-semibold text-xs lg:text-sm"
-					>Quick Order</a
-				>
-				<a href="/order-status" class="hover:text-primary-400 font-semibold text-xs lg:text-sm"
-					>Order Status</a
-				>
+			<div class="flex gap-4 text-gray-600 items-center ">
+				<a href="/quick-order">
+					<button 
+					class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium">
+						<span class="text-white font-medium text-xs lg:text-sm">
+							Quick Order
+						</span>
+					</button>
+				</a>
+				
+				<a href="/order-status">
+					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium">
+						<span class="text-white font-medium text-xs lg:text-sm">
+							Order Status
+						</span>
+					</button>
+				</a>
+				
+				
 				<div class="md:flex hidden items-center justify-center">
 					<a href="/dashboard/myfavourite">
 						<button
@@ -549,7 +588,7 @@
 						>
 							<Icon
 								icon={isLiked ? heartFilled : heartOutline}
-								class={`text-2xl transition-colors duration-300 hover:text-primary-400 ease-in-out ${isLiked ? 'text-primary-400' : 'text-gray-600'}`}
+								class={`text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out ${isLiked ? 'text-primary-400' : 'text-gray-600'}`}
 							/>
 						</button>
 					</a>

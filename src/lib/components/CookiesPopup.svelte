@@ -171,26 +171,40 @@
 		goto('/logout');
 	}
 
+
+	let popupRef;
+    function handleClickOutside(event) {
+        if (popupRef && !popupRef.contains(event.target)) {
+            closePopup();
+        }
+    }
 	onMount(() => {
-		initializeState();
-		updateScreenSize();
-		window.addEventListener('resize', updateScreenSize);
-		return () => {
-        window.removeEventListener('resize', updateScreenSize);
+	initializeState();
+    updateScreenSize();
+    window.addEventListener('resize', updateScreenSize); 
+    window.addEventListener('mousedown', handleClickOutside); 
+    return () => {
+        window.removeEventListener('resize', updateScreenSize); 
+        window.removeEventListener('mousedown', handleClickOutside); 
     };
-	});
+});
+
 </script>
 
 <!--  Start / Cookies Setting Popup -->
 <div class={`${isOpen ? 'fixed inset-0  bg-opacity-50 z-50' : 'hidden'}`}></div>
-<div class={`fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center sm:px-2 shadow-lg transition-opacity transition-visibility z-50 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
-	<div class='bg-white p-8 rounded shadow-lg w-full max-w-4xl h-auto max-h-screen overflow-y-auto mx-4 sm:mx-0'>
-	<form class="w-full h-full overflow-y-scroll hide">
+<div class={`fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm flex justify-center items-center sm:px-2 shadow-lg transition-opacity transition-visibility z-50 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+    <div class='bg-white p-8 rounded shadow-lg w-full max-w-4xl h-auto max-h-screen overflow-y-auto mx-4 sm:mx-0' bind:this={popupRef}>
+			<form class="w-full h-full overflow-y-scroll hide">
 		<header class="flex mb-5 justify-between">
 			<h2 class="pt-4 ml-2 text-xs xs:text-md sm:text-lg  mb-4 text-primary-400  font-bold">CHEMIKART</h2>
             <div class="flex sm:gap-20 gap-2">
                 <h2 class="pt-4 pl-2 text-xs xs:text-md sm:text-lg  mb-4 text-primary-400  font-bold">Privacy Preference Center</h2>
-                <button class="relative text-lg sm:text-xl md:text-2xl  text-primary-400 hover:text-primary-500 cursor-pointer transition duration-200 " on:click={closePopup}><Icon icon="gravity-ui:xmark" width="1.2em" height="1.2em"/></button>
+                <button
+          class="p-1 hover:bg-gray-200 rounded transition-colors duration-200 text-end h-7"
+          on:click={closePopup}>
+          <Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
+        </button>
             </div>
 		</header>
 		<section class="md:h-full overflow-y-scroll hide">

@@ -1,0 +1,695 @@
+<script>
+  import { enhance } from '$app/forms';
+  import { onMount } from 'svelte';
+  import { toast, Toaster } from "svelte-sonner";
+import Icon from "@iconify/svelte";
+    import { prev } from '../stores/feedStore.js'
+
+  let emailIsValid = true;
+  let urls='';
+  export let data;
+  let error;
+  let err;
+  let showSuccesDiv = false;
+  let showFailureDiv =false;
+// console.log(data, "data");
+
+let isLoadingPhone = false;
+let isEmailVerified = false;
+let loadingotp = false;
+let submitLoading = false;
+let loadingPhone = false;
+let isLoading = false;
+let ProfileEmailVerified;
+let isDataAvailable = false;
+  let errors = {};
+let isEditable = false;
+// console.log(data,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+let authedUserEmailVerified = data?.profile?.isEmailVerified;
+// console.log("authedUserEmailVerified", authedUserEmailVerified);
+
+let verificationMessage = "";
+let emailSent = false;
+let displayMessage = "";
+let enteredOtp = "";
+let enteredOtpemail = "";
+let isOtpVerified = false;
+let form3;
+
+  onMount(async () => {
+      if (data && data.profile) {
+    formData.name =
+      `${data.profile.firstname || ""} ${data.profile.lastname || ""}`.trim();
+              formData.email = data.profile.email || "";
+    
+
+    isDataAvailable = true;
+  } else {
+    formData.name = "";
+    formData.email = data?.email || "";
+    
+    if (data?.email) {
+      email = data.email;
+      const reloadFlag = sessionStorage.getItem("emailReloaded");
+      if (!reloadFlag) {
+        sessionStorage.setItem("emailReloaded", "true");
+        location.reload(); // This will reload the page only once to prevent infinite reload
+      } else {
+        sessionStorage.removeItem("emailReloaded");
+      }
+    }
+  }
+        prev.subscribe(value => {
+            urls = "https://chemikart.partskeys.com" + value;
+      // console.log("urlsurlsurls",urls);
+        });
+      });
+
+  let formData = {
+    issue: [],
+    requirement: 'Yes',
+    feedback: '',
+    name: '',
+    email: '',
+    url: '',
+    rating: '',
+    status:''
+  };
+  let successMessage = '';
+  let errorMessage = '';
+  let formValid = true;
+  let showErrors = false;
+  let showNameError = false;
+  let showEmailError = false;
+  let showFeedbackError = false;
+  let showIssueError = false;
+  let showEmailVerifyError= false;
+  let showRatingError = false;
+  let showNameValidError = false;
+    const resetForm = () => {
+    formData = {
+      issue: [],
+      requirement: 'Yes',
+      feedback: '',
+      name: '',
+      email: '',
+      url: '',
+      rating: ''
+    };
+    urls='';
+  };
+
+  const handleResendOtpemail = () => {
+  if (!loadingotp) {
+    form3.requestSubmit();
+    // startTimer();
+  }
+};
+  function showMessage(message1, keywordError) {
+    successMessage = message1;
+    errorMessage = keywordError;
+    if (keywordError === 'success') {
+      setTimeout(() => {
+        resetForm();
+      }, 2000);
+    }
+  }
+
+  // Function to validate email format using a regular expression
+// function isValidEmail() {
+//   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+//   emailIsValid = emailPattern.test(formData.email);
+//   return emailIsValid;
+// }
+
+function isValidName() {
+  const namepattern =/^[a-zA-Z]+$/;
+  nameIsValid = namepattern.test(formData.name);
+  return nameIsValid;
+}
+  // const handleSubmit = async (event) => {
+  //   const { name, email, feedback, issue, rating } = formData;
+  //   if (name.length === 0 || email.length === 0 || feedback.length === 0 || issue.length === 0 || rating.length === 0) {
+  //     event.preventDefault();
+  //     formValid = false;
+  //     showErrors = true;
+  //   }
+  //   else if (!isValidEmail()) {
+  //     event.preventDefault();
+  //     showErrors1 = true;
+  //   }
+  //    else {
+  //     formValid = true;
+  //     showErrors = false;
+  //   }
+  //   if (!formValid) {
+  //     event.preventDefault(); 
+  //   }
+  // };
+
+
+
+const handleSubmit = async (event) => {
+  // Reset all error flags
+  formValid = true;
+  showNameError = false;
+  showEmailError = false;
+  showFeedbackError = false;
+  showIssueError = false;
+  showRatingError = false;
+  showEmailVerifyError = false;
+  showNameValidError = false;
+
+  const { name, email, feedback, issue, rating } = formData;
+
+  // Check if each required field is filled
+  if (name.length === 0) {
+    showNameError = true;
+    formValid = false;
+  }
+
+  if (email.length === 0) {
+    showEmailError = true;
+    formValid = false;
+  }
+
+  if (feedback.length === 0) {
+    showFeedbackError = true;
+    formValid = false;
+  }
+
+  if (issue.length === 0) {
+    showIssueError = true;
+    formValid = false;
+  }
+
+  if (rating.length === 0) {
+    showRatingError = true;
+    formValid = false;
+  }
+
+  if (email.length === 0) {
+    showEmailError = true;
+    formValid = false;
+  }
+
+  if (!isValidName()) {
+    showNameValidError = true;
+    formValid = false;
+  }
+
+
+  // if (isOtpVerified = false){
+  //   showEmailVerifyError = true;
+  //   formValid = false;
+  // }
+
+  // If validation fails, show the general error message
+  if (!formValid) {
+    event.preventDefault();
+    showErrors = true;
+
+    // Set a timeout to hide the error message after 3 seconds (or whatever delay you prefer)
+    setTimeout(() => {
+      showErrors = false;
+    }, 3000); // 3000ms = 3 seconds
+  }
+};
+
+
+</script>
+
+<!-- {urls} -->
+
+{#if showSuccesDiv}
+<div
+    class="h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl"
+>
+    <div
+        class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
+    >
+        <h3 class="text-2xl font-semibold text-green-600 mb-4">
+            Feedback Form Submission
+        </h3>
+        <p class="text-lg text-gray-700 mb-6">
+            Thank you for submitting your Feedback form! We have
+            received your Feedback and we will look into that.
+        </p>
+
+        <div class="w-10/12 mx-auto my-6 border-t-2 border-green-300"></div>
+        <div>
+            <a
+                href="/"
+                class="bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
+            >
+                Return to Home
+            </a>
+        </div>
+    </div>
+</div>
+{:else if showFailureDiv}
+<h1 class="font-bold text-lg md:text-2xl pl-1 pt-10 pb-5 w-11/12 max-w-7xl justify-center mx-auto">Feedback</h1>
+<section class="w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto font-roboto bg-white mb-10">
+	<div class="w-full border border-gray-300 rounded-lg p-2">
+
+<div class="mt-4 p-4 bg-red-100 text-red-700 border border-red-400 rounded">
+    <p class="font-semibold mb-4">
+        There was a problem submitting the form. Please try again after some
+        time.
+    </p>
+    <a
+        href="/contact-us"
+        class="bg-white w-fit border text-black border-gray-500 px-4 py-2 rounded-md transition block"
+    >
+        Report Issue
+    </a>
+</div>
+</div>
+</section>
+{:else}
+<h1 class="font-bold text-lg md:text-2xl pl-1 pt-10 pb-5 w-11/12 max-w-7xl justify-center mx-auto">Feedback</h1>
+<section class="w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto font-roboto bg-white mb-10">
+	<div class="w-full border border-gray-300 rounded-lg p-2">
+<form
+  method="POST"
+  action="?/feedbacks"
+  id="feedback-form"
+  class="p-4"
+  use:enhance={(event) => {
+    // Check email verification first
+    const isEmailVerified = ProfileEmailVerified; // Assuming this is the first email verification check
+const isAuthedUserEmailVerified = authedUserEmailVerified; // The second email verification check
+console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification status");
+    if (!(isEmailVerified || isAuthedUserEmailVerified)) {
+        console.log("Email is not verified");
+        toast.error("Please verify your email to proceed");
+        event.preventDefault();
+        // Return a function that does nothing to prevent form submission
+        return () => {};
+    }
+
+    return async ({ result }) => {
+      let message1 = '';
+      let keywordError = '';
+      keywordError = result.data.type;
+      if (keywordError === "success") {
+        message1 = result.data.data.message;
+        resetForm();  
+        showSuccesDiv = true;
+      } else if (keywordError === "error") {
+        message1 = result.data.data.error;
+        showFailureDiv = true;
+      }
+      showMessage(message1, keywordError);
+    };
+  }}
+>
+
+  <div class="space-y-12 font-workSans">
+    <div class="">
+      <h2 class="text-sm font-semibold text-gray-900 mb-4">Report an issue <span class="text-red-500 text-xs font-semibold">*</span></h2>
+      <p class="mt-1 mb-4 sm:text-sm text-xs text-gray-600">If you come across any issues on our website, let us know! We’ll work on fixing them right away.</p>
+      
+      <fieldset class="border-b border-gray-900/10 pb-12">
+        <legend class="text-sm font-semibold text-gray-900">Enhancing Website Performance and Customer Satisfaction</legend>
+        <div class="mt-6 space-y-4 text-xs">
+          {#each ['Slow Website Loading Speed', 'Poor Mobile Responsiveness', 'Poor Search Functionality', 'Lack of Payment Options', 'Everything is running smoothly'] as issue}
+            <div class="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id={issue}
+                name="issue"
+                value={issue}
+                class="w-4 h-4 mb-1 ml-1 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0"
+                bind:group={formData.issue}
+                on:change={() => showIssueError = false} 
+              />
+              <label for={issue} class="font-base text-gray-900">{issue}</label>
+            </div>
+          {/each}
+        </div>
+        {#if showIssueError}
+        <div class="mt-1 font-normal text-xs text-red-500">Please select at least one issue.</div>
+      {/if}
+    </fieldset>
+      
+      <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 border-b border-gray-900/10 pb-12">
+        
+        <div class="sm:col-span-3">
+          <legend class="text-sm font-semibold text-gray-900 pt-2 pb-3">Your search matters! </legend>
+          <label for="requirement" class="block sm:text-sm text-xs font-base text-gray-900 pb-1">Did You Find what you are looking for?</label>
+          <select
+            id="requirement"
+            name="requirement"
+            bind:value={formData.requirement}
+            class="w-full py-1.5 pr-10 pl-3 text-sm rounded-md focus:ring-0 focus:outline-none border focus:border-primary-500 text-gray-900"
+          >
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+
+       
+
+        <div class="sm:col-span-2 sm:col-start-1">
+          <label for="name" class="block sm:text-sm text-xs font-base text-gray-900 pb-1">User Name<span class="text-red-500 text-xs font-semibold">*</span></label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            bind:value={formData.name}
+            on:input={() => showNameError = false} 
+            class="block w-full rounded-md focus:ring-0 focus:outline-none border focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
+          />
+          {#if formData.name.length > 0 && !/^[a-zA-Z]+$/.test(formData.name)}
+          <span class="text-red-500 text-xs font-normal">Please enter a valid user name.</span>
+         {/if}{#if showNameError}
+          <div class="mt-1 font-normal text-xs text-red-500">Please enter your name.</div>
+        {/if}
+      </div>
+        
+      <div class="sm:col-span-2">
+          <input
+          type="hidden"
+          name="email"
+          id="email"
+          bind:value={formData.email}
+      />
+          <label for="email" class="block tsm:text-sm text-xs font-base text-gray-900 pb-1">Email<span class="text-red-500 text-xs font-semibold">*</span></label>
+        <form
+  action="?/verifyemail"
+  bind:this={form3}
+  method="POST"
+  use:enhance={({}) => {
+      return async ({ result }) => {
+          isLoading = false;
+          // console.log("result", result);
+          if (result.data?.status === 200) {
+              ProfileEmailVerified =
+                  result.data.isEmailVerified;
+              if (authedUserEmailVerified === true) {
+                  ProfileEmailVerified = true;
+              }
+
+              verificationMessage =
+                  result.data.message;
+
+              if (
+                  verificationMessage.includes(
+                      "Verification email sent successfully. Please check your inbox.",
+                  )
+              ) {
+                  displayMessage =
+                      "Please check your inbox.";
+                  emailSent = true;
+                  enteredOtp = "";
+                  isOtpVerified = false;
+              } else {
+                  displayMessage =
+                      verificationMessage;
+                  emailSent = false;
+                  isOtpVerified = false;
+              }
+
+              toast.success(verificationMessage);
+          } else {
+              toast.error(result.data.message);
+              ProfileEmailVerified =
+                  result.data.isEmailVerified;
+              emailSent = false;
+          }
+      };
+  }}
+  class="flex w-full items-center"
+  on:submit={() => {
+      isLoading = true;
+  }}
+>
+  <div class="relative w-full">
+     
+      <input
+          type="text"
+          name="email"
+          id="email"
+          bind:value={formData.email}
+          class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+          placeholder="Email"
+          on:input={() => {
+            showEmailError = false
+              formData.email = formData.email.trim();
+              // validateField("email");
+              errors.email = !formData.email
+                  ? "*Required"
+                  : !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                      formData.email,
+                  ) ||
+                  formData.email
+                      .split("@")[1]
+                      .includes("gamil")
+                  ? "Please enter a valid email address"
+                  : "";
+              ProfileEmailVerified = false;
+              emailSent = false;
+              authedUserEmailVerified = false;
+          }}
+      />
+      {#if showEmailError}
+    <div class="mt-1 font-normal text-xs text-red-500">Please enter your email.</div>
+  {/if}
+  <!-- {#if showEmailVerifyError}
+  <div class="mt-1 font-normal text-xs text-red-500">Please select at least one issue.</div>
+{/if} -->
+      {#if isLoading}
+          <span
+              class="absolute right-2 top-1/2  transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
+          >
+              <Icon
+                  icon="line-md:loading-alt-loop"
+                  class="w-4 h-4 mr-1"
+              />
+              Verifying...
+          </span>
+      {:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
+          <button
+              type="submit"
+              class="absolute right-2 top-1/2  transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
+              disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                  formData.email,
+              ) ||
+                  formData.email
+                      .split("@")[1]
+                      .includes("gamil")}
+          >
+              Verify
+          </button>
+      {:else if emailSent}
+          <span
+              class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+          >
+              {#if isOtpVerified}
+                  Verified
+                  <Icon
+                      icon="material-symbols:verified-rounded"
+                      class="w-4 h-4 mt-2 ml-1"
+                  />
+              {:else}
+                  <Icon
+                      icon="fluent:mail-all-read-16-filled"
+                      class="w-4  h-4 mr-1"
+                  />
+                  Check your inbox
+              {/if}
+          </span>
+      {:else}
+          <span
+              class="absolute right-2  top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+          >
+              Verified
+              <Icon
+                  icon="material-symbols:verified-rounded"
+                  class="w-4 h-4 ml-1"
+              />
+          </span>
+      {/if}
+  </div>
+</form>
+
+  {#if formData.email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(formData.email)}
+  <span class="text-red-500 text-xs font-normal">Please enter a valid email address.</span>
+ {/if}
+
+ {#if emailSent && isOtpVerified === false}
+ <br />
+
+ <form
+     action="?/verifyOtpEmail"
+     method="POST"
+     use:enhance={() => {
+         return async ({ result }) => {
+             loadingotp = false; // Hide loading spinner when the request is complete
+             if (result.status === 200) {
+                 if (result.data.status === 200) {
+                     const verifiedMessage =
+                         result.data.message;
+                     toast.success(verifiedMessage);
+                     isOtpVerified =
+                         result.data.isEmailVerified;
+                     enteredOtpemail = "";
+                     ProfileEmailVerified = true;
+                     console.log(
+                         isOtpVerified,
+                         "isOtpVerified",
+                     );
+                 } else {
+                     const errorMessage =
+                         result.data.message ||
+                         "An unknown error occurred!";
+                     toast.error(errorMessage);
+                 }
+             } else {
+                 const errorMessage =
+                     result.data.message ||
+                     "Request failed. Please try again.";
+                 toast.error(errorMessage);
+             }
+         };
+     }}
+     on:submit={() => {
+         loadingotp = true; // Show loading message when form is submitted
+     }}
+ >
+     <div class="relative w-full">
+         <input
+             type="hidden"
+             name="email"
+             id="email"
+             bind:value={formData.email}
+         />
+         <input
+             type="text"
+             name="enteredOtp"
+             bind:value={enteredOtpemail}
+             placeholder="Enter 6-digit OTP"
+             class="flex-1 outline-none w-full border-gray-300 border rounded focus:border-primary-400 focus:ring-0 p-2 text-sm"
+             on:input={() => {
+                 enteredOtpemail =
+                     enteredOtpemail.trim();
+             }}
+         />
+         <button
+             type="submit"
+             class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded hover:underline"
+             disabled={loadingotp}
+         >
+             <!-- {loadingotp ? 'Verifying...' : 'Verify'} -->
+             {#if loadingotp}
+                 <span
+                     class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 flex items-center"
+                 >
+                     <Icon
+                         icon="line-md:loading-alt-loop"
+                         class="w-4 h-4 mr-1 animate-spin"
+                     />
+                     Verifying...
+                 </span>
+             {:else}
+                 Verify
+             {/if}
+         </button>
+     </div>
+     <div class="flex justify-end text-sm">
+         <button
+             type="button"
+             on:click={handleResendOtpemail}
+             disabled={loadingotp}
+             class="text-sm text-primary-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+         >
+             Get a new code
+         </button>
+     </div>
+ </form>
+{/if}
+        </div>
+
+        <div class="sm:col-span-2">
+          <label for="url" class="block sm:text-sm text-xs font-base text-gray-900 pb-1">URL/</label>
+          <input
+            type="url"
+            name="url"
+            id="url"
+            bind:value={urls}
+            class="block w-full rounded-md focus:ring-0 focus:outline-none border focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
+          />
+        </div>
+        <div class="sm:col-span-4">
+          <label for="feedback" class="block sm:text-sm text-xs font-base text-gray-900 pb-1">Tell us what we can do better!<span class="text-red-500 text-xs font-semibold">*</span></label>
+          <textarea
+            name="feedback"
+            id="feedback"
+            bind:value={formData.feedback}
+            on:input={() => showFeedbackError = false} 
+            rows="3"
+            class="block w-full rounded-md bg-white px-3 py-1.5 text-sm text-gray-900 focus:ring-0 focus:outline-none border focus:border-primary-500"
+          ></textarea>
+          {#if showFeedbackError}
+    <div class="mt-1 font-normal text-xs text-red-500">Please provide your feedback.</div>
+  {/if}
+        </div>
+      </div>
+
+      <div class="">
+        <div class="mt-10 space-y-10">
+          <fieldset>
+            <legend class="text-sm font-semibold text-gray-900">Share Your Thoughts<span class="text-red-500 text-xs font-semibold">*</span></legend>
+            <p class="mt-1 text-sm text-gray-600">Rate Your Experience on Our Website.</p>
+            <div class="mt-6 space-y-6">
+              {#each ['Excellent', 'Good', 'Average', 'Poor'] as rating}
+                <div class="flex items-center gap-x-3">
+                  <input
+                    type="radio"
+                    id={rating}
+                    name="rating"
+                    class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+                    value={rating}
+                    bind:group={formData.rating}
+                    on:input={() => showRatingError = false} 
+                  />
+                  
+                  <label for={rating} class="block sm:text-sm text-xs font-base text-gray-900">{rating}</label>
+                </div>
+              {/each}
+              {#if showRatingError}
+    <div class="mt-1 font-normal text-xs text-red-500">Please enter a rating.</div>
+  {/if}
+            </div>
+          </fieldset>
+        </div>
+      </div>
+
+      <!-- <input
+             type="hidden"
+             name="status"
+             id="status"
+             bind:value={formData.status}
+         /> -->
+
+         <input type="hidden" name="status" value="unread" />
+
+    </div>
+
+    <div class="mt-6 flex items-center justify-end gap-x-6">
+      <button type="submit" on:click={handleSubmit} class="rounded-md bg-primary-500 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-primary-600">Submit</button>
+    </div>
+  </div>
+
+  {#if showErrors}
+    <div class="font-normal text-xs text-red-500">Please fill in all required fields.</div>
+  {/if}
+  {#if successMessage}
+    <div class="mt-4 text-green-500">{successMessage}</div>
+  {/if}
+</form>
+  </div>
+</section>
+{/if}
+ 
