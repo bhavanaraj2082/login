@@ -1,36 +1,29 @@
 import mongoose from 'mongoose';
-
 const orderSchema = new mongoose.Schema(
   {
-    ordernumber: {
+    orderid: {
       type: Number,
-      required: false,
-      unique: false,
+      required: true
     },
     invoice: {
       type: Number,
-      required: false,
-      unique: false,
+      required: false
     },
     totalprice: {
       type: Number,
-      required: false,
-      unique: false,
+      required: true
     },
     subtotalprice: {
       type: Number,
-      required: false,
-      unique: false,
+      required: true
     },
     shippingprice: {
       type: Number,
-      required: false,
-      unique: false,
+      required: true
     },
     products: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',  // Replace 'Product' with the appropriate model name for the product collection
-      required: false,
+      ref: 'Product'
     }],
     orderdetails: {
       type: mongoose.Schema.Types.Mixed, // For JSON type fields
@@ -38,42 +31,26 @@ const orderSchema = new mongoose.Schema(
     },
     shipdetails: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Shipment', // Replace 'ShipDetail' with the appropriate model name for the ship details collection
-      required: false,
+      ref: 'Shipment'
     }],
-    currency: {
-      type: String,
-      enum: ['USD', 'EUR', 'INR', 'JPY', 'GBP', 'CHF', 'CAD', 'AUD', 'CNY', 'HKD', 'NZD'],
-      required: false,
-    },
     dashuserprofileid: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Profile', // Replace 'UserProfile' with the appropriate model name for the user profile collection
-      required: false,
-    },
-    deliveryaddress: {
-      type: String,
-      required: false,
-    },
-    billingaddress: {
-      type: String,
-      required: false,
+      ref: 'UserProfile',
+      required: true
     },
     status: {
       type: String,
       enum: ['pending', 'shipped', 'completed', 'pending cancellation', 'cancelled'],
-      required: false,
-    },
+      default: 'pending',
+      required: true
+    }
   },
-  { 
+  {
     timestamps: true,
-    collection:"orders"
+    collection: 'orders'
   }
 );
-
-// Create a model based on the schema
 
 const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 
 export default Order;
-

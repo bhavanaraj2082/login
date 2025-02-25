@@ -5,6 +5,8 @@
   import AboutSection from '$lib/components/AboutSection.svelte';
   import Email from '$lib/components/Email.svelte';
   export let data;
+
+  // console.log("============> hoii",data)
   let PopularProducts=data.PopularProductsData
 </script>
 <Herosection/>
