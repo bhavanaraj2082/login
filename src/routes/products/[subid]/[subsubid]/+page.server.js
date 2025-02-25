@@ -36,8 +36,8 @@ export const actions = {
 	},
 	addtocart:async({request,locals})=>{
 		try {
-			const userId = locals?.authedUser?.id || "67af35cb27b8020af0d7aab7"
-			const userEmail = locals?.authedUser?.email || "yusuf@partskeys.com"
+			const userId = locals?.authedUser?.id || ""
+			const userEmail = locals?.authedUser?.email || ""
 			const body = Object.fromEntries(await request.formData())
 			const data = JSON.parse(body.item)
 			//console.log(data);
