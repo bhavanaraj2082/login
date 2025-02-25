@@ -1,8 +1,12 @@
 import { submitContactData } from "$lib/server/mongoActions.js";
+import { sanitizeFormData } from '$lib/utils/sanitize.js';
 export const actions = {
   contactus: async ({ request }) => {
     try {
-      const body = Object.fromEntries(await request.formData());
+      const rawData = Object.fromEntries(await request.formData());
+      const body = sanitizeFormData(rawData);
+      // console.log("bodybody",body);
+      
       await submitContactData(body);
       return {
         type: "success",

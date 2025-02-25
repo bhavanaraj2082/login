@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+
 import mongooseSequence from 'mongoose-sequence';
 
 const AutoIncrement = mongooseSequence(mongoose);
@@ -60,29 +61,24 @@ const orderSchema = new mongoose.Schema(
     },
     totalprice: {
       type: Number,
-      required: false,
-      unique: false,
+      required: true
     },
     subtotalprice: {
       type: Number,
-      required: false,
-      unique: false,
+      required: true
     },
     shippingprice: {
       type: Number,
-      required: false,
-      unique: false,
+      required: true
     },
     products: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',  // Replace 'Product' with the appropriate model name for the product collection
-      required: false,
+      ref: 'Product'
     }],
     orderdetails:[orderDetailsSchema],
     shipdetails: [{
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Shipment', // Replace 'ShipDetail' with the appropriate model name for the ship details collection
-      required: false,
+      ref: 'Shipment'
     }],
     currency: {
       type: String,
@@ -106,12 +102,13 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ['pending', 'shipped', 'completed', 'pending cancellation', 'cancelled'],
-      required: false,
-    },
+      default: 'pending',
+      required: true
+    }
   },
-  { 
+  {
     timestamps: true,
-    collection:"orders"
+    collection: 'orders'
   }
 );
 //delete mongoose.models.Order
@@ -124,4 +121,3 @@ if (!mongoose.models.Order && !orderSchema.paths.orderid.options.autoIncrement) 
 const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 
 export default Order;
-

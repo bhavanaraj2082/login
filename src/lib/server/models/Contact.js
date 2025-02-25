@@ -15,6 +15,11 @@ const contactUSSchema = new Schema(
       match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, // Basic email validation
       trim: true,
     },
+    country: {
+      type: String,
+      required: false,
+      trim: true,
+    },
     subject: {
       type: String,
       required: false,
