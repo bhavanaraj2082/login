@@ -1,6 +1,6 @@
 import { DifferentProds, isProductFavorite } from "$lib/server/mongoLoads.js";
 import { RelatedProductData } from "$lib/server/mongoLoads.js";
-import { CreateProductQuote } from "$lib/server/mongoActions.js";
+import { CreateProductQuote,addToCart } from "$lib/server/mongoActions.js";
 import { CompareSimilarityData } from "$lib/server/mongoLoads.js";
 
 import {
@@ -108,4 +108,17 @@ export const actions = {
       };
     }
   },
+  addtocart:async({request,locals})=>{
+		try {
+			const userId = locals?.authedUser?.id || ""
+			const userEmail = locals?.authedUser?.email ||""
+			const body = Object.fromEntries(await request.formData())
+			const data = JSON.parse(body.item)
+			//console.log(data);
+			return await addToCart(data,userId,userEmail)
+		} catch (error) {
+			console.log(error);
+			return {success:false,message:"Something went wrong"}
+		}
+	}
 };

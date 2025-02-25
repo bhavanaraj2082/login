@@ -891,6 +891,7 @@ export async function DifferentProds(productId) {
   let orderMultiple = 0;
   let priceSize = [];
   let stockId = "";
+  let stock = 0
   let distributorId = "";
 
   // if (partNumber) {
@@ -920,6 +921,7 @@ export async function DifferentProds(productId) {
           priceSize.push(convertedPricing);
           stockId = stockRecord._id.toString();
           distributorId = stockRecord.distributor.toString();
+          stock = stockRecord.stock;
         }
       }
       // console.log("All Pricing Records:", priceSize);
@@ -983,6 +985,7 @@ export async function DifferentProds(productId) {
     orderMultiple,
     manufacturer: product?.manufacturer || {},
     stockId,
+    stock,
     distributorId,
     variants: variantRecord.map((variant) => ({
       _id: variant?._id?.toString() || "",
