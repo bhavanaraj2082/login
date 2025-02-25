@@ -66,12 +66,14 @@ function updateCell(rowIndex, cellIndex, event) {
 			$formData.solvent &&
 			$formData.units &&
 			$formData.volume &&
+			$formData.packagingType &&
 			$formData.analyticalTechnique;
 		let errorMessage = "";
 		export let tog;
 		export let tog1;
 		export let tog2;
 		const solvent = [
+			"Select a solvent",
 			"Acetone",
 			"Acetonitrile",
 			"Benzene",
@@ -169,14 +171,27 @@ function updateCell(rowIndex, cellIndex, event) {
 			unsubscribe();
 		});
 		const saveAndContinue = () => {
-			if (!uploadedFiles) { 
-				errorMessage = "Please upload an Excel file.";
-			} else if (!isFormData) {
-				errorMessage = "Please fill all the details";
-			} else {
-				errorMessage = "";
-				tog2();
-			}
+			if (!isFormData) { 
+    errorMessage = "Please fill all the fields.";
+    setTimeout(() => {
+        errorMessage = "";
+    }, 3000);
+} else if (!uploadedFiles) {
+    errorMessage = "Please upload an Excel file.";
+    setTimeout(() => {
+        errorMessage = "";
+    }, 3000);
+}
+else if (selectedSolvent === "Yes") {
+    errorMessage = "Please select a solvent.";
+    setTimeout(() => {
+        errorMessage = "";
+    }, 3000);
+} else {
+    errorMessage = "";
+    tog2();
+}
+  
 		};
 		
 		onMount(() => {
@@ -190,53 +205,53 @@ function updateCell(rowIndex, cellIndex, event) {
 		
 		
 		<div class="bg-white py-10 flex justify-between">
-			<h1 class="font-bold text-2xl text-black text-opacity-25">
+			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 1: Select custom solution type
 			</h1>
-			<button type="button" class="font-semibold text-primary-500" on:click={tog()}
+			<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog()}
 				>Edit</button
 			>
 		</div>
 		<hr />
 		<div class="bg-white py-10 flex justify-between">
-			<h1 class="font-bold text-2xl text-black text-opacity-25">
+			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 2: Select custom format
 			</h1>
-			<button type="button" class="font-semibold text-primary-500" on:click={tog1()}
+			<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog1()}
 				>Edit</button
 			>
 		</div>
-		<hr />
+		<hr /><hr />
 		<div class=" bg-white py-10">
-			<h1 class="font-bold text-2xl">Step 3: Configure custom solution</h1>
+			<h1 class="font-bold sm:text-2xl text-sm">Step 3: Configure custom solution</h1>
 		</div>
 		<div class="bg-white">
 
 		
 			<button
-				class="box-content h-25 w-4/5 p-4 border-dashed border-primary-500 border-2 ml-3 md:ml-8 py-10 bg-white"
+				class="box-content rounded h-25 w-4/5 p-4 border-dashed border-primary-500 border-2 ml-3 md:ml-8 py-10 bg-white"
 				type="button"
 				on:click={triggerFileInput}
 			>
 			
 			
-			<div class="flex items-center font-bold text-2xl justify-center">
+			<div class="flex items-center font-bold sm:text-2xl text-sm justify-center">
 				<span>Add Components</span>
-				<Icon icon="material-symbols-light:upload" class="text-3xl text-primary-500 ml-2" />
+				<Icon icon="material-symbols-light:upload" class="sm:text-3xl text-lg text-bold text-primary-500 ml-2" />
 			</div>
 			
-			<div>
+			<div class="sm:text-lg text-sm">
 				Upload an Excel
 				<a 
 					href={fileLink} 
 					download="Custom_Quote_Template.xls" 
-					class="text-primary-500 underline ml-1.5 mr-1.5"
+					class="text-primary-500 underline ml-1.5 mr-1.5 sm:text-lg text-sm"
 					role="button">
 					download template
 				</a>
 				of CAS numbers or component names that you wish to add
 			</div>
-				<div>or browse if you already have a file prepared.</div>
+				<div class="sm:text-lg text-sm">or browse if you already have a file prepared.</div>
 			</button>
 			<label>
 				<input
@@ -254,17 +269,17 @@ function updateCell(rowIndex, cellIndex, event) {
 				<thead>
 				  <tr>
 					{#each data.headers as header}
-					  <th class="border p-2 text-center">{header}</th>
+					  <th class="border p-2 text-center bg-gray-300 sm:text-md text-xs">{header}</th>
 					{/each}
-					<th class="border p-2 text-center">Action</th> <!-- Add manually -->
+					<th class="border p-2 text-center bg-gray-300 sm:text-md text-xs">Action</th> <!-- Add manually -->
 				  </tr>
 				</thead>
 				<tbody>
 				  {#each data.rows as row, rowIndex}
 					<tr>
-					  {#each Object.values(row) as cell, cellIndex} <!-- Use Object.values(row) to iterate over the object's values -->
+					  {#each Object.values(row) as cell, cellIndex} 
 						<td
-						  class="border p-2 text-center"
+						  class="border p-2 text-center sm:text-md text-xs "
 						  contenteditable="true"
 						  on:blur={(e) => updateCell(rowIndex, cellIndex, e)}
 						>
@@ -273,7 +288,7 @@ function updateCell(rowIndex, cellIndex, event) {
 					  {/each}
 					  <td class="border p-2 text-center">
 						<button
-						  class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-700"
+						  class="bg-red-500 text-white sm:text-md text-xs px-2 py-1 rounded hover:bg-red-700"
 						  on:click={() => deleteRow(rowIndex)}
 						>
 						  Delete
@@ -288,24 +303,24 @@ function updateCell(rowIndex, cellIndex, event) {
 		  
 		</div>
 		<div class="bg-white">
-			<h1 class="font-bold text-2xl ml-3 md:ml-10 py-5">Would you like to specify a solvent?*</h1>
+			<h1 class="font-bold sm:text-2xl text-sm ml-3 md:ml-10 py-5">Would you like to specify a solvent?*</h1>
 			<div class="mt-4 ml-3 md:ml-20 ">
 				<input
 					type="radio"
 					id="yes"
 					name="solvent"
-					class="form-radio w-2.5 h-2.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+					class="form-radio sm:w-3.5 sm:h-3.5 w-2 h-2 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
 					bind:group={selectedSolvent}
 					value="Yes"
 					on:change={() => {
 						setSolvent("Yes");
 						showSolventDropdown = true;
 					}}
-					style="transform: scale(1.5); margin-right: 10px; "
+					style="transform: scale(1.5); margin-right: 10px;"
 				/>
-				<label for="yes">Yes</label>
+				<label for="yes" class="sm:text-lg text-xs">Yes</label>
 				<input
-				class="form-radio w-2.5 h-2.5 text-primary-500 ml-10 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+				class="form-radio sm:w-3.5 sm:h-3.5 w-2 h-2 text-primary-500 ml-10 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
 				type="radio"
 					id="no"
 					name="solvent"
@@ -318,13 +333,14 @@ function updateCell(rowIndex, cellIndex, event) {
 					}}
 					style="transform: scale(1.5); margin-right: 10px;"
 				/>
-				<label for="no">No</label>
+				<label for="no" class="sm:text-lg text-xs">No</label>
 				{#if showSolventDropdown}
 					<select
-						class="box-content border-1 mt-4 px-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 rounded-md focus:border-primary-500 bg-white "
+						class="box-content border-1 mt-4 px-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 rounded
+						 focus:border-primary-500 bg-white "
 						id="solvent"
 						name="solvent"
-						bind:value={selectedSolvent}
+						
 						on:change={(e) => {
 							updateSelectedSolvent(e.target.value);
 							setSolvent(e.target.value);
@@ -339,67 +355,77 @@ function updateCell(rowIndex, cellIndex, event) {
 			</div>
 		</div>
 		<div class=" bg-white">
-			<h1 class="font-bold text-2xl ml-3 md:ml-10 py-5">Select your packaging type*</h1>
-			<div class="mt-4 ml-3 md:ml-14">
+			<h1 class="font-bold sm:text-2xl text-sm ml-3 md:ml-10 py-5">Select your packaging type*</h1>
+			<div class="mt-4 ml-0 md:ml-14">
 				<div class="flex flex-wrap">
 					<button
-						type="button"
-						class="box-content mx-5 my-4 h-24 w-32 border-2 transition duration-200 ease-in-out flex flex-col items-center justify-center
-						{selectedPackagingType === 'Ampoule' ? 'border-primary-500' : ''}"
-						on:click={() => setPackagingType("Ampoule")}
+					type="button"
+					class="box-content rounded sm:text-md text-xs mx-5 my-4 h-24 w-32 border-2 transition duration-200 ease-in-out flex flex-col items-center justify-center
+					{selectedPackagingType === 'Ampoule' ? 'border-primary-500' : ''}" on:click={() => setPackagingType("Ampoule")}
+					
+				  >
+					<h1 class="text-center sm:text-md text-xs">Ampoule</h1>
+					<div class="relative group">
+					  <Icon icon="ion:information" />
+					  <span class="u-sr-only"></span>
+					  <div
+						class="opacity-0 sm:text-md text-xs group-hover:opacity-100 duration-300 absolute w-40 box-content rounded p-4 border-2 bg-white z-10"
+						style="top: 100%; left: 50%; transform: translateX(-50%);"
+					  >
+						Ampoule
+					  </div>
+					</div>
+				  </button>
+				  
+				  
+				  <button
+				  type="button"
+				  class="box-content rounded mx-5 my-4 h-24 w-32 border-2 transition duration-200 ease-in-out flex flex-col items-center justify-center
+				  {selectedPackagingType === 'Bottle' ? 'border-primary-500' : ''}"  on:click={() => setPackagingType("Bottle")}
+				  
+				>
+				  <h1 class="text-center sm:text-md text-xs">Bottle with screw cap</h1>
+				  <div class="relative group">
+					<Icon icon="ion:information" />
+					<span class="u-sr-only"></span>
+					<div
+					  class="opacity-0 group-hover:opacity-100 duration-300 absolute w-40 box-content rounded p-4 border-2 text-sm bg-white z-10"
+					  style="top: 100%; left: 50%; transform: translateX(-50%);"
 					>
-						<h1 class="text-sm text-center">Ampoule</h1>
-						<div class="relative group">
-							<Icon icon="ion:information" /><span class="u-sr-only"></span>
-							<div
-								class="opacity-0 group-hover:opacity-100 duration-300 absolute w-80 box-content p-4 border-2 text-sm bg-white"
-							>
-								Ampoule
-							</div>
-						</div>
-					</button>
-					<button
-						type="button"
-						class="box-content mx-5 my-4 h-24 w-32 border-2 transition duration-200 ease-in-out flex flex-col items-center justify-center
-				{selectedPackagingType === 'CERTAN' ? 'border-primary-500' : ''}"
-						on:click={() => setPackagingType("CERTAN")}
-					>
-						<h1 class="text-sm text-center">CERTAN capillary bottle</h1>
-						<div class="relative group">
-							<Icon icon="ion:information" /><span class="u-sr-only"></span>
-							<div
-								class="opacity-0 group-hover:opacity-100 duration-300 absolute w-80 box-content p-4 border-2 text-sm bg-white"
-							>
-								CERTAN® capillary bottle provides the benefits of a sealed ampoule
-								with the flexibility of a screw-cap bottle, ensuring minimal
-								evaporation even with volatile materials.
-							</div>
-						</div>
-					</button>
-					<button
-						type="button"
-						class="box-content mx-5 my-4 h-24 w-32 border-2 transition duration-200 ease-in-out flex flex-col items-center justify-center
-						{selectedPackagingType === 'Bottle' ? 'border-primary-500' : ''}"
-						on:click={() => setPackagingType("Bottle")}
-					>
-						<h1 class="text-sm text-center">Bottle with screw cap</h1>
-						<div class="relative group">
-							<Icon icon="ion:information" /><span class="u-sr-only"></span>
-							<div
-								class="opacity-0 group-hover:opacity-100 duration-300 absolute w-80 box-content p-4 border-2 text-sm bg-white"
-							>
-								Bottle with screw cap
-							</div>
-						</div>
-					</button>
+					  Bottle with screw cap
+					</div>
+				  </div>
+				</button>
+				<button
+				type="button"
+				class="box-content rounded sm:text-md text-xs mx-5 my-4 h-24 w-32 border-2 transition duration-200 ease-in-out flex flex-col items-center justify-center
+				{selectedPackagingType === 'CERTAN' ? 'border-primary-500' : ''}" on:click={() => setPackagingType("CERTAN")}
+				
+			  >
+				<h1 class="text-sm text-center sm:text-md">CERTAN capillary bottle</h1>
+				<div class="relative group">
+				  <Icon icon="ion:information" />
+				  <span class="u-sr-only"></span>
+				  <div
+					class="opacity-0 group-hover:opacity-100 duration-300 absolute w-40 box-content rounded p-4 border-2 text-sm bg-white z-10"
+					style="top: 100%; left: 50%; transform: translateX(-50%);"
+				  >
+					CERTAN® capillary bottle provides the benefits of a sealed ampoule
+					with the flexibility of a screw-cap bottle, ensuring minimal
+					evaporation even with volatile materials.
+				  </div>
+				</div>
+			  </button>
+
+				
 				</div>
 			</div>
 		</div>
 		<div class=" bg-white">
-			<h1 class="font-bold text-2xl ml-3 md:ml-10 py-5">What unit volume do you need?*</h1>
+			<h1 class="font-bold sm:text-2xl text-sm ml-3 md:ml-10 py-5">What unit volume do you need?*</h1>
 			<div class="relative">
 				<select
-					class="ml-3 md:ml-20 border-2 border-gray-300 rounded-md mt-5 h-10 w-28 focus:ring-0 focus:outline-none focus:border-primary-500  "
+					class="ml-3 md:ml-20 border-1 border-gray-300 rounded mt-5 h-10 w-28 focus:ring-0 focus:outline-none focus:border-primary-500  "
 					on:change={handleSelect}
 					bind:value={inputValue}
 				>
@@ -411,9 +437,9 @@ function updateCell(rowIndex, cellIndex, event) {
 			</div>
 		</div>
 		<div class=" bg-white">
-			<h1 class="font-bold text-2xl ml-3 md:ml-10 py-5">How many units do you need?*</h1>
+			<h1 class="font-bold sm:text-2xl text-sm ml-3 md:ml-10 py-5">How many units do you need?*</h1>
 			<div
-				class="counter mt-3 ml-3 md:ml-20 p-1  border-gray-300 bg-white inline-flex items-center space-x-1 border-2 rounded-md h-10 w-28 focus:ring-0 focus:outline-none focus:border-primary-500  "
+				class="counter mt-3 ml-3 md:ml-20 p-1  border-gray-300 bg-white inline-flex items-center space-x-1 border-1 rounded h-10 w-28 focus:ring-0 focus:outline-none focus:border-primary-500  "
 
 			>
 				<button
@@ -436,49 +462,51 @@ function updateCell(rowIndex, cellIndex, event) {
 			</div>
 		</div>
 		<div class=" bg-white  py-10">
-			<h1 class="font-bold text-2xl ml-3 md:ml-10">Select your quality level*</h1>
+			<h1 class="font-bold sm:text-2xl text-sm ml-3 md:ml-10">Select your quality level*</h1>
 			<div class="mt-4">
-				<div class="flex flex-wrap lg:ml-10 ml-14">
+				<div class="flex flex-wrap ml-0 md:ml-10">
 					<button
 						type="button"
-						class="box-content mt-4 mx-5 h-20 w-24 p-3 border-2 md:mx-5 lg:mx-10
+						class="box-content rounded mt-4 mx-5 h-20 w-24 p-3 border-2 md:mx-5 lg:mx-10
 								{selectedFormat === 'ISO 17034' ? 'border-primary-500' : ''}"
 						on:click={() => {
 							setquality("ISO 17034");
 						}}
 					>
 						<div class="mx-6 my-2 flex">
-							<div class="text-sm">ISO 17034</div>
+							<div class="sm:text-sm text-xs">ISO 17034</div>
 							<div class="relative group">
-								<Icon icon="ion:information" /><span class="u-sr-only"></span>
+								<Icon icon="ion:information" />
+								<span class="u-sr-only"></span>
 								<div
-									class="opacity-0 group-hover:opacity-100 duration-300 absolute inset-x-0 w-80 box-content p-4 border-2 text-xs"
-									style="background-color:#fff"
+								  class="opacity-0 group-hover:opacity-100 duration-300 absolute w-40 box-content rounded p-4 border-2 text-xs"
+								  style="background-color:#fff; top: 100%; left: 0%; transform: translateX(-50%); z-index: 10;"
 								>
-									ISO 17034 Produced in accordance with internationally recognised
-									requirements for the development and production of reference
-									standards and for the competence of reference standard
-									manufacturers. Find out more.
+								  ISO 17034 Produced in accordance with internationally recognised
+								  requirements for the development and production of reference
+								  standards and for the competence of reference standard
+								  manufacturers. Find out more.
 								</div>
-							</div>
+							  </div>
+							  
 						</div>
 					</button>
 					<button
 						type="button"
-						class="box-content mt-4 mx-5 h-20 w-24 p-3 border-2 md:ml-20 lg:ml-10
+						class="box-content rounded mt-4 mx-5 h-20 w-24 p-3 border-2 md:ml-20 lg:ml-10
 					{selectedFormat === 'ISO/IEC 17025' ? 'border-primary-500' : ''}"
 						on:click={() => {
 							setquality("ISO/IEC 17025");
 						}}
 					>
 						<div class="mx-6 my-2 flex">
-							<div class="text-sm">ISO/IEC 17025</div>
+							<div class="text-smsm:text-sm text-xs">ISO/IEC 17025</div>
 							<div class="relative group">
 								<Icon icon="ion:information" /><span class="u-sr-only"></span>
 								<div
-									class="opacity-0 group-hover:opacity-100 duration-300 absolute inset-x-0 w-80 box-content p-4 border-2 text-xs"
-									style="background-color:#fff"
-								>
+								class="opacity-0 group-hover:opacity-100 duration-300 absolute w-40 box-content rounded p-4 border-2 text-xs"
+								style="background-color:#fff; top: 100%; left: 0%; transform: translateX(-50%); z-index: 10;"
+							  >
 									ISO/IEC 17025 Produced in accordance with internationally
 									recognised requirements for the development and production of
 									reference standards and for the competence of reference standard
@@ -491,18 +519,18 @@ function updateCell(rowIndex, cellIndex, event) {
 			</div>
 		</div>
 		<div class=" bg-white ">
-			<h1 class="font-bold text-2xl ml-3 md:ml-10">
+			<h1 class="font-bold sm:text-2xl text-sm ml-3 md:ml-10">
 				Which analytical technique will you use with this solution?*
 			</h1>
-			<p class="my-5 ml-3 md:ml-11">
+			<p class="my-5 ml-3 md:ml-11 sm:text-md text-xs">
 				We aim to optimise our solutions for your needs. Some components/solvents,
 				for example, do not perform well with certain analytical techniques. We may
 				offer a revised mixture in these cases.
 			</p>
-			<div class="lg:flex grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ml-3 md:ml-14">
+			<div class="lg:flex grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ml-0 md:ml-14">
 				<button
 					type="button"
-					class="box-content mt-4 mx-5 h-20 w-28 p-3 border-2 transition duration-200 ease-in-out
+					class="box-content rounded mt-4 mx-5 h-20 w-28 p-3 border-2 transition duration-200 ease-in-out
 					hover:border-primary-500 {setanalytic === 'GC'
 						? 'border-primary-500'
 						: ''}"
@@ -511,12 +539,12 @@ function updateCell(rowIndex, cellIndex, event) {
 					}}
 				>
 					<div class="mx-6">
-						<div class="text-sm">GC</div>
+						<div class="sm:text-sm text-xs">GC</div>
 					</div>
 				</button>
 				<button
 					type="button"
-					class="box-content mt-4 mx-5 h-20 w-28 p-3 border-2 transition duration-200 ease-in-out
+					class="box-content rounded mt-4 mx-5 h-20 w-28 p-3 border-2 transition duration-200 ease-in-out
 					hover:border-primary-500 {setanalytic === 'LC'
 						? 'border-primary-500'
 						: ''}"
@@ -525,12 +553,12 @@ function updateCell(rowIndex, cellIndex, event) {
 					}}
 				>
 					<div class="mx-6">
-						<div class="text-sm">LC</div>
+						<div class="sm:text-sm text-xs">LC</div>
 					</div>
 				</button>
 				<button
 					type="button"
-					class="box-content mt-4 mx-5 h-20 w-28 p-3 border-2 transition duration-200 ease-in-out
+					class="box-content rounded mt-4 mx-5 h-20 w-28 p-3 border-2 transition duration-200 ease-in-out
 					hover:border-primary-500 {setanalytic === 'GC and LC'
 						? 'border-primary-500'
 						: ''}"
@@ -539,7 +567,7 @@ function updateCell(rowIndex, cellIndex, event) {
 					}}
 				>
 					<div class="mx-6">
-						<div class="text-sm">GC and LC</div>
+						<div class="sm:text-sm text-xs">GC and LC</div>
 					</div>
 				</button>
 			</div>
@@ -555,27 +583,26 @@ function updateCell(rowIndex, cellIndex, event) {
 			<button
 				type="button"
 				on:click={saveAndContinue}
-				class="ml-3 md:ml-20 mt-10 text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
+				class="sm:ml-10 ml-0 mt-10 text-white sm:text-sm text-xs bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded sm:px-5 px-2 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none dark:focus:ring-primary-500 my-5"
 				>Save & continue</button
 			>
 			
 		</div>
-		<hr />
 		<div class="bg-white py-10 flex justify-between">
-			<h1 class="font-bold text-2xl text-black text-opacity-25">
+			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 4: Additional notes
 			</h1>
 		</div>
-		<hr />
+		<hr /><hr />
 		<div class="bg-white py-10 flex justify-between">
-			<h1 class="font-bold text-2xl text-black text-opacity-25">
+			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 5: Customer details
 			</h1>
 		</div>
-		<hr />
+		<hr /><hr />
 		<div class="bg-white py-10 flex justify-between">
-			<h1 class="font-bold text-2xl text-black text-opacity-25">
+			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 6: Delivery information
 			</h1>
 		</div>
-		<hr />
+		<hr /><hr />

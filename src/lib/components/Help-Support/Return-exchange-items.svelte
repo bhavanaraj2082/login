@@ -125,6 +125,7 @@
         return using the form below.
       </p>
       <div>
+        <!-- svelte-ignore a11y-label-has-associated-control -->
         <label class="block text-sm"
           >*Please select the option that best describes your issue:</label
         >
@@ -177,10 +178,12 @@
       </div>
 
   <div class="mt-4">
+    <!-- svelte-ignore a11y-label-has-associated-control -->
     <label class="block text-sm">Please let us know how we may assist you:</label>
     <textarea rows="5" name="assistance" bind:value={assistance} class="w-full border p-2 text-sm" required></textarea>
   </div>
 
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <div class="mt-4">
         <label class="block text-sm pb-2"
           >Please attach any images or files that may assist in troubleshooting

@@ -28,3 +28,11 @@ export const sendMessage = (actionTarget, formData, callback) => {
 		console.log('-----error------', _);
 	}
 };
+
+export function generateInvoiceNumber() {
+    const todayDate = new Date().toISOString().slice(2, 10).replace(/-/g, '');
+    const currentTime = new Date().getTime();
+    const randomComponent = Math.floor(Math.random() * 100);
+    const invoiceNumber = `${todayDate}${currentTime.toString().slice(-4)}-${String(randomComponent).padStart(2, '0')}`;
+    return invoiceNumber;
+}

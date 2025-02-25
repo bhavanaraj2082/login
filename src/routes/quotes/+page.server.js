@@ -1,9 +1,13 @@
 import { Addquotes } from '$lib/server/mongoActions.js';
+import { sanitizeFormData } from '$lib/utils/sanitize.js';
 export const actions = {
     qoutes: async ({ request }) => {
         try {
-            const data = Object.fromEntries(await request.formData());
+            const rawData = Object.fromEntries(await request.formData());
+            const data = sanitizeFormData(rawData);
             const record = await Addquotes(data);
+            console.log("server record",record);
+            
             return {
                 type: "success",
                 data: {

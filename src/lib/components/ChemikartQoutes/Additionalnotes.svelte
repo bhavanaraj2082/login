@@ -16,35 +16,34 @@
 	};
 </script>
 <div class="py-10 flex justify-between bg-white ">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">
+	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 		Step 1: Select custom solution type
 	</h1>
-	<button class="font-semibold text-primary-500" on:click={tog()}>Edit</button>
+	<button class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog()}>Edit</button>
 </div>
 <hr />
 <div class="py-10 flex justify-between bg-white ">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">
+	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 		Step 2: Select custom format
 	</h1>
-	<button class="font-semibold text-primary-500" on:click={tog1()}>Edit</button>
+	<button class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog1()}>Edit</button>
 </div>
-<hr />
+<hr /><hr />
 <div class=" py-10 flex justify-between bg-white ">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">
+	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 		Step 3: Configure custom solution
 	</h1>
-	<button class="font-semibold text-primary-500" on:click={tog2()}>Edit</button>
+	<button class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog2()}>Edit</button>
 </div>
-<hr />
+<hr /><hr />
 <div class="bg-white ">
-	<h1 class="font-bold text-2xl py-10 bg-white ">Step 4: Additional notes</h1>
-	<hr />
-	<div class="lg:ml-20 ml-3 bg-white ">
-	<h1 class="font-semibold py-5 text-primary-500">Further details or requests</h1>
+	<h1 class="font-bold sm:text-2xl text-sm pt-10 bg-white ">Step 4: Additional notes</h1>
+	<div class="bg-white sm:ml-10 ml-0">
+	<h1 class="font-semibold py-5 text-primary-500 sm:text-md text-sm">Further details or requests</h1>
 	<textarea
 		rows="6"
-		class="w-5/6 sm:w-80 p-2  border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500
-		border-1 focus:border-primary-500"
+		class="w-5/6 sm:w-80 p-2 rounded border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500
+		border-1 focus:border-primary-500 placeholder:text-sm"
 		bind:value={$AddNoted}
 		name="futherdetails"
 		placeholder="Add your notes here..."
@@ -56,19 +55,18 @@
 	<button
 		type="button"
 		on:click={handleSubmit}
-		class="text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none dark:focus:ring-primary-500 px-20 my-5">Save & continue</button
+		class="text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded sm:text-sm text-xs sm:px-5 px-2 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none dark:focus:ring-primary-500 my-5">Save & continue</button
 	>
 </div>
 </div>
-<hr />
 <div class="py-10 bg-white  flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">
+	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 		Step 5: Customer details
 	</h1>
 </div>
-<hr />
+<hr /><hr />
 <div class="py-10 bg-white  flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">
+	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 		Step 6: Delivery information
 	</h1>
 </div>

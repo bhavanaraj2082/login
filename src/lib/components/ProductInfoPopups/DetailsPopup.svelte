@@ -143,8 +143,3 @@ class="p-4 md:p-6 lg:p-8 max-w-4xl mx-auto bg-white rounded-md shadow-md max-h-[
 
 <div class="fixed inset-0 bg-black opacity-50 z-40"></div>
 {/each}
-
-
-
-
-

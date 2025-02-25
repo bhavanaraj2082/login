@@ -52,7 +52,6 @@
 			})
 		};
 	});
-
 	const shippedQuantities = shippedDetails.reduce((acc, item) => {
 		if (!acc[item.id]) {
 			acc[item.id] = 0;

@@ -8,6 +8,10 @@
 	import { goto } from '$app/navigation';
 	import { slide, fade } from 'svelte/transition';
 
+	export let data
+
+	$:cartId = data?.cart?.cart[0]?.cartId || ""
+
 	let menus = [];
 	let submenuLeaveTimeoutId;
 	let subSubmenuLeaveTimeoutId;
@@ -335,7 +339,7 @@
 					/>
 				</button>
 			</a>
-			<Cartrightside />
+			<Cartrightside {cartId}/>
 		</div>
 		<!-- Searchbar functionality -->
 		<div class="relative sm:max-w-3xl md:max-w-sm lg:max-w-md xl:max-w-xl  sm:mt-2 w-full sm:pb-0 pb-2 mx-auto">
@@ -589,7 +593,7 @@
 						</button>
 					</a>
 				</div>
-				<Cartrightside />
+				<Cartrightside {cartId} />
 			</div>
 		</div>
 	</div>

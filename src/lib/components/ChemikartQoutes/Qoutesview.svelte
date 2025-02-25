@@ -2,6 +2,7 @@
 	import { tick } from 'svelte';
 	import { derived } from 'svelte/store'
 	import { resetFormData } from  '$lib/stores/solution_stores.js';
+  import { toast, Toaster } from "svelte-sonner";
 		let successMessage = '';
 		let errorMessage = '';
 		let messageContainer;
@@ -38,24 +39,30 @@
   const componentsString = derived(formData, $formData => JSON.stringify($formData.components))
 
 	</script>
-<form method="POST" action="?/qoutes" class="mx-10 lg:p-8 md:p-2 bg-white rounded-lg shadow-lg mb-4 space-y-6"
+<form method="POST" action="?/qoutes" class="mb-4 space-y-6"
  use:enhance={() => {return async({ result }) => {
     let message1 = '';
     let keywordError = '';
+    // console.log("result form",result);
+    // console.log("result.data.data.record.quoteId form",result.data.data.record.quoteId);
     keywordError = result.data.type;
-    if (keywordError === "success") {
+    let quoteNo ='';
+    quoteNo = result.data.quoteId;
+        if (keywordError === "success") {
       message1 = result.data.data.message; 
+      toast.success(message1);
       setTimeout(() => {
         location.reload();
       }, 2000)
     } else if (keywordError === "error") {
-      message1 = result.data.data.error; 
+      message1 = result.data.data.error;
+      toast.error(message1); 
     }
     showMessage(message1, keywordError);
   };
 }}>
 
-<div class="mt-3" bind:this={messageContainer}>
+<!-- <div class="mt-3" bind:this={messageContainer}>
   {#if errorMessage === "success"}
     <div class="text-center bg-green-100 text-green-700 py-2 mb-4 rounded-md">
       {successMessage}
@@ -65,41 +72,46 @@
       {successMessage}
     </div>
   {/if}
-</div>
+</div> -->
 
   <!-- Custom solution type -->
+   
   <div class="sm:flex justify-between items-center">
     <div class="flex items-center">
-      <h1 class="font-semibold text-lg">Custom solution type:</h1>
-      <p class="ml-2 text-gray-600">{$solutionType}</p>
+      <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs mr-5 block sm:hidden" on:click={tog}>Edit</button>
+      <h1 class="font-semibold sm:text-lg text-sm">Custom solution type:</h1>
+      <p class="ml-2 text-gray-600 sm:text-sm text-xs">{$solutionType}</p>
     </div>
-    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs sm:mt-0 mt-5 hidden sm:block" on:click={tog}>Edit</button>
   </div>
 
   <!-- Custom format -->
   <div class="sm:flex justify-between items-center">
     <div class="flex items-center">
-      <h1 class="font-semibold text-lg">Custom format:</h1>
-      <p class="ml-2 text-gray-600">{$formatType}</p>
+      <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs mr-5 block sm:hidden" on:click={tog1}>Edit</button>
+      <h1 class="font-semibold sm:text-lg text-sm">Custom format:</h1>
+      <p class="ml-2 text-gray-600 sm:text-sm text-xs">{$formatType}</p>
     </div>
-    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog1}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs sm:mt-0 mt-5 hidden sm:block" on:click={tog1}>Edit</button>
   </div>
 
   <!-- Custom solution (Components) -->
-  <div class="sm:flex justify-between items-center">
+  <div class="sm:flex justify-between items-center ">
     <div class="flex items-center">
-      <h1 class="font-semibold text-lg">Configure custom solution:</h1>
+      <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs mr-5 block sm:hidden" on:click={tog2}>Edit</button>
+      <h1 class="font-semibold sm:text-lg text-sm">Configure custom solution:</h1>
     </div>
-    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog2}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs sm:mt-0 mt-5 hidden sm:block" on:click={tog2}>Edit</button>
   </div>
+  <div  class="border-2 border-gray-100 rounded p-3">
   <div class="flex flex-col sm:flex-row items-start sm:items-center">
-    <h2 class="text-black text-base font-medium">Components:</h2>
+    <h2 class="text-black sm:text-sm text-xs font-medium mb-1">Components:</h2>
     {#if $formData.components.length > 0}
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-2 sm:gap-4 ml-0 sm:ml-2 w-full">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-2 sm:gap-4 ml-1 sm:ml-2 w-full">
         {#each $formData.components as component}
-          <div class="p-4 border rounded-lg shadow-sm text-xs sm:text-lg w-full max-w-full break-words">
+          <div class="p-2 sm:border rounded shadow-sm  sm:sm:text-lg text-xs w-full max-w-full break-words">
             {#each Object.entries(component).slice(0, 3) as [key, value]}
-              <div class="text-gray-600 mb-2">
+              <div class="text-gray-600 pb-1 sm:text-sm text-xs">
                 <strong>{key}:</strong> {value}
               </div>
             {/each}
@@ -110,71 +122,82 @@
       <p class="text-gray-600 mt-4">No components added yet.</p>
     {/if}
   </div>
-  <div class="lg:flex md:flex items-center">
-    <label for="solvent" class="text-black text-base font-medium">Solvent:</label>
-    <p class="md:ml-2 ml-0 text-gray-600">{$formData.solvent}</p>
+  <div class="flex items-center mt-2">
+    <label for="solvent" class="text-black sm:text-sm text-xs font-medium">Solvent:</label>
+    <p class="ml-2 text-gray-600 sm:text-sm text-xs">{$formData.solvent}</p>
   </div>
-  <div class="lg:flex md:flex items-center">
-    <label for="packagingType" class="text-black text-base font-medium">Packaging Type:</label>
-    <p class="md:ml-2 ml-0 text-gray-600">{$formData.packagingType}</p>
+  <div class="flex items-center mt-1">
+    <label for="packagingType" class="text-black sm:text-sm text-xs font-medium">Packaging Type:</label>
+    <p class="ml-2 text-gray-600 sm:text-sm text-xs">{$formData.packagingType}</p>
   </div>
-  <div class="lg:flex md:flex items-center">
-    <label for="volume" class="text-black text-base font-medium">Volume:</label>
-    <p class="md:ml-2 ml-0 text-gray-600">{$formData.volume}</p>
+  <div class="flex items-center mt-1">
+    <label for="volume" class="text-black sm:text-sm text-xs font-medium">Volume:</label>
+    <p class="ml-2 text-gray-600 sm:text-sm text-xs">{$formData.volume}</p>
   </div>
-  <div class="lg:flex md:flex items-center">
-    <label for="units" class="text-black text-base font-medium">Units:</label>
-    <p class="md:ml-2 ml-0 text-gray-600">{$formData.units}</p>
+  <div class="flex items-center mt-1">
+    <label for="units" class="text-black sm:text-sm text-xs font-medium">Units:</label>
+    <p class="ml-2 text-gray-600 sm:text-sm text-xs">{$formData.units}</p>
   </div>
-  <div class="lg:flex md:flex items-center">
-    <label for="qualityLevel" class="text-black text-base font-medium">Quality Level:</label>
-    <p class="md:ml-2 ml-0 text-gray-600">{$formData.qualityLevel}</p>
+  <div class="flex items-center mt-1">
+    <label for="qualityLevel" class="text-black sm:text-sm text-xs font-medium">Quality Level:</label>
+    <p class="ml-2 text-gray-600 sm:text-sm text-xs">{$formData.qualityLevel}</p>
   </div>
-  <div class="lg:flex md:flex items-center">
-    <label for="analyticalTechnique" class="text-black text-base font-medium">Analytical Technique:</label>
-    <p class="md:ml-2 ml-0 text-gray-600">{$formData.analyticalTechnique}</p>
+  <div class="flex items-center mt-1">
+    <label for="analyticalTechnique" class="text-black sm:text-sm text-xs font-medium">Analytical Technique:</label>
+    <p class="ml-2 text-gray-600 sm:text-sm text-xs">{$formData.analyticalTechnique}</p>
   </div>
+</div>
   
   <!-- Additional Notes -->
   <div class="sm:flex justify-between items-center">
     <div class="flex items-center">
-      <h1 class="font-semibold text-lg">Additional notes:</h1>
-      <p class="ml-2 text-gray-600">{$AddNoted}</p>
+      <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs mr-5 block sm:hidden" on:click={tog3}>Edit</button>
+      <h1 class="font-semibold sm:text-lg text-sm">Additional notes:</h1>
+      <p class="ml-2 text-gray-600 sm:text-sm text-xs">{$AddNoted}</p>
     </div>
-    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog3}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs sm:mt-0 mt-5 hidden sm:block" on:click={tog3}>Edit</button>
   </div>
 
   <!-- Customer Details -->
-  <div class="sm:flex justify-between items-center">
-    <div>
-      <h1 class="font-semibold text-lg mb-3">Customer details:</h1>
-      <div class="space-y-4">
-        {#each Object.entries($Cusdetails) as [key, value]}
-          <div class="lg:flex md:flex items-center">
-            <label for={key} class="text-black text-base font-medium ml-1">{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
-            <p class="ml-2 text-gray-600">{value}</p>
-          </div>
-        {/each}
-      </div>
+  <div class="sm:flex justify-between items-center ">
+    <div class="flex items-center">
+      <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs mr-5 block sm:hidden" on:click={tog2}>Edit</button>
+      <h1 class="font-semibold sm:text-lg text-sm">Configure custom solution:</h1>
     </div>
-    <button type="button" class="font-semibold lg:ml-2 sm:ml-0 text-primary-500 hover:text-primary-600 sm:mt-0 mt-5" on:click={tog4}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs sm:mt-0 mt-5 hidden sm:block" on:click={tog2}>Edit</button>
   </div>
 
+<div class="border-2 border-gray-100 rounded p-3 space-y-4">
+    {#each Object.entries($Cusdetails) as [key, value]}
+<div class="flex items-center">
+<label for={key} class="text-black sm:text-sm text-xs font-medium ml-1">
+  {key === 'LGC' ? 'Invoice Number' : key.charAt(0).toUpperCase() + key.slice(1)}:
+</label>
+<p class="ml-2 text-gray-600 sm:text-sm text-xs">{value}</p>
+</div>
+{/each}
+</div>
+
   <!-- Delivery Details -->
-  <div class="sm:flex justify-between items-center">
-    <div>
-      <h1 class="font-semibold text-lg mb-3">Delivery Details:</h1>
-      <div class="space-y-4">
-        {#each Object.entries($Delivery) as [key, value]}
-          <div class="lg:flex md:flex items-center">
-            <label for={key} class="text-black text-base font-medium ml-1">{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
-            <p class="ml-2 text-gray-600">{value}</p>
-          </div>
-        {/each}
-      </div>
+  <div class="sm:flex justify-between items-center ">
+    <div class="flex items-center">
+      <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs mr-5 block sm:hidden" on:click={tog2}>Edit</button>
+      <h1 class="font-semibold sm:text-lg text-sm">Configure custom solution:</h1>
     </div>
-    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 lg:ml-2 sm:ml-0 sm:mt-0 mt-5" on:click={tog5}>Edit</button>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs sm:mt-0 mt-5 hidden sm:block" on:click={tog2}>Edit</button>
   </div>
+  <div class="border-2 border-gray-100 rounded p-3 space-y-4">
+    {#each Object.entries($Delivery) as [key, value]}
+<div class="flex items-center">
+<label for={key} class="text-black sm:text-sm text-xs font-medium ml-1">
+  {key === 'Country' ? 'State' : 
+   key === 'County' ? 'GST' : 
+   key.charAt(0).toUpperCase() + key.slice(1)}:
+</label>
+<p class="ml-2 text-gray-600 sm:text-sm text-xs">{value}</p>
+</div>
+{/each}
+</div>
 
   <!-- Hidden Inputs -->
   <input type="hidden" name="solutionValue" bind:value={$solutionType} />
@@ -205,11 +228,12 @@
   
   <!-- Form buttons -->
   <div class="flex space-x-4 mt-6">
-    <button type="submit" class="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-none focus:ring focus:ring-primary-500">
+    <button type="submit" class="rounded sm:text-sm text-xs sm:px-5 px-2 py-3 bg-primary-500 text-white hover:bg-primary-600 focus:outline-none focus:ring focus:ring-primary-500">
       Send quote request
     </button>
-    <!-- <button type="button" on:click={refreshPage} class="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 focus:outline-none focus:ring focus:ring-primary-500">
+    <!-- <button type="button" on:click={refreshPage} class="px-6 py-3 bg-primary-500 text-white rounded hover:bg-primary-600 focus:outline-none focus:ring focus:ring-primary-500">
       Back
     </button> -->
   </div>
 </form> 
+<Toaster position="bottom-right" richColor/>

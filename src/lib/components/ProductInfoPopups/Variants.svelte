@@ -4,20 +4,47 @@
   const allVariants = record.variants;
   const allManufacturer = record.manufacturer;
 
+  // function getMinMaxPrices(pricing) {
+  //   if (!pricing || !pricing.length) return { minPrice: 'N/A', maxPrice: 'N/A' };
+
+  //   const prices = pricing.map(p => p.INR).filter(price => typeof price === 'number');
+  //   if (!prices.length) return { minPrice: 'N/A', maxPrice: 'N/A' };
+
+  //   return {
+  //     minPrice: Math.min(...prices),
+  //     maxPrice: Math.max(...prices)
+  //   };
+  // }
+
   function getMinMaxPrices(pricing) {
-    if (!pricing || !pricing.length) return { minPrice: 'N/A', maxPrice: 'N/A' };
-    
-    const prices = pricing.map(p => p.INR).filter(price => typeof price === 'number');
-    if (!prices.length) return { minPrice: 'N/A', maxPrice: 'N/A' };
-    
-    return {
-      minPrice: Math.min(...prices),
-      maxPrice: Math.max(...prices)
-    };
+    if (!pricing) {
+      console.warn("Warning: Pricing data is undefined or null!", pricing);
+      return { minPrice: "--", maxPrice: "--" };
+    }
+    let prices = [];
+    if (Array.isArray(pricing)) {
+      // If pricing is an array, extract INR values
+      prices = pricing
+        .map((p) => p.INR)
+        .filter((price) => typeof price === "number" && !isNaN(price));
+    } else if (typeof pricing === "object" && pricing.INR !== undefined) {
+      // If pricing is a single object, extract INR directly
+      prices = [pricing.INR];
+    }
+    if (prices.length === 0) {
+      console.warn("No valid INR prices found in pricing data!", pricing);
+      return { minPrice: "--", maxPrice: "--" };
+    }
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    // console.log(`Min Price: ${minPrice}, Max Price: ${maxPrice}`);
+    return { minPrice, maxPrice };
   }
 </script>
 
-<div class="container mx-auto px-4 py-6">
+<div
+  class="md:w-11/12 max-w-7xl bg-white mx-auto shadow-sm border border-gray-200 rounded-lg m-10"
+>
   <h1 class="w-full text-left text-2xl text-primary-400 font-bold p-3">
     Products
   </h1>
@@ -38,7 +65,11 @@
             {@const { minPrice, maxPrice } = getMinMaxPrices(variant.pricing)}
             <tr class="bg-white border-b hover:bg-gray-50">
               <td class="py-4 px-6">
-                <img src={variant.imageSrc} alt={variant.productNumber} class="w-20">
+                <img
+                  src={variant.imageSrc}
+                  alt={variant.productNumber}
+                  class="w-20"
+                />
               </td>
               <td class="py-4 px-6 text-primary-400 font-medium cursor-pointer">
                 {variant.productNumber}
@@ -47,7 +78,9 @@
               <td class="py-4 px-6">
                 <span>
                   {#if minPrice === maxPrice}
-                    <span class="font-semibold text-black">₹ {minPrice.toLocaleString()}</span>
+                    <span class="font-semibold text-black"
+                      >₹ {minPrice.toLocaleString()}</span
+                    >
                   {:else}
                     <span class="font-semibold text-black">
                       ₹ {minPrice.toLocaleString()} - ₹ {maxPrice.toLocaleString()}

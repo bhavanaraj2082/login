@@ -10,35 +10,10 @@ const registerSchema = new mongoose.Schema(
         type:String,
         required:true
     },
-    password:{
-        type:String,
-        required:true
-    },
-    confirmpassword:{
-        type:String,
-        required:true
-    },
-    language: {
-      type: String,
-      required: false,
-    },
-    location: {
-      type: String,
-      required: false,
-    },
-    chemiDashProfileId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Profile',
-      required: false,
-    },
-    termsAndConditions: {
-      type: Boolean,
-      required: true,
-    },
   },
   {
     timestamps: true, // Optional: add createdAt and updatedAt fields
-    collection:"registers"
+    collection:"users"
   }
 );
 
