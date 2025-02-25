@@ -1,16 +1,11 @@
 import { checkoutOrder,updateBillingAddress,updateShippingAddress } from "$lib/server/mongoActions.js";
 import { getProfileDetails,getCart } from "$lib/server/mongoLoads.js";
-// import { authedUser } from "$lib/stores/mainStores.js";
 
-// created authed user object to send userId
-let authedUser={
-    userId:"67af35cb27b8020af0d7aab7"
-}
-
-export const load = async ({depends}) => {
+export const load = async ({depends,locals}) => {
     try {
-       const result = await getProfileDetails(authedUser.userId);
-       const cart =  await getCart(authedUser.userId)
+       const userId = locals?.authedUser?.id || ""
+       const result = await getProfileDetails(userId);
+       const cart =  await getCart(userId)
        depends("data:checkout")
        return { cart,result}  
     } catch (error) {
@@ -24,7 +19,7 @@ export const load = async ({depends}) => {
 export const actions = {
     checkout:async({request,locals})=>{
         try {
-            const userId = locals?.authedUser?.id || "67af35cb27b8020af0d7aab7"
+            const userId = locals?.authedUser?.id || ""
             const body = Object.fromEntries(await request.formData())
             const parsedBody = JSON.parse(body.order)
             parsedBody.userId = userId
@@ -38,7 +33,6 @@ export const actions = {
     shippingaddress: async ({ request }) => {
       try {
         let body = Object.fromEntries(await request.formData());
-        console.log(" in shipping", body);
         return await updateShippingAddress(body)  
       } catch (error) {
         console.log(error);
@@ -47,7 +41,6 @@ export const actions = {
     billingaddress: async ({ request }) => {
       try {
         let body = Object.fromEntries(await request.formData());
-         console.log("in billing", body);
         return await updateBillingAddress(body)
       } catch (error) {
         console.log(error);

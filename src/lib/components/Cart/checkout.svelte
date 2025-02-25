@@ -12,6 +12,7 @@
 	import AddressForm from '$lib/components/Cart/AddressForm.svelte';
 
 	export let data;
+	console.log(data);
 	$: userData = data.result.profileData;
 	$: shipping = userData?.shippingAddress;
 	$: billing = userData?.billingAddress;
@@ -239,10 +240,10 @@
 		<h3 class="text-md font-semibold text-gray-600">Address Selection</h3>
 		 <div class=" flex flex-col md:flex-row gap-4 mb-1">
 			<label for="" class=" w-full font-medium text-sm text-gray-600"> Email <br>
-			    <input class=" w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+			    <input value={$authedUser.email} class="mt-2 w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
 			</label>
 			<label for="" class=" w-full font-medium text-sm text-gray-600"> GST Number <br>
-				<input class=" w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+				<input value={userData.gstNumber} class="mt-2 w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
 			</label>
 		 </div>
 		<div class=" lg:flex gap-4">
@@ -317,7 +318,7 @@
 			</div>
 			{#if $cart.length}
 				<div class=" mt-4 grid grid-cols-2 gap-2">
-					{#if !$authedUser.email}
+					{#if $authedUser.email}
 						<form method="POST" action="?/checkout" use:enhance={handleSubmit} class=" col-span-2">
 							<input type="hidden" name="order" value={JSON.stringify(checkout)}/>
 							<button
@@ -394,6 +395,8 @@
 									    <p>₹{(item.pricing.INR * (1 + (18 / 100))).toLocaleString("en-IN")} with GST</p>
 									    <p class=" text-2s text-gray-400">₹{item.pricing.INR.toLocaleString("en-IN")} without GST</p>
 									</div>
+								
+							    </div>
 								<div class=" lg:w-2/6">
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Quantity</h3>
 							        	<div class="flex items-center rounded">
@@ -412,8 +415,6 @@
 											</button> -->
 							        	</div>
 							        </div>
-							    </div>
-							
 								<div class=" lg:w-2/6">
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Total</h3>
 							        <div class=" w-full flex justify-start items-center">

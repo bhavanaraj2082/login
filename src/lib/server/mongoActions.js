@@ -20,6 +20,7 @@ import Cart from "$lib/server/models/Cart.js"
 import Distributor from "$lib/server/models/Distributor.js"
 import { v4 as uuidv4 } from 'uuid';
 import { auth, authErrorMessages } from '$lib/server/lucia.js';
+import User from "$lib/server/models/User.js";
 import nodemailer from 'nodemailer';
 import { nanoid } from 'nanoid';
 // import { lucia } from 'lucia';

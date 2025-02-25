@@ -1,20 +1,21 @@
 <script>
+    import { onMount } from 'svelte';
+	import '../app.css';
 	import { sendMessage } from '$lib/utils.js';
 	import { cart,guestCart } from '$lib/stores/cart.js';
-	import '../app.css';
 	import { Toaster } from 'svelte-sonner';
 	import Header from '$lib/components/HeaderDropdownCart/Header.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { authedUser } from '$lib/stores/mainStores.js';
 	import AllowCookies from '$lib/components/AllowCookies.svelte';
-    import { onMount } from 'svelte';
 
 	export let data;
+    $authedUser = data?.authedUser;
 	let cartData;
-	console.log(data,"---------")
+	// console.log(data,"---------")
     cartData = data?.cart?.cart[0]?.cartItems ||[]
-	authedUser.set(data.locals.authedUser)
+	// authedUser.set(data.locals.authedUser)
 	let isLoggedIn = $authedUser?.id ? true : false
 
 	
@@ -51,4 +52,3 @@
 <slot />
  <Toaster position="bottom-right" richColors />
 <Footer />
-<!-- <AllowCookies /> -->

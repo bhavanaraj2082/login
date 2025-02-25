@@ -3,6 +3,7 @@
     import { enhance } from '$app/forms';
     import { toast, Toaster } from "svelte-sonner";
     import { writable } from 'svelte/store';
+    import { authedUser } from '$lib/stores/mainStores.js'
     import Icon from "@iconify/svelte";
     import Calender from '$lib/components/Calender.svelte';
 
@@ -10,6 +11,7 @@
     // console.log("favData--",data)
     
     $: isAuthenticated = !!data?.locals?.user?.email;
+    // $: isAuthenticated = !!authedUser.email;
 
     $: favData = data?.favorites?.length ? data.favorites.map(item => {
     if (!item?.productInfo?.productId) return null;

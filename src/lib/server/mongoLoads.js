@@ -883,60 +883,86 @@ export async function DifferentProds(productId) {
       )
     )
   );
+  // console.log(product,"product");
+
   const partNumber = product.productNumber;
   // products stocks
   let stockQuantity = 0;
   let orderMultiple = 0;
   let priceSize = [];
+  let stockId = "";
+  let distributorId = "";
+
+  // if (partNumber) {
+  //   const stockRecord = await Stock.findOne({
+  //     productNumber: partNumber,
+  //   }).exec();
+  //   if (stockRecord && typeof stockRecord.stock !== "undefined") {
+  //     stockQuantity = stockRecord.stock;
+  //     orderMultiple = stockRecord.orderMultiple;
+  //     // console.log("stocks=====before>>", stockRecord.pricing);
+
+  //     priceSize = await convertToINR(stockRecord.pricing);
+
+  //     // console.log("after==>>", priceSize);
+  //   }
+  // }
 
   if (partNumber) {
-    const stockRecord = await Stock.findOne({
-      productNumber: partNumber,
-    }).exec();
-    if (stockRecord && typeof stockRecord.stock !== "undefined") {
-      stockQuantity = stockRecord.stock;
-      orderMultiple = stockRecord.orderMultiple;
-      // console.log("stocks=====before>>", stockRecord.pricing);
-
-      priceSize = await convertToINR(stockRecord.pricing);
-
-      // console.log("after==>>", priceSize);
+    const stockRecords = await Stock.find({ productNumber: partNumber }).exec(); 
+    if (stockRecords.length > 0) {
+      for (const stockRecord of stockRecords) {
+        if (typeof stockRecord.stock !== "undefined") {
+          stockQuantity = stockRecord.stock;
+          orderMultiple = stockRecord.orderMultiple;
+          // console.log("stocks=====before>>", stockRecord.pricing);
+          const convertedPricing = await convertToINR(stockRecord.pricing);
+          priceSize.push(convertedPricing);
+          stockId = stockRecord._id.toString();
+          distributorId = stockRecord.distributor.toString();
+        }
+      }
+      // console.log("All Pricing Records:", priceSize);
     }
   }
 
   const variants = product.variants || [];
-	const variantRecord = await Promise.all(
-	  variants.map(async (variantId) => {
-		const variant = await Product.findById(variantId).lean();
-		if (!variant) return {};
-  
-		const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
-  
-		let variantPricing = [];
-		if (stock?.pricing) {
-		  // Await the result of convertToINR to get the actual pricing
-		  if (stock.pricing.length > 1) {
-			variantPricing = await convertToINR([stock.pricing[0]]);
-		  } else {
-			variantPricing = await convertToINR(stock.pricing);
-		  }
-		}
-  
-		return {
-		  _id: variant?._id?.toString() || "",
-		  productName: variant?.productName || "Unknown Product",
-		  prodDesc: variant?.prodDesc || "No description available",
-		  description: Array.isArray(variant?.description) ? variant.description : [],
-		  properties: variant?.properties || {},
-		  manufacturerName: variant?.manufacturerName 
-			? variant.manufacturerName.toString() 
-			: "Unknown Manufacturer",
-		  productNumber: variant?.productNumber || "N/A",
-		  imageSrc: variant?.imageSrc || "",
-		  pricing: variantPricing ? variantPricing : []
-		};
-	  })
-	);
+    const variantRecord = await Promise.all(
+      variants.map(async (variantId) => {
+        const variant = await Product.findById(variantId).lean();
+        if (!variant) return {};
+
+        const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
+
+        let variantPricing = [];
+    let variantStockId = stock?._id ? stock._id.toString() : "";
+    let variantdistributorId = stock?.distributor ? stock.distributor.toString() : "";
+        if (stock?.pricing) {
+          // Await the result of convertToINR to get the actual pricing
+          if (stock.pricing.length > 1) {
+            variantPricing = await convertToINR([stock.pricing[0]]);
+          } else {
+            variantPricing = await convertToINR(stock.pricing);
+          }
+        }
+
+        return {
+          _id: variant?._id?.toString() || "",
+          productName: variant?.productName || "Unknown Product",
+          prodDesc: variant?.prodDesc || "No description available",
+          description: Array.isArray(variant?.description) ? variant.description : [],
+          properties: variant?.properties || {},
+          manufacturerName: variant?.manufacturerName 
+            ? variant.manufacturerName.toString() 
+            : "Unknown Manufacturer",
+          productNumber: variant?.productNumber || "N/A",
+          imageSrc: variant?.imageSrc || "",
+          pricing: variantPricing ? variantPricing : [],
+      stockId: variantStockId,
+      distributorId: variantdistributorId
+    };
+      })
+    );
 
   const formattedRecord = {
     productId: product?._id?.toString() || "",
@@ -956,6 +982,8 @@ export async function DifferentProds(productId) {
     stockQuantity,
     orderMultiple,
     manufacturer: product?.manufacturer || {},
+    stockId,
+    distributorId,
     variants: variantRecord.map((variant) => ({
       _id: variant?._id?.toString() || "",
       productName: variant?.productName || "Unknown Product",
@@ -968,6 +996,8 @@ export async function DifferentProds(productId) {
       productNumber: variant?.productNumber || "N/A",
       imageSrc: variant?.imageSrc || "",
       pricing: variant?.pricing,
+      stockId: variant?.stockId,
+      distributorId: variant?.distributorId
     })),
   };
 
@@ -1094,7 +1124,7 @@ export async function CompareSimilarityData(productId) {
             $ifNull: [{ $arrayElemAt: ["$stockInfo.stock", 0] }, 0],
           },
           stockPriceSize: {
-            $ifNull: [{ $arrayElemAt: ["$stockInfo.pricing", 0] }, []],
+            $ifNull: ["$stockInfo.pricing", []],
           },
           orderMultiple: {
             $ifNull: [{ $arrayElemAt: ["$stockInfo.orderMultiple", 0] }, 1],
@@ -1107,17 +1137,15 @@ export async function CompareSimilarityData(productId) {
       },
     ]);
     let compareSimilarityJson = await Promise.all(compareSimilarity.map(async (items) => {
-			let convertedPrice = await convertToINR(items.stockPriceSize);   
-			return {
-				...items,  
-				stockPriceSize: convertedPrice  
-			};
-		}));
+            let convertedPrice = await convertToINR(items.stockPriceSize);
+            return {
+                ...items,
+                stockPriceSize: convertedPrice
+            };
+        }));
+    // console.log(compareSimilarityJson, "compareSimilarityJson");
         return JSON.parse(JSON.stringify(compareSimilarityJson));
-  }
-  else{
-    return []
-  }
+  } else { return [] }
 }
 
 export const getCart = async(userId)=>{
