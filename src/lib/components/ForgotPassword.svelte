@@ -45,16 +45,16 @@
                 <div class="flex flex-row items-center justify-center">
                     <Icon icon={'ep:success-filled'} class=" text-primary-600 text-3xl" />
                     <hr
-                        class={${form ? 'bg-primary-600 text-3xl lg:w-16 md:w-24 w-5 xs:w-5 h-1 rounded' : 'lg:w-14 md:w-24 w-5 xs:w-5 h-1 bg-primary-200 rounded text-lg'}}
+                        class={`${form ? 'bg-primary-600 text-3xl lg:w-16 md:w-24 w-5 xs:w-5 h-1 rounded' : 'lg:w-14 md:w-24 w-5 xs:w-5 h-1 bg-primary-200 rounded text-lg'}`}
                     />
                 </div>
                 <div class="flex flex-row">
                     <Icon
                         icon={form ? 'ep:success-filled' : 'bi:2-circle'}
-                        class={${form ? 'text-primary-600 text-3xl' : ''} text-2xl}
+                        class={`${form ? 'text-primary-600 text-3xl' : ''} text-2xl`}
                     />
                     <hr
-                        class={${form ? 'mt-3.5' : 'mt-2.5'} lg:w-14 md:w-24 w-5 xs:w-5 h-1 bg-primary-200 rounded text-lg}
+                        class={`${form ? 'mt-3.5' : 'mt-2.5'} lg:w-14 md:w-24 w-5 xs:w-5 h-1 bg-primary-200 rounded text-lg`}
                     />
                 </div>
                 <div class="flex flex-row">
