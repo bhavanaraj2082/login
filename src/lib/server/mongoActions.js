@@ -18,6 +18,7 @@ import Curconversion from "$lib/server/models/Curconversion.js";
 import { redirect, error } from '@sveltejs/kit';
 import { v4 as uuidv4 } from 'uuid';
 import { auth, authErrorMessages } from '$lib/server/lucia.js';
+import User from "$lib/server/models/User.js";
 import nodemailer from 'nodemailer';
 import { nanoid } from 'nanoid';
 // import { lucia } from 'lucia';
