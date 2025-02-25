@@ -1,18 +1,88 @@
 <script>
-	import { onMount } from 'svelte';
+	import {onMount} from 'svelte'
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { writable } from 'svelte/store';
 	import { toast, Toaster } from 'svelte-sonner';
-	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 	import Icon from '@iconify/svelte';
 	import Calender from '$lib/components/Calender.svelte';
-
 	export let data;
-
 	console.log("mycartdata====>",data)
-	let cartItems = data?.userData?.cart?.filter((cart) => !cart.isDeleted) || [];
-	// console.log("Initial cartItems:", cartItems);
+	function transformCartData(data) {
+  		if (!data?.cart || !Array.isArray(data.cart)) return [];
+
+  		return data.cart
+  		  .filter(cart => !cart.isDeleted)
+  		  .map(cart => ({
+  		    _id: cart._id,
+  		    cartId: cart.cartId,
+  		    cartName: cart.cartName || 'Unnamed Cart',
+  		    userEmail: cart.userEmail,
+  		    isActiveCart: cart.isActiveCart,
+  		    isDeleted: cart.isDeleted,
+  		    createdAt: cart.createdAt,
+  		    updatedAt: cart.updatedAt,
+  		    recurrence: cart.recurrence ? {
+  		      recurring: cart.recurrence.recurring,
+  		      recurringDate: cart.recurrence.recurringDate
+  		    } : null,
+  		    cartItems: Array.isArray(cart.cartItems) 
+  		      ? cart.cartItems
+  		          .map(item => {
+  		            if (!item?.productInfo?.productId) return null;
+
+  		            return {
+  		              id: item.productInfo.productId,
+  		              name: item.productInfo.productName,
+  		              description: processDescription(item.productInfo.description),
+  		              partNumber: item.productInfo.productNumber,
+  		              image: item.productInfo.imageSrc || '/default-product-image.jpg',
+  		              properties: item.productInfo.properties || {},
+  		              priceSize: item.productInfo.priceSize || [],
+  		              manufacturerInfo: {
+  		                id: item.manufacturerInfo?.manufacturerId,
+  		                name: item.manufacturerInfo?.name || 'Unknown Manufacturer',
+  		                urlName: item.manufacturerInfo?.urlName
+  		              },
+  		              distributorInfo: {
+  		                id: item.distributorInfo?.distributorId,
+  		                name: item.distributorInfo?.distributorName,
+  		                aliasName: item.distributorInfo?.aliasName || 'Direct Supply'
+  		              },
+  		              stockInfo: {
+  		                id: item.stockInfo?.stockId,
+  		                pricing: item.stockInfo?.pricing || {},
+  		                specification: item.stockInfo?.specification,
+  		                orderMultiple: parseInt(item.stockInfo?.orderMultiple) || 1,
+  		                stock: parseInt(item.stockInfo?.stock) || 0
+  		              },
+  		              quantity: parseInt(item.quantity) || 1,
+  		              backOrder: parseInt(item.backOrder) || 0,
+  		              isCart: item.isCart || false,
+  		              isQuote: item.isQuote || false,
+  		              quoteOfferPrice: item.quoteOfferPrice || { INR: 0, USD: 0 },
+  		              cartOfferPrice: item.cartOfferPrice || { INR: 0, USD: 0 }
+  		            };
+  		          })
+  		          .filter(Boolean) 
+  		      : []
+  		  }));
+	}
+
+	function processDescription(description) {
+	  if (Array.isArray(description)) {
+	    return description[0] || 'No description available';
+	  }
+	  if (typeof description === 'string') {
+	    return description;
+	  }
+	  return 'No description available';
+	}
+
+
+	let cartItems = transformCartData(data);
+	console.log("------=>>>", cartItems)
+
 	let isLoading = false;
 	let calendarComponent;
 	let newCartpopup = false;
@@ -21,7 +91,7 @@
 	let currentPage = writable(1);
 	let itemsPerPage = writable(10);
 	let showPopup = writable(false);
-	let selectedCart = writable('null');
+	let selectedCart = writable('');
 	const showDeletePopup = writable(false);
 	const showSharePopup = writable(false);
 	const shareUrl = writable('');
@@ -55,9 +125,9 @@
 		return dateB - dateA;
 	});
 
-	$: if ($selectedCart && $selectedCart.cartId) {
-		shareUrl.set(`{PUBLIC_WEBSITE_URL}/cart/${$selectedCart.cartId}`);
-	}
+	// $: if ($selectedCart && $selectedCart.cartId) {
+	// 	shareUrl.set(`{PUBLIC_WEBSITE_URL}/cart/${$selectedCart.cartId}`);
+	// }
 
 	$: filteredCartItems = filterCarts(sortedCartItems, filters);
 	$: totalPages = Math.ceil(filteredCartItems.length / $itemsPerPage);
@@ -485,8 +555,7 @@
 				toast.error('Cannot share an empty cart');
 				return;
 			}
-
-			shareUrl.set(`${PUBLIC_WEBSITE_URL}/cart/${cartId}`);
+			// shareUrl.set(`${PUBLIC_WEBSITE_URL}/cart/${cartId}`);
 			showSharePopup.set(true);
 			showPopup.set(false);
 		} catch (error) {
@@ -563,9 +632,9 @@
 		};
 	};
 
-	onMount(() => {
-		const earliestDate = getEarliestCartDate(cartItems);
-	});
+	// onMount(() => {
+	// 	const earliestDate = getEarliestCartDate(cartItems);
+	// });
 </script>
 
 <section class="w-full lg:w-11/12 mx-auto max-w-7xl p-4">
@@ -574,10 +643,10 @@
 		{#if !cartItems.length}
 			<a href="/products" class="w-full">
 				<div
-					class="border-l-8 border-yellow-500 h-40 flex flex-col items-center justify-center text-yellow-700 p-6 mb-6 rounded-xl shadow hover:bg-yellow-50 transition-all duration-300">
+					class="border-l-8 border-yellow-300 h-40 flex flex-col items-center justify-center p-6 mb-6 rounded-xl shadow hover:bg-yellow-50 transition-all duration-300">
 					<div class="flex flex-col items-center text-center">
-						<Icon icon="bx:cart-download" class="text-4xl mb-4" />
-						<p class="font-semibold text-xs md:text-xl text-yellow-700 hover:text-yellow-800">
+						<Icon icon="bx:cart-download" class="text-4xl mb-4 text-yellow-600" />
+						<p class="font-semibold text-xs md:text-xl text-yellow-600">
 							No items in cart
 						</p>
 					</div>
@@ -698,16 +767,16 @@
 				{/each}
 			{/if}
 		</div>
-		<div class="hide rounded bg-white hidden lg:block">
+		<div class="hide bg-white hidden lg:block">
 			<table class="w-full border-collapse overflow-x-auto hide">
-				<thead class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
+				<thead class="bg-gradient-to-r from-primary-400 to-primary-500 text-white">
 					<tr>
-						<th class="px-4 py-2 text-sm text-center font-semibold">Date</th>
+						<th class="px-4 py-2 text-sm text-center font-semibold rounded-tl-md">Date</th>
 						<!--<th class="px-4 py-2 text-sm text-center font-semibold">Cart ID</th> -->
 						<th class="px-4 py-2 text-sm text-center font-semibold">Items in cart</th>
 						<th class="px-4 py-2 text-sm text-center font-semibold">Cart Name</th>
 						<th class="px-4 py-2 text-sm text-center font-semibold">Recurrence</th>
-						<th class="px-4 py-2 text-sm text-center font-semibold">Actions</th>
+						<th class="px-4 py-2 text-sm text-center font-semibold rounded-tr-md">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -719,7 +788,7 @@
 						</tr>
 					{:else}
 						{#each paginatedCartItems as cart}
-							<tr class="hover:bg-primary-50">
+							<tr class="hover:bg-gray-50">
 								<td class="border-b px-4 py-2 text-center relative">
 									<div class="absolute top-0 left-0 text-xs px-3 py-1 rounded-br-lg shadow-md">
 										<span class="flex items-center gap-1">
@@ -747,7 +816,7 @@
 								<td class="border-b px-4 py-1 text-center">
 									{#if cart.recurrence}
 										<div class="flex flex-col items-center">
-											<span class="text-sm font-semibold text-heading">
+											<span class="text-sm font-semibold text-heading"> 
 												{formatRecurrenceType(cart.recurrence.recurring)}
 											</span>
 											<span class="text-xs text-description">
@@ -960,7 +1029,7 @@
 										<tr class="hover:bg-gray-50 transition-colors duration-150">
 											<td class="p-2 border text-center">
 												<div class="font-medium text-sm text-gray-900">
-													{item.component?.productName || 'N/A'}
+													{item.component?.partNumber || 'N/A'}
 												</div>
 											</td>
 											<td class="p-2 border text-center text-description">
@@ -1179,7 +1248,6 @@
 		</div>
 	</div>
 {/if}
-
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 {#if newCartpopup}

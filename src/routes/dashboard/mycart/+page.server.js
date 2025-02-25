@@ -1,35 +1,73 @@
 import { fail, error, redirect } from '@sveltejs/kit';
-import { getProfileDetails, getSingleCartDetails } from '$lib/server/mongoLoads.js';
-// import { resumeCart , updateCart , updateRecurrence, updateCartName , createNewCart} from '$lib/server/mongoActions.js';
+import { resumeCart , updateCart , updateRecurrence, updateCartName , createNewCart} from '$lib/server/mongoActions.js';
+
+import { getUserProfileData, getProfileDetails } from '$lib/server/mongoLoads.js';
 
 export const load = async ({ locals }) => {
-  if (!locals.authedUser) {
-	
-    return {
-      cart: [],
-      userData: null
-    };
-  }
-
   try {
-    const [userData, cartData] = await Promise.all([
-      getProfileDetails(locals.authedUser),
-      getSingleCartDetails(locals.authedUser.userId)
-    ]);
+    if (!locals.authedUser?.id) {
+      return {
+        authedUser: null,
+        error: 'Not authenticated'
+      };
+    }
 
+    const profileData = await getProfileDetails(locals.authedUser.id);
+    
+    if (!profileData.success && !profileData.profileData) {
+      return {
+        authedUser: {
+          id: locals.authedUser.id,
+          email: locals.authedUser.email,
+          username: locals.authedUser.username
+        },
+        error: 'Profile not found'
+      };
+    }
+
+    const userData = await getUserProfileData(locals.authedUser.id);
     return {
-      cart: cartData,  
-      userData  
+      cart: userData.cart || []
     };
   } catch (error) {
-    console.error('Load error:', error);
+    console.error('Dashboard load error:', error);
     return {
-      cart: [],
-      userData: null,
-      error: 'Failed to load data'
+      authedUser: null,
+      error: 'Failed to load dashboard data'
     };
   }
 };
+
+// import { getProfileDetails, getSingleCartDetails } from '$lib/server/mongoLoads.js';
+
+// export const load = async ({ locals }) => {
+//   if (!locals.authedUser) {
+	
+//     return {
+//       cart: [],
+//       userData: null
+//     };
+//   }
+
+//   try {
+//     const [userData, cartData] = await Promise.all([
+//       getProfileDetails(locals.authedUser),
+//       getSingleCartDetails(locals.authedUser.userId)
+//     ]);
+
+//     return {
+//       cart: cartData,  
+//       userData  
+//     };
+//   } catch (error) {
+//     console.error('Load error:', error);
+//     return {
+//       cart: [],
+//       userData: null,
+//       error: 'Failed to load data'
+//     };
+//   }
+// };
 
 export const actions = {
 	resumeCart: async ({ request, locals }) => {

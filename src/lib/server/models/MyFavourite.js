@@ -1,25 +1,59 @@
 import mongoose from "mongoose";
 
-const { Schema } = mongoose;
+const { Schema, model, models } = mongoose;
+
+const favoriteItemSchema = new Schema(
+  {
+    productId: {
+      type: Schema.Types.ObjectId,
+      ref: "Product",
+    },
+    stockId: {
+      type: Schema.Types.ObjectId,
+      ref: "Stock",
+    },
+    manufacturerId: {
+      type: Schema.Types.ObjectId,
+      ref: "Manufacturer",
+    },
+    distributorId: {
+      type: Schema.Types.ObjectId,
+      ref: "Distributor",
+    },
+    productNumber: {
+      type: String,
+      required: false,
+    },
+    quantity: {
+      type: Number,
+      default: 1,
+    },
+    stock: {
+      type: Number,
+      default: 0,
+    },
+  },
+  { _id: false } // Prevents creating an extra `_id` for subdocuments
+);
 
 const myFavouritesSchema = new Schema(
   {
-    favorite: {
-        type: mongoose.Schema.Types.ObjectId,
-          ref: 'Product',
-          default:[]
-    },
+    favorite: [favoriteItemSchema],
     userId: {
       type: String,
-      required:true
-  }
-},
+      required: false,
+    },
+    userEmail: {
+      type: String,
+      required: false,
+    },
+  },
   {
     timestamps: true,
     collection: "myfavourites",
   }
 );
 
-const MyFavourite = mongoose.models.MyFavourite || mongoose.model("MyFavourite", myFavouritesSchema);
+const MyFavourite = models.MyFavourite || model("MyFavourite", myFavouritesSchema);
 
 export default MyFavourite;

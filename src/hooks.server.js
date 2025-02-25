@@ -25,7 +25,8 @@ export const handle = async ({ event, resolve }) => {
 
   const sessionId = event.cookies.get('auth_session') || null;
 
-	let user = null;
+	// let user = null;
+	let user = 'avinash@partskeys.com';
 	let session = null;
 
 	if (sessionId) {

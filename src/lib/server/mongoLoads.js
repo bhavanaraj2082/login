@@ -1014,13 +1014,6 @@ export const quick = async () => {
 };
 
 ///Quick Order////
-//Myfavourites loads starts
-
-export async function getFavSavedData(id) {
-  const records = await MyFavourite.findOne({ userId: id });
-  return JSON.parse(JSON.stringify(records)) || { favorite: [] };
-}
-//Myfavourites loads ends
 
 //CompareSimilar Items in product page
 export async function CompareSimilarityData(productId) {
@@ -1119,77 +1112,6 @@ export async function CompareSimilarityData(productId) {
   }
 }
 
-// export async function getProfileDetails(userId) {
-//   try {
-//     if (!userId || typeof userId !== 'string') {
-//       throw new Error('Invalid userId provided');
-//     }
-
-//     const record = await Profile.findOne({ userId }).lean();
-    
-//     if (record) {
-//       return { 
-//         success: true,
-//         profileData: record 
-//       };
-//     }
-    
-//     return { 
-//       success: false, 
-//       message: "Profile not found" 
-//     };
-//   } catch (error) {
-//     console.error('getProfileDetails error:', error);
-//     return {
-//       success: false,
-//       message: "Something went wrong",
-//       error: error.message,
-//     };
-//   }
-// }
-
-// export async function getUserProfileData(userId) {
-//   try {
-//     const profile = await Profile.findOne({ userId }).lean();
-    
-//     if (!profile) {
-//       return { success: false, message: "Profile not found" };
-//     }
-
-//     const orders = await Order.find({ userId: profile.userId })
-//       .sort({ createdAt: -1 })
-//       .limit(10)
-//       .populate({
-//         path: 'products',
-//         select: 'productName manufacturerName partNumber description specifications price'
-//       })
-//       .lean();
-
-//     const quotes = await Quotes.find({ userId: profile.userId })
-//       .sort({ createdAt: -1 })
-//       .lean();
-
-//     const cart = await Cart.findOne({ userId: profile.userId, isActiveCart: true })
-//       .populate('cartItems.productId', 'productName manufacturerName price')
-//       .lean();
-
-//     const data = {
-//       profile,
-//       orders,
-//       quotes,
-//       cart
-//     };
-
-//     return JSON.parse(JSON.stringify(data));
-
-//   } catch (error) {
-//     return {
-//       success: false,
-//       message: "Something went wrong",
-//       error: error.message,
-//     };
-//   }
-// }
 
 export async function getProfileDetails(userId) {
   try {
@@ -1208,6 +1130,285 @@ export async function getProfileDetails(userId) {
   }
 }
 
+export async function getUserMycart(userId) {
+  try {
+    if (!userId || typeof userId !== 'string') {
+      throw new Error('Invalid userId provided');
+    }
+
+    const userCart = await Cart.findOne({ userId }).lean();
+    
+    if (!userCart || !userCart.cartItems || userCart.cartItems.length === 0) {
+      return {
+        success: true,
+        data: [],
+        message: 'No Cart found'
+      };
+    }
+
+    const cart = await Cart.aggregate([
+      { 
+        $match: { 
+          userId: userId 
+        } 
+      },
+      {
+        $project: {
+          cartId: 1,
+          cartName: 1,
+          userId: 1,
+          userEmail: 1,
+          isDeleted: 1,
+          isActiveCart: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          cartItems: 1,
+          recurrence: 1
+        }
+      },
+      { 
+        $unwind: '$cartItems'
+      },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'cartItems.productId',
+          foreignField: '_id',
+          as: 'productDetails'
+        }
+      },
+      {
+        $lookup: {
+          from: 'manufacturers',
+          localField: 'cartItems.manufacturerId',
+          foreignField: '_id',
+          as: 'manufacturerDetails'
+        }
+      },
+      {
+        $lookup: {
+          from: 'stocks',
+          localField: 'cartItems.stockId',
+          foreignField: '_id',
+          as: 'stockDetails'
+        }
+      },
+      {
+        $lookup: {
+          from: 'distributors',
+          localField: 'cartItems.distributorId',
+          foreignField: '_id',
+          as: 'distributorDetails'
+        }
+      },
+      {
+        $group: {
+          _id: '$_id',
+          cartId: { $first: '$cartId' },
+          cartName: { $first: '$cartName' },
+          userId: { $first: '$userId' },
+          userEmail: { $first: '$userEmail' },
+          isDeleted: { $first: '$isDeleted' },
+          isActiveCart: { $first: '$isActiveCart' },
+          createdAt: { $first: '$createdAt' },
+          updatedAt: { $first: '$updatedAt' },
+          recurrence: { $first: '$recurrence' },
+          cartItems: {
+            $push: {
+              productInfo: {
+                productId: { $toString: '$cartItems.productId' },
+                productNumber: { $arrayElemAt: ['$productDetails.productNumber', 0] },
+                productName: { $arrayElemAt: ['$productDetails.productName', 0] },
+                description: { $arrayElemAt: ['$productDetails.description', 0] },
+                properties: { $arrayElemAt: ['$productDetails.properties', 0] },
+                imageSrc: { $arrayElemAt: ['$productDetails.imageSrc', 0] },
+                priceSize: { $arrayElemAt: ['$productDetails.priceSize', 0] }
+              },
+              manufacturerInfo: {
+                manufacturerId: { $toString: '$cartItems.manufacturerId' },
+                name: { $arrayElemAt: ['$manufacturerDetails.name', 0] },
+                urlName: { $arrayElemAt: ['$manufacturerDetails.urlName', 0] }
+              },
+              stockInfo: {
+                stockId: { $toString: '$cartItems.stockId' },
+                pricing: { $arrayElemAt: ['$stockDetails.pricing', 0] },
+                stock: { $arrayElemAt: ['$stockDetails.stock', 0] },
+                orderMultiple: { $arrayElemAt: ['$stockDetails.orderMultiple', 0] },
+                specification: { $arrayElemAt: ['$stockDetails.specification', 0] }
+              },
+              distributorInfo: {
+                distributorId: { $toString: '$cartItems.distributorId' },
+                distributorName: { $arrayElemAt: ['$distributorDetails.distributorname', 0] },
+                aliasName: { $arrayElemAt: ['$distributorDetails.aliasname', 0] }
+              },
+              quantity: '$cartItems.quantity',
+              backOrder: '$cartItems.backOrder',
+              isCart: '$cartItems.isCart',
+              isQuote: '$cartItems.isQuote',
+              quoteOfferPrice: '$cartItems.quoteOfferPrice',
+              cartOfferPrice: '$cartItems.cartOfferPrice'
+            }
+          }
+        }
+      }
+    ]).exec();
+
+    return {
+      success: true,
+      data: cart || [],
+      message: cart.length > 0 ? 'Cart found' : 'No Cart found'
+    };
+
+  } catch (error) {
+    console.error('Cart error:', error);
+    return {
+      success: false,
+      message: 'Failed to fetch cart',
+      error: error.message
+    };
+  }
+}
+
+export async function getUserFavorites(userId) {
+  try {
+    if (!userId || typeof userId !== 'string') {
+      throw new Error('Invalid userId provided');
+    }
+
+    const userFavorites = await MyFavourite.findOne({ userId }).lean();
+    
+    if (!userFavorites || !userFavorites.favorite || userFavorites.favorite.length === 0) {
+      return {
+        success: true,
+        data: [],
+        message: 'No favorites found'
+      };
+    }
+
+    const favorites = await MyFavourite.aggregate([
+      { 
+        $match: { 
+          userId: userId 
+        } 
+      },
+      { 
+        $unwind: { 
+          path: '$favorite',
+          preserveNullAndEmptyArrays: true 
+        } 
+      },
+      {
+        $lookup: {
+          from: 'products',
+          let: { productId: '$favorite.productId' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$_id', '$$productId'] }
+              }
+            }
+          ],
+          as: 'productDetails'
+        }
+      },
+      {
+        $lookup: {
+          from: 'manufacturers',
+          let: { manufacturerId: '$favorite.manufacturerId' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$_id', '$$manufacturerId'] }
+              }
+            }
+          ],
+          as: 'manufacturerDetails'
+        }
+      },
+
+      {
+        $lookup: {
+          from: 'stocks',
+          let: { stockId: '$favorite.stockId' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$_id', '$$stockId'] }
+              }
+            }
+          ],
+          as: 'stockDetails'
+        }
+      },
+
+      {
+        $lookup: {
+          from: 'distributors',
+          let: { distributorId: '$favorite.distributorId' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$_id', '$$distributorId'] }
+              }
+            }
+          ],
+          as: 'distributorDetails'
+        }
+      },
+
+      {
+        $project: {
+          _id: 0,
+          productInfo: {
+            productId: { $toString: '$favorite.productId' },
+            productNumber: '$favorite.productNumber',
+            productName: { $arrayElemAt: ['$productDetails.productName', 0] },
+            description: { $arrayElemAt: ['$productDetails.description', 0] },
+            properties: { $arrayElemAt: ['$productDetails.properties', 0] },
+            imageSrc: { $arrayElemAt: ['$productDetails.imageSrc', 0] },
+            priceSize: { $arrayElemAt: ['$productDetails.priceSize', 0] }
+          },
+          manufacturerInfo: {
+            manufacturerId: { $toString: '$favorite.manufacturerId' },
+            name: { $arrayElemAt: ['$manufacturerDetails.name', 0] },
+            urlName: { $arrayElemAt: ['$manufacturerDetails.urlName', 0] }
+          },
+          stockInfo: {
+            stockId: { $toString: '$favorite.stockId' },
+            pricing: { $arrayElemAt: ['$stockDetails.pricing', 0] },
+            stock: { $arrayElemAt: ['$stockDetails.stock', 0] },
+            orderMultiple: { $arrayElemAt: ['$stockDetails.orderMultiple', 0] },
+            specification: { $arrayElemAt: ['$stockDetails.specification', 0] }
+          },
+          distributorInfo: {
+            distributorId: { $toString: '$favorite.distributorId' },
+            distributorName: { $arrayElemAt: ['$distributorDetails.distributorname', 0] },
+            aliasName: { $arrayElemAt: ['$distributorDetails.aliasname', 0] }
+          },
+          quantity: { $toString: '$favorite.quantity' },
+          stock: { $toString: '$favorite.stock' }
+        }
+      }
+    ]).exec();
+
+    // Debug logging
+    // console.log('Favorites query result:', JSON.stringify(favorites, null, 2));
+
+    return {
+      success: true,
+      data: favorites || [],
+      message: favorites.length > 0 ? 'Favorites found' : 'No favorites found'
+    };
+
+  } catch (error) {
+    console.error('getUserFavorites error:', error);
+    return {
+      success: false,
+      message: 'Failed to fetch favorites',
+      error: error.message
+    };
+  }
+}
 
 export async function getUserProfileData(userId) {
   try {
@@ -1215,45 +1416,53 @@ export async function getUserProfileData(userId) {
       throw new Error('Invalid userId provided');
     }
 
-    const profile = await Profile.findOne({ userId }).lean();
-    
+    const [profile, orders, quotes, favoritesResult, cart] = await Promise.all([
+      Profile.findOne({ userId }).lean(),
+      
+      Order.find({ userId })
+        .sort({ createdAt: -1 })
+        .lean(),
+      
+      Quotes.find({ userId })
+        .sort({ createdAt: -1 })
+        .lean(),
+      
+      getUserFavorites(userId),
+      getUserMycart(userId),
+      // Cart.find({
+      //   userId
+      // }).sort({ updatedAt: -1 })
+      // .lean()
+    ]);
+
     if (!profile) {
-      return { 
-        success: false, 
-        message: "Profile not found" 
+      return {
+        success: false,
+        message: "Profile not found"
       };
     }
-    const orders = await Order.find({ userId })
-      .sort({ createdAt: -1 })
-      .limit(10)
-      .populate({
-        path: 'products',
-        select: 'productName manufacturerName partNumber description specifications price'
-      })
-      .lean();
-    const quotes = await Quotes.find({ userId })
-      .sort({ createdAt: -1 })
-      .lean();
 
-    const cart = await Cart.find({ 
-      userId, 
-      isActiveCart: true 
-    })
-    .populate('cartItems.productId', 'productName manufacturerName price')
-    .lean();
-    return {
+    // console.log('Favorites result:', JSON.stringify(favoritesResult, null, 2));
+
+    const data = {
       success: true,
       profile,
       orders,
       quotes,
-      cart
+      favorites: favoritesResult.success ? favoritesResult.data : [],
+      cart: cart.success ? cart.data : []
     };
+
+    // console.log('Final data structure:', JSON.stringify(data, null, 2));
+
+    return JSON.parse(JSON.stringify(data));
+
   } catch (error) {
     console.error('getUserProfileData error:', error);
     return {
       success: false,
       message: "Something went wrong",
-      error: error.message,
+      error: error.message
     };
   }
 }

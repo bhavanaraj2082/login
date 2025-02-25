@@ -1,16 +1,37 @@
-import { getUserProfileData } from '$lib/server/mongoLoads.js';
+import { getUserProfileData, getProfileDetails } from '$lib/server/mongoLoads.js';
 
-export const load = async ({ locals, parent }) => {
-	await parent();
-	// console.log("==+",locals)
-	
-	try {
-		const userData = await getUserProfileData(locals.authedUser);
-		// const userData = await getUserProfileData(authedUser);
-		// console.log('orders====>', userData);
+export const load = async ({ locals }) => {
+  try {
+    if (!locals.authedUser?.id) {
+      return {
+        authedUser: null,
+        error: 'Not authenticated'
+      };
+    }
 
-		return userData;
-	} catch (error) {
-		return error.response;
-	}
+    const profileData = await getProfileDetails(locals.authedUser.id);
+    
+    
+    if (!profileData.success && !profileData.profileData) {
+      return {
+        authedUser: {
+          id: locals.authedUser.id,
+          email: locals.authedUser.email,
+          username: locals.authedUser.username
+        },
+        error: 'Profile not found'
+      };
+    }
+
+    const userData = await getUserProfileData(locals.authedUser.id);
+    return {
+      quotes: userData.quotes || []
+    };
+  } catch (error) {
+    console.error('Dashboard load error:', error);
+    return {
+      authedUser: null,
+      error: 'Failed to load dashboard data'
+    };
+  }
 };

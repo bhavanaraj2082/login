@@ -20,61 +20,58 @@
 	};
 </script>
 <div class="bg-white">
-	<h1 class="font-bold text-2xl">Step 1: Select custom solution type</h1>
+	<h1 class="font-bold sm:sm:text-2xl text-sm">Step 1: Select custom solution type</h1>
 	<br />
-	<div class="mt-4 flex flex-col md:flex-row lg:flex-row">
+	<div class="mt-4 sm:ml-10 ml-0 flex flex-col sm:flex-row gap-x-20 gap-y-4 items-center sm:items-start">
 		<button
 			type="button"
-			class={`box-content h-25 lg:w-56 p-4 border-2 md:mx-10 ${solutionValue === 'Organic' ? 'border-primary-500' : ''}`}
-			on:click={() => {
-				selectOrgan('Organic');
-			}}
+			class={`w-full sm:w-56 border-2 rounded-md px-6 py-14 flex items-center justify-center text-center ${solutionValue === 'Organic' ? 'border-primary-500' : ''}`}
+			on:click={() => selectOrgan('Organic')}
 		>
-			<div class="mx-20 my-11 font-medium">Organic</div>
+			<span class="font-medium text-sm sm:text-2xl">Organic</span>
 		</button>
-		<br />
+	
 		<button
-			type="button" 
-			class={`box-content h-25 lg:w-56 p-4 border-2 md:mx-10 mt-4 sm:mt-0  ${solutionValue === 'Inorganic' ? 'border-primary-500' : ''}`}
-			on:click={() => {
-				selectOrgan('Inorganic');
-			}}
+			type="button"
+			class={`w-full sm:w-56 border-2 rounded-md px-6 py-14 flex items-center justify-center text-center ${solutionValue === 'Inorganic' ? 'border-primary-500' : ''}`}
+			on:click={() => selectOrgan('Inorganic')}
 		>
-			<div class="mx-20 my-11 font-medium">Inorganic</div>
+			<span class="font-medium text-sm sm:text-2xl">Inorganic</span>
 		</button>
 	</div>
+	
 	<input type="hidden" name="solutionValue" bind:value={solutionValue} />
 	<button
 		type="button"
 		on:click={organ}
-		class="md:ml-10 lg:ml-10 text-white bg-primary-500 hover:bg-primary-500 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
+		class="sm:ml-10 ml-0 text-white bg-primary-500 hover:bg-primary-500 focus:ring-4 focus:ring-primary-500 font-medium rounded sm:text-sm text-xs sm:px-5 px-2 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none dark:focus:ring-primary-500 my-5"
 	>
 		Continue
 	</button>
 </div>
 <ul class="bg-white">
 	<li>
-		<h1 class="font-bold text-2xl text-black text-opacity-25 py-10">
+		<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25 py-10">
 			Step 2: Select custom format
 		</h1>
 	</li>
-	<hr />
+	<hr /><hr />
 	<li>
-		<h1 class="font-bold text-2xl my-10 text-black text-opacity-25">
+		<h1 class="font-bold sm:text-2xl text-sm my-10 text-black text-opacity-25">
 			Step 3: Configure custom solution
 		</h1>
 	</li>
-	<hr />
+	<hr /><hr />
 	<li>
-		<h1 class="font-bold text-2xl my-10 text-black text-opacity-25">Step 4: Additional notes</h1>
+		<h1 class="font-bold sm:text-2xl text-sm my-10 text-black text-opacity-25">Step 4: Additional notes</h1>
 	</li>
-	<hr />
+	<hr /><hr />
 	<li>
-		<h1 class="font-bold text-2xl my-10 text-black text-opacity-25">Step 5: Customer details</h1>
+		<h1 class="font-bold sm:text-2xl text-sm my-10 text-black text-opacity-25">Step 5: Customer details</h1>
 	</li>
-	<hr />
+	<hr /><hr />
 	<li>
-		<h1 class="font-bold text-2xl my-10 text-black text-opacity-25">
+		<h1 class="font-bold sm:text-2xl text-sm my-10 text-black text-opacity-25">
 			Step 6: Delivery information
 		</h1>
 	</li>

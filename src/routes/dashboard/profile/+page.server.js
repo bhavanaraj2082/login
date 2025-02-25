@@ -13,7 +13,7 @@ export const load = async ({locals}) => {
   try {
     //authedUser.email is the parameter for getProfileDetails
     // const {userId} = JSON.parse(cookies.get("token"))
-    console.log('=======...>',locals)
+    // console.log('=======...>',locals)
     return await getProfileDetails(locals.authedUser.id)
   } catch (error) {
     console.log('error',error);

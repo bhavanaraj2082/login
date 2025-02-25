@@ -4,7 +4,7 @@
 	import Properties from "./Properties.svelte";
 	import Imageinfo from "./Imageinfo.svelte";
 	import Icon from "@iconify/svelte";
-	import { cartState } from "$lib/stores/cartStores.js";
+	// import { cartState } from "$lib/stores/cartStores.js";
 	import { authedUser } from "$lib/stores/mainStores.js";
 	import Variants from "$lib/components/ProductInfoPopups/Variants.svelte";
 	import Description from "$lib/components/ProductInfoPopups/Description.svelte";

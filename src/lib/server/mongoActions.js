@@ -1215,7 +1215,7 @@ export const userUpdatePassword = async (body) => {
 		// Optionally, invalidate any existing sessions after password change
 		await auth.invalidateSession(userId); // Optional, for security
 		console.log('Password updated successfully.');
-		throw redirect(302, '/profile');
+		throw redirect(302, '/dashboard/profile');
 	} catch (error) {
 		console.error('Error updating password:', error);
 	}
@@ -1464,47 +1464,382 @@ export const handleFileUpload = async (fileData) => {
 };
 
 //Myfavouries actions starts
+// export const deleteFavoriteItem = async (itemId, userId) => {
+// 	try {
+// 		const updatedDoc = await MyFavourites.findOneAndDelete(
+// 			{ userId: userId },
+// 			{ $pull: { favorite: { id: itemId } } },
+// 			{ new: true }
+// 		);
+// 		if (!updatedDoc) {
+// 			throw new Error('User favorites not found');
+// 		}
+// 		return {
+// 			status: 'success',
+// 			message: 'Item deleted successfully',
+// 			favorite: updatedDoc.favorite
+// 		};
+// 	} catch (error) {
+// 		console.error('Error deleting favorite item:', error);
+// 		throw error;
+// 	}
+// };
+
+// export const clearAllFavorites = async (userId) => {
+// 	try {
+// 		const updatedDoc = await MyFavourites.findOneAndDelete(
+// 			{ userId: userId },
+// 			{ $set: { favorite: [] } },
+// 			{ new: true }
+// 		);
+// 		if (!updatedDoc) {
+// 			throw new Error('User favorites not found');
+// 		}
+// 		return {
+// 			status: 'success',
+// 			message: 'All favorite items deleted successfully',
+// 			favorite: []
+// 		};
+// 	} catch (error) {
+// 		console.error('Error deleting all favorite items:', error);
+// 		throw error;
+// 	}
+// };
+
+// export const deleteFavoriteItem = async (itemId, userId) => {
+//     try {
+//         const updatedDoc = await MyFavourites.findOne(
+//             { userId: userId },
+//             { $pull: { favorite: { productId: itemId } } },
+//             { new: true }
+//         );
+        
+//         if (!updatedDoc) {
+//             throw new Error('User favorites not found');
+//         }
+        
+//         return {
+//             status: 'success',
+//             message: 'Item deleted successfully',
+//             favorite: updatedDoc.favorite
+//         };
+//     } catch (error) {
+//         console.error('Error deleting favorite item:', error);
+//         throw error;
+//     }
+// };
 export const deleteFavoriteItem = async (itemId, userId) => {
-	try {
-		const updatedDoc = await MyFavourite.findOneAndDelete(
-			{ userId: userId },
-			{ $pull: { favorite: { id: itemId } } },
-			{ new: true }
-		);
-		if (!updatedDoc) {
-			throw new Error('User favorites not found');
-		}
-		return {
-			status: 'success',
-			message: 'Item deleted successfully',
-			favorite: updatedDoc.favorite
-		};
-	} catch (error) {
-		console.error('Error deleting favorite item:', error);
-		throw error;
-	}
+    try {
+        const existingFavorites = await MyFavourites.findOne({ userId });
+        
+        if (!existingFavorites) {
+            return {
+                status: 'error',
+                message: 'No favorites found for this user'
+            };
+        }
+
+        const updatedDoc = await MyFavourites.findOneAndUpdate(
+            { userId },
+            { $pull: { favorite: { productId: itemId } } },
+            { new: true }
+        );
+        
+        if (!updatedDoc) {
+            return {
+                status: 'error',
+                message: 'Failed to remove item from favorites'
+            };
+        }
+        
+        return {
+            status: 'success',
+            message: 'Item removed successfully',
+            favorite: updatedDoc.favorite
+        };
+    } catch (error) {
+        console.error('Error deleting favorite item:', error);
+        return {
+            status: 'error',
+            message: 'An error occurred while removing the item'
+        };
+    }
 };
 
+
+// export const clearAllFavorites = async (userId) => {
+//     try {
+//         const updatedDoc = await MyFavourites.findOneAndUpdate(
+//             { userId: userId },
+//             { $set: { favorite: [] } },
+//             { new: true }
+//         );
+        
+//         if (!updatedDoc) {
+//             throw new Error('User favorites not found');
+//         }
+        
+//         return {
+//             status: 'success',
+//             message: 'All favorite items deleted successfully',
+//             favorite: []
+//         };
+//     } catch (error) {
+//         console.error('Error deleting all favorite items:', error);
+//         throw error;
+//     }
+// };
+
 export const clearAllFavorites = async (userId) => {
-	try {
-		const updatedDoc = await MyFavourite.findOneAndDelete(
-			{ userId: userId },
-			{ $set: { favorite: [] } },
-			{ new: true }
-		);
-		if (!updatedDoc) {
-			throw new Error('User favorites not found');
-		}
-		return {
-			status: 'success',
-			message: 'All favorite items deleted successfully',
-			favorite: []
-		};
-	} catch (error) {
-		console.error('Error deleting all favorite items:', error);
-		throw error;
-	}
+    try {
+        const existingFavorites = await MyFavourites.findOne({ userId });
+        
+        if (!existingFavorites) {
+            return {
+                status: 'error',
+                message: 'No favorites found for this user'
+            };
+        }
+
+        const updatedDoc = await MyFavourites.findOneAndUpdate(
+            { userId },
+            { $set: { favorite: [] } },
+            { new: true }
+        );
+        
+        if (!updatedDoc) {
+            return {
+                status: 'error',
+                message: 'Failed to clear favorites'
+            };
+        }
+        
+        return {
+            status: 'success',
+            message: 'All favorites cleared successfully',
+            favorite: []
+        };
+    } catch (error) {
+        console.error('Error clearing favorites:', error);
+        return {
+            status: 'error',
+            message: 'An error occurred while clearing favorites'
+        };
+    }
 };
+
+// export const favaddToCart = async (cartData, userId, userEmail) => {
+//     try {
+//         if (!cartData || !userId || !userEmail) {
+//             throw new Error('Missing required data for cart operation');
+//         }
+
+//         const cartItem = {
+//             productId: cartData.productId,
+//             stockId: cartData.stockId,
+//             manufacturerId: cartData.manufacturerId,
+//             distributorId: cartData.distributorId,
+//             quantity: parseInt(cartData.quantity) || 1,
+//             backOrder: 0,
+//             isCart: false, 
+//             isQuote: false,
+//             quoteOfferPrice: {
+//                 INR: 0,
+//                 USD: 0
+//             },
+//             cartOfferPrice: {
+//                 INR: 0,
+//                 USD: 0
+//             }
+//         };
+
+//         let existingCart = await Cart.findOne({
+//             userId: userId,
+//             isActiveCart: true,
+//             isDeleted: false
+//         });
+
+//         if (existingCart) {
+//             const itemIndex = existingCart.cartItems.findIndex(
+//                 item => item.productId.toString() === cartData.productId.toString()
+//             );
+
+//             if (itemIndex > -1) {
+//                 existingCart.cartItems[itemIndex].quantity += parseInt(cartData.quantity) || 1;
+//                 const updatedCart = await existingCart.save();
+//                 return {
+//                     status: 'success',
+//                     message: 'Cart item quantity updated successfully',
+//                     cart: updatedCart
+//                 };
+//             } else {
+//                 existingCart.cartItems.push(cartItem);
+//                 const updatedCart = await existingCart.save();
+//                 return {
+//                     status: 'success',
+//                     message: 'Item added to cart successfully',
+//                     cart: updatedCart
+//                 };
+//             }
+//         } else {
+//             const newCart = await Cart.create({
+//                 cartId: nanoid(8),
+//                 cartName: `mycart`,
+//                 cartItems: [cartItem],
+//                 userId: userId,
+//                 userEmail: userEmail,
+//                 isDeleted: false,
+//                 isActiveCart: true
+//             });
+
+//             return {
+//                 status: 'success',
+//                 message: 'New cart created with item successfully',
+//                 cart: newCart
+//             };
+//         }
+//     } catch (error) {
+//         console.error('Error adding item to cart:', error);
+//         throw new Error(`Failed to add item to cart: ${error.message}`);
+//     }
+// };
+
+export const favaddToCart = async (cartData, userId, userEmail) => {
+    try {
+        if (!cartData || !userId || !userEmail) {
+            return {
+                status: 'error',
+                message: 'Missing required data for cart operation'
+            };
+        }
+
+        const existingCart = await Cart.findOne({
+            userId,
+            isActiveCart: true,
+            isDeleted: false
+        });
+
+        const cartItem = {
+            productId: cartData.productId,
+            stockId: cartData.stockId,
+            manufacturerId: cartData.manufacturerId,
+            distributorId: cartData.distributorId,
+            quantity: parseInt(cartData.quantity) || 1,
+            backOrder: 0,
+            isCart: false,
+            isQuote: false,
+            quoteOfferPrice: { INR: 0, USD: 0 },
+            cartOfferPrice: { INR: 0, USD: 0 }
+        };
+
+        if (existingCart) {
+            const itemIndex = existingCart.cartItems.findIndex(
+                item => item.productId.toString() === cartData.productId.toString()
+            );
+
+            if (itemIndex > -1) {
+                existingCart.cartItems[itemIndex].quantity += parseInt(cartData.quantity) || 1;
+                await existingCart.save();
+                return {
+                    status: 'success',
+                    message: 'Item quantity updated in cart'
+                };
+            } else {
+                existingCart.cartItems.push(cartItem);
+                await existingCart.save();
+                return {
+                    status: 'success',
+                    message: 'Item added to cart'
+                };
+            }
+        } else {
+            await Cart.create({
+                cartId: nanoid(8),
+                cartName: 'mycart',
+                cartItems: [cartItem],
+                userId,
+                userEmail,
+                isDeleted: false,
+                isActiveCart: true
+            });
+
+            return {
+                status: 'success',
+                message: 'Item added to new cart'
+            };
+        }
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        return {
+            status: 'error',
+            message: 'Failed to add item to cart'
+        };
+    }
+};
+
+export const addAllToCart = async (items, userId, userEmail) => {
+    try {
+        const cartItems = items.map(item => ({
+            productId: item.productId,
+            stockId: item.stockId,
+            manufacturerId: item.manufacturerId,
+            distributorId: item.distributorId,
+            quantity: item.quantity,
+            backOrder: 0,
+            isCart: false,
+            isQuote: false,
+            quoteOfferPrice: { INR: 0, USD: 0 },
+            cartOfferPrice: { INR: 0, USD: 0 }
+        }));
+
+        const existingCart = await Cart.findOne({
+            userId: userId,
+            isActiveCart: true,
+            isDeleted: false
+        });
+
+        if (existingCart) {
+            for (const newItem of cartItems) {
+                const existingItemIndex = existingCart.cartItems.findIndex(
+                    item => item.productId.toString() === newItem.productId.toString()
+                );
+
+                if (existingItemIndex > -1) {
+                    existingCart.cartItems[existingItemIndex].quantity += newItem.quantity;
+                } else {
+                    existingCart.cartItems.push(newItem);
+                }
+            }
+
+            const updatedCart = await existingCart.save();
+            return {
+                status: 'success',
+                message: 'All items added to existing cart',
+                cart: updatedCart
+            };
+        } else {
+            const newCart = await Cart.create({
+                cartId: nanoid(8),
+                cartName: `mycart`,
+                cartItems: cartItems,
+                userId: userId,
+                userEmail: userEmail,
+                isDeleted: false,
+                isActiveCart: true
+            });
+
+            return {
+                status: 'success',
+                message: 'New cart created with all items',
+                cart: newCart
+            };
+        }
+    } catch (error) {
+        console.error('Error adding all items to cart:', error);
+        throw error;
+    }
+};
+
 //Myfavouries actions ends
 
 export const quicksearch = async ({ query }) => {

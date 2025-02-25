@@ -68,16 +68,16 @@
 </script>
 
 <nav class="bg-white shadow rounded transition-all duration-300 ease-in-out lg:py-4 lg:max-w-xl">
-  <div class="hidden lg:flex items-center justify-center text-2xl font-bold text-heading p-6 border-b">
+  <div class="hidden lg:flex items-center justify-center text-2xl font-bold text-heading mb-1 pb-4 border-b">
     Chemikart
   </div>
   <div class="lg:hidden flex justify-between items-center p-4 border-b">
     <h1 class="text-xl font-bold text-heading">Chemikart</h1>
     <button
-      class="p-2 rounded bg-primary-50 hover:bg-primary-200 transition-all duration-300 ease-in-out"
+      class="md:p-2 p-1.5 rounded bg-primary-50 hover:bg-primary-200 transition-all duration-300 ease-in-out"
       aria-label="Toggle menu"
       on:click={() => isMenuOpen.update((v) => !v)}>
-      <Icon icon={$isMenuOpen ? 'mdi:close' : 'mdi:menu'} class="text-primary-700" width="28" height="28" />
+      <Icon icon={$isMenuOpen ? 'mdi:close' : 'mdi:menu'} class="text-primary-700 hover:scale-95 text-2xl" />
     </button>
   </div>
   <div
