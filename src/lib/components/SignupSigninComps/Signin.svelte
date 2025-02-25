@@ -95,7 +95,7 @@
 </script>
 
 <div
-  class="flex flex-col md:flex-row max-w-4xl shadow-lg rounded-lg mx-auto h-auto md:h-auto my-14 border border-gray-300"
+  class="flex flex-col md:flex-row max-w-5xl shadow-lg lg:shadow-none rounded-lg lg:rounded-none mx-auto h-auto md:h-auto my-14 border lg:border-0 border-gray-300"
 >
   <div class="md:hidden w-full h-1/2 mx-auto flex justify-center">
     <img src="/image.jpg" alt="Sign In" class="object-cover h-full rounded" />
@@ -287,7 +287,7 @@
           {/if}
           <p class="mb-4 mt-2">
             <a
-              href="/reset-password"
+              href="/forgot"
               class="text-primary-500 hover:text-primary-600 underline"
               >Forgot password?</a
             >

@@ -1,50 +1,39 @@
-// import { auth } from '$lib/server/lucia.js';
-
-// export async function load({ locals }) {
-// 	try {
-// 		if (locals.authedUser) {
-// 			const sessionId = locals.session?.sessionId;
-// 			if (sessionId) {
-// 				await auth.invalidateSession(sessionId);
-// 			}
-// 		}
-
-// 		locals.authedUser = undefined;
-// 	} catch (err) {
-// 		console.error('Error during logout:', err.message);
-// 	}
-// 	return;
-// }
-
-
 import { auth } from '$lib/server/lucia.js';
+import { redirect } from '@sveltejs/kit';
 
-export async function load({ locals }) {
+export async function load({ locals, cookies }) {
   try {
-    console.log('Load function started');
-    
-    if (locals.authedUser) {
-      console.log('User is authenticated:', locals.authedUser);
-      
-      const sessionId = locals.session?.sessionId;
-      console.log('Session ID:', sessionId);
 
-      if (sessionId) {
-        await auth.invalidateSession(sessionId);
-        console.log('Session invalidated');
-      } else {
-        console.log('No session ID found');
+    let sessionIdToInvalidate = null;
+
+    if (locals.authedUser) {
+
+      sessionIdToInvalidate = locals.session?.sessionId;
+
+      if (sessionIdToInvalidate) {
+        await auth.invalidateSession(sessionIdToInvalidate);
+        const authCookies = cookies.getAll();
+        for (const cookie of authCookies) {
+          if (cookie.name.startsWith('auth_')) {
+            cookies.delete(cookie.name, { path: '/' });
+            // console.log(`Deleted cookie: ${cookie.name}`);
+          }
+        }
+
+        cookies.delete('auth_session', { path: '/' });
       }
-    } else {
-      console.log('No authenticated user found');
     }
 
     locals.authedUser = undefined;
-    console.log('Authed user set to undefined:', locals.authedUser);
-  } catch (err) {
-    console.error('Error during logout:', err.message);
-  }
+    locals.session = undefined;
 
-  console.log('Returning from load function');
-  return;
+    console.log('Redirecting to login page');
+    throw redirect(302, '/login');
+  } catch (err) {
+    if (err.status === 302) {
+      throw err;
+    }
+    // console.error('Error during logout:', err.message);
+    throw redirect(302, '/login');
+  }
 }

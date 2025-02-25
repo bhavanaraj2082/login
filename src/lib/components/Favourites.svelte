@@ -355,7 +355,7 @@ onMount(() => {
 
 </script> 
 
-{#if !isAuthenticated}
+<!-- {#if !isAuthenticated}
 <div class="p-6 max-w-7xl mx-auto w-11/12">
     <div class="bg-primary-50 border-l-4 border-primary-500 p-4 rounded-lg shadow-sm">
         <div class="flex items-center">
@@ -376,7 +376,7 @@ onMount(() => {
         </div>
     </div>
 </div>
-{:else}
+{:else} -->
 <div class="pb-4 max-w-7xl mx-auto w-11/12">
     <h1 class="sm:text-2xl text-xl font-bold mb-4 md:mb-6">My Favourites</h1>
     {#if !favData || favData.length === 0}
@@ -642,4 +642,4 @@ onMount(() => {
     {/if}
     <Toaster position="bottom-right" richColors />
 </div>
-{/if}
+<!-- {/if} -->
