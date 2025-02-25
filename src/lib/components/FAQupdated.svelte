@@ -1,69 +1,126 @@
 <script>
   import Icon from "@iconify/svelte";
   import { sections } from "$lib/data/Faqdata.json";
-    
+  import { onMount } from "svelte";
+  import { writable } from "svelte/store";
+  import { slide } from "svelte/transition";
+
   let activeIndex = 0;
   let expandedFAQIndex = Array(sections.length).fill(null);
-    
+  let faqContainer;
+  let barElement;
+  let sectionElements = [];
+  const barWidth = writable(0);
+
+  function updateBar() {
+    const activeSection = sectionElements[activeIndex];
+    if (activeSection) {
+      const sectionWidth = activeSection.offsetWidth;
+      const width = sectionWidth * 0.8;
+      const barLeft =
+        activeSection.offsetLeft + (activeSection.offsetWidth - width) / 2;
+
+      if (barElement) {
+        barElement.style.width = `${width}px`;
+        barElement.style.left = `${barLeft}px`;
+      }
+      barWidth.set(width);
+    }
+  }
+
   function selectSection(sectionIndex) {
     activeIndex = sectionIndex;
+    updateBar();
   }
-    
+
   function toggleFAQ(index) {
-    expandedFAQIndex[activeIndex] = 
+    expandedFAQIndex[activeIndex] =
       expandedFAQIndex[activeIndex] === index ? null : index;
   }
+
+  function handleClickOutside(event) {
+    if (faqContainer && !faqContainer.contains(event.target)) {
+      expandedFAQIndex[activeIndex] = null;
+    }
+  }
+
+  onMount(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    updateBar();
+    window.addEventListener("resize", updateBar);
+  });
 </script>
+
 <section class="m-3 md:my-3 md:mx-0">
   <div>
-    <div class="pt-5 sm:p-3 w-11/12 max-w-7xl mx-auto">
-      <h1 class="sm:text-2xl text-xl font-bold text-gray-700 mb-6 sm:mb-4 md:mb-8 lg:mb-12 sm:ml-2 md:ml-0 lg:ml-0">
+    <div class="pt-0 sm:p-3 w-11/12 max-w-7xl mx-auto">
+      <h1
+        class="sm:text-2xl text-xl font-bold text-black mb-6 sm:mb-4 md:mb-8 lg:mb-12 sm:ml-2 md:ml-0 lg:ml-0"
+      >
         Frequently Asked Questions
-      </h1>        
+      </h1>
       <div class="flex gap-3 mb-4 sm:mx-2 md:ml-0 lg:mx-0 relative">
         {#each sections as { title }, index}
-          <div class="relative w-full sm:w-32">
+          <div
+            class="relative w-full sm:w-32"
+            bind:this={sectionElements[index]}
+          >
             <button
               class={`flex flex-col justify-center items-center rounded p-2 w-full pb-4 relative ${
-                activeIndex === index ? "font-semibold bg-white" : "bg-primary-200"
+                activeIndex === index
+                  ? "font-semibold bg-white"
+                  : "bg-primary-200"
               }`}
               on:click={() => selectSection(index)}
-              style="transition: background-color 0.3s, transform 0.3s;">
+              style="transition: background-color 0.3s, transform 0.3s;"
+            >
               {title}
             </button>
-            {#if activeIndex === index}
-              <div
-                class="absolute bottom-2 left-1/2 transform -translate-x-1/2 h-1 bg-primary-400 rounded w-4/5 sm:w-24 md:w-30"
-                style="transition: width 0.3s ease, transform 0.3s ease;"/>
-            {/if}
           </div>
         {/each}
-      </div>      
+        <div
+          class="absolute bottom-2 h-1 bg-primary-400 rounded transition-all duration-300 ease-in-out"
+          bind:this={barElement}
+        />
+      </div>
       <div>
-        <div class="py-6">
+        <div class="py-6" bind:this={faqContainer}>
           {#if sections[activeIndex]}
             <div class="space-y-3">
               {#each sections[activeIndex].faqs as { question, answer1, answer2 }, index}
-                <!-- svelte-ignore a11y-no-static-element-interactions -->
-                <div class="relative shadow-md rounded-md p-4">
-                  <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <div
+                  class="relative shadow-md rounded-md p-4 cursor-pointer border"
+                  on:click={() => toggleFAQ(index)}
+                  role="button"
+                  tabindex="0"
+                  on:keydown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      toggleFAQ(index);
+                    }
+                  }}
+                >
                   <div
-                    class="flex items-center justify-between cursor-pointer p-1 ps-3 mx-auto"
-                    on:click={() => toggleFAQ(index)}>
+                    class="flex items-center justify-between p-1 ps-3 mx-auto"
+                  >
                     <h3 class="text-sm text-gray-700 font-semibold">
                       {question}
                     </h3>
                     <Icon
-                      icon="solar:alt-arrow-down-bold"
-                      width="1.4em"
-                      height="1.4em"
-                      class={`mr-3 min-w-10 transition-transform duration-400 ${
-                        expandedFAQIndex[activeIndex] === index ? "rotate-180" : ""
+                      icon="eva:arrow-down-fill"
+                      width="1.5em"
+                      height="1.5em"
+                      class={`sm:mr-3 min-w-10 transition-transform duration-300 text-primary-400 ${
+                        expandedFAQIndex[activeIndex] === index
+                          ? "rotate-180 text-primary-500"
+                          : ""
                       }`}
                     />
                   </div>
                   {#if expandedFAQIndex[activeIndex] === index}
-                    <div class="p-2 ps-3 pb-3">
+                    <div
+                      class="p-2 ps-3 pb-3"
+                      transition:slide={{ duration: 300 }}
+                    >
                       <p class="pb-2 text-sm">{answer1}</p>
                       <p class="text-sm">{answer2}</p>
                     </div>
