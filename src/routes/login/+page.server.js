@@ -53,7 +53,7 @@ export const actions = {
         });
       }
     }
-    const redirectTo = "/dashboard/profile";
+    const redirectTo = "/dashboard";
     throw redirect(302, redirectTo);
   },
 
@@ -170,7 +170,7 @@ export const actions = {
 			const sessionCookie = auth.createSessionCookie(session);
 			cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
 
-			const redirectTo = '/dashborad/profile';
+			const redirectTo = '/dashboard';
 			console.log('Redirecting user to:', redirectTo);
 
 			return { type: 'success', redirectTo };

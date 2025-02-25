@@ -9,3 +9,13 @@ export const billingAddress = writable();
 let totalPrice = browser ? JSON.parse(localStorage.getItem('totalPrice')) : 0;
 
 export const cartTotal = writable(totalPrice);
+export const cartTotalComps = writable(0)
+export const currencyState= writable("inr")
+
+
+export function logout() {
+	authedUser.set({
+	  email: '',
+	  username: ''
+	});
+}

@@ -7,11 +7,12 @@ import {
 } from "$env/static/private";
 import mongoose from "mongoose";
 import { auth } from '$lib/server/lucia.js';
+import { sequence } from '@sveltejs/kit/hooks';
 
 let isConnected = false;
 const MONGODB_URI = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DATABASE}?authSource=${MONGO_DATABASE}`;
 
-export const handle = async ({ event, resolve }) => {
+export const main = async ({ event, resolve }) => {
   if (!isConnected) {
     try {
       await mongoose.connect(MONGODB_URI);
@@ -25,8 +26,7 @@ export const handle = async ({ event, resolve }) => {
 
   const sessionId = event.cookies.get('auth_session') || null;
 
-	// let user = null;
-	let user = 'avinash@partskeys.com';
+	let user = null;
 	let session = null;
 
 	if (sessionId) {
@@ -41,7 +41,7 @@ export const handle = async ({ event, resolve }) => {
 	event.locals.user = user;
 	event.locals.session = session;
 
-	// const path = event.url.pathname;
+	const path = event.url.pathname;
 
 	if (event.locals.user) {
 		event.locals.authedUser = {
@@ -56,7 +56,7 @@ export const handle = async ({ event, resolve }) => {
   return response;
 };
 
-export async function handleError() {
+export async function handleError({ error, event, status, message }) {
   const errorId = crypto.randomUUID();
 
   return {
@@ -64,3 +64,7 @@ export async function handleError() {
     errorId,
   };
 }
+
+
+
+export const handle = sequence(main);

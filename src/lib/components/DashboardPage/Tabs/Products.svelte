@@ -1,5 +1,5 @@
 <script>
-	// import { PUBLIC_COMPBUY_IMAGE_PATH } from '$env/static/public'
+	import { PUBLIC_COMPBUY_IMAGE_PATH } from '$env/static/public'
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	// import Popup from '$lib/components/AccountPage/Tabs/TooltipPopup.svelte';
@@ -367,25 +367,25 @@
 						<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 						<div class="relative">
 							<!-- {outerIndex * paginatedItems[0].components.length + innerIndex + 1} -->
-							<!-- <img
-						 src={component.image && component.image !== '-' ? `${PUBLIC_COMPBUY_IMAGE_PATH}/part/${component.image}` : '/partskeys.jpeg'} --> 
+							<img
+						  src={component.image && component.image !== '-' ? `${PUBLIC_COMPBUY_IMAGE_PATH}/part/${component.image}` : '/partskeys.jpeg'}
 						  alt="img"
 						  class="w-16 h-16 rounded border object-cover p-2 mr-2"
 						  onerror="this.src='/partskeys.jpeg'" 
 						  on:click={() => {
 							const imageUrl = component.image && component.image !== '-' 
-								// ? `${PUBLIC_COMPBUY_IMAGE_PATH}/part/${component.image}` 
-								// : '/partskeys.jpeg';
+								? `${PUBLIC_COMPBUY_IMAGE_PATH}/part/${component.image}` 
+								: '/partskeys.jpeg';
 							imagemodal(imageUrl);
 						}}
 						on:mouseenter={() => {
-							// const imageUrl = `${PUBLIC_COMPBUY_IMAGE_PATH}/part/${component.image}`;
+							const imageUrl = `${PUBLIC_COMPBUY_IMAGE_PATH}/part/${component.image}`;
 							const index = outerIndex * paginatedItems[0].components.length + innerIndex + 1;
-							// handleMouseEnter(imageUrl, index);
+							handleMouseEnter(imageUrl, index);
 						}}
 						on:mouseleave={() => handleMouseLeave()}
 						/>
-						<!-- {#if hoveredimageindex === outerIndex * paginatedItems[0].components.length + innerIndex + 1 && hoveredImageId === `${PUBLIC_COMPBUY_IMAGE_PATH}/part/${component.image}`}  -->
+						{#if hoveredimageindex === outerIndex * paginatedItems[0].components.length + innerIndex + 1 && hoveredImageId === `${PUBLIC_COMPBUY_IMAGE_PATH}/part/${component.image}`} 
     						<div class="absolute bottom-full left-1/2 transform -translate-x-1/2 z-50 whitespace-nowrap bg-white text-xs text-black font-medium py-1 px-4 rounded-md shadow-lg leading-snug">
       							Click to view <br/> larger image
       						<div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-white"></div>

@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
-  // import { cartState } from '$lib/stores/cartStores.js'; 
+  import { cartState } from '$lib/stores/cartStores.js'; 
   import { toast } from 'svelte-sonner';
   import Icon from "@iconify/svelte";
   export let relatedProducts;
@@ -11,10 +11,17 @@
     productId: product._id,
     prodDesc: product.prodDesc,
     productName: product.productName,
-    priceSize: product.stockPriceSize.map((size) => ({
-      size: size.break,
-      price: size.INR,
-    })),
+    // priceSize: product.stockPriceSize.map((size) => ({
+    //   size: size.break,
+    //   price: size.INR,
+    // })),
+    priceSize: Array.isArray(product.stockPriceSize) && product.stockPriceSize.length > 0 
+    ? product.stockPriceSize.map(size => ({
+        size: size.break || "N/A", 
+        price: size.INR || 0, 
+        offer: size.offer || "0"
+      }))
+    : [],
     image: product.imageSrc,
     manufacturer: product.manufacturerInfo[0]?.name,
     stock: product.stockQuantity,
@@ -175,12 +182,12 @@ function addToCart(product) {
 </script>
 
 <div class="max-w-7xl mx-auto my-10">
-  <h2 class="font-bold text-primary-500 mt-4 ml-12">Related Products</h2>
+  <h3 class="text-xl font-bold text-primary-400 p-1 md:w-11/12 mx-auto">Related Products</h3>
 
   <div class="relative mt-1">
-    <div class="flex items-center">
-      <button on:click={prevSlide} class="text-primary-500">
-        <Icon class="text-3xl" icon="ion:chevron-back" />
+    <div class="flex items-center max-md:mx-0 mx-6">
+      <button on:click={prevSlide} class="text-primary-500 p-1 pl-0.5 hover:bg-primary-100 hover:rounded-full">
+        <Icon class="text-2xl" icon="ion:chevron-back" />
       </button>
 
       <div class="overflow-hidden flex-1">
@@ -243,8 +250,8 @@ function addToCart(product) {
         </div>
       </div>
 
-      <button on:click={nextSlide} class="text-primary-500">
-        <Icon class="text-4xl" icon="ion:chevron-forward" />
+      <button on:click={nextSlide} class="text-primary-500 p-1 pr-0.5 hover:bg-primary-100 hover:rounded-full">
+        <Icon class="text-2xl" icon="ion:chevron-forward" />
       </button>
     </div>
     <div class="flex justify-center mt-4 relative">
@@ -259,18 +266,22 @@ function addToCart(product) {
 </div>
 
 {#if showModal}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
     class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
+    on:click={() => (showModal = false)}
   >
     <div
       class="bg-white p-6 rounded-lg w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-5/12 relative"
+      on:click|stopPropagation
     >
       <div class="mt-2 absolute right-6 top-1">
         <button
           on:click={closeModal}
           class="text-primary-500 hover:text-primary-500 hover:scale-110"
         >
-          <Icon icon="ion:close" class="text-2xl"></Icon>
+          <Icon icon="ion:close" class="text-xl font-bold hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"></Icon>
         </button>
       </div>
       <div class="flex flex-row sm:flex-row gap-4 mb-3">

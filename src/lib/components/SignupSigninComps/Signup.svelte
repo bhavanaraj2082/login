@@ -6,13 +6,28 @@
   let username = "";
   let email = "";
   let country = "";
+  let companyName = "";
+  let jobTitle = "";
+  let companyType = "";
   let currency = "";
+  let isAccountSelected = false;
   let password = "";
   let passwordConfirm = "";
   let searchTerm = "";
   let phone = "";
+  let form5;
   let errors = {};
   let termsAccepted = false;
+  let isLoading = false;
+  let emailSent = false;
+  let verificationMessage = "";
+  let ProfileEmailVerified = false;
+  let isOtpVerified = false;
+  let displayMessage = "";
+  let enteredOtp = "";
+  let errorCount = "";
+  let tanNumber = "";
+  let gstNumber = "";
   const clientId = import.meta.env.VITE_LINKEDIN_CLIENT_ID;
   const callbackUrl = import.meta.env.VITE_LINKEDIN_CALLBACK_URL;
   const scope = import.meta.env.VITE_LINKEDIN_SCOPE;
@@ -25,36 +40,83 @@
   const phoneRegex = /^[6-9]\d{9}$/;
 
   function validateUsername() {
-    if (!username || !usernameRegex.test(username)) {
-      errors.username = "Please enter a valid username";
+    if (!username) {
+      errors.username = "*Required";
+    } else if (username.length < 3) {
+      errors.username = "Please enter at least 3 characters";
+    } else if (/^[^a-zA-Z]/.test(username)) {
+      errors.username = "Username must start with a letter";
+    } else if (/[^a-zA-Z0-9_]/.test(username)) {
+      errors.username =
+        "Username can include only letters, numbers, and underscore ( _ )";
+    } else if (/^[0-9]+$/.test(username)) {
+      errors.username = "Username cannot contain only numbers";
+    } else if (/^[_]+$/.test(username)) {
+      errors.username = "Username cannot contain only underscores ( _ )";
+    } else if (!/^(?=(.*[a-zA-Z]){3,})[a-zA-Z0-9_]+$/.test(username.trim())) {
+      errors.username = "Username must contain at least 3 letters";
     } else {
-      delete errors.username; // Remove error if valid
+      delete errors.username;
     }
   }
 
   function validateEmail() {
-    if (!email || !emailRegex.test(email)) {
-      errors.email = "Please enter a valid email address.";
+    if (!email) {
+      errors.email = "*Required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = "Please enter a valid email.";
     } else {
-      delete errors.email; // Remove error if valid
+      delete errors.email;
     }
   }
 
   function validatePhone() {
-    if (!phone || !phoneRegex.test(phone)) {
-      errors.phone = "Please enter a valid phone Number.";
+    if (!phone) {
+      errors.phone = "*Required";
     } else {
-      delete errors.phone; // Remove error if valid
+      const phonePattern = getPhonePattern(country);
+      const phoneRegex = new RegExp(phonePattern);
+
+      if (!phoneRegex.test(phone)) {
+        errors.phone = `Please enter a valid phone number for ${country}.`;
+      } else {
+        delete errors.phone;
+      }
     }
   }
 
   function validatePassword() {
-    if (!password || !passwordRegex.test(password)) {
+    if (!password) {
+      errors.password = "*Required";
+    } else if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
+        password
+      )
+    ) {
       errors.password =
-        "Password must contain at least 8 characters, one number, and one special character.";
+        "Ensure your password matches the format outlined below.";
     } else {
-      delete errors.password; // Remove error if valid
+      delete errors.password;
     }
+  }
+
+  function validateConfirmPassword() {
+    if (!passwordConfirm) {
+      errors.passwordConfirm = "*Required";
+    } else if (passwordConfirm !== password) {
+      errors.passwordConfirm = "Passwords do not match";
+    } else {
+      delete errors.passwordConfirm;
+    }
+  }
+
+  const handleResendemailOtp = () => {
+    form5.requestSubmit();
+  };
+  let typing = false;
+  function handleInput() {
+    typing = true;
+    enteredOtp = enteredOtp.trim();
   }
 
   const countryCurrencyMap = {
@@ -937,6 +999,7 @@
     searchTerm = `${selectedCountry.name} `;
     showDropdown = false;
     validateCountry();
+    validatePhoneNumber(country, phone);
     updateCurrency(country);
     delete errors.country;
     localStorage.setItem("selectedCountry", JSON.stringify(selectedCountry));
@@ -974,47 +1037,329 @@
     ) {
       selectCountry(filteredCountries[0]);
     } else {
-      showDropdown = filteredCountries.length > 0;
+      showDropdown = filteredCountries.length > 0 || searchTerm.length > 0;
     }
   }
+
+  function validateGstNumber() {
+    // if (!gstNumber) {
+    //   errors.gstNumber = '*Required';
+    // } else if (!/^[0-9]{2}[A-Z0-9]+$/.test(gstNumber)) {
+    //   errors.gstNumber = 'Please provide a valid GST Number.';
+    // } else {
+    //   delete errors.gstNumber;
+    // }
+
+    if (gstNumber) {
+      if (!/^[0-9]{2}[A-Z0-9]+$/.test(gstNumber)) {
+        errors.gstNumber = "Please provide a valid GST Number.";
+      } else {
+        delete errors.gstNumber;
+      }
+    } else {
+      delete errors.gstNumber;
+    }
+  }
+
+  function validateTanNumber() {
+    if (tanNumber) {
+      if (!/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(tanNumber)) {
+        errors.tanNumber = "Please provide a valid TAN Number.";
+      } else {
+        delete errors.tanNumber;
+      }
+    } else {
+      delete errors.tanNumber;
+    }
+  }
+
+  // function validateForm() {
+  //   errors = {};
+  //   if (!username) {
+  //     errors.username = "*Required";
+  //   } else if (username.length < 3) {
+  //     errors.username = "Please enter at least 3 characters";
+  //   } else if (/^[^a-zA-Z]/.test(username)) {
+  //     errors.username = "Username must start with a letter";
+  //   } else if (/[^a-zA-Z0-9_]/.test(username)) {
+  //     errors.username =
+  //       "Username can include only letters, numbers, and underscore ( _ )";
+  //   } else if (/^[0-9]+$/.test(username)) {
+  //     errors.username = "Username cannot contain only numbers";
+  //   } else if (/^[_]+$/.test(username)) {
+  //     errors.username = "Username cannot contain only underscores ( _ )";
+  //   } else if (!/^(?=(.*[a-zA-Z]){3,})[a-zA-Z0-9_]+$/.test(username.trim())) {
+  //     errors.username = "Username must contain at least 3 letters";
+  //   } else {
+  //     delete errors.username;
+  //   }
+
+  //   if (!email) {
+  //     errors.email = "*Required";
+  //   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  //     errors.email = "Please enter a valid email.";
+  //   } else {
+  //     delete errors.email;
+  //   }
+
+  //   if (!phone) {
+  //     errors.phone = "*Required";
+  //   } else {
+  //     const phonePattern = getPhonePattern(country);
+  //     const phoneRegex = new RegExp(phonePattern);
+
+  //     if (!phoneRegex.test(phone)) {
+  //       errors.phone = `Please enter a valid phone number for ${country}.`;
+  //     } else {
+  //       delete errors.phone;
+  //     }
+  //   }
+
+  //   if (!country) {
+  //     errors.phone =
+  //       "Please select the country before entering the phone number";
+  //   } else {
+  //     delete errors.phone;
+  //   }
+
+  //   if (!country) {
+  //     errors.country = "*Required";
+  //   } else {
+  //     delete errors.country;
+  //   }
+
+  //   if (!password) {
+  //     errors.password = "*Required";
+  //   } else if (
+  //     !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
+  //       password
+  //     )
+  //   ) {
+  //     errors.password =
+  //       "Ensure your password matches the format outlined below.";
+  //   } else {
+  //     delete errors.password;
+  //   }
+
+  //   if (!passwordConfirm) {
+  //     errors.passwordConfirm = "*Required";
+  //   } else if (passwordConfirm !== password) {
+  //     errors.passwordConfirm = "Passwords do not match";
+  //   } else {
+  //     delete errors.passwordConfirm;
+  //   }
+
+  //   if (!termsAccepted) {
+  //     errors.termsAndConditions =
+  //       "You need to agree to the Terms of Service and Privacy Policy to proceed";
+  //   }
+
+  //   if (gstNumber) {
+  //     if (!/^[0-9]{2}[A-Z0-9]+$/.test(gstNumber)) {
+  //       errors.gstNumber = "Please provide a valid GST Number.";
+  //     } else {
+  //       delete errors.gstNumber;
+  //     }
+  //   } else {
+  //     delete errors.gstNumber;
+  //   }
+
+  //   if (tanNumber) {
+  //     if (!/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(tanNumber)) {
+  //       errors.tanNumber = "Please provide a valid TAN Number";
+  //     } else {
+  //       delete errors.tanNumber;
+  //     }
+  //   } else {
+  //     delete errors.tanNumber;
+  //   }
+
+  //   if (!(isOtpVerified === true)) {
+  //     // toast.error('Please verify your email or phone number to proceed');
+  //     toast.error("Please verify your email to proceed");
+  //   }
+
+  //   console.log(isOtpVerified, "isOtpVerified");
+  //   console.log("Error object:", errors);
+  //   errorCount = Object.keys(errors).length;
+  //   console.log("Number of errors:", errorCount);
+
+  //   return (
+  //     Object.keys(errors).length === 0 && isOtpVerified === true
+  //     // (isOtpVerified === true || isEmailVerified || isOtpPhoneVerified || ProfilePhoneVerified)
+  //   );
+  // }
 
   function validateForm() {
     errors = {};
-    if (!username || !usernameRegex.test(username))
-      errors.username = "Username is required.";
-    if (!email || !emailRegex.test(email))
-      errors.email = "Email address is required.";
 
-    if (!phone || !phoneRegex.test(phone)) {
-      errors.phone = "Phone number is required.";
+    // Validate business fields if account type is "For a Business"
+    if (account === "For a Business") {
+      if (!companyName) {
+        errors.companyName = "*Required";
+      } else if (!/^[a-zA-Z\s]+$/.test(companyName)) {
+        errors.companyName = "Company name can only contain letters and spaces";
+      } else {
+        delete errors.companyName;
+      }
+
+      if (!companyType) {
+        errors.companyType = "*Required";
+      } else if (!/^[a-zA-Z\s]+$/.test(companyType)) {
+        errors.companyType = "Company type can only contain letters and spaces";
+      } else {
+        delete errors.companyType;
+      }
+
+      if (!jobTitle) {
+        errors.jobTitle = "*Required";
+      } else if (!/^[a-zA-Z\s]+$/.test(jobTitle)) {
+        errors.jobTitle = "Job title can only contain letters and spaces";
+      } else {
+        delete errors.jobTitle;
+      }
+
+      // Make only GST required for business accounts
+      if (!gstNumber) {
+        errors.gstNumber = "*Required";
+      } else if (!/^[0-9]{2}[A-Z0-9]+$/.test(gstNumber)) {
+        errors.gstNumber = "Please provide a valid GST Number.";
+      } else {
+        delete errors.gstNumber;
+      }
+
+      // TAN is optional even for business accounts
+      if (tanNumber) {
+        if (!/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(tanNumber)) {
+          errors.tanNumber = "Please provide a valid TAN Number";
+        } else {
+          delete errors.tanNumber;
+        }
+      } else {
+        delete errors.tanNumber;
+      }
+    } else {
+      // For non-business accounts, GST and TAN are optional but validate if provided
+      if (gstNumber) {
+        if (!/^[0-9]{2}[A-Z0-9]+$/.test(gstNumber)) {
+          errors.gstNumber = "Please provide a valid GST Number.";
+        } else {
+          delete errors.gstNumber;
+        }
+      } else {
+        delete errors.gstNumber;
+      }
+
+      if (tanNumber) {
+        if (!/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(tanNumber)) {
+          errors.tanNumber = "Please provide a valid TAN Number";
+        } else {
+          delete errors.tanNumber;
+        }
+      } else {
+        delete errors.tanNumber;
+      }
     }
 
-    if (!country) errors.country = "Please select a country.";
-    if (!currency) errors.currency = "Please select a currency.";
-    if (!password) errors.password = "Password is required.";
-    if (!passwordRegex.test(password))
-      errors.password = "Password is required.";
-    if (!passwordConfirm)
-      errors.passwordConfirm = "Please confirm your password ones you enter.";
-    if (passwordConfirm !== password)
-      errors.passwordConfirm = "Passwords do not match.";
+    // Continue with existing validation logic
+    if (!username) {
+      errors.username = "*Required";
+    } else if (username.length < 3) {
+      errors.username = "Please enter at least 3 characters";
+    } else if (/^[^a-zA-Z]/.test(username)) {
+      errors.username = "Username must start with a letter";
+    } else if (/[^a-zA-Z0-9_]/.test(username)) {
+      errors.username =
+        "Username can include only letters, numbers, and underscore ( _ )";
+    } else if (/^[0-9]+$/.test(username)) {
+      errors.username = "Username cannot contain only numbers";
+    } else if (/^[_]+$/.test(username)) {
+      errors.username = "Username cannot contain only underscores ( _ )";
+    } else if (!/^(?=(.*[a-zA-Z]){3,})[a-zA-Z0-9_]+$/.test(username.trim())) {
+      errors.username = "Username must contain at least 3 letters";
+    } else {
+      delete errors.username;
+    }
+
+    if (!email) {
+      errors.email = "*Required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = "Please enter a valid email.";
+    } else {
+      delete errors.email;
+    }
+
+    if (!phone) {
+      errors.phone = "*Required";
+    } else {
+      const phonePattern = getPhonePattern(country);
+      const phoneRegex = new RegExp(phonePattern);
+
+      if (!phoneRegex.test(phone)) {
+        errors.phone = `Please enter a valid phone number for ${country}.`;
+      } else {
+        delete errors.phone;
+      }
+    }
+
+    if (!country) {
+      errors.phone =
+        "Please select the country before entering the phone number";
+    } else {
+      delete errors.phone;
+    }
+
+    if (!country) {
+      errors.country = "*Required";
+    } else {
+      delete errors.country;
+    }
+
+    if (!password) {
+      errors.password = "*Required";
+    } else if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
+        password
+      )
+    ) {
+      errors.password =
+        "Ensure your password matches the format outlined below.";
+    } else {
+      delete errors.password;
+    }
+
+    if (!passwordConfirm) {
+      errors.passwordConfirm = "*Required";
+    } else if (passwordConfirm !== password) {
+      errors.passwordConfirm = "Passwords do not match";
+    } else {
+      delete errors.passwordConfirm;
+    }
+
     if (!termsAccepted) {
       errors.termsAndConditions =
-        "* You must agree to the Terms of Service and Privacy Policy.";
+        "You need to agree to the Terms of Service and Privacy Policy to proceed";
     }
 
-    console.log("form errors", errors);
-    if (Object.keys(errors).length > 0) {
-      return false;
-    } else {
-      return true;
+    if (!(isOtpVerified === true)) {
+      toast.error("Please verify your email to proceed");
     }
+
+    console.log(isOtpVerified, "isOtpVerified");
+    console.log("Error object:", errors);
+    errorCount = Object.keys(errors).length;
+    console.log("Number of errors:", errorCount);
+
+    return Object.keys(errors).length === 0 && isOtpVerified === true;
   }
-
   async function handleFormSubmission({ cancel }) {
     if (!validateForm()) {
       cancel();
     }
+    // if (!validateForm()) {
+    //   cancel();
+    //   return;
+    // }
     return async ({ result, update }) => {
       console.log("result", result);
 
@@ -1027,13 +1372,23 @@
           await update();
           toast.success(result.data.message);
 
-          await goto("/profile");
+          await goto("/dashboard");
           location.reload();
         } else {
           toast.error(result.data.message);
         }
       }
     };
+  }
+
+  let showBusinessDetails = false;
+  let account;
+
+  function toggleFields(event) {
+    account = event.target.value;
+    showBusinessDetails = event.target.value === "For a Business";
+    showBusinessDetails = showBusinessDetails;
+    isAccountSelected = true;
   }
 </script>
 
@@ -1060,6 +1415,117 @@
     </p>
 
     <form method="POST" action="?/register" use:enhance={handleFormSubmission}>
+      <div class="flex items-center gap-3 mx text-md mt-2 mb-5">
+        <label class="flex items-center md:gap-2 font-medium">
+          For a Business
+          <input
+            type="radio"
+            name="account"
+            value="For a Business"
+            class="peer hidden"
+            on:change={toggleFields}
+          />
+          <span
+            class="w-4 h-4 rounded-full border border-black bg-white flex items-center justify-center peer-checked:border-primary-600 peer-checked:bg-primary-600"
+          >
+            <span class="w-2 h-2 rounded-full bg-white peer-checked:bg-white"
+            ></span>
+          </span>
+        </label>
+        <label class="flex items-center gap-2 font-medium">
+          For Myself
+          <input
+            type="radio"
+            name="account"
+            value="For Myself"
+            checked
+            class="peer hidden"
+            on:change={toggleFields}
+          />
+          <span
+            class="w-4 h-4 rounded-full border border-black bg-white flex items-center justify-center peer-checked:border-primary-600 peer-checked:bg-primary-600"
+          >
+            <span class="w-2 h-2 rounded-full bg-white peer-checked:bg-white"
+            ></span>
+          </span>
+        </label>
+      </div>
+      {#if showBusinessDetails}
+        <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
+          <div class="flex-1 mb-2 md:mb-0">
+            <label
+              for="companyname"
+              class="block text-sm font-medium text-gray-600"
+              >Company Name</label
+            >
+            <input
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+              type="text"
+              name="companyname"
+              bind:value={companyName}
+              placeholder="Company Name"
+              on:input={() => {
+                errors.companyName = !companyName
+                  ? "*Required"
+                  : !/^[a-zA-Z\s]+$/.test(companyName)
+                    ? "Company name can only contain letters and spaces"
+                    : "";
+              }}
+            />
+            <p class=" text-red-500 text-left text-xs">
+              {errors?.companyName || ""}
+            </p>
+          </div>
+          <div class="flex-1 mb-2 md:mb-0">
+            <label
+              for="companytype"
+              class="block text-sm font-medium text-gray-600"
+              >Company Type
+            </label>
+            <input
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+              type="text"
+              name="companytype"
+              bind:value={companyType}
+              placeholder="Company Type"
+              on:input={() => {
+                errors.companyType = !companyType
+                  ? "*Required"
+                  : !/^[a-zA-Z\s]+$/.test(companyType)
+                    ? "Company type can only contain letters and spaces"
+                    : "";
+              }}
+            />
+            <p class=" text-red-500 text-left text-xs">
+              {errors?.companyType || ""}
+            </p>
+          </div>
+        </div>
+        <div class="flex-1 mb-4">
+          <label
+            for="jobTitle"
+            class="block md:mt-5 text-sm font-medium text-gray-600"
+            >Job Title
+          </label>
+          <input
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+            type="text"
+            name="jobTitle"
+            bind:value={jobTitle}
+            placeholder="Job Title"
+            on:input={() => {
+              errors.jobTitle = !jobTitle
+                ? "*Required"
+                : !/^[a-zA-Z\s]+$/.test(jobTitle)
+                  ? "Job title can only contain letters and spaces"
+                  : "";
+            }}
+          />
+          <p class=" text-red-500 text-left text-xs">
+            {errors?.jobTitle || ""}
+          </p>
+        </div>
+      {/if}
       <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
         <div class="flex-1 mb-2 md:mb-0">
           <label for="username" class="block text-sm font-medium text-gray-600"
@@ -1078,24 +1544,180 @@
             <div class="text-red-500 text-xs mt-1">{errors.username}</div>
           {/if}
         </div>
-        <div class="flex-1 mb-2 md:mb-0">
+        <div class="flex-1 mb-2 md:mb-0 relative">
           <label for="email" class="block text-sm font-medium text-gray-600"
             >Email</label
           >
-          <input
-            type="email"
-            id="email"
-            name="email"
-            bind:value={email}
-            on:input={() => validateEmail()}
-            placeholder="Enter your email"
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm text-sm h-10"
-          />
+          <div class="relative">
+            <form
+              action="?/verifyemail"
+              bind:this={form5}
+              method="POST"
+              use:enhance={({}) => {
+                return async ({ result }) => {
+                  console.log("result", result);
+
+                  isLoading = false;
+                  console.log(result);
+                  if (result.data?.status === 200) {
+                    toast.success(result.data.message);
+                    ProfileEmailVerified = result.data.isEmailVerified;
+                    verificationMessage = result.data.message;
+
+                    if (
+                      verificationMessage.includes(
+                        "Verification email sent successfully. Please check your inbox."
+                      )
+                    ) {
+                      displayMessage = "Please check your inbox.";
+                      emailSent = true;
+                      isOtpVerified = false;
+                    } else {
+                      displayMessage = verificationMessage;
+                      emailSent = false;
+                      isOtpVerified = true;
+                    }
+                  } else {
+                    ProfileEmailVerified = result.data.isEmailVerified;
+                    toast.error(result.data.message);
+                    emailSent = false;
+                  }
+                };
+              }}
+              on:submit={() => {
+                isLoading = true;
+              }}
+            >
+              <input
+                type="email"
+                id="email"
+                name="email"
+                bind:value={email}
+                on:input={() => {
+                  validateEmail();
+                  ProfileEmailVerified = false;
+                  emailSent = false;
+                  isOtpVerified = false;
+                }}
+                placeholder="Enter your email"
+                class="mt-1 block w-full p-2 pr-24 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm text-sm h-10"
+              />
+
+              {#if isLoading}
+                <span
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
+                >
+                  <Icon icon="line-md:loading-alt-loop" class="w-4 h-4 mr-1" />
+                  Sending...
+                </span>
+              {:else if !ProfileEmailVerified && !emailSent}
+                <button
+                  type="submit"
+                  class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-500 font-semibold text-2s pl-2 py-1 rounded hover:underline disabled:cursor-not-allowed"
+                  disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                    email
+                  ) || email.split("@")[1].includes("gamil")}
+                >
+                  Verify
+                </button>
+              {:else if emailSent}
+                <span
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+                >
+                  {#if isOtpVerified}
+                    Verified
+                    <Icon
+                      icon="material-symbols:verified-rounded"
+                      class="w-4 h-4 ml-1"
+                    />
+                  {:else}
+                    <Icon
+                      icon="fluent:mail-all-read-16-filled"
+                      class="w-4 h-4 mr-1"
+                    />
+                    Check inbox
+                  {/if}
+                </span>
+              {:else}
+                <span
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+                >
+                  Verified
+                  <Icon
+                    icon="material-symbols:verified-rounded"
+                    class="w-4 h-4 ml-1"
+                  />
+                </span>
+              {/if}
+            </form>
+          </div>
+          <input type="hidden" name="email" bind:value={email} />
           {#if errors.email}
             <div class="text-red-500 text-xs mt-1">{errors.email}</div>
           {/if}
         </div>
       </div>
+
+      <div class="mt-1 mb-4">
+        {#if emailSent && isOtpVerified === false}
+          <form
+            action="?/verifyOtp"
+            method="POST"
+            use:enhance={() => {
+              return async ({ result }) => {
+                console.log(result);
+                isOtpVerified = result.data.isEmailVerified;
+                if (result.data?.status === 200) {
+                  toast.success(result.data.message);
+                  enteredOtp = "";
+                  isOtpVerified = true;
+                  ProfileEmailVerified = true;
+                } else if (result.data?.status === 500) {
+                  toast.error(result.data.message);
+                }
+                console.log(isOtpVerified, "isOtpVerified");
+              };
+            }}
+          >
+            <div class="relative w-full">
+              <input type="hidden" name="email" bind:value={email} />
+              <label
+                for="enteredOtp"
+                class="block text-sm font-medium text-gray-600"
+                >Enter the Recieved 6-digit OTP</label
+              >
+              <input
+                type="text"
+                maxlength="6"
+                name="enteredOtp"
+                bind:value={enteredOtp}
+                on:input={handleInput}
+                placeholder="Enter 6-digit OTP"
+                class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
+                    focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400
+                    placeholder:text-sm h-10"
+              />
+              <button
+                type="submit"
+                class="absolute top-1/2 right-2 transform text-primary-500 font-bold text-2s py-1 rounded hover:underline"
+              >
+                Verify
+              </button>
+            </div>
+          </form>
+          <p class="mt-px text-2s text-right text-gray-600">
+            Didn't receive the code?
+            <button
+              type="button"
+              on:click={handleResendemailOtp}
+              class="text-primary-500 font-medium hover:underline"
+            >
+              Get a new code
+            </button>
+          </p>
+        {/if}
+      </div>
+      <input name="isEmailVerified" type="hidden" bind:value={isOtpVerified} />
 
       <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
         <div class="w-full sm:mx-auto grid">
@@ -1110,7 +1732,9 @@
               placeholder="Search Country"
               on:input={handleInputChange}
               on:click={toggleDropdown}
-              class="w-full rounded placeholder-gray-400 placeholder:text-sm text-sm h-10 py-2 px-3 border border-gray-300 focus:ring-0 focus:outline-none focus:border-primary-400"
+              class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
+                    focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400
+                    placeholder:text-sm h-10"
             />
             <Icon
               icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
@@ -1120,13 +1744,13 @@
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
               <ul
-                class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 text-sm max-h-60 overflow-auto"
+                class="absolute z-10 w-full p-1.5 bg-white border border-gray-300 rounded-md text-sm max-h-60 overflow-auto"
                 on:click|stopPropagation
               >
                 {#each filteredCountries as { name, code }}
                   <li
                     on:click={() => selectCountry({ name, code })}
-                    class="cursor-pointer px-2 py-1 hover:bg-primary-50 text-xs text-left"
+                    class="cursor-pointer px-2 py-1 text-gray-500 hover:bg-primary-50 text-xs font-medium text-left"
                   >
                     <option value={code}>{name} ({code})</option>
                   </li>
@@ -1137,7 +1761,7 @@
                       icon="tabler:info-square-rounded-filled"
                       class="text-red-500 text-base mr-1"
                     />
-                    <li class="text-gray-800 text-xs">
+                    <li class="text-gray-500 text-xs font-medium">
                       No matching countries found!
                     </li>
                   </div>
@@ -1155,7 +1779,9 @@
             >Currency</label
           >
           <select
-            class="rounded focus:ring-1 focus:ring-primary-600 text-gray-400 placeholder-gray-400 placeholder:text-sm text-sm h-10 py-2 px-3 outline-none border border-gray-300 w-full"
+            class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
+                    focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400
+                    placeholder:text-sm h-10"
             name="currency"
             bind:value={currency}
             id="currency-select"
@@ -1168,9 +1794,8 @@
             {/each}
           </select>
           <input type="hidden" name="currency" bind:value={currency} />
-          <!-- <p class="text-red-500 text-left ml-2 text-xs">{errors?.currency || ''}</p> -->
           {#if errors.country}
-            <div class="text-red-500 text-xs mt-1">{errors?.currency}</div>
+            <div class="text-red-500 text-xs mt-1">{errors.country}</div>
           {/if}
         </div>
       </div>
@@ -1184,7 +1809,7 @@
           id="phone"
           name="phone"
           bind:value={phone}
-          on:input={() => validatePhone()}
+          on:input={() => validatePhoneNumber(country, phone)}
           placeholder="Enter your phone number"
           class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
                     focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400
@@ -1194,7 +1819,49 @@
           <div class="text-red-500 text-xs mt-1">{errors.phone}</div>
         {/if}
       </div>
+      {#if showBusinessDetails}
+        <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
+          <div class="flex-1 mb-2 md:mb-0">
+            <label
+              for="gstNumber"
+              class="block text-sm font-medium text-gray-600">GST Number</label
+            >
+            <input
+              type="text"
+              id="gstNumber"
+              name="gstNumber"
+              placeholder="Enter your GST number"
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+              bind:value={gstNumber}
+              on:input={validateGstNumber}
+            />
+            {#if errors.gstNumber}
+              <div class="text-red-500 text-xs mt-1">{errors.gstNumber}</div>
+            {/if}
+          </div>
 
+          <div class="flex-1 mb-2 md:mb-0 relative">
+            <label
+              for="tanNumber"
+              class="block text-sm font-medium text-gray-600">TAN Number</label
+            >
+            <div class="relative">
+              <input
+                type="text"
+                id="tanNumber"
+                name="tanNumber"
+                placeholder="Enter your TAN number"
+                class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm text-sm h-10"
+                on:input={validateTanNumber}
+                bind:value={tanNumber}
+              />
+              {#if errors.tanNumber}
+                <div class="text-red-500 text-xs mt-1">{errors.tanNumber}</div>
+              {/if}
+            </div>
+          </div>
+        </div>
+      {/if}
       <div class="mb-4">
         <label for="password" class="block text-sm font-medium text-gray-600"
           >Password</label
@@ -1230,7 +1897,7 @@
           id="passwordConfirm"
           name="confirmpassword"
           bind:value={passwordConfirm}
-          on:input={() => validateForm()}
+          on:input={() => validateConfirmPassword()}
           placeholder="Confirm your password"
           class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10"
         />
@@ -1257,7 +1924,7 @@
           value={true}
           bind:checked={termsAccepted}
           on:change={validateForm}
-          class="mt-0.5 text-primary-500 focus:ring-0"
+          class="mt-0.5 text-primary-500 rounded focus:ring-0"
         />
         <div class=" text-sm">
           I have read and agreed to the
@@ -1281,25 +1948,8 @@
       {/if}
 
       <div class="mb-4 hidden md:block text-gray-500">
-        <div class="flex flex-col md:flex-row items-start">
-          <!-- <div class="font-semibold underline text-lg">Note:</div>
-                    <div class="text-sm mt-1 md:mt-0 md:ml-2">
-                        <p class="whitespace-normal max-w-full">
-                            You can withdraw our consent at any time by clicking the unsubscribe link contained in every email or by sending an email to 
-                            <a href="mailto:privacy@chemikartgroup.com" class="text-primary-500 underline">privacy@chemikartgroup.com</a>. 
-                            Detailed information is available in our 
-                            <a href="/privacy" class="text-primary-500 underline">Privacy Statement</a>.
-                        </p>
-                    </div> -->
-        </div>
+        <div class="flex flex-col md:flex-row items-start"></div>
       </div>
-
-      <!-- <div class="mb-4 md:hidden text-sm text-gray-500">
-                <p class="whitespace-normal max-w-full">
-                    Need to change your mind? Just hit unsubscribe in any email or email us at 
-                    <a href="mailto:privacy@chemikartgroup.com" class="text-primary-500 underline">privacy@chemikartgroup.com</a>.
-                </p>
-            </div> -->
 
       <button
         type="submit"
