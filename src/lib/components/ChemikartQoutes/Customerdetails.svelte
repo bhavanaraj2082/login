@@ -1,13 +1,15 @@
 <script>
 	import { Cusdetails } from '$lib/stores/solution_stores.js';
+	import Icon from '@iconify/svelte';
 	export let tog;
 	export let tog1;
 	export let tog2;
 	export let tog3;
 	export let tog4;
+	let errors={};
+	let country;
 	let errorMessage = '';
 	$: isFormData =
-		$Cusdetails.Title &&
 		$Cusdetails.FirstName &&
 		$Cusdetails.LastName &&
 		$Cusdetails.Organisation &&
@@ -16,7 +18,7 @@
 		$Cusdetails.Number;
 	
 	const titles = ['Dr', 'Miss', 'Mr', 'Ms', 'Mrs', 'Prof'];
-	const countries = [
+    const countries = [
 		{ name: 'Afghanistan', code: '+93' },
 		{ name: 'Albania', code: '+355' },
 		{ name: 'Algeria', code: '+213' },
@@ -210,191 +212,567 @@
 		{ name: 'Zambia', code: '+260' },
 		{ name: 'Zimbabwe', code: '+263' }
 	];
-	let emailError = '';
-	let phoneError = '';
-	
-	const cust = () => {
-	console.log("@@@@@@",$Cusdetails.FirstName);
-	
-		console.log("$$$",isFormData);
+    const phoneNumberPatterns = {
+		Afghanistan: /^[7-9]\d{8}$/,
+		Algeria: /^[5-9]\d{8}$/,
+		Andorra: /^\+376[0-9]{6}$/,
+		Angola: /^(\+244|0)9\d{8}$/,
+		'Antigua and Barbuda': /^\+1[2689]\d{7}$/,
+		Armenia: /^(\+374|0)(10|20|30|40|50|60|70|80)\d{6}$/,
+		Austria: /^\+43\d{1,12}$/,
+		Azerbaijan: /^(\+994|0)5[0-9]\d{7}$/,
+		Bahamas: /^\+1[242]\d{7}$/,
+		Bangladesh: /^(\+8801|01)\d{9}$/,
+		Belarus: /^(\+375|0)29\d{7}$/,
+		Belgium: /^(\+32|0)4\d{8}$/,
+		Belize: /^(\+501|0)\d{7}$/,
+		Benin: /^(\+229|0)\d{8}$/,
+		Bolivia: /^(\+591|0)\d{8}$/,
+		'Bosnia and Herzegovina': /^(\+387|0)\d{8}$/,
+		'Burkina Faso': /^(\+226|0)\d{8}$/,
+		Burundi: /^(\+257|0)\d{8}$/,
+		'Cabo Verde': /^(\+238|0)\d{7}$/,
+		Cambodia: /^(\+855|0)\d{8,9}$/,
+		Cameroon: /^(\+237|0)\d{8}$/,
+		'Central African Republic': /^(\+236|0)\d{8}$/,
+		Chad: /^(\+235|0)\d{8}$/,
+		Comoros: /^(\+269|0)\d{7}$/,
+		'Congo, Republic of the': /^(\+242|0)\d{7}$/,
+		'Congo, Democratic Republic of the': /^(\+243|0)\d{9}$/,
+		'Costa Rica': /^(\+506|0)\d{8}$/,
+		Croatia: /^(\+385|0)9\d{8}$/,
+		Cyprus: /^(\+357|0)\d{8}$/,
+		'Czech Republic': /^(\+420|0)\d{9}$/,
+		Djibouti: /^(\+253|0)\d{7}$/,
+		Dominica: /^(\+1[7678]|0)\d{7}$/,
+		'Dominican Republic': /^(\+1[809]|0)\d{7}$/,
+		Ecuador: /^(\+593|0)\d{9}$/,
+		'El Salvador': /^(\+503|0)\d{8}$/,
+		'Equatorial Guinea': /^(\+240|0)\d{8}$/,
+		Eritrea: /^(\+291|0)\d{7}$/,
+		Estonia: /^(\+372|0)\d{7}$/,
+		Eswatini: /^(\+268|0)\d{8}$/,
+		Finland: /^(\+358|0)\d{9}$/,
+		France: /^(\+33|0)\d{9}$/,
+		Gabon: /^(\+241|0)\d{7}$/,
+		Gambia: /^(\+220|0)\d{7}$/,
+		Georgia: /^(\+995|0)\d{9}$/,
+		Germany: /^(\+49|0)\d{10}$/,
+		Greece: /^(\+30|0)\d{10}$/,
+		Grenada: /^(\+1[473]|0)\d{7}$/,
+		Guatemala: /^(\+502|0)\d{8}$/,
+		Guinea: /^(\+224|0)\d{9}$/,
+		'Guinea-Bissau': /^(\+245|0)\d{7}$/,
+		Guyana: /^(\+592|0)\d{7}$/,
+		Honduras: /^(\+504|0)\d{8}$/,
+		Iran: /^(\+98|0)\d{10}$/,
+		Iraq: /^(\+964|0)\d{9}$/,
+		Ireland: /^(\+353|0)\d{9}$/,
+		Italy: /^(\+39|0)\d{10}$/,
+		Jamaica: /^(\+1[876]|0)\d{7}$/,
+		Kenya: /^(\+254|0)\d{9}$/,
+		Kiribati: /^(\+686|0)\d{4}$/,
+		Laos: /^(\+856|0)\d{8}$/,
+		Latvia: /^(\+371|0)\d{8}$/,
+		Lebanon: /^(\+961|0)\d{8}$/,
+		Lesotho: /^(\+266|0)\d{8}$/,
+		Liechtenstein: /^(\+423|0)\d{7}$/,
+		Lithuania: /^(\+370|0)\d{8}$/,
+		Luxembourg: /^(\+352|0)\d{6}$/,
+		Malawi: /^(\+265|0)\d{9}$/,
+		Maldives: /^(\+960|0)\d{7}$/,
+		Mali: /^(\+223|0)\d{8}$/,
+		Malta: /^(\+356|0)\d{8}$/,
+		'Marshall Islands': /^(\+692|0)\d{7}$/,
+		Mauritania: /^(\+222|0)\d{8}$/,
+		Micronesia: /^(\+691|0)\d{7}$/,
+		Monaco: /^(\+377|0)\d{8}$/,
+		Mongolia: /^(\+976|0)\d{8}$/,
+		Montenegro: /^(\+382|0)\d{8}$/,
+		Mozambique: /^(\+258|0)\d{9}$/,
+		Myanmar: /^(\+95|0)\d{9}$/,
+		Nauru: /^(\+674|0)\d{4}$/,
+		Netherlands: /^(\+31|0)\d{9}$/,
+		'New Zealand': /^(\+64|0)\d{9}$/,
+		Niger: /^(\+227|0)\d{8}$/,
+		Nigeria: /^(\+234|0)\d{10}$/,
+		'North Macedonia': /^(\+389|0)\d{9}$/,
+		Oman: /^(\+968|0)\d{8}$/,
+		Palau: /^(\+680|0)\d{7}$/,
+		Palestine: /^(\+970|0)\d{9}$/,
+		Panama: /^(\+507|0)\d{7}$/,
+		'Papua New Guinea': /^(\+675|0)\d{7}$/,
+		Paraguay: /^(\+595|0)\d{9}$/,
+		Poland: /^(\+48|0)\d{9}$/,
+		Portugal: /^(\+351|0)\d{9}$/,
+		Romania: /^(\+40|0)\d{9}$/,
+		'Saint Kitts and Nevis': /^(\+1[869]|0)\d{7}$/,
+		'Saint Lucia': /^(\+1[758]|0)\d{7}$/,
+		'Saint Vincent and the Grenadines': /^(\+1[784]|0)\d{7}$/,
+		Samoa: /^(\+685|0)\d{5}$/,
+		'San Marino': /^(\+378|0)\d{7}$/,
+		'Sao Tome and Principe': /^(\+239|0)\d{7}$/,
+		'Saudi Arabia': /^(\+966|0)\d{9}$/,
+		Senegal: /^(\+221|0)\d{9}$/,
+		Seychelles: /^(\+248|0)\d{7}$/,
+		'Sierra Leone': /^(\+232|0)\d{8}$/,
+		Slovakia: /^(\+421|0)\d{9}$/,
+		Slovenia: /^(\+386|0)\d{8}$/,
+		'Solomon Islands': /^(\+677|0)\d{5}$/,
+		Somalia: /^(\+252|0)\d{8}$/,
+		'South Africa': /^(\+27|0)\d{9}$/,
+		'South Korea': /^(\+82|0)\d{9}$/,
+		Spain: /^(\+34|0)\d{9}$/,
+		'Sri Lanka': /^(\+94|0)\d{9}$/,
+		Syria: /^(\+963|0)\d{9}$/,
+		Togo: /^(\+228|0)\d{8}$/,
+		'Trinidad and Tobago': /^(\+1[868]|0)\d{7}$/,
+		Tuvalu: /^(\+688|0)\d{4}$/,
+		Uganda: /^(\+256|0)\d{9}$/,
+		Ukraine: /^(\+380|0)\d{9}$/,
+		'United Arab Emirates': /^(\+971|0)\d{9}$/,
+		'United Kingdom': /^(\+44|0)\d{10}$/,
+		'United States': /^(\+1|0)\d{10}$/,
+		Uruguay: /^(\+598|0)\d{8}$/,
+		Uzbekistan: /^(\+998|0)\d{9}$/,
+		Vanuatu: /^(\+678|0)\d{5}$/,
+		'Vatican City': /^(\+379|0)\d{7}$/,
+		Venezuela: /^(\+58|0)\d{10}$/,
+		Yemen: /^(\+967|0)\d{9}$/,
+		Zimbabwe: /^(\+263|0)\d{9}$/,
 
-		if (!isFormData) {
-			errorMessage = 'Please fill all the details';
-			return;
-		} else {
-			errorMessage = '';
-		}
-		const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!emailPattern.test($Cusdetails.Email)) {
-			emailError = 'Please enter a valid email address.';
-			return;
-		} 
-		else {
-			emailError = '';
-		}
-		const phonePattern = /^\d{10}$/;
-		if (!phonePattern.test($Cusdetails.Number)) {
-			phoneError = 'Please enter a valid  phone number (10 digits).';
-			return;
-		}
-		else{
-		phoneError = '';
-		}
-		tog4();
+		Albania: /^\d{9}$/,
+		USA: /^[2-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}$/,
+		UK: /^\d{4}[\s-]?\d{6}$/,
+		Eurozone: /^\d{8,15}$/,
+		Japan: /^\d{10,11}$/,
+		Canada: /^[2-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}$/,
+		Australia: /^[4-5]\d{8}$/,
+		Switzerland: /^\d{9}$/,
+		China: /^[1-9]\d{10}$/,
+		Sweden: /^\d{6,13}$/,
+		NewZealand: /^[2-9]\d{7,9}$/,
+		Singapore: /^[8-9]\d{7}$/,
+		HongKong: /^[5-9]\d{7}$/,
+		Norway: /^\d{8}$/,
+		Mexico: /^\d{10}$/,
+		India: /^[6-9]\d{9}$/,
+		Brazil: /^\d{10,11}$/,
+		Russia: /^[1-9]\d{9}$/,
+		SouthAfrica: /^\d{10}$/,
+		Israel: /^[5-7]\d{8}$/,
+		Thailand: /^[6-9]\d{8}$/,
+		Malaysia: /^[1-9]\d{7,9}$/,
+		Philippines: /^[8-9]\d{9}$/,
+		UAE: /^[5-9]\d{8}$/,
+		Colombia: /^\d{10}$/,
+		Pakistan: /^[3-9]\d{9}$/,
+		CzechRepublic: /^\d{9}$/,
+		Argentina: /^\d{10,11}$/,
+		Denmark: /^\d{8}$/,
+		Hungary: /^\d{9}$/,
+		Turkey: /^[5-9]\d{9}$/,
+		Chile: /^\d{9}$/,
+		SaudiArabia: /^[5-9]\d{8}$/,
+		Taiwan: /^[9]\d{8}$/,
+		Indonesia: /^[8-9]\d{9,10}$/,
+		Vietnam: /^[3-9]\d{8,9}$/,
+		Egypt: /^[1-9]\d{9}$/,
+		Bahrain: /^\d{8}$/,
+		Qatar: /^\d{8}$/,
+		Kuwait: /^\d{8}$/,
+		Morocco: /^[5-9]\d{8}$/,
+		Jordan: /^\d{8,9}$/,
+		Kazakhstan: /^\d{10}$/,
+		Serbia: /^\d{9}$/,
+		Peru: /^\d{9}$/,
+		Tunisia: /^\d{8}$/,
+		WestAfrica: /^\d{8}$/,
+		CentralAfrica: /^\d{8}$/,
+		Zambia: /^\d{9}$/,
+		Nepal: /^[9]\d{9}$/,
+		SriLanka: /^[7]\d{8}$/,
+		Turkmenistan: /^\d{8}$/,
+		Moldova: /^\d{8}$/,
+		Ethiopia: /^\d{9}$/,
+		Tanzania: /^\d{9}$/,
+		Ghana: /^[2-9]\d{8}$/,
+		Nicaragua: /^\d{8}$/,
+		Bulgaria: /^\d{8,10}$/,
+		BosniaHerzegovina: /^\d{8,9}$/,
+		Namibia: /^\d{9}$/,
+		CaymanIslands: /^\d{7}$/,
+		Fiji: /^\d{7}$/,
+		Macau: /^\d{8}$/,
+		Mauritius: /^\d{8}$/,
+		Tajikistan: /^\d{9}$/,
+		Aruba: /^\d{7}$/,
+		Suriname: /^\d{7}$/,
+		Iceland: /^\d{7}$/,
+		SierraLeone: /^\d{8}$/,
+		Madagascar: /^\d{8,9}$/,
+		EastCaribbean: /^\d{7}$/,
+		Barbados: /^\d{7}$/,
+		CFPFranc: /^\d{6,9}$/,
+		PapuaNewGuinea: /^\d{8}$/,
+		ElSalvador: /^\d{8}$/,
+		Gibraltar: /^\d{8}$/,
+		Liberia: /^\d{7}$/,
+		Rwanda: /^\d{9}$/,
+		Botswana: /^\d{7,8}$/,
+		Kyrgyzstan: /^\d{9}$/,
+		Brunei: /^\d{7}$/,
+		Sudan: /^\d{9}$/,
+		Libya: /^\d{8,9}$/,
+		Cuba: /^\d{8}$/,
+		Bhutan: /^\d{8}$/,
+		DominicanRepublic: /^\d{10}$/,
+		Haiti: /^\d{8}$/,
+		Tonga: /^\d{7}$/
 	};
+    let errorMessage1, errorMessage2,errorMessage3,errorMessage4;	
+	
+    //VALIDATIONS
+    function validateFirstName(event) {
+    const input = event.target.value;
+    const regex = /^[A-Za-z\s]*$/; 
+    if (!regex.test(input)) {
+        errorMessage1 = 'Name cannot contain numbers or special characters';
+    } else {
+        errorMessage1 = '';
+    }
+}
+function validateLastName(event) {
+    const input = event.target.value;
+    const regex = /^[A-Za-z\s]*$/; 
+    if (!regex.test(input)) {
+        errorMessage2 = 'Name cannot contain numbers or special characters';
+    } else {
+        errorMessage2 = '';
+    }
+}
+function validateEmail(event) {
+    const input = event.target.value;
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!regex.test(input)) {
+        errorMessage3 = 'Please enter a valid email address';
+    } else {
+        errorMessage3 = '';
+    }
+}
+function validatePhNo(country, number) {
+    const pattern = phoneNumberPatterns[country];
+    if (!pattern) {
+        errorMessage4 = 'No validation pattern found for this country';
+    } else if (!pattern.test(number)) { 
+        errorMessage4 = 'Please enter a valid phone number for ${country}';
+    } else {
+        errorMessage4 = ''; 
+    }
+}
+
+
+
+const validateAll = (country, number) => {
+if (!isFormData) {
+    errorMessage = 'Please fill all the required fields'; 
+	setTimeout(() => {
+	errorMessage = '';
+}, 5000);
+    return false; 
+} else {
+    errorMessage = ''; 
+}
+validateFirstName({ target: { value: $Cusdetails.FirstName } });
+validateLastName({ target: { value: $Cusdetails.LastName } });
+validateEmail({ target: { value: $Cusdetails.Email } });
+// validatePhNo(country, number);
+return !errorMessage1 && !errorMessage2 && !errorMessage3 && !errorMessage4;
+};
+const cust = () => {
+if (!validateAll($Cusdetails.Country, $Cusdetails.Number)) {
+    return;
+}
+tog4();
+};
+
+
+
+
+
+
+let searchTerm = "";
+    let showDropdown = false;
+    let filteredCountries = countries;
+
+	function filterCountries() {
+		filteredCountries = countries.filter(
+			(country) =>
+				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				country.code
+					.replace("+", "")
+					.includes(searchTerm.replace("+", "").toLowerCase()),
+		);
+		if (
+			filteredCountries.length === 1 &&
+			(filteredCountries[0].name.toLowerCase() ===
+				searchTerm.toLowerCase() ||
+				filteredCountries[0].code.replace("+", "").toLowerCase() ===
+					searchTerm.replace("+", "").toLowerCase())
+		) {
+			selectCountry(filteredCountries[0]);
+		} else {
+			showDropdown = filteredCountries.length > 0; 
+		}
+	}
+	function selectCountry(selectedCountry) {
+		$Cusdetails.Country = selectedCountry.name;
+		searchTerm = `${selectedCountry.name} `;
+		showDropdown = false;
+		// validatePhoneNumber(country, phone);
+		validatePhNo($Cusdetails.Country, number);
+		delete errors.$Cusdetails.Country;
+	}
+
+	function handleInputChange(event) {
+    searchTerm = event.target.value;
+    filterCountries();
+}
+
+
+    function toggleDropdown() {
+        showDropdown = !showDropdown;
+    }
+
+	// function validatePhoneNumber(country, phone) {
+	// const pattern = phoneNumberPatterns[country];
+	// if (!pattern) {
+	// throw new Error(`No validation pattern found for country: ${country}`);
+	// }
+	// return pattern.test(phone);
+	// }
 </script>
 
 <div class="py-10 bg-white  flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 1: Select custom solution type</h1>
-	<button type="button" class="font-semibold text-primary-500" on:click={tog()}>Edit</button>
+	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 1: Select custom solution type</h1>
+	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog()}>Edit</button>
 </div>
 <hr />
 <div class="py-10 bg-white  flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 2: Select custom format</h1>
-	<button type="button" class="font-semibold text-primary-500" on:click={tog1()}>Edit</button>
+	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 2: Select custom format</h1>
+	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog1()}>Edit</button>
 </div>
-<hr />
+<hr /><hr />
 <div class="py-10 bg-white  flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 3: Configure custom solution</h1>
-	<button type="button" class="font-semibold text-primary-500" on:click={tog2()}>Edit</button>
+	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 3: Configure custom solution</h1>
+	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog2()}>Edit</button>
 </div>
-<hr />
+<hr /><hr />
 <div class="py-10 bg-white  flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 4: Additional notes</h1>
-	<button type="button" class="font-semibold text-primary-500" on:click={tog3()}>Edit</button>
+	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 4: Additional notes</h1>
+	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog3()}>Edit</button>
 </div>
-<hr />
+<hr /><hr />
 <div class="bg-white ">
-	<h1 class="font-bold text-2xl py-10">Step 5: Customer details</h1>
-	<hr />
-	<h1 class="font-semibold py-5 text-primary-500 ">Log in to auto fill</h1>
+	<h1 class="font-bold sm:text-2xl text-sm pt-10">Step 5: Customer details</h1>
+	<div class="sm:ml-10 ml-0">
+	<h1 class="font-semibold py-5 text-primary-500 sm:text-md text-sm ">Please fill the details</h1>
 	<div class="grid grid-cols-1 gap-x-6 gap-y-1 md:w-3/4 lg:w-1/2 sm:grid-cols-6">
 		<div class="sm:col-span-2  sm:col-start-1">
-			<label for="title" class="text-sm">Title</label>
-		  <div class="mt-2">
+				<label for="title" class="sm:text-sm text-xs">Title</label>
+		  <div class="">
 			<select
 				id="title"
 				name="title"
-				class="block w-full rounded-md py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
+				placeholder="title"
+				class="block w-full sm:text-sm text-xs rounded py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1  focus:border-primary-500 bg-white"
 				bind:value={$Cusdetails.Title}
 			>
 				<option value="" disabled selected>Title</option>
 				{#each titles as title}
-					<option value={title}>{title}</option>
+					<option value={title} class="sm:text-sm text-xs">{title}</option>
 				{/each}
 			</select>
 		  </div>
 		</div>
 		<div class="sm:col-span-2">
-			<label for="" class="text-sm">First name <span class="text-primary-500"> *</span></label>
-			<div class="mt-2">
+			<label for="" class="sm:text-sm text-xs">First name <span class="text-primary-500"> *</span></label>
+			<div class="">
 			<input
 			type="text"
-			class="block w-full rounded-md py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			class="block w-full rounded py-1.5 sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 			bind:value={$Cusdetails.FirstName}
 			name="Firstname"
 			id="firstname"
+            on:input={validateFirstName}
 			required
 		/>
+        {#if errorMessage && !$Cusdetails.FirstName}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			FirstName is required</div>
+		{/if}
 		  </div>
 		</div>
 		<div class="sm:col-span-2">
-			<label for="" class="text-sm">Last name <span class="text-primary-500"> *</span></label>
-			<div class="mt-2">
+			<label for="" class="sm:text-sm text-xs">Last name <span class="text-primary-500"> *</span></label>
+			<div class="">
 			<input
 					type="text"
 					name="lastname"
-					class="block w-full rounded-md py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+					class="block w-full sm:text-sm text-xs rounded py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 					id="lastname"
 					bind:value={$Cusdetails.LastName}
 					required
+                    on:input={validateLastName}
 				/>
+                {#if errorMessage && !$Cusdetails.LastName}
+                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                    LastName is required</div>
+                {/if}
 		  </div>
 		</div>
 	  </div>
+	<div class=" mb-2">
+		{#if errorMessage1}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			{errorMessage1}</div>
+		{/if}
+		{#if errorMessage2}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			{errorMessage2}</div>
+		{/if}
+		<label for="" class="sm:text-sm text-xs">Country <span class="text-primary-500"> *</span></label>
+		<br />
+		<div class="flex-1 mb-4 relative w-full">
+			<div class="relative w-full md:w-3/4 sm:2/5 lg:w-1/2">
+    <input
+        type="text"
+        id="country"
+        name="country"
+        bind:value={$Cusdetails.Country}
+        placeholder="Select your Country"
+        on:input={handleInputChange}
+        on:click={toggleDropdown}
+        class="block w-full sm:text-sm text-xs rounded p-1.5 pr-8 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
+        required
+    />
+    <Icon
+        icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
+        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+        on:click={toggleDropdown}
+    />
+			</div>
+			{#if showDropdown}
+				<div class="absolute md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs bg-white border border-gray-300 rounded-md shadow-lg z-10 mt-1">
+					<ul class="max-h-60 overflow-y-auto text-sm">
+						{#each filteredCountries as country (country.name)}
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+							<li
+								on:click={() => selectCountry(country)}
+								class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+							>
+								{country.name} ({country.code})
+							</li>
+						{/each}
+						{#if filteredCountries.length === 0}
+							<div class="px-4 py-2 text-gray-600 text-xs">No matching countries found!</div>
+						{/if}
+					</ul>
+				</div>
+			{/if}
+		
+			
+		</div>
+        {#if errorMessage && !$Cusdetails.Country}
+                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                    Country is required</div>
+                {/if}
+	</div>
 	<div class="mt-2 mb-2">
-		<label for="" class="text-sm">Organisation name <span class="text-primary-500"> *</span></label>
+		<label for="" class="sm:text-sm text-xs">Phone number <span class="text-primary-500"> *</span></label>
+		<br />
+		<input
+			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 placeholder:text-sm"
+			type="tel"
+			name="phone"
+			id="phone"
+			bind:value={$Cusdetails.Number}
+			placeholder=""
+			required
+            on:input={() => validatePhNo($Cusdetails.Country, $Cusdetails.Number)}	
+            />
+			{#if errorMessage && !$Cusdetails.Number}
+			<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+				Phone number is required</div>
+			{/if}
+		{#if errorMessage4}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			Please enter a valid phone number for {$Cusdetails.Country}</div>
+		{/if}
+	</div>
+	<div class="mt-2 mb-2">
+		<label for="" class="sm:text-sm text-xs">Email address <span class="text-primary-500"> *</span></label>
+		<br />
+		<input
+			type="text"
+			name="email"
+			id=""
+			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			bind:value={$Cusdetails.Email}
+            on:input={validateEmail}
+		/>
+        {#if errorMessage3}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			{errorMessage3}</div>
+		{/if}
+        {#if errorMessage && !$Cusdetails.Email}
+                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                    Email is required</div>
+                {/if}
+		
+	</div>
+	<div class="mt-2 mb-2">
+		<label for="" class="sm:text-sm text-xs">Company name <span class="text-primary-500"> *</span></label>
 		<br />
 		<input
 			type="text"
 			name="organisation"
 			id=""
 			bind:value={$Cusdetails.Organisation}
-			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 		/>
-	</div>
-	<div class="">
-		<label for="" class="text-sm">Country <span class="text-primary-500"> *</span></label>
-		<br />
-		<select
-			class="block md:w-3/4 sm:2/5 lg:w-1/2 w-full rounded-md p-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
-			name="country"
-			id="country"
-			bind:value={$Cusdetails.Country}
-		>
-			<option value="" disabled selected>Select your country</option>
-			{#each countries as country}
-				<option value={`${country.name},${country.code}`}>{country.name} ({country.code})</option>
-			{/each}
-		</select>
+        {#if errorMessage && !$Cusdetails.Organisation}
+                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                    Company name is required</div>
+                {/if}
 	</div>
 	<div class="mt-2 mb-2">
-		<label for="" class="text-sm">Invoice number</label>
+		<label for="" class="sm:text-sm text-xs">Invoice number</label>
 		<br />
 		<input
 			type="text"
 			name="lgcnumber"
 			id=""
-			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 			bind:value={$Cusdetails.LGC}
 		/>
 	</div>
-	<div class="mt-2 mb-2">
-		<label for="" class="text-sm">Email address <span class="text-primary-500"> *</span></label>
-		<br />
-		<input
-			type="text"
-			name="email"
-			id=""
-			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-			bind:value={$Cusdetails.Email}
-		/>
-		{#if emailError}
-			<p class="text-red-500 text-sm font-medium">{emailError}</p>
-		{/if}
-	</div>
-	<div class="mt-2 mb-2">
-		<label for="" class="text-sm">Phone number <span class="text-primary-500"> *</span></label>
-		<br />
-		<input
-			class="block rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-			type="tel"
-			name="phone"
-			id="phone"
-			bind:value={$Cusdetails.Number}
-			placeholder="Enter your number"
-			required
-		/>
-		{#if phoneError}
-			<p class="text-red-500 text-sm font-medium">{phoneError}</p>
-		{/if}
-		
-		{#if errorMessage}
-		<div class="text-red-500 ml-1 mt-1 text-sm font-medium">
+    <!-- {#if errorMessage}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
 			{errorMessage}</div>
-		{/if}
-	</div>
-	<div class="flex space-x-4 mt-5">
+		{/if} -->
+	<div class="flex space-x-4">
 		<button
 			type="button"
 			on:click={cust}
-			class="text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-500 focus:outline-none dark:focus:ring-primary-500 px-20 my-5"
+			class="text-white bg-primary-500 hover:bg-primary-600 focus:ring-4 focus:ring-primary-500 font-medium rounded sm:text-sm text-xs sm:px-5 px-2 py-2.5 me-2 mb-2 dark:bg-primary-500 dark:hover:bg-primary-500 focus:outline-none dark:focus:ring-primary-500 my-5"
 			>Save & continue</button
 		>
 	</div>
 </div>
-<hr />
+</div>
 <div class="py-10 bg-white  flex justify-between">
-	<h1 class="font-bold text-2xl text-black text-opacity-25">Step 6: Delivery information</h1>
+	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">Step 6: Delivery information</h1>
 </div>
 <hr />

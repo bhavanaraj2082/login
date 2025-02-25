@@ -37,7 +37,9 @@
   
   {#if !emailSent}
     <!-- Overlay -->
-    <div class="fixed inset-0 bg-black bg-opacity-50" on:click={closePopup}></div>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm" on:click={closePopup}></div>
   
     <!-- Popup Content -->
     <div class="fixed inset-0 flex items-center justify-center z-50">
@@ -61,6 +63,8 @@
     </div>
   {:else}
     <!-- Overlay -->
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="fixed inset-0 bg-black bg-opacity-50" on:click={closePopup}></div>
   
     <!-- Success Popup -->

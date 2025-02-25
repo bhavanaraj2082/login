@@ -1,16 +1,27 @@
 <script>
+	import { addItemToCart,cart,guestCart } from '$lib/stores/cart.js';
+	import { sendMessage } from '$lib/utils.js';
 	import { page } from '$app/stores';
-	import { cartState,updateCartState } from '$lib/stores/cartStores.js';
-	import { goto } from '$app/navigation';
+	import { goto,invalidate } from '$app/navigation';
     import { toast } from 'svelte-sonner';
     import Icon from "@iconify/svelte";
+	import { authedUser } from '$lib/stores/mainStores.js';
+
 
     export let products
     export let manufacturers
     export let productCount
     export let subSubCategory
 
-    //console.log(products);
+	let isLoggedIn = $authedUser?.id ? true : false
+    
+    const guestCartFetch = () => {
+		const formdata = new FormData();
+		formdata.append('guestCart', JSON.stringify($guestCart));
+		sendMessage('/cart?/guestCart', formdata, async (result) => {
+			cart.set(result.cart);
+		});
+	};
 
     $: paginatedProducts = products.map(x=>x)
     let categoryName = products[0]?.categoryDetails.urlName
@@ -55,8 +66,7 @@
 
     paginatedProducts = sortedBy;
     };
-
-    
+ 
     const handleManufacturer = (searchTerm) => {
         if (!searchTerm) {
             searchManufacture = manufacturers;
@@ -160,35 +170,37 @@
   };
 
   const addToCart = (product) =>{
-    let priceSize = {
-        price:product.pricing.INR,
-        size:product.pricing.break
-    }
-     const addCart = {
-        description:product.prodDesc,
-        id:product._id,
-        image:product.imageSrc,
-        name:product.productName,
-        partNumber:product.productNumber,
-        priceSize,
+    console.log(product,"============");
+    const backOrder = product.quantity > product.stock ? product.quantity - product.stock : 0
+    if(isLoggedIn === false){
+        const addCart = {
+        productId:product._id,
+        manufacturerId:product.manufacturerDetails._id,
+        distributorId:product.distributorId,
+        stockId:product.stockId,
         quantity:product.quantity,
-        stock:product.stock
+        backOrder
      }
-     if(!$cartState.length){
-        updateCartState([addCart])
-        toast.success("Item added to Cart")
-        return
-     }
-     const filtered = $cartState.find(cart=>(cart._id === product._id && cart.priceSize.break === product.pricing.break))
-     if(filtered === undefined){
-        $cartState.push(addCart)
-     }else{
-        filtered.quantity = product.quantity
-        let selectedPrice = product.pricing.find(x=>x.break === filtered.priceSize.break)
-        filtered.priceSize = selectedPrice
-     }
-     updateCartState($cartState)
-     toast.info("Item quantity updated")
+     addItemToCart(addCart)
+     toast.success("product added to cart")
+     guestCartFetch()
+     return
+    }
+
+    const formdata = new FormData()
+    formdata.append("item",JSON.stringify({
+        productId:product._id,
+        manufacturerId:product.manufacturerDetails._id,
+        distributorId:product.distributorId,
+        stockId:product.stockId,
+        quantity:product.quantity,
+        backOrder
+    }))
+    sendMessage("?/addtocart",formdata,async(result)=>{
+        toast.success(result.message)
+        invalidate("/")
+    })
+     
   }
 
 let typingTimeout;
@@ -231,37 +243,37 @@ const handleSearch = (searchName) => {
 <section class=" space-y-3 lg:flex items-start gap-4">
     <!-- filters -->
     <div class=" w-full h-fit sticky top-0 lg:w-1/4">
-        <div class="p-4 border-1 bg-white border-gray-300 rounded space-y-3 mt-3">
+        <div class=" p-2 sm:p-4 border-1 bg-white border-gray-300 rounded space-y-3 mt-3">
             
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <div on:click={()=>(toggleFilter = !toggleFilter)} class=" flex gap-2 justify-center lg:justify-start items-center text-xl font-semibold font-montserrat">
-                <Icon icon="ic:sharp-segment" class="text-3xl text-primary-500" />
+            <div on:click={()=>(toggleFilter = !toggleFilter)} class=" flex gap-2 justify-center lg:justify-start items-center text-lg md:text-xl font-semibold font-montserrat">
+                <Icon icon="ic:sharp-segment" class="text-2xl text-primary-500" />
                 <h1>Filter</h1>
             </div>
             <div class=" space-y-3 {toggleFilter ? "block":" hidden lg:block"}">
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <!-- svelte-ignore a11y-no-static-element-interactions -->
-             <div on:click={()=>showSearchDropdown = !showSearchDropdown} class=" cursor-pointer font-semibold text-sm flex items-center justify-between p-2 rounded border-1 border-gray-300 ">
+             <div on:click={()=>showSearchDropdown = !showSearchDropdown} class=" cursor-pointer font-semibold text-xs sm:text-sm flex items-center justify-between p-1 md:p-1.5 rounded border-1 border-gray-300 ">
                 <div class=" flex items-center gap-2">
-                    <span>Search </span>
+                    <span class="ml-2">Search </span>
                     {#if searchLoading}
                     <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-primary-500"></div>
                     {/if}
-                   </div>
+                </div>
                 <button type="button" on:click={()=>showSearchDropdown = !showSearchDropdown}>
                      <Icon icon={showSearchDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
                 </button>
             </div>
-            <div class="p-3 border-1 rounded {showSearchDropdown ? "block" : "hidden"}">
-                <input type="text" placeholder="Search..." on:input={e=>handleSearch(e.target.value)} class=" w-full rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
+            <div class=" p-2  border-1 rounded {showSearchDropdown ? "block" : "hidden"}">
+                <input type="text" placeholder="Search..." on:input={e=>handleSearch(e.target.value)} class=" w-full text-sm font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
              </div>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div on:click={() => showManufacturerDropdown = !showManufacturerDropdown} 
-                class="cursor-pointer font-semibold text-sm flex items-center justify-between p-2 rounded border-1 border-gray-300">
+                class="cursor-pointer font-semibold text-xs sm:text-sm flex items-center justify-between p-1 md:p-1.5 rounded border-1 border-gray-300">
                <div class=" flex items-center gap-2">
-                <span>Manufacturers </span>
+                <span class="ml-2">Manufacturers </span>
                 {#if loading}
                 <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-primary-500"></div>
                 {/if}
@@ -276,7 +288,7 @@ const handleSearch = (searchName) => {
                <input type="text" 
                       placeholder="Search manufacturers..." 
                       on:input={e => handleManufacturer(e.target.value)} 
-                      class="w-full rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
+                      class="w-full text-sm rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
                <div class="space-y-2.5 py-2.5 h-40 overflow-y-scroll my-1 scroll">
                    {#if !searchManufacture.length}
                        <p class="text-sm text-center">No manufacturer found</p>
@@ -321,8 +333,8 @@ const handleSearch = (searchName) => {
              
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <!-- svelte-ignore a11y-no-static-element-interactions -->
-             <div on:click={()=>showSortByDropdown = !showSortByDropdown} class=" cursor-pointer font-semibold text-sm flex items-center justify-between p-2 rounded border-1 border-gray-300 ">
-                <span>Sort By</span>
+             <div on:click={()=>showSortByDropdown = !showSortByDropdown} class=" cursor-pointer font-semibold text-xs sm:text-sm flex items-center justify-between p-1 md:p-1.5 rounded border-1 border-gray-300 ">
+                <span class="ml-2">Sort By</span>
                 <button type="button" on:click={()=>showSortByDropdown = !showSortByDropdown}>
                      <Icon icon={showSortByDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
                 </button>
@@ -354,23 +366,23 @@ const handleSearch = (searchName) => {
         </div>
         {:else}
        {#each paginatedProducts as product}
-        <div class=" bg-white border-1 border-gray-300 p-4 md:px-8 md:py-6 space-y-2 rounded">
+        <div class=" bg-white border-1 border-gray-300 p-2 sm:p-4 md:px-8 md:py-6 space-y-2 rounded">
             <div>
-                <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" text-md font-semibold text-primary-500 hover:underline">{product?.productName  || ""}</a>
+                <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{product?.productName  || ""}</a>
             </div>
-            <div class=" flex items-start gap-4 md:gap-8">
+            <div class=" flex items-start gap-2 md:gap-8">
                 <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`}>
-                <img src={product?.imageSrc} class=" w-40 h-40 object-contain" alt="">
+                <img src={product?.imageSrc} class=" w-20 h-20 sm:w-40 sm:h-40 object-contain" alt="">
                 </a>
                 <div class=" text-xs md:text-sm space-y-1 grow font-medium">
                     <p>Product Number : <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.productNumber || ""}</a></p>
                     <p>Category : <a href={`/products/${categoryName}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.categoryDetails.name || ""}</a></p>
                     <p>Sub Category : <span class=" font-semibold ">{product?.subCategoryDetails.name || ""}</span></p>
                     <p>Manufacturer : <span class=" font-semibold ">{product?.manufacturerDetails.name || ""}</span></p>
-                    <p>Price : <span class=" font-semibold">₹{product?.pricing.INR || ""}</span></p>
+                    <p>Price : <span class=" font-semibold">₹{product?.pricing.INR.toLocaleString("en-IN") || ""}</span></p>
                     <p>Size : <span class=" font-semibold">{product?.pricing.break || ""}</span></p>
                     <div class=" hidden sm:flex items-center justify-between">
-                        <p class=" font-bold text-4s">₹{product?.totalPrice}</p>
+                        <p class=" font-bold text-4s">₹{product?.totalPrice.toLocaleString("en-IN")}</p>
                         <div class="flex items-center">
                             <div class="flex items-center border-1 rounded">
                                 <button on:click={() => decrementQuantity(product._id)} class=" border-r-1 p-2.5 text-primary-500"
@@ -382,52 +394,52 @@ const handleSearch = (searchName) => {
                                 >
                             </div>
                         </div>
-                        <button type="button" on:click={()=>addToCart(product)} class=" border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 px-5 py-1.5 rounded ">Add to Cart</button>
+                        <button type="button" on:click={()=>addToCart(product)} class="text-xs sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded ">Add to Cart</button>
                     </div>
                 </div>
             </div>
             <div class=" flex sm:hidden items-center justify-between">
-                <p class=" font-bold">₹{product?.totalPrice}</p>
+                <p class=" text-xs font-bold">₹{product?.totalPrice.toLocaleString("en-IN")}</p>
                 <div class="flex items-center">
                     <div class="flex items-center border-1 rounded">
-                        <button on:click={() => decrementQuantity(product._id,product.quantity)} class=" border-r-1 p-2.5 text-primary-500"
-                            ><Icon icon="rivet-icons:minus" class="text-sm"/></button
+                        <button on:click={() => decrementQuantity(product._id,product.quantity)} class=" border-r-1 p-1.5 sm:p-2.5 text-primary-500"
+                            ><Icon icon="rivet-icons:minus" class=" text-xs sm:text-sm"/></button
                         >
-                        <p class="w-fit mx-3 text-sm font-medium outline-none text-center">{product?.quantity}</p>
-                        <button on:click={() => incrementQuantity(product._id,product.quantity)} class=" border-l-1 p-2.5 text-primary-500"
-                            ><Icon icon="rivet-icons:plus" class="text-sm"/></button
+                        <p class="w-fit mx-2 text-sm font-medium outline-none text-center">{product?.quantity}</p>
+                        <button on:click={() => incrementQuantity(product._id,product.quantity)} class=" border-l-1 p-1.5 sm:p-2.5 text-primary-500"
+                            ><Icon icon="rivet-icons:plus" class=" text-xs sm:text-sm"/></button
                         >
                     </div>
                 </div>
-                <button type="button" on:click={()=>addToCart(product)} class=" border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 px-5 py-1.5 rounded ">Add to Cart</button>
+                <button type="button" on:click={()=>addToCart(product)} class=" text-xs sm:text-sm px-3 py-1 sm:p-1.5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded ">Add to Cart</button>
             </div>
         </div>
        {/each}
        {/if}
        
        <!-- pagination -->
-       <div class=" w-fit  mx-auto {products.length< 10 ? "hidden": "flex"}">
-        <button class=" border-1 bg-white border-primary-500 rounded p-1.5 hover:bg-primary-500"
+       <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {products.length< 10 ? "hidden": "flex"}">
+        <button class="border-1 bg-white border-primary-500 rounded text-primary-500 hover:bg-primary-500 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
           on:click={() => goToPage(currentPage - 1)} 
-          disabled={currentPage <= 1}
+          disabled={currentPage == 1}
         >
-        <Icon icon="ic:round-chevron-left" class=" text-primary-500 hover:text-white" width="24" height="24" />
+        <Icon icon="ic:round-chevron-left" class="p-1 sm:p-1.5 text-2xl sm:text-4xl rounded disabled:text-gray-300 hover:text-white" />
         </button>
       
         {#each getPageNumbers(currentPage,totalPages) as page}
           <button
             on:click={() => goToPage(page)}
-            class="{page === currentPage ? "text-primary-500 border-primary-500" : ""} bg-white mx-0.5 border-1 border-gray-300 rounded w-10 font-medium"
+            class="{page === currentPage ? "text-primary-500 border-primary-500" : ""} bg-white border-1 border-gray-300 rounded px-2.5 sm:px-4 text-xs sm:text-sm font-medium"
           >
             {page}
           </button>
         {/each}
       
-        <button class=" border-1 bg-white border-primary-500 rounded p-1.5 hover:bg-primary-500"
+        <button class=" border-1 bg-white border-primary-500 rounded text-primary-500 hover:bg-primary-500 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
           on:click={() => goToPage(currentPage + 1)}
-          disabled={currentPage >= totalPages}
+          disabled={currentPage == totalPages}
         >
-        <Icon icon="ic:round-chevron-right" class=" text-primary-500 hover:text-white" width="24" height="24" />
+        <Icon icon="ic:round-chevron-right" class="p-1 sm:p-1.5 text-2xl sm:text-4xl rounded disabled:text-gray-300 hover:text-white" />
         </button>
       </div>
     </div>

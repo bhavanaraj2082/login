@@ -7,6 +7,10 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 
+	export let data
+
+	$:cartId = data?.cart?.cart[0]?.cartId || ""
+
 	let menus = [];
 	let submenuLeaveTimeoutId;
 	let subSubmenuLeaveTimeoutId;
@@ -307,7 +311,7 @@
 				</div>
 				</div>
 			{/if}
-			<a href="/my-favourite">
+			<a href="/dashboard/myfavourite">
 				<button
 					on:click={toggleLike}
 					aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
@@ -319,7 +323,7 @@
 					/>
 				</button>
 			</a>
-			<Cartrightside />
+			<Cartrightside {cartId}/>
 		</div>
 		<!-- Searchbar functionality -->
 		<div class="relative w-full md:max-w-sm lg:max-w-lg md:mx-4 lg:mx-8 sm:mt-2">
@@ -537,7 +541,7 @@
 					>Order Status</a
 				>
 				<div class="md:flex hidden items-center justify-center">
-					<a href="/my-favourite">
+					<a href="/dashboard/myfavourite">
 						<button
 							on:click={toggleLike}
 							aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
@@ -550,7 +554,7 @@
 						</button>
 					</a>
 				</div>
-				<Cartrightside />
+				<Cartrightside {cartId} />
 			</div>
 		</div>
 	</div>

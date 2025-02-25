@@ -25,7 +25,16 @@ const quoteSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    quoteId: {
+      type: Number,
+      required: false,
+      unique: false,
+    },
     status: {
+      type: String,
+      required: false,
+    },
+    userId: {
       type: String,
       required: false,
     },
