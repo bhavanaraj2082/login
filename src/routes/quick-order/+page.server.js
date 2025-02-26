@@ -206,90 +206,6 @@ export const actions = {
       return fail(500, { message: 'Failed to add items to cart' });
     }
   },
-  
-  
-
-
-// createQuote: async ({ request }) => {
-//   try {
-//     const data = Object.fromEntries(await request.formData());
-//     console.log("quote data in server js", data);
-
-//     const components = {
-//       productName: data.productName,
-//       productNumber: data.productNumber,
-//     };
-
-//     const formattedData = {
-//       Configure_custom_solution: {
-//         components: components,
-//         units: data.units,
-//       },
-//       Additional_notes: data.futherdetails,
-//       status: data.status,
-//       Customer_details: {
-//         Firstname: data.Firstname,
-//         Lastname: data.lastname,
-//         organisation: data.organisation,
-//         email: data.email,
-//         number: data.phone,
-//       },
-//     };
-
-//     const record = await CreateProductQuote(formattedData);
-
-//     const targetEmailContent = sendemail.emailTemplatequote
-//       .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
-//       .replaceAll('{{APP_URL}}', APP_URL)
-//       .replaceAll('{{productName}}', formattedData.Configure_custom_solution.components.productName || '')
-//       .replaceAll('{{productNumber}}', formattedData.Configure_custom_solution.components.productNumber || '')
-//       .replaceAll('{{units}}', formattedData.Configure_custom_solution.units || '')
-//       .replaceAll('{{Firstname}}', formattedData.Customer_details.Firstname || '')
-//       .replaceAll('{{Lastname}}', formattedData.Customer_details.Lastname || '')
-//       .replaceAll('{{organisation}}', formattedData.Customer_details.organisation || '')
-//       .replaceAll('{{email}}', formattedData.Customer_details.email || '')
-//       .replaceAll('{{phone}}', formattedData.Customer_details.number || '')
-//       .replaceAll('{{futherdetails}}', formattedData.Additional_notes || '');
-
-//     try {
-//       await sendNotificationEmail(
-//         `New Quote Created – ${PUBLIC_WEBSITE_NAME}`,
-//         targetEmailContent
-//       );
-//     } catch (error) {
-//       console.error('Error sending notification email to the team:', error);
-//     }
-
-//     // Send confirmation email to the user (customer)
-//     const userEmailContent = sendemail.emailTemplatequoteuser
-//       .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
-//       .replaceAll('{{APP_URL}}', APP_URL)
-//       .replaceAll('{{productName}}', formattedData.Configure_custom_solution.components.productName || '')
-//       .replaceAll('{{productNumber}}', formattedData.Configure_custom_solution.components.productNumber || '')
-//       .replaceAll('{{units}}', formattedData.Configure_custom_solution.units || '')
-//       .replaceAll('{{Firstname}}', formattedData.Customer_details.Firstname || '')
-//       .replaceAll('{{Lastname}}', formattedData.Customer_details.Lastname || '')
-//       .replaceAll('{{organisation}}', formattedData.Customer_details.organisation || '')
-//       .replaceAll('{{email}}', formattedData.Customer_details.email || '')
-//       .replaceAll('{{phone}}', formattedData.Customer_details.number || '')
-//       .replaceAll('{{futherdetails}}', formattedData.Additional_notes || '');
-
-//     try {
-//       await sendEmailToUser(
-//         `Your Quote Confirmation – ${PUBLIC_WEBSITE_NAME}`,
-//         userEmailContent,
-//         formattedData.Customer_details.email
-//       );
-//     } catch (error) {
-//       console.error('Error sending confirmation email to the user:', error);
-//     }
-
-//     return record;
-
-//   } catch (error) {
-//     console.error("Error creating quote:", error);
-//   }
-// },
 createQuote: async ({ request }) => {
   try {
     const data = Object.fromEntries(await request.formData());
@@ -384,6 +300,142 @@ createQuote: async ({ request }) => {
   }
 },
 
+verifyemail: async ({ request }) => {
+  const rawData = Object.fromEntries(await request.formData());
+
+
+  const email = rawData.email;
+
+
+
+  if (!email) {
+    return {
+      status: 500,
+      message: 'Please provide a valid email address',
+      success: false,
+      isEmailVerified: false
+    };
+  }
+
+  try {
+    const tokenVerificationRecord = await TokenVerification.findOne({ email });
+
+    if (tokenVerificationRecord && tokenVerificationRecord.isEmailVerified) {
+
+      return {
+        status: 200,
+        message: 'Email is already verified',
+        success: true,
+        isEmailVerified: true
+      };
+    }
+    const user = await Profile.findOne({ email });
+
+
+    if (!user) {
+      const result = await sendemailOtp(email);
+      if (result) {
+        return {
+          status: 200,
+          message: 'Verification email sent successfully. Please check your inbox.',
+          success: true,
+          isEmailVerified: false
+        };
+      } else {
+        throw new Error('Email sending failed');
+      }
+    }
+
+    if (!user.isEmailVerified) {
+      const result = await sendemailOtp(email);
+      if (result) {
+        return {
+          status: 200,
+          message: 'Verification email sent successfully. Please check your inbox.',
+          success: true,
+          isEmailVerified: false
+        };
+      } else {
+
+        throw new Error('Email sending failed');
+      }
+    }
+    return {
+      status: 200,
+      message: 'User already exists and email is verified.',
+      success: true,
+      isEmailVerified: true
+    };
+  } catch (error) {
+    // console.error('Error during email verification:', error);
+    return {
+      status: 500,
+      message: 'Verification mail could not be sent. Double-Check your email again',
+      success: false,
+      isEmailVerified: false
+    };
+  }
+},
+
+verifyOtpEmail: async ({ request }) => {
+  const body = Object.fromEntries(await request.formData());
+  console.log('verifyOtp body', body);
+
+  const { email, enteredOtp } = body;
+
+  try {
+    if (!email ) {
+
+      return {
+        status: 500,
+        message: 'Please provide email  verify.',
+        success: false,
+        isEmailVerified: false
+      };
+    }
+    if (!enteredOtp ) {   
+
+      return {
+        status: 500,
+        message: 'Please provide OTP to verify.',
+        success: false,
+        isEmailVerified: false
+      };
+    }
+
+    //   console.log(`Verifying OTP for email: ${email}`);
+    const verificationResult = await verifyemailOtp(email, enteredOtp);
+
+    //   console.log(verificationResult, "verificationResult");
+
+    if (!verificationResult.success) {
+      // console.log("OTP verification failed:", verificationResult.message);
+      return {
+        status: 500,
+        message: verificationResult.message,
+        success: false,
+        isEmailVerified: false
+      };
+    } else {
+      // console.log("OTP verification successful:", verificationResult.message);
+      return {
+        status: 200,
+        message: verificationResult.message,
+        success: true,
+        isEmailVerified: true
+      };
+    }
+  } catch (error) {
+    //   console.error("Error in verifyOtp handler:", error);
+    return {
+      status: 500,
+      message: 'An unexpected error occurred while verifying the OTP. Please try again later.',
+      success: false,
+      isEmailVerified: false
+    };
+  }
+},
+
 
 };
 
@@ -391,12 +443,26 @@ createQuote: async ({ request }) => {
 
 
 
-export async function load({ locals }) {
-  console.log("Authenticated User:", locals.authedUser);
+// export async function load({ locals }) {
+//   console.log("Authenticated User:", locals.authedUser);
 
-  if (!locals.authedUser) {
-    return { authedUser: null };
-  }
+//   if (!locals.authedUser) {
+//     return { authedUser: null };
+//   }
 
-  return { authedUser: locals.authedUser };
-}
+//   return { authedUser: locals.authedUser };
+// }
+export const load = async ({ locals }) => {
+	if (!locals.user) {
+		return null;
+	}
+	const authedUser = { id: locals.user.userId };
+	const userProfile = await Profile.findOne({ userId: authedUser.id });
+  console.log(userProfile,"userProile");
+  
+
+	if (!userProfile) {
+		return null;
+	}
+	return JSON.parse(JSON.stringify({ profile: userProfile }));
+};
