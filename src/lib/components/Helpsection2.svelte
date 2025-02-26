@@ -45,7 +45,7 @@
 <!-- <div  class="block md:hidden"> -->
   <div class="relative">
       <button
-        class="font-semibold absolute rounded rounded-b-none flex flex-col items-center px-3 pt-2 pb-1 gap-2 transition-opacity duration-300 transform bottom-[-10] right-5 z-30
+        class="font-semibold absolute rounded rounded-b-none flex flex-col items-center px-3 pt-2 pb-1 gap-2 transition-opacity duration-300 transform bottom-12 right-7 z-30
         "
         on:click={toggleHelp}>
         <div class="fixed w-12 h-12 bg-primary-500 text-white rounded-full flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
