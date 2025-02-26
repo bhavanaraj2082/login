@@ -33,6 +33,7 @@ export const actions = {
     shippingaddress: async ({ request }) => {
       try {
         let body = Object.fromEntries(await request.formData());
+        console.log(body);
         return await updateShippingAddress(body)  
       } catch (error) {
         console.log(error);
@@ -41,6 +42,7 @@ export const actions = {
     billingaddress: async ({ request }) => {
       try {
         let body = Object.fromEntries(await request.formData());
+        console.log(body);
         return await updateBillingAddress(body)
       } catch (error) {
         console.log(error);

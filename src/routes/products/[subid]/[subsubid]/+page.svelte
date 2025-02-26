@@ -8,6 +8,7 @@
     import ProductFilter from '$lib/components/ProductsFilter/ProductFilter.svelte';
 
 	export let data;
+	console.log(data,"object");
 	$: ({manufacturers,products,productCount,subSubCategory} = data)
 	const handlePage = (e) =>{
 		invalidate('page:data')

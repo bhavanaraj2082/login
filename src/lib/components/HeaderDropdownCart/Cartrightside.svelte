@@ -247,7 +247,7 @@
 			/>
 			<!-- Badge -->
 			<span
-				class="absolute top-1 right-0 transform translate-x-1/2 -translate-y-1/2 {$cart.length === 0 ? "hidden" : "bg-primary-500 text-white"} text-2s font-medium rounded-full w-4 h-4 flex items-center justify-center"
+				class="absolute top-1 right-0 transform translate-x-1/2 -translate-y-1/2 {$cart.length === 0 ? "hidden" : "bg-black text-white"} text-2s font-medium rounded-full w-4 h-4 flex items-center justify-center"
 			>
 			{$cart.length}
 			</span>
