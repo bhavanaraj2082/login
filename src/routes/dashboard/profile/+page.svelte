@@ -47,7 +47,7 @@
 
 
 <div class="w-full md:w-11/12 px-4 pb-4 mx-auto max-w-7xl">
-  {#if isEmailVerified}
+  {#if !isEmailVerified}
     <EmailVerifyPopup/>
   {/if}
   <h1 class=" text-lg md:text-xl font-bold my-2">Profile</h1>

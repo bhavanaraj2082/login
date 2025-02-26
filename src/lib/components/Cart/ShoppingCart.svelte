@@ -16,7 +16,7 @@
 
 	export let data
 
-    console.log('first',$authedUser)
+    //console.log('first',$authedUser)
 	let loading = false;
 	let isLoggedIn = $authedUser?.id ? true : false
 	let totalPrice = 0;
@@ -34,7 +34,7 @@
 	$: cartId = data?.cart[0]?.cartId || '';
 	$: cartName = data?.cart[0]?.cartName || '';
 	$: recurrence = data?.cart[0]?.recurrence || '';
-	//$: console.log(data,"forntend");
+	$: console.log($cart,"forntend");
 
 	const calculateTotalPrice = (cart)=>{
        priceINR = cart.reduce((sum,crt)=> sum + crt.pricing.INR*crt.quantity,0)
@@ -212,7 +212,9 @@
 		  formdata.append("quantity",$cart[index]?.quantity)
 		  formdata.append("cartId",cartId)
 		  sendMessage("?/updateQty",formdata,async(result)=>{
+			invalidate("data:cart")
 			calculateTotalPrice($cart)
+
 		  })
 	  },1000)
 
@@ -248,6 +250,7 @@
 		  formdata.append("quantity",$cart[index].quantity)
 		  formdata.append("cartId",cartId)
 		  sendMessage("?/updateQty",formdata,async(result)=>{
+			invalidate("data:cart")
 			calculateTotalPrice($cart)
 		  })
 	  },1000)
@@ -299,11 +302,6 @@
 		const currentUrl = $page.url.href;
 		document.cookie = `redirectUrl=${encodeURIComponent(currentUrl)}; path=/;`;
 	}
-	onMount(() => {
-		calculateTotals();
-		functionDispatch();
-		loading = false;
-	});
 
 	let selectedImage = null;
 	let showimage=false;
@@ -393,35 +391,47 @@
 							<div class="flex items-center w-full md:w-6/12 md:pr-2">
 								<img src={item.productDetails.imageSrc} alt={item.productDetails.productName} class="w-20 h-20 shrink-0 object-cover rounded-md" />
 								<div class="ml-2">
-									<p class="text-sm text-red-500 font-semibold">{item.productDetails.productNumber}</p>
-									<p class=" text-gray-800 text-xs lg:text-3s">{item.productDetails.productName}</p>
-									<p class=" text-gray-800 text-xs font-semibold">{item.pricing.break}</p>
+									<p class="text-xs text-black font-semibold">{item.productDetails.productNumber}</p>
+									<p class=" text-gray-800 text-xs">{item.productDetails.productName}</p>
+									<p class=" text-gray-800 text-2s font-semibold">{item.pricing.break}</p>
+									<p class=" {item.quantity > item.stockDetails.stock ? " text-red-500" :" text-green-500"} text-2s ext-red-600 font-semibold">
+										{item.quantity > item.stockDetails.stock ? item.quantity - item.stockDetails.stock + " Back Order" : item.stockDetails.stock + " In Stock"}
+										<span class="{item.quantity > item.stockDetails.stock ? "" : " hidden"} text-green-500 ml-1">{item.stockDetails.stock + " In Stock"}</span>
+									</p>
 								</div>
 							</div>
                             <div class=" lg:w-6/12 sm:flex justify-between items-center">
 							    
 								 <div class=" lg:w-2/6">
 									<h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Price</h3>
-									<p class="text-xs w-full font-semibold text-content">
+									<div class="{item.isCart || item.isQuote ? " text-green-500" : ""} text-xs flex lg:flex-col lg:gap-0 gap-1 w-full font-semibold text-content">
+										{#if item.isCart}
+										₹{item.cartOfferPrice.INR.toLocaleString("en-IN")}
+                                        {:else if item.isQuote}
+										₹{item.QuoteOfferPrice.INR.toLocaleString("en-IN")}
+										{:else}
 										₹{item.pricing.INR.toLocaleString("en-IN")}
-									</p>
+										{/if}
+										<p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">₹{item.pricing.INR.toLocaleString("en-IN")}</p>
+										
+									</div>
 								 </div>
 							
 								<div class=" lg:w-2/6">
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Quantity</h3>
 							        <div class="flex items-center md:w-2/12">
 							        	<div class="flex items-center border-1 rounded">
-							        		<button
+							        		<button disabled={item.isCart || item.isQuote}
 							        			on:click={() => decrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}
-							        			class=" border-r-1 p-1.5 text-primary-500"
+							        			class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							        			><Icon icon="rivet-icons:minus" class="text-xs" /></button
 							        		>
 							        		<p class="w-fit mx-3 text-xs font-medium outline-none text-center">
 							        			{item.quantity}
 							        		</p>
-							        		<button
+							        		<button disabled={item.isCart || item.isQuote}
 							        			on:click={() => incrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}
-							        			class=" border-l-1 p-1.5  text-primary-500">
+							        			class=" border-l-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
 												<Icon icon="rivet-icons:plus" class="text-xs" />
 											</button>
 							        	</div>
@@ -431,9 +441,10 @@
 								<div class=" lg:w-2/6">
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Total</h3>
 							        <div class=" w-full flex justify-between items-center">
-							        	<p class="text-xs font-semibold">
-							        		₹{(item.pricing.INR * item.quantity).toLocaleString("en-IN")}
-							        	</p>
+							        	<div class="{item.isCart || item.isQuote ? " text-green-500" : ""} text-xs flex gap-1 lg:flex-col lg:gap-0 font-semibold">
+							        		₹{item.itemTotalPrice.totalINR.toLocaleString("en-IN")}
+										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">₹{(item.pricing.INR*item.quantity).toLocaleString("en-IN")}</p>
+									    </div>
 							        	<button
 							        		type="button"
 							        		on:click={() => removeItem(item.productDetails.productNumber,item._id,index)}

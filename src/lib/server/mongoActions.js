@@ -2542,6 +2542,7 @@ export const updateBillingAddress = async (body) => {
 	const { userId, addAlternate, ...billingDetails } = body;
 	billingDetails.isDefault = billingDetails.isDefault === 'true';
 	const addAlternateBoolean = addAlternate === 'true';
+	console.log('object',addAlternateBoolean);
 	try {
 		const userProfile = await Profile.findById(userId).select('billingAddress');
 		if (!userProfile) {
@@ -2564,6 +2565,7 @@ export const updateBillingAddress = async (body) => {
 				billingAddressArray.push(newAddress);
 			}
 		} else {
+		console.log('object',billingAddressArray);
 			billingAddressArray = userProfile.billingAddress.map((adr) => {
 				if (adr.addressId === billingDetails.addressId) {
 					return { ...billingDetails, isDefault: billingDetails.isDefault };

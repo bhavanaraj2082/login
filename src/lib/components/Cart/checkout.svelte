@@ -229,36 +229,44 @@
 	formdata={formData}
 	handlePopupAddress = {()=>isForm = false}
 	{actionName}
-	firstname={userData?.firstname} 
-	lastname={userData?.lastname} 
+	firstname={userData?.firstName} 
+	lastname={userData?.lastName} 
 	{isShowbox}
 	/>
 {/if}
 
 <section class=" mx-auto mb-4 w-11/12 sm:flex gap-4 sm:items-start space-y-4 sm:space-y-0">
 	<div class="p-3 lg:p-4 sm:w-1/2 md:w-3/5 lg:w-3/4 bg-white shadow-sm rounded">
-		<h3 class="text-md font-semibold text-gray-600">Address Selection</h3>
+		<!-- <h3 class="text-md font-semibold text-gray-600">Address Selection</h3> -->
 		 <div class=" flex flex-col md:flex-row gap-4 mb-1">
-			<label for="" class=" w-full font-medium text-sm text-gray-600"> Email <br>
-			    <input value={$authedUser.email} class="mt-2 w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
-			</label>
-			<label for="" class=" w-full font-medium text-sm text-gray-600"> GST Number <br>
-				<input value={userData.gstNumber} class="mt-2 w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
-			</label>
+			<div class=" w-full font-medium text-sm text-gray-600">
+				<label for="" >Email</label><br>
+			    <input value={$authedUser.email} disabled class="mt-2 w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+			</div>
+			<div class=" w-full font-medium text-sm text-gray-600">
+				<div class=" flex items-center justify-between">
+					Email
+					<button on:click={()=>{}}
+				    class=" p-1 hidden bg-gray-200 hover:text-white hover:bg-primary-500 rounded">
+					    <Icon icon="ic:round-mode-edit" class=" text-md" />
+					</button>
+				</div>
+				<input value={userData.gstNumber} disabled class="mt-2 w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+			</div>
 		 </div>
 		<div class=" lg:flex gap-4">
 			<div class=" w-full ">
-				<div class="flex justify-between items-center my-2">
+				<div class="flex justify-between items-center my-1.5">
 					<label for="billing-address" class="block font-medium text-sm text-gray-600">Billing Address</label>
 					<button on:click={()=>{
 						formData ={}
 				        isForm = true
 				        actionName = "billingaddress"
 				        let address = filteredBillingAddress === undefined ? '' : filteredBillingAddress
-				        formData = {userId:userData?._id,addAlternate:false,...address}
+				        formData = {userId:userData?._id,addAlternate:billing !== null ? false : true,...address}
 				    }} 
-				    class=" p-1.5 bg-gray-200 hover:text-white hover:bg-primary-500 rounded">
-					    <Icon icon="ic:round-mode-edit" class=" text-lg" />
+				    class=" p-1 bg-gray-200 hover:text-white hover:bg-primary-500 rounded">
+					    <Icon icon="ic:round-mode-edit" class=" text-md" />
 					</button>
 				</div>
 				<textarea
@@ -270,17 +278,17 @@
 				/>
 			</div>
 			<div class="w-full ">
-				<div class=" flex justify-between items-center my-2">
+				<div class=" flex justify-between items-center my-1.5">
 				    <label for="shipping-address" class="block font-medium text-sm text-gray-600">Shipping Address</label>
 				    <button on:click={()=>{
 						formData ={}
 				        isForm = true
 				        actionName = "shippingaddress"
 				        let address = filteredShippingAddress === undefined ? '' : filteredShippingAddress
-				        formData = {userId:userData?._id,addAlternate:false,...address}
+				        formData = {userId:userData?._id,addAlternate:shipping !== null ? false : true,...address}
 				    }} 
-					class="  p-1.5 bg-gray-200 hover:text-white hover:bg-primary-500 rounded">
-					    <Icon icon="ic:round-mode-edit" class=" text-lg" />
+					class="  p-1 bg-gray-200 hover:text-white hover:bg-primary-500 rounded">
+					    <Icon icon="ic:round-mode-edit" class=" text-md" />
 					</button>
 				</div>
 				<textarea
@@ -294,8 +302,8 @@
 		</div>
 	</div>
    
-	<div class="w-full sm:w-1/2 md:w-2/5 lg:w-1/4 bg-white rounded shadow-sm">
-		<div class=" bg-white mx-auto p-4 ">
+	<div class="w-full sm:w-1/2 md:w-2/5 lg:w-1/4">
+		<div class=" bg-white mx-auto p-4 rounded shadow-sm ">
 			<div class=" space-y-2">
 				<h2 class=" text-lg lg:text-xl font-bold">Your Order</h2>
 				<div class="space-y-2">
@@ -382,19 +390,46 @@
 							<div class="flex items-center w-full md:w-6/12 md:pr-2">
 								<img src={item.productDetails.imageSrc} alt={item.productDetails.productName} class="w-20 h-20 shrink-0 object-cover rounded-md" />
 								<div class="ml-2">
-									<p class="text-sm text-red-500 font-semibold">{item.productDetails.productNumber}</p>
-									<p class=" text-gray-800 text-xs lg:text-3s">{item.productDetails.productName}</p>
-									<p class=" text-gray-800 text-xs font-semibold">{item.pricing.break}</p>
+									<p class="text-sm text-black font-semibold">{item.productDetails.productNumber}</p>
+									<p class=" text-gray-800 text-xs lg:text-3s font-medium">{item.productDetails.productName}</p>
+									<p class=" text-gray-600 text-xs font-semibold">{item.pricing.break}</p>
+									<p class=" {item.quantity > item.stockDetails.stock ? " text-red-500" :" text-green-500"} text-xs font-semibold">
+										{item.quantity > item.stockDetails.stock ? item.quantity - item.stockDetails.stock + " Back Order" : item.stockDetails.stock + " In Stock"}
+										<span class="{item.quantity > item.stockDetails.stock ? "" : " hidden"} text-green-500 ml-1">{item.stockDetails.stock + " In Stock"}</span>
+									</p>
 								</div>
 							</div>
                             <div class=" lg:w-6/12 sm:flex justify-between items-center">
 							    
 								 <div class=" lg:w-2/6">
 									<h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Price</h3>
-									<div class="text-xs w-full font-semibold">
-									    <p>₹{(item.pricing.INR * (1 + (18 / 100))).toLocaleString("en-IN")} with GST</p>
-									    <p class=" text-2s text-gray-400">₹{item.pricing.INR.toLocaleString("en-IN")} without GST</p>
+									<div class="{item.isCart || item.isQuote ? " text-green-500" : ""} text-xs gap-1 w-full font-semibold">
+										<div class=" flex gap-2 sm:block">
+											<p>{#if item.isCart}
+											₹{(item.cartOfferPrice.INR * (1 + (18 / 100))).toLocaleString("en-IN")}
+											{:else if item.isQuote}
+											₹{(item.QuoteOfferPrice.INR * (1 + (18 / 100))).toLocaleString("en-IN")}
+											{:else}
+											₹{(item.pricing.INR * (1 + (18 / 100))).toLocaleString("en-IN")}
+											{/if} with GST </p>
+											<p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">₹{(item.pricing.INR * (1 + (18 / 100))).toLocaleString("en-IN")} with GST</p>		
+										</div>
+									<div class=" flex gap-2 sm:block">
+										<p class=" text-2s text-gray-500">
+										{#if item.isCart}
+										₹{item.cartOfferPrice.INR.toLocaleString("en-IN")}
+                                        {:else if item.isQuote}
+										₹{item.QuoteOfferPrice.INR.toLocaleString("en-IN")}
+										{:else}
+										₹{item.pricing.INR.toLocaleString("en-IN")}
+										{/if} without GST</p>
+										<p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-2s line-through text-slate-300">₹{item.pricing.INR.toLocaleString("en-IN")} without GST</p>
 									</div>
+									</div>
+									<!-- <div class="text-xs w-full font-semibold">
+									    <p>₹{(item.pricing.INR * (1 + (18 / 100))).toLocaleString("en-IN")} with GST</p>
+									 
+									</div> -->
 								
 							    </div>
 								<div class=" lg:w-2/6">
@@ -405,7 +440,7 @@
 							        			class=" border-r-1 p-1.5 text-primary-500"
 							        			><Icon icon="rivet-icons:minus" class="text-xs" /></button
 							        		> -->
-							        		<p class="w-fit mx-3 text-xs font-medium outline-none text-center">
+							        		<p class="w-fit text-sm font-medium outline-none text-center">
 							        			{item.quantity}
 							        		</p>
 							        		<!-- <button
@@ -418,9 +453,28 @@
 								<div class=" lg:w-2/6">
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Total</h3>
 							        <div class=" w-full flex justify-start items-center">
-										<div class="text-xs w-full font-semibold">
-											<p>₹{(item.pricing.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST</p>
-											<p class=" text-2s text-gray-400">₹{(item.pricing.INR * item.quantity).toLocaleString("en-IN")} without GST</p>
+									<div class=" {item.isCart || item.isQuote ? " text-green-500" : ""} text-xs w-full font-semibold">
+										<div class=" flex gap-2 sm:block">
+											{#if item.isCart}
+										    ₹{(item.cartOfferPrice.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")}
+                                            {:else if item.isQuote}
+										    ₹{(item.QuoteOfferPrice.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")}
+										    {:else}
+										    ₹{(item.pricing.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")}
+										    {/if} with GST
+										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">₹{(item.pricing.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST</p>
+										</div>
+										<div class=" flex gap-2 sm:block">
+											<p class=" text-2s text-gray-500">
+											{#if item.isCart}
+										    ₹{(item.cartOfferPrice.INR * item.quantity).toLocaleString("en-IN")}
+                                            {:else if item.isQuote}
+										    ₹{(item.QuoteOfferPrice.INR * item.quantity).toLocaleString("en-IN")}
+										    {:else}
+										    ₹{(item.pricing.INR * item.quantity).toLocaleString("en-IN")}
+										    {/if} without GST</p>
+										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-2s line-through text-slate-300">₹{(item.pricing.INR * item.quantity).toLocaleString("en-IN")} without GST</p>
+										</div>
 										</div>
 							        	<div class="text-xs font-semibold">
 							        		
