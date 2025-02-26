@@ -45,29 +45,28 @@
   }
     </script>
     <div class="md:ml-5 ml-0">
-        <div class="pt-5 max-w-7xl md:w-11/12 mx-auto">
-            <div class="fixed z-30 bottom-0 right-0 lg:right-4 py-4 lg:p-4">
-                <button
-                  class="font-semibold rounded flex flex-col items-center px-1.5 pb-2 lg:p-2 gap-2 text-primary-900 transition-opacity duration-300 transform"
-                  on:click={scrollToTop}
-                  class:hidden={!showButton}
-                  on:mouseenter={handleMouseEnter}
-                    on:mouseleave={handleMouseLeave}
-                >
-                  <Icon icon="ci:chevron-up-duo" class="text-bold text-4xl text-primary-400 hover:text-primary-500" />
-                </button>
-                {#if showTooltip}
-                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <!-- svelte-ignore a11y-no-static-element-interactions -->
-                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 z-50 whitespace-nowrap bg-transparent text-black font-medium py-1 rounded-md shadow-lg sm:text-sm text-[10px] px-4"
-                on:click={scrollToTop}
-                class:hidden={!showButton}>
-                <div
-                  class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-transparent"></div>
-                </div>
-                {/if}
-              </div>
-        </div>
+      <div class="pt-5 max-w-7xl md:w-11/12 mx-auto">
+        <div class="fixed z-30 bottom-1.5 right-0 lg:right-10 py-4 lg:p-4">
+            <button
+            class="flex items-center justify-center p-2 rounded text-primary-500 md:mr-14 lg:mr-0" on:click={scrollToTop}
+              class:hidden={!showButton}
+              on:mouseenter={handleMouseEnter}
+                on:mouseleave={handleMouseLeave}
+            >
+            <Icon icon="gg:arrow-up-r" width="2.2em" height="2.2em" />
+          </button>
+            {#if showTooltip}
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 z-50 whitespace-nowrap bg-transparent text-black font-medium py-1 rounded-md shadow-lg sm:text-sm text-[10px] px-4"
+            on:click={scrollToTop}
+            class:hidden={!showButton}>
+            <div
+              class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-transparent"></div>
+            </div>
+            {/if}
+          </div>
+    </div>
         <h1 class="text-2xl font-bold mb-4 mt-5 text-center">General Terms and Conditions of Sale
         </h1>
         <p class="mt-2 font-bold">Rev. April 2021</p>

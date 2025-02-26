@@ -45,7 +45,7 @@
 							href="https://facebook.com/chemikart"
 							target="_blank"
 							rel="noopener noreferrer"
-							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300 hover:text-gray-50"
+							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded hover:bg-primary-300 hover:text-gray-50"
 							aria-label="Follow us on Facebook">
 							<Icon icon="ri:facebook-fill" width="1.2em" height="1.2em" />
 						</a>
@@ -53,7 +53,7 @@
 							href="https://twitter.com/chemikart"
 							target="_blank"
 							rel="noopener noreferrer"
-							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300 hover:text-gray-50"
+							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded hover:bg-primary-300 hover:text-gray-50"
 							aria-label="Follow us on Twitter">
 							<Icon icon="ri:twitter-x-fill" width="1.2em" height="1.2em" />
 						</a>
@@ -61,7 +61,7 @@
 							href="https://instagram.com/chemikart"
 							target="_blank"
 							rel="noopener noreferrer"
-							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300 hover:text-gray-50"
+							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded hover:bg-primary-300 hover:text-gray-50"
 							aria-label="Follow us on Instagram">
 							<Icon icon="typcn:social-instagram" width="1.2em" height="1.2em" />
 						</a>
@@ -69,7 +69,7 @@
 							href="https://linkedin.com/chemikart"
 							target="_blank"
 							rel="noopener noreferrer"
-							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300 hover:text-gray-50"
+							class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded hover:bg-primary-300 hover:text-gray-50"
 							aria-label="Follow us on LinkedIn">
 							<Icon icon="ant-design:linkedin-outlined" width="1.2em" height="1.2em" />
 						</a>
@@ -101,6 +101,9 @@
 					<li><a href="/quotes" class="font-medium sm:text-sm text-xs hover:underline">Quotes</a></li>
 					<li><a href="/returns" class="font-medium sm:text-sm text-xs hover:underline">Returns & its Status</a></li>
 				</ul>
+				<div class="sm:block hidden">
+					<Scroller />
+				</div>
 			</div>
 			<div class="md:hidden block">
 				<div class="flex flex-col items-center md:items-start text-center md:text-left">
@@ -120,7 +123,7 @@
 								href="https://facebook.com/chemikart"
 								target="_blank"
 								rel="noopener noreferrer"
-								class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300 hover:text-gray-50"
+								class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded hover:bg-primary-300 hover:text-gray-50"
 								aria-label="Follow us on Facebook">
 								<Icon icon="ri:facebook-fill" width="1.2em" height="1.2em" />
 							</a>
@@ -128,7 +131,7 @@
 								href="https://twitter.com/chemikart"
 								target="_blank"
 								rel="noopener noreferrer"
-								class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300 hover:text-gray-50"
+								class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded hover:bg-primary-300 hover:text-gray-50"
 								aria-label="Follow us on Twitter">
 								<Icon icon="ri:twitter-x-fill" width="1.2em" height="1.2em" />
 							</a>
@@ -136,7 +139,7 @@
 								href="https://instagram.com/chemikart"
 								target="_blank"
 								rel="noopener noreferrer"
-								class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300 hover:text-gray-50"
+								class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded hover:bg-primary-300 hover:text-gray-50"
 								aria-label="Follow us on Instagram">
 								<Icon icon="typcn:social-instagram" width="1.2em" height="1.2em" />
 							</a>
@@ -144,15 +147,16 @@
 								href="https://linkedin.com/chemikart"
 								target="_blank"
 								rel="noopener noreferrer"
-								class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded-full hover:bg-primary-300 hover:text-gray-50"
+								class="flex items-center justify-center p-2 bg-gray-50 text-primary-400 rounded hover:bg-primary-300 hover:text-gray-50"
 								aria-label="Follow us on LinkedIn">
 								<Icon icon="ant-design:linkedin-outlined" width="1.2em" height="1.2em" />
 							</a>
 						</div>
 					</div>
 				</div>
-			</div>
 				<Scroller />
+			</div>
+			
 
 			
 		</div>
