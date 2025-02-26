@@ -1,14 +1,15 @@
 import { popularProducts } from '$lib/server/mongoLoads.js';
 import { searchByQuery } from '$lib/server/mongoActions.js';
 import { MAILCHIMP_API_KEY,MAILCHIMP_LIST_ID,MAILCHIMP_SERVER_PREFIX } from '$env/static/private';
+import FooterLink from '$lib/server/models/FooterLink.js';
 
 
 export async function load() {
     try {
         const PopularProductsData = await popularProducts()
-        // const foolterinksdata = await getFooterLinks()
+        const foolterinksdata = await getFooterLinks()
         
-        return { PopularProductsData }
+        return { PopularProductsData ,foolterinksdata }
     }
     catch (error) {
         console.error('Error loading products:', error);
@@ -16,19 +17,18 @@ export async function load() {
     };
 }
 
-// const getFooterLinks = async () => {
-// 	try {
-// 		const footerLinks = await FooterLink.find().sort({ name: 1 }).lean();
-
-// 		if (footerLinks) {
-// 			return footerLinks;
-// 		} else {
-// 			return [];
-// 		}
-// 	} catch (error) {
-// 		console.error("Error fetching footer links");
-// 	}
-// };
+const getFooterLinks = async () => {
+	try {
+		const footerLinks = await FooterLink.find().sort({ name: 1 }).lean();
+		if (footerLinks) {
+			return JSON.parse(JSON.stringify(footerLinks));
+		} else {
+			return [];
+		}
+	} catch (error) {
+		console.error("Error fetching footer links");
+	}
+};
 
 export const actions = {
     search: async ({ request }) => {
