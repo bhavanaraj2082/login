@@ -1267,7 +1267,7 @@ export const saveContactInfo = async (data) => {
 	try {
 		let finalData = finalformdata(data);
 		const record = await Helpsupport.create(finalData);
-		return { success: true, record };
+		return { success: true, message:"Details Submittied Succesfully" };
 	} catch (error) {
 		console.error('Error saving contact info:', error);
 		return { success: false, error: error.message };

@@ -4,13 +4,18 @@ export const actions = {
       try {
         const body = Object.fromEntries(await request.formData());
         // console.log('Form Data:', body); // Log for debugging
-        const output = await saveContactInfo(body);
-        // console.log("outputttttttttt",output);
+        const response = await saveContactInfo(body);
+        // console.log("outputttttttttt",response);
         
-        return output;
+        return response;
       } catch (error) {
         console.error('Error handling form submission:', error);
         return { success: false, error: error.message };
       }
     }
   };
+
+
+
+
+    

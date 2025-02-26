@@ -744,6 +744,7 @@
     };
     function formValid() {
         console.log("Errors before validation:", errors);
+        validateField("title")
         validateField("firstname");
         validateField("lastname");
         validateField("email");
@@ -948,8 +949,10 @@
                     <select
                         id="title"
                         name="title"
+                        bind:value={title}
+                        on:change={() => validateField("title")}
                         class="focus:border-primary-500 bg-gray-50 border border-gray-300 text-sm focus:outline-none focus:ring-0 rounded mb-2 w-full md:w-4/5 p-2"
-                        required
+                      
                     >
                         <option value="" disabled selected>Select Title</option>
                         <option value="Mr.">Mr.</option>
@@ -1174,6 +1177,11 @@
                                         authedUserEmailVerified = false;
                                     }}
                                 />
+                                {#if errors?.email}
+                                <span class="text-red-500 text-xs"
+                                    >{errors.email}</span
+                                >
+                            {/if}
                                 {#if isLoading}
                                     <span
                                         class="absolute right-2 top-1/2 mt-4 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
@@ -1362,11 +1370,11 @@
                             type="text"
                             name="country"
                             bind:value={country}
-                            placeholder="Select country"
+                            placeholder="Search country"
                             on:input={handleInputChange}
                             on:click={toggleDropdown}
                             class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-                            required
+                          
                         />
 
                         {#if showDropdown}
@@ -1557,7 +1565,7 @@
                 </div>
                 <div class="mb-3 rounded">
                     <button
-                        class="bg-primary-400 hover:bg-primary-500 text-white py-2 px-4 transition duration-300 rounded"
+                    class="bg-primary-400 hover:bg-primary-500 text-white py-3 px-6 transition duration-300 rounded-lg text-lg font-semibold shadow-md hover:shadow-lg active:scale-95"
                         on:click={(event) => {
                             // event.preventDefault();
                             if (!formValid()) {
