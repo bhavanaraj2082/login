@@ -1,4 +1,5 @@
 <script>
+	import Footerlinkcomp from '$lib/components/Footerlinkcomp.svelte';
   import Herosection from '$lib/components/Herosection.svelte';
   import FeaturedLinks from '$lib/components/FeaturedLinks.svelte';
   import PopularProduct from '$lib/components/PopularComps/PopularProduct.svelte';
@@ -14,4 +15,5 @@
 <PopularProduct {PopularProducts}/>
 <AboutSection/>
 <Email/>
+<Footerlinkcomp footerData={data.foolterinksdata} />
 
