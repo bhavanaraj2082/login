@@ -241,11 +241,14 @@
                 class="flex flex-col w-full bg-white shadow-sm border rounded-lg overflow-hidden"
               >
                 <div class="flex items-center p-3">
+                  <a
+                        href="/products/{product.category}/{product.subCategory}/{product.productNumber}"
+                        >
                   <img
                     src={product.image}
                     alt="Img"
                     class="w-20 h-20 object-contain rounded-sm"
-                  />
+                  /></a>
                   <div class="ml-2 text-left flex-1">
                     <h3 class="text-gray-600 text-xs font-semibold">
                       {product.manufacturer || "--"}
@@ -288,11 +291,11 @@
                 
                 
 								<div class="px-3 mb-3">
-									<h3 class="text-gray-600 text-xs font-semibold">
+									<h3 class="text-gray-700">
 											{#each specificKeys as key}
-													<div class="grid grid-cols-2 gap-4 mb-2 mt-2 rounded-sm p-2 {showDifference && isUnique(product.properties[key], key) ? 'bg-primary-100' : 'bg-white'}">
-															<span class="font-bold text-left">{key}:</span>
-															<span class="text-gray-500 text-right">
+													<div class="grid grid-cols-2 gap-4 mb-2 mt-2 rounded-sm p-2 {showDifference && isUnique(product.properties[key], key) ? 'bg-primary-100 border border-gray-200' : 'bg-white'}">
+															<span class="text-left text-xs font-semibold">{key}:</span>
+															<span class="text-gray-500 text-right text-xs font-normal">
 																	{#if product.properties && product.properties[key]}
 																			{#if typeof product.properties[key] === 'object'}
 																					{JSON.stringify(product.properties[key])}

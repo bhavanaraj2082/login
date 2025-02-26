@@ -22,7 +22,7 @@
                   <div
                     class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-1 border-b border-gray-300"
                   >
-                    <div><h3 class="text-base font-semibold">{key}</h3></div>
+                    <div><h3 class="text-sm font-semibold">{key}</h3></div>
                     <div class="col-span-2">
                       <p class="text-sm">{value}</p>
                     </div>

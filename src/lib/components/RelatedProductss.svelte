@@ -204,11 +204,14 @@ function addToCart(product) {
                 class="flex flex-col w-full bg-white shadow-sm border rounded-lg overflow-hidden"
               >
                 <div class="flex items-center p-3">
+                  <a
+                        href="/products/{product.category}/{product.subCategory}/{product.productNumber}"
+                        >
                   <img
                     src={product.image}
                     alt="Img"
                     class="w-20 h-20 object-contain rounded-sm"
-                  />
+                  /></a>
                   <div class="ml-2 text-left flex-1">
                     <h3 class="text-gray-600 text-xs font-semibold">
                       {product.manufacturer || "--"}

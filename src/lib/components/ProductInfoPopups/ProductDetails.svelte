@@ -13,7 +13,7 @@
 	import Description from "$lib/components/ProductInfoPopups/Description.svelte";
 	import { toast, Toaster } from "svelte-sonner";
 	export let data;
-	//export let authedUser;
+	export let isauthedUser;
 	export let isFavorite;
 	// console.log(isFavorite, "isFavorite");
 	// console.log(authedUser, "authedUser");
@@ -28,7 +28,14 @@
 	let showTooltip = false;
 	let screenWidth = 0;
 	let isLoggedIn = $authedUser?.id ? true : false
-	
+	let form5;
+	let isLoading = false;
+  let emailSent = false;
+  let verificationMessage = "";
+  let ProfileEmailVerified = false;
+  let isOtpVerified = false;
+  let displayMessage = "";
+  let enteredOtp = "";
 
 	const updateWidth = () => {
 	  screenWidth = window.innerWidth;
@@ -42,6 +49,14 @@
 		window.removeEventListener("resize", updateWidth);
 	  };
 	});
+
+	function handleInput() {
+    enteredOtp = enteredOtp.trim();
+  }
+
+  const handleResendemailOtp = () => {
+    form5.requestSubmit();
+  };
   
 	function toggleTooltip() {
 	  showTooltip = !showTooltip;
@@ -65,7 +80,7 @@
 	$: isLiked = isFavorite;
 	let favoriteNotification = "";
 	let favoriteStatus = "";
-	let authedEmail = authedUser.email;
+	let authedEmail = isauthedUser.email;	
 	let email = "";
 	let password = "";
 	let loginSuccessmsg = "";
@@ -401,7 +416,11 @@
 		formErrors.email = "Enter a valid email address.";
 	  }
   
-	  return Object.keys(formErrors).length === 0;
+	  if (!(isOtpVerified === true)) {
+      toast.error("Please verify your email to proceed");
+    }
+
+    return Object.keys(formErrors).length === 0 && isOtpVerified === true;
 	}
   </script>
   
@@ -547,7 +566,7 @@
 			  </div>
 			{/if}
 		  </div>
-		  <h1 class="text-gray-800 font-semibold text-2xl !mt-0">
+		  <h1 class="text-gray-800 font-semibold text-[22px] !mt-0">
 			{product?.productName}
 		  </h1>
 		  {#if product?.manufacturer?.name && product?.manufacturer?.name !== ""}
@@ -1039,17 +1058,17 @@
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
-		  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-md z-50 transition-opacity"
+		  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity"
 		  on:click={() => (showLikedPopup = false)}
 		>
 		  <div
-			class="bg-white rounded-2xl shadow-xl p-10 max-w-sm w-full relative transform transition-all scale-95 hover:scale-100"
+			class="bg-white rounded-lg shadow-xl p-5 max-w-sm w-full relative"
 			on:click|stopPropagation
 		  >
 			<!-- Close Button -->
 			<button
 			  on:click={toggleLikedPopup}
-			  class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition-transform hover:rotate-90"
+			  class="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
 			  aria-label="Close"
 			>
 			  <Icon
@@ -1059,57 +1078,29 @@
 			</button>
   
 			<!-- Title -->
-			<h2 class="text-2xl font-semibold text-gray-900 text-center mb-6">
+			<h2 class="text-xl font-bold text-gray-900 text-center mb-6">
 			  Please Login or Register to Continue
 			</h2>
   
 			<!-- Login Button -->
+			 <div class="mx-16">
 			<button
-			  class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white font-medium py-3 px-6 rounded-lg shadow-lg mb-4 transition-all transform hover:scale-105"
+			  class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-sm text-white font-medium py-2.5 px-2 rounded-lg shadow-lg mb-4"
 			>
 			  <a href="/login" class="block">Login</a>
 			</button>
   
 			<!-- Register Section -->
-			<p class="text-center text-gray-500 mb-2">Don’t have an account?</p>
+			<p class="text-center text-sm text-gray-500 mb-2">Don’t have an account?</p>
 			<button
-			  class="w-full border border-primary-400 hover:bg-primary-500 hover:text-white text-primary-500 font-medium py-3 px-6 rounded-lg shadow-md mb-6 transition-all transform hover:scale-105"
+			  class="w-full border border-primary-400 hover:bg-primary-500 hover:text-white text-primary-500 text-sm font-medium py-2 px-2 rounded-lg shadow-md mb-6"
 			>
 			  <a href="/signup" class="block">Register</a>
 			</button>
-  
-			<!-- Continue Browsing -->
-			<div class="text-center">
-			  <a
-				href="/"
-				class="text-primary-500 hover:text-primary-600 font-medium transition-all"
-				on:click|preventDefault={toggleLikedPopup}
-			  >
-				Continue Browsing
-			  </a>
-			</div>
+		</div>
 		  </div>
 		</div>
 	  {/if}
-	{:else if showLikedPopup}
-	  <div
-		class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50"
-	  >
-		<div class="bg-white rounded-2xl shadow-lg p-8 relative max-w-md w-full">
-		  <h1 class="text-xl font-bold text-gray-700 text-center mb-4">
-			{favoriteNotification}
-		  </h1>
-		  <hr class="border-gray-200 mb-6" />
-		  <div class="flex items-center justify-center">
-			<button
-			  on:click={toggleLikedPopup}
-			  class="bg-primary-400 hover:bg-primary-500 text-white font-medium py-2 px-6 rounded-lg shadow-md transition"
-			>
-			  Close
-			</button>
-		  </div>
-		</div>
-	  </div>
 	{/if}
   {/each}
   {#if showQuoteModal}
@@ -1133,7 +1124,7 @@
 		  use:enhance={() => {
 			return async ({ result, cancel }) => {
 			  if (!validateForm()) {
-				toast.error("Please fix the errors before submitting.");
+				// toast.error("Please fix the errors before submitting.");
 				cancel();
 			  }
 			  if (result.status === 200) {
@@ -1295,30 +1286,186 @@
 			  <p class="text-red-500 text-xs">{formErrors.phone}</p>
 			{/if}
 		  </div>
-		  <div class="mb-4">
-			<label for="email" class="block text-sm font-medium text-gray-700"
-			  >Email</label
-			>
-			<input
-			  type="email"
-			  name="email"
-			  bind:value={email}
-			  class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1"
-			  placeholder="Your email"
-			  on:input={() => {
-				if (!email.trim()) {
-				  formErrors.email = "Email is required.";
-				} else if (!/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-				  formErrors.email = "Enter a valid email address.";
-				} else {
-				  formErrors.email = "";
-				}
-			  }}
-			/>
-			{#if formErrors.email}
-			  <p class="text-red-500 text-xs">{formErrors.email}</p>
-			{/if}
-		  </div>
+
+
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-gray-700"
+            >Email</label
+          >
+          <div class="relative">
+            <form
+              action="?/verifyemail"
+              bind:this={form5}
+              method="POST"
+              use:enhance={({}) => {
+                return async ({ result }) => {
+                  console.log("result", result);
+
+                  isLoading = false;
+                  console.log(result);
+                  if (result.data?.status === 200) {
+                    toast.success(result.data.message);
+                    ProfileEmailVerified = result.data.isEmailVerified;
+                    verificationMessage = result.data.message;
+
+                    if (
+                      verificationMessage.includes(
+                        "Verification email sent successfully. Please check your inbox."
+                      )
+                    ) {
+                      displayMessage = "Please check your inbox.";
+                      emailSent = true;
+                      isOtpVerified = false;
+                    } else {
+                      displayMessage = verificationMessage;
+                      emailSent = false;
+                      isOtpVerified = true;
+                    }
+                  } else {
+                    ProfileEmailVerified = result.data.isEmailVerified;
+                    toast.error(result.data.message);
+                    emailSent = false;
+                  }
+                };
+              }}
+              on:submit={() => {
+                isLoading = true;
+              }}
+            >
+              <input
+                type="email"
+                name="email"
+                bind:value={email}
+                class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1"
+                placeholder="Your email"
+                on:input={() => {
+                  if (!email.trim()) {
+                    formErrors.email = "Email is required.";
+                  } else if (
+                    !/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)
+                  ) {
+                    formErrors.email = "Enter a valid email address.";
+                  } else {
+                    formErrors.email = "";
+                  }
+                  ProfileEmailVerified = false;
+                  emailSent = false;
+                  isOtpVerified = false;
+                }}
+              />
+              {#if isLoading}
+                <span
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
+                >
+                  <Icon icon="line-md:loading-alt-loop" class="w-4 h-4 mr-1" />
+                  Sending...
+                </span>
+              {:else if !ProfileEmailVerified && !emailSent}
+                <button
+                  type="submit"
+                  class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-500 font-semibold text-2s pl-2 py-1 rounded hover:underline disabled:cursor-not-allowed"
+                  disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                    email
+                  ) || email.split("@")[1].includes("gamil")}
+                >
+                  Verify
+                </button>
+              {:else if emailSent}
+                <span
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+                >
+                  {#if isOtpVerified}
+                    Verified
+                    <Icon
+                      icon="material-symbols:verified-rounded"
+                      class="w-4 h-4 ml-1"
+                    />
+                  {:else}
+                    <Icon
+                      icon="fluent:mail-all-read-16-filled"
+                      class="w-4 h-4 mr-1"
+                    />
+                    Check inbox
+                  {/if}
+                </span>
+              {:else}
+                <span
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+                >
+                  Verified
+                  <Icon
+                    icon="material-symbols:verified-rounded"
+                    class="w-4 h-4 ml-1"
+                  />
+                </span>
+              {/if}
+            </form>
+          </div>
+          <input type="hidden" name="email" bind:value={email} />
+          {#if formErrors.email}
+            <p class="text-red-500 text-xs">{formErrors.email}</p>
+          {/if}
+        </div>
+
+        {#if emailSent && isOtpVerified === false}
+          <form
+            action="?/verifyOtp"
+            method="POST"
+            use:enhance={() => {
+              return async ({ result }) => {
+                console.log(result);
+                isOtpVerified = result.data.isEmailVerified;
+                if (result.data?.status === 200) {
+                  toast.success(result.data.message);
+                  enteredOtp = "";
+                  isOtpVerified = true;
+                  ProfileEmailVerified = true;
+                } else if (result.data?.status === 500) {
+                  toast.error(result.data.message);
+                }
+                console.log(isOtpVerified, "isOtpVerified");
+              };
+            }}
+          >
+            <div class="relative w-full mb-4">
+              <input type="hidden" name="email" bind:value={email} />
+              <label
+                for="enteredOtp"
+                class="block text-sm font-medium text-gray-600"
+                >Enter the Recieved 6-digit OTP</label
+              >
+              <input
+                type="text"
+                maxlength="6"
+                name="enteredOtp"
+                bind:value={enteredOtp}
+                on:input={handleInput}
+                placeholder="Enter 6-digit OTP"
+                class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
+				  focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400
+				  placeholder:text-sm h-10"
+              />
+              <button
+                type="submit"
+                class="absolute top-1/2 right-2 -translate-y-1/2 text-primary-500 font-bold text-2s py-1 rounded hover:underline"
+              >
+                Verify
+              </button>
+
+              <p class="mt-px text-2s text-right text-gray-600">
+                Didn't receive the code?
+                <button
+                  type="button"
+                  on:click={handleResendemailOtp}
+                  class="text-primary-500 font-medium hover:underline"
+                >
+                  Get a new code
+                </button>
+              </p>
+            </div>
+          </form>
+        {/if}
+
 		  <div class="mb-4">
 			<label
 			  for="futherdetails"

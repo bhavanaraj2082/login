@@ -15,7 +15,7 @@
         <!-- If it's an array, display as a bulleted list -->
         <ul class="list-disc pl-6">
           {#each product.description as item}
-            <li class="text-gray-700 text-md mt-2">{item}</li>
+            <li class="text-gray-700 text-sm mt-2">{item}</li>
           {/each}
         </ul>
 
@@ -24,8 +24,8 @@
         <!-- If it's an object, display key-value pairs -->
         <ul>
           {#each Object.entries(product.description) as [key, value]}
-            <li class="text-gray-700 text-md mt-2">
-              <strong>{key}:</strong>
+            <li class="text-gray-700 text-sm mt-2">
+              <strong class="text-sm font-bold">{key}:</strong>
               {value}
             </li>
           {/each}
