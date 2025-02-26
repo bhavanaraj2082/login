@@ -9,14 +9,18 @@
   let showSavedCarts = false;
 
   export let data;
-  // console.log("daa", data);
+  console.log("daa", data);
+  console.log(data.authedUser.email,"i am email")
+  
   let isLoadingPhone = false;
+  let submitting = false;
   let isEmailVerified = false;
   let cartloading = false;
   let loadingotp = false;
   let loadingPhone = false;
   let isLoading = false;
   let ProfileEmailVerified;
+  let authedUserEmailVerified = data?.profile?.isEmailVerified;
   // console.log(data,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
   // console.log("authedUserEmailVerified",authedUserEmailVerified);
@@ -87,7 +91,7 @@
   }
 
   // let email = userLoggedIn ? data.authedUser.email : "";
-  let email = "";
+  let email = data.authedUser.email||"";
 
   function checkAvailability() {
     if (!selectedProduct) {
@@ -317,6 +321,127 @@
     }
   }
 
+  // async function addManualEntriesToCart() {
+  //   cartloading = true;
+  //   const validRows = rows.filter((row) => {
+  //     return row.sku.trim() !== "" && row.selectedSize;
+  //   });
+
+  //   if (validRows.length === 0) {
+  //     cartloading = false;
+  //     toast.error("No valid items to add to cart");
+  //     return;
+  //   }
+
+  //   const cartItems = validRows
+  //     .map((row) => {
+  //       const productNumber = row.sku.split(" -")[0].trim();
+  //       const validProduct = products.find(
+  //         (p) =>
+  //           String(p.productNumber).trim().toLowerCase() ===
+  //           productNumber.toLowerCase(),
+  //       );
+
+  //       if (!validProduct) {
+  //         toast.error(`Product ${productNumber} not found`);
+  //         return null;
+  //       }
+
+  //       const sizePriceInfo = validProduct.pricing?.find(
+  //         (item) =>
+  //           item.break.trim().toLowerCase() ===
+  //           row.selectedSize.trim().toLowerCase(),
+  //       );
+
+  //       if (!sizePriceInfo) {
+  //         toast.error(
+  //           `Size ${row.selectedSize} not available for ${productNumber}`,
+  //         );
+  //         return null;
+  //       }
+  //       const quantity =
+  //         selectedProduct &&
+  //         selectedProduct.productNumber === validProduct.productNumber
+  //           ? selectedProduct.quantity
+  //           : row.quantity > 0
+  //             ? row.quantity
+  //             : 1;
+
+  //       return {
+  //         id: validProduct.id,
+  //         image: validProduct.image,
+  //         productName: validProduct.productName,
+  //         manufacturerId: validProduct.manufacturer,
+  //         distributerId: validProduct.distributer,
+  //         stockId: validProduct.stockId,
+  //         stock: validProduct.stock,
+  //         productId:validProduct.id,
+  //         priceSize: {
+  //           price: sizePriceInfo.price,
+  //           size: row.selectedSize,
+  //         },
+  //         backOrder: Math.max(row.quantity - validProduct.stock),
+  //         quantity: quantity || row.quantity > 0 ? row.quantity : 1,
+  //       };
+  //     })
+  //     .filter(Boolean);
+
+  //   if (cartItems.length === 0) {
+  //     return;
+  //   }
+
+  //   const authedUser = data.authedUser;
+
+  //   if (authedUser && authedUser.id) {
+  //     const form = new FormData();
+  //     form.append("cartItems", JSON.stringify(cartItems));
+  //     cartloading = true;
+
+  //     try {
+  //       const response = await fetch("?/addToCart", {
+  //         method: "POST",
+  //         body: form,
+  //       });
+
+  //       const result = await response.json();
+  //       cartloading = false;
+
+  //       const resultData = JSON.parse(result.data);
+
+  //       if (resultData && resultData[0]?.success === 1) {
+  //         toast.success(resultData[2] || "Items added to cart successfully");
+  //         rows = rows.map((row) => ({
+  //           sku: "",
+  //           size: "",
+  //           quantity: 1,
+
+  //           error: "",
+  //           filteredProducts: [],
+  //           selectedSize: "",
+  //         }));
+
+  //         showCartPopup(cartItems);
+  //       } else {
+  //         toast.error(resultData[1] || "Failed to add items to cart");
+  //         cartloading = false;
+  //       }
+  //     } catch (err) {
+  //       console.error("Error adding to cart:", err);
+  //       toast.error("Failed to add items to cart");
+  //       cartloading = false;
+  //     }
+  //   } else {
+  //     localStorage.setItem("cart", JSON.stringify(cartItems));
+  //     toast.success("Items added to cart successfully.");
+  //     showCartPopup(cartItems);
+  //     cartloading = false;
+  //   }
+  // }
+
+
+
+
+  
   async function addManualEntriesToCart() {
     cartloading = true;
     const validRows = rows.filter((row) => {
@@ -371,6 +496,7 @@
           distributerId: validProduct.distributer,
           stockId: validProduct.stockId,
           stock: validProduct.stock,
+          productId:validProduct.id,
           priceSize: {
             price: sizePriceInfo.price,
             size: row.selectedSize,
@@ -426,10 +552,28 @@
         cartloading = false;
       }
     } else {
-      localStorage.setItem("cart", JSON.stringify(cartItems));
-      toast.success("Items added to cart successfully.");
-      showCartPopup(cartItems);
-      cartloading = false;
+      const simplifiedCartItems = cartItems.map(item => ({
+      productId: item.productId,
+      stockId: item.stockId,
+      manufacturerId: item.manufacturerId,
+      distributerId: item.distributerId,
+      quantity: item.quantity,
+      backOrder: item.backOrder
+
+    }));
+    rows = rows.map((row) => ({
+            sku: "",
+            size: "",
+            quantity: 1,
+
+            error: "",
+            filteredProducts: [],
+            selectedSize: "",
+          }));
+    localStorage.setItem("cart", JSON.stringify(simplifiedCartItems));
+    toast.success("Items added to cart successfully.");
+    showCartPopup(cartItems);
+    cartloading = false;
     }
   }
 
@@ -526,141 +670,7 @@
     }
   }
 
-  // function addToCart() {
-  //   console.log("Adding manual entries to cart");
 
-  //   const validRows = rows.filter((row) => {
-  //     return row.sku.trim() !== "" && row.selectedSize && row.quantity > 0;
-  //   });
-
-  //   console.log("Valid Rows:", validRows);
-
-  //   if (validRows.length === 0) {
-  //     toast.error("No valid items to add to cart");
-  //     console.log("No valid rows found");
-  //     return;
-  //   }
-
-  //   try {
-  //     let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
-  //     console.log(currentCart, "currentCart");
-
-  //     let addedItems = 0;
-
-  //     console.log("Available Products:", validRows);
-
-  //     // Create an array for new cart items to avoid adding duplicates
-  //     const newCartItems = [];
-
-  //     validRows.forEach((row) => {
-  //       console.log("Processing row:", row);
-  //       const productNumber = row.sku.split(" -")[0].trim();
-  //       console.log("Cleaned Product Number:", productNumber);
-  //       const validProduct = products.find(
-  //         (p) =>
-  //           String(p.productNumber).trim().toLowerCase() ===
-  //           productNumber.toLowerCase(),
-  //       );
-
-  //       console.log("Product found:", validProduct);
-
-  //       if (!validProduct) {
-  //         toast.error(`Product ${productNumber} not found`);
-  //         console.log(`Product ${productNumber} not found`);
-  //         return;
-  //       }
-
-  //       const sizePriceInfo = validProduct.pricing?.find(
-  //         (item) =>
-  //           item.break.trim().toLowerCase() ===
-  //           row.selectedSize.trim().toLowerCase(),
-  //       );
-
-  //       if (!sizePriceInfo) {
-  //         toast.error(
-  //           `Size ${row.selectedSize} not available for ${productNumber}`,
-  //         );
-  //         console.log(
-  //           `Size ${row.selectedSize} not found for ${productNumber}`,
-  //         );
-  //         return;
-  //       }
-
-  //       const cartItem = {
-  //         description: validProduct.prodDesc,
-  //         id: validProduct.id,
-  //         name: validProduct.productName,
-  //         image: validProduct.image,
-  //         partNumber: validProduct.productNumber,
-  //         priceSize: {
-  //           price: sizePriceInfo.price,
-  //           size: row.selectedSize,
-  //         },
-  //         quantity: row.quantity > 0 ? row.quantity : 1, // Ensure the correct quantity is used
-  //         stock: validProduct.stock,
-  //       };
-
-  //       console.log("Cart Item to be added:", cartItem);
-  //       const existingItemIndex = currentCart.findIndex(
-  //         (item) =>
-  //           item.partNumber === cartItem.partNumber &&
-  //           item.priceSize.size === cartItem.priceSize.size,
-  //       );
-
-  //       if (existingItemIndex !== -1) {
-  //         // If item exists, update the quantity
-  //         currentCart[existingItemIndex].quantity += cartItem.quantity;
-  //         console.log(
-  //           `Updated quantity for existing item: ${cartItem.partNumber}`,
-  //         );
-  //       } else {
-  //         newCartItems.push(cartItem);
-  //         console.log(`Added new item to cart: ${cartItem.partNumber}`);
-  //       }
-
-  //       addedItems++;
-  //     });
-
-  //     if (addedItems > 0) {
-  //       // Add only new items to the cart
-  //       currentCart = [...currentCart, ...newCartItems];
-  //       localStorage.setItem("cart", JSON.stringify(currentCart));
-  //       cartState.set(currentCart);
-
-  //       // Calculate the total price of the current cart
-  //       const totalPrice = currentCart.reduce(
-  //         (total, item) => total + item.priceSize.price * item.quantity,
-  //         0,
-  //       );
-  //       cartSummary = {
-  //         items: newCartItems,
-  //         totalPrice: totalPrice,
-  //       };
-
-  //       toast.success(
-  //         `${addedItems} item${addedItems > 1 ? "s" : ""} added to cart`,
-  //       );
-  //       showCartPopup();
-  //       console.log(`Added ${addedItems} item(s) to cart`);
-  //       rows = rows.map((row) => {
-  //         if (row.sku.trim() !== "" && row.selectedSize) {
-  //           return {
-  //             sku: "",
-  //             size: "",
-  //             quantity: 1,
-  //             error: "",
-  //             filteredProducts: [],
-  //             selectedSize: "",
-  //           };
-  //         }
-  //         return row;
-  //       });
-  //     }
-  //   } catch (err) {
-  //     console.error("Error managing cart:", err);
-  //     toast.error("Failed to add items to cart");
-  //   }
-  // }
 
   function increaseQuantity() {
     if (selectedProduct && selectedProduct.quantity < 9999) {
@@ -766,7 +776,7 @@
     loadingState[index] = true;
     const loadingStartTime = Date.now();
     return async ({ result }) => {
-      // console.log(result, "i am from page");
+
 
       let processingEndTime = 0;
       if (Array.isArray(result.data)) {
@@ -1104,7 +1114,7 @@
 
           <button
             on:click={addManualEntriesToCart}
-            class="lg:w-1/5 w-1/2 mt-6 lg:px-4 py-2 bg-primary-400 text-white rounded-md shadow-md hover:bg-primary-600 flex items-center justify-center"
+             class="lg:ml-60 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
           >
             {#if cartloading}
               <span>Adding...</span>
@@ -1262,10 +1272,16 @@
   {/if} -->
 
   {#if showDetailsModal && selectedProduct}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       class="fixed inset-0 !ml-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50"
+      on:click|self={hideDetails}
     >
-      <div class="bg-white p-8 rounded-lg relative shadow-lg max-w-lg mx-4">
+      <div
+        class="bg-white p-8 rounded-lg relative shadow-lg max-w-lg mx-4"
+        on:click|self={hideDetails}
+      >
         <button
           class=" absolute top-2 right-2 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
           on:click={hideDetails}
@@ -1299,7 +1315,7 @@
 
             <button
               class="flex justify-center items-center w-10 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
-              on:click={decreaseQuantity}
+              on:click|preventDefault={decreaseQuantity}
             >
               <Icon icon="ic:round-minus" class="text-xl" />
             </button>
@@ -1318,7 +1334,7 @@
 
             <button
               class="flex justify-center items-center w-10 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
-              on:click={increaseQuantity}
+              on:click|preventDefault={increaseQuantity}
             >
               <Icon icon="ic:round-plus" class="text-xl" />
             </button>
@@ -1368,25 +1384,36 @@
       class=" !ml-0 fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center"
       on:click={() => (showQuoteModal = false)}
     >
-      <div
-        class="bg-white rounded-lg p-6 w-2/5 h-5/6 overflow-y-auto"
-        on:click|stopPropagation
-      >
+    <div
+    class="bg-white rounded-lg w-full md:w-2/5 max-h-full overflow-y-auto p-4 md:p-6  m-4 md:m-0"
+    on:click|stopPropagation
+  >
         <h2 class="text-xl font-semibold mb-4 text-primary-400">
           Request a Quote
         </h2>
-        <!-- Form -->
         <form
           method="POST"
           action="?/createQuote"
-          use:enhance={() => {
-            return async ({ result, cancel }) => {
-              if (!validateForm()) {
-                toast.error("Please fix the errors before submitting.");
-                cancel();
-              }
+          use:enhance={(event) => {
+            submitting = true;
+            if (!validateForm()) {
+              submitting = false;
+              toast.error("Please fix the errors before submitting.");
+              event.preventDefault();
+              return;
+            }
+            if (!ProfileEmailVerified && !authedUserEmailVerified) {
+    submitting = false;
+    toast.error("Please verify your email to proceed.");
+    event.preventDefault(); 
+    return;
+  }
+
+            return async ({ result }) => {
+              // console.log(result, "result");
+              submitting = false;
               if (result.status === 200) {
-                toast.success("Submitted the quotes successfully!.");
+                toast.success("Submitted the quotes successfully!");
                 errorMessage = "";
                 setTimeout(() => {
                   location.reload();
@@ -1394,8 +1421,9 @@
               } else {
                 successMessage = "";
                 toast.error("Error creating Quote");
+                submitting = false;
               }
-              // showQuoteModal=false
+
               await applyAction(result);
             };
           }}
@@ -1563,6 +1591,51 @@
             <label for="email" class="block text-sm font-medium text-gray-700"
               >Email</label
             >
+            <form
+            action="?/verifyemail"
+            bind:this={form3}
+            method="POST"
+            use:enhance={({}) => {
+              return async ({ result }) => {
+                isLoading = false;
+                console.log('result', result);
+                if (result.data?.status === 200) {
+                  ProfileEmailVerified = result.data.isEmailVerified;
+                  if (authedUserEmailVerified === true) {
+                    ProfileEmailVerified = true;
+                  }
+
+                  verificationMessage = result.data.message;
+
+                  if (
+                    verificationMessage.includes(
+                      'Verification email sent successfully. Please check your inbox.'
+                    )
+                  ) {
+                    displayMessage = 'Please check your inbox.';
+                    emailSent = true;
+                    enteredOtp = '';
+                    isOtpVerified = false;
+                  } else {
+                    displayMessage = verificationMessage;
+                    emailSent = false;
+                    isOtpVerified = false;
+                  }
+
+                  toast.success(verificationMessage);
+                } else {
+                  toast.error(result.data.message);
+                  ProfileEmailVerified = result.data.isEmailVerified;
+                  emailSent = false;
+                }
+              };
+            }}
+            class="flex w-full items-center"
+            on:submit={() => {
+              isLoading = true;
+            }}
+          >
+          <div class="relative w-full">
             <input
               type="email"
               name="email"
@@ -1581,11 +1654,140 @@
                 } else {
                   formErrors.email = "";
                 }
+                ProfileEmailVerified = false;
+															emailSent = false;
+															authedUserEmailVerified = false;
               }}
             />
+            {#if isLoading}
+            <span
+              class="absolute right-2 top-1/2 mt- transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
+            >
+              <Icon icon="line-md:loading-alt-loop" class="w-4 h-4 mr-1" />
+              Verifying...
+            </span>
+          {:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
+            <button
+              type="submit"
+               class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
+              disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                email
+              ) || email.split('@')[1].includes('gamil')}
+            >
+              Verify
+            </button>
+          {:else if emailSent}
+            <span
+              class="absolute right-2 mt- top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+            >
+              {#if isOtpVerified}
+                Verified
+                <Icon
+                  icon="material-symbols:verified-rounded"
+                  class="w-4 h-4 mt-2 ml-1"
+                />
+              {:else}
+                <Icon icon="fluent:mail-all-read-16-filled" class="w-4  h-4 mr-1" />
+                Check your inbox
+              {/if}
+            </span>
+          {:else}
+            <span
+              class="absolute right-2  top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+            >
+              Verified
+              <Icon icon="material-symbols:verified-rounded" class="w-4 h-4 ml-1" />
+            </span>
+          {/if}
+          </div>
+            </form>
             {#if formErrors.email}
               <p class="text-red-500 text-xs">{formErrors.email}</p>
             {/if}
+            {#if emailSent && isOtpVerified === false}
+            <br />
+            <form
+              action="?/verifyOtpEmail"
+              method="POST"
+              use:enhance={() => {
+                return async ({ result }) => {
+                  // console.log(result);
+                  loadingotp = false;
+                  if (result.status === 200) {
+                    if (result.data.status === 200) {
+                      const verifiedMessage = result.data.message;
+                      toast.success(verifiedMessage);
+
+                      isOtpVerified = result.data.isEmailVerified;
+                      enteredOtpemail = '';
+                      isOtpVerified = true;
+                      ProfileEmailVerified = true;
+                      console.log(isOtpVerified, 'isOtpVerified');
+                    } else {
+                      const errorMessage =
+                        result.data.message || 'An unknown error occurred!';
+                      toast.error(errorMessage);
+                    }
+                  } else {
+                    const errorMessage =
+                      result.data.message || 'Request failed. Please try again.';
+                    toast.error(errorMessage);
+                  }
+                };
+              }}
+              on:submit={() => {
+                loadingotp = true;
+              }}
+            >
+              <div class="relative w-full">
+                <input type="hidden" name="email" id="email" bind:value={email} />
+                <input
+                  type="text"
+                  name="enteredOtp"
+                  bind:value={enteredOtpemail}
+                  placeholder="Enter 6-digit OTP"
+                  class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+                  on:input={() => {
+                    enteredOtpemail = enteredOtpemail.trim();
+                  }}
+                />
+                <button
+                  type="submit"
+                  class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded hover:underline"
+                  disabled={loadingotp}
+                >
+                  <!-- {loadingotp ? 'Verifying...' : 'Verify'} -->
+                  {#if loadingotp}
+                    <span
+                      class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 flex items-center"
+                    >
+                      <Icon
+                        icon="line-md:loading-alt-loop"
+                        class="w-4 h-4 mr-1 animate-spin"
+                      />
+                      Verifying...
+                    </span>
+                  {:else}
+                    Verify
+                  {/if}
+                </button>
+              </div>
+              <div class="flex justify-end text-sm">
+                <p class="mt-px text-2s text-right text-gray-600">
+                  Didn't receive the code?
+                  <button
+                    type="button"
+                    on:click={handleResendOtpemail}
+                    disabled={loadingotp}
+                    class="text-medium text-primary-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Get a new code
+                  </button>
+                </p>
+              </div>
+
+            </form>
+          {/if}
           </div>
           <div class="mb-4">
             <label
@@ -1640,7 +1842,11 @@
               type="submit"
               class="bg-gradient-to-r from-primary-400 to-primary-500 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
             >
-              Submit
+              {#if submitting}
+                Submitting...
+              {:else}
+                Submit
+              {/if}
             </button>
           </div>
         </form>
