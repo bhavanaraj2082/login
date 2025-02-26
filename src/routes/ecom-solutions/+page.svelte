@@ -1,5 +1,6 @@
 <script>
     import Ecommerce from '$lib/components/Ecommerce.svelte'
+    export let data;
 
     import { onMount } from 'svelte';
     import Icon from '@iconify/svelte';
@@ -70,4 +71,4 @@
         {/if}
       </div>
 </div>
-<Ecommerce/>
+<Ecommerce {data}/>
