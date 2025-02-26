@@ -48,13 +48,13 @@ export const auth = lucia({
     id: user.id.toString(),
     username: user.username,
     email: user.email,
-    phone: user.phone,
+    // phone: user.phone,
   }),
   getUserAttributes: (databaseUser) => {
     return {
       username: databaseUser.username,
       email: databaseUser.email,
-      phone: databaseUser.phone,
+      // phone: databaseUser.phone,
     };
   },
 });

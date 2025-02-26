@@ -456,9 +456,9 @@ export async function login(body, cookies) {
 export const signUp = async (body, cookies) => {
 	// console.log(body, "bodysignUp");
 	const existingUser = await auth.getKey("email", body.email).catch(() => null);
-	const existingPhoneKey = await auth
-	  .getKey("phone", body.phone)
-	  .catch(() => null);
+	// const existingPhoneKey = await auth
+	//   .getKey("phone", body.phone)
+	//   .catch(() => null);
   
 	if (existingUser) {
 	  return {
@@ -467,12 +467,12 @@ export const signUp = async (body, cookies) => {
 	  };
 	}
   
-	if (existingPhoneKey) {
-	  return {
-		success: false,
-		message: "This phone already exists. Please login or try with another.",
-	  };
-	}
+	// if (existingPhoneKey) {
+	//   return {
+	// 	success: false,
+	// 	message: "This phone already exists. Please login or try with another.",
+	//   };
+	// }
   
 	const luciaUser = await auth.createUser({
 	  key: {
@@ -483,18 +483,18 @@ export const signUp = async (body, cookies) => {
 	  attributes: {
 		username: body.username,
 		email: body.email,
-		phone: body.phone,
+		// phone: body.phone,
 	  },
 	});
   
-	if (!existingPhoneKey) {
-	  await auth.createKey({
-		userId: luciaUser.userId,
-		providerId: "phone",
-		providerUserId: body.phone,
-		password: "Password123",
-	  });
-	}
+	// if (!existingPhoneKey) {
+	//   await auth.createKey({
+	// 	userId: luciaUser.userId,
+	// 	providerId: "phone",
+	// 	providerUserId: body.phone,
+	// 	password: "Password123",
+	//   });
+	// }
 	console.log(luciaUser, "luciaUser");
   
 	const newProfile = new Profile({
@@ -509,7 +509,6 @@ export const signUp = async (body, cookies) => {
         isEmailVerified: body.isEmailVerified,
         gstNumber: body.gstNumber,
         tanNumber: body.tanNumber,
-        phone: body.phone,
         country: body.country,
         currency: body.currency,
 	});
@@ -517,7 +516,7 @@ export const signUp = async (body, cookies) => {
 	const savedProfile = JSON.parse(JSON.stringify(await newProfile.save()));
 	console.log(savedProfile, "savedProfile");
   
-	const key = await auth.useKey("phone", body.phone, "Password123");
+	const key = await auth.useKey("email", body.email, body.password);
 	console.log("key.userId",key);
 	
 	const user = await auth.getUser(key.userId);
@@ -600,17 +599,17 @@ export const signUp = async (body, cookies) => {
 			attributes: {
 				username: userData.username,
 				email: userData.email,
-				phone: 'N/A'
+				// phone: 'N/A'
 			}
 		});
 
 		// Step 3: Add another key for phone-based login
-		await auth.createKey({
-		userId: luciaUser.userId, 
-		providerId: 'phone', 
-		providerUserId: 'N/A', 
-		password: 'Password123', // Use the same password or leave null for OTP-based login
-		});
+		// await auth.createKey({
+		// userId: luciaUser.userId, 
+		// providerId: 'phone', 
+		// providerUserId: 'N/A', 
+		// password: 'Password123', // Use the same password or leave null for OTP-based login
+		// });
 		console.log('Lucia user created:', luciaUser);
 
 		const newProfile = new Profile({
@@ -620,7 +619,7 @@ export const signUp = async (body, cookies) => {
 			email: userData.email,
 			isEmailVerified: userData.isEmailVerified,
 			country: 'N/A',
-			phone:'N/A'
+			// phone:'N/A'
 		});
 		console.log('New Profile:', newProfile);
 

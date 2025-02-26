@@ -5,7 +5,7 @@
   import { toast } from 'svelte-sonner';
   import Icon from "@iconify/svelte";
   export let relatedProducts;
-  console.log("relatedProducts",relatedProducts);
+  // console.log("relatedProducts",relatedProducts);
   const productsData = relatedProducts;
   // console.log("productsDataproductsDataproductsDataproductsDataproductsData",productsData);
   
