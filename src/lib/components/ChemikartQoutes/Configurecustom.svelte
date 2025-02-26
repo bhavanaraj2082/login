@@ -10,6 +10,7 @@ function deleteRow(index) {
     data.rows.splice(index, 1);
     data = { ...data }; 
 }
+let errorMessage10 = "";
 
 function updateCell(rowIndex, cellIndex, event) {
     data.rows[rowIndex][cellIndex] = event.target.textContent.trim();
@@ -20,44 +21,93 @@ function updateCell(rowIndex, cellIndex, event) {
 	import Icon from "@iconify/svelte";
 	import { onMount, onDestroy } from "svelte";
 	import { formData } from '$lib/stores/solution_stores.js';
+	
 	let fileLink = '/Custom_Quote_Template.xls';
 		let uploadedFiles = false;	
-	const handleFileUpload = (event) => {
-    uploadedFiles = true;  
-    const uploadedFile = event.target.files[0];
-	if (uploadedFile) {
-    event.stopPropagation();
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const arrayBuffer = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+		const requiredHeaders = ["Component Name", "CasNumber", "Concentration"];
 
-        const headers = jsonData[0]; // First row is the header
-        const rows = jsonData.slice(1).filter((row) => row.some((cell) => cell !== null && cell !== ''));
-
-        // Map rows to an array of objects, using the headers as keys
-        const components = rows.map(row => {
-            return headers.reduce((acc, header, index) => {
-                acc[header] = row[index] || ''; // Set empty string for undefined/null values
-                return acc;
-            }, {});
-        });
-
-        // Update the formData store
-        formData.update((currentData) => {
-            return { 
-                ...currentData, 
-                components 
-            };
-        });
-    };
-    reader.readAsArrayBuffer(uploadedFile);
-}
-
+const isValidCasNumber = (value) => {
+	return /^\d+$/.test(value);
 };
+
+const handleFileUpload = (event) => {
+    uploadedFiles = true;
+    const uploadedFile = event.target.files[0];
+
+    if (uploadedFile) {
+        event.stopPropagation();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const arrayBuffer = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(arrayBuffer, { type: "array" });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+            const headers = jsonData[0] || []; // First row is the header
+            const rows = jsonData.slice(1).filter(row => row.some(cell => cell !== null && cell !== ''));
+
+            // Check if all required headers exist
+            const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
+
+            if (missingHeaders.length > 0) {
+                errorMessage10 = `Missing required headers: ${missingHeaders.join(", ")}`;
+                uploadedFiles = false;
+                return;
+            }
+
+            // Get the index positions of required headers
+            const headerIndex = {};
+            headers.forEach((header, index) => {
+                headerIndex[header] = index;
+            });
+
+            // Validate if data is in the correct columns
+            for (let i = 0; i < Math.min(rows.length, 5); i++) { // Check first 5 rows
+                const row = rows[i];
+
+                // Validate "Component Name" (should be a string)
+                if (typeof row[headerIndex["Component Name"]] !== "string" || row[headerIndex["Component Name"]].trim() === "") {
+                    errorMessage10 = `Invalid Component Name at row ${i + 1}`;
+                    uploadedFiles = false;
+                    return;
+                }
+
+                // Validate "CasNumber" (should be a valid CAS number format)
+                if (!isValidCasNumber(row[headerIndex["CasNumber"]])) {
+                    errorMessage10 = `Invalid CAS Number format at row ${i + 1}`;
+                    uploadedFiles = false;
+                    return;
+                }
+
+                // Validate "Concentration" (should be a number)
+                if (isNaN(row[headerIndex["Concentration"]]) || row[headerIndex["Concentration"]] === "") {
+                    errorMessage10 = `Invalid Concentration value at row ${i + 1}`;
+                    uploadedFiles = false;
+                    return;
+                }
+            }
+
+            // If validation passes, update the formData store
+            const components = rows.map(row => {
+                return headers.reduce((acc, header, index) => {
+                    acc[header] = row[index] || "";
+                    return acc;
+                }, {});
+            });
+
+            formData.update((currentData) => ({
+                ...currentData,
+                components
+            }));
+
+            errorMessage10 = ""; // Clear error if data is correct
+        };
+        reader.readAsArrayBuffer(uploadedFile);
+    }
+};
+
+
 		function triggerFileInput() {
 			fileInput.click();
 		}
@@ -199,11 +249,8 @@ else if (selectedSolvent === "Yes") {
         uploadedFiles = true;
     }
 });
-
+// console.log("formDataformData",data);
 		</script>
-		
-		
-		
 		<div class="bg-white py-10 flex justify-between">
 			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 1: Select custom solution type
@@ -226,15 +273,11 @@ else if (selectedSolvent === "Yes") {
 			<h1 class="font-bold sm:text-2xl text-sm">Step 3: Configure custom solution</h1>
 		</div>
 		<div class="bg-white">
-
-		
 			<button
 				class="box-content rounded h-25 w-4/5 p-4 border-dashed border-primary-500 border-2 ml-3 md:ml-8 py-10 bg-white"
 				type="button"
 				on:click={triggerFileInput}
 			>
-			
-			
 			<div class="flex items-center font-bold sm:text-2xl text-sm justify-center">
 				<span>Add Components</span>
 				<Icon icon="material-symbols-light:upload" class="sm:text-3xl text-lg text-bold text-primary-500 ml-2" />
@@ -268,10 +311,13 @@ else if (selectedSolvent === "Yes") {
 			  <table class="min-w-full border-collapse">
 				<thead>
 				  <tr>
-					{#each data.headers as header}
+					<!-- {#each data.headers as header}
 					  <th class="border p-2 text-center bg-gray-300 sm:text-md text-xs">{header}</th>
-					{/each}
-					<th class="border p-2 text-center bg-gray-300 sm:text-md text-xs">Action</th> <!-- Add manually -->
+					{/each} -->
+					{#each Object.keys(data.rows[0]) as key}
+					<th class="border p-2 text-center bg-gray-300 sm:text-md text-xs">{key}</th>
+				  {/each}
+					<th class="border p-2 text-center bg-gray-300 sm:text-md text-xs">Action</th> 
 				  </tr>
 				</thead>
 				<tbody>
@@ -300,9 +346,12 @@ else if (selectedSolvent === "Yes") {
 			  </table>
 			</div>
 		  {/if}
-		  
 		</div>
-		<div class="bg-white">
+	{#if errorMessage10}
+		<div class="text-red-500 mt-5 ml-12 text-sm font-medium">
+			{errorMessage10}
+		</div>
+	{/if}		<div class="bg-white">
 			<h1 class="font-bold sm:text-2xl text-sm ml-3 md:ml-10 py-5">Would you like to specify a solvent?*</h1>
 			<div class="mt-4 ml-3 md:ml-20 ">
 				<input
@@ -416,8 +465,6 @@ else if (selectedSolvent === "Yes") {
 				  </div>
 				</div>
 			  </button>
-
-				
 				</div>
 			</div>
 		</div>

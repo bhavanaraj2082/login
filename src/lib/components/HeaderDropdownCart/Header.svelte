@@ -1,6 +1,6 @@
 <script>
 	import { authedUser } from '$lib/stores/mainStores.js';
-	import { onMount } from 'svelte';
+	import { onMount , onDestroy} from 'svelte';
 	import Icon from '@iconify/svelte';
 	import Cartrightside from '$lib/components/HeaderDropDownCart/Cartrightside.svelte';
 	import menusdata from '$lib/data/chemicalProducts.json';
@@ -151,6 +151,21 @@
 			searchQuery = '';
 		}
 	};
+
+	// function closeSearch(event) {
+	// 	if (form && !form.contains(event.target)) {
+	// 		searchQuery = ""; 
+	// 		searchResults = []; 
+	// 	}
+	// }
+
+	// onMount(() => {
+	// 	window.addEventListener("click", closeSearch);
+	// });
+
+	// onDestroy(() => {
+	// 	window.removeEventListener("click", closeSearch);
+	// });
 </script>
 <nav class="bg-primary-400 font-workSans">
 	{#if isOpen}
@@ -259,7 +274,7 @@
 				on:click={() => {
 					navigateTo('/');
 				}}
-				class="flex items-center hover:text-primary-100 hover:scale-105 text-white text-2xl md:text-3xl lg:text-3xl sm:text-2xl font-poppins md:mb-0 py-2 font-roboto font-bold"
+				class="flex items-center hover:text-primary-100 text-white text-md sm:text-3xl font-poppins md:mb-0 py-2 font-roboto font-bold"
 			>
 				Chemikart
 			</button>
@@ -267,9 +282,9 @@
 		<!-- SMALL -->
 		<div class="md:hidden flex items-center gap-1">
 			{#if $authedUser.email}
-						<div class="relative bg-white" bind:this={dropdown}>
+						<div class="relative " bind:this={dropdown}>
 				<button
-						class="w-4 h-4 flex items-center justify-center bg-primary-400 text-white rounded-full text-xs"
+						class="sm:w-6 sm:h-6 w-4 h-4 p-0.5 flex items-center justify-center bg-white text-primary-400 font-semibold rounded-full text-sm sm:text-lg"
 						on:click={handleProfile}>
 						{getInitial(userName)}
 				</button>
@@ -280,7 +295,7 @@
 					  <div class="absolute top-[-7px] right-1 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white transform rotate-180"></div>
 				  
 					  <button
-						on:click={() => navigateTo('/profile')}
+						on:click={() => navigateTo('/dashboard/profile')}
 						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
 						My Profile
 					  </button>
@@ -331,15 +346,15 @@
 				<button
 					on:click={toggleLike}
 					aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
-					class={`py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'bg-gray-50' : 'bg-transparent'}`}
+					class={`py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}`}
 				>
 					<Icon
 						icon={isLiked ? heartFilled : heartOutline}
-						class={`text-lg transition-colors duration-300 hover:text-primary-400 ease-in-out ${isLiked ? 'text-white' : 'text-primary-100'}`}
+						class={`text-lg transition-colors duration-300  ease-in-out ${isLiked ? 'text-white' : 'text-white'}`}
 					/>
 				</button>
 			</a>
-			<Cartrightside {cartId}/>
+			<Cartrightside {cartId}/>	
 		</div>
 		<!-- Searchbar functionality -->
 		<div class="relative sm:max-w-3xl md:max-w-sm lg:max-w-md xl:max-w-xl  sm:mt-2 w-full sm:pb-0 pb-2 mx-auto">
@@ -435,7 +450,7 @@
 					  <div class="absolute top-[-7px] right-1 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white transform rotate-180"></div>
 				  
 					  <button
-						on:click={() => navigateTo('/profile')}
+						on:click={() => navigateTo('/dashboard/profile')}
 						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
 						My Profile
 					  </button>
@@ -584,11 +599,11 @@
 						<button
 							on:click={toggleLike}
 							aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
-							class={`py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'bg-white' : 'bg-transparent'}`}
+							class={`py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}`}
 						>
 							<Icon
 								icon={isLiked ? heartFilled : heartOutline}
-								class={`text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out ${isLiked ? 'text-primary-400' : 'text-gray-600'}`}
+								class={`text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out ${isLiked ? 'text-white' : 'text-white'}`}
 							/>
 						</button>
 					</a>
