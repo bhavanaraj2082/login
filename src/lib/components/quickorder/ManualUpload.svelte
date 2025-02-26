@@ -554,9 +554,9 @@
     } else {
       const simplifiedCartItems = cartItems.map(item => ({
       productId: item.productId,
-      manufacturerId: item.manufacturerId,
-      distributorId: item.distributerId,
       stockId: item.stockId,
+      manufacturerId: item.manufacturerId,
+      distributerId: item.distributerId,
       quantity: item.quantity,
       backOrder: item.backOrder
 

@@ -43,7 +43,6 @@ export const actions = {
     if (quickSearch && quickSearch.length >= 0) {
       try {
         const results = await quicksearch({ query: quickSearch });
-        // Log the raw results from the quicksearch function
         console.log('Raw results:', results);
   
         const processedResults = results.map(product => {
@@ -67,7 +66,6 @@ export const actions = {
           };
         });
   
-        // Log the processed results before returning them
         console.log('Processed results:', processedResults);
   
         return processedResults;
@@ -210,18 +208,12 @@ createQuote: async ({ request }) => {
   try {
     const data = Object.fromEntries(await request.formData());
     console.log("quote data in server js", data);
-
-    // Function to fetch the client's IP address
     async function getClientIP() {
       const response = await fetch('https://api.ipify.org?format=json');
       const data = await response.json();
       return data.ip;
     }
-
-    // Fetch the client's IP address
     const ipAddress = await getClientIP();
-
-    // Prepare components and formatted data
     const components = {
       productName: data.productName,
       productNumber: data.productNumber,
