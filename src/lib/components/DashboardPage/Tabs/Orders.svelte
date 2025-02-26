@@ -9,7 +9,7 @@
 	import { toast, Toaster } from 'svelte-sonner';
     
     export let data;
-    console.log("data=>",data)
+    // console.log("data=>",data)
     let initialOrders = [];
     let orders = [];
     let expandedOrderId = null;
@@ -101,11 +101,11 @@
     subtotalprice: order.subtotalprice || 0,
     shippingprice: order.shippingprice || 0,
     transactionid: order.transactionid || 'N/A',
-    Invoice: order.Invoice || 'N/A',
+    Invoice: order.invoice || 'N/A',
     orderType: order.orderType || 'personal',
     orderdetails: (order.orderdetails || []).map(item => ({
         customerReference: item.customerReference || '--',
-        manufacturerProductName: item.manufacturerProductName || 'N/A',
+        productName: item.productName || 'N/A',
         orderQty: item.orderQty || 0,
         readyToShip: item.readyToShip || 0,
         backOrder: item.backOrder || 0,
@@ -390,7 +390,7 @@ function downloadAsExcel(order) {
             [createStyledHeader("Transaction Details")],
             [],
             ["Transaction ID", order.transactionid || '-'],
-            ["Invoice Number", order.Invoice || '-'],
+            ["Invoice Number", order.invoice || '-'],
             ["Payment Status", order.transdetails?.status || '-'],
             ["Payment Mode", order.transdetails?.mode || order.transdetails?.payment_source || '-'],
             [],
@@ -406,7 +406,7 @@ function downloadAsExcel(order) {
                     item.orderQty || 0,
                     item.readyToShip || 0,
                     item.backOrder || 0,
-                    item.customerReference || '--',
+                    // item.customerReference || '--',
                     formatCurrency(item.unitPrice || 0, order.currency),
                     formatCurrency(item.extendedPrice || 0, order.currency)
                 ]);
@@ -478,7 +478,7 @@ function downloadAsExcel(order) {
             </div>
             <!-- <div class="flex flex-col sm:flex-row lg:flex-row w-full lg:w-2/5 my-2 md:my-2 lg:my-0 lg:ml-2"> -->
             <div class="flex flex-col sm:flex-row lg:flex-row w-full lg:w-2/5 my-2 md:my-2 lg:my-0 lg:ml-2">
-                <div class="flex-1 max-w-[290px] mr-2">
+                <div class="flex-1 mr-2">
                     <Calender
                 bind:this={calendarComponent}
                 minDate={getEarliestOrderDate(initialOrders)}
@@ -513,8 +513,8 @@ function downloadAsExcel(order) {
             </div>
         </div>
     </div>
-    <div class="mb-6 flex items-center gap-6">
-        <label class="inline-flex items-center {userOrderType === 'company' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
+   <!--   <div class="mb-6 flex items-center gap-6">
+       <label class="inline-flex items-center {userOrderType === 'company' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
             <input 
                 type="radio" 
                 class="form-radio text-primary-600 h-4 w-4" 
@@ -542,8 +542,8 @@ function downloadAsExcel(order) {
                     <Icon icon="ri:question-line" width="16" height="16"/>
                 </button>
             </sup>
-        </label>
-    </div>
+        </label> 
+    </div>-->
     <div class="overflow-x-auto rounded">
         <table class="w-full border-collapse border border-gray-100">
             <thead class="bg-gradient-to-r from-primary-500 to-primary-600 text-white uppercase text-xs tracking-wider">
@@ -565,7 +565,7 @@ function downloadAsExcel(order) {
                 </tr>
 			{:else}
                 {#each paginatedOrders as order}
-                    <tr class="mr-6 bg-white hover:bg-primary-50 text-center border-b cursor-pointer transition-colors duration-150" in:fade={{duration: 200}} on:click={() => toggleOrderDetails(order?._id)}>
+                    <tr class="mr-6 bg-white text-center border-b cursor-pointer transition-colors duration-150" in:fade={{duration: 200}} on:click={() => toggleOrderDetails(order?._id)}>
                         <td class="px-4 py-2 text-xs">{formatDate(order?.createdAt) || 'N/A'}</td>
                         <td class="px-4 py-2 text-xs">{order?.orderid || 'N/A'}</td>
                         <td class="px-4 py-2 text-xs font-semibold">{order?.purchaseorder || 'N/A'}</td>
@@ -598,7 +598,7 @@ function downloadAsExcel(order) {
                         </td>
                     </tr>
                     {#if expandedOrderId === order?._id}
-                        <tr class="bg-primary-50" >
+                        <tr class="bg-white" >
                             <td colspan="6" class="border p-0">
                                 <div transition:slide={{duration: 300, easing: quintOut}} 
                                      class="transition-all duration-300">
@@ -624,7 +624,7 @@ function downloadAsExcel(order) {
                                             </div>
                                             <div>
                                                 <p class="text-heading font-semibold">Invoice Number</p>
-                                                <p class="text-xs">{order?.Invoice || 'N/A'}</p>
+                                                <p class="text-xs">{order?.invoice || 'N/A'}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -636,14 +636,14 @@ function downloadAsExcel(order) {
                                         <div class="overflow-x-auto">
                                             <table class="w-full text-sm rounded">
                                                 <thead class="rounded">
-                                                    <tr class="bg-primary-50">
-                                                        <th class="border px-2 py-1 text-left">Manufacturer Part Name</th>
+                                                    <tr class="bg-white">
+                                                        <th class="border px-2 py-1 text-left">Product Name</th>
                                                         <th class="border px-2 py-1 text-center">Order Qty</th>
                                                         <!-- <th class="border px-2 py-1 text-center">Available</th> -->
                                                         <th class="border px-2 py-1 text-center">Ready</th>
                                                         <th class="border px-2 py-1 text-center">Back Order</th>
                                                         <th class="border px-2 py-1 text-center">Lead Time</th>
-                                                        <th class="border px-2 py-1 text-center">Customer Ref</th>
+                                                        <!-- <th class="border px-2 py-1 text-center">Customer Ref</th> -->
                                                         <th class="border px-2 py-1 text-right">Unit Price</th>
                                                         <th class="border px-2 py-1 text-right">Total</th>
                                                     </tr>
@@ -651,13 +651,13 @@ function downloadAsExcel(order) {
                                                 <tbody>
                                                     {#each order?.orderdetails || [] as item}
                                                         <tr class="hover:bg-gray-50">
-                                                            <td class="border px-2 py-1 text-left">{item?.manufacturerProductName || 'N/A'}</td>
+                                                            <td class="border px-2 py-1 text-left">{item?.productName || 'N/A'}</td>
                                                             <td class="border px-2 py-1 text-center">{item?.orderQty || 0 }</td>
                                                             <!-- <td class="border px-2 py-1 text-center">{item?.availableStock}</td> -->
                                                             <td class="border px-2 py-1 text-center">{item?.readyToShip || 0 }</td>
                                                             <td class="border px-2 py-1 text-center">{item?.backOrder || 0 }</td>
                                                             <td class="border px-2 py-1 text-center">{item?.leadtime || '--' }</td>
-                                                            <td class="border px-2 py-1 text-center">{item?.customerReference || '--'}</td>
+                                                            <!-- <td class="border px-2 py-1 text-center">{item?.customerReference || '--'}</td> -->
                                                             <td class="border px-2 py-1 text-right">{formatCurrency(item?.unitPrice || 0, item?.currency || 'INR')}</td>
                                                             <td class="border px-2 py-1 text-right">{formatCurrency(item?.extendedPrice || 0, item?.currency || 'INR')}</td>
                                                         </tr>
@@ -736,13 +736,15 @@ function downloadAsExcel(order) {
                         </tr>
                         {/if}
                         {#if expandedOrderId === order?._id}
-                            <div class="w-full flex justify-center items-end">
-                                <button 
-                                    on:click={() => downloadAsExcel(order)} 
-                                    class="bg-gray-100 text-heading px-3 py-1 rounded shadow my-1 md:text-sm text-2s">
-                                    Download as Excel
-                                </button>
-                            </div>
+                            <tr>
+                                <td colspan="6" class="border px-4 py-1 text-end bg-white">
+                                    <button 
+                                        on:click={() => downloadAsExcel(order)} 
+                                        class="bg-white text-heading px-3 py-1 border rounded shadow my-1 md:text-sm text-2s hover:text-white hover:bg-green-700 transition-all">
+                                        Download as Excel
+                                    </button>
+                                </td>
+                            </tr>
                         {/if}
                 {/each}
                 {/if}

@@ -28,12 +28,11 @@
   		    } : null,
   		    cartItems: Array.isArray(cart.cartItems) 
   		      ? cart.cartItems
+				.filter(item => item !== null)
   		          .map(item => {
-  		            if (!item?.productInfo?.productId) return null;
-
   		            return {
   		              id: item.productInfo.productId,
-  		              name: item.productInfo.productName,
+  		              productName: item.productInfo.productName,
   		              description: processDescription(item.productInfo.description),
   		              partNumber: item.productInfo.productNumber,
   		              image: item.productInfo.imageSrc || '/default-product-image.jpg',
@@ -81,7 +80,7 @@
 
 
 	let cartItems = transformCartData(data);
-	console.log("------=>>>", cartItems)
+	// console.log("------=>>>", cartItems)
 
 	let isLoading = false;
 	let calendarComponent;
@@ -274,27 +273,32 @@
 	}
 
 	const openPopup = (cart) => {
-		const transformedCart = {
-			...cart,
-			_id: cart._id,
-			cartId: cart.cartId,
-			cartName: cart.cartName,
-			cartItems: cart.cartItems.map((item) => ({
-				_id: item.componentId?._id,
-				quantity: item.quantity,
-				component: {
-					productName: item.componentId?.productName || 'Unknown Product',
-					manufacturerName: item.componentId?.manufacturerName || 'Unknown Manufacturer',
-					description: item.componentId?.description || 'No description found'
-				},
-				reference: {
-					referenceNumber: item.customerReference?.referenceNumber || ''
-				}
-			}))
-		};
+    	const transformedCart = {
+    	    ...cart,
+    	    _id: cart._id,
+    	    cartId: cart.cartId,
+    	    cartName: cart.cartName,
+    	    cartItems: cart.cartItems.map((item) => ({
+    	        _id: item.id,
+    	        quantity: item.quantity,
+    	        productInfo: {
+    	            productName: item.productName || 'Unknown Product',
+    	            productId: item.id
+    	        },
+    	        manufacturerInfo: {
+    	            name: item.manufacturerInfo?.name || 'Unknown Manufacturer'
+    	        },
+    	        component: {
+    	            description: item.description || 'No description found'
+    	        },
+    	        reference: {
+    	            referenceNumber: item.reference?.referenceNumber || ''
+    	        }
+    	    }))
+    	};
 
-		selectedCart.set(transformedCart);
-		showPopup.set(true);
+    	selectedCart.set(transformedCart);
+    	showPopup.set(true);
 	};
 
 	const updateFilters = (key, value) => {
@@ -632,9 +636,9 @@
 		};
 	};
 
-	// onMount(() => {
-	// 	const earliestDate = getEarliestCartDate(cartItems);
-	// });
+	onMount(() => {
+		const earliestDate = getEarliestCartDate(cartItems);
+	});
 </script>
 
 <section class="w-full lg:w-11/12 mx-auto max-w-7xl p-4">
@@ -942,8 +946,8 @@
 			class="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm animate-fadeIn"
 			on:click={closePopup}></div>
 		<div class="min-h-screen px-4 flex items-center justify-center overflow-auto">
-			<div class="relative bg-white rounded shadow-2xl w-full max-w-7xl mx-auto animate-slideUp motion-reduce:animate-none">
-				<div class="flex items-center justify-between p-4 border-b">
+			<div class="relative bg-white rounded-lg shadow-2xl w-full max-w-7xl mx-auto animate-slideUp motion-reduce:animate-none">
+				<div class="flex items-center justify-between p-4 border-b bg-gray-50">
 					<div class="flex items-center justify-between">
 						<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 						{#if isEditing}
@@ -959,7 +963,7 @@
 										name="cartName"
 										value={newCartName}
 										on:input={handleNameChange}
-										class="w-full px-3 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent {!newCartName.trim()
+										class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent {!newCartName.trim()
 											? 'border-red-300'
 											: ''}"
 										placeholder="Enter new cart name"
@@ -972,7 +976,7 @@
 									<button
 										type="submit"
 										disabled={!canSave}
-										class="px-3 py-1 bg-primary-500 text-white rounded hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-20 justify-center">
+										class="px-3 py-2 bg-primary-500 text-white rounded hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-20 justify-center">
 										{#if isLoading}
 											<Icon icon="mdi:loading" class="animate-spin" />
 											<span>Saving...</span>
@@ -980,18 +984,18 @@
 											<span>Save</span>
 										{/if}
 									</button>
-									<button type="button" on:click={cancelEditing} disabled={isLoading} class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-100">
+									<button type="button" on:click={cancelEditing} disabled={isLoading} class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-100">
 										Cancel
 									</button>
 								</div>
 							</form>
 						{:else}
 							<span class="flex items-center gap-2">
-								<p class="font-semibold">Cart Details</p>
-								<p class="font-base">
+								<p class="font-semibold text-gray-700">Cart Details</p>
+								<p class="font-medium text-primary-600">
 									- {$selectedCart?.cartName || 'Loading...'}
 								</p>
-								<button on:click={startEditing} class="p-2 text-primary-500 rounded hover:bg-primary-500 hover:text-white transition-colors duration-200 group relative">
+								<button on:click={startEditing} class="p-2 text-primary-500 rounded hover:bg-primary-50 transition-colors duration-200 group relative">
 									<span class="relative">
 										<Icon icon={isLoading ? 'mdi:loading' : 'mdi:edit-outline'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
 										<span class="absolute transform -translate-x-1/2 z-auto whitespace-nowrap top-full mt-3 px-2 bg-gray-200 text-gray-600 text-xs py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1008,42 +1012,46 @@
 						<Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
 					</button>
 				</div>
-				{#if $selectedCart.cartItems.length === 0}
-					<div class="p-6 text-center bg-yellow-100 border m-6 border-yellow-300 rounded-lg">
-						<p class="text-lg text-gray-700 font-semibold">No items are added to the Cart</p>
+				{#if !$selectedCart.cartItems || $selectedCart.cartItems.length === 0}
+					<div class="p-8 text-center bg-yellow-50 border m-6 border-yellow-200 rounded-lg">
+						<Icon icon="mdi:cart-off" class="text-4xl text-yellow-500 mb-2 mx-auto" />
+						<p class="text-lg text-gray-700 font-semibold">No items in this cart</p>
+						<p class="text-sm text-gray-500 mt-2">Resume this cart to add items</p>
 					</div>
 				{:else}
 					<div class="p-6">
-						<div class="overflow-x-auto rounded-lg shadow">
+						<div class="overflow-x-auto rounded-lg shadow border border-gray-200">
 							<table class="w-full border-collapse bg-white">
-								<thead class="border">
+								<thead>
 									<tr class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
-										<th class="p-2 text-center font-semibold text-sm border">Product Name</th>
-										<th class="p-2 text-center font-semibold text-sm border">Customer Reference</th>
-										<th class="p-2 text-center font-semibold text-sm border">Description</th>
-										<th class="p-2 text-center font-semibold text-sm border">Quantity</th>
+										<th class="p-3 text-left font-semibold text-sm">Product</th>
+										<th class="p-3 text-center font-semibold text-sm">Reference</th>
+										<th class="p-3 text-left font-semibold text-sm">Description</th>
+										<th class="p-3 text-center font-semibold text-sm w-24">Quantity</th>
 									</tr>
 								</thead>
 								<tbody class="divide-y divide-gray-200">
 									{#each $selectedCart.cartItems as item}
 										<tr class="hover:bg-gray-50 transition-colors duration-150">
-											<td class="p-2 border text-center">
-												<div class="font-medium text-sm text-gray-900">
-													{item.component?.partNumber || 'N/A'}
+											<td class="p-3">
+												<div class="font-medium text-gray-800">
+													{item.productInfo?.productName || 'N/A'}
+												</div>
+												<div class="text-xs text-gray-500 mt-1">
+													{item.manufacturerInfo?.name || 'Unknown Manufacturer'}
 												</div>
 											</td>
-											<td class="p-2 border text-center text-description">
+											<td class="p-3 text-center text-gray-600">
 												{item.reference?.referenceNumber || '-'}
 											</td>
-											<td class="p-2 border text-center">
-												<div class="text-xs text-gray-500 max-w-md truncate">
+											<td class="p-3">
+												<div class="text-sm text-gray-600 max-w-md line-clamp-2">
 													{item.component?.description || 'No description found'}
 												</div>
 											</td>
-											<td class="p-2 border text-center">
+											<td class="p-3 text-center">
 												<span
-													class="inline-flex items-center justify-center px-2 py-2 bg-primary-100 text-primary-800 rounded"
-													style="width: 40px; text-align: center; line-height: 1.2;">
+													class="inline-flex items-center justify-center px-3 py-1 bg-primary-100 text-primary-800 rounded-full font-medium">
 													{item.quantity || '0'}
 												</span>
 											</td>
@@ -1059,40 +1067,40 @@
 						type="button"
 						disabled={isLoading}
 						on:click={() => handleDelete($selectedCart._id)}
-						class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded hover:bg-red-700 hover:text-white transition-colors duration-200 disabled:opacity-50">
+						class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded hover:bg-red-50 hover:border-red-700 hover:text-red-700 transition-colors duration-200 disabled:opacity-50">
 						<Icon icon={isLoading ? 'mdi:loading' : 'mdi:delete'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
 						Delete Cart
 					</button>
-					<div class="relative">
-						<button
-							on:click={() => handleShareCart($selectedCart.cartId)}
-							disabled={isLoading || !$selectedCart.cartItems.length}
-							class="w-full sm:w-auto px-6 py-2 bg-primary-600 text-white rounded
-              {!$selectedCart.cartItems.length
-								? 'opacity-50 cursor-not-allowed'
-								: 'hover:bg-primary-700'} 
-              transition-colors duration-200 flex items-center justify-center gap-2">
-							<Icon icon={isLoading ? 'mdi:loading' : 'fluent:share-24-filled'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
-							{isLoading ? 'Generating...' : 'Share Cart'}
-						</button>
-						{#if !$selectedCart.cartItems.length}
-							<div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-								Add items to cart before sharing
-							</div>
-						{/if}
-					</div>
 					<div class="flex flex-col-reverse sm:flex-row gap-3">
+						<div class="relative">
+							<button
+								on:click={() => handleShareCart($selectedCart.cartId)}
+								disabled={isLoading || !$selectedCart.cartItems.length}
+								class="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded
+								{!$selectedCart.cartItems.length
+									? 'opacity-50 cursor-not-allowed'
+									: 'hover:bg-primary-700'} 
+								transition-colors duration-200 flex items-center justify-center gap-2">
+								<Icon icon={isLoading ? 'mdi:loading' : 'fluent:share-24-filled'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
+								{isLoading ? 'Generating...' : 'Share Cart'}
+							</button>
+							{#if !$selectedCart.cartItems.length}
+								<div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+									Add items to cart before sharing
+								</div>
+							{/if}
+						</div>
 						<form method="POST" action="?/resumeCart" use:enhance={handleResumeCart}>
 							<input type="hidden" name="cartId" value={$selectedCart?._id} />
 							<button
 								type="submit"
 								disabled={isLoading}
-								class="w-full sm:w-auto px-6 py-2 bg-green-700 text-white rounded hover:bg-green-500 transition-colors duration-200 flex items-center justify-center gap-2">
+								class="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors duration-200 flex items-center justify-center gap-2">
 								<Icon icon={isLoading ? 'mdi:loading' : 'mdi:cart'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
 								{isLoading ? 'Resuming...' : 'Resume Cart'}
 							</button>
 						</form>
-						<button class="w-full sm:w-auto px-6 py-2 bg-gray-200 text-description rounded hover:bg-gray-300 transition-colors duration-200" on:click={closePopup}>
+						<button class="w-full sm:w-auto px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors duration-200" on:click={closePopup}>
 							Cancel
 						</button>
 					</div>
