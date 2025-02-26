@@ -18,7 +18,7 @@
 	// console.log(isFavorite, "isFavorite");
 	// console.log(authedUser, "authedUser");
 	// console.log(data.records, "data");
-  
+
 	let showDropdown = false;
 	let showSharePopup = false;
 	let showModal = false;
@@ -118,14 +118,14 @@
 		maxPrice = -Infinity;
   
 		data.records.forEach((record, recordIndex) => {
-		  //   console.log(` Processing record ${recordIndex} with ${record?.variants?.length || 0} variants`, record);
+		    console.log(` Processing record ${recordIndex} with ${record?.variants?.length || 0} variants`, record);
   
 		  if (record?.variants && Array.isArray(record.variants)) {
 			record.variants.forEach((variant, variantIndex) => {
-			  //   console.log(`Processing variant ${variantIndex}`, variant);
+			    console.log(`Processing variant ${variantIndex}`, variant);
   
 			  if (variant?.pricing && typeof variant.pricing === "object") {
-				// console.log(`Found pricing object:`, variant.pricing);
+				console.log(`Found pricing object:`, variant.pricing);
   
 				let priceValue = Number(variant.pricing.INR); // Extract INR value
   
@@ -143,8 +143,8 @@
 		});
   
 		// Ensure prices are valid numbers
-		if (minPrice === Infinity) minPrice = "N/A";
-		if (maxPrice === -Infinity) maxPrice = "N/A";
+		if (minPrice === Infinity) minPrice = "--";
+		if (maxPrice === -Infinity) maxPrice = "--";
 	  }
   
 	  //   console.log(`Final minPrice: ${minPrice}, maxPrice: ${maxPrice}`);
@@ -604,7 +604,7 @@
 			  </p>
 			</div>
 		  {/if}
-		  {#if product?.variants && product?.variants.length > 0 && product.variants.some((variant) => variant.pricing?.length > 0)}
+		  {#if product?.variants && product?.variants.length > 0 && product?.variants.some(variant => variant.pricing &&  ((variant.pricing.INR && variant.pricing.INR > 0) || (variant.pricing.USD && variant.pricing.USD > 0)))}
 			<div class="flex justify-between !mt-3">
 			  <p class="text-gray-900 text-lg font-semibold text-start">
 				₹ {minPrice.toLocaleString()} - ₹ {maxPrice.toLocaleString()}
@@ -679,14 +679,13 @@
 			  {/each}
 			</div>
 		  {/if}
-		  {#if !((product?.variants && product?.variants.length > 0 && product.variants.some((variant) => variant.pricing?.length > 0)) || product?.priceSize?.length > 0)}
+		  {#if !((product?.variants && product?.variants.length > 0 && product?.variants.some(variant => variant.pricing && Object.keys(variant.pricing).length > 0)) || product?.priceSize?.length > 0)}
 			<div>
 			  <p>Price not available for this product, request Quote</p>
 			  <button
 				on:click={() => toggleQuoteModal(product)}
 				class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-white mt-2"
-				>Request Quote</button
-			  >
+			  >Request Quote</button>
 			</div>
 		  {/if}
 		</div>

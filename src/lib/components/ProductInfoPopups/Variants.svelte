@@ -65,11 +65,14 @@
             {@const { minPrice, maxPrice } = getMinMaxPrices(variant.pricing)}
             <tr class="bg-white border-b hover:bg-gray-50">
               <td class="py-4 px-6">
+                <a
+                  href={variant.productNumber}
+                >
                 <img
                   src={variant.imageSrc}
                   alt={variant.productNumber}
                   class="w-20"
-                />
+                /></a>
               </td>
               <td class="py-4 px-6 text-primary-400 font-medium cursor-pointer">
                 {variant.productNumber}
