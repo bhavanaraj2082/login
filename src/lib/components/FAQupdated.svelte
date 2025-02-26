@@ -66,7 +66,7 @@
             bind:this={sectionElements[index]}
           >
             <button
-              class={`flex flex-col justify-center items-center rounded p-2 w-full pb-4 relative ${
+              class={`flex flex-col justify-center items-center rounded p-2 w-full pb-4 relative text-base lg:text-lg ${
                 activeIndex === index
                   ? "font-semibold bg-white"
                   : "bg-primary-200"
@@ -102,7 +102,7 @@
                   <div
                     class="flex items-center justify-between p-1 ps-3 mx-auto"
                   >
-                    <h3 class="text-sm text-gray-700 font-semibold">
+                    <h3 class="text-sm sm:text-base text-gray-700 font-semibold">
                       {question}
                     </h3>
                     <Icon
@@ -121,8 +121,8 @@
                       class="p-2 ps-3 pb-3"
                       transition:slide={{ duration: 300 }}
                     >
-                      <p class="pb-2 text-sm">{answer1}</p>
-                      <p class="text-sm">{answer2}</p>
+                      <p class="pb-2 text-xs sm:text-sm">{answer1}</p>
+                      <p class="text-xs sm:text-sm">{answer2}</p>
                     </div>
                   {/if}
                 </div>
