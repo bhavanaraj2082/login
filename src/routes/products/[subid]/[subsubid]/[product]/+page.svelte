@@ -6,7 +6,7 @@
     // console.log("Data relatedProducts===>:", data);    
 </script>
 
-<ProductDetails data={data.productData} isFavorite={data.isFavorite} authedUser={data.authedUser}/>
+<ProductDetails data={data.productData} isFavorite={data.isFavorite} isauthedUser={data.authedUser}/>
 
 {#if data.relatedProducts.length !== 0}
     <RelatedProductss relatedProducts={data.relatedProducts}/>  
