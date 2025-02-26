@@ -46,8 +46,8 @@
         class="font-semibold absolute rounded rounded-b-none flex flex-col items-center px-3 pt-2 pb-1 gap-2 transition-opacity duration-300 transform bottom-12 right-5 z-30
         "
         on:click={toggleHelp}>
-        <div class="fixed w-12 h-12 bg-primary-500 text-white rounded-full flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
-          <Icon icon="line-md:chat-twotone" class="text-bold text-3xl" />
+        <div class="fixed w-8 h-8 bg-primary-500 text-white rounded flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
+          <Icon icon="ic:outline-chat" class="text-bold text-xl" />
       </div>
       </button>
   </div>
@@ -72,11 +72,17 @@
       <div class="flex items-center p-3 text-black">
         <span class="text-xl font-extrabold text-white font-serif">Chemikart</span>  
       </div>
-      <button
+      <!-- <button
       class="p-1 hover:bg-gray-100 rounded transition-colors duration-200 text-end"
-      on:click={toggleHelp}>
+      on:click={hideHelp}>
       <Icon icon="mdi:close" class="text-xl text-white hover:text-white" />
-    </button>
+    </button> -->
+    <button
+        class="text-white text-lg font-bold mr-2"
+        on:click={hideHelp}
+      >
+        ✖
+      </button> 
     </div>
     <div class="text-xs bg-white overflow-y-auto scroll p-3" style="max-height: 400px">
   
@@ -102,11 +108,11 @@
         </div>
   
         <div class="relative w-full h-16 flex items-center justify-end cursor-pointer" on:click={togglePage} >
-          <button class="absolute text-md text-gray-500 font-semibold border-1 p-2 rounded-md mb-7" type='submit'>
+          <button class="absolute text-md text-primary-500 font-semibold border-1 p-2 rounded-md mb-7" type='submit'>
             Click here
           </button>
             <Icon icon="ph:hand-pointing-thin" class="absolute text-bold text-3xl text-gray-500 icon-1 mt-6" />
-            <Icon icon="svg-spinners:pulse-rings-multiple" class="absolute text-bold text-lg text-gray-700 icon-2 mr-2" />
+            <!-- <Icon icon="svg-spinners:pulse-rings-multiple" class="absolute text-bold text-lg text-gray-700 icon-2 mr-2" /> -->
           </div>
       </div>
     </div>

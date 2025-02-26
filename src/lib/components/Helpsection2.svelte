@@ -48,15 +48,18 @@
         class="font-semibold absolute rounded rounded-b-none flex flex-col items-center px-3 pt-2 pb-1 gap-2 transition-opacity duration-300 transform bottom-12 right-7 z-30
         "
         on:click={toggleHelp}>
-        <div class="fixed w-12 h-12 bg-primary-500 text-white rounded-full flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
-          <Icon icon="line-md:chat-twotone" class="text-bold text-3xl" />
+        <div class="fixed w-8 h-8 bg-primary-500 text-white rounded flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
+          <Icon icon="ic:outline-chat" class="text-bold text-xl" />
       </div>
       </button>
   </div>
 <!-- </div> -->
 {/if}
 {#if isHelpVisible}
-    <div
+
+
+
+    <!-- <div
     class="fixed inset-0 flex items-center justify-center z-30"
   >
     <div
@@ -66,7 +69,10 @@
       <Icon icon="prime:chevron-down" class="text-xl text-white" />
   </div>
     </div>
-  </div>
+  </div> -->
+
+
+
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
@@ -78,7 +84,13 @@
         bind:this={popupRef}
         on:click|stopPropagation transition:slide
       >
-        <span class="text-xl font-extrabold text-white font-serif">Chemikart</span>  
+        <span class="text-xl font-extrabold text-white font-serif">Chemikart</span> 
+        <button
+        class="absolute top-2 right-2 text-white text-lg font-bold"
+        on:click={hideHelp}
+      >
+        ✖
+      </button> 
       <div
       class="fixed bg-white p-3 rounded-xl shadow-xl mx-auto overflow-hidden lg:w-[250px] md:w-[200px] sm:w-[200px] right-0 h-72 bottom-7 border-2 border-gray-100"
       bind:this={popupRef}
@@ -109,7 +121,7 @@
             Click here
           </button>
             <Icon icon="ph:hand-pointing-thin" class="absolute text-bold text-3xl text-gray-500 icon-1 mt-6" />
-            <Icon icon="svg-spinners:pulse-rings-multiple" class="absolute text-bold text-lg text-gray-700 icon-2 ml-1" />
+            <!-- <Icon icon="svg-spinners:pulse-rings-multiple" class="absolute text-bold text-lg text-gray-700 icon-2 ml-1" /> -->
           </div>
       </div>
     </div>

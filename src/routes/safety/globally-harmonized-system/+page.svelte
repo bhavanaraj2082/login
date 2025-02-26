@@ -47,16 +47,15 @@
 </script>
 <div>
   <div class="pt-5 max-w-7xl md:w-11/12 mx-auto">
-    <div class="fixed z-30 bottom-0 right-0 lg:right-4 py-4 lg:p-4">
+    <div class="fixed z-30 bottom-1.5 right-0 lg:right-10 py-4 lg:p-4">
         <button
-          class="font-semibold rounded flex flex-col items-center px-1.5 pb-2 lg:p-2 gap-2 text-primary-900 transition-opacity duration-300 transform"
-          on:click={scrollToTop}
+        class="flex items-center justify-center p-2 rounded text-primary-500 md:mr-14 lg:mr-0" on:click={scrollToTop}
           class:hidden={!showButton}
           on:mouseenter={handleMouseEnter}
             on:mouseleave={handleMouseLeave}
         >
-          <Icon icon="ci:chevron-up-duo" class="text-bold text-4xl text-primary-400 hover:text-primary-500" />
-        </button>
+        <Icon icon="gg:arrow-up-r" width="2.2em" height="2.2em" />
+      </button>
         {#if showTooltip}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->

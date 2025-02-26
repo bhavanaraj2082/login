@@ -48,6 +48,7 @@ $: {
       }
     }
 
+
     const handleScroll = () => {
       if (!footer) return;
       const footerTop = footer.getBoundingClientRect().top;
@@ -75,8 +76,8 @@ $: {
           class="font-semibold rounded-sm rounded-t-none flex flex-col items-center px-3 py-2 transition-opacity duration-300 transform 0 "
           on:click={toggleHelp}
         >
-        <div class="fixed w-12 h-12 bg-primary-500 text-white rounded-full flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
-            <Icon icon="line-md:chat-twotone" class="text-bold text-3xl" />
+        <div class="fixed w-8 h-8 bg-primary-500 text-white rounded flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
+            <Icon icon="ic:outline-chat" class="text-bold text-xl" />
         </div>
       </button>
       </div>
@@ -87,7 +88,10 @@ $: {
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
    
-  <div
+
+
+
+  <!-- <div
   class="fixed inset-0 flex items-center justify-center z-30"
 >
   <div
@@ -97,8 +101,14 @@ $: {
     <Icon icon="prime:chevron-down" class="text-xl text-white" />
 </div>
   </div>
-</div>
+</div> -->
+
+
+
+
   <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
     class="fixed inset-0 flex items-center justify-center z-30"
@@ -110,17 +120,18 @@ $: {
       on:click|stopPropagation transition:slide
     >
       <span class="text-xl font-extrabold text-white font-serif">Chemikart</span>  
+      <button
+      class="absolute top-2 right-2 transform -translate-x-2 text-white text-lg font-bold"
+      on:click={hideHelp}
+    >
+      ✖
+    </button>
     <div
     class="fixed bg-white p-3 rounded-xl shadow-xl mx-auto overflow-hidden lg:w-[250px] md:w-[200px] sm:w-[200px] right-0 h-72 bottom-7 border-2 border-gray-100"
     bind:this={popupRef}
     on:click|stopPropagation transition:slide
   >
-  <!-- <button
-  class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl font-bold"
-  on:click={toggleHelp}
->
-  ✖
-</button> -->
+
     <div class="w-full max-w-lg px-2">
       <div class="slide h-10 flex justify-start items-start text-center text-sm font-semibold font-montserrat">
           <Icon icon="noto:waving-hand" class="text-bold text-3xl" />
@@ -146,8 +157,8 @@ $: {
         <button class="absolute text-md text-primary-500 font-semibold border-1 p-2 rounded-md mb-7" type='submit'>
           Click here
         </button>
-          <Icon icon="ph:hand-pointing-thin" class="absolute text-bold text-3xl text-gray-500 icon-1 mt-6" />
-          <Icon icon="svg-spinners:pulse-rings-multiple" class="absolute text-bold text-lg text-gray-700 icon-2 mr-2" />
+          <Icon icon="ph:hand-pointing-thin" class="absolute text-bold text-3xl text-gray-500 icon-1 mt-4" />
+          <!-- <Icon icon="svg-spinners:pulse-rings-multiple" class="absolute text-bold text-lg text-gray-700 icon-2 mr-2" /> -->
         </div>
       
     </div>

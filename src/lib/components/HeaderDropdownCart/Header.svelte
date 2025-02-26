@@ -297,7 +297,7 @@
 					  <div class="absolute top-[-7px] right-1 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white transform rotate-180"></div>
 				  
 					  <button
-						on:click={() => navigateTo('/dashboard/profile')}
+						on:click={() => navigateTo('/dashboard')}
 						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
 						My Profile
 					  </button>
@@ -432,17 +432,17 @@
 			
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
-			<div class="relative p-2 bg-primary-200 hidden md:block cursor-pointer rounded-md" on:click={handleProfile} bind:this={dropdown}>
+			<div class="relative p-2 hover:bg-primary-300 hover:text-primary-400 hidden md:block cursor-pointer rounded-md transition-all" on:click={handleProfile} bind:this={dropdown}>
 				<button
 						class="mr-2 flex flex-row justify-center cursor-pointer z-30 gap-2">
 						<p class="w-7 h-7 flex items-center justify-center bg-primary-400 text-white rounded-full text-lg"
 						>{getInitial(userName)}
 					</p>
-						<h2 class="text-sm text-primary-500 mt-1">{userName}</h2>
+						<h2 class="text-sm text-white mt-1">{userName}</h2>
 						<button on:click={handleProfile}>
 							<Icon
 								icon={showUserOptions ? 'ion:chevron-up' : 'ion:chevron-down'}
-								class="text-primary-500 mt-0.5"
+								class="text-white mt-0.5"
 							/>
 					</button>
 				</button>
@@ -454,7 +454,7 @@
 					  <div class="absolute top-[-7px] right-1 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white transform rotate-180"></div>
 				  
 					  <button
-						on:click={() => navigateTo('/dashboard/profile')}
+						on:click={() => navigateTo('/dashboard')}
 						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
 						My Profile
 					  </button>
