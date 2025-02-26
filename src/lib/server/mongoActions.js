@@ -16,6 +16,7 @@ import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '$lib/server/models/MyFavourite.js';
 import SearchQueries from '$lib/server/models/SearchQueries.js';
 import Curconversion from "$lib/server/models/Curconversion.js";
+import Feedback from '$lib/server/models/Feedback.js'
 import { redirect, error } from '@sveltejs/kit';
 import Distributor from "$lib/server/models/Distributor.js"
 import { v4 as uuidv4 } from 'uuid';
@@ -2874,14 +2875,14 @@ export const updateRecurrence = async (body) => {
 };
 
 export const submitFeedback = async (data) => {
-    try {
-      const newFeedback = new Feedback(data); // Use the Feedback model here
-      const savedFeedback = await newFeedback.save();
-      console.log("savedFeedback",savedFeedback);
-
-      return savedFeedback;
-    } catch (error) {
-    //   console.error('Error saving feedback:', error);
-      throw new Error('Failed to save feedback information');
-    }
+	try {
+	  const newFeedback = new Feedback(data); // Use the Feedback model here
+	  const savedFeedback = await newFeedback.save();
+	  console.log("savedFeedback",savedFeedback);
+	  
+	  return savedFeedback;
+	} catch (error) {
+	//   console.error('Error saving feedback:', error);
+	  throw new Error('Failed to save feedback information');
+	}
   };

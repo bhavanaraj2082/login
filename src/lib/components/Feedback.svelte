@@ -432,7 +432,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
           name="email"
           id="email"
           bind:value={formData.email}
-          class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+            class="block w-full md:mt-1 rounded-md focus:ring-0 focus:outline-none border focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
           placeholder="Email"
           on:input={() => {
             showEmailError = false
@@ -678,7 +678,8 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
     </div>
 
     <div class="mt-6 flex items-center justify-end gap-x-6">
-      <button type="submit" on:click={handleSubmit} class="rounded-md bg-primary-500 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-primary-600">Submit</button>
+      <button type="submit" on:click={handleSubmit}                   
+      class="bg-primary-400 hover:bg-primary-500 text-white py-3 px-6 transition duration-300 rounded-lg text-lg font-semibold shadow-md hover:shadow-lg active:scale-95">Submit</button>
     </div>
   </div>
 
