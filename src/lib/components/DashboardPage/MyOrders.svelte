@@ -28,7 +28,7 @@
             </div>
         </a>
     {:else}
-        <div class="flex mb-4 transition-opacity duration-500 ease-in-out">
+        <!-- <div class="flex mb-4 transition-opacity duration-500 ease-in-out">
             {#each tabs as tab}
                 <button
                     class={`px-4 py-2 ${activeTab === tab.toLowerCase() ? 'border-b-2 border-primary-500' : ''}`}
@@ -36,7 +36,7 @@
                     {tab}
                 </button>
             {/each}
-        </div>
+        </div> -->
         <div class="transition-opacity duration-500 ease-in-out">
             {#if activeTab === 'orders'}
             <OrdersTab {data} />
