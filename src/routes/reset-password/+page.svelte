@@ -3,4 +3,5 @@
     export let data
 </script>
 
-<Resetpassword token={data.token}/>
+<!-- <Resetpassword token={data.token}/> -->
+ <Resetpassword {data} />

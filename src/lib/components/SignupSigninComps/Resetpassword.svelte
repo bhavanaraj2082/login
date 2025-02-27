@@ -4,7 +4,13 @@
 	import { authedUser } from "$lib/stores/mainStores.js";
 	import { toast } from "svelte-sonner";
 	import { Toaster } from "svelte-sonner";
-	export let token = "";
+	export let data;
+	console.log(data,"ddataaa");
+	// console.log(authedUser,"authedUser");
+	
+	let token = data?.token || "" ;
+	console.log(token,"tpoken");
+	
 	let message = "";
 	let flag = false;
 	const dispatch = createEventDispatcher();
@@ -110,18 +116,26 @@
 						cancel();
 						return;
 					}
-
+				
 					return async ({ result }) => {
 						console.log('result', result);
 						if (result.data.success === true) {
 							toast.success(result.data.message);
+
+							if (data?.authedUser && data?.authedUser.id) {
+								setTimeout(() => {
+									goto("/dashboard");
+								}, 2000);
+							} else {
+								setTimeout(() => {
+									goto("/login");
+								}, 2000);
+							}
+							
 							successMessage = "Password Reset Successfully";
 							errorMessage = "";
 							flag = true;
 							hide = false;
-							setTimeout(() => {
-								goto("/login");
-							}, 3000);
 						}
 						if (result.data.success === false) {
 							successMessage = "";
