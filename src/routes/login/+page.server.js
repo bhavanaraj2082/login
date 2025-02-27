@@ -131,7 +131,12 @@ export const actions = {
 				errorMsg: 'Incorrect or expired OTP. Please try again.'
 			});
 		}
-		console.log('OTP verification successful.');
+		await Profile.findOneAndUpdate(
+			{ email: email },
+			{ isEmailVerified: true },
+			{ new: true, upsert: false }
+		  );		
+		  console.log('OTP verification successful. Email verified');
 
 		try {
 			let user;
