@@ -3,7 +3,7 @@
   import Icon from "@iconify/svelte";
   import { enhance, applyAction } from "$app/forms";
   import { cartState } from "$lib/stores/cartStores.js";
-  import Bulkupload from "./Bulkupload.svelte";
+  // import Bulkupload from "./Bulkupload.svelte";
   import { toast } from "svelte-sonner";
   let uploadedRows = [];
   let showSavedCarts = false;
@@ -712,7 +712,7 @@
 
     <!-- svelte-ignore empty-block -->
     {#if toggle}
-      <Bulkupload {data} />
+      <!-- <Bulkupload {data} /> -->
     {:else}
       <div class="text-black text-sm md:ml-5">
         *Enter the product SKU (product number and pack size) and quantity for
@@ -1232,9 +1232,7 @@
     </div>
   {/if}
 
-  {#if showQuoteModal}
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- {#if showQuoteModal}
     <div
       class=" !ml-0 fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center"
       on:click={() => (showQuoteModal = false)}
@@ -1265,7 +1263,7 @@
   }
 
             return async ({ result }) => {
-              // console.log(result, "result");
+    
               submitting = false;
               if (result.status === 200) {
                 toast.success("Submitted the quotes successfully!");
@@ -1566,7 +1564,7 @@
               method="POST"
               use:enhance={() => {
                 return async ({ result }) => {
-                  // console.log(result);
+                 
                   loadingotp = false;
                   if (result.status === 200) {
                     if (result.data.status === 200) {
@@ -1611,7 +1609,7 @@
                   class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded hover:underline"
                   disabled={loadingotp}
                 >
-                  <!-- {loadingotp ? 'Verifying...' : 'Verify'} -->
+                  
                   {#if loadingotp}
                     <span
                       class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 flex items-center"
@@ -1707,5 +1705,5 @@
         </form>
       </div>
     </div>
-  {/if}
+  {/if} -->
 </div>
