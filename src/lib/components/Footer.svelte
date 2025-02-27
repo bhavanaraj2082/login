@@ -164,8 +164,8 @@
 			<hr class="border-gray-50 m-4 border-1" />
 			<div
 				class="flex flex-col md:flex-row justify-center md:justify-between items-center text-gray-50 mx-auto w-11/12 mt-4 max-w-7xl">
-				<p class="text-xs text-center font-medium">
-					&copy; {currentYear} Chemikart. All Rights Reserved.
+				<p class="text-xs text-start font-medium">
+					&copy; {currentYear} Chemikart. <span class="md:block lg:inline">All Rights Reserved.</span>
 				</p>
 				<div class="flex flex-col md:flex-row items-center gap-0 md:gap-4 lg:gap-6 mt-2 md:mt-0 space-y-1 md:space-y-0">
 					<a href="/" class="hover:text-primary-100 transition-colors duration-200 font-medium sm:text-sm text-xs" on:click={togglePopup}>Cookies Settings</a>
