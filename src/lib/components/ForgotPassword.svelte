@@ -1,80 +1,91 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
-    import Icon from '@iconify/svelte';
-    import { enhance } from '$app/forms';
-    import { toast } from 'svelte-sonner';
-    import { applyAction } from '$app/forms';
-    import { Toaster } from 'svelte-sonner';
-    import { authedUser } from '$lib/stores/mainStores.js';
+    import { createEventDispatcher } from "svelte";
+    import Icon from "@iconify/svelte";
+    import { enhance } from "$app/forms";
+    import { toast } from "svelte-sonner";
+    import { applyAction } from "$app/forms";
+    import { Toaster } from "svelte-sonner";
+    import { authedUser } from "$lib/stores/mainStores.js";
 
     let form;
-    let email = '';
-    let emailError = '';
-    let token = '';
+    let email = "";
+    let emailError = "";
+    let token = "";
     let loading = false;
 
     const dispatch = createEventDispatcher();
 
     function handleSubmit() {
         const emailaddress = form.resetrequest.record.email;
-        dispatch('email', emailaddress);
+        dispatch("email", emailaddress);
     }
 
-    let heading = 'Request';
+    let heading = "Request";
     if (form) {
-        heading = 'Validate';
+        heading = "Validate";
     }
 
-    $: successMessage = '';
-    $: errorMessage = '';
+    $: successMessage = "";
+    $: errorMessage = "";
 </script>
-
 
 <main class="my-10">
     <div
-        class="max-w-80 sm:max-w-xs md:max-w-sm lg:max-w-sm border rounded-md shadow-lg mx-auto mt-10 border-primary-300"
+        class="max-w-80 sm:max-w-xs md:max-w-sm lg:max-w-sm rounded-lg shadow-xl mx-auto mt-10 border border-gray-200 overflow-hidden"
     >
-        <h1 class="text-center text-xl lg:text-2xl text-white bg-primary-500 py-2 rounded-t-sm">
-            Password Reset
-        </h1>
-        <div class="px-10 py-6">
-            <div class="flex items-center justify-center">
-                <p class="text-black text-sm font-bold">{heading}</p>
+        {#if !successMessage}
+            <div
+                class="bg-primary-400 text-white p-6 flex flex-col items-center justify-center"
+            >
+                <Icon icon="mdi:lock-reset" class="text-4xl mb-2" />
+                <h1
+                    class="text-center text-xl text-white lg:text-2xl font-semibold"
+                >
+                    Forgot your Password?
+                </h1>
+                <p class="text-center text-white text-opacity-80 text-sm mt-2">
+                    We'll help you reset it in just a few steps
+                </p>
             </div>
-            <div class="flex items-center justify-center py-5 text-gray-400">
-                <div class="flex flex-row items-center justify-center">
-                    <Icon icon={'ep:success-filled'} class=" text-primary-600 text-3xl" />
-                    <hr
-                        class={`${form ? 'bg-primary-600 text-3xl lg:w-16 md:w-24 w-5 xs:w-5 h-1 rounded' : 'lg:w-14 md:w-24 w-5 xs:w-5 h-1 bg-primary-200 rounded text-lg'}`}
-                    />
-                </div>
-                <div class="flex flex-row">
-                    <Icon
-                        icon={form ? 'ep:success-filled' : 'bi:2-circle'}
-                        class={`${form ? 'text-primary-600 text-3xl' : ''} text-2xl`}
-                    />
-                    <hr
-                        class={`${form ? 'mt-3.5' : 'mt-2.5'} lg:w-14 md:w-24 w-5 xs:w-5 h-1 bg-primary-200 rounded text-lg`}
-                    />
-                </div>
-                <div class="flex flex-row">
-                    <Icon icon="bi:3-circle" class=" text-2xl" />
-                </div>
-            </div>
+        {/if}
 
+        <div class="bg-white p-6">
             {#if successMessage}
-                <div class="mt-4 p-4 text-sm bg-green-100 text-green-800 rounded border border-gray-200">
-                    {successMessage}
+                <div
+                    class="my-4 p-6 text-sm rounded-md flex flex-col items-center"
+                >
+                    <Icon
+                        icon="mdi:email-check"
+                        class="text-primary-400 text-3xl mb-3"
+                    />
+                    <h2 class="text-lg font-semibold mb-2 text-primary-400">
+                        Email Sent!
+                    </h2>
+                    <p class="text-center text-gray-700">{successMessage}</p>
+                    <div class="mt-4 w-full">
+                        <a
+                            href="/login"
+                            class="block w-full py-2 text-center text-sm rounded-md font-medium border border-primary-400 text-primary-400 hover:bg-gray-100 transition-colors duration-200 shadow-sm"
+                        >
+                            Return to Login
+                        </a>
+                    </div>
                 </div>
             {/if}
 
             {#if errorMessage}
-                <div class="mt-4 p-4 text-sm bg-red-100 rounded border border-gray-200">
+                <div
+                    class="mb-6 p-4 text-sm bg-red-100 text-red-800 rounded-md border border-red-200 flex items-center"
+                >
+                    <Icon
+                        icon="mdi:alert-circle"
+                        class="text-red-500 mr-2 text-lg"
+                    />
                     {errorMessage}
                 </div>
             {/if}
 
-            {#if !form}
+            {#if !form && !successMessage}
                 <div>
                     <form
                         use:enhance={() => {
@@ -82,14 +93,14 @@
                                 loading = false;
                                 if (result.data.success === true) {
                                     successMessage =
-                                        'Password reset link sent successfully! Please check your email to proceed.';
+                                        "Password reset link sent successfully! Please check your email to proceed.";
                                     toast.success(result.data.message);
-                                    email = '';
-                                    emailError = '';
+                                    email = "";
+                                    emailError = "";
                                     form = true;
-                                    heading = 'Validate';
+                                    heading = "Validate";
                                 } else {
-                                    successMessage = '';
+                                    successMessage = "";
                                     toast.error(result.data.message);
                                 }
                                 await applyAction(result);
@@ -101,59 +112,102 @@
                             loading = true;
                         }}
                     >
-                        <div class="border p-4 border-primary-50 rounded-md bg-primary-100 text-gray-600 my-5">
-                            <p class="text-xs float-start font-medium my-3">
-                                Enter your email to receive a password reset link.
-                            </p>
-                            {#if $authedUser.email}
-                                <input
-                                    class="w-full text-xs border-gray-400 p-2 rounded-sm"
-                                    name="email"
-                                    placeholder="email..."
-                                    type="email"
-                                    value={$authedUser.email}
-                                    readonly
-                                />
-                            {:else}
-                                <input
-                                    class="w-full text-xs border-gray-400 p-2 rounded-sm"
-                                    name="email"
-                                    placeholder="email..."
-                                    type="email"
-                                    bind:value={email}
-                                    on:input={() => {
-                                        const emailRegex = /^\S+@\S+.\S+$/;
-                                        emailError =
-                                            !email || !emailRegex.test(email) ? 'Please enter a valid email address' : '';
-                                    }}
-                                />
+                        <div class="mb-6">
+                            <label
+                                for="email"
+                                class="block text-sm font-medium text-gray-700 mb-2"
+                            >
+                                Email Address
+                            </label>
+                            <div class="relative">
+                                <div
+                                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                                >
+                                    <Icon
+                                        icon="mdi:email-outline"
+                                        class="text-gray-400 text-lg"
+                                    />
+                                </div>
+                                {#if $authedUser.email}
+                                    <input
+                                        id="email"
+                                        class="w-full text-sm border border-gray-300 p-3 pl-10 rounded-md  focus:ring-0 shadow-sm focus:ring-primary-500 focus:border-primary-500 focus:outline-none"
+                                        name="email"
+                                        placeholder="your@email.com"
+                                        type="email"
+                                        value={$authedUser.email}
+                                        readonly
+                                    />
+                                {:else}
+                                    <input
+                                        id="email"
+                                        class="w-full text-sm border border-gray-300 p-3 pl-10 rounded-md shadow-sm focus:ring-0 focus:ring-primary-500 focus:border-primary-500 focus:outline-none"
+                                        name="email"
+                                        placeholder="your@email.com"
+                                        type="email"
+                                        bind:value={email}
+                                        on:input={() => {
+                                            const emailRegex = /^\S+@\S+.\S+$/;
+                                            emailError =
+                                                !email ||
+                                                !emailRegex.test(email)
+                                                    ? "Please enter a valid email address"
+                                                    : "";
+                                        }}
+                                    />
+                                {/if}
+                            </div>
+                            {#if emailError}
+                                <p
+                                    class="mt-2 text-red-600 text-xs flex items-center"
+                                >
+                                    <Icon
+                                        icon="mdi:alert-circle"
+                                        class="mr-1"
+                                    />
+                                    {emailError}
+                                </p>
                             {/if}
-                            <p class="text-red-500 text-left ml-px text-xs">{emailError}</p>
-                            <Icon
-                                icon={form?.invalid ? 'typcn:warning' : ''}
-                                class="w-5 h-5 text-red-500 inline pr-1"
-                            />
-                            <p class="text-black text-xs py-0.5 inline">{form?.invalid || ''}</p>
+                            {#if form?.invalid}
+                                <p
+                                    class="mt-2 text-red-600 text-xs flex items-center"
+                                >
+                                    <Icon icon="typcn:warning" class="mr-1" />
+                                    {form.invalid}
+                                </p>
+                            {/if}
+                            <p class="mt-2 text-xs text-gray-500">
+                                We'll send a secure link to reset your password
+                            </p>
                         </div>
 
-                        <div class="flex justify-between items-center">
+                        <div class="mt-6">
                             <button
                                 type="submit"
-                                class="w-[120px] py-1.5 text-sm rounded-md font-medium bg-primary-600 text-white my-3 hover:bg-primary-400"
+                                class="w-full py-3 text-sm rounded-md font-medium bg-primary-400 text-white hover:bg-primary-500 transition-colors duration-200 shadow-sm flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                                 disabled={loading}
                             >
                                 {#if loading}
-                                    <div class="flex items-center">
-                                        <Icon
-                                            icon="svg-spinners:pulse-rings-3"
-                                            class="text-3xl font-bold animate-spin"
-                                        />
-                                        <span class="ml-1 text-xs"> Submitting... </span>
-                                    </div>
+                                    <Icon
+                                        icon="svg-spinners:pulse-rings-3"
+                                        class="text-2xl animate-spin"
+                                    />
+                                    <span>Sending Link...</span>
                                 {:else}
-                                    Submit
+                                    <Icon icon="mdi:send" class="text-lg" />
+                                    <span>Send Reset Link</span>
                                 {/if}
                             </button>
+                        </div>
+
+                        <div class="mt-4 text-center">
+                            <a
+                                href="/login"
+                                class="text-sm text-primary-400 hover:text-primary-500 flex items-center justify-center gap-1"
+                            >
+                                <Icon icon="mdi:arrow-left" />
+                                <span>Back to Login</span>
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -161,6 +215,5 @@
         </div>
     </div>
 </main>
-
 
 <Toaster position="bottom-right" richColors />

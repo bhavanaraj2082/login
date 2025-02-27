@@ -13,6 +13,7 @@ import Products from '$lib/server/models/Product.js';
 import Helpsupport from '$lib/server/models/Helpsupport.js';
 import  User from '$lib/server/models/User.js'
 import Cart from '$lib/server/models/cart.js';
+import User from '$lib/server/models/User.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '$lib/server/models/MyFavourite.js';
 import SearchQueries from '$lib/server/models/SearchQueries.js';
@@ -1404,7 +1405,7 @@ export const passwordVerificationToken = async (body, verifyType) => {
 			  We received a request to reset your password. To proceed, please click the button below to reset your password.
 			</p>
 			<div style="text-align: center;">
-			  <a href="${APP_URL}/reset-password?token=${token}" style="display: inline-block; background-color: #5d1ffb; color: #ffffff; padding: 15px 30px; font-size: 16px; text-decoration: none; border-radius: 5px; text-transform: uppercase; font-weight: bold; margin-top: 20px;">
+			  <a href="${APP_URL}/reset-password?token=${token}" style="display: inline-block; background-color: #e87a3f; color: #ffffff; padding: 15px 30px; font-size: 16px; text-decoration: none; border-radius: 5px; text-transform: uppercase; font-weight: bold; margin-top: 20px;">
 				Reset Password
 			  </a>
 			</div>
