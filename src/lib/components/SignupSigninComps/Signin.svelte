@@ -95,7 +95,7 @@
 </script>
 
 <div
-  class="flex flex-col md:flex-row max-w-5xl shadow-lg lg:shadow-none rounded-lg lg:rounded-none mx-auto h-auto md:h-auto my-14 border lg:border-0 border-gray-300"
+  class="flex flex-col md:flex-row max-w-4xl shadow-md mx-auto h-auto md:h-auto my-14 border rounded-lg border-gray-300"
 >
   <div class="md:hidden w-full h-1/2 mx-auto flex justify-center">
     <img src="/image.jpg" alt="Sign In" class="object-cover h-full rounded" />
@@ -341,7 +341,7 @@
     </div>
   </div>
 
-  <div class="hidden md:flex md:w-1/2 flex-grow">
+  <div class="hidden md:flex md:w-2/5 flex-grow">
     <img
       src="/image.jpg"
       alt="Sign In"
