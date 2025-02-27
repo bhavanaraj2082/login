@@ -1165,7 +1165,7 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity"
     on:click={() => (showQuoteModal = false)}
   >
     <div
