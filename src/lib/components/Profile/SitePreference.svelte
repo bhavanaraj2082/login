@@ -6,9 +6,9 @@
     const dispatch = createEventDispatcher()
 
     export let recordId
-    // console.log('===>',recordId)
+    console.log('siteprfernece===>',recordId)
     export let sitePreferences
-    // console.log('===>',sitePreferences)
+    console.log('sitepreference===>',sitePreferences)
 
     let toggleEdit = false
 
@@ -51,7 +51,7 @@ const handleSubmit =()=>{
 }
 </script>
 
-<div class="border shadow-sm md:w-11/12 max-w-7xl mx-auto rounded-md p-5 bg-white">
+<div class="shadow  rounded p-5 bg-white">
     <h1 class=" text-xl font-bold"> Manage Your Site Preferences</h1>
     {#if !toggleEdit}
        <div>

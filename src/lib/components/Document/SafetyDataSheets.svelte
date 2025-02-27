@@ -163,10 +163,10 @@ function toggleRotation(index) {
   };
 </script>
 
-<div class="p-6 md:px-10 max-w-7xl lg:px-14 mx-auto bg-white border rounded-lg">
-  <h1 class="text-4xl font-bold mb-8">Documents</h1>
+<div class="px-6 pb-6 md:px-10 max-w-7xl lg:px-14 mx-auto">
+  <h1 class="text-2xl font-bold mb-8">Documents</h1>
   
-  <div class="w-full inline-flex rounded-md mb-8">
+  <div class="w-full inline-flex rounded mb-8">
     <!-- Navigation Menu (Tabs) -->
     <!-- <nav aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto">
       {#each tabs as tab}
@@ -205,7 +205,7 @@ function toggleRotation(index) {
     
   </div>
   <div class="flex flex-col lg:flex-row"> 
-    <div class="w-full lg:w-7/12 p-2"> 
+    <div class="w-full lg:w-7/12 p-6 rounded bg-white shadow"> 
       {#if activeTab === "SafetyData Sheets"}
       <div class="mb-6 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">SafetyData Sheets (SDS)</h2>
@@ -240,7 +240,7 @@ function toggleRotation(index) {
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. IPAKKIT00"
-            class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm mb-0"
+            class="block w-full p-3 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm mb-0"
           />
           {#if showErrors && inputValue.length === 0}
           <div class="flex text-start">
@@ -252,7 +252,7 @@ function toggleRotation(index) {
             {/if}
             <button
             type="submit"
-            class="font-semibold bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300 mt-5"
+            class="font-semibold bg-primary-400 text-white py-2 px-6 rounded shadow hover:bg-primary-500 transition duration-300 mt-5"
           >
             SEARCH
           </button>
@@ -297,7 +297,7 @@ function toggleRotation(index) {
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. IPAKKIT00"
-            class="block w-full  p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            class="block w-full  p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
           {#if showErrors && inputValue1.length === 0}
           <div class="flex text-start">
@@ -319,7 +319,7 @@ function toggleRotation(index) {
                 name="product-number"
                 bind:value={lotNumber}
                 placeholder="E.G. 708371"
-                class="block w-full p-3  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+                class="block w-full p-3  border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
               />
               {#if showErrors && lotNumber.length === 0}
               <div class="flex text-start">
@@ -329,7 +329,7 @@ function toggleRotation(index) {
             </div>
               <button
               type="submit"
-              class="font-semibold mt-5 bg-primary-400 hover:bg-primary-500 text-white py-2 px-6 rounded-md shadow transition duration-300"
+              class="font-semibold mt-5 bg-primary-400 hover:bg-primary-500 text-white py-2 px-6 rounded shadow transition duration-300"
             >
               SEARCH
             </button>
@@ -374,7 +374,7 @@ function toggleRotation(index) {
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. IPAKKIT00"
-            class="block w-full  p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            class="block w-full  p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
           {#if showErrors && inputValue2.length === 0}
           <div class="flex text-start">
@@ -395,7 +395,7 @@ function toggleRotation(index) {
             name="product-number"
             bind:value={lotNumber1}
             placeholder="E.G. 708371"
-            class="block w-full p-3  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            class="block w-full p-3  border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
           {#if showErrors && lotNumber1.length === 0}
           <div class="flex text-start">
@@ -407,7 +407,7 @@ function toggleRotation(index) {
           {/if}
             <button
               type="submit"
-              class="font-semibold mt-5 bg-primary-400 text-white py-2 px-6 rounded-md shadow hover:bg-primary-500 transition duration-300"
+              class="font-semibold mt-5 bg-primary-400 text-white py-2 px-6 rounded shadow hover:bg-primary-500 transition duration-300"
             >
               SEARCH
             </button>
@@ -452,7 +452,7 @@ function toggleRotation(index) {
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. IPAKKIT00"
-            class="block w-full p-3  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm" 
+            class="block w-full p-3  border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm" 
           />
           {#if showErrors && inputValue3.length === 0}
           <div class="flex text-start">
@@ -470,7 +470,7 @@ function toggleRotation(index) {
             name="product-number"
             bind:value={lotNumber2}
             placeholder="E.G. 708371"
-            class="block w-full p-3  border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            class="block w-full p-3  border border-gray-300 rounded shadow focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
           />
           {#if showErrors && lotNumber2.length === 0}
           <div class="flex text-start">
@@ -493,9 +493,9 @@ function toggleRotation(index) {
       </div>
       {/if}
     </div>
-    <div class="w-full lg:w-5/12 p-2"> 
+    <div class="w-full lg:w-5/12 pl-2"> 
       {#if activeTab === "SafetyData Sheets"}
-        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start">
+        <div class="bg-white p-4 border rounded shadow-md w-full self-start">
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div on:click={() => toggleProductDetails2("Safety Data Sheets")} class="flex items-center justify-between">
@@ -544,8 +544,8 @@ function toggleRotation(index) {
         </div>
       {/if}
       {#if activeTab === "Certificates of Analysis"}
-      <div class="flex flex-wrap  space-y-4 ml-0 lg:ml-16">       
-        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start"> 
+      <div class="flex flex-wrap  space-y-4 ml-0 lg:ml-1">       
+        <div class="bg-white p-4 border rounded shadow w-full self-start"> 
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div on:click={() => toggleProductDetails2("Certificates of Analysis")} class="flex items-center justify-between">
@@ -592,7 +592,7 @@ function toggleRotation(index) {
           </div>
         {/if}        
         </div>
-        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start">
+        <div class="bg-white p-4 border rounded shadow w-full self-start">
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div on:click={() => toggleLotDetails("Certificates of Analysis")} class="flex items-center justify-between">
@@ -613,7 +613,7 @@ function toggleRotation(index) {
           </div>
           {/if}
         </div>
-        <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
+        <div class="bg-white p-4 border rounded shadow w-full  self-start">
           <div class="flex items-center justify-between">
             <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
           </div>
@@ -632,8 +632,8 @@ function toggleRotation(index) {
       </div>
       {/if}   
 {#if activeTab === "Certificates of Origin"}
-<div class="flex flex-wrap space-y-4 ml-0 lg:ml-16">
-  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
+<div class="flex flex-wrap space-y-4 ml-0 lg:ml-1">
+  <div class="bg-white p-4 border rounded shadow w-full  self-start">
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div on:click={() => toggleProductDetails2("Certificates of Origin")} class="flex items-center justify-between">
@@ -680,7 +680,7 @@ function toggleRotation(index) {
     </div>
   {/if}
   </div>
-  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
+  <div class="bg-white p-4 border rounded shadow w-full  self-start">
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div on:click={() => toggleLotDetails("Certificates of Origin")} class="flex items-center justify-between">
@@ -704,7 +704,7 @@ function toggleRotation(index) {
       </div>
     {/if}
   </div>
-  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
+  <div class="bg-white p-4 border rounded shadow w-full self-start">
     <div class="flex items-center justify-between">
       <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
     </div>
@@ -722,14 +722,14 @@ function toggleRotation(index) {
 </div>
 {/if}   
 {#if activeTab === "Certificates of Quality"}
-<div class="flex flex-wrap space-y-4 ml-0 lg:ml-16">
-  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full self-start"> 
-    <div class="flex items-center justify-between">
+<div class="flex flex-wrap space-y-4 ml-0 lg:ml-1">
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <div class="bg-white p-4 border rounded shadow w-full self-start"> 
+    <div class="flex items-center justify-between" on:click={() => toggleProductDetails2("Certificates of Quality")}>
       <h3 class="text-md font-medium text-gray-700">How to Find the Product Number</h3>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-missing-attribute -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <a on:click={() => toggleProductDetails2("Certificates of Quality")} class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
+      <a class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
         <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-300 ${showProductDetailsQuality ? 'rotate-45' : '-rotate-45'}`} />
       </a>
     </div>
@@ -770,7 +770,7 @@ function toggleRotation(index) {
     </div>
   {/if}
   </div>
-  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
+  <div class="bg-white p-4 border rounded shadow w-full  self-start">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div on:click={() => toggleLotDetails("Certificates of Origin")} class="flex items-center justify-between">
@@ -794,7 +794,7 @@ function toggleRotation(index) {
       </div>
     {/if}
   </div>
-  <div class="bg-white p-4 border border-primary-100 rounded-lg shadow-md w-full  self-start">
+  <div class="bg-white p-4 border rounded shadow w-full  self-start">
     <div class="flex items-center justify-between">
       <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
     </div>

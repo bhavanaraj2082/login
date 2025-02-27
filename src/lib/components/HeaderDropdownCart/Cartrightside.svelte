@@ -242,18 +242,16 @@
 		<div class="relative inline-block">
 			<!-- Shopping Cart Icon -->
 			<Icon
-				icon="eva:shopping-cart-fill"
+				icon="heroicons-solid:shopping-cart"
 				class=" text-lg sm:text-2xl hover:text-primary-100 hover:scale-105 text-white shrink-0"
 			/>
 			<!-- Badge -->
 			<span
-				class="absolute top-1 right-0 transform translate-x-1/2 -translate-y-1/2 {$cart.length === 0 ? "hidden" : "bg-black text-white"} text-2s font-medium rounded-full w-4 h-4 flex items-center justify-center"
-			>
+				class="absolute sm:ml-2.5 ml-1.5 top-1 right-0 transform translate-x-1/2 -translate-y-1/2 {$cart.length === 0 ? "hidden" : "text-white font-semibold bg-gray-600 inset-0 shadow-md"} text-2s font-medium rounded-full w-4 h-4 flex items-center justify-center">
 			{$cart.length}
 			</span>
 		</div>
 	</span>
-	
 </button>
 
 {#if cartOpen}

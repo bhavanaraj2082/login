@@ -7,7 +7,7 @@
 
   export let data;
 
-  $: user = data?.authedUser || null;
+  let user = data?.authedUser || null;
   $: orders = data?.orders || [];
   $: isRegistrationComplete = user && user.firstname && user.phone;
   $: navigationProps = {
@@ -131,7 +131,7 @@
                     {#each recentOrders as order}
                       <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 text-sm text-gray-600">{order?.orderid || 'N/A'}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">{order?.Invoice || 'N/A'}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">{order?.invoice || 'N/A'}</td>
                         <td class="px-6 py-4 text-sm font-medium text-gray-800">
                           {#if order?.totalprice !== undefined && order?.totalprice !== null}
                             ₹{(order?.totalprice).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
