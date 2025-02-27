@@ -445,7 +445,7 @@ verifyOtpEmail: async ({ request }) => {
 //   return { authedUser: locals.authedUser };
 // }
 export const load = async ({ locals }) => {
-	if (!locals.user) {
+	if (!locals?.user) {
 		return null;
 	}
 	const authedUser = { id: locals.user.userId };

@@ -10,7 +10,7 @@
 
   export let data;
   console.log("daa", data);
-  console.log(data.authedUser.email,"i am email")
+  console.log(data?.authedUser?.email,"i am email")
   
   let isLoadingPhone = false;
   let submitting = false;
@@ -86,12 +86,12 @@
   let validationMessages = [];
 
   let userLoggedIn = false;
-  if (data.authedUser && data.authedUser.email) {
+  if (data?.authedUser && data?.authedUser?.email) {
     userLoggedIn = true;
   }
 
   // let email = userLoggedIn ? data.authedUser.email : "";
-  let email = data.authedUser.email||"";
+  let email = data?.authedUser?.email||"";
 
   function checkAvailability() {
     if (!selectedProduct) {
@@ -511,9 +511,9 @@
       return;
     }
 
-    const authedUser = data.authedUser;
+    const authedUser = data?.authedUser;
 
-    if (authedUser && authedUser.id) {
+    if (authedUser && authedUser?.id) {
       const form = new FormData();
       form.append("cartItems", JSON.stringify(cartItems));
       cartloading = true;
@@ -1666,7 +1666,7 @@
               <Icon icon="line-md:loading-alt-loop" class="w-4 h-4 mr-1" />
               Verifying...
             </span>
-          {:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
+          {:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data?.isEmailVerified !== true}
             <button
               type="submit"
                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
