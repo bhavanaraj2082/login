@@ -175,32 +175,7 @@
     selectedProduct = null;
   }
 
-  // function selectProduct(product, index, size) {
-  //   console.log("Selecting product:", product, "for index:", index);
-  //   const currentQuantity =
-  //     selectedProduct && selectedProduct.productNumber === product.productNumber
-  //       ? selectedProduct.quantity
-  //       : 1;
-  //   rows[index] = {
-  //     ...rows[index],
-  //     sku: `${product.productNumber} - ${size.break}`,
-  //     size: size.break,
-  //     filteredProducts: [],
-  //     selectedSize: size.break,
-  //     quantity: rows[index].quantity,
-  //     selectedProduct: product,
-  //   };
-  //   // (selectedProduct = product),
-  //   selectedProduct = {
-  //     ...product,
-  //     quantity: currentQuantity,
-  //   };
-
-  //   checkAvailability();
-  // }
-  // Add this at the top level of your component/module
-  let selectedProducts = {}; // Object to store selections by index
-
+  let selectedProducts = {}; 
   function selectProduct(product, index, size) {
     console.log("Starting selectProduct for index:", index);
     console.log("Previous selectedProducts:", selectedProducts);
@@ -243,54 +218,54 @@
 
   let cartSummary = {};
 
-  function showCartPopup(cartItems) {
-    const cartPopup = document.getElementById("cart-popup");
-    const cartItemsList = document.getElementById("cart-items-list");
+  // function showCartPopup(cartItems) {
+  //   const cartPopup = document.getElementById("cart-popup");
+  //   const cartItemsList = document.getElementById("cart-items-list");
 
-    cartItemsList.innerHTML = "";
+  //   cartItemsList.innerHTML = "";
 
-    const cartItemCount = cartItems.length;
-    if (cartItemCount > 3) {
-      cartItems.slice(0, 3).forEach((item, index) => {
-        cartItemsList.innerHTML += `
-                <div class="flex items-center gap-4 py-2">
-                    <div class="font-medium">${index + 1}</div> 
+  //   const cartItemCount = cartItems.length;
+  //   if (cartItemCount > 3) {
+  //     cartItems.slice(0, 3).forEach((item, index) => {
+  //       cartItemsList.innerHTML += `
+  //               <div class="flex items-center gap-4 py-2">
+  //                   <div class="font-medium">${index + 1}</div> 
                     
-                    <img src="${item.image}" alt="${item.productName}" class="w-16 h-16 object-cover rounded-md" />
+  //                   <img src="${item.image}" alt="${item.productName}" class="w-16 h-16 object-cover rounded-md" />
 
-                    <div class="flex flex-col ml-4">
-                        <p class="font-medium">${item.productName}</p>
-                        <p>Quantity: ${item.quantity}</p>
-                        <p>Total Price: ₹${(item.quantity * item.priceSize.price).toFixed(2)}</p>
-                    </div>
-                </div>
-            `;
-      });
-      cartItemsList.innerHTML += `
-            <div class="text-center mt-4">
-                <p>You have ${cartItemCount} items in your cart. <a href="/cart" class="text-orange-500">See all your items</a></p>
-            </div>
-        `;
-    } else {
-      cartItems.forEach((item, index) => {
-        cartItemsList.innerHTML += `
-                <div class="flex items-center gap-4 py-2">
-                    <div class="font-medium">${index + 1}</div> 
+  //                   <div class="flex flex-col ml-4">
+  //                       <p class="font-medium">${item.productName}</p>
+  //                       <p>Quantity: ${item.quantity}</p>
+  //                       <p>Total Price: ₹${(item.quantity * item.priceSize.price).toFixed(2)}</p>
+  //                   </div>
+  //               </div>
+  //           `;
+  //     });
+  //     cartItemsList.innerHTML += `
+  //           <div class="text-center mt-4">
+  //               <p>You have ${cartItemCount} items in your cart. <a href="/cart" class="text-orange-500">See all your items</a></p>
+  //           </div>
+  //       `;
+  //   } else {
+  //     cartItems.forEach((item, index) => {
+  //       cartItemsList.innerHTML += `
+  //               <div class="flex items-center gap-4 py-2">
+  //                   <div class="font-medium">${index + 1}</div> 
                     
-                    <img src="${item.image}" alt="${item.productName}" class="w-16 h-16 object-cover rounded-md" />
+  //                   <img src="${item.image}" alt="${item.productName}" class="w-16 h-16 object-cover rounded-md" />
 
-                    <div class="flex flex-col ml-4">
-                        <p class="font-medium">${item.productName}</p>
-                        <p>Quantity: ${item.quantity}</p>
-                        <p>Total Price: ₹${(item.quantity * item.priceSize.price).toFixed(2)}</p>
-                    </div>
-                </div>
-                <hr class="my-2" />
-            `;
-      });
-    }
-    cartPopup.style.display = "flex";
-  }
+  //                   <div class="flex flex-col ml-4">
+  //                       <p class="font-medium">${item.productName}</p>
+  //                       <p>Quantity: ${item.quantity}</p>
+  //                       <p>Total Price: ₹${(item.quantity * item.priceSize.price).toFixed(2)}</p>
+  //                   </div>
+  //               </div>
+  //               <hr class="my-2" />
+  //           `;
+  //     });
+  //   }
+  //   cartPopup.style.display = "flex";
+  // }
 
   function closeCartPopup(event) {
     event.stopPropagation();
@@ -321,122 +296,6 @@
     }
   }
 
-  // async function addManualEntriesToCart() {
-  //   cartloading = true;
-  //   const validRows = rows.filter((row) => {
-  //     return row.sku.trim() !== "" && row.selectedSize;
-  //   });
-
-  //   if (validRows.length === 0) {
-  //     cartloading = false;
-  //     toast.error("No valid items to add to cart");
-  //     return;
-  //   }
-
-  //   const cartItems = validRows
-  //     .map((row) => {
-  //       const productNumber = row.sku.split(" -")[0].trim();
-  //       const validProduct = products.find(
-  //         (p) =>
-  //           String(p.productNumber).trim().toLowerCase() ===
-  //           productNumber.toLowerCase(),
-  //       );
-
-  //       if (!validProduct) {
-  //         toast.error(`Product ${productNumber} not found`);
-  //         return null;
-  //       }
-
-  //       const sizePriceInfo = validProduct.pricing?.find(
-  //         (item) =>
-  //           item.break.trim().toLowerCase() ===
-  //           row.selectedSize.trim().toLowerCase(),
-  //       );
-
-  //       if (!sizePriceInfo) {
-  //         toast.error(
-  //           `Size ${row.selectedSize} not available for ${productNumber}`,
-  //         );
-  //         return null;
-  //       }
-  //       const quantity =
-  //         selectedProduct &&
-  //         selectedProduct.productNumber === validProduct.productNumber
-  //           ? selectedProduct.quantity
-  //           : row.quantity > 0
-  //             ? row.quantity
-  //             : 1;
-
-  //       return {
-  //         id: validProduct.id,
-  //         image: validProduct.image,
-  //         productName: validProduct.productName,
-  //         manufacturerId: validProduct.manufacturer,
-  //         distributerId: validProduct.distributer,
-  //         stockId: validProduct.stockId,
-  //         stock: validProduct.stock,
-  //         productId:validProduct.id,
-  //         priceSize: {
-  //           price: sizePriceInfo.price,
-  //           size: row.selectedSize,
-  //         },
-  //         backOrder: Math.max(row.quantity - validProduct.stock),
-  //         quantity: quantity || row.quantity > 0 ? row.quantity : 1,
-  //       };
-  //     })
-  //     .filter(Boolean);
-
-  //   if (cartItems.length === 0) {
-  //     return;
-  //   }
-
-  //   const authedUser = data.authedUser;
-
-  //   if (authedUser && authedUser.id) {
-  //     const form = new FormData();
-  //     form.append("cartItems", JSON.stringify(cartItems));
-  //     cartloading = true;
-
-  //     try {
-  //       const response = await fetch("?/addToCart", {
-  //         method: "POST",
-  //         body: form,
-  //       });
-
-  //       const result = await response.json();
-  //       cartloading = false;
-
-  //       const resultData = JSON.parse(result.data);
-
-  //       if (resultData && resultData[0]?.success === 1) {
-  //         toast.success(resultData[2] || "Items added to cart successfully");
-  //         rows = rows.map((row) => ({
-  //           sku: "",
-  //           size: "",
-  //           quantity: 1,
-
-  //           error: "",
-  //           filteredProducts: [],
-  //           selectedSize: "",
-  //         }));
-
-  //         showCartPopup(cartItems);
-  //       } else {
-  //         toast.error(resultData[1] || "Failed to add items to cart");
-  //         cartloading = false;
-  //       }
-  //     } catch (err) {
-  //       console.error("Error adding to cart:", err);
-  //       toast.error("Failed to add items to cart");
-  //       cartloading = false;
-  //     }
-  //   } else {
-  //     localStorage.setItem("cart", JSON.stringify(cartItems));
-  //     toast.success("Items added to cart successfully.");
-  //     showCartPopup(cartItems);
-  //     cartloading = false;
-  //   }
-  // }
 
 
 
@@ -541,7 +400,7 @@
             selectedSize: "",
           }));
 
-          showCartPopup(cartItems);
+          // showCartPopup(cartItems);
         } else {
           toast.error(resultData[1] || "Failed to add items to cart");
           cartloading = false;
@@ -572,7 +431,7 @@
           }));
     localStorage.setItem("cart", JSON.stringify(simplifiedCartItems));
     toast.success("Items added to cart successfully.");
-    showCartPopup(cartItems);
+    // showCartPopup(cartItems);
     cartloading = false;
     }
   }
@@ -1128,19 +987,17 @@
 
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div
+      <!-- <div
         id="cart-popup"
         class="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center"
         style="display: none;"
         on:click={closeCartPopup}
       >
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
+     
         <div
           class="bg-white p-6 rounded-md shadow-lg max-w-md w-full relative"
           on:click|stopPropagation
         >
-          <!-- Close Button (Cross Mark) -->
           <button
             on:click={closeCartPopup}
             class="absolute top-4 right-4 text-primary-500 hover:scale-105"
@@ -1155,8 +1012,6 @@
           <div class="flex flex-col items-center">
             <h3 class="text-xl font-semibold mb-4">Items Added to Cart</h3>
             <div id="cart-items-list" class="mb-4"></div>
-
-            <!-- Cart Action Buttons -->
             <div class="flex justify-end gap-5 mt-6 pt-3 border-t">
               <button
                 on:click={continueShopping}
@@ -1176,7 +1031,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
     {/if}
   </div>
 
