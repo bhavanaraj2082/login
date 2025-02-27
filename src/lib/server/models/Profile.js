@@ -35,6 +35,7 @@ const chemiDashProfileSchema = new mongoose.Schema(
     email: {
       type: String,
       required: false,
+      unique: true,
     },
     isEmailVerified: {
       type: Boolean,
