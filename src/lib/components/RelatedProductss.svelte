@@ -316,7 +316,15 @@ function addToCart(product) {
       </div>
       <hr class="my-4" />
       <div class="pl-2">
+        {#if selectedPrice}
         <h1 class="font-semibold">Select Size</h1>
+        {:else}
+        <div ><p>Price not available for this product, request Quote</p> 
+          <a
+              href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
+              >
+          <button class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-white mt-2 ">Request Quote</button></a></div>
+        {/if}
         <div class="flex gap-3 mt-3 flex-wrap">
           {#each selectedProduct.priceSize as { size }, index}
             <button
@@ -341,6 +349,7 @@ function addToCart(product) {
             </p>
           </div>
         {/if}
+        {#if selectedPrice !== undefined && selectedPrice !== null && selectedPrice !== false}
         <div class="mt-4">
           <form
             class="flex items-center gap-3"
@@ -384,6 +393,7 @@ function addToCart(product) {
             </button>
           </form>
         </div>
+        {/if}
       </div>
     </div>
   </div>
