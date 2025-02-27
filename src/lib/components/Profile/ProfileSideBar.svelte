@@ -23,22 +23,22 @@
         },
         {
             id: 4,
-            title: "Payment Methods",
-            logo: "fluent:payment-32-regular",
-            desc: "Manage your payment methods and more",
-        },
+            title: "Site Preferences",
+            logo: "ep:set-up",
+            desc: "Manage your site preferences and more",
+        }
+        // {
+        //     id: 4,
+        //     title: "Payment Methods",
+        //     logo: "fluent:payment-32-regular",
+        //     desc: "Manage your payment methods and more",
+        // },
         // {
         //     id: 5,
         //     title: "Link Organizations",
         //     logo: "fa-solid:link",
         //     desc: "Manage your orgnization information and more",
         // },
-        {
-            id: 6,
-            title: "Site Preferences",
-            logo: "ep:set-up",
-            desc: "Manage your site preferences and more",
-        }
     ];
 </script>
 

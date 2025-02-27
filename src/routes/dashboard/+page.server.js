@@ -1,5 +1,5 @@
-// import { getUserProfileData, getProfileDetails } from '$lib/server/mongoLoads.js';
-import { getProfileDetails } from '$lib/server/mongoLoads.js';
+import { getUserProfileData, getProfileDetails } from '$lib/server/mongoLoads.js';
+// import { getProfileDetails } from '$lib/server/mongoLoads.js';
 
 export const load = async ({ locals }) => {
   try {
@@ -25,7 +25,7 @@ export const load = async ({ locals }) => {
     }
 
     // Get full user data including orders, quotes, etc.
-    // const userData = await getUserProfileData(locals.authedUser.id);
+    const userData = await getUserProfileData(locals.authedUser.id);
     
     return {
       authedUser: {
@@ -37,7 +37,7 @@ export const load = async ({ locals }) => {
         phone: profileData.profileData?.primaryPhone || ''
       },
       profile: profileData.profileData,
-      // orders: userData.orders || [],
+      orders: userData.orders || [],
       // quotes: userData.quotes || [],
 	    // favourites: userData.favourites || [],
       // cart: userData.cart || null,

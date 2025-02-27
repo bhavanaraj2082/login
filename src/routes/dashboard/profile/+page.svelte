@@ -10,6 +10,7 @@
   import EmailVerifyPopup from '$lib/components/Profile/EmailVerifyPopup.svelte';
 
   export let data;
+  console.log('profiledata=========>>',data)
   let activeComp = 0
   let message = ''
   
@@ -47,9 +48,9 @@
 
 
 <div class="w-full md:w-11/12 px-4 pb-4 mx-auto max-w-7xl">
-  {#if !isEmailVerified}
+  <!-- {#if !isEmailVerified}
     <EmailVerifyPopup/>
-  {/if}
+  {/if} -->
   <h1 class=" text-lg md:text-xl font-bold my-2">Profile</h1>
   <div class=" w-full flex flex-col md:flex-row gap-1">
     <div class=" w-full md:w-2/5 lg:w-1/3 xl:w-1/4">
@@ -72,13 +73,13 @@
             {emailPreferences} 
         />
 
-      {:else if activeComp === 3}
+      <!-- {:else if activeComp === 3}
         <PaymentMethod 
             on:onSuccess={handleEvent}
             {recordId}  
             {changeTabs} 
             {paymentMethods} 
-        />
+        /> -->
 
       <!-- {:else if activeComp === 4}
         <LinkOrganization 
@@ -91,7 +92,7 @@
             {paymentAddress}
         /> -->
 
-      {:else if activeComp === 5}
+      {:else if activeComp === 3}
         <SitePreference 
             on:onSuccess={handleEvent} 
             {recordId} 

@@ -11,6 +11,7 @@ import Solution from '$lib/server/models/Solution.js';
 import Quotes from '$lib/server/models/Quotes.js';
 import Products from '$lib/server/models/Product.js';
 import Helpsupport from '$lib/server/models/Helpsupport.js';
+import  User from '$lib/server/models/User.js'
 import Cart from '$lib/server/models/cart.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '$lib/server/models/MyFavourite.js';
@@ -511,6 +512,12 @@ export const signUp = async (body, cookies) => {
         tanNumber: body.tanNumber,
         country: body.country,
         currency: body.currency,
+		sitePreferences: {
+			productEntryType : "Manual Entry",
+			noOfQuickOrderFields: 3,
+			noOfOrdersPerPage: 3,
+			noOfQuotesPerPage: 3
+		}
 	});
   
 	const savedProfile = JSON.parse(JSON.stringify(await newProfile.save()));

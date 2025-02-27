@@ -1,6 +1,6 @@
 <div class="w-11/12 mx-auto py-12 max-w-7xl ">
     <section class="flex items-center justify-center flex-wrap-reverse md:flex-nowrap gap-4">
-        <div class="text-center md:text-left mx-4 w-full md:w-6/12">
+        <div class="text-center md:text-left mx-4 md:mx-8 w-full md:w-1/2">
             <h1 class="my-2 sm:m-0 md:mt-14 sm:mt-10 font-bold md:text-3xl text-2xl">
                 Empowering Science with Quality Chemicals.
             </h1>

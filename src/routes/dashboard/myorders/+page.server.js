@@ -22,9 +22,9 @@ export const load = async ({ locals }) => {
       };
     }
 
-    const userData = await getUserProfileData(locals.authedUser.id);
+    const userOrders = await getUserProfileData(locals.authedUser.id);
     return {
-      orders: userData.orders || []
+      orders: userOrders.orders || []
     };
   } catch (error) {
     console.error('Dashboard load error:', error);

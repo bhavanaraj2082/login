@@ -152,7 +152,7 @@
                 </div>
                 <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
                     <h4 class="font-medium">Password :</h4>
-                    <a href="/reset-password" class="text-xs text-primary-500 font-semibold ml-2">Reset Password</a>
+                    <a href="/forgot" class="text-xs text-primary-500 font-semibold ml-2">Reset Password</a>
                     <div class=" flex items-center gap-2 -mt-1.5">
                         <!-- <p class="pt-2 text-lg ml-2">*******</p> -->
                     </div>
