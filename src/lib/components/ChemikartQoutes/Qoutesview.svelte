@@ -296,6 +296,7 @@
   <input type="hidden" name="lgc" bind:value={$Cusdetails.LGC} />
   <input type="hidden" name="email" bind:value={$Cusdetails.Email} />
   <input type="hidden" name="number" bind:value={$Cusdetails.Number} />
+  <input type="hidden" name="userId" bind:value={$Cusdetails.userId} />
   <input type="hidden" name="address1" bind:value={$Delivery.Address1} />
   <input type="hidden" name="address2" bind:value={$Delivery.Address2} />
   <input type="hidden" name="country1" bind:value={$Delivery.Country} />
