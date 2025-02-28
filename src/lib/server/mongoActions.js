@@ -500,7 +500,8 @@ export const signUp = async (body, cookies) => {
   
 	const newProfile = new Profile({
 		userId: luciaUser.userId,
-        account: body.account,
+      firstName:body.firstName,
+	  lastName : body.lastName,
         cellPhone: body.phone,
         companyname: body.companyname,
         companytype: body.companytype,
