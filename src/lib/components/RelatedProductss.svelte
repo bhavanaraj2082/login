@@ -1,32 +1,66 @@
 <script>
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
-  import { cartState } from '$lib/stores/cartStores.js'; 
-  import { toast } from 'svelte-sonner';
+  import { cartState } from "$lib/stores/cartStores.js";
+  import { toast } from "svelte-sonner";
   import Icon from "@iconify/svelte";
+  import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
+  import { authedUser } from "$lib/stores/mainStores.js";
+  import { sendMessage } from "$lib/utils.js";
   export let relatedProducts;
   // console.log("relatedProducts",relatedProducts);
   const productsData = relatedProducts;
-  // console.log("productsDataproductsDataproductsDataproductsDataproductsData",productsData);
-  
+  let isLoggedIn = $authedUser?.id ? true : false;
+  // let RelatedProductData = productsData.map((product) => ({
+  //   productId: product._id,
+  //   prodDesc: product.prodDesc,
+  //   productName: product.productName,
+  //   // priceSize: product.stockPriceSize.map((size) => ({
+  //   //   size: size.break,
+  //   //   price: size.INR,
+  //   // })),
+  //   priceSize: Array.isArray(product.stockPriceSize) && product.stockPriceSize.length > 0
+  //   ? product.stockPriceSize.map(size => ({
+  //       size: size.break || "N/A",
+  //       price: size.INR || 0,
+  //       offer: size.offer || "0"
+  //     }))
+  //   : [],
+
+  //   image: product.imageSrc,
+  //   manufacturer: product.manufacturerInfo[0]?.name,
+  //   manufacturerId: product.manufacturerInfo[0]?._id,
+  //   distributorId:product.stockInfo[0]?.distributor,
+  //   stockId:product.stockInfo[0]?._id,
+  //   stock: product.stockQuantity,
+  //   category: product.categoryInfo[0]?.urlName,
+  //   subCategory: product.subCategoryInfo[0]?.urlName,
+  //   subsubCategory: product.subsubCategoryInfo[0]?.urlName,
+  //   productUrl: product.productUrl,
+  //   productNumber: product.productNumber,
+  // }));
+
   let RelatedProductData = productsData.map((product) => ({
     productId: product._id,
     prodDesc: product.prodDesc,
     productName: product.productName,
-    // priceSize: product.stockPriceSize.map((size) => ({
-    //   size: size.break,
-    //   price: size.INR,
-    // })),
-    priceSize: Array.isArray(product.stockPriceSize) && product.stockPriceSize.length > 0 
-    ? product.stockPriceSize.map(size => ({
-        size: size.break || "N/A", 
-        price: size.INR || 0, 
-        offer: size.offer || "0"
-      }))
-    : [],
-
+    priceSize:
+      Array.isArray(product.stockPriceSize) && product.stockPriceSize.length > 0
+        ? product.stockPriceSize.map((size) => ({
+            size: size.break || "N/A",
+            price: size.INR || 0,
+            offer: size.offer || "0",
+          }))
+        : [],
     image: product.imageSrc,
     manufacturer: product.manufacturerInfo[0]?.name,
+    manufacturerId: product.manufacturerInfo[0]?._id,
+    distributorId: product.stockInfo?.[0]?.distributor || "",
+    stockInfo: Array.isArray(product.stockInfo) ? product.stockInfo : [],
+    stockId:
+      Array.isArray(product.stockInfo) && product.stockInfo.length > 0
+        ? product.stockInfo.map((stock) => stock._id)
+        : [],
     stock: product.stockQuantity,
     category: product.categoryInfo[0]?.urlName,
     subCategory: product.subCategoryInfo[0]?.urlName,
@@ -73,38 +107,80 @@
 
   let selectedProduct = {};
   let selectedPrice;
+  let selectedStockId;
   let selectedPriceIndex = 0;
   let showModal = false;
 
-  function openModal(product) {
+  // function openModal(product) {
+  //   selectedProduct = {
+  //   brand : product.brand,
+  // 	description: product.description,
+  // 	id:product.id,
+  // 	name : product.name,
+  // 	image : product.image,
+  // 	name : product.name,
+  //       partNumber : product.partNumber,
+  // 	priceSize : product.priceSize,
+  //       quantity : product.quantity,
+  // 	stock : product.stock,
+  //   productId: product.productId,
+  //   manufacturerId: product.manufacturerId,
+  //   distributorId: product.distributorId,
+  //   stockId: product.stockId,
+  // }
+  //   selectedPrice = selectedProduct.priceSize[0];
+  //   selectedPriceIndex = 0;
+  //   showModal = true;
+  // }
 
+  function openModal(product) {
+    // console.log("Product Data in openModal:", product);
     selectedProduct = {
-    brand : product.brand,
-		description: product.description,
-		id:product.id,
-		name : product.name,
-		image : product.image,
-		name : product.name,
-        partNumber : product.partNumber,
-		priceSize : product.priceSize,
-        quantity : product.quantity,
-		stock : product.stock
-	}
-    selectedPrice = selectedProduct.priceSize[0];
+      productId: product.productId || product._id,
+      brand: product.brand,
+      description: product.description,
+      name: product.productName || product.name,
+      image: product.imageSrc || product.image,
+      partNumber: product.partNumber,
+      priceSize: product.priceSize,
+      quantity: 1,
+      stock: product.stock,
+      manufacturerId:
+        product.manufacturerId || product.manufacturerInfo?.[0]?._id,
+      distributorId:
+        product.distributorId || product.stockInfo?.[0]?.distributor || "",
+      stockId: Array.isArray(product.stockId) ? product.stockId : [],
+    };
+
     selectedPriceIndex = 0;
+    selectedPrice = selectedProduct.priceSize[selectedPriceIndex];
+    selectedStockId = selectedProduct.stockId[selectedPriceIndex] || "NA";
     showModal = true;
+
+    // console.log("Selected Product Data after openModal:", selectedProduct);
+    // console.log("Selected Price:", selectedPrice);
+    // console.log("Selected Stock ID:", selectedStockId);
   }
 
   function closeModal() {
     showModal = false;
   }
 
+  // function selectPrice(index, size) {
+  //   const filtered = selectedProduct.priceSize.find(
+  //     (price) => price.size === size
+  //   );
+  //   selectedPrice = filtered;
+  //   selectedPriceIndex = index;
+  // }
+
   function selectPrice(index, size) {
-    const filtered = selectedProduct.priceSize.find(
-      (price) => price.size === size
-    );
-    selectedPrice = filtered;
+    selectedPrice = selectedProduct.priceSize[index];
     selectedPriceIndex = index;
+    selectedStockId = selectedProduct.stockId[index] || "NA";
+
+    console.log("Selected Price:", selectedPrice);
+    console.log("Updated Stock ID:", selectedStockId);
   }
   let popupQuantity = 1;
 
@@ -127,69 +203,74 @@
     }
   }
 
-  function getCart() {
-    if (browser) {
-      const cart = localStorage.getItem("cart");
-      return cart ? JSON.parse(cart) : [];
+  const guestCartFetch = () => {
+    const formdata = new FormData();
+    formdata.append("guestCart", JSON.stringify($guestCart));
+    sendMessage("/cart?/guestCart", formdata, async (result) => {
+      cart.set(result.cart);
+    });
+  };
+
+  export function addToCart(product, index) {
+    // console.log("Product Data:", product);
+
+    if (
+      !product ||
+      !Array.isArray(product.priceSize) ||
+      product.priceSize.length === 0
+    ) {
+      console.error("Invalid product data or missing priceSize.");
+      return;
     }
-    return [];
+    const selectedPrice = product.priceSize[index] || product.priceSize[0];
+    const selectedStockId =
+      Array.isArray(product.stockId) && product.stockId.length > index
+        ? product.stockId[index]
+        : "NA";
+
+    const backOrder =
+      popupQuantity > product.stock ? popupQuantity - product.stock : 0;
+    const cartItem = {
+      productId: product.productId,
+      manufacturerId: product.manufacturerId,
+      distributorId: product.distributorId,
+      stockId: selectedStockId,
+      quantity: popupQuantity,
+      backOrder,
+      price: selectedPrice.price || 0,
+      size: selectedPrice.size || "N/A",
+    };
+
+    if (!isLoggedIn) {
+      addItemToCart(cartItem);
+      toast.success("Product added to cart");
+      guestCartFetch();
+      return;
+    }
+
+    const formdata = new FormData();
+    formdata.append("items", JSON.stringify([cartItem]));
+
+    sendMessage("?/addtocart", formdata, async (result) => {
+      toast.success(result.message);
+      invalidate("/");
+    });
+
+    // console.log("Final Cart Item Sent:", cartItem);
   }
-
-function addToCart(product) {
-  if (!browser) return;
-
-  const cart = getCart();
-
-  const existingProduct = cart.find(
-    (item) =>
-      item.partNumber === product.partNumber &&
-      item.priceSize.size === product.priceSize.size
-  );
-
-  if (existingProduct) {
-
-    existingProduct.quantity += product.quantity;
-
-    cartState.update((currentCart) => {
-      const index = currentCart.findIndex(
-        (item) =>
-          item.partNumber === product.partNumber &&
-          item.priceSize.size === product.priceSize.size
-      );
-
-      if (index !== -1) {
-        currentCart[index].quantity += product.quantity;
-        toast.info("Item quantity updated!")
-      }
-      return currentCart; 
-    });
-    
-  } else {
-    cart.push({
-      ...product,
-    });
-
-    cartState.update((currentCart) => {
-      currentCart.push(product);
-      return currentCart;
-    });
-    toast.success("Item added to cart")
-  }
-  localStorage.setItem("cart", JSON.stringify(cart));
-
-  setTimeout(() => {
-    showModal = false;
-    popupQuantity = 1;
-  }, 500);
-}
 </script>
 
 <div class="max-w-7xl mx-auto my-10">
-  <h3 class="text-xl font-bold text-primary-400 p-1 md:w-11/12 mx-auto">Related Products</h3>
+  <h3 class="text-xl font-bold text-primary-400 p-1 md:w-11/12 mx-auto">
+    Related Products
+  </h3>
 
   <div class="relative mt-1">
     <div class="flex items-center max-md:mx-0 mx-6">
-      <button on:click={prevSlide} class="text-primary-500 p-1 pl-0.5 hover:bg-primary-100 hover:rounded-full">
+      <button
+        on:click={prevSlide}
+        class="text-primary-500 p-1 pl-0.5 hover:bg-primary-100 hover:rounded-full"
+      >
         <Icon class="text-2xl" icon="ion:chevron-back" />
       </button>
 
@@ -205,13 +286,14 @@ function addToCart(product) {
               >
                 <div class="flex items-center p-3">
                   <a
-                        href="/products/{product.category}/{product.subCategory}/{product.productNumber}"
-                        >
-                  <img
-                    src={product.image}
-                    alt="Img"
-                    class="w-20 h-20 object-contain rounded-sm"
-                  /></a>
+                    href="/products/{product.category}/{product.subCategory}/{product.productNumber}"
+                  >
+                    <img
+                      src={product.image}
+                      alt="Img"
+                      class="w-20 h-20 object-contain rounded-sm"
+                    /></a
+                  >
                   <div class="ml-2 text-left flex-1">
                     <h3 class="text-gray-600 text-xs font-semibold">
                       {product.manufacturer || "--"}
@@ -244,6 +326,10 @@ function addToCart(product) {
                         category: product.category,
                         subCategory: product.subCategory,
                         subsubCategory: product.subsubCategory,
+                        productId: product.productId,
+                        manufacturerId: product.manufacturerId,
+                        distributorId: product.distributorId,
+                        stockId: product.stockId,
                       })}
                     class="w-11/12 max-w-xs text-primary-500 py-2 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition p-2 mb-4"
                   >
@@ -256,7 +342,10 @@ function addToCart(product) {
         </div>
       </div>
 
-      <button on:click={nextSlide} class="text-primary-500 p-1 pr-0.5 hover:bg-primary-100 hover:rounded-full">
+      <button
+        on:click={nextSlide}
+        class="text-primary-500 p-1 pr-0.5 hover:bg-primary-100 hover:rounded-full"
+      >
         <Icon class="text-2xl" icon="ion:chevron-forward" />
       </button>
     </div>
@@ -287,7 +376,10 @@ function addToCart(product) {
           on:click={closeModal}
           class="text-primary-500 hover:text-primary-500 hover:scale-110"
         >
-          <Icon icon="ion:close" class="text-xl font-bold hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"></Icon>
+          <Icon
+            icon="ion:close"
+            class="text-xl font-bold hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"
+          ></Icon>
         </button>
       </div>
       <div class="flex flex-row sm:flex-row gap-4 mb-3">
@@ -317,13 +409,19 @@ function addToCart(product) {
       <hr class="my-4" />
       <div class="pl-2">
         {#if selectedPrice}
-        <h1 class="font-semibold">Select Size</h1>
+          <h1 class="font-semibold">Select Size</h1>
         {:else}
-        <div ><p>Price not available for this product, request Quote</p> 
-          <a
+          <div>
+            <p>Price not available for this product, request Quote</p>
+            <a
               href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
-              >
-          <button class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-white mt-2 ">Request Quote</button></a></div>
+            >
+              <button
+                class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-white mt-2"
+                >Request Quote</button
+              ></a
+            >
+          </div>
         {/if}
         <div class="flex gap-3 mt-3 flex-wrap">
           {#each selectedProduct.priceSize as { size }, index}
@@ -344,55 +442,48 @@ function addToCart(product) {
           >
             <p class="text-base sm:text-lg ml-2">
               Price: <span class="font-semibold text-2xl"
-                >₹ {selectedPrice.price}</span
+                >₹ {(selectedPrice?.price ?? 0).toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}</span
               >
             </p>
           </div>
         {/if}
         {#if selectedPrice !== undefined && selectedPrice !== null && selectedPrice !== false}
-        <div class="mt-4">
-          <form
-            class="flex items-center gap-3"
-            on:submit|preventDefault={() =>
-              addToCart({
-                ...selectedProduct,
-                priceSize: {
-                  price: selectedPrice.price,
-                  size: selectedPrice.size,
-                },
-                quantity: popupQuantity,
-              })}
-          >
-            <div
-              class="border border-gray-300 rounded-md flex gap-2 justify-between items-center hover:shadow-lg hover:shadow-orange-100 w-full sm:w-36"
-            >
+          <div class="mt-4">
+            <form class="flex items-center gap-3">
+              <div
+                class="border border-gray-300 rounded-md flex gap-2 justify-between items-center hover:shadow-lg hover:shadow-orange-100 w-full sm:w-36"
+              >
+                <button
+                  type="button"
+                  class="pl-3 text-xl text-primary-500 hover:scale-110"
+                  on:click={decrementPopupQuantity}>-</button
+                >
+                <input
+                  type="number"
+                  id="popupQuantity"
+                  min="1"
+                  value={popupQuantity}
+                  on:input={handlePopupInput}
+                  class="w-16 sm:w-20 h-9 text-center border-none focus:outline-none focus:ring-0"
+                />
+                <button
+                  type="button"
+                  class="pr-3 text-xl text-primary-500 hover:scale-110"
+                  on:click={incrementPopupQuantity}>+</button
+                >
+              </div>
               <button
                 type="button"
-                class="pl-3 text-xl text-primary-500 hover:scale-110"
-                on:click={decrementPopupQuantity}>-</button
+                class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-400 hover:text-white transition"
+                on:click={() => addToCart(selectedProduct, selectedPriceIndex)}
               >
-              <input
-                type="number"
-                id="popupQuantity"
-                min="1"
-                value={popupQuantity}
-                on:input={handlePopupInput}
-                class="w-16 sm:w-20 h-9 text-center border-none focus:outline-none focus:ring-0"
-              />
-              <button
-                type="button"
-                class="pr-3 text-xl text-primary-500 hover:scale-110"
-                on:click={incrementPopupQuantity}>+</button
-              >
-            </div>
-            <button
-              type="submit"
-              class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-400 hover:text-white transition"
-            >
-              Add to Cart
-            </button>
-          </form>
-        </div>
+                Add to Cart
+              </button>
+            </form>
+          </div>
         {/if}
       </div>
     </div>

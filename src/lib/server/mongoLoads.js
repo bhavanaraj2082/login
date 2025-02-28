@@ -212,7 +212,10 @@ export async function RelatedProductData(productId) {
 					'categoryInfo.urlName': 1,
 					'subCategoryInfo.urlName': 1,
 					'manufacturerInfo.name': 1,
+          'manufacturerInfo._id': 1,
 					'subsubCategoryInfo.urlName': 1,
+          'stockInfo._id': 1,
+          'stockInfo.distributor': 1,
 					stockQuantity: { $ifNull: [{ $arrayElemAt: ['$stockInfo.stock', 0] }, 0] }, 
 					// stockPriceSize: { $ifNull: [{ $arrayElemAt: ['$stockInfo.pricing', 0] }, []] },
           stockPriceSize: { $ifNull: ['$stockInfo.pricing', []] },
@@ -974,7 +977,7 @@ export async function DifferentProds(productId) {
   let stockQuantity = 0;
   let orderMultiple = 0;
   let priceSize = [];
-  let stockId = "";
+  let stockId = [];
   let stock = 0
   let distributorId = "";
 
@@ -1003,7 +1006,7 @@ export async function DifferentProds(productId) {
           // console.log("stocks=====before>>", stockRecord.pricing);
           const convertedPricing = await convertToINR(stockRecord.pricing);
           priceSize.push(convertedPricing);
-          stockId = stockRecord._id.toString();
+          stockId.push(stockRecord._id.toString());
           distributorId = stockRecord.distributor.toString();
           stock = stockRecord.stock;
         }
@@ -1021,8 +1024,8 @@ export async function DifferentProds(productId) {
         const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
 
         let variantPricing = [];
-    let variantStockId = stock?._id ? stock._id.toString() : "";
-    let variantdistributorId = stock?.distributor ? stock.distributor.toString() : "";
+        let variantStockId = []; 
+        let variantdistributorId = stock?.distributor ? stock.distributor.toString() : "";
         if (stock?.pricing) {
           // Await the result of convertToINR to get the actual pricing
           if (stock.pricing.length > 1) {
@@ -1208,6 +1211,9 @@ export async function CompareSimilarityData(productId) {
           "subCategoryInfo.urlName": 1,
           "manufacturerInfo.name": 1,
           "subsubCategoryInfo.urlName": 1,
+          'manufacturerInfo._id': 1,
+          'stockInfo._id': 1,
+          'stockInfo.distributor': 1,
           stockQuantity: {
             $ifNull: [{ $arrayElemAt: ["$stockInfo.stock", 0] }, 0],
           },
