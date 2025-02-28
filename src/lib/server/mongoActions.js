@@ -13,7 +13,6 @@ import Products from '$lib/server/models/Product.js';
 import Helpsupport from '$lib/server/models/Helpsupport.js';
 import  User from '$lib/server/models/User.js'
 import Cart from '$lib/server/models/cart.js';
-import User from '$lib/server/models/User.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '$lib/server/models/MyFavourite.js';
 import SearchQueries from '$lib/server/models/SearchQueries.js';
