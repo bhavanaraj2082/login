@@ -2,34 +2,45 @@
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
   import Icon from "@iconify/svelte";
-  import { cartState } from '$lib/stores/cartStores.js'; 
-  import { toast } from 'svelte-sonner';
-
+  import { cartState } from "$lib/stores/cartStores.js";
+  import { toast } from "svelte-sonner";
+  import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
+  import { authedUser } from "$lib/stores/mainStores.js";
+  import { sendMessage } from "$lib/utils.js";
   export let compareSimilarity;
-  const productsData = compareSimilarity;
 
+  const productsData = compareSimilarity;
+  let isLoggedIn = $authedUser?.id ? true : false;
   let CompareSimilarityData = productsData.map((product) => ({
-  productId: product._id,
-  prodDesc: product.prodDesc,
-  productName: product.productName,
-  image: product.imageSrc,
-  manufacturer: product.manufacturerInfo?.[0]?.name || "Unknown",
-  stock: product.stockQuantity,
-  category: product.categoryInfo?.[0]?.urlName || "Uncategorized",
-  subCategory: product.subCategoryInfo?.[0]?.urlName || "Uncategorized",
-  subsubCategory: product.subsubCategoryInfo?.[0]?.urlName || "Uncategorized",
-  productUrl: product.productUrl,
-  productNumber: product.productNumber,
-  properties: product.properties || {},
-  priceSize: Array.isArray(product.stockPriceSize) && product.stockPriceSize.length > 0 
-    ? product.stockPriceSize.map(size => ({
-        size: size.break || "N/A", 
-        price: size.INR || 0, 
-        offer: size.offer || "0"
-      }))
-    : [],
-}));
-// console.log(CompareSimilarityData, "CompareSimilarityData*****");
+    productId: product._id,
+    prodDesc: product.prodDesc,
+    productName: product.productName,
+    image: product.imageSrc,
+    manufacturer: product.manufacturerInfo?.[0]?.name || "Unknown",
+    stock: product.stockQuantity,
+    category: product.categoryInfo?.[0]?.urlName || "Uncategorized",
+    subCategory: product.subCategoryInfo?.[0]?.urlName || "Uncategorized",
+    subsubCategory: product.subsubCategoryInfo?.[0]?.urlName || "Uncategorized",
+    productUrl: product.productUrl,
+    manufacturerId: product.manufacturerInfo[0]?._id,
+    distributorId: product.stockInfo?.[0]?.distributor || "",
+    stockInfo: Array.isArray(product.stockInfo) ? product.stockInfo : [],
+    stockId:
+      Array.isArray(product.stockInfo) && product.stockInfo.length > 0
+        ? product.stockInfo.map((stock) => stock._id)
+        : [],
+    productNumber: product.productNumber,
+    properties: product.properties || {},
+    priceSize:
+      Array.isArray(product.stockPriceSize) && product.stockPriceSize.length > 0
+        ? product.stockPriceSize.map((size) => ({
+            size: size.break || "N/A",
+            price: size.INR || 0,
+            offer: size.offer || "0",
+          }))
+        : [],
+  }));
+  // console.log(CompareSimilarityData, "CompareSimilarityData*****");
 
   let currentIndex = 0;
   let logosPerSlide = 4;
@@ -69,39 +80,57 @@
 
   let selectedProduct = {};
   let selectedPrice;
+  let selectedStockId;
   let selectedPriceIndex = 0;
   let showModal = false;
   // let showCartMessage = false;
-  function openModal(product) {
 
+  function openModal(product) {
     selectedProduct = {
-		description: product.description,
-		id:product.id,
-		name : product.name,
-		image : product.image,
-		name : product.name,
-        partNumber : product.partNumber,
-		priceSize : product.priceSize,
-        quantity : product.quantity,
-		stock : product.stock,
-	}
-    selectedPrice = selectedProduct.priceSize[0];
+      description: product.description,
+      id: product.id,
+      name: product.name,
+      image: product.image,
+      name: product.name,
+      partNumber: product.partNumber,
+      priceSize: product.priceSize,
+      quantity: product.quantity,
+      stock: product.stock,
+      manufacturerId:
+        product.manufacturerId || product.manufacturerInfo?.[0]?._id,
+      distributorId:
+        product.distributorId || product.stockInfo?.[0]?.distributor || "",
+      stockId: Array.isArray(product.stockId) ? product.stockId : [],
+      productId: product.productId || product._id,
+    };
     selectedPriceIndex = 0;
+    selectedPrice = selectedProduct.priceSize[selectedPriceIndex];
+    selectedStockId = selectedProduct.stockId[selectedPriceIndex] || "NA";
     showModal = true;
-    showCartMessage = false;
+    // showCartMessage = false;
   }
 
   function closeModal() {
     showModal = false;
   }
 
+  // function selectPrice(index, size) {
+  //   const filtered = selectedProduct.priceSize.find(
+  //     (price) => price.size === size
+  //   );
+  //   selectedPrice = filtered;
+  //   selectedPriceIndex = index;
+  // }
+
   function selectPrice(index, size) {
-    const filtered = selectedProduct.priceSize.find(
-      (price) => price.size === size
-    );
-    selectedPrice = filtered;
+    selectedPrice = selectedProduct.priceSize[index];
     selectedPriceIndex = index;
+    selectedStockId = selectedProduct.stockId[index] || "NA";
+
+    console.log("Selected Price:", selectedPrice);
+    console.log("Updated Stock ID:", selectedStockId);
   }
+
   let popupQuantity = 1;
 
   function decrementPopupQuantity() {
@@ -123,110 +152,121 @@
     }
   }
 
-  function getCart() {
-    if (browser) {
-      const cart = localStorage.getItem("cart");
-      return cart ? JSON.parse(cart) : [];
+  const guestCartFetch = () => {
+    const formdata = new FormData();
+    formdata.append("guestCart", JSON.stringify($guestCart));
+    sendMessage("/cart?/guestCart", formdata, async (result) => {
+      cart.set(result.cart);
+    });
+  };
+
+  export function addToCart(product, index) {
+    // console.log("Product Data:", product);
+
+    if (
+      !product ||
+      !Array.isArray(product.priceSize) ||
+      product.priceSize.length === 0
+    ) {
+      console.error("Invalid product data or missing priceSize.");
+      return;
     }
-    return [];
+    const selectedPrice = product.priceSize[index] || product.priceSize[0];
+    const selectedStockId =
+      Array.isArray(product.stockId) && product.stockId.length > index
+        ? product.stockId[index]
+        : "NA";
+
+    const backOrder =
+      popupQuantity > product.stock ? popupQuantity - product.stock : 0;
+    const cartItem = {
+      productId: product.productId,
+      manufacturerId: product.manufacturerId,
+      distributorId: product.distributorId,
+      stockId: selectedStockId,
+      quantity: popupQuantity,
+      backOrder,
+      price: selectedPrice.price || 0,
+      size: selectedPrice.size || "N/A",
+    };
+
+    if (!isLoggedIn) {
+      addItemToCart(cartItem);
+      toast.success("Product added to cart");
+      guestCartFetch();
+      return;
+    }
+
+    const formdata = new FormData();
+    formdata.append("items", JSON.stringify([cartItem]));
+
+    sendMessage("?/addtocart", formdata, async (result) => {
+      toast.success(result.message);
+      invalidate("/");
+    });
+
+    // console.log("Final Cart Item Sent:", cartItem);
   }
 
-  
-  function addToCart(product) {
-  if (!browser) return;
-
-  const cart = getCart();
-
-  const existingProduct = cart.find(
-    (item) =>
-      item.partNumber === product.partNumber &&
-      item.priceSize.size === product.priceSize.size
-  );
-
-  if (existingProduct) {
-
-    existingProduct.quantity += product.quantity;
-
-    cartState.update((currentCart) => {
-      const index = currentCart.findIndex(
-        (item) =>
-          item.partNumber === product.partNumber &&
-          item.priceSize.size === product.priceSize.size
-      );
-
-      if (index !== -1) {
-        currentCart[index].quantity += product.quantity;
-        toast.info("Item quantity updated!")
-      }
-      return currentCart; 
-    });
-    
-  } else {
-    cart.push({
-      ...product,
-    });
-
-    cartState.update((currentCart) => {
-      currentCart.push(product);
-      return currentCart;
-    });
-    toast.success("Item added to cart")
+  let specificKeys = [
+    "material",
+    "Agency",
+    "matrix active group",
+    "technique(s)",
+    "application(s)",
+  ];
+  let showDifference = false;
+  function toggleDifference(event) {
+    showDifference = event.target.checked;
   }
-  localStorage.setItem("cart", JSON.stringify(cart));
-
-  setTimeout(() => {
-    showModal = false;
-    popupQuantity = 1;
-  }, 500);
-}
-
-  let specificKeys = ["material", "Agency", "matrix active group", "technique(s)", "application(s)"];
-	let showDifference = false;
-	function toggleDifference(event) {
-			showDifference = event.target.checked;
-	}
-	function truncateByLength(text, maxLength) {
-			if (text.length > maxLength) {
-					return text.substring(0, maxLength) + "...";
-			}
-			return text;
-	}
-	function isUnique(value, key) {
-	if (value === '-' || value === undefined) {
-		return false;
-		}
-	const values = CompareSimilarityData.map(product => product.properties[key]).filter(val => val !== '-'); 
-	return values.filter(v => v === value).length === 1;
-}
+  function truncateByLength(text, maxLength) {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + "...";
+    }
+    return text;
+  }
+  function isUnique(value, key) {
+    if (value === "-" || value === undefined) {
+      return false;
+    }
+    const values = CompareSimilarityData.map(
+      (product) => product.properties[key]
+    ).filter((val) => val !== "-");
+    return values.filter((v) => v === value).length === 1;
+  }
 </script>
 
 <div class="max-w-7xl mx-auto my-10">
-	<div class="flex justify-between items-center mb-4 md:w-11/12 mx-auto">
-		<h3 class="text-xl font-bold text-primary-400 p-1">Compare Similar Items</h3>
-		<div class="flex items-center space-x-2 p-1">
-				<h3 class="text-xl font-bold text-primary-400">Show Difference</h3>
-				<label class="relative inline-flex items-center cursor-pointer">
-						<input
-								type="checkbox"
-								class="sr-only peer"
-								id="toggleDifference"
-								checked={showDifference}
-								on:change={toggleDifference}
-						/>
-						<div class="w-10 h-5 border-2 border-primary-500 rounded-full peer-checked:bg-primary-500 transition-colors duration-300"></div>
-						<div
-								class="dot absolute left-1 top-1 bg-primary-500 w-3 h-3 rounded-full transition-transform duration-300 peer-checked:translate-x-5 peer-checked:bg-white"
-						></div>
-				</label>
-		</div>
-</div>
-
-
-
+  <div class="flex justify-between items-center mb-4 md:w-11/12 mx-auto">
+    <h3 class="text-xl font-bold text-primary-400 p-1">
+      Compare Similar Items
+    </h3>
+    <div class="flex items-center space-x-2 p-1">
+      <h3 class="text-xl font-bold text-primary-400">Show Difference</h3>
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input
+          type="checkbox"
+          class="sr-only peer"
+          id="toggleDifference"
+          checked={showDifference}
+          on:change={toggleDifference}
+        />
+        <div
+          class="w-10 h-5 border-2 border-primary-500 rounded-full peer-checked:bg-primary-500 transition-colors duration-300"
+        ></div>
+        <div
+          class="dot absolute left-1 top-1 bg-primary-500 w-3 h-3 rounded-full transition-transform duration-300 peer-checked:translate-x-5 peer-checked:bg-white"
+        ></div>
+      </label>
+    </div>
+  </div>
 
   <div class="relative md:w-11/12 mx-auto">
     <div class="flex items-center">
-      <button on:click={prevSlide} class="text-primary-500 p-1 pl-0.5 hover:bg-primary-100 hover:rounded-full lg:hidden">
+      <button
+        on:click={prevSlide}
+        class="text-primary-500 p-1 pl-0.5 hover:bg-primary-100 hover:rounded-full lg:hidden"
+      >
         <Icon class="text-2xl" icon="ion:chevron-back" />
       </button>
 
@@ -242,13 +282,14 @@
               >
                 <div class="flex items-center p-3">
                   <a
-                        href="/products/{product.category}/{product.subCategory}/{product.productNumber}"
-                        >
-                  <img
-                    src={product.image}
-                    alt="Img"
-                    class="w-20 h-20 object-contain rounded-sm"
-                  /></a>
+                    href="/products/{product.category}/{product.subCategory}/{product.productNumber}"
+                  >
+                    <img
+                      src={product.image}
+                      alt="Img"
+                      class="w-20 h-20 object-contain rounded-sm"
+                    /></a
+                  >
                   <div class="ml-2 text-left flex-1">
                     <h3 class="text-gray-600 text-xs font-semibold">
                       {product.manufacturer || "--"}
@@ -281,45 +322,57 @@
                         category: product.category,
                         subCategory: product.subCategory,
                         subsubCategory: product.subsubCategory,
+                        productId: product.productId,
+                        manufacturerId: product.manufacturerId,
+                        distributorId: product.distributorId,
+                        stockId: product.stockId,
                       })}
                     class="w-11/12 max-w-xs text-primary-500 py-2 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition p-2 mb-4"
                   >
                     View Price & Availability
                   </button>
                 </div>
-                
-                
-                
-								<div class="px-3 mb-3">
-									<h3 class="text-gray-700">
-											{#each specificKeys as key}
-													<div class="grid grid-cols-2 gap-4 mb-2 mt-2 rounded-sm p-2 {showDifference && isUnique(product.properties[key], key) ? 'bg-primary-100 border border-gray-200' : 'bg-white'}">
-															<span class="text-left text-xs font-semibold">{key}:</span>
-															<span class="text-gray-500 text-right text-xs font-normal">
-																	{#if product.properties && product.properties[key]}
-																			{#if typeof product.properties[key] === 'object'}
-																					{JSON.stringify(product.properties[key])}
-																			{:else}
-																					{truncateByLength(product.properties[key], 10)}
-																			{/if}
-																	{:else}
-																			-
-																	{/if}
-															</span>
-													</div>
-													<hr class="border-t border-gray-300" />
-											{/each}
-									</h3>
-							</div>
-                
-                
+
+                <div class="px-3 mb-3">
+                  <h3 class="text-gray-700">
+                    {#each specificKeys as key}
+                      <div
+                        class="grid grid-cols-2 gap-4 mb-2 mt-2 rounded-sm p-2 {showDifference &&
+                        isUnique(product.properties[key], key)
+                          ? 'bg-primary-100 border border-gray-200'
+                          : 'bg-white'}"
+                      >
+                        <span class="text-left text-xs font-semibold"
+                          >{key}:</span
+                        >
+                        <span
+                          class="text-gray-500 text-right text-xs font-normal"
+                        >
+                          {#if product.properties && product.properties[key]}
+                            {#if typeof product.properties[key] === "object"}
+                              {JSON.stringify(product.properties[key])}
+                            {:else}
+                              {truncateByLength(product.properties[key], 10)}
+                            {/if}
+                          {:else}
+                            -
+                          {/if}
+                        </span>
+                      </div>
+                      <hr class="border-t border-gray-300" />
+                    {/each}
+                  </h3>
+                </div>
               </div>
             </div>
           {/each}
         </div>
       </div>
-      
-      <button on:click={nextSlide} class="text-primary-500 p-1 pr-0.5 hover:bg-primary-100 hover:rounded-full lg:hidden">
+
+      <button
+        on:click={nextSlide}
+        class="text-primary-500 p-1 pr-0.5 hover:bg-primary-100 hover:rounded-full lg:hidden"
+      >
         <Icon class="text-2xl" icon="ion:chevron-forward" />
       </button>
     </div>
@@ -347,7 +400,10 @@
           on:click={closeModal}
           class="text-primary-500 hover:text-primary-500 hover:scale-110"
         >
-          <Icon icon="ion:close" class="text-xl font-bold hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"></Icon>
+          <Icon
+            icon="ion:close"
+            class="text-xl font-bold hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"
+          ></Icon>
         </button>
       </div>
       <div class="flex flex-row sm:flex-row gap-4 mb-3">
@@ -377,13 +433,19 @@
       <hr class="my-4" />
       <div class="pl-2">
         {#if selectedPrice}
-        <h1 class="font-semibold">Select Size</h1>
+          <h1 class="font-semibold">Select Size</h1>
         {:else}
-        <div ><p>Price not available for this product, request Quote</p> 
-          <a
+          <div>
+            <p>Price not available for this product, request Quote</p>
+            <a
               href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
-              >
-          <button class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-white mt-2 ">Request Quote</button></a></div>
+            >
+              <button
+                class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-white mt-2"
+                >Request Quote</button
+              ></a
+            >
+          </div>
         {/if}
         <div class="flex gap-3 mt-3 flex-wrap">
           {#each selectedProduct.priceSize as { size }, index}
@@ -404,55 +466,48 @@
           >
             <p class="text-base sm:text-lg ml-2">
               Price: <span class="font-semibold text-2xl"
-                >₹ {selectedPrice.price}</span
+                >₹ {(selectedPrice?.price ?? 0).toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}</span
               >
             </p>
           </div>
         {/if}
         {#if selectedPrice !== undefined && selectedPrice !== null && selectedPrice !== false}
-        <div class="mt-4">
-          <form
-            class="flex items-center gap-3"
-            on:submit|preventDefault={() =>
-              addToCart({
-                ...selectedProduct,
-                priceSize: {
-                  price: selectedPrice.price,
-                  size: selectedPrice.size,
-                },
-                quantity: popupQuantity,
-              })}
-          >
-            <div
-              class="border border-gray-300 rounded-md flex gap-2 justify-between items-center hover:shadow-lg hover:shadow-orange-100 w-full sm:w-36"
-            >
-              <button
-                type="button"
-                class="pl-3 text-xl text-primary-500 hover:scale-110"
-                on:click={decrementPopupQuantity}>-</button
+          <div class="mt-4">
+            <form class="flex items-center gap-3">
+              <div
+                class="border border-gray-300 rounded-md flex gap-2 justify-between items-center hover:shadow-lg hover:shadow-orange-100 w-full sm:w-36"
               >
-              <input
-                type="number"
-                id="popupQuantity"
-                min="1"
-                value={popupQuantity}
-                on:input={handlePopupInput}
-                class="w-16 sm:w-20 h-9 text-center border-none focus:outline-none focus:ring-0"
-              />
+                <button
+                  type="button"
+                  class="pl-3 text-xl text-primary-500 hover:scale-110"
+                  on:click={decrementPopupQuantity}>-</button
+                >
+                <input
+                  type="number"
+                  id="popupQuantity"
+                  min="1"
+                  value={popupQuantity}
+                  on:input={handlePopupInput}
+                  class="w-16 sm:w-20 h-9 text-center border-none focus:outline-none focus:ring-0"
+                />
+                <button
+                  type="button"
+                  class="pr-3 text-xl text-primary-500 hover:scale-110"
+                  on:click={incrementPopupQuantity}>+</button
+                >
+              </div>
               <button
-                type="button"
-                class="pr-3 text-xl text-primary-500 hover:scale-110"
-                on:click={incrementPopupQuantity}>+</button
+                type="submit"
+                on:click={() => addToCart(selectedProduct, selectedPriceIndex)}
+                class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-400 hover:text-white transition"
               >
-            </div>
-            <button
-              type="submit"
-              class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-400 hover:text-white transition"
-            >
-              Add to Cart
-            </button>
-          </form>
-        </div>
+                Add to Cart
+              </button>
+            </form>
+          </div>
         {/if}
       </div>
     </div>

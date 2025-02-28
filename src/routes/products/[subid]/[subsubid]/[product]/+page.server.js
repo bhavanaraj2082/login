@@ -6,11 +6,7 @@ import { sendemailOtp, verifyemailOtp } from "$lib/server/mongoActions.js";
 import { sanitizeFormData } from "$lib/utils/sanitize.js";
 import Profile from "$lib/server/models/Profile.js";
 import TokenVerification from "$lib/server/models/TokenVerification.js";
-
-import {
-  favorite,
-  checkavailabilityproduct,
-} from "$lib/server/mongoActions.js";
+import { favorite, checkavailabilityproduct } from "$lib/server/mongoActions.js";
 
 export async function load({ params, locals }) {
   let authedUser = {};

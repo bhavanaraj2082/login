@@ -76,7 +76,6 @@
   let stockUnAvailability = "";
   let cartNotification = "";
   let notificationTimeout;
-  let index = 0;
   $: isLiked = isFavorite;
   let favoriteNotification = "";
   let favoriteStatus = "";
@@ -86,7 +85,6 @@
   let loginSuccessmsg = "";
   let loginSuccesstype = "";
   let showLikedPopup = false;
-
   let successMessage = "";
   let errorMessage = "";
   let orderMultiple = null;
@@ -113,15 +111,14 @@
       minPrice = "N/A";
       maxPrice = "N/A";
     } else {
-      // Reset the prices before recalculating
       minPrice = Infinity;
       maxPrice = -Infinity;
 
       data.records.forEach((record, recordIndex) => {
-        console.log(
-          ` Processing record ${recordIndex} with ${record?.variants?.length || 0} variants`,
-          record
-        );
+        // console.log(
+        //   ` Processing record ${recordIndex} with ${record?.variants?.length || 0} variants`,
+        //   record
+        // );
 
         if (record?.variants && Array.isArray(record.variants)) {
           record.variants.forEach((variant, variantIndex) => {
@@ -130,7 +127,7 @@
             if (variant?.pricing && typeof variant.pricing === "object") {
               console.log(`Found pricing object:`, variant.pricing);
 
-              let priceValue = Number(variant.pricing.INR); // Extract INR value
+              let priceValue = Number(variant.pricing.INR);
 
               if (!isNaN(priceValue) && priceValue > 0) {
                 minPrice = Math.min(minPrice, priceValue);
@@ -145,94 +142,33 @@
         }
       });
 
-      // Ensure prices are valid numbers
       if (minPrice === Infinity) minPrice = "--";
       if (maxPrice === -Infinity) maxPrice = "--";
     }
-
     //   console.log(`Final minPrice: ${minPrice}, maxPrice: ${maxPrice}`);
   }
 
-  //   $: {
-  // 	  // Reset the prices before recalculating
-  // 	  minPrice = Infinity;
-  // 	  maxPrice = -Infinity;
-
-  // 	  data.records.forEach((record) => {
-  // 		if (record?.variants && record?.variants.length > 0) {
-  // 		  record?.variants.forEach((variant) => {
-  // 			let variantMinPrice = Infinity;
-  // 			let variantMaxPrice = -Infinity;
-
-  // 			if (variant?.pricing && variant?.pricing?.length > 0) {
-  // 			  variant.pricing.forEach((priceItem) => {
-  // 				if (priceItem.USD) {
-  // 				  // Convert USD to INR
-  // 				  const usdValue = priceItem.USD;
-  // 				  const inrValue = usdValue * conversionRate;
-  // 				  priceItem.INR = inrValue;
-  // 				  delete priceItem.USD; // Remove USD key
-  // 				}
-  // 			  });
-
-  // 			  variant.pricing.forEach((priceItem) => {
-  // 				if (priceItem.INR !== undefined) {
-  // 				  variantMinPrice = Math.min(variantMinPrice, priceItem.INR);
-  // 				  variantMaxPrice = Math.max(variantMaxPrice, priceItem.INR);
-
-  // 				  // Update the global min and max prices
-  // 				  minPrice = Math.min(minPrice, priceItem.INR);
-  // 				  maxPrice = Math.max(maxPrice, priceItem.INR);
-  // 				}
-  // 			  });
-
-  // 			  // Set the min/max price for the variant
-  // 			  variant.minPriceINR = variantMinPrice;
-  // 			  variant.maxPriceINR = variantMaxPrice;
-  // 			}
-  // 		  });
-  // 		}
-  // 	  });
-  // 	}
-  // console.log("data in componenet",data);
-  //   $: {
-  //     // Reset the prices before recalculating
-  //     minPrice = Infinity;
-  //     maxPrice = -Infinity;
-
-  //     data.records.forEach((record) => {
-  //       if (record?.variants && record?.variants.length > 0) {
-  //         record?.variants.forEach((variant) => {
-  //           if (variant?.pricing && variant?.pricing?.length > 0) {
-  //             variant.pricing.forEach((priceItem) => {
-  //               if (priceItem.INR !== undefined) {
-  //                 minPrice = Math.min(minPrice, priceItem.INR);
-  //                 maxPrice = Math.max(maxPrice, priceItem.INR);
-  //               }
-  //             });
-  //           }
-  //         });
-  //       }
-  //     });
-  //   }
-
-  function handleThumbnailClick(selectedIndex) {
-    index = selectedIndex;
-  }
+let index = 0; 
+let selectedStockId = ""; 
+function handleThumbnailClick(selectedIndex, product) {
+  index = selectedIndex;
+  selectedStockId = product?.stockId?.[index] || "NA";
+  // console.log("Updated Index:", index);
+  // console.log("Updated Stock ID:", selectedStockId);
+}
 
   function togglePopup() {
     showPopup = !showPopup;
   }
 
   function toggleLike() {
-    isFavorite = !isFavorite; // Ensure reactivity
+    isFavorite = !isFavorite; 
     console.log("isFavorite changed:", isFavorite);
   }
 
   onMount(() => {
     productURL = window.location.href;
   });
-
   // console.log("Products from load function:", product);
 
   function toggleModal() {
@@ -289,85 +225,36 @@
     });
   };
 
-  export function addToCart(product, index) {
-    const backOrder = quantity > product.stock ? quantity - product.stock : 0;
-    if (isLoggedIn === false) {
-      const addCart = {
-        productId: product.productId,
-        manufacturerId: product.manufacturer._id,
-        distributorId: product.distributorId,
-        stockId: product.stockId,
-        quantity: quantity,
-        backOrder,
-      };
-      addItemToCart(addCart);
-      toast.success("product added to cart");
-      guestCartFetch();
-      return;
-    }
+  export function addToCart(product) {
+  const backOrder = quantity > product.stock ? quantity - product.stock : 0;
+  const cartItem = {
+    productId: product.productId,
+    manufacturerId: product.manufacturer._id,
+    distributorId: product.distributorId,
+    stockId: selectedStockId || "NA",
+    quantity: quantity,
+    backOrder,
+    price: product.priceSize[index]?.INR || 0, 
+    size: product.priceSize[index]?.break || "N/A", 
+  };
+  // console.log("Cart Item Before Adding:", cartItem); 
 
-    const formdata = new FormData();
-    formdata.append(
-      "item",
-      JSON.stringify({
-        productId: product.productId,
-        manufacturerId: product.manufacturer._id,
-        distributorId: product.distributorId,
-        stockId: product.stockId,
-        quantity: quantity,
-        backOrder,
-      })
-    );
-    sendMessage("?/addtocart", formdata, async (result) => {
-      toast.success(result.message);
-      invalidate("/");
-    });
-    console.log(product);
-    //     const cartProduct = {
-    // 	id: product.productId,
-    // 	name: product.productName,
-    // 	partNumber: product.productNumber,
-    // 	description: product.prodDesc,
-    // 	image: product.imageSrc,
-    // 	stock: product.stockQuantity,
-    // 	priceSize: {
-    // 	  price: product?.priceSize[index].INR,
-    // 	  size: product?.priceSize[index].break,
-    // 	},
-    // 	quantity: quantity,
-    //   };
-    //   cartState.update((cart) => {
-    // 	const exactMatchIndex = cart.findIndex(
-    // 	  (item) =>
-    // 		item?.priceSize?.size === cartProduct?.priceSize?.size &&
-    // 		item?.priceSize?.price === cartProduct?.priceSize?.price
-    // 	);
-    // 	if (exactMatchIndex !== -1) {
-    // 	  const existingItem = cart[exactMatchIndex];
-    // 	  if (existingItem.quantity !== cartProduct.quantity) {
-    // 		cart[exactMatchIndex].quantity = cartProduct.quantity;
-    // 		toast.info(`Updated quantity for item in your cart.`);
-    // 		// cartNotification = `Updated quantity for item in your cart.`;
-    // 	  } else {
-    // 		toast.info(
-    // 		  `The item is already in your cart with the same quantity.`
-    // 		);
-    // 		// cartNotification = `The item is already in your cart with the same quantity.`;
-    // 	  }
-    // 	} else {
-    // 	  cart.push(cartProduct);
-    // 	  const totalItems = cart.length;
-    // 	  toast.success(`You have ${totalItems} item(s) in your cart.`);
-    // 	  //   cartNotification = `You have ${totalItems} item(s) in your cart.`;
-    // 	}
-    // 	localStorage.setItem("cart", JSON.stringify(cart));
-    // 	return cart;
-    //   });
-    //   if (notificationTimeout) clearTimeout(notificationTimeout);
-    //   notificationTimeout = setTimeout(() => {
-    // 	cartNotification = "";
-    //   }, 3000);
+  if (!isLoggedIn) {
+    addItemToCart(cartItem);
+    toast.success("Product added to cart");
+    guestCartFetch();
+    return;
   }
+
+  const formdata = new FormData();
+  formdata.append("item", JSON.stringify(cartItem));
+  sendMessage("?/addtocart", formdata, async (result) => {
+    toast.success(result.message);
+    invalidate("/");
+  });
+  // console.log("Final Cart Item Sent:", cartItem);
+}
+
 
   let units = "";
   let firstName = "";
@@ -377,7 +264,6 @@
   let message = "";
   let formErrors = {};
 
-  // Function to validate inputs
   function validateForm() {
     formErrors = {};
 
@@ -393,7 +279,6 @@
       delete formErrors.firstName;
     }
 
-    // Last Name Validation
     if (!lastName.trim()) {
       formErrors.lastName = "Last name is required.";
     } else if (/[\d]/.test(lastName)) {
@@ -402,7 +287,6 @@
       delete formErrors.lastName;
     }
 
-    // Organisation Validation (Allows numbers but no special characters)
     if (!organisation.trim()) {
       formErrors.organisation = "Organisation name is required.";
     } else if (/[^a-zA-Z0-9\s]/.test(organisation)) {
@@ -414,7 +298,7 @@
 
     if (!phone.match(/^\+?[1-9]\d{1,14}$/)) {
       formErrors.phone =
-        "Enter a valid phone number with country code (e.g. +919876543210)";
+        "Enter a valid phone number";
     }
 
     if (!email.match(/^\S+@\S+\.\S+$/)) {
@@ -632,10 +516,10 @@
                 <button
                   type="button"
                   class={`w-full grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-500 cursor-pointer transition-transform border border-gray-300 rounded-sm ${index === i ? "border md:border-l-6 lg:border bg-primary-50" : "border-none"}`}
-                  on:click={() => handleThumbnailClick(i)}
+                  on:click={() => handleThumbnailClick(i, product)}
                 >
                   <div class="col-span-1 p-2 text-left">
-                    {product?.priceSize[0].break}
+                    {priceItem?.break}
                   </div>
                   <div class="col-span-1 p-2 text-left">
                     {product?.productNumber}-{priceItem?.break}
@@ -674,7 +558,7 @@
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
                 class={`border border-gray-300 rounded w-28 bg-white p-2 shadow-sm hover:shadow-sm  cursor-pointer ${index === i ? "border-1 border-primary-500" : "border border-gray-300"}`}
-                on:click={() => handleThumbnailClick(i)}
+                on:click={() => handleThumbnailClick(i, product)}
               >
                 <div class="text-lg font-bold text-gray-800">
                   {priceItem?.break}
