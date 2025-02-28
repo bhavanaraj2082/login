@@ -531,6 +531,9 @@ const cust = () => {
 }
 if (validateEmail && !(authedUserEmailVerified || ProfileEmailVerified)) {
     errorMessage7 = 'Please verify your Email';
+	setTimeout(() => {
+	errorMessage7 = '';
+}, 3000);
 	return;
 }
 tog4();
@@ -539,11 +542,11 @@ tog4();
 onMount(() => {
 		if (data && data.profile) {
 			// Updating Cusdetails store values
-			$Cusdetails.FirstName = `${data.profile.firstname || ""}`.trim();
-			$Cusdetails.LastName = `${data.profile.lastname || ""}`.trim();
-			$Cusdetails.Email = data.profile.email || "";
-			$Cusdetails.Number = data.profile.phone || "";
-			$Cusdetails.userId = data.profile.userId || "";
+			$Cusdetails.FirstName = `${data.profile.firstName }`.trim();
+			$Cusdetails.LastName = `${data.profile.lastName }`.trim();
+			$Cusdetails.Email = data.profile.email ;
+			$Cusdetails.Number = data.profile.cellPhone || data.profile.primaryPhone;
+			$Cusdetails.userId = data.profile.userId ;
 
 			// Country logic
 			const profileCountry = data.profile.country?.trim();
@@ -559,28 +562,19 @@ onMount(() => {
 			}
 
 			isDataAvailable = true;
-		} else {
-			// If no profile data is available, reset store values
-			$Cusdetails.FirstName = "";
-			$Cusdetails.LastName = "";
-			$Cusdetails.Email = data?.email || "";
-			$Cusdetails.Number = "";
-			$Cusdetails.userId = "";
+		} 
 
-			country = "";
-			isDataAvailable = false;
 
-			if (data?.email) {
-				email = data.email;
-				const reloadFlag = sessionStorage.getItem("emailReloaded");
-				if (!reloadFlag) {
-					sessionStorage.setItem("emailReloaded", "true");
-					location.reload(); // This will reload the page only once to prevent infinite reload
-				} else {
-					sessionStorage.removeItem("emailReloaded");
-				}
-			}
-		}
+		// else {
+		// 	// If no profile data is available, reset store values
+		// 	$Cusdetails.FirstName = "";
+		// 	$Cusdetails.LastName = "";
+		// 	$Cusdetails.Email = data?.email || "";
+		// 	$Cusdetails.Number = "";
+		// 	$Cusdetails.userId = "";
+		// 	country = "";
+		// 	isDataAvailable = false;
+		// }
 
 		isEditable = false;
 	});

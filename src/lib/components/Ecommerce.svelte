@@ -655,22 +655,22 @@
 {:else}
 	<section class="md:w-11/12 mx-auto max-w-7xl px-6 md:px-2 bg-gray-50">
 		<section class="mt-6">
-			<div class="text-primary-400 text-2xl font-semibold mb-7">
+			<div class="font-bold text-lg md:text-2xl py-4">
 				Chemikart Solutions
 			</div>
-			<p class="leading-6 text-content mx-auto text-justify-center">
+			<p class="sm:text-sm text-xs leading-6 text-content mx-auto text-justify-center">
 				We offer a full range of e-Commerce tools designed to enable
 				greater spend control for your procurement staff, providing your
 				researchers with ease of access to the products they've come to
 				rely on.
 			</p>
-			<p class="leading-6 text-content mx-auto text-justify-center mt-2">
+			<p class="sm:text-sm text-xs leading-6 text-content mx-auto text-justify-center mt-2">
 				We have three solutions available to help you save time and cost
 				in procurement management. Read further for more details of each
 				solution, or fill out our contact form and our team will reach
 				out to you to answer any questions.
 			</p>
-			<div class="mt-12 mx-auto">
+			<div class="md:mt-12 mt-2 mx-auto">
 				<div
 					class="flex gap-5 flex-wrap lg:flex-nowrap max-md:flex-col"
 				>
@@ -685,11 +685,11 @@
 								/>
 								<div class="flex-auto">
 									<h2
-										class="font-semibold text-lg font-worksans text-primary-400"
+										class="font-semibold font-worksans sm:text-base text-sm text-heading"
 									>
 										The One-to-One Solution: E-Procurement
 									</h2>
-									<p class="text-content mt-4">
+									<p class="sm:text-sm text-xs text-content mt-4">
 										e-Procurement provides seamless
 										system-to-system connectivity of your
 										existing spend management system.
@@ -705,11 +705,11 @@
 								/>
 								<div class="flex-auto">
 									<h2
-										class="font-semibold text-lg font-worksans text-primary-400"
+										class="font-semibold font-worksans sm:text-base text-sm text-heading"
 									>
 										The Customized Solution: Pipeline®
 									</h2>
-									<p class="text-content mt-4">
+									<p class="sm:text-sm text-xs text-content mt-4">
 										This customized service balances your
 										organization's business needs with the
 										product requirements of your
@@ -726,11 +726,11 @@
 								/>
 								<div class="flex-auto">
 									<h2
-										class="font-semibold text-lg font-worksans text-primary-400"
+										class="font-semibold font-worksans sm:text-base text-sm text-heading"
 									>
 										The Simple Solution: Chemikart E-Shop
 									</h2>
-									<p class="text-content mt-4">
+									<p class="sm:text-sm text-xs text-content mt-4">
 										Your procurement staff can access our
 										products simply, easily, and securely
 										through chemikart.com.
@@ -749,7 +749,7 @@
 								icon="game-icons:chemical-drop"
 								class="w-20 h-24 text-primary-400"
 							/>
-							<p class="text-content">
+							<p class="sm:text-sm text-xs text-content">
 								Discover our latest website features and enhance
 								your experience with Chemikart.<br />Find
 								information regarding new features as well as
@@ -763,21 +763,21 @@
 		</section>
 		<section class="mx-1 md:mx-1">
 			<hr
-				class="self-center mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-10"
+				class="self-center md:mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-3"
 			/>
 		</section>
 		<section class="px-4 mt-8">
 			<div class="flex gap-8 max-md:flex-col">
 				<div class="flex flex-col w-2/3 max-md:w-full">
 					<div
-						class="flex flex-col text-sm leading-6 text-black max-md:mt-6"
+						class="flex flex-col text-sm leading-6 text-black max-md:mt-0"
 					>
 						<h3
-							class="font-semibold text-lg font-worksans mt-8 text-primary-400"
+							class="font-semibold font-worksans mt-8 sm:text-base text-sm text-heading"
 						>
 							The One-to-One Solution: E-Procurement
 						</h3>
-						<p class="mt-4 text-content">
+						<p class="sm:text-sm text-xs mt-4 text-content">
 							Chemikart is your source for procurement
 							optimization. If you are already using an electronic
 							spend management solution, leverage your investment
@@ -785,7 +785,7 @@
 							Chemikart's purchases and link your current buying
 							platform to us.
 						</p>
-						<p class="mt-4 text-content">
+						<p class="sm:text-sm text-xs mt-4 text-content">
 							We support all major e-Procurement providers and
 							have a dedicated technical team available to work
 							with your organization or platform provider and
@@ -798,12 +798,12 @@
 							notices, and more.
 						</p>
 						<h4
-							class="mt-6 font-semibold text-lg font-worksans text-primary-400"
+							class="mt-6 font-semibold font-worksans sm:text-base text-sm text-heading"
 						>
 							Three Steps to Install e-Procurement
 						</h4>
 						<ol
-							class="list-decimal list-inside mt-4 space-y-3 text-content"
+							class="list-decimal list-inside mt-4 space-y-3 sm:text-sm text-xs text-content"
 						>
 							<li>
 								Create a Project Plan: We will partner with you
@@ -824,14 +824,14 @@
 						</ol>
 					</div>
 				</div>
-				<div class="flex flex-col w-1/3 max-md:w-full max-md:mt-6">
+				<div class="flex flex-col w-1/3 max-md:w-full max-md:mt-0">
 					<h3
-						class="font-semibold text-lg font-worksans mt-8 text-primary-400"
+						class="font-semibold font-worksans mt-8 sm:text-base text-sm text-heading"
 					>
 						Benefits to e-Procurement
 					</h3>
 					<ol
-						class="list-decimal list-inside mt-4 space-y-3 text-content"
+						class="list-decimal list-inside mt-4 space-y-3 sm:text-sm text-xs text-content"
 					>
 						<li>
 							Process efficiency from end-to-end driven by
@@ -859,14 +859,14 @@
 					<a href="#contact-team"> </a>
 				</div>
 			</div>
-			<div class="flex gap-8 max-md:flex-col mt-12">
+			<div class="flex gap-8 max-md:flex-col md:mt-12 mt-3">
 				<div class="flex flex-col w-2/3 max-md:w-full">
 					<h3
-						class="font-semibold text-lg font-worksans mt-8 text-primary-400"
+						class="font-semibold font-worksans mt-8 sm:text-base text-sm text-heading"
 					>
 						The Customized Solution: Pipeline®
 					</h3>
-					<p class="mt-4 text-content">
+					<p class="sm:text-sm text-xs mt-4 text-content">
 						An advanced ordering process customized to meet your
 						business needs. PIPELINE® delivers options and benefits
 						beyond simple ordering, providing direct, private
@@ -874,26 +874,26 @@
 						system. Flexible ordering processes are customized to
 						meet your organization's requirements.
 					</p>
-					<p class="mt-4 text-content">
+					<p class="sm:text-sm text-xs mt-4 text-content">
 						When you create your order through PIPELINE®, you see
 						the exact purchase total. In addition, it provides a
 						portal to information and special offers that have been
 						tailored specifically for your organization.
 					</p>
-					<p class="mt-4 text-content">
+					<p class="sm:text-sm text-xs mt-4 text-content">
 						To learn more about creating your PIPELINE® experience,
 						submit the form to have one of our team members reach
 						out.
 					</p>
 				</div>
-				<div class="flex flex-col w-1/3 max-md:w-full max-md:mt-6">
+				<div class="flex flex-col w-1/3 max-md:w-full max-md:mt-0">
 					<h4
-						class="font-semibold text-lg font-worksans mt-8 text-primary-400"
+						class="font-semibold font-worksans mt-8 sm:text-base text-sm text-heading"
 					>
 						Benefits of PIPELINE®
 					</h4>
 					<ul
-						class="list-disc list-inside mt-4 space-y-2 text-content"
+						class="list-disc list-inside md:mt-4 mt-3 space-y-2 sm:text-sm text-xs text-content"
 					>
 						<li>Elimination of paper transactions</li>
 						<li>No IT investment required</li>
@@ -907,33 +907,33 @@
 					<a href="#contact-team"> </a>
 				</div>
 			</div>
-			<div class="flex gap-8 max-md:flex-col mt-12">
+			<div class="flex gap-8 max-md:flex-col md:mt-12 mt-3">
 				<div class="flex flex-col w-2/3 max-md:w-full">
 					<h3
-						class="font-semibold text-lg font-worksans mt-8 text-primary-400"
+						class="font-semibold font-worksans mt-8 sm:text-base text-sm text-heading"
 					>
 						The Simple Solution: Chemikart E-Shop
 					</h3>
-					<p class="mt-4 text-content">
+					<p class="sm:text-sm text-xs mt-4 text-content">
 						Your online order is integrated with our fulfillment
 						systems, allowing for rapid processing. You can request
 						quotes, place orders, and track deliveries all in one
 						place.
 					</p>
-					<p class="mt-4 text-content">
+					<p class="sm:text-sm text-xs mt-4 text-content">
 						With Chemikart.com as the leading Web site in the
 						industry, you can rest assured you're getting the most
 						competitive service available.
 					</p>
 				</div>
-				<div class="flex flex-col w-1/3 max-md:w-full max-md:mt-6">
+				<div class="flex flex-col w-1/3 max-md:w-full max-md:mt-0">
 					<h4
-						class="font-semibold text-lg font-worksans mt-8 text-primary-400"
+						class="font-semibold font-worksans mt-8 sm:text-base text-sm text-heading"
 					>
 						Benefits of the Chemikart e-Shop:
 					</h4>
 					<ul
-						class="list-disc list-inside mt-4 space-y-2 text-content"
+						class="list-disc list-inside md:mt-4 mt-3 space-y-2 sm:text-sm text-xs text-content"
 					>
 						<li>Your information is safe and secure</li>
 						<li>Advanced tools and product searches</li>
@@ -946,7 +946,7 @@
 		</section>
 		<section class="mx-1 md:mx-1">
 			<hr
-				class="self-center mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-10"
+				class="self-center md:mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-3"
 			/>
 		</section>
 		<section
@@ -954,14 +954,14 @@
 			class="flex flex-col items-start py-6 w-full max-md:px-2 md:mt-10 scroll-smooth"
 		>
 			<h2
-				class="font-semibold text-2xl font-worksans text-primary-400 ml-3"
+				class="font-semibold font-worksans sm:text-lg text-md text-heading sm:ml-3 ml-0"
 			>
 				Contact Our Team
 			</h2>
 			<form
 				method="POST"
 				action="?/contactus"
-				class="w-full mt-3 max-w-3xl ml-3"
+				class="w-full md:mt-3 mt-0 max-w-3xl sm:ml-3 ml-0"
 				use:enhance={(event) => {
 					submitting= true;
 					const isEmailVerified = ProfileEmailVerified; // Assuming this is the first email verification check
@@ -1017,7 +1017,7 @@
     </div> -->
 				<div>
 					<p
-						class="mb-5 mt-6 text-bold font-semibold text-primary-400"
+						class="mb-5 mt-6 text-bold font-semibold sm:text-base text-sm text-heading"
 					>
 						Select all that apply
 					</p>
@@ -1099,12 +1099,12 @@
 								placeholder="First Name*"
 							/>
 							{#if showErrors && fname.length === 0}
-								<span class="text-red-400 text-xs"
+								<span class="text-red-500 text-xs font-medium"
 									>First Name is required</span
 								>
 							{/if}
 							{#if fname.length > 0 && !/^[A-Za-z\s]+$/.test(fname)}
-								<span class="text-red-400 text-xs"
+								<span class="text-red-500 text-xs font-medium"
 									>First Name cannot contain numbers or
 									special characters</span
 								>
@@ -1120,12 +1120,12 @@
 								placeholder="Last Name*"
 							/>
 							{#if showErrors && lname.length === 0}
-								<span class="text-red-400 text-xs"
+								<span class="text-red-500 text-xs font-medium"
 									>Last Name is required</span
 								>
 							{/if}
 							{#if lname.length > 0 && !/^[A-Za-z\s]+$/.test(lname)}
-								<span class="text-red-400 text-xs"
+								<span class="text-red-500 text-xs font-medium"
 									>Last Name cannot contain numbers or special
 									characters</span
 								>
@@ -1190,15 +1190,15 @@
 								placeholder="Phone Number*"
 							/>
 							{#if showErrors && number.length === 0}
-								<span class="text-red-400 text-xs"
+								<span class="text-red-500 text-xs font-medium"
 									>Number is required</span
 								>
 							{/if}
 							<!-- {#if number.length > 0 && !/^\+?[0-9]{10}$/.test(number)}
-                                    <span class="text-red-400 text-xs">Please enter a valid number number.</span>
+                                    <span class="text-red-500 text-xs font-medium">Please enter a valid number number.</span>
                                 {/if} -->
 							{#if number.length > 0 && !validatePhoneNumber(location, number)}
-								<span class="text-red-400 text-xs"
+								<span class="text-red-500 text-xs font-medium"
 									>Please enter a valid phone number for {location}</span
 								>
 							{/if}
@@ -1215,7 +1215,7 @@
 								placeholder="Company Name*"
 							/>
 							{#if showErrors && company.length === 0}
-								<span class="text-red-400 text-xs"
+								<span class="text-red-500 text-xs font-medium"
 									>Company Name is required</span
 								>
 							{/if}
@@ -1230,7 +1230,7 @@
 								placeholder="Role*"
 							/>
 							{#if showErrors && role.length === 0}
-								<span class="text-red-400 text-xs"
+								<span class="text-red-500 text-xs font-medium"
 									>Role is required</span
 								>
 							{/if}
@@ -1313,12 +1313,12 @@
 										}}
 									/>
 									{#if showErrors && email.length === 0}
-										<span class="text-red-400 text-xs"
+										<span class="text-red-500 text-xs font-medium"
 											>Email is required</span
 										>
 									{/if}
 									{#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
-										<span class="text-red-400 text-xs"
+										<span class="text-red-500 text-xs font-medium"
 											>Please enter a valid email address.</span
 										>
 									{/if}
@@ -1473,10 +1473,10 @@
 								</form>
 							{/if}
 							<!-- {#if showErrors && email.length === 0}
-                                    <span class="text-red-400 text-xs">Email is required</span>
+                                    <span class="text-red-500 text-xs font-medium">Email is required</span>
                                 {/if}
                                 {#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
-                                    <span class="text-red-400 text-xs">Please enter a valid email address.</span>
+                                    <span class="text-red-500 text-xs font-medium">Please enter a valid email address.</span>
                                 {/if} -->
 						</div>
 					</div>
@@ -1489,7 +1489,7 @@
 							placeholder="Additional Details*"
 						></textarea>
 						{#if showErrors && details.length === 0}
-							<span class="text-red-400 text-xs"
+							<span class="text-red-500 text-xs font-medium"
 								>Additional Details are required</span
 							>
 						{/if}
@@ -1510,18 +1510,18 @@
 							>
 						</label>
 						{#if showErrors && reason.length === 0}
-							<span class="text-red-400 text-xs"
+							<span class="text-red-500 text-xs font-medium"
 								>Please select one of the above reasons</span
 							>
 						{/if}
 						{#if showErrors && !isChecked}
-							<span class="text-red-400 text-xs"
+							<span class="text-red-500 text-xs font-medium"
 								>confirm the above statement</span
 							>
 						{/if}
 						<input type="hidden" name="status" value="unread" />
 					</div>
-					<div class="flex-1 mb-4 sm:mt-0">
+					<div class="mt-0 flex items-center justify-end gap-x-6">
 						<button
   type="submit"
   on:click={handleSubmit}
