@@ -3,39 +3,23 @@
     import { onMount } from 'svelte';
     import Icon from '@iconify/svelte';
     let showButton = false;
-	let thresholdFromBottom = 360;
 
-	const updateThreshold = () => {
-		const windowWidth = window.innerWidth;
-		if (windowWidth <= 640) {  
-			thresholdFromBottom = 1185; 
-		} else if (windowWidth <= 768) {  
-			thresholdFromBottom = 690; 
-		} else if (windowWidth <= 1024) {  
-			thresholdFromBottom = 480; 
-		} else {
-			thresholdFromBottom = 480; 
-		}
-	};
+    const handleScroll = () => {
+    showButton = window.scrollY > 20;
+};
 
-  const handleScroll = () => {
-	const scrollPosition = window.scrollY;
-	const documentHeight = document.documentElement.scrollHeight;
-	const windowHeight = window.innerHeight;
-    showButton = window.scrollY > 20 && (documentHeight - (scrollPosition + windowHeight)) > thresholdFromBottom;
-  };
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
   onMount(() => {
-	updateThreshold();
     window.addEventListener('scroll', handleScroll);
-	window.addEventListener('resize', updateThreshold);
     return () => {
       window.removeEventListener('scroll', handleScroll);
-	  window.removeEventListener('resize', updateThreshold);
     };
   });
+
   let showTooltip = false;
   function handleMouseEnter(){
     showTooltip = true;
@@ -47,14 +31,17 @@
 </script>
 <div>
   <div class="pt-5 max-w-7xl md:w-11/12 mx-auto">
-    <div class="fixed z-30 bottom-1.5 right-0 lg:right-10 py-4 lg:p-4">
-        <button
-        class="flex items-center justify-center p-2 rounded text-primary-500 md:mr-14 lg:mr-0" on:click={scrollToTop}
-          class:hidden={!showButton}
+		<div class="fixed z-30 md:bottom-[75px] bottom-40 right-0 lg:right-10 py-6 lg:p-4">
+      <button
+        class="flex items-center justify-center rounded py-0.3 bg-primary-400 text-white md:mr-14 lg:mr-0 shadow-md" on:click={scrollToTop}
+        class:hidden={!showButton}
           on:mouseenter={handleMouseEnter}
             on:mouseleave={handleMouseLeave}
         >
-        <Icon icon="gg:arrow-up-r" width="2.2em" height="2.2em" />
+        <div class="flex flex-col items-center">
+          <Icon icon="tdesign:chevron-up" width="20" height="20"  />
+          <span class="px-1.5 text-xs pb-0.5">TOP</span>
+        </div>
       </button>
         {#if showTooltip}
         <!-- svelte-ignore a11y-click-events-have-key-events -->

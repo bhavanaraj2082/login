@@ -101,7 +101,7 @@
 					<li><a href="/quotes" class="font-medium sm:text-sm text-xs hover:underline">Quotes</a></li>
 					<li><a href="/returns" class="font-medium sm:text-sm text-xs hover:underline">Returns & its Status</a></li>
 				</ul>
-				<div class="sm:block hidden">
+				<div class="sm:hidden block">
 					<Scroller />
 				</div>
 			</div>
@@ -154,7 +154,7 @@
 						</div>
 					</div>
 				</div>
-				<Scroller />
+				<!-- <Scroller /> -->
 			</div>
 			
 

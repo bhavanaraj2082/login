@@ -34,7 +34,7 @@
 	};
 </script>
 
-<div class="flex items-center justify-center">
+<div class="flex items-center justify-center pb-12">
 	<div class="container mx-auto p-6 max-w-screen-lg rounded-lg">
 		<h2 class="text-2xl font-bold">Order Status</h2>
 		<p class="text-lg md:text-base sm:text-sm mb-4">

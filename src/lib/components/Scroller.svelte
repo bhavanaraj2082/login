@@ -14,18 +14,18 @@
       showTooltip = false;
     }
   </script>
-  <div class="absolute z-70 lg:right-20 right-12 lg:mt-[-36px] md:mt-[-36px] sm:mt-0 mt-20
+  <div class="absolute z-70 lg:right-20 right-7 lg:mt-[-36px] md:mt-[-36px] sm:mt-0 mt-[182px]
 ">
     <div class="">
       <button
-      class="flex items-center justify-center p-2 text-white bg-primary-400 rounded hover:bg-primary-300 hover:shadow"
+      class="flex items-center justify-center rounded py-0.3 bg-primary-400 text-white md:mr-14 lg:mr-0 shadow-md"
         on:click={toggleHelp}
-      
       >
-      <!-- class="w-10 h-10  font-bold text-lg text-white rounded-full flex items-center justify-center shadow-lg transition-transform duration-300 hover:bg-white hover:text-primary-400 mt-2" -->
-
-      <Icon icon="gg:arrow-up-r" width="20" height="20"/>   
-       </button>
+       <div class="flex flex-col items-center">
+				<Icon icon="tdesign:chevron-up" width="20" height="20"  />
+				<span class="px-2 text-xs pb-0.5">TOP</span>
+			</div>	
+    </button>
     </div>
   </div>      
   {#if showTooltip}
