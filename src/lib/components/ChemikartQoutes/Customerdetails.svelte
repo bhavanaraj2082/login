@@ -1,11 +1,44 @@
 <script>
 	import { Cusdetails } from '$lib/stores/solution_stores.js';
+	import { enhance } from "$app/forms";
+	import { onMount } from "svelte";
 	import Icon from '@iconify/svelte';
+	import { toast, Toaster } from "svelte-sonner";
+	export let data;
+	console.log(data, "data customer details");
 	export let tog;
 	export let tog1;
 	export let tog2;
 	export let tog3;
 	export let tog4;
+
+	let authedUserEmailVerified = data?.profile?.isEmailVerified || "";
+	console.log("authedUserEmailVerified", authedUserEmailVerified);
+	const handleResendOtpemail = () => {
+		if (!loadingotp) {
+			form3.requestSubmit();
+		}
+	};
+	let isLoadingPhone = false;
+	let isEmailVerified = false;
+	let loadingotp = false;
+	let loadingPhone = false;
+	let isLoading = false;
+	let ProfileEmailVerified = false;
+	let isDataAvailable = false;
+	let isEditable = false;
+	// console.log(data,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+
+	// console.log("authedUserEmailVerified",authedUserEmailVerified);
+
+	let verificationMessage = "";
+	let emailSent = false;
+	let displayMessage = "";
+	let enteredOtp = "";
+	let enteredOtpemail = "";
+	let isOtpVerified = false;
+	let isOtpPhoneVerified = false;
+	let form3;
 	let errors={};
 	let country;
 	let errorMessage = '';
@@ -16,6 +49,9 @@
 		$Cusdetails.Country &&
 		$Cusdetails.Email &&
 		$Cusdetails.Number;
+
+	$Cusdetails.userId = data?.profile?.userId || "";
+	console.log("$Cusdetails.userId",$Cusdetails.userId);
 	
 	const titles = ['Dr', 'Miss', 'Mr', 'Ms', 'Mrs', 'Prof'];
     const countries = [
@@ -430,7 +466,7 @@
 		Haiti: /^\d{8}$/,
 		Tonga: /^\d{7}$/
 	};
-    let errorMessage1, errorMessage2,errorMessage3,errorMessage4;	
+    let errorMessage1, errorMessage2,errorMessage3,errorMessage4,errorMessage7;	
 	
     //VALIDATIONS
     function validateFirstName(event) {
@@ -486,19 +522,68 @@ if (!isFormData) {
 validateFirstName({ target: { value: $Cusdetails.FirstName } });
 validateLastName({ target: { value: $Cusdetails.LastName } });
 validateEmail({ target: { value: $Cusdetails.Email } });
-// validatePhNo(country, number);
+
 return !errorMessage1 && !errorMessage2 && !errorMessage3 && !errorMessage4;
 };
 const cust = () => {
-if (!validateAll($Cusdetails.Country, $Cusdetails.Number)) {
-    return;
+	if (!validateAll($Cusdetails.Country, $Cusdetails.Number)) {
+	return;
+}
+if (validateEmail && !(authedUserEmailVerified || ProfileEmailVerified)) {
+    errorMessage7 = 'Please verify your Email';
+	return;
 }
 tog4();
 };
 
+onMount(() => {
+		if (data && data.profile) {
+			// Updating Cusdetails store values
+			$Cusdetails.FirstName = `${data.profile.firstname || ""}`.trim();
+			$Cusdetails.LastName = `${data.profile.lastname || ""}`.trim();
+			$Cusdetails.Email = data.profile.email || "";
+			$Cusdetails.Number = data.profile.phone || "";
+			$Cusdetails.userId = data.profile.userId || "";
 
+			// Country logic
+			const profileCountry = data.profile.country?.trim();
+			if (profileCountry) {
+				const foundCountry = countries.find(
+					(c) =>
+						c.name.toLowerCase() === profileCountry.toLowerCase(),
+				);
+				if (foundCountry) {
+					country = foundCountry.name;
+					$Cusdetails.Country = country; // Assigning the country to the store
+				}
+			}
 
+			isDataAvailable = true;
+		} else {
+			// If no profile data is available, reset store values
+			$Cusdetails.FirstName = "";
+			$Cusdetails.LastName = "";
+			$Cusdetails.Email = data?.email || "";
+			$Cusdetails.Number = "";
+			$Cusdetails.userId = "";
 
+			country = "";
+			isDataAvailable = false;
+
+			if (data?.email) {
+				email = data.email;
+				const reloadFlag = sessionStorage.getItem("emailReloaded");
+				if (!reloadFlag) {
+					sessionStorage.setItem("emailReloaded", "true");
+					location.reload(); // This will reload the page only once to prevent infinite reload
+				} else {
+					sessionStorage.removeItem("emailReloaded");
+				}
+			}
+		}
+
+		isEditable = false;
+	});
 
 
 let searchTerm = "";
@@ -579,6 +664,12 @@ let searchTerm = "";
 	<h1 class="font-semibold py-5 text-primary-500 sm:text-md text-sm ">Please fill the details</h1>
 	<div class="grid grid-cols-1 gap-x-6 gap-y-1 md:w-3/4 lg:w-1/2 sm:grid-cols-6">
 		<div class="sm:col-span-2  sm:col-start-1">
+			<input
+				type="hidden"
+				name="userId"
+				id="userId"
+				bind:value={$Cusdetails.userId}
+			/>
 				<label for="title" class="sm:text-sm text-xs">Title</label>
 		  <div class="">
 			<select
@@ -681,13 +772,11 @@ let searchTerm = "";
 					</ul>
 				</div>
 			{/if}
-		
-			
+			{#if errorMessage && !$Cusdetails.Country}
+			<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+				Country is required</div>
+			{/if}
 		</div>
-        {#if errorMessage && !$Cusdetails.Country}
-                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-                    Country is required</div>
-                {/if}
 	</div>
 	<div class="mt-2 mb-2">
 		<label for="" class="sm:text-sm text-xs">Phone number <span class="text-primary-500"> *</span></label>
@@ -711,26 +800,239 @@ let searchTerm = "";
 			Please enter a valid phone number for {$Cusdetails.Country}</div>
 		{/if}
 	</div>
-	<div class="mt-2 mb-2">
-		<label for="" class="sm:text-sm text-xs">Email address <span class="text-primary-500"> *</span></label>
-		<br />
+	<div class="flex-1 mb-4 mt-2">
+		<!-- <input type="text" name="email" id="email" bind:value={email} class="block w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email" />
+        {#if showErrors && email.length === 0}
+            <span class="text-red-400 text-xs">Email is required</span>
+        {/if}
+        {#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
+            <span class="text-red-400 text-xs">Please enter a valid email address.</span>
+        {/if} -->
+		<label for="" class="sm:text-sm text-xs">Email <span class="text-primary-500"> *</span></label>
 		<input
-			type="text"
+			type="hidden"
 			name="email"
-			id=""
-			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+			id="email"
 			bind:value={$Cusdetails.Email}
-            on:input={validateEmail}
 		/>
-        {#if errorMessage3}
-		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-			{errorMessage3}</div>
+		<form
+			action="?/verifyemail"
+			bind:this={form3}
+			method="POST"
+			use:enhance={({}) => {
+				return async ({ result }) => {
+					isLoading = false;
+					console.log("result", result);
+					if (result.data?.status === 200) {
+						ProfileEmailVerified = result.data.isEmailVerified;
+						if (authedUserEmailVerified === true) {
+							ProfileEmailVerified = true;
+						}
+
+						verificationMessage = result.data.message;
+
+						if (
+							verificationMessage.includes(
+								"Verification email sent successfully. Please check your inbox.",
+							)
+						) {
+							displayMessage = "Please check your inbox.";
+							emailSent = true;
+							enteredOtp = "";
+							isOtpVerified = false;
+						} else {
+							displayMessage = verificationMessage;
+							emailSent = false;
+							isOtpVerified = false;
+						}
+
+						toast.success(verificationMessage);
+					} else {
+						toast.error(result.data.message);
+						ProfileEmailVerified = result.data.isEmailVerified;
+						emailSent = false;
+					}
+				};
+			}}
+			class="flex w-full items-center"
+			on:submit={() => {
+				isLoading = true;
+			}}
+		>
+			<div
+				class="flex items-center space-x-2 rounded md:w-3/4 sm:2/5 lg:w-1/2 w-full py-0.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 pr-1"
+			>
+				<input
+					type="text"
+					name="email"
+					id="email"
+					bind:value={$Cusdetails.Email}
+					class="block w-full h-6 border-0 focus:outline-none focus:ring-0 sm:text-sm text-xs"
+					on:input={() => {
+						ProfileEmailVerified = false;
+						emailSent = false;
+						authedUserEmailVerified = false;
+					}}
+				/>
+				{#if isLoading}
+					<span
+						class="text-2s font-semibold text-primary-600 flex items-center"
+					>
+						<Icon
+							icon="line-md:loading-alt-loop"
+							class="w-4 h-4 mr-1"
+						/>
+						Verifying...
+					</span>
+				{:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
+					<button
+						type="submit"
+						class="sm:text-xs text-[9px] font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
+						disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+							$Cusdetails.Email,
+						) || $Cusdetails.Email.split("@")[1].includes("gmial")}
+					>
+						Verify
+					</button>
+				{:else if emailSent}
+					<span
+						class="text-2s font-semibold text-green-600 flex items-center"
+					>
+						{#if isOtpVerified}
+							Verified
+							<Icon
+								icon="material-symbols:verified-rounded"
+								class="w-4 h-4 ml-1"
+							/>
+						{:else}
+							<Icon
+								icon="fluent:mail-all-read-16-filled"
+								class="w-4 h-4 mr-1"
+							/>
+							Check your inbox
+						{/if}
+					</span>
+				{:else}
+					<span
+						class="text-2s font-semibold text-green-600 flex items-center"
+					>
+						Verified
+						<Icon
+							icon="material-symbols:verified-rounded"
+							class="w-4 h-4 ml-1"
+						/>
+					</span>
+				{/if}
+			</div>
+		</form>
+		{#if $Cusdetails.Email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test($Cusdetails.Email)}
+			<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+				Please enter a valid email address.
+			</div>
 		{/if}
-        {#if errorMessage && !$Cusdetails.Email}
-                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-                    Email is required</div>
-                {/if}
-		
+		{#if errorMessage && !$Cusdetails.Email}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			Email is required</div>
+		{/if}
+		{#if errorMessage7}
+    <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+        {errorMessage7}
+    </div>
+{/if}
+
+
+
+		{#if emailSent && isOtpVerified === false}
+			<br />
+
+			<form
+				action="?/verifyOtpEmail"
+				method="POST"
+				use:enhance={() => {
+					return async ({ result }) => {
+						loadingotp = false;
+						if (result.status === 200) {
+							if (result.data.status === 200) {
+								const verifiedMessage = result.data.message;
+								toast.success(verifiedMessage);
+								isOtpVerified = result.data.isEmailVerified;
+								enteredOtpemail = "";
+								ProfileEmailVerified = true;
+								console.log(isOtpVerified, "isOtpVerified");
+							} else {
+								const errorMessage =
+									result.data.message ||
+									"An unknown error occurred!";
+								toast.error(errorMessage);
+							}
+						} else {
+							const errorMessage =
+								result.data.message ||
+								"Request failed. Please try again.";
+							toast.error(errorMessage);
+						}
+					};
+				}}
+				on:submit={() => {
+					loadingotp = true;
+				}}
+			>
+				<div
+					class="flex items-center space-x-1 rounded-md md:w-3/4 sm:2/5 lg:w-1/2 w-full py-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+				>
+					<input
+						type="hidden"
+						name="email"
+						id="email"
+						bind:value={$Cusdetails.Email}
+					/>
+					<input
+						type="text"
+						name="enteredOtp"
+						bind:value={enteredOtpemail}
+						placeholder="Enter 6-digit OTP"
+						class="block w-full h-6 border-0 sm:text-sm text-xs focus:outline-none focus:ring-0"
+						on:input={() => {
+							enteredOtpemail = enteredOtpemail.trim();
+						}}
+					/>
+					<button
+						type="submit"
+						class="text-primary-600 font-semibold sm:text-xs text-[9px] rounded hover:underline pr-4"
+						disabled={loadingotp}
+					>
+						{#if loadingotp}
+							<span
+								class="text-2s font-semibold text-primary-600 flex items-center"
+							>
+								<Icon
+									icon="line-md:loading-alt-loop"
+									class="w-4 h-4 animate-spin"
+								/>
+								Verifying
+							</span>
+						{:else}
+							Verify
+						{/if}
+					</button>
+				</div>
+				<div class="">
+					<button
+						type="button"
+						on:click={handleResendOtpemail}
+						disabled={loadingotp}
+						class="sm:text-2s text-[8px]"
+					>
+						Didn't receive the code?
+						<span
+							class="sm:text-2s text-[8px] font-semibold text-primary-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							Get a new code
+						</span>
+					</button>
+				</div>
+			</form>
+		{/if}
 	</div>
 	<div class="mt-2 mb-2">
 		<label for="" class="sm:text-sm text-xs">Company name <span class="text-primary-500"> *</span></label>

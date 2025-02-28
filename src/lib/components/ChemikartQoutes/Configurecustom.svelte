@@ -251,6 +251,18 @@ else if (selectedSolvent === "Yes") {
 });
 // console.log("formDataformData",data);
 		</script>
+		<style>
+			.tooltip::after {
+				content: '';
+				position: absolute;
+				top: 100%; /* Position below the tooltip */
+				left: 50%;
+				margin-left: -5px; /* Center the triangle */
+				border-width: 7px;
+				border-style: solid;
+				border-color: black transparent transparent transparent; /* Triangle color */
+			}
+		</style>
 		<div class="bg-white py-10 flex justify-between">
 			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 1: Select custom solution type
@@ -326,7 +338,6 @@ else if (selectedSolvent === "Yes") {
 					  {#each Object.values(row) as cell, cellIndex} 
 						<td
 						  class="border p-2 text-center sm:text-md text-xs "
-						  contenteditable="true"
 						  on:blur={(e) => updateCell(rowIndex, cellIndex, e)}
 						>
 						  {cell}
@@ -418,15 +429,15 @@ else if (selectedSolvent === "Yes") {
 					  <Icon icon="ion:information" />
 					  <span class="u-sr-only"></span>
 					  <div
-						class="opacity-0 sm:text-md text-xs group-hover:opacity-100 duration-300 absolute w-40 box-content rounded p-4 border-2 bg-white z-10"
-						style="top: 100%; left: 50%; transform: translateX(-50%);"
+						class="tooltip absolute hidden group-hover:block w-40 p-2 text-center text-white bg-black rounded-md -bottom-10 left-1/2 transform -translate-x-1/2"
+						style="bottom: calc(100% + 30px); left: 50%; transform: translateX(-50%);"
 					  >
 						Ampoule
 					  </div>
 					</div>
 				  </button>
-				  
-				  
+				
+
 				  <button
 				  type="button"
 				  class="box-content rounded mx-5 my-4 h-24 w-32 border-2 transition duration-200 ease-in-out flex flex-col items-center justify-center
@@ -438,9 +449,9 @@ else if (selectedSolvent === "Yes") {
 					<Icon icon="ion:information" />
 					<span class="u-sr-only"></span>
 					<div
-					  class="opacity-0 group-hover:opacity-100 duration-300 absolute w-40 box-content rounded p-4 border-2 text-sm bg-white z-10"
-					  style="top: 100%; left: 50%; transform: translateX(-50%);"
-					>
+					class="tooltip absolute hidden group-hover:block w-40 text-xs p-2 text-center text-white bg-black rounded-md -bottom-10 left-1/2 transform -translate-x-1/2"
+					style="bottom: calc(100% + 30px); left: 50%; transform: translateX(-50%);"
+				>
 					  Bottle with screw cap
 					</div>
 				  </div>
@@ -456,9 +467,9 @@ else if (selectedSolvent === "Yes") {
 				  <Icon icon="ion:information" />
 				  <span class="u-sr-only"></span>
 				  <div
-					class="opacity-0 group-hover:opacity-100 duration-300 absolute w-40 box-content rounded p-4 border-2 text-sm bg-white z-10"
-					style="top: 100%; left: 50%; transform: translateX(-50%);"
-				  >
+				  class="tooltip absolute hidden group-hover:block w-40 p-2 text-center text-white bg-black rounded-md -bottom-10 left-1/2 transform -translate-x-1/2"
+				  style="bottom: calc(100% + 30px); left: 50%; transform: translateX(-50%);"
+			>
 					CERTAN® capillary bottle provides the benefits of a sealed ampoule
 					with the flexibility of a screw-cap bottle, ensuring minimal
 					evaporation even with volatile materials.
@@ -526,8 +537,8 @@ else if (selectedSolvent === "Yes") {
 								<Icon icon="ion:information" />
 								<span class="u-sr-only"></span>
 								<div
-								  class="opacity-0 group-hover:opacity-100 duration-300 absolute w-40 box-content rounded p-4 border-2 text-xs"
-								  style="background-color:#fff; top: 100%; left: 0%; transform: translateX(-50%); z-index: 10;"
+								class="tooltip absolute text-xs hidden group-hover:block w-40 p-2 text-center text-white bg-black rounded-md -bottom-10 left-1/2 transform -translate-x-1/2"
+								style="bottom: calc(100% + 10px); left: 50%; transform: translateX(-65%);"
 								>
 								  ISO 17034 Produced in accordance with internationally recognised
 								  requirements for the development and production of reference
@@ -551,9 +562,9 @@ else if (selectedSolvent === "Yes") {
 							<div class="relative group">
 								<Icon icon="ion:information" /><span class="u-sr-only"></span>
 								<div
-								class="opacity-0 group-hover:opacity-100 duration-300 absolute w-40 box-content rounded p-4 border-2 text-xs"
-								style="background-color:#fff; top: 100%; left: 0%; transform: translateX(-50%); z-index: 10;"
-							  >
+								class="tooltip text-xs absolute hidden group-hover:block w-40 p-2 text-center text-white bg-black rounded-md -bottom-10 left-1/2 transform -translate-x-1/2"
+								style="bottom: calc(100% + 10px); left: 50%; transform: translateX(-60%);"
+								>
 									ISO/IEC 17025 Produced in accordance with internationally
 									recognised requirements for the development and production of
 									reference standards and for the competence of reference standard
