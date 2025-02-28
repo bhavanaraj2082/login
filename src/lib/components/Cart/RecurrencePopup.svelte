@@ -10,7 +10,7 @@
   export let cartId
 
   $: month = recurrence?.recurring ? (recurrence?.recurring !== 1 && recurrence?.recurring !== 3 && recurrence?.recurring !== 6 && recurrence?.recurring !== 12 ? "Custom" : String(recurrence?.recurring)) : undefined
-  let custom = "Custom"
+  let custom =  String(recurrence?.recurring)
   let popup
   let error = ""
   let message = ""
@@ -33,7 +33,7 @@
   // minus15 = new Date(minus15).toISOString().split("T")[0]
   // plus15 = new Date(plus15).toISOString().split("T")[0]
 
-  // console.log(minus15,plus15,'object');
+   console.log(month,custom,'object');
 
   const handleClick = (e)=>{
 		if(!popup.contains(e.target)){
@@ -72,12 +72,12 @@
     if (date) {
         lastDayOfMonth = new Date(futureDate.getFullYear(), futureDate.getMonth() + 1, 0).getDate();
         console.log(lastDayOfMonth);
-    if (date > lastDayOfMonth) {
-        futureDate.setDate(lastDayOfMonth);
-    } else {
-        futureDate.setDate(date); 
-    }
-}
+        if (date > lastDayOfMonth) {
+          futureDate.setDate(lastDayOfMonth);
+        } else {
+          futureDate.setDate(date); 
+        }
+      }
 
     // If the date is invalid, log it
     // if (isNaN(futureDate)) {
@@ -178,7 +178,7 @@
          <input type="hidden" name="CartId" value={cartId}>
          <div>
             <label for="startDate" class=" font-medium text-sm w-full">Recurrence Date</label>
-            <input type="text" bind:value={lastDay} on:input={e=>calculateFutureDate(month,e.target.value)} class="border-1 text-sm border-gray-300 rounded w-full focus:ring-0 focus:border-primary-500" >
+            <input type="text" bind:value={lastDay} on:input={e=>calculateFutureDate(custom,e.target.value)} class="border-1 text-sm border-gray-300 rounded w-full focus:ring-0 focus:border-primary-500" >
             <p class="{!dateError.length ? "hidden" : ""} text-red-500 text-xs">{dateError}</p>
             <!-- <div class=" flex items-center w-full relative">
                <input type="date"  bind:value={oldDate} min={minus15} max={plus15} on:change={handleMonth} class=" full-width-input p-0 text-sm border-1 border-gray-300 rounded w-full sm:w-96 md:w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />

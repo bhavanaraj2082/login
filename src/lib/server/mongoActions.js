@@ -35,6 +35,7 @@ import {
 } from '$env/static/private';
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public'; 
 import Return from '$lib/server/models/Return.js';
+import Counter from '$lib/server/models/Counter';
 
 
 async function conversionRates() {
@@ -299,6 +300,15 @@ export async function favorite(favdata) {
 
 export const checkoutOrder = async (order) => {
 	try {
+        let orderid 
+		const counter = await Counter.findOne({})
+		if(counter?._id){
+			orderid = await Counter.findOneAndUpdate({_id:counter._id},{$inc:{counter:1}},{new:true})
+		}else{
+			orderid = await Counter.create({counter:1})
+		}
+		order.orderid = orderid.counter
+		//console.log(order,"_______________________________________");
 		const newOrder = await Order.create(order);
         for(let rec of order.orderdetails){
 			const stock = await Stock.findOneAndUpdate({_id:rec.stockId},{$inc:{orderedQty:rec.orderQty}},{new:true})
