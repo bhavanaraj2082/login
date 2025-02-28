@@ -7,15 +7,8 @@ const jsonSchema = {
 
 const chemiDashProfileSchema = new mongoose.Schema(
   {
-    account: {
-      type: String,
-      enum: ["For a Business", "For Myself"],
-      required: false,
-      default: "For Myself",
-    },
     companyname: { type: String, required: false, unique: false },
     companytype: { type: String, required: false, unique: false },
-    jobTitle: { type: String, required: false, unique: false },
     firstName: {
       type: String,
       required: false,
