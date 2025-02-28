@@ -12,9 +12,9 @@
 
 	export let data;
     $authedUser = data?.authedUser;
-	let cartData;
-	// console.log(data,"---------")
-    cartData = data?.cart?.cart[0]?.cartItems ||[]
+	//let cartData;
+	$:console.log(data,"---------")
+    $:cartData = data?.cart?.cart[0]?.cartItems ||[]
 	// authedUser.set(data.locals.authedUser)
 	let isLoggedIn = $authedUser?.id ? true : false
 

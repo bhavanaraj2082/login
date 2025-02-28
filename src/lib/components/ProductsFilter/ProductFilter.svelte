@@ -2,7 +2,7 @@
 	import { addItemToCart,cart,guestCart } from '$lib/stores/cart.js';
 	import { sendMessage } from '$lib/utils.js';
 	import { page } from '$app/stores';
-	import { goto,invalidate } from '$app/navigation';
+	import { goto,invalidateAll } from '$app/navigation';
     import { toast } from 'svelte-sonner';
     import Icon from "@iconify/svelte";
 	import { authedUser } from '$lib/stores/mainStores.js';
@@ -197,8 +197,9 @@
         backOrder
     }))
     sendMessage("?/addtocart",formdata,async(result)=>{
+        await invalidateAll()
+
         toast.success(result.message)
-        invalidate("/")
     })
      
   }

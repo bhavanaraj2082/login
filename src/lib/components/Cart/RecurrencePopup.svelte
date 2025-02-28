@@ -2,6 +2,7 @@
 	import Icon from '@iconify/svelte';
 	import { invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
+    import { fastify } from 'lucia/middleware';
 
   export let recureModal
   export let recurrence
@@ -9,16 +10,30 @@
   export let cartId
 
   $: month = recurrence?.recurring ? (recurrence?.recurring !== 1 && recurrence?.recurring !== 3 && recurrence?.recurring !== 6 && recurrence?.recurring !== 12 ? "Custom" : String(recurrence?.recurring)) : undefined
-  let custom = String(recurrence?.recurring)
+  let custom = "Custom"
   let popup
   let error = ""
-  let customError = ""
   let message = ""
+  let customError = ""
+  let dateError = ""
   let startingDate 
   let recurringDate
   let recurring
+  let isSave = true
+  let lastDayOfMonth
+  let lastDay =  new Date(recurrence?.recurringDate).getDate()||''
 
   let oldDate = recurrence?.previousRecurringDate ? new Date(recurrence.previousRecurringDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+
+  // let plus15 = new Date(oldDate)
+  // let minus15 = new Date(oldDate)
+  // minus15.setDate(minus15.getDate() - 15);
+  // plus15.setDate(plus15.getDate() + 15);
+
+  // minus15 = new Date(minus15).toISOString().split("T")[0]
+  // plus15 = new Date(plus15).toISOString().split("T")[0]
+
+  // console.log(minus15,plus15,'object');
 
   const handleClick = (e)=>{
 		if(!popup.contains(e.target)){
@@ -29,35 +44,86 @@
 		   togglePopup()
 		}
 	}
-
-  const handleMonth = (months)=>{
-    if(months === "Custom"){
-      month = months
+ let timeout
+  function calculateFutureDate(intervals, date) {
+    isSave = true
+    if(intervals === "Custom"){
+      console.log(intervals);
+     month = intervals
       return
     }
-    if(months === "1" || months === "3" || months === "6" || months === "12"){
-      month = months
-    }else{
-      month = "Custom"
+    if(intervals === "1" || intervals === "3" || intervals === "6" || intervals === "12"){
+      month = intervals
     }
 
-    error = ''
-    customError = ''
-    months = parseInt(months)
-    const d = oldDate.split('-')
-    const dateInUTC = new Date(parseInt(d[0]),parseInt(d[1])-1,parseInt(d[2]))
-    startingDate = new Date(dateInUTC.getTime() + (5.5 * 60 * 60 * 1000)).toISOString();
-    recurringDate = new Date(dateInUTC.getTime() + (5.5 * 60 * 60 * 1000));
-    recurringDate.setMonth(recurringDate.getMonth() + months )
-
-    if(recurrence?.recurringDate){
-      if(recurringDate.toISOString() < new Date().toISOString()){
-			  error = "Please adjust the start date or period if the recurrence falls in the current or previous month."
-        return
-      }
+    dateError = ""
+    if(!date || !/^\d+$/.test(date)){
+      dateError = "Required and enter a valid date"
+      return
     }
-    recurring = months
+    clearTimeout(timeout)
+    timeout = setTimeout(()=>{
+
+    const today = new Date();
+    const futureDate = new Date(today);
+
+    futureDate.setMonth(futureDate.getMonth() + parseInt(intervals));
+
+    if (date) {
+        lastDayOfMonth = new Date(futureDate.getFullYear(), futureDate.getMonth() + 1, 0).getDate();
+        console.log(lastDayOfMonth);
+    if (date > lastDayOfMonth) {
+        futureDate.setDate(lastDayOfMonth);
+    } else {
+        futureDate.setDate(date); 
+    }
+}
+
+    // If the date is invalid, log it
+    // if (isNaN(futureDate)) {
+    //     console.error('Calculated future date is invalid');
+    //     return null; // Avoid returning an invalid date
+    // }
+    startingDate = new Date().toISOString()
+    recurringDate = futureDate.toISOString()
+    recurring = parseInt(intervals)
+    lastDay = futureDate.getDate()
+    console.log(recurring,"oo",recurringDate,"pp",startingDate,'object',lastDay);
+    isSave = false
+    // Return the future date as a Date object
+    //return futureDate; // Return as Date, not as string
+    },1000)
+    
   }
+
+  // const handleMonth = (months)=>{
+  //   if(months === "Custom"){
+  //     month = months
+  //     return
+  //   }
+  //   if(months === "1" || months === "3" || months === "6" || months === "12"){
+  //     month = months
+  //   }else{
+  //     month = "Custom"
+  //   }
+
+  //   error = ''
+  //   customError = ''
+  //   months = parseInt(months)
+  //   const d = oldDate.split('-')
+  //   const dateInUTC = new Date(parseInt(d[0]),parseInt(d[1])-1,parseInt(d[2]))
+  //   startingDate = new Date(dateInUTC.getTime() + (5.5 * 60 * 60 * 1000)).toISOString();
+  //   recurringDate = new Date(dateInUTC.getTime() + (5.5 * 60 * 60 * 1000));
+  //   recurringDate.setMonth(recurringDate.getMonth() + months )
+
+  //   if(recurrence?.recurringDate){
+  //     if(recurringDate.toISOString() < new Date().toISOString()){
+	// 		  error = "Please adjust the start date or period if the recurrence falls in the current or previous month."
+  //       return
+  //     }
+  //   }
+  //   recurring = months
+// }
     
   function handleSubmit({cancel}) {
     if(error.length > 0 || month === "Custom" && !custom){
@@ -73,12 +139,14 @@
       if(result.type === "success"){
         if(result.data.success){
           message = result.data.msg
-          invalidate("data:cart")
           error = ''
           customError = ''
-          togglePopup()
+          
           setTimeout(()=>{
+            togglePopup()
             message =""
+            invalidate("data:cart")
+
           },1000)
         }
       }
@@ -98,7 +166,7 @@
            </div>
         {:else}
         <div class=" flex items-center justify-between">
-        <h2 class="text-lg md:text-xl font-medium"> Recurrence</h2>
+        <h2 class="text-lg md:text-xl font-medium">Recurrence</h2>
          <button type="button" on:click={()=>{
           togglePopup()
           }}>
@@ -109,16 +177,18 @@
          <input type="hidden" name="dates" value={JSON.stringify({startingDate,recurringDate,recurring,cartId})}>
          <input type="hidden" name="CartId" value={cartId}>
          <div>
-            <label for="startDate" class=" font-medium text-sm w-full">Recurrence Starting Date</label>
-            <div class=" flex items-center w-full relative">
-               <input type="date"  bind:value={oldDate} on:change={handleMonth} class=" full-width-input p-0 text-sm border-1 border-gray-300 rounded w-full sm:w-96 md:w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label for="startDate" class=" font-medium text-sm w-full">Recurrence Date</label>
+            <input type="text" bind:value={lastDay} on:input={e=>calculateFutureDate(month,e.target.value)} class="border-1 text-sm border-gray-300 rounded w-full focus:ring-0 focus:border-primary-500" >
+            <p class="{!dateError.length ? "hidden" : ""} text-red-500 text-xs">{dateError}</p>
+            <!-- <div class=" flex items-center w-full relative">
+               <input type="date"  bind:value={oldDate} min={minus15} max={plus15} on:change={handleMonth} class=" full-width-input p-0 text-sm border-1 border-gray-300 rounded w-full sm:w-96 md:w-full focus:outline-none focus:ring-2 focus:ring-blue-500" />
                <Icon icon="uil:calender" class=" shrink-0 text-xl absolute right-3 " />
-           </div>
+           </div> -->
          </div>
 
          <div>
-            <label for="recurrence" class=" font-medium text-sm">Choose Recurrence Period</label><br>
-         <select name="recurring" value={month} on:change={e=>handleMonth(e.target.value)} id="recurrence" class=" border-1 text-sm border-gray-300 rounded w-full focus:ring-0 focus:border-primary-500">
+            <label for="recurrence" class=" font-medium text-sm">Choose Recurrence Interval</label><br>
+         <select name="recurring" value={month} on:change={e=>calculateFutureDate(e.target.value,lastDay)} id="recurrence" class=" border-1 text-sm border-gray-300 rounded w-full focus:ring-0 focus:border-primary-500">
             <option selected hidden value="Select">Select</option>
             <option value="1">Monthly</option>
             <option value="3">Quarterly</option>
@@ -131,7 +201,7 @@
          {#if month === "Custom"}
          <div class=" font-medium">
             <label for="custom" class=" font-medium text-sm">Custom Interval</label><br>
-            <select name="recurring" bind:value={custom} on:change={e=>handleMonth(e.target.value)} id="custom" class="border-1 text-sm border-gray-300 rounded w-1/2 focus:ring-0 focus:border-primary-500">
+            <select name="recurring" bind:value={custom} on:change={e=>calculateFutureDate(e.target.value,lastDay)} id="custom" class="border-1 text-sm border-gray-300 rounded w-1/2 focus:ring-0 focus:border-primary-500">
                 <option selected hidden value="">Select</option>
                 {#each ["2", "4", "5", "7", "8", "9", "10", "11"] as months}
                   <option value={months}>{months}</option>
@@ -141,7 +211,7 @@
          </div>
          {/if}
         <div class="flex gap-4 justify-between text-sm font-medium mt-4">
-          <button type="submit" class="w-full py-2 bg-primary-600 text-white rounded hover:bg-primary-700 focus:outline-none">
+          <button disabled={isSave} type="submit" class="w-full py-2 bg-primary-600 text-white rounded hover:bg-primary-700 focus:outline-none disabled:bg-gray-100 disabled:cursor-not-allowed">
             Save
           </button>
           <button formaction="?/deleteRecurring" type="submit" class="{!recurrence?.recurring ? "hidden":""} w-full py-2 bg-white text-primary-600 border-1 border-primary-600 rounded hover:bg-primary-100 focus:outline-none">

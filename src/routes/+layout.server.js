@@ -8,7 +8,7 @@ export const load = async({ url, cookies, locals,depends }) => {
 			cookies.delete('token', { path: '/' });
 			redirect(302, '/login');
 		}
-		depends("/")
+		depends("data:load")
 		const cart = await getCart(locals.authedUser?.id)
 
        let authedUser = {};
