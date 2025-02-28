@@ -159,7 +159,7 @@
 			}else{
 				toast.error(result.message)
 			}
-			invalidate("/")
+			invalidate("data:load")
 
 		})
 	};
@@ -178,7 +178,7 @@
 			}else{
 				toast.error(result.message)
 			}
-			invalidate("/")
+			invalidate("data:load")
 
 		})
 	};
