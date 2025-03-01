@@ -122,10 +122,10 @@
 
         if (record?.variants && Array.isArray(record.variants)) {
           record.variants.forEach((variant, variantIndex) => {
-            console.log(`Processing variant ${variantIndex}`, variant);
+            // console.log(`Processing variant ${variantIndex}`, variant);
 
             if (variant?.pricing && typeof variant.pricing === "object") {
-              console.log(`Found pricing object:`, variant.pricing);
+              // console.log(`Found pricing object:`, variant.pricing);
 
               let priceValue = Number(variant.pricing.INR);
 
@@ -148,11 +148,13 @@
     //   console.log(`Final minPrice: ${minPrice}, maxPrice: ${maxPrice}`);
   }
 
+let productStock = data.records;
 let index = 0; 
-let selectedStockId = ""; 
+let selectedStockId = productStock?.[0]?.stockId?.[0] || "NA"; 
+
 function handleThumbnailClick(selectedIndex, product) {
-  index = selectedIndex;
-  selectedStockId = product?.stockId?.[index] || "NA";
+  index = selectedIndex ?? 0;
+  selectedStockId = product?.stockId?.[index] || product?.stockId?.[0] || "NA";
   // console.log("Updated Index:", index);
   // console.log("Updated Stock ID:", selectedStockId);
 }
@@ -163,7 +165,7 @@ function handleThumbnailClick(selectedIndex, product) {
 
   function toggleLike() {
     isFavorite = !isFavorite; 
-    console.log("isFavorite changed:", isFavorite);
+    // console.log("isFavorite changed:", isFavorite);
   }
 
   onMount(() => {
@@ -234,8 +236,8 @@ function handleThumbnailClick(selectedIndex, product) {
     stockId: selectedStockId || "NA",
     quantity: quantity,
     backOrder,
-    price: product.priceSize[index]?.INR || 0, 
-    size: product.priceSize[index]?.break || "N/A", 
+    // price: product.priceSize[index]?.INR || 0, 
+    // size: product.priceSize[index]?.break || "N/A", 
   };
   // console.log("Cart Item Before Adding:", cartItem); 
 
@@ -247,7 +249,7 @@ function handleThumbnailClick(selectedIndex, product) {
   }
 
   const formdata = new FormData();
-  formdata.append("item", JSON.stringify(cartItem));
+  formdata.append("items", JSON.stringify(cartItem));
   sendMessage("?/addtocart", formdata, async (result) => {
     toast.success(result.message);
     invalidate("/");
@@ -404,7 +406,7 @@ function handleThumbnailClick(selectedIndex, product) {
                   value={product?.manufacturer?._id}
                 />
                 <input type="hidden" name="authedEmail" value={authedEmail} />
-                <input type="hidden" name="stockId" value={product?.stockId} />
+                <input type="hidden" name="stockId" value={selectedStockId} />
                 <!-- <input
 				  type="hidden"
 				  name="size"
