@@ -2,7 +2,7 @@
 
     import Manualupload from "$lib/components/quickorder/Manualupload.svelte"
       export let data;
-  console.log(data)
+  // console.log(data)
       
       
   </script>
