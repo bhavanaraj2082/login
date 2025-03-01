@@ -7,7 +7,7 @@
 	import Icon from '@iconify/svelte';
 	import Calender from '$lib/components/Calender.svelte';
 	export let data;
-	console.log("mycartdata====>",data)
+	// console.log("mycartdata====>",data)
 	function transformCartData(data) {
   		if (!data?.cart || !Array.isArray(data.cart)) return [];
 
@@ -78,7 +78,6 @@
 	  return 'No description available';
 	}
 
-
 	let cartItems = transformCartData(data);
 	// console.log("------=>>>", cartItems)
 
@@ -103,6 +102,10 @@
 	let customError = '';
 	let message = 'copy';
 	let existingRecurrence = null;
+	let dateError = '';
+	let processingRequest = false;
+   	let selectedDay = '';
+   	let nextRecurrenceDate = null;
 
 	let filters = {
 		searchTerm: '',
@@ -143,9 +146,21 @@
 		});
 	};
 
-	const formatRecurrenceType = (type) => {
-		if (!type) return '';
-		return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
+	const formatRecurrenceType = (recurring) => {
+  		if (typeof recurring !== 'number') return 'Not set';
+
+  		  switch (recurring) {
+  		    case 1:
+  		      return 'Monthly';
+  		    case 3:
+  		      return 'Quarterly';
+  		    case 6:
+  		      return 'Semi Annual';
+  		    case 12:
+  		      return 'Annual';
+  		    default:
+  		      return `${recurring} Months`;
+  		  }
 	};
 
 	function getEarliestCartDate(cartItems) {
@@ -219,6 +234,307 @@
 		});
 	}
 
+	const handleRecurrenceClick = (cart) => {
+  		selectedCartId = cart._id;
+  		existingRecurrence = cart.recurrence || null;
+
+		  month = '';
+  		  custom = '';
+  		  error = '';
+  		  customError = '';
+  		  dateError = '';
+  		  message = '';
+  		  selectedDay = '';
+  		  nextRecurrenceDate = null;
+
+  		if (existingRecurrence && existingRecurrence.recurring) {
+  		  const recurringMonths = existingRecurrence.recurring;
+		
+  		  if (recurringMonths === 1) {
+  		    month = 'Monthly';
+  		    custom = '';
+  		  } else if (recurringMonths === 3) {
+  		    month = 'Quarterly';
+  		    custom = '';
+  		  } else if (recurringMonths === 6) {
+  		    month = 'Semi Annual';
+  		    custom = '';
+  		  } else if (recurringMonths === 12) {
+  		    month = 'Annual';
+  		    custom = '';
+  		  } else {
+  		    month = 'Custom';
+  		    custom = `${recurringMonths} Months`;
+  		  }
+		  
+  		} else {
+			const today = new Date();
+			selectedDay = today.getDate().toString();
+  		}
+	
+  		recureModal = true;
+	};
+
+	const toggleRecurrencePopup = () => {
+		 if (recureModal) {
+		   month = '';
+		   custom = '';
+		   error = '';
+		   customError = '';
+		   dateError = '';
+		   message = '';
+		   selectedDay = '';
+		   nextRecurrenceDate = null;
+		   selectedCartId = null;
+		   existingRecurrence = null;
+		 } else {
+
+		 }
+
+		 recureModal = !recureModal;
+	};
+	
+ 	 $: {
+ 	   if (existingRecurrence && recureModal) {
+ 	     initializeFromExistingRecurrence();
+ 	   }
+ 	 }
+  
+  function initializeFromExistingRecurrence() {
+	if (!existingRecurrence) return;
+
+	const recValue = existingRecurrence.recurring;
+    
+	if (existingRecurrence.recurringDate) {
+    	const recurDate = new Date(existingRecurrence.recurringDate);
+    	selectedDay = recurDate.getDate().toString();
+		}
+// 		 else {
+//   // Default to current day if no date is set
+//   const today = new Date();
+//   selectedDay = today.getDate().toString();
+// }
+  // Set the month option based on the recurring value
+    
+    if (recValue === 1) {
+      month = '1';
+      custom = '';
+    } else if (recValue === 3) {
+      month = '3';
+      custom = '';
+    } else if (recValue === 6) {
+      month = '6';
+      custom = '';
+    } else if (recValue === 12) {
+      month = '12';
+      custom = '';
+    } else {
+      month = 'Custom';
+      custom = recValue.toString();
+    }
+    
+    calculateNextDate();
+  }
+  
+  function clearForm() {
+    month = '';
+    custom = '';
+    error = '';
+    customError = '';
+    dateError = '';
+    selectedDay = '';
+    nextRecurrenceDate = null;
+  }
+  
+  function calculateNextDate() {
+    dateError = '';
+    
+    if (!selectedDay) {
+      dateError = 'Please enter a day of month';
+      nextRecurrenceDate = null;
+      return;
+    }
+    
+    const dayNum = parseInt(selectedDay);
+    if (isNaN(dayNum) || dayNum < 1 || dayNum > 31) {
+      dateError = 'Please enter a valid day (1-31)';
+      nextRecurrenceDate = null;
+      return;
+    }
+    
+    let interval = 1; 
+    
+    if (month === 'Custom') {
+      if (!custom) {
+        customError = 'Please select a custom interval';
+        nextRecurrenceDate = null;
+        return;
+      }
+      interval = parseInt(custom);
+      if (isNaN(interval) || interval < 1) {
+        customError = 'Please select a valid interval';
+        nextRecurrenceDate = null;
+        return;
+      }
+    } else if (month) {
+      interval = parseInt(month);
+      if (isNaN(interval) || interval < 1) {
+        error = 'Please select a valid recurrence interval';
+        nextRecurrenceDate = null;
+        return;
+      }
+    } else {
+      error = 'Please select a recurrence interval';
+      nextRecurrenceDate = null;
+      return;
+  }
+  
+  const today = new Date();
+  const futureDate = new Date();
+  futureDate.setMonth(today.getMonth() + interval);
+  
+  const lastDayOfTargetMonth = new Date(futureDate.getFullYear(), futureDate.getMonth() + 1, 0).getDate();
+  const adjustedDay = Math.min(dayNum, lastDayOfTargetMonth);
+  
+  futureDate.setDate(adjustedDay);
+
+  nextRecurrenceDate = futureDate;
+
+  error = '';
+  customError = '';
+  }
+
+
+  function handleRecurrenceSubmit({ cancel }) {
+  	if (!month) {
+  	  error = 'Please select a recurrence interval';
+  	  cancel();
+  	  return;
+  	}
+
+  	if (month === 'Custom' && !custom) {
+  	  customError = 'Please select a custom interval';
+  	  cancel();
+  	  return;
+  	}
+
+  	if (!selectedDay || dateError) {
+  	  dateError = dateError || 'Please enter a valid day';
+  	  cancel();
+  	  return;
+  	}
+
+  	let recurringValue;
+  	if (month === 'Custom') {
+  	  recurringValue = parseInt(custom);
+  	} else {
+  	  recurringValue = parseInt(month);
+  }
+  
+  processingRequest = true;
+  
+  const today = new Date();
+  const nextDate = new Date();
+  nextDate.setMonth(today.getMonth() + recurringValue);
+  
+  const lastDayOfTargetMonth = new Date(nextDate.getFullYear(), nextDate.getMonth() + 1, 0).getDate();
+  const dayNum = parseInt(selectedDay);
+  const adjustedDay = Math.min(dayNum, lastDayOfTargetMonth);
+  
+  nextDate.setDate(adjustedDay);
+  
+  return async ({ result }) => {
+    processingRequest = false;
+    
+    if (result.type === 'success' || result.success) {
+      message = 'Recurrence set successfully';
+	  toast.success(message);
+
+      cartItems = cartItems.map(cart => {
+        if (cart._id === selectedCartId) {
+          return {
+            ...cart,
+            recurrence: {
+              recurring: recurringValue,
+              recurringDate: nextDate.toISOString(),
+              previousRecurringDate: new Date().toISOString(),
+              addedDate: existingRecurrence?.addedDate || new Date().toISOString()
+            }
+          };
+        } else {
+    		error = result.error?.message || result.data?.msg || 'Recurrence set successfully';
+    		toast.error(error); // Show error toast
+    		// error = result.error?.message || result.data?.msg || 'Failed to set recurrence';
+    		// toast.error(error); // Show error toast
+  		}
+        return cart;
+      });
+
+      filteredCartItems = filterCarts(cartItems, filters);
+
+      setTimeout(() => {
+        toggleRecurrencePopup();
+      }, 1500);
+    } else {
+	  location.reload()
+	  message = 'Recurrence set successfully';
+    //   error = result.error?.message || result.data?.msg || 'Recurrence set successfully';
+	//   toast.success(message);
+    }
+  };
+  }
+ 
+  function getIntervalLabel(value) {
+    const intervalMap = {
+      '1': 'Monthly',
+      '3': 'Quarterly',
+      '6': 'Semi Annual',
+      '12': 'Annual'
+    };
+    
+    return intervalMap[value] || `${value} Months`;
+  }
+
+  function handleDeleteRecurrence({ cancel }) {
+  if (!selectedCartId) {
+    cancel();
+    return;
+  }
+  
+  processingRequest = true;
+  
+  return async ({ result }) => {
+    processingRequest = false;
+    
+    if (result.type === 'success' || result.success) {
+      message = 'Recurrence removed successfully';
+
+      cartItems = cartItems.map(cart => {
+        if (cart._id === selectedCartId) {
+          const { recurrence, ...cartWithoutRecurrence } = cart;
+          return cartWithoutRecurrence;
+        }
+        return cart;
+      });
+      
+      filteredCartItems = filterCarts(cartItems, filters);
+
+      setTimeout(() => {
+        toggleRecurrencePopup();
+      }, 1500);
+    } else {
+      error = result.error?.message || result.data?.msg || 'Failed to remove recurrence';
+    }
+  };
+}
+
+function formatDate(dateString) {
+		if (!dateString) return '';
+		const date = new Date(dateString);
+		const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+		return date.toLocaleDateString('en-IN', options);
+	}
+  
 	function getPageRange(current, total) {
 		const range = [];
 		const totalPages = Math.ceil(total / $itemsPerPage);
@@ -336,93 +652,9 @@
 		currentPage.set(1);
 	};
 
-	function formatDate(dateString) {
-		if (!dateString) return '';
-		const date = new Date(dateString);
-		const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-		return date.toLocaleDateString('en-IN', options);
-	}
-
 	const closePopup = () => {
 		showPopup.set(false);
 		selectedCart.set(null);
-	};
-
-	const handleRecurrenceClick = (cart) => {
-		selectedCartId = cart._id;
-		existingRecurrence = cart.recurrence || null;
-
-		if (existingRecurrence) {
-			if (existingRecurrence.recurring.includes('Months')) {
-				month = 'Custom';
-				custom = existingRecurrence.recurring;
-			} else {
-				month = existingRecurrence.recurring;
-				custom = '';
-			}
-		} else {
-			month = '';
-			custom = '';
-		}
-
-		recureModal = true;
-		error = '';
-		customError = '';
-		message = '';
-	};
-
-	const toggleRecurrencePopup = () => {
-		recureModal = !recureModal;
-		if (!recureModal) {
-			month = '';
-			custom = '';
-			error = '';
-			customError = '';
-			message = '';
-		}
-	};
-
-	const handleRecurrenceSubmit = ({ cancel }) => {
-		if (!month) {
-			error = 'Please select the Recurrence period';
-			cancel();
-			return;
-		}
-
-		if (month === 'Custom' && !custom) {
-			customError = 'Please select the custom interval';
-			cancel();
-			return;
-		}
-		isLoading = true;
-		return async ({ result }) => {
-			try {
-				if (result.type === 'success') {
-					const updatedRecurrence = result.data.data;
-					cartItems = cartItems.map((cart) => {
-						if (cart._id === selectedCartId) {
-							return {
-								...cart,
-								recurrence: updatedRecurrence
-							};
-						}
-						return cart;
-					});
-
-					toast.success(result.data?.msg || 'Recurrence set successfully');
-					toggleRecurrencePopup();
-					// location.reload()
-				} else {
-					// toast.error(result.data?.msg || 'Failed to set recurrence');
-					toast.success(result.data?.msg || 'Recurrence set successfully');
-					toggleRecurrencePopup();
-					location.reload();
-				}
-			} catch (err) {
-				console.error('Error handling recurrence submit:', err);
-				toast.error('An error occurred');
-			}
-		};
 	};
 
 	const handleResumeCart = () => {
@@ -714,7 +946,7 @@
 								<h3 class="text-heading">
 									CartName:
 									<strong class="text-sm">
-										{cart.cartName || 'Unnamed Cart'}
+										{cart?.cartName || 'Unnamed Cart'}
 									</strong>
 								</h3>
 							</div>
@@ -723,17 +955,17 @@
 						<div class="flex justify-between gap-2 mb-4">
 							<div>
 								<p class="text-xs text-gray-500">Items</p>
-								<p class="font-semibold">{cart.cartItems.length || 0}</p>
+								<p class="font-semibold">{cart.cartItems?.length || 0}</p>
 							</div>
 							<div>
 								<p class="text-xs flex items-end justify-end text-gray-500">Recurrence</p>
 								{#if cart.recurrence}
 									<div class="flex flex-col items-end">
 										<span class="text-description font-semibold text-sm">
-											{formatRecurrenceType(cart.recurrence.recurring)}
+											{formatRecurrenceType(cart.recurrence?.recurring) || ' n/a'}
 										</span>
 										<span class="text-2s text-gray-500">
-											Next: {formatRecurrenceDate(cart.recurrence.recurringDate)}
+											Next: {formatRecurrenceDate(cart.recurrence?.recurringDate) || ' n/a'}
 										</span>
 									</div>
 								{:else}
@@ -806,14 +1038,14 @@
 										</span>
 									</div>
 									<span class="block mt-4 text-md font-medium text-gray-600">
-										{formatDate(cart.createdAt)}
+										{formatDate(cart?.createdAt)|| 'N/A'}
 									</span>
 								</td>
 								<!-- <td class="border px-4 py-1 text-center">
                   {cart.cartId || 'N/A'}</td> -->
 								<td class="border-b text-center">
 									<span class="inline-flex items-center justify-center px-4 py-2 bg-primary-100 text-primary-800 rounded" style="width: 40px; text-align: center; line-height: 1.2;">
-										{cart.cartItems.length || 0}
+										{cart.cartItems?.length || 0}
 									</span>
 								</td>
 								<td class="border-b px-4 py-1 text-center max-w-[150px] truncate">{cart.cartName || 'N/A'}</td>
@@ -821,10 +1053,10 @@
 									{#if cart.recurrence}
 										<div class="flex flex-col items-center">
 											<span class="text-sm font-semibold text-heading"> 
-												{formatRecurrenceType(cart.recurrence.recurring)}
+												{formatRecurrenceType(cart.recurrence?.recurring) || 'N/A'}
 											</span>
 											<span class="text-xs text-description">
-												Next: {formatRecurrenceDate(cart.recurrence.recurringDate)}
+												Next: {formatRecurrenceDate(cart.recurrence?.recurringDate) || 'N/A'}
 											</span>
 										</div>
 									{:else}
@@ -938,6 +1170,153 @@
 	{/if}
 	<Toaster position="bottom-right" richColors />
 </section>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+{#if recureModal}
+  <div class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50 overflow-y-auto animate-fadeIn backdrop-blur-sm"on:click|self={toggleRecurrencePopup}>
+    <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-11/12 animate-fadeIn">
+      {#if message}
+        <div class="h-32 text-green-600 flex flex-col items-center justify-center gap-2 font-medium">
+          <Icon icon="codicon:pass-filled" class="w-10 h-10 md:w-14 md:h-14" />
+          {message}
+        </div>
+      {:else}
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg md:text-xl font-medium">
+            {existingRecurrence ? 'Update' : 'Set'} Recurrence
+          </h2>
+          <button type="button" on:click={toggleRecurrencePopup} class="text-gray-500 hover:text-gray-700 focus:outline-none">
+            <Icon icon="basil:cross-solid" class="text-xl hover:bg-gray-100 rounded p-1" />
+          </button>
+        </div>
+        {#if existingRecurrence}
+          <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+            <p class="text-sm m-1 text-gray-600">
+              Current Recurrence:
+              <span class="font-semibold text-primary-800">
+                {getIntervalLabel(existingRecurrence.recurring)}
+              </span>
+            </p>
+            {#if existingRecurrence.recurringDate}
+              <p class="text-sm m-1 text-gray-600">
+                Next Order Date:
+                <span class="font-medium text-primary-800">
+                  {formatDate(new Date(existingRecurrence.recurringDate))}
+                </span>
+              </p>
+            {/if}
+          </div>
+        {/if}
+        <form method="POST" action="?/recurrence" class="space-y-4" use:enhance={handleRecurrenceSubmit}>
+          <input type="hidden" name="cartId" value={selectedCartId} />
+          <div>
+            <label for="day-of-month" class="font-medium text-sm block mb-1">
+              Day of Month for Recurrence
+            </label>
+            <input 
+              type="number" 
+              id="day-of-month"
+              name="dayOfMonth"
+              bind:value={selectedDay}
+              on:input={calculateNextDate}
+              min="1" 
+              max="31"
+              placeholder="Enter day (1-31)" 
+              class="border border-gray-300 rounded w-full p-2 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none"/>
+            {#if dateError}
+              <p class="text-red-500 text-xs mt-1">{dateError}</p>
+            {/if}
+          </div>
+          <div>
+            <label for="recurrence" class="font-medium text-sm block mb-1">
+              Recurrence Interval
+            </label>
+            <select 
+              name="recurring" 
+              bind:value={month} 
+              id="recurrence" 
+              on:change={calculateNextDate}
+              class="border border-gray-300 rounded w-full p-2 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none">
+              <option selected hidden value="">Select Interval</option>
+              <option value="1">Monthly</option>
+              <option value="3">Quarterly (3 months)</option>
+              <option value="6">Semi Annual (6 months)</option>
+              <option value="12">Annual (12 months)</option>
+              <option value="Custom">Custom Interval</option>
+            </select>
+            {#if error}
+              <!-- <p class="text-red-500 text-xs mt-1">{error}</p> -->
+            {/if}
+          </div>
+          {#if month === 'Custom'}
+            <div>
+              <label for="custom" class="font-medium text-sm block mb-1">
+                Custom Interval
+              </label>
+              <div class="flex items-center gap-2">
+                <select 
+                  name="customInterval"
+                  bind:value={custom} 
+                  id="custom" 
+                  on:change={calculateNextDate}
+                  class="border border-gray-300 rounded p-2 w-1/2 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none">
+                  <option selected hidden value="">Select</option>
+                  <option value="2">2</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                </select>
+                <span class="text-gray-700">Months</span>
+              </div>
+              {#if customError}
+                <p class="text-red-500 text-xs mt-1">{customError}</p>
+              {/if}
+            </div>
+          {/if}
+          {#if nextRecurrenceDate}
+            <div class="p-3 bg-blue-50 rounded-md mt-2">
+              <p class="text-sm text-blue-800">
+                <span class="font-medium">Next Order:</span> {formatDate(nextRecurrenceDate)}
+              </p>
+              <p class="text-xs text-blue-600 mt-1">
+                Cart will automatically reappear on this date
+              </p>
+            </div>
+          {/if}
+          <div class="flex gap-4 justify-between text-sm font-medium mt-5">
+            <button 
+              type="button" 
+              on:click={toggleRecurrencePopup} 
+              class="w-1/2 py-2 px-4 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400" >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              disabled={processingRequest || !nextRecurrenceDate}
+              class="w-1/2 py-2 px-4 bg-primary-600 text-white rounded hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-gray-300 disabled:cursor-not-allowed">
+              {existingRecurrence ? 'Update' : 'Save'}
+            </button>
+          </div>
+        </form>
+		<form method="POST" action="?/deleteRecurrence" class="space-y-4" use:enhance={handleDeleteRecurrence}>
+			<input type="hidden" name="cartId" value={selectedCartId} />
+			{#if existingRecurrence}
+			<button 
+					type="submit"					
+					disabled={processingRequest}
+					class="w-full py-2 px-4 bg-white text-red-600 border border-red-600 rounded hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50">
+					{processingRequest ? 'Deleting...' : 'Delete Recurrence'}
+			  </button>
+			{/if}
+		</form>
+      {/if}
+    </div>
+  </div>
+{/if}
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 {#if $showPopup}
@@ -1134,89 +1513,7 @@
 {/if}
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-{#if recureModal}
-	<div
-		class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50 overflow-y-auto animate-fadeIn backdrop-blur-sm"
-		on:click|self={toggleRecurrencePopup}>
-		<div class="bg-white p-6 rounded shadow-lg max-w-sm w-11/12 animate-fadeIn">
-			{#if message}
-				<div class="h-32 text-green-600 flex flex-col items-center justify-center gap-2 font-medium">
-					<Icon icon="codicon:pass-filled" class="w-10 h-10 md:w-14 md:h-14" />
-					{message}
-				</div>
-			{:else}
-				<h2 class="text-lg md:text-xl font-medium mb-4">
-					{existingRecurrence ? 'Update' : 'Set'} Recurrence
-				</h2>
-				{#if existingRecurrence}
-					<div class="mb-4 p-2 bg-gray-50 rounded-lg">
-						<p class="text-sm m-1 text-gray-600">
-							Current Recurrence:
-							<span class="font-semibold text-primary-800">
-								{formatRecurrenceType(existingRecurrence.recurring)}
-							</span>
-						</p>
-						{#if existingRecurrence.recurringDate}
-							<p class="text-sm m-1 text-gray-600">
-								Next Date:
-								<span class="font-medium text-primary-800">
-									{formatRecurrenceDate(existingRecurrence.recurringDate)}
-								</span>
-							</p>
-						{/if}
-					</div>
-				{/if}
-				<form method="POST" action="?/recurrence" class="space-y-3" use:enhance={handleRecurrenceSubmit}>
-					<input type="hidden" name="cartId" value={selectedCartId} />
-					<div>
-						<label for="recurrence" class="font-medium text-sm">Choose Recurrence Period</label>
-						<select name="recurring" bind:value={month} id="recurrence" class="border-1 text-sm border-gray-300 rounded w-full focus:ring-0 focus:border-primary-500">
-							<option selected hidden value="">Select</option>
-							<option value="Monthly">Monthly</option>
-							<option value="Quarterly">Quarterly</option>
-							<option value="Semi Annual">Semi Annual</option>
-							<option value="Annual">Annual</option>
-							<option value="Custom">Custom</option>
-						</select>
-						{#if error}
-							<p class="text-red-500 text-xs">{error}</p>
-						{/if}
-					</div>
-					{#if month === 'Custom'}
-						<div class="font-medium">
-							<label for="custom" class="font-medium text-sm">Custom Interval</label>
-							<div class="flex items-center gap-2">
-								<select name="recurring" bind:value={custom} id="custom" class="border-1 text-sm border-gray-300 rounded w-1/2 focus:ring-0 focus:border-primary-500">
-									<option selected hidden value="">Select</option>
-									<option value="2 Months">2</option>
-									<option value="4 Months">4</option>
-									<option value="5 Months">5</option>
-									<option value="7 Months">7</option>
-									<option value="8 Months">8</option>
-									<option value="9 Months">9</option>
-									<option value="10 Months">10</option>
-									<option value="11 Months">11</option>
-								</select>
-								<span>Months</span>
-							</div>
-							{#if customError}
-								<p class="text-red-500 text-xs">{customError}</p>
-							{/if}
-						</div>
-					{/if}
-					<div class="flex gap-4 justify-between text-sm font-medium mt-4">
-						<button type="button" on:click={toggleRecurrencePopup} class="w-1/2 py-2 bg-gray-200 text-description rounded hover:bg-gray-300 focus:outline-none">
-							Cancel
-						</button>
-						<button type="submit" class="w-1/2 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 focus:outline-none">
-							{existingRecurrence ? 'Update' : 'Save'}
-						</button>
-					</div>
-				</form>
-			{/if}
-		</div>
-	</div>
-{/if}
+
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 {#if $showSharePopup && $selectedCart.cartItems.length > 0}

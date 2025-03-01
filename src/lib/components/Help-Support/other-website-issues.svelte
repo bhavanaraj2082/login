@@ -858,6 +858,7 @@ onMount(() => {
     <input hidden name="issueName" value="Technical Problems" />
 
     <div class="mt-4">
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label class="block text-sm"
         >Please let us know how we may assist you:</label
       >
@@ -876,6 +877,7 @@ onMount(() => {
     </div>
 
     <div class="mt-4">
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label class="block text-sm pb-2"
         >Please attach any images or files that may assist in troubleshooting
         or investigation:</label
@@ -925,6 +927,7 @@ onMount(() => {
       </p>
     </div>
     <div class="mt-4">
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label class="block text-sm">*Would you like us to contact you?</label>
       <div class="mt-2">
         <label class="block text-sm py-2">
