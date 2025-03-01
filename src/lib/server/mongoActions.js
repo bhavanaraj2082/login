@@ -2824,75 +2824,107 @@ export const createNewCart = async (body) => {
     }
 };
 
-export const updateRecurrence = async (body) => {
-	const { cartId, recurring } = body;
-
-	const calculateNextRecurringDate = (recurringType) => {
-		const today = new Date();
-		const type = recurringType.toLowerCase();
-
-		switch (type) {
-			case 'monthly':
-				return new Date(today.setMonth(today.getMonth() + 1));
-			case 'quarterly':
-				return new Date(today.setMonth(today.getMonth() + 3));
-			case 'semi annual':
-				return new Date(today.setMonth(today.getMonth() + 6));
-			case 'annual':
-				return new Date(today.setFullYear(today.getFullYear() + 1));
-			default:
-				if (recurringType.includes('Months')) {
-					const months = parseInt(recurringType.split(' ')[0]);
-					return new Date(today.setMonth(today.getMonth() + (months || 1)));
-				}
-				return new Date(today.setMonth(today.getMonth() + 1));
-		}
-	};
-
+export const updateRecurrence = async (body ) => {
+	const { cartId, recurring, dayOfMonth, recurringDate } = body;
+	
 	try {
-		const existingCart = await Cart.findOne({ _id: cartId });
-
-		if (!existingCart) {
-			return {
-				success: false,
-				msg: 'Cart not found'
-			};
-		}
-
-		const recurringDate = calculateNextRecurringDate(recurring);
-
-		const recurrenceData = {
-			recurring: recurring,
-			recurringDate: recurringDate,
-			addedDate: new Date()
-		};
-
-		const updatedCart = await Cart.findOneAndUpdate(
-			{ _id: cartId },
-			{ $set: { recurrence: recurrenceData } },
-			{ new: true }
-		);
-
-		if (!updatedCart) {
-			return {
-				success: false,
-				msg: 'Failed to update recurrence'
-			};
-		}
-		const action = existingCart.recurrence ? 'updated' : 'added';
+	  const existingCart = await Cart.findOne({ _id: cartId });
+	  
+	  if (!existingCart) {
 		return {
-			success: true,
-			msg: `Recurrence ${action} successfully`,
-			data: updatedCart.recurrence
+		  success: false,
+		  msg: 'Cart not found'
 		};
+	  }
+	  
+	  const currentDate = new Date();
+	  
+	  const recurrenceData = {
+		recurring: recurring,
+		recurringDate: recurringDate || calculateRecurringDate(recurring, dayOfMonth),
+		previousRecurringDate: currentDate,
+		addedDate: existingCart.recurrence?.addedDate || currentDate
+	  };
+	  
+	  const updatedCart = await Cart.findOneAndUpdate(
+		{ _id: cartId },
+		{ $set: { recurrence: recurrenceData } },
+		{ new: true }
+	  );
+	  
+	  if (!updatedCart) {
+		return {
+		  success: false,
+		  msg: 'Failed to update recurrence'
+		};
+	  }
+	  
+	  const action = existingCart.recurrence ? 'updated' : 'added';
+	  return {
+		success: true,
+		msg: `Recurrence ${action} successfully`,
+		data: updatedCart.recurrence
+	  };
 	} catch (error) {
-		console.error('Error in addRecurrence:', error);
-		return {
-			success: false,
-			msg: 'An error occurred while processing recurrence'
-		};
+	  console.error('Error in updateRecurrence:', error);
+	  return {
+		success: false,
+		msg: 'An error occurred while processing recurrence'
+	  };
 	}
 };
+  
+export const deleteCartRecurrence = async (cartId ) => {
+	try {
+	  const existingCart = await Cart.findOne({ _id: cartId });
+	  
+	  if (!existingCart) {
+		return {
+		  success: false,
+		  msg: 'Cart not found'
+		};
+	  }
+	  
+	  const updatedCart = await Cart.findOneAndUpdate(
+		{ _id: cartId },
+		{ $unset: { recurrence: 1 } },
+		{ new: true }
+	  );
+	  
+	  if (!updatedCart) {
+		return {
+		  success: false,
+		  msg: 'Failed to remove recurrence'
+		};
+	  }
+	  
+	  return {
+		success: true,
+		msg: 'Recurrence removed successfully',
+		data: null
+	  };
+	} catch (error) {
+	  console.error('Error in deleteCartRecurrence:', error);
+	  return {
+		success: false,
+		msg: 'An error occurred while removing recurrence'
+	  };
+	}
+};
+  
+function calculateRecurringDate(recurring, dayOfMonth) {
+	const today = new Date();
+	const futureDate = new Date();
+	futureDate.setMonth(today.getMonth() + recurring);
+	
+	const targetDay = parseInt(dayOfMonth) || today.getDate();
+	const lastDayOfTargetMonth = new Date(futureDate.getFullYear(), futureDate.getMonth() + 1, 0).getDate();
+	const adjustedDay = Math.min(targetDay, lastDayOfTargetMonth);
+	
+	futureDate.setDate(adjustedDay);
+	
+	return futureDate;
+}
 
 export const submitFeedback = async (data) => {
 	try {

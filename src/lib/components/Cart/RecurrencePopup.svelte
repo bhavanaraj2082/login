@@ -2,7 +2,6 @@
 	import Icon from '@iconify/svelte';
 	import { invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
-    import { fastify } from 'lucia/middleware';
 
   export let recureModal
   export let recurrence
@@ -223,7 +222,7 @@
   </div>
 {/if}  
 
-<style>
+<!-- <style>
 .full-width-input {
     position: relative;
     width: 100%; 
@@ -242,4 +241,4 @@
     height: 32.5px;
     width: 100%;
 }
-</style>
+</style> -->
