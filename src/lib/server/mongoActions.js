@@ -2199,65 +2199,138 @@ export const addAllToCart = async (items, userId, userEmail) => {
 
 //Myfavouries actions ends
 
+// export const quicksearch = async ({ query }) => {
+// 	try {
+// 		//   console.log('Received query:', query);
+
+// 		const queryFilter = { productNumber: { $regex: query, $options: 'i' } };
+
+// 		const products = await Product.find(queryFilter)
+// 			.select('productName productNumber prodDesc imageSrc ')
+// 			.limit(20)
+// 			.exec();
+
+// 		const enrichedProducts = [];
+
+// 		for (let product of products) {
+// 			const stockInfos = await Stock.find({ productNumber: product.productNumber }).select('id stock pricing distributor manufacturer');
+// 			console.log(stockInfos, "asadsdsfsdfxdrdr********************8");
+
+// 			let convertedPricing = [];
+// 			for (let stockInfo of stockInfos) {
+// 				const { pricing = [], distributor, manufacturer } = stockInfo || []; // Extract distributor and manufacturer
+
+// 				if (pricing && pricing[0] && pricing[0].INR) {
+// 					convertedPricing = convertedPricing.concat(pricing);
+// 				} else {
+// 					const converted = await convertToINR([pricing] || []);
+// 					convertedPricing = convertedPricing.concat(converted);
+// 				}
+
+// 				// Ensure you are accessing 'distributor' and 'manufacturer' correctly
+// 				console.log('Distributor:', distributor);
+// 				console.log('Manufacturer:', manufacturer);
+// 			}
+
+// 			const enrichedProduct = {
+// 				id: product._id.toString(),
+// 				image: product.imageSrc,
+// 				description: product.prodDesc,
+// 				productName: product.productName,
+// 				productNumber: product.productNumber,
+// 				stockId: stockInfos[0]?.id.toString() || null,
+
+// 				manufacturer: stockInfos[0]?.manufacturer.toString() || null,
+// 				distributer: stockInfos[0]?.distributor.toString() || null,
+
+// 				stock: stockInfos.reduce((total, stockInfo) => total + (stockInfo.stock || 0), 0),
+// 				pricing: convertedPricing,
+// 			};
+
+// 			console.log('Enriched product:', enrichedProduct);
+
+// 			enrichedProducts.push(enrichedProduct);
+// 		}
+
+// 		return enrichedProducts;
+// 	} catch (error) {
+// 		console.error('Error during quicksearch function call:', error);
+// 		throw new Error('An error occurred while processing the quicksearch.');
+// 	}
+// };
+
 export const quicksearch = async ({ query }) => {
 	try {
-		//   console.log('Received query:', query);
+	  const baseProducts = await Product.find({
+		productNumber: { $regex: query, $options: 'i' }
+	  })
+		.select('_id productName productNumber prodDesc imageSrc')
+		.limit(20)
+		.lean()
+		.exec();
+	  const enrichedProducts = [];
+	  for (const baseProduct of baseProducts) {
+		const stockEntries = await Stock.find({ 
+		  productNumber: baseProduct.productNumber 
+		})
+		  .select('_id stock pricing distributor manufacturer')
+		  .lean()
+		  .exec();
 
-		const queryFilter = { productNumber: { $regex: query, $options: 'i' } };
-
-		const products = await Product.find(queryFilter)
-			.select('productName productNumber prodDesc imageSrc ')
-			.limit(20)
-			.exec();
-
-		const enrichedProducts = [];
-
-		for (let product of products) {
-			const stockInfos = await Stock.find({ productNumber: product.productNumber }).select('id stock pricing distributor manufacturer');
-			console.log(stockInfos, "asadsdsfsdfxdrdr********************8");
-
-			let convertedPricing = [];
-			for (let stockInfo of stockInfos) {
-				const { pricing = [], distributor, manufacturer } = stockInfo || []; // Extract distributor and manufacturer
-
-				if (pricing && pricing[0] && pricing[0].INR) {
-					convertedPricing = convertedPricing.concat(pricing);
-				} else {
-					const converted = await convertToINR([pricing] || []);
-					convertedPricing = convertedPricing.concat(converted);
-				}
-
-				// Ensure you are accessing 'distributor' and 'manufacturer' correctly
-				console.log('Distributor:', distributor);
-				console.log('Manufacturer:', manufacturer);
-			}
-
-			const enrichedProduct = {
-				id: product._id.toString(),
-				image: product.imageSrc,
-				description: product.prodDesc,
-				productName: product.productName,
-				productNumber: product.productNumber,
-				stockId: stockInfos[0]?.id.toString() || null,
-
-				manufacturer: stockInfos[0]?.manufacturer.toString() || null,
-				distributer: stockInfos[0]?.distributor.toString() || null,
-
-				stock: stockInfos.reduce((total, stockInfo) => total + (stockInfo.stock || 0), 0),
-				pricing: convertedPricing,
-			};
-
-			// console.log('Enriched product:', enrichedProduct);
-
-			enrichedProducts.push(enrichedProduct);
+		if (!stockEntries || stockEntries.length === 0) {
+		  enrichedProducts.push({
+			id: baseProduct._id.toString(),
+			image: baseProduct.imageSrc || null,
+			description: baseProduct.prodDevariantsc || null,
+			productName: baseProduct.productName,
+			productNumber: baseProduct.productNumber,
+			stockId: null,
+			manufacturer: null,
+			distributer: null,
+			stock: 0,
+			pricing: []
+		  });
+		  continue;
 		}
-
-		return enrichedProducts;
+		for (const entry of stockEntries) {
+		  let processedPricing = [];
+		  
+		  if (entry.pricing) {
+			if (entry.pricing.INR || (Array.isArray(entry.pricing) && entry.pricing[0] && entry.pricing[0].INR)) {
+			  processedPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
+			} else {
+			  const pricingToConvert = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
+			  try {
+				processedPricing = await convertToINR(pricingToConvert);
+			  } catch (error) {
+				console.error('Error converting pricing to INR:', error);
+				processedPricing = pricingToConvert; // Use original pricing if conversion fails
+			  }
+			}
+		  }
+  
+		  enrichedProducts.push({
+			id: baseProduct._id.toString(),
+			image: baseProduct.imageSrc || null,
+			description: baseProduct.prodDesc || null,
+			productName: baseProduct.productName,
+			productNumber: baseProduct.productNumber,
+			stockId: entry._id.toString(),
+			manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
+			distributer: entry.distributor ? entry.distributor.toString() : null,
+			stock: entry.stock || 0,
+			pricing: processedPricing
+		  });
+		}
+	  }
+  console.log(enrichedProducts,"enrichedProducts");
+  
+	  return enrichedProducts;
 	} catch (error) {
-		console.error('Error during quicksearch function call:', error);
-		throw new Error('An error occurred while processing the quicksearch.');
+	  console.error('Error during quicksearch function call:', error);
+	  throw new Error('An error occurred while processing the quicksearch.');
 	}
-};
+  };
 
 
 
@@ -2643,62 +2716,51 @@ export const deleteRecurrence = async(body)=>{
 
 export const addToCartquick = async (item, userId, userEmail) => {
 	try {
-		console.log('Attempting to add item to cart:', { item, userId, userEmail });
-
-		// Search for an active cart associated with the user
-		const search = await Cart.findOne({ userId, userEmail, isActiveCart: true }).lean();
-		console.log('Cart search result:', search);
-
-		let cart;
-
-		// If no active cart is found, create a new cart
-		if (search === null) {
-			console.log('No active cart found. Creating a new cart...');
-			cart = await Cart.create({ cartId: nanoid(8), cartName: "mycart", cartItems: [item], userId, userEmail, isActiveCart: true });
-			console.log('New cart created:', cart);
-			return { success: true, message: "Product is added to cart" };
-		} else {
-			// If an active cart is found, check for the item's productId
-			if (!item.productId) {
-				console.error('Item does not have a valid productId:', item);
-				return { success: false, message: 'Invalid productId' };
-			}
-
-			// Check if the item already exists in the cart
-			const findItem = search.cartItems.find(x => x.productId && x.productId.toString() === item.productId.toString());
-			console.log('findItem:', findItem);
-
-			// If the item isn't found, add it to the cart
-			if (findItem === undefined) {
-				console.log('Item not found in cart. Adding new item...');
-				cart = await Cart.findOneAndUpdate(
-					{ userId, userEmail, isActiveCart: true },
-					{ $push: { cartItems: item } },
-					{ new: true }
-				);
-				console.log('Cart after adding item:', cart);
-				return { success: true, message: "Product is added to cart" };
-			} else {
-				// If the item is found, update the quantity
-				console.log('Item found in cart. Updating quantity...');
-				cart = await Cart.findOneAndUpdate(
-					{ userId, userEmail, isActiveCart: true },
-					{ $set: { 'cartItems.$[elem]': item } },
-					{
-						arrayFilters: [{ 'elem.productId': item.productId }],
-						new: true
-					}
-				);
-				console.log('Cart after updating item:', cart);
-				return { success: true, message: "Product quantity is updated in cart" };
-			}
+	  const search = await Cart.findOne({ userId, userEmail, isActiveCart: true }).lean();
+  
+	  let cart;
+  
+	  if (search === null) {
+		cart = await Cart.create({ cartId: nanoid(8), cartName: "mycart", cartItems: [item], userId, userEmail, isActiveCart: true });
+		return { success: true, message: "Product is added to cart" };
+	  } else {
+		if (!item.productId || !item.stockId) {
+		  return { success: false, message: 'Invalid productId or stockId' };
 		}
+		const findItem = search.cartItems.find(x => 
+		  x.productId && 
+		  x.productId.toString() === item.productId.toString() &&
+		  x.stockId && 
+		  x.stockId.toString() === item.stockId.toString()
+		);
+		if (findItem === undefined) {
+		  cart = await Cart.findOneAndUpdate(
+			{ userId, userEmail, isActiveCart: true },
+			{ $push: { cartItems: item } },
+			{ new: true }
+		  );
+		  return { success: true, message: "Product is added to cart" };
+		} else {
+		  cart = await Cart.findOneAndUpdate(
+			{ userId, userEmail, isActiveCart: true },
+			{ $set: { 'cartItems.$[elem]': item } },
+			{
+			  arrayFilters: [{ 
+				'elem.productId': item.productId,
+				'elem.stockId': item.stockId 
+			  }],
+			  new: true
+			}
+		  );
+		//   console.log('Cart after updating item:', cart);
+		  return { success: true, message: "Product quantity is updated in cart" };
+		}
+	  }
 	} catch (err) {
-		console.error('Error adding to cart:', err);
-		return { success: false, message: 'Failed to add product to cart' };
+	
+	  return { success: false, message: 'Failed to add product to cart' };
 	}
-};
-
+  };
 export const resumeCart = async (cartId, userId) => {
 	if (!cartId || !userId) {
 		throw new Error('Cart ID and User ID are required');
@@ -2824,75 +2886,107 @@ export const createNewCart = async (body) => {
     }
 };
 
-export const updateRecurrence = async (body) => {
-	const { cartId, recurring } = body;
-
-	const calculateNextRecurringDate = (recurringType) => {
-		const today = new Date();
-		const type = recurringType.toLowerCase();
-
-		switch (type) {
-			case 'monthly':
-				return new Date(today.setMonth(today.getMonth() + 1));
-			case 'quarterly':
-				return new Date(today.setMonth(today.getMonth() + 3));
-			case 'semi annual':
-				return new Date(today.setMonth(today.getMonth() + 6));
-			case 'annual':
-				return new Date(today.setFullYear(today.getFullYear() + 1));
-			default:
-				if (recurringType.includes('Months')) {
-					const months = parseInt(recurringType.split(' ')[0]);
-					return new Date(today.setMonth(today.getMonth() + (months || 1)));
-				}
-				return new Date(today.setMonth(today.getMonth() + 1));
-		}
-	};
-
+export const updateRecurrence = async (body ) => {
+	const { cartId, recurring, dayOfMonth, recurringDate } = body;
+	
 	try {
-		const existingCart = await Cart.findOne({ _id: cartId });
-
-		if (!existingCart) {
-			return {
-				success: false,
-				msg: 'Cart not found'
-			};
-		}
-
-		const recurringDate = calculateNextRecurringDate(recurring);
-
-		const recurrenceData = {
-			recurring: recurring,
-			recurringDate: recurringDate,
-			addedDate: new Date()
-		};
-
-		const updatedCart = await Cart.findOneAndUpdate(
-			{ _id: cartId },
-			{ $set: { recurrence: recurrenceData } },
-			{ new: true }
-		);
-
-		if (!updatedCart) {
-			return {
-				success: false,
-				msg: 'Failed to update recurrence'
-			};
-		}
-		const action = existingCart.recurrence ? 'updated' : 'added';
+	  const existingCart = await Cart.findOne({ _id: cartId });
+	  
+	  if (!existingCart) {
 		return {
-			success: true,
-			msg: `Recurrence ${action} successfully`,
-			data: updatedCart.recurrence
+		  success: false,
+		  msg: 'Cart not found'
 		};
+	  }
+	  
+	  const currentDate = new Date();
+	  
+	  const recurrenceData = {
+		recurring: recurring,
+		recurringDate: recurringDate || calculateRecurringDate(recurring, dayOfMonth),
+		previousRecurringDate: currentDate,
+		addedDate: existingCart.recurrence?.addedDate || currentDate
+	  };
+	  
+	  const updatedCart = await Cart.findOneAndUpdate(
+		{ _id: cartId },
+		{ $set: { recurrence: recurrenceData } },
+		{ new: true }
+	  );
+	  
+	  if (!updatedCart) {
+		return {
+		  success: false,
+		  msg: 'Failed to update recurrence'
+		};
+	  }
+	  
+	  const action = existingCart.recurrence ? 'updated' : 'added';
+	  return {
+		success: true,
+		msg: `Recurrence ${action} successfully`,
+		data: updatedCart.recurrence
+	  };
 	} catch (error) {
-		console.error('Error in addRecurrence:', error);
-		return {
-			success: false,
-			msg: 'An error occurred while processing recurrence'
-		};
+	  console.error('Error in updateRecurrence:', error);
+	  return {
+		success: false,
+		msg: 'An error occurred while processing recurrence'
+	  };
 	}
 };
+  
+export const deleteCartRecurrence = async (cartId ) => {
+	try {
+	  const existingCart = await Cart.findOne({ _id: cartId });
+	  
+	  if (!existingCart) {
+		return {
+		  success: false,
+		  msg: 'Cart not found'
+		};
+	  }
+	  
+	  const updatedCart = await Cart.findOneAndUpdate(
+		{ _id: cartId },
+		{ $unset: { recurrence: 1 } },
+		{ new: true }
+	  );
+	  
+	  if (!updatedCart) {
+		return {
+		  success: false,
+		  msg: 'Failed to remove recurrence'
+		};
+	  }
+	  
+	  return {
+		success: true,
+		msg: 'Recurrence removed successfully',
+		data: null
+	  };
+	} catch (error) {
+	  console.error('Error in deleteCartRecurrence:', error);
+	  return {
+		success: false,
+		msg: 'An error occurred while removing recurrence'
+	  };
+	}
+};
+  
+function calculateRecurringDate(recurring, dayOfMonth) {
+	const today = new Date();
+	const futureDate = new Date();
+	futureDate.setMonth(today.getMonth() + recurring);
+	
+	const targetDay = parseInt(dayOfMonth) || today.getDate();
+	const lastDayOfTargetMonth = new Date(futureDate.getFullYear(), futureDate.getMonth() + 1, 0).getDate();
+	const adjustedDay = Math.min(targetDay, lastDayOfTargetMonth);
+	
+	futureDate.setDate(adjustedDay);
+	
+	return futureDate;
+}
 
 export const submitFeedback = async (data) => {
 	try {

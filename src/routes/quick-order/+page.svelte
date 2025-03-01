@@ -1,7 +1,7 @@
 <script>
   import Manualupload from "$lib/components/quickorder/Manualupload.svelte";
   export let data;
-  console.log(data);
+  // console.log(data);
 
   import SEO from "$lib/components/SEO.svelte";
   import {
@@ -34,5 +34,5 @@
 </script>
 
 <SEO {metadata} />
-
 <Manualupload {data} />
+

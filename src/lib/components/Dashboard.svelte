@@ -74,8 +74,87 @@
           </div>
         {/if}
         {#if isLoading}
-          <div class="flex justify-center items-center h-48">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full animate-pulse">
+            <div class="bg-white p-6 rounded-lg shadow">
+              <div class="flex justify-between items-center mb-4">
+                <div class="h-7 bg-gray-200 rounded-md w-1/2"></div>
+                <div class="h-8 w-8 rounded-full bg-gray-200"></div>
+              </div>
+              {#each Array(4) as _, i}
+                <div class="flex items-start gap-3 mb-4">
+                  <div class="h-5 w-5 mt-1 rounded-full bg-gray-200 flex-shrink-0"></div>
+                  <div class="w-full">
+                    <div class="h-4 bg-gray-200 rounded w-11/12 mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded w-4/5"></div>
+                  </div>
+                </div>
+              {/each}
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+              <div class="flex justify-between items-center mb-4">
+                <div class="h-7 bg-gray-200 rounded-md w-1/3"></div>
+                <div class="h-8 w-8 rounded-full bg-gray-200"></div>
+              </div>
+              {#each Array(4) as _, i}
+                <div class="flex items-start gap-3 mb-4">
+                  <div class="h-5 w-5 mt-1 rounded-full bg-gray-200 flex-shrink-0"></div>
+                  <div class="w-full">
+                    <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                  </div>
+                </div>
+              {/each}
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+              <div class="flex justify-between items-center mb-4">
+                <div class="h-7 bg-gray-200 rounded-md w-1/3"></div>
+                <div class="h-8 w-8 rounded-full bg-gray-200"></div>
+              </div>
+              {#each Array(3) as _, i}
+                <div class="flex items-start gap-3 mb-4">
+                  <div class="h-5 w-5 mt-1 rounded-full bg-gray-200 flex-shrink-0"></div>
+                  <div class="w-full">
+                    <div class="h-4 bg-gray-200 rounded w-11/12 mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded w-10/12"></div>
+                  </div>
+                </div>
+              {/each}
+            </div>
+            <div class="md:col-span-3 mt-4">
+              <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex justify-between items-center mb-6">
+                  <div class="h-7 bg-gray-200 rounded-md w-1/6"></div>
+                  <div class="h-10 w-32 rounded-md bg-gray-200"></div>
+                </div>
+                <div class="grid grid-cols-5 gap-4 mb-4 px-2">
+                  {#each Array(5) as _, i}
+                    <div class="h-5 bg-gray-200 rounded w-3/4"></div>
+                  {/each}
+                </div>
+                {#each Array(2) as _, i}
+                  <div class="grid grid-cols-5 gap-4 py-4 px-2 border-t border-gray-100">
+                    <div class="h-5 bg-gray-200 rounded w-8"></div>
+                    <div class="h-5 bg-gray-200 rounded w-28"></div>
+                    <div class="h-5 bg-gray-200 rounded w-24"></div>
+                    <div class="h-5 bg-gray-200 rounded w-12"></div>
+                    <div class="h-5 bg-gray-200 rounded w-24"></div>
+                  </div>
+                {/each}
+              </div>
+            </div>
+            <div class="md:col-span-3 mt-4">
+              <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-start gap-4">
+                  <div class="h-12 w-12 bg-gray-200 rounded-md"></div>
+                  <div class="w-full">
+                    <div class="h-6 bg-gray-200 rounded w-1/4 mb-3"></div>
+                    <div class="h-5 bg-gray-200 rounded w-1/3 mb-3"></div>
+                    <div class="h-5 bg-gray-200 rounded w-1/2 mb-2"></div>
+                    <div class="h-5 bg-gray-200 rounded w-2/3"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         {:else if error}
           <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-lg">
@@ -119,28 +198,28 @@
               <div class="overflow-x-auto">
                 <table class="w-full">
                   <thead>
-                    <tr class="bg-gray-50 text-left">
-                      <th class="px-6 py-3 text-sm font-semibold text-gray-600">Order ID</th>
-                      <th class="px-6 py-3 text-sm font-semibold text-gray-600">Invoice Number</th>
-                      <th class="px-6 py-3 text-sm font-semibold text-gray-600">Total Amount</th>
-                      <th class="px-6 py-3 text-sm font-semibold text-gray-600">Purchase Order</th>
-                      <th class="px-6 py-3 text-sm font-semibold text-gray-600">Status</th>
+                    <tr class="bg-primary-50 text-left">
+                      <th class="px-6 py-3 text-sm font-semibold text-gray-600 text-center">Order ID</th>
+                      <th class="px-6 py-3 text-sm font-semibold text-gray-600 text-center">Invoice Number</th>
+                      <th class="px-6 py-3 text-sm font-semibold text-gray-600 text-center">Total Amount</th>
+                      <th class="px-6 py-3 text-sm font-semibold text-gray-600 text-center">Purchase Order</th>
+                      <th class="px-6 py-3 text-sm font-semibold text-gray-600 text-center">Status</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-gray-100">
                     {#each recentOrders as order}
                       <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 text-sm text-gray-600">{order?.orderid || 'N/A'}</td>
-                        <td class="px-6 py-4 text-sm text-gray-600">{order?.invoice || 'N/A'}</td>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-800">
+                        <td class="px-6 py-4 text-sm text-gray-600 text-center">{order?.orderid || 'N/A'}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600 text-center">{order?.invoice || 'N/A'}</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800 text-center">
                           {#if order?.totalprice !== undefined && order?.totalprice !== null}
                             ₹{(order?.totalprice).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           {:else}
                             N/A
                           {/if}
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600">{order?.purchaseorder || 'N/A'}</td>
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-4 text-sm text-gray-600 text-center">{order?.purchaseorder || 'N/A'}</td>
+                        <td class="px-6 py-4 flex justify-center">
                           <a href={`/order-status/${order?.orderid}?email=${userEmail}`} 
                              class="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700">
                             <Icon icon="heroicons:chart-bar" class="text-lg"/>

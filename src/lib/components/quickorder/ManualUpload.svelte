@@ -9,10 +9,12 @@
   let showSavedCarts = false;
 
   export let data;
-  console.log("daa", data);
-  console.log(data?.authedUser?.email,"i am email")
-  
+  // console.log("daa", data);
+  // console.log(data?.authedUser?.email,"i am email")
+
   let isLoadingPhone = false;
+  let showCartPopupdetail = false;
+
   let submitting = false;
   let isEmailVerified = false;
   let cartloading = false;
@@ -21,8 +23,6 @@
   let isLoading = false;
   let ProfileEmailVerified;
   let authedUserEmailVerified = data?.profile?.isEmailVerified;
-  // console.log(data,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-
   // console.log("authedUserEmailVerified",authedUserEmailVerified);
 
   let verificationMessage = "";
@@ -47,6 +47,7 @@
   let toggle = false;
   let showLists = false;
   let showquotes = false;
+  let selectedProductIndex = null;
 
   let showDetailsModal = false;
   let fileError = "";
@@ -91,7 +92,7 @@
   }
 
   // let email = userLoggedIn ? data.authedUser.email : "";
-  let email = data?.authedUser?.email||"";
+  let email = data?.authedUser?.email || "";
 
   function checkAvailability() {
     if (!selectedProduct) {
@@ -175,7 +176,7 @@
     selectedProduct = null;
   }
 
-  let selectedProducts = {}; 
+  let selectedProducts = {};
   function selectProduct(product, index, size) {
     console.log("Starting selectProduct for index:", index);
     console.log("Previous selectedProducts:", selectedProducts);
@@ -218,62 +219,6 @@
 
   let cartSummary = {};
 
-  function showCartPopup(cartItems) {
-    const cartPopup = document.getElementById("cart-popup");
-    const cartItemsList = document.getElementById("cart-items-list");
-
-    cartItemsList.innerHTML = "";
-
-    const cartItemCount = cartItems.length;
-    if (cartItemCount > 3) {
-      cartItems.slice(0, 3).forEach((item, index) => {
-        cartItemsList.innerHTML += `
-                <div class="flex items-center gap-4 py-2">
-                    <div class="font-medium">${index + 1}</div> 
-                    
-                    <img src="${item.image}" alt="${item.productName}" class="w-16 h-16 object-cover rounded-md" />
-
-                    <div class="flex flex-col ml-4">
-                        <p class="font-medium">${item.productName}</p>
-                        <p>Quantity: ${item.quantity}</p>
-                        <p>Total Price: ₹${(item.quantity * item.priceSize.price).toFixed(2)}</p>
-                    </div>
-                </div>
-            `;
-      });
-      cartItemsList.innerHTML += `
-            <div class="text-center mt-4">
-                <p>You have ${cartItemCount} items in your cart. <a href="/cart" class="text-orange-500">See all your items</a></p>
-            </div>
-        `;
-    } else {
-      cartItems.forEach((item, index) => {
-        cartItemsList.innerHTML += `
-                <div class="flex items-center gap-4 py-2">
-                    <div class="font-medium">${index + 1}</div> 
-                    
-                    <img src="${item.image}" alt="${item.productName}" class="w-16 h-16 object-cover rounded-md" />
-
-                    <div class="flex flex-col ml-4">
-                        <p class="font-medium">${item.productName}</p>
-                        <p>Quantity: ${item.quantity}</p>
-                        <p>Total Price: ₹${(item.quantity * item.priceSize.price).toFixed(2)}</p>
-                    </div>
-                </div>
-                <hr class="my-2" />
-            `;
-      });
-    }
-    cartPopup.style.display = "flex";
-  }
-
-  function closeCartPopup(event) {
-    event.stopPropagation();
-
-    const cartPopup = document.getElementById("cart-popup");
-    cartPopup.style.display = "none";
-  }
-
   function hideCartPopup() {
     const cartPopup = document.getElementById("cart-popup");
     cartPopup.style.display = "none";
@@ -295,76 +240,273 @@
       );
     }
   }
+  async function addToCart(productNumber) {
+    const productToAdd = products.find(
+      (p) => p.productNumber === productNumber,
+    );
+    const currentIndex = selectedProductIndex;
 
-
-
-
-
-  
-  async function addManualEntriesToCart() {
-    cartloading = true;
-    const validRows = rows.filter((row) => {
-      return row.sku.trim() !== "" && row.selectedSize;
-    });
-
-    if (validRows.length === 0) {
-      cartloading = false;
-      toast.error("No valid items to add to cart");
+    if (!productToAdd) {
+      toast.error(`Product ${productNumber} not found`);
       return;
     }
 
-    const cartItems = validRows
-      .map((row) => {
-        const productNumber = row.sku.split(" -")[0].trim();
-        const validProduct = products.find(
-          (p) =>
-            String(p.productNumber).trim().toLowerCase() ===
-            productNumber.toLowerCase(),
-        );
+    const size = selectedProduct.size || "default";
+    const Price = selectedProduct.price || 0;
+    const quantity =
+      selectedProduct.quantity > 0 ? selectedProduct.quantity : 1;
+    const cartItem = {
+      id: productToAdd.id,
+      description: productToAdd.prodDesc,
+      productName: productToAdd.productName,
+      image: productToAdd.image,
+      partNumber: productToAdd.productNumber,
+      manufacturerId: productToAdd.manufacturer,
+      distributerId: productToAdd.distributer,
+      stockId: productToAdd.stockId,
+      stock: productToAdd.stock,
+      productId: productToAdd.id,
+      priceSize: {
+        price: Price,
+        size: size,
+      },
+      backOrder: Math.max(quantity - productToAdd.stock) || 0,
+      quantity: quantity,
+      _rowIndex: currentIndex,
+    };
 
-        if (!validProduct) {
-          toast.error(`Product ${productNumber} not found`);
-          return null;
+    const authedUser = data?.authedUser;
+
+    if (authedUser && authedUser?.id) {
+      const form = new FormData();
+      form.append("cartItems", JSON.stringify([cartItem]));
+
+      try {
+        const response = await fetch("?/addToCart", {
+          method: "POST",
+          body: form,
+        });
+
+        const result = await response.json();
+        const resultData = JSON.parse(result.data);
+
+        if (resultData && resultData[0]?.success === 1) {
+          toast.success(`Product added to the cart!`);
+          showCartPopup([cartItem]);
+        } else {
+          toast.error(resultData[1] || "Failed to add item to cart");
         }
+      } catch (err) {
+        console.error("Error adding to cart:", err);
+        toast.error("Failed to add item to cart");
+      }
+    } else {
+      let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
 
-        const sizePriceInfo = validProduct.pricing?.find(
+      const simplifiedCartItem = {
+        productId: productToAdd.id,
+        manufacturerId: productToAdd.manufacturer,
+        stockId: productToAdd.stockId,
+        distributorId: productToAdd.distributer,
+
+        quantity: quantity,
+        backOrder: Math.max(quantity - productToAdd.stock) || 0,
+      };
+
+      const existingItemIndex = currentCart.findIndex(
+        (item) => item.partNumber === productToAdd.productNumber,
+      );
+
+      if (existingItemIndex > -1) {
+        currentCart[existingItemIndex].quantity = quantity;
+        currentCart[existingItemIndex].backOrder =
+          Math.max(quantity - productToAdd.stock) || 0;
+        toast.success(`Product added to the cart`);
+      } else {
+        currentCart.push(simplifiedCartItem);
+        toast.success(`Product added to the cart`);
+      }
+
+      localStorage.setItem("cart", JSON.stringify(currentCart));
+      showCartPopup([cartItem]);
+    }
+  }
+  let cartRowIndexToBeCleared = null;
+
+  function showCartPopup(cartItems) {
+    const cartPopup = document.getElementById("cart-popup");
+    const cartItemsList = document.getElementById("cart-items-list");
+
+    if (
+      cartItems &&
+      cartItems.length > 0 &&
+      cartItems[0]._rowIndex !== undefined
+    ) {
+      cartRowIndexToBeCleared = cartItems[0]._rowIndex;
+      // console.log("Stored row index to be cleared:", cartRowIndexToBeCleared);
+    }
+
+    cartItemsList.innerHTML = "";
+
+    const cartItemCount = cartItems.length;
+    if (cartItemCount > 3) {
+      cartItems.slice(0, 3).forEach((item, index) => {
+        cartItemsList.innerHTML += `
+              <div class="flex items-center gap-4 py-2">
+                  <div class="font-medium">${index + 1}</div> 
+                  
+                  <img src="${item.image}" alt="${item.productName}" class="w-16 h-16 object-cover rounded-md" />
+
+                  <div class="flex flex-col ml-4">
+                      <p class="font-medium">${item.productName}</p>
+                      <p>Quantity: ${item.quantity}</p>
+                      <p>Total Price: ₹${(item.quantity * item.priceSize.price).toFixed(2)}</p>
+                  </div>
+              </div>
+          `;
+      });
+      cartItemsList.innerHTML += `
+          <div class="text-center mt-4">
+              <p>You have ${cartItemCount} items in your cart. <a href="/cart" class="text-orange-500">See all your items</a></p>
+          </div>
+      `;
+    } else {
+      cartItems.forEach((item, index) => {
+        cartItemsList.innerHTML += `
+              <div class="flex items-center gap-4 py-2">
+                  <div class="font-medium">${index + 1}</div> 
+                  
+                  <img src="${item.image}" alt="${item.productName}" class="w-16 h-16 object-cover rounded-md" />
+
+                  <div class="flex flex-col ml-4">
+                      <p class="font-medium">${item.productName}</p>
+                      <p>Quantity: ${item.quantity}</p>
+                      <p>Total Price: ₹${(item.quantity * item.priceSize.price).toFixed(2)}</p>
+                  </div>
+              </div>
+              <hr class="my-2" />
+          `;
+      });
+    }
+    cartPopup.style.display = "flex";
+  }
+
+  function closeCartPopup(event) {
+    event.stopPropagation();
+
+    const cartPopup = document.getElementById("cart-popup");
+    // console.log("Closing cart popup for index:", cartRowIndexToBeCleared);
+
+    cartPopup.style.display = "none";
+    clearSelectedRow(cartRowIndexToBeCleared);
+    cartRowIndexToBeCleared = null;
+  }
+  function clearSelectedRow(index) {
+    if (
+      index !== undefined &&
+      index !== null &&
+      index >= 0 &&
+      index < rows.length
+    ) {
+      console.log("Clearing row at index:", index);
+      rows[index] = {
+        sku: "",
+        size: "",
+        quantity: 1,
+        error: "",
+        filteredProducts: [],
+        selectedSize: "",
+        selectedProduct: null,
+      };
+      rows = [...rows];
+    } else {
+      // console.log("Index is undefined, cannot clear product.");
+    }
+  }
+
+
+async function addManualEntriesToCart() {
+  cartloading = true;
+  const validRows = rows.filter((row) => {
+    return row.sku.trim() !== "" && row.selectedSize;
+  });
+  console.log(validRows, "validRows");
+
+  if (validRows.length === 0) {
+    cartloading = false;
+    toast.error("No valid items to add to cart");
+    return;
+  }
+
+  const cartItems = validRows
+    .map((row) => {
+      const validProduct = row.selectedProduct;
+      const productNumber = row.sku.split(" -")[0].trim();
+
+      if (!validProduct) {
+        toast.error(`Product ${productNumber} not found`);
+        return null;
+      }
+
+      console.log('validProduct stockId:', validProduct.stockId);
+      let sizePriceInfo = null;
+      if (Array.isArray(validProduct.pricing)) {
+        sizePriceInfo = validProduct.pricing.find(
           (item) =>
+            item && item.break && 
             item.break.trim().toLowerCase() ===
             row.selectedSize.trim().toLowerCase(),
         );
-
         if (!sizePriceInfo) {
-          toast.error(
-            `Size ${row.selectedSize} not available for ${productNumber}`,
+          sizePriceInfo = validProduct.pricing.find(
+            (item) => 
+              item && item.break && 
+              item.break.trim().toLowerCase().includes(
+                row.selectedSize.trim().toLowerCase()
+              )
           );
-          return null;
         }
-        const quantity =
-          selectedProduct &&
-          selectedProduct.productNumber === validProduct.productNumber
-            ? selectedProduct.quantity
-            : row.quantity > 0
-              ? row.quantity
-              : 1;
+        if (!sizePriceInfo && validProduct.pricing.length > 0) {
+          sizePriceInfo = validProduct.pricing[0];
+          console.warn(`Using default size for ${productNumber}: ${sizePriceInfo.break}`);
+        }
+      }
+      
+      console.log(sizePriceInfo, "sizePriceInfo");
 
-        return {
-          id: validProduct.id,
-          image: validProduct.image,
-          productName: validProduct.productName,
-          manufacturerId: validProduct.manufacturer,
-          distributerId: validProduct.distributer,
-          stockId: validProduct.stockId,
-          stock: validProduct.stock,
-          productId:validProduct.id,
-          priceSize: {
-            price: sizePriceInfo.price,
-            size: row.selectedSize,
-          },
-          backOrder: Math.max(row.quantity - validProduct.stock),
-          quantity: quantity || row.quantity > 0 ? row.quantity : 1,
-        };
-      })
-      .filter(Boolean);
+      if (!sizePriceInfo) {
+        toast.error(
+          `Size ${row.selectedSize} not available for ${productNumber}`,
+        );
+        return null;
+      }
+      
+      const quantity =
+        selectedProduct &&
+        selectedProduct.productNumber === validProduct.productNumber
+          ? selectedProduct.quantity
+          : row.quantity > 0
+            ? row.quantity
+            : 1;
+
+      return {
+        id: validProduct.id,
+        image: validProduct.image,
+        productName: validProduct.productName,
+        manufacturerId: validProduct.manufacturer,
+        distributerId: validProduct.distributer,
+        stockId: validProduct.stockId, 
+        stock: validProduct.stock,
+        productId: validProduct.id,
+        priceSize: {
+          price: sizePriceInfo.price || sizePriceInfo.INR || 0,
+          size: sizePriceInfo.break || row.selectedSize,
+        },
+        backOrder: Math.max(row.quantity - validProduct.stock, 0),
+        quantity: quantity || row.quantity > 0 ? row.quantity : 1,
+      };
+    })
+    .filter(Boolean);
 
     if (cartItems.length === 0) {
       return;
@@ -394,7 +536,6 @@
             sku: "",
             size: "",
             quantity: 1,
-
             error: "",
             filteredProducts: [],
             selectedSize: "",
@@ -411,31 +552,43 @@
         cartloading = false;
       }
     } else {
-      const simplifiedCartItems = cartItems.map(item => ({
-      productId: item.productId,
-      stockId: item.stockId,
-      manufacturerId: item.manufacturerId,
-      distributerId: item.distributerId,
-      quantity: item.quantity,
-      backOrder: item.backOrder
+      let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
+      for (const item of cartItems) {
+        const simplifiedCartItem = {
+          productId: item.productId,
+          manufacturerId: item.manufacturerId,
+          stockId: item.stockId,
+          distributorId: item.distributerId,
+          quantity: item.quantity,
+          backOrder: item.backOrder,
+        };
+        
+        const existingItemIndex = currentCart.findIndex(
+          (cartItem) => 
+            cartItem.productId === item.productId && 
+            cartItem.stockId === item.stockId
+        );
 
-    }));
-    rows = rows.map((row) => ({
-            sku: "",
-            size: "",
-            quantity: 1,
-
-            error: "",
-            filteredProducts: [],
-            selectedSize: "",
-          }));
-    localStorage.setItem("cart", JSON.stringify(simplifiedCartItems));
-    toast.success("Items added to cart successfully.");
-    showCartPopup(cartItems);
-    cartloading = false;
+        if (existingItemIndex > -1) {
+          currentCart[existingItemIndex] = simplifiedCartItem;
+        } else {
+          currentCart.push(simplifiedCartItem);
+        }
+      }
+      rows = rows.map((row) => ({
+        sku: "",
+        size: "",
+        quantity: 1,
+        error: "",
+        filteredProducts: [],
+        selectedSize: "",
+      }));
+      localStorage.setItem("cart", JSON.stringify(currentCart));
+      toast.success("Items added to cart successfully.");
+      showCartPopup(cartItems);
+      cartloading = false;
     }
-  }
-
+}
   function cart() {
     if (userLoggedIn) {
       cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -447,16 +600,19 @@
     }
   });
 
-  // function showDetails() {
-  //   selectedProduct = { ...selectedProduct, quantity: 1 };
+  // const showDetails = (product) => {
+  //   selectedProduct = product;
   //   showDetailsModal = true;
-  // }
-
-  const showDetails = (product) => {
+  //   console.log("Selected Product:", selectedProduct);
+  // };
+  const showDetails = (index, product) => {
     selectedProduct = product;
+    selectedProductIndex = index;
     showDetailsModal = true;
-    console.log("Selected Product:", selectedProduct);
+    // console.log("Selected Product:", selectedProduct);
+    // console.log("Selected Product Index:", selectedProductIndex);
   };
+
   function addRows() {
     const newRows = Array(3).fill({
       sku: "",
@@ -528,8 +684,6 @@
       return null;
     }
   }
-
-
 
   function increaseQuantity() {
     if (selectedProduct && selectedProduct.quantity < 9999) {
@@ -635,8 +789,6 @@
     loadingState[index] = true;
     const loadingStartTime = Date.now();
     return async ({ result }) => {
-
-
       let processingEndTime = 0;
       if (Array.isArray(result.data)) {
         products = [...products, ...result.data];
@@ -666,6 +818,45 @@
         row.filteredProducts = filterProducts(row.sku);
       });
     };
+  };
+  const closeCartPopDetails = (index) => {
+    const cartPopup = document.getElementById("cart-popup-details");
+    if (cartPopup) {
+      cartPopup.style.display = "none"; // Hide the cart popup
+    }
+
+    // Clear the selected product (if you need to reset the UI)
+    clearSelectedProductcart(index);
+  };
+
+  const clearSelectedProductcart = (index) => {
+    if (typeof index === "undefined") {
+      console.error("Index is undefined, cannot clear product.");
+      return;
+    }
+
+    // Log to check the state of rows and index
+    console.log("Rows:", rows);
+    console.log("Index:", index);
+
+    // Check if the index is within bounds
+    if (rows && index >= 0 && index < rows.length) {
+      // Reset the fields of the row at the specified index
+      rows[index].sku = "";
+      rows[index].size = "";
+      rows[index].filteredProducts = [];
+      rows[index].error = "";
+
+      // Log the updated row to check the change
+      console.log(`Row at index ${index} after reset:`, rows[index]);
+    } else {
+      // If index is out of bounds, log an error
+      console.error("Index is out of bounds or rows are undefined.");
+    }
+
+    // Reset the selected product to null
+    selectedProduct = null;
+    console.log("Selected Product after reset:", selectedProduct);
   };
 </script>
 
@@ -904,25 +1095,16 @@
             </div>
           {/if}
           {#if row.sku}
-            <!-- <div class="mb-2">
-            {row.sku.substring(0, row.sku.lastIndexOf("-")).trim()}
-          </div> -->
-
-            {#if row.selectedProduct}
+            {#if row.selectedProduct && !loadingState[index]}
               <div
                 class="w-full ml-5 gap-4 items-start flex flex-col md:flex-row lg:flex-row xl:flex-row"
               >
-                <!-- Product Name -->
                 <span class="font-semibold text-sm">
                   {row.selectedProduct.productName}
                 </span>
-
-                <!-- Size -->
                 <span>
                   Size: {row.selectedSize || "No Size Available"}
                 </span>
-
-                <!-- Price or Quote Request -->
                 <span>
                   {#if row.selectedProduct.pricing?.[0]?.price}
                     ₹{row.selectedProduct.pricing[0].price}
@@ -935,22 +1117,26 @@
                     </button>
                   {/if}
                 </span>
-                <span>
-                  1 Estimated to ship on {estimatedShipDate}
-                </span>
+                {#if row.selectedProduct.pricing?.[0]?.price}
+                  <span>
+                    1 Estimated to ship on {estimatedShipDate}
+                  </span>
 
-                <!-- Details Button -->
-                <button
-                  class=" text-primary-400 rounded"
-                  on:click={() =>
-                    showDetails({
-                      productName: row.selectedProduct.productName,
-                      productNumber: row.selectedProduct.productNumber,
-                      quantity: row.quantity || 1,
-                    })}
-                >
-                  Details
-                </button>
+                  <button
+                    class="text-primary-400 rounded"
+                    on:click={() =>
+                      showDetails(index, {
+                        productName: row.selectedProduct.productName,
+                        productNumber: row.selectedProduct.productNumber,
+                        size: row.selectedSize,
+                        price: row.selectedProduct.pricing[0].price || 0,
+                        quantity: row.quantity || 1,
+                      })}
+                  >
+                    Details
+                  </button>
+                {/if}
+
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <div
@@ -973,7 +1159,7 @@
 
           <button
             on:click={addManualEntriesToCart}
-             class="lg:ml-60 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
+            class="lg:ml-60 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
           >
             {#if cartloading}
               <span>Adding...</span>
@@ -993,7 +1179,6 @@
         style="display: none;"
         on:click={closeCartPopup}
       >
-     
         <div
           class="bg-white p-6 rounded-md shadow-lg max-w-md w-full relative"
           on:click|stopPropagation
@@ -1031,7 +1216,54 @@
             </div>
           </div>
         </div>
-      </div> 
+      </div>
+      <!-- svelte-ignore missing-declaration -->
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div
+        id="cart-popup-details"
+        class="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center"
+        style="display: {showCartPopupdetail ? 'flex' : 'none'}"
+        on:click={closeCartPopDetails}
+      >
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <div
+          class="bg-white p-6 rounded-md shadow-lg max-w-md w-full relative"
+          on:click|stopPropagation
+        >
+          <button
+            on:click={closeCartPopDetails}
+            class="absolute top-4 right-4 text-primary-500 hover:scale-105"
+          >
+            <span class="text-xl font-semibold text-primary-500 hover:scale-105"
+              >✖</span
+            >
+          </button>
+
+          <div class="flex flex-col items-center">
+            <h3 class="text-xl font-semibold mb-4">Items Added to Cart</h3>
+            <div id="cart-items-list" class="mb-4"></div>
+            <div class="flex justify-end gap-5 mt-6 pt-3 border-t">
+              <button
+                on:click={continueShopping}
+                class="bg-primary-500 text-white px-5 py-1.5 rounded font-normal hover:bg-primary-600 transition-all ease-in-out duration-300 shadow-sm"
+              >
+                Continue Shopping
+              </button>
+              <a href="/cart">
+                <button
+                  on:click={viewCart}
+                  class="text-primary-600 px-5 py-1.5 rounded font-normal flex gap-2 border-1 border-primary-600 hover:bg-primary-600 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
+                >
+                  View Cart
+                  <Icon icon="mdi:cart" width="20" height="20" />
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     {/if}
   </div>
 
@@ -1146,7 +1378,8 @@
         </button>
 
         <h3 class="text-2xl font-semibold mb-4 text-gray-800">
-          {selectedProduct.productName} - {selectedProduct.productNumber}
+          {selectedProduct.productName} - {selectedProduct.productNumber} - {selectedProduct
+            .size.break}
         </h3>
         <p class="text-sm text-gray-600 mb-5">
           Enter quantity to check availability and estimated ship date.
@@ -1220,7 +1453,8 @@
         <button
           class="mt-6 w-full sm:w-auto p-3 text-white bg-primary-500 rounded-lg flex items-center justify-center gap-2 hover:bg-primary-600 transition"
           on:click={() => {
-            addManualEntriesToCart(rows, products);
+            // addToCart(rows, products);
+            addToCart(selectedProduct.productNumber);
             showCartMessage = true;
             hideDetails();
           }}
@@ -1232,19 +1466,19 @@
     </div>
   {/if}
 
- {#if showQuoteModal}
+  {#if showQuoteModal}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       class=" !ml-0 fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center"
       on:click={() => (showQuoteModal = false)}
     >
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div
-    class="bg-white rounded-lg w-full md:w-2/5 max-h-full overflow-y-auto p-4 md:p-6  m-4 md:m-0"
-    on:click|stopPropagation
-  >
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div
+        class="bg-white rounded-lg w-full md:w-2/5 max-h-full overflow-y-auto p-4 md:p-6 m-4 md:m-0"
+        on:click|stopPropagation
+      >
         <h2 class="text-xl font-semibold mb-4 text-primary-400">
           Request a Quote
         </h2>
@@ -1260,14 +1494,13 @@
               return;
             }
             if (!ProfileEmailVerified && !authedUserEmailVerified) {
-    submitting = false;
-    toast.error("Please verify your email to proceed.");
-    event.preventDefault(); 
-    return;
-  }
+              submitting = false;
+              toast.error("Please verify your email to proceed.");
+              event.preventDefault();
+              return;
+            }
 
             return async ({ result }) => {
-    
               submitting = false;
               if (result.status === 200) {
                 toast.success("Submitted the quotes successfully!");
@@ -1449,202 +1682,214 @@
               >Email</label
             >
             <form
-            action="?/verifyemail"
-            bind:this={form3}
-            method="POST"
-            use:enhance={({}) => {
-              return async ({ result }) => {
-                isLoading = false;
-                console.log('result', result);
-                if (result.data?.status === 200) {
-                  ProfileEmailVerified = result.data.isEmailVerified;
-                  if (authedUserEmailVerified === true) {
-                    ProfileEmailVerified = true;
-                  }
+              action="?/verifyemail"
+              bind:this={form3}
+              method="POST"
+              use:enhance={({}) => {
+                return async ({ result }) => {
+                  isLoading = false;
+                  console.log("result", result);
+                  if (result.data?.status === 200) {
+                    ProfileEmailVerified = result.data.isEmailVerified;
+                    if (authedUserEmailVerified === true) {
+                      ProfileEmailVerified = true;
+                    }
 
-                  verificationMessage = result.data.message;
+                    verificationMessage = result.data.message;
 
-                  if (
-                    verificationMessage.includes(
-                      'Verification email sent successfully. Please check your inbox.'
-                    )
-                  ) {
-                    displayMessage = 'Please check your inbox.';
-                    emailSent = true;
-                    enteredOtp = '';
-                    isOtpVerified = false;
+                    if (
+                      verificationMessage.includes(
+                        "Verification email sent successfully. Please check your inbox.",
+                      )
+                    ) {
+                      displayMessage = "Please check your inbox.";
+                      emailSent = true;
+                      enteredOtp = "";
+                      isOtpVerified = false;
+                    } else {
+                      displayMessage = verificationMessage;
+                      emailSent = false;
+                      isOtpVerified = false;
+                    }
+
+                    toast.success(verificationMessage);
                   } else {
-                    displayMessage = verificationMessage;
+                    toast.error(result.data.message);
+                    ProfileEmailVerified = result.data.isEmailVerified;
                     emailSent = false;
-                    isOtpVerified = false;
                   }
-
-                  toast.success(verificationMessage);
-                } else {
-                  toast.error(result.data.message);
-                  ProfileEmailVerified = result.data.isEmailVerified;
-                  emailSent = false;
-                }
-              };
-            }}
-            class="flex w-full items-center"
-            on:submit={() => {
-              isLoading = true;
-            }}
-          >
-          <div class="relative w-full">
-            <input
-              type="email"
-              name="email"
-              bind:value={email}
-              class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
-              placeholder="Your email"
-              on:input={() => {
-                if (!email.trim()) {
-                  formErrors.email = "Email is required.";
-                } else if (
-                  !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-                    email,
-                  )
-                ) {
-                  formErrors.email = "Please enter a valid email address.";
-                } else {
-                  formErrors.email = "";
-                }
-                ProfileEmailVerified = false;
-															emailSent = false;
-															authedUserEmailVerified = false;
+                };
               }}
-            />
-            {#if isLoading}
-            <span
-              class="absolute right-2 top-1/2 mt- transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
+              class="flex w-full items-center"
+              on:submit={() => {
+                isLoading = true;
+              }}
             >
-              <Icon icon="line-md:loading-alt-loop" class="w-4 h-4 mr-1" />
-              Verifying...
-            </span>
-          {:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data?.isEmailVerified !== true}
-            <button
-              type="submit"
-               class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
-              disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-                email
-              ) || email.split('@')[1].includes('gamil')}
-            >
-              Verify
-            </button>
-          {:else if emailSent}
-            <span
-              class="absolute right-2 mt- top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-            >
-              {#if isOtpVerified}
-                Verified
-                <Icon
-                  icon="material-symbols:verified-rounded"
-                  class="w-4 h-4 mt-2 ml-1"
+              <div class="relative w-full">
+                <input
+                  type="email"
+                  name="email"
+                  bind:value={email}
+                  class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
+                  placeholder="Your email"
+                  on:input={() => {
+                    if (!email.trim()) {
+                      formErrors.email = "Email is required.";
+                    } else if (
+                      !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                        email,
+                      )
+                    ) {
+                      formErrors.email = "Please enter a valid email address.";
+                    } else {
+                      formErrors.email = "";
+                    }
+                    ProfileEmailVerified = false;
+                    emailSent = false;
+                    authedUserEmailVerified = false;
+                  }}
                 />
-              {:else}
-                <Icon icon="fluent:mail-all-read-16-filled" class="w-4  h-4 mr-1" />
-                Check your inbox
-              {/if}
-            </span>
-          {:else}
-            <span
-              class="absolute right-2  top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-            >
-              Verified
-              <Icon icon="material-symbols:verified-rounded" class="w-4 h-4 ml-1" />
-            </span>
-          {/if}
-          </div>
+                {#if isLoading}
+                  <span
+                    class="absolute right-2 top-1/2 mt- transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
+                  >
+                    <Icon
+                      icon="line-md:loading-alt-loop"
+                      class="w-4 h-4 mr-1"
+                    />
+                    Verifying...
+                  </span>
+                {:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data?.isEmailVerified !== true}
+                  <button
+                    type="submit"
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
+                    disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                      email,
+                    ) || email.split("@")[1].includes("gamil")}
+                  >
+                    Verify
+                  </button>
+                {:else if emailSent}
+                  <span
+                    class="absolute right-2 mt- top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+                  >
+                    {#if isOtpVerified}
+                      Verified
+                      <Icon
+                        icon="material-symbols:verified-rounded"
+                        class="w-4 h-4 mt-2 ml-1"
+                      />
+                    {:else}
+                      <Icon
+                        icon="fluent:mail-all-read-16-filled"
+                        class="w-4  h-4 mr-1"
+                      />
+                      Check your inbox
+                    {/if}
+                  </span>
+                {:else}
+                  <span
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+                  >
+                    Verified
+                    <Icon
+                      icon="material-symbols:verified-rounded"
+                      class="w-4 h-4 ml-1"
+                    />
+                  </span>
+                {/if}
+              </div>
             </form>
             {#if formErrors.email}
               <p class="text-red-500 text-xs">{formErrors.email}</p>
             {/if}
             {#if emailSent && isOtpVerified === false}
-            <br />
-            <form
-              action="?/verifyOtpEmail"
-              method="POST"
-              use:enhance={() => {
-                return async ({ result }) => {
-                 
-                  loadingotp = false;
-                  if (result.status === 200) {
-                    if (result.data.status === 200) {
-                      const verifiedMessage = result.data.message;
-                      toast.success(verifiedMessage);
+              <br />
+              <form
+                action="?/verifyOtpEmail"
+                method="POST"
+                use:enhance={() => {
+                  return async ({ result }) => {
+                    loadingotp = false;
+                    if (result.status === 200) {
+                      if (result.data.status === 200) {
+                        const verifiedMessage = result.data.message;
+                        toast.success(verifiedMessage);
 
-                      isOtpVerified = result.data.isEmailVerified;
-                      enteredOtpemail = '';
-                      isOtpVerified = true;
-                      ProfileEmailVerified = true;
-                      console.log(isOtpVerified, 'isOtpVerified');
+                        isOtpVerified = result.data.isEmailVerified;
+                        enteredOtpemail = "";
+                        isOtpVerified = true;
+                        ProfileEmailVerified = true;
+                        console.log(isOtpVerified, "isOtpVerified");
+                      } else {
+                        const errorMessage =
+                          result.data.message || "An unknown error occurred!";
+                        toast.error(errorMessage);
+                      }
                     } else {
                       const errorMessage =
-                        result.data.message || 'An unknown error occurred!';
+                        result.data.message ||
+                        "Request failed. Please try again.";
                       toast.error(errorMessage);
                     }
-                  } else {
-                    const errorMessage =
-                      result.data.message || 'Request failed. Please try again.';
-                    toast.error(errorMessage);
-                  }
-                };
-              }}
-              on:submit={() => {
-                loadingotp = true;
-              }}
-            >
-              <div class="relative w-full">
-                <input type="hidden" name="email" id="email" bind:value={email} />
-                <input
-                  type="text"
-                  name="enteredOtp"
-                  bind:value={enteredOtpemail}
-                  placeholder="Enter 6-digit OTP"
-                  class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-                  on:input={() => {
-                    enteredOtpemail = enteredOtpemail.trim();
-                  }}
-                />
-                <button
-                  type="submit"
-                  class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded hover:underline"
-                  disabled={loadingotp}
-                >
-                  
-                  {#if loadingotp}
-                    <span
-                      class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 flex items-center"
-                    >
-                      <Icon
-                        icon="line-md:loading-alt-loop"
-                        class="w-4 h-4 mr-1 animate-spin"
-                      />
-                      Verifying...
-                    </span>
-                  {:else}
-                    Verify
-                  {/if}
-                </button>
-              </div>
-              <div class="flex justify-end text-sm">
-                <p class="mt-px text-2s text-right text-gray-600">
-                  Didn't receive the code?
+                  };
+                }}
+                on:submit={() => {
+                  loadingotp = true;
+                }}
+              >
+                <div class="relative w-full">
+                  <input
+                    type="hidden"
+                    name="email"
+                    id="email"
+                    bind:value={email}
+                  />
+                  <input
+                    type="text"
+                    name="enteredOtp"
+                    bind:value={enteredOtpemail}
+                    placeholder="Enter 6-digit OTP"
+                    class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+                    on:input={() => {
+                      enteredOtpemail = enteredOtpemail.trim();
+                    }}
+                  />
                   <button
-                    type="button"
-                    on:click={handleResendOtpemail}
+                    type="submit"
+                    class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded hover:underline"
                     disabled={loadingotp}
-                    class="text-medium text-primary-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Get a new code
+                    {#if loadingotp}
+                      <span
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 flex items-center"
+                      >
+                        <Icon
+                          icon="line-md:loading-alt-loop"
+                          class="w-4 h-4 mr-1 animate-spin"
+                        />
+                        Verifying...
+                      </span>
+                    {:else}
+                      Verify
+                    {/if}
                   </button>
-                </p>
-              </div>
-
-            </form>
-          {/if}
+                </div>
+                <div class="flex justify-end text-sm">
+                  <p class="mt-px text-2s text-right text-gray-600">
+                    Didn't receive the code?
+                    <button
+                      type="button"
+                      on:click={handleResendOtpemail}
+                      disabled={loadingotp}
+                      class="text-medium text-primary-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Get a new code
+                    </button>
+                  </p>
+                </div>
+              </form>
+            {/if}
           </div>
           <div class="mb-4">
             <label
@@ -1709,5 +1954,5 @@
         </form>
       </div>
     </div>
-  {/if} 
+  {/if}
 </div>
