@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
   import Icon from "@iconify/svelte";
+  import { invalidate } from "$app/navigation";
   import { cartState } from "$lib/stores/cartStores.js";
   import { toast } from "svelte-sonner";
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
@@ -89,6 +90,7 @@
     selectedProduct = {
       description: product.description,
       id: product.id,
+      brand: product.brand,
       name: product.name,
       image: product.image,
       name: product.name,
@@ -127,8 +129,8 @@
     selectedPriceIndex = index;
     selectedStockId = selectedProduct.stockId[index] || "NA";
 
-    console.log("Selected Price:", selectedPrice);
-    console.log("Updated Stock ID:", selectedStockId);
+    // console.log("Selected Price:", selectedPrice);
+    // console.log("Updated Stock ID:", selectedStockId);
   }
 
   let popupQuantity = 1;
@@ -186,8 +188,8 @@
       stockId: selectedStockId,
       quantity: popupQuantity,
       backOrder,
-      price: selectedPrice.price || 0,
-      size: selectedPrice.size || "N/A",
+      // price: selectedPrice.price || 0,
+      // size: selectedPrice.size || "N/A",
     };
 
     if (!isLoggedIn) {
@@ -205,7 +207,7 @@
       invalidate("/");
     });
 
-    // console.log("Final Cart Item Sent:", cartItem);
+    console.log("Final Cart Item Sent:", cartItem);
   }
 
   let specificKeys = [
@@ -414,11 +416,11 @@
         />
         <div>
           <p class="text-xs font-semibold text-left">
-            {selectedProduct.brand || "--"}
+            {selectedProduct.brand}
           </p>
           <p class="text-base font-semibold text-primary-500 text-left">
             <a
-              href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
+              href={selectedProduct.partNumber}
               >{selectedProduct.partNumber || "--"}</a
             >
           </p>
@@ -438,7 +440,7 @@
           <div>
             <p>Price not available for this product, request Quote</p>
             <a
-              href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
+              href={selectedProduct.partNumber}
             >
               <button
                 class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-white mt-2"

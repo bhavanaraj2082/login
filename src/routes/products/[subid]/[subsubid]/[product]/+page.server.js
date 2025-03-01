@@ -115,8 +115,7 @@ export const actions = {
 			const userId = locals?.authedUser?.id || ""
 			const userEmail = locals?.authedUser?.email ||""
 			const body = Object.fromEntries(await request.formData())
-			const data = JSON.parse(body.item)
-			//console.log(data);
+			const data = JSON.parse(body.items)
 			return await addToCart(data,userId,userEmail)
 		} catch (error) {
 			console.log(error);

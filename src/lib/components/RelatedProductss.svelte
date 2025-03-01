@@ -3,6 +3,7 @@
   import { browser } from "$app/environment";
   import { cartState } from "$lib/stores/cartStores.js";
   import { toast } from "svelte-sonner";
+  import { invalidate } from "$app/navigation";
   import Icon from "@iconify/svelte";
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
   import { authedUser } from "$lib/stores/mainStores.js";
@@ -179,8 +180,8 @@
     selectedPriceIndex = index;
     selectedStockId = selectedProduct.stockId[index] || "NA";
 
-    console.log("Selected Price:", selectedPrice);
-    console.log("Updated Stock ID:", selectedStockId);
+    // console.log("Selected Price:", selectedPrice);
+    // console.log("Updated Stock ID:", selectedStockId);
   }
   let popupQuantity = 1;
 
@@ -237,8 +238,8 @@
       stockId: selectedStockId,
       quantity: popupQuantity,
       backOrder,
-      price: selectedPrice.price || 0,
-      size: selectedPrice.size || "N/A",
+      // price: selectedPrice.price || 0,
+      // size: selectedPrice.size || "N/A",
     };
 
     if (!isLoggedIn) {
@@ -250,7 +251,6 @@
 
     const formdata = new FormData();
     formdata.append("items", JSON.stringify([cartItem]));
-
     sendMessage("?/addtocart", formdata, async (result) => {
       toast.success(result.message);
       invalidate("/");
@@ -394,7 +394,7 @@
           </p>
           <p class="text-base font-semibold text-primary-500 text-left">
             <a
-              href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
+              href={selectedProduct.partNumber}
               >{selectedProduct.partNumber || "--"}</a
             >
           </p>
@@ -414,7 +414,7 @@
           <div>
             <p>Price not available for this product, request Quote</p>
             <a
-              href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
+              href={selectedProduct.partNumber}
             >
               <button
                 class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-white mt-2"
