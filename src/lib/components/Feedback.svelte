@@ -34,14 +34,14 @@ let displayMessage = "";
 let enteredOtp = "";
 let enteredOtpemail = "";
 let isOtpVerified = false;
-let form3;
+let form3;      
 
   onMount(async () => {
-      if (data && data.profile) {
+      if (data && data.profile) {   
     formData.name =
-      `${data.profile.firstname || ""} ${data.profile.lastname || ""}`.trim();
-              formData.email = data.profile.email || "";
-    
+      `${data.profile.firstName || ""} ${data.profile.lastName || ""}`.trim();
+    formData.email = data.profile.email || "";
+          
 
     isDataAvailable = true;
   } else {
@@ -86,6 +86,7 @@ let form3;
   let showEmailVerifyError= false;
   let showRatingError = false;
   let showNameValidError = false;
+  let nameIsValid='';
     const resetForm = () => {
     formData = {
       issue: [],
@@ -123,7 +124,7 @@ let form3;
 // }
 
 function isValidName() {
-  const namepattern =/^[a-zA-Z]+$/;
+  const namepattern =/^[A-Za-z\s]+$/;
   nameIsValid = namepattern.test(formData.name);
   return nameIsValid;
 }
@@ -223,49 +224,53 @@ const handleSubmit = async (event) => {
 
 {#if showSuccesDiv}
 <div
-    class="h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl"
->
-    <div
-        class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
-    >
-        <h3 class="text-2xl font-semibold text-green-600 mb-4">
-            Feedback Form Submission
-        </h3>
-        <p class="text-lg text-gray-700 mb-6">
-            Thank you for submitting your Feedback form! We have
-            received your Feedback and we will look into that.
-        </p>
+		class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
+	>
+		<div
+			class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
+		>
+			<h3 class="sm:text-xl text-md font-semibold text-green-600 mb-4">
+				Feedback Form Submission
+			</h3>
+			<p class="sm:text-md text-sm text-gray-700 mb-6">
+				Thank you for submitting your Feedback! We have
+            received it and we will look into that.
+			</p>
 
-        <div class="w-10/12 mx-auto my-6 border-t-2 border-green-300"></div>
-        <div>
-            <a
-                href="/"
-                class="bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
-            >
-                Return to Home
-            </a>
-        </div>
-    </div>
-</div>
+			<div class="w-10/12 mx-auto my-6 border-t-2 border-green-300"></div>
+			<div>
+				<a
+					href="/"
+					class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
+				>
+					Return to Home
+				</a>
+			</div>
+		</div>
+	</div>
+
 {:else if showFailureDiv}
-<h1 class="font-bold text-lg md:text-2xl pl-1 pt-10 pb-5 w-11/12 max-w-7xl justify-center mx-auto">Feedback</h1>
-<section class="w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto font-roboto bg-white mb-10">
-	<div class="w-full border border-gray-300 rounded-lg p-2">
+<div
+		class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
+	>
+		<div
+			class="w-10/12 md:w-8/12 bg-gradient-to-r from-red-100 via-red-50 to-red-100 p-8 rounded-lg shadow-lg text-center"
+		>
+			<p class="sm:text-md text-sm text-gray-700 mb-6">
+			There was an issue with submitting the form. Please try again after a while.
+			</p>
 
-<div class="mt-4 p-4 bg-red-100 text-red-700 border border-red-400 rounded">
-    <p class="font-semibold mb-4">
-        There was a problem submitting the form. Please try again after some
-        time.
-    </p>
-    <a
-        href="/contact-us"
-        class="bg-white w-fit border text-black border-gray-500 px-4 py-2 rounded-md transition block"
-    >
-        Report Issue
-    </a>
-</div>
-</div>
-</section>
+			<div class="w-10/12 mx-auto my-6 border-t-2 border-red-300"></div>
+			<div>
+				<a
+					href="/feedback"
+					class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
+				>
+				Back to Feedback
+				</a>
+			</div>
+		</div>
+	</div>
 {:else}
 <h1 class="font-bold text-lg md:text-2xl pl-1 pt-10 pb-5 w-11/12 max-w-7xl justify-center mx-auto">Feedback</h1>
 <section class="w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto font-roboto bg-white mb-10">
@@ -296,6 +301,9 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
         message1 = result.data.data.message;
         resetForm();  
         showSuccesDiv = true;
+        setTimeout(() => {
+								location.reload();
+							}, 3000);
       } else if (keywordError === "error") {
         message1 = result.data.data.error;
         showFailureDiv = true;
@@ -313,7 +321,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
       <fieldset class="border-b border-gray-900/10 pb-12">
         <legend class="text-sm font-semibold text-gray-900">Enhancing Website Performance and Customer Satisfaction</legend>
         <div class="mt-6 space-y-4 text-xs">
-          {#each ['Slow Website Loading Speed', 'Poor Mobile Responsiveness', 'Poor Search Functionality', 'Lack of Payment Options', 'Everything is running smoothly'] as issue}
+          {#each ['Slow Website Loading Speed','Issue with Contact form submission','Issue with Quotes request submission', 'Issue with other form submission','Poor Mobile Responsiveness', 'Poor Search Functionality', 'Lack of Payment Options', 'Everything is running smoothly'] as issue}
             <div class="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -329,7 +337,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
           {/each}
         </div>
         {#if showIssueError}
-        <div class="mt-1 font-normal text-xs text-red-500">Please select at least one issue.</div>
+        <div class="text-red-500 sm:text-xs text-2s font-medium mt-3">Please select at least one issue.</div>
       {/if}
     </fieldset>
       
@@ -361,10 +369,11 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
             on:input={() => showNameError = false} 
             class="block w-full rounded-md focus:ring-0 focus:outline-none border focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
           />
-          {#if formData.name.length > 0 && !/^[a-zA-Z]+$/.test(formData.name)}
+          <!-- {#if formData.name.length > 0 && !/^[a-zA-Z]+$/.test(formData.name)} -->
+          {#if formData.name.length > 0 && !/^[A-Za-z\s]+$/.test(formData.name)}  
           <span class="text-red-500 text-xs font-normal">Please enter a valid user name.</span>
          {/if}{#if showNameError}
-          <div class="mt-1 font-normal text-xs text-red-500">Please enter your name.</div>
+          <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please enter your name.</div>
         {/if}
       </div>
         
@@ -454,10 +463,10 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
           }}
       />
       {#if showEmailError}
-    <div class="mt-1 font-normal text-xs text-red-500">Please enter your email.</div>
+    <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please enter your email.</div>
   {/if}
   <!-- {#if showEmailVerifyError}
-  <div class="mt-1 font-normal text-xs text-red-500">Please select at least one issue.</div>
+  <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please select at least one issue.</div>
 {/if} -->
       {#if isLoading}
           <span
@@ -632,7 +641,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
             class="block w-full rounded-md bg-white px-3 py-1.5 text-sm text-gray-900 focus:ring-0 focus:outline-none border focus:border-primary-500"
           ></textarea>
           {#if showFeedbackError}
-    <div class="mt-1 font-normal text-xs text-red-500">Please provide your feedback.</div>
+    <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please provide your feedback.</div>
   {/if}
         </div>
       </div>
@@ -659,7 +668,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
                 </div>
               {/each}
               {#if showRatingError}
-    <div class="mt-1 font-normal text-xs text-red-500">Please enter a rating.</div>
+    <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please enter a rating.</div>
   {/if}
             </div>
           </fieldset>
@@ -672,23 +681,22 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
              id="status"
              bind:value={formData.status}
          /> -->
-
          <input type="hidden" name="status" value="unread" />
-
     </div>
 
-    <div class="mt-6 flex items-center justify-end gap-x-6">
-      <button type="submit" on:click={handleSubmit}                   
-      class="bg-primary-400 hover:bg-primary-500 text-white py-3 px-6 transition duration-300 rounded-lg text-lg font-semibold shadow-md hover:shadow-lg active:scale-95">Submit</button>
-    </div>
-  </div>
-
-  {#if showErrors}
+    {#if showErrors}
     <div class="font-normal text-xs text-red-500">Please fill in all required fields.</div>
   {/if}
   {#if successMessage}
     <div class="mt-4 text-green-500">{successMessage}</div>
   {/if}
+
+    <div class="flex items-center justify-end gap-x-6">
+      <button type="submit" on:click={handleSubmit}                   
+      class="px-5 py-2 bg-primary-400 text-white rounded transition duration-300 hover:bg-primary-500 sm:w-auto font-medium">Submit</button>
+    </div>
+  </div>
+
 </form>
   </div>
 </section>

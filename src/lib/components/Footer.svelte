@@ -5,6 +5,12 @@
 	import Helpsection from '$lib/components/Helpsection.svelte';
 	import Helpsection1 from '$lib/components/Helpsection1.svelte';
 	import Helpsection2 from '$lib/components/Helpsection2.svelte';
+	import { page } from '$app/stores';
+	let currentUrl;
+	$: {
+  currentUrl = $page.url.pathname;
+//   console.log("currentUrl",currentUrl);
+}
 
 	let isPopupOpen = false;
 
@@ -20,10 +26,14 @@
 	const currentYear = new Date().getFullYear();
 	let footer;
 </script>
+{#if currentUrl !== "/feedback"}
 <Helpsection1 />
 <Helpsection2 />
+{/if}
 <footer class="w-full bg-primary-400 p-6 font-workSans" bind:this={footer}>
+	{#if currentUrl !== "/feedback" || currentUrl !== "/order-status"}
 	<Helpsection {footer} />
+	{/if}
 
 	<div class="mx-auto">
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mt-4 w-11/12 mx-auto max-w-7xl">

@@ -4,70 +4,70 @@
 <div class="w-full mx-auto">
   <div class="flex flex-col md:flex-row">
     <div class="w-full p-5">
-      <h1 class="text-2xl font-bold mb-6">Globally Harmonized System (GHS)</h1>
+      <!-- <h1 class="text-2xl font-bold mb-6">Globally Harmonized System (GHS)</h1> -->
 
-      <p class="text-lg mb-4">
-        The <strong
-          >Globally Harmonized System of Classification and Labeling of
-          Chemicals (GHS)</strong
-        > was introduced to ensure consistent, clear, and standardized hazard communication
+      <p class="sm:text-sm text-xs mb-4">
+        The 
+          Globally Harmonized System of Classification and Labeling of
+          Chemicals (GHS)
+        was introduced to ensure consistent, clear, and standardized hazard communication
         regarding chemicals globally. Developed by the United Nations, it aims to
         eliminate discrepancies in classification and labeling of hazardous chemicals
         across different countries and regions.
       </p>
 
-      <p class="text-lg mb-4">
+      <p class="sm:text-sm text-xs mb-4">
         First established at the UN Conference on Environment and Development in
         Rio de Janeiro in 1992, GHS facilitates international trade and enhances
         safety through consistent and understandable classification of hazardous
         substances. The first formal version of the GHS was published in 2003,
-        commonly referred to as the <strong>Purple Book</strong>, in contrast to
-        the <strong>Orange Book</strong> used for transportation. The system is reviewed
+        commonly referred to as the Purple Book, in contrast to
+        the Orange Book used for transportation. The system is reviewed
         and updated regularly to adapt to new scientific knowledge and safety standards.
       </p>
 
-      <h2 class="text-xl font-semibold mt-6 mb-2">Purpose of GHS</h2>
-      <ul class="list-disc pl-6 mb-4">
+      <h2 class="sm:text-md text-sm font-medium mt-6 mb-2">Purpose of GHS</h2>
+      <ul class="sm:text-sm text-xs list-disc pl-6 mb-4">
         <li>
-          <strong>Globalization of trade:</strong> Harmonizes chemical classification
+          Globalization of trade: Harmonizes chemical classification
           and communication standards, reducing barriers to international trade.
         </li>
         <li>
-          <strong>Varying labeling requirements:</strong> Different countries had
+          Varying labeling requirements: Different countries had
           different criteria for labeling hazardous chemicals. GHS resolves these
           differences by introducing a universal standard.
         </li>
         <li>
-          <strong>Inconsistent chemical classifications:</strong> Chemicals with
+          Inconsistent chemical classifications: Chemicals with
           similar properties were being classified differently in various regions.
           GHS ensures consistent classification based on the intrinsic properties
           of substances.
         </li>
         <li>
-          <strong>Safety communication:</strong> The system ensures that all stakeholders,
+          Safety communication: The system ensures that all stakeholders,
           from manufacturers to workers, receive clear and accurate hazard information.
         </li>
       </ul>
 
-      <h2 class="text-xl font-semibold mt-6 mb-2">Key Benefits of GHS</h2>
-      <ul class="list-disc pl-6 mb-4">
+      <h2 class="sm:text-md text-sm font-medium mt-6 mb-2">Key Benefits of GHS</h2>
+      <ul class="sm:text-sm text-xs list-disc pl-6 mb-4">
         <li>
-          <strong>Improved safety:</strong> Clearer hazard communication ensures
+          Improved safety: Clearer hazard communication ensures
           better protection for workers and consumers.
         </li>
         <li>
-          <strong>Consistent classification:</strong> A global standard for classifying
+          Consistent classification: A global standard for classifying
           and labeling chemicals reduces confusion and increases safety.
         </li>
         <li>
-          <strong>Regulatory harmonization:</strong> Facilitates easier trade by
+          Regulatory harmonization: Facilitates easier trade by
           harmonizing chemical regulations internationally.
         </li>
       </ul>
     </div>
   </div>
-  <div class="container mx-auto">
-    <h1 class="text-2xl font-bold mb-6">Key to Our Product Labels</h1>
+  <div class="container mx-auto pl-5">
+    <h1 class="sm:text-md text-sm font-medium mb-6">Key to Our Product Labels</h1>
 
     <div class="overflow-x-auto">
       <table
@@ -75,25 +75,25 @@
       >
         <thead>
           <tr>
-            <th class="px-4 py-2 border border-gray-300 text-left"
+            <th class="sm:text-sm text-xs px-4 py-2 border border-gray-300 text-left"
               >Description</th
             >
-            <th class="px-4 py-2 border border-gray-300 text-left">Pictogram</th
+            <th class="sm:text-sm text-xs px-4 py-2 border border-gray-300 text-left">Pictogram</th
             >
-            <th class="px-4 py-2 border border-gray-300 text-left"
+            <th class="sm:text-sm text-xs px-4 py-2 border border-gray-300 text-left"
               >Hazard Class and Hazard Category</th
             >
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td class="px-4 py-2 border border-gray-300"
-              ><strong>Exploding Bomb</strong></td
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
+              >Exploding Bomb</td
             >
-            <td class="px-4 py-2 border border-gray-300"
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img src="/productsafety/bomb.jpg" alt="img" class="w-52" /></td
             >
-            <td class="px-4 py-2 border border-gray-300">
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Unstable explosives<br />
               Explosives of division 1.1 to 1.4<br />
               Self-reactive substances, mixtures types A,B<br />
@@ -101,13 +101,13 @@
             </td>
           </tr>
           <tr>
-            <td class="px-4 py-2 border border-gray-300"
-              ><strong>Flame</strong></td
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
+              >Flame</td
             >
-            <td class="px-4 py-2 border border-gray-300"
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img src="/productsafety/flame.jpg" alt="img" class="w-52" /></td
             >
-            <td class="px-4 py-2 border border-gray-300">
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Aerosols, cat. 1,2<br />
               Flammable solids, cat. 1,2<br />
               Flammable liquids, cat. 1,2,3<br />
@@ -128,34 +128,34 @@
             </td>
           </tr>
           <tr>
-            <td class="px-4 py-2 border border-gray-300"
-              ><strong>Flame Over Circle</strong></td
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
+              >Flame Over Circle</td
             >
-            <td class="px-4 py-2 border border-gray-300"
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img
                 src="/productsafety/flamecircle.jpg"
                 alt="img"
                 class="w-52"
               /></td
             >
-            <td class="px-4 py-2 border border-gray-300">
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Oxidizing gases, cat. 1<br />
               Oxidizing liquids, cat. 1,2,3<br />
               Oxidizing solids, cat. 1,2,3
             </td>
           </tr>
           <tr>
-            <td class="px-4 py-2 border border-gray-300"
-              ><strong>Gas Cylinder</strong></td
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
+              >Gas Cylinder</td
             >
-            <td class="px-4 py-2 border border-gray-300"
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img
                 src="/productsafety/cylinder.jpg"
                 alt="img"
                 class="w-52"
               /></td
             >
-            <td class="px-4 py-2 border border-gray-300">
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Chemicals under pressure, cat. 1,2,3<br />
               Gases under pressure<br />
               Compressed gas<br />
@@ -165,45 +165,45 @@
             </td>
           </tr>
           <tr>
-            <td class="px-4 py-2 border border-gray-300"
-              ><strong>Corrosion</strong></td
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
+              >Corrosion</td
             >
-            <td class="px-4 py-2 border border-gray-300"
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img
                 src="/productsafety/Corrosion.jpg"
                 alt="img"
                 class="w-52"
               /></td
             >
-            <td class="px-4 py-2 border border-gray-300">
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Corrosive to metals, cat. 1<br />
               Skin corrosion/irritation, cat. 1 (1A,1B,1C)<br />
               Serious eye damage/eye irritation, cat. 1
             </td>
           </tr>
           <tr>
-            <td class="px-4 py-2 border border-gray-300"
-              ><strong>Skull and Crossbones</strong></td
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
+              >Skull and Crossbones</td
             >
-            <td class="px-4 py-2 border border-gray-300"
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img src="/productsafety/skull.jpg" alt="img" class="w-52" /></td
             >
-            <td class="px-4 py-2 border border-gray-300">
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Acute toxicity, cat. 1,2,3 (Oral, Dermal, Inhalation)
             </td>
           </tr>
           <tr>
-            <td class="px-4 py-2 border border-gray-300"
-              ><strong>Exclamation Mark</strong></td
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
+              >Exclamation Mark</td
             >
-            <td class="px-4 py-2 border border-gray-300"
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img
                 src="/productsafety/exclamation.jpg"
                 alt="img"
                 class="w-52"
               /></td
             >
-            <td class="px-4 py-2 border border-gray-300">
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Acute toxicity, cat. 4 (Oral, Dermal, Inhalation)<br />
               Skin corrosion/irritation, cat. 2<br />
               Serious eye damage/eye irritation, cat. 2/2A<br />
@@ -213,17 +213,17 @@
             </td>
           </tr>
           <tr>
-            <td class="px-4 py-2 border border-gray-300"
-              ><strong>Health Hazard</strong></td
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
+              >Health Hazard</td
             >
-            <td class="px-4 py-2 border border-gray-300"
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img
                 src="/productsafety/healthhazard.jpg"
                 alt="img"
                 class="w-52"
               /></td
             >
-            <td class="px-4 py-2 border border-gray-300">
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Respiratory sensitization, cat. 1, 1A, 1B<br />
               Germ cell mutagenicity, cat. 1,1A,1B,2<br />
               Carcinogenicity, cat. 1,1A,1B,2<br />
@@ -234,28 +234,28 @@
             </td>
           </tr>
           <tr>
-            <td class="px-4 py-2 border border-gray-300"
-              ><strong>Environment</strong></td
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
+              >Environment</td
             >
-            <td class="px-4 py-2 border border-gray-300"
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img
                 src="/productsafety/environment.jpg"
                 alt="img"
                 class="w-52"
               /></td
             >
-            <td class="px-4 py-2 border border-gray-300">
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Hazardous to the aquatic environment, short-term (acute), cat. 1<br
               />
               Hazardous to the aquatic environment, long-term (chronic), cat. 1,2
             </td>
           </tr>
           <tr>
-            <td class="px-4 py-2 border border-gray-300"
-              ><strong>Other Regional Elements (USA)</strong></td
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
+              >Other Regional Elements (USA)</td
             >
-            <td class="px-4 py-2 border border-gray-300"></td>
-            <td class="px-4 py-2 border border-gray-300">
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"></td>
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Simple Asphyxiant<br />
               Combustible Dust<br />
               Pyrophoric Gases

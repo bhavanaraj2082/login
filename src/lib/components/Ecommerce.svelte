@@ -24,6 +24,7 @@
 	let showSuccesDiv = false;
 	let showFailureDiv = false;
 	let ProfileEmailVerified;
+	let errors = {};
 	let form3;
 	import { enhance } from "$app/forms";
 	const countries = [
@@ -442,10 +443,10 @@
 	let isEditable = false;
 	onMount(() => {
 		if (data && data.profile) {
-			name =
-				`${data.profile.firstname || ""} ${data.profile.lastname || ""}`.trim();
+			fname=data.profile.firstName || "";
+lname=data.profile.lastName || "";
 			email = data.profile.email || "";
-			number = data.profile.cellPhone || "";
+			number = data.profile.cellPhone || data.profile.primaryPhone;
 
 			const profileCountry = data.profile.country?.trim();
 			if (profileCountry) {
@@ -615,45 +616,54 @@
 
 {#if showSuccesDiv}
 	<div
-		class="h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10"
+	class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
+>
+	<div
+		class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
+	>
+		<h3 class="sm:text-xl text-md font-semibold text-green-600 mb-4">
+			Chemikart Solution Submission
+		</h3>
+		<p class="sm:text-md text-sm text-gray-700 mb-6">
+			Thank you for reaching out! We have received your inquiry and
+				will get back to you with a customized solution shortly.
+		</p>
+
+		<div class="w-10/12 mx-auto my-6 border-t-2 border-green-300"></div>
+		<div>
+			<a
+				href="/"
+				class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
+			>
+				Return to Home
+			</a>
+		</div>
+	</div>
+</div>
+	{:else if showFailureDiv}
+	<div
+		class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
 	>
 		<div
-			class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
+			class="w-10/12 md:w-8/12 bg-gradient-to-r from-red-100 via-red-50 to-red-100 p-8 rounded-lg shadow-lg text-center"
 		>
-			<h3 class="text-2xl font-semibold text-green-600 mb-4">
-				Chemikart Solution Submission
-			</h3>
-			<p class="text-lg text-gray-700 mb-6">
-				Thank you for reaching out! We have received your inquiry and
-				will get back to you with a tailored solution shortly.
+			<p class="sm:text-md text-sm text-gray-700 mb-6">
+			There was an issue with submitting the form. Please try again after a while.
 			</p>
 
-			<div class="w-10/12 mx-auto my-6 border-t-2 border-green-300"></div>
+			<div class="w-10/12 mx-auto my-6 border-t-2 border-red-300"></div>
 			<div>
 				<a
-					href="/ecom-solutions"
-					class="bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
+					href="/feedback"
+					class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
 				>
-					Return to Solutions Page
+				Report Issue
 				</a>
 			</div>
 		</div>
 	</div>
-{:else if showFailureDiv}
-	<div class="mt-4 p-4 bg-red-100 text-red-700 border border-red-400 rounded">
-		<p class="font-semibold mb-4">
-			There was a problem submitting the form. Please try again after some
-			time.
-		</p>
-		<a
-			href="/contact-us"
-			class="bg-white w-fit border text-black border-gray-500 px-4 py-2 rounded-md transition block"
-		>
-			Report Issue
-		</a>
-	</div>
 {:else}
-	<section class="md:w-11/12 mx-auto max-w-7xl px-6 md:px-2 bg-gray-50">
+	<section class="md:w-11/12 mx-auto max-w-7xl bg-gray-50 sm:pb-0 px-1 pb-10">
 		<section class="mt-6">
 			<div class="font-bold text-lg md:text-2xl py-4">
 				Chemikart Solutions
@@ -963,7 +973,6 @@
 				action="?/contactus"
 				class="w-full md:mt-3 mt-0 max-w-3xl sm:ml-3 ml-0"
 				use:enhance={(event) => {
-					submitting= true;
 					const isEmailVerified = ProfileEmailVerified; // Assuming this is the first email verification check
 					const isAuthedUserEmailVerified = authedUserEmailVerified; // The second email verification check
 					console.log(
@@ -978,7 +987,7 @@
 						// Return a function that does nothing to prevent form submission
 						return () => {};
 					}
-
+					submitting= true;
 					return async ({ result }) => {
 						let message1 = "";
 						let keywordError = "";
@@ -989,12 +998,14 @@
 							submitting = false;
 							showSuccesDiv = true;
 							console.log(message1);
+							setTimeout(() => {
+								window.location.reload(); 							
+							}, 3000);
 						} else if (keywordError === "error") {
-							submitting = false;
 							message1 = result.data.data.error;
+							submitting = false;
 							toast.error(message1);
 							showFailureDiv = true;
-							
 							console.log(message1);
 						}
 						showMessage(message1, keywordError);
@@ -1095,16 +1106,16 @@
 								name="fname"
 								id="fname"
 								bind:value={fname}
-								class="flex text-sm w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="flex sm:text-sm text-xs w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="First Name*"
 							/>
 							{#if showErrors && fname.length === 0}
-								<span class="text-red-500 text-xs font-medium"
+								<span class="text-red-500 sm:text-xs text-2s font-medium"
 									>First Name is required</span
 								>
 							{/if}
 							{#if fname.length > 0 && !/^[A-Za-z\s]+$/.test(fname)}
-								<span class="text-red-500 text-xs font-medium"
+								<span class="text-red-500 sm:text-xs text-2s font-medium"
 									>First Name cannot contain numbers or
 									special characters</span
 								>
@@ -1116,16 +1127,16 @@
 								name="lname"
 								id="lname"
 								bind:value={lname}
-								class="flex w-full border border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="flex w-full border border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Last Name*"
 							/>
 							{#if showErrors && lname.length === 0}
-								<span class="text-red-500 text-xs font-medium"
+								<span class="text-red-500 sm:text-xs text-2s font-medium"
 									>Last Name is required</span
 								>
 							{/if}
 							{#if lname.length > 0 && !/^[A-Za-z\s]+$/.test(lname)}
-								<span class="text-red-500 text-xs font-medium"
+								<span class="text-red-500 sm:text-xs text-2s font-medium"
 									>Last Name cannot contain numbers or special
 									characters</span
 								>
@@ -1143,7 +1154,7 @@
 								placeholder="Location"
 								on:input={handleInputChange}
 								on:click={toggleDropdown}
-								class="w-full text-sm px-2 py-2 placeholder-gray-400 rounded  border border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
+								class="w-full sm:text-sm text-xs px-2 py-2 placeholder-gray-400 rounded  border border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
 								required
 							/>
 						
@@ -1157,7 +1168,7 @@
 							<!-- Dropdown Suggestions -->
 							{#if showDropdown}
 								<div class="absolute w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 mt-1">
-									<ul class="max-h-60 overflow-y-auto text-sm">
+									<ul class="max-h-60 overflow-y-auto sm:text-sm text-xs">
 										{#each filteredCountries as location (location.name)}
 											<!-- svelte-ignore a11y-click-events-have-key-events -->
 											<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -1177,7 +1188,7 @@
 						
 							<!-- Validation Message -->
 							{#if showErrors && location.length === 0}
-								<span class="text-red-500 text-xs font-medium">location is required</span>
+								<span class="text-red-500 sm:text-xs text-2s font-medium">location is required</span>
 							{/if}
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
@@ -1186,19 +1197,19 @@
 								name="number"
 								id="number"
 								bind:value={number}
-								class="block w-full border border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="block w-full border border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Phone Number*"
 							/>
 							{#if showErrors && number.length === 0}
-								<span class="text-red-500 text-xs font-medium"
+								<span class="text-red-500 sm:text-xs text-2s font-medium"
 									>Number is required</span
 								>
 							{/if}
 							<!-- {#if number.length > 0 && !/^\+?[0-9]{10}$/.test(number)}
-                                    <span class="text-red-500 text-xs font-medium">Please enter a valid number number.</span>
+                                    <span class="text-red-500 sm:text-xs text-2s font-medium">Please enter a valid number number.</span>
                                 {/if} -->
 							{#if number.length > 0 && !validatePhoneNumber(location, number)}
-								<span class="text-red-500 text-xs font-medium"
+								<span class="text-red-500 sm:text-xs text-2s font-medium"
 									>Please enter a valid phone number for {location}</span
 								>
 							{/if}
@@ -1211,11 +1222,11 @@
 								name="company"
 								id="company"
 								bind:value={company}
-								class="block w-full border border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="block w-full border border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Company Name*"
 							/>
 							{#if showErrors && company.length === 0}
-								<span class="text-red-500 text-xs font-medium"
+								<span class="text-red-500 sm:text-xs text-2s font-medium"
 									>Company Name is required</span
 								>
 							{/if}
@@ -1226,11 +1237,11 @@
 								name="role"
 								id="role"
 								bind:value={role}
-								class="block w-full border border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="block w-full border border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Role*"
 							/>
 							{#if showErrors && role.length === 0}
-								<span class="text-red-500 text-xs font-medium"
+								<span class="text-red-500 sm:text-xs text-2s font-medium"
 									>Role is required</span
 								>
 							{/if}
@@ -1302,7 +1313,7 @@
 										name="email"
 										id="email"
 										bind:value={email}
-										class="flex w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										class="flex w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 										placeholder="Email"
 										on:input={() => {
 											email = email.trim();
@@ -1313,12 +1324,12 @@
 										}}
 									/>
 									{#if showErrors && email.length === 0}
-										<span class="text-red-500 text-xs font-medium"
+										<span class="text-red-500 sm:text-xs text-2s font-medium"
 											>Email is required</span
 										>
 									{/if}
 									{#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
-										<span class="text-red-500 text-xs font-medium"
+										<span class="text-red-500 sm:text-xs text-2s font-medium"
 											>Please enter a valid email address.</span
 										>
 									{/if}
@@ -1473,10 +1484,10 @@
 								</form>
 							{/if}
 							<!-- {#if showErrors && email.length === 0}
-                                    <span class="text-red-500 text-xs font-medium">Email is required</span>
+                                    <span class="text-red-500 sm:text-xs text-2s font-medium">Email is required</span>
                                 {/if}
                                 {#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
-                                    <span class="text-red-500 text-xs font-medium">Please enter a valid email address.</span>
+                                    <span class="text-red-500 sm:text-xs text-2s font-medium">Please enter a valid email address.</span>
                                 {/if} -->
 						</div>
 					</div>
@@ -1485,11 +1496,11 @@
 							name="details"
 							id="details"
 							bind:value={details}
-							class="w-full text-sm p-2 border border-gray-300 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 mb-4 h-32"
+							class="w-full sm:text-sm text-xs p-2 border border-gray-300 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 mb-4 h-32"
 							placeholder="Additional Details*"
 						></textarea>
 						{#if showErrors && details.length === 0}
-							<span class="text-red-500 text-xs font-medium"
+							<span class="text-red-500 sm:text-xs text-2s font-medium"
 								>Additional Details are required</span
 							>
 						{/if}
@@ -1510,12 +1521,12 @@
 							>
 						</label>
 						{#if showErrors && reason.length === 0}
-							<span class="text-red-500 text-xs font-medium"
+							<span class="text-red-500 sm:text-xs text-2s font-medium"
 								>Please select one of the above reasons</span
 							>
 						{/if}
 						{#if showErrors && !isChecked}
-							<span class="text-red-500 text-xs font-medium"
+							<span class="text-red-500 sm:text-xs text-2s font-medium"
 								>confirm the above statement</span
 							>
 						{/if}
@@ -1525,7 +1536,7 @@
 						<button
   type="submit"
   on:click={handleSubmit}
-  class="px-5 py-2 bg-primary-400 text-white rounded transition duration-300 hover:bg-primary-500 sm:w-auto"
+  class="px-5 py-2 bg-primary-400 text-white font-medium rounded transition duration-300 hover:bg-primary-500 sm:w-auto"
 >
   {#if submitting}
     Sending...

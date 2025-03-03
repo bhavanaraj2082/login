@@ -15,6 +15,7 @@
 	let ProfileEmailVerified;
 	let submitting = false;
 	let form;
+	let errors = {};
 	// console.log(data,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 	let authedUserEmailVerified = data?.profile?.isEmailVerified;
 	console.log("authedUserEmailVerified", authedUserEmailVerified);
@@ -55,9 +56,9 @@
 	onMount(() => {
 		if (data && data.profile) {
 			name =
-				`${data.profile.firstname || ""} ${data.profile.lastname || ""}`.trim();
+				`${data.profile.firstName || ""} ${data.profile.lastName || ""}`.trim();
 			email = data.profile.email || "";
-			phone = data.profile.phone || "";
+			phone = data.profile.cellPhone || data.profile.primaryPhone;
 
 			const profileCountry = data.profile.country?.trim();
 			if (profileCountry) {
@@ -639,15 +640,15 @@
 
 {#if showSuccesDiv}
 	<div
-		class="h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10"
+		class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
 	>
 		<div
 			class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
 		>
-			<h3 class="text-2xl font-semibold text-green-600 mb-4">
+			<h3 class="sm:text-xl text-md font-semibold text-green-600 mb-4">
 				Contact Us Form Submission
 			</h3>
-			<p class="text-lg text-gray-700 mb-6">
+			<p class="sm:text-md text-sm text-gray-700 mb-6">
 				Thank you for reaching out! We have received your message and
 				will get back to you as soon as possible.
 			</p>
@@ -656,7 +657,7 @@
 			<div>
 				<a
 					href="/"
-					class="bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
+					class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
 				>
 					Return to Home
 				</a>
@@ -664,19 +665,29 @@
 		</div>
 	</div>
 {:else if showFailureDiv}
-	<div class="mt-4 p-4 bg-red-100 text-red-700 border border-red-400 rounded">
-		<p class="font-semibold mb-4">
-			There was a problem submitting the form. Please try again after some
-			time.
-		</p>
-		<a
-			href="/contact-us"
-			class="bg-white w-fit border text-black border-gray-500 px-4 py-2 rounded-md transition block"
+	<div
+		class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
+	>
+		<div
+			class="w-10/12 md:w-8/12 bg-gradient-to-r from-red-100 via-red-50 to-red-100 p-8 rounded-lg shadow-lg text-center"
 		>
-			Report Issue
-		</a>
+			<p class="sm:text-md text-sm text-gray-700 mb-6">
+			There was an issue with submitting the form. Please try again after a while.
+			</p>
+
+			<div class="w-10/12 mx-auto my-6 border-t-2 border-red-300"></div>
+			<div>
+				<a
+					href="/feedback"
+					class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
+				>
+				Report Issue
+				</a>
+			</div>
+		</div>
 	</div>
-{:else}
+
+	{:else}
 	<section
 		class="my-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto sm:p-0 font-roboto bg-white"
 	>
@@ -722,7 +733,7 @@
 							console.log(message1);
 							setTimeout(() => {
 								location.reload();
-							}, 2000);
+							}, 3000);
 						} else if (keywordError === "error") {
 							message1 = result.data.data.error;
 							submitting = false;
@@ -773,19 +784,18 @@
 							<div class="sm:mt-5 mt-0">
 								<p class="sm
 								:text-lg text-sm text-heading font-semibold">Send a Message</p>
-								<p class="sm
-								:text-lg text-sm text-heading mt-3 mb-3">We’d love to hear from you! Send us a message, and let’s stay connected.</p>
+								<p class="sm:text-sm text-xs text-heading mt-3 mb-3">We’d love to hear from you! Send us a message, and let’s stay connected.</p>
 							</div>
 							<div class="flex flex-col md:flex-row md:space-x-4">
 								<div class="flex-1 mb-4">
-									<input type="text" name="name" id="name" bind:value={name} class="flex w-full border border-gray-300 p-1 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400 placeholder:text-sm" placeholder="User Name" />
+									<input type="text" name="name" id="name" bind:value={name} class="flex w-full border sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="User Name" />
 									{#if showErrors && name.length === 0}
-										<span class="text-red-500 text-xs font-medium"
+										<span class="text-red-500 sm:text-xs text-2s font-medium"
 											>Name is required</span
 										>
 									{/if}
 									{#if name.length > 0 && !/^[A-Za-z\s]+$/.test(name)}
-										<span class="text-red-500 text-xs font-medium"
+										<span class="text-red-500 sm:text-xs text-2s font-medium"
 											>Name cannot contain numbers or
 											special characters</span
 										>
@@ -866,7 +876,7 @@
 												name="email"
 												id="email"
 												bind:value={email}
-												class="flex w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+												class="flex w-full border border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 												placeholder="Email"
 												on:input={() => {
 													email = email.trim();
@@ -878,13 +888,13 @@
 											/>
 											{#if showErrors && email.length === 0}
 												<span
-													class="text-red-500 text-xs font-medium"
+													class="text-red-500 sm:text-xs text-2s font-medium"
 													>Email is required</span
 												>
 											{/if}
 											{#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
 												<span
-													class="text-red-500 text-xs font-medium"
+													class="text-red-500 sm:text-xs text-2s font-medium"
 													>Please enter a valid email
 													address.</span
 												>
@@ -1009,7 +1019,7 @@
 													name="enteredOtp"
 													bind:value={enteredOtpemail}
 													placeholder="Enter 6-digit OTP"
-													class="flex w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+													class="flex w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 													on:input={() => {
 														enteredOtpemail =
 															enteredOtpemail.trim();
@@ -1058,7 +1068,7 @@
 										name="country"
 										id="country"
 										bind:value={country}
-										class="block w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										class="block w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 									>
 										<option value="" disabled selected
 											>Select a country</option
@@ -1070,7 +1080,7 @@
 										{/each}
 									</select>
 									{#if showErrors && country.length === 0}
-										<span class="text-red-500 text-xs font-medium"
+										<span class="text-red-500 sm:text-xs text-2s font-medium"
 											>country is required</span
 										>
 									{/if}
@@ -1081,16 +1091,16 @@
 										name="phone"
 										id="phone"
 										bind:value={phone}
-										class="block w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										class="block w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 										placeholder="Phone"
 									/>
 									{#if showErrors && phone.length === 0}
-										<span class="text-red-500 text-xs font-medium"
+										<span class="text-red-500 sm:text-xs text-2s font-medium"
 											>Phone number is required</span
 										>
 									{/if}
 									{#if phone.length > 0 && !validatePhoneNumber(country, phone)}
-										<span class="text-red-500 text-xs font-medium"
+										<span class="text-red-500 sm:text-xs text-2s font-medium"
 											>Please enter a valid phone number
 											for {country}</span
 										>
@@ -1099,14 +1109,14 @@
 							</div> -->
 							<div class="flex flex-col md:flex-row md:space-x-4">
 								<!-- <div class="flex-1 mb-4">
-									<select name="country" id="country" bind:value={country} class="block w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400">
+									<select name="country" id="country" bind:value={country} class="block w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400">
 										<option value="" disabled selected>Select a country</option>
 										{#each countries as { code, name }}
 										  <option value={name}>{name}({code})</option>
 										{/each}
 									  </select>
 									{#if showErrors && country.length === 0}
-										<span class="text-red-500 text-xs font-medium">country is required</span>
+										<span class="text-red-500 sm:text-xs text-2s font-medium">country is required</span>
 									{/if}
 								</div> -->
 								<div class="flex-1 mb-4 relative w-full">
@@ -1120,7 +1130,7 @@
 											placeholder="Country"
 											on:input={handleInputChange}
 											on:click={toggleDropdown}
-											class="block w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+											class="block w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 											required
 										/>
 										<Icon
@@ -1168,7 +1178,7 @@
 									<!-- Validation Message -->
 									{#if showErrors && country.length === 0}
 										<span
-											class="text-red-500 text-xs font-medium "
+											class="text-red-500 sm:text-xs text-2s font-medium "
 											>Country is required</span
 										>
 									{/if}
@@ -1179,18 +1189,18 @@
 										name="phone"
 										id="phone"
 										bind:value={phone}
-										class="block w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										class="block w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 										placeholder="Phone"
 									/>
 									{#if showErrors && phone.length === 0}
 										<span
-											class="text-red-500 text-xs font-medium "
+											class="text-red-500 sm:text-xs text-2s font-medium "
 											>Phone number is required</span
 										>
 									{/if}
 									{#if phone.length > 0 && !validatePhoneNumber(country, phone)}
 										<span
-											class="text-red-500 text-xs font-medium "
+											class="text-red-500 sm:text-xs text-2s font-medium "
 											>Please enter a valid phone number
 											for {country}</span
 										>
@@ -1205,20 +1215,20 @@
 										name="subject"
 										id="subject"
 										bind:value={subject}
-										class="block w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										class="block w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 										placeholder="Subject"
 									/>
 									{#if showErrors && subject.length === 0}
-										<span class="text-red-500 text-xs font-medium"
+										<span class="text-red-500 sm:text-xs text-2s font-medium"
 											>Subject is required</span
 										>
 									{/if}
 								</div>
 							</div>
 							<div class="flex-1 mb-4">
-								<textarea name="message" id="message" bind:value={message} class="w-full p-1 border border-gray-300 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400 h-32 placeholder:text-sm" placeholder="Message"></textarea>
+								<textarea name="message" id="message" bind:value={message} class="w-full sm:text-sm text-xs p-1 border border-gray-300 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400 h-32" placeholder="Message"></textarea>
 								{#if showErrors && message.length === 0}
-									<span class="text-red-500 text-xs font-medium"
+									<span class="text-red-500 sm:text-xs text-2s font-medium"
 										>Message is required</span
 									>
 								{/if}
