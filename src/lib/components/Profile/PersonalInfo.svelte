@@ -15,11 +15,12 @@
         firstName,
         lastName,
         cellPhone,
-        primaryPhone
+        alternatePhone
     } = contact
 
     let toggleEdit = false
     let togglePass = false
+
 
     let errors
     $:console.log(errors);
@@ -27,7 +28,7 @@
 		errors={}
             if(!firstName || !/^[A-Za-z\s]+$/.test(firstName)) errors.firstName="First name is required and valid"
             // if(!/^[A-Za-z\s]+$/.test(lastName)) errors.lastName="Last name must be valid"
-            if(!primaryPhone || !/^\d{10}$/.test(primaryPhone)) errors.primaryPhone="Primary phone number is required and valid"
+            if(!cellPhone || !/^\d{10}$/.test(cellPhone)) errors.cellPhone="Primary phone number is required and valid"
             // if(!cellPhone || !/^\d{10}$/.test(cellPhone)) errors.cellPhone="Cell phone number is required and valid"
 		if(Object.keys(errors).length >0){
 			return false
@@ -87,18 +88,18 @@
             </div>
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
             <div class=" w-full">
-                <label class=" text-xs md:text-sm font-medium" for="primaryPhone"><span class=" text-sm font-bold text-red-500">*</span>Primary Phone</label><br>
+                <label class=" text-xs md:text-sm font-medium" for="cellPhone"><span class=" text-sm font-bold text-red-500">*</span>Primary Phone</label><br>
                 <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
-                type="text" name="primaryPhone" bind:value={primaryPhone}/>
-                {#if errors?.primaryPhone}
-				<span class="text-red-400 text-xs">{errors.primaryPhone}</span>
+                type="text" name="cellPhone" bind:value={cellPhone}/>
+                {#if errors?.cellPhone}
+				<span class="text-red-400 text-xs">{errors.cellPhone}</span>
 			    {/if}
             </div>
             
             <div class=" w-full">
-                <label class=" text-xs md:text-sm font-medium" for="cellPhone"><span class=" text-sm font-bold text-red-500"></span>Alternative Phone </label><br>
+                <label class=" text-xs md:text-sm font-medium" for="alternatePhone"><span class=" text-sm font-bold text-red-500"></span>Alternative Phone </label><br>
                 <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
-                type="text" name="cellPhone" bind:value={cellPhone}/>
+                type="text" name="alternatePhone" bind:value={alternatePhone}/>
                 <!-- {#if errors?.cellPhone}
 				<span class="text-red-400 text-xs">{errors.cellPhone}</span>
 			    {/if} -->
@@ -137,11 +138,11 @@
                 </div>
                 <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
                     <h4 class="font-medium">Primary Phone :</h4>
-                    <p class=" text-sm ml-2">{primaryPhone || "NA"}</p>
+                    <p class=" text-sm ml-2">{cellPhone || "NA"}</p>
                 </div>
                 <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
                     <h4 class="font-medium">Alternative Phone :</h4>
-                    <p class=" text-sm ml-2">{cellPhone || "--"}</p>
+                    <p class=" text-sm ml-2">{alternatePhone || "--"}</p>
                 </div>
                 <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
                     <div class="flex items-center gap-2">
