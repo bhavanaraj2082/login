@@ -6,7 +6,7 @@
 		PUBLIC_WEBSITE_NAME
 	} from '$env/static/public';
   import SubSubCategory from "$lib/components/Application/SubSubCategory.svelte";
-
+  import  SEO  from '$lib/components/SEO.svelte'; 
   let metadata = {
     title: `${data?.subsubcategoryData?.name} | ${PUBLIC_WEBSITE_NAME}`,
     description: data?.subsubcategoryData?.description || '',
@@ -32,5 +32,5 @@
   // console.log(metadata);
   
 </script>
-
+<SEO {metadata} />
 <SubSubCategory {data} />

@@ -6,7 +6,7 @@
 		PUBLIC_WEBSITE_URL,
 		PUBLIC_WEBSITE_NAME
 	} from '$env/static/public';
-
+  import  SEO  from '$lib/components/SEO.svelte';
   let metadata = {
     title: `${data?.categoryData?.name} | ${PUBLIC_WEBSITE_NAME}`,
     description: data?.categoryData?.description || '',
@@ -32,5 +32,5 @@
   // console.log(metadata);
   
 </script>
-
+<SEO {metadata} />
 <Category {data} />
