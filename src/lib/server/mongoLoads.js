@@ -1245,11 +1245,22 @@ export async function CompareSimilarityData(productId) {
   } else { return [] }
 }
 
-export const getCart = async(userId)=>{
+export const getCart = async(userId,cartId)=>{
    //if(!userId) return { cart:[]}
+   let matchConditions = {}
+   if (userId){
+    matchConditions = {
+      userId,
+      isActiveCart:true
+    }
+   }else{
+    matchConditions = {
+      cartId
+    }
+   }
   const cart = await Cart.aggregate([
     // Match the specific cart by cartId
-    { $match: { userId,isActiveCart:true } },
+    { $match: matchConditions },
     { $unwind: '$cartItems' },
 
     // Lookup components with only required fields

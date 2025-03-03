@@ -15,6 +15,7 @@
 	let subtotal = 0;
 	let priceINR = 0
 	let priceUSD = 0
+	let tog = null
 
 	let isLoggedIn = $authedUser?.id ? true : false
   
@@ -69,13 +70,55 @@
     $: calculateTotalPrice($cart)
 
 	let timeout
+
+	const handleQty = (quantity,stock,_id,indx)=>{
+		if (quantity > 10000000){
+			quantity = 10000000
+		}
+		clearTimeout(timeout)
+
+		if(!isLoggedIn){
+			cart.update(item=>{
+				item[indx].quantity = quantity
+				return item
+			})
+			guestCart.update(item=>{
+			item[indx].quantity = quantity
+			return item
+		    })
+			calculateTotalPrice($cart)
+			return
+		}
+
+	    const index = $cart.findIndex((item) =>item._id === _id);
+		if (index !== -1) {
+			cart.update(item=>{
+				item[index].quantity = quantity
+				return item
+			})
+		}
+
+		timeout = setTimeout(()=>{
+		  const formdata = new FormData()
+		  formdata.append("_id",_id)
+		  formdata.append("stock",stock)
+		  formdata.append("quantity",$cart[index]?.quantity)
+		  formdata.append("cartId",cartId)
+		  sendMessage("/cart?/updateQty",formdata,async(result)=>{
+			invalidate("data:cart")
+			calculateTotalPrice($cart)
+            tog = null
+            
+		  })
+	  },1400)
+	}
 	const incrementQuantity = (stock,_id,indx) => {
 		clearTimeout(timeout)
 
 		if(!isLoggedIn){
 			cart.update(item=>{
 				item[indx].quantity += 1
-				return item
+				return 
 			})
 			guestCart.update(item=>{
 			item[indx].quantity += 1
@@ -264,7 +307,9 @@ on:click={(e) => {
 	  cartOpen = false;
   }
 }}
-></div>  <div class="fixed top-0 right-0 h-full w-full sm:w-1/2 md:w-2/4 lg:w-2/6 z-50">
+>
+</div>  
+<div class="fixed top-0 right-0 h-full w-full sm:w-1/2 md:w-2/4 lg:w-2/6 z-50">
     <div class="w-full h-full bg-white shadow-lg flex flex-col">
       <div class="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
         <h1 class="text-md font-semibold">
@@ -302,15 +347,26 @@ on:click={(e) => {
 
             <div class="flex items-center justify-between mt-3">
               <p class="text-sm font-semibold text-gray-600">₹{item.pricing.INR.toFixed(2)}</p>
-              <div class="flex items-center border border-gray-300 rounded-sm">
-                <button
-                  on:click={() => decrementQuantity(item.stockDetails.stock,item._id,index)}
-                  class="text-2xl border-r-1 px-2 text-primary-400">-</button>
-                <p class="px-3">{item.quantity}</p>
-                <button
-                  on:click={() => incrementQuantity(item.stockDetails.stock,item._id,index)}
-                  class="text-2xl border-l-1 px-2 text-primary-400">+</button>
-              </div>
+              <div class="flex items-center">
+				<input type="number" bind:value={item.quantity}
+				on:input={e=>handleQty(parseInt(e.target.value),item.stockDetails.stock,item._id,index)}
+				class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
+				<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded">
+					<button disabled={item.isCart || item.isQuote}
+						on:click={() => decrementQuantity(item.stockDetails.stock,item._id,index)}
+						class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
+						><Icon icon="rivet-icons:minus" class="text-xs" /></button
+					>
+					<button on:click={()=>{tog = index}} class="w-fit px-3 py-1 text-xs font-medium outline-none text-center">
+						{item.quantity}
+					</button>
+					<button disabled={item.isCart || item.isQuote}
+						on:click={() => incrementQuantity(item.stockDetails.stock,item._id,index)}
+						class=" border-l-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
+						<Icon icon="rivet-icons:plus" class="text-xs" />
+					</button>
+				</div>
+               </div>
               <p class="text-sm font-semibold text-gray-600">
                 ₹{(item.pricing.INR * item.quantity).toFixed(2)}
               </p>

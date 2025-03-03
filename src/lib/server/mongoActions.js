@@ -3000,3 +3000,31 @@ export const submitFeedback = async (data) => {
 	  throw new Error('Failed to save feedback information');
 	}
   };
+
+  export const createShareCart = async(userId,userEmail,cartId)=>{
+	const sharecart = await Cart.findOne({cartId})
+
+	const cartItems = sharecart.cartItems.map(cart=>{
+		cart.isQuote = false
+		cart.isCart = false
+		cart.cartOfferPrice = {INR:0,USD:0}
+		cart.offerPrice = {INR:0,USD:0}
+		cart.bomOfferPrice = {INR:0,USD:0}
+		return cart
+	})
+	const newcart = await Cart.create({
+		userId,
+		userEmail,
+		cartId:nanoid(8),
+		cartName:"mycart",
+		isActiveCart:true,
+		cartItems
+	});
+	//console.log(newcart);
+	const remove = await Cart.updateOne({userId,isActiveCart:true},{isActiveCart:false})
+	if(newcart.userId === userId && remove.acknowledged){
+		return {success:true}
+	}else{
+		return {success:false}
+	}
+}
