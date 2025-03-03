@@ -5,22 +5,16 @@
 	import { enhance } from '$app/forms';
 	import { authedUser } from '$lib/stores/mainStores.js';
 	import Icon from '@iconify/svelte';
-	import { onMount, createEventDispatcher } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import RecurrencePopup from '$lib/components/Cart/RecurrencePopup.svelte';
 	import { cart, guestCart,removeFromCart } from '$lib/stores/cart.js';
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/stores';
 	import * as XLSX from 'xlsx';
 
-	const dispatch = createEventDispatcher();
-
 	export let data
-
-    //console.log('first',$authedUser)
 	let loading = false;
 	let isLoggedIn = $authedUser?.id ? true : false
-	let totalPrice = 0;
-	let order = '';
 	let filteredGuestCart = ''
 	let container
 	let addToCartModal = false
@@ -28,6 +22,11 @@
 	let timeout
 	let priceINR = 0
 	let priceUSD = 0
+	let checkout,items
+	let scrollto = false
+	let isHide = false
+	let tog = null
+	let checkoutDisabled = false
 
 	$: cartData = data?.cart[0]?.cartItems || [];
 	$: cart.set(cartData);
@@ -50,7 +49,16 @@
 		});
 	};
 
+	let scrollTimeout
+	const handleScroll = (e) => {
+	isHide = true;
+	clearTimeout(scrollTimeout);
+	scrollTimeout = setTimeout(() => {
+      isHide = false;
+    }, 400)
+	}
 	onMount(() => {
+		//window.addEventListener('scroll', handleScroll)
 		filteredGuestCart = $guestCart.filter(guestItem => 
             !$cart.some(cartItem => cartItem.productId === guestItem.productId)
         );
@@ -69,6 +77,10 @@
 		}
 
 	});
+
+	onDestroy(() => {
+   // window.removeEventListener('scroll', handleScroll);
+    });
 	
 	//$:calculateTotalPrice($cart)
 	let showModal = false;
@@ -180,10 +192,53 @@
 		return recurring + " Months"
 	}
 	}
+	
+	const handleQty = (quantity,stock,_id,indx)=>{
+		if (quantity > 10000000){
+			quantity = 10000000
+		}
+		clearTimeout(timeout)
+        checkoutDisabled = true
+
+		if(!isLoggedIn){
+			cart.update(item=>{
+				item[indx].quantity = quantity
+				return item
+			})
+			guestCart.update(item=>{
+			item[indx].quantity = quantity
+			return item
+		    })
+			calculateTotalPrice($cart)
+			return
+		}
+
+	    const index = $cart.findIndex((item) =>item._id === _id);
+		if (index !== -1) {
+			cart.update(item=>{
+				item[index].quantity = quantity
+				return item
+			})
+		}
+
+		timeout = setTimeout(()=>{
+		  const formdata = new FormData()
+		  formdata.append("_id",_id)
+		  formdata.append("stock",stock)
+		  formdata.append("quantity",$cart[index]?.quantity)
+		  formdata.append("cartId",cartId)
+		  sendMessage("?/updateQty",formdata,async(result)=>{
+			invalidate("data:cart")
+			calculateTotalPrice($cart)
+            tog = null
+            checkoutDisabled = false
+		  })
+	  },1400)
+	}
 
 	const incrementQuantity = (quantity,stock,_id,indx) => {
 		clearTimeout(timeout)
-
+        checkoutDisabled = true
 		if(!isLoggedIn){
 			cart.update(item=>{
 				item[indx].quantity += 1
@@ -214,7 +269,7 @@
 		  sendMessage("?/updateQty",formdata,async(result)=>{
 			invalidate("data:cart")
 			calculateTotalPrice($cart)
-
+			checkoutDisabled = false
 		  })
 	  },1000)
 
@@ -222,6 +277,8 @@
 
 	const decrementQuantity = (quantity,stock,_id,indx) => {
 		clearTimeout(timeout)
+        checkoutDisabled = true
+
 		if(!isLoggedIn){
 			cart.update(item=>{
 				item[indx].quantity -= 1
@@ -252,6 +309,7 @@
 		  sendMessage("?/updateQty",formdata,async(result)=>{
 			invalidate("data:cart")
 			calculateTotalPrice($cart)
+			checkoutDisabled = false
 		  })
 	  },1000)
 	};
@@ -313,7 +371,7 @@
 		showimage = false;
 		selectedImage = null;
 	}
-
+	
 	function handleCart({ cancel }) {
 		return async ({ result }) => {
 			console.log(result);
@@ -326,8 +384,20 @@
 	}
 </script>
 
-<div class="mx-auto bg-gray-50 mb-5">
 
+<div on:scroll={handleScroll} class=" relative h-screen overflow-y-scroll hide mx-auto bg-gray-50 mb-5">
+	<button class="{isHide ? "hidden" : ""} fixed xl:hidden {scrollto ? "top-48 sm:top-28 " : "top-24 sm:top-36"}   right-2 z-20 rounded border shrink-0 p-1.5 bg-primary-100 hover:text-white hover:bg-primary-600" 
+	on:click={()=>{
+	   scrollto = !scrollto
+	   if(scrollto){
+		checkout.scrollIntoView({ behavior: 'smooth' })
+	   }else{
+		items.scrollIntoView({ behavior: 'smooth' })
+		window.scrollTo({top:0,behavior:"smooth"})
+	   }
+	}}>
+		<Icon icon={scrollto ? "zondicons:cheveron-up" :"zondicons:cheveron-down"} class='text-2xl'/>
+	</button>
 	<div class=" w-11/12 mx-auto flex flex-col xl:flex-row justify-between gap-4">
 		{#if loading}
 			<div
@@ -341,8 +411,8 @@
 				<p class=" font-bold text-lg md:text-xl">Cart is Empty</p>
 			</div>
 		{:else}
-			<div class="w-full lg:w-4/4 xl:w-3/4 bg-white p-3 sm:px-4 sm:py-3 rounded-lg shadow-sm h-fit">
-				<div class=" w-full flex items-center justify-between mb-4 sm:space-y-1">
+			<div bind:this={items} class="w-full lg:w-4/4 xl:w-3/4 bg-white p-3 sm:px-4 sm:py-3 rounded-lg shadow-sm h-fit">
+				<div class=" w-full sticky top-0 bg-white rounded flex items-center justify-between mb-4 sm:space-y-1">
 					<div>
 						<h2 class=" text-xs sm:text-4s font-semibold">
 							Cart Items <span class="text-red-500">({$cart.length})</span>
@@ -375,7 +445,6 @@
 					</div>
 				</div>
 				
-
 				<div class="hidden lg:flex text-gray-500 text-sm pb-2 font-semibold">
 					<p class=" w-6/12">Product</p>
 					<p class=" w-2/12">Price</p>
@@ -389,13 +458,13 @@
 					
 							<h3 class=" lg:hidden font-medium text-xs sm:text-sm">Product</h3>
 							<div class="flex items-center w-full md:w-6/12 md:pr-2">
-								<img src={item.productDetails.imageSrc} alt={item.productDetails.productName} class="w-20 h-20 shrink-0 object-cover rounded-md" />
+								<img src={item.productDetails.imageSrc} alt={item.productDetails.productName} class=" w-20 h-20 object-contain rounded-md" />
 								<div class="ml-2">
 									<p class="text-xs text-black font-semibold">{item.productDetails.productNumber}</p>
 									<p class=" text-gray-800 text-xs">{item.productDetails.productName}</p>
 									<p class=" text-gray-800 text-2s font-semibold">{item.pricing.break}</p>
 									<p class=" {item.quantity > item.stockDetails.stock ? " text-red-500" :" text-green-500"} text-2s ext-red-600 font-semibold">
-										{item.quantity > item.stockDetails.stock ? item.quantity - item.stockDetails.stock + " Back Order" : item.stockDetails.stock + " In Stock"}
+										{item.quantity > item.stockDetails.stock ? item.quantity - item.stockDetails.stock + " Back Order" : item.quantity + " In Stock"}
 										<span class="{item.quantity > item.stockDetails.stock ? "" : " hidden"} text-green-500 ml-1">{item.stockDetails.stock + " In Stock"}</span>
 									</p>
 								</div>
@@ -420,15 +489,18 @@
 								<div class=" lg:w-2/6">
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Quantity</h3>
 							        <div class="flex items-center md:w-2/12">
-							        	<div class="flex items-center border-1 rounded">
+										<input type="number" bind:value={item.quantity}
+										on:input={e=>handleQty(parseInt(e.target.value),item.stockDetails.stock,item._id,index)}
+										class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
+							        	<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded">
 							        		<button disabled={item.isCart || item.isQuote}
 							        			on:click={() => decrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}
 							        			class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							        			><Icon icon="rivet-icons:minus" class="text-xs" /></button
 							        		>
-							        		<p class="w-fit mx-3 text-xs font-medium outline-none text-center">
+							        		<button on:click={()=>{tog = index}} class="w-fit mx-3 text-xs font-medium outline-none text-center">
 							        			{item.quantity}
-							        		</p>
+							        		</button>
 							        		<button disabled={item.isCart || item.isQuote}
 							        			on:click={() => incrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}
 							        			class=" border-l-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
@@ -468,7 +540,7 @@
 		{/if}
 
 		
-		 <div class="w-full sm:w-2/4 md:w-2/5 lg:w-2/6 xl:w-1/4 self-end xl:self-start bg-white p-3 rounded-lg shadow-sm">
+		 <div bind:this={checkout} class="w-full sm:w-2/4 md:w-2/5 lg:w-2/6 xl:w-1/4 self-end xl:self-start bg-white p-3 rounded-lg shadow-sm">
 			<div class=" space-y-2">
 				<h2 class=" text-sm lg:text-lg font-bold">Your Order</h2>
 				<div class="space-y-2">
@@ -489,9 +561,9 @@
 			{#if $cart.length}
 				<div class="mt-4 w-full gap-2">
 					{#if isLoggedIn}
-						<button
+						<button disabled={checkoutDisabled}
 							on:click={()=>goto('/checkout')}
-							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold">
+							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white hover:bg-primary-600 py-2 rounded font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed">
 							Checkout
 				        </button>
 					{:else}

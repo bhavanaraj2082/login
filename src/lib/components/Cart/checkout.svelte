@@ -245,7 +245,7 @@
 			</div>
 			<div class=" w-full font-medium text-sm text-gray-600">
 				<div class=" flex items-center justify-between">
-					Email
+					GST Number
 					<button on:click={()=>{}}
 				    class=" p-1 hidden bg-gray-200 hover:text-white hover:bg-primary-500 rounded">
 					    <Icon icon="ic:round-mode-edit" class=" text-md" />
