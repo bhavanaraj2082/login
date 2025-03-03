@@ -6,6 +6,8 @@
 		let successMessage = '';
 		let errorMessage = '';
 		let messageContainer;
+    let showSuccesDiv = false;
+	  let showFailureDiv = false;
 		function refreshPage() {
 			resetFormData();
 			tog();
@@ -39,6 +41,55 @@
   const componentsString = derived(formData, $formData => JSON.stringify($formData.components))
 
 	</script>
+{#if showSuccesDiv}
+	<div
+		class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
+	>
+		<div
+			class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
+		>
+			<h3 class="sm:text-xl text-md font-semibold text-green-600 mb-4">
+				Quotes request Submission
+			</h3>
+			<p class="sm:text-md text-sm text-gray-700 mb-6">
+				Your form has been submitted successfully. We noted your requirements and will get back to you with quotes soon.
+			</p>
+
+			<div class="w-10/12 mx-auto my-6 border-t-2 border-green-300"></div>
+			<div>
+				<a
+					href="/"
+					class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
+				>
+					Return to Home
+				</a>
+			</div>
+		</div>
+	</div>
+{:else if showFailureDiv}
+	<div
+		class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
+	>
+		<div
+			class="w-10/12 md:w-8/12 bg-gradient-to-r from-red-100 via-red-50 to-red-100 p-8 rounded-lg shadow-lg text-center"
+		>
+			<p class="sm:text-md text-sm text-gray-700 mb-6">
+			There was an issue with submitting the request. Please try again after a while.
+			</p>
+
+			<div class="w-10/12 mx-auto my-6 border-t-2 border-red-300"></div>
+			<div>
+				<a
+					href="/feedback"
+					class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
+				>
+				Report Issue
+				</a>
+			</div>
+		</div>
+	</div>
+
+	{:else}
 <form method="POST" action="?/qoutes" class="mb-4 space-y-6"
  use:enhance={() => {return async({ result }) => {
     let message1 = '';
@@ -50,13 +101,15 @@
     quoteNo = result.data.quoteId;
         if (keywordError === "success") {
       message1 = result.data.data.message; 
-      toast.success(message1);
+      // toast.success(message1);
+      showSuccesDiv = true;
       setTimeout(() => {
         location.reload();
-      }, 2000)
+      }, 3000)
     } else if (keywordError === "error") {
       message1 = result.data.data.error;
-      toast.error(message1); 
+      showFailureDiv = true;
+      // toast.error(message1); 
     }
     showMessage(message1, keywordError);
   };
@@ -220,12 +273,14 @@
   </div>
 <div class=" rounded pr-28 pl-2 py-2 space-y-4 border border-gray-300">
     {#each Object.entries($Cusdetails) as [key, value]}
+    {#if key !== 'userId'}
 <div class="flex items-center">
 <label for={key} class="text-black sm:text-sm text-xs font-medium ml-1">
   {key === 'LGC' ? 'Invoice Number' : key.charAt(0).toUpperCase() + key.slice(1)}:
 </label>
 <p class="ml-2 text-gray-600 sm:text-sm text-xs">{value}</p>
 </div>
+{/if}
 {/each}
 </div>
 <div class="flex items-center sm:hidden block">
@@ -315,4 +370,6 @@
     </button> -->
   </div>
 </form> 
+{/if}
+
 <Toaster position="bottom-right" richColor/>

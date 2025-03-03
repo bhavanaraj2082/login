@@ -21,6 +21,18 @@
 		tog1();
 	};
 </script>
+<style>
+	.tooltip::after {
+		content: '';
+		position: absolute;
+		top: 100%; /* Position below the tooltip */
+		left: 50%;
+		margin-left: -5px; /* Center the triangle */
+		border-width: 7px;
+		border-style: solid;
+		border-color: black transparent transparent transparent; /* Triangle color */
+	}
+</style>
 
 <div class="py-10 flex justify-between bg-white">
 	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">Step 1: Select custom solution type</h1>
@@ -38,8 +50,14 @@
 			on:click={() => Neatsolution('Neat')}
 		>
 			<span class="font-medium text-sm sm:text-2xl">Neat</span>
-			<div class="relative">
+			<div class="relative group">
 				<Icon icon="ion:information" />
+				<div
+						class="tooltip absolute sm:text-sm text-xs hidden group-hover:block w-64 p-2 text-center text-white bg-black rounded-md -bottom-10 left-1/2 transform -translate-x-1/2"
+						style="bottom: calc(100% + 30px); left: 50%; transform: translateX(-62%);"
+					  >
+					  Substance in pure form, without any solvent, for maximum flexibility 
+					  </div>
 			</div>
 		</button>
 	
@@ -50,8 +68,14 @@
 			on:click={() => Neatsolution('Solution')}
 		>
 			<span class="font-medium text-sm sm:text-2xl">Solution</span>
-			<div class="relative">
+			<div class="relative group">
 				<Icon icon="ion:information" />
+				<div
+						class="tooltip absolute sm:text-sm text-xs hidden group-hover:block w-64 p-2 text-center text-white bg-black rounded-md -bottom-10 left-1/2 transform -translate-x-1/2"
+						style="bottom: calc(100% + 30px); left: 50%; transform: translateX(-71%);"
+					  >
+					  Single or multiple analytes at a definable concentration in a solvent, for quick and easy use 
+					  </div>
 			</div>
 		</button>
 	</div>
