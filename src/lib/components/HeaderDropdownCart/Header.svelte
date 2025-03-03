@@ -1,5 +1,5 @@
 <script>
-	import { authedUser } from '$lib/stores/mainStores.js';
+	import { authedUser,currencyState } from '$lib/stores/mainStores.js';
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import Cartrightside from '$lib/components/HeaderDropDownCart/Cartrightside.svelte';
@@ -7,7 +7,7 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { slide, fade } from 'svelte/transition';
-
+	import { toast, Toaster } from 'svelte-sonner';	
 	export let data
 
 	$:cartId = data?.cart?.cart[0]?.cartId || ""
@@ -168,8 +168,42 @@
 	// onDestroy(() => {
 	// 	window.removeEventListener("click", closeSearch);
 	// });
+	function setINR() {
+    currencyState.set('inr')
+    localStorage.setItem('currency', 'inr');
+	toast.success("Currency changed to INR successfully");
+  }
+
+  // Set currency to USD and store it in localStorage
+  function setUSD() {
+    currencyState.set('usd');
+    localStorage.setItem('currency', 'usd');
+	toast.success("Currency changed to USD successfully");
+  }
+  let showTooltip = false;
+	let hoveredCurrency = null;
+    function handleMouseEnter1(currency) {
+		hoveredCurrency = currency;
+        showTooltip = true;
+    }
+    function handleMouseLeave1() {
+		hoveredCurrency = null;
+        showTooltip = false;
+    }
+	function toggleCurrency() {
+    currencyState.update(current => {
+      const newCurrency = current === 'inr' ? 'usd' : 'inr';
+      if (newCurrency === 'inr') {
+        toast.success("Currency changed to INR successfully");
+      } else {
+        toast.success("Currency changed to USD successfully");
+      }
+      return newCurrency; 
+    });
+  }
 </script>
 <nav class="bg-primary-400 font-workSans">
+	<Toaster position="bottom-right" richColors />
 	{#if isOpen}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -179,6 +213,7 @@
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div class={`fixed top-0 left-0 h-full bg-primary-400 bg-opacity-70 transition-transform transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden z-50 w-9/12 overflow-y-auto`}
 		on:click={(e) => e.stopPropagation()}>
+		
 	<!-- <div
 	class={`fixed top-0 left-0 h-full bg-primary-950 bg-opacity-70 transition-transform transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:hidden z-50 w-9/12 overflow-y-auto`}
 > -->
@@ -247,13 +282,43 @@
 		{/if}
 		</div>
 	</div>
+	
 	<div class="flex items-center justify-between w-11/12 py-0 sm:py-4 mx-auto max-w-7xl flex-wrap">
-		<div class="flex md:hidden">
+		<div class="flex gap-3 md:hidden">
 			<button
 				on:click={toggleLogoMenu}
 				class="flex items-center text-gray-600 focus:outline-none">
 				<Icon icon="fa6-solid:bars" class=" text-md text-white" />
 			</button>
+			<div class="relative flex items-center justify-center w-12  h-6 rounded-full cursor-pointer pl-1.5 bg-primary-100 border border-primary-400">
+				<div class="relative flex items-center justify-between w-full h-full transition-all duration-300 ease-in-out">
+					<button 
+						class="absolute w-4 h-10 rounded-full flex items-center justify-center transition-all duration-300 ease-in-out"
+						style="top: 50%; left: 20%; transform: translate(-50%, -50%); z-index: 1; background-color: {$currencyState === 'inr' ? 'bg-primary-400' : 'bg-gray-400'};"
+						on:click={setINR} 
+						on:mouseenter={() => handleMouseEnter1('inr')} 
+						on:mouseleave={() => handleMouseLeave1()}
+					>
+						<span class="text-primary-600 w-full h-full items-center justify-center flex">₹</span>
+					</button>
+					<button 
+						class="absolute w-4 h-10 rounded-full flex items-center justify-center transition-all duration-300 ease-in-out"
+						style="top: 50%; left: 70%; transform: translate(-50%, -50%); z-index: 1; background-color: {$currencyState === 'usd' ? 'bg-primary-400' : 'bg-gray-400'};"
+						on:click={setUSD} 
+						on:mouseenter={() => handleMouseEnter1('usd')} 
+						on:mouseleave={() => handleMouseLeave1()}
+					>
+						<span class="text-primary-600 w-full h-full items-center justify-center flex">$</span>
+					</button>
+				</div>
+				<div 
+					class="absolute w-4 h-4 rounded-full bg-primary-600 transition-all duration-300 ease-in-out flex items-center justify-center"
+					style="top: 50%; left: {$currencyState === 'inr' ? '26.5%' : '76.5%'}; transform: translate(-50%, -50%); z-index: 10;"
+				>
+					<button class="text-white text-sm" on:click={toggleCurrency}>{$currencyState === 'inr' ? '₹' : '$'}
+					</button>
+				</div>
+			</div>
 		</div>
 		<div class="text-center pl-3 w-1/10">
 			<button
@@ -378,6 +443,7 @@
 				{/if}
 			</form>
 		</div>
+	
 		<!-- big-->
 		<div class="md:flex hidden w-1/10">
 			{#if $authedUser.email}
@@ -502,12 +568,11 @@
 										</div>
 									{/if}
 								{/each}
+								
 							</div>
 						{/if}
 					</div>
 				{/each}
-			</div>
-			<div class="flex gap-4 text-gray-600 items-center ">
 				<a href="/quick-order">
 					<button 
 					class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium">
@@ -516,13 +581,66 @@
 						</span>
 					</button>
 				</a>
-				<a href="/order-status">
+			</div>
+				
+			<div class="flex gap-4 text-gray-600 items-center ">
+				<!-- <a href="/quick-order">
+					<button 
+					class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium">
+						<span class="text-white font-medium text-xs lg:text-sm">
+							Quick Order
+						</span>
+					</button>
+				</a> -->
+				<!-- <a href="/order-status">
 					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium">
 						<span class="text-white font-medium text-xs lg:text-sm">
 							Order Status
 						</span>
 					</button>
-				</a>
+				</a> -->
+				<div class="relative flex items-center justify-center lg:space-x-2 lg:pr-5">
+							<div class="relative flex items-center justify-between bg-white border-2 border-white w-28 lg:w-40 h-8 bottom-1 rounded-md cursor-pointer">
+								<div class="absolute flex items-center justify-between w-full h-full transition-all duration-300 ease-in-out">
+									<button 
+										class="w-1/2 h-full flex items-center justify-center text-gray-600 z-10 text-xs"
+										on:click={setINR} 
+									>
+										₹ <span class="text-xs ml-1">INR</span>
+									</button>
+									<button 
+										class="w-1/2 h-full flex items-center justify-center text-gray-600 z-10 text-xs"
+										on:click={setUSD} 
+									>
+										$ <span class="text-xs ml-1">USD</span>
+									</button>
+							</div>
+							
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<!-- svelte-ignore a11y-no-static-element-interactions -->
+							<div 
+								class="absolute w-1/2 h-full rounded bg-primary-500 transition-all duration-300 ease-in-out flex items-center justify-center"
+								style="top: 50%; left: {$currencyState === 'inr' ? '25%' : '75%'}; transform: translate(-50%, -50%); z-index: 10;"
+							on:click={toggleCurrency}>
+								<button class="text-white text-xs">{$currencyState === 'inr' ? '₹ INR' : '$ USD'}
+								</button>
+							</div>
+						</div>
+					{#if showTooltip}
+					  <div class="absolute bottom-7 left-1/4 transform -translate-x-1/2 mb-2 z-50 whitespace-nowrap bg-white
+					   text-xs font-medium py-1 px-4 rounded shadow-lg leading-snug">
+						{#if hoveredCurrency === 'inr' && $currencyState === 'inr'}
+						  Current currency is INR
+						{:else if hoveredCurrency === 'inr'}
+						  Click to view prices in Indian Rupees (INR)
+						{:else if hoveredCurrency === 'usd' && $currencyState === 'usd'}
+						  Current currency is USD
+						{:else}
+						  Click to view prices in US Dollars (USD)
+						{/if}
+					  </div>
+					{/if}
+				  </div>
 				<div class="md:flex hidden items-center justify-center">
 					<a href="/dashboard/myfavourite">
 						<button
