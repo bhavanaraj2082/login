@@ -34,7 +34,7 @@
 	$: cartId = data?.cart[0]?.cartId || '';
 	$: cartName = data?.cart[0]?.cartName || '';
 	$: recurrence = data?.cart[0]?.recurrence || '';
-	$: console.log($cart,"forntend");
+	// $: console.log($cart,"forntend");
 
 	const calculateTotalPrice = (cart)=>{
        priceINR = cart.reduce((sum,crt)=> sum + crt.pricing.INR*crt.quantity,0)
@@ -94,7 +94,7 @@
         'Total Price'
     ];
 
-    console.log($cart);
+    // console.log($cart);
 
     const data = $cart.map((item) => [
         item.productDetails.productName,
@@ -267,7 +267,7 @@
 		formdata.append("productNumber",productNumber)
 		formdata.append("_id",_id)
 	    sendMessage("?/deleteOne",formdata,async(result)=>{
-			console.log(result);
+			// console.log(result);
 			if(result.success){
 				toast.success(result.message)
 			}else{
@@ -287,7 +287,7 @@
 		const formdata = new FormData()
 		formdata.append("cartId",cartId)
 	    sendMessage("?/deleteAll",formdata,async(result)=>{
-			console.log(result);
+			// console.log(result);
 			if(result.success){
 				toast.success(result.message)
 			}else{
@@ -316,7 +316,7 @@
 
 	function handleCart({ cancel }) {
 		return async ({ result }) => {
-			console.log(result);
+			// console.log(result);
 			addToCartModal = !addToCartModal;
 			removeFromCart();
 			calculateTotalPrice($cart)

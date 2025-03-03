@@ -1,6 +1,7 @@
 <script>
-	import { SEO } from '$lib/components/SEO.svelte';
   import Application from "$lib/components/Application/Application.svelte";
+  import  SEO  from '$lib/components/SEO.svelte';
+  import { PUBLIC_WEBSITE_URL, PUBLIC_COMPBUY_IMAGE_PATH,PUBLIC_WEBSITE_NAME } from '$env/static/public';
   export let data;
 
   let metadata = {

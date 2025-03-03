@@ -2536,7 +2536,7 @@ export const getGuestCart = async(body)=>{
 	  }
       arr.push(result)
 	}
-	console.log(arr);
+	///console.log(arr);
 	return {cart:JSON.parse(JSON.stringify(arr))}
 }
 
