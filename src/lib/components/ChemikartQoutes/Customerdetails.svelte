@@ -11,6 +11,8 @@
 	export let tog2;
 	export let tog3;
 	export let tog4;
+	let number = "";
+
 
 	let authedUserEmailVerified = data?.profile?.isEmailVerified || "";
 	console.log("authedUserEmailVerified", authedUserEmailVerified);
@@ -39,7 +41,7 @@
 	let isOtpVerified = false;
 	let isOtpPhoneVerified = false;
 	let form3;
-	let errors={};
+	// let errors={};
 	let country;
 	let errorMessage = '';
 	$: isFormData =
@@ -473,7 +475,7 @@
     const input = event.target.value;
     const regex = /^[A-Za-z\s]*$/; 
     if (!regex.test(input)) {
-        errorMessage1 = 'Name cannot contain numbers or special characters';
+        errorMessage1 = 'First Name cannot contain numbers or special characters';
     } else {
         errorMessage1 = '';
     }
@@ -482,7 +484,7 @@ function validateLastName(event) {
     const input = event.target.value;
     const regex = /^[A-Za-z\s]*$/; 
     if (!regex.test(input)) {
-        errorMessage2 = 'Name cannot contain numbers or special characters';
+        errorMessage2 = 'Last Name cannot contain numbers or special characters';
     } else {
         errorMessage2 = '';
     }
@@ -610,7 +612,7 @@ let searchTerm = "";
 		showDropdown = false;
 		// validatePhoneNumber(country, phone);
 		validatePhNo($Cusdetails.Country, number);
-		delete errors.$Cusdetails.Country;
+		// delete errors.$Cusdetails.Country;
 	}
 
 	function handleInputChange(event) {
@@ -631,7 +633,6 @@ let searchTerm = "";
 	// return pattern.test(phone);
 	// }
 </script>
-
 <div class="py-10 bg-white  flex justify-between">
 	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 1: Select custom solution type</h1>
 	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog()}>Edit</button>
@@ -693,8 +694,12 @@ let searchTerm = "";
 			required
 		/>
         {#if errorMessage && !$Cusdetails.FirstName}
-		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">   
 			FirstName is required</div>
+		{/if}
+		{#if errorMessage1}
+		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1 md:hidden block ">
+			{errorMessage1}</div>
 		{/if}
 		  </div>
 		</div>
@@ -711,19 +716,23 @@ let searchTerm = "";
                     on:input={validateLastName}
 				/>
                 {#if errorMessage && !$Cusdetails.LastName}
-                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
                     LastName is required</div>
                 {/if}
+				{#if errorMessage2}
+		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1 md:hidden block">
+			{errorMessage2}</div>
+		{/if}
 		  </div>
 		</div>
 	  </div>
 	<div class=" mb-2">
 		{#if errorMessage1}
-		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1 md:block hidden ">
 			{errorMessage1}</div>
 		{/if}
 		{#if errorMessage2}
-		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1 md:block hidden">
 			{errorMessage2}</div>
 		{/if}
 		<label for="" class="sm:text-sm text-xs">Country <span class="text-primary-500"> *</span></label>
@@ -767,7 +776,7 @@ let searchTerm = "";
 				</div>
 			{/if}
 			{#if errorMessage && !$Cusdetails.Country}
-			<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
 				Country is required</div>
 			{/if}
 		</div>
@@ -786,11 +795,11 @@ let searchTerm = "";
             on:input={() => validatePhNo($Cusdetails.Country, $Cusdetails.Number)}	
             />
 			{#if errorMessage && !$Cusdetails.Number}
-			<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
 				Phone number is required</div>
 			{/if}
-		{#if errorMessage4}
-		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+		{#if $Cusdetails.Number && errorMessage4}
+		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
 			Please enter a valid phone number for {$Cusdetails.Country}</div>
 		{/if}
 	</div>
@@ -920,16 +929,16 @@ let searchTerm = "";
 			</div>
 		</form>
 		{#if $Cusdetails.Email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test($Cusdetails.Email)}
-			<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
 				Please enter a valid email address.
 			</div>
 		{/if}
 		{#if errorMessage && !$Cusdetails.Email}
-		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
 			Email is required</div>
 		{/if}
 		{#if errorMessage7}
-    <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+    <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
         {errorMessage7}
     </div>
 {/if}
@@ -1039,7 +1048,7 @@ let searchTerm = "";
 			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 		/>
         {#if errorMessage && !$Cusdetails.Organisation}
-                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
                     Company name is required</div>
                 {/if}
 	</div>
@@ -1055,7 +1064,7 @@ let searchTerm = "";
 		/>
 	</div>
     <!-- {#if errorMessage}
-		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
 			{errorMessage}</div>
 		{/if} -->
 	<div class="flex space-x-4">

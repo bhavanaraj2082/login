@@ -29,7 +29,7 @@
   }
     </script>
     <div class="md:ml-5 ml-0">
-      <div class="pt-5 max-w-7xl md:w-11/12 mx-auto">
+      <div class="pt-5 max-w-7xl md:w-11/12 mx-auto sm:block hidden">
         <div class="fixed z-30 md:bottom-[75px] bottom-40 right-0 lg:right-10 py-6 lg:p-4">
           <button
             class="flex items-center justify-center rounded py-0.3 bg-primary-400 text-white md:mr-14 lg:mr-0 shadow-md" on:click={scrollToTop}

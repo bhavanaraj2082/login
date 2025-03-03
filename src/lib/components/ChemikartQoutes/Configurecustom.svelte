@@ -396,8 +396,7 @@ else if (selectedSolvent === "Yes") {
 				<label for="no" class="sm:text-lg text-xs">No</label>
 				{#if showSolventDropdown}
 					<select
-						class="box-content border-1 mt-4 px-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 rounded
-						 focus:border-primary-500 bg-white "
+					class="box-content border-1 sm:mt-4 mt-0 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 rounded focus:border-primary-500 bg-white sm:text-sm text-2s h-5 ml-4"
 						id="solvent"
 						name="solvent"
 						

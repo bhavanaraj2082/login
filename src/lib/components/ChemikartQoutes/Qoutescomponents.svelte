@@ -36,32 +36,66 @@
   };
 </script>
 
-<div class="px-4 pt-4 w-11/12 mx-auto max-w-7xl border rounded bg-white mb-6">
+<div class="w-11/12 mx-auto max-w-7xl border rounded rounded-t-xl bg-white mb-6">
   {#if currentView === "qoutes"}
-    <Qoutes tag={toggleQoutes1} />
+  <div class="w-full mx-auto max-w-7xl border rounded-t-lg mb-10">
+    <h1 class="sm:text-2xl text-sm font-bold bg-primary-400 text-white py-4 pl-4 rounded-t-lg">
+      Let us know what you need and we'll help you get Quotes
+    </h1>
+    </div>
+    <div class="px-4">
+      <Qoutes tag={toggleQoutes1} />
+    </div>
   {/if}
 
   {#if currentView === "qoutes1"}
+  <div class="w-full mx-auto max-w-7xl border rounded-t-lg">
+    <h1 class="sm:text-2xl text-sm font-bold bg-primary-400 text-white py-4 pl-4 rounded-t-lg">
+      Let us know what you need and we'll help you get Quotes
+    </h1>
+    </div>
+    <div class="px-4">
     <Qoutes1 tog={toggleQoutes} tog1={toggleQoutes2} />
+    </div>
   {/if}
 
   {#if currentView === "qoutes2"}
+  <div class="w-full mx-auto max-w-7xl border rounded-t-lg">
+    <h1 class="sm:text-2xl text-sm font-bold bg-primary-400 text-white py-4 pl-4 rounded-t-lg">
+      Let us know what you need and we'll help you get Quotes
+    </h1>
+    </div>
+    <div class="px-4">
     <Qoutes2 tog={toggleQoutes} tog1={toggleQoutes1} tog2={toggleQoutes3} />
+    </div>
   {/if}
 
   {#if currentView === "qoutes3"}
+  <div class="w-full mx-auto max-w-7xl border rounded-t-lg">
+    <h1 class="sm:text-2xl text-sm font-bold bg-primary-400 text-white py-4 pl-4 rounded-t-lg">
+      Let us know what you need and we'll help you get Quotes
+    </h1>
+    </div>
+    <div class="px-4">
     <Qoutes3
       tog={toggleQoutes}
       tog1={toggleQoutes1}
       tog2={toggleQoutes2}
       tog3={toggleQoutes4}
     />
+    </div>
   {/if}
 
   <!-- {#if currentView === 'qoutes4'}
   <Qoutes4 tog={toggleQoutes} tog1={toggleQoutes1} tog2={toggleQoutes2} tog3={toggleQoutes3} tog4={toggleQoutes5}/>
   {/if} -->
   {#if currentView === "qoutes4"}
+  <div class="w-full mx-auto max-w-7xl border rounded-t-lg">
+    <h1 class="sm:text-2xl text-sm font-bold bg-primary-400 text-white py-4 pl-4 rounded-t-lg">
+      Let us know what you need and we'll help you get Quotes
+    </h1>
+    </div>
+    <div class="px-4">
     <Qoutes4
       tog={toggleQoutes}
       tog1={toggleQoutes1}
@@ -70,9 +104,16 @@
       tog4={toggleQoutes5}
       {data}
     />
+    </div>
   {/if}
 
   {#if currentView === "qoutes5"}
+  <div class="w-full mx-auto max-w-7xl border rounded-t-lg">
+    <h1 class="sm:text-2xl text-sm font-bold bg-primary-400 text-white py-4 pl-4 rounded-t-lg">
+      Let us know what you need and we'll help you get Quotes
+    </h1>
+    </div>
+    <div class="px-4">
     <Qoutes5
       tog={toggleQoutes}
       tog1={toggleQoutes1}
@@ -81,9 +122,11 @@
       tog4={toggleQoutes4}
       tog5={toggleQoutes6}
     />
+    </div>
   {/if}
 
   {#if currentView === "qoutes6"}
+  <div class="px-4 pt-5">
     <Qoutes6
       tog={toggleQoutes}
       tog1={toggleQoutes1}
@@ -92,5 +135,6 @@
       tog4={toggleQoutes4}
       tog5={toggleQoutes5}
     />
+    </div>
   {/if}
 </div>

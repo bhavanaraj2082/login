@@ -17,7 +17,7 @@ const chemiDashProfileSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    primaryPhone: {
+    alternatePhone: {
       type: Number,
       required: false,
     },
