@@ -20,6 +20,9 @@ import Cart from "$lib/server/models/Cart.js";
 
 export async function getProductdatas() {
   const records = await Category.find();
+
+  console.log("--->",records.length);
+
   if (records.length > 0) {
     return { records: JSON.parse(JSON.stringify(records)) };
   } else {
@@ -677,7 +680,7 @@ export const loadProductsubcategory = async (
     
     const after = Date.now();
 
-   console.log(products);
+  //  console.log(products);
    if(!products[0].data.length && !products[0].totalCount.length ){
     return {
       products: [],
