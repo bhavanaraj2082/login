@@ -128,12 +128,15 @@ async function submitForm() {
 		form2.requestSubmit();
 	}
 	async function submitAlternateForm() {
-		submitGuestForm.requestSubmit();
+		// submitGuestForm.requestSubmit();
+		const storedTotalComps = JSON.parse(localStorage.getItem('cart'));;
+		localStorage.setItem('totalComps', storedTotalComps.length);
+		syncLocalStorageToStore();	
 	}
 
 	function handleDataCart() {
 		return async ({ result }) => {
-			console.log("result from page server for carat data",result);
+			// console.log("result from page server for carat data",result);
 			
 			const totalComps  = result?.data?.cartData?.cartItems.length 
 			// console.log("totalComps",totalComps);
@@ -141,16 +144,16 @@ async function submitForm() {
 			syncLocalStorageToStore();	
 		};
 	}
-	function handleGuestData() {
-		return async ({ result }) => {
-			// console.log(result);
+	// function handleGuestData() {
+	// 	return async ({ result }) => {
+	// 		// console.log(result);
 			
-			const { totalLength } = result.data;
-			// console.log("totalComps in handl  guest data ",result.data);
-			localStorage.setItem('totalComps', totalLength);
-			syncLocalStorageToStore();
-		};
-	}
+	// 		const { totalLength } = result.data;
+	// 		// console.log("totalComps in handl  guest data ",result.data);
+	// 		localStorage.setItem('totalComps', totalLength);
+	// 		syncLocalStorageToStore();
+	// 	};
+	// }
 	function handleMouseEnter(subSubmenu) {
 		clearTimeout(subSubmenuLeaveTimeoutId);
 		hoveredSubSubmenu = subSubmenu;
@@ -296,14 +299,14 @@ async function submitForm() {
 <form method="POST" action="/?/getCartValue" bind:this={form2} use:enhance={handleDataCart}>
 	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
 </form>
-<form
+<!-- <form
 	method="POST"
 	action="/cart?/guestCart"
 	bind:this={submitGuestForm}
 	use:enhance={handleGuestData}
 >
 	<input type="hidden" name="guestCart" value={JSON.stringify($guestCart)} />
-</form>
+</form> -->
 <nav class="bg-primary-400 font-workSans">
 	<Toaster position="bottom-right" richColors />
 	{#if isOpen}
