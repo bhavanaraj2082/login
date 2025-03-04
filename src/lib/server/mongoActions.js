@@ -1174,27 +1174,17 @@ export const Addquotes = async (data) => {
 			country: data.country,
             invoiceNumber: data.lgc,
             email: data.email,
-            number: data.number,
-			userId: data.userId
+            number: data.number
+			// userId: data.userId
         },
-        Delivery_information: {
-            Address1: data.address1,
-            Address2: data.address2,
-			Country1: data.country1,
-            GST: data.county,
-            City: data.city,
-            Post: data.post
-        }
     };
     const quoteCount = await Quotes.countDocuments();
     formattedData.quoteId = quoteCount + 1;  
+	formattedData.userId = data.userId;  
     const newQuote = new Quotes(formattedData);
     console.log("mongoactions newQuote",newQuote);
     try {
         await newQuote.save();
-
- 
-
         return { success: true, message: 'Quote added successfully', quoteId: formattedData.quoteId };
     } catch (error) {
         return { success: false, message: error.message };
