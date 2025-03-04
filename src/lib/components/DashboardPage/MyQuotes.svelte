@@ -194,19 +194,6 @@ onMount(() => {
     const earliestDate = getEarliestQuoteDate(quotes);
 });
 
-// function getStatusColor(status) {
-//       switch (status?.toLowerCase()) {
-//           case 'unread':
-//               return 'bg-yellow-100 text-yellow-800';
-//           case 'read':
-//               return 'bg-blue-100 text-blue-800';
-//           case 'processed':
-//               return 'bg-green-100 text-green-800';
-//           default:
-//               return 'bg-gray-100 text-gray-800';
-//       }
-//   }
-
 function getStatusColor (status) {
         switch(status?.toLowerCase()) {
             case 'processed':
@@ -301,11 +288,11 @@ function getStatusColor (status) {
                               <div class="text-sm text-gray-500">{quote.Customer_details?.organisation}</div>
                           </td>
                           <td class="px-6 py-4">
-                              <div class="text-sm text-gray-900">{quote.Custom_solution_type}</div>
-                              <div class="text-sm text-gray-500">{quote.Custom_format}</div>
+                              <div class="text-sm text-gray-900">{quote?.Custom_solution_type}</div>
+                              <div class="text-sm text-gray-500">{quote?.Custom_format}</div>
                           </td>
                           <td class="px-6 py-4 whitespace-nowrap text-center">
-                              <div class="text-sm text-gray-900">{formatDate(quote.createdAt)}</div>
+                              <div class="text-sm text-gray-900">{formatDate(quote?.createdAt) || 'N/A'}</div>
                           </td>
                           <td class="px-6 py-4 flex justify-center whitespace-nowrap">
                             <!-- <span class={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1 ${getTransactionStatusClass(quote.status )}`}>
@@ -313,7 +300,7 @@ function getStatusColor (status) {
                           </span> -->
                               <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {getStatusColor(quote.status)}">
                                 <Icon icon={getStatusIcon(quote.status )} width="16" height="16" />
-                                  {quote.status || 'N/A'}
+                                  {quote?.status || 'N/A'}
                               </span>
                           </td>
                       </tr>
@@ -383,13 +370,15 @@ function getStatusColor (status) {
 </div>
 
 {#if selectedQuote}
-  <div class="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm overflow-y-auto hide h-full w-full z-50">
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div class="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm overflow-y-auto hide h-full w-full z-50" on:click|self={closeQuoteDetails}>
       <div class="relative top-20 mx-auto p-5 w-full max-w-6xl">
           <div class="bg-white rounded-lg shadow-xl">
               <div class="px-6 py-4 border-b border-gray-200">
                   <div class="flex justify-between items-center">
                       <div>
-                          <h2 class="text-2xl font-bold text-gray-900 mb-2">Quote #{selectedQuote?.quoteId || 'N/A'}</h2>
+                          <h2 class="text-2xl font-bold text-gray-900 mb-2">QuoteID #{selectedQuote?.quoteId || 'N/A'}</h2>
                           <p class="text-xs text-gray-500">Created on {formatDate(selectedQuote.createdAt) || 'N/A'}</p>
                       </div>
                       <button 
@@ -424,47 +413,116 @@ function getStatusColor (status) {
                           </div>
                       </div>
                   </section>
-                  <section>
-                      <h3 class="text-lg font-semibold text-gray-900 mb-4">Solution Specifications</h3>
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div class="bg-gray-50 p-4 rounded-lg">
-                              <div class="grid grid-cols-2 gap-4">
-                                  <div>
-                                      <p class="text-sm font-semibold text-heading">Solution Type</p>
-                                      <p class="mt-1 text-sm text-gray-900">{selectedQuote?.Custom_solution_type || 'N/A'}</p>
-                                  </div>
-                                  <div>
-                                      <p class="text-sm font-semibold text-heading">Format</p>
-                                      <p class="mt-1 text-sm text-gray-900">{selectedQuote?.Custom_format || 'N/A'}</p>
-                                  </div>
-                                  <div>
-                                      <p class="text-sm font-semibold text-heading">Quality Level</p>
-                                      <p class="mt-1 text-sm text-gray-900">{selectedQuote?.Configure_custom_solution?.qualityLevel || 'N/A' }</p>
-                                  </div>
-                                  <div>
-                                      <p class="text-sm font-semibold text-heading">Volume</p>
-                                      <p class="mt-1 text-sm text-gray-900">{selectedQuote.Configure_custom_solution?.volume || '0 ml'}</p>
-                                  </div>
-                              </div>
+                 <section class="lg:block hidden">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Solution Specifications</h3>
+                    <div class="w-full gap-2">
+                      <div class="bg-gray-50 p-6 rounded">
+                        <div class="mb-4">
+                          <p class="text-sm font-semibold text-heading">Solution Type</p>
+                          <p class="mt-1 text-sm text-gray-900">{selectedQuote?.Custom_solution_type || 'N/A'}</p>
+                        </div>
+                        <div class="grid grid-cols-3 gap-6">
+                          <div>
+                            <p class="text-sm font-semibold text-heading">Format</p>
+                            <p class="mt-1 text-sm text-gray-900">{selectedQuote?.Custom_format || 'N/A'}</p>
                           </div>
-                          <div class="bg-gray-50 p-4 rounded-lg">
-                              <p class="text-sm font-medium text-gray-500 mb-3">Components</p>
-                              <div class="space-y-3">
-                                  {#each selectedQuote.Configure_custom_solution.components as component}
-                                      <div class="border-b border-gray-200 last:border-0 pb-2 last:pb-0">
-                                          <div class="flex justify-between items-center">
-                                              <div>
-                                                  <p class="text-sm font-semibold text-heading mb-2">{component["Component Name"]}</p>
-                                                  <p class="text-xs text-primary-500"><strong class="text-heading mt-2">CAS :</strong> {component?.CasNumber || 'N/A'}</p>
-                                              </div>
-                                              <span class="text-sm font-medium text-blue-600">{component?.Concentration || 0 }%</span>
-                                          </div>
-                                      </div>
-                                  {/each}
-                              </div>
+                          <div>
+                            <p class="text-sm font-semibold text-heading">Quality Level</p>
+                            <p class="mt-1 text-sm text-gray-900">{selectedQuote?.Configure_custom_solution?.qualityLevel || 'N/A' }</p>
                           </div>
+                          <div>
+                            <p class="text-sm font-semibold text-heading">Volume</p>
+                            <p class="mt-1 text-sm text-gray-900">{selectedQuote.Configure_custom_solution?.volume || '0 ml'}</p>
+                          </div>
+                          <div>
+                            <p class="text-sm font-semibold text-heading">Analytical Technique</p>
+                            <p class="mt-1 text-sm text-gray-900">{selectedQuote.Configure_custom_solution?.analyticalTechnique || 'N/A'}</p>
+                          </div>
+                          <div>
+                            <p class="text-sm font-semibold text-heading">Packaging Type</p>
+                            <p class="mt-1 text-sm text-gray-900">{selectedQuote.Configure_custom_solution?.packagingType || 'N/A'}</p>
+                          </div>
+                          <div>
+                            <p class="text-sm font-semibold text-heading">Units</p>
+                            <p class="mt-1 text-sm text-gray-900">{selectedQuote.Configure_custom_solution?.Units || 0 }</p>
+                          </div>
+                        </div>
                       </div>
-                  </section>
+                      <div class="overflow-x-auto mt-6 bg-white">
+                        <table class="w-full table-auto">
+                          <thead class="bg-gradient-to-r from-primary-400 to-primary-500 text-white border-b">
+                            <tr>
+                              <th class="px-4 py-2 text-sm text-left font-semibold rounded-tl-md">Components</th>
+                              <th class="px-4 py-2 text-sm text-center font-semibold">CAS</th>
+                              <th class="px-4 py-2 text-sm text-center font-semibold rounded-tr-md">Concentration</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {#each selectedQuote.Configure_custom_solution.components as component}
+                            <tr class="border-b rounded-b-md">
+                              <td class="px-4 py-2 text-left border-l">{component["Component Name"]}</td>
+                              <td class="px-4 py-2 text-center">{component?.CasNumber || 'N/A'}</td>
+                              <td class="px-4 py-2 text-center border-r">{component?.Concentration || 0}%</td>
+                            </tr>
+                            {/each}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                 </section>
+                 <section class="lg:hidden block">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Solution Specifications</h3>
+                    <div class="overflow-x-auto bg-white rounded border">
+                      <table class="min-w-full table-auto">
+                        <tbody>
+                          <tr class="border-b border-gray-200">
+                            <td class="text-sm font-semibold text-heading py-2 px-4">Solution Type</td>
+                            <td class="text-sm text-gray-900 py-2 px-4">{selectedQuote?.Custom_solution_type || 'N/A'}</td>
+                          </tr>
+                          <tr class="border-b border-gray-200">
+                            <td class="text-sm font-semibold text-heading py-2 px-4">Format</td>
+                            <td class="text-sm text-gray-900 py-2 px-4">{selectedQuote?.Custom_format || 'N/A'}</td>
+                          </tr>
+                          <tr class="border-b border-gray-200">
+                            <td class="text-sm font-semibold text-heading py-2 px-4">Quality Level</td>
+                            <td class="text-sm text-gray-900 py-2 px-4">{selectedQuote?.Configure_custom_solution?.qualityLevel || 'N/A' }</td>
+                          </tr>
+                          <tr class="border-b border-gray-200">
+                            <td class="text-sm font-semibold text-heading py-2 px-4">Volume</td>
+                            <td class="text-sm text-gray-900 py-2 px-4">{selectedQuote.Configure_custom_solution?.volume || '0 ml'}</td>
+                          </tr>
+                          <tr class="border-b border-gray-200">
+                            <td class="text-sm font-semibold text-heading py-2 px-4">Analytical Technique</td>
+                            <td class="text-sm text-gray-900 py-2 px-4">{selectedQuote.Configure_custom_solution?.analyticalTechnique || '0 ml'}</td>
+                          </tr>
+                          <tr class="border-b border-gray-200">
+                            <td class="text-sm font-semibold text-heading py-2 px-4">Packaging Type</td>
+                            <td class="text-sm text-gray-900 py-2 px-4 capitalize">{selectedQuote.Configure_custom_solution?.packagingType || ''}</td>
+                          </tr>
+                          <tr class="border-gray-200">
+                            <td class="text-sm font-semibold text-heading py-2 px-4">Units</td>
+                            <td class="text-sm text-gray-900 py-2 px-4">{selectedQuote.Configure_custom_solution?.units || '0'}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div class="border p-4 rounded mt-6">
+                      <p class="text-heading font-medium mb-3 border-b">Components</p>
+                      <div class="space-y-3">
+                        {#each selectedQuote.Configure_custom_solution.components as component}
+                        <div class="border-b border-gray-200 last:border-0 pb-2 last:pb-0">
+                          <div class="flex justify-between items-center">
+                            <div>
+                              <p class="text-sm font-semibold text-heading mb-2">{component["Component Name"]}</p>
+                              <p class="text-xs text-primary-500"><strong class="text-heading mt-2">CAS :</strong> {component?.CasNumber || 'N/A'}</p>
+                            </div>
+                            <span class="text-sm font-medium text-blue-600">{component?.Concentration || 0}%</span>
+                          </div>
+                        </div>
+                        {/each}
+                      </div>
+                    </div>
+                 </section>
                   {#if selectedQuote.Additional_notes}
                       <section>
                           <h3 class="text-lg font-semibold text-gray-900 mb-4">Additional Notes</h3>

@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { writable } from 'svelte/store';
 	import { toast, Toaster } from 'svelte-sonner';
+	import { PUBLIC_WEBSITE_URL } from '$env/static/public';
 	import Icon from '@iconify/svelte';
 	import Calender from '$lib/components/Calender.svelte';
 	export let data;
@@ -122,14 +123,17 @@
 	}
 
 	$: sortedCartItems = cartItems.sort((a, b) => {
+		if (a.isActiveCart && !b.isActiveCart) return -1;
+		if (!a.isActiveCart && b.isActiveCart) return 1;
+
 		const dateA = new Date(a.createdAt);
 		const dateB = new Date(b.createdAt);
 		return dateB - dateA;
 	});
 
-	// $: if ($selectedCart && $selectedCart.cartId) {
-	// 	shareUrl.set(`{PUBLIC_WEBSITE_URL}/cart/${$selectedCart.cartId}`);
-	// }
+	$: if ($selectedCart && $selectedCart.cartId) {
+		shareUrl.set(`{PUBLIC_WEBSITE_URL}/cart/${$selectedCart.cartId}`);
+	}
 
 	$: filteredCartItems = filterCarts(sortedCartItems, filters);
 	$: totalPages = Math.ceil(filteredCartItems.length / $itemsPerPage);
@@ -791,7 +795,7 @@ function formatDate(dateString) {
 				toast.error('Cannot share an empty cart');
 				return;
 			}
-			// shareUrl.set(`${PUBLIC_WEBSITE_URL}/cart/${cartId}`);
+			shareUrl.set(`${PUBLIC_WEBSITE_URL}/cart/${cartId}`);
 			showSharePopup.set(true);
 			showPopup.set(false);
 		} catch (error) {
@@ -872,7 +876,6 @@ function formatDate(dateString) {
 		const earliestDate = getEarliestCartDate(cartItems);
 	});
 </script>
-
 <section class="w-full lg:w-11/12 mx-auto max-w-7xl p-4">
 	<div class="flex flex-col justify-between items-center">
 		<h1 class="text-2xl font-bold mb-6 text-left w-full">My Cart</h1>
