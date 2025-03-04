@@ -201,8 +201,25 @@
       return newCurrency; 
     });
   }
+  function closeSuggestions() {
+	// console.log("clikced");
+		searchQuery = '';
+		searchResults = [];
+	}
+	function handleClick(event) {
+		// if (suggestionsRef && !suggestionsRef.contains(event.target)) {
+			closeSuggestions();
+		// }
+	}
+
+	onMount(() => {
+		window.addEventListener('click', handleClick);
+		return () => {
+			window.removeEventListener('click', handleClick);
+		};
+	});
 </script>
-<nav class="bg-primary-400 font-workSans">
+<nav class="bg-primary-400 font-workSans" >
 	<Toaster position="bottom-right" richColors />
 	{#if isOpen}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -396,7 +413,7 @@
 			<Cartrightside {cartId}/>	
 		</div>
 		<!-- Searchbar functionality -->
-		<div class="relative sm:max-w-3xl md:max-w-sm lg:max-w-md xl:max-w-xl  sm:mt-2 w-full sm:pb-0 pb-2 mx-auto">
+		<div  class="relative sm:max-w-3xl md:max-w-sm lg:max-w-md xl:max-w-xl  sm:mt-2 w-full sm:pb-0 pb-2 mx-auto">
 			<form action="/?/search" method="post" bind:this={form} use:enhance={handleData}>
 				<div class=" w-full flex items-center">
 					<input
