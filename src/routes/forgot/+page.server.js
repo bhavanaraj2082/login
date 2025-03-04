@@ -11,7 +11,7 @@ export const actions = {
 					message: 'Please provide your registered email address'
 				};
 			}
-			// const response = await resetpassmail(locals.pb, body); // Get token using the function
+			// const response = await resetpassmail(locals.pb, body); 
 			return await passwordVerificationToken(body, 'Password');
 			// return response;
 		} catch (error) {
