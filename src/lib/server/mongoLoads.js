@@ -1823,3 +1823,15 @@ export const getSingleCartDetails = async (userId) => {
 	}
 };
 
+export const singleCartForCount = async (userId) => {
+  try {
+    const carts = await Cart.findOne({ userId, isActiveCart: true })
+      .exec();
+      return JSON.parse(JSON.stringify(carts));
+  } catch (error) {
+    console.error('Error fetching cart details:', error);
+    throw error;
+  }
+};
+
+
