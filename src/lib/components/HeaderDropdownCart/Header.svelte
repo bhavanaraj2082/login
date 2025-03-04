@@ -201,25 +201,8 @@
       return newCurrency; 
     });
   }
-  function closeSuggestions() {
-	// console.log("clikced");
-		searchQuery = '';
-		searchResults = [];
-	}
-	function handleClick(event) {
-		// if (suggestionsRef && !suggestionsRef.contains(event.target)) {
-			closeSuggestions();
-		// }
-	}
-
-	onMount(() => {
-		window.addEventListener('click', handleClick);
-		return () => {
-			window.removeEventListener('click', handleClick);
-		};
-	});
 </script>
-<nav class="bg-primary-400 font-workSans" >
+<nav class="bg-primary-400 font-workSans">
 	<Toaster position="bottom-right" richColors />
 	{#if isOpen}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
