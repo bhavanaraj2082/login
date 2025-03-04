@@ -8,9 +8,20 @@
 	import { goto } from '$app/navigation';
 	import { slide, fade } from 'svelte/transition';
 	import { toast, Toaster } from 'svelte-sonner';	
-	export let data
 	import { guestCart } from '$lib/stores/cart.js';
+	import { page } from '$app/stores';
+	export let data;
+	let isFavoritePage = false;
+
+	$: {
+  		let currentUrl = $page.url.pathname;
+ 		isFavoritePage = currentUrl === "/dashboard/myfavourite"; 
+		//console.log("isFavoritePage", isFavoritePage);
+	}
+
 	$:cartId = data?.cart?.cart[0]?.cartId || ""
+
+	
 
 	let menus = [];
 	let submenuLeaveTimeoutId;
@@ -494,8 +505,8 @@ async function submitForm() {
 				<button
 					on:click={toggleLike}
 					aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
-					class={`py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}`}>
-					<Icon icon={isLiked ? heartFilled : heartOutline} class={`text-lg transition-colors duration-300  ease-in-out ${isLiked ? 'text-white' : 'text-white'}`}/>
+					class="py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}">
+					<Icon icon={isFavoritePage ? heartFilled : heartOutline} class="text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out" />
 				</button>
 			</a>
 			<Cartrightside {cartId}/>	
@@ -754,8 +765,8 @@ async function submitForm() {
 						<button
 							on:click={toggleLike}
 							aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
-							class={`py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}`}>
-							<Icon icon={isLiked ? heartFilled : heartOutline} class={`text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out ${isLiked ? 'text-white' : 'text-white'}`}/>
+							class="py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}">
+							<Icon icon={isFavoritePage ? heartFilled : heartOutline} class="text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out"/>
 						</button>
 					</a>
 				</div>

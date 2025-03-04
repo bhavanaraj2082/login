@@ -31,7 +31,7 @@
 <Helpsection2 />
 {/if}
 <footer class="w-full bg-primary-400 p-6 font-workSans" bind:this={footer}>
-	{#if currentUrl !== "/feedback" || currentUrl !== "/order-status"}
+	{#if currentUrl !== "/feedback" && currentUrl !== "/order-status"}
 	<Helpsection {footer} />
 	{/if}
 
