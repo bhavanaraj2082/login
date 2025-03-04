@@ -72,7 +72,7 @@
 		try {
 			menus = menusdata.menus;
 			syncLocalStorageToStore();
-			const existingExpiration = localStorage.getItem('cartExpiration');
+			const existingExpiration = localStorage.getItem('cartExpirationChemi');
 			const currency = localStorage.getItem('currency')
 			if (!currency) {
 				localStorage.setItem('currency', "inr");
@@ -86,7 +86,7 @@
 				}
 				const expirationTime = new Date();
 				expirationTime.setHours(expirationTime.getHours() + 6);
-				localStorage.setItem('cartExpiration', expirationTime.toISOString());
+				localStorage.setItem('cartExpirationChemi', expirationTime.toISOString());
 			} else {
 				const cartExpirationTime = existingExpiration;
 				const currentTime = new Date();
@@ -99,7 +99,7 @@
 					}
 					const newExpirationTime = new Date();
 					newExpirationTime.setHours(newExpirationTime.getHours() + 6);
-					localStorage.setItem('cartExpiration', newExpirationTime.toISOString());
+					localStorage.setItem('cartExpirationChemi', newExpirationTime.toISOString());
 				}
 			}
 			window.addEventListener('click', handleClick);
@@ -114,7 +114,7 @@
 	function syncLocalStorageToStore() {
     // Check if we are in the browser
     if (typeof window !== 'undefined') {
-        const storedTotalComps = localStorage.getItem('totalComps');
+        const storedTotalComps = localStorage.getItem('totalCompsChemi');
 		const storedCurrency = localStorage.getItem('currency')
 		if (storedCurrency) {
 			currencyState.set(storedCurrency)
@@ -128,29 +128,32 @@ async function submitForm() {
 		form2.requestSubmit();
 	}
 	async function submitAlternateForm() {
-		submitGuestForm.requestSubmit();
+		// submitGuestForm.requestSubmit();
+		const storedTotalComps = JSON.parse(localStorage.getItem('cart'));;
+		localStorage.setItem('totalCompsChemi', storedTotalComps.length);
+		syncLocalStorageToStore();	
 	}
 
 	function handleDataCart() {
 		return async ({ result }) => {
-			console.log("result from page server for carat data",result);
+			// console.log("result from page server for carat data",result);
 			
 			const totalComps  = result?.data?.cartData?.cartItems.length 
 			// console.log("totalComps",totalComps);
-			localStorage.setItem('totalComps', totalComps);
+			localStorage.setItem('totalCompsChemi', totalComps);
 			syncLocalStorageToStore();	
 		};
 	}
-	function handleGuestData() {
-		return async ({ result }) => {
-			// console.log(result);
+	// function handleGuestData() {
+	// 	return async ({ result }) => {
+	// 		// console.log(result);
 			
-			const { totalLength } = result.data;
-			// console.log("totalComps in handl  guest data ",result.data);
-			localStorage.setItem('totalComps', totalLength);
-			syncLocalStorageToStore();
-		};
-	}
+	// 		const { totalLength } = result.data;
+	// 		// console.log("totalComps in handl  guest data ",result.data);
+	// 		localStorage.setItem('totalComps', totalLength);
+	// 		syncLocalStorageToStore();
+	// 	};
+	// }
 	function handleMouseEnter(subSubmenu) {
 		clearTimeout(subSubmenuLeaveTimeoutId);
 		hoveredSubSubmenu = subSubmenu;
@@ -296,14 +299,14 @@ async function submitForm() {
 <form method="POST" action="/?/getCartValue" bind:this={form2} use:enhance={handleDataCart}>
 	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
 </form>
-<form
+<!-- <form
 	method="POST"
 	action="/cart?/guestCart"
 	bind:this={submitGuestForm}
 	use:enhance={handleGuestData}
 >
 	<input type="hidden" name="guestCart" value={JSON.stringify($guestCart)} />
-</form>
+</form> -->
 <nav class="bg-primary-400 font-workSans">
 	<Toaster position="bottom-right" richColors />
 	{#if isOpen}
