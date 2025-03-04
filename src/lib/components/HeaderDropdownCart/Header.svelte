@@ -1,5 +1,5 @@
 <script>
-	import { authedUser,currencyState } from '$lib/stores/mainStores.js';
+	import { authedUser,currencyState,cartTotalComps } from '$lib/stores/mainStores.js';
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import Cartrightside from '$lib/components/HeaderDropDownCart/Cartrightside.svelte';
@@ -9,7 +9,7 @@
 	import { slide, fade } from 'svelte/transition';
 	import { toast, Toaster } from 'svelte-sonner';	
 	export let data
-
+	import { guestCart } from '$lib/stores/cart.js';
 	$:cartId = data?.cart?.cart[0]?.cartId || ""
 
 	let menus = [];
@@ -30,7 +30,8 @@
 	// $authedUser.username="Sameena"
 	let userEmail = $authedUser.email;
 	let userName = $authedUser.username;
-	
+	let form2;
+	let submitGuestForm;
 	$: showUserOptions = false;
   let dropdown; 
   function handleProfile(event) {
@@ -70,6 +71,37 @@
 	onMount(async () => {
 		try {
 			menus = menusdata.menus;
+			syncLocalStorageToStore();
+			const existingExpiration = localStorage.getItem('cartExpiration');
+			const currency = localStorage.getItem('currency')
+			if (!currency) {
+				localStorage.setItem('currency', "inr");
+				currencyState.set('inr')
+			}
+			if (!existingExpiration) {
+				if (!$authedUser.id) {
+					await submitAlternateForm();
+				} else {
+					await submitForm();
+				}
+				const expirationTime = new Date();
+				expirationTime.setHours(expirationTime.getHours() + 6);
+				localStorage.setItem('cartExpiration', expirationTime.toISOString());
+			} else {
+				const cartExpirationTime = existingExpiration;
+				const currentTime = new Date();
+				const currenctISo=currentTime.toISOString()
+				if (currenctISo > cartExpirationTime) {
+					if (!$authedUser.id) {
+						await submitAlternateForm();
+					} else {
+						await submitForm();	
+					}
+					const newExpirationTime = new Date();
+					newExpirationTime.setHours(newExpirationTime.getHours() + 6);
+					localStorage.setItem('cartExpiration', newExpirationTime.toISOString());
+				}
+			}
 			window.addEventListener('click', handleClick);
 			return () => {
 			window.removeEventListener('click', handleClick);
@@ -79,8 +111,46 @@
 		}
 		isLiked = false;
 	});
+	function syncLocalStorageToStore() {
+    // Check if we are in the browser
+    if (typeof window !== 'undefined') {
+        const storedTotalComps = localStorage.getItem('totalComps');
+		const storedCurrency = localStorage.getItem('currency')
+		if (storedCurrency) {
+			currencyState.set(storedCurrency)
+		}
+        if (storedTotalComps ) {
+            cartTotalComps.set(Number(storedTotalComps));
+        }
+    }
+}
+async function submitForm() {
+		form2.requestSubmit();
+	}
+	async function submitAlternateForm() {
+		submitGuestForm.requestSubmit();
+	}
 
-
+	function handleDataCart() {
+		return async ({ result }) => {
+			console.log("result from page server for carat data",result);
+			
+			const totalComps  = result?.data?.cartData?.cartItems.length 
+			// console.log("totalComps",totalComps);
+			localStorage.setItem('totalComps', totalComps);
+			syncLocalStorageToStore();	
+		};
+	}
+	function handleGuestData() {
+		return async ({ result }) => {
+			// console.log(result);
+			
+			const { totalLength } = result.data;
+			// console.log("totalComps in handl  guest data ",result.data);
+			localStorage.setItem('totalComps', totalLength);
+			syncLocalStorageToStore();
+		};
+	}
 	function handleMouseEnter(subSubmenu) {
 		clearTimeout(subSubmenuLeaveTimeoutId);
 		hoveredSubSubmenu = subSubmenu;
@@ -223,6 +293,17 @@
     });
   }
 </script>
+<form method="POST" action="/?/getCartValue" bind:this={form2} use:enhance={handleDataCart}>
+	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
+</form>
+<form
+	method="POST"
+	action="/cart?/guestCart"
+	bind:this={submitGuestForm}
+	use:enhance={handleGuestData}
+>
+	<input type="hidden" name="guestCart" value={JSON.stringify($guestCart)} />
+</form>
 <nav class="bg-primary-400 font-workSans">
 	<Toaster position="bottom-right" richColors />
 	{#if isOpen}
@@ -417,7 +498,10 @@
 			<Cartrightside {cartId}/>	
 		</div>
 		<!-- Searchbar functionality -->
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div on:click|stopPropagation class="relative sm:max-w-3xl md:max-w-sm lg:max-w-md xl:max-w-xl  sm:mt-2 w-full sm:pb-0 pb-2 mx-auto" bind:this={suggestionsRef}>
+
 			<form action="/?/search" method="post" bind:this={form} use:enhance={handleData}>
 				<div class=" w-full flex items-center">
 					<input

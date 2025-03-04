@@ -8,7 +8,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { toast } from 'svelte-sonner';
-	import {authedUser} from '$lib/stores/mainStores.js'
+	import {authedUser,cartTotalComps} from '$lib/stores/mainStores.js'
   
 	let cartOpen = false;
 	let cartItems = [];
@@ -290,8 +290,8 @@
 			/>
 			<!-- Badge -->
 			<span
-				class="absolute sm:ml-2.5 ml-1.5 top-1 right-0 transform translate-x-1/2 -translate-y-1/2 {$cart.length === 0 ? "hidden" : "text-white font-semibold bg-gray-600 inset-0 shadow-md"} text-2s font-medium rounded-full w-4 h-4 flex items-center justify-center">
-			{$cart.length}
+				class="absolute sm:ml-2.5 ml-1.5 top-1 right-0 transform translate-x-1/2 -translate-y-1/2 {$cartTotalComps === 0 ? "hidden" : "text-white font-semibold bg-gray-600 inset-0 shadow-md"} text-2s font-medium rounded-full w-4 h-4 flex items-center justify-center">
+			{$cartTotalComps}
 			</span>
 		</div>
 	</span>
