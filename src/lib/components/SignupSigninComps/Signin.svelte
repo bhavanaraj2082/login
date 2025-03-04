@@ -49,11 +49,20 @@
     return async ({ result, update }) => {
       console.log(result);
 
+      // if (result.type === "redirect") {
+      //   await update();
+      //   await applyAction(result);
+      //   return;
+      // }
+
       if (result.type === "redirect") {
+        await goto(result.location);
         await update();
-        await applyAction(result);
-        return;
+        location.reload();
+        // return;
       }
+      await applyAction(result);
+
 
       if (result.type === "failure") {
         toast.error(result.data.errorMsg);
