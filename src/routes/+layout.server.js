@@ -9,7 +9,7 @@ export const load = async({ url, cookies, locals,depends }) => {
 			redirect(302, '/login');
 		}
 		depends("data:load")
-		const cart = await getCart(locals.authedUser?.id)
+		// const cart = await getCart(locals.authedUser?.id)
 
        let authedUser = {};
 
@@ -18,7 +18,7 @@ export const load = async({ url, cookies, locals,depends }) => {
        }
 
        return {
-         authedUser,cart
+         authedUser
         };
 }catch(error){
 	console.log(error);

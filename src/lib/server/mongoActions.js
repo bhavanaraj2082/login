@@ -1466,74 +1466,67 @@ export const userUpdatePassword = async (body) => {
 	}
 };
 
-
-
-
-
 export const ResetPassword = async (body) => {
 	try {
-	  const { userId, newPassword, token } = body;
-	  console.log("Request body:", body); // Log the incoming body
-  
-	  // Step 1: Verify the token
-	  const tokenRecord = await TokenVerification.findOne({ token });
-	  console.log("Token verification record found:", tokenRecord);
-  
-	  if (!tokenRecord) {
-		console.log("No token record found. Invalid or expired token.");
-		return { success: false, message: 'Invalid or expired token.' };
-	  }
-  
-	  const currentTime = new Date();
-	  console.log("Current time:", currentTime);
-	  console.log("Token expiry time:", tokenRecord.expiry);
-  
-	  // Step 2: Check token expiry
-	  if (currentTime > tokenRecord.expiry) {
-		await TokenVerification.deleteOne({ token });
-		console.log("Token expired, deleted from DB.");
-		return { success: false, message: 'Token has expired' };
-	  }
-  
-	  // Step 3: Check if the token has already been used
-	  if (tokenRecord.used) {
-		console.log("Token already used.");
-		return { success: false, message: 'Token has already been used' };
-	  }
-  
-	  // Step 4: Mark token as used
-	  await TokenVerification.updateOne({ token }, { $set: { used: true } });
-	  console.log("Token marked as used in DB.");
-  
-	  const email = tokenRecord.email;
-	  console.log("Email associated with the token:", email);
-  
-	  // Step 5: Update the password
-	  await auth.updateKeyPassword('email', email, newPassword);
-	  console.log("Password updated for email:", email);
-  
-	  // Step 6: Invalidate the user session
-	  await auth.invalidateSession(userId);
-	  console.log("User session invalidated for userId:", userId);
-  
-	  // Step 7: Delete the token record from DB
-	  await TokenVerification.deleteOne({ token });
-	  console.log("Token deleted from DB after successful password reset.");
-  
-	  return { success: true, message: 'Password reset successfully.' };
+		const { email, newPassword, token } = body;
+		// console.log("Request body:", body);
+
+		// Case 1: If token is provided, verify it
+		if (token) {
+			const tokenRecord = await TokenVerification.findOne({ token });
+
+			// If token is not found or expired, return an error
+			if (!tokenRecord) {
+				return { success: false, message: 'Invalid or expired token.' };
+			}
+
+			const currentTime = new Date();
+			if (currentTime > tokenRecord.expiry) {
+				await TokenVerification.deleteOne({ token });
+				return { success: false, message: 'Token has expired' };
+			}
+
+			// If token is already used, prevent reuse
+			if (tokenRecord.used) {
+				return { success: false, message: 'Token has already been used' };
+			}
+
+			// Mark token as used and get the associated email
+			await TokenVerification.updateOne({ token }, { $set: { used: true } });
+			const email = tokenRecord.email;
+
+			// Reset password using the email
+			await auth.updateKeyPassword('email', email, newPassword);
+			
+			// Invalidate session and delete token record
+			await auth.invalidateSession(email);
+			await TokenVerification.deleteOne({ token });
+
+			return { success: true, message: 'Password reset successfull' };
+		}
+
+		// Case 2: If no token but userEmail is provided, reset password directly
+		if (email) {
+			await auth.updateKeyPassword('email', email, newPassword);
+			// Invalidate user session
+			await auth.invalidateSession(email);
+
+			return { success: true, message: 'Password reset successfull' };
+		}
+
+		// Case 3: If neither token nor userEmail is provided, return an error
+		return { success: false, message: 'Token has expired or is missing.' };
+
 	} catch (error) {
-	  console.log("Error occurred during password reset:", error);
-  
-	  // Handling LuciaError specifically
-	  if (error instanceof LuciaError) {
-		console.log("LuciaError:", error.message);
-		return { success: false, message: 'Failed to update password: ' + error.message };
-	  } else {
-		console.log("Generic error:", error);
+		console.log("Error during password reset:", error);
+		// Handle LuciaError separately
+		if (error instanceof LuciaError) {
+			console.log("LuciaError:", error.message);
+			return { success: false, message: 'Failed to update the password' };
+		}
 		return { success: false, message: 'Failed to reset the password' };
-	  }
 	}
-  };
+};
 
   export const generateVerificationUrl = async (email, userId) => {
 	const token = uuidv4();
