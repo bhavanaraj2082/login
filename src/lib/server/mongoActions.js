@@ -2199,65 +2199,130 @@ export const addAllToCart = async (items, userId, userEmail) => {
 
 //Myfavouries actions ends
 
+
+
 // export const quicksearch = async ({ query }) => {
 // 	try {
-// 		//   console.log('Received query:', query);
-
-// 		const queryFilter = { productNumber: { $regex: query, $options: 'i' } };
-
-// 		const products = await Product.find(queryFilter)
-// 			.select('productName productNumber prodDesc imageSrc ')
-// 			.limit(20)
-// 			.exec();
-
-// 		const enrichedProducts = [];
-
-// 		for (let product of products) {
-// 			const stockInfos = await Stock.find({ productNumber: product.productNumber }).select('id stock pricing distributor manufacturer');
-// 			console.log(stockInfos, "asadsdsfsdfxdrdr********************8");
-
-// 			let convertedPricing = [];
-// 			for (let stockInfo of stockInfos) {
-// 				const { pricing = [], distributor, manufacturer } = stockInfo || []; // Extract distributor and manufacturer
-
-// 				if (pricing && pricing[0] && pricing[0].INR) {
-// 					convertedPricing = convertedPricing.concat(pricing);
-// 				} else {
-// 					const converted = await convertToINR([pricing] || []);
-// 					convertedPricing = convertedPricing.concat(converted);
-// 				}
-
-// 				// Ensure you are accessing 'distributor' and 'manufacturer' correctly
-// 				console.log('Distributor:', distributor);
-// 				console.log('Manufacturer:', manufacturer);
-// 			}
-
-// 			const enrichedProduct = {
-// 				id: product._id.toString(),
-// 				image: product.imageSrc,
-// 				description: product.prodDesc,
-// 				productName: product.productName,
-// 				productNumber: product.productNumber,
-// 				stockId: stockInfos[0]?.id.toString() || null,
-
-// 				manufacturer: stockInfos[0]?.manufacturer.toString() || null,
-// 				distributer: stockInfos[0]?.distributor.toString() || null,
-
-// 				stock: stockInfos.reduce((total, stockInfo) => total + (stockInfo.stock || 0), 0),
-// 				pricing: convertedPricing,
-// 			};
-
-// 			console.log('Enriched product:', enrichedProduct);
-
-// 			enrichedProducts.push(enrichedProduct);
+// 	  const baseProducts = await Product.find({
+// 		productNumber: { $regex: query, $options: 'i' }
+// 	  })
+// 		.select('_id productName productNumber prodDesc imageSrc')
+// 		.limit(20)
+// 		.lean()
+// 		.exec();
+// 	  const enrichedProducts = [];
+// 	  for (const baseProduct of baseProducts) {
+// 		const stockEntries = await Stock.find({ 
+// 		  productNumber: baseProduct.productNumber 
+// 		})
+// 		  .select('_id stock pricing distributor manufacturer')
+// 		  .lean()
+// 		  .exec();
+  
+// 		if (!stockEntries || stockEntries.length === 0) {
+// 		  enrichedProducts.push({
+// 			id: baseProduct._id.toString(),
+// 			image: baseProduct.imageSrc || null,
+// 			description: baseProduct.prodDesc || null,
+// 			productName: baseProduct.productName,
+// 			productNumber: baseProduct.productNumber,
+// 			stockId: null,
+// 			manufacturer: null,
+// 			distributer: null,
+// 			stock: 0,
+// 			priceone: "",
+// 			pricing: []
+// 		  });
+// 		  continue;
 // 		}
-
-// 		return enrichedProducts;
+// 		for (const entry of stockEntries) {
+// 		  // Log the original pricing object structure
+// 		  console.log('Original pricing data:', JSON.stringify(entry.pricing, null, 2));
+		  
+// 		  let processedPricing = [];
+// 		  let priceoneValue = "";
+		  
+// 		  if (entry.pricing) {
+// 			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
+			
+// 			if (originalPricing[0]?.INR) {
+// 			  // If pricing already has INR, use it directly
+// 			  processedPricing = originalPricing;
+// 			  priceoneValue = originalPricing[0]?.INR || "";
+			  
+// 			  // Log pricing that already has INR
+// 			  console.log('Using existing INR pricing:', JSON.stringify(processedPricing, null, 2));
+// 			} else {
+// 			  try {
+// 				// Convert to INR but keep original values
+// 				const originalPricingArray = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
+				
+// 				// Log pricing before conversion
+// 				console.log('Before conversion:', JSON.stringify(originalPricingArray, null, 2));
+				
+// 				const convertedPricing = await convertToINR(originalPricingArray);
+				
+// 				// Log pricing after conversion
+// 				console.log('After conversion:', JSON.stringify(convertedPricing, null, 2));
+				
+// 				// For each pricing object, add the INR value while keeping original currency
+// 				processedPricing = originalPricingArray.map((origPrice, index) => {
+// 				  const convertedPrice = convertedPricing[index];
+// 				  const result = {
+// 					...origPrice,  // Keep all original properties (USD, break, offer, etc.)
+// 					inr: convertedPrice.INR  // Add the converted INR value
+// 				  };
+				  
+// 				  return result;
+// 				});
+				
+// 				// Log the final processed pricing objects
+// 				console.log('Final processed pricing:', JSON.stringify(processedPricing, null, 2));
+				
+// 				// Set the priceone value from the first item's INR price
+// 				priceoneValue = processedPricing[0]?.inr || "";
+// 			  } catch (error) {
+// 				console.error('Error converting pricing to INR:', error);
+// 				processedPricing = originalPricing;
+// 				console.log('Using original pricing due to error:', JSON.stringify(processedPricing, null, 2));
+// 			  }
+// 			}
+// 		  }
+  
+// 		  const productEntry = {
+// 			id: baseProduct._id.toString(),
+// 			image: baseProduct.imageSrc || null,
+// 			description: baseProduct.prodDesc || null,
+// 			productName: baseProduct.productName,
+// 			productNumber: baseProduct.productNumber,
+// 			stockId: entry._id.toString(),
+// 			manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
+// 			distributer: entry.distributor ? entry.distributor.toString() : null,
+// 			stock: entry.stock || 0,
+// 			priceone: priceoneValue, // Add the top-level price converted to INR
+// 			pricing: processedPricing
+// 		  };
+		  
+// 		  // Log the final product entry
+// 		  console.log('Final product entry structure:', JSON.stringify({
+// 			id: productEntry.id,
+// 			productName: productEntry.productName,
+// 			priceone: productEntry.priceone,
+// 			pricing: productEntry.pricing
+// 		  }, null, 2));
+		  
+// 		  enrichedProducts.push(productEntry);
+// 		}
+// 	  }
+// 	  console.log('Total enriched products:', enrichedProducts.length);
+  
+// 	  return enrichedProducts;
 // 	} catch (error) {
-// 		console.error('Error during quicksearch function call:', error);
-// 		throw new Error('An error occurred while processing the quicksearch.');
+// 	  console.error('Error during quicksearch function call:', error);
+// 	  throw new Error('An error occurred while processing the quicksearch.');
 // 	}
-// };
+//   };
+
 
 export const quicksearch = async ({ query }) => {
 	try {
@@ -2276,40 +2341,75 @@ export const quicksearch = async ({ query }) => {
 		  .select('_id stock pricing distributor manufacturer')
 		  .lean()
 		  .exec();
-
+  
 		if (!stockEntries || stockEntries.length === 0) {
 		  enrichedProducts.push({
 			id: baseProduct._id.toString(),
 			image: baseProduct.imageSrc || null,
-			description: baseProduct.prodDevariantsc || null,
+			description: baseProduct.prodDesc || null,
 			productName: baseProduct.productName,
 			productNumber: baseProduct.productNumber,
 			stockId: null,
 			manufacturer: null,
 			distributer: null,
 			stock: 0,
+			priceone: "",
 			pricing: []
 		  });
 		  continue;
 		}
 		for (const entry of stockEntries) {
+
+		  
 		  let processedPricing = [];
+		  let priceoneValue = "";
 		  
 		  if (entry.pricing) {
-			if (entry.pricing.INR || (Array.isArray(entry.pricing) && entry.pricing[0] && entry.pricing[0].INR)) {
-			  processedPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
+			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
+			
+			if (originalPricing[0]?.INR) {
+			  const currentRates = await conversionRates();
+			  const usdRate = currentRates["USD"] ? 1/currentRates["USD"] : null;
+			  
+			  processedPricing = originalPricing.map(price => {
+				const inrValue = price.INR;
+				const usdValue = usdRate ? (inrValue * usdRate).toFixed(2) : "N/A";
+				
+				return {
+				  ...price,
+				  usd: usdValue
+				};
+			  });
+			  
+			  priceoneValue = originalPricing[0]?.INR || "";
+			  
 			} else {
-			  const pricingToConvert = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
 			  try {
-				processedPricing = await convertToINR(pricingToConvert);
+				const originalPricingArray = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
+				
+				
+				const convertedPricing = await convertToINR(originalPricingArray);
+				
+
+				
+				processedPricing = originalPricingArray.map((origPrice, index) => {
+				  const convertedPrice = convertedPricing[index];
+				  const result = {
+					...origPrice,  
+					inr: convertedPrice.INR  
+				  };
+				  
+				  return result;
+				});
+				
+				priceoneValue = processedPricing[0]?.inr || convertedPricing[0]?.INR || "";
 			  } catch (error) {
-				console.error('Error converting pricing to INR:', error);
-				processedPricing = pricingToConvert; // Use original pricing if conversion fails
+				processedPricing = originalPricing;
 			  }
 			}
 		  }
   
-		  enrichedProducts.push({
+		  const productEntry = {
 			id: baseProduct._id.toString(),
 			image: baseProduct.imageSrc || null,
 			description: baseProduct.prodDesc || null,
@@ -2319,21 +2419,26 @@ export const quicksearch = async ({ query }) => {
 			manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
 			distributer: entry.distributor ? entry.distributor.toString() : null,
 			stock: entry.stock || 0,
+			priceone: priceoneValue, 
 			pricing: processedPricing
-		  });
+		  };
+		  
+		  console.log('Final product entry structure:', JSON.stringify({
+			id: productEntry.id,
+			productName: productEntry.productName,
+			priceone: productEntry.priceone,
+			pricing: productEntry.pricing
+		  }, null, 2));
+		  
+		  enrichedProducts.push(productEntry);
 		}
 	  }
-  console.log(enrichedProducts,"enrichedProducts");
   
 	  return enrichedProducts;
 	} catch (error) {
-	  console.error('Error during quicksearch function call:', error);
 	  throw new Error('An error occurred while processing the quicksearch.');
 	}
   };
-
-
-
 
 export const uploadFile = async ({ query }) => {
 	const validQueries = query.filter(([productNumberAndSize, quantity]) =>

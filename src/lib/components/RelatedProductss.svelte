@@ -5,41 +5,14 @@
   import { toast } from "svelte-sonner";
   import { invalidate } from "$app/navigation";
   import Icon from "@iconify/svelte";
+  import { currencyState } from "$lib/stores/mainStores.js";
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
   import { authedUser } from "$lib/stores/mainStores.js";
   import { sendMessage } from "$lib/utils.js";
   export let relatedProducts;
-  // console.log("relatedProducts",relatedProducts);
+  console.log("relatedProducts",relatedProducts);
   const productsData = relatedProducts;
   let isLoggedIn = $authedUser?.id ? true : false;
-  // let RelatedProductData = productsData.map((product) => ({
-  //   productId: product._id,
-  //   prodDesc: product.prodDesc,
-  //   productName: product.productName,
-  //   // priceSize: product.stockPriceSize.map((size) => ({
-  //   //   size: size.break,
-  //   //   price: size.INR,
-  //   // })),
-  //   priceSize: Array.isArray(product.stockPriceSize) && product.stockPriceSize.length > 0
-  //   ? product.stockPriceSize.map(size => ({
-  //       size: size.break || "N/A",
-  //       price: size.INR || 0,
-  //       offer: size.offer || "0"
-  //     }))
-  //   : [],
-
-  //   image: product.imageSrc,
-  //   manufacturer: product.manufacturerInfo[0]?.name,
-  //   manufacturerId: product.manufacturerInfo[0]?._id,
-  //   distributorId:product.stockInfo[0]?.distributor,
-  //   stockId:product.stockInfo[0]?._id,
-  //   stock: product.stockQuantity,
-  //   category: product.categoryInfo[0]?.urlName,
-  //   subCategory: product.subCategoryInfo[0]?.urlName,
-  //   subsubCategory: product.subsubCategoryInfo[0]?.urlName,
-  //   productUrl: product.productUrl,
-  //   productNumber: product.productNumber,
-  // }));
 
   let RelatedProductData = productsData.map((product) => ({
     productId: product._id,
@@ -68,7 +41,11 @@
     subsubCategory: product.subsubCategoryInfo[0]?.urlName,
     productUrl: product.productUrl,
     productNumber: product.productNumber,
+    variants: product.variants
   }));
+
+  console.log(RelatedProductData,"RelatedProductData");
+  
 
   let currentIndex = 0;
   let logosPerSlide = 4;
@@ -112,28 +89,6 @@
   let selectedPriceIndex = 0;
   let showModal = false;
 
-  // function openModal(product) {
-  //   selectedProduct = {
-  //   brand : product.brand,
-  // 	description: product.description,
-  // 	id:product.id,
-  // 	name : product.name,
-  // 	image : product.image,
-  // 	name : product.name,
-  //       partNumber : product.partNumber,
-  // 	priceSize : product.priceSize,
-  //       quantity : product.quantity,
-  // 	stock : product.stock,
-  //   productId: product.productId,
-  //   manufacturerId: product.manufacturerId,
-  //   distributorId: product.distributorId,
-  //   stockId: product.stockId,
-  // }
-  //   selectedPrice = selectedProduct.priceSize[0];
-  //   selectedPriceIndex = 0;
-  //   showModal = true;
-  // }
-
   function openModal(product) {
     // console.log("Product Data in openModal:", product);
     selectedProduct = {
@@ -151,6 +106,7 @@
       distributorId:
         product.distributorId || product.stockInfo?.[0]?.distributor || "",
       stockId: Array.isArray(product.stockId) ? product.stockId : [],
+      variants: product.variants
     };
 
     selectedPriceIndex = 0;
@@ -167,14 +123,6 @@
     showModal = false;
   }
 
-  // function selectPrice(index, size) {
-  //   const filtered = selectedProduct.priceSize.find(
-  //     (price) => price.size === size
-  //   );
-  //   selectedPrice = filtered;
-  //   selectedPriceIndex = index;
-  // }
-
   function selectPrice(index, size) {
     selectedPrice = selectedProduct.priceSize[index];
     selectedPriceIndex = index;
@@ -186,23 +134,31 @@
   let popupQuantity = 1;
 
   function decrementPopupQuantity() {
-    if (popupQuantity > 1) {
-      popupQuantity--;
-    }
+  if (popupQuantity > 1) {
+    popupQuantity--;  
   }
+}
 
-  function incrementPopupQuantity() {
-    popupQuantity++;
+function incrementPopupQuantity() {
+  if (popupQuantity < 999) {
+    popupQuantity++;  
   }
+}
 
-  function handlePopupInput(event) {
-    const value = parseInt(event.target.value, 10);
-    if (value >= 1) {
-      popupQuantity = value;
+function handlePopupInput(event) {
+  const value = parseInt(event.target.value, 10);
+  if (isNaN(value)) {
+    popupQuantity = 1;  
+  } else {
+    if (value < 1) {
+      popupQuantity = 1;  
+    } else if (value > 999) {
+      popupQuantity = 999;  
     } else {
-      popupQuantity = 1;
+      popupQuantity = value;  
     }
   }
+}
 
   const guestCartFetch = () => {
     const formdata = new FormData();
@@ -408,7 +364,8 @@
       </div>
       <hr class="my-4" />
       <div class="pl-2">
-        {#if selectedPrice}
+        {#if ((selectedProduct?.variants && selectedProduct?.variants.length > 0) || selectedProduct?.priceSize?.length === 0)}
+        <!-- {#if selectedPrice} -->
           <h1 class="font-semibold">Select Size</h1>
         {:else}
           <div>
@@ -423,6 +380,7 @@
             >
           </div>
         {/if}
+        {#if ((selectedProduct?.variants && selectedProduct?.variants.length > 0) || selectedProduct?.priceSize?.length === 0)}
         <div class="flex gap-3 mt-3 flex-wrap">
           {#each selectedProduct.priceSize as { size }, index}
             <button
@@ -450,6 +408,7 @@
             </p>
           </div>
         {/if}
+        {/if}
         {#if selectedPrice !== undefined && selectedPrice !== null && selectedPrice !== false}
           <div class="mt-4">
             <form class="flex items-center gap-3">
@@ -467,6 +426,8 @@
                   min="1"
                   value={popupQuantity}
                   on:input={handlePopupInput}
+                    
+            max="999"
                   class="w-16 sm:w-20 h-9 text-center border-none focus:outline-none focus:ring-0"
                 />
                 <button
