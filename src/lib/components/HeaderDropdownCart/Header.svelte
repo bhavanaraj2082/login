@@ -72,7 +72,7 @@
 		try {
 			menus = menusdata.menus;
 			syncLocalStorageToStore();
-			const existingExpiration = localStorage.getItem('cartExpiration');
+			const existingExpiration = localStorage.getItem('cartExpirationChemi');
 			const currency = localStorage.getItem('currency')
 			if (!currency) {
 				localStorage.setItem('currency', "inr");
@@ -86,7 +86,7 @@
 				}
 				const expirationTime = new Date();
 				expirationTime.setHours(expirationTime.getHours() + 6);
-				localStorage.setItem('cartExpiration', expirationTime.toISOString());
+				localStorage.setItem('cartExpirationChemi', expirationTime.toISOString());
 			} else {
 				const cartExpirationTime = existingExpiration;
 				const currentTime = new Date();
@@ -99,7 +99,7 @@
 					}
 					const newExpirationTime = new Date();
 					newExpirationTime.setHours(newExpirationTime.getHours() + 6);
-					localStorage.setItem('cartExpiration', newExpirationTime.toISOString());
+					localStorage.setItem('cartExpirationChemi', newExpirationTime.toISOString());
 				}
 			}
 			window.addEventListener('click', handleClick);
@@ -114,7 +114,7 @@
 	function syncLocalStorageToStore() {
     // Check if we are in the browser
     if (typeof window !== 'undefined') {
-        const storedTotalComps = localStorage.getItem('totalComps');
+        const storedTotalComps = localStorage.getItem('totalCompsChemi');
 		const storedCurrency = localStorage.getItem('currency')
 		if (storedCurrency) {
 			currencyState.set(storedCurrency)
@@ -130,7 +130,7 @@ async function submitForm() {
 	async function submitAlternateForm() {
 		// submitGuestForm.requestSubmit();
 		const storedTotalComps = JSON.parse(localStorage.getItem('cart'));;
-		localStorage.setItem('totalComps', storedTotalComps.length);
+		localStorage.setItem('totalCompsChemi', storedTotalComps.length);
 		syncLocalStorageToStore();	
 	}
 
@@ -140,7 +140,7 @@ async function submitForm() {
 			
 			const totalComps  = result?.data?.cartData?.cartItems.length 
 			// console.log("totalComps",totalComps);
-			localStorage.setItem('totalComps', totalComps);
+			localStorage.setItem('totalCompsChemi', totalComps);
 			syncLocalStorageToStore();	
 		};
 	}
