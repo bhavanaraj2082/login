@@ -35,12 +35,12 @@
       </div>
 
       <div class="flex justify-center items-center">
-        <div class="w-full h-96 overflow-hidden" on:click={toggleZoom}>
+        <div class="flex justify-center items-center overflow-hidden" on:click={toggleZoom}>
           <!-- svelte-ignore a11y-img-redundant-alt -->
           <img
             src={product.imageSrc}
             alt="Product Image"
-            class="w-full h-96 rounded-md transition-transform duration-300"
+            class="w-96 h-96 object-contain rounded-md transition-transform duration-300"
             class:scale-150={isZoomed}
             class:cursor-zoom-in={!isZoomed}
             class:cursor-zoom-out={isZoomed}

@@ -36,49 +36,124 @@ export const actions = {
       };
     }
   },
- quicksearch: async ({ request }) => {
-    const data = Object.fromEntries(await request.formData());
-    const { quickSearch } = data;
+//  quicksearch: async ({ request }) => {
+//     const data = Object.fromEntries(await request.formData());
+//     const { quickSearch } = data;
   
-    if (quickSearch && quickSearch.length >= 0) {
-      try {
-        const results = await quicksearch({ query: quickSearch });
-        console.log('Raw results:', results);
+//     if (quickSearch && quickSearch.length >= 0) {
+//       try {
+//         const results = await quicksearch({ query: quickSearch });
+//         console.log('Raw results:', results);
   
-        const processedResults = results.map(product => {
-          if (product.pricing && Array.isArray(product.pricing)) {
-            product.pricing = product.pricing.map(item => ({
+//         const processedResults = results.map(product => {
+//           if (product.pricing && Array.isArray(product.pricing)) {
+//             product.pricing = product.pricing.map(item => ({
+//               break: item.break || 'N/A',
+//               price: item.INR || 'N/A',
+//             }));
+//           }
+//           return {
+//             id: product.id,
+//             image: product.image,
+//             description: product.description,
+//             productName: product.productName,
+//             productNumber: product.productNumber,
+//             stockId: product.stockId,
+//             manufacturer: product.manufacturer,
+//             distributer: product.distributer,
+//             stock: product.stock || 0,
+//             pricing: product.pricing,
+//             priceone:product.priceone,
+//           };
+//         });
+  
+//         // console.log('Processed results:', processedResults);
+  
+//         return processedResults;
+//       } catch (error) {
+//         console.error('Error in quicksearch action:', error);
+//         return { error: 'An error occurred while fetching search results.' };
+//       }
+//     } else {
+//       console.log('Search query is invalid:', quickSearch);
+//       return { error: 'Search query must be at least 2 characters.' };
+//     }
+//   },
+quicksearch: async ({ request }) => {
+  const data = Object.fromEntries(await request.formData());
+  const { quickSearch } = data;
+
+  if (quickSearch && quickSearch.length >= 0) {
+    try {
+      const results = await quicksearch({ query: quickSearch });
+      console.log('Raw results:', JSON.stringify(results, null, 2));
+
+      const processedResults = results.map(product => {
+        // Log the raw pricing data for debugging
+        console.log('Product pricing before processing:', JSON.stringify(product.pricing, null, 2));
+        
+        let processedPricing = [];
+        if (product.pricing && Array.isArray(product.pricing)) {
+          processedPricing = product.pricing.map(item => {
+            // Create an object with all original properties
+            const processedItem = { ...item };
+            
+            // Check for different price formats
+            if (item.INR) {
+              processedItem.inr = item.INR;
+            }
+            
+            // Preserve the original currency if it exists
+            if (item.usd) {
+              processedItem.usd = item.usd;
+            } else if (item.USD) {
+              processedItem.usd = item.USD;
+            }
+            
+            return {
               break: item.break || 'N/A',
-              price: item.INR || 'N/A',
-            }));
-          }
-          return {
-            id: product.id,
-            image: product.image,
-            description: product.description,
-            productName: product.productName,
-            productNumber: product.productNumber,
-            stockId: product.stockId,
-            manufacturer: product.manufacturer,
-            distributer: product.distributer,
-            stock: product.stock || 0,
-            pricing: product.pricing,
-          };
-        });
-  
-        console.log('Processed results:', processedResults);
-  
-        return processedResults;
-      } catch (error) {
-        console.error('Error in quicksearch action:', error);
-        return { error: 'An error occurred while fetching search results.' };
-      }
-    } else {
-      console.log('Search query is invalid:', quickSearch);
-      return { error: 'Search query must be at least 2 characters.' };
+              usd: item.usd || item.USD || 'N/A',
+              inr: item.inr || item.INR || 'N/A', 
+              offer: item.offer || '0'
+            };
+          });
+        }
+        
+        // Log the processed pricing for debugging
+        console.log('Product pricing after processing:', JSON.stringify(processedPricing, null, 2));
+        
+        return {
+          id: product.id,
+          image: product.image,
+          description: product.description,
+          productName: product.productName,
+          productNumber: product.productNumber,
+          stockId: product.stockId,
+          manufacturer: product.manufacturer,
+          distributer: product.distributer,
+          stock: product.stock || 0,
+          pricing: processedPricing,
+          priceone: product.priceone || (processedPricing[0]?.inr || processedPricing[0]?.INR || ''),
+        };
+      });
+
+      console.log('Processed results:', JSON.stringify(processedResults.map(p => ({
+        id: p.id,
+        productName: p.productName,
+        priceone: p.priceone,
+        pricing: p.pricing
+      })), null, 2));
+
+      return processedResults;
+    } catch (error) {
+      console.error('Error in quicksearch action:', error);
+      return { error: 'An error occurred while fetching search results.' };
     }
-  },
-  
+  } else {
+    console.log('Search query is invalid:', quickSearch);
+    return { error: 'Search query must be at least 2 characters.' };
+  }
+},
 
   uploadFile: async ({ request }) => {
     try {

@@ -87,14 +87,18 @@
   let showLikedPopup = false;
   let successMessage = "";
   let errorMessage = "";
-  let orderMultiple = null;
-  let quantity = orderMultiple;
+  let orderMultiple = 1;
+  let quantity = 1; 
+
+  // console.log(data.records,"data.records");
+  
+  // Reactive block to update orderMultiple and quantity only when data changes
   $: {
-    if (data.records.length > 0) {
+    if (data.records.length > 0 && quantity === 1) {
       orderMultiple = data.records[0].orderMultiple;
-      quantity = orderMultiple;
-    } else {
-      quantity = null;
+      quantity = orderMultiple;  // Only update if quantity is still 1 (initial value)
+    } else if (data.records.length === 0) {
+      quantity = 1;  // Reset to 1 if no data records
     }
   }
 
@@ -180,19 +184,31 @@ function handleThumbnailClick(selectedIndex, product) {
   const toggleDropdown = () => {
     showDropdown = !showDropdown;
   };
-
+  const updateQuantity = (event) => {
+    let value = parseInt(event.target.value);
+    if (isNaN(value) || value < 1) {
+      quantity = 1;
+    } else if (value > 999) {
+      quantity = 999;
+    } else {
+      quantity = value;
+    }
+  };
   const increaseQuantity = () => {
-    quantity += orderMultiple;
+    if (quantity + orderMultiple <= 999) {
+      quantity += orderMultiple;
+    } else {
+      quantity = 999; 
+    }
   };
 
   const decreaseQuantity = () => {
     if (quantity - orderMultiple >= 1) {
       quantity -= orderMultiple;
     } else {
-      quantity = 1;
+      quantity = 1; 
     }
   };
-
   function toggleSharePopup() {
     showSharePopup = !showSharePopup;
   }
@@ -327,17 +343,17 @@ function handleThumbnailClick(selectedIndex, product) {
         : 'lg:w-10/12'}"
     >
       <div class="flex flex-col space-y-4 lg:w-[30%] mt-3">
-        <div class="mb-3">
+        <div class="mb-3 flex justify-center items-center xl:block">
           <button
-            on:click={toggleImagePopup}
-            class="w-full md:w-11/12 border border-gray-300 rounded-md"
-          >
+          on:click={toggleImagePopup}
+          class="border border-gray-300 rounded-md p-3 max-lg:border-none"
+        >
             <!-- svelte-ignore a11y-img-redundant-alt -->
             <img
-              src={product.imageSrc}
-              alt="Product Image"
-              class="rounded-lg w-full p-2 h-52 max-md:h-72"
-            />
+            src={product.imageSrc}
+            alt="Product Image"
+            class="w-60 h-60 object-contain"
+          />
           </button>
           {#if showImagePopup}
             <Imageinfo {data} ImageclosePopup={toggleImagePopup} />
@@ -960,9 +976,15 @@ function handleThumbnailClick(selectedIndex, product) {
               class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
               ><Icon icon="ic:round-minus" class="text-2xl" /></button
             >
-            <span class="w-full text-center text-gray-800 rounded-sm p-1"
-              >{quantity}</span
-            >
+            <input
+            type="text"
+            class="w-full text-center border-none focus:outline-none focus:ring-0 p-1"
+            bind:value={quantity}
+            on:input={updateQuantity}
+            min="1"
+            max="999"
+          />
+        
             <button
               on:click={increaseQuantity}
               class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"

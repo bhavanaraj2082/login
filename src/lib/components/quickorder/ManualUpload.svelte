@@ -2,12 +2,13 @@
   import { onMount } from "svelte";
   import Icon from "@iconify/svelte";
   import { enhance, applyAction } from "$app/forms";
+  import { currencyState } from "$lib/stores/mainStores.js";
   import { cartState } from "$lib/stores/cartStores.js";
   import Bulkupload from "./Bulkupload.svelte";
   import { toast } from "svelte-sonner";
   let uploadedRows = [];
   let showSavedCarts = false;
-
+  console.log(currencyState,"currencyState");
   export let data;
   // console.log("daa", data);
   // console.log(data?.authedUser?.email,"i am email")
@@ -117,10 +118,12 @@
         product.productNumber && product.productNumber.includes(query),
     );
   }
+
   let debounceTimeout;
 
   function handleInput(event, sku, index) {
-    const value = event.target.value;
+    let value = event.target.value.trim();
+    rows[index].sku = value;
     searchQuery = value;
 
     if (value.length > 2) {
@@ -130,8 +133,9 @@
         if (form) {
           form.requestSubmit();
         }
+
+        rows[index].filteredProducts = filterProducts(value);
       }, 300);
-      rows[index].filteredProducts = filterProducts(value);
     } else {
       rows[index].filteredProducts = [];
     }
@@ -360,14 +364,15 @@
                   <div class="flex flex-col ml-4">
                       <p class="font-medium">${item.productName}</p>
                       <p>Quantity: ${item.quantity}</p>
-                      <p>Total Price: ₹${(item.quantity * item.priceSize.price).toFixed(2)}</p>
+
+
                   </div>
               </div>
           `;
       });
       cartItemsList.innerHTML += `
           <div class="text-center mt-4">
-              <p>You have ${cartItemCount} items in your cart. <a href="/cart" class="text-orange-500">See all your items</a></p>
+              <p>You have ${cartItemCount} items in your cart. <a href="/cart" class="text-orange-600">See all your items</a></p>
           </div>
       `;
     } else {
@@ -381,7 +386,6 @@
                   <div class="flex flex-col ml-4">
                       <p class="font-medium">${item.productName}</p>
                       <p>Quantity: ${item.quantity}</p>
-                      <p>Total Price: ₹${(item.quantity * item.priceSize.price).toFixed(2)}</p>
                   </div>
               </div>
               <hr class="my-2" />
@@ -424,89 +428,70 @@
     }
   }
 
+  async function addManualEntriesToCart() {
+    cartloading = true;
+    const validRows = rows.filter((row) => {
+      return row.sku.trim() !== "" && row.selectedSize;
+    });
 
-async function addManualEntriesToCart() {
-  cartloading = true;
-  const validRows = rows.filter((row) => {
-    return row.sku.trim() !== "" && row.selectedSize;
-  });
-  console.log(validRows, "validRows");
+    if (validRows.length === 0) {
+      cartloading = false;
+      toast.error("No valid items to add to cart");
+      return;
+    }
 
-  if (validRows.length === 0) {
-    cartloading = false;
-    toast.error("No valid items to add to cart");
-    return;
-  }
+    const cartItems = validRows
+      .map((row) => {
+        const productNumber = row.sku.split(" -")[0].trim();
+        const validProduct = products.find(
+          (p) =>
+            String(p.productNumber).trim().toLowerCase() ===
+            productNumber.toLowerCase(),
+        );
 
-  const cartItems = validRows
-    .map((row) => {
-      const validProduct = row.selectedProduct;
-      const productNumber = row.sku.split(" -")[0].trim();
+        if (!validProduct) {
+          toast.error(`Product ${productNumber} not found`);
+          return null;
+        }
 
-      if (!validProduct) {
-        toast.error(`Product ${productNumber} not found`);
-        return null;
-      }
-
-      console.log('validProduct stockId:', validProduct.stockId);
-      let sizePriceInfo = null;
-      if (Array.isArray(validProduct.pricing)) {
-        sizePriceInfo = validProduct.pricing.find(
+        const sizePriceInfo = validProduct.pricing?.find(
           (item) =>
-            item && item.break && 
             item.break.trim().toLowerCase() ===
             row.selectedSize.trim().toLowerCase(),
         );
+
         if (!sizePriceInfo) {
-          sizePriceInfo = validProduct.pricing.find(
-            (item) => 
-              item && item.break && 
-              item.break.trim().toLowerCase().includes(
-                row.selectedSize.trim().toLowerCase()
-              )
+          toast.error(
+            `Size ${row.selectedSize} not available for ${productNumber}`,
           );
+          return null;
         }
-        if (!sizePriceInfo && validProduct.pricing.length > 0) {
-          sizePriceInfo = validProduct.pricing[0];
-          console.warn(`Using default size for ${productNumber}: ${sizePriceInfo.break}`);
-        }
-      }
-      
-      console.log(sizePriceInfo, "sizePriceInfo");
+        const quantity =
+          selectedProduct &&
+          selectedProduct.productNumber === validProduct.productNumber
+            ? selectedProduct.quantity
+            : row.quantity > 0
+              ? row.quantity
+              : 1;
 
-      if (!sizePriceInfo) {
-        toast.error(
-          `Size ${row.selectedSize} not available for ${productNumber}`,
-        );
-        return null;
-      }
-      
-      const quantity =
-        selectedProduct &&
-        selectedProduct.productNumber === validProduct.productNumber
-          ? selectedProduct.quantity
-          : row.quantity > 0
-            ? row.quantity
-            : 1;
-
-      return {
-        id: validProduct.id,
-        image: validProduct.image,
-        productName: validProduct.productName,
-        manufacturerId: validProduct.manufacturer,
-        distributerId: validProduct.distributer,
-        stockId: validProduct.stockId, 
-        stock: validProduct.stock,
-        productId: validProduct.id,
-        priceSize: {
-          price: sizePriceInfo.price || sizePriceInfo.INR || 0,
-          size: sizePriceInfo.break || row.selectedSize,
-        },
-        backOrder: Math.max(row.quantity - validProduct.stock, 0),
-        quantity: quantity || row.quantity > 0 ? row.quantity : 1,
-      };
-    })
-    .filter(Boolean);
+        return {
+          id: validProduct.id,
+          image: validProduct.image,
+          productName: validProduct.productName,
+          manufacturerId: validProduct.manufacturer,
+          distributerId: validProduct.distributer,
+          stockId: validProduct.stockId,
+          stock: validProduct.stock,
+          productId: validProduct.id,
+          priceSize: {
+            price: sizePriceInfo.price,
+            size: row.selectedSize,
+          },
+          backOrder: Math.max(row.quantity - validProduct.stock),
+          quantity: quantity || row.quantity > 0 ? row.quantity : 1,
+        };
+      })
+      .filter(Boolean);
 
     if (cartItems.length === 0) {
       return;
@@ -536,6 +521,7 @@ async function addManualEntriesToCart() {
             sku: "",
             size: "",
             quantity: 1,
+
             error: "",
             filteredProducts: [],
             selectedSize: "",
@@ -552,43 +538,31 @@ async function addManualEntriesToCart() {
         cartloading = false;
       }
     } else {
-      let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
-      for (const item of cartItems) {
-        const simplifiedCartItem = {
-          productId: item.productId,
-          manufacturerId: item.manufacturerId,
-          stockId: item.stockId,
-          distributorId: item.distributerId,
-          quantity: item.quantity,
-          backOrder: item.backOrder,
-        };
-        
-        const existingItemIndex = currentCart.findIndex(
-          (cartItem) => 
-            cartItem.productId === item.productId && 
-            cartItem.stockId === item.stockId
-        );
+      const simplifiedCartItems = cartItems.map((item) => ({
+        productId: item.productId,
+        manufacturerId: item.manufacturerId,
+        stockId: item.stockId,
+        distributorId: item.distributerId,
 
-        if (existingItemIndex > -1) {
-          currentCart[existingItemIndex] = simplifiedCartItem;
-        } else {
-          currentCart.push(simplifiedCartItem);
-        }
-      }
+        quantity: item.quantity,
+        backOrder: item.backOrder,
+      }));
       rows = rows.map((row) => ({
         sku: "",
         size: "",
         quantity: 1,
+
         error: "",
         filteredProducts: [],
         selectedSize: "",
       }));
-      localStorage.setItem("cart", JSON.stringify(currentCart));
+      localStorage.setItem("cart", JSON.stringify(simplifiedCartItems));
       toast.success("Items added to cart successfully.");
       showCartPopup(cartItems);
       cartloading = false;
     }
-}
+  }
+
   function cart() {
     if (userLoggedIn) {
       cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -795,6 +769,8 @@ async function addManualEntriesToCart() {
       }
 
       if (result && result.data) {
+        console.log(result, "result");
+
         if (result.data.length === 0) {
           toast.error("No Components found");
         } else {
@@ -858,6 +834,10 @@ async function addManualEntriesToCart() {
     selectedProduct = null;
     console.log("Selected Product after reset:", selectedProduct);
   };
+  let currency = "inr"; // Default value for currency
+
+  // Reactive statement to update `currency` whenever it changes in localStorage
+  // $: currency = localStorage.getItem('currency') || 'inr';
 </script>
 
 <div class="w-11/12 mx-auto py-5 px-2 md:flex md:space-x-8 max-w-7xl">
@@ -955,6 +935,7 @@ async function addManualEntriesToCart() {
                     {#each row.filteredProducts as result}
                       <div
                         class="p-4 border-b border-gray-300 last:border-b-0 hover:bg-gray-100 cursor-pointer"
+                        
                       >
                         <div class="space-y-1 mt-2">
                           {#if result.pricing?.length > 0}
@@ -1072,12 +1053,6 @@ async function addManualEntriesToCart() {
                   </button>
                 </div>
               </div>
-
-              {#if row.selectedSize === null && row.sku.trim() !== ""}
-                <span class="text-red-500 font-medium"
-                  >Cannot be added to the cart</span
-                >
-              {:else}{/if}
             </div>
           </div>
 
@@ -1094,6 +1069,7 @@ async function addManualEntriesToCart() {
               {row.error}
             </div>
           {/if}
+
           {#if row.sku}
             {#if row.selectedProduct && !loadingState[index]}
               <div
@@ -1106,8 +1082,12 @@ async function addManualEntriesToCart() {
                   Size: {row.selectedSize || "No Size Available"}
                 </span>
                 <span>
-                  {#if row.selectedProduct.pricing?.[0]?.price}
-                    ₹{row.selectedProduct.pricing[0].price}
+                  {#if row.selectedProduct.pricing?.[0]?.usd || row.selectedProduct.pricing?.[0]?.inr}
+                    {#if $currencyState === "usd"}
+                      $ {row.selectedProduct.pricing[0]?.usd}
+                    {:else}
+                      ₹ {row.selectedProduct.pricing[0]?.inr}
+                    {/if}
                   {:else}
                     <button
                       on:click={() => toggleQuoteModal(row.selectedProduct)}
@@ -1117,21 +1097,29 @@ async function addManualEntriesToCart() {
                     </button>
                   {/if}
                 </span>
-                {#if row.selectedProduct.pricing?.[0]?.price}
+
+                {#if row.selectedProduct.pricing?.[0]?.usd || row.selectedProduct.pricing?.[0]?.inr}
                   <span>
                     1 Estimated to ship on {estimatedShipDate}
                   </span>
 
+      
                   <button
                     class="text-primary-400 rounded"
-                    on:click={() =>
-                      showDetails(index, {
+                    on:click={() => {
+                      const price =
+                        currency === "usd"
+                          ? row.selectedProduct.pricing[0].usd
+                          : row.selectedProduct.pricing[0].inr;
+
+                      showDetails(0, {
                         productName: row.selectedProduct.productName,
                         productNumber: row.selectedProduct.productNumber,
                         size: row.selectedSize,
-                        price: row.selectedProduct.pricing[0].price || 0,
-                        quantity: row.quantity || 1,
-                      })}
+                        price: price,
+                        quantity: 1,
+                      });
+                    }}
                   >
                     Details
                   </button>
@@ -1140,7 +1128,7 @@ async function addManualEntriesToCart() {
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <div
-                  class=" text-red-500 cursor-pointer hover:scale-105"
+                  class="text-red-500 cursor-pointer hover:scale-105"
                   on:click={() => clearSelectedProduct(index)}
                 >
                   <Icon icon="mdi:close-circle" class="w-6 h-6" />
@@ -1362,15 +1350,15 @@ async function addManualEntriesToCart() {
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="fixed inset-0 !ml-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 px-4 sm:px-5"
       on:click|self={hideDetails}
     >
       <div
-        class="bg-white p-8 rounded-lg relative shadow-lg max-w-lg mx-4"
+        class="bg-white p-8 rounded-lg relative shadow-lg max-w-lg w-full sm:w-auto mx-4 sm:mx-0"
         on:click|self={hideDetails}
       >
         <button
-          class=" absolute top-2 right-2 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
+          class="absolute top-2 right-2 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
           on:click={hideDetails}
           aria-label="Close"
         >
@@ -1378,8 +1366,7 @@ async function addManualEntriesToCart() {
         </button>
 
         <h3 class="text-2xl font-semibold mb-4 text-gray-800">
-          {selectedProduct.productName} - {selectedProduct.productNumber} - {selectedProduct
-            .size.break}
+          {selectedProduct.productName} - {selectedProduct.productNumber}
         </h3>
         <p class="text-sm text-gray-600 mb-5">
           Enter quantity to check availability and estimated ship date.
@@ -1428,7 +1415,7 @@ async function addManualEntriesToCart() {
             </button>
 
             <button
-              class="flex justify-center text-sm items-center w-36 h-10 text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition"
+              class="flex justify-center text-sm items-center w-36 h-10 text-white bg-primary-500 rounded hover:bg-primary-600 transition"
               type="submit"
             >
               Check Availability
@@ -1451,9 +1438,8 @@ async function addManualEntriesToCart() {
         {/if}
 
         <button
-          class="mt-6 w-full sm:w-auto p-3 text-white bg-primary-500 rounded-lg flex items-center justify-center gap-2 hover:bg-primary-600 transition"
+          class="mt-6 w-full sm:w-auto p-3 text-white bg-primary-500 rounded flex items-center justify-center gap-2 hover:bg-primary-600 transition"
           on:click={() => {
-            // addToCart(rows, products);
             addToCart(selectedProduct.productNumber);
             showCartMessage = true;
             hideDetails();
@@ -1465,7 +1451,6 @@ async function addManualEntriesToCart() {
       </div>
     </div>
   {/if}
-
   {#if showQuoteModal}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
