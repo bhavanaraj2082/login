@@ -3,7 +3,7 @@
 	import { goto,invalidate } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
-	import { authedUser } from '$lib/stores/mainStores.js';
+	import { authedUser ,currencyState } from '$lib/stores/mainStores.js';
 	import Icon from '@iconify/svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import RecurrencePopup from '$lib/components/Cart/RecurrencePopup.svelte';
@@ -36,8 +36,8 @@
 	// $: console.log($cart,"forntend");
 
 	const calculateTotalPrice = (cart)=>{
-       priceINR = cart.reduce((sum,crt)=> sum + crt.pricing.INR*crt.quantity,0)
-       priceUSD = cart.reduce((sum,crt)=> sum + crt.pricing.USD*crt.quantity,0)
+       priceINR = cart.reduce((sum,crt)=> sum + crt.currentPrice.INR*crt.quantity,0)
+       priceUSD = cart.reduce((sum,crt)=> sum + crt.currentPrice.USD*crt.quantity,0)
 	}
 	const guestCartFetch = () => {
 		const formdata = new FormData();
@@ -474,15 +474,10 @@
 								 <div class=" lg:w-2/6">
 									<h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Price</h3>
 									<div class="{item.isCart || item.isQuote ? " text-green-500" : ""} text-xs flex lg:flex-col lg:gap-0 gap-1 w-full font-semibold text-content">
-										{#if item.isCart}
-										₹{item.cartOfferPrice.INR.toLocaleString("en-IN")}
-                                        {:else if item.isQuote}
-										₹{item.QuoteOfferPrice.INR.toLocaleString("en-IN")}
-										{:else}
-										₹{item.pricing.INR.toLocaleString("en-IN")}
-										{/if}
-										<p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">₹{item.pricing.INR.toLocaleString("en-IN")}</p>
-										
+										{$currencyState === "inr" ? "₹" + item.currentPrice.INR.toLocaleString("en-IN"): "$"+ item.currentPrice.USD.toLocaleString("en-IN")}
+										<p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">
+										{$currencyState === "inr" ? "₹" + item.normalPrice.INR.toLocaleString("en-IN"): "$"+ item.normalPrice.USD.toLocaleString("en-IN")}
+										</p>
 									</div>
 								 </div>
 							
@@ -514,8 +509,10 @@
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Total</h3>
 							        <div class=" w-full flex justify-between items-center">
 							        	<div class="{item.isCart || item.isQuote ? " text-green-500" : ""} text-xs flex gap-1 lg:flex-col lg:gap-0 font-semibold">
-							        		₹{item.itemTotalPrice.totalINR.toLocaleString("en-IN")}
-										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">₹{(item.pricing.INR*item.quantity).toLocaleString("en-IN")}</p>
+											{$currencyState === "inr" ? "₹" + item.itemTotalPrice.totalINR.toLocaleString("en-IN"): "$"+ item.itemTotalPrice.totalUSD.toLocaleString("en-IN")}
+										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">
+												{$currencyState === "inr" ? "₹" + (item.normalPrice.INR*item.quantity).toLocaleString("en-IN"): "$"+ (item.normalPrice.USD*item.quantity).toLocaleString("en-IN")}
+											</p>
 									    </div>
 							        	<button
 							        		type="button"
@@ -546,7 +543,9 @@
 				<div class="space-y-2">
 					<div class="flex justify-between font-medium text-sm">
 						<p>Subtotal</p>
-						<p>₹{priceINR.toLocaleString("en-IN")}</p>
+						<p>
+							{$currencyState === "inr" ? "₹" + priceINR.toLocaleString("en-IN"): "$"+ priceUSD.toLocaleString("en-IN")}
+						</p>
 					</div>
 					<div class="flex justify-between font-medium text-sm">
 						<p>Tax</p>
@@ -554,7 +553,9 @@
 					</div>
 					<div class="flex border-t-1 pt-2 justify-between text-sm font-bold">
 						<p>Total</p>
-						<p>₹{priceINR.toLocaleString("en-IN")}</p>
+						<p>
+							{$currencyState === "inr" ? "₹" + priceINR.toLocaleString("en-IN"): "$"+ priceUSD.toLocaleString("en-IN")}
+						</p>
 					</div>
 				</div>
 			</div>

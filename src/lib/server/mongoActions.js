@@ -2556,55 +2556,19 @@ export const addItemsToNewCart = async(body,userId,userEmail)=>{
 }
 
 export const updateShippingAddress = async (body) => {
-	const { userId, addAlternate, ...shippingDetails } = body;
-	shippingDetails.isDefault = shippingDetails.isDefault === 'true';
-	const addAlternateBoolean = addAlternate === 'true';
-	console.log(shippingDetails,"details");
+	const { userId, addAlternate, ...shippingDetails } = body
 	try {
 		const userProfile = await Profile.findById(userId).select('shippingAddress');
 		if (!userProfile) {
 			return { field: 'shipping', success: false, message: 'User not found' };
 		}
-		let shippingAddressArray;
-		if (addAlternateBoolean) {
-			if (!userProfile.shippingAddress || userProfile.shippingAddress.length === 0) {
-				const newAddress = {
-					...shippingDetails,
-					addressId: nanoid(8),
-					isDefault: true
-				};
-				shippingAddressArray = [newAddress];
-			} else {
-				shippingAddressArray = [...userProfile.shippingAddress];
-				const newAddress = {
-					...shippingDetails,
-					addressId: nanoid(8),
-					isDefault: shippingDetails.isDefault
-				};
-				if (newAddress.isDefault) {
-					shippingAddressArray = shippingAddressArray.map((addr) => ({
-						...addr,
-						isDefault: false
-					}));
-				}
-				shippingAddressArray.push(newAddress);
-			}
-		} else {
-			shippingAddressArray = userProfile.shippingAddress.map((adr) => {
-				if (adr.addressId === shippingDetails.addressId) {
-					return { ...shippingDetails, isDefault: shippingDetails.isDefault };
-				} else if (shippingDetails.isDefault) {
-					return { ...adr, isDefault: false };
-				}
-				return adr;
-			});
-		}
-		userProfile.shippingAddress = shippingAddressArray;
+
+		userProfile.shippingAddress = shippingDetails;
 		await userProfile.save();
 		return {
 			field: 'shipping',
 			success: true,
-			message: addAlternateBoolean ? 'Added address successfully' : 'Updated successfully'
+			message: 'Added address successfully'
 		};
 	} catch (error) {
 		console.error('Error updating shipping address:', error);
@@ -2614,48 +2578,18 @@ export const updateShippingAddress = async (body) => {
 
 export const updateBillingAddress = async (body) => {
 	const { userId, addAlternate, ...billingDetails } = body;
-	billingDetails.isDefault = billingDetails.isDefault === 'true';
-	const addAlternateBoolean = addAlternate === 'true';
-	console.log('object',addAlternateBoolean);
+	
 	try {
 		const userProfile = await Profile.findById(userId).select('billingAddress');
 		if (!userProfile) {
 			return { field: 'billing', success: false, message: 'User not found' };
 		}
-		let billingAddressArray;
-		if (addAlternateBoolean) {
-			if (!userProfile.billingAddress || userProfile.billingAddress.length === 0) {
-				const newAddress = { ...billingDetails, addressId: nanoid(8),isDefault:true};
-				billingAddressArray = [newAddress];
-			} else {
-				billingAddressArray = [...userProfile.billingAddress];
-				const newAddress = { ...billingDetails, addressId: nanoid(8),isDefault:billingDetails.isDefault };
-				if (newAddress.isDefault) {
-					billingAddressArray = billingAddressArray.map((addr) => ({
-						...addr,
-						isDefault: false
-					}));
-				}
-				billingAddressArray.push(newAddress);
-			}
-		} else {
-		console.log('object',billingAddressArray);
-			billingAddressArray = userProfile.billingAddress.map((adr) => {
-				if (adr.addressId === billingDetails.addressId) {
-					return { ...billingDetails, isDefault: billingDetails.isDefault };
-				} else if (billingDetails.isDefault) {
-					return { ...adr, isDefault: false };
-				}
-				return adr;
-			});
-		}
-		console.log('object',billingAddressArray);
-		userProfile.billingAddress = billingAddressArray;
+		userProfile.billingAddress = billingDetails;
 		await userProfile.save();
 		return {
 			field: 'billing',
 			success: true,
-			message: addAlternateBoolean ? 'Added address successfully' : 'Updated successfully'
+			message:'Added address successfully'
 		};
 	} catch (error) {
 		console.error('Error updating billing address:', error);

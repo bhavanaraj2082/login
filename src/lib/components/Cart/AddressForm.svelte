@@ -18,12 +18,16 @@ let message="At least one address must be default";
   let showErrors = false;
 	let email='';
 	let phone='';
-	let postalcode='';
+	let postalCode='';
   // let gst='';
-	let address='';
 	let city='';
 	let state='';
-	let country = '';
+	let street='';
+	let building='';
+	let location='';
+	let attentionTo='';
+	let organizationName='';
+	let department='';
 	let errors = {};
   const states = [
     "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -35,13 +39,17 @@ let message="At least one address must be default";
 
   email= formdata?.email || email ,
   phone= formdata?.phone || phone ,
-  postalcode= formdata?.postalcode || postalcode ,
-  address= formdata?.address || address ,
+  postalCode= formdata?.postalCode || postalCode ,
   city= formdata?.city || city ,
   state= formdata?.state || state ,
+  organizationName= formdata?.organizationName || organizationName ,
+  attentionTo= formdata?.attentionTo || attentionTo ,
+  street= formdata?.street || street ,
+  building= formdata?.building || building ,
+  department= formdata?.department || department ,
   // gst=formdata?.gst || gst,
   
-  country= formdata?.country || country ;
+  location= formdata?.location || location ;
 	let name;
 	let errorMessage = '';
 	actionName == 'billingaddress' ? (name = 'Billing') : (name = 'Shipping');
@@ -475,13 +483,13 @@ let message="At least one address must be default";
 let filteredCountries = countries;
 let showDropdown = false;
 function selectCountry(selectedCountry) {
-        country = selectedCountry.name; // Set the selected country name
+        location = selectedCountry.name; // Set the selected location name
         filteredCountries = countries; // Reset the filtered list
         showDropdown = false; // Hide dropdown after selection
-        validateForm('country');
-		validatePhoneNumber(country, phone); 
-		validatePostalCode(country, postalcode); 
-        delete errors.country; // Clear any existing errors
+        validateForm('location');
+		validatePhoneNumber(location, phone); 
+		validatePostalCode(location, postalCode); 
+        delete errors.location; // Clear any existing errors
     }
 
 	function toggleDropdown() {
@@ -495,7 +503,7 @@ function selectCountry(selectedCountry) {
 			country.name.toLowerCase().includes(searchTerm) || 
 			country.code.toLowerCase().includes(searchTerm)
 		);
-		country = searchTerm; // Update the bound value with the search term
+		location = searchTerm; // Update the bound value with the search term
 	}
 
 function validatePhoneNumber(countryCode, phone) {
@@ -509,10 +517,10 @@ function validatePhoneNumber(countryCode, phone) {
         return false;
     }
 
-    const country = getCountryByCode(countryCode);
-    if (!country) {
+    const location = getCountryByCode(countryCode);
+    if (!location) {
         errors.phone = 'Invalid country selected';
-        errors.country = 'Invalid country selected';
+        errors.location = 'Invalid country selected';
         return false;
     }
 
@@ -524,7 +532,7 @@ function validatePhoneNumber(countryCode, phone) {
 
     const phoneRegex = new RegExp(phonePattern);
     if (!phoneRegex.test(phone)) {
-        errors.phone = `Please enter a valid phone number for ${country}.`;
+        errors.phone = `Please enter a valid phone number for ${location}.`;
         return false;
     } else {
         delete errors.phone;  
@@ -533,9 +541,9 @@ function validatePhoneNumber(countryCode, phone) {
 }
 
 	function getCountryByCode(name) {
-    const country = countries.find(c => c.name === name);
+    const location = countries.find(c => c.name === name);
   
-    return country ? country.name : null; 
+    return location ? location.name : null; 
 }
 
     function getPhonePattern(countryCode) {
@@ -548,11 +556,11 @@ function validatePhoneNumber(countryCode, phone) {
 	let isValid = true;
   	
  function validateForm(fieldName) {
-  if (!fieldName || fieldName === 'address') {
-    if (!address || !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(address)) {
-      errors.address = 'Address is required and can contain only letters, numbers, and a few special characters.';
+  if (!fieldName || fieldName === 'street') {
+    if (!street || !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(street)) {
+      errors.street = 'Address is required and can contain only letters, numbers, and a few special characters.';
     } else {
-      delete errors.address;
+      delete errors.street;
     }
   }
 
@@ -585,11 +593,11 @@ function validatePhoneNumber(countryCode, phone) {
 // }
 
 if (!fieldName || fieldName === 'country') {
-	if (!country || country === 'country') {
-		if (!country || country === "") {
-      errors.country = 'Please select a country';
+	if (!location || location === 'country') {
+		if (!location || location === "") {
+      errors.location = 'Please select a country';
     } else {
-      delete errors.country;
+      delete errors.location;
     }
 	}
   }
@@ -601,11 +609,11 @@ if (!fieldName || fieldName === 'country') {
     }
   }
 
-  if (!fieldName || fieldName === 'postalcode') {
-    if (!postalcode || !/^\d{6}$|^\d{5}(-\d{4})?$|^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$|^\d{5}$|^[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}$|^\d{4} [A-Za-z]{2}$|^\d{4}$|^\d{5}-\d{3}$|^\d{3} \d{2}$|^\d{3}-\d{4}$|^[A-Z]{1,2}\d{1,2}[A-Z]? ?\d[A-Z]{2}$/.test(postalcode)) {
-      errors.postalcode = 'Please enter a valid postal code';
+  if (!fieldName || fieldName === 'postalCode') {
+    if (!postalCode || !/^\d{6}$|^\d{5}(-\d{4})?$|^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$|^\d{5}$|^[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}$|^\d{4} [A-Za-z]{2}$|^\d{4}$|^\d{5}-\d{3}$|^\d{3} \d{2}$|^\d{3}-\d{4}$|^[A-Z]{1,2}\d{1,2}[A-Z]? ?\d[A-Z]{2}$/.test(postalCode)) {
+      errors.postalCode = 'Please enter a valid postal code';
     } else {
-      delete errors.postalcode;
+      delete errors.postalCode;
     }
   }
 
@@ -618,16 +626,16 @@ if (Object.keys(errors).length > 0) {
 
 }
 
-	function validatePostalCode(countryCode, postalcode) {
+	function validatePostalCode(countryCode, postalCode) {
     const selectedCountry = countries.find(country => country.name === countryCode);
     // console.log('Selected Country:', selectedCountry); 
     
-    if (selectedCountry && selectedCountry.postalRegex && postalcode) {
+    if (selectedCountry && selectedCountry.postalRegex && postalCode) {
         const regex = selectedCountry.postalRegex;
-        if (!regex.test(postalcode)) {
-            errors.postalcode = 'Please enter a valid postal code for the selected country';
+        if (!regex.test(postalCode)) {
+            errors.postalCode = 'Please enter a valid postal code for the selected country';
         } else {
-            delete errors.postalcode;
+            delete errors.postalCode;
         }
     }
 }
@@ -671,18 +679,18 @@ $: show= isShowbox ? `Edit ${name} Address` : `Add ${name} Address`;
 			<input type="hidden" name="actionType" value={actionName} />
 			<input type="hidden" name="addressId" value={formdata.addressId} />
 			<input type="hidden" name="addAlternate" value={formdata.addAlternate} />
-			<label class="w-full text-xs md:text-sm font-medium mt-1 bg-red" for="firstname">First Name</label>
+			<label class="w-full text-xs md:text-sm font-medium mt-1 bg-red" for="firstname">Attention To</label>
 			<input
 				class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text"
-				name="firstname"
-				value={firstname}/>
-			<label class="w-full text-xs md:text-sm font-medium mt-1" for="lastname">Last Name</label>
+				name="attentionTo"
+				value={attentionTo}/>
+			<label class="w-full text-xs md:text-sm font-medium mt-1" for="lastname">Company Name</label>
 			<input
 				class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text"
-				name="lastname"
-				value={lastname}/>
+				name="organizationName"
+				value={organizationName}/>
 				<!-- <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="email">Email</label>
 		             <input type="email" name="email" required
 			         class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
@@ -711,21 +719,45 @@ $: show= isShowbox ? `Edit ${name} Address` : `Add ${name} Address`;
                         {#if showErrors && phone.length === 0}
 				            <span class="text-red-500 text-xs block">Phone is required</span>
 		                {/if} -->
-			<label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Address</label>
+			
+        <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Department</label>
+        <input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
+          type="text" name="department"
+          bind:value={department}/>
+              {#if department.length > 0 && !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(department)}
+          <span class="text-red-500 text-xs block">Please enter a valid department</span>
+        {/if}
+              {#if showErrors && department.length === 0}
+          <span class="text-red-500 text-xs block">Address is required</span>
+          {/if}
+          	
+      <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Building</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-				type="text" name="address"
-		    bind:value={address}/>
-            {#if address.length > 0 && !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(address)}
-				<span class="text-red-500 text-xs block">Please enter a valid address</span>
+				type="text" name="building"
+		    bind:value={building}/>
+            {#if building.length > 0 && !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(building)}
+				<span class="text-red-500 text-xs block">Please enter a valid building name</span>
 			{/if}
-            {#if showErrors && address.length === 0}
+            {#if showErrors && building.length === 0}
 				<span class="text-red-500 text-xs block">Address is required</span>
 		    {/if}
+
+        <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Street</label>
+			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
+				type="text" name="street"
+		    bind:value={street}/>
+            {#if street.length > 0 && !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(street)}
+				<span class="text-red-500 text-xs block">Please enter a valid street name</span>
+			{/if}
+            {#if showErrors && street.length === 0}
+				<span class="text-red-500 text-xs block">Address is required</span>
+		    {/if}
+
 				
             <label class="w-full text-xs md:text-sm font-medium mt-1" for="country">Country</label>
             <div class="relative z-10">
             <div class="flex items-center border border-gray-300 rounded my-1 overflow-hidden">
-            <input type="text" name="country" bind:value={country} placeholder="Search Country"
+            <input type="text" name="location" bind:value={location} placeholder="Search Country"
             on:input={toggleDropdown} on:click={toggleDropdown} on:input={filterCountries} on:input={delete errors.country}
             class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-none"
             required/>
@@ -777,7 +809,7 @@ $: show= isShowbox ? `Edit ${name} Address` : `Add ${name} Address`;
 
 
 		    <label class="w-full text-xs md:text-sm font-medium mt-1" for="state">State</label>
-            {#if country === 'India' || country === 'india' }
+            {#if location === 'India' || location === 'india' }
             <select class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
             name="state" bind:value={state}>
                 <option value="" disabled selected>Select a State</option>
@@ -805,16 +837,16 @@ $: show= isShowbox ? `Edit ${name} Address` : `Add ${name} Address`;
             {/if}
 
 
-			<label class="w-full text-xs md:text-sm font-medium mt-1" for="postalcode">Postal code</label>
+			<label class="w-full text-xs md:text-sm font-medium mt-1" for="postalCode">Postal code</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-			type="text" name="postalcode" bind:value={postalcode}
+			type="text" name="postalCode" bind:value={postalCode}
 			on:input={() => {
-				validateForm('postalcode'); 
-				validatePostalCode(country, postalcode);  // Validate postal code as user types
+				validateForm('postalCode'); 
+				validatePostalCode(location, postalCode);  // Validate postal code as user types
 			}}
-            on:input={delete errors.postalcode}/>
-			{#if errors?.postalcode}
-			    <p class="text-red-500 text-xs mt-1">{errors.postalcode}</p>
+            on:input={delete errors.postalCode}/>
+			{#if errors?.postalCode}
+			    <p class="text-red-500 text-xs mt-1">{errors.postalCode}</p>
 		    {/if}
 
 			    <div class=" flex items-center mt-4 mb-2">

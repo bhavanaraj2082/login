@@ -8,7 +8,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { toast } from 'svelte-sonner';
-	import {authedUser,cartTotalComps} from '$lib/stores/mainStores.js'
+	import {authedUser,currencyState,cartTotalComps} from '$lib/stores/mainStores.js'
   
 	let cartOpen = false;
 	let cartItems = [];
@@ -346,7 +346,7 @@ on:click={(e) => {
             </div>
 
             <div class="flex items-center justify-between mt-3">
-              <p class="text-sm font-semibold text-gray-600">₹{item.pricing.INR.toFixed(2)}</p>
+              <p class="text-sm font-semibold text-gray-600">{$currencyState === "inr" ? "₹" + item?.pricing.INR.toLocaleString("en-IN"): "$"+ item?.pricing.USD.toLocaleString("en-IN")}</p>
               <div class="flex items-center">
 				<input type="number" bind:value={item.quantity}
 				on:input={e=>handleQty(parseInt(e.target.value),item.stockDetails.stock,item._id,index)}
@@ -368,7 +368,7 @@ on:click={(e) => {
 				</div>
                </div>
               <p class="text-sm font-semibold text-gray-600">
-                ₹{(item.pricing.INR * item.quantity).toFixed(2)}
+                {$currencyState === "inr" ? "₹" + (item.pricing.INR*item.quantity).toLocaleString("en-IN"): "$"+ (item.pricing.USD*item.quantity).toLocaleString("en-IN")}
               </p>
             </div>
           </div>
@@ -378,7 +378,7 @@ on:click={(e) => {
       <div class="p-2 border-t mt-4 sticky bottom-0 bg-white z-10">
         <div class="flex justify-between items-center mb-4">
           <p class="text-gray-600 text-sm font-semibold">Estimated Total</p>
-          <p class="font-bold text-lg">₹{priceINR.toLocaleString('en-IN')}</p>
+          <p class="font-bold text-lg">{$currencyState === "inr" ? "₹" + priceINR.toLocaleString("en-IN"): "$"+ priceUSD.toLocaleString("en-IN")}</p>
         </div>
 
         <div class="flex flex-col space-y-4">
