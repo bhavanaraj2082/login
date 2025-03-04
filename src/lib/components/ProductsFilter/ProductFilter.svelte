@@ -5,7 +5,7 @@
 	import { goto,invalidateAll } from '$app/navigation';
     import { toast } from 'svelte-sonner';
     import Icon from "@iconify/svelte";
-	import { authedUser } from '$lib/stores/mainStores.js';
+	import { authedUser,currencyState } from '$lib/stores/mainStores.js';
 
 
     export let products
@@ -38,6 +38,7 @@
     let search = $page.url.searchParams.get('search') || null
     let selectedManufacturer = $page.url.searchParams.get('manufacturer') || null;
     let totalPages = parseInt(productCount/10);
+    let tog= null
 
     let selectedSort =''
 
@@ -70,7 +71,15 @@
     const handleManufacturer = (searchTerm) => {
         if (!searchTerm) {
             searchManufacture = manufacturers;
-        return;
+            const newUrl = new URL(window.location.href)
+            newUrl.searchParams.delete('manufacturer')
+            goto(newUrl.toString(), {
+            invalidateAll: true, 
+            keepfocus: true, 
+            replaceState: true, 
+            noScroll: true 
+            });
+            return;
         }
         searchManufacture = manufacturers.filter(mfr => 
             mfr.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -107,19 +116,39 @@
     } finally {
         loading = false;
     }
-};    
+};   
+    let timeout
+    const handleQty = (id,quantity) =>{
+         clearTimeout(timeout)
+         timeout = setTimeout(()=>{
+            products = products.map(product => {
+        if (product._id === id) {
+            let selectedQty = Math.ceil(quantity/ product.orderMultiple) * product.orderMultiple;
+            return {
+                ...product, // Copy the product object
+                quantity:selectedQty, // Increment the quantity
+                totalPrice:product.pricing.INR*selectedQty
+            };
+        }
+        return product; 
+         })
+         console.log('object');
+         tog = null
+         },1000);
+    }
+
     const decrementQuantity = (id) => {
     products = products.map(product => {
         if (product._id === id) {
-            if (product.quantity > product.orderMultiple) {
+          //  if (product.quantity > product.orderMultiple) {
                 return {
                     ...product,
                     quantity:product.quantity - product.orderMultiple,
                     totalPrice:product.pricing.INR*(product.quantity-product.orderMultiple)
                     
                 };
-            }
-            return product;
+          //  }
+           // return product;
         }
         return product;
     });
@@ -252,10 +281,10 @@ const handleSearch = (searchName) => {
                 <Icon icon="ic:sharp-segment" class="text-2xl text-primary-500" />
                 <h1>Filter</h1>
             </div>
-            <div class=" space-y-3 {toggleFilter ? "block":" hidden lg:block"}">
+            <div class=" space-y-2 {toggleFilter ? "block":" hidden lg:block"}">
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <!-- svelte-ignore a11y-no-static-element-interactions -->
-             <div on:click={()=>showSearchDropdown = !showSearchDropdown} class=" cursor-pointer font-semibold text-xs sm:text-sm flex items-center justify-between p-1 md:p-1.5 rounded border-1 border-gray-300 ">
+             <!-- <div on:click={()=>showSearchDropdown = !showSearchDropdown} class=" cursor-pointer font-semibold text-xs sm:text-sm flex items-center justify-between p-1 md:p-1.5 rounded border-1 border-gray-300 ">
                 <div class=" flex items-center gap-2">
                     <span class="ml-2">Search </span>
                     {#if searchLoading}
@@ -265,13 +294,16 @@ const handleSearch = (searchName) => {
                 <button type="button" on:click={()=>showSearchDropdown = !showSearchDropdown}>
                      <Icon icon={showSearchDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
                 </button>
-            </div>
-            <div class=" p-2  border-1 rounded {showSearchDropdown ? "block" : "hidden"}">
-                <input type="text" placeholder="Search..." bind:value={search} on:input={e=>handleSearch(e.target.value)} class=" w-full text-sm font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
+            </div> -->
+            <div class="relative">
+                <input type="text" placeholder="Search..." bind:value={search} on:input={e=>handleSearch(e.target.value)} class=" w-full text-sm font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500"/>
+                {#if searchLoading}
+                    <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
+                {/if}
              </div>
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <div on:click={() => showManufacturerDropdown = !showManufacturerDropdown} 
+            <!-- <div on:click={() => showManufacturerDropdown = !showManufacturerDropdown} 
                 class="cursor-pointer font-semibold text-xs sm:text-sm flex items-center justify-between p-1 md:p-1.5 rounded border-1 border-gray-300">
                <div class=" flex items-center gap-2">
                 <span class="ml-2">Manufacturers </span>
@@ -284,13 +316,17 @@ const handleSearch = (searchName) => {
                    <Icon icon={showManufacturerDropdown ? "iconamoon:arrow-up-2-duotone" : "iconamoon:arrow-down-2-duotone"} 
                          class="text-2xl"/>
                </button>
-           </div>
-           <div class="p-3 border-1 rounded {showManufacturerDropdown ? 'block' : 'hidden'}">
+           </div> -->
+           <p class=" font-semibold text-sm">Manufacturer</p>
+           <div class="relative">
                <input type="text" bind:value={selectedManufacturer}
                       placeholder="Search manufacturers..." 
                       on:input={e => handleManufacturer(e.target.value)} 
                       class="w-full text-sm rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
-               <div class="space-y-2.5 py-2.5 h-40 overflow-y-scroll my-1 scroll">
+                      {#if loading}
+                        <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
+                      {/if}
+               <div class="space-y-2.5 py-2.5 h-48 px-2 overflow-y-scroll my-1 scroll">
                    {#if !searchManufacture.length}
                        <p class="text-sm text-center">No manufacturer found</p>
                    {:else}
@@ -298,7 +334,7 @@ const handleSearch = (searchName) => {
                            <label for={name} class="flex cursor-pointer items-center gap-2 text-xs font-medium">
                                <input 
                                    id={name}
-                                   type="checkbox" 
+                                   type="radio" 
                                    checked={name === selectedManufacturer}
                                    on:change={(e) => handleManufacturerSelect(name, e.target.checked)}
                                    class="cursor-pointer text-primary-500 focus:ring-0">
@@ -344,11 +380,11 @@ const handleSearch = (searchName) => {
              <div class="p-3 border-1 rounded {showSortByDropdown ? "block" : "hidden"}">
                 <div class=" space-y-2.5 py-2.5 h-auto">
                     <label for="asc" class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
-                        <input type="checkbox" id='asc' on:change={(e)=>sortBy(e.target.checked,"asc")} checked={selectedSort === "asc"} class=" cursor-pointer text-primary-500 focus:ring-0">
+                        <input type="radio" id='asc' on:change={(e)=>sortBy(e.target.checked,"asc")} checked={selectedSort === "asc"} class=" cursor-pointer text-primary-500 focus:ring-0">
                         <p>Price Ascending </p>
                     </label>
                     <label for="desc" class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
-                        <input type="checkbox" id="desc" on:change={(e)=>sortBy(e.target.checked,"desc")} checked={selectedSort === "desc"} class=" cursor-pointer text-primary-500 focus:ring-0">
+                        <input type="radio" id="desc" on:change={(e)=>sortBy(e.target.checked,"desc")} checked={selectedSort === "desc"} class=" cursor-pointer text-primary-500 focus:ring-0">
                         <p>Price Descending </p>
                     </label>
                 </div>
@@ -363,7 +399,7 @@ const handleSearch = (searchName) => {
             <p class=" text-center font-medium pt-10">No Product Found</p>
         </div>
         {:else}
-       {#each paginatedProducts as product}
+       {#each paginatedProducts as product,index}
         <div class=" bg-white border-1 border-gray-300 p-2 sm:p-4 md:px-8 md:py-6 space-y-2 rounded">
             <div>
                 <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{product?.productName  || ""}</a>
@@ -377,19 +413,29 @@ const handleSearch = (searchName) => {
                     <p>Category : <a href={`/products/${categoryName}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.categoryDetails.name || ""}</a></p>
                     <p>Sub Category : <span class=" font-semibold ">{product?.subCategoryDetails.name || ""}</span></p>
                     <p>Manufacturer : <span class=" font-semibold ">{product?.manufacturerDetails.name || ""}</span></p>
-                    <p>Price : <span class=" font-semibold">₹{product?.pricing.INR.toLocaleString("en-IN") || ""}</span></p>
+                    <p>Price : <span class=" font-semibold">{$currencyState === "inr" ? "₹" + product?.pricing.INR.toLocaleString("en-IN"): "$"+ product?.pricing.USD.toLocaleString("en-IN")}</span></p>
                     <p>Size : <span class=" font-semibold">{product?.pricing.break || ""}</span></p>
                     <div class=" hidden sm:flex items-center justify-between">
-                        <p class=" font-bold text-4s">₹{product?.totalPrice.toLocaleString("en-IN")}</p>
+                        <p class=" font-bold text-4s">{$currencyState === "inr" ? "₹" + product?.totalPrice.priceINR.toLocaleString("en-IN"): "$"+ product?.totalPrice.priceUSD.toLocaleString("en-IN")}</p>
                         <div class="flex items-center">
-                            <div class="flex items-center border-1 rounded">
-                                <button on:click={() => decrementQuantity(product._id)} class=" border-r-1 p-2.5 text-primary-500"
-                                    ><Icon icon="rivet-icons:minus" class="text-sm"/></button
-                                >
-                                <p class="w-fit mx-3 text-sm font-medium outline-none text-center">{product?.quantity}</p>
-                                <button on:click={() => incrementQuantity(product._id)} class=" border-l-1 p-2.5 text-primary-500"
-                                    ><Icon icon="rivet-icons:plus" class="text-sm"/></button
-                                >
+                            <div class="flex items-center">
+                                <input type="number" bind:value={product.quantity}
+					            on:input={e=>handleQty(product._id,parseInt(e.target.value))}
+					            class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
+					        <div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded">
+						    <button
+							on:click={() => decrementQuantity(product._id)}
+							class=" border-r-1 p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
+							><Icon icon="rivet-icons:minus" class="text-xs" /></button>
+						    <button on:click={()=>{tog = index}} class="w-fit px-3 py-1 text-sm font-medium outline-none text-center">
+							    {product.quantity}
+						    </button>
+						    <button
+							    on:click={() => incrementQuantity(product._id)}
+							    class=" border-l-1 p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
+							    <Icon icon="rivet-icons:plus" class="text-xs" />
+						    </button>
+					</div>
                             </div>
                         </div>
                         <button type="button" on:click={()=>addToCart(product)} class="text-xs sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded ">Add to Cart</button>
@@ -397,16 +443,27 @@ const handleSearch = (searchName) => {
                 </div>
             </div>
             <div class=" flex sm:hidden items-center justify-between">
-                <p class=" text-xs font-bold">₹{product?.totalPrice.toLocaleString("en-IN")}</p>
+                <p class=" text-xs font-bold">{$currencyState === "inr" ? "₹" + product?.totalPrice.priceINR.toLocaleString("en-IN"): "$"+ product?.totalPrice.priceUSD.toLocaleString("en-IN")}</p>
                 <div class="flex items-center">
-                    <div class="flex items-center border-1 rounded">
-                        <button on:click={() => decrementQuantity(product._id,product.quantity)} class=" border-r-1 p-1.5 sm:p-2.5 text-primary-500"
-                            ><Icon icon="rivet-icons:minus" class=" text-xs sm:text-sm"/></button
-                        >
-                        <p class="w-fit mx-2 text-sm font-medium outline-none text-center">{product?.quantity}</p>
-                        <button on:click={() => incrementQuantity(product._id,product.quantity)} class=" border-l-1 p-1.5 sm:p-2.5 text-primary-500"
-                            ><Icon icon="rivet-icons:plus" class=" text-xs sm:text-sm"/></button
-                        >
+                    <div class="flex items-center">
+                        <input type="number" bind:value={product.quantity}
+					on:input={e=>handleQty(product._id,parseInt(e.target.value))}
+					class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
+					<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded">
+						<button
+							on:click={() => decrementQuantity(product._id)}
+							class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
+							><Icon icon="rivet-icons:minus" class="text-xs" /></button
+						>
+						<button on:click={()=>{tog = index}} class="w-fit mx-3 text-sm font-medium outline-none text-center">
+							{product.quantity}
+						</button>
+						<button
+							on:click={() => incrementQuantity(product._id)}
+							class=" border-l-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
+							<Icon icon="rivet-icons:plus" class="text-xs" />
+						</button>
+					</div>
                     </div>
                 </div>
                 <button type="button" on:click={()=>addToCart(product)} class=" text-xs sm:text-sm px-3 py-1 sm:p-1.5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded ">Add to Cart</button>

@@ -1,7 +1,7 @@
 <script>
   import Signin from "$lib/components/SignupSigninComps/Signin.svelte";
   import SEO from '$lib/components/SEO.svelte';
-  import { PUBLIC_WEBSITE_URL, PUBLIC_COMPBUY_IMAGE_PATH,PUBLIC_WEBSITE_NAME } from '$env/static/public';
+  import { PUBLIC_WEBSITE_URL,PUBLIC_WEBSITE_NAME } from '$env/static/public';
 
   let metadata = {
     title: `Login | ${PUBLIC_WEBSITE_NAME}` || "Default Product Title",

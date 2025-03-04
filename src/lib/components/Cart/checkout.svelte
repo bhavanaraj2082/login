@@ -4,15 +4,13 @@
 	import { cart } from '$lib/stores/cart.js';
 	import { sendMessage,generateInvoiceNumber } from '$lib/utils.js';
 	import { enhance } from '$app/forms';
-	import { authedUser } from '$lib/stores/mainStores.js';
+	import { authedUser, currencyState } from '$lib/stores/mainStores.js';
 	import Icon from '@iconify/svelte';
 	import { onMount, createEventDispatcher } from 'svelte';
-	import { cartState } from '$lib/stores/cartStores.js';
 	import { shippingAddress, billingAddress } from '$lib/stores/mainStores.js';
 	import AddressForm from '$lib/components/Cart/AddressForm.svelte';
 
 	export let data;
-	console.log(data);
 	$: userData = data.result.profileData;
 	$: shipping = userData?.shippingAddress;
 	$: billing = userData?.billingAddress;
@@ -124,15 +122,15 @@
      let filteredShippingAddress
      let profileAddress
 	 $:{
-	 filteredBillingAddress = billing !== null ? billing.find(x=>x.isDefault === true) : undefined
-	 filteredShippingAddress = shipping !== null ? shipping.find(x=>x.isDefault === true) : undefined
+	 filteredBillingAddress = billing !== null ? billing : undefined
+	 filteredShippingAddress = shipping !== null ? shipping : undefined
 	// profileAddress = `${profile?.firstname} ${profile?.lastName || ''}, ${profile?.address1}, ${profile?.city}, ${profile?.country}, ${profile?.state}, ${profile?.postalcode}`;
    
 	if (filteredBillingAddress !== undefined) {
-		const { firstname, lastname, address, city, state, country, postalcode } =
+		const { attentionTo,organizationName, department, street,building, city, state, location, postalCode } =
 			filteredBillingAddress;
 
-		$billingAddress = [firstname, lastname, address, city, state, country, postalcode]
+		$billingAddress = [attentionTo,organizationName, department, street,building, city, state, location, postalCode]
 			.filter(Boolean)
 			.join(', ');
 	} else {
@@ -140,10 +138,10 @@
 	}
 
 	if (filteredShippingAddress !== undefined) {
-		const { firstname, lastname, address, city, state, country, postalcode } =
+		const { attentionTo,organizationName, department, street,building, city, state, location, postalCode  } =
 			filteredShippingAddress;
 
-		$shippingAddress = [firstname, lastname, address, city, state, country, postalcode]
+		$shippingAddress = [attentionTo,organizationName, department, street,building, city, state, location, postalCode ]
 			.filter(Boolean)
 			.join(', ');
 	} else {
@@ -164,7 +162,7 @@
 		carts?.map((cart) => {
 			products.push(cart.productId);
 			let backOrder = cart.quantity > cart.stockDetails.stock ? parseInt(cart.quantity) - parseInt(cart.stockDetails.stock) : 0;
-			let price = cart.isQuote ? (cart.quoteOfferPrice.INR * (1 + (18 / 100))) :(cart.isCart ? (cart.cartOfferPrice.INR * (1 + (18 / 100))) :(cart.pricing.INR * (1 + (18 / 100))))
+			let price = cart.pricing.INR * (1 + (18 / 100))
 			  
 			orderdetails.push({
 				backOrder,
@@ -310,7 +308,7 @@
 					<div class="flex justify-between font-medium text-sm">
 						<p>Subtotal</p>
 						<div class=" flex flex-col items-end">
-						<p class=" font-semibold">₹{priceINR.toLocaleString("en-IN")}</p>
+						<p class=" font-semibold">{$currencyState === "inr" ? "₹" + priceINR.toLocaleString("en-IN"): "$"+ priceUSD.toLocaleString("en-IN")}</p>
                          <span class=" text-xs">including GST</span>
 						</div>
 					</div>
@@ -320,7 +318,7 @@
 					</div>
 					<div class="flex border-t-1 pt-2 justify-between text-sm font-bold">
 						<p>Total</p>
-						<p>₹{priceINR.toLocaleString("en-IN")}</p>
+						<p>{$currencyState === "inr" ? "₹" + priceINR.toLocaleString("en-IN"): "$"+ priceUSD.toLocaleString("en-IN")}</p>
 					</div>
 				</div>
 			</div>
@@ -405,25 +403,16 @@
 									<h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Price</h3>
 									<div class="{item.isCart || item.isQuote ? " text-green-500" : ""} text-xs gap-1 w-full font-semibold">
 										<div class=" flex gap-2 sm:block">
-											<p>{#if item.isCart}
-											₹{(item.cartOfferPrice.INR * (1 + (18 / 100))).toLocaleString("en-IN")}
-											{:else if item.isQuote}
-											₹{(item.QuoteOfferPrice.INR * (1 + (18 / 100))).toLocaleString("en-IN")}
-											{:else}
-											₹{(item.pricing.INR * (1 + (18 / 100))).toLocaleString("en-IN")}
-											{/if} with GST </p>
-											<p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">₹{(item.pricing.INR * (1 + (18 / 100))).toLocaleString("en-IN")} with GST</p>		
-										</div>
-									<div class=" flex gap-2 sm:block">
-										<p class=" text-2s text-gray-500">
-										{#if item.isCart}
-										₹{item.cartOfferPrice.INR.toLocaleString("en-IN")}
-                                        {:else if item.isQuote}
-										₹{item.QuoteOfferPrice.INR.toLocaleString("en-IN")}
-										{:else}
-										₹{item.pricing.INR.toLocaleString("en-IN")}
-										{/if} without GST</p>
-										<p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-2s line-through text-slate-300">₹{item.pricing.INR.toLocaleString("en-IN")} without GST</p>
+									        {$currencyState === "inr" ? "₹" + (item.currentPrice.INR * (1 + (18 / 100))).toLocaleString("en-IN"): "$"+ (item.currentPrice.USD * (1 + (18 / 100))).toLocaleString("en-IN")} with GST
+										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} line-through text-slate-300">
+										    {$currencyState === "inr" ? "₹" + (item.normalPrice.INR * (1 + (18 / 100))).toLocaleString("en-IN"): "$"+ (item.normalPrice.USD * (1 + (18 / 100))).toLocaleString("en-IN")} with GST
+										    </p>
+									    </div>
+									<div class=" text-2s text-gray-400 flex gap-2 sm:block">
+										{$currencyState === "inr" ? "₹" + item.currentPrice.INR.toLocaleString("en-IN"): "$"+ item.currentPrice.USD.toLocaleString("en-IN")} without GST
+										<p class=" {item.isCart || item.isQuote ? "" : "hidden"} line-through text-slate-300">
+										{$currencyState === "inr" ? "₹" + item.normalPrice.INR.toLocaleString("en-IN"): "$"+ item.normalPrice.USD.toLocaleString("en-IN")} without GST
+										</p>
 									</div>
 									</div>
 									<!-- <div class="text-xs w-full font-semibold">
@@ -455,26 +444,17 @@
 							        <div class=" w-full flex justify-start items-center">
 									<div class=" {item.isCart || item.isQuote ? " text-green-500" : ""} text-xs w-full font-semibold">
 										<div class=" flex gap-2 sm:block">
-											{#if item.isCart}
-										    ₹{(item.cartOfferPrice.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")}
-                                            {:else if item.isQuote}
-										    ₹{(item.QuoteOfferPrice.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")}
-										    {:else}
-										    ₹{(item.pricing.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")}
-										    {/if} with GST
-										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">₹{(item.pricing.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST</p>
+											{$currencyState === "inr" ? "₹" + (item.currentPrice.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN"): "$"+ (item.currentPrice.USD * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST
+										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} line-through text-slate-300">
+										    {$currencyState === "inr" ? "₹" + (item.normalPrice.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN"): "$"+ (item.normalPrice.USD * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST
+										    </p>
 										</div>
-										<div class=" flex gap-2 sm:block">
-											<p class=" text-2s text-gray-500">
-											{#if item.isCart}
-										    ₹{(item.cartOfferPrice.INR * item.quantity).toLocaleString("en-IN")}
-                                            {:else if item.isQuote}
-										    ₹{(item.QuoteOfferPrice.INR * item.quantity).toLocaleString("en-IN")}
-										    {:else}
-										    ₹{(item.pricing.INR * item.quantity).toLocaleString("en-IN")}
-										    {/if} without GST</p>
-										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-2s line-through text-slate-300">₹{(item.pricing.INR * item.quantity).toLocaleString("en-IN")} without GST</p>
-										</div>
+										<div class="  text-gray-400 text-2s flex gap-2 sm:block">
+											{$currencyState === "inr" ? "₹" + (item.currentPrice.INR * item.quantity).toLocaleString("en-IN"): "$"+ (item.currentPrice.USD * item.quantity).toLocaleString("en-IN")} without GST
+											<p class=" {item.isCart || item.isQuote ? "" : "hidden"} line-through text-slate-300">
+											{$currencyState === "inr" ? "₹" + (item.normalPrice.INR * item.quantity).toLocaleString("en-IN"): "$"+ (item.normalPrice.USD * item.quantity).toLocaleString("en-IN")} without GST
+											</p>
+									    </div>
 										</div>
 							        	<div class="text-xs font-semibold">
 							        		

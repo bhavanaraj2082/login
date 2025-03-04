@@ -3,7 +3,6 @@
   export let data;
   import {
     PUBLIC_WEBSITE_URL,
-    PUBLIC_COMPBUY_IMAGE_PATH,
     PUBLIC_WEBSITE_NAME,
   } from "$env/static/public";
   import SEO from "$lib/components/SEO.svelte";

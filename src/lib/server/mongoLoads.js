@@ -709,7 +709,7 @@ export const loadProductsubcategory = async (
         prodDesc,
         imageSrc,
         pricing: priceConversion,
-        totalPrice: priceConversion.INR*stockDetails.orderMultiple,
+        totalPrice:{ priceINR:priceConversion.INR*stockDetails.orderMultiple,priceUSD:priceConversion.USD*stockDetails.orderMultiple},
         quantity: stockDetails.orderMultiple,
         orderMultiple: stockDetails.orderMultiple,
         distributorId: stockDetails.distributor,
@@ -1408,22 +1408,6 @@ export const getCart = async(userId,cartId)=>{
     pricing.INR = pricing.USD * currency.rate;
    }
 
-    let totalINR,totalUSD
-    const {INR,USD} = pricing
-
-    if(cartItemsData.isQuote){
-       totalINR = cartItemsData.quoteOfferPrice.INR * cartItemsData.quantity;
-       totalUSD = cartItemsData.quoteOfferPrice.USD * cartItemsData.quantity;
-    }else if(cartItemsData.isCart){
-       totalINR = cartItemsData.cartOfferPrice.INR * cartItemsData.quantity;
-       totalUSD = cartItemsData.cartOfferPrice.USD * cartItemsData.quantity; 
-    }else{
-       totalINR = INR * cartItemsData.quantity;
-       totalUSD = USD * cartItemsData.quantity;
-    }
-
-    let itemTotalPrice = {totalINR,totalUSD}
-     
     const quoteExpiryDate = cartItemsData?.quoteExpiryTime ? cartItemsData?.quoteExpiryTime.getTime() : Date.now()+1000
     const cartExpiryDate = cartItemsData?.cartExpiryTime ? cartItemsData?.cartExpiryTime.getTime() : Date.now()+1000
     if(cartItemsData.isQuote && Date.now() > quoteExpiryDate){
@@ -1435,7 +1419,26 @@ export const getCart = async(userId,cartId)=>{
    //updateIsQuote(cartId,cartItemsData.componentId,"cart")
    }
 
-    return { ...cartItemsData, pricing, currentPrice:{INR,USD}, itemTotalPrice };
+    let totalINR,totalUSD,price
+    const {INR,USD} = pricing
+
+    if(cartItemsData.isQuote){
+			 price = {INR:cartItemsData.quoteOfferPrice.INR,USD:cartItemsData.quoteOfferPrice.USD}
+       totalINR = cartItemsData.quoteOfferPrice.INR * cartItemsData.quantity;
+       totalUSD = cartItemsData.quoteOfferPrice.USD * cartItemsData.quantity;
+    }else if(cartItemsData.isCart){
+				price = {INR:cartItemsData.cartOfferPrice.INR,USD:cartItemsData.cartOfferPrice.USD}
+       totalINR = cartItemsData.cartOfferPrice.INR * cartItemsData.quantity;
+       totalUSD = cartItemsData.cartOfferPrice.USD * cartItemsData.quantity; 
+    }else{
+       price = {INR,USD}
+       totalINR = INR * cartItemsData.quantity;
+       totalUSD = USD * cartItemsData.quantity;
+    }
+
+    let itemTotalPrice = {totalINR,totalUSD}
+     
+    return { ...cartItemsData, pricing, currentPrice:price,normalPrice:{INR,USD}, itemTotalPrice };
   });
   cart[0].cartItems = updatedcart
  // console.log(cart,"+++++");
