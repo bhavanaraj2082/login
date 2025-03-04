@@ -51,14 +51,35 @@
         }
     }
 	const getInitial = (name) => name.charAt(0).toUpperCase();
+
+
+	let suggestionsRef;
+	let showSuggestions;
+
+	function closeSuggestions() {
+		searchQuery = '';
+		showSuggestions = false;
+	}
+
+	function handleClick(event) {
+		if (suggestionsRef && !suggestionsRef.contains(event.target)) {
+			closeSuggestions();
+		}
+	}
+
 	onMount(async () => {
 		try {
 			menus = menusdata.menus;
+			window.addEventListener('click', handleClick);
+			return () => {
+			window.removeEventListener('click', handleClick);
+		};
 		} catch (error) {
 			console.error('Error fetching menus:', error);
 		}
 		isLiked = false;
 	});
+
 
 	function handleMouseEnter(subSubmenu) {
 		clearTimeout(subSubmenuLeaveTimeoutId);
@@ -396,7 +417,10 @@
 			<Cartrightside {cartId}/>	
 		</div>
 		<!-- Searchbar functionality -->
-		<div  class="relative sm:max-w-3xl md:max-w-sm lg:max-w-md xl:max-w-xl  sm:mt-2 w-full sm:pb-0 pb-2 mx-auto">
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div on:click|stopPropagation class="relative sm:max-w-3xl md:max-w-sm lg:max-w-md xl:max-w-xl  sm:mt-2 w-full sm:pb-0 pb-2 mx-auto" bind:this={suggestionsRef}>
+
 			<form action="/?/search" method="post" bind:this={form} use:enhance={handleData}>
 				<div class=" w-full flex items-center">
 					<input

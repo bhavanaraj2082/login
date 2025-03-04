@@ -542,6 +542,10 @@ tog4();
 };
 
 onMount(() => {
+	const storedEmailVerified = localStorage.getItem("ProfileEmailVerified");
+    if (storedEmailVerified === "true") {
+        ProfileEmailVerified = true;
+    }
 		if (data && data.profile) {
 			// Updating Cusdetails store values
 			$Cusdetails.FirstName = `${data.profile.firstName }`.trim();
@@ -580,7 +584,9 @@ onMount(() => {
 
 		isEditable = false;
 	});
-
+	$: if (ProfileEmailVerified) {
+    localStorage.setItem("ProfileEmailVerified", "true");
+}
 
 let searchTerm = "";
     let showDropdown = false;
@@ -941,10 +947,7 @@ let searchTerm = "";
     <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
         {errorMessage7}
     </div>
-{/if}
-
-
-
+		{/if}
 		{#if emailSent && isOtpVerified === false}
 			<br />
 
