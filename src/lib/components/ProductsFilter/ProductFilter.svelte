@@ -273,7 +273,7 @@ const handleSearch = (searchName) => {
 <section class=" space-y-3 lg:flex items-start gap-4">
     <!-- filters -->
     <div class=" w-full h-fit sticky top-0 lg:w-1/4">
-        <div class=" p-2 sm:p-4 border-1 bg-white border-gray-300 rounded space-y-3 mt-3">
+        <div class=" p-2 sm:p-4 bg-white shadow rounded space-y-3 mt-3">
             
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -354,7 +354,7 @@ const handleSearch = (searchName) => {
                 </button>
              </div>
              <div class="p-3 border-1 rounded {showCategoryDropdown ? "block" : "hidden"}">
-                <input type="text" placeholder="Search..." on:input={e=>handleManufacturer(e.target.value)} class=" w-full rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
+                <input type="text" placeholder="Search..." on:input={e=>handleManufacturer(e.target.value)} class=" w-full rounded border focus:ring-0 focus:border-primary-500">
                 <div class=" space-y-2.5 py-2.5 h-40 overflow-y-scroll my-1 scroll">
                     {#if !subSubCategory.length}
                         <p class=" text-sm text-center">No maunfacturer found</p>
@@ -400,7 +400,7 @@ const handleSearch = (searchName) => {
         </div>
         {:else}
        {#each paginatedProducts as product,index}
-        <div class=" bg-white border-1 border-gray-300 p-2 sm:p-4 md:px-8 md:py-6 space-y-2 rounded">
+        <div class=" bg-white shadow p-2 sm:p-4 md:px-8 md:py-6 space-y-2 rounded">
             <div>
                 <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{product?.productName  || ""}</a>
             </div>

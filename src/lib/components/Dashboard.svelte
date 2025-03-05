@@ -49,7 +49,7 @@
           <div class="flex flex-col sm:flex-row items-center justify-between">
             <div>
               <h1 class="sm:text-xl text-md font-semibold text-gray-800">
-                Welcome, <span class="text-primary-600">{user?.firstname || 'Guest'}</span>
+                Welcome, <span class="text-primary-600 capitalize">{user?.firstname || 'Guest'}</span>
               </h1>
               <p class="text-gray-500 sm:text-sm text-xs mt-1">{user?.email || 'N/A'}</p>
             </div>
