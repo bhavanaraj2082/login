@@ -367,97 +367,6 @@ async function getMatchedSubCategories(search) {
   }
 }
 
-export async function popularProducts() {
-  const records = await PopularProduct.find({}, { _id: 0 })
-    .sort("order")
-    .populate({
-      path: "product",
-      select: "-_id prodDesc productName imageSrc productNumber",
-      populate: [
-        { path: "category", select: "-_id urlName" },
-        { path: "subCategory", select: "-_id urlName" },
-      ],
-    });
-
-  return JSON.parse(JSON.stringify(records));
-}
-
-export async function getSearchData(search) {
-  try {
-    const components = await getMatchedComponents(search);
-    const categories = await getMatchedCategories(search);
-    const subcategories = await getMatchedSubCategories(search);
-
-    const allData = {
-      components,
-      categories,
-      subcategories,
-      search
-    };
-
-    return JSON.parse(JSON.stringify(allData));
-  } catch (error) {
-    console.error("Error fetching search data:", error);
-    return { success: false, message: "Error fetching search data" };
-  }
-}
-
-async function getMatchedComponents(search) {
-  let cleanedQuery = search.replace(/[^\w]/g, "");
-  try {
-    const queryFilter = {
-      $or: [
-        { cleanedName: { $eq: cleanedQuery } },
-        { $text: { $search: cleanedQuery } },
-        { CAS: { $eq: search } }
-      ],
-    };
-
-    const components = await Product.find(queryFilter)
-      .limit(9)
-      .populate("category")
-      .populate("subCategory")
-      .exec();
-
-    return components;
-  } catch (error) {
-    console.error("Error fetching matched components:", error);
-    return { success: false, message: "Error fetching matched components" };
-  }
-}
-
-async function getMatchedCategories(search) {
-  try {
-    const queryFilter = {
-      name: { $regex: search, $options: "i" },
-    };
-
-    const categories = await Category.find(queryFilter).limit(6).exec();
-    return JSON.parse(JSON.stringify(categories));
-  } catch (error) {
-    console.error("Error fetching matched categories:", error);
-    throw new Error("Error fetching matched categories");
-  }
-}
-
-async function getMatchedSubCategories(search) {
-  try {
-    const queryFilter = {
-      name: { $regex: search, $options: "i" },
-    };
-
-    const subcategories = await SubCategory.find(queryFilter)
-      .limit(6)
-      .populate("category")
-      .exec();
-
-    return JSON.parse(JSON.stringify(subcategories));
-  } catch (error) {
-    console.error("Error fetching matched subcategories", error);
-    return { success: false, message: "Error fetching matched subcategories" };
-  }
-}
-
 // export const loadProductsubcategory = async (
 //   suburl,
 //   pageNum,
@@ -1216,7 +1125,6 @@ export async function convertToINR(pricing) {
 //   return { records: [formattedRecord] };
 // }
 //Product info ends
-
 export async function DifferentProds(productId) {
   const product = JSON.parse(
     JSON.stringify(
@@ -1379,7 +1287,6 @@ export async function DifferentProds(productId) {
 }
 
 
-
 //////Quick Order//////////
 
 export const quick = async () => {
@@ -1525,7 +1432,6 @@ export const quick = async () => {
 //         return JSON.parse(JSON.stringify(compareSimilarityJson));
 //   } else { return [] }
 // }
-
 export async function CompareSimilarityData(productId) {
   try {
     const product = await Product.findOne({ productNumber: productId }).populate("subsubCategory");
@@ -1648,7 +1554,7 @@ export async function CompareSimilarityData(productId) {
     
     return JSON.parse(JSON.stringify(relatedProductsJson));
   } catch (error) {
-    console.error("Error in RelatedProductData:", error);
+    console.error("Error in Compare similar products:", error);
     return { error: "An error occurred while fetching related products" };
   }
 }
