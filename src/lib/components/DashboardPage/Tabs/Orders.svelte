@@ -478,7 +478,7 @@ function downloadAsExcel(order) {
             </div>
             <!-- <div class="flex flex-col sm:flex-row lg:flex-row w-full lg:w-2/5 my-2 md:my-2 lg:my-0 lg:ml-2"> -->
             <div class="flex flex-col sm:flex-row lg:flex-row w-full lg:w-2/5 my-2 md:my-2 lg:my-0 lg:ml-2">
-                <div class="flex-1 mr-2">
+                <div class="relative w-full md:max-w-80">
                     <Calender
                 bind:this={calendarComponent}
                 minDate={getEarliestOrderDate(initialOrders)}
