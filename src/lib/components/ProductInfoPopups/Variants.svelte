@@ -38,7 +38,7 @@
   }
 </script>
 
-<div class="md:w-11/12 max-w-7xl bg-white mx-auto shadow-sm border border-gray-200 rounded-lg m-10">
+<div id="productVariants" class="md:w-11/12 max-w-7xl bg-white mx-auto shadow-sm border border-gray-200 rounded-lg m-10">
   <h1 class="w-full text-left text-2xl text-primary-400 font-bold p-3">Products</h1>
 
   <div class="bg-white shadow-md rounded-lg overflow-hidden">
