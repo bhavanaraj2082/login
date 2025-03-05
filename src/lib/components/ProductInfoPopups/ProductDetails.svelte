@@ -493,15 +493,18 @@ function handleThumbnailClick(selectedIndex, product) {
             {product.prodDesc}
           </p>
         {/if}
-        {#if product?.returnPolicy === true}
-          <p class="text-blue-500 text-sm font-normal !mt-1 mb-1">
-            This product is Returnable.
-          </p>
-        {:else}
-          <p class="text-blue-500 text-sm font-normal !mt-1 mb-1">
-            This product is Not Returnable.
-          </p>
-        {/if}
+              <!-- Product Returnable Section -->
+              {#if product?.returnPolicy}
+              <div class="flex items-center gap-1 text-green-600 font-medium text-xs mt-2">
+                <Icon icon="ix:success-filled" class="text-base text-green-500" />
+                <span>Returns Accepted</span>
+              </div>
+            <!-- {:else}
+              <div class="flex items-center gap-2 text-red-500 font-medium text-sm mt-2">
+                <Icon icon="mdi:close-circle" class="text-lg text-red-500" />
+                <span>Non-Returnable</span>
+              </div> -->
+            {/if}
         {#if product.productSynonym}
           <div class="flex justify-between !mt-3">
             <p class="text-gray-900 text-sm font-semibold text-start">
@@ -590,10 +593,10 @@ function handleThumbnailClick(selectedIndex, product) {
         {/if}
         {#if !((product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && Object.keys(variant.pricing).length > 0)) || product?.priceSize?.length > 0)}
           <div>
-            <p>Price not available for this product, request Quote</p>
+            <p class="text-gray-700 text-sm">The price for this product is unavailable. Please request a quote</p>
             <button
               on:click={() => toggleQuoteModal(product)}
-              class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-white mt-2"
+              class="bg-primary-500 py-2 px-3 hover:bg-primary-600 rounded text-sm text-white mt-2"
               >Request Quote</button
             >
           </div>

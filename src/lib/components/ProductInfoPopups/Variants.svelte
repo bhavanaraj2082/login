@@ -42,7 +42,7 @@
   }
 </script>
 
-<div
+<div id="productVariants"
   class="md:w-11/12 max-w-7xl bg-white mx-auto shadow-sm border border-gray-200 rounded-lg m-10"
 >
   <h1 class="w-full text-left text-2xl text-primary-400 font-bold p-3">
@@ -63,7 +63,8 @@
         <tbody>
           {#each allVariants as variant}
             {@const { minPrice, maxPrice } = getMinMaxPrices(variant.pricing)}
-            <tr class="bg-white border-b hover:bg-gray-50">
+            <tr class="bg-white border-b hover:bg-gray-50 cursor-pointer" 
+            on:click={() => window.location.href = variant.productNumber}>
               <td class="py-4 px-6">
                 <a
                   href={variant.productNumber}
@@ -71,7 +72,7 @@
                 <img
                   src={variant.imageSrc}
                   alt={variant.productNumber}
-                  class="w-20"
+                  class="w-28 h-28 object-contain"
                 /></a>
               </td>
               <td class="py-4 px-6 text-primary-400 font-medium cursor-pointer">
@@ -94,7 +95,7 @@
               <td class="py-4 px-6 text-center sm:py-3 sm:px-4">
                 <a
                   href={variant.productNumber}
-                  class="bg-primary-400 text-white py-2 px-4 rounded hover:bg-primary-500 text-sm md:text-base block sm:inline-block"
+                  class="bg-primary-400 text-white py-2 px-3 text-xs md:text-sm rounded hover:bg-primary-500 lg:text-sm block sm:inline-block"
                 >
                   View Product
                 </a>
