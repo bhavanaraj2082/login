@@ -150,102 +150,127 @@ export const isProductFavorite = async (productNumber, locals) => {
 
 
 export async function RelatedProductData(productId) {
-  // console.log("==", productId);
-  const product = await Product.findOne({ productNumber: productId }).populate(
-    "subsubCategory"
-  );
-  if (!product) {
-    return { error: "Product not found" };
-  }
+  try {
+    const product = await Product.findOne({ productNumber: productId }).populate("subsubCategory");
+    
+    if (!product) {
+      return { error: "Product not found" };
+    }
 
     const subsubCategoryId = product.subsubCategory._id;
-	if(subsubCategoryId){
-		const relatedProducts = await Product.aggregate([
-			{
-				$match: { 'subsubCategory': subsubCategoryId } 
-			},
-			{
-				$limit: 8 
-			},
-			{
-				$lookup: {
-					from: 'categories', 
-					localField: 'category',
-					foreignField: '_id',
-					as: 'categoryInfo'
-				}
-			},
-			{
-				$lookup: {
-					from: 'subcategories', 
-					localField: 'subCategory',
-					foreignField: '_id',
-					as: 'subCategoryInfo'
-				}
-			},
-			{
-				$lookup: {
-					from: 'manufacturers', 
-					localField: 'manufacturer',
-					foreignField: '_id',
-					as: 'manufacturerInfo'
-				}
-			},
-			{
-				$lookup: {
-					from: 'subsubcategories', 
-					localField: 'subsubCategory',
-					foreignField: '_id',
-					as: 'subsubCategoryInfo'
-				}
-			},
-			{
-				$lookup: {
-					from: 'stocks', 
-					localField: 'productNumber',
-					foreignField: 'productNumber',
-					as: 'stockInfo'
-				}
-			},
-			{
-				$project: { 
-					_id: 1,
-					productName: 1,
-					prodDesc: 1,
-					'categoryInfo.urlName': 1,
-					'subCategoryInfo.urlName': 1,
-					'manufacturerInfo.name': 1,
+    
+    if (!subsubCategoryId) {
+      return [];
+    }
+    const relatedProducts = await Product.aggregate([
+      {
+        $match: { 'subsubCategory': subsubCategoryId }
+      },
+      {
+        $limit: 8
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'categoryInfo'
+        }
+      },
+      {
+        $lookup: {
+          from: 'subcategories',
+          localField: 'subCategory',
+          foreignField: '_id',
+          as: 'subCategoryInfo'
+        }
+      },
+      {
+        $lookup: {
+          from: 'manufacturers',
+          localField: 'manufacturer',
+          foreignField: '_id',
+          as: 'manufacturerInfo'
+        }
+      },
+      {
+        $lookup: {
+          from: 'subsubcategories',
+          localField: 'subsubCategory',
+          foreignField: '_id',
+          as: 'subsubCategoryInfo'
+        }
+      },
+      {
+        $lookup: {
+          from: 'stocks',
+          localField: 'productNumber',
+          foreignField: 'productNumber',
+          as: 'stockInfo'
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          productName: 1,
+          prodDesc: 1,
+          'categoryInfo.urlName': 1,
+          'subCategoryInfo.urlName': 1,
+          'manufacturerInfo.name': 1,
           'manufacturerInfo._id': 1,
-					'subsubCategoryInfo.urlName': 1,
+          'subsubCategoryInfo.urlName': 1,
           'stockInfo._id': 1,
           'stockInfo.distributor': 1,
-					stockQuantity: { $ifNull: [{ $arrayElemAt: ['$stockInfo.stock', 0] }, 0] }, 
-					// stockPriceSize: { $ifNull: [{ $arrayElemAt: ['$stockInfo.pricing', 0] }, []] },
+          stockQuantity: { $ifNull: [{ $arrayElemAt: ['$stockInfo.stock', 0] }, 0] },
           stockPriceSize: { $ifNull: ['$stockInfo.pricing', []] },
-					orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
-					priceSize: 1, 
-					imageSrc: 1,  
-					productUrl: 1, 
-					productNumber :1
-				}
-			}
-		]);
-		
-		let relatedProductsJson = await Promise.all(relatedProducts.map(async (items) => {
-		
-			let convertedPrice = await convertToINR(items.stockPriceSize);   
-			return {
-				...items,  
-				stockPriceSize: convertedPrice  
-			};
-		}));
- 
-        return JSON.parse(JSON.stringify(relatedProductsJson));
-	} 
-	else{
-
-		return []
-	}
+          orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
+          priceSize: 1,
+          imageSrc: 1,
+          productUrl: 1,
+          productNumber: 1,
+          variants: { $ifNull: ["$variants", []] }
+        }
+      }
+    ]);
+    let relatedProductsJson = await Promise.all(relatedProducts.map(async (item) => {
+      if (item.stockPriceSize && item.stockPriceSize.length > 0) {
+        const convertedPricing = await Promise.all(
+          item.stockPriceSize.map(async (price) => {
+            if (price.USD) {
+                        const conversionResult = await convertToINR(price);
+                        return {
+                          usd: price.USD || 0,
+                          inr: conversionResult.INR,  
+                          break: price.break,
+                          offer: price.offer || "0"
+                        };
+                      }
+            else if (price.INR) {
+              const currentRates = await conversionRates();
+              const usdRate = currentRates["USD"] ? 1/currentRates["USD"] : null;
+              
+              return {
+                inr: parseFloat(price.INR).toFixed(2),
+                usd: usdRate ? parseFloat(price.INR * usdRate).toFixed(2) : "N/A",
+                break: price.break,
+                offer: price.offer || "0"
+              };
+            }
+            return price;
+          })
+        );
+    
+        item.stockPriceSize = convertedPricing;
+      }
+    
+      return item;
+    }));
+    
+    return JSON.parse(JSON.stringify(relatedProductsJson));
+  } catch (error) {
+    console.error("Error in RelatedProductData:", error);
+    return { error: "An error occurred while fetching related products" };
+  }
 }
 
 export async function popularProducts() {
