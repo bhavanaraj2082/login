@@ -506,7 +506,7 @@ async function submitForm() {
 					on:click={toggleLike}
 					aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
 					class="py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}">
-					<Icon icon={isFavoritePage ? heartFilled : heartOutline} class="text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out" />
+					<Icon icon={isFavoritePage ? heartFilled : heartOutline} class="text-lg sm:text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out" />
 				</button>
 			</a>
 			<Cartrightside {cartId}/>	
@@ -694,8 +694,8 @@ async function submitForm() {
 				{/each}
 				<a href="/quick-order">
 					<button 
-					class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium">
-						<span class="text-white font-medium text-xs lg:text-sm">
+					class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap hover:scale-105 ">
+						<span class="text-white text-xs lg:text-base font-medium">
 							Quick Order
 						</span>
 					</button>
