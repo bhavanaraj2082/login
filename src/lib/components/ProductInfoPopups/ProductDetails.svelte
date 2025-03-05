@@ -7,6 +7,7 @@
   import Properties from "./Properties.svelte";
   import Imageinfo from "./Imageinfo.svelte";
   import Icon from "@iconify/svelte";
+  import { currencyState } from "$lib/stores/mainStores.js";
   import { cartState } from "$lib/stores/cartStores.js";
   import { authedUser } from "$lib/stores/mainStores.js";
   import Variants from "$lib/components/ProductInfoPopups/Variants.svelte";
@@ -17,7 +18,7 @@
   export let isFavorite;
   // console.log(isFavorite, "isFavorite");
   // console.log(authedUser, "authedUser");
-  // console.log(data.records, "data");
+  console.log(data.records, "data");
 
   let showDropdown = false;
   let showSharePopup = false;
@@ -88,87 +89,149 @@
   let successMessage = "";
   let errorMessage = "";
   let orderMultiple = 1;
-  let quantity = 1; 
+  let quantity = 1;
 
   // console.log(data.records,"data.records");
-  
+
   // Reactive block to update orderMultiple and quantity only when data changes
   $: {
     if (data.records.length > 0 && quantity === 1) {
       orderMultiple = data.records[0].orderMultiple;
-      quantity = orderMultiple;  // Only update if quantity is still 1 (initial value)
+      quantity = orderMultiple; // Only update if quantity is still 1 (initial value)
     } else if (data.records.length === 0) {
-      quantity = 1;  // Reset to 1 if no data records
+      quantity = 1; // Reset to 1 if no data records
     }
   }
 
   let minPrice = Infinity;
   let maxPrice = -Infinity;
 
+  // $: {
+  //   if (
+  //     !data?.records ||
+  //     !Array.isArray(data.records) ||
+  //     data.records.length === 0
+  //   ) {
+  //     console.warn("No records found!");
+  //     minPrice = "N/A";
+  //     maxPrice = "N/A";
+  //   } else {
+  //     minPrice = Infinity;
+  //     maxPrice = -Infinity;
+
+  //     data.records.forEach((record, recordIndex) => {
+  //       // console.log(
+  //       //   ` Processing record ${recordIndex} with ${record?.variants?.length || 0} variants`,
+  //       //   record
+  //       // );
+
+  //       if (record?.variants && Array.isArray(record.variants)) {
+  //         record.variants.forEach((variant, variantIndex) => {
+  //           // console.log(`Processing variant ${variantIndex}`, variant);
+
+  //           if (variant?.pricing && typeof variant.pricing === "object") {
+  //             // console.log(`Found pricing object:`, variant.pricing);
+
+  //             let priceValue = Number(variant.pricing.INR);
+
+  //             if (!isNaN(priceValue) && priceValue > 0) {
+  //               minPrice = Math.min(minPrice, priceValue);
+  //               maxPrice = Math.max(maxPrice, priceValue);
+  //             }
+  //           } else {
+  //             console.warn(
+  //               `variant.pricing is missing or not an object for variant ${variantIndex}`,
+  //             );
+  //           }
+  //         });
+  //       }
+  //     });
+
+  //     if (minPrice === Infinity) minPrice = "--";
+  //     if (maxPrice === -Infinity) maxPrice = "--";
+  //   }
+  //   //   console.log(`Final minPrice: ${minPrice}, maxPrice: ${maxPrice}`);
+  // }
+
   $: {
-    if (
-      !data?.records ||
-      !Array.isArray(data.records) ||
-      data.records.length === 0
-    ) {
-      console.warn("No records found!");
-      minPrice = "N/A";
-      maxPrice = "N/A";
-    } else {
-      minPrice = Infinity;
-      maxPrice = -Infinity;
+  if (
+    !data?.records ||
+    !Array.isArray(data.records) ||
+    data.records.length === 0
+  ) {
+    console.warn("No records found!");
+    minPrice = "N/A";
+    maxPrice = "N/A";
+  } else {
+    minPrice = { INR: Infinity, USD: Infinity };
+    maxPrice = { INR: -Infinity, USD: -Infinity };
 
-      data.records.forEach((record, recordIndex) => {
-        // console.log(
-        //   ` Processing record ${recordIndex} with ${record?.variants?.length || 0} variants`,
-        //   record
-        // );
+    data.records.forEach((record, recordIndex) => {
+      if (record?.variants && Array.isArray(record.variants)) {
+        record.variants.forEach((variant, variantIndex) => {
+          // Check if pricing data exists
+          if (variant?.pricing && Array.isArray(variant.pricing) && variant.pricing.length > 0) {
+            const pricingData = variant.pricing[0]; // Access the first item in the array
 
-        if (record?.variants && Array.isArray(record.variants)) {
-          record.variants.forEach((variant, variantIndex) => {
-            // console.log(`Processing variant ${variantIndex}`, variant);
+            console.log(`Record ${recordIndex}, Variant ${variantIndex}: Pricing data found:`, pricingData);
 
-            if (variant?.pricing && typeof variant.pricing === "object") {
-              // console.log(`Found pricing object:`, variant.pricing);
-
-              let priceValue = Number(variant.pricing.INR);
-
-              if (!isNaN(priceValue) && priceValue > 0) {
-                minPrice = Math.min(minPrice, priceValue);
-                maxPrice = Math.max(maxPrice, priceValue);
-              }
+            // Check and parse INR price
+            let priceINR = Number(pricingData.INR); // Access INR from the first object in the array
+            if (!isNaN(priceINR) && priceINR > 0) {
+              minPrice.INR = Math.min(minPrice.INR, priceINR);
+              maxPrice.INR = Math.max(maxPrice.INR, priceINR);
+              console.log(`Record ${recordIndex}, Variant ${variantIndex}: INR - ${priceINR}`);
             } else {
-              console.warn(
-                `variant.pricing is missing or not an object for variant ${variantIndex}`
-              );
+              console.warn(`Record ${recordIndex}, Variant ${variantIndex}: Invalid INR value:`, pricingData.INR);
             }
-          });
-        }
-      });
 
-      if (minPrice === Infinity) minPrice = "--";
-      if (maxPrice === -Infinity) maxPrice = "--";
-    }
-    //   console.log(`Final minPrice: ${minPrice}, maxPrice: ${maxPrice}`);
+            // Check and parse USD price
+            let priceUSD = Number(pricingData.USD); // Access USD from the first object in the array
+            if (!isNaN(priceUSD) && priceUSD > 0) {
+              minPrice.USD = Math.min(minPrice.USD, priceUSD);
+              maxPrice.USD = Math.max(maxPrice.USD, priceUSD);
+              console.log(`Record ${recordIndex}, Variant ${variantIndex}: USD - ${priceUSD}`);
+            } else {
+              console.warn(`Record ${recordIndex}, Variant ${variantIndex}: Invalid USD value:`, pricingData.USD);
+            }
+          } else {
+            console.warn(`Record ${recordIndex}, Variant ${variantIndex}: Pricing data missing or incorrect.`);
+          }
+        });
+      }
+    });
+
+    // Log the final min and max prices for INR and USD
+    console.log(`Final minPrice (INR): ${minPrice.INR}, maxPrice (INR): ${maxPrice.INR}`);
+    console.log(`Final minPrice (USD): ${minPrice.USD}, maxPrice (USD): ${maxPrice.USD}`);
   }
 
-let productStock = data.records;
-let index = 0; 
-let selectedStockId = productStock?.[0]?.stockId?.[0] || "NA"; 
-
-function handleThumbnailClick(selectedIndex, product) {
-  index = selectedIndex ?? 0;
-  selectedStockId = product?.stockId?.[index] || product?.stockId?.[0] || "NA";
-  // console.log("Updated Index:", index);
-  // console.log("Updated Stock ID:", selectedStockId);
+  // If no valid prices found, set to '--'
+  if (minPrice.INR === Infinity) minPrice.INR = "--";
+  if (maxPrice.INR === -Infinity) maxPrice.INR = "--";
+  if (minPrice.USD === Infinity) minPrice.USD = "--";
+  if (maxPrice.USD === -Infinity) maxPrice.USD = "--";
 }
+
+
+  let productStock = data.records;
+  let index = 0;
+  let selectedStockId = productStock?.[0]?.stockId?.[0] || "NA";
+
+  function handleThumbnailClick(selectedIndex, product) {
+    index = selectedIndex ?? 0;
+    selectedStockId =
+      product?.stockId?.[index] || product?.stockId?.[0] || "NA";
+    // console.log("Updated Index:", index);
+    // console.log("Updated Stock ID:", selectedStockId);
+  }
 
   function togglePopup() {
     showPopup = !showPopup;
   }
 
   function toggleLike() {
-    isFavorite = !isFavorite; 
+    isFavorite = !isFavorite;
     // console.log("isFavorite changed:", isFavorite);
   }
 
@@ -198,7 +261,7 @@ function handleThumbnailClick(selectedIndex, product) {
     if (quantity + orderMultiple <= 999) {
       quantity += orderMultiple;
     } else {
-      quantity = 999; 
+      quantity = 999;
     }
   };
 
@@ -206,7 +269,7 @@ function handleThumbnailClick(selectedIndex, product) {
     if (quantity - orderMultiple >= 1) {
       quantity -= orderMultiple;
     } else {
-      quantity = 1; 
+      quantity = 1;
     }
   };
   function toggleSharePopup() {
@@ -244,35 +307,34 @@ function handleThumbnailClick(selectedIndex, product) {
   };
 
   export function addToCart(product) {
-  const backOrder = quantity > product.stock ? quantity - product.stock : 0;
-  const cartItem = {
-    productId: product.productId,
-    manufacturerId: product.manufacturer._id,
-    distributorId: product.distributorId,
-    stockId: selectedStockId || "NA",
-    quantity: quantity,
-    backOrder,
-    // price: product.priceSize[index]?.INR || 0, 
-    // size: product.priceSize[index]?.break || "N/A", 
-  };
-  // console.log("Cart Item Before Adding:", cartItem); 
+    const backOrder = quantity > product.stock ? quantity - product.stock : 0;
+    const cartItem = {
+      productId: product.productId,
+      manufacturerId: product.manufacturer._id,
+      distributorId: product.distributorId,
+      stockId: selectedStockId || "NA",
+      quantity: quantity,
+      backOrder,
+      // price: product.priceSize[index]?.INR || 0,
+      // size: product.priceSize[index]?.break || "N/A",
+    };
+    // console.log("Cart Item Before Adding:", cartItem);
 
-  if (!isLoggedIn) {
-    addItemToCart(cartItem);
-    toast.success("Product added to cart");
-    guestCartFetch();
-    return;
+    if (!isLoggedIn) {
+      addItemToCart(cartItem);
+      toast.success("Product added to cart");
+      guestCartFetch();
+      return;
+    }
+
+    const formdata = new FormData();
+    formdata.append("items", JSON.stringify(cartItem));
+    sendMessage("?/addtocart", formdata, async (result) => {
+      toast.success(result.message);
+      invalidate("/");
+    });
+    // console.log("Final Cart Item Sent:", cartItem);
   }
-
-  const formdata = new FormData();
-  formdata.append("items", JSON.stringify(cartItem));
-  sendMessage("?/addtocart", formdata, async (result) => {
-    toast.success(result.message);
-    invalidate("/");
-  });
-  // console.log("Final Cart Item Sent:", cartItem);
-}
-
 
   let units = "";
   let firstName = "";
@@ -315,8 +377,7 @@ function handleThumbnailClick(selectedIndex, product) {
     }
 
     if (!phone.match(/^\+?[1-9]\d{1,14}$/)) {
-      formErrors.phone =
-        "Enter a valid phone number";
+      formErrors.phone = "Enter a valid phone number";
     }
 
     if (!email.match(/^\S+@\S+\.\S+$/)) {
@@ -345,15 +406,15 @@ function handleThumbnailClick(selectedIndex, product) {
       <div class="flex flex-col space-y-4 lg:w-[30%] mt-3">
         <div class="mb-3 flex justify-center items-center xl:block">
           <button
-          on:click={toggleImagePopup}
-          class="border border-gray-300 rounded-md p-3 max-lg:border-none"
-        >
+            on:click={toggleImagePopup}
+            class="border border-gray-300 rounded-md p-3 max-lg:border-none"
+          >
             <!-- svelte-ignore a11y-img-redundant-alt -->
             <img
-            src={product.imageSrc}
-            alt="Product Image"
-            class="w-60 h-60 object-contain"
-          />
+              src={product.imageSrc}
+              alt="Product Image"
+              class="w-60 h-60 object-contain"
+            />
           </button>
           {#if showImagePopup}
             <Imageinfo {data} ImageclosePopup={toggleImagePopup} />
@@ -493,18 +554,20 @@ function handleThumbnailClick(selectedIndex, product) {
             {product.prodDesc}
           </p>
         {/if}
-              <!-- Product Returnable Section -->
-              {#if product?.returnPolicy}
-              <div class="flex items-center gap-1 text-green-600 font-medium text-xs mt-2">
-                <Icon icon="ix:success-filled" class="text-base text-green-500" />
-                <span>Returns Accepted</span>
-              </div>
-            <!-- {:else}
+        <!-- Product Returnable Section -->
+        {#if product?.returnPolicy}
+          <div
+            class="flex items-center gap-1 text-green-600 font-medium text-xs mt-2"
+          >
+            <Icon icon="ix:success-filled" class="text-base text-green-500" />
+            <span>Returns Accepted</span>
+          </div>
+          <!-- {:else}
               <div class="flex items-center gap-2 text-red-500 font-medium text-sm mt-2">
                 <Icon icon="mdi:close-circle" class="text-lg text-red-500" />
                 <span>Non-Returnable</span>
               </div> -->
-            {/if}
+        {/if}
         {#if product.productSynonym}
           <div class="flex justify-between !mt-3">
             <p class="text-gray-900 text-sm font-semibold text-start">
@@ -514,11 +577,36 @@ function handleThumbnailClick(selectedIndex, product) {
             </p>
           </div>
         {/if}
-        {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && ((variant.pricing.INR && variant.pricing.INR > 0) || (variant.pricing.USD && variant.pricing.USD > 0)))}
+        <!-- {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && ((variant.pricing.INR && variant.pricing.INR > 0) || (variant.pricing.USD && variant.pricing.USD > 0)))} -->
+        {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant?.pricing && variant.pricing.length > 0 && 
+          variant.pricing.some((pricingItem) => 
+            (pricingItem.INR && Number(pricingItem.INR) > 0) || 
+            (pricingItem.USD && Number(pricingItem.USD) > 0)
+          ))}
+        
           <div class="flex justify-between !mt-3">
-            <p class="text-gray-900 text-lg font-semibold text-start">
+            <!-- <p class="text-gray-900 text-lg font-semibold text-start">
               ₹ {minPrice.toLocaleString()} - ₹ {maxPrice.toLocaleString()}
-            </p>
+            </p> -->
+            <p class="text-gray-900 text-lg font-semibold text-start">
+              {#if $currencyState === 'usd'}
+                $ {minPrice.USD.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })} - $ {maxPrice.USD.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })}
+              {:else}
+                ₹ {minPrice.INR.toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })} - ₹ {maxPrice.INR.toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })}
+              {/if}
+            </p>          
           </div>
         {/if}
         {#if screenWidth >= 640 && !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
@@ -563,7 +651,17 @@ function handleThumbnailClick(selectedIndex, product) {
                     </span>
                   </div>
                   <div class="col-span-1 p-2 text-left">
-                    ₹ {priceItem.INR.toLocaleString("en-IN")}
+                    {#if $currencyState === "usd"}
+                      $ {(priceItem.USD ?? 0).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    {:else}
+                      ₹ {(priceItem.INR ?? 0).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    {/if}
                   </div>
                 </button>
               </div>
@@ -585,7 +683,17 @@ function handleThumbnailClick(selectedIndex, product) {
                   {priceItem?.break}
                 </div>
                 <div class="text-sm text-gray-700">
-                  ₹ {priceItem.INR.toLocaleString("en-IN")}
+                  {#if $currencyState === "usd"}
+                    $ {(priceItem.USD ?? 0).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  {:else}
+                    ₹ {(priceItem.INR ?? 0).toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  {/if}
                 </div>
               </div>
             {/each}
@@ -593,7 +701,9 @@ function handleThumbnailClick(selectedIndex, product) {
         {/if}
         {#if !((product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && Object.keys(variant.pricing).length > 0)) || product?.priceSize?.length > 0)}
           <div>
-            <p class="text-gray-700 text-sm">The price for this product is unavailable. Please request a quote</p>
+            <p class="text-gray-700 text-sm">
+              The price for this product is unavailable. Please request a quote
+            </p>
             <button
               on:click={() => toggleQuoteModal(product)}
               class="bg-primary-500 py-2 px-3 hover:bg-primary-600 rounded text-sm text-white mt-2"
@@ -658,7 +768,24 @@ function handleThumbnailClick(selectedIndex, product) {
                 </div>
               </div>
               <span class="text-lg font-semibold">
-                ₹ {product?.priceSize[index]?.INR.toLocaleString("en-IN")}
+                <!-- ₹ {product?.priceSize[index]?.INR.toLocaleString("en-IN")} -->
+                {#if $currencyState === "usd"}
+                  $ {(product?.priceSize[index]?.USD ?? 0).toLocaleString(
+                    "en-US",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    },
+                  )}
+                {:else}
+                  ₹ {(product?.priceSize[index]?.INR ?? 0).toLocaleString(
+                    "en-IN",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    },
+                  )}
+                {/if}
               </span>
             </div>
           </div>
@@ -726,11 +853,11 @@ function handleThumbnailClick(selectedIndex, product) {
                           console.log("success/error type:", status);
                           console.log(
                             "success/error message:result.data.message=",
-                            result.data.message
+                            result.data.message,
                           );
                           console.log(
                             "success/error message:result.data.message=",
-                            result.data.stock
+                            result.data.stock,
                           );
                           stockStatus = result.data.stock;
                           stockAvailability = result.data.message;
@@ -935,12 +1062,28 @@ function handleThumbnailClick(selectedIndex, product) {
                 <p class="font-normal text-xs py-px">
                   Base Price:
                   <span class="font-medium text-xs">
-                    ₹ {(
+                    <!-- ₹ {(
                       product?.priceSize[index]?.INR * quantity
                     ).toLocaleString("en-IN", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    })}
+                    })} -->
+
+                    {#if $currencyState === "usd"}
+                      $ {(
+                        product?.priceSize[index]?.USD * quantity ?? 0
+                      ).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    {:else}
+                      ₹ {(
+                        product?.priceSize[index]?.INR * quantity ?? 0
+                      ).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    {/if}
                   </span>
                 </p>
 
@@ -949,22 +1092,37 @@ function handleThumbnailClick(selectedIndex, product) {
                 >
                   GST (18%):
                   <span class="font-medium text-xs">
-                    ₹ {(
-                      product?.priceSize[index]?.INR *
-                      0.18 *
-                      quantity
-                    ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    {#if $currencyState === "usd"}
+                      $ {(
+                        product?.priceSize[index]?.USD * 0.18 * quantity ?? 0
+                      ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    {:else}
+                      ₹ {(
+                        product?.priceSize[index]?.INR * 0.18 * quantity ?? 0
+                      ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    {/if}
                   </span>
                 </p>
 
                 <p class="font-normal text-xs">
                   Total Price:
-                  <span class="font-semibold text-xs">
+                  <!-- <span class="font-semibold text-xs">
                     ₹ {(
                       product?.priceSize[index]?.INR *
                       1.18 *
                       quantity
                     ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </span> -->
+                  <span class="font-semibold text-xs">
+                    {#if $currencyState === "usd"}
+                      $ {(
+                        product?.priceSize[index]?.USD * 1.18 * quantity ?? 0
+                      ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    {:else}
+                      ₹ {(
+                        product?.priceSize[index]?.INR * 1.18 * quantity ?? 0
+                      ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    {/if}
                   </span>
                 </p>
               </div>
@@ -980,14 +1138,14 @@ function handleThumbnailClick(selectedIndex, product) {
               ><Icon icon="ic:round-minus" class="text-2xl" /></button
             >
             <input
-            type="text"
-            class="w-full text-center border-none focus:outline-none focus:ring-0 p-1"
-            bind:value={quantity}
-            on:input={updateQuantity}
-            min="1"
-            max="999"
-          />
-        
+              type="text"
+              class="w-full text-center border-none focus:outline-none focus:ring-0 p-1"
+              bind:value={quantity}
+              on:input={updateQuantity}
+              min="1"
+              max="999"
+            />
+
             <button
               on:click={increaseQuantity}
               class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
@@ -1278,7 +1436,7 @@ function handleThumbnailClick(selectedIndex, product) {
 
                     if (
                       verificationMessage.includes(
-                        "Verification email sent successfully. Please check your inbox."
+                        "Verification email sent successfully. Please check your inbox.",
                       )
                     ) {
                       displayMessage = "Please check your inbox.";
@@ -1333,7 +1491,7 @@ function handleThumbnailClick(selectedIndex, product) {
                   type="submit"
                   class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-500 font-semibold text-2s pl-2 py-1 rounded hover:underline disabled:cursor-not-allowed"
                   disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-                    email
+                    email,
                   ) || email.split("@")[1].includes("gamil")}
                 >
                   Verify

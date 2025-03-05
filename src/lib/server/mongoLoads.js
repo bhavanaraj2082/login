@@ -156,7 +156,10 @@ export async function RelatedProductData(productId) {
     if (!product) {
       return { error: "Product not found" };
     }
-
+    if (!product.subsubCategory) {
+      console.warn(`No subsubCategory found for product: ${product.productName}`);
+      return [];
+    }
     const subsubCategoryId = product.subsubCategory._id;
     
     if (!subsubCategoryId) {
@@ -270,6 +273,97 @@ export async function RelatedProductData(productId) {
   } catch (error) {
     console.error("Error in RelatedProductData:", error);
     return { error: "An error occurred while fetching related products" };
+  }
+}
+
+export async function popularProducts() {
+  const records = await PopularProduct.find({}, { _id: 0 })
+    .sort("order")
+    .populate({
+      path: "product",
+      select: "-_id prodDesc productName imageSrc productNumber",
+      populate: [
+        { path: "category", select: "-_id urlName" },
+        { path: "subCategory", select: "-_id urlName" },
+      ],
+    });
+
+  return JSON.parse(JSON.stringify(records));
+}
+
+export async function getSearchData(search) {
+  try {
+    const components = await getMatchedComponents(search);
+    const categories = await getMatchedCategories(search);
+    const subcategories = await getMatchedSubCategories(search);
+
+    const allData = {
+      components,
+      categories,
+      subcategories,
+      search
+    };
+
+    return JSON.parse(JSON.stringify(allData));
+  } catch (error) {
+    console.error("Error fetching search data:", error);
+    return { success: false, message: "Error fetching search data" };
+  }
+}
+
+async function getMatchedComponents(search) {
+  let cleanedQuery = search.replace(/[^\w]/g, "");
+  try {
+    const queryFilter = {
+      $or: [
+        { cleanedName: { $eq: cleanedQuery } },
+        { $text: { $search: cleanedQuery } },
+        { CAS: { $eq: search } }
+      ],
+    };
+
+    const components = await Product.find(queryFilter)
+      .limit(9)
+      .populate("category")
+      .populate("subCategory")
+      .exec();
+
+    return components;
+  } catch (error) {
+    console.error("Error fetching matched components:", error);
+    return { success: false, message: "Error fetching matched components" };
+  }
+}
+
+async function getMatchedCategories(search) {
+  try {
+    const queryFilter = {
+      name: { $regex: search, $options: "i" },
+    };
+
+    const categories = await Category.find(queryFilter).limit(6).exec();
+    return JSON.parse(JSON.stringify(categories));
+  } catch (error) {
+    console.error("Error fetching matched categories:", error);
+    throw new Error("Error fetching matched categories");
+  }
+}
+
+async function getMatchedSubCategories(search) {
+  try {
+    const queryFilter = {
+      name: { $regex: search, $options: "i" },
+    };
+
+    const subcategories = await SubCategory.find(queryFilter)
+      .limit(6)
+      .populate("category")
+      .exec();
+
+    return JSON.parse(JSON.stringify(subcategories));
+  } catch (error) {
+    console.error("Error fetching matched subcategories", error);
+    return { success: false, message: "Error fetching matched subcategories" };
   }
 }
 
@@ -989,97 +1083,261 @@ export async function convertToINR(pricing) {
 }
 
 //Product info starts
+// export async function DifferentProds(productId) {
+//   // fething product
+//   const product = JSON.parse(
+//     JSON.stringify(
+//       await Product.findOne({ productNumber: productId }).populate(
+//         "manufacturer"
+//       )
+//     )
+//   );
+//   // console.log(product,"product");
+
+//   const partNumber = product.productNumber;
+//   // products stocks
+//   let stockQuantity = 0;
+//   let orderMultiple = 0;
+//   let priceSize = [];
+//   let stockId = [];
+//   let stock = 0
+//   let distributorId = "";
+
+//   // if (partNumber) {
+//   //   const stockRecord = await Stock.findOne({
+//   //     productNumber: partNumber,
+//   //   }).exec();
+//   //   if (stockRecord && typeof stockRecord.stock !== "undefined") {
+//   //     stockQuantity = stockRecord.stock;
+//   //     orderMultiple = stockRecord.orderMultiple;
+//   //     // console.log("stocks=====before>>", stockRecord.pricing);
+
+//   //     priceSize = await convertToINR(stockRecord.pricing);
+
+//   //     // console.log("after==>>", priceSize);
+//   //   }
+//   // }
+
+//   if (partNumber) {
+//     const stockRecords = await Stock.find({ productNumber: partNumber }).exec(); 
+//     if (stockRecords.length > 0) {
+//       for (const stockRecord of stockRecords) {
+//         if (typeof stockRecord.stock !== "undefined") {
+//           stockQuantity = stockRecord.stock;
+//           orderMultiple = stockRecord.orderMultiple;
+//           // console.log("stocks=====before>>", stockRecord.pricing);
+//           const convertedPricing = await convertToINR(stockRecord.pricing);
+//           priceSize.push(convertedPricing);
+//           stockId.push(stockRecord._id.toString());
+//           distributorId = stockRecord.distributor.toString();
+//           stock = stockRecord.stock;
+//         }
+//       }
+//       // console.log("All Pricing Records:", priceSize);
+//     }
+//   }
+
+//   const variants = product.variants || [];
+//     const variantRecord = await Promise.all(
+//       variants.map(async (variantId) => {
+//         const variant = await Product.findById(variantId).lean();
+//         if (!variant) return {};
+
+//         const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
+
+//         let variantPricing = [];
+//         let variantStockId = []; 
+//         let variantdistributorId = stock?.distributor ? stock.distributor.toString() : "";
+//         if (stock?.pricing) {
+//           // Await the result of convertToINR to get the actual pricing
+//           if (stock.pricing.length > 1) {
+//             variantPricing = await convertToINR([stock.pricing[0]]);
+//           } else {
+//             variantPricing = await convertToINR(stock.pricing);
+//           }
+//         }
+
+//         return {
+//           _id: variant?._id?.toString() || "",
+//           productName: variant?.productName || "Unknown Product",
+//           prodDesc: variant?.prodDesc || "No description available",
+//           description: Array.isArray(variant?.description) ? variant.description : [],
+//           properties: variant?.properties || {},
+//           manufacturerName: variant?.manufacturerName 
+//             ? variant.manufacturerName.toString() 
+//             : "Unknown Manufacturer",
+//           productNumber: variant?.productNumber || "N/A",
+//           imageSrc: variant?.imageSrc || "",
+//           pricing: variantPricing ? variantPricing : [],
+//       stockId: variantStockId,
+//       distributorId: variantdistributorId
+//     };
+//       })
+//     );
+
+//   const formattedRecord = {
+//     productId: product?._id?.toString() || "",
+//     productName: product?.productName || "Unknown Product",
+//     CAS: product?.CAS,
+//     productNumber: product?.productNumber || "N/A",
+//     prodDesc: product?.prodDesc,
+//     returnPolicy: product?.returnPolicy,
+//     imageSrc: product?.imageSrc || "",
+//     safetyDatasheet: product?.safetyDatasheet || "",
+//     priceSize,
+//     properties: product?.properties || {},
+//     description: product?.description || {},
+//     safetyInfo: product?.safetyInfo || {},
+//     filteredProductData: product?.filteredProductData || {},
+//     productSynonym: product?.filteredProductData?.["Synonym(S)"] || "",
+//     stockQuantity,
+//     orderMultiple,
+//     manufacturer: product?.manufacturer || {},
+//     stockId,
+//     stock,
+//     distributorId,
+//     variants: variantRecord.map((variant) => ({
+//       _id: variant?._id?.toString() || "",
+//       productName: variant?.productName || "Unknown Product",
+//       prodDesc: variant?.prodDesc || "No description available",
+//       description: variant?.description || [],
+//       properties: variant?.properties || {},
+//       manufacturerName: variant?.manufacturerName
+//         ? variant.manufacturerName.toString()
+//         : "Unknown Manufacturer",
+//       productNumber: variant?.productNumber || "N/A",
+//       imageSrc: variant?.imageSrc || "",
+//       pricing: variant?.pricing,
+//       stockId: variant?.stockId,
+//       distributorId: variant?.distributorId
+//     })),
+//   };
+
+//   return { records: [formattedRecord] };
+// }
+//Product info ends
+
 export async function DifferentProds(productId) {
-  // fething product
   const product = JSON.parse(
     JSON.stringify(
-      await Product.findOne({ productNumber: productId }).populate(
-        "manufacturer"
-      )
+      await Product.findOne({ productNumber: productId }).populate("manufacturer")
     )
   );
-  // console.log(product,"product");
 
   const partNumber = product.productNumber;
-  // products stocks
   let stockQuantity = 0;
   let orderMultiple = 0;
   let priceSize = [];
   let stockId = [];
-  let stock = 0
+  let stock = 0;
   let distributorId = "";
 
-  // if (partNumber) {
-  //   const stockRecord = await Stock.findOne({
-  //     productNumber: partNumber,
-  //   }).exec();
-  //   if (stockRecord && typeof stockRecord.stock !== "undefined") {
-  //     stockQuantity = stockRecord.stock;
-  //     orderMultiple = stockRecord.orderMultiple;
-  //     // console.log("stocks=====before>>", stockRecord.pricing);
-
-  //     priceSize = await convertToINR(stockRecord.pricing);
-
-  //     // console.log("after==>>", priceSize);
-  //   }
-  // }
-
   if (partNumber) {
-    const stockRecords = await Stock.find({ productNumber: partNumber }).exec(); 
+    const stockRecords = await Stock.find({ productNumber: partNumber }).exec();
     if (stockRecords.length > 0) {
       for (const stockRecord of stockRecords) {
         if (typeof stockRecord.stock !== "undefined") {
           stockQuantity = stockRecord.stock;
           orderMultiple = stockRecord.orderMultiple;
-          // console.log("stocks=====before>>", stockRecord.pricing);
           const convertedPricing = await convertToINR(stockRecord.pricing);
-          priceSize.push(convertedPricing);
+          const { break: breakPoint, offer, ...currencies } = stockRecord.pricing;
+          let priceData = {
+            break: breakPoint, 
+            offer: offer || undefined,  
+            USD: 0,  
+            INR: 0   
+          };
+          if (currencies.INR && !currencies.USD) {
+            priceData.INR = currencies.INR;
+            const currentRates = await conversionRates();
+            const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;
+            if (usdRate) {
+              priceData.USD = Number(currencies.INR * usdRate).toFixed(2); 
+            }
+          }
+          if (currencies.USD && !currencies.INR) {
+            priceData.USD = currencies.USD;
+            const currentRates = await conversionRates();
+            const inrRate = currentRates["USD"] ? currentRates["USD"] : null;
+            if (inrRate) {
+              priceData.INR = Number(currencies.USD * inrRate).toFixed(2); 
+            }
+          }
+          if (currencies.INR && currencies.USD) {
+            priceData.USD = currencies.USD;
+            priceData.INR = currencies.INR;
+          }
+
+          priceSize.push(priceData);  
+
           stockId.push(stockRecord._id.toString());
           distributorId = stockRecord.distributor.toString();
           stock = stockRecord.stock;
         }
       }
-      // console.log("All Pricing Records:", priceSize);
     }
   }
 
   const variants = product.variants || [];
-    const variantRecord = await Promise.all(
-      variants.map(async (variantId) => {
-        const variant = await Product.findById(variantId).lean();
-        if (!variant) return {};
+  const variantRecord = await Promise.all(
+    variants.map(async (variantId) => {
+      const variant = await Product.findById(variantId).lean();
+      if (!variant) return {};
 
-        const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
+      const stock = await Stock.findOne({ productNumber: variant.productNumber }).lean();
 
-        let variantPricing = [];
-        let variantStockId = []; 
-        let variantdistributorId = stock?.distributor ? stock.distributor.toString() : "";
-        if (stock?.pricing) {
-          // Await the result of convertToINR to get the actual pricing
-          if (stock.pricing.length > 1) {
-            variantPricing = await convertToINR([stock.pricing[0]]);
-          } else {
-            variantPricing = await convertToINR(stock.pricing);
+      let variantPricing = [];
+      let variantStockId = []; 
+      let variantdistributorId = stock?.distributor ? stock.distributor.toString() : "";
+
+      if (stock?.pricing) {
+        const { break: breakPoint, offer, ...variantCurrencies } = stock.pricing;
+
+        let variantPriceData = {
+          break: breakPoint, 
+          offer: offer || undefined,  
+          USD: 0,
+          INR: 0   
+        };
+        if (variantCurrencies.INR && !variantCurrencies.USD) {
+          variantPriceData.INR = variantCurrencies.INR;
+          const currentRates = await conversionRates();
+          const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;
+          if (usdRate) {
+            variantPriceData.USD = Number(variantCurrencies.INR * usdRate).toFixed(2); 
           }
         }
+        if (variantCurrencies.USD && !variantCurrencies.INR) {
+          variantPriceData.USD = variantCurrencies.USD;
+          const currentRates = await conversionRates();
+          const inrRate = currentRates["USD"] ? currentRates["USD"] : null;
+          if (inrRate) {
+            variantPriceData.INR = Number(variantCurrencies.USD * inrRate).toFixed(2); 
+          }
+        }
+        if (variantCurrencies.INR && variantCurrencies.USD) {
+          variantPriceData.USD = variantCurrencies.USD;
+          variantPriceData.INR = variantCurrencies.INR;
+        }
 
-        return {
-          _id: variant?._id?.toString() || "",
-          productName: variant?.productName || "Unknown Product",
-          prodDesc: variant?.prodDesc || "No description available",
-          description: Array.isArray(variant?.description) ? variant.description : [],
-          properties: variant?.properties || {},
-          manufacturerName: variant?.manufacturerName 
-            ? variant.manufacturerName.toString() 
-            : "Unknown Manufacturer",
-          productNumber: variant?.productNumber || "N/A",
-          imageSrc: variant?.imageSrc || "",
-          pricing: variantPricing ? variantPricing : [],
-      stockId: variantStockId,
-      distributorId: variantdistributorId
-    };
-      })
-    );
+        variantPricing.push(variantPriceData);  
+      }
+
+      return {
+        _id: variant?._id?.toString() || "",
+        productName: variant?.productName || "Unknown Product",
+        prodDesc: variant?.prodDesc || "No description available",
+        description: Array.isArray(variant?.description) ? variant.description : [],
+        properties: variant?.properties || {},
+        manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
+        productNumber: variant?.productNumber || "N/A",
+        imageSrc: variant?.imageSrc || "",
+        pricing: variantPricing,
+        stockId: variantStockId,
+        distributorId: variantdistributorId,
+      };
+    })
+  );
 
   const formattedRecord = {
     productId: product?._id?.toString() || "",
@@ -1090,7 +1348,7 @@ export async function DifferentProds(productId) {
     returnPolicy: product?.returnPolicy,
     imageSrc: product?.imageSrc || "",
     safetyDatasheet: product?.safetyDatasheet || "",
-    priceSize,
+    priceSize, 
     properties: product?.properties || {},
     description: product?.description || {},
     safetyInfo: product?.safetyInfo || {},
@@ -1108,9 +1366,7 @@ export async function DifferentProds(productId) {
       prodDesc: variant?.prodDesc || "No description available",
       description: variant?.description || [],
       properties: variant?.properties || {},
-      manufacturerName: variant?.manufacturerName
-        ? variant.manufacturerName.toString()
-        : "Unknown Manufacturer",
+      manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
       productNumber: variant?.productNumber || "N/A",
       imageSrc: variant?.imageSrc || "",
       pricing: variant?.pricing,
@@ -1121,7 +1377,7 @@ export async function DifferentProds(productId) {
 
   return { records: [formattedRecord] };
 }
-//Product info ends
+
 
 
 //////Quick Order//////////
@@ -1173,103 +1429,229 @@ export const quick = async () => {
 ///Quick Order////
 
 //CompareSimilar Items in product page
+// export async function CompareSimilarityData(productId) {
+//   const product = await Product.findOne({ productNumber: productId }).populate(
+//     "subsubCategory"
+//   );
+//   if (!product) {
+//     return { error: "Product not found" };
+//   }
+//   const subsubCategoryId = product.subsubCategory._id;
+//   if(subsubCategoryId){
+//     const compareSimilarity = await Product.aggregate([
+//       {
+//         $match: { subsubCategory: subsubCategoryId },
+//       },
+//       {
+//         $limit: 4,
+//       },
+//       {
+//         $lookup: {
+//           from: "categories",
+//           localField: "category",
+//           foreignField: "_id",
+//           as: "categoryInfo",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "subcategories",
+//           localField: "subCategory",
+//           foreignField: "_id",
+//           as: "subCategoryInfo",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "manufacturers",
+//           localField: "manufacturer",
+//           foreignField: "_id",
+//           as: "manufacturerInfo",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "subsubcategories",
+//           localField: "subsubCategory",
+//           foreignField: "_id",
+//           as: "subsubCategoryInfo",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "stocks",
+//           localField: "productNumber",
+//           foreignField: "productNumber",
+//           as: "stockInfo",
+//         },
+//       },
+//       {
+//         $project: {
+//           _id: 1,
+//           productName: 1,
+//           prodDesc: 1,
+//           properties: 1,
+//           "categoryInfo.urlName": 1,
+//           "subCategoryInfo.urlName": 1,
+//           "manufacturerInfo.name": 1,
+//           "subsubCategoryInfo.urlName": 1,
+//           'manufacturerInfo._id': 1,
+//           'stockInfo._id': 1,
+//           'stockInfo.distributor': 1,
+//           stockQuantity: {
+//             $ifNull: [{ $arrayElemAt: ["$stockInfo.stock", 0] }, 0],
+//           },
+//           stockPriceSize: {
+//             $ifNull: ["$stockInfo.pricing", []],
+//           },
+//           orderMultiple: {
+//             $ifNull: [{ $arrayElemAt: ["$stockInfo.orderMultiple", 0] }, 1],
+//           },
+//           priceSize: 1,
+//           imageSrc: 1,
+//           productUrl: 1,
+//           productNumber: 1,
+//         },
+//       },
+//     ]);
+//     let compareSimilarityJson = await Promise.all(compareSimilarity.map(async (items) => {
+//             let convertedPrice = await convertToINR(items.stockPriceSize);
+//             return {
+//                 ...items,
+//                 stockPriceSize: convertedPrice
+//             };
+//         }));
+//     // console.log(compareSimilarityJson, "compareSimilarityJson");
+//         return JSON.parse(JSON.stringify(compareSimilarityJson));
+//   } else { return [] }
+// }
+
 export async function CompareSimilarityData(productId) {
-  const product = await Product.findOne({ productNumber: productId }).populate(
-    "subsubCategory"
-  );
-  if (!product) {
-    return { error: "Product not found" };
-  }
-  const subsubCategoryId = product.subsubCategory._id;
-  if(subsubCategoryId){
-    const compareSimilarity = await Product.aggregate([
+  try {
+    const product = await Product.findOne({ productNumber: productId }).populate("subsubCategory");
+    
+    if (!product) {
+      return { error: "Product not found" };
+    }
+    if (!product.subsubCategory) {
+      console.warn(`No subsubCategory found for product: ${product.productName}`);
+      return [];
+    }
+    const subsubCategoryId = product.subsubCategory._id;
+    
+    if (!subsubCategoryId) {
+      return [];
+    }
+    const relatedProducts = await Product.aggregate([
       {
-        $match: { subsubCategory: subsubCategoryId },
+        $match: { 'subsubCategory': subsubCategoryId }
       },
       {
-        $limit: 4,
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "categoryInfo",
-        },
-      },
-      {
-        $lookup: {
-          from: "subcategories",
-          localField: "subCategory",
-          foreignField: "_id",
-          as: "subCategoryInfo",
-        },
+        $limit: 4
       },
       {
         $lookup: {
-          from: "manufacturers",
-          localField: "manufacturer",
-          foreignField: "_id",
-          as: "manufacturerInfo",
-        },
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'categoryInfo'
+        }
       },
       {
         $lookup: {
-          from: "subsubcategories",
-          localField: "subsubCategory",
-          foreignField: "_id",
-          as: "subsubCategoryInfo",
-        },
+          from: 'subcategories',
+          localField: 'subCategory',
+          foreignField: '_id',
+          as: 'subCategoryInfo'
+        }
       },
       {
         $lookup: {
-          from: "stocks",
-          localField: "productNumber",
-          foreignField: "productNumber",
-          as: "stockInfo",
-        },
+          from: 'manufacturers',
+          localField: 'manufacturer',
+          foreignField: '_id',
+          as: 'manufacturerInfo'
+        }
+      },
+      {
+        $lookup: {
+          from: 'subsubcategories',
+          localField: 'subsubCategory',
+          foreignField: '_id',
+          as: 'subsubCategoryInfo'
+        }
+      },
+      {
+        $lookup: {
+          from: 'stocks',
+          localField: 'productNumber',
+          foreignField: 'productNumber',
+          as: 'stockInfo'
+        }
       },
       {
         $project: {
           _id: 1,
           productName: 1,
           prodDesc: 1,
-          properties: 1,
-          "categoryInfo.urlName": 1,
-          "subCategoryInfo.urlName": 1,
-          "manufacturerInfo.name": 1,
-          "subsubCategoryInfo.urlName": 1,
+          'categoryInfo.urlName': 1,
+          'subCategoryInfo.urlName': 1,
+          'manufacturerInfo.name': 1,
           'manufacturerInfo._id': 1,
+          'subsubCategoryInfo.urlName': 1,
           'stockInfo._id': 1,
           'stockInfo.distributor': 1,
-          stockQuantity: {
-            $ifNull: [{ $arrayElemAt: ["$stockInfo.stock", 0] }, 0],
-          },
-          stockPriceSize: {
-            $ifNull: ["$stockInfo.pricing", []],
-          },
-          orderMultiple: {
-            $ifNull: [{ $arrayElemAt: ["$stockInfo.orderMultiple", 0] }, 1],
-          },
+          stockQuantity: { $ifNull: [{ $arrayElemAt: ['$stockInfo.stock', 0] }, 0] },
+          stockPriceSize: { $ifNull: ['$stockInfo.pricing', []] },
+          orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
           priceSize: 1,
           imageSrc: 1,
           productUrl: 1,
           productNumber: 1,
-        },
-      },
+          variants: { $ifNull: ["$variants", []] }
+        }
+      }
     ]);
-    let compareSimilarityJson = await Promise.all(compareSimilarity.map(async (items) => {
-            let convertedPrice = await convertToINR(items.stockPriceSize);
-            return {
-                ...items,
-                stockPriceSize: convertedPrice
-            };
-        }));
-    // console.log(compareSimilarityJson, "compareSimilarityJson");
-        return JSON.parse(JSON.stringify(compareSimilarityJson));
-  } else { return [] }
+    let relatedProductsJson = await Promise.all(relatedProducts.map(async (item) => {
+      if (item.stockPriceSize && item.stockPriceSize.length > 0) {
+        const convertedPricing = await Promise.all(
+          item.stockPriceSize.map(async (price) => {
+            if (price.USD) {
+                        const conversionResult = await convertToINR(price);
+                        return {
+                          usd: price.USD || 0,
+                          inr: conversionResult.INR,  
+                          break: price.break,
+                          offer: price.offer || "0"
+                        };
+                      }
+            else if (price.INR) {
+              const currentRates = await conversionRates();
+              const usdRate = currentRates["USD"] ? 1/currentRates["USD"] : null;
+              
+              return {
+                inr: parseFloat(price.INR).toFixed(2),
+                usd: usdRate ? parseFloat(price.INR * usdRate).toFixed(2) : "N/A",
+                break: price.break,
+                offer: price.offer || "0"
+              };
+            }
+            return price;
+          })
+        );
+    
+        item.stockPriceSize = convertedPricing;
+      }
+    
+      return item;
+    }));
+    
+    return JSON.parse(JSON.stringify(relatedProductsJson));
+  } catch (error) {
+    console.error("Error in RelatedProductData:", error);
+    return { error: "An error occurred while fetching related products" };
+  }
 }
-
 export const getCart = async(userId,cartId)=>{
    //if(!userId) return { cart:[]}
    let matchConditions = {}
