@@ -998,9 +998,9 @@ lname=data.profile.lastName || "";
 							submitting = false;
 							showSuccesDiv = true;
 							console.log(message1);
-							setTimeout(() => {
-								window.location.reload(); 							
-							}, 3000);
+							// setTimeout(() => {
+							// 	window.location.reload(); 							
+							// }, 3000);
 						} else if (keywordError === "error") {
 							message1 = result.data.data.error;
 							submitting = false;
@@ -1106,7 +1106,7 @@ lname=data.profile.lastName || "";
 								name="fname"
 								id="fname"
 								bind:value={fname}
-								class="flex sm:text-sm text-xs w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="First Name*"
 							/>
 							{#if showErrors && fname.length === 0}
@@ -1127,7 +1127,7 @@ lname=data.profile.lastName || "";
 								name="lname"
 								id="lname"
 								bind:value={lname}
-								class="flex w-full border border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="flex w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Last Name*"
 							/>
 							{#if showErrors && lname.length === 0}
@@ -1154,7 +1154,7 @@ lname=data.profile.lastName || "";
 								placeholder="Location"
 								on:input={handleInputChange}
 								on:click={toggleDropdown}
-								class="w-full sm:text-sm text-xs px-2 py-2 placeholder-gray-400 rounded  border border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
+								class="w-full sm:text-sm text-xs px-2 py-2 placeholder-gray-400 rounded  border-1 border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
 								required
 							/>
 						
@@ -1197,7 +1197,7 @@ lname=data.profile.lastName || "";
 								name="number"
 								id="number"
 								bind:value={number}
-								class="block w-full border border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Phone Number*"
 							/>
 							{#if showErrors && number.length === 0}
@@ -1222,7 +1222,7 @@ lname=data.profile.lastName || "";
 								name="company"
 								id="company"
 								bind:value={company}
-								class="block w-full border border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Company Name*"
 							/>
 							{#if showErrors && company.length === 0}
@@ -1237,7 +1237,7 @@ lname=data.profile.lastName || "";
 								name="role"
 								id="role"
 								bind:value={role}
-								class="block w-full border border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Role*"
 							/>
 							{#if showErrors && role.length === 0}
@@ -1249,7 +1249,7 @@ lname=data.profile.lastName || "";
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
-							<!-- <input type="text" name="email" id="email" bind:value={email} class="block w-full border border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email Address*" /> -->
+							<!-- <input type="text" name="email" id="email" bind:value={email} class="block w-full border-1 border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email Address*" /> -->
 							<input
 								type="hidden"
 								name="email"
@@ -1313,7 +1313,7 @@ lname=data.profile.lastName || "";
 										name="email"
 										id="email"
 										bind:value={email}
-										class="flex w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										class="flex w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 										placeholder="Email"
 										on:input={() => {
 											email = email.trim();
@@ -1444,7 +1444,7 @@ lname=data.profile.lastName || "";
 											name="enteredOtp"
 											bind:value={enteredOtpemail}
 											placeholder="Enter 6-digit OTP"
-											class="flex w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+											class="flex w-full border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 											on:input={() => {
 												enteredOtpemail =
 													enteredOtpemail.trim();
@@ -1496,7 +1496,7 @@ lname=data.profile.lastName || "";
 							name="details"
 							id="details"
 							bind:value={details}
-							class="w-full sm:text-sm text-xs p-2 border border-gray-300 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 mb-4 h-32"
+							class="w-full sm:text-sm text-xs p-2 border-1 border-gray-300 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 mb-4 h-32"
 							placeholder="Additional Details*"
 						></textarea>
 						{#if showErrors && details.length === 0}
@@ -1536,8 +1536,8 @@ lname=data.profile.lastName || "";
 						<button
   type="submit"
   on:click={handleSubmit}
-  class="px-5 py-2 bg-primary-400 text-white font-medium rounded transition duration-300 hover:bg-primary-500 sm:w-auto"
->
+  class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+  >
   {#if submitting}
     Sending...
   {:else}

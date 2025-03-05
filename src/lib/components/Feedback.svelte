@@ -10,6 +10,7 @@ import Icon from "@iconify/svelte";
   export let data;
   let error;
   let err;
+  let selectedRating = '';
   let showSuccesDiv = false;
   let showFailureDiv =false;
 // console.log(data, "data");
@@ -34,6 +35,7 @@ let displayMessage = "";
 let enteredOtp = "";
 let enteredOtpemail = "";
 let isOtpVerified = false;
+let submitting = false;
 let form3;      
 
   onMount(async () => {
@@ -292,20 +294,22 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
         // Return a function that does nothing to prevent form submission
         return () => {};
     }
-
+    submitting= true;
     return async ({ result }) => {
       let message1 = '';
       let keywordError = '';
       keywordError = result.data.type;
       if (keywordError === "success") {
         message1 = result.data.data.message;
+        submitting = false;
         resetForm();  
         showSuccesDiv = true;
-        setTimeout(() => {
-								location.reload();
-							}, 3000);
+        // setTimeout(() => {
+				// 				location.reload();
+				// 			}, 3000);
       } else if (keywordError === "error") {
         message1 = result.data.data.error;
+        submitting = false;
         showFailureDiv = true;
       }
       showMessage(message1, keywordError);
@@ -315,13 +319,31 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
 
   <div class="space-y-12 font-workSans">
     <div class="">
-      <h2 class="text-sm font-semibold text-gray-900 mb-4">Report an issue <span class="text-red-500 text-xs font-semibold">*</span></h2>
+      <h2 class="text-sm font-semibold text-gray-900 mb-4"> Chemikart feedback<span class="text-red-500 text-xs font-semibold">*</span></h2>
       <p class="mt-1 mb-4 sm:text-sm text-xs text-gray-600">If you come across any issues on our website, let us know! We’ll work on fixing them right away.</p>
       
       <fieldset class="border-b border-gray-900/10 pb-12">
+        <div class="mt-2 space-y-4 text-xs">
+
+          <!-- {#if !selectedRating} -->
+          {#each ['Website design & usability', 'User Experience & Website Functionality'] as rating}
+  <div class="flex items-center gap-x-3">
+    <input
+      type="radio"
+      class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500 cursor-pointer"
+      bind:group={selectedRating} 
+      value={rating}
+    />
+    <!-- svelte-ignore a11y-label-has-associated-control -->
+    <label class="block sm:text-sm text-xs font-base text-gray-900">{rating}</label>
+  </div>
+{/each}
+<!-- {/if} -->
+
+
+        {#if selectedRating === 'Website design & usability'}
         <legend class="text-sm font-semibold text-gray-900">Enhancing Website Performance and Customer Satisfaction</legend>
-        <div class="mt-6 space-y-4 text-xs">
-          {#each ['Slow Website Loading Speed','Issue with Contact form submission','Issue with Quotes request submission', 'Issue with other form submission','Poor Mobile Responsiveness', 'Poor Search Functionality', 'Lack of Payment Options', 'Everything is running smoothly'] as issue}
+          {#each ['Slow Website Loading Speed','Poor Mobile Responsiveness', 'Poor Search Functionality', 'Lack of Payment Options', 'Good Website design'] as issue}
             <div class="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -335,6 +357,24 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
               <label for={issue} class="font-base text-gray-900">{issue}</label>
             </div>
           {/each}
+
+          {:else if selectedRating === 'User Experience & Website Functionality'}
+          <legend class="text-sm font-semibold text-gray-900">Report an issue</legend>
+          {#each ['I can`t login to my profile' ,'Issue with Contact form submission','Issue with Quotes request submission', 'Issue with other form submission','Everything is running smoothly'] as issue}
+          <div class="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id={issue}
+              name="issue"
+              value={issue}
+              class="w-4 h-4 mb-1 ml-1 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0"
+              bind:group={formData.issue}
+              on:change={() => showIssueError = false} 
+            />
+            <label for={issue} class="font-base text-gray-900">{issue}</label>
+          </div>
+        {/each}
+        {/if}
         </div>
         {#if showIssueError}
         <div class="text-red-500 sm:text-xs text-2s font-medium mt-3">Please select at least one issue.</div>
@@ -350,7 +390,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
             id="requirement"
             name="requirement"
             bind:value={formData.requirement}
-            class="w-full py-1.5 pr-10 pl-3 text-sm rounded-md focus:ring-0 focus:outline-none border focus:border-primary-500 text-gray-900"
+            class="w-full py-1.5 pr-10 pl-3 text-sm rounded-md focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500 text-gray-900"
           >
             <option value="Yes">Yes</option>
             <option value="No">No</option>
@@ -367,7 +407,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
             id="name"
             bind:value={formData.name}
             on:input={() => showNameError = false} 
-            class="block w-full rounded-md focus:ring-0 focus:outline-none border focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
+            class="block w-full rounded-md focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
           />
           <!-- {#if formData.name.length > 0 && !/^[a-zA-Z]+$/.test(formData.name)} -->
           {#if formData.name.length > 0 && !/^[A-Za-z\s]+$/.test(formData.name)}  
@@ -441,7 +481,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
           name="email"
           id="email"
           bind:value={formData.email}
-            class="block w-full md:mt-1 rounded-md focus:ring-0 focus:outline-none border focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
+            class="block w-full md:mt-1 rounded-md focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
           placeholder="Email"
           on:input={() => {
             showEmailError = false
@@ -627,7 +667,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
             name="url"
             id="url"
             bind:value={urls}
-            class="block w-full rounded-md focus:ring-0 focus:outline-none border focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
+            class="block w-full rounded-md focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
           />
         </div>
         <div class="sm:col-span-4">
@@ -638,7 +678,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
             bind:value={formData.feedback}
             on:input={() => showFeedbackError = false} 
             rows="3"
-            class="block w-full rounded-md bg-white px-3 py-1.5 text-sm text-gray-900 focus:ring-0 focus:outline-none border focus:border-primary-500"
+            class="block w-full rounded-md bg-white px-3 py-1.5 text-sm text-gray-900 focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500"
           ></textarea>
           {#if showFeedbackError}
     <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please provide your feedback.</div>
@@ -693,7 +733,13 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
 
     <div class="flex items-center justify-end gap-x-6">
       <button type="submit" on:click={handleSubmit}                   
-      class="px-5 py-2 bg-primary-400 text-white rounded transition duration-300 hover:bg-primary-500 sm:w-auto font-medium">Submit</button>
+      class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+      >
+      {#if submitting}
+    Submitting...
+  {:else}
+    Submit
+  {/if}</button>
     </div>
   </div>
 

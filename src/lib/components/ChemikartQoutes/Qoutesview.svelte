@@ -8,10 +8,11 @@
 		let messageContainer;
     let showSuccesDiv = false;
 	  let showFailureDiv = false;
-		function refreshPage() {
-			resetFormData();
-			tog();
-		}
+    let submitting = false;
+		// function refreshPage() {
+		// 	resetFormData();
+		// 	tog();
+		// }
 		import {
 			solutionType,
 			formatType,
@@ -34,6 +35,11 @@
 				if (messageContainer) {
 					messageContainer.scrollIntoView({ behavior: 'smooth' });
 				}
+        if (keywordError === "success") {
+			setTimeout(() => {
+				resetFormData();
+			}, 2000);
+		}
 			});
 		}
 
@@ -91,7 +97,9 @@
 
 	{:else}
 <form method="POST" action="?/qoutes" class="mb-4 space-y-6"
- use:enhance={() => {return async({ result }) => {
+ use:enhance={() => {
+  submitting= true;
+  return async({ result }) => {
     let message1 = '';
     let keywordError = '';
     // console.log("result form",result);
@@ -101,13 +109,15 @@
     quoteNo = result.data.quoteId;
         if (keywordError === "success") {
       message1 = result.data.data.message; 
+      submitting = false;
       // toast.success(message1);
       showSuccesDiv = true;
-      setTimeout(() => {
-        location.reload();
-      }, 3000)
+      // setTimeout(() => {
+      //   location.reload();
+      // }, 3000)
     } else if (keywordError === "error") {
       message1 = result.data.data.error;
+      submitting = false;
       showFailureDiv = true;
       // toast.error(message1); 
     }
@@ -362,8 +372,14 @@
   
   <!-- Form buttons -->
   <div class="flex space-x-4 mt-6 justify-end">
-    <button type="submit" class="rounded sm:text-sm text-xs sm:px-5 px-2 py-3 bg-primary-500 text-white hover:bg-primary-600 focus:outline-none focus:ring focus:ring-primary-500">
-      Send quote request
+    <button type="submit"
+    class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+    >
+      {#if submitting}
+    Sending...
+  {:else}
+  Send quote request
+  {/if}
     </button>
     <!-- <button type="button" on:click={refreshPage} class="px-6 py-3 bg-primary-500 text-white rounded hover:bg-primary-600 focus:outline-none focus:ring focus:ring-primary-500">
       Back

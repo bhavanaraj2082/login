@@ -731,9 +731,9 @@
 							submitting = false;
 							showSuccesDiv = true;
 							console.log(message1);
-							setTimeout(() => {
-								location.reload();
-							}, 3000);
+							// setTimeout(() => {
+							// 	location.reload();
+							// }, 3000);
 						} else if (keywordError === "error") {
 							message1 = result.data.data.error;
 							submitting = false;
@@ -788,7 +788,7 @@
 							</div>
 							<div class="flex flex-col md:flex-row md:space-x-4">
 								<div class="flex-1 mb-4">
-									<input type="text" name="name" id="name" bind:value={name} class="flex w-full border sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="User Name" />
+									<input type="text" name="name" id="name" bind:value={name} class="flex w-full border-1 sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="User Name" />
 									{#if showErrors && name.length === 0}
 										<span class="text-red-500 sm:text-xs text-2s font-medium"
 											>Name is required</span
@@ -876,7 +876,7 @@
 												name="email"
 												id="email"
 												bind:value={email}
-												class="flex w-full border border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+												class="flex w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 												placeholder="Email"
 												on:input={() => {
 													email = email.trim();
@@ -1019,7 +1019,7 @@
 													name="enteredOtp"
 													bind:value={enteredOtpemail}
 													placeholder="Enter 6-digit OTP"
-													class="flex w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+													class="flex w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 													on:input={() => {
 														enteredOtpemail =
 															enteredOtpemail.trim();
@@ -1130,7 +1130,7 @@
 											placeholder="Country"
 											on:input={handleInputChange}
 											on:click={toggleDropdown}
-											class="block w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+											class="block w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 											required
 										/>
 										<Icon
@@ -1189,7 +1189,7 @@
 										name="phone"
 										id="phone"
 										bind:value={phone}
-										class="block w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										class="block w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 										placeholder="Phone"
 									/>
 									{#if showErrors && phone.length === 0}
@@ -1215,7 +1215,7 @@
 										name="subject"
 										id="subject"
 										bind:value={subject}
-										class="block w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										class="block w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 										placeholder="Subject"
 									/>
 									{#if showErrors && subject.length === 0}
@@ -1226,7 +1226,7 @@
 								</div>
 							</div>
 							<div class="flex-1 mb-4">
-								<textarea name="message" id="message" bind:value={message} class="w-full sm:text-sm text-xs p-1 border border-gray-300 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400 h-32" placeholder="Message"></textarea>
+								<textarea name="message" id="message" bind:value={message} class="w-full sm:text-sm text-xs p-1 border-1 border-gray-300 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400 h-32" placeholder="Message"></textarea>
 								{#if showErrors && message.length === 0}
 									<span class="text-red-500 sm:text-xs text-2s font-medium"
 										>Message is required</span
