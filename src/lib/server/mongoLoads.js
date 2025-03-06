@@ -157,7 +157,7 @@ export async function RelatedProductData(productId) {
       return { error: "Product not found" };
     }
     if (!product.subsubCategory) {
-      console.warn(`No subsubCategory found for product: ${product.productName}`);
+      // console.warn(`No subsubCategory found for product: ${product.productName}`);
       return [];
     }
     const subsubCategoryId = product.subsubCategory._id;
