@@ -10,53 +10,52 @@
   import { authedUser } from "$lib/stores/mainStores.js";
   import { sendMessage } from "$lib/utils.js";
   export let relatedProducts;
-  console.log("relatedProducts",relatedProducts);
+  // console.log("relatedProducts",relatedProducts);
 
-$: displayPrice = $currencyState === 'usd' 
-  ? selectedProduct.priceUSD 
-  : selectedProduct.priceINR;
-  $: currencySymbol = $currencyState === 'usd' ? '$' : '₹';
+  $: displayPrice =
+    $currencyState === "usd"
+      ? selectedProduct.priceUSD
+      : selectedProduct.priceINR;
+  $: currencySymbol = $currencyState === "usd" ? "$" : "₹";
 
   const productsData = relatedProducts;
   let isLoggedIn = $authedUser?.id ? true : false;
 
   let RelatedProductData = productsData.map((product) => {
-
-  return {
-    productId: product._id,
-    prodDesc: product.prodDesc,
-    productName: product.productName,
-    priceSize:
-      Array.isArray(product.stockPriceSize) && product.stockPriceSize.length > 0
-        ? product.stockPriceSize.map((size) => ({
-            size: size.break || "N/A",
-            priceINR: size.inr || 0,
-            priceUSD: size.usd || 0,
-            offer: size.offer || "0",
-          }))
-        : [],
-    image: product.imageSrc,
-    manufacturer: product.manufacturerInfo[0]?.name,
-    manufacturerId: product.manufacturerInfo[0]?._id,
-    distributorId: product.stockInfo?.[0]?.distributor || "",
-    stockInfo: Array.isArray(product.stockInfo) ? product.stockInfo : [],
-    stockId:
-      Array.isArray(product.stockInfo) && product.stockInfo.length > 0
-        ? product.stockInfo.map((stock) => stock._id)
-        : [],
-    stock: product.stockQuantity,
-    category: product.categoryInfo[0]?.urlName,
-    subCategory: product.subCategoryInfo[0]?.urlName,
-    subsubCategory: product.subsubCategoryInfo[0]?.urlName,
-    productUrl: product.productUrl,
-    productNumber: product.productNumber,
-    variants: Array.isArray(product.variants) ? product.variants : [],  
-  };
-});
-
+    return {
+      productId: product._id,
+      prodDesc: product.prodDesc,
+      productName: product.productName,
+      priceSize:
+        Array.isArray(product.stockPriceSize) &&
+        product.stockPriceSize.length > 0
+          ? product.stockPriceSize.map((size) => ({
+              size: size.break || "N/A",
+              priceINR: size.inr || 0,
+              priceUSD: size.usd || 0,
+              offer: size.offer || "0",
+            }))
+          : [],
+      image: product.imageSrc,
+      manufacturer: product.manufacturerInfo[0]?.name,
+      manufacturerId: product.manufacturerInfo[0]?._id,
+      distributorId: product.stockInfo?.[0]?.distributor || "",
+      stockInfo: Array.isArray(product.stockInfo) ? product.stockInfo : [],
+      stockId:
+        Array.isArray(product.stockInfo) && product.stockInfo.length > 0
+          ? product.stockInfo.map((stock) => stock._id)
+          : [],
+      stock: product.stockQuantity,
+      category: product.categoryInfo[0]?.urlName,
+      subCategory: product.subCategoryInfo[0]?.urlName,
+      subsubCategory: product.subsubCategoryInfo[0]?.urlName,
+      productUrl: product.productUrl,
+      productNumber: product.productNumber,
+      variants: Array.isArray(product.variants) ? product.variants : [],
+    };
+  });
 
   // console.log(RelatedProductData,"RelatedProductData from svelte");
-
 
   let currentIndex = 0;
   let logosPerSlide = 4;
@@ -126,14 +125,12 @@ $: displayPrice = $currencyState === 'usd'
     selectedPriceIndex = 0;
     selectedPrice = selectedProduct.priceSize[selectedPriceIndex];
     selectedStockId = selectedProduct.stockId[selectedPriceIndex] || "NA";
-    selectedVariants=selectedProduct.variants[selectedPriceIndex] || "NA"
+    selectedVariants = selectedProduct.variants[selectedPriceIndex] || "NA";
     showModal = true;
 
-    console.log("Selected Product Data after openModal:", selectedProduct);
-    console.log("Selected Price:", selectedPrice);
-    console.log("Selected Stock ID:", selectedStockId);
-
-    
+    // console.log("Selected Product Data after openModal:", selectedProduct);
+    // console.log("Selected Price:", selectedPrice);
+    // console.log("Selected Stock ID:", selectedStockId);
   }
 
   function closeModal() {
@@ -148,49 +145,47 @@ $: displayPrice = $currencyState === 'usd'
   //   // console.log("Selected Price:", selectedPrice);
   //   // console.log("Updated Stock ID:", selectedStockId);
   // }
-  
+
   // console.log('Selected Product:', selectedProduct);
   //       console.log('Variants:', selectedProduct?.variants);
   //       console.log('Price Size:', selectedProduct?.priceSize);
   let popupQuantity = 1;
 
   function decrementPopupQuantity() {
-  if (popupQuantity > 1) {
-    popupQuantity--;  
+    if (popupQuantity > 1) {
+      popupQuantity--;
+    }
   }
-}
 
-function incrementPopupQuantity() {
-  if (popupQuantity < 999) {
-    popupQuantity++;  
+  function incrementPopupQuantity() {
+    if (popupQuantity < 999) {
+      popupQuantity++;
+    }
   }
-}
 
-function selectPrice(index, size) {
+  function selectPrice(index, size) {
     selectedPrice = {
       ...selectedProduct.priceSize[index],
-      index: index  
+      index: index,
     };
     selectedPriceIndex = index;
     selectedStockId = selectedProduct.stockId[index] || "NA";
   }
 
-
-
-function handlePopupInput(event) {
-  const value = parseInt(event.target.value, 10);
-  if (isNaN(value)) {
-    popupQuantity = 1;  
-  } else {
-    if (value < 1) {
-      popupQuantity = 1;  
-    } else if (value > 999) {
-      popupQuantity = 999;  
+  function handlePopupInput(event) {
+    const value = parseInt(event.target.value, 10);
+    if (isNaN(value)) {
+      popupQuantity = 1;
     } else {
-      popupQuantity = value;  
+      if (value < 1) {
+        popupQuantity = 1;
+      } else if (value > 999) {
+        popupQuantity = 999;
+      } else {
+        popupQuantity = value;
+      }
     }
   }
-}
 
   const guestCartFetch = () => {
     const formdata = new FormData();
@@ -235,8 +230,8 @@ function handlePopupInput(event) {
       toast.success("Product added to cart");
       guestCartFetch();
       setTimeout(() => {
-    closeModal();
-  }, 30000);
+        closeModal();
+      }, 30000);
       return;
     }
 
@@ -246,8 +241,8 @@ function handlePopupInput(event) {
       toast.success(result.message);
       invalidate("/");
       setTimeout(() => {
-    closeModal();
-  }, 30000);
+        closeModal();
+      }, 30000);
     });
 
     // console.log("Final Cart Item Sent:", cartItem);
@@ -324,7 +319,7 @@ function handlePopupInput(event) {
                         manufacturerId: product.manufacturerId,
                         distributorId: product.distributorId,
                         stockId: product.stockId,
-                        variants : product.variants,
+                        variants: product.variants,
                       })}
                     class="w-11/12 max-w-xs text-primary-500 py-2 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition p-2 mb-4"
                   >
@@ -390,7 +385,10 @@ function handlePopupInput(event) {
             {selectedProduct.brand || "--"}
           </p>
           <p class="text-base font-semibold text-primary-500 text-left">
-            <a href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}">{selectedProduct.partNumber || "--"}</a>
+            <a
+              href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
+              >{selectedProduct.partNumber || "--"}</a
+            >
           </p>
           <h2 class="text-lg font-medium text-left">
             {selectedProduct.name || "--"}
@@ -405,60 +403,77 @@ function handlePopupInput(event) {
       <div class="pl-2">
         {#if selectedProduct?.variants?.length > 0}
           {#if selectedProduct?.variants?.length > 0}
-          <p class="text-gray-700 text-sm">
-            Multiple variants of this product are available with different prices. View more details below.
-          </p>
-          
-          <a href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}#productVariants">
-            <button 
-              on:click={closeModal} 
-              class="bg-primary-500 py-2 px-4 hover:bg-primary-600 text-sm rounded text-white mt-2"
-            >
-              View Products
-            </button>
-          </a>
-{/if}
-
-            {#if selectedProduct?.variants?.length === 0}
-
-          {#if selectedPrice}
-          <div class="mt-5 flex gap-6 items-center justify-between sm:justify-start">
-            <p class="text-base sm:text-lg ml-2">
-              Price: <span class="font-semibold text-2xl">
-                {#if $currencyState === "inr"}
-                ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString("en-IN", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                {:else if $currencyState === "usd"}
-               
-                  $ {(selectedPrice?.priceUSD ?? 0).toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                {/if}
-              </span>
+            <p class="text-gray-700 text-sm">
+              Multiple variants of this product are available with different
+              prices. View more details below.
             </p>
-          </div>
-        {/if}
-        {/if}
+
+            <a
+              href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}#productVariants"
+            >
+              <button
+                on:click={closeModal}
+                class="bg-primary-500 py-2 px-4 hover:bg-primary-600 text-sm rounded text-white mt-2"
+              >
+                View Products
+              </button>
+            </a>
+          {/if}
+
+          {#if selectedProduct?.variants?.length === 0}
+            {#if selectedPrice}
+              <div
+                class="mt-5 flex gap-6 items-center justify-between sm:justify-start"
+              >
+                <p class="text-base sm:text-lg ml-2">
+                  Price: <span class="font-semibold text-2xl">
+                    {#if $currencyState === "inr"}
+                      ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString(
+                        "en-IN",
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }
+                      )}
+                    {:else if $currencyState === "usd"}
+                      $ {(selectedPrice?.priceUSD ?? 0).toLocaleString(
+                        "en-US",
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }
+                      )}
+                    {/if}
+                  </span>
+                </p>
+              </div>
+            {/if}
+          {/if}
         {:else if selectedProduct?.variants?.length === 0 && selectedProduct?.priceSize?.length === 0}
-        <div>
-          <p class="text-gray-700 text-sm">The price for this product is unavailable. Please request a quote</p>
-          <a href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}">
-            <button class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-sm text-white mt-2">
-              Request Quote
-            </button>
-          </a>
-        </div>
+          <div>
+            <p class="text-gray-700 text-sm">
+              The price for this product is unavailable. Please request a quote
+            </p>
+            <a
+              href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
+            >
+              <button
+                class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-sm text-white mt-2"
+              >
+                Request Quote
+              </button>
+            </a>
+          </div>
         {:else}
           <div class="mt-4">
             <h1 class="font-semibold">Select Size</h1>
             <div class="flex gap-3 mt-3 flex-wrap mb-4">
-        
               {#each selectedProduct.priceSize as { size }, index}
                 <button
-                  class="focus:bg-primary-400 hover:scale-105 focus:text-white border px-3 py-1 rounded-full {selectedPriceIndex === index ? ' bg-primary-400 text-white' : ''}"
+                  class="focus:bg-primary-400 hover:scale-105 focus:text-white border px-3 py-1 rounded-full {selectedPriceIndex ===
+                  index
+                    ? ' bg-primary-400 text-white'
+                    : ''}"
                   on:click={() => selectPrice(index, size)}
                 >
                   {size}
@@ -467,27 +482,36 @@ function handlePopupInput(event) {
             </div>
 
             {#if selectedPrice}
-            <div class="mt-5 flex gap-6 items-center justify-between sm:justify-start mb-4">
-              <p class="text-base sm:text-lg ml-2">
-                Price: <span class="font-semibold text-2xl">
-                  {#if $currencyState === 'usd'}
-                    $ {(selectedPrice?.priceUSD ?? 0).toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  {:else}
-                    ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString("en-IN", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  {/if}
-                </span>
-              </p>
-            </div>
-            
+              <div
+                class="mt-5 flex gap-6 items-center justify-between sm:justify-start mb-4"
+              >
+                <p class="text-base sm:text-lg ml-2">
+                  Price: <span class="font-semibold text-2xl">
+                    {#if $currencyState === "usd"}
+                      $ {(selectedPrice?.priceUSD ?? 0).toLocaleString(
+                        "en-US",
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }
+                      )}
+                    {:else}
+                      ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString(
+                        "en-IN",
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }
+                      )}
+                    {/if}
+                  </span>
+                </p>
+              </div>
 
               <form class="flex items-center gap-3">
-                <div class="border border-gray-300 rounded-md flex gap-2 justify-between items-center hover:shadow-lg hover:shadow-orange-100 w-full sm:w-36">
+                <div
+                  class="border border-gray-300 rounded-md flex gap-2 justify-between items-center hover:shadow-lg hover:shadow-orange-100 w-full sm:w-36"
+                >
                   <button
                     type="button"
                     class="pl-3 text-xl text-primary-500 hover:scale-110"
@@ -515,7 +539,8 @@ function handlePopupInput(event) {
                 <button
                   type="button"
                   class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-400 hover:text-white transition"
-                  on:click={() => addToCart(selectedProduct, selectedPriceIndex)}
+                  on:click={() =>
+                    addToCart(selectedProduct, selectedPriceIndex)}
                 >
                   Add to Cart
                 </button>
@@ -527,4 +552,3 @@ function handlePopupInput(event) {
     </div>
   </div>
 {/if}
-

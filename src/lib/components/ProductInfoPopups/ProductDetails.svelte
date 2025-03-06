@@ -9,7 +9,7 @@
   import Icon from "@iconify/svelte";
   import { currencyState } from "$lib/stores/mainStores.js";
   import { cartState } from "$lib/stores/cartStores.js";
-  import { authedUser,cartTotalComps } from "$lib/stores/mainStores.js";
+  import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
   import Variants from "$lib/components/ProductInfoPopups/Variants.svelte";
   import Description from "$lib/components/ProductInfoPopups/Description.svelte";
   import { toast, Toaster } from "svelte-sonner";
@@ -18,7 +18,7 @@
   export let isFavorite;
   // console.log(isFavorite, "isFavorite");
   // console.log(authedUser, "authedUser");
-  console.log(data.records, "data");
+  // console.log(data.records, "data");
   let form;
   let showDropdown = false;
   let showSharePopup = false;
@@ -154,65 +154,83 @@
   // }
 
   $: {
-  if (
-    !data?.records ||
-    !Array.isArray(data.records) ||
-    data.records.length === 0
-  ) {
-    console.warn("No records found!");
-    minPrice = "N/A";
-    maxPrice = "N/A";
-  } else {
-    minPrice = { INR: Infinity, USD: Infinity };
-    maxPrice = { INR: -Infinity, USD: -Infinity };
+    if (
+      !data?.records ||
+      !Array.isArray(data.records) ||
+      data.records.length === 0
+    ) {
+      console.warn("No records found!");
+      minPrice = "N/A";
+      maxPrice = "N/A";
+    } else {
+      minPrice = { INR: Infinity, USD: Infinity };
+      maxPrice = { INR: -Infinity, USD: -Infinity };
 
-    data.records.forEach((record, recordIndex) => {
-      if (record?.variants && Array.isArray(record.variants)) {
-        record.variants.forEach((variant, variantIndex) => {
-          // Check if pricing data exists
-          if (variant?.pricing && Array.isArray(variant.pricing) && variant.pricing.length > 0) {
-            const pricingData = variant.pricing[0]; // Access the first item in the array
+      data.records.forEach((record, recordIndex) => {
+        if (record?.variants && Array.isArray(record.variants)) {
+          record.variants.forEach((variant, variantIndex) => {
+            // Check if pricing data exists
+            if (
+              variant?.pricing &&
+              Array.isArray(variant.pricing) &&
+              variant.pricing.length > 0
+            ) {
+              const pricingData = variant.pricing[0]; // Access the first item in the array
 
-            console.log(`Record ${recordIndex}, Variant ${variantIndex}: Pricing data found:`, pricingData);
+              console.log(
+                `Record ${recordIndex}, Variant ${variantIndex}: Pricing data found:`,
+                pricingData
+              );
 
-            // Check and parse INR price
-            let priceINR = Number(pricingData.INR); // Access INR from the first object in the array
-            if (!isNaN(priceINR) && priceINR > 0) {
-              minPrice.INR = Math.min(minPrice.INR, priceINR);
-              maxPrice.INR = Math.max(maxPrice.INR, priceINR);
-              console.log(`Record ${recordIndex}, Variant ${variantIndex}: INR - ${priceINR}`);
+              // Check and parse INR price
+              let priceINR = Number(pricingData.INR); // Access INR from the first object in the array
+              if (!isNaN(priceINR) && priceINR > 0) {
+                minPrice.INR = Math.min(minPrice.INR, priceINR);
+                maxPrice.INR = Math.max(maxPrice.INR, priceINR);
+                console.log(
+                  `Record ${recordIndex}, Variant ${variantIndex}: INR - ${priceINR}`
+                );
+              } else {
+                console.warn(
+                  `Record ${recordIndex}, Variant ${variantIndex}: Invalid INR value:`,
+                  pricingData.INR
+                );
+              }
+
+              // Check and parse USD price
+              let priceUSD = Number(pricingData.USD); // Access USD from the first object in the array
+              if (!isNaN(priceUSD) && priceUSD > 0) {
+                minPrice.USD = Math.min(minPrice.USD, priceUSD);
+                maxPrice.USD = Math.max(maxPrice.USD, priceUSD);
+                console.log(
+                  `Record ${recordIndex}, Variant ${variantIndex}: USD - ${priceUSD}`
+                );
+              } else {
+                console.warn(
+                  `Record ${recordIndex}, Variant ${variantIndex}: Invalid USD value:`,
+                  pricingData.USD
+                );
+              }
             } else {
-              console.warn(`Record ${recordIndex}, Variant ${variantIndex}: Invalid INR value:`, pricingData.INR);
+              console.warn(
+                `Record ${recordIndex}, Variant ${variantIndex}: Pricing data missing or incorrect.`
+              );
             }
+          });
+        }
+      });
 
-            // Check and parse USD price
-            let priceUSD = Number(pricingData.USD); // Access USD from the first object in the array
-            if (!isNaN(priceUSD) && priceUSD > 0) {
-              minPrice.USD = Math.min(minPrice.USD, priceUSD);
-              maxPrice.USD = Math.max(maxPrice.USD, priceUSD);
-              console.log(`Record ${recordIndex}, Variant ${variantIndex}: USD - ${priceUSD}`);
-            } else {
-              console.warn(`Record ${recordIndex}, Variant ${variantIndex}: Invalid USD value:`, pricingData.USD);
-            }
-          } else {
-            console.warn(`Record ${recordIndex}, Variant ${variantIndex}: Pricing data missing or incorrect.`);
-          }
-        });
-      }
-    });
+      // Log the final min and max prices for INR and USD
+      // console.log(`Final minPrice (INR): ${minPrice.INR}, maxPrice (INR): ${maxPrice.INR}`);
+      // console.log(`Final minPrice (USD): ${minPrice.USD}, maxPrice (USD): ${maxPrice.USD}`);
+    }
 
-    // Log the final min and max prices for INR and USD
-    console.log(`Final minPrice (INR): ${minPrice.INR}, maxPrice (INR): ${maxPrice.INR}`);
-    console.log(`Final minPrice (USD): ${minPrice.USD}, maxPrice (USD): ${maxPrice.USD}`);
+    // If no valid prices found, set to '--'
+    if (minPrice.INR === Infinity) minPrice.INR = "--";
+    if (maxPrice.INR === -Infinity) maxPrice.INR = "--";
+    if (minPrice.USD === Infinity) minPrice.USD = "--";
+    if (maxPrice.USD === -Infinity) maxPrice.USD = "--";
   }
-
-  // If no valid prices found, set to '--'
-  if (minPrice.INR === Infinity) minPrice.INR = "--";
-  if (maxPrice.INR === -Infinity) maxPrice.INR = "--";
-  if (minPrice.USD === Infinity) minPrice.USD = "--";
-  if (maxPrice.USD === -Infinity) maxPrice.USD = "--";
-}
-
 
   let productStock = data.records;
   let index = 0;
@@ -304,9 +322,9 @@
     // sendMessage("/cart?/guestCart", formdata, async (result) => {
     //   cart.set(result.cart);
     // });
-    const storedTotalComps = JSON.parse(localStorage.getItem('cart'));;
-		localStorage.setItem('totalCompsChemi', storedTotalComps.length);
-		syncLocalStorageToStore();	
+    const storedTotalComps = JSON.parse(localStorage.getItem("cart"));
+    localStorage.setItem("totalCompsChemi", storedTotalComps.length);
+    syncLocalStorageToStore();
   };
 
   export function addToCart(product) {
@@ -335,7 +353,7 @@
     sendMessage("?/addtocart", formdata, async (result) => {
       // console.log("result",result);
       if (result.success) {
-        await submitForm();	
+        await submitForm();
       }
       toast.success(result.message);
       invalidate("/");
@@ -398,25 +416,31 @@
     return Object.keys(formErrors).length === 0 && isOtpVerified === true;
   }
   function handleData() {
-		return async ({ result }) => {
-			// console.log("resultresultresultresultresultresultresult",result);
-			const totalComps  = result?.data?.cartData?.cartItems.length 
-			localStorage.setItem('totalCompsChemi', totalComps);
-			syncLocalStorageToStore();
-		};
-	}
-	function syncLocalStorageToStore() {
-		const storedTotalComps = localStorage.getItem('totalCompsChemi');
+    return async ({ result }) => {
+      // console.log("resultresultresultresultresultresultresult",result);
+      const totalComps = result?.data?.cartData?.cartItems.length;
+      localStorage.setItem("totalCompsChemi", totalComps);
+      syncLocalStorageToStore();
+    };
+  }
+  function syncLocalStorageToStore() {
+    const storedTotalComps = localStorage.getItem("totalCompsChemi");
 
-		if (storedTotalComps ) {
-			cartTotalComps.set(Number(storedTotalComps));
-		}
-	}
+    if (storedTotalComps) {
+      cartTotalComps.set(Number(storedTotalComps));
+    }
+  }
   async function submitForm() {
-		form.requestSubmit();
-	}
+    form.requestSubmit();
+  }
 </script>
-<form method="POST" action="/?/getCartValue" bind:this={form} use:enhance={handleData}>
+
+<form
+  method="POST"
+  action="/?/getCartValue"
+  bind:this={form}
+  use:enhance={handleData}
+>
   <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
 </form>
 {#each data.records as product}
@@ -492,7 +516,7 @@
                     if (result.data.success) {
                       toast.success(result.data.message);
                     } else {
-                      toast.error(result.data.message);
+                      // toast.error(result.data.message);
                     }
                     favoriteNotification = result.data.message;
                     favoriteStatus = result.data.type;
@@ -605,35 +629,30 @@
           </div>
         {/if}
         <!-- {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && ((variant.pricing.INR && variant.pricing.INR > 0) || (variant.pricing.USD && variant.pricing.USD > 0)))} -->
-        {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant?.pricing && variant.pricing.length > 0 && 
-          variant.pricing.some((pricingItem) => 
-            (pricingItem.INR && Number(pricingItem.INR) > 0) || 
-            (pricingItem.USD && Number(pricingItem.USD) > 0)
-          ))}
-        
+        {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant?.pricing && variant.pricing.length > 0 && variant.pricing.some((pricingItem) => (pricingItem.INR && Number(pricingItem.INR) > 0) || (pricingItem.USD && Number(pricingItem.USD) > 0)))}
           <div class="flex justify-between !mt-3">
             <!-- <p class="text-gray-900 text-lg font-semibold text-start">
               ₹ {minPrice.toLocaleString()} - ₹ {maxPrice.toLocaleString()}
             </p> -->
             <p class="text-gray-900 text-lg font-semibold text-start">
-              {#if $currencyState === 'usd'}
+              {#if $currencyState === "usd"}
                 $ {minPrice.USD.toLocaleString("en-US", {
                   minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
+                  maximumFractionDigits: 2,
                 })} - $ {maxPrice.USD.toLocaleString("en-US", {
                   minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
+                  maximumFractionDigits: 2,
                 })}
               {:else}
                 ₹ {minPrice.INR.toLocaleString("en-IN", {
                   minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
+                  maximumFractionDigits: 2,
                 })} - ₹ {maxPrice.INR.toLocaleString("en-IN", {
                   minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
+                  maximumFractionDigits: 2,
                 })}
               {/if}
-            </p>          
+            </p>
           </div>
         {/if}
         {#if screenWidth >= 640 && !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
@@ -802,7 +821,7 @@
                     {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    },
+                    }
                   )}
                 {:else}
                   ₹ {(product?.priceSize[index]?.INR ?? 0).toLocaleString(
@@ -810,7 +829,7 @@
                     {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    },
+                    }
                   )}
                 {/if}
               </span>
@@ -880,11 +899,11 @@
                           console.log("success/error type:", status);
                           console.log(
                             "success/error message:result.data.message=",
-                            result.data.message,
+                            result.data.message
                           );
                           console.log(
                             "success/error message:result.data.message=",
-                            result.data.stock,
+                            result.data.stock
                           );
                           stockStatus = result.data.stock;
                           stockAvailability = result.data.message;
@@ -1463,7 +1482,7 @@
 
                     if (
                       verificationMessage.includes(
-                        "Verification email sent successfully. Please check your inbox.",
+                        "Verification email sent successfully. Please check your inbox."
                       )
                     ) {
                       displayMessage = "Please check your inbox.";
@@ -1518,7 +1537,7 @@
                   type="submit"
                   class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-500 font-semibold text-2s pl-2 py-1 rounded hover:underline disabled:cursor-not-allowed"
                   disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-                    email,
+                    email
                   ) || email.split("@")[1].includes("gamil")}
                 >
                   Verify

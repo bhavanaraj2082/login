@@ -23,7 +23,7 @@
 		}
 	};
 
-	console.log("SEO----metadata---->",metadata);
+	// console.log("SEO----metadata---->",metadata);
 </script>
 
 <svelte:head>
