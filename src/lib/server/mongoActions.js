@@ -2349,48 +2349,36 @@ export const quicksearch = async ({ query }) => {
 		  
 		  if (entry.pricing) {
 			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
-			
-			if (originalPricing[0]?.INR) {
-			  const currentRates = await conversionRates();
-			  const usdRate = currentRates["USD"] ? 1/currentRates["USD"] : null;
-			  
-			  processedPricing = originalPricing.map(price => {
-				const inrValue = price.INR;
-				const usdValue = usdRate ? (inrValue * usdRate).toFixed(2) : "N/A";
-				
-				return {
-				  ...price,
-				  usd: usdValue
-				};
-			  });
-			  
-			  priceoneValue = originalPricing[0]?.INR || "";
-			  
-			} else {
-			  try {
-				const originalPricingArray = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
-				
-				
-				const convertedPricing = await convertToINR(originalPricingArray);
-				
-
-				
-				processedPricing = originalPricingArray.map((origPrice, index) => {
-				  const convertedPrice = convertedPricing[index];
-				  const result = {
-					...origPrice,  
-					inr: convertedPrice.INR  
-				  };
-				  
-				  return result;
+			const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+		
+			if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
+				processedPricing = originalPricing.map(price => {
+					const inrValue = price.INR;
+					const usdValue = inrValue / currency.rate; 
+					return {
+						...price,
+						USD: usdValue.toFixed(2) 
+					};
 				});
-				
-				priceoneValue = processedPricing[0]?.inr || convertedPricing[0]?.INR || "";
-			  } catch (error) {
+		
+				priceoneValue = originalPricing[0]?.INR || "";
+		
+			} else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
+				processedPricing = originalPricing.map(price => {
+					const usdValue = price.USD;
+					const inrValue = usdValue * currency.rate; 
+					return {
+						...price,
+						INR: inrValue.toFixed(2) 
+					};
+				});
+		
+				priceoneValue = originalPricing[0]?.USD || "";
+			} else {
 				processedPricing = originalPricing;
-			  }
 			}
-		  }
+		}
+		
   
 		  const productEntry = {
 			id: baseProduct._id.toString(),
