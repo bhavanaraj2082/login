@@ -2,7 +2,7 @@ import { popularProducts } from '$lib/server/mongoLoads.js';
 import { searchByQuery } from '$lib/server/mongoActions.js';
 import { MAILCHIMP_API_KEY,MAILCHIMP_LIST_ID,MAILCHIMP_SERVER_PREFIX } from '$env/static/private';
 import FooterLink from '$lib/server/models/FooterLink.js';
-import { singleCartForCount } from '$lib/server/mongoLoads.js';
+import { singleCartForCount,getCart } from '$lib/server/mongoLoads.js';
 
 export async function load() {
     try {
@@ -93,6 +93,16 @@ export const actions = {
         try {
           const cartData = await singleCartForCount(body.loggedInUser);
           return { cartData };
+        } catch (err) {
+          console.log('--error--', err);
+          return fail(400, err);
+        }
+      },
+      getCartData: async ({ request }) => {
+        const body = Object.fromEntries(await request.formData());
+        try {
+          const cartData = await getCart(body.loggedInUser);
+          return  cartData ;
         } catch (err) {
           console.log('--error--', err);
           return fail(400, err);
