@@ -2619,6 +2619,8 @@ export const getGuestCart = async(body)=>{
 		stockDetails,
 		manufacturerId,
 		quantity,
+		currentPrice:{INR:pricing.INR,USD:pricing.USD},
+		normalPrice:{INR:pricing.INR,USD:pricing.USD},
 		pricing,
 		itemTotalPrice:{totalINR,totalUSD}
 	  }
