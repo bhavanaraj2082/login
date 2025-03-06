@@ -291,6 +291,8 @@
 			// console.log("totalComps",totalComps);
 			localStorage.setItem("totalCompsChemi", totalComps);
 			
+
+			
 			cartId = result.data?.cart[0]?.cartId;
 			$cart = result.data?.cart[0]?.cartItems || [];
 			syncLocalStorageToStore();
