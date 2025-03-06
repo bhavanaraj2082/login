@@ -3,13 +3,13 @@
 	import { cart,guestCart,removeFromCart } from '$lib/stores/cart.js';
 	import { goto,invalidate } from '$app/navigation';
 	import { enhance } from '$app/forms';
-	export let cartId
+    let cartId
 	// import { updateCartState } from '$lib/stores/cart.js';
 	import { onMount, onDestroy } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { toast } from 'svelte-sonner';
 	import {authedUser,currencyState,cartTotalComps} from '$lib/stores/mainStores.js'
-  console.log("hey im guest cart from side cart",$guestCart);
+//   console.log("hey im guest cart from side cart",$guestCart);
   
 	let cartOpen = false;
 	let cartItems = [];
@@ -65,8 +65,12 @@
 	};
 
 	const calculateTotalPrice = (cart)=>{
-       priceINR = cart.reduce((sum,crt)=> sum + crt.pricing.INR*crt.quantity,0)
-       priceUSD = cart.reduce((sum,crt)=> sum + crt.pricing.USD*crt.quantity,0)
+		console.log("cart",cart);
+		
+       priceINR = cart.reduce((sum,crt)=> sum + crt?.pricing?.INR*crt?.quantity,0)
+       priceUSD = cart.reduce((sum,crt)=> sum + crt?.pricing?.USD*crt?.quantity,0)
+	//    console.log("priceUINR",priceINR);
+	//    console.log("priceUSD",priceUSD);
 	}
 
     $: calculateTotalPrice($cart)
@@ -116,12 +120,16 @@
 	}
 	const incrementQuantity = (stock,_id,indx) => {
 		clearTimeout(timeout)
-
+		// console.log("stock",stock);
+		// console.log("_id",_id);
+		// console.log("indx",indx);
 		if(!isLoggedIn){
 			cart.update(item=>{
 				item[indx].quantity += 1
-				return 
+				return item
 			})
+			// console.log("afterrrrrrrrrrr updationn",$cart);
+			
 			guestCart.update(item=>{
 			item[indx].quantity += 1
 			return item
@@ -145,7 +153,7 @@
 		  formdata.append("quantity",$cart[index]?.quantity)
 		  formdata.append("cartId",cartId)
 		  sendMessage("/cart?/updateQty",formdata,async(result)=>{
-			console.log(result);
+			// console.log(result);
 			calculateTotalPrice($cart)
 		  })
 	  },1000)
@@ -154,6 +162,9 @@
 
 	const decrementQuantity = (stock,_id,indx) => {
 		clearTimeout(timeout)
+		// console.log("stock",stock);
+		// console.log("_id",_id);
+		// console.log("indx",indx);
 		if(!isLoggedIn){
 			cart.update(item=>{
 				item[indx].quantity -= 1
@@ -183,7 +194,7 @@
 		  formdata.append("cartId",cartId)
 		  sendMessage("/cart?/updateQty",formdata,async(result)=>{
 			calculateTotalPrice($cart)
-			console.log(result);
+			// console.log(result);
 		  })
 	  },1000)
 	};
@@ -200,12 +211,14 @@
 		formdata.append("_id",_id)
 	    sendMessage("/cart?/deleteOne",formdata,async(result)=>{
 			if(result.success){
+				cart.update((items) => {
+        // Filter out the item with the matching _id
+        return items.filter(item => item._id !== _id);
+    });
 				toast.success(result.message)
 			}else{
 				toast.error(result.message)
 			}
-			invalidate("data:load")
-
 		})
 	};
 
@@ -219,6 +232,9 @@
 		formdata.append("cartId",cartId)
 	    sendMessage("/cart?/deleteAll",formdata,async(result)=>{
 			if(result.success){
+				cart.update(() => {
+        return []; 
+    });
 				toast.success(result.message)
 			}else{
 				toast.error(result.message)
@@ -239,7 +255,7 @@
 	};
   
 	const toggleCart = () => {
-		console.log("clicked");
+		// console.log("clicked");
 		if ($authedUser.id) {
 			form.requestSubmit();
 		}else{
@@ -253,13 +269,14 @@
 	};
 	function handleDataCart() {
 		return async ({ result }) => {
-			console.log("result from page server for carat data",result.data.cart[0].cartItems);
-			$cart=result.data.cart[0].cartItems	
+			// console.log("result from page server for carat data",result.data);
+			cartId=result.data?.cart[0]?.cartId
+			$cart=result.data?.cart[0]?.cartItems||[]	
 		};
 	}
 	function handleDataGuestCart() {
 		return async ({ result }) => {
-			console.log("result from page server for carat data",result.data.cart);
+			// console.log("result from page server for carat data",result.data.cart);
 			$cart=result.data.cart
 		};
 	}
