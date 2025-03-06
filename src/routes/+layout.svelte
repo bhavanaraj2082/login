@@ -15,12 +15,12 @@
     $authedUser = data?.authedUser;
 	//let cartData;
 	// $:console.log(data,"---------")
-    $:cartData = data?.cart?.cart[0]?.cartItems ||[]
+   // $:cartData = data?.cart?.cart[0]?.cartItems ||[]
 	// authedUser.set(data.locals.authedUser)
 	let isLoggedIn = $authedUser?.id ? true : false
 
 	
-	$:cart.set(cartData)
+	//$:cart.set(cartData)
 
 	const guestCartFetch = () => {
 		const formdata = new FormData();
@@ -40,8 +40,8 @@
 				cart.set([]);
 			}
 		} else {
-			cartData = data?.cart?.cart[0]?.cartItems || [];
-			cart.set(cartData);
+			// cartData = data?.cart?.cart[0]?.cartItems || [];
+			// cart.set(cartData);
 		}
 
 	});

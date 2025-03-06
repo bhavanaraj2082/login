@@ -124,10 +124,12 @@
             products = products.map(product => {
         if (product._id === id) {
             let selectedQty = Math.ceil(quantity/ product.orderMultiple) * product.orderMultiple;
+            let priceINR = product.pricing.INR*selectedQty
+            let priceUSD = product.pricing.USD*selectedQty
             return {
                 ...product, // Copy the product object
                 quantity:selectedQty, // Increment the quantity
-                totalPrice:product.pricing.INR*selectedQty
+                totalPrice:{priceINR,priceUSD}
             };
         }
         return product; 
@@ -141,10 +143,12 @@
     products = products.map(product => {
         if (product._id === id) {
           //  if (product.quantity > product.orderMultiple) {
+            let priceINR = product.pricing.INR*(product.quantity-product.orderMultiple)
+            let priceUSD = product.pricing.USD*(product.quantity-product.orderMultiple)
                 return {
                     ...product,
                     quantity:product.quantity - product.orderMultiple,
-                    totalPrice:product.pricing.INR*(product.quantity-product.orderMultiple)
+                    totalPrice:{priceINR,priceUSD}
                     
                 };
           //  }
@@ -158,10 +162,12 @@
     const incrementQuantity = (id, quantity) => {
     products = products.map(product => {
         if (product._id === id) {
+            let priceINR = product.pricing.INR*(product.quantity+product.orderMultiple)
+            let priceUSD = product.pricing.USD*(product.quantity+product.orderMultiple)
             return {
                 ...product, // Copy the product object
                 quantity: product.quantity + product.orderMultiple, // Increment the quantity
-                totalPrice:product.pricing.INR*(product.quantity+product.orderMultiple)
+                totalPrice:{priceINR,priceUSD}
             };
         }
         return product; // Keep other products unchanged
@@ -455,7 +461,7 @@ const handleSearch = (searchName) => {
 							class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							><Icon icon="rivet-icons:minus" class="text-xs" /></button
 						>
-						<button on:click={()=>{tog = index}} class="w-fit mx-3 text-sm font-medium outline-none text-center">
+						<button on:click={()=>{tog = index}} class="w-fit px-3 py-0.5 text-sm font-medium outline-none text-center">
 							{product.quantity}
 						</button>
 						<button

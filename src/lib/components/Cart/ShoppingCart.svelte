@@ -33,7 +33,7 @@
 	$: cartId = data?.cart[0]?.cartId || '';
 	$: cartName = data?.cart[0]?.cartName || '';
 	$: recurrence = data?.cart[0]?.recurrence || '';
-	// $: console.log($cart,"forntend");
+    console.log(data,"forntend");
 
 	const calculateTotalPrice = (cart)=>{
        priceINR = cart.reduce((sum,crt)=> sum + crt.currentPrice.INR*crt.quantity,0)
@@ -48,7 +48,7 @@
 			calculateTotalPrice($cart);
 		});
 	};
-
+	console.log($cart,"1")
 	let scrollTimeout
 	const handleScroll = (e) => {
 	isHide = true;
@@ -71,18 +71,14 @@
 				cart.set([]);
 			}
 		} else {
-			cartData = data?.cart[0]?.cartItems || [];
+			let cartData = data?.cart[0]?.cartItems || [];
 			cart.set(cartData);
 		    calculateTotalPrice($cart);
 		}
+		console.log($cart,"2")
 
 	});
 
-	onDestroy(() => {
-   // window.removeEventListener('scroll', handleScroll);
-    });
-	
-	//$:calculateTotalPrice($cart)
 	let showModal = false;
 
 	const toggleModal = () => {
@@ -94,7 +90,7 @@
 			addToCartModal = !addToCartModal;
 		}
 	};
-
+    console.log($cart,"3")
 	const downloadExcel = () => {
     // Define the data (same as the original CSV content)
     const headers = [
@@ -178,7 +174,7 @@
     // Generate Excel file and trigger download
     XLSX.writeFile(workbook, 'cart_details.xlsx');
     };
-
+	console.log($cart,"4")
 	const recurrencePeriod =(recurring)=>{
 		if(recurring === 1){
        return "Monthly" 
@@ -382,6 +378,7 @@
 			invalidate('data:cart');
 		};
 	}
+	$:console.log($cart,"5")
 </script>
 
 
