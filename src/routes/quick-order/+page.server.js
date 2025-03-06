@@ -223,7 +223,7 @@ quicksearch: async ({ request }) => {
       const formData = await request.formData();
       console.log('Form Data:', formData);
       
-      const cartItems = JSON.parse(formData.get('cartItems'));
+      const cartItems = JSON.parse(formData.get('cartItems')) || JSON.parse(formData.get('manualEntries')) ;
       console.log('Parsed Cart Items:', cartItems);
       
       if (!locals.user) {
