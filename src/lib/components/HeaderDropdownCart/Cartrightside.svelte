@@ -2,13 +2,14 @@
 	import { sendMessage } from '$lib/utils.js';
 	import { cart,guestCart,removeFromCart } from '$lib/stores/cart.js';
 	import { goto,invalidate } from '$app/navigation';
-
+	import { enhance } from '$app/forms';
 	export let cartId
 	// import { updateCartState } from '$lib/stores/cart.js';
 	import { onMount, onDestroy } from 'svelte';
 	import Icon from '@iconify/svelte';
 	import { toast } from 'svelte-sonner';
 	import {authedUser,currencyState,cartTotalComps} from '$lib/stores/mainStores.js'
+  console.log("hey im guest cart from side cart",$guestCart);
   
 	let cartOpen = false;
 	let cartItems = [];
@@ -16,7 +17,8 @@
 	let priceINR = 0
 	let priceUSD = 0
 	let tog = null
-
+	let form;
+	let form2
 	let isLoggedIn = $authedUser?.id ? true : false
   
 	function formatPriceToNumber(priceString) {
@@ -237,9 +239,30 @@
 	};
   
 	const toggleCart = () => {
+		console.log("clicked");
+		if ($authedUser.id) {
+			form.requestSubmit();
+		}else{
+			// observeLocalStorage();
+			form2.requestSubmit()
+		}
+	//   if (typeof window !== 'undefined') {
+	// 	window.addEventListener('storage', handleStorageChange);
+	//   }
 	  cartOpen = !cartOpen;
 	};
-
+	function handleDataCart() {
+		return async ({ result }) => {
+			console.log("result from page server for carat data",result.data.cart[0].cartItems);
+			$cart=result.data.cart[0].cartItems	
+		};
+	}
+	function handleDataGuestCart() {
+		return async ({ result }) => {
+			console.log("result from page server for carat data",result.data.cart);
+			$cart=result.data.cart
+		};
+	}
     const visitcart =() =>
 	{
 		goto('/cart')
@@ -249,7 +272,7 @@
   
 	onMount(() => {
 	//   loadCartFromLocalStorage();
-	  observeLocalStorage();
+	//   observeLocalStorage();
 	  if (typeof window !== 'undefined') {
 		window.addEventListener('storage', handleStorageChange);
 	  }
@@ -278,7 +301,12 @@
     return `${basePath}/${encodeURIComponent(partNumber)}`;
   }
   </script>
-
+<form method="POST" action="/?/getCartData" bind:this={form} use:enhance={handleDataCart}>
+	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
+</form>
+<form method="POST" action="/cart?/guestCart" bind:this={form2} use:enhance={handleDataGuestCart}>
+	<input type="hidden" name="guestCart" value={JSON.stringify($guestCart)} />
+</form>
 <button on:click={toggleCart} class=" space-x-4 text-gray-600 pr-0 sm:pr-2">
 	<span class="flex items-center space-x-1">
 		<!-- Wrapper for Icon with Badge -->
