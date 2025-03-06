@@ -17,34 +17,33 @@
 	// $:console.log(data,"---------")
    // $:cartData = data?.cart?.cart[0]?.cartItems ||[]
 	// authedUser.set(data.locals.authedUser)
-	let isLoggedIn = $authedUser?.id ? true : false
+	// let isLoggedIn = $authedUser?.id ? true : false
 
-	
 	//$:cart.set(cartData)
 
-	const guestCartFetch = () => {
-		const formdata = new FormData();
-		formdata.append('guestCart', JSON.stringify($guestCart));
-		sendMessage('/cart?/guestCart', formdata, async (result) => {
-		    //console.log("guest cart in coponent",result);
-			cart.set(result.cart);
-		});
-	};
+	// const guestCartFetch = () => {
+	// 	const formdata = new FormData();
+	// 	formdata.append('guestCart', JSON.stringify($guestCart));
+	// 	sendMessage('/cart?/guestCart', formdata, async (result) => {
+	// 	    //console.log("guest cart in coponent",result);
+	// 		cart.set(result.cart);
+	// 	});
+	// };
 
-	onMount(() => {
+	// onMount(() => {
 
-		if (!isLoggedIn) {
-			if ($guestCart.length) {
-				guestCartFetch();
-			} else {
-				cart.set([]);
-			}
-		} else {
-			// cartData = data?.cart?.cart[0]?.cartItems || [];
-			// cart.set(cartData);
-		}
+	// 	if (!isLoggedIn) {
+	// 		if ($guestCart.length) {
+	// 			guestCartFetch();
+	// 		} else {
+	// 			cart.set([]);
+	// 		}
+	// 	} else {
+	// 		cartData = data?.cart?.cart[0]?.cartItems || [];
+	// 		cart.set(cartData);
+	// 	}
 
-	});
+	// });
 	$: isAuthRoute = $page.url.pathname === '/login' || $page.url.pathname === '/signup' || $page.url.pathname === '/forgot' || $page.url.pathname === '/reset-password';
 </script>
 {#if !isAuthRoute}

@@ -9,7 +9,7 @@
   import Icon from "@iconify/svelte";
   import { currencyState } from "$lib/stores/mainStores.js";
   import { cartState } from "$lib/stores/cartStores.js";
-  import { authedUser } from "$lib/stores/mainStores.js";
+  import { authedUser,cartTotalComps } from "$lib/stores/mainStores.js";
   import Variants from "$lib/components/ProductInfoPopups/Variants.svelte";
   import Description from "$lib/components/ProductInfoPopups/Description.svelte";
   import { toast, Toaster } from "svelte-sonner";
@@ -19,7 +19,7 @@
   // console.log(isFavorite, "isFavorite");
   // console.log(authedUser, "authedUser");
   console.log(data.records, "data");
-
+  let form;
   let showDropdown = false;
   let showSharePopup = false;
   let showModal = false;
@@ -299,11 +299,14 @@
   }
 
   const guestCartFetch = () => {
-    const formdata = new FormData();
-    formdata.append("guestCart", JSON.stringify($guestCart));
-    sendMessage("/cart?/guestCart", formdata, async (result) => {
-      cart.set(result.cart);
-    });
+    // const formdata = new FormData();
+    // formdata.append("guestCart", JSON.stringify($guestCart));
+    // sendMessage("/cart?/guestCart", formdata, async (result) => {
+    //   cart.set(result.cart);
+    // });
+    const storedTotalComps = JSON.parse(localStorage.getItem('cart'));;
+		localStorage.setItem('totalCompsChemi', storedTotalComps.length);
+		syncLocalStorageToStore();	
   };
 
   export function addToCart(product) {
@@ -330,6 +333,10 @@
     const formdata = new FormData();
     formdata.append("items", JSON.stringify(cartItem));
     sendMessage("?/addtocart", formdata, async (result) => {
+      // console.log("result",result);
+      if (result.success) {
+        await submitForm();	
+      }
       toast.success(result.message);
       invalidate("/");
     });
@@ -390,8 +397,28 @@
 
     return Object.keys(formErrors).length === 0 && isOtpVerified === true;
   }
-</script>
+  function handleData() {
+		return async ({ result }) => {
+			// console.log("resultresultresultresultresultresultresult",result);
+			const totalComps  = result?.data?.cartData?.cartItems.length 
+			localStorage.setItem('totalCompsChemi', totalComps);
+			syncLocalStorageToStore();
+		};
+	}
+	function syncLocalStorageToStore() {
+		const storedTotalComps = localStorage.getItem('totalCompsChemi');
 
+		if (storedTotalComps ) {
+			cartTotalComps.set(Number(storedTotalComps));
+		}
+	}
+  async function submitForm() {
+		form.requestSubmit();
+	}
+</script>
+<form method="POST" action="/?/getCartValue" bind:this={form} use:enhance={handleData}>
+  <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
+</form>
 {#each data.records as product}
   <div
     class="md:w-11/12 max-w-7xl md:flex lg:flex mx-auto bg-white shadow-md border border-gray-200 rounded-lg m-10"
