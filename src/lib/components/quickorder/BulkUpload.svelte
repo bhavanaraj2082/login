@@ -333,6 +333,109 @@
       });
     }
   }
+  function prepareValidatedProductsForCart() {
+    const productsToAdd = [];
+    
+    // Check if validatedProducts exists and has items
+    if (!validatedProducts || validatedProducts.length === 0) {
+      console.log("No validated products found");
+      return productsToAdd;
+    }
+    
+    validatedProducts.forEach((product) => {
+      if (!product.isValid) {
+        console.log(
+          `Product ${product.productNumber} is not valid: ${product.message}`
+        );
+        return;
+      }
+
+      if (
+        product.stockMessage === "Stock is sufficient for all uploaded quantities" ||
+        (product.productNumber &&
+          product.productName &&
+          product.pricing &&
+          product.pricing[0] &&
+          product.pricing[0].break &&
+          product.stock > 0)
+      ) {
+        console.log(`Product ${product.productName} passed validation check`);
+
+        const sizePriceInfo = product.pricing[0];
+        const size = sizePriceInfo.break;
+        const price = sizePriceInfo.price;
+
+        const newProduct = {
+          id: product.id,
+          manufacturerId: product.manufacturer,
+          distributerId: product.distributer ? product.distributer : null,
+          stockId: product.stockId,
+          productName: product.productName,
+          image: product.image,
+          partNumber: product.productNumber,
+          description: product.prodDesc,
+          priceSize: {
+            price: price,
+            size: size,
+          },
+          quantity: product.quantity,
+          backOrder: Math.max(product.quantity - product.stock),
+          stock: product.stock,
+        };
+
+        productsToAdd.push(newProduct);
+        console.log(
+          `Prepared product ${newProduct.productName} for cart addition`
+        );
+      } else {
+        console.log(
+          `Product ${product.productName} did not pass validation.`
+        );
+      }
+    });
+    
+    console.log(`Prepared ${productsToAdd.length} products for cart`);
+    return productsToAdd;
+  }
+  
+  // Handle local storage for non-authenticated users
+  function handleLocalStorage() {
+    try {
+      cartloading = true;
+      const productsToAdd = prepareValidatedProductsForCart();
+      const simplifiedCartItems = productsToAdd.map((item) => ({
+      productId: item.id,
+      manufacturerId: item.manufacturerId,
+      stockId: item.stockId,
+      distributorId: item.distributerId,
+      quantity: item.quantity,
+      backOrder: item.backOrder,
+    }));
+      if (productsToAdd.length === 0) {
+        cartloading = false;
+        toast.error("No valid items to add to cart");
+        return;
+      }
+      
+      const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+      const updatedCart = [...existingCart, ...simplifiedCartItems];
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      
+      const productsAddedCount = productsToAdd.length;
+      toast.success(
+        `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} saved to cart.`
+      );
+      
+      cartloading = false;
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
+    } catch (err) {
+      cartloading = false;
+      console.error("Error saving to localStorage:", err);
+      toast.error("Failed to save items to cart");
+    }
+  }
 </script>
 
 <div class="text-black text-sm md:ml-2 mb-1">
@@ -520,7 +623,7 @@
     </ul>
   {/if}
 </form>
-
+<!-- 
 <div class="flex justify-end">
   <button
     class="lg:ml-60 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
@@ -533,8 +636,79 @@
       <span>Add to Cart</span>
     {/if}
   </button>
-</div>
+</div> -->
 
+<div class="flex justify-end">
+  {#if data?.authedUser && data?.authedUser?.id}
+    <form
+      method="POST"
+      action="?/addToCart"
+      use:enhance={({ formData, cancel }) => {
+        cartloading = true;
+
+        const productsToAdd = prepareValidatedProductsForCart();
+
+        if (productsToAdd.length === 0) {
+          cancel();
+          cartloading = false;
+          toast.error("No valid items to add to cart");
+          return;
+        }
+        
+        formData.set('cartItems', JSON.stringify(productsToAdd));
+        
+        return async ({ result }) => {
+          cartloading = false;
+          
+          try {
+            const resultData = result.data;
+            
+            if (resultData && resultData.success === true) {
+              const productsAddedCount = productsToAdd.length;
+              toast.success(
+                `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`
+              );
+              setTimeout(() => {
+                location.reload();
+              }, 2000);
+            } else {
+              throw new Error(resultData[1] || "Failed to add items to cart");
+            }
+          } catch (err) {
+            console.error("Error processing cart response:", err);
+            toast.error("Failed to add items to cart");
+          }
+        };
+      }}
+    >
+      <button
+        type="submit"
+        class="lg:ml-60 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
+        disabled={cartloading}
+      >
+        {#if cartloading}
+          <span>Adding...</span>
+        {:else}
+          <Icon icon="ic:round-shopping-cart" class="text-2xl" />
+          <span>Add to Cart</span>
+        {/if}
+      </button>
+    </form>
+  {:else}
+    <button
+      class="lg:ml-60 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
+      on:click={handleLocalStorage}
+      disabled={cartloading}
+    >
+      {#if cartloading}
+        <span>Adding...</span>
+      {:else}
+        <Icon icon="ic:round-shopping-cart" class="text-2xl" />
+        <span>Add to Cart</span>
+      {/if}
+    </button>
+  {/if}
+</div>
 {#if cartNotification}
   <div
     class="fixed bottom-4 left-4 p-4 bg-primary-400 text-white rounded-md shadow-lg z-50"
