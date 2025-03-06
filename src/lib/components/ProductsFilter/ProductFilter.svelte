@@ -5,8 +5,8 @@
 	import { goto,invalidateAll } from '$app/navigation';
     import { toast } from 'svelte-sonner';
     import Icon from "@iconify/svelte";
-	import { authedUser,currencyState } from '$lib/stores/mainStores.js';
-
+	import { authedUser,currencyState,cartTotalComps } from '$lib/stores/mainStores.js';
+    import { enhance } from "$app/forms";
 
     export let products
     export let manufacturers
@@ -16,11 +16,14 @@
 	let isLoggedIn = $authedUser?.id ? true : false
     
     const guestCartFetch = () => {
-		const formdata = new FormData();
-		formdata.append('guestCart', JSON.stringify($guestCart));
-		sendMessage('/cart?/guestCart', formdata, async (result) => {
-			cart.set(result.cart);
-		});
+		// const formdata = new FormData();
+		// formdata.append('guestCart', JSON.stringify($guestCart));
+		// sendMessage('/cart?/guestCart', formdata, async (result) => {
+		// 	cart.set(result.cart);
+		// });
+        const storedTotalComps = JSON.parse(localStorage.getItem('cart'));;
+		localStorage.setItem('totalCompsChemi', storedTotalComps.length);
+		syncLocalStorageToStore();	
 	};
 
     $: paginatedProducts = products.length ? products.map(x=>x) : []
@@ -39,7 +42,7 @@
     let selectedManufacturer = $page.url.searchParams.get('manufacturer') || null;
     let totalPages = parseInt(productCount/10);
     let tog= null
-
+    let form;
     let selectedSort =''
 
     const sortBy = (checked, sortType) => {
@@ -226,13 +229,33 @@
         backOrder
     }))
     sendMessage("?/addtocart",formdata,async(result)=>{
+        if (result.success) {
+        await submitForm();	
+      }
         await invalidateAll()
 
         toast.success(result.message)
     })
      
   }
+  function handleData() {
+		return async ({ result }) => {
+			// console.log("resultresultresultresultresultresultresult",result);
+			const totalComps  = result?.data?.cartData?.cartItems.length 
+			localStorage.setItem('totalCompsChemi', totalComps);
+			syncLocalStorageToStore();
+		};
+	}
+	function syncLocalStorageToStore() {
+		const storedTotalComps = localStorage.getItem('totalCompsChemi');
 
+		if (storedTotalComps ) {
+			cartTotalComps.set(Number(storedTotalComps));
+		}
+	}
+  async function submitForm() {
+		form.requestSubmit();
+	}
 let typingTimeout;
 let searchLoading = false
 const handleSearch = (searchName) => {
@@ -270,6 +293,9 @@ const handleSearch = (searchName) => {
 <!-- <div>
     product filter
 </div> -->
+<form method="POST" action="/?/getCartValue" bind:this={form} use:enhance={handleData}>
+    <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
+  </form>
 <section class=" space-y-3 lg:flex items-start gap-4">
     <!-- filters -->
     <div class=" w-full h-fit sticky top-0 lg:w-1/4">
