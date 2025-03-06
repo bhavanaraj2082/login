@@ -286,10 +286,11 @@
 	};
 	function handleDataCart() {
 		return async ({ result }) => {
-			const totalComps = result?.data?.cartData?.cartItems.length;
+			// console.log("result from page server for carat data",result.data);
+			const totalComps = result.data?.cart[0]?.cartItems.length;
 			// console.log("totalComps",totalComps);
 			localStorage.setItem("totalCompsChemi", totalComps);
-			// console.log("result from page server for carat data",result.data);
+			
 			cartId = result.data?.cart[0]?.cartId;
 			$cart = result.data?.cart[0]?.cartItems || [];
 			syncLocalStorageToStore();
