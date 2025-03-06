@@ -242,6 +242,7 @@
 			removeFromCart();
 			toast.success(`All products are deleted successfully`);
 			cartTotalComps.set(0);
+			syncLocalStorageToStore();
 			return;
 		}
 		const formdata = new FormData();
@@ -252,6 +253,7 @@
 					return [];
 				});
 				cartTotalComps.set(0);
+				syncLocalStorageToStore();
 				toast.success(result.message);
 			} else {
 				toast.error(result.message);
@@ -373,7 +375,7 @@
 			<!-- Badge -->
 			<span
 				class="absolute sm:ml-2.5 ml-1.5 top-1 right-0 transform translate-x-1/2 -translate-y-1/2 {$cartTotalComps ===
-				0
+				0 || $cartTotalComps == undefined || isNaN($cartTotalComps)
 					? 'hidden'
 					: 'text-white font-semibold bg-gray-600 inset-0 shadow-md'} text-2s font-medium rounded-full w-4 h-4 flex items-center justify-center"
 			>
