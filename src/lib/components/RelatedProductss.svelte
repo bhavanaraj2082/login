@@ -113,6 +113,8 @@ $: displayPrice = $currencyState === 'usd'
       priceSize: product.priceSize,
       quantity: 1,
       stock: product.stock,
+      category: product.category,
+      subCategory: product.subCategory,
       manufacturerId:
         product.manufacturerId || product.manufacturerInfo?.[0]?._id,
       distributorId:
@@ -127,9 +129,9 @@ $: displayPrice = $currencyState === 'usd'
     selectedVariants=selectedProduct.variants[selectedPriceIndex] || "NA"
     showModal = true;
 
-    // console.log("Selected Product Data after openModal:", selectedProduct);
-    // console.log("Selected Price:", selectedPrice);
-    // console.log("Selected Stock ID:", selectedStockId);
+    console.log("Selected Product Data after openModal:", selectedProduct);
+    console.log("Selected Price:", selectedPrice);
+    console.log("Selected Stock ID:", selectedStockId);
 
     
   }
@@ -232,6 +234,9 @@ function handlePopupInput(event) {
       addItemToCart(cartItem);
       toast.success("Product added to cart");
       guestCartFetch();
+      setTimeout(() => {
+    closeModal();
+  }, 30000);
       return;
     }
 
@@ -240,6 +245,9 @@ function handlePopupInput(event) {
     sendMessage("?/addtocart", formdata, async (result) => {
       toast.success(result.message);
       invalidate("/");
+      setTimeout(() => {
+    closeModal();
+  }, 30000);
     });
 
     // console.log("Final Cart Item Sent:", cartItem);
@@ -382,7 +390,7 @@ function handlePopupInput(event) {
             {selectedProduct.brand || "--"}
           </p>
           <p class="text-base font-semibold text-primary-500 text-left">
-            <a href={selectedProduct.partNumber}>{selectedProduct.partNumber || "--"}</a>
+            <a href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}">{selectedProduct.partNumber || "--"}</a>
           </p>
           <h2 class="text-lg font-medium text-left">
             {selectedProduct.name || "--"}
@@ -401,7 +409,7 @@ function handlePopupInput(event) {
             Multiple variants of this product are available with different prices. View more details below.
           </p>
           
-          <a href="{selectedProduct.partNumber}#productVariants">
+          <a href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}#productVariants">
             <button 
               on:click={closeModal} 
               class="bg-primary-500 py-2 px-4 hover:bg-primary-600 text-sm rounded text-white mt-2"
@@ -437,7 +445,7 @@ function handlePopupInput(event) {
         {:else if selectedProduct?.variants?.length === 0 && selectedProduct?.priceSize?.length === 0}
         <div>
           <p class="text-gray-700 text-sm">The price for this product is unavailable. Please request a quote</p>
-          <a href={selectedProduct.partNumber}>
+          <a href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}">
             <button class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-sm text-white mt-2">
               Request Quote
             </button>

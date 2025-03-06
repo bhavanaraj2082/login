@@ -8,7 +8,7 @@
   import { toast } from "svelte-sonner";
   let uploadedRows = [];
   let showSavedCarts = false;
-  console.log(currencyState,"currencyState");
+  console.log(currencyState, "currencyState");
   export let data;
   // console.log("daa", data);
   // console.log(data?.authedUser?.email,"i am email")
@@ -583,8 +583,8 @@
     selectedProduct = product;
     selectedProductIndex = index;
     showDetailsModal = true;
-    // console.log("Selected Product:", selectedProduct);
-    // console.log("Selected Product Index:", selectedProductIndex);
+    console.log("Selected Product:", selectedProduct);
+    console.log("Selected Product Index:", selectedProductIndex);
   };
 
   function addRows() {
@@ -935,7 +935,6 @@
                     {#each row.filteredProducts as result}
                       <div
                         class="p-4 border-b border-gray-300 last:border-b-0 hover:bg-gray-100 cursor-pointer"
-                        
                       >
                         <div class="space-y-1 mt-2">
                           {#if result.pricing?.length > 0}
@@ -1103,7 +1102,6 @@
                     1 Estimated to ship on {estimatedShipDate}
                   </span>
 
-      
                   <button
                     class="text-primary-400 rounded"
                     on:click={() => {
@@ -1111,8 +1109,7 @@
                         currency === "usd"
                           ? row.selectedProduct.pricing[0].usd
                           : row.selectedProduct.pricing[0].inr;
-
-                      showDetails(0, {
+                      showDetails(index, {
                         productName: row.selectedProduct.productName,
                         productNumber: row.selectedProduct.productNumber,
                         size: row.selectedSize,
