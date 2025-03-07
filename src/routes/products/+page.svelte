@@ -69,7 +69,7 @@
 
 <SEO {metadata} />
 <div>
-  <div class="pt-5 max-w-7xl md:w-11/12 mx-auto">
+  <div class="pt-2 max-w-7xl md:w-11/12 mx-auto">
     <div
       class="fixed z-30 md:bottom-[75px] bottom-40 right-0 lg:right-10 py-6 lg:p-4"
     >

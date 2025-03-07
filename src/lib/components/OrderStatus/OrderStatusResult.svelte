@@ -122,7 +122,7 @@
   };
 </script>
 
-<div class="bg-white">
+<div class="">
   <div class="max-w-7xl mx-auto">
     <div class="mx-4 sm:mx-6 lg:mx-20">
       <div class="flex flex-col sm:flex-row justify-between items-center pt-4">
@@ -194,7 +194,7 @@
       {/if}
 
       <div
-        class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8 bg-gray-100 border border-gray-200 rounded-lg pl-6 py-3 sm:p-6"
+        class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8 bg-white border border-gray-200 rounded-lg pl-6 py-3 sm:p-6"
       >
         <div
           class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"
@@ -292,12 +292,12 @@
         {/if}
 
         <div>
-          <div class="mt-3">
+          <div class="mt-3 ">
             <h2 class="text-sm font-semibold mb-2 text-gray-600">
               Order Summary
             </h2>
             <div
-              class="mb-4 px-4 py-4 rounded-lg border-1 border-gray-200 flex flex-col gap-1"
+              class="mb-4 px-4 py-4 rounded-lg border-1 bg-white border-gray-200 flex flex-col gap-1"
             >
               <div class="flex justify-between">
                 <p class="text-gray-500 text-sm font-medium">Subtotal:</p>
@@ -322,11 +322,11 @@
               </div>
             </div>
 
-            <div class="mb-6">
+            <div class="mb-6 ">
               <h1 class="font-semibold mb-2 text-sm text-gray-600">
                 Billing Address
               </h1>
-              <div class=" rounded-lg py-3 px-3 border-1 text-gray-500">
+              <div class=" rounded-lg py-3 px-3 border-1 bg-white text-gray-500">
                 <p class="font-medium text-sm text-gray-500">
                   {order.billingaddress || "--"}
                 </p>
@@ -334,7 +334,7 @@
               <h1 class="font-semibold mb-2 mt-2 text-sm text-gray-600">
                 Shipping Address
               </h1>
-              <div class=" rounded-lg py-3 px-3 border-1 text-gray-500">
+              <div class=" rounded-lg py-3 px-3 border-1 bg-white text-gray-500">
                 <p class="font-medium text-sm text-gray-500">
                   {order.shippingaddress || "--"}
                 </p>
