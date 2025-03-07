@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { enhance, applyAction } from "$app/forms";
-  import { toast } from "svelte-sonner";
+  import { toast, Toaster } from "svelte-sonner";
   import Icon from "@iconify/svelte";
   import { goto } from "$app/navigation";
   let username = "";
@@ -111,7 +111,7 @@
       passwordStrength = 0;
     } else if (
       !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-        password,
+        password
       )
     ) {
       errors.password =
@@ -739,7 +739,7 @@
   function updateCurrency(country) {
     const normalizedCountry = country.trim().toLowerCase();
     const selectedCurrency = Object.keys(countryCurrencyMap).find(
-      (key) => key.toLowerCase() === normalizedCountry,
+      (key) => key.toLowerCase() === normalizedCountry
     );
 
     if (selectedCurrency) {
@@ -1015,7 +1015,7 @@
   const mapLength = Object.keys(countryCurrencyMap).length;
   const countryNames = countries.map((country) => country.name);
   const missingPatterns = countryNames.filter(
-    (name) => !phoneNumberPatterns.hasOwnProperty(name),
+    (name) => !phoneNumberPatterns.hasOwnProperty(name)
   );
   function validateCountry() {
     if (!country) {
@@ -1043,7 +1043,7 @@
 
   function handleSearchChange() {
     filteredCountries = countries.filter((country) =>
-      country.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      country.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     showDropdown = filteredCountries.length > 0 && searchTerm !== "";
   }
@@ -1059,7 +1059,7 @@
         country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         country.code
           .replace("+", "")
-          .includes(searchTerm.replace("+", "").toLowerCase()),
+          .includes(searchTerm.replace("+", "").toLowerCase())
     );
     if (
       filteredCountries.length === 1 &&
@@ -1341,7 +1341,7 @@
       errors.password = "*Required";
     } else if (
       !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-        password,
+        password
       )
     ) {
       errors.password =
@@ -1418,26 +1418,25 @@
   }
   let passwordVisible = false;
   function togglePasswordVisibility() {
-    passwordVisible = !passwordVisible; 
+    passwordVisible = !passwordVisible;
     const input = document.getElementById("password");
-    input.type = passwordVisible ? "text" : "password"; 
+    input.type = passwordVisible ? "text" : "password";
   }
   let confirmPasswordVisible = false;
   function toggleConfirmPasswordVisibility() {
-    confirmPasswordVisible = !confirmPasswordVisible; 
+    confirmPasswordVisible = !confirmPasswordVisible;
     const input = document.getElementById("passwordConfirm");
-    input.type = confirmPasswordVisible ? "text" : "password"; 
+    input.type = confirmPasswordVisible ? "text" : "password";
   }
   function handleClickOutside(event) {
-		if (!event.target.closest('.dropdown-container')) {
-			showDropdown = false;
-		}
-	}
-	onMount(() => {
-	
-		document.addEventListener('click', handleClickOutside);
-		return () => document.removeEventListener('click', handleClickOutside);
-	});
+    if (!event.target.closest(".dropdown-container")) {
+      showDropdown = false;
+    }
+  }
+  onMount(() => {
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  });
 </script>
 
 <div
@@ -1542,7 +1541,7 @@
 
                     if (
                       verificationMessage.includes(
-                        "Verification email sent successfully. Please check your inbox.",
+                        "Verification email sent successfully. Please check your inbox."
                       )
                     ) {
                       displayMessage = "Please check your inbox.";
@@ -1591,7 +1590,7 @@
                   type="submit"
                   class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-500 font-semibold text-2s pl-2 py-1 rounded hover:underline disabled:cursor-not-allowed"
                   disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-                    email,
+                    email
                   ) || email.split("@")[1].includes("gamil")}
                 >
                   Verify
@@ -2118,3 +2117,4 @@
     >
   </div>
 </div>
+<Toaster position="bottom-right" richColors />
