@@ -65,7 +65,8 @@
     onMount(() => {
         if (data && data.profile) {
             firstname =
-                `${data.profile.firstname || ""} ${data.profile.lastname || ""}`.trim();
+                `${data.profile.firstName || ""} `.trim();
+                lastname = `${data.profile.lastName || ""}`.trim();
             email = data.profile.email || "";
             phone = data.profile.cellPhone || "";
             company = data.profile.companyname || "";
@@ -84,6 +85,7 @@
             isDataAvailable = true;
         } else {
             firstname = "";
+            lastname = "";
             email = data?.email || "";
             phone = "";
             company = "";
@@ -864,7 +866,7 @@
 
 {#if showSuccesDiv}
     <div
-        class="h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl"
+        class="h-4/5 mb-4 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl"
     >
         <div
             class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
@@ -1015,7 +1017,7 @@
                                 errors.lastname = !lastname
                                     ? "*Required"
                                     : !/^[A-Za-z]+$/.test(lastname)
-                                      ? "Please enter a valid name"
+                                      ? "Please enter a valid last name"
                                       : "";
                             }}
                         />
@@ -1048,7 +1050,7 @@
                                     : !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(
                                             company,
                                         )
-                                      ? "Please enter a valid name"
+                                      ? "Please enter a valid company name"
                                       : "";
                             }}
                         />
@@ -1078,7 +1080,7 @@
                                     : !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(
                                             street,
                                         )
-                                      ? "Please enter a valid name"
+                                      ? "Please enter a valid street name"
                                       : "";
                             }}
                         />
@@ -1291,9 +1293,10 @@
                                         placeholder="Enter 6-digit OTP"
                                         class="flex-1 outline-none w-full border-gray-300 border rounded focus:border-primary-400 focus:ring-0 p-2 text-sm"
                                         on:input={() => {
-                                            enteredOtpemail =
-                                                enteredOtpemail.trim();
+                                            enteredOtpemail = enteredOtpemail.trim();
+                                            enteredOtpemail = enteredOtpemail.replace(/\D/g, '').slice(0, 6);
                                         }}
+                                        
                                     />
                                     <button
                                         type="submit"
@@ -1442,16 +1445,16 @@
                         {/if}
                     </div>
                 </div>
-                <!-- File/Image Upload Selection -->
+
                 <fieldset class="mb-4">
                     <div class="font-semibold text-gray-700 mt-2 md:w-5/12">
-                        Please attach it to this request or share the link so
+                        Please share the link so
                         that we could allocate it.
                     </div>
                     <div class="flex flex-col md:flex-row mb-0">
                         <div class="mt-1 w-full md:w-1/2">
                             <!-- Radio buttons to choose between file or URL -->
-                            <div class="mb-4">
+                            <!-- <div class="mb-4">
                                 <input
                                     type="radio"
                                     id="toggleUpload"
@@ -1460,11 +1463,7 @@
                                     bind:group={uploadOption}
                                     class="mr-2 rounded text-primary-500 focus:outline-none focus:ring-0 focus:ring-primary-600"
                                 />
-                                <label
-                                    for="toggleUpload"
-                                    class="text-sm text-gray-700"
-                                    >Choose File or Image</label
-                                >
+                             
 
                                 <div class="mb-4">
                                     <input
@@ -1481,42 +1480,23 @@
                                         >Provide URL to the Work</label
                                     >
                                 </div>
-                            </div>
-                            <!-- Upload File -->
-                            {#if uploadOption === "file"}
-                                <div>
-                                    <label
-                                        for="file"
-                                        class="block font-semibold text-gray-700 text-sm mt-2 mb-1"
-                                        >Choose File
-                                        (.csv,.txt,.pdf,.jpg,.png,.jpeg)
-                                    </label>
-                                    <input
-                                        type="file"
-                                        id="file"
-                                        name={fileName}
-                                        accept=".csv,.txt,.pdf,.jpg,.jpeg,.png"
-                                        class="border border-gray-400 focus:outline-primary-400 rounded p-2 w-full md:w-3/4 lg:w-4/5"
-                                        on:change={handleFileChange}
-                                    />
-                                </div>
-                            {/if}
-
+                            </div> -->
+                    
                             <!-- URL -->
-                            {#if uploadOption === "url"}
+                            <!-- {#if uploadOption === "url"} -->
                                 <div class="mb-4">
-                                    <label
+                                    <!-- <label
                                         for="url"
                                         class="block text-gray-700 font-semibold text-sm mb-1"
                                         >*URL to the Work</label
-                                    >
+                                    > -->
                                     <input
                                         name="url"
                                         type="url"
                                         placeholder="url"
                                         bind:value={url}
                                         class="bg-gray-50 border border-gray-300 fo rounded md:w-4/5 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
-                                        required
+                                        
                                         on:input={() => validateField("url")}
                                     />
                                     {#if errors.url}
@@ -1525,7 +1505,7 @@
                                         </p>
                                     {/if}
                                 </div>
-                            {/if}
+                            <!-- {/if} -->
                         </div>
                     </div>
                 </fieldset>
@@ -1549,7 +1529,7 @@
                                 ? "*Required"
                                 : /<script.*?>.*?<\/script>/i.test(description) // Regex to check for script tags
                                   ? "Script tags are not allowed."
-                                  : !/^[A-Za-z" "/?()*$#0-9\s]+$/.test(
+                                  : !/^[A-Za-z" "/?().,:;""''*$#0-9\s]+$/.test(
                                           description,
                                       ) // Existing pattern for valid city names
                                     ? "Please enter a valid description"

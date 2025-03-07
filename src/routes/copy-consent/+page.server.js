@@ -41,11 +41,10 @@ export const actions = {
 				.replaceAll('{{email}}', updatedBodyWithIP.email || '')
 				.replaceAll('{{description}}', updatedBodyWithIP.description || '')
 				.replaceAll('{{ipAddress}}', ipAddress);
-			if (updatedBodyWithIP.image) {
-				emailContent = emailContent.replaceAll('{{image}}', `<img src="${updatedBodyWithIP.image}" alt="Customer Image" style="max-width: 100%;">`);
-			} else {
-				emailContent = emailContent.replaceAll('{{image}}', '');
-			}
+				if (updatedBodyWithIP.url) {
+					emailContent = emailContent.replaceAll('{{url}}', '');
+				}
+		
 			try {
 				await sendNotificationEmail(
 					`New Customer Inquiry – ${PUBLIC_WEBSITE_NAME}`,
@@ -71,10 +70,7 @@ export const actions = {
 
 
 
-			if (updatedBodyWithIP.image) {
-
-				userEmailContent = userEmailContent.replaceAll('{{image}}', '');
-			}
+		
 			if (updatedBodyWithIP.url) {
 				userEmailContent = userEmailContent.replaceAll('{{url}}', '');
 			}

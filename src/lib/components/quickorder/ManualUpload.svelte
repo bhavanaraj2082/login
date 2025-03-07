@@ -12,7 +12,7 @@
   export let data;
   // console.log("daa", data);
   // console.log(data?.authedUser?.email,"i am email")
-
+	import { authedUser,cartTotalComps } from '$lib/stores/mainStores.js';
   let isLoadingPhone = false;
   let showCartPopupdetail = false;
 
@@ -1028,8 +1028,39 @@
       manualEntriesForm.requestSubmit();
     }
   }
+  let form2;
+  async function submitForm() {
+		form2.requestSubmit();
+	}
+  async function submitAlternateForm() {
+		// submitGuestForm.requestSubmit();
+		const storedTotalComps = JSON.parse(localStorage.getItem('cart'));;
+		localStorage.setItem('totalCompsChemi', storedTotalComps.length);
+		syncLocalStorageToStore();	
+	}
+  function syncLocalStorageToStore() {
+    // Check if we are in the browser
+    if (typeof window !== 'undefined') {
+        const storedTotalComps = localStorage.getItem('totalCompsChemi');
+        if (storedTotalComps ) {
+            cartTotalComps.set(Number(storedTotalComps));
+        }
+    }
+}
+function handleDataCart() {
+		return async ({ result }) => {
+			// console.log("result from page server for carat data",result);
+			
+			const totalComps  = result?.data?.cartData?.cartItems.length 
+			// console.log("totalComps",totalComps);
+			localStorage.setItem('totalCompsChemi', totalComps);
+			syncLocalStorageToStore();	
+		};
+	}
 </script>
-
+<form method="POST" action="/?/getCartValue" bind:this={form2} use:enhance={handleDataCart}>
+	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
+</form>
 <div class="w-11/12 mx-auto py-5 px-2 md:flex md:space-x-8 max-w-7xl">
   <div class="md:w-full">
     <h1 class="font-bold text-lg md:text-2xl">Quick Order</h1>
@@ -1357,6 +1388,12 @@
           
         
           if (resultData && resultData.success === true) {
+            if ($authedUser.id) {
+              submitForm()
+            }else{
+              submitAlternateForm()
+            }
+           
             toast.success(resultData[2] || "Items added to cart successfully");
             setTimeout(() => {
               resetRows();
