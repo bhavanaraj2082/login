@@ -11,7 +11,7 @@
 </script>
 
 <section class="w-11/12 flex flex-col mx-auto mb-3 max-w-7xl">
-  <h1 class="text-2xl font-bold text-primary-400">Applications</h1>
+  <h1 class="text-heading font-bold text-lg md:text-2xl">Applications</h1>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mt-6 mb-3">
     {#each categoryData as category}
       <div class="max-w-xs rounded-lg overflow-hidden shadow-lg bg-white">

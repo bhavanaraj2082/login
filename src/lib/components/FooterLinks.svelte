@@ -45,9 +45,9 @@
 </script>
 <div class="lg:w-11/12 mx-auto max-w-7xl ">
 
-<div class="flex flex-col  md:flex-row lg:p-6 p-4 ">
-    <aside class="w-full md:w-1/3 lg:p-4">
-        <h1 class="text-3xl font-semibold mb-4">
+<div class="flex flex-col  md:flex-row lg:px-6 px-4 ">
+    <aside class="w-full md:w-1/3 lg:px-4">
+        <h1 class="text-heading font-bold text-lg md:text-2xl">
             {#if contentComponent === Terms}
                 Site Use Terms
             {:else if contentComponent === ProductLicense}
