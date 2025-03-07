@@ -89,25 +89,27 @@
 		</div>
 			<div class="flex flex-col items-center md:items-start text-center md:text-left">
 				<p class="text-white font-semibold sm:text-lg text-md uppercase">Information</p>
-				<ul class="mt-2 space-y-2 text-sm text-gray-50">
+				<ul class="mt-2 space-y-2 text-sm text-gray-50 underline-offset-2">
 					<li><a href="/about-us" class="font-medium sm:text-sm text-xs hover:underline">About Us</a></li>
 					<li><a href="/sitemap" class="font-medium sm:text-sm text-xs hover:underline">Site Map</a></li>
+					<li><a href="/newsroom" class="font-medium sm:text-sm text-xs hover:underline">Newsroom</a></li>
 					<li><a href="/copy-consent" class="font-medium sm:text-sm text-xs hover:underline">Copyright Consent</a></li>
 				</ul>
 			</div>
 			<div class="flex flex-col items-center md:items-start text-center md:text-left">
 				<p class="text-white font-semibold sm:text-lg text-md uppercase">Help & Support</p>
-				<ul class="mt-2 space-y-2 text-sm text-gray-50">
+				<ul class="mt-2 space-y-2 text-sm text-gray-50 underline-offset-2">
 					<li><a href="/contact-us" class="font-medium sm:text-sm text-xs hover:underline">Contact Us</a></li>
 					<li><a href="/help-support" class="font-medium sm:text-sm text-xs hover:underline">Customer Support</a></li>
 					<li><a href="/faq" class="font-medium sm:text-sm text-xs hover:underline">FAQs</a></li>
+					<li><a href="/ecom-solutions" class="font-medium sm:text-sm text-xs hover:underline">Chemikart Solutions</a></li>
 				</ul>
 			</div>
 			<div class="flex flex-col items-center md:items-start text-center md:text-left lg:mr-12">
 				<p class="text-white font-semibold sm:text-lg text-md uppercase">Orders</p>
-				<ul class="mt-2 space-y-2 text-sm text-gray-50">
-					<li><a href="/ecom-solutions" class="font-medium sm:text-sm text-xs hover:underline">Chemikart Solutions</a></li>
+				<ul class="mt-2 space-y-2 text-sm text-gray-50 underline-offset-2">
 					<li><a href="/quick-order" class="font-medium sm:text-sm text-xs hover:underline">Quick Order</a></li>
+					<li><a href="/order-status" class="font-medium sm:text-sm text-xs hover:underline">Order Status</a></li>
 					<li><a href="/quotes" class="font-medium sm:text-sm text-xs hover:underline">Quotes</a></li>
 					<li><a href="/returns" class="font-medium sm:text-sm text-xs hover:underline">Returns & its Status</a></li>
 				</ul>
@@ -164,7 +166,7 @@
 						</div>
 					</div>
 				</div>
-				<!-- <Scroller /> -->
+				<Scroller />
 			</div>
 			
 

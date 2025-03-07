@@ -4,7 +4,7 @@
   import Icon from "@iconify/svelte";
   import { invalidate } from "$app/navigation";
   import { cartState } from "$lib/stores/cartStores.js";
-  import { toast } from "svelte-sonner";
+  import { toast, Toaster } from "svelte-sonner";
   import { currencyState } from "$lib/stores/mainStores.js";
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
   import { authedUser } from "$lib/stores/mainStores.js";
@@ -611,3 +611,4 @@
     </div>
   </div>
 {/if}
+<Toaster position="bottom-right" richColors />

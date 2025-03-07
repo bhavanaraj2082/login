@@ -462,7 +462,36 @@
 					
 							<h3 class=" lg:hidden font-medium text-xs sm:text-sm">Product</h3>
 							<div class="flex items-center w-full md:w-6/12 md:pr-2">
-								<img src={item.productDetails.imageSrc} alt={item.productDetails.productName} class=" w-20 h-20 object-contain rounded-md" />
+								<div>
+									<!-- svelte-ignore a11y-click-events-have-key-events -->
+									<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+									<img src={item.productDetails.imageSrc} alt={item.productDetails.productName} class=" cursor-pointer w-20 h-20 object-contain rounded-md"
+									on:click={() => imagemodal(item.productDetails.imageSrc)} />
+									{#if showimage}
+									<!-- svelte-ignore a11y-click-events-have-key-events -->
+									<!-- svelte-ignore a11y-no-static-element-interactions -->
+									<div
+										on:click={(e) => {
+											if (e.target === e.currentTarget) {
+												showimage = false;
+											}
+										}}
+										class="fixed inset-0 bg-gray-900 bg-opacity-25 backdrop-blur-xs flex items-center justify-center z-50">
+										<div class="bg-white rounded-lg shadow-md p-6 mx-4 w-full md:w-1/2 lg:w-1/3">
+											<div class="flex justify-end items-center mb-2">
+												<button
+													on:click={closePopup}
+													class="rounded hover:bg-slate-200 duration-200"
+												>
+													<Icon icon="si:close-duotone" class="text-3xl text-red-600" />
+												</button>
+											</div>
+											<!-- svelte-ignore a11y-img-redundant-alt -->
+											<img src={selectedImage} alt="image" onerror="this.src='/partskeys.jpeg'" class="" />
+										</div>
+									</div>
+								{/if}
+								</div>
 								<div class="ml-2">
 									<p class="text-xs text-black font-semibold">{item.productDetails.productNumber}</p>
 									<p class=" text-gray-800 text-xs">{item.productDetails.productName}</p>
