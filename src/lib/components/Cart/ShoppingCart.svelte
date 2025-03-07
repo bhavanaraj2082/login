@@ -601,13 +601,20 @@
 							Checkout
 				        </button>
 					{:else}
-						<button
+					<button
+							type="button"
+							on:click={()=>goto('/signin')}
+							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
+						>
+							SignIn to Proceed
+						</button>
+						<!-- <button
 							type="button"
 							on:click={()=>goto('/login')}
 							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
 						>
 							Login to Proceed
-						</button>
+						</button> -->
 					{/if}					
 				</div>
 			{/if}
@@ -638,7 +645,7 @@
 				height="60"
 				class=" w-full text-center text-primary-600"
 			/>
-			<h1 class=" font-medium pt-2">You have added components to cart before Login</h1>
+			<h1 class=" font-medium pt-2">You have added components to cart before SignIn</h1>
 			<p class=" text-sm">{cartId.length ? "Are you willing to add in existing cart or create a new cart": "Create a new cart"}</p>
 			<form method="POST" use:enhance={handleCart} class=" w-full flex items-center gap-6">
 				{#if isLoggedIn && filteredGuestCart.length}
@@ -678,9 +685,12 @@
 				>
 					Cancel
 				</button>
-				<a href="/login" on:click={setRedirectUrl} class="bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-700">
-					Login
+				<a href="/signin" on:click={setRedirectUrl} class="bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-700">
+					SignIn
 				</a>
+				<!-- <a href="/login" on:click={setRedirectUrl} class="bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-700">
+					Login
+				</a> -->
 			</div>
 		</div>
 	</div>

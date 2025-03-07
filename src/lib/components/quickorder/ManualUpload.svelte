@@ -1074,11 +1074,11 @@ function handleDataCart() {
             icon="mingcute:warning-line"
             class="text-primary-500 text-4xl shrink-0"
           />
-          <a href="/login"
-            ><span class="hover:text-primary-600 text-primary-400"
-              >Sign in
-            </span> to import items from your recent orders and quotes.</a
-          >
+          <!-- <a href="/login"> -->
+          <a href="/signin">
+            <span class="hover:text-primary-600 text-primary-400">
+              Sign In
+            </span> to import items from your recent orders and quotes.</a>
         </div>
       </div>
     {/if}

@@ -436,7 +436,8 @@ function addToCart(rowsToProcess) {
         <div class="flex justify-normal md:justify-end">
             <div class="flex items-center gap-2 w-72 text-xs rounded-md p-3 border border-primary-100 shadow-sm bg-white shadow-primary-100 my-1">
                 <Icon icon="mingcute:warning-line" class="text-primary-500 text-4xl shrink-0" />
-                <a href="/login"><span class="hover:text-primary-600 text-primary-400">Sign in  </span> to import items from your recent orders and quotes.</a>
+                <a href="/signin"><span class="hover:text-primary-600 text-primary-400">Sign in  </span> to import items from your recent orders and quotes.</a>
+                <!-- <a href="/login"><span class="hover:text-primary-600 text-primary-400">Sign in  </span> to import items from your recent orders and quotes.</a> -->
             </div>
         </div>
     {/if}

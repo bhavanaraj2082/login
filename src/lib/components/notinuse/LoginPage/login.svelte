@@ -101,8 +101,11 @@
                 </p>
 
                 <button class="bg-primary-400 text-white rounded p-2 w-full text-center">
-                    Login
+                    SignIn
                 </button>
+                <!-- <button class="bg-primary-400 text-white rounded p-2 w-full text-center">
+                    Login
+                </button> -->
             </form>
 
 

@@ -64,12 +64,20 @@
                     <p class="text-center text-gray-700">{successMessage}</p>
                     <div class="mt-4 w-full">
                         <a
+                            href="/signin"
+                            class="block w-full py-2 text-center text-sm rounded-md font-medium border border-primary-400 text-primary-400 hover:bg-gray-100 transition-colors duration-200 shadow-sm"
+                        >
+                            Return to SignIn
+                        </a>
+                    </div>
+                    <!-- <div class="mt-4 w-full">
+                        <a
                             href="/login"
                             class="block w-full py-2 text-center text-sm rounded-md font-medium border border-primary-400 text-primary-400 hover:bg-gray-100 transition-colors duration-200 shadow-sm"
                         >
                             Return to Login
                         </a>
-                    </div>
+                    </div> -->
                 </div>
             {/if}
 
@@ -199,8 +207,17 @@
                                 {/if}
                             </button>
                         </div>
-
                         <div class="mt-4 text-center">
+                            <a
+                                href="/signin"
+                                class="text-sm text-primary-400 hover:text-primary-500 flex items-center justify-center gap-1"
+                            >
+                                <Icon icon="mdi:arrow-left" />
+                                <span>Back to SignIn</span>
+                            </a>
+                        </div>
+
+                        <!-- <div class="mt-4 text-center">
                             <a
                                 href="/login"
                                 class="text-sm text-primary-400 hover:text-primary-500 flex items-center justify-center gap-1"
@@ -208,7 +225,7 @@
                                 <Icon icon="mdi:arrow-left" />
                                 <span>Back to Login</span>
                             </a>
-                        </div>
+                        </div> -->
                     </form>
                 </div>
             {/if}

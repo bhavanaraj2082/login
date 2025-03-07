@@ -53,9 +53,10 @@
 			<h1 class="text-primary-400 font-semibold text-xl pb-2">What do you need help with?</h1>
 			<p class="text-sm">
 				Please select an option below and complete the form to contact our support specialists. For
-				a better experience and access to your account details and order information, please <span
-					><a href="./login">Sign In.</a></span
-				>
+				a better experience and access to your account details and order information, please <span>
+					<!-- <a href="./login">Sign In.</a> -->
+					<a href="/signin">Sign In.</a>
+				</span>
 			</p>
 		</div>
 	</div>

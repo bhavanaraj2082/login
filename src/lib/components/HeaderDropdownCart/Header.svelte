@@ -501,10 +501,15 @@ async function submitForm() {
 						  <!-- Triangle -->
 						  <div class="absolute top-[-7px] right-1 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white transform rotate-180"></div>
 					  
-						  <button
+						  <!-- <button
 							on:click={() => navigateTo('/login')}
 							class="block px-4 font-workSans py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
 							Login
+						  </button> -->
+						  <button
+							on:click={() => navigateTo('/signin')}
+							class="block px-4 font-workSans py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+							SignIn
 						  </button>
 						  <button
 							on:click={() => navigateTo('/signup')}
@@ -618,19 +623,25 @@ async function submitForm() {
 		</div>
 			{:else}
 				<div class="flex items-center justify-between">
-					<button
+					<!-- <button
 						on:click={() => {
 							navigateTo('/login');
 						}}
 						class="loginbtn  font-workSans text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
-						>Login</button>
+						>Login</button> -->
+					<button
+						on:click={() => {
+							navigateTo('/signin');
+						}}
+						class="loginbtn  font-workSans text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
+						>SignIn</button>
 					<Icon icon="vaadin:line-v" class="mr-0 text-white font-semibold" />
 					<button
 						on:click={() => {
 							navigateTo('/signup');
 						}}
 						class=" registerbtn font-workSans pr-2  text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
-						>Register</button>
+						>SignUp</button>
 				</div>
 			{/if}
 		</div>
