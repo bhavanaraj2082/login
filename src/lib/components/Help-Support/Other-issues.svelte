@@ -5,17 +5,18 @@ import Icon from "@iconify/svelte";
 import { toast } from "svelte-sonner";
 let formLoading=false;
 
-let country="";
+export let data;
 let form;
 let searchTerm="";
 let errors={};
 let poNumber = "";
 let assistanceMessage = "";
-let firstName = "";
-let lastName = "";
-let email = "";
-let phoneNumber = "";
-let companyName = "";
+let country= data?.profile?.country||"";
+let firstName = data?.profile?.firstName||"";
+let lastName = data?.profile?.lastName||"";
+let email =  data?.profile?.email||"";
+let phoneNumber = data?.profile?.cellPhone|| "";
+let companyName =  data?.profile?.companyName|| "";
 
 let location = "";
 let accountNumber = "";
@@ -657,6 +658,10 @@ return isValid;
 }
 
 const handlesubmit = async (data) => {
+  if (!formValid()) {
+            cancel();
+            return;
+        }
 try {
 
   const result = await submitForm(data);
@@ -981,12 +986,14 @@ use:enhance={handlesubmit}
          toast.error('Please fill all the required fields.');
          return;
        }
+       else{
  
 
  
 
 
        handlesubmit();
+       }
      }}
      on:keydown={(event) => {
        if (event.key === 'Enter') {

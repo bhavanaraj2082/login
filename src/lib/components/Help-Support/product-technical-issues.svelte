@@ -1,12 +1,13 @@
 <script>
+		import {onMount} from 'svelte'
   import { enhance } from "$app/forms";
   import Icon from "@iconify/svelte";
 
-
+export let data;
 import { toast } from "svelte-sonner";
 let formLoading=false;
 
-let country="";
+
 let form;
 let searchTerm="";
 let errors={};
@@ -15,11 +16,12 @@ let errors={};
   let assistance = "";
   let attachments = [];
   let totalSize = 0;
-  let firstName = "";
-  let lastName = "";
-  let email = "";
-  let phoneNumber = "";
-  let companyName = "";
+  let country= data?.profile?.country||"";
+let firstName = data?.profile?.firstName||"";
+let lastName = data?.profile?.lastName||"";
+let email =  data?.profile?.email||"";
+let phoneNumber = data?.profile?.cellPhone|| "";
+let companyName =  data?.profile?.companyName|| "";
   let location = "";
   let accountNumber = "";
   let message = "";
@@ -102,7 +104,7 @@ let errors={};
 		return;
 	  }
   
-	  if (!phoneNumber || phoneNumber.trim() === '') {
+	  if (!phoneNumber || phoneNumber === '') {
 		errors.phoneNumber = 'Required for the selected country';
 	  } else {
 		const countryDetails = getCountryByCode(country);
@@ -713,6 +715,11 @@ if (!fieldName || fieldName === 'documentRequired') {
   }
 
 const handlesubmit = async (data) => {
+	if (!formValid()) {
+            cancel();
+            return;
+        }
+		   else{
     try {
    
         const result = await submitForm(data);
@@ -749,6 +756,7 @@ const handlesubmit = async (data) => {
         // loading = false;
         showFailureDiv = true;
     }
+}
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
@@ -852,6 +860,7 @@ const submitForm = async (data) => {
       {/each}
       <input hidden name="products" value={JSON.stringify(products)} />
       <div class="mt-4">
+        <!-- svelte-ignore a11y-label-has-associated-control -->
         <label class="block text-sm"
           >Please let us know how we may assist you:</label
         >
@@ -869,6 +878,7 @@ const submitForm = async (data) => {
       </div>
 
       <div class="mt-4">
+        <!-- svelte-ignore a11y-label-has-associated-control -->
         <label class="block text-sm pb-2"
           >Please attach any images or files that may assist in troubleshooting
           or investigation:</label
@@ -1074,14 +1084,17 @@ const submitForm = async (data) => {
            // Check form validity
            if (!formValid()) {
              toast.error('Please fill all the required fields.');
+			 event.preventDefault();
              return;
-           }
+           } else{
+			
+			handlesubmit();
+		   }
      
   
      
   
   
-           handlesubmit();
          }}
          on:keydown={(event) => {
            if (event.key === 'Enter') {

@@ -2,19 +2,21 @@
   import { enhance } from "$app/forms";
   import Icon from '@iconify/svelte';
   import { toast } from "svelte-sonner";
+  export let data;
 	let form;
 	let selectOptionNumber = "";
   let errors={};
   let searchTerm = '';
   let formLoading = false;
-  let country="";
+//   let country="";
   let products = [{ itemNumber: "" }];
   let poNumber = "";
-  let firstName = "";
-  let lastName = "";
-  let email = "";
-  let phoneNumber = "";
-  let companyName = "";
+  let country= data?.profile?.country||"";
+let firstName = data?.profile?.firstName||"";
+let lastName = data?.profile?.lastName||"";
+let email =  data?.profile?.email||"";
+let phoneNumber = data?.profile?.cellPhone|| "";
+let companyName =  data?.profile?.companyName|| "";
   let location = "";
   let accountNumber = "";
   let message = "";
@@ -669,6 +671,10 @@
   }
 
 const handlesubmit = async (data) => {
+	if (!formValid()) {
+            cancel();
+            return;
+        }
     try {
         const result = await submitForm(data);
         console.log(result, "result");
@@ -988,14 +994,16 @@ const submitForm = async (data) => {
              // Check form validity
              if (!formValid()) {
                toast.error('Please fill all the required fields.');
+			   event.preventDefault();
                return;
              }
-       
+       else{
     
        
     
     
              handlesubmit();
+	   }
            }}
            on:keydown={(event) => {
              if (event.key === 'Enter') {

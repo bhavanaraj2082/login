@@ -6,18 +6,18 @@
   import { toast } from "svelte-sonner";
   let formLoading=false;
  
-  let country="";
+ export let data;
   let form;
   let searchTerm="";
   let errors={};
   let accountNumber = "";
   let assistanceMessage = "";
-  let firstName = "";
-  let lastName = "";
-  let email = "";
-  let phoneNumber = "";
-  let companyName = "";
-  let location = "";
+  let country= data?.profile?.country||"";
+let firstName = data?.profile?.firstName||"";
+let lastName = data?.profile?.lastName||"";
+let email =  data?.profile?.email||"";
+let phoneNumber = data?.profile?.cellPhone|| "";
+let companyName =  data?.profile?.companyName|| "";
   let message = "";
   let errormessage = "";
   const validateField = (fieldName) => {
@@ -656,6 +656,10 @@
   }
 
 const handlesubmit = async (data) => {
+	if (!formValid()) {
+            cancel();
+            return;
+        }
     try {
    
         const result = await submitForm(data);
@@ -974,14 +978,16 @@ const submitForm = async (data) => {
              // Check form validity
              if (!formValid()) {
                toast.error('Please fill all the required fields.');
+			   event.preventDefault();
                return;
              }
-       
+       else{
     
        
     
     
              handlesubmit();
+	   }
            }}
            on:keydown={(event) => {
              if (event.key === 'Enter') {
