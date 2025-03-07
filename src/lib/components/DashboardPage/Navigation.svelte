@@ -1,4 +1,5 @@
 <script>
+  import {onMount} from 'svelte';
   import Icon from '@iconify/svelte';
   import { slide } from 'svelte/transition';
   import { page } from '$app/stores';
@@ -41,6 +42,7 @@
   ];
 
   let hovered = false;
+  export let loading = true;
   const isMenuOpen = writable(false);
 
   $: if ($page.url.pathname) {
@@ -65,25 +67,52 @@
   function isItemDisabled(item) {
     return item.requiresRegistration && !isRegistrationComplete;
   }
+
+  onMount(() => {
+    setTimeout(() => {
+        loading = false; 
+    }, 200); 
+  });
 </script>
 
 <nav class="bg-white shadow rounded transition-all duration-300 ease-in-out lg:py-4 lg:max-w-xl">
+  {#if loading}
+  <div class="hidden lg:flex my-1 items-center justify-center px-2 py-3 w-44 animate-pulse">
+    <div class="h-6 bg-gray-300 rounded w-3/4"></div>
+  </div>
+  {:else}
   <div class="hidden lg:flex items-center justify-center text-2xl font-bold text-heading mb-1 pb-4 border-b">
     Chemikart
   </div>
+  {/if}
   <div class="lg:hidden flex justify-between items-center p-4 border-b">
+    {#if loading}
+    <div class="flex my-1 items-center justify-between px-2 py-3 w-full animate-pulse">
+      <div class="h-6 bg-gray-300 rounded w-3/4"></div>
+      <div class="h-6 w-6 bg-gray-300 rounded ml-6"></div>
+    </div>
+    {:else}
     <h1 class="text-xl font-bold text-heading">Chemikart</h1>
     <button
-      class="md:p-2 p-1.5 rounded bg-primary-50 hover:bg-primary-200 transition-all duration-300 ease-in-out"
-      aria-label="Toggle menu"
-      on:click={() => isMenuOpen.update((v) => !v)}>
-      <Icon icon={$isMenuOpen ? 'mdi:close' : 'mdi:menu'} class="text-primary-700 hover:scale-95 text-2xl" />
-    </button>
+    class="md:p-2 p-1.5 rounded bg-primary-50 hover:bg-primary-200 transition-all duration-300 ease-in-out"
+    aria-label="Toggle menu"
+    on:click={() => isMenuOpen.update((v) => !v)}>
+    <Icon icon={$isMenuOpen ? 'mdi:close' : 'mdi:menu'} class="text-primary-700 hover:scale-95 text-2xl" />
+  </button>
+  {/if}
   </div>
   <div
-    class="lg:block overflow-hidden transition-all duration-500 ease-in-out"
+    class="lg:block w-full overflow-hidden transition-all duration-500 ease-in-out"
     class:hidden={!$isMenuOpen}
     transition:slide|local>
+    {#if loading}
+    {#each Array(8) as _, i}
+        <div class="flex my-1 items-center gap-2 px-6 py-3 w-full animate-pulse">
+          <div class="w-5 h-5 bg-gray-300 rounded-full"></div>
+          <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+        </div>
+      {/each}
+    {:else}
     {#each navigationGroups as group}
       {#if group.title}
         <h2 class="px-6 py-2 text-sm font-semibold text-gray-800 uppercase whitespace-nowrap tracking-wider mt-1">{group.title}</h2>
@@ -114,5 +143,6 @@
         {/each}
       </div>
     {/each}
+    {/if}
   </div>
 </nav>
