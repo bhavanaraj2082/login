@@ -5,13 +5,13 @@
   import { toast } from "svelte-sonner";
   import { invalidate } from "$app/navigation";
   import Icon from "@iconify/svelte";
-  import { currencyState } from "$lib/stores/mainStores.js";
+  import { currencyState,cartTotalComps } from "$lib/stores/mainStores.js";
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
   import { authedUser } from "$lib/stores/mainStores.js";
   import { sendMessage } from "$lib/utils.js";
   export let relatedProducts;
   // console.log("relatedProducts",relatedProducts);
-
+	import { enhance } from '$app/forms';
   $: displayPrice =
     $currencyState === "usd"
       ? selectedProduct.priceUSD
@@ -227,6 +227,7 @@
 
     if (!isLoggedIn) {
       addItemToCart(cartItem);
+      submitAlternateForm()
       toast.success("Product added to cart");
       guestCartFetch();
       setTimeout(() => {
@@ -238,6 +239,7 @@
     const formdata = new FormData();
     formdata.append("items", JSON.stringify([cartItem]));
     sendMessage("?/addtocart", formdata, async (result) => {
+      submitForm()
       toast.success(result.message);
       invalidate("/");
       setTimeout(() => {
@@ -247,8 +249,39 @@
 
     // console.log("Final Cart Item Sent:", cartItem);
   }
+  let form2;
+  async function submitForm() {
+		form2.requestSubmit();
+	}
+  async function submitAlternateForm() {
+		// submitGuestForm.requestSubmit();
+		const storedTotalComps = JSON.parse(localStorage.getItem('cart'));;
+		localStorage.setItem('totalCompsChemi', storedTotalComps.length);
+		syncLocalStorageToStore();	
+	}
+  function syncLocalStorageToStore() {
+    // Check if we are in the browser
+    if (typeof window !== 'undefined') {
+        const storedTotalComps = localStorage.getItem('totalCompsChemi');
+        if (storedTotalComps ) {
+            cartTotalComps.set(Number(storedTotalComps));
+        }
+    }
+}
+function handleDataCart() {
+		return async ({ result }) => {
+			// console.log("result from page server for carat data",result);
+			
+			const totalComps  = result?.data?.cartData?.cartItems.length 
+			// console.log("totalComps",totalComps);
+			localStorage.setItem('totalCompsChemi', totalComps);
+			syncLocalStorageToStore();	
+		};
+	}
 </script>
-
+<form method="POST" action="/?/getCartValue" bind:this={form2} use:enhance={handleDataCart}>
+	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
+</form>
 <div class="max-w-7xl mx-auto my-10">
   <h3 class="text-xl font-bold text-primary-400 p-1 md:w-11/12 mx-auto">
     Related Products
