@@ -1,5 +1,6 @@
 import data from '$lib/data/applications.json';  
 import { RelatedApplicationData } from '$lib/server/mongoLoads.js';
+import { addToCart } from '$lib/server/mongoActions.js';
 
 function findData(items, key, value) {
   const found = items.find(item => item[key] === value);
@@ -39,3 +40,20 @@ export async function load({ params }) {
     return { status: 500, error: 'Internal Server Error' };
   }
 }
+export const actions = {
+  addtocart:async({request,locals})=>{
+		try {
+			const userId = locals?.authedUser?.id || ""
+			const userEmail = locals?.authedUser?.email ||""
+			const body = Object.fromEntries(await request.formData())
+      console.log(body);
+      
+			const data = JSON.parse(body.items)
+			return await addToCart(data,userId,userEmail)
+		} catch (error) {
+			console.log(error);
+			return {success:false,message:"Something went wrong"}
+		}
+	},
+
+};
