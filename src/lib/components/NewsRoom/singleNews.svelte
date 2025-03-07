@@ -9,7 +9,7 @@
     };
   </script>
   
-  <div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+  <div class="max-w-7xl mx-auto p-6 bg-white shadow-lg rounded-lg w-full md:w-11/12">
     <!-- Title -->
     <h1 class="text-4xl font-bold text-gray-800 mb-4">{singleNewsData.title}</h1>
   

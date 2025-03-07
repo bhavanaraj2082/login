@@ -18,12 +18,12 @@
 ">
     <div class="">
       <button
-      class="flex items-center justify-center rounded py-0.3 bg-primary-400 text-white md:mr-14 lg:mr-0 shadow-md"
+      class="flex items-center justify-center rounded py-0.3 bg-primary-50 md:mr-14 lg:mr-0 shadow-md"
         on:click={toggleHelp}
       >
        <div class="flex flex-col items-center">
 				<Icon icon="tdesign:chevron-up" width="20" height="20"  />
-				<span class="px-2 text-xs pb-0.5">TOP</span>
+				<span class="px-2 text-xs pb-0.5 text-primary-500">TOP</span>
 			</div>	
     </button>
     </div>

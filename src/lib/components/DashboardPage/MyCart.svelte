@@ -29,7 +29,6 @@
   		    } : null,
   		    cartItems: Array.isArray(cart.cartItems) 
   		      ? cart.cartItems
-				.filter(item => item !== null)
   		          .map(item => {
   		            return {
   		              id: item.productInfo.productId,
@@ -934,7 +933,7 @@ function formatDate(dateString) {
 				</div>
 			{:else}
 				{#each paginatedCartItems as cart}
-					<div class="border rounded shadow-sm p-4 bg-white">
+					<div class="border rounded shadow p-4 bg-white">
 						<div class="flex justify-between items-start mb-4">
 							<div class="">
 								<span class="flex items-center my-1.5 gap-1">
