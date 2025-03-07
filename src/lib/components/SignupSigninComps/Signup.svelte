@@ -1787,7 +1787,7 @@
               errors.lastName = !lastName
                 ? "*Required"
                 : !/^[a-zA-Z\s]+$/.test(lastName)
-                  ? "Company type can only contain letters and spaces"
+                  ? "Lastname can only contain letters and spaces"
                   : "";
             }}
           />
