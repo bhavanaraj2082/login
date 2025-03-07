@@ -3,7 +3,7 @@
 	import { goto,invalidate } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
-	import { authedUser ,currencyState } from '$lib/stores/mainStores.js';
+	import { authedUser ,currencyState,cartTotalComps } from '$lib/stores/mainStores.js';
 	import Icon from '@iconify/svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import RecurrencePopup from '$lib/components/Cart/RecurrencePopup.svelte';
@@ -33,7 +33,7 @@
 	$: cartId = data?.cart[0]?.cartId || '';
 	$: cartName = data?.cart[0]?.cartName || '';
 	$: recurrence = data?.cart[0]?.recurrence || '';
-    console.log(data,"forntend");
+    //console.log(data,"forntend");
 
 	const calculateTotalPrice = (cart)=>{
        priceINR = cart.reduce((sum,crt)=> sum + crt.currentPrice.INR*crt.quantity,0)
@@ -48,7 +48,6 @@
 			calculateTotalPrice($cart);
 		});
 	};
-	console.log($cart,"1")
 	let scrollTimeout
 	const handleScroll = (e) => {
 	isHide = true;
@@ -75,8 +74,6 @@
 			cart.set(cartData);
 		    calculateTotalPrice($cart);
 		}
-		console.log($cart,"2")
-
 	});
 
 	let showModal = false;
@@ -90,7 +87,17 @@
 			addToCartModal = !addToCartModal;
 		}
 	};
-    console.log($cart,"3")
+    
+	$:syncLocalStorageToStore($cart.length)
+	function syncLocalStorageToStore(count) {
+    // Check if we are in the browser
+    if (typeof window !== 'undefined') {
+        const storedTotalComps = localStorage.getItem('totalCompsChemi');
+        if (storedTotalComps ) {
+            cartTotalComps.set(Number(count));
+        }
+    }
+   }
 	const downloadExcel = () => {
     // Define the data (same as the original CSV content)
     const headers = [
@@ -174,7 +181,7 @@
     // Generate Excel file and trigger download
     XLSX.writeFile(workbook, 'cart_details.xlsx');
     };
-	console.log($cart,"4")
+
 	const recurrencePeriod =(recurring)=>{
 		if(recurring === 1){
        return "Monthly" 

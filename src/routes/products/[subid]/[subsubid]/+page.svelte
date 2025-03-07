@@ -13,7 +13,7 @@
   import SEO from "$lib/components/SEO.svelte";
 
   export let data;
-  console.log(data.products, "object->");
+  //console.log(data.products, "object->");
 
   let catName = data?.products[0]?.categoryDetails?.name;
   let catUrl = data?.products[0]?.categoryDetails?.urlName;
