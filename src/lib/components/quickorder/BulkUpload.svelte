@@ -2,6 +2,7 @@
   import Icon from "@iconify/svelte";
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
+  import * as XLSX from 'xlsx';
   export let data;
   let validationMessages = [];
   let duplicateEntries = [];
@@ -18,6 +19,7 @@
 
     const lines = fileContent.split("\n").filter((line) => line.trim());
     const seenEntries = new Map();
+    
     const duplicates = [];
     const uniqueLines = [];
 
@@ -43,87 +45,26 @@
     return { duplicates, uniqueLines };
   }
 
-  // function removeDuplicateEntry(productInfo, event) {
-  //     // Get the current lines and create a map to track first occurrence
-  //     const lines = rawFileData.split('\n').filter(line => line.trim());
-  //     const seenProducts = new Map();
-
-  //     // Keep only the first occurrence of each product
-  //     const deduplicatedLines = lines.filter(line => {
-  //       const [currentProductInfo] = line.split(',').map(item => item.trim());
-  //       if (currentProductInfo === productInfo) {
-  //         if (seenProducts.has(productInfo)) {
-  //           return false; // Skip duplicates
-  //         }
-  //         seenProducts.set(productInfo, true); // Mark as seen
-  //       }
-  //       return true;
-  //     });
-
-  //     // Update the raw file data with deduplicated content
-  //     rawFileData = deduplicatedLines.join('\n');
-
-  //     // Recheck for any remaining duplicates
-  //     const { duplicates } = checkForDuplicates(rawFileData);
-  //     duplicateEntries = duplicates;
-
-  //     toast.success(`Removed duplicate entry for ${productInfo}`);
-
-  //     // Create a new FormData with the updated content
-  //     const formData = new FormData(event.target.closest('form'));
-
-  //     // Create a new File object with the deduplicated content
-  //     const deduplicatedFile = new File([rawFileData], 'updated.csv', {
-  //       type: 'text/csv'
-  //     });
-
-  //     formData.set('file', deduplicatedFile);
-
-  //     // If no more duplicates, submit the form with deduplicated data
-  //     if (duplicateEntries.length === 0) {
-  //       const form = event.target.closest("form");
-  //       if (form) {
-  //         // Update the form's file input with the new deduplicated file
-  //         const dataTransfer = new DataTransfer();
-  //         dataTransfer.items.add(deduplicatedFile);
-  //         const fileInput = form.querySelector('input[type="file"]');
-  //         if (fileInput) {
-  //           fileInput.files = dataTransfer.files;
-  //         }
-
-  //         form.requestSubmit();
-  //       }
-  //     }
-  //   }
   function removeDuplicateEntry(productInfo, event) {
-    // Get the current lines and create a map to track first occurrence
     const lines = rawFileData.split("\n").filter((line) => line.trim());
     const seenProducts = new Map();
-
-    // Keep only the first occurrence of each product
     const deduplicatedLines = lines.filter((line) => {
-      const [currentProductInfo] = line.split(",").map((item) => item.trim()); // Trim here
+      const [currentProductInfo] = line.split(",").map((item) => item.trim());
       if (currentProductInfo === productInfo) {
         if (seenProducts.has(productInfo)) {
-          return false; // Skip duplicates
+          return false; 
         }
-        seenProducts.set(productInfo, true); // Mark as seen
+        seenProducts.set(productInfo, true); 
       }
       return true;
     });
-
-    // Now, trim the content for every line (ensure no extra spaces are left)
     const finalLines = deduplicatedLines.map((line) => {
       const [productInfo, quantity] = line
         .split(",")
-        .map((item) => item.trim()); // Trim here
+        .map((item) => item.trim()); 
       return `${productInfo},${quantity}`;
     });
-
-    // Update the raw file data with trimmed, deduplicated content
     rawFileData = finalLines.join("\n");
-
-    // Recheck for any remaining duplicates (this will run after trimming)
     const { duplicates } = checkForDuplicates(rawFileData);
     duplicateEntries = duplicates;
 
@@ -157,41 +98,138 @@
     duplicateEntries = duplicates;
   }
 
-  let selectedFileName = ""; // To store the selected file name
+  let selectedFileName = ""; 
+
+  // function handleFileInputChange(event) {
+  //   const file = event.target.files[0];
+
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = function (e) {
+  //       rawFileData = e.target.result;
+  //       fileError = "";
+  //       selectedFileName = file.name;
+  //       const { duplicates } = checkForDuplicates(rawFileData);
+  //       duplicateEntries = duplicates;
+
+  //       if (duplicates.length > 0) {
+  //         toast.error(
+  //           `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+  //         );
+  //       } else {
+  //         const form = event.target.closest("form");
+  //         if (form) {
+  //           form.requestSubmit();
+  //         }
+  //       }
+  //     };
+
+  //     reader.onerror = function () {
+  //       fileError = "Error reading the file. Please try again.";
+  //     };
+
+  //     reader.readAsText(file);
+  //   } else {
+  //     fileError = "No file selected.";
+  //   }
+  // }
 
   function handleFileInputChange(event) {
     const file = event.target.files[0];
 
     if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        rawFileData = e.target.result;
-        fileError = "";
+        const fileType = file.name.split('.').pop().toLowerCase();
         selectedFileName = file.name;
-        const { duplicates } = checkForDuplicates(rawFileData);
-        duplicateEntries = duplicates;
-
-        if (duplicates.length > 0) {
-          toast.error(
-            `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
-          );
+        
+        if (fileType === 'xlsx' || fileType === 'xls') {
+            fileError = "";
+            
+            if (typeof XLSX !== 'undefined') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                        
+                        let csvData = XLSX.utils.sheet_to_csv(worksheet);
+                        const lines = csvData.split('\n').filter(line => line.trim());
+                        const transformedLines = lines.map(line => {
+                            const parts = line.split(',').map(part => part.trim());
+                            if (parts.length >= 2) {
+                                return `${parts[0]}-${parts[1]},${parts[2] || 1}`;
+                            }
+                            return line; 
+                        });
+                        
+                        rawFileData = transformedLines.join('\n');
+                        const csvFile = new File([rawFileData], file.name.replace(/\.xlsx$|\.xls$/i, '.csv'), {
+                            type: 'text/csv'
+                        });
+                        
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(csvFile);
+                        
+                        const fileInput = document.getElementById('bulkupload');
+                        if (fileInput) {
+                            fileInput.files = dataTransfer.files;
+                        }
+                        
+                        const { duplicates } = checkForDuplicates(rawFileData);
+                        duplicateEntries = duplicates;
+                        
+                        if (duplicates.length > 0) {
+                            toast.error(
+                                `Found ${duplicates.length} duplicate entries. Please review and remove them.`
+                            );
+                        } else {
+                            const form = event.target.closest("form");
+                            if (form) {
+                                form.requestSubmit();
+                            }
+                        }
+                    } catch (error) {
+                        console.error("Excel processing error:", error);
+                        fileError = "Error processing Excel file. Please check file format.";
+                    }
+                };
+                reader.onerror = function() {
+                    fileError = "Error reading the file. Please try again.";
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                fileError = "Excel file support requires the SheetJS library. Please use CSV format instead.";
+            }
         } else {
-          const form = event.target.closest("form");
-          if (form) {
-            form.requestSubmit();
-          }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                rawFileData = e.target.result;
+                fileError = "";
+                
+                const { duplicates } = checkForDuplicates(rawFileData);
+                duplicateEntries = duplicates;
+                
+                if (duplicates.length > 0) {
+                    toast.error(
+                        `Found ${duplicates.length} duplicate entries. Please review and remove them.`
+                    );
+                } else {
+                    const form = event.target.closest("form");
+                    if (form) {
+                        form.requestSubmit();
+                    }
+                }
+            };
+            reader.onerror = function() {
+                fileError = "Error reading the file. Please try again.";
+            };
+            reader.readAsText(file);
         }
-      };
-
-      reader.onerror = function () {
-        fileError = "Error reading the file. Please try again.";
-      };
-
-      reader.readAsText(file);
     } else {
-      fileError = "No file selected.";
+        fileError = "No file selected.";
     }
-  }
+}
 
   async function addValidatedProductsToCart() {
     cartloading = true;
