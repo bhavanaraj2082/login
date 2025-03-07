@@ -34,14 +34,14 @@
   <div class="pt-5 max-w-7xl md:w-11/12 mx-auto sm:block hidden">
 		<div class="fixed z-30 md:bottom-[75px] bottom-40 right-0 lg:right-10 py-6 lg:p-4">
       <button
-        class="flex items-center justify-center rounded py-0.3 bg-primary-400 text-white md:mr-14 lg:mr-0 shadow-md" on:click={scrollToTop}
+        class="flex items-center justify-center rounded py-0.3 bg-primary-50 text-white md:mr-14 lg:mr-0 shadow-md" on:click={scrollToTop}
         class:hidden={!showButton}
           on:mouseenter={handleMouseEnter}
             on:mouseleave={handleMouseLeave}
         >
         <div class="flex flex-col items-center">
-          <Icon icon="tdesign:chevron-up" width="20" height="20"  />
-          <span class="px-1.5 text-xs pb-0.5">TOP</span>
+          <Icon icon="tdesign:chevron-up" width="20" height="20" class="text-primary-500"  />
+          <span class="px-1.5 text-xs pb-0.5 text-primary-500 font-medium">TOP</span>
         </div>
       </button>
         {#if showTooltip}

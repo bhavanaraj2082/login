@@ -367,11 +367,11 @@ async function submitForm() {
 				</button>
 			{/each}
 			<div class="flex flex-col font-semibold">
-				<button
+				<!-- <button
 					on:click={() => navigateTo('/quick-order')}
 					class="text-left text-white text-md transition duration-200 w-full py-2 px-4 font-medium">
 					Quick Order
-				</button>
+				</button> -->
 				<button
 					on:click={() => navigateTo('/order-status')}
 					class="text-left text-white text-md transition duration-200 w-full py-2 px-4 font-medium">

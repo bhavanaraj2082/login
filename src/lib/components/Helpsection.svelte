@@ -61,7 +61,7 @@ $: {
       window.addEventListener('scroll', handleScroll);
       window.addEventListener('mousedown', handleClickOutside); 
       handleScroll(); 
-    //   setTimeout(handleScroll, 100);
+      setTimeout(handleScroll, 100);
       return () => {
         window.removeEventListener('scroll', handleScroll);
         window.removeEventListener('mousedown', handleClickOutside); 

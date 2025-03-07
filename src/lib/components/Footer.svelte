@@ -25,13 +25,24 @@
 
 	const currentYear = new Date().getFullYear();
 	let footer;
+
+	const excludedUrls = [
+  "/ecom-solutions",
+  "/safety/understanding-product-labels",
+  "/safety/globally-harmonized-system",
+  "/safety/tsca-8-notification",
+  "/safety/hazard-and-precautionary-statements",
+  "/products",
+  "/terms/site-and-terms",
+  "/terms/privacy-notice"
+];
 </script>
 {#if currentUrl !== "/feedback"}
 <Helpsection1 />
 <Helpsection2 />
 {/if}
 <footer class="w-full bg-primary-400 p-6 font-workSans" bind:this={footer}>
-	{#if currentUrl !== "/feedback" && currentUrl !== "/order-status"}
+	{#if currentUrl !== "/feedback" && currentUrl !== "/order-status" && currentUrl !== "/dashboard/myfavourite" && currentUrl !== "/safety/tsca-8-notification"}
 	<Helpsection {footer} />
 	{/if}
 
@@ -113,8 +124,10 @@
 					<li><a href="/quotes" class="font-medium sm:text-sm text-xs hover:underline">Quotes</a></li>
 					<li><a href="/returns" class="font-medium sm:text-sm text-xs hover:underline">Returns & its Status</a></li>
 				</ul>
-				<div class="sm:hidden block">
+				<div class="">
+					{#if !excludedUrls.includes(currentUrl)}					
 					<Scroller />
+					{/if}
 				</div>
 			</div>
 			<div class="md:hidden block">
@@ -166,7 +179,7 @@
 						</div>
 					</div>
 				</div>
-				<Scroller />
+				<!-- <Scroller /> -->
 			</div>
 			
 
