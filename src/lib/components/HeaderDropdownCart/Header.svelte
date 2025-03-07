@@ -641,7 +641,7 @@ async function submitForm() {
 							navigateTo('/signup');
 						}}
 						class=" registerbtn font-workSans pr-2  text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
-						>Register</button>
+						>SignUp</button>
 				</div>
 			{/if}
 		</div>
