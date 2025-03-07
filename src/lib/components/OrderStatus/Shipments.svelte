@@ -60,7 +60,7 @@
         </h1>
       </div>
       {#each shipment.shipDetails as item}
-        <div class="border rounded-lg mb-5">
+        <div class="border rounded-lg mb-5 bg-white">
           <div
             class="border flex justify-between items-center px-4 py-2 bg-white rounded-md"
           >
