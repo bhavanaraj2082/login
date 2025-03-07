@@ -40,7 +40,7 @@
 </script>
 
 <div class="main-container mx-auto w-11/12 max-w-7xl lg:px-3 md:px-2 sm:px-8 px-3 bg-gray-50 pb-10">
-	<h3 class="text-2xl mb-6 font-semibold text-primary-600">Help & Support</h3>
+	<h3 class="mb-6 text-heading font-bold text-lg md:text-2xl">Help & Support</h3>
 
 	<div
 		class="flex flex-col justify-evenly items-center lg:flex-row lg:mb-8 bg-white border p-6 rounded"

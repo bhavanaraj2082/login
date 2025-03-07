@@ -228,13 +228,13 @@
 							</a>
 								
 								{#if activeSection === 'a' && !isMdScreen}
-								<div class="p-2 bg-gray-100" transition:slide={{ duration: 300, easing: cubicOut }}>
+								<!--<div class="p-2 bg-gray-100" transition:slide={{ duration: 300, easing: cubicOut }}>
 									<h3 class="text-x md:text-md font-bold py-2">
-										<span class="text-primary-400">Your Privacy</span></h3>
+										 <span class="text-primary-400">Your Privacy</span></h3>
 									<p class="text-xs md:text-sm text-description">When you visit any website, it may store or retrieve information on your browser, mostly in the form of cookies. This information might be about you, your preferences or your device and is mostly used to make the site work as you expect it to. The information does not usually directly identify you, but it can give a more personalized web exprience. Because we respect your right to privacy, you can choose not to allow some types cookies. 
-										Please note that blocking some types of cookies may impact your experience on the site and the services we are able to offer.</p>
+										Please note that blocking some types of cookies may impact your experience on the site and the services we are able to offer.</p> 
 										<button class="text-xs text-primary-400 hover:text-primary-600 hover:underline" on:click={handlePrivacyPolicyClick}>Privacy Policy</button>
-								</div>
+								</div>-->
 								{/if}
 							</li>
 							<li>
@@ -393,8 +393,8 @@
 						{#if activeSection === 'a'}
 							<div id="a" transition:slide={{ duration: 300, easing: cubicOut }}>
 								<h3 class="text-md font-bold py-1 text-heading flex gap-2"> 
-									<Icon icon="fluent:cookies-48-regular" width="1.6em" height="1.6em" class="text-primary-400"/>
-									<span class="text-primary-400">Your Privacy</span>
+									<Icon icon="fluent:cookies-48-regular" width="1.6em" height="1.6em" class="text-heading"/>
+									<span class="text-heading">Your Privacy</span>
 								</h3>
 								<p class="text-xs ml-10 text-description">
 									When you visit any website, it may store or retrieve information on your browser, mostly in the form of cookies. This information might be about you, your preferences or your device and is mostly used to make the site work as you expect it to. The information does not usually directly identify you, but it can give a more personalized web exprience. Because we respect your right to privacy, you can choose not to allow some types cookies. 
@@ -408,8 +408,8 @@
 							<div id="b" transition:slide={{ duration: 300, easing: cubicOut }}>
 								<h3 class="text-md font-bold py-1 flex justify-between">
 									<div class="flex text-heading">
-									<Icon icon="fluent:cookies-48-regular" width="1.6em" height="1.6em" class="text-primary-400"/>
-									<span class="text-primary-400 pl-3">Necessary Cookies</span>
+									<Icon icon="fluent:cookies-48-regular" width="1.6em" height="1.6em" class="text-heading"/>
+									<span class="text-heading pl-3">Necessary Cookies</span>
 									</div>
 									<div class="flex gap-2">
 									<button 
