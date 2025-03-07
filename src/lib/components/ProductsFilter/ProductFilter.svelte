@@ -94,7 +94,7 @@
     try {
         loading = true;
         const newUrl = new URL(window.location.href);
-        
+        console.log(checked,"PPPPPPPP");
         if (checked) {
             selectedManufacturer = manufacturerName;
             newUrl.searchParams.set('manufacturer', manufacturerName);
@@ -145,7 +145,7 @@
     const decrementQuantity = (id) => {
     products = products.map(product => {
         if (product._id === id) {
-          //  if (product.quantity > product.orderMultiple) {
+          if (product.quantity > product.orderMultiple) {
             let priceINR = product.pricing.INR*(product.quantity-product.orderMultiple)
             let priceUSD = product.pricing.USD*(product.quantity-product.orderMultiple)
                 return {
@@ -154,8 +154,8 @@
                     totalPrice:{priceINR,priceUSD}
                     
                 };
-          //  }
-           // return product;
+           }
+            return product;
         }
         return product;
     });
@@ -208,7 +208,7 @@
   };
 
   const addToCart = (product) =>{
-    console.log(product,"============");
+    //console.log(product,"============");
     const backOrder = product.quantity > product.stock ? product.quantity - product.stock : 0
     if(isLoggedIn === false){
         const addCart = {
@@ -358,7 +358,7 @@ const handleSearch = (searchName) => {
                       {#if loading}
                         <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
                       {/if}
-               <div class="space-y-2.5 py-2.5 h-48 px-2 overflow-y-scroll my-1 scroll">
+               <div class="space-y-2.5 py-2.5 h-48 px-2 overflow-y-auto my-1 scroll">
                    {#if !searchManufacture.length}
                        <p class="text-sm text-center">No manufacturer found</p>
                    {:else}
@@ -366,10 +366,11 @@ const handleSearch = (searchName) => {
                            <label for={name} class="flex cursor-pointer items-center gap-2 text-xs font-medium">
                                <input 
                                    id={name}
-                                   type="radio" 
+                                   name={name}
+                                   type="checkbox" 
                                    checked={name === selectedManufacturer}
                                    on:change={(e) => handleManufacturerSelect(name, e.target.checked)}
-                                   class="cursor-pointer text-primary-500 focus:ring-0">
+                                   class="cursor-pointer rounded-full text-primary-500 focus:ring-0 outline-none">
                                {name}
                            </label>
                        {/each}
@@ -405,18 +406,16 @@ const handleSearch = (searchName) => {
              <!-- svelte-ignore a11y-no-static-element-interactions -->
              <div on:click={()=>showSortByDropdown = !showSortByDropdown} class=" cursor-pointer font-semibold text-xs sm:text-sm flex items-center justify-between p-1 md:p-1.5 rounded border-1 border-gray-300 ">
                 <span class="ml-2">Sort By</span>
-                <button type="button" on:click={()=>showSortByDropdown = !showSortByDropdown}>
-                     <Icon icon={showSortByDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
-                </button>
+                <Icon icon={showSortByDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
              </div>
              <div class="p-3 border-1 rounded {showSortByDropdown ? "block" : "hidden"}">
                 <div class=" space-y-2.5 py-2.5 h-auto">
                     <label for="asc" class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
-                        <input type="radio" id='asc' on:change={(e)=>sortBy(e.target.checked,"asc")} checked={selectedSort === "asc"} class=" cursor-pointer text-primary-500 focus:ring-0">
+                        <input type="checkbox" id='asc' on:change={(e)=>sortBy(e.target.checked,"asc")} checked={selectedSort === "asc"} class=" cursor-pointer outline-none rounded-full text-primary-500 focus:ring-0">
                         <p>Price Ascending </p>
                     </label>
                     <label for="desc" class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
-                        <input type="radio" id="desc" on:change={(e)=>sortBy(e.target.checked,"desc")} checked={selectedSort === "desc"} class=" cursor-pointer text-primary-500 focus:ring-0">
+                        <input type="checkbox" id="desc" on:change={(e)=>sortBy(e.target.checked,"desc")} checked={selectedSort === "desc"} class=" cursor-pointer outline-none rounded-full text-primary-500 focus:ring-0">
                         <p>Price Descending </p>
                     </label>
                 </div>
@@ -432,20 +431,20 @@ const handleSearch = (searchName) => {
         </div>
         {:else}
        {#each paginatedProducts as product,index}
-        <div class=" bg-white shadow p-2 sm:p-4 md:px-8 md:py-6 space-y-2 rounded">
+        <div class=" bg-white shadow p-2 sm:p-4 md:px-8 space-y-2 rounded">
             <div>
                 <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{product?.productName  || ""}</a>
             </div>
-            <div class=" flex items-start gap-2 md:gap-8">
+            <div class=" flex items-center gap-2 md:gap-8">
                 <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`}>
                 <img src={product?.imageSrc} class=" w-20 h-20 sm:w-40 sm:h-40 object-contain" alt="">
                 </a>
-                <div class=" text-xs md:text-sm space-y-1 grow font-medium">
+                <div class=" text-xs space-y-1 grow font-medium">
                     <p>Product Number : <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.productNumber || ""}</a></p>
                     <p>Category : <a href={`/products/${categoryName}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.categoryDetails.name || ""}</a></p>
                     <p>Sub Category : <span class=" font-semibold ">{product?.subCategoryDetails.name || ""}</span></p>
                     <p>Manufacturer : <span class=" font-semibold ">{product?.manufacturerDetails.name || ""}</span></p>
-                    <p>Price : <span class=" font-semibold">{$currencyState === "inr" ? "₹" + product?.pricing.INR.toLocaleString("en-IN"): "$"+ product?.pricing.USD.toLocaleString("en-IN")}</span></p>
+                    <!-- <p>Price : <span class=" font-semibold">{$currencyState === "inr" ? "₹" + product?.pricing.INR.toLocaleString("en-IN"): "$"+ product?.pricing.USD.toLocaleString("en-IN")}</span></p> -->
                     <p>Size : <span class=" font-semibold">{product?.pricing.break || ""}</span></p>
                     <div class=" hidden sm:flex items-center justify-between">
                         <p class=" font-bold text-4s">{$currencyState === "inr" ? "₹" + product?.totalPrice.priceINR.toLocaleString("en-IN"): "$"+ product?.totalPrice.priceUSD.toLocaleString("en-IN")}</p>
@@ -454,23 +453,26 @@ const handleSearch = (searchName) => {
                                 <input type="number" bind:value={product.quantity}
 					            on:input={e=>handleQty(product._id,parseInt(e.target.value))}
 					            class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
-					        <div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded">
+					        <div class=" {tog === index ? "hidden" : ""} flex items-center border-1 border-primary-300 rounded">
 						    <button
 							on:click={() => decrementQuantity(product._id)}
-							class=" border-r-1 p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
+							class=" p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							><Icon icon="rivet-icons:minus" class="text-xs" /></button>
 						    <button on:click={()=>{tog = index}} class="w-fit px-3 py-1 text-sm font-medium outline-none text-center">
 							    {product.quantity}
 						    </button>
 						    <button
 							    on:click={() => incrementQuantity(product._id)}
-							    class=" border-l-1 p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
+							    class=" p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
 							    <Icon icon="rivet-icons:plus" class="text-xs" />
 						    </button>
 					</div>
                             </div>
                         </div>
-                        <button type="button" on:click={()=>addToCart(product)} class="text-xs sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded ">Add to Cart</button>
+                        <button type="button" on:click={()=>addToCart(product)} class="text-xs flex items-center gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded transition ease-in-out duration-300">
+                            <Icon icon="mdi:cart" class="text-xl" />
+                            Add to Cart
+                        </button>
                     </div>
                 </div>
             </div>
@@ -498,7 +500,10 @@ const handleSearch = (searchName) => {
 					</div>
                     </div>
                 </div>
-                <button type="button" on:click={()=>addToCart(product)} class=" text-xs sm:text-sm px-3 py-1 sm:p-1.5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded ">Add to Cart</button>
+                <button type="button" on:click={()=>addToCart(product)} class=" text-xs sm:text-sm px-3 py-1 flex items-center gap-1 sm:p-1.5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded ">
+                    <Icon icon="mdi:cart" class="text-xl" />
+                    Add to Cart
+                </button>
             </div>
         </div>
        {/each}
@@ -506,27 +511,38 @@ const handleSearch = (searchName) => {
        
        <!-- pagination -->
        <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {products.length< 10 ? "hidden": "flex"}">
-        <button class="border-1 bg-white border-primary-500 rounded text-primary-500 hover:bg-primary-500 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
+        <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
+        on:click={() => goToPage(1)} 
+        disabled={currentPage == 1}
+      >
+      <Icon icon="charm:chevrons-left" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded disabled:text-gray-300" />
+      </button>
+        <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
           on:click={() => goToPage(currentPage - 1)} 
           disabled={currentPage == 1}
         >
-        <Icon icon="ic:round-chevron-left" class="p-1 sm:p-1.5 text-2xl sm:text-4xl rounded disabled:text-gray-300 hover:text-white" />
+        <Icon icon="ic:round-chevron-left" class="p-1 sm:p-2 text-2xl sm:text-4xl rounded disabled:text-gray-300" />
         </button>
       
         {#each getPageNumbers(currentPage,totalPages) as page}
           <button
             on:click={() => goToPage(page)}
-            class="{page === currentPage ? "text-primary-500 border-primary-500" : ""} bg-white border-1 border-gray-300 rounded px-2.5 sm:px-4 text-xs sm:text-sm font-medium"
+            class="{page === currentPage ? "text-white bg-primary-500 border-primary-500" : "border-gray-300 bg-white"}  border shadow-md  rounded-md px-2.5 sm:px-3.5 text-xs sm:text-sm font-medium"
           >
             {page}
           </button>
         {/each}
       
-        <button class=" border-1 bg-white border-primary-500 rounded text-primary-500 hover:bg-primary-500 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
+        <button class=" border shadow-md bg-white border-gray-300 rounded-md text-gray-400 hover:bg-gray-100 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
           on:click={() => goToPage(currentPage + 1)}
           disabled={currentPage == totalPages}
         >
-        <Icon icon="ic:round-chevron-right" class="p-1 sm:p-1.5 text-2xl sm:text-4xl rounded disabled:text-gray-300 hover:text-white" />
+        <Icon icon="charm:chevron-right" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded disabled:text-gray-300" />
+        </button>
+        <button class=" border shadow-md bg-white border-gray-300 rounded-md text-gray-400 hover:bg-gray-100 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
+          on:click={() => goToPage(totalPages)}
+        >
+        <Icon icon="charm:chevrons-right" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded disabled:text-gray-300" />
         </button>
       </div>
     </div>
