@@ -1256,7 +1256,7 @@
 
           <!-- Title -->
           <h2 class="text-xl font-bold text-gray-900 text-center mb-6">
-            Please Login or Register to Continue
+            Please SignIn or Register to Continue
           </h2>
 
           <!-- Login Button -->
@@ -1264,7 +1264,8 @@
             <button
               class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-sm text-white font-medium py-2.5 px-2 rounded-lg shadow-lg mb-4"
             >
-              <a href="/login" class="block">Login</a>
+              <!-- <a href="/login" class="block">Login</a> -->
+              <a href="/signin" class="block">SignIn</a>
             </button>
 
             <!-- Register Section -->

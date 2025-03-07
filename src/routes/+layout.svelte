@@ -44,7 +44,7 @@
 	// 	}
 
 	// });
-	$: isAuthRoute = $page.url.pathname === '/login' || $page.url.pathname === '/signup' || $page.url.pathname === '/forgot' || $page.url.pathname === '/reset-password';
+	$: isAuthRoute = $page.url.pathname === '/login' || $page.url.pathname === '/signup' || $page.url.pathname === '/forgot' || $page.url.pathname === '/reset-password' || $page.url.pathname === '/signin';
 </script>
 {#if !isAuthRoute}
  <Header {data}/>

@@ -309,7 +309,7 @@
             type="submit"
             class="bg-primary-400 text-sm font-medium hover:bg-primary-500 text-white rounded p-2 w-full text-center"
           >
-            Login
+            SignIn
           </button>
         </form>
       {/if}
@@ -327,7 +327,7 @@
           <!-- svelte-ignore a11y-missing-attribute -->
           <a class="flex items-center space-x-2">
             <Icon icon="fluent-mdl2:signin" class="text-2xl" />
-            <span class="text-sm font-medium">Back to Login</span></a
+            <span class="text-sm font-medium">Back to SignIn</span></a
           ></button
         >
       {:else}
@@ -339,7 +339,7 @@
           <!-- svelte-ignore a11y-missing-attribute -->
           <a class="flex items-center space-x-2">
             <Icon icon="fluent-mdl2:signin" class="text-2xl" />
-            <span class="text-sm font-medium">Login with OTP</span></a
+            <span class="text-sm font-medium">SignIn with OTP</span></a
           ></button
         >
       {/if}
@@ -347,7 +347,7 @@
         class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-600 rounded-md transition duration-200"
         ><a href={linkedinUrl} class="flex items-center space-x-2">
           <Icon icon="bi:linkedin" class="text-2xl" />
-          <span class="text-sm font-medium">Login with LinkedIn</span></a
+          <span class="text-sm font-medium">SignIn with LinkedIn</span></a
         ></button
       >
     </div>

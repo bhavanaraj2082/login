@@ -28,12 +28,13 @@ export async function load({ locals, cookies }) {
     locals.session = undefined;
 
     console.log('Redirecting to login page');
-    throw redirect(302, '/login');
+    // throw redirect(302, '/login');
+    throw redirect(302, '/signin');
   } catch (err) {
     if (err.status === 302) {
       throw err;
     }
     // console.error('Error during logout:', err.message);
-    throw redirect(302, '/login');
+    throw redirect(302, '/signin');
   }
 }

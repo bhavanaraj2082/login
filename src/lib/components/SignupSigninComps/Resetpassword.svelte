@@ -93,7 +93,7 @@
             the {#if userEmail}
               dashboard
             {:else}
-              login page
+              SignIn page
             {/if} shortly.
           </p>
 
@@ -101,7 +101,7 @@
             Redirecting to {#if userEmail}
               dashboard
             {:else}
-              login page...
+              SignIn page...
             {/if}
           </div>
         </div>
@@ -137,7 +137,8 @@
                 }, 2000);
               } else {
                 setTimeout(() => {
-                  goto("/login");
+                  // goto("/login");
+                  goto("/signin");
                 }, 2000);
               }
 

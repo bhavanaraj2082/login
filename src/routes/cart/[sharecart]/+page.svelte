@@ -6,7 +6,8 @@
     export let data
     onMount(()=>{
         if(!$authedUser?.id){
-        goto('/login')
+        // goto('/login')
+        goto('/signin')
     }
     })
 </script>
