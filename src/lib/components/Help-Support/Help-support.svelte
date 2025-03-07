@@ -22,6 +22,9 @@
 	let components = {};
 	let Mainimage = '/images/Help&Support.JPG';
 	let clickedButton = '';
+	export let data;
+	console.log(data,"help support");
+	
 
 	const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -207,55 +210,55 @@
 		</div>
 	</div>
 	<div bind:this={components['invoice']}>
-		{#if clickedButton === 'invoice'}<Invoice />{/if}
+		{#if clickedButton === 'invoice'}<Invoice {data}/>{/if}
 	</div>
 	<div bind:this={components['quotes']}>
-		{#if clickedButton === 'quotes'}<Quotes />{/if}
+		{#if clickedButton === 'quotes'}<Quotes {data} />{/if}
 	</div>
 	<div bind:this={components['order-status']}>
-		{#if clickedButton === 'order-status'}<OrderStatus />{/if}
+		{#if clickedButton === 'order-status'}<OrderStatus {data} />{/if}
 	</div>
 	<div bind:this={components['order-configuration']}>
-		{#if clickedButton === 'order-configuration'}<OrderConfiguration />{/if}
+		{#if clickedButton === 'order-configuration'}<OrderConfiguration {data} />{/if}
 	</div>
 	<div bind:this={components['return-exchange-items']}>
-		{#if clickedButton === 'return-exchange-items'}<ReturnExchangeItems />{/if}
+		{#if clickedButton === 'return-exchange-items'}<ReturnExchangeItems {data} />{/if}
 	</div>
 	<div bind:this={components['other-issues']}>
-		{#if clickedButton === 'other-issues'}<OtherIssues />{/if}
+		{#if clickedButton === 'other-issues'}<OtherIssues {data}/>{/if}
 	</div>
 	<div bind:this={components['update-billing']}>
-		{#if clickedButton === 'update-billing'}<UpdateBilling />{/if}
+		{#if clickedButton === 'update-billing'}<UpdateBilling {data} />{/if}
 	</div>
 	<div bind:this={components['shipping-info']}>
-		{#if clickedButton === 'shipping-info'}<ShippingInfo />{/if}
+		{#if clickedButton === 'shipping-info'}<ShippingInfo {data} />{/if}
 	</div>
 	<div bind:this={components['password-reset']}>
-		{#if clickedButton === 'password-reset'}<PasswordReset />{/if}
+		{#if clickedButton === 'password-reset'}<PasswordReset {data} />{/if}
 	</div>
 	<div bind:this={components['update-email']}>
-		{#if clickedButton === 'update-email'}<UpdateEmail />{/if}
+		{#if clickedButton === 'update-email'}<UpdateEmail {data} />{/if}
 	</div>
 	<div bind:this={components['Other-account-issues']}>
-		{#if clickedButton === 'Other-account-issues'}<OtherAccountIssues />{/if}
+		{#if clickedButton === 'Other-account-issues'}<OtherAccountIssues {data} />{/if}
 	</div>
 	<div bind:this={components['pricing-availability']}>
-		{#if clickedButton === 'pricing-availability'}<PricingAvailability />{/if}
+		{#if clickedButton === 'pricing-availability'}<PricingAvailability {data} />{/if}
 	</div>
 	<div bind:this={components['product-documentation']}>
-		{#if clickedButton === 'product-documentation'}<ProductDocumentation />{/if}
+		{#if clickedButton === 'product-documentation'}<ProductDocumentation {data} />{/if}
 	</div>
 	<div bind:this={components['product-technical-issues']}>
-		{#if clickedButton === 'product-technical-issues'}<ProductTechnicalIssues />{/if}
+		{#if clickedButton === 'product-technical-issues'}<ProductTechnicalIssues {data} />{/if}
 	</div>
 	<div bind:this={components['report-product-issues']}>
-		{#if clickedButton === 'report-product-issues'}<ReportProductIssues />{/if}
+		{#if clickedButton === 'report-product-issues'}<ReportProductIssues {data} />{/if}
 	</div>
 	<div bind:this={components['technical-problem']}>
-		{#if clickedButton === 'technical-problem'}<TechnicalProblems />{/if}
+		{#if clickedButton === 'technical-problem'}<TechnicalProblems {data} />{/if}
 	</div>
 	<div bind:this={components['other-website-issues']}>
-		{#if clickedButton === 'other-website-issues'}<OtherWebsiteIssues />{/if}
+		{#if clickedButton === 'other-website-issues'}<OtherWebsiteIssues {data} />{/if}
 	</div>
 
 	<!-- If you require user to contact u directly send there contact details to email uncomment the below svelte file and use it -->

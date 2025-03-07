@@ -4,17 +4,18 @@
     import Icon from "@iconify/svelte";
   import { toast } from "svelte-sonner";
   let formLoading=false;
- 
-  let country="";
+export let data;
   let form;
   let searchTerm="";
   let errors={};
-  let firstName = "";
-  let lastName = "";
+  let country= data?.profile?.country||"";
+let firstName = data?.profile?.firstName||"";
+let lastName = data?.profile?.lastName||"";
+let email =  data?.profile?.email||"";
+let phoneNumber = data?.profile?.cellPhone|| "";
+let companyName =  data?.profile?.companyName|| "";
   let assistance = '';
-  let email = "";
-  let phoneNumber = "";
-  let companyName = "";
+ 
   let location = "";
   let accountNumber = "";
   let resetemail = "";
@@ -660,6 +661,10 @@
   }
 
 const handlesubmit = async (data) => {
+	if (!formValid()) {
+            cancel();
+            return;
+        }
     try {
    
         const result = await submitForm(data);
@@ -766,6 +771,7 @@ const submitForm = async (data) => {
     <div class=" w-full pb-6 h-full">
       <h2 class="text-primary-400 font-semibold text-base pb-6">Password Reset</h2>
       <input hidden name="issueName" value="Password Reset"/>
+      <!-- svelte-ignore a11y-label-has-associated-control -->
       <label class="text-base">*Email address/User ID (From online account)</label>
       <input
       type="email"
@@ -779,6 +785,7 @@ const submitForm = async (data) => {
     <p class="text-red-500 text-xs mt-1">{errors.resetemail}</p>
     {/if}
       <div class="mt-4">
+        <!-- svelte-ignore a11y-label-has-associated-control -->
         <label class="block text-base">*Please share any comments that would help us complete your request</label>
         <textarea rows="5" name="assistance"
          bind:value={assistance} 
@@ -945,14 +952,16 @@ const submitForm = async (data) => {
              // Check form validity
              if (!formValid()) {
                toast.error('Please fill all the required fields.');
+			   event.preventDefault();
                return;
              }
-       
+       else{
     
        
     
     
              handlesubmit();
+	   }
            }}
            on:keydown={(event) => {
              if (event.key === 'Enter') {

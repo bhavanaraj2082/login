@@ -4,6 +4,7 @@ import { enhance } from "$app/forms";
 let selectedOption = "";
 import Icon from '@iconify/svelte';
 import { toast } from "svelte-sonner";
+export let data;
 let confirmationNumber = "";
 let itemNumber = "";
 let form;
@@ -11,12 +12,12 @@ let selectOptionNumber = "";
 let errors={};
 let searchTerm = '';
 let formLoading = false;
-let country="";
-let firstName = "";
-let lastName = "";
-let email = "";
-let phoneNumber = "";
-let companyName = "";
+let country= data?.profile?.country||"";
+let firstName = data?.profile?.firstName||"";
+let lastName = data?.profile?.lastName||"";
+let email =  data?.profile?.email||"";
+let phoneNumber = data?.profile?.cellPhone|| "";
+let companyName =  data?.profile?.companyName|| "";
 let location = "";
 let accountNumber = "";
 let errormessage = "";
@@ -54,7 +55,7 @@ errors.phoneNumber = 'Please select the country before entering the phone number
 return;
 }
 
-if (!phoneNumber || phoneNumber.trim() === '') {
+if (!phoneNumber || phoneNumber === '') {
 errors.phoneNumber = 'Required for the selected country';
 } else {
 const countryDetails = getCountryByCode(country);
@@ -604,7 +605,7 @@ const phoneNumberPatterns = {
   Tonga: /^\d{7}$/
 };
 function validatePhoneNumber(countryCode, phoneNumber) {
-  if (!phoneNumber || !countryCode || phoneNumber.trim() === '') {
+  if (!phoneNumber || !countryCode || phoneNumber === '') {
     // errors.contactNumber = `*Required`;
     return false;
   }
@@ -665,6 +666,10 @@ return isValid;
 }
 
 const handlesubmit = async (data) => {
+  if (!formValid()) {
+            cancel();
+            return;
+        }
 try {
     const result = await submitForm(data);
     console.log(result, "result");
@@ -955,8 +960,18 @@ use:enhance={handlesubmit}
           placeholder="Company Name "
           bind:value={companyName}
           class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
-          required
-          on:input={() => validateField('companyName')}
+          reqired
+          
+          on:input={() => {
+            validateField("companyName");
+            errors.companyName = !companyName
+                ? "*Required"
+                : !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(
+                  companyName,
+                    )
+                  ? "Please enter a valid company name"
+                  : "";
+        }}
         />
         {#if errors.companyName}
           <p class="text-red-500 text-xs mt-1">{errors.companyName}</p>
@@ -1044,11 +1059,14 @@ use:enhance={handlesubmit}
     class="w-full bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
    on:click={(event) => {
      // event.preventDefault();
-
-     // Check form validity
      if (!formValid()) {
-       toast.error('Please fill all the required fields.');
-       return;
+      if (Object.keys(errors).length > 0) {
+                                    toast.error(
+                                        "Please fill all the required fields.",
+                                    );
+                                    event.preventDefault();
+                                    return;
+                                }
      }
 
 

@@ -1,5 +1,6 @@
 <script>
     import Helpsupport from '$lib/components/Help-Support/Help-support.svelte'
+	export let data;
     import SEO from '$lib/components/SEO.svelte';
 	import {
 		PUBLIC_WEBSITE_URL,
@@ -31,4 +32,4 @@
 </script>
 
 <SEO {metadata} />
-<Helpsupport/>
+<Helpsupport {data}/>

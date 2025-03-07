@@ -5,7 +5,7 @@ import Icon from "@iconify/svelte";
 import { toast } from "svelte-sonner";
 let formLoading=false;
 
-let country="";
+export let data;
 let form;
 let searchTerm="";
 let errors={};
@@ -13,11 +13,12 @@ let issue = "";
 let assistance = "";
 let attachments = [];
 let totalSize = 0;
-let firstName = "";
-let lastName = "";
-let email = "";
-let phoneNumber = "";
-let companyName = "";
+let country= data?.profile?.country||"";
+let firstName = data?.profile?.firstName||"";
+let lastName = data?.profile?.lastName||"";
+let email =  data?.profile?.email||"";
+let phoneNumber = data?.profile?.cellPhone|| "";
+let companyName =  data?.profile?.companyName|| "";
 let location = "";
 let accountNumber = "";
 let message = "";
@@ -726,6 +727,10 @@ return isValid;
 }
 
 const handlesubmit = async (data) => {
+  if (!formValid()) {
+            cancel();
+            return;
+        }
 try {
 
   const result = await submitForm(data);
@@ -1134,14 +1139,16 @@ on:input={() => validateField('assistance')}
      // Check form validity
      if (!formValid()) {
        toast.error('Please fill all the required fields.');
+       event.preventDefault();
        return;
      }
 
-
+else{
 
 
 
      handlesubmit();
+}
    }}
    on:keydown={(event) => {
      if (event.key === 'Enter') {
