@@ -14,6 +14,7 @@
   let password = "";
   let otpStatus = "";
   let enteredOtp = "";
+  let showPassword = false;
   let errors = {};
   let form4;
   let timeLeft;
@@ -286,17 +287,42 @@
           <label for="password" class="mb-2 text-gray-600"
             >Enter your password</label
           >
-          <input
-            name="password"
-            type="password"
-            id="password"
-            bind:value={password}
-            placeholder="********"
-            class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400"
-          />
-          {#if errors.password}
-            <div class="text-red-500 text-xs mt-1">{errors.password}</div>
-          {/if}
+          <div class="relative w-full">
+            {#if showPassword}
+              <input
+                name="password"
+                type="text"
+                id="password"
+                bind:value={password}
+                placeholder="********"
+                class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 pr-10"
+              />
+            {:else}
+              <input
+                name="password"
+                type="password"
+                id="password"
+                bind:value={password}
+                placeholder="********"
+                class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 pr-10"
+              />
+            {/if}
+
+            <button
+              type="button"
+              class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
+              on:click={() => (showPassword = !showPassword)}
+            >
+              <Icon
+                icon={showPassword ? "mdi:eye-off" : "mdi:eye"}
+                class="text-lg"
+              />
+            </button>
+
+            {#if errors?.password}
+              <div class="text-red-500 text-xs mt-1">{errors.password}</div>
+            {/if}
+          </div>
           <p class="mb-4 mt-2">
             <a
               href="/forgot"
@@ -304,7 +330,6 @@
               >Forgot password?</a
             >
           </p>
-
           <button
             type="submit"
             class="bg-primary-400 text-sm font-medium hover:bg-primary-500 text-white rounded p-2 w-full text-center"

@@ -606,19 +606,23 @@
           </p>
         {/if}
         <!-- Product Returnable Section -->
-        {#if product?.returnPolicy}
+        {#if !product?.returnPolicy}
+          <!-- <div class="flex items-center gap-1 text-green-500 font-medium text-xs mt-2">
+          <Icon icon="material-symbols:verified" class="text-base text-green-600" />
+          <span>Returns Accepted</span>
+        </div>
+      {:else} -->
           <div
-            class="flex items-center gap-1 text-green-600 font-medium text-xs mt-2"
+            class="flex items-center gap-2 text-red-500 font-medium text-sm mt-2"
           >
-            <Icon icon="ix:success-filled" class="text-base text-green-500" />
-            <span>Returns Accepted</span>
+            <Icon
+              icon="clarity:shopping-cart-solid-badged"
+              class="text-xl font-medium text-red-600"
+            />
+            <span>Non-Returnable</span>
           </div>
-          <!-- {:else}
-              <div class="flex items-center gap-2 text-red-500 font-medium text-sm mt-2">
-                <Icon icon="mdi:close-circle" class="text-lg text-red-500" />
-                <span>Non-Returnable</span>
-              </div> -->
         {/if}
+
         {#if product.productSynonym}
           <div class="flex justify-between !mt-3">
             <p class="text-gray-900 text-sm font-semibold text-start">
