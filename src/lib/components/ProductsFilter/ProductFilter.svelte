@@ -320,47 +320,21 @@ const handleSearch = (searchName) => {
             
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <div on:click={()=>(toggleFilter = !toggleFilter)} class=" flex gap-2 justify-center lg:justify-start items-center text-lg md:text-xl font-semibold font-montserrat">
+            <div on:click={()=>(toggleFilter = !toggleFilter)} class=" flex items-center justify-between text-lg md:text-xl font-semibold font-montserrat">
+               <div class=" flex gap-2 items-center">
                 <Icon icon="ic:sharp-segment" class="text-2xl text-primary-500" />
                 <h1>Filter</h1>
+               </div>
+               <Icon icon={toggleFilter ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-3xl p-0.5 rounded-full hover:bg-gray-100 md:hidden"/>
             </div>
             <div class=" space-y-2 {toggleFilter ? "block":" hidden lg:block"}">
-             <!-- svelte-ignore a11y-click-events-have-key-events -->
-             <!-- svelte-ignore a11y-no-static-element-interactions -->
-             <!-- <div on:click={()=>showSearchDropdown = !showSearchDropdown} class=" cursor-pointer font-semibold text-xs sm:text-sm flex items-center justify-between p-1 md:p-1.5 rounded border-1 border-gray-300 ">
-                <div class=" flex items-center gap-2">
-                    <span class="ml-2">Search </span>
-                    {#if searchLoading}
-                    <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-primary-500"></div>
-                    {/if}
-                </div>
-                <button type="button" on:click={()=>showSearchDropdown = !showSearchDropdown}>
-                     <Icon icon={showSearchDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
-                </button>
-            </div> -->
             <div class="relative">
                 <input type="text" placeholder="Search..." bind:value={search} on:input={e=>handleSearch(e.target.value)} class=" w-full text-sm font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500"/>
                 {#if searchLoading}
                     <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
                 {/if}
              </div>
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-            <!-- <div on:click={() => showManufacturerDropdown = !showManufacturerDropdown} 
-                class="cursor-pointer font-semibold text-xs sm:text-sm flex items-center justify-between p-1 md:p-1.5 rounded border-1 border-gray-300">
-               <div class=" flex items-center gap-2">
-                <span class="ml-2">Manufacturers </span>
-                {#if loading}
-                <div class="animate-spin rounded-full h-3 w-3 border-b-2 border-primary-500"></div>
-                {/if}
-               </div>
-               <button type="button" 
-                       on:click={() => showManufacturerDropdown = !showManufacturerDropdown}>
-                   <Icon icon={showManufacturerDropdown ? "iconamoon:arrow-up-2-duotone" : "iconamoon:arrow-down-2-duotone"} 
-                         class="text-2xl"/>
-               </button>
-           </div> -->
-           <p class=" font-semibold text-sm">Manufacturer</p>
+            <p class=" font-semibold text-sm">Manufacturer</p>
            <div class="relative">
                <input type="text" bind:value={selectedManufacturer}
                       placeholder="Search manufacturers..." 
@@ -369,7 +343,7 @@ const handleSearch = (searchName) => {
                       {#if loading}
                         <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
                       {/if}
-               <div class="space-y-2.5 py-2.5 h-48 px-2 overflow-y-auto my-1 scroll">
+               <div class="space-y-2.5 py-2.5 max-h-48 px-2 overflow-y-auto my-1 scroll">
                    {#if !searchManufacture.length}
                        <p class="text-sm text-center">No manufacturer found</p>
                    {:else}

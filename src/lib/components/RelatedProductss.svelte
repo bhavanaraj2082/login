@@ -237,7 +237,7 @@
     }
 
     const formdata = new FormData();
-    formdata.append("items", JSON.stringify([cartItem]));
+    formdata.append("items", JSON.stringify(cartItem));
     sendMessage("?/addtocart", formdata, async (result) => {
       submitForm()
       toast.success(result.message);

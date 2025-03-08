@@ -3,7 +3,6 @@
   import { browser } from "$app/environment";
   import Icon from "@iconify/svelte";
   import { invalidate } from "$app/navigation";
-  import { cartState } from "$lib/stores/cartStores.js";
   import { toast, Toaster } from "svelte-sonner";
   import { currencyState } from "$lib/stores/mainStores.js";
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
@@ -229,7 +228,7 @@
     }
 
     const formdata = new FormData();
-    formdata.append("items", JSON.stringify([cartItem]));
+    formdata.append("items", JSON.stringify(cartItem));
 
     sendMessage("?/addtocart", formdata, async (result) => {
       toast.success(result.message);

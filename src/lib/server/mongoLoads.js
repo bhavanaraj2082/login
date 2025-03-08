@@ -1778,7 +1778,7 @@ export const getCart = async(userId,cartId)=>{
     return { ...cartItemsData, pricing, currentPrice:price,normalPrice:{INR,USD}, itemTotalPrice };
   });
   cart[0].cartItems = updatedcart
- // console.log(cart,"+++++");
+  //console.log(cart,"+++++");
  // console.log(updatedcart,"result");
   return {cart:JSON.parse(JSON.stringify(cart))}
 }

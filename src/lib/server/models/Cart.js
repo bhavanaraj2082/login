@@ -88,7 +88,12 @@ const cartSchema = new mongoose.Schema({
         addedDate:Date,
         previousRecurringDate:Date,
         recurringDate:Date,
-    }
+    },
+    recurrenceLogs:[{
+        recurringDate:Date,
+        action:String,
+        _id:false
+    }]
 },
 {
     collection:"carts",
