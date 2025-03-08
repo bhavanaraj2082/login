@@ -1469,7 +1469,7 @@
 <div class="flex flex-col w-11/12 md:flex-row justify-center items-start shadow-md mt-20 mb-12 rounded-lg max-w-3xl bg-white/95 mx-auto border-gray-300 border">
   <button 
 	on:click={() => goto('/')}
-		class="absolute top-0.5 right-4 md:right-4 flex z-10 items-center justify-center py-2 px-2 sm:px-3 text-primary-500 bg-white hover:bg-primary-600 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
+		class="absolute top-0.5 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-3 text-primary-500 bg-white hover:bg-primary-600 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
 		<div class="flex items-center space-x-2">
 			<Icon icon="mdi:home" class="text-xl" />
 			<span class="hidden sm:inline text-sm font-medium">Back to Home</span>
@@ -2173,28 +2173,43 @@
         </div>
       {/if}
 
-      <div class="mb-4 hidden md:block text-gray-500">
-        <div class="flex flex-col md:flex-row items-start"></div>
-      </div>
-
       <button
         type="submit"
-        class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-500 transition duration-200"
-        >Create Account</button
-      >
+        class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center sm:hidden ">
+        <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
+        Create Account
+      </button>
+      <div class="hidden sm:flex sm:space-x-4 sm:justify-between w-full py-2">
+        <div class="flex items-center justify-center py-2 px-6 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200">
+          <a href={linkedinUrl} class="flex items-center space-x-2">
+            <Icon icon="bi:linkedin" class="text-xl" />
+            <span class="text-sm font-medium">Continue with LinkedIn</span>
+          </a>
+        </div>
+      <div class="relative flex items-center py-1 w-1/6">
+        <div class="flex-grow border-t border-gray-300"></div>
+        <span class="px-2 text-sm text-gray-500 font-bold bg-white">OR</span>
+        <div class="flex-grow border-t border-gray-300"></div>
+      </div>
+      <button
+      type="submit"
+      class="w-full sm:w-auto bg-primary-400 text-white py-2 px-6 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center">
+      <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
+      Create Account
+    </button>
+
     </form>
-    <div class="relative flex items-center my-4 w-full">
+    <div class="relative flex items-center my-4 w-full sm:hidden">
       <div class="flex-grow border-t border-gray-300"></div>
       <span class="px-2 text-sm text-gray-500 font-bold bg-white">OR</span>
       <div class="flex-grow border-t border-gray-300"></div>
     </div>
-    <button
-      class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-600 rounded-md transition duration-200"
-      ><a href={linkedinUrl} class="flex items-center space-x-2">
+    <button class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-600 rounded-md transition duration-200 sm:hidden">
+      <a href={linkedinUrl} class="flex items-center space-x-2">
         <Icon icon="bi:linkedin" class="text-2xl" />
-        <span class="text-sm font-medium">Continue with LinkedIn</span></a
-      ></button
-    >
+        <span class="text-sm font-medium">Continue with LinkedIn</span>
+      </a>
+    </button>
   </div>
 </div>
 <Toaster position="bottom-right" richColors />

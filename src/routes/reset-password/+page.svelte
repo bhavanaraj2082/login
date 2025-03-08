@@ -13,9 +13,9 @@
 <SEO {metadata} />
 <!-- <Resetpassword token={data.token}/> -->
 <div class="min-h-screen overflow-hidden bg-gradient-to-br from-primary-200 via-primary-50 to-primary-400 relative">
-	<div class="absolute top-1/4 left-10 w-72 h-80 bg-primary-200/20 blur-sm clip-hexagon shadow-md"></div>
-	<div class="absolute bottom-0 right-1/4 w-80 h-80 bg-primary-200/10 clip-hexagon"></div>
-	<div class="absolute top-0 right-10 w-80 h-80 bg-primary-100/10 clip-hexagon"></div>
+	<div class="absolute top-1/4 left-10 md:w-72 w-8 md:h-80 h-8 bg-primary-200/20 blur-sm clip-hexagon shadow-md"></div>
+	<div class="absolute md:bottom-20 bottom-5 right-1 md:right-10 w-20 h-20 bg-primary-800/10 clip-hexagon"></div>
+	<div class="absolute top-0 md:right-10 right-20 md:w-80 w-8 md:h-80 h-8 bg-primary-400/10 clip-hexagon"></div>
  <Resetpassword {data} />
  </div>
 

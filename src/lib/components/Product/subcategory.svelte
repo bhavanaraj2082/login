@@ -15,7 +15,7 @@
 <div class="w-full mb-8 px-6 lg:px-8 md:w-11/12 mx-auto">
   <div class="pl-4 md:pl-0">
     <div class="text-center lg:flex px-6 lg:px-0 justify-between items-center mb-2">
-      <p class="text-primary-400 font-semibold text-xl lg:text-2xl mb-2 lg:mb-0">
+      <p class="text-heading font-bold text-xl lg:text-2xl mb-2 lg:mb-0">
         {subcategories[0]?.category?.name}
       </p>
 

@@ -64,8 +64,16 @@
 </script>
 
 {#if token || userEmail}
+<button 
+on:click={() => goto('/')}
+  class="absolute top-4 right-4 md:top-8 md:right-8 flex z-50 items-center justify-center py-2 px-2 sm:px-4 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
+  <div class="flex items-center space-x-2">
+    <Icon icon="mdi:home" class="text-xl" />
+    <span class="hidden sm:inline text-sm font-medium">Back to Home</span>
+  </div>
+</button>
   <div
-    class="max-w-80 my-10 sm:max-w-xs md:max-w-sm lg:max-w-sm rounded-lg shadow-xl mx-auto border border-gray-200 overflow-hidden"
+    class="max-w-80 my-20 sm:max-w-xs md:max-w-sm lg:max-w-sm rounded-lg shadow-xl mx-auto z-50 border border-gray-200 overflow-hidden"
   >
     {#if !successMessage}
       <div
