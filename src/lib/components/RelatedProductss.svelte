@@ -101,7 +101,7 @@
   let showModal = false;
 
   function openModal(product) {
-    // console.log("Product Data in openModal:", product);
+    console.log("Product Data in openModal:", product);
     selectedProduct = {
       productId: product.productId || product._id,
       brand: product.brand,
@@ -110,7 +110,7 @@
       image: product.imageSrc || product.image,
       partNumber: product.partNumber,
       priceSize: product.priceSize,
-      quantity: 1,
+      quantity:  product.quantity || 1,
       stock: product.stock,
       category: product.category,
       subCategory: product.subCategory,
@@ -126,6 +126,7 @@
     selectedPrice = selectedProduct.priceSize[selectedPriceIndex];
     selectedStockId = selectedProduct.stockId[selectedPriceIndex] || "NA";
     selectedVariants = selectedProduct.variants[selectedPriceIndex] || "NA";
+    popupQuantity = selectedProduct.quantity || 1;
     showModal = true;
 
     // console.log("Selected Product Data after openModal:", selectedProduct);
@@ -135,6 +136,8 @@
 
   function closeModal() {
     showModal = false;
+
+   
   }
 
   // function selectPrice(index, size) {
@@ -154,13 +157,16 @@
   function decrementPopupQuantity() {
     if (popupQuantity > 1) {
       popupQuantity--;
+      selectedProduct.quantity = popupQuantity;
     }
   }
 
   function incrementPopupQuantity() {
     if (popupQuantity < 999) {
       popupQuantity++;
+      selectedProduct.quantity = popupQuantity;
     }
+
   }
 
   function selectPrice(index, size) {
@@ -173,7 +179,7 @@
   }
 
   function handlePopupInput(event) {
-    const value = parseInt(event.target.value, 10);
+    const value = parseInt(event.target.value, 3);
     if (isNaN(value)) {
       popupQuantity = 1;
     } else {
@@ -185,6 +191,7 @@
         popupQuantity = value;
       }
     }
+    selectedProduct.quantity = popupQuantity;
   }
 
   const guestCartFetch = () => {
@@ -229,10 +236,10 @@
       addItemToCart(cartItem);
       submitAlternateForm()
       toast.success("Product added to cart");
-      guestCartFetch();
       setTimeout(() => {
         closeModal();
-      }, 30000);
+      }, 1000);
+      guestCartFetch();
       return;
     }
 
@@ -241,10 +248,11 @@
     sendMessage("?/addtocart", formdata, async (result) => {
       submitForm()
       toast.success(result.message);
-      invalidate("/");
       setTimeout(() => {
         closeModal();
-      }, 30000);
+      }, 1000);
+      invalidate("/");
+     
     });
 
     // console.log("Final Cart Item Sent:", cartItem);
@@ -278,6 +286,7 @@ function handleDataCart() {
 			syncLocalStorageToStore();	
 		};
 	}
+  
 </script>
 <form method="POST" action="/?/getCartValue" bind:this={form2} use:enhance={handleDataCart}>
 	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
@@ -345,6 +354,7 @@ function handleDataCart() {
                         description: product.prodDesc,
                         id: product.productId,
                         stock: product.stock,
+                        quantity:product.quantity || 1,
                         category: product.category,
                         subCategory: product.subCategory,
                         subsubCategory: product.subsubCategory,

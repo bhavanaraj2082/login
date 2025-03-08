@@ -106,7 +106,7 @@
       name: product.name,
       partNumber: product.partNumber,
       priceSize: product.priceSize,
-      quantity: product.quantity,
+      quantity: product.quantity || 1,
       stock: product.stock,
       manufacturerId:
         product.manufacturerId || product.manufacturerInfo?.[0]?._id,
@@ -120,6 +120,7 @@
     selectedPrice = selectedProduct.priceSize[selectedPriceIndex];
     selectedStockId = selectedProduct.stockId[selectedPriceIndex] || "NA";
     selectedVariants = selectedProduct.variants[selectedPriceIndex] || "NA";
+    popupQuantity = selectedProduct.quantity || 1;
     showModal = true;
     // showCartMessage = false;
 
@@ -163,20 +164,31 @@
   function decrementPopupQuantity() {
     if (popupQuantity > 1) {
       popupQuantity--;
+      selectedProduct.quantity = popupQuantity;
     }
   }
-
   function incrementPopupQuantity() {
-    popupQuantity++;
+    if (popupQuantity < 999) {
+      popupQuantity++;
+      selectedProduct.quantity = popupQuantity;
+    }
+
   }
 
   function handlePopupInput(event) {
-    const value = parseInt(event.target.value, 10);
-    if (value >= 1) {
-      popupQuantity = value;
-    } else {
+    const value = parseInt(event.target.value, 3);
+    if (isNaN(value)) {
       popupQuantity = 1;
+    } else {
+      if (value < 1) {
+        popupQuantity = 1;
+      } else if (value > 999) {
+        popupQuantity = 999;
+      } else {
+        popupQuantity = value;
+      }
     }
+    selectedProduct.quantity = popupQuantity;
   }
 
   const guestCartFetch = () => {
@@ -220,11 +232,11 @@
     if (!isLoggedIn) {
       addItemToCart(cartItem);
       toast.success("Product added to cart");
-
-      guestCartFetch();
       setTimeout(() => {
         closeModal();
-      }, 30000);
+      }, 1000);
+      guestCartFetch();
+    
       return;
     }
 
@@ -233,10 +245,11 @@
 
     sendMessage("?/addtocart", formdata, async (result) => {
       toast.success(result.message);
-      invalidate("/");
       setTimeout(() => {
         closeModal();
-      }, 3000);
+      }, 1000);
+      invalidate("/");
+     
     });
 
     console.log("Final Cart Item Sent:", cartItem);
@@ -353,6 +366,7 @@
                         description: product.prodDesc,
                         id: product.productId,
                         stock: product.stock,
+                        quantity:product.quantity || 1,
                         category: product.category,
                         subCategory: product.subCategory,
                         subsubCategory: product.subsubCategory,

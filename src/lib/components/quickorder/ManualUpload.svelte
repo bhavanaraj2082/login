@@ -1084,6 +1084,22 @@ function handleDataCart() {
 			syncLocalStorageToStore();	
 		};
 	}
+  let popupQuantity = 1;
+  function handlePopupInput(event) {
+    const value = parseInt(event.target.value, 3);
+    if (isNaN(value)) {
+      popupQuantity = 1;
+    } else {
+      if (value < 1) {
+        popupQuantity = 1;
+      } else if (value > 999) {
+        popupQuantity = 999;
+      } else {
+        popupQuantity = value;
+      }
+    }
+    selectedProduct.quantity = popupQuantity;
+  }
 </script>
 <form method="POST" action="/?/getCartValue" bind:this={form2} use:enhance={handleDataCart}>
 	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
@@ -1279,10 +1295,11 @@ function handleDataCart() {
                     on:input={() =>
                       (row.quantity = Math.max(
                         1,
-                        Math.min(9999, row.quantity),
+                        Math.min(999, row.quantity),
                       ))}
                     aria-label="Quantity"
-                    readonly
+                     on:input={handlePopupInput}
+                    max="999"
                   />
                 </div>
                 <div class="w-1/4">
@@ -1738,12 +1755,19 @@ function handleDataCart() {
               <Icon icon="ic:round-plus" class="text-xl" />
             </button>
 
-            <button
+            <!-- <button
               class="flex justify-center text-sm items-center w-36 h-10 text-white bg-primary-500 rounded hover:bg-primary-600 transition"
               type="submit"
             >
               Check Availability
-            </button>
+            </button> -->
+            <button
+            type="submit"
+              class="flex justify-center text-sm items-center w-36 h-10 text-white bg-primary-400 rounded hover:bg-primary-500 transition"
+          >
+            <Icon icon="tabler:calendar-check" class="text-lg" />
+            <span class="text-sm">Check Availability</span>
+          </button>
           </div>
           <p class="mt-4 text-sm text-gray-600 flex items-center">
             <span class="ml-2">{stockStatus}</span>
@@ -1805,21 +1829,43 @@ function handleDataCart() {
           value={cartItemsValue}
         />
       
-        <button
+        <!-- <button
           class="mt-6 w-full sm:w-auto p-3 text-white bg-primary-500 rounded flex items-center justify-center gap-2 hover:bg-primary-600 transition"
           type="submit"
         >
           Add to Cart
-        </button>
+        </button> -->
+        <div class="mt-8 flex justify-end">
+          <button
+           type="submit"
+            class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
+          >
+            <Icon
+              icon="ic:round-shopping-cart"
+              class="text-xl"
+            /><span class="text-sm">Add To Cart</span>
+          </button>
+        </div>
       </form>
       {:else}
-
+<!-- 
         <button
           class="mt-6 w-full sm:w-auto p-3 text-white bg-primary-500 rounded flex items-center justify-center gap-2 hover:bg-primary-600 transition"
           on:click={handleLocalCart}
         >
           Add to Cart
-        </button>
+        </button> -->
+        <div class=" flex ml-20 justify-center">
+          <button
+          on:click={handleLocalCart}
+            class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
+          >
+            <Icon
+              icon="ic:round-shopping-cart"
+              class="text-xl"
+            /><span class="text-sm">Add To Cart</span>
+          </button>
+        </div>
       {/if}
       
       
