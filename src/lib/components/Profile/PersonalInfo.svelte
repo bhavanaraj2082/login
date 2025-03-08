@@ -15,11 +15,15 @@
         firstName,
         lastName,
         cellPhone,
-        alternatePhone
+        alternatePhone,
+        gstNumber,
+        companyName
     } = contact
 
-    let toggleEdit = false
-    let togglePass = false
+    let toggleEdit = false;
+    let togglePass = false;
+    let toggleGST = false;
+    let toggleCompany = false;
 
 
     let errors
@@ -29,6 +33,8 @@
             if(!firstName || !/^[A-Za-z\s]+$/.test(firstName)) errors.firstName="First name is required and valid"
             // if(!/^[A-Za-z\s]+$/.test(lastName)) errors.lastName="Last name must be valid"
             if(!cellPhone || !/^\d{10}$/.test(cellPhone)) errors.cellPhone="Primary phone number is required and valid"
+            // if(!gstNumber || !/^\d{10}$/.test(gstNumber)) errors.gstNumber="Enter Valid GST Number"
+            
             // if(!cellPhone || !/^\d{10}$/.test(cellPhone)) errors.cellPhone="Cell phone number is required and valid"
 		if(Object.keys(errors).length >0){
 			return false
@@ -43,6 +49,7 @@
             cancel()
         }
     return async({result,update})=>{
+        console.log('form result==>',result)
         if(result.type === "success"){
             toggleEdit = false
             dispatch("onSuccess",result.data)
@@ -95,7 +102,6 @@
 				<span class="text-red-400 text-xs">{errors.cellPhone}</span>
 			    {/if}
             </div>
-            
             <div class=" w-full">
                 <label class=" text-xs md:text-sm font-medium" for="alternatePhone"><span class=" text-sm font-bold text-red-500"></span>Alternative Phone </label><br>
                 <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
@@ -103,15 +109,32 @@
                 <!-- {#if errors?.cellPhone}
 				<span class="text-red-400 text-xs">{errors.cellPhone}</span>
 			    {/if} -->
+            </div>            
             </div>
-            
+            <div class="w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4 pb-4">
+                <div class=" w-full">
+                    <label class=" text-xs md:text-sm font-medium" for="companyName">Company Name</label><br>
+                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
+                    type="text" name="companyName" bind:value={companyName}/>
+                    {#if errors?.companyName}
+                    <span class="text-red-400 text-xs">{errors.companyName}</span>
+                    {/if}
+                </div>
+                <div class=" w-full">
+                    <label class=" text-xs md:text-sm font-medium" for="gstNumber">GST Number</label><br>
+                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
+                    type="text" name="gstNumber" bind:value={gstNumber}/>
+                    {#if errors?.gstNumber}
+                    <span class="text-red-400 text-xs">{errors.gstNumber}</span>
+                    {/if}
+                </div>
             </div>
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
-                <button type="submit" class=" w-full rounded py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Submit</button>
                 <button type="button" on:click={()=>{
                     toggleEdit = false
-                    window.location.reload()
-                    }} class=" w-full rounded py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
+                    // window.location.reload()
+                }} class=" w-full rounded py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
+                <button type="submit" class=" w-full rounded py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Submit</button>
             </div>
 
         </form>
@@ -126,12 +149,12 @@
         <h1 class=" font-bold text-4s md:text-lg mb-2">
             Manage Your Personal Information
         </h1>
-        <div class="mt-6">
+        <div class="mt-4">
             <div class=" flex items-center justify-between border-b-1 mt-2 pb-2">
                 <h2 class=" font-semibold text-4s">Contact Information</h2>
                 <button on:click={()=>toggleEdit = true} class=" w-20 rounded py-1.5 font-medium text-xs md:text-sm text-white bg-primary-500 hover:bg-primary-600">Edit</button>
             </div>
-            <section class=" w-full flex flex-col sm:flex-row flex-wrap gap-y-3 py-3">
+            <section class=" w-full flex flex-col sm:flex-row flex-wrap gap-y-4 py-3">
                 <div class="flex sm:flex-row items-center text-sm md:text-4s w-full sm:w-1/2">
                     <h4 class="font-medium">Name :</h4>
                     <p class="ml-2 text-sm">{firstName || "NA"} {lastName || ""}</p>
@@ -159,6 +182,17 @@
                     </div>
                 </div>
             </section>
+            <div class="mt-4">
+                <h2 class="font-semibold text-lg border-b-1 pb-2">Business Information</h2>
+                <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
+                    <h4 class="font-medium">Company Name:</h4>
+                    <p class=" text-sm ml-2">{companyName || "--"}</p>
+                </div>
+                <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
+                    <h4 class=" font-medium">GST Number:</h4>
+                    <p class=" text-sm ml-2">{gstNumber || "--"}</p>
+                </div>
+            </div>
         </div>
     </div>
 {/if}

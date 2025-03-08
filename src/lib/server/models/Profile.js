@@ -7,7 +7,7 @@ const jsonSchema = {
 
 const chemiDashProfileSchema = new mongoose.Schema(
   {
-    companyname: { type: String, required: false, unique: false },
+    companyName: { type: String, required: false, unique: false },
     companytype: { type: String, required: false, unique: false },
     firstName: {
       type: String,

@@ -14,12 +14,12 @@
   let firstName = "";
   let currency = "";
   let isAccountSelected = false;
-  let password = "";
+  let password = '';
   let passwordConfirm = "";
   let searchTerm = "";
   let phone = "";
   let form5;
-  let errors = {};
+  let error = {};
   let termsAccepted = false;
   let isLoading = false;
   let emailSent = false;
@@ -102,10 +102,33 @@
   //     delete errors.password;
   //   }
   // }
+  let errors = { password: ''};
+
+
+  if (!password) {
+			error.password = '*Required';
+		} else if (
+			!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(password)
+		) {
+			error.password = 'Ensure your password matches the format outlined below.';
+		} else {
+			delete error.password;
+		}
 
   let passwordStrength = 0;
 
   function validatePassword() {
+    typing = password.length > 0; 
+    errors.password = ''; 
+
+    if (password.length < 8) {
+      errors.password = 'Password must be at least 8 characters long.';
+    }
+    // Check if the password contains the word 'password'
+    else if (password.includes('password')) {
+      errors.password = 'Password cannot contain common or guessable text.';
+    }
+
     if (!password) {
       errors.password = "*Required";
       passwordStrength = 0;
@@ -132,6 +155,8 @@
     return strength;
   }
 
+  $: calculateStrength(password)
+
   function validateConfirmPassword() {
     if (!passwordConfirm) {
       errors.passwordConfirm = "*Required";
@@ -145,7 +170,9 @@
   const handleResendemailOtp = () => {
     form5.requestSubmit();
   };
+
   let typing = false;
+
   function handleInput() {
     typing = true;
     enteredOtp = enteredOtp.trim();
@@ -1439,23 +1466,18 @@
   });
 </script>
 
-<div
-  class="flex flex-col w-11/12 md:flex-row justify-center items-start shadow-md my-12 rounded-lg max-w-5xl bg-white mx-auto border-gray-300 border"
->
-  <!-- Image  -->
-  <!-- <div class="image-container w-full md:w-1/2 flex items-center justify-center">
-    <img
-      src="/image.jpg"
-      alt="Signup"
-      class="w-full transform scale-x-[-1] object-center rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
-    />
-  </div> -->
-
-  <div
-    class="content w-full md:w-2/3 p-4 md:p-6 flex flex-col justify-center rounded-tr-lg rounded-b-lg md:rounded-l-lg md:rounded-tl-none"
-  >
-    <h2 class="text-2xl font-bold text-primary-500">Sign Up</h2>
-    <p class="text-gray-500 mb-5">
+<div class="flex flex-col w-11/12 md:flex-row justify-center items-start shadow-md mt-20 mb-12 rounded-lg max-w-3xl bg-white/95 mx-auto border-gray-300 border">
+  <button 
+	on:click={() => goto('/')}
+		class="absolute top-0.5 right-4 md:right-4 flex z-10 items-center justify-center py-2 px-2 sm:px-3 text-primary-500 bg-white hover:bg-primary-600 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
+		<div class="flex items-center space-x-2">
+			<Icon icon="mdi:home" class="text-xl" />
+			<span class="hidden sm:inline text-sm font-medium">Back to Home</span>
+		</div>
+	</button>
+  <div class="content w-full p-4 md:p-10 flex flex-col justify-center rounded-tr-lg rounded-b-lg md:rounded-l-lg md:rounded-tl-none" >
+    <h2 class="text-2xl font-bold text-primary-500 sm:pt-0 pt-2 sm:pb-2 pb-4">Sign Up</h2>
+    <p class="text-gray-500 mb-5 md:text-sm text-xs">
       Already have an account? <a
         href="/signin"
         class="underline text-primary-500 hover:text-primary-600">SignIn.</a
@@ -1527,8 +1549,7 @@
         </div>
         <div class="flex-1 mb-2 md:mb-0 relative">
           <label for="email" class="block text-sm font-medium text-gray-600"
-            >Email</label
-          >
+            >Email</label>
           <div class="relative">
             <form
               action="?/verifyemail"
@@ -1996,37 +2017,90 @@
         {/if}
       </div>
 
-      <div class="mt-2">
-        <div class="text-gray-400 text-sm mt-1">
-          <p>*Contain at least 8 Characters</p>
-          <p>*Cannot contain common or guessable text</p>
-          <p>*Contain at least one number</p>
-          <p>*Contain one of the following special characters !@#$%_-*</p>
-        </div>
-
-        <div class="relative pt-1">
-          <div class="flex mb-2 items-center justify-between"></div>
-          <div class="flex mb-2">
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-              <div
-                class="h-2.5 rounded-full"
-                style="width: {passwordStrength}%"
-                class:bg-red-500={passwordStrength <= 33}
-                class:bg-yellow-500={passwordStrength > 33 &&
-                  passwordStrength <= 66}
-                class:bg-green-500={passwordStrength > 66}
-              ></div>
+      {#if typing}
+      <div class="bg-primary-50 px-2 mt-3 py-2 rounded-md border border-gray-200">
+        <ul class="w-full text-xs text-gray-500 text-left list-none ml-1 ">
+          <li class="flex justify-start items-center sm:text-xs text-2s py-1">
+            {#if password.length >= 8} 
+              <span class="text-green-500">
+                <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+              </span>
+            {:else}
+              <span class="text-red-500">
+                <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1" />
+              </span>
+            {/if}
+            Contain at least 8 characters
+          </li>
+          <li class="flex justify-start items-center sm:text-xs text-2s py-1">
+            {#if !password.includes('password')}
+              <span class="text-green-500">
+                <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+              </span>
+            {:else}
+              <span class="text-red-500">
+                <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1" />
+              </span>
+            {/if}
+            Cannot contain common or guessable text
+          </li>
+          <li class="flex justify-start items-center sm:text-xs text-2s py-1">
+            {#if /[!@#$%_*\\-]/.test(password)} 
+            <span class="text-green-500">
+              <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+            </span>
+            {:else}
+            <span class="text-red-500">
+              <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1" />
+            </span>
+            {/if}
+            Contain one of the following special characters !@#$%_-*
+          </li>
+          <li class="flex justify-start items-center sm:text-xs text-2s py-1">
+            {#if /[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password)}
+              <span class="text-green-500">
+                <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+              </span>
+            {:else}
+              <span class="text-red-500">
+                <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1" />
+              </span>
+            {/if}
+            Contain at least one uppercase letter, one lowercase letter, one number
+          </li>
+        </ul>
+      </div>
+    {/if}
+    <div class="mt-2">
+      <div class="relative pt-1">
+        <div class="flex mb-2 items-center justify-between"></div>
+        <div class="flex mb-2">
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div
+              class="h-2.5 rounded-full transition-all duration-300 ease-in-out"
+              style="width: {passwordStrength}%"
+              class:bg-red-500={passwordStrength <= 33}
+              class:bg-yellow-500={passwordStrength > 33 && passwordStrength <= 66}
+              class:bg-green-500={passwordStrength > 66} >
             </div>
           </div>
         </div>
+        <div class="mt-1 md:text-xs text-2s font-medium pb-2">
+          {#if passwordStrength <= 33}
+            <span class="text-red-500">Weak</span>
+          {:else if passwordStrength <= 66}
+            <span class="text-yellow-500">Moderate</span>
+          {:else}
+            <span class="text-green-500">Strong</span>
+          {/if}
+        </div>
       </div>
-
+    </div>
       <div class="mb-4 relative">
         <label
           for="passwordConfirm"
-          class="block text-sm font-medium text-gray-600"
-          >Confirm Password</label
-        >
+          class="block text-sm font-medium text-gray-600">
+          Confirm Password</label>
         <div class="relative">
           <input
             id="passwordConfirm"
@@ -2059,10 +2133,10 @@
         {/if}
       </div>
       <div class="mb-4">
-        <div class="text-primary-500 text-sm font-semibold">
+        <div class="text-primary-500 sm:text-sm text-xs font-semibold pb-2">
           TERMS AND CONDITION:
         </div>
-        <p class="text-gray-500 text-sm">
+        <p class="text-gray-500 sm:text-xs text-2s">
           We will occasionally contact you with relevant updates about your
           account and our products and services. You may manage your account
           preferences in your account or unsubscribe at any time. We are
@@ -2076,9 +2150,9 @@
           value={true}
           bind:checked={termsAccepted}
           on:change={validateForm}
-          class="mt-0.5 text-primary-500 rounded focus:ring-0"
+          class="mt-0.5 text-primary-500 rounded focus:ring-0 outline-none"
         />
-        <div class=" text-sm">
+        <div class=" sm:text-sm text-xs">
           I have read and agreed to the
           <a
             class="font-medium text-primary-500 hover:underline"
