@@ -30,7 +30,7 @@ const CopyConsentSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    location: {
+    country: {
       type: String,
       required: false,
     },

@@ -385,11 +385,18 @@
     };
 
     const validateField = (fieldName) => {
+        // if (!fieldName || fieldName === "title") {
+        //     if (!title) {
+        //         errors.title = "Title is required";
+        //     } else {
+        //         delete errors.title;
+        //     }
+        // }
         if (!fieldName || fieldName === "title") {
             if (!title) {
-                errors.title = "Title is required";
-            } else {
-                delete errors.title;
+                errors = { ...errors, title: "Title is required" };  
+                const { title, ...rest } = errors; 
+                errors = { ...rest }; 
             }
         }
         if (!fieldName || fieldName === "firstname") {
@@ -946,15 +953,18 @@
                     <label
                         for="title"
                         class="block text-gray-700 font-semibold text-sm py-2"
-                        >*Title</label
-                    >
+                    >*Title</label>
                     <select
                         id="title"
                         name="title"
                         bind:value={title}
-                        on:change={() => validateField("title")}
+                        on:change={() => {
+                            validateField("title");
+                            if (errors?.title) {
+                                errors.title = '';  // Clear the error on change
+                            }
+                        }}
                         class="focus:border-primary-500 bg-gray-50 border border-gray-300 text-sm focus:outline-none focus:ring-0 rounded mb-2 w-full md:w-4/5 p-2"
-                      
                     >
                         <option value="" disabled selected>Select Title</option>
                         <option value="Mr.">Mr.</option>
@@ -966,9 +976,11 @@
                         <option value="Rev.">Rev.</option>
                     </select>
                 </div>
+                
                 {#if errors?.title}
                     <span class="text-red-500 text-xs">{errors.title}</span>
                 {/if}
+                
                 <!-- Name fields -->
                 <div class="mb-4 flex flex-col md:flex-row gap-x-6">
                     <div class="mb-3 md:mb-0 md:mr-12 w-full md:w-1/2">
@@ -1421,7 +1433,7 @@
 
                     <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2 my-2">
                         <label
-                            for="city"
+                            for="phone"
                             class="text-sm font-semibold text-gray-700 mb-2 block"
                             >*Phone Number:</label
                         >
@@ -1446,106 +1458,98 @@
                     </div>
                 </div>
 
-                <fieldset class="mb-4">
+<!--               
                     <div class="font-semibold text-gray-700 mt-2 md:w-5/12">
                         Please share the link so
                         that we could allocate it.
-                    </div>
-                    <div class="flex flex-col md:flex-row mb-0">
-                        <div class="mt-1 w-full md:w-1/2">
-                            <!-- Radio buttons to choose between file or URL -->
-                            <!-- <div class="mb-4">
-                                <input
-                                    type="radio"
-                                    id="toggleUpload"
-                                    name="uploadOption"
-                                    value="file"
-                                    bind:group={uploadOption}
-                                    class="mr-2 rounded text-primary-500 focus:outline-none focus:ring-0 focus:ring-primary-600"
-                                />
-                             
-
-                                <div class="mb-4">
-                                    <input
-                                        type="radio"
-                                        id="toggleURL"
-                                        name="uploadOption"
-                                        value="url"
-                                        bind:group={uploadOption}
-                                        class="mr-2 rounded text-primary-500 focus:outline-none focus:ring-0 focus:ring-primary-600"
-                                    />
-                                    <label
-                                        for="toggleURL"
-                                        class="text-sm text-gray-700"
-                                        >Provide URL to the Work</label
-                                    >
-                                </div>
-                            </div> -->
-                    
-                            <!-- URL -->
-                            <!-- {#if uploadOption === "url"} -->
-                                <div class="mb-4">
-                                    <!-- <label
-                                        for="url"
-                                        class="block text-gray-700 font-semibold text-sm mb-1"
-                                        >*URL to the Work</label
-                                    > -->
-                                    <input
-                                        name="url"
-                                        type="url"
-                                        placeholder="url"
-                                        bind:value={url}
-                                        class="bg-gray-50 border border-gray-300 fo rounded md:w-4/5 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
-                                        
-                                        on:input={() => validateField("url")}
-                                    />
-                                    {#if errors.url}
-                                        <p class="text-red-500 text-sm mt-1">
-                                            {errors.url}
-                                        </p>
-                                    {/if}
-                                </div>
-                            <!-- {/if} -->
+                    </div> -->
+                    <div class="mb-4 flex flex-col md:flex-row gap-x-6">
+                         
+                        <div class="mb-2 md:mb-0 w-full md:w-1/2 my-2">
+                            <label
+                                for="description"
+                               class="text-sm font-semibold text-gray-700 mb-2 block"
+                            >
+                                *Please describe the way and the purpose you are going to use our copyrighted work
+                            </label>
+                            <textarea
+                                id="description"
+                                name="description"
+                                rows="3"
+                                bind:value={description}
+                                on:input={() => {
+                                    validateField("description");
+                                    errors.description = !description
+                                        ? "*Required"
+                                        : /<script.*?>.*?<\/script>/i.test(description) // Regex to check for script tags
+                                        ? "Script tags are not allowed."
+                                        : !/^[A-Za-z" "/?().,:;""''*$#0-9\s]+$/.test(description)
+                                        ? "Please enter a valid description"
+                                        : "";
+                                }}
+                                class="bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300 rounded w-full p-2 text-sm"
+                            ></textarea>
+                            {#if errors.description}
+                                <p class="text-red-500 text-sm mt-1">
+                                    {errors.description}
+                                </p>
+                            {/if}
                         </div>
-                    </div>
-                </fieldset>
-
-                <div class="mb-4">
-                    <label
-                        for="description"
-                        class="block text-gray-700 md:w-5/12 font-semibold mb-2"
-                    >
-                        *Please describe the way and the purpose you are going
-                        to use our copyrighted work</label
-                    >
-                    <textarea
-                        id="description"
-                        name="description"
-                        rows="3"
-                        bind:value={description}
-                        on:input={() => {
-                            validateField("description");
-                            errors.description = !description
-                                ? "*Required"
-                                : /<script.*?>.*?<\/script>/i.test(description) // Regex to check for script tags
-                                  ? "Script tags are not allowed."
-                                  : !/^[A-Za-z" "/?().,:;""''*$#0-9\s]+$/.test(
-                                          description,
-                                      ) // Existing pattern for valid city names
-                                    ? "Please enter a valid description"
-                                    : "";
-                        }}
-                        class="bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300 rounded w-full md:w-5/12 p-2"
-                    ></textarea>
-                    {#if errors.description}
+                        
+                    <div class="mb-2 md:mb-0 md:ml-20 w-full md:w-1/2 my-2">
+                        <label
+                            for="phone"
+                            class="text-sm font-semibold text-gray-700 mb-2 block"
+                            >Please share the link so
+                            that we could allocate it.</label
+                        >
+                        <input
+                        name="url"
+                        type="url"
+                        placeholder="url"
+                        bind:value={url}
+                            class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+                        
+                            title="Please enter a valid phone number"
+                            on:input={() => validateField("url")}
+                        />
+                        {#if errors.url}
                         <p class="text-red-500 text-sm mt-1">
-                            {errors.description}
+                            {errors.url}
                         </p>
                     {/if}
-                </div>
+                    </div>
+                        <!-- <div class="mb-2 md:mb-0 md:ml-16 w-full md:w-1/2 my-2">
+                            <label
+                            for="url"
+                            class="text-sm font-semibold text-gray-700 mb-2 block"
+                            >  Please share the link so
+                            that we could allocate it.</label
+                        >
+                            <div class="mb-4">
+                                <input
+                                    name="url"
+                                    type="url"
+                                    placeholder="url"
+                                    bind:value={url}
+                                    class="bg-gray-50 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
+                                    on:input={() => validateField("url")}
+                                />
+                                {#if errors.url}
+                                    <p class="text-red-500 text-sm mt-1">
+                                        {errors.url}
+                                    </p>
+                                {/if}
+                            </div>
+                        </div> -->
+                    
+                    </div>
+                    
+        
+
                 <div class="mb-3 rounded flex items-center justify-end">
                     <button
-                    class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+                    class="px-3 md:px-6 py-2 md:py-3 bg-primary-500 text-white text-md md:text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
                     on:click={(event) => {
                             // event.preventDefault();
                             if (!formValid()) {
