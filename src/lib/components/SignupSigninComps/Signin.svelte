@@ -84,7 +84,7 @@
 <div class="min-h-screen bg-gradient-to-br from-gray-100 via-primary-50 to-primary-300 flex items-center justify-center p-4">
   <button 
 	on:click={() => goto('/')}
-		class="absolute top-1 right-4 md:right-4 flex z-10 items-center justify-center py-2 px-2 sm:px-3 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
+		class="absolute top-1 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-3 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
 		<div class="flex items-center space-x-2">
 			<Icon icon="mdi:home" class="text-xl" />
 			<span class="hidden sm:inline text-sm font-medium">Back to Home</span>
@@ -166,7 +166,7 @@
                     bind:value={email}
                     on:input={validateEmail}
                     placeholder="username@example.com"
-                    class="pl-10 w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                    class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
                   />
                 </div>
                 {#if errors.email}
@@ -177,7 +177,7 @@
               {#if otpStatus !== 200}
                 <button
                   type="submit"
-                  class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-lg py-3 font-medium transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center">
+                  class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-md py-2 font-medium transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center">
                   <Icon icon="heroicons:paper-airplane" class="mr-2" />
                   Send OTP
                 </button>
@@ -210,7 +210,7 @@
                   }}
                   class="space-y-4"
                 >
-                  <div class="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                  <div class="bg-primary-50 p-4 rounded-md border border-primary-100">
                     <p class="text-gray-700 text-sm mb-3">
                       Enter the 6-digit OTP sent to your email to complete verification.
                     </p>
@@ -228,12 +228,10 @@
                           bind:value={enteredOtp}
                           on:input={() => (enteredOtp = enteredOtp.trim())}
                           placeholder="6-digit OTP"
-                          class="pl-10 w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                          class="pl-10 w-full rounded-md border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
                         />
                       </div>
-                      <button
-                        class="bg-primary-500 text-white text-sm py-2.5 px-4 rounded-lg font-medium hover:bg-primary-600 transition-colors"
-                      >
+                      <button class="bg-primary-500 text-white text-sm py-2.5 px-4 rounded-md font-medium hover:bg-primary-600 transition-colors">
                         Verify
                       </button>
                     </div>
@@ -255,13 +253,11 @@
                       }
                       await applyAction(result);
                     };
-                  }}
-                >
+                  }}>
                   {#if timeLeft > 0}
                     <div class="flex justify-center">
                       <span
-                        class="text-sm px-4 py-2 rounded-full bg-gradient-to-r from-primary-100 to-primary-200 text-primary-800 border border-primary-300 flex items-center"
-                      >
+                        class="text-sm px-4 py-2 rounded-full bg-gradient-to-r from-primary-100 to-primary-200 text-primary-800 border border-primary-300 flex items-center">
                         <Icon icon="heroicons:clock" class="mr-2" />
                         Resend in {formatTime(timeLeft)}
                       </span>
@@ -272,8 +268,7 @@
                       <button
                         on:click={handleResendOtp}
                         type="submit"
-                        class="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline flex items-center"
-                      >
+                        class="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline flex items-center">
                         <Icon icon="heroicons:arrow-path" class="mr-1" />
                         Resend OTP
                       </button>
@@ -297,7 +292,7 @@
                     bind:value={email}
                     on:input={validateEmail}
                     placeholder="username@example.com"
-                    class="pl-10 w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                    class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
                   />
                 </div>
                 {#if errors.email}
@@ -321,7 +316,7 @@
                         password = password.trim();
                         validErrorpass = !password ? 'Please enter a valid Password' : '';
                       }}
-                      class="pl-10 w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                      class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
                     />
                   {:else}
                     <input
@@ -334,7 +329,7 @@
                         password = password.trim();
                         validErrorpass = !password ? 'Please enter a valid Password' : '';
                       }}
-                      class="pl-10 w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                      class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
                     />
                   {/if}
                   <button
@@ -362,8 +357,8 @@
 
               <button
                 type="submit"
-                class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-lg py-3 font-medium transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center">
-                <Icon icon="heroicons:arrow-right-on-rectangle" class="mr-2" />
+                class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-md py-2 font-medium transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center">
+                <Icon icon="material-symbols:open-in-phone" class="mr-2" />
                 Sign In
               </button>
             </form>
@@ -378,7 +373,7 @@
           {#if isOtpLogin}
             <button
               on:click={() => (isOtpLogin = false)}
-              class="w-full mb-3 flex items-center justify-center py-2.5 px-4 text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition duration-200 font-medium"
+              class="w-full mb-3 flex items-center justify-center py-2 px-4 text-white bg-primary-500 hover:bg-primary-600 rounded-md transition duration-200 font-medium"
             >
               <Icon icon="heroicons:arrow-left" class="mr-2" />
               <span class="text-sm">Back to Password Login</span>
@@ -386,15 +381,15 @@
           {:else}
             <button
               on:click={() => (isOtpLogin = true)}
-              class="w-full mb-3 flex items-center justify-center py-2.5 px-4 text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition duration-200 font-medium"
+              class="w-full mb-3 flex items-center justify-center py-2 px-4 text-white bg-primary-500 hover:bg-primary-600 rounded-md transition duration-200 font-medium"
             >
-              <Icon icon="heroicons:device-phone-mobile" class="mr-2" />
+              <Icon icon="fluent:mail-12-regular" class="mr-1 text-2xl" />
               <span class="text-sm">Sign In with OTP</span>
             </button>
           {/if}
           
           <button
-            class="w-full flex items-center justify-center py-2.5 px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition duration-200 font-medium"
+            class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200 font-medium"
           >
             <a href={linkedinUrl} class="flex items-center">
               <Icon icon="bi:linkedin" class="mr-2 text-lg" />

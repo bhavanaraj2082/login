@@ -205,7 +205,7 @@ async function submitForm() {
 	}
 	function navigateTo(url) {
 		goto(url)
-		//window.location.href = url;
+		// window.location.href = url;
 		isLiked = false;
 	}
 	let isOpen = false;
@@ -613,6 +613,21 @@ async function submitForm() {
 						My Dashboard
 					  </button>
 					  <button
+						on:click={() => navigateTo('/dashboard/mycart')}
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						My Carts
+					  </button>
+					  <button
+						on:click={() => navigateTo('/dashboard/myorders')}
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						My Orders
+					  </button>
+					  <button
+						on:click={() => navigateTo('/dashboard/myquotes')}
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						My Quotes
+					  </button>
+					  <button
 						on:click={() => navigateTo('/logout')}
 						class="loginbtn block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
 						Logout
@@ -634,14 +649,14 @@ async function submitForm() {
 							navigateTo('/signin');
 						}}
 						class="loginbtn  font-workSans text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
-						>SignIn</button>
+						>Sign In</button>
 					<Icon icon="vaadin:line-v" class="mr-0 text-white font-semibold" />
 					<button
 						on:click={() => {
 							navigateTo('/signup');
 						}}
 						class=" registerbtn font-workSans pr-2  text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
-						>SignUp</button>
+						>Sign Up</button>
 				</div>
 			{/if}
 		</div>
@@ -739,19 +754,19 @@ async function submitForm() {
 					</button>
 				</a> -->
 				<div class="relative flex items-center justify-center lg:space-x-2 lg:pr-4">
-							<div class="relative flex items-center justify-between bg-white border-2 border-white w-28 lg:w-32 h-8 bottom-0.5 rounded-md cursor-pointer">
+							<div class="relative flex items-center justify-between bg-primary-400 border-2 border-white w-28 lg:w-32 h-7 bottom-0.5 rounded-md cursor-pointer">
 								<div class="absolute flex items-center justify-between w-full h-full transition-all duration-300 ease-in-out">
 									<button 
-										class="w-1/2 h-full flex items-center justify-center text-gray-600 z-10 text-xs"
+										class="w-1/2 h-full flex items-center justify-center bg-white text-gray-400 z-10 text-xs"
 										on:click={setINR} 
 									>
-										₹ <span class="text-xs ml-1">INR</span>
+										₹ <span class="text-2s ml-1 font-medium">INR</span>
 									</button>
 									<button 
-										class="w-1/2 h-full flex items-center justify-center text-gray-600 z-10 text-xs"
+										class="w-1/2 h-full flex items-center justify-center bg-white text-gray-400 z-10 text-xs"
 										on:click={setUSD} 
 									>
-										$ <span class="text-xs ml-1">USD</span>
+										$ <span class="text-2s ml-1 font-medium">USD</span>
 									</button>
 							</div>
 							
@@ -761,7 +776,7 @@ async function submitForm() {
 								class="absolute w-1/2 h-full rounded bg-primary-500 transition-all duration-300 ease-in-out flex items-center justify-center"
 								style="top: 50%; left: {$currencyState === 'inr' ? '25%' : '75%'}; transform: translate(-50%, -50%); z-index: 10;"
 							on:click={toggleCurrency}>
-								<button class="text-white text-xs">{$currencyState === 'inr' ? '₹ INR' : '$ USD'}
+								<button class="text-white text-2s font-medium">{$currencyState === 'inr' ? '₹ INR' : '$ USD'}
 								</button>
 							</div>
 						</div>
@@ -785,8 +800,8 @@ async function submitForm() {
 						<button
 							on:click={toggleLike}
 							aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
-							class=" rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}">
-							<Icon icon={isFavoritePage ? heartFilled : heartOutline} class="text-3xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out"/>
+							class=" rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartFilled'}">
+							<Icon icon={isFavoritePage ? heartFilled : heartFilled} class="text-3xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out"/>
 						</button>
 					</a>
 				</div>

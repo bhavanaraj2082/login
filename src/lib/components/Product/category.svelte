@@ -16,7 +16,7 @@
 <div class="w-full mb-10 lg:px-8 md:w-11/12 mx-auto max-w-7xl">
   <div class="md:pl-0">
     <div class="text-center sm:flex px-6 sm:px-0 justify-between items-center mb-2">
-      <h1 class="mb-2 sm:mb-0 font-semibold text-2xl text-primary-400">
+      <h1 class="mb-2 sm:mb-0 font-bold text-2xl text-heading">
         Our Category
       </h1>
 
