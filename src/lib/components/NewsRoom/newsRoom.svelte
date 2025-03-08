@@ -26,6 +26,10 @@
         return text && text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
     }
 
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     const goToPage = async (page) => {
         if (page >= 0 && page < totalPages) {
             currentPage = page;
@@ -69,34 +73,35 @@
 
     <div class="w-fit gap-1 sm:gap-1.5 mx-auto flex mt-10 mb-5">
         <button class="border shadow-md bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
-            on:click={() => goToPage(0)}
+            on:click={() => { goToPage(0); setTimeout(scrollToTop, 100); }}
             disabled={currentPage === 0}>
             <Icon icon="charm:chevrons-left" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded" />
         </button>
         <button class="border shadow-md bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
-            on:click={previousPage}
+            on:click={() => { previousPage(); setTimeout(scrollToTop, 100); }}
             disabled={currentPage === 0}>
             <Icon icon="ic:round-chevron-left" class="p-1 sm:p-2 text-2xl sm:text-4xl rounded" />
         </button>
-
+    
         {#each getPageNumbers() as page}
-            <button on:click={() => goToPage(page)}
+            <button on:click={() => { goToPage(page); setTimeout(scrollToTop, 100); }}
                 class={`border shadow-md rounded-md px-3 py-1 text-sm font-medium 
                 ${page === currentPage ? 'text-white bg-primary-500 border-primary-500' : 'border-gray-300 bg-white hover:bg-gray-100'}`}>
                 {page + 1}
             </button>
         {/each}
-
+    
         <button class="border shadow-md bg-white border-gray-300 rounded-md text-gray-400 hover:bg-gray-100 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
-            on:click={nextPage}
+            on:click={() => { nextPage(); setTimeout(scrollToTop, 100); }}
             disabled={currentPage >= totalPages - 1}>
             <Icon icon="charm:chevron-right" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded" />
         </button>
-        
+    
         <button class="border shadow-md bg-white border-gray-300 rounded-md text-gray-400 hover:bg-gray-100 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
-            on:click={() => goToPage(totalPages - 1)}
+            on:click={() => { goToPage(totalPages - 1); setTimeout(scrollToTop, 100); }}
             disabled={currentPage >= totalPages - 1}>
             <Icon icon="charm:chevrons-right" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded" />
         </button>
     </div>
+    
 </div>

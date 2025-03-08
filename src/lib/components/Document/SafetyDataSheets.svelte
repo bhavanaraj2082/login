@@ -163,7 +163,7 @@ function toggleRotation(index) {
   };
 </script>
 
-<div class="px-6 pb-6 md:px-10 max-w-7xl lg:px-14 mx-auto">
+<div class="sm:px-6 px-7 sm:pb-6 pb-14 max-w-7xl lg:px-17 mx-auto">
   <h1 class="text-2xl font-bold mb-8">Documents</h1>
   
   <div class="w-full inline-flex rounded mb-8">
@@ -185,7 +185,7 @@ function toggleRotation(index) {
       </div>
       {/each}
     </nav> -->
-    <nav aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto rounded-t">
+    <nav aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto rounded-t scroll">
       {#each tabs as tab}
         <div class="inline-block w-full">
           <button
@@ -204,10 +204,10 @@ function toggleRotation(index) {
     </nav>
     
   </div>
-  <div class="flex flex-col lg:flex-row"> 
-    <div class="w-full lg:w-7/12 p-6 rounded bg-white shadow"> 
+  <div class="flex flex-col lg:flex-row lg:space-y-0 space-y-5"> 
+    <div class="w-full lg:w-7/12 px-3 pt-3 rounded bg-white shadow"> 
       {#if activeTab === "SafetyData Sheets"}
-      <div class="mb-6 max-sm:w-full" >
+      <div class="mb-2 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">SafetyData Sheets (SDS)</h2>
         <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Safety Data Sheet, please enter the product number.</p>
         <form 
@@ -250,21 +250,30 @@ function toggleRotation(index) {
             {#if sdsProductNumberError}
             <p class="text-red-500 text-md">{sdsProductNumberError}</p>
             {/if}
-            <button
-            type="submit"
-            class="font-semibold bg-primary-400 text-white py-2 px-6 rounded shadow hover:bg-primary-500 transition duration-300 mt-5"
-          >
-            SEARCH
-          </button>
+            <div class="flex items-center justify-end mt-2">
+              <div class="flex items-center justify-end mt-2">
+                <button
+                type="submit"
+                class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+              >
+                SEARCH
+              </button>
+              </div>
+            </div>
+           
           </div>
-          <!-- <p class="text-lg font-semibold text-primary-500 my-4 p-4">
-          {status}
-          </p> -->
+          <p class="sm:text-sm text-xs font-medium text-primary-500 my-2">
+          {#if status === undefined}
+          <div class="sm:text-lg text-md font-semibold text-black mb-2">
+            SDS Not Found
+          </div> We were unable to locate an SDS for the selected product.
+          {/if}
+          </p>
         </form>
       </div>
       {/if}
       {#if activeTab === "Certificates of Analysis"}
-      <div class="mb-6 max-sm:w-full" >
+      <div class="mb-2 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">Certificates of Analysis (COA)</h2>
         <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Analysis (COA), please enter both the product number and the Lot/batch Number.</p>
         <form 
@@ -327,21 +336,27 @@ function toggleRotation(index) {
               </div>
             {/if}
             </div>
+            <div class="flex items-center justify-end mt-2">
               <button
               type="submit"
-              class="font-semibold mt-5 bg-primary-400 hover:bg-primary-500 text-white py-2 px-6 rounded shadow transition duration-300"
+              class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
             >
               SEARCH
             </button>
+            </div>
           </div>
-          <p class="text-lg font-semibold text-primary-500 my-4 p-4">
-          {status}
-          </p>
+          <p class="sm:text-sm text-xs font-medium text-primary-500 my-2">
+            {#if status === undefined}
+            <div class="sm:text-lg text-md font-semibold text-black mb-2">
+              SDS Not Found
+            </div> We were unable to locate an SDS for the selected product.
+            {/if}
+            </p>
         </form>
       </div>
       {/if}
       {#if activeTab === "Certificates of Origin"}
-      <div class="mb-6 max-sm:w-full" >
+      <div class="mb-2 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">Certificates of Origin (COO)</h2>
         <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Origin (COO), please enter both the product number and the Lot/batch Number.</p>
         <form 
@@ -405,21 +420,27 @@ function toggleRotation(index) {
           {#if lotNumber === '' || lotNumber === null}
             <p class="text-red-500 text-md mt-1">{sdsLottNumberError}</p>
           {/if}
+          <div class="flex items-center justify-end mt-2">
             <button
-              type="submit"
-              class="font-semibold mt-5 bg-primary-400 text-white py-2 px-6 rounded shadow hover:bg-primary-500 transition duration-300"
-            >
-              SEARCH
-            </button>
+            type="submit"
+            class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+          >
+            SEARCH
+          </button>
           </div>
-          <p class="text-lg font-semibold text-primary-500 my-4 p-4">
-          {status}
-          </p>
+          </div>
+          <p class="sm:text-sm text-xs font-medium text-primary-500 my-2">
+            {#if status === undefined}
+            <div class="sm:text-lg text-md font-semibold text-black mb-2">
+              SDS Not Found
+            </div> We were unable to locate an SDS for the selected product.
+            {/if}
+            </p>
         </form>
       </div>
       {/if}
       {#if activeTab === "Certificates of Quality"}
-      <div class="mb-6 max-sm:w-full" >
+      <div class="mb-2 max-sm:w-full" >
         <h2 class="text-lg font-semibold mb-4">Certificates of Quality (COQ)</h2>
         <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Quality (COQ), please enter both the product number and the Lot/batch Number.</p>
         <form 
@@ -480,14 +501,20 @@ function toggleRotation(index) {
           {#if lotNumber === '' || lotNumber === null}
             <p class="text-red-500 text-md mt-1">{sdsLottNumberError}</p>
           {/if}
-          <button
-          type="submit"
-          class="font-semibold mt-5 bg-primary-400 text-white py-2 px-6 rounded-md  shadow hover:bg-primary-500 transition duration-300"
-        >
-          SEARCH
-        </button>
-          <p class="text-lg font-semibold text-primary-500 my-4 p-4">
-          {status}
+          <div class="flex items-center justify-end mt-2">
+            <button
+            type="submit"
+            class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+          >
+            SEARCH
+          </button>
+          </div>
+        <p class="sm:text-sm text-xs font-medium text-primary-500 my-2">
+          {#if status === undefined}
+          <div class="sm:text-lg text-md font-semibold text-black mb-2">
+            SDS Not Found
+          </div> We were unable to locate an SDS for the selected product.
+          {/if}
           </p>
         </form>
       </div>
@@ -618,15 +645,16 @@ function toggleRotation(index) {
             <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
           </div>
           <p class="mt-4 text-sm text-gray-600">
-            In some cases, a COA may not be available online. If your search was unable to find the COA, you can request one.
+            In some cases, a COA may not be available online. If your search was unable to find the COA, you can request one by clicking product documentation.
           </p>
-          <div class="mt-4">
-            <button 
-            class="bg-primary-400 text-white px-4 py-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-600"
-            onclick="window.location.href='https://chemikart.partskeys.com/help-support'">
-            Request COA
-          </button>          
-
+          <div class="flex items-center justify-end mt-4">
+            <button
+            type="submit"
+            class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+            onclick="window.location.href='https://chemikart.partskeys.com/help-support'"
+          >
+          Request COA
+          </button>
           </div>
         </div>
       </div>
@@ -711,12 +739,14 @@ function toggleRotation(index) {
     <p class="mt-4 text-sm text-gray-600">
       In some cases, a COO may not be available online. If your search was unable to find the COO, you can request one.
     </p>
-    <div class="mt-4">
-      <button 
-      class="bg-primary-400 text-white px-4 py-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-600"
-      onclick="window.location.href='https://chemikart.partskeys.com/help-support'">
-      Request COO
-    </button>   
+    <div class="flex items-center justify-end mt-4">
+      <button
+      type="submit"
+      class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+      onclick="window.location.href='https://chemikart.partskeys.com/help-support'"
+    >
+    Request COO
+    </button>
     </div>
   </div>
 </div>
@@ -801,12 +831,14 @@ function toggleRotation(index) {
     <p class="mt-4 text-sm text-gray-600">
       In some cases, a COQ may not be available online. If your search was unable to find the COQ, you can request one.
     </p>
-    <div class="mt-4">
-      <button 
-      class="bg-primary-400 text-white px-4 py-2 rounded-md hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-600"
-      onclick="window.location.href='https://chemikart.partskeys.com/help-support'">
-      Request COQ
-    </button>   
+    <div class="flex items-center justify-end mt-4">
+      <button
+      type="submit"
+      class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+      onclick="window.location.href='https://chemikart.partskeys.com/help-support'"
+    >
+    Request COQ
+    </button>
     </div>
   </div>
 </div>
