@@ -35,8 +35,8 @@ import {
 } from '$env/static/private';
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public'; 
 import Return from '$lib/server/models/Return.js';
-import Counter from '$lib/server/models/Counter';
-
+import Counter from '$lib/server/models/Counter.js';
+import { sendEmail } from '$lib/server/utils/sendEmail.js';
 
 async function conversionRates() {
 	const rates = await Curconversion.find().exec();
@@ -2539,10 +2539,10 @@ export const addToCart = async(item,userId,userEmail)=>{
 	let cart
 	if(search === null){
 		cart = await Cart.create({cartId:nanoid(8),cartName:"mycart",cartItems:item,userId,userEmail,isActiveCart:true})
-		return {success:true,message:"Product is added to cart"}
+		return {success:true,message:"Product is added to cart2"}
 	}else{
 		const findItem = search.cartItems.find(x=>x.stockId.toString() === item.stockId)
-	   // console.log(search,"sdffffffffff");
+	   console.log(item,"sdffffffffff",findItem);
 		if(findItem === undefined){
 		cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$push:{cartItems:item}},{new:true})
 		return {success:true,message:"Product is added to cart"}
@@ -3041,4 +3041,42 @@ export const submitFeedback = async (data) => {
 	}else{
 		return {success:false}
 	}
+}
+
+export const addNewRecurrenceDate = async(userId,body) =>{
+	const {cartId,newDate} = body
+	
+	const findCart = await Cart.findOne({cartId})
+	let timePortion = findCart.recurrence.recurringDate.toISOString().split("T")[1]
+	let updatedDateTime = newDate + "T" + timePortion;
+    const findcart = await Cart.findOne({cartId,'recurrenceLogs.recurringDate':findCart.recurrence.recurringDate,'recurrenceLogs.action':"Extended Date"})
+	if(findcart?._id){
+	    return { success:true,message:"Recurrence date is already updated"}
+	}
+    await Cart.findOneAndUpdate({cartId},
+		{'recurrence.recurringDate':updatedDateTime,
+		$push:{recurrenceLogs:{recurringDate:findCart.recurrence.recurringDate,action:"Extended Date"}}},{new:true})
+	return { success:true,message:"Recurrence date updated successfully"}
+}
+
+export const addRecurrenceReject = async(userId,body) =>{
+	const {cartId,recurringDate} = body
+	const findcart = await Cart.findOne({cartId,'recurrenceLogs.recurringDate':recurringDate,'recurrenceLogs.action':"Rejected"})
+	console.log(findcart);
+	if(findcart?._id){
+	    return { success:true,message:"Recurrence is already rejected"}
+	}
+    await Cart.findOneAndUpdate({cartId},{$push:{recurrenceLogs:{recurringDate,action:"Rejected"}}},{new:true})
+	await sendEmail("Recurrence Order Rejected","recurrence order is rejected by user","yusuf@partskeys.com")
+	return { success:true,action:"reject",message:"Recurrence date updated successfully"}
+}
+export const recurrenceCartActive = async(userId,body) =>{
+	const {cartId,recurringDate} = body
+	const findcart = await Cart.findOne({cartId,'recurrenceLogs.recurringDate':recurringDate,'recurrenceLogs.action':"Accepted"})
+	if(findcart?._id){
+	    return { success:true,message:"Recurrence order is completed"}
+	}
+    await Cart.findOneAndUpdate({userId,isActiveCart:true},{isActiveCart:false})
+    await Cart.findOneAndUpdate({cartId},{isActiveCart:true,$push:{recurrenceLogs:{recurringDate,action:"Accepted"}}})
+	return { success:true,action:"accept",message:"Recurrence date updated successfully"}
 }
