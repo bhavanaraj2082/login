@@ -722,6 +722,7 @@ async function submitForm() {
 			</div>
 				
 			<div class="flex gap-1 text-gray-600 items-center ">
+
 				<!-- <a href="/quick-order">
 					<button 
 					class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium">

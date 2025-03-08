@@ -241,7 +241,7 @@
 		if (!isLoggedIn) {
 			removeFromCart();
 			toast.success(`All products are deleted successfully`);
-			cartTotalComps.set(0);
+			localStorage.setItem("totalCompsChemi", 0);
 			syncLocalStorageToStore();
 			return;
 		}
@@ -252,7 +252,7 @@
 				cart.update(() => {
 					return [];
 				});
-				cartTotalComps.set(0);
+				localStorage.setItem("totalCompsChemi", 0);
 				syncLocalStorageToStore();
 				toast.success(result.message);
 			} else {
