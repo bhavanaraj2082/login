@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { browser } from "$app/environment";
   import { cartState } from "$lib/stores/cartStores.js";
-  import { toast } from "svelte-sonner";
+  import { toast, Toaster } from "svelte-sonner";
   import { invalidate } from "$app/navigation";
   import Icon from "@iconify/svelte";
   import { currencyState,cartTotalComps } from "$lib/stores/mainStores.js";
@@ -585,3 +585,4 @@ function handleDataCart() {
     </div>
   </div>
 {/if}
+<Toaster position="bottom-right" richColors />

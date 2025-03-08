@@ -45,6 +45,17 @@
     let form;
     let selectedSort =''
 
+	let selectedImage = null;
+	let showimage = false;
+	function imagemodal(imageSrc) {
+		selectedImage = imageSrc;
+		showimage = true;
+	}
+	function closePopup() {
+		showimage = false;
+		selectedImage = null;
+	}
+
     const sortBy = (checked, sortType) => {
     let sortedBy;
     selectedSort = sortType
@@ -437,9 +448,40 @@ const handleSearch = (searchName) => {
                 <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{product?.productName  || ""}</a>
             </div>
             <div class=" flex items-start gap-2 md:gap-8">
-                <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`}>
-                <img src={product?.imageSrc} class=" w-20 h-20 sm:w-40 sm:h-40 object-contain" alt="">
-                </a>
+                <!-- <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`}> -->
+                <div class="">
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                <img src={product?.imageSrc} class="cursor-pointer w-20 h-20 sm:w-40 sm:h-40 object-contain" alt=""
+                on:click={() => imagemodal(product?.imageSrc)}
+                >
+
+                {#if showimage}
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
+					<div
+						on:click={(e) => {
+							if (e.target === e.currentTarget) {
+								showimage = false;
+							}
+						}}
+						class="fixed inset-0 bg-gray-900 bg-opacity-10 backdrop-blur-xs flex items-center justify-center z-50">
+						<div class="bg-white rounded-lg shadow-md p-6 mx-4 w-full md:w-1/2 lg:w-1/3">
+							<div class="flex justify-end items-center mb-2">
+								<button
+									on:click={closePopup}
+									class="rounded hover:bg-slate-200 duration-200"
+								>
+									<Icon icon="si:close-duotone" class="text-3xl text-red-600" />
+								</button>
+							</div>
+							<!-- svelte-ignore a11y-img-redundant-alt -->
+							<img src={selectedImage} alt="image" onerror="this.src='/partskeys.jpeg'" class="" />
+						</div>
+					</div>
+				{/if}
+                <!-- </a> -->
+                </div>
                 <div class=" text-xs md:text-sm space-y-1 grow font-medium">
                     <p>Product Number : <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.productNumber || ""}</a></p>
                     <p>Category : <a href={`/products/${categoryName}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.categoryDetails.name || ""}</a></p>

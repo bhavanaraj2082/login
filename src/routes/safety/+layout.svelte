@@ -2,6 +2,7 @@
   import { page } from "$app/stores";
 </script>
 <div class="w-11/12 mx-auto pb-10">
+  <h1 class="text-heading font-bold text-lg md:text-2xl">Product Safety</h1>
   <div class="flex flex-col md:flex-row">
     <div class="w-full md:w-1/4 h-fit border-t-2 border-b-2 sm:mb-0 mb-5 border-gray-300 mt-10 pt-7 pb-7">
       <a href="/safety" 

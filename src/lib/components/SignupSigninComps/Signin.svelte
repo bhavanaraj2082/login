@@ -5,7 +5,7 @@
   const baseUrl = import.meta.env.VITE_LINKEDIN_BASE_URL;
   import Icon from "@iconify/svelte";
   import { enhance, applyAction } from "$app/forms";
-  import { toast } from "svelte-sonner";
+  import { toast, Toaster } from "svelte-sonner";
   import { goto } from "$app/navigation";
   import { onDestroy } from "svelte";
 
@@ -62,7 +62,6 @@
         // return;
       }
       await applyAction(result);
-
 
       if (result.type === "failure") {
         toast.error(result.data.errorMsg);
@@ -142,21 +141,23 @@
             };
           }}
         >
-        <div class="mb-5">
-          <label for="email" class="mb-2 text-gray-600">Enter your email</label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            bind:value={email}
-            on:input={validateEmail}
-            placeholder="username@example.com"
-            class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm text-sm"
-          />
-          {#if errors.email}
-            <div class="text-red-500 text-xs mb-4">{errors.email}</div>
-          {/if}
-        </div>
+          <div class="mb-5">
+            <label for="email" class="mb-2 text-gray-600"
+              >Enter your email</label
+            >
+            <input
+              type="email"
+              name="email"
+              id="email"
+              bind:value={email}
+              on:input={validateEmail}
+              placeholder="username@example.com"
+              class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm text-sm"
+            />
+            {#if errors.email}
+              <div class="text-red-500 text-xs mb-4">{errors.email}</div>
+            {/if}
+          </div>
           {#if otpStatus !== 200}
             <button
               type="submit"
@@ -266,20 +267,22 @@
       {:else}
         <form method="POST" action="?/login" use:enhance={handleFormSubmit}>
           <div class="mb-4">
-          <label for="email" class="mb-2 text-gray-600">Enter your email</label>
-          <input
-            type="text"
-            name="email"
-            id="email"
-            bind:value={email}
-            on:input={validateEmail}
-            placeholder="username@example.com"
-            class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm"
-          />
-          {#if errors.email}
-            <div class="text-red-500 text-xs mt-1 mb-3">{errors.email}</div>
-          {/if}
-        </div>
+            <label for="email" class="mb-2 text-gray-600"
+              >Enter your email</label
+            >
+            <input
+              type="text"
+              name="email"
+              id="email"
+              bind:value={email}
+              on:input={validateEmail}
+              placeholder="username@example.com"
+              class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm"
+            />
+            {#if errors.email}
+              <div class="text-red-500 text-xs mt-1 mb-3">{errors.email}</div>
+            {/if}
+          </div>
           <label for="password" class="mb-2 text-gray-600"
             >Enter your password</label
           >
@@ -358,3 +361,4 @@
     />
   </div>
 </div>
+<Toaster position="bottom-right" richColors />
