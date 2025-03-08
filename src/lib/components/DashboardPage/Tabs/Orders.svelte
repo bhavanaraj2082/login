@@ -618,10 +618,12 @@ function downloadAsExcel(order) {
                                                 <p class="text-heading font-semibold">Total</p>
                                                 <p>{formatCurrency(order?.totalprice || 0 , order?.currency || 0)}</p>
                                             </div>
-                                            <div>
-                                                <p class="text-heading font-semibold">Transation ID</p>
-                                                <p>{order?.transactionid || 'N/A'}</p>
-                                            </div>
+                                            {#if order?.transactionid && order?.transdetails}
+                                                <div>
+                                                    <p class="text-heading font-semibold">Transation ID</p>
+                                                    <p>{order?.transactionid || '--'}</p>
+                                                </div>
+                                            {/if}
                                             <div>
                                                 <p class="text-heading font-semibold">Invoice Number</p>
                                                 <p class="text-xs">{order?.invoice || 'N/A'}</p>
@@ -672,7 +674,7 @@ function downloadAsExcel(order) {
                                             <div>
                                                 <h4 class="text-sm font-medium text-gray-500 mb-2">Shipping Address</h4>
                                                 <div class="text-sm">
-                                                    {#each formatAddress(order?.shippingAddress || order?.shipmentAddress) as line}
+                                                    {#each formatAddress(order?.shippingaddress || order?.shipmentAddress) as line}
                                                         <p class="flex flex-wrap mb-1">{line}</p>
                                                     {/each}
                                                 </div>
@@ -680,7 +682,7 @@ function downloadAsExcel(order) {
                                             <div>
                                                 <h4 class="text-sm font-medium text-gray-500 mb-2">Billing Address</h4>
                                                 <div class="text-sm">
-                                                    {#each formatAddress(order?.billingAddress) as line}
+                                                    {#each formatAddress(order?.billingaddress) as line}
                                                         <p class="flex flex-wrap mb-1">{line}</p>
                                                     {/each}
                                                 </div>

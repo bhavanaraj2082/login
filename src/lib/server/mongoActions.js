@@ -901,10 +901,10 @@ export async function verifyemailOtp(email, enteredOtp) {
 
 // profile action functions
 export async function editProfileContact(body) {
-	const { recordId, ...contact } = body;
+	const { recordId, companyName, gstNumber, ...contact } = body;
 
 	try {
-		const result = await Profile.findByIdAndUpdate(recordId, contact, {
+		const result = await Profile.findByIdAndUpdate(recordId, { ...contact, companyName, gstNumber }, {
 			new: true, // Return the updated document
 			runValidators: true // Ensure that validation is run
 		});

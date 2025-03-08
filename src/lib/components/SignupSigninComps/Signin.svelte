@@ -12,28 +12,16 @@
   let isOtpLogin = false;
   let email = "";
   let password = "";
+  let validErrorpass = '';
   let otpStatus = "";
-  let enteredOtp = "";
   let showPassword = false;
+  let enteredOtp = "";
   let errors = {};
   let form4;
   let timeLeft;
   let timerInterval;
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const linkedinUrl = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(callbackUrl)}&scope=${scope}`;
-
-  // const validateForm = () => {
-  //   errors = {};
-  //   if (!email || !emailRegex.test(email))
-  //     errors.email = "Please enter a valid email address.";
-  //   if (!password) errors.password = "Please enter a valid password";
-
-  //   if (Object.keys(errors).length > 0) {
-  //     return false;
-  //   } else {
-  //     return true;
-  //   }
-  // };
 
   function validateEmail() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -44,23 +32,13 @@
   }
 
   const handleFormSubmit = ({ cancel }) => {
-    // if (!validateForm()) {
-    //   cancel();
-    // }
     return async ({ result, update }) => {
       console.log(result);
-
-      // if (result.type === "redirect") {
-      //   await update();
-      //   await applyAction(result);
-      //   return;
-      // }
 
       if (result.type === "redirect") {
         await goto(result.location);
         await update();
         location.reload();
-        // return;
       }
       await applyAction(result);
 
@@ -94,7 +72,7 @@
   onDestroy(() => {
     if (timerInterval) clearInterval(timerInterval);
   });
-
+  
   const handleResendOtp = () => {
     if (timeLeft === 0 && !loadingPhone) {
       form4.requestSubmit();
@@ -103,131 +81,66 @@
   };
 </script>
 
-<div
-  class="flex flex-col md:flex-row max-w-4xl shadow-md mx-auto h-auto md:h-auto my-14 border rounded-lg border-gray-300"
->
-  <div class="md:hidden w-full h-1/2 mx-auto flex justify-center">
-    <img src="/image.jpg" alt="Sign In" class="object-cover h-full rounded" />
-  </div>
-
-  <div
-    class="flex flex-col items-center w-full md:w-2/5 rounded-l md:rounded-l-lg p-6 bg-white"
-  >
-    <div class="w-full mx-auto">
-      <h1 class="text-2xl font-bold text-primary-500 mb-4">Sign In</h1>
-      <p class="mb-4 text-gray-600">
-        Do not have an account? <a
-          href="/signup"
-          class="text-primary-500 hover:text-primary-600 underline"
-          >Create a new one</a
-        >
-      </p>
-      {#if isOtpLogin}
-        <form
-          method="POST"
-          action="?/sendOtp"
-          use:enhance={() => {
-            return async ({ result, update }) => {
-              console.log(result);
-              otpStatus = result.status;
-              if (result.type === "failure") {
-                toast.error(result.data.errorMsg);
-              } else if (result.type === "success") {
-                toast.success(result.data.errorMsg);
-                startTimer();
-                // goto(result.location);
-                // location.reload();
-              }
-              await applyAction(result);
-            };
-          }}
-        >
-          <div class="mb-5">
-            <label for="email" class="mb-2 text-gray-600"
-              >Enter your email</label
-            >
-            <input
-              type="email"
-              name="email"
-              id="email"
-              bind:value={email}
-              on:input={validateEmail}
-              placeholder="username@example.com"
-              class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm text-sm"
-            />
-            {#if errors.email}
-              <div class="text-red-500 text-xs mb-4">{errors.email}</div>
-            {/if}
+<div class="min-h-screen bg-gradient-to-br from-gray-100 via-primary-50 to-primary-300 flex items-center justify-center p-4">
+  <button 
+	on:click={() => goto('/')}
+		class="absolute top-1 right-4 md:right-4 flex z-10 items-center justify-center py-2 px-2 sm:px-3 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
+		<div class="flex items-center space-x-2">
+			<Icon icon="mdi:home" class="text-xl" />
+			<span class="hidden sm:inline text-sm font-medium">Back to Home</span>
+		</div>
+	</button>
+  <div class="w-full max-w-5xl mt-10">
+    <div class="flex flex-col md:flex-row bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl border border-white/20">
+      <div class="w-full md:w-3/5 p-8 md:p-12 flex flex-col justify-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary-500/80 via-primary-500/80 to-primary-600/80 z-0"></div>
+        <div class="absolute sm:top-6 sm:left-6 top-4 right-5 w-20 h-20 rounded bg-primary-100/20 animate-pulse clip-hexagon flex md:justify-center justify-end items-center">
+          <Icon icon="lets-icons:chemistry-light" class="text-gray-100 text-5xl" />
+        </div>
+        <div class="absolute md:bottom-2 md:right-0 bottom-2 left-48 sm:w-80 sm:h-80 h-20 w-20 rounded bg-primary-100/10 animate-pulse clip-hexagon">
+        </div>
+        <div class="relative z-10">
+          <h1 class="text-3xl md:text-4xl font-bold text-white mb-6">Welcome Back!</h1>
+          <div class="md:w-72 w-20 h-1 bg-primary-50 mb-8"></div>
+          <p class="text-white/90 sm:text-lg max-w-lg text-md mb-8">
+            Sign in to continue your journey with us. Access your personalized dashboard and exclusive features.
+          </p>
+          <div class="space-y-6 md:pr-12">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-full bg-primary-50/20 shadow-md flex items-center justify-center">
+                <Icon icon="ph:shield-check-bold" class="text-lg text-white" />
+              </div>
+              <span class="text-white md:text-lg text-xs">Secure authentication</span>
+            </div>
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-full bg-primary-50/20 shadow-md flex items-center justify-center">
+                <Icon icon="ph:lightning-bold" class="text-lg text-white" />
+              </div>
+              <span class="text-white md:text-lg text-xs">Fast and reliable access</span>
+            </div>
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-full bg-primary-50/20 shadow-md flex items-center justify-center">
+                <Icon icon="ph:devices-bold" class="text-lg text-white" />
+              </div>
+              <span class="text-white md:text-lg text-xs">Works across all your devices</span>
+            </div>
           </div>
-          {#if otpStatus !== 200}
-            <button
-              type="submit"
-              class="bg-primary-400 hover:bg-primary-500 text-sm font-medium text-white rounded p-2 w-full text-center"
-            >
-              Send OTP
-            </button>{/if}
-
-          {#if otpStatus === 200}
+        </div>
+      </div>
+      <div class="w-full md:w-2/5 bg-white md:rounded-r-xl relative z-10 p-4 md:p-10">
+        <div class="max-w-md mx-auto">
+          <h2 class="text-2xl font-bold text-primary-600 mb-2">Sign In</h2>
+          <p class="mb-6 sm:text-sm text-xs text-gray-600">
+            Don't have an account? <a
+              href="/signup"
+              class="text-primary-500 hover:text-primary-600 font-medium">Create a new one</a>
+          </p>
+          {#if isOtpLogin}
             <form
-              action="?/verifyOtp"
               method="POST"
+              action="?/sendOtp"
               use:enhance={() => {
                 return async ({ result, update }) => {
-                  if (result.type === "failure") {
-                    toast.error(result.data.errorMsg); // Show error messages for failed verification
-                  } else if (result.type === "redirect") {
-                    await goto(result.location);
-                    location.reload();
-                  } else if (result.type === "success") {
-                    // Handle successful responses with a redirect (if provided)
-                    const { redirectTo } = result.data;
-                    if (redirectTo) {
-                      await goto(redirectTo);
-                      location.reload();
-                    } else {
-                      toast.error(
-                        "Verification successful, but no redirect URL provided!"
-                      );
-                    }
-                  }
-                  await applyAction(result);
-                };
-              }}
-            >
-              <div class="mb-4 flex flex-col items-center">
-                <p class="text-gray-700 sm:text-sm text-xs mb-3 text-left">
-                  Enter the OTP sent to your registered email to complete
-                  verification.
-                </p>
-                <input type="hidden" name="email" bind:value={email} />
-
-                <div class="flex w-full justify-between items-center">
-                  <!-- OTP Input -->
-                  <input
-                    type="text"
-                    maxlength="6"
-                    name="enteredOtp"
-                    bind:value={enteredOtp}
-                    on:input={() => (enteredOtp = enteredOtp.trim())}
-                    placeholder="Enter 6-digit OTP"
-                    class="w-full max-w-[220px] px-4 py-1.5 border border-gray-300 text-xs sm:text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500 text-center"
-                  />
-
-                  <!-- Verify Button -->
-                  <button
-                    class="bg-primary-500 text-white text-xs sm:text-sm py-1.5 px-4 rounded-md shadow-md hover:bg-primary-600 hover:shadow-lg transition-all duration-300 focus:outline-none"
-                  >
-                    Verify
-                  </button>
-                </div>
-              </div>
-            </form>
-
-            <form
-              action="?/sendOtp"
-              method="POST"
-              use:enhance={() => {
-                return async ({ result }) => {
                   console.log(result);
                   otpStatus = result.status;
                   if (result.type === "failure") {
@@ -239,151 +152,272 @@
                   await applyAction(result);
                 };
               }}
-            >
-              {#if timeLeft > 0}
-                <div class="flex justify-center">
-                  <span
-                    class="text-xs sm:text-sm font-semibold px-3 mb-1 py-1 pb-2 rounded-md bg-gradient-to-r from-red-400 to-red-500 text-white"
-                  >
-                    <span class="text-lg">⏳</span> Time remaining {formatTime(
-                      timeLeft
-                    )}
-                  </span>
+              class="space-y-4">
+              <div class="space-y-1">
+                <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Icon icon="heroicons:envelope" class="text-gray-400" />
+                  </div>
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    bind:value={email}
+                    on:input={validateEmail}
+                    placeholder="username@example.com"
+                    class="pl-10 w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                  />
                 </div>
-              {:else}
-                <div class="flex justify-center mt-3">
-                  <input type="hidden" name="email" bind:value={email} />
-                  <button
-                    on:click={handleResendOtp}
-                    type="submit"
-                    class="text-xs sm:text-sm pb-2 font-medium text-primary-500 px-3 py-1 hover:underline"
-                  >
-                    Get a new code?
-                  </button>
-                </div>
+                {#if errors.email}
+                  <p class="text-red-500 text-xs mt-1">{errors.email}</p>
+                {/if}
+              </div>
+              
+              {#if otpStatus !== 200}
+                <button
+                  type="submit"
+                  class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white rounded-lg py-3 font-medium transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center">
+                  <Icon icon="heroicons:paper-airplane" class="mr-2" />
+                  Send OTP
+                </button>
+              {/if}
+
+              {#if otpStatus === 200}
+                <form
+                  action="?/verifyOtp"
+                  method="POST"
+                  use:enhance={() => {
+                    return async ({ result, update }) => {
+                      if (result.type === "failure") {
+                        toast.error(result.data.errorMsg);
+                      } else if (result.type === "redirect") {
+                        await goto(result.location);
+                        location.reload();
+                      } else if (result.type === "success") {
+                        const { redirectTo } = result.data;
+                        if (redirectTo) {
+                          await goto(redirectTo);
+                          location.reload();
+                        } else {
+                          toast.error(
+                            "Verification successful, but no redirect URL provided!"
+                          );
+                        }
+                      }
+                      await applyAction(result);
+                    };
+                  }}
+                  class="space-y-4"
+                >
+                  <div class="bg-primary-50 p-4 rounded-lg border border-primary-100">
+                    <p class="text-gray-700 text-sm mb-3">
+                      Enter the 6-digit OTP sent to your email to complete verification.
+                    </p>
+                    <input type="hidden" name="email" bind:value={email} />
+
+                    <div class="flex gap-2 items-center">
+                      <div class="relative flex-1">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                          <Icon icon="heroicons:key" class="text-gray-400" />
+                        </div>
+                        <input
+                          type="text"
+                          maxlength="6"
+                          name="enteredOtp"
+                          bind:value={enteredOtp}
+                          on:input={() => (enteredOtp = enteredOtp.trim())}
+                          placeholder="6-digit OTP"
+                          class="pl-10 w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                        />
+                      </div>
+                      <button
+                        class="bg-primary-500 text-white text-sm py-2.5 px-4 rounded-lg font-medium hover:bg-primary-600 transition-colors"
+                      >
+                        Verify
+                      </button>
+                    </div>
+                  </div>
+                </form>
+
+                <form
+                  action="?/sendOtp"
+                  method="POST"
+                  use:enhance={() => {
+                    return async ({ result }) => {
+                      console.log(result);
+                      otpStatus = result.status;
+                      if (result.type === "failure") {
+                        toast.error(result.data.errorMsg);
+                      } else if (result.type === "success") {
+                        toast.success(result.data.errorMsg);
+                        startTimer();
+                      }
+                      await applyAction(result);
+                    };
+                  }}
+                >
+                  {#if timeLeft > 0}
+                    <div class="flex justify-center">
+                      <span
+                        class="text-sm px-4 py-2 rounded-full bg-gradient-to-r from-primary-100 to-primary-200 text-primary-800 border border-primary-300 flex items-center"
+                      >
+                        <Icon icon="heroicons:clock" class="mr-2" />
+                        Resend in {formatTime(timeLeft)}
+                      </span>
+                    </div>
+                  {:else}
+                    <div class="flex justify-center mt-3">
+                      <input type="hidden" name="email" bind:value={email} />
+                      <button
+                        on:click={handleResendOtp}
+                        type="submit"
+                        class="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline flex items-center"
+                      >
+                        <Icon icon="heroicons:arrow-path" class="mr-1" />
+                        Resend OTP
+                      </button>
+                    </div>
+                  {/if}
+                </form>
               {/if}
             </form>
+          {:else}
+            <form method="POST" action="?/login" use:enhance={handleFormSubmit} class="space-y-4">
+              <div class="space-y-1">
+                <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Icon icon="heroicons:envelope" class="text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    name="email"
+                    id="email"
+                    bind:value={email}
+                    on:input={validateEmail}
+                    placeholder="username@example.com"
+                    class="pl-10 w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                  />
+                </div>
+                {#if errors.email}
+                  <p class="text-red-500 text-xs mt-1">{errors.email}</p>
+                {/if}
+              </div>
+              <div class="space-y-1">
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <Icon icon="heroicons:lock-closed" class="text-gray-400" />
+                  </div>
+                  {#if showPassword}
+                    <input
+                      type="text"
+                      name="password"
+                      id="password"
+                      placeholder="Password"
+                      bind:value={password}
+                      on:input={() => {
+                        password = password.trim();
+                        validErrorpass = !password ? 'Please enter a valid Password' : '';
+                      }}
+                      class="pl-10 w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                    />
+                  {:else}
+                    <input
+                      type="password"
+                      name="password"
+                      id="password"
+                      placeholder="Password"
+                      bind:value={password}
+                      on:input={() => {
+                        password = password.trim();
+                        validErrorpass = !password ? 'Please enter a valid Password' : '';
+                      }}
+                      class="pl-10 w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                    />
+                  {/if}
+                  <button
+                    type="button"
+                    class="absolute top-3 right-2.5 text-gray-500 hover:text-gray-700 focus:outline-none"
+                    on:click={() => (showPassword = !showPassword)} >
+                    {#if showPassword}
+                      <Icon icon="mdi:eye-off-outline" class="w-5 h-5" />
+                    {:else}
+                      <Icon icon="mdi:eye-outline" class="w-5 h-5" />
+                    {/if}
+                  </button>
+                </div>
+                {#if validErrorpass}
+                  <p class="text-red-500 text-xs mt-1">{validErrorpass}</p>
+                {/if}
+              </div>
+
+              <div class="flex justify-end">
+                <a
+                  href="/forgot"
+                  class="md:text-sm text-xs text-primary-600 hover:text-primary-700 hover:underline underline-offset-2"
+                >Forgot password?</a>
+              </div>
+
+              <button
+                type="submit"
+                class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-lg py-3 font-medium transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center">
+                <Icon icon="heroicons:arrow-right-on-rectangle" class="mr-2" />
+                Sign In
+              </button>
+            </form>
           {/if}
-        </form>
-      {:else}
-        <form method="POST" action="?/login" use:enhance={handleFormSubmit}>
-          <div class="mb-4">
-            <label for="email" class="mb-2 text-gray-600"
-              >Enter your email</label
-            >
-            <input
-              type="text"
-              name="email"
-              id="email"
-              bind:value={email}
-              on:input={validateEmail}
-              placeholder="username@example.com"
-              class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm"
-            />
-            {#if errors.email}
-              <div class="text-red-500 text-xs mt-1 mb-3">{errors.email}</div>
-            {/if}
+          
+          <div class="relative flex py-5 items-center">
+            <div class="flex-grow border-t border-gray-300"></div>
+            <span class="flex-shrink mx-4 text-gray-500 text-sm">OR</span>
+            <div class="flex-grow border-t border-gray-300"></div>
           </div>
-          <label for="password" class="mb-2 text-gray-600"
-            >Enter your password</label
-          >
-          <div class="relative w-full">
-            {#if showPassword}
-              <input
-                name="password"
-                type="text"
-                id="password"
-                bind:value={password}
-                placeholder="********"
-                class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 pr-10"
-              />
-            {:else}
-              <input
-                name="password"
-                type="password"
-                id="password"
-                bind:value={password}
-                placeholder="********"
-                class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 pr-10"
-              />
-            {/if}
-
+          
+          {#if isOtpLogin}
             <button
-              type="button"
-              class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
-              on:click={() => (showPassword = !showPassword)}
+              on:click={() => (isOtpLogin = false)}
+              class="w-full mb-3 flex items-center justify-center py-2.5 px-4 text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition duration-200 font-medium"
             >
-              <Icon
-                icon={showPassword ? "mdi:eye-off" : "mdi:eye"}
-                class="text-lg"
-              />
+              <Icon icon="heroicons:arrow-left" class="mr-2" />
+              <span class="text-sm">Back to Password Login</span>
             </button>
-
-            {#if errors?.password}
-              <div class="text-red-500 text-xs mt-1">{errors.password}</div>
-            {/if}
-          </div>
-          <p class="mb-4 mt-2">
-            <a
-              href="/forgot"
-              class="text-primary-500 hover:text-primary-600 underline"
-              >Forgot password?</a
+          {:else}
+            <button
+              on:click={() => (isOtpLogin = true)}
+              class="w-full mb-3 flex items-center justify-center py-2.5 px-4 text-white bg-primary-500 hover:bg-primary-600 rounded-lg transition duration-200 font-medium"
             >
-          </p>
+              <Icon icon="heroicons:device-phone-mobile" class="mr-2" />
+              <span class="text-sm">Sign In with OTP</span>
+            </button>
+          {/if}
+          
           <button
-            type="submit"
-            class="bg-primary-400 text-sm font-medium hover:bg-primary-500 text-white rounded p-2 w-full text-center"
+            class="w-full flex items-center justify-center py-2.5 px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition duration-200 font-medium"
           >
-            SignIn
+            <a href={linkedinUrl} class="flex items-center">
+              <Icon icon="bi:linkedin" class="mr-2 text-lg" />
+              <span class="text-sm">Sign In with LinkedIn</span>
+            </a>
           </button>
-        </form>
-      {/if}
-      <div class="relative flex items-center my-4 w-full">
-        <div class="flex-grow border-t border-gray-300"></div>
-        <span class="px-2 text-sm text-gray-500 font-bold bg-white">OR</span>
-        <div class="flex-grow border-t border-gray-300"></div>
+        </div>
       </div>
-      {#if isOtpLogin}
-        <button
-          on:click={() => (isOtpLogin = false)}
-          class="w-full flex mb-6 items-center justify-center py-2 px-4 text-white bg-primary-400 hover:bg-primary-500 rounded-md transition duration-200"
-        >
-          <!-- svelte-ignore a11y-invalid-attribute -->
-          <!-- svelte-ignore a11y-missing-attribute -->
-          <a class="flex items-center space-x-2">
-            <Icon icon="fluent-mdl2:signin" class="text-2xl" />
-            <span class="text-sm font-medium">Back to SignIn</span></a
-          ></button
-        >
-      {:else}
-        <button
-          on:click={() => (isOtpLogin = true)}
-          class="w-full flex mb-6 items-center justify-center py-2 px-4 text-white bg-primary-400 hover:bg-primary-500 rounded-md transition duration-200"
-        >
-          <!-- svelte-ignore a11y-invalid-attribute -->
-          <!-- svelte-ignore a11y-missing-attribute -->
-          <a class="flex items-center space-x-2">
-            <Icon icon="fluent-mdl2:signin" class="text-2xl" />
-            <span class="text-sm font-medium">SignIn with OTP</span></a
-          ></button
-        >
-      {/if}
-      <button
-        class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-600 rounded-md transition duration-200"
-        ><a href={linkedinUrl} class="flex items-center space-x-2">
-          <Icon icon="bi:linkedin" class="text-2xl" />
-          <span class="text-sm font-medium">SignIn with LinkedIn</span></a
-        ></button
-      >
     </div>
   </div>
-
-  <div class="hidden md:flex md:w-2/5 flex-grow">
-    <img
-      src="/image.jpg"
-      alt="Sign In"
-      class="object-cover w-full h-full rounded-r-lg"
-    />
-  </div>
+  <Toaster position="bottom-right" richColors />
 </div>
-<Toaster position="bottom-right" richColors />
+
+
+<style>
+  .clip-hexagon {
+    clip-path: polygon(
+      50% 0%,  
+      100% 25%, 
+      100% 75%, 
+      50% 100%, 
+      0% 75%,   
+      0% 25% 
+    );
+  }
+</style>

@@ -9,8 +9,8 @@
 	let messageType=""
 </script>
 
-<div class="flex flex-col py-10 px-4 items-center justify-center bg-gray-50">
-  <h1 class="text-2xl sm:text-4xl font-bold text-gray-800 text-center md:pt-20">Ready To Get Started</h1>
+<div class="flex flex-col pb-10 px-4 items-center justify-center bg-gray-50">
+  <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 text-center md:pt-20">Ready To Get Started</h1>
   <p class="text-md sm:text-lg text-gray-500 mt-2 text-center">To Join Our Community</p>
   <form 
   action="/?/subscribe"

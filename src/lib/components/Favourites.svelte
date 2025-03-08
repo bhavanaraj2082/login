@@ -377,7 +377,7 @@ onMount(() => {
     </div>
 </div>
 {:else} -->
-<div class="pb-4 max-w-7xl mx-auto w-11/12">
+<div class="pb-10 max-w-7xl mx-auto w-11/12">
     <h1 class="sm:text-2xl text-xl font-bold mb-4 md:mb-6">My Favourites</h1>
     {#if !favData || favData.length === 0}
     <div class="flex flex-col items-center justify-center py-12 px-4 border bg-white border-primary-200 rounded-md pb-6">

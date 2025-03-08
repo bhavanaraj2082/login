@@ -10,7 +10,7 @@
   import EmailVerifyPopup from '$lib/components/Profile/EmailVerifyPopup.svelte';
 
   export let data;
-  console.log('profiledata=========>>',data)
+  // console.log('profiledata=========>>',data)
   let activeComp = 0
   let message = ''
   
@@ -47,11 +47,11 @@
 
 
 
-<div class="w-full md:w-11/12 px-4 pb-4 mx-auto max-w-7xl">
+<div class="w-full md:w-11/12 px-4 pb-10 mx-auto max-w-7xl">
   <!-- {#if !isEmailVerified}
     <EmailVerifyPopup/>
   {/if} -->
-  <h1 class=" text-lg md:text-xl font-bold my-2">Profile</h1>
+  <h1 class=" text-lg md:text-xl font-bold mb-4">Profile</h1>
   <div class=" w-full flex flex-col md:flex-row gap-1">
     <div class=" w-full md:w-2/5 lg:w-1/3 xl:w-1/4">
       <ProfileSideBar {changeTabs} />
