@@ -1543,10 +1543,10 @@
                         </p>
                     {/if}
                 </div>
-                <div class="mb-3 rounded">
+                <div class="mb-3 rounded flex items-center justify-end">
                     <button
-                    class="bg-primary-400 hover:bg-primary-500 text-white py-3 px-6 transition duration-300 rounded-lg text-lg font-semibold shadow-md hover:shadow-lg active:scale-95"
-                        on:click={(event) => {
+                    class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+                    on:click={(event) => {
                             // event.preventDefault();
                             if (!formValid()) {
                                 if (Object.keys(errors).length > 0) {

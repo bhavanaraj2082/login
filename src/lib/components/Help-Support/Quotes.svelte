@@ -3,20 +3,25 @@
 import { enhance } from "$app/forms";
 import Icon from '@iconify/svelte';
 import { toast } from "svelte-sonner";
+export let data;
 let products = [{ itemNumber: "", quantity: "" }];
 let exportMaterial = "";
-let firstName = "";
+
+let country= data?.profile?.country||"";
+let firstName = data?.profile?.firstName||"";
+let lastName = data?.profile?.lastName||"";
+let email =  data?.profile?.email||"";
+let phoneNumber = data?.profile?.cellPhone|| "";
+let companyName =  data?.profile?.companyName|| "";
 let formLoading=false;
-let lastName = "";
-let country="";
+
 let searchTerm="";
 let errors={};
-let email = "";
+
 let showSuccesDiv=false;
 let showFailureDiv=false;
 let form;
-let phoneNumber = "";
-let companyName = "";
+
 let location = "";
 let accountNumber = "";
 let streetAddress = "";
@@ -72,7 +77,7 @@ errors.phoneNumber = 'Please select the country before entering the phone number
 return;
 }
 
-if (!phoneNumber || phoneNumber.trim() === '') {
+if (!phoneNumber || phoneNumber === '') {
 errors.phoneNumber = 'Required for the selected country';
 } else {
 const countryDetails = getCountryByCode(country);
@@ -673,7 +678,7 @@ const phoneNumberPatterns = {
   Tonga: /^\d{7}$/
 };
 function validatePhoneNumber(countryCode, phoneNumber) {
-  if (!phoneNumber || !countryCode || phoneNumber.trim() === '') {
+  if (!phoneNumber || !countryCode || phoneNumber=== '') {
     // errors.contactNumber = `*Required`;
     return false;
   }
@@ -776,6 +781,10 @@ if (useShippingAddress) {
 }
 };
 const handlesubmit = async (data) => {
+     if (!formValid()) {
+            cancel();
+            return;
+        }
 try {
     const result = await submitForm(data);
     console.log(result, "result");
@@ -1153,7 +1162,7 @@ use:enhance={handlesubmit}
         <select
           name="shippinglocation"
           bind:value={shippinglocation}
-          on:input={() => validateField('shippinglocation')}
+          on:click={() => validateField('shippinglocation')}
           class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         >
@@ -1249,7 +1258,7 @@ use:enhance={handlesubmit}
         <select
           name="billingLocation"
           bind:value={billingLocation}
-          on:input={() => validateField('billingLocation')}
+          on:click={() => validateField('billingLocation')}
           class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
           required
         >
@@ -1288,6 +1297,7 @@ use:enhance={handlesubmit}
      // Check form validity
      if (!formValid()) {
        toast.error('Please fill all the required fields.');
+       event.preventDefault();
        return;
      }
 

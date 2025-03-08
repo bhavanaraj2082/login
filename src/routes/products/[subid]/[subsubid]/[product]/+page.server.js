@@ -105,7 +105,7 @@ export const actions = {
       console.error("Error in action:", error);
       return {
         type: "error",
-        message: "An error occurred while processing the request.",
+        message: "Something went wrong. Please try again later",
       };
     }
   },

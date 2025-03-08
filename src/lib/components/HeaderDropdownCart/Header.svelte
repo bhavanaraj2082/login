@@ -204,7 +204,8 @@ async function submitForm() {
 		}, 50000);
 	}
 	function navigateTo(url) {
-		window.location.href = url;
+		goto(url)
+		//window.location.href = url;
 		isLiked = false;
 	}
 	let isOpen = false;
@@ -366,11 +367,11 @@ async function submitForm() {
 				</button>
 			{/each}
 			<div class="flex flex-col font-semibold">
-				<button
+				<!-- <button
 					on:click={() => navigateTo('/quick-order')}
 					class="text-left text-white text-md transition duration-200 w-full py-2 px-4 font-medium">
 					Quick Order
-				</button>
+				</button> -->
 				<button
 					on:click={() => navigateTo('/order-status')}
 					class="text-left text-white text-md transition duration-200 w-full py-2 px-4 font-medium">
@@ -404,7 +405,7 @@ async function submitForm() {
 			<button
 				on:click={toggleLogoMenu}
 				class="flex items-center text-gray-600 focus:outline-none">
-				<Icon icon="fa6-solid:bars" class=" text-md text-white" />
+				<Icon icon="fa6-solid:bars" class=" text-xl text-white" />
 			</button>
 			<div class="relative flex items-center justify-center w-12  h-6 rounded-full cursor-pointer pl-1.5 bg-primary-100 border border-primary-400">
 				<div class="relative flex items-center justify-between w-full h-full transition-all duration-300 ease-in-out">
@@ -441,16 +442,16 @@ async function submitForm() {
 				on:click={() => {
 					navigateTo('/');
 				}}
-				class="flex items-center hover:text-primary-100 text-white text-md sm:text-3xl font-poppins md:mb-0 py-2 font-roboto font-bold">
+				class="flex items-center text-white text-lg sm:text-3xl font-poppins md:mb-0 py-2 font-roboto font-bold">
 				Chemikart
 			</button>
 		</div>
 		<!-- SMALL -->
-		<div class="md:hidden flex items-center gap-1">
+		<div class="md:hidden flex items-center gap-0.5">
 			{#if $authedUser.email}
 						<div class="relative " bind:this={dropdown}>
 				<button
-						class="sm:w-6 sm:h-6 w-4 h-4 p-0.5 flex items-center justify-center bg-white text-primary-400 font-semibold rounded-full text-sm sm:text-lg"
+						class="sm:w-6 sm:h-6 w-4 h-4 flex items-center justify-center bg-white text-primary-400 font-semibold rounded-full text-sm sm:text-lg"
 						on:click={handleProfile}>
 						{getInitial(userName)}
 				</button>
@@ -465,6 +466,21 @@ async function submitForm() {
 						My Dashboard
 					  </button>
 					  <button
+						on:click={() => navigateTo('/dashboard/mycart')}
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						My Carts
+					  </button>
+					  <button
+						on:click={() => navigateTo('/dashboard/myorders')}
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						My Orders
+					  </button>
+					  <button
+						on:click={() => navigateTo('/dashboard/myquotes')}
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						My Quotes
+					  </button>
+					  <button
 						on:click={() => navigateTo('/logout')}
 						class="loginbtn block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
 						Logout
@@ -476,8 +492,8 @@ async function submitForm() {
 		{:else}
 			<div class="flex items-center justify-between">
 				<div class="relative bg-primary-400" bind:this={dropdown}>
-						<button class="w-4 h-4 flex items-center justify-center text-primary-400 bg-white rounded-full" on:click={handleProfile}>
-						<Icon icon="tdesign:user-filled" class="w-4 h-4 flex items-center justify-center bg-white text-primary-400 rounded-full p-1"/>
+						<button class="w-5 h-5 flex items-center justify-center text-primary-400 bg-white rounded-full" on:click={handleProfile}>
+						<Icon icon="tdesign:user-filled" class="w-5 h-5 flex items-center justify-center bg-white text-primary-400 rounded-full p-1"/>
 					</button>
 					{#if showUserOptions}
 					<div class="relative">
@@ -485,10 +501,15 @@ async function submitForm() {
 						  <!-- Triangle -->
 						  <div class="absolute top-[-7px] right-1 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white transform rotate-180"></div>
 					  
-						  <button
+						  <!-- <button
 							on:click={() => navigateTo('/login')}
 							class="block px-4 font-workSans py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
 							Login
+						  </button> -->
+						  <button
+							on:click={() => navigateTo('/signin')}
+							class="block px-4 font-workSans py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+							SignIn
 						  </button>
 						  <button
 							on:click={() => navigateTo('/signup')}
@@ -505,8 +526,8 @@ async function submitForm() {
 				<button
 					on:click={toggleLike}
 					aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
-					class="py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}">
-					<Icon icon={isFavoritePage ? heartFilled : heartOutline} class="text-lg sm:text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out" />
+					class="py-2 ml-1.5 md:ml-0 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}">
+					<Icon icon={isFavoritePage ? heartFilled : heartOutline} class="text-2xl sm:text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out" />
 				</button>
 			</a>
 			<Cartrightside {cartId}/>	
@@ -524,16 +545,16 @@ async function submitForm() {
 						bind:value={searchQuery}
 						name="query"
 						on:input={handleInput}
-						class=" border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 w-full px-3 py-3 text-sm placeholder:text-xs truncate pr-12 sm:pr-10"/>
+						class=" border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 w-full px-3 py-2 md:py-3 text-sm placeholder:text-xs truncate pr-12 sm:pr-10"/>
 					{#if isLoading}
 						<div class="absolute right-3 top-1/2 transform -translate-y-1/2">
 							<Icon icon="ei:spinner" class="w-8 h-8 animate-spin text-primary-600 opacity-75 text-5xl"/>
 						</div>
 					{/if}
 					<button
-						class="absolute right-1 sm:top-1/2 top-[42%] transform -translate-y-1/2 bg-primary-400 text-white w-10 h-10 flex items-center justify-center rounded-md"
+						class="absolute right-0.5 md:right-1 sm:top-1/2 top-[42%] transform -translate-y-1/2 bg-primary-400 text-white p-2 flex items-center justify-center rounded-md"
 						on:click={handleSubmitBtn}>
-						<Icon icon="feather:search" style="width: 25px; height: 25px;" />
+						<Icon icon="feather:search" class=" text-md md:text-xl" />
 					</button>
 				</div>
 				{#if searchQuery.trim() && searchResults && searchResults.length > 0}
@@ -602,19 +623,25 @@ async function submitForm() {
 		</div>
 			{:else}
 				<div class="flex items-center justify-between">
-					<button
+					<!-- <button
 						on:click={() => {
 							navigateTo('/login');
 						}}
 						class="loginbtn  font-workSans text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
-						>Login</button>
+						>Login</button> -->
+					<button
+						on:click={() => {
+							navigateTo('/signin');
+						}}
+						class="loginbtn  font-workSans text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
+						>SignIn</button>
 					<Icon icon="vaadin:line-v" class="mr-0 text-white font-semibold" />
 					<button
 						on:click={() => {
 							navigateTo('/signup');
 						}}
 						class=" registerbtn font-workSans pr-2  text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
-						>Register</button>
+						>SignUp</button>
 				</div>
 			{/if}
 		</div>
@@ -636,7 +663,7 @@ async function submitForm() {
 								class={`flex items-center hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-white scale-105' : 'text-white'}`}
 								role="menuitem">
 								{menu.title}
-								{#if index < 5 && menu.title !== 'Documents' && menu.title !== 'Support'}
+								{#if index < 5 && menu.title !== 'Documents' && menu.title !== 'Support' && menu.title !== 'Quick Order'}
 									<Icon icon="prime:chevron-down" class="ml-1 w-5 h-5 " />
 								{/if}
 							</button>
@@ -692,17 +719,10 @@ async function submitForm() {
 						{/if}
 					</div>
 				{/each}
-				<a href="/quick-order">
-					<button 
-					class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap hover:scale-105 ">
-						<span class="text-white text-xs lg:text-base font-medium">
-							Quick Order
-						</span>
-					</button>
-				</a>
 			</div>
 				
-			<div class="flex gap-2 text-gray-600 items-center ">
+			<div class="flex gap-1 text-gray-600 items-center ">
+
 				<!-- <a href="/quick-order">
 					<button 
 					class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium">
@@ -718,8 +738,8 @@ async function submitForm() {
 						</span>
 					</button>
 				</a> -->
-				<div class="relative flex items-center justify-center lg:space-x-2 lg:pr-5">
-							<div class="relative flex items-center justify-between bg-white border-2 border-white w-28 lg:w-40 h-8 bottom-1 rounded-md cursor-pointer">
+				<div class="relative flex items-center justify-center lg:space-x-2 lg:pr-4">
+							<div class="relative flex items-center justify-between bg-white border-2 border-white w-28 lg:w-32 h-8 bottom-0.5 rounded-md cursor-pointer">
 								<div class="absolute flex items-center justify-between w-full h-full transition-all duration-300 ease-in-out">
 									<button 
 										class="w-1/2 h-full flex items-center justify-center text-gray-600 z-10 text-xs"
@@ -765,8 +785,8 @@ async function submitForm() {
 						<button
 							on:click={toggleLike}
 							aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
-							class="py-2 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}">
-							<Icon icon={isFavoritePage ? heartFilled : heartOutline} class="text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out"/>
+							class=" rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}">
+							<Icon icon={isFavoritePage ? heartFilled : heartOutline} class="text-3xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out"/>
 						</button>
 					</a>
 				</div>

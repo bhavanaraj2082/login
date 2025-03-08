@@ -8,7 +8,7 @@
   import { toast } from "svelte-sonner";
   let uploadedRows = [];
   let showSavedCarts = false;
-  console.log(currencyState, "currencyState");
+  // console.log(currencyState, "currencyState");
   export let data;
   // console.log("daa", data);
   // console.log(data?.authedUser?.email,"i am email")
@@ -181,27 +181,35 @@
   }
 
   let selectedProducts = {};
-  function selectProduct(product, index, size) {
-    console.log("Starting selectProduct for index:", index);
-    console.log("Previous selectedProducts:", selectedProducts);
-    const currentQuantity = selectedProducts[index]?.quantity || 1;
+  function selectProduct(product, index, sizeObject) {
+  console.log("Starting selectProduct for index:", index);
+
+  const sizeValue = sizeObject.break || null;
+
+  // Check if product already exists
+  if (rows[index]) {
     rows[index] = {
       ...rows[index],
-      sku: `${product.productNumber} - ${size.break}`,
-      size: size.break,
+      sku: sizeValue ? `${product.productNumber} - ${sizeValue}` : product.productNumber,
+      size: sizeValue,
       filteredProducts: [],
-      selectedSize: size.break,
-      quantity: rows[index].quantity,
+      selectedSize: sizeValue ? sizeValue : product.productNumber,
+      quantity: rows[index].quantity || 1,
       selectedProduct: product,
     };
+
     selectedProducts[index] = {
       ...product,
-      quantity: currentQuantity,
-      size: size.break,
+      quantity: rows[index].quantity || 1,
+      size: sizeValue,
     };
 
+    // Ensure availability check is run after updating rows
     checkAvailability();
+  } else {
+    console.error("No row found at index:", index);
   }
+}
 
   function clearSearch(index) {
     rows[index].sku = "";
@@ -394,7 +402,13 @@
   //   }
   //   cartPopup.style.display = "flex";
   // }
-
+  let cartItemsValue = '';
+  
+  // Function to update cart items value whenever quantity changes
+  function updateCartItemsValue() {
+    cartItemsValue = JSON.stringify([prepareCartItem()]);
+    console.log("Updated cartItemsValue:", cartItemsValue);
+  }
   function closeCartPopup(event) {
     event.stopPropagation();
 
@@ -585,6 +599,7 @@
     showDetailsModal = true;
     console.log("Selected Product:", selectedProduct);
     console.log("Selected Product Index:", selectedProductIndex);
+    updateCartItemsValue();
   };
 
   function addRows() {
@@ -599,22 +614,51 @@
 
     rows = [...rows, ...newRows.map((row) => ({ ...row }))];
   }
+  function increaseQuantity() {
+    if (selectedProduct && selectedProduct.quantity < 9999) {
+      selectedProduct = {
+        ...selectedProduct,
+        quantity: selectedProduct.quantity + 1,
+      };
+      
+      // Update the rows array too
+      if (selectedProductIndex !== undefined && selectedProductIndex !== null) {
+        const updatedRows = [...rows];
+        if (updatedRows[selectedProductIndex]) {
+          updatedRows[selectedProductIndex] = {
+            ...updatedRows[selectedProductIndex],
+            quantity: selectedProduct.quantity
+          };
+          rows = updatedRows;
+        }
+      }
+      
+      // Update the form value
+      updateCartItemsValue();
+    }
+  }
+  
   function decreaseQuantity() {
     if (selectedProduct && selectedProduct.quantity > 1) {
       selectedProduct = {
         ...selectedProduct,
         quantity: selectedProduct.quantity - 1,
       };
-      const rowIndex = rows.findIndex(
-        (row) =>
-          row.selectedProduct?.productNumber === selectedProduct.productNumber,
-      );
-      if (rowIndex !== -1) {
-        rows[rowIndex] = {
-          ...rows[rowIndex],
-          quantity: selectedProduct.quantity,
-        };
+      
+      // Update the rows array too
+      if (selectedProductIndex !== undefined && selectedProductIndex !== null) {
+        const updatedRows = [...rows];
+        if (updatedRows[selectedProductIndex]) {
+          updatedRows[selectedProductIndex] = {
+            ...updatedRows[selectedProductIndex],
+            quantity: selectedProduct.quantity
+          };
+          rows = updatedRows;
+        }
       }
+      
+      // Update the form value
+      updateCartItemsValue();
     }
   }
 
@@ -626,7 +670,7 @@
 
   function hideDetails() {
     showDetailsModal = false;
-    selectProduct = null;
+    // selectProduct = null;
   }
 
   function findProductBySku(sku) {
@@ -659,24 +703,7 @@
     }
   }
 
-  function increaseQuantity() {
-    if (selectedProduct && selectedProduct.quantity < 9999) {
-      selectedProduct = {
-        ...selectedProduct,
-        quantity: selectedProduct.quantity + 1,
-      };
-      const rowIndex = rows.findIndex(
-        (row) =>
-          row.selectedProduct?.productNumber === selectedProduct.productNumber,
-      );
-      if (rowIndex !== -1) {
-        rows[rowIndex] = {
-          ...rows[rowIndex],
-          quantity: selectedProduct.quantity,
-        };
-      }
-    }
-  }
+
   let showCartMessage = false;
   let showQuoteModal = false;
   let productQuote = {};
@@ -1074,11 +1101,11 @@ function handleDataCart() {
             icon="mingcute:warning-line"
             class="text-primary-500 text-4xl shrink-0"
           />
-          <a href="/login"
-            ><span class="hover:text-primary-600 text-primary-400"
-              >Sign in
-            </span> to import items from your recent orders and quotes.</a
-          >
+          <!-- <a href="/login"> -->
+          <a href="/signin">
+            <span class="hover:text-primary-600 text-primary-400">
+              Sign In
+            </span> to import items from your recent orders and quotes.</a>
         </div>
       </div>
     {/if}
@@ -1172,7 +1199,7 @@ function handleDataCart() {
                                     checked={row.selectedSize ===
                                       `${result.productNumber}-${size.break}`}
                                     on:change={() =>
-                                      selectProduct(result, index, size)}
+                                      selectProduct(result, index,size)}
                                   />
                                   <label for="size-{size.break}"
                                     >{result.productNumber} - {size.break}</label
@@ -1191,8 +1218,7 @@ function handleDataCart() {
                                 bind:group={row.selectedSize}
                                 checked={row.selectedSize ===
                                   result.productNumber}
-                                on:change={() =>
-                                  selectProduct(result, index, { size: null })}
+  on:change={() => selectProduct(result, index, { break: null })}
                               />
                               <label for="product-{result.productNumber}"
                                 >{result.productNumber}</label
@@ -1211,8 +1237,7 @@ function handleDataCart() {
                                 bind:group={row.selectedSize}
                                 checked={row.selectedSize ===
                                   result.productNumber}
-                                on:change={() =>
-                                  selectProduct(result, index, { size: null })}
+                               on:change={() => selectProduct(result, index, { break: null })}
                               />
                               <label for="product-{result.productNumber}"
                                 >{result.productNumber}</label
@@ -1638,7 +1663,7 @@ function handleDataCart() {
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 px-4 sm:px-5"
+      class="fixed !ml-0 inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 px-4 sm:px-5"
       on:click|self={hideDetails}
     >
       <div
@@ -1666,6 +1691,7 @@ function handleDataCart() {
           use:enhance={() => {
             return async ({ result }) => {
               stockStatus = result.data.record.message;
+              
             };
           }}
         >
@@ -1684,16 +1710,26 @@ function handleDataCart() {
             </button>
 
             <input
-              type="text"
-              name="quantity"
-              bind:value={selectedProduct.quantity}
-              class="w-16 h-10 text-center p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-400"
-              on:input={() => {
-                if (selectedProduct.quantity < 1) selectedProduct.quantity = 1;
-                if (selectedProduct.quantity > 9999)
-                  selectedProduct.quantity = 9999;
-              }}
-            />
+            type="text"
+            name="quantity"
+            bind:value={selectedProduct.quantity}
+            class="w-16 h-10 text-center p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-400"
+            on:input={() => {
+              if (selectedProduct.quantity < 1) selectedProduct.quantity = 1;
+              if (selectedProduct.quantity > 9999) selectedProduct.quantity = 9999;
+              if (selectedProductIndex !== undefined && selectedProductIndex !== null) {
+                const updatedRows = [...rows];
+                if (updatedRows[selectedProductIndex]) {
+                  updatedRows[selectedProductIndex] = {
+                    ...updatedRows[selectedProductIndex],
+                    quantity: selectedProduct.quantity
+                  };
+                  rows = updatedRows;
+                }
+              }
+              updateCartItemsValue();
+            }}
+          />
 
             <button
               class="flex justify-center items-center w-10 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
@@ -1709,13 +1745,10 @@ function handleDataCart() {
               Check Availability
             </button>
           </div>
-        </form>
-
-        <p class="mt-4 text-sm text-gray-600 flex items-center">
-          <span class="ml-2">{stockStatus}</span>
-        </p>
-
-        {#if selectedProduct.stockType === "success"}
+          <p class="mt-4 text-sm text-gray-600 flex items-center">
+            <span class="ml-2">{stockStatus}</span>
+          </p>
+          {#if selectedProduct.stockType === "success"}
           <div class="mt-4 text-sm text-green-600">
             <p>{selectedProduct.stockAvailability}</p>
           </div>
@@ -1724,55 +1757,61 @@ function handleDataCart() {
             <p>{selectedProduct.stockAvailability}</p>
           </div>
         {/if}
+        </form>
+
+       
+
+
         {#if data?.authedUser && data?.authedUser?.id}
         <form
-          method="POST"
-          action="?/addToCart"
-          bind:this={form}
-          use:enhance={() => {
-            return async ({ result }) => {
-              console.log(result, "result");
+        method="POST"
+        action="?/addToCart"
+        bind:this={form}
+        use:enhance={() => {
+          
+          return async ({ result }) => {
+            console.log(result, "result");
       
-              if (result.type === "success") {
-                const resultData = result.data;
-                console.log(resultData, "resultData");
+            if (result.type === "success") {
+              const resultData = result.data;
+              console.log(resultData, "resultData");
       
-                if (resultData && resultData.success === true) {
-                  const cartItem = prepareCartItem();
-                  console.log(cartItem,"cartItem");
-                  
-                  toast.success(`Product added to the cart!`);
-                  cartRowIndexToBeCleared = cartItem.rowIndex; 
-                  console.log(cartRowIndexToBeCleared,"cartRowIndexToBeCleared");
-                  
-                  setTimeout(() => {
-              clearSelectedProductcart(cartRowIndexToBeCleared);
-            }, 1000); 
+              if (resultData && resultData.success === true) {
+                const cartItem = prepareCartItem();
+                console.log(cartItem, "cartItem");
+                
+                toast.success(`Product added to the cart!`);
+                cartRowIndexToBeCleared = cartItem.rowIndex; 
+                console.log(cartRowIndexToBeCleared, "cartRowIndexToBeCleared");
+                
+                setTimeout(() => {
+                  clearSelectedProductcart(cartRowIndexToBeCleared);
+                }, 1000); 
       
-                  showCartMessage = true;
-                  hideDetails();
-                } else {
-                  toast.error(resultData.message || "Failed to add item to cart");
-                }
+                showCartMessage = true;
+                hideDetails();
               } else {
-                toast.error("Failed to add item to cart");
+                toast.error(resultData.message || "Failed to add item to cart");
               }
-            };
-          }}
-        >
-          <input
-            type="hidden"
-            name="cartItems"
-            value={JSON.stringify([prepareCartItem()])}
-          />
+            } else {
+              toast.error("Failed to add item to cart");
+            }
+          };
+        }}
+      >
+        <input
+          type="hidden"
+          name="cartItems"
+          value={cartItemsValue}
+        />
       
-          <button
-            class="mt-6 w-full sm:w-auto p-3 text-white bg-primary-500 rounded flex items-center justify-center gap-2 hover:bg-primary-600 transition"
-            type="submit"
-          >
-            Add to Cart
-          </button>
-        </form>
+        <button
+          class="mt-6 w-full sm:w-auto p-3 text-white bg-primary-500 rounded flex items-center justify-center gap-2 hover:bg-primary-600 transition"
+          type="submit"
+        >
+          Add to Cart
+        </button>
+      </form>
       {:else}
 
         <button

@@ -606,19 +606,23 @@
           </p>
         {/if}
         <!-- Product Returnable Section -->
-        {#if product?.returnPolicy}
+        {#if !product?.returnPolicy}
+          <!-- <div class="flex items-center gap-1 text-green-500 font-medium text-xs mt-2">
+          <Icon icon="material-symbols:verified" class="text-base text-green-600" />
+          <span>Returns Accepted</span>
+        </div>
+      {:else} -->
           <div
-            class="flex items-center gap-1 text-green-600 font-medium text-xs mt-2"
+            class="flex items-center gap-2 text-red-500 font-medium text-sm mt-2"
           >
-            <Icon icon="ix:success-filled" class="text-base text-green-500" />
-            <span>Returns Accepted</span>
+            <Icon
+              icon="clarity:shopping-cart-solid-badged"
+              class="text-xl font-medium text-red-600"
+            />
+            <span>Non-Returnable</span>
           </div>
-          <!-- {:else}
-              <div class="flex items-center gap-2 text-red-500 font-medium text-sm mt-2">
-                <Icon icon="mdi:close-circle" class="text-lg text-red-500" />
-                <span>Non-Returnable</span>
-              </div> -->
         {/if}
+
         {#if product.productSynonym}
           <div class="flex justify-between !mt-3">
             <p class="text-gray-900 text-sm font-semibold text-start">
@@ -888,110 +892,116 @@
                       Enter quantity to check availability.
                     </p>
 
-                    <form
-                      method="POST"
-                      action="?/checkavailabilityproduct"
-                      use:enhance={() => {
-                        return async ({ result }) => {
-                          let status = "";
-                          console.log(result);
-                          status = result.type;
-                          console.log("success/error type:", status);
-                          console.log(
-                            "success/error message:result.data.message=",
-                            result.data.message
-                          );
-                          console.log(
-                            "success/error message:result.data.message=",
-                            result.data.stock
-                          );
-                          stockStatus = result.data.stock;
-                          stockAvailability = result.data.message;
-                          // stockUnAvailability = result.data.message1;
-                          stockType = result.data.type;
-                        };
-                      }}
-                    >
-                      <div class="flex justify-between items-center mt-6">
-                        <div class="flex items-center space-x-4">
-                          <button
-                            on:click={decreaseQuantity}
-                            class="w-8 h-8 text-primary-400 flex items-center justify-center"
-                          >
-                            <Icon icon="ic:round-minus" class="text-2xl" />
-                          </button>
-                          <input
-                            type="text"
-                            name="quantity"
-                            bind:value={quantity}
-                            readonly
-                            class="w-16 h-8 text-center border border-gray-300 rounded-md"
-                          />
-                          <input
-                            type="hidden"
-                            name="ProductId"
-                            value={product.productNumber}
-                          />
-                          <button
-                            on:click={increaseQuantity}
-                            class="w-8 h-8 text-primary-400 flex items-center justify-center"
-                          >
-                            <Icon icon="ic:round-plus" class="text-2xl" />
-                          </button>
-                        </div>
-
+                    <div class="flex gap-10 mt-6">
+                      <div
+                        class="flex items-center space-x-4 border border-gray-300 rounded"
+                      >
                         <button
-                          type="submit"
-                          class="bg-primary-400 text-white p-2 rounded-lg flex items-center space-x-1"
+                          on:click={decreaseQuantity}
+                          class="w-8 h-8 text-primary-400 flex items-center justify-center"
                         >
-                          <Icon
-                            icon="tabler:calendar-check"
-                            class="text-base"
-                          />
-                          <span class="text-sm">Check Availability</span>
+                          <Icon icon="ic:round-minus" class="text-2xl" />
+                        </button>
+                        <input
+                          type="text"
+                          name="quantity"
+                          bind:value={quantity}
+                          on:input={updateQuantity}
+                          class="w-14 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
+                        />
+
+                        <input
+                          type="hidden"
+                          name="ProductId"
+                          value={product.productNumber}
+                        />
+                        <button
+                          on:click={increaseQuantity}
+                          class="w-8 h-8 text-primary-400 flex items-center justify-center"
+                        >
+                          <Icon icon="ic:round-plus" class="text-2xl" />
                         </button>
                       </div>
+                      <form
+                        method="POST"
+                        action="?/checkavailabilityproduct"
+                        use:enhance={() => {
+                          return async ({ result }) => {
+                            let status = "";
+                            console.log(result);
+                            status = result.type;
+                            console.log("success/error type:", status);
+                            console.log(
+                              "success/error message:result.data.message=",
+                              result.data.message
+                            );
+                            console.log(
+                              "success/error message:result.data.message=",
+                              result.data.stock
+                            );
+                            stockStatus = result.data.stock;
+                            stockAvailability = result.data.message;
+                            // stockUnAvailability = result.data.message1;
+                            stockType = result.data.type;
+                          };
+                        }}
+                      >
+                        <input type="hidden" name="quantity" value={quantity} />
+                        <input
+                          type="hidden"
+                          name="ProductId"
+                          value={product.productNumber}
+                        />
+                        <button
+                          type="submit"
+                          class="bg-primary-400 text-white p-2 rounded flex items-center space-x-1"
+                        >
+                          <Icon icon="tabler:calendar-check" class="text-lg" />
+                          <span class="text-sm">Check Availability</span>
+                        </button>
+                      </form>
+                    </div>
 
-                      {#if stockType === "success"}
-                        <div class="mt-6 space-y-2 text-sm">
+                    {#if stockType === "success"}
+                      <div class="mt-6 space-y-2 text-sm">
+                        <div class="flex items-center space-x-2">
+                          <!-- <Icon icon="ix:success-filled" class="text-base text-green-500" /> -->
+                          <Icon
+                            icon="ix:success-filled"
+                            class="text-lg text-green-500"
+                          />
+                          <p>{stockAvailability}</p>
+                        </div>
+                        {#if stockUnAvailability !== ""}
                           <div class="flex items-center space-x-2">
                             <Icon
-                              icon="material-symbols:check-circle-outline"
-                              class="text-sm text-primary-400"
+                              icon="ix:success-filled"
+                              class="text-lg text-green-500"
                             />
-                            <p>{stockAvailability}</p>
+                            <p>{stockUnAvailability}</p>
                           </div>
-                          {#if stockUnAvailability !== ""}
-                            <div class="flex items-center space-x-2">
-                              <Icon
-                                icon="material-symbols:check-circle-outline"
-                                class="text-sm text-primary-400"
-                              />
-                              <p>{stockUnAvailability}</p>
-                            </div>
-                          {/if}
+                        {/if}
+                      </div>
+                    {:else if stockType === "error"}
+                      <div class="mt-6 space-y-2 text-sm">
+                        <div class="flex items-center space-x-2">
+                          <Icon
+                            icon="meteor-icons:circle-xmark"
+                            class="text-sm text-primary-400"
+                          />
+                          <p>{stockAvailability}</p>
                         </div>
-                      {:else if stockType === "error"}
-                        <div class="mt-6 space-y-2 text-sm">
-                          <div class="flex items-center space-x-2">
-                            <Icon
-                              icon="meteor-icons:circle-xmark"
-                              class="text-sm text-primary-400"
-                            />
-                            <p>{stockAvailability}</p>
-                          </div>
-                        </div>
-                      {/if}
-                    </form>
-                    <div class="mt-6 flex justify-end">
+                      </div>
+                    {/if}
+                    <div class="mt-8 flex justify-end">
                       <button
                         on:click={() => addToCart(product, index)}
-                        class="bg-primary-400 text-white py-2 px-4 rounded-lg flex items-center space-x-1"
+                        class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
                       >
                         <Icon
                           icon="ic:round-shopping-cart"
-                          class="text-2xl"
-                        />Add To Cart
+                          class="text-xl"
+                        /><span class="text-sm">Add To Cart</span>
                       </button>
                     </div>
                   </div>
@@ -1250,7 +1260,7 @@
 
           <!-- Title -->
           <h2 class="text-xl font-bold text-gray-900 text-center mb-6">
-            Please Login or Register to Continue
+            Please SignIn or Register to Continue
           </h2>
 
           <!-- Login Button -->
@@ -1258,7 +1268,8 @@
             <button
               class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-sm text-white font-medium py-2.5 px-2 rounded-lg shadow-lg mb-4"
             >
-              <a href="/login" class="block">Login</a>
+              <!-- <a href="/login" class="block">Login</a> -->
+              <a href="/signin" class="block">SignIn</a>
             </button>
 
             <!-- Register Section -->

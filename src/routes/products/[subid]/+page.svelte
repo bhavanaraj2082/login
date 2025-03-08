@@ -38,6 +38,6 @@
 </script>
 
 <SEO {metadata} />
-<div>
+<div class="pt-2">
   <Subcategory {data} />
 </div>

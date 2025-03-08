@@ -2541,13 +2541,15 @@ export const addToCart = async(item,userId,userEmail)=>{
 		cart = await Cart.create({cartId:nanoid(8),cartName:"mycart",cartItems:item,userId,userEmail,isActiveCart:true})
 		return {success:true,message:"Product is added to cart"}
 	}else{
-		const findItem = search.cartItems.find(x=>x.productId.toString() === item.productId)
-		//console.log(searchsssss,"sdffffffffff");
+		const findItem = search.cartItems.find(x=>x.stockId.toString() === item.stockId)
+	   // console.log(search,"sdffffffffff");
 		if(findItem === undefined){
 		cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$push:{cartItems:item}},{new:true})
 		return {success:true,message:"Product is added to cart"}
 		}else{
-		cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$set:{cartItems:item}},{new:true})
+		 findItem.quantity = item.quantity
+		 findItem.backOrder = item.backOrder
+		cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$set:{cartItems:search.cartItems}},{new:true})
 		return {success:true,message:"Product quantity is updated in cart"}
 		}
 	}

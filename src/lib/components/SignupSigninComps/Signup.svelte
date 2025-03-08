@@ -1457,10 +1457,16 @@
     <h2 class="text-2xl font-bold text-primary-500">Sign Up</h2>
     <p class="text-gray-500 mb-5">
       Already have an account? <a
+        href="/signin"
+        class="underline text-primary-500 hover:text-primary-600">SignIn.</a
+      >
+    </p>
+    <!-- <p class="text-gray-500 mb-5">
+      Already have an account? <a
         href="/login"
         class="underline text-primary-500 hover:text-primary-600">Login.</a
       >
-    </p>
+    </p> -->
 
     <form method="POST" action="?/register" use:enhance={handleFormSubmission}>
       <!-- <div class="flex items-center gap-3 mx text-md mt-2 mb-5">
@@ -1781,7 +1787,7 @@
               errors.lastName = !lastName
                 ? "*Required"
                 : !/^[a-zA-Z\s]+$/.test(lastName)
-                  ? "Company type can only contain letters and spaces"
+                  ? "Lastname can only contain letters and spaces"
                   : "";
             }}
           />

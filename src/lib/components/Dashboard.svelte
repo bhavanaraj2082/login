@@ -42,17 +42,24 @@
 
 <section class="bg-gray-50">
   <div class="max-w-7xl mx-auto px-4 lg:px-8 py-2">
-    <div class="flex flex-col lg:flex-row gap-4">
+    <div class="flex flex-col lg:flex-row gap-4 pb-2">
       <Navigation {...navigationProps} />
       <div class="flex-1 space-y-6">
         <div class="bg-white rounded shadow p-4">
-          <div class="flex flex-col sm:flex-row items-center justify-between">
+          <div class="flex flex-col sm:flex-row justify-between">
+            {#if isLoading}
+            <!-- <div class="flex flex-col"> -->
+              <div class="h-4 bg-gray-200 rounded md:w-1/3 w-full mb-2"></div>
+              <div class="h-4 bg-gray-200 rounded md:w-1/4 w-full"></div>
+            <!-- </div> -->
+            {:else}
             <div>
               <h1 class="sm:text-xl text-md font-semibold text-gray-800">
                 Welcome, <span class="text-primary-600 capitalize">{user?.firstname || 'Guest'}</span>
               </h1>
               <p class="text-gray-500 sm:text-sm text-xs mt-1">{user?.email || 'N/A'}</p>
             </div>
+            {/if}
             {#if !isRegistrationComplete}
               <button 
                 class="sm:px-6 sm:py-2.5 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-500 transition-all duration-200 shadow-sm hover:scale-95 flex items-center gap-2 mt-4 sm:mt-0"
@@ -163,7 +170,7 @@
         {:else if isRegistrationComplete}
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {#each cardsData as card}
-              <div class="bg-white rounded shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden group">
+              <div class="bg-white rounded shadow hover:shadow-md transition-shadow duration-200 overflow-hidden group">
                 <div class="p-6">
                   <div class="flex items-start justify-between mb-4">
                     <h3 class="sm:text-xl text-md font-semibold text-gray-800 group-hover:text-primary-600 transition-colors">
@@ -183,7 +190,7 @@
               </div>
             {/each}
           </div>
-          <div class="bg-white rounded shadow-sm overflow-hidden">
+          <div class="bg-white rounded shadow overflow-hidden">
             <div class="p-3 border-b-1 border-gray-100">
               <div class="flex items-center justify-between">
                 <h2 class="sm:text-xl text-sm font-semibold text-gray-800">Recent Orders</h2>
@@ -202,7 +209,9 @@
                       <th class="px-6 py-3 text-sm font-semibold text-gray-600 text-center">Order ID</th>
                       <th class="px-6 py-3 text-sm font-semibold text-gray-600 text-center">Invoice Number</th>
                       <th class="px-6 py-3 text-sm font-semibold text-gray-600 text-center">Total Amount</th>
-                      <th class="px-6 py-3 text-sm font-semibold text-gray-600 text-center">Purchase Order</th>
+                      {#if recentOrders.some(order => order?.purchaseorder)}
+                        <th class="px-6 py-3 text-sm font-semibold text-gray-600 text-center">Purchase Order</th>
+                      {/if}
                       <th class="px-6 py-3 text-sm font-semibold text-gray-600 text-center">Status</th>
                     </tr>
                   </thead>
@@ -218,11 +227,13 @@
                             N/A
                           {/if}
                         </td>
+                        {#if order?.purchaseorder}
                         <td class="px-6 py-4 text-sm text-gray-600 text-center">{order?.purchaseorder || 'N/A'}</td>
+                        {/if}
                         <td class="px-6 py-4 flex justify-center">
                           <a href={`/order-status/${order?.orderid}?email=${userEmail}`} 
                              class="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700">
-                            <Icon icon="heroicons:chart-bar" class="text-lg"/>
+                            <Icon icon="carbon:ai-governance-tracked" class="text-lg"/>
                             <span class="text-sm">Track Order</span>
                           </a>
                         </td>
@@ -238,7 +249,7 @@
               </div>
             {/if}
           </div>
-          <div class="bg-white rounded shadow-sm p-6">
+          <div class="bg-white rounded shadow p-6">
             <div class="flex items-start gap-4">
               <div class="hidden sm:block p-1 sm:p-3 bg-primary-50 rounded">
                 <Icon icon="heroicons:building-office-2" class="sm:text-2xl text-xs text-primary-600"/>

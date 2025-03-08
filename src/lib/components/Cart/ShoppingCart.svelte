@@ -3,7 +3,7 @@
 	import { goto,invalidate } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
-	import { authedUser ,currencyState } from '$lib/stores/mainStores.js';
+	import { authedUser ,currencyState,cartTotalComps } from '$lib/stores/mainStores.js';
 	import Icon from '@iconify/svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import RecurrencePopup from '$lib/components/Cart/RecurrencePopup.svelte';
@@ -33,7 +33,7 @@
 	$: cartId = data?.cart[0]?.cartId || '';
 	$: cartName = data?.cart[0]?.cartName || '';
 	$: recurrence = data?.cart[0]?.recurrence || '';
-    console.log(data,"forntend");
+    //console.log(data,"forntend");
 
 	const calculateTotalPrice = (cart)=>{
        priceINR = cart.reduce((sum,crt)=> sum + crt.currentPrice.INR*crt.quantity,0)
@@ -48,7 +48,6 @@
 			calculateTotalPrice($cart);
 		});
 	};
-	console.log($cart,"1")
 	let scrollTimeout
 	const handleScroll = (e) => {
 	isHide = true;
@@ -75,8 +74,6 @@
 			cart.set(cartData);
 		    calculateTotalPrice($cart);
 		}
-		console.log($cart,"2")
-
 	});
 
 	let showModal = false;
@@ -90,7 +87,17 @@
 			addToCartModal = !addToCartModal;
 		}
 	};
-    console.log($cart,"3")
+    
+	$:syncLocalStorageToStore($cart.length)
+	function syncLocalStorageToStore(count) {
+    // Check if we are in the browser
+    if (typeof window !== 'undefined') {
+        const storedTotalComps = localStorage.getItem('totalCompsChemi');
+        if (storedTotalComps ) {
+            cartTotalComps.set(Number(count));
+        }
+    }
+   }
 	const downloadExcel = () => {
     // Define the data (same as the original CSV content)
     const headers = [
@@ -174,7 +181,7 @@
     // Generate Excel file and trigger download
     XLSX.writeFile(workbook, 'cart_details.xlsx');
     };
-	console.log($cart,"4")
+
 	const recurrencePeriod =(recurring)=>{
 		if(recurring === 1){
        return "Monthly" 
@@ -594,13 +601,20 @@
 							Checkout
 				        </button>
 					{:else}
-						<button
+					<button
+							type="button"
+							on:click={()=>goto('/signin')}
+							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
+						>
+							SignIn to Proceed
+						</button>
+						<!-- <button
 							type="button"
 							on:click={()=>goto('/login')}
 							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
 						>
 							Login to Proceed
-						</button>
+						</button> -->
 					{/if}					
 				</div>
 			{/if}
@@ -631,7 +645,7 @@
 				height="60"
 				class=" w-full text-center text-primary-600"
 			/>
-			<h1 class=" font-medium pt-2">You have added components to cart before Login</h1>
+			<h1 class=" font-medium pt-2">You have added components to cart before SignIn</h1>
 			<p class=" text-sm">{cartId.length ? "Are you willing to add in existing cart or create a new cart": "Create a new cart"}</p>
 			<form method="POST" use:enhance={handleCart} class=" w-full flex items-center gap-6">
 				{#if isLoggedIn && filteredGuestCart.length}
@@ -671,9 +685,12 @@
 				>
 					Cancel
 				</button>
-				<a href="/login" on:click={setRedirectUrl} class="bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-700">
-					Login
+				<a href="/signin" on:click={setRedirectUrl} class="bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-700">
+					SignIn
 				</a>
+				<!-- <a href="/login" on:click={setRedirectUrl} class="bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-700">
+					Login
+				</a> -->
 			</div>
 		</div>
 	</div>

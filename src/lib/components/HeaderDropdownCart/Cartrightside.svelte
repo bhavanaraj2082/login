@@ -241,7 +241,7 @@
 		if (!isLoggedIn) {
 			removeFromCart();
 			toast.success(`All products are deleted successfully`);
-			cartTotalComps.set(0);
+			localStorage.setItem("totalCompsChemi", 0);
 			syncLocalStorageToStore();
 			return;
 		}
@@ -252,7 +252,7 @@
 				cart.update(() => {
 					return [];
 				});
-				cartTotalComps.set(0);
+				localStorage.setItem("totalCompsChemi", 0);
 				syncLocalStorageToStore();
 				toast.success(result.message);
 			} else {
@@ -366,18 +366,18 @@
 >
 	<input type="hidden" name="guestCart" value={JSON.stringify($guestCart)} />
 </form>
-<button on:click={toggleCart} class=" space-x-4 text-gray-600 pr-0 sm:pr-2">
+<button on:click={toggleCart} class="  text-gray-600 pr-0 md:-mt-2 sm:pr-2">
 	<span class="flex items-center space-x-1">
 		<!-- Wrapper for Icon with Badge -->
 		<div class="relative inline-block">
 			<!-- Shopping Cart Icon -->
 			<Icon
 				icon="heroicons-solid:shopping-cart"
-				class=" text-lg sm:text-2xl hover:text-primary-100 hover:scale-105 text-white shrink-0"
+				class=" text-xl sm:text-3xl hover:text-primary-100 hover:scale-105 text-white shrink-0"
 			/>
 			<!-- Badge -->
 			<span
-				class="absolute sm:ml-2.5 ml-1.5 top-1 right-0 transform translate-x-1/2 -translate-y-1/2 {$cartTotalComps ===
+				class="absolute sm:ml-3.5 ml-1.5 top-1 transform translate-x-1/2 -translate-y-1/2 {$cartTotalComps ===
 				0 || $cartTotalComps == undefined || isNaN($cartTotalComps)
 					? 'hidden'
 					: 'text-white font-semibold bg-gray-600 inset-0 shadow-md'} text-2s font-medium rounded-full w-4 h-4 flex items-center justify-center"

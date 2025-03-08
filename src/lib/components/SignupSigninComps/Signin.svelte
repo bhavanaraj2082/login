@@ -14,6 +14,7 @@
   let password = "";
   let otpStatus = "";
   let enteredOtp = "";
+  let showPassword = false;
   let errors = {};
   let form4;
   let timeLeft;
@@ -286,17 +287,42 @@
           <label for="password" class="mb-2 text-gray-600"
             >Enter your password</label
           >
-          <input
-            name="password"
-            type="password"
-            id="password"
-            bind:value={password}
-            placeholder="********"
-            class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400"
-          />
-          {#if errors.password}
-            <div class="text-red-500 text-xs mt-1">{errors.password}</div>
-          {/if}
+          <div class="relative w-full">
+            {#if showPassword}
+              <input
+                name="password"
+                type="text"
+                id="password"
+                bind:value={password}
+                placeholder="********"
+                class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 pr-10"
+              />
+            {:else}
+              <input
+                name="password"
+                type="password"
+                id="password"
+                bind:value={password}
+                placeholder="********"
+                class="border border-gray-300 rounded-md p-2 w-full focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 pr-10"
+              />
+            {/if}
+
+            <button
+              type="button"
+              class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
+              on:click={() => (showPassword = !showPassword)}
+            >
+              <Icon
+                icon={showPassword ? "mdi:eye-off" : "mdi:eye"}
+                class="text-lg"
+              />
+            </button>
+
+            {#if errors?.password}
+              <div class="text-red-500 text-xs mt-1">{errors.password}</div>
+            {/if}
+          </div>
           <p class="mb-4 mt-2">
             <a
               href="/forgot"
@@ -304,12 +330,11 @@
               >Forgot password?</a
             >
           </p>
-
           <button
             type="submit"
             class="bg-primary-400 text-sm font-medium hover:bg-primary-500 text-white rounded p-2 w-full text-center"
           >
-            Login
+            SignIn
           </button>
         </form>
       {/if}
@@ -327,7 +352,7 @@
           <!-- svelte-ignore a11y-missing-attribute -->
           <a class="flex items-center space-x-2">
             <Icon icon="fluent-mdl2:signin" class="text-2xl" />
-            <span class="text-sm font-medium">Back to Login</span></a
+            <span class="text-sm font-medium">Back to SignIn</span></a
           ></button
         >
       {:else}
@@ -339,7 +364,7 @@
           <!-- svelte-ignore a11y-missing-attribute -->
           <a class="flex items-center space-x-2">
             <Icon icon="fluent-mdl2:signin" class="text-2xl" />
-            <span class="text-sm font-medium">Login with OTP</span></a
+            <span class="text-sm font-medium">SignIn with OTP</span></a
           ></button
         >
       {/if}
@@ -347,7 +372,7 @@
         class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-600 rounded-md transition duration-200"
         ><a href={linkedinUrl} class="flex items-center space-x-2">
           <Icon icon="bi:linkedin" class="text-2xl" />
-          <span class="text-sm font-medium">Login with LinkedIn</span></a
+          <span class="text-sm font-medium">SignIn with LinkedIn</span></a
         ></button
       >
     </div>

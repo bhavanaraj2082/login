@@ -9,7 +9,8 @@ export async function load({ locals }) {
 		// guestList.includes(locals.authedUser.username)
 		locals.authedUser.email === 'guest@partskeys.com'
 	) {
-		throw redirect(307, '/login');
+		// throw redirect(307, '/login');
+		throw redirect(307, '/signin');
 	}
 
 	return;

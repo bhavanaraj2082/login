@@ -7,7 +7,7 @@
 import { toast } from "svelte-sonner";
 let formLoading=false;
 
-let country="";
+export let data;
 let form;
 let searchTerm="";
 let errors={};
@@ -15,11 +15,12 @@ let errors={};
   let assistance = "";
   let attachments = [];
   let totalSize = 0;
-  let firstName = "";
-  let lastName = "";
-  let email = "";
-  let phoneNumber = "";
-  let companyName = "";
+  let country= data?.profile?.country||"";
+let firstName = data?.profile?.firstName||"";
+let lastName = data?.profile?.lastName||"";
+let email =  data?.profile?.email||"";
+let phoneNumber = data?.profile?.cellPhone|| "";
+let companyName =  data?.profile?.companyName|| "";
   let location = "";
   let accountNumber = "";
   let message = "";
@@ -102,7 +103,7 @@ let errors={};
 		return;
 	  }
   
-	  if (!phoneNumber || phoneNumber.trim() === '') {
+	  if (!phoneNumber || phoneNumber=== '') {
 		errors.phoneNumber = 'Required for the selected country';
 	  } else {
 		const countryDetails = getCountryByCode(country);
@@ -694,7 +695,7 @@ if (!fieldName || fieldName === 'issue') {
 	validateField('country');
 	validateField('accountNumber');
   validateField('issue');
-	validateField('assistance');
+  validateField('assistance');
   
   
   
@@ -705,7 +706,12 @@ if (!fieldName || fieldName === 'issue') {
 	return isValid;
   }
 
-const handlesubmit = async (data) => {
+  const handlesubmit = async (data) => {
+	if (!formValid()) {
+            cancel();
+            return;
+        }
+		   else{
     try {
    
         const result = await submitForm(data);
@@ -742,6 +748,7 @@ const handlesubmit = async (data) => {
         // loading = false;
         showFailureDiv = true;
     }
+}
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
@@ -901,6 +908,7 @@ const submitForm = async (data) => {
         <textarea
           rows="5"
           name="assistance"
+		  id="assistance"
           bind:value={assistance}
           on:input={() => validateField('assistance')}
           class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm  w-full"
@@ -912,56 +920,8 @@ const submitForm = async (data) => {
         {/if}
       </div>
 
-      <div class="mt-4">
-        <!-- svelte-ignore a11y-label-has-associated-control -->
-        <label class="block text-sm pb-2"
-          >Please attach any images or files that may assist in troubleshooting
-          or investigation:</label
-        >
-        <button
-          type="button "
-          on:click={triggerFileInput}
-          class=" text-primary-400 border border-primary-400 mb-4 px-2 rounded-md  md:ml-4 hover:text-white hover:bg-primary-400"
-        >
-          Choose Files
-        </button>
-        <input
-          type="file"
-          multiple
-          on:change={handleFileChange}
-          bind:this={fileInputRef}
-          class="hidden"
-        />
-
-        {#each attachments as file, index}
-          <div class="flex items-center mt-2">
-            <span class="mr-2">{file.name}</span>
-            <a
-              href={URL.createObjectURL(file)}
-              download
-              class="text-blue-500 mr-2"
-              ><Icon
-                icon="line-md:download-loop"
-                class="w-8 h-5 text-black"
-              /></a
-            >
-            <button
-              type="button"
-              on:click={() => removeAttachment(index)}
-              class="text-red-500"
-              ><Icon
-                icon="material-symbols:delete"
-                class="w-8 h-5 text-red"
-              /></button
-            >
-          </div>
-        {/each}
-      </div>
-      <div class="flex justify-center">
-        <p class="text-gray-400 text-sm">
-          Attachments are limited to a combined size of 25MB
-        </p>
-      </div>
+ 
+   
     </div>
     <div class=" w-full pb-6 mx-auto h-full">
       <h2 class="text-primary-400 font-semibold text-base pb-6">
@@ -1026,7 +986,7 @@ const submitForm = async (data) => {
                 placeholder="Company Name "
                 bind:value={companyName}
                 class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
-                required
+                
                 on:input={() => validateField('companyName')}
               />
               {#if errors.companyName}
@@ -1111,31 +1071,34 @@ const submitForm = async (data) => {
         </div>
       
         <div class="flex justify-center col-span-2 mt-2">
-        <button
-          class="w-full bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
-         on:click={(event) => {
-           // event.preventDefault();
-     
-           // Check form validity
-           if (!formValid()) {
-             toast.error('Please fill all the required fields.');
-             return;
-           }
-     
-  
-     
-  
-  
-           handlesubmit();
-         }}
-         on:keydown={(event) => {
-           if (event.key === 'Enter') {
-             event.preventDefault();
-           }
-         }}
-       >
-         Submit
-       </button>
+			<button
+			class="w-full bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
+		   on:click={(event) => {
+			 // event.preventDefault();
+	   
+			 // Check form validity
+			 if (!formValid()) {
+			   toast.error('Please fill all the required fields.');
+			   event.preventDefault();
+			   return;
+			 } else{
+			  
+			  handlesubmit();
+			 }
+	   
+	
+	   
+	
+	
+		   }}
+		   on:keydown={(event) => {
+			 if (event.key === 'Enter') {
+			   event.preventDefault();
+			 }
+		   }}
+		 >
+		   Submit
+		 </button>
         </div>
     </div>
   </form>

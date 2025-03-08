@@ -2,30 +2,59 @@
     export let data;
     const { singleNewsData } = data;  // Extract single news data
     console.log(singleNewsData);
+    let isExpanded = false;
+    function truncateText(text, wordLimit) {
+    const words = text.split(" ");
+    return words.length > wordLimit ? words.slice(0, wordLimit).join(" ") + "..." : text;
+  }
+  function toggleExpand() {
+    isExpanded = !isExpanded;
+  }
     
-    // Function to convert newline characters to <br> tags for HTML rendering
     const formatText = (text) => {
       return text.split('\n').map(item => item + "<br>").join('');
     };
   </script>
-  
-  <div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-    <!-- Title -->
-    <h1 class="text-4xl font-bold text-gray-800 mb-4">{singleNewsData.title}</h1>
-  
-    <!-- Image -->
-    <div class="mb-6">
-      <img src={`/path/to/images/${singleNewsData.image}`} alt={singleNewsData.title} class="w-full h-40 object-cover rounded-lg mb-4" />
-    </div>
-  
-    <!-- Full Content -->
-    <div class="text-lg text-gray-800">
-      {@html formatText(singleNewsData.previewText)}
-    </div>
-  
-    <!-- Optional: Add a link to go back to the list of news -->
-    <div class="mt-8">
-      <a href="/newsroom" class="text-blue-500 hover:underline">Back to News</a>
-    </div>
-  </div>
-  
+<div class="mx-auto w-11/12 mb-10">
+      <div class="overflow-hidden mb-8 p-7 bg-white rounded-lg shadow-lg">
+        <div class="mb-4">
+          <h2 class="text-3xl font-semibold text-gray-800">{singleNewsData.title}</h2>
+          <p class="text-sm text-gray-500 mt-2">
+            {new Date(singleNewsData.createdAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </p>
+        </div>
+        <hr class="my-4">
+        <div class="flex sm:flex-row flex-col items-center sm:space-x-8 mt-4">
+          <div class="sm:w-2/3 w-full">
+              <p class="lg:text-sm md:text-sm sm:text-xs text-gray-600">
+                {#if isExpanded}
+                  {singleNewsData.previewText}
+                {:else}
+                  {truncateText(singleNewsData.previewText, 100)} 
+                {/if}
+              </p>
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+            <p
+            class="text-primary-500 cursor-pointer hover:underline underline-offset-2 mt-2 text-sm"
+            on:click={toggleExpand}>
+            {isExpanded ? "Read less" : "Read more"}
+          </p>
+          </div>
+          <div class="sm:w-1/3 w-full h-60">
+            <img src={singleNewsData.image} alt="Blog Post" class="rounded-lg w-full h-full object-cover" />
+          </div>
+        </div>
+        <p class="text-gray-700 xl:text-xl md:text-lg sm:text-md font-semibold mt-2">About Chemikart</p>
+        <p class="text-gray-500 xl:text-sm md:text-sm sm:text-xs mt-2">At Chemikart, our misssion is to provide high-quality chemical products with unparalleled service. We aim to be the trusted partner for industries by delivering reliable solutions that meet our customers' needs efficiently and safely.We envision a world where business thrive with access to premium chemical products and services. Our goal is to be the leading distributor in the chemical industry, know for our commitment to excellence and innovation.Our knowledgeable team can assist you in selecting the right products for your applications.we pride ourseleves on our consistent supply chain and timely deliveries.We offer tailored solutions to meet the specific requirements of our clients. <a href="https://chemikart.partskeys.com/" class="font-semibold ml-1 text-primary-500">Chemikart.com</a> and on 
+          <a href="https://www.facebook.com/chemikart" class="font-semibold ml-1 text-primary-500">Facebook,</a><a href="https://x.com/chemikart" class="font-semibold ml-1 text-primary-500">Twitter,</a><a href="https://www.instagram.com/chemikart/" class="font-semibold ml-1 text-primary-500">Instagram,</a>&nbsp; and<a href="https://www.linkedin.com/chemikart?_l=en_US" class="font-semibold ml-1 text-primary-500">LinkedIn</a>.
+        </p>
+        <div class="mt-8">
+          <a href="/newsroom" class="text-primary-500 hover:underline text-sm">Back to News</a>
+        </div>
+      </div> 
+</div>

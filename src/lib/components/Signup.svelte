@@ -59,7 +59,8 @@
     </div>
     <div class="content w-full md:w-2/3 p-4 md:p-6 flex flex-col justify-center bg-white rounded-tr-lg rounded-b-lg md:rounded-l-lg md:rounded-tl-none"> 
         <h2 class="text-2xl font-bold text-orange-500">Sign Up</h2>
-        <p class="text-gray-500 mb-5">Already have an account? <a href='/login' class="underline text-orange-500">Login.</a></p>
+        <!-- <p class="text-gray-500 mb-5">Already have an account? <a href='/login' class="underline text-orange-500">Login.</a></p> -->
+        <p class="text-gray-500 mb-5">Already have an account? <a href='/signin' class="underline text-orange-500">SignIn.</a></p>
     
         <form on:submit={handleSubmit}>
             <div class="mb-4 flex flex-col md:flex-row md:space-x-4">

@@ -6,7 +6,8 @@ export const load = async({ url, cookies, locals,depends }) => {
     try {
 	    if (url.pathname === '/logout') {
 			cookies.delete('token', { path: '/' });
-			redirect(302, '/login');
+			// redirect(302, '/login');
+			redirect(302, '/signin');
 		}
 		depends("data:load")
 		// const cart = await getCart(locals.authedUser?.id)
