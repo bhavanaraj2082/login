@@ -14,7 +14,15 @@
     export let subSubCategory
 
 	let isLoggedIn = $authedUser?.id ? true : false
-    
+
+    let hoveredItem = null; 
+    function handleMouseEnter(imageSrc, index) {
+    hoveredItem = { imageSrc, index }; 
+  }
+
+function handleMouseLeave() {
+  hoveredItem = null; 
+}
     const guestCartFetch = () => {
 		// const formdata = new FormData();
 		// formdata.append('guestCart', JSON.stringify($guestCart));
@@ -422,12 +430,28 @@ const handleSearch = (searchName) => {
             </div>
             <div class=" flex items-start gap-2 md:gap-8">
                 <!-- <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`}> -->
-                <div class="">
+                <div class="relative">
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                <img src={product?.imageSrc} class="cursor-pointer w-20 h-20 sm:w-40 sm:h-40 object-contain" alt=""
+                <img 
+                src={product?.imageSrc} 
+                class="cursor-pointer w-20 h-20 sm:w-40 sm:h-40 object-contain" 
+                alt=""
                 on:click={() => imagemodal(product?.imageSrc)}
+                on:mouseenter={() => handleMouseEnter(product?.imageSrc , index)}
+                on:mouseleave={handleMouseLeave}
+              />
+            
+               {#if hoveredItem && hoveredItem.imageSrc === product?.imageSrc && hoveredItem.index === index}
+                <div
+                  class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-50 whitespace-nowrap text-xs text-description font-medium py-1 px-4 rounded-md shadow-lg border leading-snug bg-black text-white"
                 >
+                  Click to view <br />larger image
+                  <div
+                    class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-black"
+                  ></div>
+                </div>
+              {/if}
 
                 {#if showimage}
 					<!-- svelte-ignore a11y-click-events-have-key-events -->

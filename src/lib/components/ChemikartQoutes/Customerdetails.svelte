@@ -639,28 +639,42 @@ let searchTerm = "";
 	// return pattern.test(phone);
 	// }
 </script>
-<div class="py-10 bg-white  flex justify-between">
+<div class="pb-10 bg-white  flex justify-between">
+	<span class="flex items-center gap-2">
+		<Icon icon="ph:test-tube-fill" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300" />
 	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 1: Select custom solution type</h1>
+	</span>
 	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog()}>Edit</button>
 </div>
 <hr />
 <div class="py-10 bg-white  flex justify-between">
+	<span class="flex items-center gap-2">
+		<Icon icon="wpf:edit-file" class="sm:w-7 sm:h-7 w-5 h-5 text-primary-300" />
 	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 2: Select custom format</h1>
+	</span>
 	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog1()}>Edit</button>
 </div>
 <hr /><hr />
 <div class="py-10 bg-white  flex justify-between">
+	<span class="flex items-center gap-2">
+		<Icon icon="hugeicons:test-tube" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300" />
 	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 3: Configure custom solution</h1>
+	</span>
 	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog2()}>Edit</button>
 </div>
 <hr /><hr />
 <div class="py-10 bg-white  flex justify-between">
+	<span class="flex items-center gap-2">
+		<Icon icon="arcticons:youdao-note" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300"  style="stroke-width: 2;" />
 	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 4: Additional notes</h1>
 	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog3()}>Edit</button>
 </div>
 <hr /><hr />
 <div class="bg-white ">
-	<h1 class="font-bold sm:text-2xl text-sm pt-10">Step 5: Customer details</h1>
+	<span class="flex items-center gap-2 pt-10">
+		<Icon icon="mdi:account-details" class="sm:w-8 sm:h-8 w-6 h-6 text-heading" />
+	<h1 class="font-bold sm:text-2xl text-sm ">Step 5: Customer details</h1>
+	</span>
 	<div class="sm:ml-10 ml-0">
 	<h1 class="font-semibold py-5 text-primary-500 sm:text-md text-sm ">Please fill the details</h1>
 	<div class="grid grid-cols-1 gap-x-6 gap-y-1 md:w-3/4 lg:w-1/2 sm:grid-cols-6">
@@ -1081,6 +1095,9 @@ let searchTerm = "";
 </div>
 </div>
 <div class="py-10 bg-white  flex justify-between">
+	<span class="flex items-center gap-2">
+		<Icon icon="material-symbols-light:delivery-truck-speed-outline" class="sm:w-9 sm:h-9 w-7 h-7 text-gray-300" />
 	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">Step 6: Delivery information</h1>
+	</span>
 </div>
 <hr />

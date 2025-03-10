@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { slide } from "svelte/transition";
 	import { cubicOut } from "svelte/easing";
+	import { fade } from 'svelte/transition';
 	export let isOpen = false;
 	export let closePopup = () => {
 		isOpen = !isOpen;
@@ -198,8 +199,8 @@
 </script>
 
 <!--  Start / Cookies Setting Popup -->
-<div class={`${isOpen ? 'fixed inset-0  bg-opacity-50 backdrop-blur-sm transition-opacity transition-visibility z-50' : 'hidden'}`}></div>
-<div class={`fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm flex justify-center items-center sm:px-2 shadow-lg transition-opacity transition-visibility z-50 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+<div class={`${isOpen ? 'fixed inset-0  bg-opacity-50 backdrop-blur-sm transition-opacity transition-visibility z-50' : 'hidden'}`}transition:fade></div>
+<div class={`fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm flex justify-center items-center sm:px-2 shadow-lg transition-opacity transition-visibility z-50  ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`} transition:fade>
 	<div class='bg-white p-8 rounded shadow-lg w-full max-w-4xl h-auto max-h-screen overflow-y-auto mx-4 sm:mx-0' bind:this={popupRef}>
 		<form class="w-full h-full overflow-y-scroll hide">
 			<header class="flex sm:mb-5 justify-between">

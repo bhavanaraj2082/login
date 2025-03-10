@@ -13,6 +13,9 @@
 		// 	resetFormData();
 		// 	tog();
 		// }
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 		import {
 			solutionType,
 			formatType,
@@ -29,6 +32,7 @@
 			export let tog4
 			export let tog5
 		function showMessage(message1, keywordError) {
+      scrollToTop();
 			successMessage = message1;
 			errorMessage = keywordError;
 			tick().then(() => {
@@ -381,9 +385,6 @@
   Send quote request
   {/if}
     </button>
-    <!-- <button type="button" on:click={refreshPage} class="px-6 py-3 bg-primary-500 text-white rounded hover:bg-primary-600 focus:outline-none focus:ring focus:ring-primary-500">
-      Back
-    </button> -->
   </div>
 </form> 
 {/if}

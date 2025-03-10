@@ -1,4 +1,5 @@
 <script>
+    import Icon from '@iconify/svelte';
 	import { Cusdetails } from '$lib/stores/solution_stores.js';
 	import { Delivery } from '$lib/stores/solution_stores.js'
 	  import { onMount } from 'svelte';
@@ -192,35 +193,49 @@ onMount(() => {
   });
   
 	  </script>
-  <div class="py-10 bg-white  flex justify-between">
+  <div class="pb-10 bg-white  flex justify-between">
+    <span class="flex items-center gap-2">
+		<Icon icon="ph:test-tube-fill" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300" />
 		  <h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 			  Step 1: Select custom solution type
 		  </h1>
+    </span>
 		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={tog()}>Edit</button>
 	  </div>
 	  <hr /><hr />
 	  <div class="py-10 bg-white  flex justify-between">
+        <span class="flex items-center gap-2">
+            <Icon icon="wpf:edit-file" class="sm:w-7 sm:h-7 w-5 h-5 text-primary-300" />
 		  <h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 			  Step 2: Select custom format 
 		  </h1>
+        </span>
 		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={tog1()}>Edit</button>
 	  </div>
 	  <hr /><hr />
 	  <div class="py-10 bg-white  flex justify-between">
+        <span class="flex items-center gap-2">
+            <Icon icon="hugeicons:test-tube" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300" />
 		  <h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 			  Step 3: Configure custom solution 
 		  </h1>
+        </span>
 		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={tog2()}>Edit</button>
 	  </div>
 	  <hr /><hr />
 	  <div class="py-10 bg-white  flex justify-between">
+        <span class="flex items-center gap-2">
+            <Icon icon="arcticons:youdao-note" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300 " style="stroke-width: 2;"  />
 		  <h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 			  Step 4: Additional notes
 		  </h1>
+        </span>
 		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={tog3()}>Edit</button>
 	  </div>
 	  <hr /><hr />
 	  <div class="py-10 bg-white  flex justify-between">
+        <span class="flex items-center gap-2">
+            <Icon icon="mdi:account-details" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300" />
 		  <h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 			  Step 5: Customer details
 		  </h1>
@@ -229,8 +244,11 @@ onMount(() => {
 	  <hr /><hr />
 	  <div class="bg-white ">
 		  <div>
-			  <h1 class="font-bold sm:text-2xl text-sm pt-10"> Step 6: Delivery information
+            <span class="flex items-center gap-2 pt-10">
+                <Icon icon="material-symbols-light:delivery-truck-speed-outline" class="sm:w-9 sm:h-9 w-7 h-7 text-heading" />
+			  <h1 class="font-bold sm:text-2xl text-sm "> Step 6: Delivery information
 			  </h1>
+            </span>
 			  <div class="sm:ml-10 ml-0">
 			  <h1 class="font-semibold py-5 text-primary-500 sm:text-md text-sm">Address</h1>
 			  <div class="">

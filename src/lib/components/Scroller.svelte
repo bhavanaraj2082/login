@@ -14,16 +14,16 @@
       showTooltip = false;
     }
   </script>
-  <div class="absolute z-70 lg:right-20 right-7 lg:mt-[-36px] md:mt-[-36px] sm:mt-0 mt-[182px]
+  <div class="absolute z-70 lg:right-20 right-3 lg:mt-[-36px] md:mt-[-36px] sm:mt-0 mt-[182px]
 ">
     <div class="">
       <button
-      class="flex items-center justify-center rounded py-0.3 bg-primary-50 md:mr-14 lg:mr-0 shadow-md"
+      class="flex items-center justify-center rounded py-0.3 bg-primary-50 text-white md:mr-14 lg:mr-0 shadow-md"
         on:click={toggleHelp}
       >
        <div class="flex flex-col items-center">
 				<Icon icon="tdesign:chevron-up" width="20" height="20"  class="text-primary-500" />
-				<span class="px-2 text-xs pb-0.5 text-primary-500">TOP</span>
+				<span class="px-1.5 text-xs pb-0.5 text-primary-500 font-medium">TOP</span> 
 			</div>	
     </button>
     </div>

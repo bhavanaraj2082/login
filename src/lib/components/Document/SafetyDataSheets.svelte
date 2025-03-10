@@ -163,7 +163,7 @@ function toggleRotation(index) {
   };
 </script>
 
-<div class="sm:px-6 px-7 sm:pb-6 pb-14 max-w-7xl lg:px-17 mx-auto">
+<div class="w-[90%] mx-auto pb-10">
   <h1 class="text-2xl font-bold mb-8">Documents</h1>
   
   <div class="w-full inline-flex rounded mb-8">
