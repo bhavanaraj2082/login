@@ -33,9 +33,9 @@
 <main class="my-10 z-10">
     <button 
 	on:click={() => goto('/')}
-		class="absolute top-4 right-4 md:top-8 md:right-8 flex z-50 items-center justify-center py-2 px-2 sm:px-4 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
+		class="absolute top-0.5 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-4 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
 		<div class="flex items-center space-x-2">
-			<Icon icon="mdi:home" class="text-xl" />
+			<Icon icon="mdi:home" class="text-xl"/>
 			<span class="hidden sm:inline text-sm font-medium">Back to Home</span>
 		</div>
 	</button>

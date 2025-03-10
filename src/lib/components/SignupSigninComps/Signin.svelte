@@ -92,9 +92,9 @@
 	</button>
   <div class="w-full max-w-5xl mt-10">
     <div class="flex flex-col md:flex-row bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl border border-white/20">
-      <div class="w-full md:w-3/5 p-8 md:p-12 flex flex-col justify-center relative overflow-hidden">
+      <div class="w-full md:w-3/5 p-8 md:pb-12 md:px-12 flex flex-col justify-center relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary-500/80 via-primary-500/80 to-primary-600/80 z-0"></div>
-        <div class="absolute sm:top-6 sm:left-6 top-4 right-5 w-20 h-20 rounded bg-primary-100/20 animate-pulse clip-hexagon flex md:justify-center justify-end items-center">
+        <div class="absolute top-6 md:right-10 right-4 w-20 h-20 rounded bg-primary-100/20 animate-pulse clip-hexagon flex md:justify-center justify-end items-center">
           <Icon icon="lets-icons:chemistry-light" class="text-gray-100 text-5xl" />
         </div>
         <div class="absolute md:bottom-2 md:right-0 bottom-2 left-48 sm:w-80 sm:h-80 h-20 w-20 rounded bg-primary-100/10 animate-pulse clip-hexagon">
@@ -105,7 +105,7 @@
           <p class="text-white/90 sm:text-lg max-w-lg text-md mb-8">
             Sign in to continue your journey with us. Access your personalized dashboard and exclusive features.
           </p>
-          <div class="space-y-6 md:pr-12">
+          <div class="space-y-6 md:pr-12 hidden md:block">
             <div class="flex items-center space-x-3">
               <div class="w-10 h-10 rounded-full bg-primary-50/20 shadow-md flex items-center justify-center">
                 <Icon icon="ph:shield-check-bold" class="text-lg text-white" />
