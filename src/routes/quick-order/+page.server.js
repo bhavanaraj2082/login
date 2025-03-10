@@ -251,8 +251,8 @@ quicksearch: async ({ request }) => {
           quantity: item.quantity || '',
           backOrder: backorder,
           offerPrice: {
-            usd: item.priceSize.price,
-            inr: item.priceSize.price * 75 // Use appropriate conversion rate
+            usd: item.usdPrice,
+            inr: item.inrPrice * 75 // Use appropriate conversion rate
           },
           isQuote: false,
           isBom: false,
