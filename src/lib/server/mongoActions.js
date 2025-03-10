@@ -122,21 +122,15 @@ export const submitContactInfo = async (data) => {
 
 export const getOrderresultData = async (body) => {
 	try {
-		const records = await Order.findOne({ orderid: body.orderNumber }).populate('profileId');
-
-		if (!records) {
-			return { success: false, message: 'Order not found' };
-		}
-		else if(records.profileId.email !== body.email){
-			return { success: false, message: 'Email does not match the profile associated with this order' };
-		} 
-		else {
+		const records = await Order.findOne({ orderid: body.orderNumber });
+		if (records) {
 			return {
 				success: true,
 				msg: 'Success',
-				order: JSON.parse(JSON.stringify(records)) 
+				order: JSON.parse(JSON.stringify(records))
 			};
-			
+		} else {
+			return { success: false, message: 'Order not found' };
 		}
 	} catch (error) {
 		console.error('Error getting order data:', error);
@@ -318,7 +312,7 @@ export const checkoutOrder = async (order) => {
 		const newOrder = await Order.create(order);
         for(let rec of order.orderdetails){
 			const stock = await Stock.findOneAndUpdate({_id:rec.stockId},{$inc:{orderedQty:rec.orderQty}},{new:true})
-			console.log(stock);
+			//console.log(stock);
 			await StockLog.create({
                  productId:rec.productId,
 				 manufacturerId:rec.manufacturerId,
@@ -340,7 +334,7 @@ export const checkoutOrder = async (order) => {
 			};
 		}
 	} catch (error) {
-		console.error('Error creating order:', error);
+		//console.error('Error creating order:', error);
 		return { success: false, message: 'Something went wrong' };
 	}
 };
@@ -362,7 +356,7 @@ export const getUpdatedCartData = async (product) => {
 		}
 	}
 
-	console.log(productObj);
+	//console.log(productObj);
 	return JSON.stringify(productObj);
 };
 
@@ -2073,22 +2067,22 @@ export const favaddToCart = async (cartData, userId, userEmail) => {
             isDeleted: false
         });
 
-        const cartItem = {
-            productId: cartData.productId,
-            stockId: cartData.stockId,
-            manufacturerId: cartData.manufacturerId,
-            distributorId: cartData.distributorId,
-            quantity: parseInt(cartData.quantity) || 1,
-            backOrder: 0,
-            isCart: false,
-            isQuote: false,
-            quoteOfferPrice: { INR: 0, USD: 0 },
-            cartOfferPrice: { INR: 0, USD: 0 }
-        };
-
+        // const cartItem = {
+        //     productId: cartData.productId,
+        //     stockId: cartData.stockId,
+        //     manufacturerId: cartData.manufacturerId,
+        //     distributorId: cartData.distributorId,
+        //     quantity: parseInt(cartData.quantity) || 1,
+        //     backOrder: cartData.backOrder,
+        //     isCart: false,
+        //     isQuote: false,
+        //     quoteOfferPrice: { INR: 0, USD: 0 },
+        //     cartOfferPrice: { INR: 0, USD: 0 }
+        // };
+        //console.log(cartData,"opopopop");
         if (existingCart) {
             const itemIndex = existingCart.cartItems.findIndex(
-                item => item.productId.toString() === cartData.productId.toString()
+                item => item.productId.toString() === cartData.productId
             );
 
             if (itemIndex > -1) {
@@ -2099,7 +2093,7 @@ export const favaddToCart = async (cartData, userId, userEmail) => {
                     message: 'Item quantity updated in cart'
                 };
             } else {
-                existingCart.cartItems.push(cartItem);
+                existingCart.cartItems.push(cartData);
                 await existingCart.save();
                 return {
                     status: 'success',
@@ -2110,7 +2104,7 @@ export const favaddToCart = async (cartData, userId, userEmail) => {
             await Cart.create({
                 cartId: nanoid(8),
                 cartName: 'mycart',
-                cartItems: [cartItem],
+                cartItems: [cartData],
                 userId,
                 userEmail,
                 isDeleted: false,
@@ -2598,7 +2592,7 @@ export const deleteOneFromCart = async (body, userId) => {
 		{ $pull: { cartItems: { _id }}},
 		{ new: true }
 	);
-	console.log(result);
+	//console.log(result);
 	return {success:true, message: `${productNumber} is removed from Cart` };
 };
 
@@ -2644,7 +2638,7 @@ export const addItemsToExistingCart = async(body,cartId)=>{
 		},
 		{ new: true }  // Return the updated document
 	)
-	console.log(updatedCart);
+	//console.log(updatedCart);
 	return { success:true}
 }
 
@@ -2738,7 +2732,7 @@ export const addRecurrence = async (body, userId) => {
 export const deleteRecurrence = async(body)=>{
 	const {cartId} = body
 	const deleteRecurrence =  await Cart.updateOne({ cartId },{ $unset: { recurrence: 1 } });
-	console.log(deleteRecurrence,"fff");   
+	//console.log(deleteRecurrence,"fff");   
 	return { success: true, msg: `Recurrence deleted successfully` };
 }
 
@@ -3093,4 +3087,10 @@ export const recurrenceCartActive = async(userId,body) =>{
     await Cart.findOneAndUpdate({userId,isActiveCart:true},{isActiveCart:false})
     await Cart.findOneAndUpdate({cartId},{isActiveCart:true,$push:{recurrenceLogs:{recurringDate,action:"Accepted"}}})
 	return { success:true,action:"accept",message:"Recurrence date updated successfully"}
+}
+
+export const getMyFavorites = async(userId) => {
+	const myFav = await MyFavourites.findOne({userId},{favorite:1,_id:0}).lean()
+	let favorite = JSON.parse(JSON.stringify(myFav.favorite.map(x=>x.productId)))
+	return {favorite}
 }
