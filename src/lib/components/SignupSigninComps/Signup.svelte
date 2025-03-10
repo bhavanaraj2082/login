@@ -1466,7 +1466,7 @@
   });
 </script>
 
-<div class="flex flex-col w-11/12 md:flex-row justify-center items-start shadow-md mt-20 mb-12 rounded-lg max-w-3xl bg-white/95 mx-auto border-gray-300 border">
+<div class="flex flex-col w-11/12 md:flex-row justify-center z-50 items-start shadow-md mt-20 mb-12 rounded-lg max-w-3xl bg-white mx-auto border-gray-300 border">
   <button 
 	on:click={() => goto('/')}
 		class="absolute top-0.5 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-3 text-primary-500 bg-white hover:bg-primary-600 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
