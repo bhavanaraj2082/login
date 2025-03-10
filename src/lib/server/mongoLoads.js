@@ -2042,7 +2042,7 @@ export async function getUserFavorites(userId) {
           _id: 0,
           productInfo: {
             productId: { $toString: '$favorite.productId' },
-            productNumber: '$favorite.productNumber',
+            productNumber: { $arrayElemAt: ['$productDetails.productNumber', 0] },
             productName: { $arrayElemAt: ['$productDetails.productName', 0] },
             description: { $arrayElemAt: ['$productDetails.description', 0] },
             properties: { $arrayElemAt: ['$productDetails.properties', 0] },
