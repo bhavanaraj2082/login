@@ -1,4 +1,5 @@
 <script>
+	import { addLocalToFavorites,myFavorites } from '$lib/stores/favorites.js';
 	import { addItemToCart,cart,guestCart } from '$lib/stores/cart.js';
 	import { sendMessage } from '$lib/utils.js';
 	import { page } from '$app/stores';
@@ -304,6 +305,26 @@ const handleSearch = (searchName) => {
     }
 };
 
+const handleFavorites = (product)=>{
+    try {
+       // console.log(product);
+    addLocalToFavorites(product._id)
+    let formdata = new FormData()
+    formdata.append("authedEmail",$authedUser.email)
+    formdata.append("productId",product._id)
+    formdata.append("manufacturerId",product.manufacturerDetails._id)
+    formdata.append("stockId",product.stockId)
+    formdata.append("distributorId",product.distributorId)
+    formdata.append("quantity",product.quantity)
+    formdata.append("stock",product.stock)
+    sendMessage("?/favorite",formdata,async(result)=>{
+        console.log(result);
+    }) 
+    } catch (error) {
+        console.log(error);
+    }
+    
+}
 
 </script>
 
@@ -416,7 +437,10 @@ const handleSearch = (searchName) => {
         </div>
         {:else}
        {#each paginatedProducts as product,index}
-        <div class=" bg-white shadow p-2 sm:p-4 md:px-8 space-y-2 rounded">
+        <div class=" relative bg-white shadow p-2 sm:p-4 md:px-8 space-y-2 rounded">
+            <button on:click={()=>handleFavorites(product)} class=" absolute right-2">
+                <Icon icon={$myFavorites.find(x=> x === product._id) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
+            </button>
             <div>
                 <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{product?.productName  || ""}</a>
             </div>
@@ -428,7 +452,6 @@ const handleSearch = (searchName) => {
                 <img src={product?.imageSrc} class="cursor-pointer w-20 h-20 sm:w-40 sm:h-40 object-contain" alt=""
                 on:click={() => imagemodal(product?.imageSrc)}
                 >
-
                 {#if showimage}
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->

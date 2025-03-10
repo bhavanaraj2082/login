@@ -1,5 +1,5 @@
 import { loadProductsubcategory } from '$lib/server/mongoLoads.js';
-import { addToCart } from '$lib/server/mongoActions.js';
+import { addToCart,favorite } from '$lib/server/mongoActions.js';
 
 export async function load({ params,url,depends }) {
 	try {
@@ -46,5 +46,21 @@ export const actions = {
 			console.log(error);
 			return {success:false,message:"Something went wrong"}
 		}
-	}
+	},
+	favorite: async ({ request }) => {
+			const favdata = Object.fromEntries(await request.formData());
+			console.log("Form Data Received:", favdata);
+			// const {productDesc, id, imgUrl,productName,productNumber,priceSize,quantity,stock,size,price,} = favdata;
+			try {
+			  const result = await favorite(favdata);
+			  return result;
+			} catch (error) {
+			  console.error("Error adding to favourites:", error.message);
+			  return {
+				success: false,
+				type: "error",
+				message: "Something went wrong please try again later!",
+			  };
+			}
+		  },
 };
