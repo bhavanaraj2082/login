@@ -91,6 +91,10 @@ const orderSchema = new mongoose.Schema(
     userEmail: {
       type:String
     },
+    profileId:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Profile"
+    },
     shippingaddress: {
       type: String,
       required: false,

@@ -1,7 +1,7 @@
 import { deleteFavoriteItem, clearAllFavorites, favaddToCart, addAllToCart } from "$lib/server/mongoactions.js";
 import { getUserProfileData, getProfileDetails } from '$lib/server/mongoLoads.js';
 
-export const load = async ({ locals }) => {
+export const load = async ({ locals,depends }) => {
   try {
     if (!locals.authedUser?.id) {
       return {
@@ -9,7 +9,7 @@ export const load = async ({ locals }) => {
         error: 'Not authenticated'
       };
     }
-
+    depends("data:fav")
     const profileData = await getProfileDetails(locals.authedUser.id);
     
     if (!profileData.success && !profileData.profileData) {
@@ -52,7 +52,7 @@ export const actions = {
         locals.authedUser.id,
         locals.authedUser.email
       );
-
+      console.log(result);
       if (result.status === 'success') {
         return { success: true, message: result.message };
       } else {

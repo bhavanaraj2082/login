@@ -1966,7 +1966,7 @@ export async function getUserFavorites(userId) {
       };
     }
 
-    const favorites = await MyFavourite.aggregate([
+    let favorites = await MyFavourite.aggregate([
       { 
         $match: { 
           userId: userId 
@@ -2071,10 +2071,18 @@ export async function getUserFavorites(userId) {
         }
       }
     ]).exec();
-
-    // Debug logging
-    // console.log('Favorites query result:', JSON.stringify(favorites, null, 2));
-
+    
+    const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+    favorites = favorites.map(fav=>{
+      let {stockInfo,...data} = fav
+      if(stockInfo.pricing.INR !== undefined && stockInfo.pricing.INR !== null){
+        stockInfo.pricing.USD = stockInfo.pricing.INR/currency.rate
+      }else{
+       stockInfo.pricing.INR = stockInfo.pricing.USD * currency.rate;
+      }
+      return {stockInfo,...data}
+    })
+    
     return {
       success: true,
       data: favorites || [],

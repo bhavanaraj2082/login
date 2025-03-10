@@ -1,4 +1,6 @@
 <script>
+	import { myFavorites } from '$lib/stores/favorites.js';
+	import { sendMessage } from '$lib/utils.js';
 	import { authedUser,currencyState,cartTotalComps } from '$lib/stores/mainStores.js';
 	import { onMount } from 'svelte';
 	import Icon from '@iconify/svelte';
@@ -92,7 +94,14 @@
 			if (!existingExpiration) {
 				if (!$authedUser.id) {
 					await submitAlternateForm();
+					
 				} else {
+					const formdata = new FormData()
+					sendMessage("/?/getFavorites",formdata,async(result)=>{
+						console.log(result.favorite);
+						myFavorites.set(result.favorite)
+						localStorage.setItem("myfavorites",JSON.stringify(result.favorite))
+					})
 					await submitForm();
 				}
 				const expirationTime = new Date();
