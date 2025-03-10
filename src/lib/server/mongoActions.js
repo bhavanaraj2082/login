@@ -122,15 +122,21 @@ export const submitContactInfo = async (data) => {
 
 export const getOrderresultData = async (body) => {
 	try {
-		const records = await Order.findOne({ orderid: body.orderNumber });
-		if (records) {
+		const records = await Order.findOne({ orderid: body.orderNumber }).populate('profileId');
+
+		if (!records) {
+			return { success: false, message: 'Order not found' };
+		}
+		else if(records.profileId.email !== body.email){
+			return { success: false, message: 'Email does not match the profile associated with this order' };
+		} 
+		else {
 			return {
 				success: true,
 				msg: 'Success',
-				order: JSON.parse(JSON.stringify(records))
+				order: JSON.parse(JSON.stringify(records)) 
 			};
-		} else {
-			return { success: false, message: 'Order not found' };
+			
 		}
 	} catch (error) {
 		console.error('Error getting order data:', error);
@@ -2067,22 +2073,22 @@ export const favaddToCart = async (cartData, userId, userEmail) => {
             isDeleted: false
         });
 
-        // const cartItem = {
-        //     productId: cartData.productId,
-        //     stockId: cartData.stockId,
-        //     manufacturerId: cartData.manufacturerId,
-        //     distributorId: cartData.distributorId,
-        //     quantity: parseInt(cartData.quantity) || 1,
-        //     backOrder: cartData.backOrder,
-        //     isCart: false,
-        //     isQuote: false,
-        //     quoteOfferPrice: { INR: 0, USD: 0 },
-        //     cartOfferPrice: { INR: 0, USD: 0 }
-        // };
-        //console.log(cartData,"opopopop");
+        const cartItem = {
+            productId: cartData.productId,
+            stockId: cartData.stockId,
+            manufacturerId: cartData.manufacturerId,
+            distributorId: cartData.distributorId,
+            quantity: parseInt(cartData.quantity) || 1,
+            backOrder: 0,
+            isCart: false,
+            isQuote: false,
+            quoteOfferPrice: { INR: 0, USD: 0 },
+            cartOfferPrice: { INR: 0, USD: 0 }
+        };
+
         if (existingCart) {
             const itemIndex = existingCart.cartItems.findIndex(
-                item => item.productId.toString() === cartData.productId
+                item => item.productId.toString() === cartData.productId.toString()
             );
 
             if (itemIndex > -1) {
@@ -2093,7 +2099,7 @@ export const favaddToCart = async (cartData, userId, userEmail) => {
                     message: 'Item quantity updated in cart'
                 };
             } else {
-                existingCart.cartItems.push(cartData);
+                existingCart.cartItems.push(cartItem);
                 await existingCart.save();
                 return {
                     status: 'success',
@@ -2104,7 +2110,7 @@ export const favaddToCart = async (cartData, userId, userEmail) => {
             await Cart.create({
                 cartId: nanoid(8),
                 cartName: 'mycart',
-                cartItems: [cartData],
+                cartItems: [cartItem],
                 userId,
                 userEmail,
                 isDeleted: false,
@@ -3087,10 +3093,4 @@ export const recurrenceCartActive = async(userId,body) =>{
     await Cart.findOneAndUpdate({userId,isActiveCart:true},{isActiveCart:false})
     await Cart.findOneAndUpdate({cartId},{isActiveCart:true,$push:{recurrenceLogs:{recurringDate,action:"Accepted"}}})
 	return { success:true,action:"accept",message:"Recurrence date updated successfully"}
-}
-
-export const getMyFavorites = async(userId) => {
-	const myFav = await MyFavourites.findOne({userId},{favorite:1,_id:0}).lean()
-	let favorite = JSON.parse(JSON.stringify(myFav.favorite.map(x=>x.productId)))
-	return {favorite}
 }
