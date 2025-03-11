@@ -3,7 +3,7 @@
 	import SelectItems from "$lib/components/ReturnStatus/SelectItems.svelte";
     export let data;
 	const returndata = data.returndata;
-	
+	console.log(data)
 </script>
 
 <InvoiceDatailes {returndata}/>

@@ -56,6 +56,15 @@
       isHide = false;
     }, 400)
 	}
+
+	let hoveredItem = null; 
+    function handleMouseEnter(imageSrc, index) {
+    hoveredItem = { imageSrc, index }; 
+  }
+
+function handleMouseLeave() {
+  hoveredItem = null; 
+}
 	onMount(() => {
 		//window.addEventListener('scroll', handleScroll)
 		filteredGuestCart = $guestCart.filter(guestItem => 
@@ -462,11 +471,35 @@
 					
 							<h3 class=" lg:hidden font-medium text-xs sm:text-sm">Product</h3>
 							<div class="flex items-center w-full md:w-6/12 md:pr-2">
-								<div>
+								<div class="relative">
 									<!-- svelte-ignore a11y-click-events-have-key-events -->
 									<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-									<img src={item.productDetails.imageSrc} alt={item.productDetails.productName} class=" cursor-pointer w-20 h-20 object-contain rounded-md"
-									on:click={() => imagemodal(item.productDetails.imageSrc)} />
+									<!-- <img src={item.productDetails.imageSrc}  class=" cursor-pointer w-20 h-20 object-contain rounded-md"
+									on:click={() => imagemodal(item.productDetails.imageSrc)} /> -->
+
+
+									<img 
+									src={item.productDetails.imageSrc} 
+									class="cursor-pointer w-20 h-20 sm:w-40 sm:h-40 object-contain" 
+									alt={item.productDetails.productName}
+									on:click={() => imagemodal(item.productDetails.imageSrc)}
+									on:mouseenter={() => handleMouseEnter(item.productDetails.imageSrc , index)}
+									on:mouseleave={handleMouseLeave}
+								  />
+								
+								   {#if hoveredItem && hoveredItem.imageSrc === item.productDetails.imageSrc && hoveredItem.index === index}
+									<div
+									  class="absolute bottom-3/4 left-1/2 transform -translate-x-1/2 mb-2 z-50 whitespace-nowrap text-xs text-description font-medium py-1 px-4 rounded-md shadow-lg border leading-snug bg-black text-white"
+									>
+									  Click to view <br />larger image
+									  <div
+										class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-black"
+									  ></div>
+									</div>
+								  {/if}
+
+
+
 									{#if showimage}
 									<!-- svelte-ignore a11y-click-events-have-key-events -->
 									<!-- svelte-ignore a11y-no-static-element-interactions -->

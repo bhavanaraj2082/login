@@ -65,11 +65,11 @@
 
 <button 
 on:click={() => goto('/')}
-  class="absolute top-0.5 my-2.5 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-4 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
-  <div class="flex items-center space-x-2">
-    <Icon icon="mdi:home" class="text-xl"/>
-    <span class="hidden sm:inline text-sm font-medium">Back to Home</span>
-  </div>
+		class="absolute top-0.5 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-4 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
+		<div class="flex items-center space-x-2">
+			<Icon icon="mdi:home" class="text-xl"/>
+			<span class="hidden sm:inline text-sm font-medium">Back to Home</span>
+		</div>
 </button>
 {#if token || userEmail}
   <div

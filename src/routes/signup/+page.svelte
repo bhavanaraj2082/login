@@ -17,7 +17,7 @@
 
 <SEO {metadata} />
 <div class="min-h-screen overflow-hidden bg-gradient-to-br from-primary-400 via-primary-400 to-primary-200 relative">
-  <div class="absolute top-0 left-0 w-full h-12 text-primary-500  bg-white flex items-center md:justify-start justify-center">
+  <div class="absolute top-0 left-0 w-full h-11 text-primary-500  bg-white flex items-center md:justify-start justify-center">
     <span class="text-2xl font-extrabold md:ml-6 py-4">Chemikart</span>
   </div>
   <div class="absolute top-1/4 left-10 lg:w-40 w-10 lg:h-40 h-10 md:bg-white/30 bg-gray-800/10 blur-2xl clip-hexagon shadow-md"></div>
