@@ -311,8 +311,9 @@
     });
 
     if (validRows.length === 0) {
-      cartloading = false;
+      
       toast.error("No valid items to add to cart");
+      cartloading = false;
       return;
     }
 
@@ -752,7 +753,9 @@
     const Price = selectedProduct.price || 0;
     const quantity =
       selectedProduct.quantity > 0 ? selectedProduct.quantity : 1;
-
+      const rowQuantity = parseInt(quantity, 10) || 0;
+              const productStock = parseInt(validProduct.stock, 10) || 0;
+              const backOrder = Math.max(rowQuantity - productStock, 0);
     return {
       id: productToAdd.id,
       description: productToAdd.prodDesc,
@@ -768,7 +771,7 @@
       inrPrice: selectedProduct.inrPrice,
       size: size,
 
-      backOrder: Math.max(quantity - productToAdd.stock) || 0,
+      backOrder: backOrder,
       quantity: quantity,
       rowIndex: currentIndex,
     };
@@ -827,6 +830,7 @@
 
     if (validRows.length === 0) {
       toast.error("No valid items to add to cart");
+      cartloading = false;
       return [];
     }
 
@@ -873,6 +877,9 @@
             : row.quantity > 0
               ? row.quantity
               : 1;
+              const rowQuantity = parseInt(row.quantity, 10) || 0;
+              const productStock = parseInt(validProduct.stock, 10) || 0;
+              const backOrder = Math.max(rowQuantity - productStock, 0);
 
         return {
           id: validProduct.id,
@@ -895,7 +902,8 @@
             validProduct.pricing.find((p) => p.break === row.selectedSize)
               ?.inr || "N/A",
           size: row.selectedSize,
-          backOrder: Math.max(row.quantity - validProduct.stock),
+          backOrder : backOrder,
+
           quantity: quantity || row.quantity > 0 ? row.quantity : 1,
         };
       })
@@ -939,11 +947,10 @@
       );
 
       if (existingItemIndex > -1) {
-        // Update existing item
+
         currentCart[existingItemIndex].quantity = item.quantity;
         currentCart[existingItemIndex].backOrder = item.backOrder;
       } else {
-        // Add new item
         currentCart.push(simplifiedItem);
       }
     }
@@ -1619,7 +1626,7 @@ on:change={() => selectProduct(result, index, { break: null })}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="fixed !ml-0 inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50 px-4 sm:px-5"
+      class="fixed !ml-0 inset-0 bg-black bg-opacity-40 flex justify-center items-center backdrop-blur-sm z-50 px-4 transition-opacity sm:px-5"
       on:click|self={hideDetails}
     >
       <div
@@ -1787,13 +1794,13 @@ on:change={() => selectProduct(result, index, { break: null })}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class=" !ml-0 fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity"
       on:click={() => (showQuoteModal = false)}
     >
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
-        class="bg-white rounded-lg w-full md:w-2/5 max-h-full overflow-y-auto p-4 md:p-6 m-4 md:m-0"
+      class="bg-white rounded-lg p-6 w-2/5 h-5/6 overflow-y-auto"
         on:click|stopPropagation
       >
         <h2 class="text-xl font-semibold mb-4 text-primary-400">
@@ -2284,12 +2291,12 @@ on:change={() => selectProduct(result, index, { break: null })}
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
-  class={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 ${!isCartPopupVisible ? "hidden" : ""}`}
+  class={`fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center backdrop-blur-sm   transition-opacity z-50 ${!isCartPopupVisible ? "hidden" : ""}`}
   bind:this={cartPopupOverlay}
   transition:fade={{ duration: 200 }}
   on:click={hideCartPopup}
 >
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md overflow-hidden">
     <!-- Popup Header -->
     <div class="flex justify-between items-center p-4 border-b border-gray-200">
       <h3 class="text-lg font-semibold text-gray-800">Added to Cart</h3>

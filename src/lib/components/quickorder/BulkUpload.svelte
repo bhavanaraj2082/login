@@ -402,6 +402,9 @@
         const sizePriceInfo = product.pricing[0];
         const size = sizePriceInfo.break;
         const price = sizePriceInfo.price;
+           const rowQuantity = parseInt(product.quantity, 10) || 0;
+              const productStock = parseInt(product.stock, 10) || 0;
+              const backOrder = Math.max(rowQuantity - productStock, 0);
 
         const newProduct = {
           id: product.id,
@@ -417,7 +420,7 @@
             size: size,
           },
           quantity: product.quantity,
-          backOrder: Math.max(product.quantity - product.stock),
+          backOrder: backOrder,
           stock: product.stock,
         };
 

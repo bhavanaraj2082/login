@@ -151,21 +151,96 @@ export const CancelOrder = async (body) => {
 	}
 };
 
-export async function checkavailabilityproduct(data) {
-	// console.log(data);
-	const stockRecord = await Stock.findOne({ productNumber: data.ProductId }).exec();
-	// console.log('stockRecord:', stockRecord);
-	const stockQuantity = stockRecord.stock;
-	// console.log(stockQuantity,"stockQuantity");
+// export async function checkavailabilityproduct(data) {
+// 	// console.log(data);
+// 	const stockRecord = await Stock.findOne({ productNumber: data.ProductId }).exec();
+// 	// console.log('stockRecord:', stockRecord);
+// 	const stockQuantity = stockRecord.stock;
+// 	// console.log(stockQuantity,"stockQuantity");
 
-	if (!stockRecord) {
-		return { message: 'Out of stock', type: 'error' };
+// 	if (!stockRecord) {
+// 		return { message: 'Out of stock', type: 'error' };
+// 	}
+
+// 	if (stockQuantity > 0) {
+// 		return { message: `${stockQuantity} Quantity is Available to ship.`, type: 'success' };
+// 	} else {
+// 		return { message: `Out of Stock`, type: 'error' };
+// 	}
+// }
+export async function checkavailabilityproduct(data) {
+	const { ProductId, quantity } = data;
+
+	// console.log('ProductId from actions:', ProductId);
+
+	if (!ProductId || !quantity) {
+		return {
+			type: 'error',
+			message: 'Product ID and Quantity are required.'
+		};
 	}
 
-	if (stockQuantity > 0) {
-		return { message: `${stockQuantity} Quantity is Available to ship.`, type: 'success' };
-	} else {
-		return { message: `Out of Stock`, type: 'error' };
+	const requestedQuantity = parseInt(quantity, 10);
+
+	
+
+	try {
+	
+		// console.log(`Querying stock with ProductId: ${ProductId}`);
+
+	
+		const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
+
+		// console.log('Stock Record:', stockRecord);
+
+		if (!stockRecord) {
+			console.log(`No stock record found for ProductId: ${ProductId}`);
+			return {
+				message: 'Out of stock',
+				stock: 'Unavailable',
+				type: 'error'
+			};
+		}
+
+		const stockQuantity = stockRecord.stock;
+
+		if (stockQuantity > 0) {
+			if (requestedQuantity <= stockQuantity) {
+				const remainingStock = stockQuantity - requestedQuantity;
+				if (remainingStock >= 0) {
+					return {
+						message: `${stockQuantity} Quantity is available to ship`,
+						stock: 'Available',
+						type: 'success'
+					};
+				} else {
+					return {
+						message: `Only ${stockQuantity} Quantity available.`,
+						stock: 'Limited Availability',
+						type: 'error'
+					};
+				}
+			} else {
+				return {
+					message: `Only ${stockQuantity} Quantity available.`,
+					stock: 'Limited Availability',
+					type: 'error'
+				};
+			}
+		} else {
+			return {
+				message: 'Out of Stock',
+				stock: 'Unavailable',
+				type: 'error'
+			};
+		}
+	} catch (error) {
+		console.error('Error during stock check:', error);
+		return {
+			message: 'Something went wrong with the stock check.',
+			stock: 'Unavailable',
+			type: 'error'
+		};
 	}
 }
 
@@ -1689,6 +1764,70 @@ export const getcancelreturn = async (id) => {
 };
 //returns ends
 
+// export async function quickcheck(data) {
+// 	const { ProductId, quantity } = data;
+
+// 	// console.log('ProductId from actions:', ProductId);
+
+// 	if (!ProductId || !quantity) {
+// 		return {
+// 			type: 'error',
+// 			message: 'Product ID and Quantity are required.'
+// 		};
+// 	}
+
+// 	const requestedQuantity = parseInt(quantity, 10);
+
+// 	try {
+	
+// 		// console.log(`Querying stock with ProductId: ${ProductId}`);
+
+	
+// 		const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
+
+// 		// console.log('Stock Record:', stockRecord);
+
+// 		if (!stockRecord) {
+// 			console.log(`No stock record found for ProductId: ${ProductId}`);
+// 			return {
+// 				message: 'Out of stock',
+// 				stock: 'Unavailable',
+// 				type: 'error'
+// 			};
+// 		}
+
+// 		const stockQuantity = stockRecord.stock;
+
+// 		if (stockQuantity > 0) {
+// 			if (requestedQuantity <= stockQuantity) {
+// 				return {
+// 					message: `${stockQuantity} is avilable to ship`,
+// 					stock: 'Available',
+// 					type: 'success'
+// 				};
+// 			} else {
+// 				return {
+// 					message: `Only ${stockQuantity} units available.`,
+// 					stock: 'Limited Availability',
+// 					type: 'error'
+// 				};
+// 			}
+// 		} else {
+// 			return {
+// 				message: 'Out of Stock',
+// 				stock: 'Unavailable',
+// 				type: 'error'
+// 			};
+// 		}
+// 	} catch (error) {
+// 		console.error('Error during stock check:', error);
+// 		return {
+// 			message: 'Something went wrong with the stock check.',
+// 			stock: 'Unavailable',
+// 			type: 'error'
+// 		};
+// 	}
+// }
 export async function quickcheck(data) {
 	const { ProductId, quantity } = data;
 
@@ -1702,6 +1841,8 @@ export async function quickcheck(data) {
 	}
 
 	const requestedQuantity = parseInt(quantity, 10);
+
+	
 
 	try {
 	
@@ -1725,14 +1866,23 @@ export async function quickcheck(data) {
 
 		if (stockQuantity > 0) {
 			if (requestedQuantity <= stockQuantity) {
-				return {
-					message: `${stockQuantity} is avilable to ship`,
-					stock: 'Available',
-					type: 'success'
-				};
+				const remainingStock = stockQuantity - requestedQuantity;
+				if (remainingStock >= 0) {
+					return {
+						message: `${stockQuantity} Quantity is available to ship`,
+						stock: 'Available',
+						type: 'success'
+					};
+				} else {
+					return {
+						message: `Only ${stockQuantity} Quantity available.`,
+						stock: 'Limited Availability',
+						type: 'error'
+					};
+				}
 			} else {
 				return {
-					message: `Only ${stockQuantity} units available.`,
+					message: `Only ${stockQuantity} Quantity available.`,
 					stock: 'Limited Availability',
 					type: 'error'
 				};
@@ -2749,53 +2899,28 @@ export const deleteRecurrence = async(body)=>{
 	return { success: true, msg: `Recurrence deleted successfully` };
 }
 
-export const addToCartquick = async (item, userId, userEmail) => {
-	try {
-	  const search = await Cart.findOne({ userId, userEmail, isActiveCart: true }).lean();
-  
-	  let cart;
-  
-	  if (search === null) {
-		cart = await Cart.create({ cartId: nanoid(8), cartName: "mycart", cartItems: [item], userId, userEmail, isActiveCart: true });
-		return { success: true, message: "Product is added to cart" };
-	  } else {
-		if (!item.productId || !item.stockId) {
-		  return { success: false, message: 'Invalid productId or stockId' };
+
+export const addToCartquick = async(item,userId,userEmail)=>{
+	const search = await Cart.findOne({userId,userEmail,isActiveCart:true}).lean()
+	let cart
+	if(search === null){
+		cart = await Cart.create({cartId:nanoid(8),cartName:"mycart",cartItems:item,userId,userEmail,isActiveCart:true})
+		return {success:true,message:"Product is added to cart2"}
+	}else{
+		const findItem = search.cartItems.find(x=>x.stockId.toString() === item.stockId)
+	   console.log(item,"sdffffffffff",findItem);
+		if(findItem === undefined){
+		cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$push:{cartItems:item}},{new:true})
+		return {success:true,message:"Product is added to cart"}
+		}else{
+		 findItem.quantity = item.quantity
+		 findItem.backOrder = item.backOrder
+		cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$set:{cartItems:search.cartItems}},{new:true})
+		return {success:true,message:"Product quantity is updated in cart"}
 		}
-		const findItem = search.cartItems.find(x => 
-		  x.productId && 
-		  x.productId.toString() === item.productId.toString() &&
-		  x.stockId && 
-		  x.stockId.toString() === item.stockId.toString()
-		);
-		if (findItem === undefined) {
-		  cart = await Cart.findOneAndUpdate(
-			{ userId, userEmail, isActiveCart: true },
-			{ $push: { cartItems: item } },
-			{ new: true }
-		  );
-		  return { success: true, message: "Product is added to cart" };
-		} else {
-		  cart = await Cart.findOneAndUpdate(
-			{ userId, userEmail, isActiveCart: true },
-			{ $set: { 'cartItems.$[elem]': item } },
-			{
-			  arrayFilters: [{ 
-				'elem.productId': item.productId,
-				'elem.stockId': item.stockId 
-			  }],
-			  new: true
-			}
-		  );
-		//   console.log('Cart after updating item:', cart);
-		  return { success: true, message: "Product quantity is updated in cart" };
-		}
-	  }
-	} catch (err) {
-	
-	  return { success: false, message: 'Failed to add product to cart' };
 	}
-  };
+} 
+
 export const resumeCart = async (cartId, userId) => {
 	if (!cartId || !userId) {
 		throw new Error('Cart ID and User ID are required');

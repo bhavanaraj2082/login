@@ -238,8 +238,8 @@ quicksearch: async ({ request }) => {
   
       // Process each cart item
       for (const item of cartItems) {
-        console.log('Processing item:', item);
-        const backorder =Math.max(item.quantity-item.stock)
+        // console.log('Processing item:', item);
+        // const backorder =Math.max(item.quantity-item.stock)
         
         const cartItem = {
           productId:  item.id,
@@ -249,7 +249,7 @@ quicksearch: async ({ request }) => {
           distributorId : item.distributerId || '',
           stockId :item.stockId|| '',
           quantity: item.quantity || '',
-          backOrder: backorder,
+          backOrder: item.backOrder,
           offerPrice: {
             usd: item.usdPrice,
             inr: item.inrPrice * 75 
