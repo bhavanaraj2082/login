@@ -119,7 +119,7 @@
     selectedPrice = selectedProduct.priceSize[selectedPriceIndex];
     selectedStockId = selectedProduct.stockId[selectedPriceIndex] || "NA";
     selectedVariants = selectedProduct.variants[selectedPriceIndex] || "NA";
-    popupQuantity = null;
+    popupQuantity = 1;
     showModal = true;
     // showCartMessage = false;
 
@@ -158,7 +158,7 @@
     selectedStockId = selectedProduct.stockId[index] || "NA";
   }
 
-  let popupQuantity = null;
+  let popupQuantity = 1;
 
   function decrementPopupQuantity() {
     if (popupQuantity > 1) {
@@ -601,7 +601,7 @@
                   >
                     -
                   </button>
-                  <input
+                  <!-- <input
                     type="number"
                     id="popupQuantity"
                     min="1"
@@ -609,7 +609,51 @@
                     bind:value={popupQuantity}
                     on:input={handlePopupInput}
                     class="w-16 sm:w-20 h-9 text-center border-none focus:outline-none focus:ring-0"
-                  />
+                  /> -->
+                  <input
+                  type="text"
+                  min="1"
+                  maxlength="3"
+                  bind:value={popupQuantity}
+                  class="w-12 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
+            
+                  on:input={(e) => { 
+                    // Ensure only numbers are allowed 
+                    e.target.value = e.target.value.replace(/[^0-9]/g, ""); 
+                  
+                    // If the value starts with '0' but has more than one character, remove the leading zero 
+                    if (e.target.value.startsWith("0") && e.target.value.length > 1) { 
+                      e.target.value = e.target.value.slice(1); 
+                    } 
+                  
+                    // Allow empty field during typing
+                    if (e.target.value === "") { 
+                      popupQuantity = ""; // Allow empty value during typing
+                    } else {
+                      // Parse the input value and update quantity 
+                      const parsedValue = parseInt(e.target.value, 10); 
+                      
+                      if (parsedValue >= 1 && parsedValue <= 999) { 
+                        popupQuantity = parsedValue; 
+                      } else if (parsedValue > 999) {
+                        popupQuantity = 999;
+                        e.target.value = "999";
+                      }
+                    }
+                    
+                    // We're handling validation in onBlur now, so we don't need to call handlePopupInput here
+                  }} 
+                  
+                  on:blur={(e) => { 
+                    // Only validate when focus leaves the field
+                    if (e.target.value === "" || e.target.value === "0") { 
+                      popupQuantity = 1; 
+                      e.target.value = "1"; 
+                    } 
+                  }}
+                  aria-label="popupQuantity"
+                  max="999"
+                />
                   <button
                     type="button"
                     class="pr-3 text-xl text-primary-500 hover:scale-110"

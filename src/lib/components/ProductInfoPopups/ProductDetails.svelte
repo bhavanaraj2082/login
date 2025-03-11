@@ -90,7 +90,7 @@
   let successMessage = "";
   let errorMessage = "";
   let orderMultiple = null;
-  let quantity = null;
+  let quantity = 1;
 
   // console.log(data.records,"data.records");
 
@@ -180,7 +180,7 @@
 
               console.log(
                 `Record ${recordIndex}, Variant ${variantIndex}: Pricing data found:`,
-                pricingData
+                pricingData,
               );
 
               // Check and parse INR price
@@ -189,12 +189,12 @@
                 minPrice.INR = Math.min(minPrice.INR, priceINR);
                 maxPrice.INR = Math.max(maxPrice.INR, priceINR);
                 console.log(
-                  `Record ${recordIndex}, Variant ${variantIndex}: INR - ${priceINR}`
+                  `Record ${recordIndex}, Variant ${variantIndex}: INR - ${priceINR}`,
                 );
               } else {
                 console.warn(
                   `Record ${recordIndex}, Variant ${variantIndex}: Invalid INR value:`,
-                  pricingData.INR
+                  pricingData.INR,
                 );
               }
 
@@ -204,17 +204,17 @@
                 minPrice.USD = Math.min(minPrice.USD, priceUSD);
                 maxPrice.USD = Math.max(maxPrice.USD, priceUSD);
                 console.log(
-                  `Record ${recordIndex}, Variant ${variantIndex}: USD - ${priceUSD}`
+                  `Record ${recordIndex}, Variant ${variantIndex}: USD - ${priceUSD}`,
                 );
               } else {
                 console.warn(
                   `Record ${recordIndex}, Variant ${variantIndex}: Invalid USD value:`,
-                  pricingData.USD
+                  pricingData.USD,
                 );
               }
             } else {
               console.warn(
-                `Record ${recordIndex}, Variant ${variantIndex}: Pricing data missing or incorrect.`
+                `Record ${recordIndex}, Variant ${variantIndex}: Pricing data missing or incorrect.`,
               );
             }
           });
@@ -844,7 +844,7 @@
                     {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    }
+                    },
                   )}
                 {:else}
                   ₹ {(product?.priceSize[index]?.INR ?? 0).toLocaleString(
@@ -852,7 +852,7 @@
                     {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    }
+                    },
                   )}
                 {/if}
               </span>
@@ -921,12 +921,68 @@
                         >
                           <Icon icon="ic:round-minus" class="text-2xl" />
                         </button>
-                        <input
+                        <!-- <input
                           type="text"
                           name="quantity"
                           bind:value={quantity}
                           on:input={updateQuantity}
                           class="w-12 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
+                        /> -->
+
+                        <input
+                          type="text"
+                          min="1"
+                          maxlength="3"
+                          bind:value={quantity}
+                          class="w-12 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
+                          on:focus={(e) => {
+                            const currentValue = e.target.value;
+                            e.target.value = "";
+                            setTimeout(() => {
+                              e.target.select();
+                            }, 10);
+                          }}
+                          on:blur={(e) => {
+                            if (
+                              e.target.value === "" ||
+                              e.target.value === "0"
+                            ) {
+                              quantity = 1;
+                              e.target.value = "1";
+                            }
+                          }}
+                          on:input={(e) => {
+                            // Ensure only numbers are allowed
+                            e.target.value = e.target.value.replace(
+                              /[^0-9]/g,
+                              "",
+                            );
+
+                            // If the value starts with '0' but has more than one character, remove the leading zero
+                            if (
+                              e.target.value.startsWith("0") &&
+                              e.target.value.length > 1
+                            ) {
+                              e.target.value = e.target.value.slice(1);
+                            }
+
+                            // Parse the input value and update quantity
+                            const parsedValue = parseInt(e.target.value, 10);
+
+                            if (
+                              parsedValue &&
+                              parsedValue >= 1 &&
+                              parsedValue <= 999
+                            ) {
+                              quantity = parsedValue;
+                            } else if (e.target.value === "") {
+                              quantity = 0; // Set to 0 if empty
+                            }
+
+                            updateQuantity(e); // Handle additional input logic if needed
+                          }}
+                          aria-label="Quantity"
+                          max="999"
                         />
 
                         <input
@@ -952,11 +1008,11 @@
                             console.log("success/error type:", status);
                             console.log(
                               "success/error message:result.data.message=",
-                              result.data.message
+                              result.data.message,
                             );
                             console.log(
                               "success/error message:result.data.message=",
-                              result.data.stock
+                              result.data.stock,
                             );
                             stockStatus = result.data.stock;
                             stockAvailability = result.data.message;
@@ -1103,13 +1159,13 @@
                       <div class="flex justify-start space-x-4 mt-3">
                         <a
                           href="https://t.me/share/url?url={encodeURIComponent(
-                            productURL
+                            productURL,
                           )}&text={encodeURIComponent(
                             'Manufacturer Name: ' +
                               product.manufacturer.name +
                               ' - ' +
                               ' Product Name: ' +
-                              product.productName
+                              product.productName,
                           )}"
                           target="_blank"
                           class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-600 transition duration-200"
@@ -1126,7 +1182,7 @@
                                 "Product Name: " +
                                 product.productName +
                                 " " +
-                                productURL
+                                productURL,
                             )}
                           target="_blank"
                           class="w-12 h-12 flex items-center justify-center rounded-full bg-green-500 text-white shadow-md hover:bg-green-600 transition duration-200"
@@ -1263,12 +1319,52 @@
               class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
               ><Icon icon="ic:round-minus" class="text-2xl" /></button
             >
-            <input
+            <!-- <input
               type="text"
               class="w-12 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
               bind:value={quantity}
               on:input={updateQuantity}
               min="1"
+              max="999"
+            /> -->
+            <input
+              type="text"
+              min="1"
+              maxlength="3"
+              bind:value={quantity}
+              class="w-12 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
+              on:focus={(e) => {
+                const currentValue = e.target.value;
+                e.target.value = "";
+                setTimeout(() => {
+                  e.target.select();
+                }, 10);
+              }}
+              on:blur={(e) => {
+                if (e.target.value === "" || e.target.value === "0") {
+                  quantity = 1;
+                  e.target.value = "1";
+                }
+              }}
+              on:input={(e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                if (
+                  e.target.value.startsWith("0") &&
+                  e.target.value.length > 1
+                ) {
+                  e.target.value = e.target.value.slice(1);
+                }
+                const parsedValue = parseInt(e.target.value, 10);
+
+                if (parsedValue && parsedValue >= 1 && parsedValue <= 999) {
+                  quantity = parsedValue;
+                } else if (e.target.value === "") {
+                  quantity = 0;
+                }
+
+                updateQuantity(e);
+              }}
+              aria-label="Quantity"
               max="999"
             />
 
@@ -1678,7 +1774,7 @@
 
                     if (
                       verificationMessage.includes(
-                        "Verification email sent successfully. Please check your inbox."
+                        "Verification email sent successfully. Please check your inbox.",
                       )
                     ) {
                       displayMessage = "Please check your inbox.";
@@ -1733,7 +1829,7 @@
                   type="submit"
                   class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-500 font-semibold text-2s pl-2 py-1 rounded hover:underline disabled:cursor-not-allowed"
                   disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-                    email
+                    email,
                   ) || email.split("@")[1].includes("gamil")}
                 >
                   Verify
