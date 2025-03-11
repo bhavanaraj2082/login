@@ -42,11 +42,11 @@
   {#if currentView === "qoutes"}
   <div class="w-full mx-auto max-w-7xl rounded-t-lg mb-10">
     <div class="flex flex-col sm:flex-row gap-4">
-      <div class="w-full sm:w-2/3 p-4">
+      <div class="w-full sm:w-2/3 p-6">
         <h1 class="sm:text-2xl text-sm font-bold text-black rounded-t-lg">
           Custom solution quote request
         </h1>
-        <p class="py-1 pb-2 font-medium sm:text-sm text-xs">
+        <p class="py-1 pb-2 font-medium sm:text-xs text-2s">
           Our skilled teams and cutting-edge facilities specialize in delivering tailored organic smart solutions and custom inorganic reference materials, allowing you to specify your exact needs at the required quality level, ensuring precise production to meet your specifications.
         </p>
         <!-- <button 
@@ -55,16 +55,16 @@
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button> -->
       </div>
-      <div class="w-full sm:w-1/3 rounded-lg bg-gray-200 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
-        <h1 class="pb-2 sm:text-lg text-sm font-bold text-black">
+      <div class="w-full sm:w-1/3 rounded-lg bg-gray-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
+        <h1 class="pb-2 sm:text-lg text-sm font-bold text-description">
           Need help?
         </h1>
         <p class="flex items-center gap-2">
-          <Icon icon="mdi:phone" class="text-lg text-black" /> 
+          <Icon icon="mdi:phone" class="text-lg text-description" /> 
           <a href="tel:7829922222" class="hover:text-primary-500">7829922222</a>
         </p>
         <p class="flex items-center gap-2">
-          <Icon icon="mdi:email" class="text-lg text-black" /> 
+          <Icon icon="mdi:email" class="text-lg text-description" /> 
           <a href="mailto:sales@partskey.com" class="hover:text-primary-500">sales@partskey.com</a>
         </p>
       </div>
@@ -80,11 +80,11 @@
   {#if currentView === "qoutes1"}
   <div class="w-full mx-auto max-w-7xl rounded-t-lg mb-10">
     <div class="flex flex-col sm:flex-row gap-4">
-      <div class="w-full sm:w-2/3 p-4">
+      <div class="w-full sm:w-2/3 p-6">
         <h1 class="sm:text-2xl text-sm font-bold text-black rounded-t-lg">
           Custom solution quote request
         </h1>
-        <p class="py-1 pb-2 font-medium sm:text-sm text-xs">
+        <p class="py-1 pb-2 font-medium sm:text-xs text-2s">
           Our skilled teams and cutting-edge facilities specialize in delivering tailored organic smart solutions and custom inorganic reference materials, allowing you to specify your exact needs at the required quality level, ensuring precise production to meet your specifications.
         </p>
         <button 
@@ -93,16 +93,16 @@
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
-      <div class="w-full sm:w-1/3 rounded-lg bg-gray-200 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
-        <h1 class="pb-2 sm:text-lg text-sm font-bold text-black">
+      <div class="w-full sm:w-1/3 rounded-lg bg-gray-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
+        <h1 class="pb-2 sm:text-lg text-sm font-bold text-description">
           Need help?
         </h1>
         <p class="flex items-center gap-2">
-          <Icon icon="mdi:phone" class="text-lg text-black" /> 
+          <Icon icon="mdi:phone" class="text-lg text-description" /> 
           <a href="tel:7829922222" class="hover:text-primary-500">7829922222</a>
         </p>
         <p class="flex items-center gap-2">
-          <Icon icon="mdi:email" class="text-lg text-black" /> 
+          <Icon icon="mdi:email" class="text-lg text-description" /> 
           <a href="mailto:sales@partskey.com" class="hover:text-primary-500">sales@partskey.com</a>
         </p>
       </div>
@@ -116,11 +116,11 @@
   {#if currentView === "qoutes2"}
   <div class="w-full mx-auto max-w-7xl rounded-t-lg mb-10">
     <div class="flex flex-col sm:flex-row gap-4">
-      <div class="w-full sm:w-2/3 p-4">
+      <div class="w-full sm:w-2/3 p-6">
         <h1 class="sm:text-2xl text-sm font-bold text-black rounded-t-lg">
           Custom solution quote request
         </h1>
-        <p class="py-1 pb-2 font-medium sm:text-sm text-xs">
+        <p class="py-1 pb-2 font-medium sm:text-xs text-2s">
           Our skilled teams and cutting-edge facilities specialize in delivering tailored organic smart solutions and custom inorganic reference materials, allowing you to specify your exact needs at the required quality level, ensuring precise production to meet your specifications.
         </p>
         <button 
@@ -129,16 +129,16 @@
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
-      <div class="w-full sm:w-1/3 rounded-lg bg-gray-200 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
-        <h1 class="pb-2 sm:text-lg text-sm font-bold text-black">
+      <div class="w-full sm:w-1/3 rounded-lg bg-gray-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
+        <h1 class="pb-2 sm:text-lg text-sm font-bold text-description">
           Need help?
         </h1>
         <p class="flex items-center gap-2">
-          <Icon icon="mdi:phone" class="text-lg text-black" /> 
+          <Icon icon="mdi:phone" class="text-lg text-description" /> 
           <a href="tel:7829922222" class="hover:text-primary-500">7829922222</a>
         </p>
         <p class="flex items-center gap-2">
-          <Icon icon="mdi:email" class="text-lg text-black" /> 
+          <Icon icon="mdi:email" class="text-lg text-description" /> 
           <a href="mailto:sales@partskey.com" class="hover:text-primary-500">sales@partskey.com</a>
         </p>
       </div>
@@ -152,11 +152,11 @@
   {#if currentView === "qoutes3"}
   <div class="w-full mx-auto max-w-7xl rounded-t-lg mb-10">
     <div class="flex flex-col sm:flex-row gap-4">
-      <div class="w-full sm:w-2/3 p-4">
+      <div class="w-full sm:w-2/3 p-6">
         <h1 class="sm:text-2xl text-sm font-bold text-black rounded-t-lg">
           Custom solution quote request
         </h1>
-        <p class="py-1 pb-2 font-medium sm:text-sm text-xs">
+        <p class="py-1 pb-2 font-medium sm:text-xs text-2s">
           Our skilled teams and cutting-edge facilities specialize in delivering tailored organic smart solutions and custom inorganic reference materials, allowing you to specify your exact needs at the required quality level, ensuring precise production to meet your specifications.
         </p>
         <button 
@@ -165,16 +165,16 @@
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
-      <div class="w-full sm:w-1/3 rounded-lg bg-gray-200 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
-        <h1 class="pb-2 sm:text-lg text-sm font-bold text-black">
+      <div class="w-full sm:w-1/3 rounded-lg bg-gray-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
+        <h1 class="pb-2 sm:text-lg text-sm font-bold text-description">
           Need help?
         </h1>
         <p class="flex items-center gap-2">
-          <Icon icon="mdi:phone" class="text-lg text-black" /> 
+          <Icon icon="mdi:phone" class="text-lg text-description" /> 
           <a href="tel:7829922222" class="hover:text-primary-500">7829922222</a>
         </p>
         <p class="flex items-center gap-2">
-          <Icon icon="mdi:email" class="text-lg text-black" /> 
+          <Icon icon="mdi:email" class="text-lg text-description" /> 
           <a href="mailto:sales@partskey.com" class="hover:text-primary-500">sales@partskey.com</a>
         </p>
       </div>
@@ -196,11 +196,11 @@
   {#if currentView === "qoutes4"}
   <div class="w-full mx-auto max-w-7xl rounded-t-lg mb-10">
     <div class="flex flex-col sm:flex-row gap-4">
-      <div class="w-full sm:w-2/3 p-4">
+      <div class="w-full sm:w-2/3 p-6">
         <h1 class="sm:text-2xl text-sm font-bold text-black rounded-t-lg">
           Custom solution quote request
         </h1>
-        <p class="py-1 pb-2 font-medium sm:text-sm text-xs">
+        <p class="py-1 pb-2 font-medium sm:text-xs text-2s">
           Our skilled teams and cutting-edge facilities specialize in delivering tailored organic smart solutions and custom inorganic reference materials, allowing you to specify your exact needs at the required quality level, ensuring precise production to meet your specifications.
         </p>
         <button 
@@ -209,16 +209,16 @@
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
-      <div class="w-full sm:w-1/3 rounded-lg bg-gray-200 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
-        <h1 class="pb-2 sm:text-lg text-sm font-bold text-black">
+      <div class="w-full sm:w-1/3 rounded-lg bg-gray-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
+        <h1 class="pb-2 sm:text-lg text-sm font-bold text-description">
           Need help?
         </h1>
         <p class="flex items-center gap-2">
-          <Icon icon="mdi:phone" class="text-lg text-black" /> 
+          <Icon icon="mdi:phone" class="text-lg text-description" /> 
           <a href="tel:7829922222" class="hover:text-primary-500">7829922222</a>
         </p>
         <p class="flex items-center gap-2">
-          <Icon icon="mdi:email" class="text-lg text-black" /> 
+          <Icon icon="mdi:email" class="text-lg text-description" /> 
           <a href="mailto:sales@partskey.com" class="hover:text-primary-500">sales@partskey.com</a>
         </p>
       </div>
@@ -239,11 +239,11 @@
   {#if currentView === "qoutes5"}
   <div class="w-full mx-auto max-w-7xl rounded-t-lg mb-10">
     <div class="flex flex-col sm:flex-row gap-4">
-      <div class="w-full sm:w-2/3 p-4">
+      <div class="w-full sm:w-2/3 p-6">
         <h1 class="sm:text-2xl text-sm font-bold text-black rounded-t-lg">
           Custom solution quote request
         </h1>
-        <p class="py-1 pb-2 font-medium sm:text-sm text-xs">
+        <p class="py-1 pb-2 font-medium sm:text-xs text-2s">
           Our skilled teams and cutting-edge facilities specialize in delivering tailored organic smart solutions and custom inorganic reference materials, allowing you to specify your exact needs at the required quality level, ensuring precise production to meet your specifications.
         </p>
         <button 
@@ -252,16 +252,16 @@
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
-      <div class="w-full sm:w-1/3 rounded-lg bg-gray-200 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
-        <h1 class="pb-2 sm:text-lg text-sm font-bold text-black">
+      <div class="w-full sm:w-1/3 rounded-lg bg-gray-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
+        <h1 class="pb-2 sm:text-lg text-sm font-bold text-description">
           Need help?
         </h1>
         <p class="flex items-center gap-2">
-          <Icon icon="mdi:phone" class="text-lg text-black" /> 
+          <Icon icon="mdi:phone" class="text-lg text-description" /> 
           <a href="tel:7829922222" class="hover:text-primary-500">7829922222</a>
         </p>
         <p class="flex items-center gap-2">
-          <Icon icon="mdi:email" class="text-lg text-black" /> 
+          <Icon icon="mdi:email" class="text-lg text-description" /> 
           <a href="mailto:sales@partskey.com" class="hover:text-primary-500">sales@partskey.com</a>
         </p>
       </div>
