@@ -280,8 +280,11 @@
       quantity = value;
     }
   };
+
   const increaseQuantity = () => {
-    if (quantity + orderMultiple <= 999) {
+    if (quantity === null) {
+      quantity = 1;
+    } else if (quantity + orderMultiple <= 999) {
       quantity += orderMultiple;
     } else {
       quantity = 999;
@@ -289,12 +292,13 @@
   };
 
   const decreaseQuantity = () => {
-    if (quantity - orderMultiple >= 1) {
-      quantity -= orderMultiple;
-    } else {
+    if (quantity === null || quantity - orderMultiple < 1) {
       quantity = 1;
+    } else {
+      quantity -= orderMultiple;
     }
   };
+
   function toggleSharePopup() {
     showSharePopup = !showSharePopup;
   }
@@ -360,7 +364,7 @@
       if (result.success) {
         await submitForm();
       }
-      toast.success(result.message);
+      // toast.success(result.message);
       invalidate("/");
     });
     // console.log("Final Cart Item Sent:", cartItem);
@@ -460,10 +464,12 @@
         : 'lg:w-10/12'}"
     >
       <div class="flex flex-col space-y-4 lg:w-[30%] mt-3">
-        <div class="mb-3 flex justify-center items-center xl:block">
+        <div
+          class="mb-3 flex justify-center items-center xl:block relative group"
+        >
           <button
             on:click={toggleImagePopup}
-            class="border border-gray-300 rounded-md p-3 max-lg:border-none"
+            class="border border-gray-300 rounded-md p-3 max-lg:border-none relative"
           >
             <!-- svelte-ignore a11y-img-redundant-alt -->
             <img
@@ -471,6 +477,14 @@
               alt="Product Image"
               class="w-60 h-60 object-contain"
             />
+            <div
+              class="absolute bottom-full left-1/2 transform -translate-x-1/2 w-max px-3 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap"
+            >
+              Click to view larger image
+              <div
+                class="absolute left-1/2 transform -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-600"
+              ></div>
+            </div>
           </button>
           {#if showImagePopup}
             <Imageinfo {data} ImageclosePopup={toggleImagePopup} />
@@ -668,7 +682,7 @@
           <div class="">
             <h2 class="bg-white font-semibold text-left">SELECT A SIZE</h2>
             <div
-              class="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm font-semibold text-gray-700 mt-2 text-left border-b border-gray-300"
+              class="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm font-semibold text-gray-700 text-left border-b border-gray-300"
             >
               <div class="p-2">Pack Size</div>
               <div class="p-2">SKU</div>
@@ -731,7 +745,7 @@
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
-                class={`border border-gray-300 rounded w-28 bg-white p-2 shadow-sm hover:shadow-sm  cursor-pointer ${index === i ? "border-1 border-primary-500" : "border border-gray-300"}`}
+                class={`border border-gray-300 rounded w-28  p-2 shadow-sm hover:shadow-sm  cursor-pointer ${index === i ? "border-1 border-primary-500 bg-primary-50" : "border-1 border-gray-300"}`}
                 on:click={() => handleThumbnailClick(i, product)}
               >
                 <div class="text-lg font-bold text-gray-800">
@@ -870,7 +884,7 @@
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <div
-                  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 !ml-0"
+                  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity !ml-0"
                   on:click={() => (showPopup = false)}
                 >
                   <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -912,7 +926,7 @@
                           name="quantity"
                           bind:value={quantity}
                           on:input={updateQuantity}
-                          class="w-14 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
+                          class="w-12 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
                         />
 
                         <input
@@ -961,7 +975,7 @@
                           type="submit"
                           class="bg-primary-400 text-white p-2 rounded flex items-center space-x-1 {quantity <
                           1
-                            ? 'cursor-not-allowed opacity-50'
+                            ? 'cursor-not-allowed hover:opacity-65'
                             : ''}"
                           disabled={quantity < 1}
                         >
@@ -1012,7 +1026,7 @@
                         }}
                         class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1 {quantity <
                         1
-                          ? 'cursor-not-allowed opacity-50'
+                          ? 'cursor-not-allowed hover:opacity-65'
                           : ''}"
                         disabled={quantity < 1}
                       >
@@ -1030,14 +1044,14 @@
                 class="w-full text-sm font-semibold text-right text-primary-400"
                 >Share <Icon
                   icon="fluent:share-24-regular"
-                  class="text-md inline"
+                  class="text-lg font-bold inline"
                 /></button
               >
               {#if showSharePopup}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <div
-                  class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 !m-0"
+                  class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity !m-0"
                   on:click={() => (showSharePopup = false)}
                 >
                   <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -1056,36 +1070,74 @@
                       />
                     </button>
 
-                    <h2 class="text-base font-semibold text-primary-400 mb-3">
+                    <h2 class="text-base font-semibold text-heading mb-3">
                       Share Product
                     </h2>
 
                     <div class="flex items-start space-x-4">
-                      <div
-                        class="w-32 h-20 rounded-lg overflow-hidden flex items-center justify-center"
-                      >
+                      <div class="border-gray-300 border rounded-md">
                         <!-- svelte-ignore a11y-img-redundant-alt -->
                         <img
                           src={product.imageSrc}
                           alt="Product Image"
-                          class="w-full h-full border border-gray-300 rounded-md"
+                          class="w-32 h-20 p-1 object-contain"
                         />
                       </div>
 
                       <div>
-                        <p class="text-lg font-semibold text-primary-400">
+                        <p class="text-sm font-semibold text-primary-500">
                           {product.productNumber}
                         </p>
-                        <p class="text-sm text-gray-600">
+                        <p class="text-sm font-normal text-gray-600">
                           {product.productName}
                         </p>
                       </div>
                     </div>
 
+                    <!-- Social Media Share Section -->
+                    <div class="mt-6">
+                      <p class="text-sm font-semibold text-gray-700">
+                        Share this link via:
+                      </p>
+
+                      <div class="flex justify-start space-x-4 mt-3">
+                        <a
+                          href="https://t.me/share/url?url={encodeURIComponent(
+                            productURL
+                          )}&text={encodeURIComponent(
+                            'Manufacturer Name: ' +
+                              product.manufacturer.name +
+                              ' - ' +
+                              ' Product Name: ' +
+                              product.productName
+                          )}"
+                          target="_blank"
+                          class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 text-white shadow-md hover:bg-blue-600 transition duration-200"
+                        >
+                          <Icon icon="bxl:telegram" class="text-2xl" />
+                        </a>
+
+                        <a
+                          href={"https://wa.me/?text=" +
+                            encodeURIComponent(
+                              "Manufacturer Name: " +
+                                product.manufacturer.name +
+                                " - " +
+                                "Product Name: " +
+                                product.productName +
+                                " " +
+                                productURL
+                            )}
+                          target="_blank"
+                          class="w-12 h-12 flex items-center justify-center rounded-full bg-green-500 text-white shadow-md hover:bg-green-600 transition duration-200"
+                        >
+                          <Icon icon="bxl:whatsapp" class="text-2xl" />
+                        </a>
+                      </div>
+                    </div>
+
                     <div class="mt-4">
-                      <p
-                        class="text-sm md:text-base font-semibold text-gray-800 mb-1"
-                      >
+                      <p class="text-sm font-semibold text-heading mb-1">
                         Direct Link
                       </p>
                       <div
@@ -1213,7 +1265,7 @@
             >
             <input
               type="text"
-              class="w-full text-center border-none focus:outline-none focus:ring-0 p-1"
+              class="w-12 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
               bind:value={quantity}
               on:input={updateQuantity}
               min="1"
@@ -1236,7 +1288,7 @@
               }}
               class="w-full text-white border border-primary-400 rounded-lg py-2 px-2
     hover:bg-primary-400 bg-primary-400 hover:text-white
-    {quantity < 1 ? 'cursor-not-allowed opacity-50' : ''}"
+    {quantity < 1 ? 'cursor-not-allowed hover:opacity-65' : ''}"
               disabled={quantity < 1}
             >
               <Icon
@@ -1259,7 +1311,7 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 !ml-0"
+      class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity"
       on:click={() => (showCartPopup = false)}
     >
       <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -1824,14 +1876,14 @@
   </div>
 {/if}
 
-<Properties {data} />
+<!-- <Properties {data} /> -->
 
 {#each data.records as record}
   {#if record?.variants && record?.variants?.length > 0}
     <Variants {record} />
   {/if}
 {/each}
-<Description {data} />
+<!-- <Description {data} /> -->
 <Toaster position="bottom-right" richColors />
 
 <style>

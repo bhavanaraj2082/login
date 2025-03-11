@@ -2,12 +2,29 @@
   import Icon from "@iconify/svelte";
   export let data;
   let product = data.records;
-  // console.log("ImageclosePopup",data);
   export let ImageclosePopup;
   let isZoomed = false;
+  let offsetX = 0;
+  let offsetY = 0;
+  let container = null;
 
-  function toggleZoom() {
+  function toggleZoom(event) {
     isZoomed = !isZoomed;
+
+    if (isZoomed) {
+      updateZoomPosition(event);
+    }
+  }
+
+  function updateZoomPosition(event) {
+    if (!isZoomed || !container) return;
+
+    const rect = container.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+
+    offsetX = x;
+    offsetY = y;
   }
 </script>
 
@@ -15,11 +32,13 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="fixed inset-0 flex items-center justify-center z-50 overflow-y-auto bg-neutral-500 bg-opacity-30"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity"
     on:click={ImageclosePopup}
   >
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="w-full md:max-w-lg bg-white rounded-md shadow-md p-4 relative"
+      class="w-full md:max-w-lg bg-white rounded-md shadow-md p-1 relative"
       on:click|stopPropagation
     >
       <div class="flex justify-end">
@@ -34,16 +53,24 @@
         </button>
       </div>
 
+      <!-- Zoomable Image Container -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div class="flex justify-center items-center">
-        <div class="flex justify-center items-center overflow-hidden" on:click={toggleZoom}>
+        <div
+          class="relative w-96 h-96 overflow-hidden"
+          bind:this={container}
+          on:mousemove={updateZoomPosition}
+          on:click={toggleZoom}
+        >
           <!-- svelte-ignore a11y-img-redundant-alt -->
           <img
             src={product.imageSrc}
             alt="Product Image"
-            class="w-96 h-96 object-contain rounded-md transition-transform duration-300"
+            class="w-full h-full object-contain transition-transform duration-300"
             class:scale-150={isZoomed}
             class:cursor-zoom-in={!isZoomed}
             class:cursor-zoom-out={isZoomed}
+            style="transform-origin: {offsetX}% {offsetY}%;"
           />
         </div>
       </div>
