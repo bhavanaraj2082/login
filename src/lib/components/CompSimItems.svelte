@@ -50,7 +50,7 @@
     variants: Array.isArray(product.variants) ? product.variants : [],
   }));
   // console.log(CompareSimilarityData, "CompareSimilarityData*****");
-
+  let showCartPopup = false;
   let currentIndex = 0;
   let logosPerSlide = 4;
   let totalSlides = Math.ceil(CompareSimilarityData.length / logosPerSlide);
@@ -119,7 +119,7 @@
     selectedPrice = selectedProduct.priceSize[selectedPriceIndex];
     selectedStockId = selectedProduct.stockId[selectedPriceIndex] || "NA";
     selectedVariants = selectedProduct.variants[selectedPriceIndex] || "NA";
-    popupQuantity = selectedProduct.quantity || 1;
+    popupQuantity = null;
     showModal = true;
     // showCartMessage = false;
 
@@ -158,7 +158,7 @@
     selectedStockId = selectedProduct.stockId[index] || "NA";
   }
 
-  let popupQuantity = 1;
+  let popupQuantity = null;
 
   function decrementPopupQuantity() {
     if (popupQuantity > 1) {
@@ -171,22 +171,29 @@
       popupQuantity++;
       selectedProduct.quantity = popupQuantity;
     }
-
   }
 
   function handlePopupInput(event) {
-    const value = parseInt(event.target.value, 3);
-    if (isNaN(value)) {
-      popupQuantity = 1;
+    let value = event.target.value;
+
+    // Remove non-numeric characters
+    value = value.replace(/\D/g, "");
+
+    // Convert to integer
+    value = parseInt(value, 10);
+
+    // Ensure value is within limits
+    if (isNaN(value) || value < 1) {
+      popupQuantity = null;
+    } else if (value > 999) {
+      popupQuantity = 999;
     } else {
-      if (value < 1) {
-        popupQuantity = 1;
-      } else if (value > 999) {
-        popupQuantity = 999;
-      } else {
-        popupQuantity = value;
-      }
+      popupQuantity = value;
     }
+
+    // Update input field value to prevent invalid entries
+    event.target.value = popupQuantity;
+
     selectedProduct.quantity = popupQuantity;
   }
 
@@ -197,6 +204,10 @@
       cart.set(result.cart);
     });
   };
+
+  function cartTogglePopup() {
+    showCartPopup = !showCartPopup;
+  }
 
   export function addToCart(product, index) {
     // console.log("Product Data:", product);
@@ -230,12 +241,12 @@
 
     if (!isLoggedIn) {
       addItemToCart(cartItem);
-      toast.success("Product added to cart");
-      setTimeout(() => {
-        closeModal();
-      }, 1000);
+      // toast.success("Product added to cart");
+      // setTimeout(() => {
+      //   closeModal();
+      // }, 1000);
       guestCartFetch();
-    
+
       return;
     }
 
@@ -248,7 +259,6 @@
         closeModal();
       }, 1000);
       invalidate("/");
-     
     });
 
     console.log("Final Cart Item Sent:", cartItem);
@@ -365,7 +375,7 @@
                         description: product.prodDesc,
                         id: product.productId,
                         stock: product.stock,
-                        quantity:product.quantity || 1,
+                        quantity: product.quantity || 1,
                         category: product.category,
                         subCategory: product.subCategory,
                         subsubCategory: product.subsubCategory,
@@ -595,9 +605,9 @@
                     type="number"
                     id="popupQuantity"
                     min="1"
-                    value={popupQuantity}
-                    on:input={handlePopupInput}
                     max="999"
+                    bind:value={popupQuantity}
+                    on:input={handlePopupInput}
                     class="w-16 sm:w-20 h-9 text-center border-none focus:outline-none focus:ring-0"
                   />
                   <button
@@ -610,12 +620,159 @@
                 </div>
                 <button
                   type="button"
-                  class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-400 hover:text-white transition"
-                  on:click={() =>
-                    addToCart(selectedProduct, selectedPriceIndex)}
+                  class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-400 hover:text-white transition {popupQuantity <
+                  1
+                    ? 'cursor-not-allowed opacity-50'
+                    : ''}"
+                  disabled={popupQuantity < 1}
+                  on:click={() => {
+                    addToCart(selectedProduct, selectedPriceIndex);
+                    cartTogglePopup();
+                  }}
                 >
                   Add to Cart
                 </button>
+                {#if showCartPopup}
+                  <!-- svelte-ignore a11y-click-events-have-key-events -->
+                  <!-- svelte-ignore a11y-no-static-element-interactions -->
+                  <div
+                    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity"
+                    on:click={() => {
+                      closeModal();
+                      showCartPopup = false;
+                    }}
+                  >
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <!-- svelte-ignore a11y-no-static-element-interactions -->
+                    <div
+                      class="bg-white rounded-lg w-full max-w-lg p-6 md:p-8 mx-4 md:mx-0 relative shadow-lg"
+                      on:click|stopPropagation
+                    >
+                      <div
+                        class="flex justify-between items-center mb-2 border-b-1 pb-3 s-gLNherB2qjnt"
+                      >
+                        <h2
+                          class="text-lg font-semibold text-heading s-gLNherB2qjnt"
+                        >
+                          Added to Cart
+                        </h2>
+                        <button
+                          on:click={cartTogglePopup}
+                          class="text-primary-400 font-bold"
+                        >
+                          <Icon
+                            icon="mdi:close"
+                            class="text-2xl font-bold hover:bg-primary-400 hover:text-white hover:rounded-md hover:p-px"
+                          />
+                        </button>
+                      </div>
+                      <div class="flex flex-col items-center">
+                        <div
+                          class="flex items-center mb-6 justify-around w-full"
+                        >
+                          <img
+                            src={selectedProduct.image}
+                            alt="Img"
+                            class="w-24 h-24 object-contain p-1 mt-2 border rounded"
+                          />
+                          <div class="text-sm m-4">
+                            <p class="font-semibold text-primary-500">
+                              {selectedProduct.partNumber || "--"}
+                            </p>
+                            <p class="text-description">
+                              {selectedProduct.description || "--"}
+                            </p>
+                          </div>
+                        </div>
+                        <div
+                          class="flex justify-between items-center w-full bg-primary-50 p-2 rounded-md border border-gray-200"
+                        >
+                          <div class="text-center">
+                            <p class="text-sm font-semibold text-gray-700">
+                              Quantity
+                            </p>
+                            <p class="text-base font-semibold text-gray-800">
+                              {popupQuantity}
+                            </p>
+                          </div>
+                          <div class="text-center">
+                            <p class="text-sm font-semibold text-gray-700">
+                              Total Price
+                            </p>
+                            <div class="flex flex-col items-center gap-1 mt-1">
+                              <p class="text-base font-semibold text-gray-800">
+                                {#if $currencyState === "usd"}
+                                  $ {(
+                                    (selectedPrice?.priceUSD ?? 0) *
+                                    popupQuantity *
+                                    1.18
+                                  ).toLocaleString("en-US", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })}
+                                {:else}
+                                  ₹ {(
+                                    (selectedPrice?.priceINR ?? 0) *
+                                    popupQuantity *
+                                    1.18
+                                  ).toLocaleString("en-IN", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })}
+                                {/if}
+                              </p>
+                              <p class="text-xs text-gray-500">with GST</p>
+                            </div>
+                          </div>
+
+                          <div class="text-center">
+                            <p class="text-sm font-semibold text-gray-700">
+                              Base Price
+                            </p>
+                            <div class="flex flex-col items-center gap-1 mt-1">
+                              <p class="text-sm font-bold text-gray-500">
+                                {#if $currencyState === "usd"}
+                                  $ {(
+                                    selectedPrice?.priceUSD ?? 0
+                                  ).toLocaleString("en-US", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })}
+                                {:else}
+                                  ₹ {(
+                                    selectedPrice?.priceINR ?? 0
+                                  ).toLocaleString("en-IN", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  })}
+                                {/if}
+                              </p>
+                              <p class="text-xs text-gray-400">without GST</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex justify-end gap-5 mt-6 pt-3 border-t-1">
+                        <button
+                          on:click={cartTogglePopup}
+                          class="bg-primary-400 text-white px-3 py-1.5 rounded font-normal hover:bg-primary-500 transition-all ease-in-out duration-300 shadow-sm"
+                        >
+                          Continue Shopping
+                        </button>
+                        <button
+                          class="text-primary-400 px-3 py-1.5 rounded font-normal flex gap-2 border-1 border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
+                          on:click={() => (window.location.href = "/cart")}
+                        >
+                          View Cart
+                          <Icon
+                            icon="ic:round-shopping-cart"
+                            class="text-2xl inline mr-1"
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                {/if}
               </form>
             {/if}
           </div>

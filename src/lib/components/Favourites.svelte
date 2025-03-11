@@ -1,14 +1,16 @@
 <script>
+	import { invalidate } from '$app/navigation';
+	import { currencyState } from './../stores/mainStores.js';
     import { onMount } from 'svelte';
     import { enhance } from '$app/forms';
     import { toast, Toaster } from "svelte-sonner";
     import { writable } from 'svelte/store';
-    import { authedUser } from '$lib/stores/mainStores.js'
+    import { authedUser,cartTotalComps } from '$lib/stores/mainStores.js'
     import Icon from "@iconify/svelte";
     import Calender from '$lib/components/Calender.svelte';
 
     export let data;
-    // console.log("favData--",data)
+    let form;
     
     $: isAuthenticated = !!data?.locals?.user?.email;
     // $: isAuthenticated = !!authedUser.email;
@@ -216,25 +218,25 @@ $: paginatedFavorites = getPaginatedData(filteredFavorites, $currentPage, $items
 function calculateTotalPrice(price, quantity) {
     if (!price || price === 'Price not available') return 'N/A';
     const numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
-    return isNaN(numericPrice) ? 'N/A' : (numericPrice * quantity).toFixed(2);
+    return isNaN(numericPrice) ? 'N/A' : (numericPrice * quantity).toLocaleString("en-IN");
 }
 
     // function calculateTotalPrice(price, quantity) {
     //     if (!price || price === 'Price not available') return 'N/A';
     //     const numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
-    //     return isNaN(numericPrice) ? 'N/A' : (numericPrice * quantity).toFixed(2);
+    //     return isNaN(numericPrice) ? 'N/A' : (numericPrice * quantity).toLocaleString("en-IN");
     // }
 
     function increaseQuantity(item) {
-        const maxQuantity = Math.floor(item.stockInfo.stock / item.stockInfo.orderMultiple) * item.stockInfo.orderMultiple;
-        if (item.quantity + item.stockInfo.orderMultiple <= maxQuantity) {
+       // const maxQuantity = Math.floor(item.stockInfo.stock / item.stockInfo.orderMultiple) * item.stockInfo.orderMultiple;
+       // if (item.quantity + item.stockInfo.orderMultiple <= maxQuantity) {
             item.quantity += item.stockInfo.orderMultiple;
             favData = [...favData];
-        } else {
-            toast.warning("Maximum stock reached", { 
-                description: `Only ${maxQuantity} items available in multiples of ${item.stockInfo.orderMultiple}` 
-            });
-        }
+        // } else {
+        //     toast.warning("Maximum stock reached", { 
+        //         description: `Only ${maxQuantity} items available in multiples of ${item.stockInfo.orderMultiple}` 
+        //     });
+        // }
     }
 
     function decreaseQuantity(item) {
@@ -244,30 +246,20 @@ function calculateTotalPrice(price, quantity) {
         }
     }
 
-    function handleAddToCart(item) {
-    if (!item || item.stockInfo.stock <= 0) {
-        toast.error('Item unavailable', { 
-            description: 'This item is out of stock' 
-        });
-        return;
-    }
+    function handleAddToCart() {
 
-    return async ({ result, update }) => {
+    return async ({ result }) => {
         try {
+            // console.log(result);
             if (result.type === 'success') {
                 toast.success("Added to Cart", { 
-                    description: `${item.name} added successfully` 
-                });
-            } else {
-                location.reload();
-                toast.success("Added to Cart", { 
-                    description: `${item.name} added successfully` 
-                    // description: result.data?.message || "Failed to add item to cart" 
+                    description: `Product added successfully` 
                 });
             }
-        await update();
+        //await update();
+        form.requestSubmit();
         } catch (error) {
-            console.error('Error handling cart update:', error);
+            // console.error('Error handling cart update:', error);
             toast.error("Cart Error", { 
                 description: result.data?.message || "Failed to add item to cart" 
                 // description: "Failed to process cart update" 
@@ -277,65 +269,66 @@ function calculateTotalPrice(price, quantity) {
 }
 
     function handleAddAllToCart() {
-        const availableItems = favData.filter(item => item.stockInfo.stock > 0);
+        // const availableItems = favData.filter(item => item.stockInfo.stock > 0);
         
-        if (availableItems.length === 0) {
-            toast.info("No Available Items", { 
-                description: "All favourite items are out of stock" 
-            });
-            return;
-        }
-
+        // if (availableItems.length === 0) {
+        //     toast.info("No Available Items", { 
+        //         description: "All favourite items are out of stock" 
+        //     });
+        //     return;
+        // }
         return async ({ result, update }) => {
-            await update();
             
             if (result.type === 'success') {
-                location.reload();
                 toast.success("All available items added to cart", { 
                     description: "Added all items that are in stock to your cart" 
                 });
             } else {
-                location.reload();
                 toast.error("Cart Error", { 
                     description: result.data?.message || "Failed to add items to cart" 
                 });
             }
+            form.requestSubmit();
         };
     }
 
-    function handleRemoveItem(item) {
-    return async ({ result, update }) => {
-        await update();
+    function handleRemoveItem() {
+    return async ({ result }) => {
         try{
         if (result.type === 'success') {
-            favData = favData.filter(fav => fav.id !== item.id);
             toast.success('Item removed', {
-                description: `${item.name} removed from favourites`
+                description: `Product removed from favourites`
             });
-        } else {
-            location.reload();
-            toast.success('Item removed', {
-                description: `${item.name} removed from favourites`
-            });
-            // toast.error('Remove Failed', {
-            //     description: result.data?.message || 'Failed to remove item'
-            // });
         }
+        invalidate("data:fav")
     }
         catch (error) {
-            console.error('Error handling cart update:', error);
+           // console.error('Error handling cart update:', error);
             toast.error("Cart Error", { 
-                description: result.data?.message || "Failed to add item to cart" 
-                // description: "Failed to process cart update" 
+                description: result.data?.message || "Failed to add item to cart"  
             });
         }
     };
+    }
+function handleDataCart() {
+    return async ({ result }) => {
+        const totalComps = result.data?.cart[0]?.cartItems.length;
+        localStorage.setItem("totalCompsChemi", totalComps);        
+        syncLocalStorageToStore();
+    };
+}
+
+function syncLocalStorageToStore() {
+    if (typeof window !== "undefined") {
+        const storedTotalComps = localStorage.getItem("totalCompsChemi");
+        if (storedTotalComps) {
+            cartTotalComps.set(Number(storedTotalComps));
+        }
+    }
 }
 
 function handleClearAll() {
-    return async ({ result, update }) => {
-        await update();
-        
+    return async ({ result }) => {
         if (result.type === 'success') {
             favData = [];
             toast.success('Favourites cleared', {
@@ -346,6 +339,7 @@ function handleClearAll() {
                 description: result.data?.message || 'Failed to clear favourites'
             });
         }
+        invalidate("data:fav")
     };
 }
 
@@ -355,6 +349,14 @@ onMount(() => {
 
 </script> 
 
+<form
+	method="POST"
+	action="/?/getCartData"
+	bind:this={form}
+	use:enhance={handleDataCart}
+>
+	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
+</form>
 <!-- {#if !isAuthenticated}
 <div class="p-6 max-w-7xl mx-auto w-11/12">
     <div class="bg-primary-50 border-l-4 border-primary-500 p-4 rounded-lg shadow-sm">
@@ -444,9 +446,9 @@ onMount(() => {
                     })))} />
             <button 
                 type="submit"
-                class="flex bg-primary-400 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 p-2 rounded">
-                <span>Add all to</span>
-                <Icon icon="heroicons-solid:shopping-cart" width="18" />
+                class="flex bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 px-5 py-2 rounded">
+                <Icon icon="heroicons-solid:shopping-cart" width="20" />
+                <span class=" text-sm font-medium">Add All to Cart</span>
             </button>
         </form>
         <form 
@@ -455,9 +457,9 @@ onMount(() => {
             use:enhance={handleClearAll}>
             <button 
                 type="submit" 
-                class="flex bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 p-2 rounded">
-                <span>Clear all</span>
-                <Icon icon="mdi:delete" width="18" />
+                class="flex bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2 rounded">
+                <Icon icon="mdi:delete" width="20" />
+                <span class=" font-medium text-sm">Remove All</span>
             </button>
         </form>
     </div>
@@ -474,7 +476,7 @@ onMount(() => {
                     alt={item.name} 
                     class="w-32 h-32 object-cover rounded-md mb-4 md:mb-0 md:mr-6"/>
                 
-                <div class="flex-1 text-center md:text-left space-y-2">
+                <div class="flex-1 text-center md:text-left space-y-0.5">
                     <h2 class="text-sm font-bold text-gray-800">{item?.name || ''}</h2>
                     <p class="text-sm">
                         <span class="font-semibold">Product Number:</span> {item?.partNumber || ''}
@@ -487,26 +489,27 @@ onMount(() => {
                     </p>
                     <p class="text-sm font-semibold">
                         Price: <span class="text-black">
-                            {item.stockInfo.pricing?.USD 
-                                ? `$${item.stockInfo.pricing.USD.toFixed(2)}` 
+                            { $currencyState === "usd" 
+                                ? `$${item.stockInfo.pricing.USD.toLocaleString("en-IN")}` 
                                 : item.stockInfo.pricing?.INR 
-                                    ? `₹${item.stockInfo.pricing.INR.toFixed(2)}` 
+                                    ? `₹${item.stockInfo.pricing.INR.toLocaleString("en-IN")}` 
                                     : 'Price not available'}
                         </span>
                     </p>
                     {#if item.stockInfo.specification}
-                        <p class="text-xs">
-                            Specification: {item.stockInfo.specification}
+                        <p class="text-sm font-semibold">
+                            Specification: <span class=" font-normal">{item.stockInfo.specification}</span>
                         </p>
                     {/if}
                 </div>
                 <div class="flex pl-2 justify-start md:w-1/4 sm:items-center m-1 p-2 rounded sm:justify-center">
-                    <div class="flex flex-col items-center">
-                        <p class="font-semibold text-center" 
+                    <div class="flex flex-col items-start">
+                        <p class="font-semibold" 
                            class:text-green-600={item.stockInfo.stock > 0} 
                            class:text-red-600={item.stockInfo.stock === 0}>
                             <span class="text-gray-500 text-xs">Available Stock:</span> {item.stockInfo?.stock || 0}
                         </p>
+                        <p class="{item.quantity > item.stockInfo.stock ? "" : "hidden"} text-xs font-semibold text-gray-500">Back Order: <span class=" text-sm text-red-500">{item.quantity > item.stockInfo.stock ? item.quantity - item.stockInfo.stock : 0}</span></p>
                         {#if item.stockInfo.orderMultiple > 1}
                             <p class="text-xs text-gray-500">
                                 Order Multiple: {item.stockInfo.orderMultiple}
@@ -520,37 +523,38 @@ onMount(() => {
                         <form 
                         method="POST" 
                         action="?/addItemToCart"
-                        use:enhance={handleAddToCart(item)}>
-                        <input type="hidden" name="itemData" value={JSON.stringify(favData.filter(item => item.stockInfo.stock > 0)
-                    .map(item => ({
+                        use:enhance={handleAddToCart}>
+                        <input type="hidden" name="itemData" value={JSON.stringify({
                         productId: item.id,
                         stockId: item.stockInfo.id,
                         manufacturerId: item.manufacturerInfo.id,
                         distributorId: item.distributorInfo.id,
-                        quantity: item.quantity
-                    })))} />
+                        quantity: item.quantity,
+                        backOrder:item.quantity > item.stockInfo.stock ? item.quantity - item.stockInfo.stock : 0
+                    })} />
                         <button 
                             type="submit" 
-                            class="flex bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-primary-500 p-2 rounded"
+                            class="flex bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-primary-500 px-5 py-2 rounded"
                             disabled={item.stockInfo.stock <= 0}>
-                            <span class="hidden md:inline">Add to</span>
                             <Icon 
-                                icon="heroicons-solid:shopping-cart" 
-                                class="w-6 h-6 md:w-5 md:h-5 lg:w-6 lg:h-6" 
-                                aria-label="Add to Cart Icon" />
+                            icon="heroicons-solid:shopping-cart" 
+                            class="w-5 h-5" 
+                            aria-label="Add to Cart Icon" />
+                            <span class="hidden text-xs font-medium md:inline">Add to Cart</span>
+                           
                         </button>
                     </form>
                         {/if}
                         <form 
                             method="POST" 
                             action="?/removeItem"
-                            use:enhance={() => handleRemoveItem(item)}>
+                            use:enhance={handleRemoveItem}>
                             <input type="hidden" name="itemId" value={item.id} />
                             <button 
                                 type="submit" 
-                                class="flex bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-primary-500 p-2 rounded">
-                                <span class="hidden md:inline">Remove</span>
-                                <Icon icon="mdi:delete" class="w-6 h-6 md:w-5 md:h-5 lg:w-6 lg:h-6" aria-label="Remove Icon" />
+                                class="flex bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-primary-500 px-5 py-2 rounded">
+                                <Icon icon="mdi:delete" class="w-5 h-5" aria-label="Remove Icon" />
+                                <span class="hidden text-xs font-medium md:inline">Remove</span>
                             </button>
                         </form>
                     </div>
@@ -565,15 +569,15 @@ onMount(() => {
                         <button 
                             on:click={() => increaseQuantity(item)} 
                             class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                            disabled={item.quantity >= (Math.floor(item.stockInfo.stock / item.stockInfo.orderMultiple) * item.stockInfo.orderMultiple)}>
+                        >
                             +
                         </button>
                     </div>
                     {#if item.stockInfo.pricing}
                         <p class="text-sm font-semibold text-gray-800">
-                            Total: {item.stockInfo.pricing.USD 
-                                ? `$${(item.stockInfo.pricing.USD * item.quantity).toFixed(2)}`
-                                : `₹${(item.stockInfo.pricing.INR * item.quantity).toFixed(2)}`}
+                            Total: { $currencyState === "usd" 
+                                ? `$${(item.stockInfo.pricing.USD * item.quantity).toLocaleString("en-IN")}`
+                                : `₹${(item.stockInfo.pricing.INR * item.quantity).toLocaleString("en-IN")}`}
                         </p>
                     {:else}
                         <p class="text-sm font-semibold text-gray-800">

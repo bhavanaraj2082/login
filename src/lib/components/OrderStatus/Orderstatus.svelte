@@ -26,7 +26,13 @@
 		}
 		return async ({ result }) => {
 			if (result.type === 'success' && result.data.success) {
-				goto(`/order-status/${result.data?.order?.orderid}`);
+
+				let email = result?.data?.order?.profileId?.email || '';
+				let url = `/order-status/${result.data?.order?.orderid}`;
+				if (email) {
+					url += `?email=${encodeURIComponent(email)}`;
+				}
+				goto(url);
 			} else {
 				showErrorPopup = true;
 			}

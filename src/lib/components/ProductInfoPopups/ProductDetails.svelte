@@ -71,6 +71,7 @@
   let showToast = false;
   let productURL = "";
   let showPopup = false;
+  let showCartPopup = false;
   let stockStatus = "";
   let stockAvailability = "";
   let stockType = "";
@@ -88,8 +89,8 @@
   let showLikedPopup = false;
   let successMessage = "";
   let errorMessage = "";
-  let orderMultiple = 1;
-  let quantity = 1;
+  let orderMultiple = null;
+  let quantity = null;
 
   // console.log(data.records,"data.records");
 
@@ -99,7 +100,7 @@
       orderMultiple = data.records[0].orderMultiple;
       quantity = orderMultiple; // Only update if quantity is still 1 (initial value)
     } else if (data.records.length === 0) {
-      quantity = 1; // Reset to 1 if no data records
+      quantity = null; // Reset to 1 if no data records
     }
   }
 
@@ -248,6 +249,10 @@
     showPopup = !showPopup;
   }
 
+  function cartTogglePopup() {
+    showCartPopup = !showCartPopup;
+  }
+
   function toggleLike() {
     isFavorite = !isFavorite;
     // console.log("isFavorite changed:", isFavorite);
@@ -268,7 +273,7 @@
   const updateQuantity = (event) => {
     let value = parseInt(event.target.value);
     if (isNaN(value) || value < 1) {
-      quantity = 1;
+      quantity = null;
     } else if (value > 999) {
       quantity = 999;
     } else {
@@ -343,7 +348,7 @@
 
     if (!isLoggedIn) {
       addItemToCart(cartItem);
-      toast.success("Product added to cart");
+      // toast.success("Product added to cart");
       guestCartFetch();
       return;
     }
@@ -756,7 +761,7 @@
             </p>
             <button
               on:click={() => toggleQuoteModal(product)}
-              class="bg-primary-500 py-2 px-3 hover:bg-primary-600 rounded text-sm text-white mt-2"
+              class="bg-primary-500 py-2 px-3 hover:bg-primary-500 rounded text-sm text-white mt-2"
               >Request Quote</button
             >
           </div>
@@ -954,7 +959,11 @@
                         />
                         <button
                           type="submit"
-                          class="bg-primary-400 text-white p-2 rounded flex items-center space-x-1"
+                          class="bg-primary-400 text-white p-2 rounded flex items-center space-x-1 {quantity <
+                          1
+                            ? 'cursor-not-allowed opacity-50'
+                            : ''}"
+                          disabled={quantity < 1}
                         >
                           <Icon icon="tabler:calendar-check" class="text-lg" />
                           <span class="text-sm">Check Availability</span>
@@ -995,8 +1004,17 @@
                     {/if}
                     <div class="mt-8 flex justify-end">
                       <button
-                        on:click={() => addToCart(product, index)}
-                        class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
+                        on:click={() => {
+                          if (quantity >= 1) {
+                            addToCart(product, index);
+                            cartTogglePopup();
+                          }
+                        }}
+                        class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1 {quantity <
+                        1
+                          ? 'cursor-not-allowed opacity-50'
+                          : ''}"
+                        disabled={quantity < 1}
                       >
                         <Icon
                           icon="ic:round-shopping-cart"
@@ -1210,13 +1228,24 @@
           </div>
           <div class="w-full mt-3">
             <button
-              on:click={() => addToCart(product, index)}
-              class="w-full text-white border border-primary-400 rounded-lg py-2 px-2 hover:bg-primary-400 bg-primary-400 hover:text-white"
-              ><Icon
+              on:click={() => {
+                if (quantity >= 1) {
+                  addToCart(product, index);
+                  cartTogglePopup();
+                }
+              }}
+              class="w-full text-white border border-primary-400 rounded-lg py-2 px-2
+    hover:bg-primary-400 bg-primary-400 hover:text-white
+    {quantity < 1 ? 'cursor-not-allowed opacity-50' : ''}"
+              disabled={quantity < 1}
+            >
+              <Icon
                 icon="ic:round-shopping-cart"
                 class="text-2xl inline mr-1"
-              />Add To Cart</button
-            >
+              />
+              Add To Cart
+            </button>
+
             <!-- <button class="mt-4 w-full bg-white text-primary-400 border border-primary-400 rounded-lg py-2 px-2 hover:bg-primary-400 hover:text-white">
 			  <i class="fa-solid fa-code-pull-request mr-1"></i>Request For Bulk
 				Order
@@ -1226,11 +1255,115 @@
       </div>
     {/if}
   </div>
-  {#if cartNotification}
+  {#if showCartPopup}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="fixed bottom-4 left-4 p-4 bg-primary-400 text-white rounded-md shadow-lg z-50"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 !ml-0"
+      on:click={() => (showCartPopup = false)}
     >
-      {cartNotification}
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <div
+        class="bg-white rounded-lg w-full max-w-lg p-6 md:p-8 mx-4 md:mx-0 relative shadow-lg"
+        on:click|stopPropagation
+      >
+        <div
+          class="flex justify-between items-center mb-2 border-b-1 pb-3 s-gLNherB2qjnt"
+        >
+          <h2 class="text-lg font-semibold text-heading s-gLNherB2qjnt">
+            Added to Cart
+          </h2>
+          <button on:click={cartTogglePopup} class="text-primary-400 font-bold">
+            <Icon
+              icon="mdi:close"
+              class="text-2xl font-bold hover:bg-primary-400 hover:text-white hover:rounded-md hover:p-px"
+            />
+          </button>
+        </div>
+        <div class="flex flex-col items-center">
+          <div class="flex items-center mb-6 justify-around w-full">
+            <img
+              src={product.imageSrc}
+              alt="Img"
+              class="w-24 h-24 object-contain p-1 mt-2 border rounded"
+            />
+            <div class="text-sm m-4">
+              <p class="font-semibold text-primary-500">
+                {product.productNumber}
+              </p>
+              <p class="text-description">{product.productName}</p>
+            </div>
+          </div>
+          <div
+            class="flex justify-between items-center w-full bg-primary-50 p-2 rounded-md border border-gray-200"
+          >
+            <div class="text-center">
+              <p class="text-sm font-semibold text-gray-700">Quantity</p>
+              <p class="text-base font-semibold text-gray-800">{quantity}</p>
+            </div>
+            <div class="text-center">
+              <p class="text-sm font-semibold text-gray-700">Total Price</p>
+              <div class="flex flex-col items-center gap-1 mt-1">
+                <p class="text-base font-semibold text-gray-800">
+                  {#if $currencyState === "usd"}
+                    $ {(
+                      product?.priceSize[index]?.USD * 0.18 * quantity ?? 0
+                    ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  {:else}
+                    ₹ {(
+                      product?.priceSize[index]?.INR * 0.18 * quantity ?? 0
+                    ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  {/if}
+                </p>
+                <p class="text-xs text-gray-500">with GST</p>
+              </div>
+            </div>
+            <div class="text-center">
+              <p class="text-sm font-semibold text-gray-700">Base Price</p>
+              <div class="flex flex-col items-center gap-1 mt-1">
+                <p class="text-sm font-bold text-gray-500">
+                  {#if $currencyState === "usd"}
+                    $ {(
+                      product?.priceSize[index]?.USD * quantity ?? 0
+                    ).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  {:else}
+                    ₹ {(
+                      product?.priceSize[index]?.INR * quantity ?? 0
+                    ).toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  {/if}
+                </p>
+                <p class="text-xs text-gray-400">without GST</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-end gap-5 mt-6 pt-3 border-t-1">
+          <button
+            on:click={cartTogglePopup}
+            class="bg-primary-400 text-white px-3 py-1.5 rounded font-normal hover:bg-primary-500 transition-all ease-in-out duration-300 shadow-sm"
+          >
+            Continue Shopping
+          </button>
+          <a href="/cart">
+            <button
+              class="text-primary-400 px-3 py-1.5 rounded font-normal flex gap-2 border-1 border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
+            >
+              View Cart
+              <Icon
+                icon="ic:round-shopping-cart"
+                class="text-2xl inline mr-1"
+              />
+            </button>
+          </a>
+        </div>
+      </div>
     </div>
   {/if}
 
@@ -1266,7 +1399,7 @@
           <!-- Login Button -->
           <div class="mx-16">
             <button
-              class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-sm text-white font-medium py-2.5 px-2 rounded-lg shadow-lg mb-4"
+              class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-500 text-sm text-white font-medium py-2.5 px-2 rounded-lg shadow-lg mb-4"
             >
               <!-- <a href="/login" class="block">Login</a> -->
               <a href="/signin" class="block">SignIn</a>
@@ -1538,7 +1671,7 @@
               />
               {#if isLoading}
                 <span
-                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-500 flex items-center"
                 >
                   <Icon icon="line-md:loading-alt-loop" class="w-4 h-4 mr-1" />
                   Sending...

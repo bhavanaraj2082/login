@@ -63,15 +63,15 @@
   }
 </script>
 
-{#if token || userEmail}
 <button 
 on:click={() => goto('/')}
-  class="absolute top-4 right-4 md:top-8 md:right-8 flex z-50 items-center justify-center py-2 px-2 sm:px-4 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
+  class="absolute top-0.5 my-2.5 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-4 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
   <div class="flex items-center space-x-2">
-    <Icon icon="mdi:home" class="text-xl" />
+    <Icon icon="mdi:home" class="text-xl"/>
     <span class="hidden sm:inline text-sm font-medium">Back to Home</span>
   </div>
 </button>
+{#if token || userEmail}
   <div
     class="max-w-80 my-20 sm:max-w-xs md:max-w-sm lg:max-w-sm rounded-lg shadow-xl mx-auto z-50 border border-gray-200 overflow-hidden"
   >
@@ -91,37 +91,38 @@ on:click={() => goto('/')}
 
     <div class="px-6 py-6 bg-white">
       {#if successMessage}
-        <div
-          class="mb-6 p-6 text-gray-800 rounded-xl flex flex-col items-center"
-        >
-          <Icon icon="mdi:check-circle" class="text-green-500 text-5xl mb-4" />
-
-          <p class="text-md mt-2 text-primary-500">
-            Your password has been reset successfully. You will be redirected to
-            the {#if userEmail}
-              dashboard
-            {:else}
-              SignIn page
-            {/if} shortly.
-          </p>
-
-          <div class="mt-4 text-center text-primary-500 text-md">
-            Redirecting to {#if userEmail}
-              dashboard
-            {:else}
-              SignIn page...
-            {/if}
-          </div>
+      <div class="p-6 text-gray-900 bg-green-50 border border-green-300 rounded-lg shadow-md text-center animate-fadeIn">
+        <!-- Center the icon properly -->
+        <div class="flex justify-center">
+          <Icon icon="mdi:check-circle" class="text-green-500 text-6xl drop-shadow-lg" />
         </div>
+      
+        <h2 class="text-lg font-semibold text-green-700 mt-3">
+          Your password has been reset successfully!
+        </h2>
+        
+        <p class="text-sm text-gray-700 mt-2">
+          You will be redirected to the 
+          <span class="font-semibold text-green-600">
+            {#if userEmail} Dashboard {:else} Sign In Page {/if}
+          </span> shortly.
+        </p>
+      
+        <div class="mt-4 text-sm text-gray-600 flex items-center justify-center gap-2">
+          <Icon icon="mdi:clock-outline" class="text-gray-500 w-5 h-5" />
+          <span>Redirecting in a moment...</span>
+        </div>
+      </div>
+      
       {/if}
-
+      
       {#if errorMessage}
-        <div
-          class="mb-6 p-4 bg-red-100 text-red-800 rounded-md flex items-center"
-        >
-          <Icon icon="mdi:alert-circle" class="text-red-500 mr-2 text-lg" />
-          <span class="text-sm">{errorMessage}</span>
+      <div class="p-4 bg-red-50 border border-red-300 text-red-800 rounded-lg shadow-md flex items-center animate-fadeIn">
+        <div class="flex justify-center">
+          <Icon icon="mdi:alert-circle" class="text-red-500 mr-3 text-xl drop-shadow-lg" />
         </div>
+        <span class="text-sm font-medium">{errorMessage}</span>
+      </div>
       {/if}
 
       <form
@@ -142,12 +143,12 @@ on:click={() => goto('/')}
               if (data?.authedUser && data?.authedUser.id) {
                 setTimeout(() => {
                   goto("/dashboard");
-                }, 2000);
+                }, 4000);
               } else {
                 setTimeout(() => {
                   // goto("/login");
                   goto("/signin");
-                }, 2000);
+                }, 4000);
               }
 
               successMessage = "Password Reset Successfully";
@@ -331,7 +332,7 @@ on:click={() => goto('/')}
   </div>
 {:else}
   <div
-    class="max-w-80 sm:max-w-xs md:max-w-sm lg:max-w-sm mx-auto my-10 p-6 bg-white rounded-lg shadow-xl border border-gray-200"
+    class="max-w-80 sm:max-w-xs md:max-w-sm lg:max-w-sm mx-auto my-28 p-6 bg-white rounded-lg shadow-xl border border-gray-200"
   >
     <div class="flex flex-col items-center justify-center mb-4">
       <Icon icon="mdi:link-off" class="text-red-500 text-4xl mb-2" />

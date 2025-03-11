@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/stores';
   import { authedUser } from "$lib/stores/mainStores.js";
   import { enhance } from "$app/forms";
   import AllOrders from "./AllOrders.svelte";
@@ -120,6 +121,10 @@
   const hideCancelPopup = () => {
     showCancelPopup = false;
   };
+
+	let param = $page.url;
+	let url = new URL(param);
+	let email = url.searchParams.get('email');
 </script>
 
 <div class="">
@@ -131,7 +136,7 @@
         >
           Items Order and Order Details
         </h2>
-        {#if user}
+        {#if user === email}
           {#if orderStatus == "pending"}
             <div>
               <button
