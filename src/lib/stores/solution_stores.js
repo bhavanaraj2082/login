@@ -29,7 +29,10 @@ export const Delivery = writable({
     City: '',
     Post: '',
 });
+export const isCleared = writable(false);
 export function resetFormData() {
+    isCleared.set(true);
+    setTimeout(() => { isCleared.set(false); }, 3000);
     solutionType.set('');
     formatType.set('');
     formData.set({

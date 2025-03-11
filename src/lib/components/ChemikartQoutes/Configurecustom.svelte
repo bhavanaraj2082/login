@@ -263,26 +263,35 @@ else if (selectedSolvent === "Yes") {
 				border-color: black transparent transparent transparent; /* Triangle color */
 			}
 		</style>
-		<div class="bg-white py-10 flex justify-between">
+		<div class="bg-white pb-10 flex justify-between">
+			<span class="flex items-center gap-2">
+				<Icon icon="ph:test-tube-fill" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300" />
 			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 1: Select custom solution type
 			</h1>
+			</span>
 			<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog()}
 				>Edit</button
 			>
 		</div>
 		<hr />
 		<div class="bg-white py-10 flex justify-between">
+			<span class="flex items-center gap-2">
+				<Icon icon="wpf:edit-file" class="sm:w-7 sn:h-7 w-5 h-5 text-primary-300" />
 			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 2: Select custom format
 			</h1>
+			</span>
 			<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog1()}
 				>Edit</button
 			>
 		</div>
 		<hr /><hr />
 		<div class=" bg-white py-10">
+			<span class="flex items-center gap-2">
+				<Icon icon="hugeicons:test-tube" class="sm:w-8 sm:h-8 w-6 h-6 text-heading" />
 			<h1 class="font-bold sm:text-2xl text-sm">Step 3: Configure custom solution</h1>
+			</span>
 		</div>
 		<div class="bg-white">
 			<button
@@ -646,20 +655,29 @@ else if (selectedSolvent === "Yes") {
 			
 		</div>
 		<div class="bg-white py-10 flex justify-between">
+			<span class="flex items-center gap-2">
+				<Icon icon="arcticons:youdao-note" class="sm:w-8 sm:h-8 w-6 h-6 text-gray-300"  style="stroke-width: 2;"/>
 			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 4: Additional notes
 			</h1>
+			</span>
 		</div>
 		<hr /><hr />
 		<div class="bg-white py-10 flex justify-between">
+			<span class="flex items-center gap-2">
+				<Icon icon="mdi:account-details" class="sm:w-8 sm:h-8 w-6 h-6 text-gray-300" />
 			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 5: Customer details
 			</h1>
+			</span>
 		</div>
 		<hr /><hr />
 		<div class="bg-white py-10 flex justify-between">
+			<span class="flex items-center gap-2">
+				<Icon icon="material-symbols-light:delivery-truck-speed-outline" class="sm:w-9 sm:h-9 w-7 h-7 text-gray-300" />
 			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 6: Delivery information
 			</h1>
+			</span>
 		</div>
 		<hr /><hr />

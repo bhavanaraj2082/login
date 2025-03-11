@@ -2,6 +2,7 @@
 	import { solutionType } from '$lib/stores/solution_stores.js';
 	import { get } from 'svelte/store';
 	import { onMount } from 'svelte';
+	import Icon from "@iconify/svelte";
 	export let tag;
 	let solutionValue = 'Organic';
 	onMount(() => {
@@ -20,8 +21,11 @@
 	};
 </script>
 <div class="bg-white">
-	<h1 class="font-bold sm:sm:text-2xl text-sm">Step 1: Select custom solution type</h1>
-	<br />
+	<span class="flex items-center gap-2">
+		<Icon icon="ph:test-tube-fill" class="sm:w-8 sm:h-8 w-6 h-6" />
+		<h1 class="font-bold sm:text-2xl text-sm">Step 1: Select custom solution type</h1>
+	</span>
+		<br />
 	<div class="mt-4 sm:ml-10 ml-0 flex flex-col sm:flex-row gap-x-20 gap-y-4 items-center sm:items-start">
 		<button
 			type="button"
@@ -51,28 +55,43 @@
 </div>
 <ul class="bg-white">
 	<li>
-		<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25 py-10">
-			Step 2: Select custom format
-		</h1>
+		<span class="flex items-center gap-2">
+			<Icon icon="wpf:edit-file" class="sm:w-7 sm:h-7 w-5 h-5 text-gray-300" />
+			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25 py-10">
+				Step 2: Select custom format
+			</h1>
+		</span>
 	</li>
 	<hr /><hr />
 	<li>
+		<span class="flex items-center gap-2">
+			<Icon icon="hugeicons:test-tube" class="sm:w-8 sm:h-8 w-6 h-6 text-gray-300" />
 		<h1 class="font-bold sm:text-2xl text-sm my-10 text-black text-opacity-25">
 			Step 3: Configure custom solution
 		</h1>
+		</span>
 	</li>
 	<hr /><hr />
 	<li>
+		<span class="flex items-center gap-2">
+			<Icon icon="arcticons:youdao-note" class="sm:w-8 sm:h-8 w-6 h-6 text-gray-300"  style="stroke-width: 2;" />
 		<h1 class="font-bold sm:text-2xl text-sm my-10 text-black text-opacity-25">Step 4: Additional notes</h1>
+		</span>
 	</li>
 	<hr /><hr />
 	<li>
+		<span class="flex items-center gap-2">
+			<Icon icon="mdi:account-details" class="sm:w-8 sm:h-8 w-6 h-6 text-gray-300" />
 		<h1 class="font-bold sm:text-2xl text-sm my-10 text-black text-opacity-25">Step 5: Customer details</h1>
+		</span>
 	</li>
 	<hr /><hr />
 	<li>
+		<span class="flex items-center gap-2">
+			<Icon icon="material-symbols-light:delivery-truck-speed-outline" class="sm:w-9 sm:h-9 w-7 h-7 text-gray-300" />
 		<h1 class="font-bold sm:text-2xl text-sm my-10 text-black text-opacity-25">
 			Step 6: Delivery information
 		</h1>
+		</span>
 	</li>
 </ul>
