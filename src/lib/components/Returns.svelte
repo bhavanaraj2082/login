@@ -1,8 +1,9 @@
 <script>
-	import { fade } from 'svelte/transition';
 	import { enhance, applyAction } from '$app/forms';
-	import { goto } from '$app/navigation';
+	import { fade } from 'svelte/transition';
+	// import { goto } from '$app/navigation';
 	import policyData from '$lib/data/returnReasons.json';
+	import { toast, Toaster } from 'svelte-sonner';
 
 	let email = '';
 	let invoiceNumber = '';
@@ -14,18 +15,22 @@
 	const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 	function scrollToForm() {
-		showFormReturn = true;
 		requestAnimationFrame(() => {
-			document.getElementById('formReturn')?.scrollIntoView({ behavior: 'smooth' });
+			const formElement = document.getElementById('formReturn');
+			if (formElement) {
+				formElement.scrollIntoView({ behavior: 'smooth' });
+			}
 		});
 	}
 	const validateForm = () => {
 		error = {};
-		if (!email || !emailPattern.test(email)) {
-			error.email = '*required and must be valid';
+		if (!email) {
+			error.email = '*Email is required';
+		} else if (!emailPattern.test(email)) {
+			error.email = '*Invalid email format';
 		}
 		if (!invoiceNumber) {
-			error.invoiceNumber = '*required Invoice number';
+			error.invoiceNumber = '* Invoice number is required';
 		}
 		return Object.keys(error).length === 0;
 	};
@@ -42,26 +47,47 @@
 	const handleSubmit = ({ cancel }) => {
 		if (!validateForm()) {
 			cancel();
+			if (error.email) {
+				toast.error(error.email);
+				setTimeout(() => {
+					if (error.invoiceNumber) {
+						toast.error(error.invoiceNumber); 
+					}
+				}, 5000);
+			} else if (error.invoiceNumber) {
+				toast.error("Invoice Number is required. Please provide a valid Invoice Number.");
+			}
+			return false;
 		}
+		// if (!validateForm()) {
+		// 	cancel();
+		// }
 		return async ({ result }) => {
 			console.log(result);
 			if (result.type === 'redirect') {
-				await applyAction(result);
-			} else if (result.type === 'success') {
-				if (result.data?.error === 'invalid_invoice') {
-					formError = 'Invalid Invoice Number. Please check and try again.';
-				} else if (result.data?.error === 'order_not_found') {
-					formError = 'Order not found in the database.';
-				} else if (result.data?.order?.invoiceNumber) {
-					goto(`/returns/${result.data?.order?.invoiceNumber}`);
-				}
-			} else {
-				formError = 'An unexpected error occurred. Please try again.';
+				window.location.href = result.location;
+				// await applyAction(result);
+				toast.success('Order found! Redirecting to your return request page...');  
+				return;
+			 } else {
+				formError = 'Invalid Email address OR Invoice Number. Please check and try again';
+				toast.error(formError);  
 			}
+			// else if (result.type === 'success') {
+			// 	if (result.data?.error === 'invalid_invoice') {
+			// 		formError = 'Invalid Invoice Number. Please check and try again.';
+			// 	} else if (result.data?.error === 'order_not_found') {
+			// 		formError = 'Order not found in the database.';
+			// 	} else if (result.data?.order?.invoiceNumber) {
+			// 		goto(`/returns/${result.data?.order?.invoiceNumber}`);
+			// 	}
+			// } else {
+			// 	formError = 'An unexpected error occurred. Please try again.';
+			// }
 		};
 	};
 </script>
-<section class="w-full md:w-11/12 mx-auto px-4 max-w-7xl">
+<section class="w-full mx-auto max-w-7xl">
 	<div class="bg-white border rounded flex justify-center items-center py-4">
 		<div class="flex flex-col md:flex-row w-full items-center">
 			<img
@@ -158,12 +184,13 @@
 			</button>
 		</form>
 	</section>
-	{#if formError}
+	<Toaster position="bottom-right" richColors />
+	<!-- {#if formError}
 		<div
 			class="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg z-50"
 			role="alert"
 			transition:fade>
 			<p>{formError}</p>
 		</div>
-	{/if}
+	{/if} -->
 </section>
