@@ -40,6 +40,9 @@ const orderDetailsSchema = new mongoose.Schema({
 	productName:{
 		type:String
 	},
+  productNumber:{
+		type:String
+	},
 	manufacturerName:{
 		type:String
 	},

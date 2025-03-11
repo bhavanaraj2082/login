@@ -87,11 +87,15 @@
 	let timeout;
 
 	const handleQty = (quantity, stock, _id, indx) => {
-		if (quantity > 10000000) {
-			quantity = 10000000;
+		if(isNaN(quantity)){
+			calculateTotalPrice($cart)
+			return
 		}
 		clearTimeout(timeout);
-
+		if (quantity > 10000000) quantity = 10000000;
+		timeout = setTimeout(() => {
+		if(quantity < 1 ) quantity = 1
+			
 		if (!isLoggedIn) {
 			cart.update((item) => {
 				item[indx].quantity = quantity;
@@ -102,8 +106,11 @@
 				return item;
 			});
 			calculateTotalPrice($cart);
+			tog = null;
 			return;
 		}
+	}, 1500);
+
 
 		const index = $cart.findIndex((item) => item._id === _id);
 		if (index !== -1) {
@@ -173,11 +180,14 @@
 		// console.log("_id",_id);
 		// console.log("indx",indx);
 		if (!isLoggedIn) {
+
 			cart.update((item) => {
+				if(item[indx].quantity === 1) return item
 				item[indx].quantity -= 1;
 				return item;
 			});
 			guestCart.update((item) => {
+				if(item[indx].quantity === 1) return item
 				item[indx].quantity -= 1;
 				return item;
 			});
@@ -526,7 +536,7 @@
 											}}
 											class="w-fit px-3 py-1 text-xs font-medium outline-none text-center"
 										>
-											{item.quantity}
+											{item.quantity === null ? "" : item.quantity}
 										</button>
 										<button
 											disabled={item.isCart ||

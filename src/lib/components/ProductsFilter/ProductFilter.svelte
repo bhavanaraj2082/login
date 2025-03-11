@@ -8,6 +8,7 @@
     import Icon from "@iconify/svelte";
 	import { authedUser,currencyState,cartTotalComps } from '$lib/stores/mainStores.js';
     import { enhance } from "$app/forms";
+    import { tick } from 'svelte';
 
     export let products
     export let manufacturers
@@ -33,9 +34,8 @@
 
     let searchManufacture = manufacturers
     
-	let showSearchDropdown = false;
+	let point
 	let showCategoryDropdown = false;
-	let showManufacturerDropdown = false;
 	let showSortByDropdown = false;
     let toggleFilter = false
     let currentPage = parseInt($page.url.searchParams.get('page')) || 1;
@@ -134,6 +134,9 @@
 };   
     let timeout
     const handleQty = (id,quantity) =>{
+        if(isNaN(quantity)){
+            return
+        }
          clearTimeout(timeout)
          timeout = setTimeout(()=>{
             products = products.map(product => {
@@ -149,7 +152,6 @@
         }
         return product; 
          })
-         console.log('object');
          tog = null
          },1000);
     }
@@ -497,7 +499,11 @@ const handleFavorites = (product)=>{
 							on:click={() => decrementQuantity(product._id)}
 							class=" p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							><Icon icon="rivet-icons:minus" class="text-xs" /></button>
-						    <button on:click={()=>{tog = index}} class="w-fit px-3 py-1 text-sm font-medium outline-none text-center">
+						    <button on:click={async()=>{
+                                tog = index
+                                await tick();
+                                point.focus()
+                                }} class="w-fit px-3 py-1 text-sm font-medium outline-none text-center">
 							    {product.quantity}
 						    </button>
 						    <button
@@ -528,7 +534,11 @@ const handleFavorites = (product)=>{
 							class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							><Icon icon="rivet-icons:minus" class="text-xs" /></button
 						>
-						<button on:click={()=>{tog = index}} class="w-fit px-3 py-0.5 text-sm font-medium outline-none text-center">
+						<button on:click={async()=>{
+                            tog = index
+                                await tick();
+                                point.focus()
+                        }} class="w-fit px-3 py-0.5 text-sm font-medium outline-none text-center">
 							{product.quantity}
 						</button>
 						<button

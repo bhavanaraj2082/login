@@ -23,7 +23,7 @@ export const actions = {
             const body = Object.fromEntries(await request.formData())
             const parsedBody = JSON.parse(body.order)
             parsedBody.userId = userId
-            console.log(parsedBody);
+            //console.log(parsedBody);
             return await checkoutOrder(parsedBody)   
         } catch (error) {
             console.log(error.response.data);
