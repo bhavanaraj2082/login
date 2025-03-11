@@ -12,6 +12,7 @@
   // console.log(currencyState, "currencyState");
   export let data;
   let cartPopupItems;
+  let index;
   import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
   let isLoadingPhone = false;
   let showCartPopupdetail = false;
@@ -116,11 +117,15 @@
     const productStock = products.find(
       (product) => product.productNumber === selectedProduct.productNumber,
     );
+    if (productStock) {
+    stockStatus = productStock.stockAvailability || "";
+  } else {
+    stockStatus = "Product not found";
+  }
   }
 
   function filterProducts(query) {
     if (!Array.isArray(products)) {
-      console.log(products);
 
       return [];
     }
@@ -197,8 +202,9 @@
     console.log(product,"product");
     
     console.log("Starting selectProduct for index:", index);
-    console.log("Previous selectedProducts:", selectedProducts);
+
     const currentQuantity = selectedProducts[index]?.quantity || 1;
+    stockStatus = "";
     rows[index] = {
       ...rows[index],
       sku: `${product.productNumber} - ${size.break}`,
@@ -263,7 +269,7 @@
 
   function updateCartItemsValue() {
     cartItemsValue = JSON.stringify([prepareCartItem()]);
-    console.log("Updated cartItemsValue:", cartItemsValue);
+    // console.log("Updated cartItemsValue:", cartItemsValue);
   }
   function closeCartPopup(event) {
     event.stopPropagation();
@@ -282,7 +288,7 @@
       index >= 0 &&
       index < rows.length
     ) {
-      console.log("Clearing row at index:", index);
+      // console.log("Clearing row at index:", index);
       rows[index] = {
         sku: "",
         size: "",
@@ -525,6 +531,8 @@
   function hideDetails() {
     showDetailsModal = false;
     // selectProduct = null;
+    stockStatus = "";  // Reset stockStatus when closing the modal
+  console.log("Modal closed and stockStatus reset");
   }
 
   function findProductBySku(sku) {
@@ -567,15 +575,20 @@
   //   showQuoteModal = !showQuoteModal;
   //   productQuote = selectedProduct;
   // }
+
   function toggleQuoteModal(index, selectedProduct) {
   console.log("Index:", index);  
-  console.log("Selected Product:", selectedProduct);  
+  // console.log("Selected Product:", selectedProduct);  
 
-  showQuoteModal = !showQuoteModal;  
-  productQuote = selectedProduct;   
+ 
+  productQuote = { 
+    ...selectedProduct,  
+    index: index       
+  };
 
-  
+  showQuoteModal = !showQuoteModal;
 }
+
 
 
   const handleResendOtpemail = () => {
@@ -905,45 +918,6 @@
     }));
   }
 
-  // function handleLocalManualEntries() {
-  //   const cartItems = prepareManualEntriesToCart();
-  //   if (cartItems.length === 0) return;
-  //   let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
-  //   const simplifiedCartItems = cartItems.map((item) => ({
-  //     productId: item.productId,
-  //     manufacturerId: item.manufacturerId,
-  //     stockId: item.stockId,
-  //     distributorId: item.distributerId,
-  //     quantity: item.quantity,
-  //     backOrder: item.backOrder,
-  //   }));
-  //   const existingItemIndex = currentCart.findIndex(
-  //   (item) => item.productId === cartItems.productId,
-  // );
-  // console.log(existingItemIndex,"existingItemIndex");
-
-  // if (existingItemIndex > -1) {
-  //   currentCart[existingItemIndex].quantity = cartItems.quantity;
-  //   currentCart[existingItemIndex].backOrder = cartItems.backOrder;
-  //   toast.success(`Product added to the cart`);
-  //   showCartPopup(cartItems);
-
-  // } else {
-  //   currentCart.push(simplifiedCartItems);
-  //   toast.success(`Product added to the cart`);
-  //   showCartPopup(cartItems);
-  // }
-
-  // localStorage.setItem("cart", JSON.stringify(currentCart));
-  // showCartPopup(cartItems);
-
-  // setTimeout(() => {
-  //     resetRows();
-  //           }, 1000);
-  //   showCartMessage = true;
-
-  //   cartloading = false;
-  // }
 
   function handleLocalManualEntries() {
     const cartItems = prepareManualEntriesToCart();
@@ -1048,7 +1022,6 @@
   //   selectedProduct.quantity = popupQuantity;
   // }
   function handlePopupInput(event) {
-    // Ensure we're using base 10 for parsing
     const value = parseInt(event.target.value, 10);
 
     if (isNaN(value)) {
@@ -1062,8 +1035,27 @@
         popupQuantity = value;
       }
     }
-    selectedProduct.quantity = popupQuantity;
+    
   }
+  let currentIndexqoute= null
+  const clearSelectedProductquote = () => {
+  if (productQuote !== null && productQuote !== undefined) {
+    const index = productQuote.index;
+    productQuote = null;
+    if (rows && index >= 0 && index < rows.length) {
+      rows[index].sku = "";
+      rows[index].size = "";
+      rows[index].filteredProducts = [];
+      rows[index].error = "";
+      rows[index].quantity = 1;
+      if (selectedProducts && selectedProducts[index]) {
+        selectedProducts[index].quantity = 1;
+      }
+    }
+
+    currentIndexqoute = null;
+  }
+};
 </script>
 
 <form
@@ -1269,43 +1261,42 @@ on:change={() => selectProduct(result, index, { break: null })}
                   aria-label="Quantity"
                   max="999"
                 /> -->
-                  <input
-                    type="text"
-                    min="1"
-                    maxlength="3"
-                    bind:value={row.quantity}
-                    class="w-3/4 sm:ml-1 ml-3 grow text-center border-1 border-gray-200 rounded bg-white font-medium h-10 outline-none py-2 hover:border-primary-400 focus:border-primary-400 focus:ring-0"
-                    on:focus={(e) => {
-                      const currentValue = e.target.value;
-
-                      e.target.value = "";
-                      setTimeout(() => {
-                        e.target.select();
-                      }, 10);
-                    }}
-                    on:blur={(e) => {
-                      if (!e.target.value || e.target.value === "0") {
-                        e.target.value = "1";
-                        row.quantity = 1;
-                        handlePopupInput({ target: { value: "1" } });
-                      }
-                    }}
-                    on:input={(e) => {
-                      e.target.value = e.target.value.replace(/[^0-9]/g, "");
-                      if (e.target.value.length > 4) {
-                        e.target.value = e.target.value.slice(0, 4);
-                      }
-
-                      if (e.target.value.startsWith("0")) {
-                        e.target.value = "1";
-                      }
-                      const parsedValue = parseInt(e.target.value, 10) || 1;
-                      row.quantity = Math.max(1, Math.min(999, parsedValue));
-                      handlePopupInput(e);
-                    }}
-                    aria-label="Quantity"
-                    max="999"
-                  />
+                <input
+                type="text"
+                min="1"
+                maxlength="3"
+                bind:value={row.quantity}
+                class="w-3/4 sm:ml-1 ml-3 grow text-center border-1 border-gray-200 rounded bg-white font-medium h-10 outline-none py-2 hover:border-primary-400 focus:border-primary-400 focus:ring-0"
+                on:focus={(e) => {
+                  const currentValue = e.target.value;
+                  e.target.value = ""; 
+                  setTimeout(() => {
+                    e.target.select(); 
+                  }, 10);
+                }}
+                on:blur={(e) => {
+                  if (e.target.value === "" || e.target.value === "0") {
+                    row.quantity = 1; 
+                    e.target.value = "1"; 
+                  }
+                }}
+                on:input={(e) => {
+                  e.target.value = e.target.value.replace(/[^0-9]/g, ""); 
+                  if (e.target.value.startsWith("0") && e.target.value.length > 1) {
+                    e.target.value = e.target.value.slice(1);
+                  }
+                  const parsedValue = parseInt(e.target.value, 10);
+                  
+                  if (parsedValue && parsedValue >= 1 && parsedValue <= 999) {
+                    row.quantity = parsedValue;
+                  } else if (e.target.value === "") {
+                    row.quantity = 0; 
+                  }
+                  handlePopupInput(e);
+                }}
+                aria-label="Quantity"
+                max="999"
+              />
                 </div>
                 <div class="w-1/4">
                   <button
@@ -1454,7 +1445,7 @@ on:change={() => selectProduct(result, index, { break: null })}
               <button
                 type="button"
                 on:click={handleManualEntriesSubmit}
-                class="lg:ml-60 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
+                class="md:mr-16 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
               >
                 {#if cartloading}
                   <span>Adding...</span>
@@ -1738,27 +1729,22 @@ on:change={() => selectProduct(result, index, { break: null })}
 
                 if (result.type === "success") {
                   const resultData = result.data;
-                  console.log(resultData, "resultData");
+                 
 
                   if (resultData && resultData.success === true) {
                     const cartItem = prepareCartItem();
-                    console.log(cartItem, "cartItem");
+                
 
                     toast.success(`Product added to the cart!`);
                     cartRowIndexToBeCleared = cartItem.rowIndex;
-                    console.log(
-                      cartRowIndexToBeCleared,
-                      "cartRowIndexToBeCleared",
-                    );
                     hideDetails();
                     showCartPopupdetails(cartItem);
                     setTimeout(() => {
                       clearSelectedProductcart(cartRowIndexToBeCleared);
                     }, 1000);
 
-                    // showCartPopup(prepareCartItem());
                     showCartMessage = true;
-                    // hideDetails();
+                
                   } else {
                     toast.error(
                       resultData.message || "Failed to add item to cart",
@@ -1771,13 +1757,6 @@ on:change={() => selectProduct(result, index, { break: null })}
             }}
           >
             <input type="hidden" name="cartItems" value={cartItemsValue} />
-
-            <!-- <button
-          class="mt-6 w-full sm:w-auto p-3 text-white bg-primary-500 rounded flex items-center justify-center gap-2 hover:bg-primary-600 transition"
-          type="submit"
-        >
-          Add to Cart
-        </button> -->
             <div class="flex justify-end">
               <button
                 type="submit"
@@ -1844,8 +1823,9 @@ on:change={() => selectProduct(result, index, { break: null })}
                 toast.success("Submitted the quotes successfully!");
                 errorMessage = "";
                 setTimeout(() => {
-                  location.reload();
-                }, 2000);
+      clearSelectedProductquote(); 
+      toggleQuoteModal(); 
+    }, 1000);
               } else {
                 successMessage = "";
                 toast.error("Error creating Quote");
@@ -1861,7 +1841,7 @@ on:change={() => selectProduct(result, index, { break: null })}
               <p><strong>Product Name:</strong> {productQuote.productName}</p>
             </div>
           {/if}
-
+          <input type="text" hidden name="index" value={productQuote.index} />
           <input
             type="text"
             hidden
@@ -1887,6 +1867,12 @@ on:change={() => selectProduct(result, index, { break: null })}
             name="productNumber"
             value={productQuote.productNumber}
           />
+          <input
+          type="hidden"
+          name="email"
+          id="email"
+          bind:value={email}
+        />
           <input type="text" hidden name="status" value="unread" />
           <div class="mb-4">
             <label for="name" class="block text-sm font-medium text-gray-700"
@@ -2232,7 +2218,7 @@ on:change={() => selectProduct(result, index, { break: null })}
           <div class="mb-4">
             <label
               for="futherdetails"
-              class="block text-sm font-medium text-gray-700">Message</label
+              class="block text-sm font-medium text-gray-700">Further Details</label
             >
             <textarea
               class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
