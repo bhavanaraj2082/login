@@ -39,6 +39,7 @@
        priceINR = cart.reduce((sum,crt)=> sum + crt.currentPrice.INR*crt.quantity,0)
        priceUSD = cart.reduce((sum,crt)=> sum + crt.currentPrice.USD*crt.quantity,0)
 	}
+	$:calculateTotalPrice($cart)
 	const guestCartFetch = () => {
 		const formdata = new FormData();
 		formdata.append('guestCart', JSON.stringify($guestCart));
@@ -206,6 +207,10 @@ function handleMouseLeave() {
 	}
 	
 	const handleQty = (quantity,stock,_id,indx)=>{
+		if(isNaN(quantity)){
+			calculateTotalPrice($cart)
+			return
+		}
 		if (quantity > 10000000){
 			quantity = 10000000
 		}
@@ -394,7 +399,7 @@ function handleMouseLeave() {
 			invalidate('data:cart');
 		};
 	}
-	$:console.log($cart,"5")
+	
 </script>
 
 
@@ -530,8 +535,8 @@ function handleMouseLeave() {
 									<p class=" text-gray-800 text-xs">{item.productDetails.productName}</p>
 									<p class=" text-gray-800 text-2s font-semibold">{item.pricing.break}</p>
 									<p class=" {item.quantity > item.stockDetails.stock ? " text-red-500" :" text-green-500"} text-2s ext-red-600 font-semibold">
-										{item.quantity > item.stockDetails.stock ? item.quantity - item.stockDetails.stock + " Back Order" : item.quantity + " In Stock"}
-										<span class="{item.quantity > item.stockDetails.stock ? "" : " hidden"} text-green-500 ml-1">{item.stockDetails.stock + " In Stock"}</span>
+										{item.quantity > item.stockDetails.stock ? item.quantity - item.stockDetails.stock + " Back Order" : item.stockDetails.stock + " In Stock"}
+										<span class="{item?.quantity > item.stockDetails.stock ? "" : " hidden"} text-green-500 ml-1">{item.stockDetails.stock + " In Stock"}</span>
 									</p>
 								</div>
 							</div>
@@ -559,8 +564,8 @@ function handleMouseLeave() {
 							        			class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							        			><Icon icon="rivet-icons:minus" class="text-xs" /></button
 							        		>
-							        		<button on:click={()=>{tog = index}} class="w-fit mx-3 text-xs font-medium outline-none text-center">
-							        			{item.quantity}
+							        		<button on:click={()=>{tog = index}} class="w-fit px-3 py-0.5 text-xs font-medium outline-none text-center">
+							        			{item.quantity === null ? "" : item.quantity}
 							        		</button>
 							        		<button disabled={item.isCart || item.isQuote}
 							        			on:click={() => incrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}

@@ -24,6 +24,8 @@
 	let order = ''
 	let checkout
 	let cartdata = data?.cart?.cart[0]?.cartItems || []
+	//$:console.log(userData);
+	$: isGST = userData.country === "India" ? true : false
 
 	cart.set(cartdata)
 
@@ -147,13 +149,11 @@
 	} else {
 		$shippingAddress = '';
 	}
-   }
+    }
   
 	const dispatch = createEventDispatcher();
 
 	function handleCheckout(carts) {
-		//let hash = Math.random(2).toString(20).substring(2, 20);
-		//console.log(isGST,"gst");
 		let products = [];
 		let orderdetails = [];
 		if (carts?.length === 0) {
@@ -162,7 +162,20 @@
 		carts?.map((cart) => {
 			products.push(cart.productId);
 			let backOrder = cart.quantity > cart.stockDetails.stock ? parseInt(cart.quantity) - parseInt(cart.stockDetails.stock) : 0;
-			let price = cart.pricing.INR * (1 + (18 / 100))
+			let price
+			if(isGST){
+				if($currencyState === "inr"){
+				    price = cart.currentPrice.INR * (1 + (18 / 100))
+			    }else{
+				    price = cart.currentPrice.USD * (1 + (18 / 100))
+			    }
+			}else{
+				if($currencyState === "inr"){
+				    price = cart.currentPrice.INR
+			    }else{
+				    price = cart.currentPrice.USD
+			    }
+			}
 			  
 			orderdetails.push({
 				backOrder,
@@ -175,6 +188,7 @@
 				stockId: cart.stockId,
 				unitPrice: price,
 				productName:cart.productDetails.productName,
+				productNumber:cart.productDetails.productNumber,
 				manufacturerName:cart.mfrDetails.name,
 				//distributorAlias:cart.distributorDetails.aliasname
 			});
@@ -190,7 +204,7 @@
 			billingaddress:$billingAddress,
 			shippingaddress:$shippingAddress,
 			//carrier:{carrier,accountNumber},
-			currency: "INR",
+			currency: $currencyState === "inr" ? "INR" : "USD",
 			profileId:userData._id
 		};
 		checkout = order;
@@ -250,7 +264,7 @@
 					    <Icon icon="ic:round-mode-edit" class=" text-md" />
 					</button>
 				</div>
-				<input value={userData.gstNumber} disabled class="mt-2 w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+				<input value={userData?.gstNumber || ""} disabled class="mt-2 w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
 			</div>
 		 </div>
 		<div class=" lg:flex gap-4">
