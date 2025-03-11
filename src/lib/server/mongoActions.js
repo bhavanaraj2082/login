@@ -1622,6 +1622,7 @@ export const getreturnsOrderData = async ({ body }) => {
 				const processedItem = {
 					productNumber: item.productNumber,
 					productName: item.productName,
+					manufacturerName: item.manufacturerName,
 					orderQty: parseInt(item.orderQty, 10),
 					returnqty: parseInt(item.returnqty, 10),
 					reason: isEntireOrder ? entireOrderReason : item.reason,
@@ -1658,6 +1659,7 @@ export const getreturnsOrderData = async ({ body }) => {
 		};
 	}
 };
+
 
 export const getcancelreturnData = async (id) => {
 	try {
