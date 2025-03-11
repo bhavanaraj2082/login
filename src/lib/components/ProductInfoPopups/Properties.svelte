@@ -10,7 +10,7 @@
       <div class="p-4 w-full">
         <div class="container mx-auto">
           <button type="button" class="w-full text-left pb-4">
-            <h2 class="text-2xl font-bold text-primary-400">Properties</h2>
+            <h2 class="text-xl font-bold text-heading">Properties</h2>
           </button>
         </div>
         <div class="transition-all duration-300">
@@ -39,9 +39,7 @@
         <div class="p-4 max-md:w-full w-1/3">
           <div class="container mx-auto">
             <button type="button" class="w-full text-left pb-4">
-              <h2 class="text-2xl font-bold text-primary-400">
-                About This Item
-              </h2>
+              <h2 class="text-xl font-bold text-heading">About This Item</h2>
             </button>
           </div>
           <div class="transition-all duration-300">

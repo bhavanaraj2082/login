@@ -1524,6 +1524,7 @@ export async function CompareSimilarityData(productId) {
           _id: 1,
           productName: 1,
           prodDesc: 1,
+          properties: 1,
           'categoryInfo.urlName': 1,
           'subCategoryInfo.urlName': 1,
           'manufacturerInfo.name': 1,

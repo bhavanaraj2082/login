@@ -8,7 +8,7 @@
       class="md:w-11/12 max-w-7xl p-4 mx-auto bg-white shadow-md border border-gray-200 rounded-lg m-10"
       id="des"
     >
-      <h3 class="text-2xl font-bold text-primary-400">Description</h3>
+      <h3 class="text-xl font-bold text-heading mb-3">Description</h3>
 
       <!-- Check if description is an array -->
       {#if Array.isArray(product.description)}
