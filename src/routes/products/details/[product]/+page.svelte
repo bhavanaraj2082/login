@@ -2,7 +2,9 @@
 	import SEO from '$lib/components/SEO.svelte';
     import ProductDetails from "$lib/components/ProductInfoPopups/ProductDetails.svelte";
     import RelatedProductss from "$lib/components/RelatedProductss.svelte";
-    import CompSimItems from '$lib/components/CompSimItems.svelte'
+    import CompSimItems from '$lib/components/CompSimItems.svelte';
+	import Properties from '$lib/components/ProductInfoPopups/Properties.svelte';
+	import Description from '$lib/components/ProductInfoPopups/Description.svelte';
     import { PUBLIC_WEBSITE_URL,PUBLIC_WEBSITE_NAME } from '$env/static/public';
 
     export let data;
@@ -40,11 +42,15 @@
 <SEO {metadata} />
 
 <ProductDetails data={data.productData} isFavorite={data.isFavorite} isauthedUser={data.authedUser}/>
-
+{#if data.productData.length !== 0}
+<Properties data={data.productData} />
+{/if} 
 {#if data.relatedProducts.length !== 0}
     <RelatedProductss relatedProducts={data.relatedProducts}/>  
 {/if} 
-
+{#if data.productData.length !== 0}
+<Description data={data.productData} />
+{/if}
 {#if data.compareSimilarity.length !== 0}
     <CompSimItems compareSimilarity={data.compareSimilarity}/>
 {/if} 
