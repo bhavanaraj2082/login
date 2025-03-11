@@ -252,7 +252,7 @@ quicksearch: async ({ request }) => {
           backOrder: backorder,
           offerPrice: {
             usd: item.usdPrice,
-            inr: item.inrPrice * 75 // Use appropriate conversion rate
+            inr: item.inrPrice * 75 
           },
           isQuote: false,
           isBom: false,
@@ -261,7 +261,7 @@ quicksearch: async ({ request }) => {
   
         // console.log('Prepared Cart Item:', cartItem);
         const result = await addToCartquick(cartItem, userId, userEmail);
-        console.log('Add to Cart Result:', result);
+        // console.log('Add to Cart Result:', result);
   
         if (!result.success) {
           console.error('Failed to add item to cart:', result.message);
@@ -510,22 +510,14 @@ verifyOtpEmail: async ({ request }) => {
 
 
 
-// export async function load({ locals }) {
-//   console.log("Authenticated User:", locals.authedUser);
 
-//   if (!locals.authedUser) {
-//     return { authedUser: null };
-//   }
-
-//   return { authedUser: locals.authedUser };
-// }
 export const load = async ({ locals }) => {
 	if (!locals?.user) {
 		return null;
 	}
 	const authedUser = { id: locals.user.userId };
 	const userProfile = await Profile.findOne({ userId: authedUser.id });
-  console.log(userProfile,"userProile");
+  // console.log(userProfile,"userProile");
   
 
 	if (!userProfile) {
