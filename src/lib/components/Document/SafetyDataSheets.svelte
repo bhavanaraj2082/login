@@ -192,9 +192,9 @@ function toggleRotation(index) {
             on:click={() => (activeTab = tab.name)} 
             class="w-full py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300
               {activeTab === tab.name 
-                ? 'bg-white text-primary-500 font-bold'
+                ? 'bg-gray-50 text-primary-500 font-bold'
                 : 'bg-primary-100 text-black'}
-              hover:bg-white hover:text-primary-500 whitespace-nowrap">
+              hover:bg-gray-50 hover:text-primary-500 whitespace-nowrap">
             {tab.name}
           </button>
           <div class="h-0.5 bg-primary-300 
@@ -208,8 +208,8 @@ function toggleRotation(index) {
     <div class="w-full lg:w-7/12 px-3 pt-3 rounded bg-white shadow"> 
       {#if activeTab === "SafetyData Sheets"}
       <div class="mb-2 max-sm:w-full" >
-        <h2 class="text-lg font-semibold mb-4">SafetyData Sheets (SDS)</h2>
-        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Safety Data Sheet, please enter the product number.</p>
+        <h2 class="sm:text-lg text-md font-semibold mb-4 text-heading">SafetyData Sheets (SDS)</h2>
+        <p class="mb-6 sm:text-md text-sm text-description mx-auto">To search for a Safety Data Sheet, please enter the product number.</p>
         <form 
         method="post" 
         action="?/document" 
@@ -230,7 +230,7 @@ function toggleRotation(index) {
                 }
             };
         }}>
-          <label for="product-number-sds" class="block text-md font-medium mb-1 {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+          <label for="product-number-sds" class="block sm:text-sm text-xs font-medium mb-1 {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
           <div class="w-full">
@@ -240,8 +240,9 @@ function toggleRotation(index) {
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. IPAKKIT00"
-            class="block w-full p-3 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm mb-0"
+            class="flex w-full border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
           />
+          <!-- class="block w-full p-3 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm mb-0" -->
           {#if showErrors && inputValue.length === 0}
           <div class="flex text-start">
             <span class="text-red-400 text-xs">Order Number is required</span>
@@ -274,8 +275,8 @@ function toggleRotation(index) {
       {/if}
       {#if activeTab === "Certificates of Analysis"}
       <div class="mb-2 max-sm:w-full" >
-        <h2 class="text-lg font-semibold mb-4">Certificates of Analysis (COA)</h2>
-        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Analysis (COA), please enter both the product number and the Lot/batch Number.</p>
+        <h2 class="sm:text-lg text-md font-semibold text-heading mb-4">Certificates of Analysis (COA)</h2>
+        <p class="mb-6 sm:text-md text-sm text-description mx-auto">To search for a Certificates of Analysis (COA), please enter both the product number and the Lot/batch Number.</p>
         <form 
         method="post" 
         action="?/document" 
@@ -296,7 +297,7 @@ function toggleRotation(index) {
                 }
             };
         }}>
-        <label for="product-number-sds" class="block text-md font-medium mb-1{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+        <label for="product-number-sds" class="block sm:text-sm text-xs font-medium mb-1{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
           <div class="w-full">
@@ -306,7 +307,7 @@ function toggleRotation(index) {
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. IPAKKIT00"
-            class="block w-full  p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
           />
           {#if showErrors && inputValue1.length === 0}
           <div class="flex text-start">
@@ -317,7 +318,7 @@ function toggleRotation(index) {
             <p class="text-red-500 text-md">{sdsProductNumberError}</p>
             {/if}
             <br>
-            <label for="product-number-sds" class="block text-md font-medium mb-2{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+            <label for="product-number-sds" class="block sm:text-sm text-xs font-medium mb-2{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
               * Lot/batch Number
             </label>
             
@@ -328,8 +329,8 @@ function toggleRotation(index) {
                 name="product-number"
                 bind:value={lotNumber}
                 placeholder="E.G. 708371"
-                class="block w-full p-3  border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
-              />
+                class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+                />
               {#if showErrors && lotNumber.length === 0}
               <div class="flex text-start">
                 <span class="text-red-400 text-xs">Lot Number is required</span>
@@ -357,8 +358,8 @@ function toggleRotation(index) {
       {/if}
       {#if activeTab === "Certificates of Origin"}
       <div class="mb-2 max-sm:w-full" >
-        <h2 class="text-lg font-semibold mb-4">Certificates of Origin (COO)</h2>
-        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Origin (COO), please enter both the product number and the Lot/batch Number.</p>
+        <h2 class="sm:text-lg text-md text-heading font-semibold mb-4">Certificates of Origin (COO)</h2>
+        <p class="mb-6 sm:text-md text-sm text-description mx-auto">To search for a Certificates of Origin (COO), please enter both the product number and the Lot/batch Number.</p>
         <form 
         method="post" 
         action="?/document" 
@@ -379,7 +380,7 @@ function toggleRotation(index) {
                 }
             };
         }}>
-          <label for="product-number-sds" class="block text-md font-medium mb-1 {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+          <label for="product-number-sds" class="block sm:text-sm text-xs font-medium mb-1 {sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
           <div class=" w-full">
@@ -389,7 +390,7 @@ function toggleRotation(index) {
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. IPAKKIT00"
-            class="block w-full  p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
           />
           {#if showErrors && inputValue2.length === 0}
           <div class="flex text-start">
@@ -400,7 +401,7 @@ function toggleRotation(index) {
             <p class="text-red-500 text-md">{sdsProductNumberError}</p>
             {/if}
             <br>
-            <label for="product-number-sds" class="block text-md font-medium mb-2{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+            <label for="product-number-sds" class="block sm:text-sm text-xs font-medium mb-2{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
               * Lot/batch Number
             </label>
             <div class=" w-full">
@@ -410,7 +411,7 @@ function toggleRotation(index) {
             name="product-number"
             bind:value={lotNumber1}
             placeholder="E.G. 708371"
-            class="block w-full p-3  border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            class="flex w-full border-1 mt-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
           />
           {#if showErrors && lotNumber1.length === 0}
           <div class="flex text-start">
@@ -441,8 +442,8 @@ function toggleRotation(index) {
       {/if}
       {#if activeTab === "Certificates of Quality"}
       <div class="mb-2 max-sm:w-full" >
-        <h2 class="text-lg font-semibold mb-4">Certificates of Quality (COQ)</h2>
-        <p class="mb-6 text-md text-gray-600 mx-auto">To search for a Certificates of Quality (COQ), please enter both the product number and the Lot/batch Number.</p>
+        <h2 class="sm:text-lg text-md text-heading font-semibold mb-4">Certificates of Quality (COQ)</h2>
+        <p class="mb-6 sm:text-md text-sm text-description mx-auto">To search for a Certificates of Quality (COQ), please enter both the product number and the Lot/batch Number.</p>
         <form 
         method="post" 
         action="?/document" 
@@ -463,7 +464,7 @@ function toggleRotation(index) {
                 }
             };
         }}>
-        <label for="product-number-sds" class="block text-md font-medium mb-1{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+        <label for="product-number-sds" class="block sm:text-sm text-xs font-medium mb-1{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
             * Product Number
           </label>
           <div class=" w-full">
@@ -473,7 +474,7 @@ function toggleRotation(index) {
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. IPAKKIT00"
-            class="block w-full p-3  border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm" 
+            class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
           />
           {#if showErrors && inputValue3.length === 0}
           <div class="flex text-start">
@@ -481,7 +482,7 @@ function toggleRotation(index) {
           </div>
           {/if}
             <br>
-            <label for="product-number-sds" class="block text-md font-medium mb-2{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
+            <label for="product-number-sds" class="block sm:text-sm text-xs font-medium mb-2{sdsProductNumberError ? 'text-red-500' : 'text-gray-700'}">
               * Lot/batch Number
             </label>
             <div class=" w-full">
@@ -491,7 +492,7 @@ function toggleRotation(index) {
             name="product-number"
             bind:value={lotNumber2}
             placeholder="E.G. 708371"
-            class="block w-full p-3  border border-gray-300 rounded shadow focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm"
+            class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
           />
           {#if showErrors && lotNumber2.length === 0}
           <div class="flex text-start">
@@ -520,20 +521,20 @@ function toggleRotation(index) {
       </div>
       {/if}
     </div>
-    <div class="w-full lg:w-5/12 pl-2"> 
+    <div class="w-full lg:w-5/12 md:pl-2 pl-0"> 
       {#if activeTab === "SafetyData Sheets"}
         <div class="bg-white p-4 border rounded shadow-md w-full self-start">
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div on:click={() => toggleProductDetails2("Safety Data Sheets")} class="flex items-center justify-between">
-            <h3 class="text-md font-medium text-gray-700">How to Find the Product Number</h3>
+            <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find the Product Number</h3>
                   <!-- svelte-ignore a11y-missing-attribute -->
             <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
               <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`  transition-transform duration-400 ${showProductDetailsSafety ? 'rotate-45' : '-rotate-45'}`} />
             </a>
           </div>
           {#if showProductDetailsSafety}
-            <div class="mt-4 text-sm text-gray-600 leading-relaxed">
+            <div class="mt-4 sm:text-sm text-xs text-description leading-relaxed">
               <p>
                 Product numbers are combined with Pack Sizes/Quantity when displayed on the website 
                 (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00-25G</code>). 
@@ -576,14 +577,14 @@ function toggleRotation(index) {
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div on:click={() => toggleProductDetails2("Certificates of Analysis")} class="flex items-center justify-between">
-            <h3 class="text-md font-medium text-gray-700">How to Find the Product Number</h3>
+            <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find the Product Number</h3>
                   <!-- svelte-ignore a11y-missing-attribute -->
             <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
               <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showProductDetailsCertificates ? 'rotate-45' : '-rotate-45'}`} />
             </a>
           </div>
           {#if showProductDetailsCertificates}
-          <div class="mt-4 text-sm text-gray-600 leading-relaxed">
+          <div class="mt-4 sm:text-sm text-xs text-description leading-relaxed">
             <p>
               Product numbers are combined with Pack Sizes/Quantity when displayed on the website 
               (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00-25G</code>). 
@@ -623,14 +624,14 @@ function toggleRotation(index) {
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div on:click={() => toggleLotDetails("Certificates of Analysis")} class="flex items-center justify-between">
-            <h3 class="text-md font-medium text-gray-700">How to Find a Lot/Batch Number for COA</h3>
+            <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find a Lot/Batch Number for COA</h3>
                   <!-- svelte-ignore a11y-missing-attribute -->
             <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
               <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showLotDetailsCertificates ? 'rotate-45' : '-rotate-45'}`} />
             </a>
           </div>
           {#if showLotDetailsCertificates}
-          <div class="mt-4 text-sm text-gray-600">
+          <div class="mt-4 sm:text-sm text-xs text-description">
             <p>Lot and Batch Numbers can be found on a product's label following the words 'Lot' or 'Batch'.</p>
             <h4 class="font-bold mt-2">Mallipore Products</h4>
             <h2>
@@ -642,9 +643,9 @@ function toggleRotation(index) {
         </div>
         <div class="bg-white p-4 border rounded shadow w-full  self-start">
           <div class="flex items-center justify-between">
-            <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
+            <h3 class="sm:text-md text-sm font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
           </div>
-          <p class="mt-4 text-sm text-gray-600">
+          <p class="mt-4 sm:text-sm text-xs text-description">
             In some cases, a COA may not be available online. If your search was unable to find the COA, you can request one by clicking product documentation.
           </p>
           <div class="flex items-center justify-end mt-4">
@@ -665,14 +666,14 @@ function toggleRotation(index) {
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div on:click={() => toggleProductDetails2("Certificates of Origin")} class="flex items-center justify-between">
-      <h3 class="text-md font-medium text-gray-700">How to Find the Product Number</h3>
+      <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find the Product Number</h3>
             <!-- svelte-ignore a11y-missing-attribute -->
       <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
         <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showProductDetailsOrigin ? 'rotate-45' : '-rotate-45'}`} />
       </a>
     </div>
     {#if showProductDetailsOrigin}
-    <div class="mt-4 text-sm text-gray-600 leading-relaxed">
+    <div class="mt-4 sm:text-sm text-xs text-description leading-relaxed">
       <p>
         Product numbers are combined with Pack Sizes/Quantity when displayed on the website 
         (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00-25G</code>). 
@@ -712,14 +713,14 @@ function toggleRotation(index) {
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div on:click={() => toggleLotDetails("Certificates of Origin")} class="flex items-center justify-between">
-      <h3 class="text-md font-medium text-gray-700">How to Find a Lot/Batch Number for COO</h3>
+      <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find a Lot/Batch Number for COO</h3>
             <!-- svelte-ignore a11y-missing-attribute -->
       <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
         <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showLotDetailsOrigin ? 'rotate-45' : '-rotate-45'}`} />
       </a>
     </div>
     {#if showLotDetailsOrigin}
-      <div class="mt-4 text-sm text-gray-600">
+      <div class="mt-4 sm:text-sm text-xs text-description">
         <p>Lot and Batch Numbers can be found on a product's label following the words 'Lot' or 'Batch'.</p>
         <h4 class="font-bold mt-2">Sigma Products</h4>
         <p>If the letter is preceded by only two numbers (e.g. 62K1064), insert a '0' to the beginning and enter it as <code>062K1064</code>.</p>
@@ -734,9 +735,9 @@ function toggleRotation(index) {
   </div>
   <div class="bg-white p-4 border rounded shadow w-full self-start">
     <div class="flex items-center justify-between">
-      <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
+      <h3 class="sm:text-md text-sm font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
     </div>
-    <p class="mt-4 text-sm text-gray-600">
+    <p class="mt-4 sm:text-sm text-xs text-description">
       In some cases, a COO may not be available online. If your search was unable to find the COO, you can request one.
     </p>
     <div class="flex items-center justify-end mt-4">
@@ -757,14 +758,14 @@ function toggleRotation(index) {
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div class="bg-white p-4 border rounded shadow w-full self-start"> 
     <div class="flex items-center justify-between" on:click={() => toggleProductDetails2("Certificates of Quality")}>
-      <h3 class="text-md font-medium text-gray-700">How to Find the Product Number</h3>
+      <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find the Product Number</h3>
       <!-- svelte-ignore a11y-missing-attribute -->
       <a class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
         <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-300 ${showProductDetailsQuality ? 'rotate-45' : '-rotate-45'}`} />
       </a>
     </div>
     {#if showProductDetailsQuality}
-    <div class="mt-4 text-sm text-gray-600 leading-relaxed">
+    <div class="mt-4 sm:text-sm text-xs text-description leading-relaxed">
       <p>
         Product numbers are combined with Pack Sizes/Quantity when displayed on the website 
         (example: <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded">TIPAKKIT00-25G</code>). 
@@ -804,14 +805,14 @@ function toggleRotation(index) {
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div on:click={() => toggleLotDetails("Certificates of Origin")} class="flex items-center justify-between">
-      <h3 class="text-md font-medium text-gray-700">How to Find a Lot/Batch Number for COQ</h3>
+      <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find a Lot/Batch Number for COQ</h3>
       <!-- svelte-ignore a11y-missing-attribute -->
       <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
         <Icon icon="mynaui:arrow-right" width="1.8em" height="1.8em"  class={`transition-transform duration-400 ${showLotDetailsOrigin ? 'rotate-45' : '-rotate-45'}`} />
       </a>
     </div>
     {#if showLotDetailsOrigin}
-      <div class="mt-4 text-sm text-gray-600">
+      <div class="mt-4 sm:text-sm text-xs text-description">
         <p>Lot and Batch Numbers can be found on a product's label following the words 'Lot' or 'Batch'.</p>
         <h4 class="font-bold mt-2">Sigma Products</h4>
         <p>If the letter is preceded by only two numbers (e.g. 62K1064), insert a '0' to the beginning and enter it as <code>062K1064</code>.</p>
@@ -826,9 +827,9 @@ function toggleRotation(index) {
   </div>
   <div class="bg-white p-4 border rounded shadow w-full  self-start">
     <div class="flex items-center justify-between">
-      <h3 class="text-md font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
+      <h3 class="sm:text-md text-sm font-medium text-gray-700">Not Finding What You Are Looking For?</h3>
     </div>
-    <p class="mt-4 text-sm text-gray-600">
+    <p class="mt-4 sm:text-sm text-xs text-description">
       In some cases, a COQ may not be available online. If your search was unable to find the COQ, you can request one.
     </p>
     <div class="flex items-center justify-end mt-4">
