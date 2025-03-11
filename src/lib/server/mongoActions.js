@@ -1557,16 +1557,25 @@ export const ResetPassword = async (body) => {
 
 //returns starts
 export const getReturnresultData = async (body) => {
+	// console.log('returnsbody-->',body)
 	try {
-		const invoiceNumber = parseInt(body.invoiceNumber);
-		const record = await Order.findOne({ invoice: invoiceNumber });
-		if (record) {
-			return {
-				redirectTo: `/returns/${record.invoice}`
-			};
-		} else {
-			return { message: 'Return-Order not found' };
+		const invoiceNumber = body.invoiceNumber;
+		const record = await Order.findOne({ invoice: invoiceNumber }).populate('profileId');
+
+		if (!record) {
+			return { message: 'Order not found' };
 		}
+
+		if (record.profileId.email !== body.email) {
+			return { message: 'Email does not match the profile associated with this order' };
+		}
+
+		return {
+			redirectTo: `/returns/${record.invoice}`,
+			order: {
+				invoiceNumber: record.invoice
+			}
+		};
 	} catch (error) {
 		console.error('Error fetching return result:', error);
 		return { message: 'Error occurred while fetching the order' };
@@ -1580,6 +1589,7 @@ export const getreturnsOrderData = async ({ body }) => {
 			orderNumber,
 			invoiceNumber,
 			returnOrderId,
+			userId,
 			selectall,
 			reason: entireOrderReason,
 			entireOrderResolution,
@@ -1606,7 +1616,7 @@ export const getreturnsOrderData = async ({ body }) => {
 		});
 
 		Object.values(itemsByIndex).forEach((item) => {
-			console.log('item', item);
+			// console.log('item', item);
 
 			if (item.productNumber) {
 				const processedItem = {
@@ -1627,6 +1637,7 @@ export const getreturnsOrderData = async ({ body }) => {
 				selectedItems
 			},
 			invoiceNumber,
+			userId: userId,
 			orderNumber,
 			returnOrderid: returnOrderId,
 			status: 'Pending'
@@ -1648,9 +1659,9 @@ export const getreturnsOrderData = async ({ body }) => {
 	}
 };
 
-export const getcancelreturnData = async ({ id }) => {
+export const getcancelreturnData = async (id) => {
 	try {
-		const deletedRecord = await Return.findByIdAndDelete(id);
+		const deletedRecord = await Return.findByIdAndDelete({ _id: id });
 		if (!deletedRecord) {
 			return { status: 404, message: 'Return order not found.' };
 		}

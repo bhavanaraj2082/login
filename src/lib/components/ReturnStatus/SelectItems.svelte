@@ -1,6 +1,7 @@
 <script>
   import { fade, slide } from "svelte/transition";
   import { enhance, applyAction } from "$app/forms";
+  import { toast, Toaster } from 'svelte-sonner';
 
   export let data;
   let returndata= data?.returndata
@@ -16,7 +17,7 @@
   //   (item) => String(item.records.invoice) === String(returndata)
   // );
 
-
+  let userId = returndata?.userId || '';
   let selectAll = false;
   let entireOrderReason = "";
   let entireOrderResolution = "";
@@ -280,7 +281,7 @@
     <input type="hidden" name="orderNumber" value={orderDetail.orderid} />
     <input type="hidden" name="invoiceNumber" value={orderDetail.invoiceNumber} />
     <input type="hidden" name="returnOrderId" value={returnOrderId} />
-    
+    <input type="hidden" name="userId" value={userId}/>  
     {#each selectedItems as item, index}
       <input type="hidden" name={`selectedItems[${index}].productNumber`} value={item.productNumber} />
       <input type="hidden" name={`selectedItems[${index}].productName`} value={item.productName} />

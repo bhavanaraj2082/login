@@ -13,5 +13,8 @@
 </script>
 
 <SEO {metadata} />
-
-<Returns />
+<section class="bg-gray-50 py-2">
+	<div class="px-4 lg:w-11/12 mx-auto">
+		<Returns />
+	</div>
+</section>

@@ -13,6 +13,9 @@ const returnsSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  userId:{
+    type:String
+  },
   status: {
     type: mongoose.Schema.Types.Mixed,
     required: false,

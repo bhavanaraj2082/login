@@ -1,5 +1,6 @@
 <script>
   export let returndata;
+  console.log('FE returnsdata',returndata)
 
   function formatAddress(address) {
     if (!address) return "N/A"; 
