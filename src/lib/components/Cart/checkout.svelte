@@ -23,6 +23,7 @@
 	let isShowbox = true
 	let order = ''
 	let checkout
+	let onSubmit = false
 	let cartdata = data?.cart?.cart[0]?.cartItems || []
 	//$:console.log(userData);
 	$: isGST = userData.country === "India" ? true : false
@@ -190,15 +191,16 @@
 				productName:cart.productDetails.productName,
 				productNumber:cart.productDetails.productNumber,
 				manufacturerName:cart.mfrDetails.name,
+				returnPolicy:cart.productDetails.returnPolicy
 				//distributorAlias:cart.distributorDetails.aliasname
 			});
 		});
 
 		let order = {
 			invoice:generateInvoiceNumber(),
-			subtotalprice: priceINR,
+			subtotalprice: $currencyState === "inr" ? priceINR : priceUSD,
 			shippingprice: 0,
-			totalprice: priceINR,
+			totalprice: $currencyState === "inr" ? priceINR : priceUSD,
 			products,
 			orderdetails,
 			billingaddress:$billingAddress,
@@ -219,6 +221,7 @@
 	}
 
 	const handleSubmit = ()=>{
+		onSubmit = true
 		return async({result})=>{
 			console.log(result);
 			if(result.data.success){
@@ -343,7 +346,7 @@
 						<form method="POST" action="?/checkout" use:enhance={handleSubmit} class=" col-span-2">
 							<input type="hidden" name="order" value={JSON.stringify(checkout)}/>
 							<button
-								type="submit"
+								type="submit" disabled={onSubmit}
 								class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
 							>
 								Proceed to Order
