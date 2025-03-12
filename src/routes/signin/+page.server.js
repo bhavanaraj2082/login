@@ -84,7 +84,12 @@ export const actions = {
 							attributes: { email, username: `${email.split('@')[0]}` }
 						});
 						user = luciaUser;
-						await new Profile({ userId: luciaUser.userId, email }).save();
+						await new Profile({ userId: luciaUser.userId, email, sitePreferences: {
+							productEntryType : "Manual Entry",
+							noOfQuickOrderFields: 3,
+							noOfOrdersPerPage: 3,
+							noOfQuotesPerPage: 3
+						}}).save();
 					} else {
 						user = await auth.getUserAttributes(existingKey.userId);
 					}
@@ -109,10 +114,6 @@ export const actions = {
 	verifyOtp: async ({ request, cookies }) => {
 		const body = Object.fromEntries(await request.formData());
 		const { email, enteredOtp } = body;
-
-		console.log(body, 'body verifyOtp');
-
-		// Check if email and OTP are provided
 		if (!email) {
 			console.log('Missing email');
 			return fail(400, { error: 'Missing email', errorMsg: 'Email is required.' });
@@ -122,8 +123,6 @@ export const actions = {
 			console.log('Missing OTP');
 			return fail(400, { error: 'Missing OTP', errorMsg: 'OTP is required.' });
 		}
-
-		console.log('Checking OTP for email:', email, 'Entered OTP:', enteredOtp);
 		if (!verifyOtp(email, enteredOtp)) {
 			console.log('OTP verification failed.');
 			return fail(400, {
@@ -136,29 +135,20 @@ export const actions = {
 			{ isEmailVerified: true },
 			{ new: true, upsert: false }
 		  );		
-		  console.log('OTP verification successful. Email verified');
 
 		try {
 			let user;
 			try {
 				const key = await auth.useKey('email', email);
-				console.log('Authentication successful, key:', key);
-
 				user = await auth.getUserAttributes(key.userId);
-				console.log('Fetched user attributes:', user);
 			} catch (error) {
 				console.error('Authentication error:', error.message);
 
 				if (error.message === 'AUTH_INVALID_PASSWORD') {
 					try {
 						const existingKey = await auth.getKey('email', email);
-						console.log('Existing key found:', existingKey);
-
 						await auth.updateKeyPassword('email', email, 'Password123');
-						console.log('Password updated successfully.');
-
 						user = await auth.getUser(existingKey.userId);
-						console.log('Fetched user after password update:', user);
 					} catch (err) {
 						console.error('Error handling invalid password case:', err);
 						return fail(500, { errorMsg: 'Failed to update password. Please try again later.' });
@@ -168,15 +158,11 @@ export const actions = {
 				}
 			}
 
-			console.log('Creating session for user:', user?.userId);
 			const session = await auth.createSession({ userId: user.userId, attributes: {} });
-			console.log('Session created:', session);
 
 			const sessionCookie = auth.createSessionCookie(session);
 			cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-
 			const redirectTo = '/dashboard';
-			console.log('Redirecting user to:', redirectTo);
 
 			return { type: 'success', redirectTo };
 		} catch (error) {

@@ -633,14 +633,12 @@ export const signUp = async (body, cookies) => {
   };
 
   export const loginWithLinkedIn = async (userData, cookies) => {
-	console.log(userData, 'linkedinluciauser');
+	// console.log(userData, 'linkedinluciauser');
 	try {
 		const existingUser = await auth.getKey('email', userData.email);
 		if (existingUser) {
-			// Log the existing user's details
 			console.log('Existing Lucia user found:', existingUser);
 
-			// Optionally, retrieve the full user profile
 			let existingUserProfile;
 			try {
 				existingUserProfile = await auth.getUser(existingUser.userId);
@@ -650,12 +648,11 @@ export const signUp = async (body, cookies) => {
 				throw new Error('Failed to fetch user profile.');
 			}
 
-			// Step 3: Create a session for the user
 			let session;
 			try {
 				session = await auth.createSession({
-					userId: existingUser.userId, // Use the user ID from the existing Lucia user
-					attributes: {} // Add any additional session attributes if needed
+					userId: existingUser.userId, 
+					attributes: {}
 				});
 				console.log('Session created:', session);
 			} catch (sessionError) {
@@ -663,7 +660,6 @@ export const signUp = async (body, cookies) => {
 				throw new Error('Failed to create session for the user.');
 			}
 
-			// Step 4: Create and set the session cookie
 			try {
 				if (!cookies || typeof cookies.set !== 'function') {
 					console.error('Cookies object is not defined or invalid.');
@@ -672,7 +668,6 @@ export const signUp = async (body, cookies) => {
 
 				const sessionCookie = auth.createSessionCookie(session);
 				cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-
 				console.log('Session cookie set:', sessionCookie);
 			} catch (cookieError) {
 				console.error('Error setting session cookie:', cookieError);
@@ -712,10 +707,15 @@ export const signUp = async (body, cookies) => {
 			email: userData.email,
 			isEmailVerified: userData.isEmailVerified,
 			country: 'N/A',
+			sitePreferences: {
+				productEntryType : "Manual Entry",
+				noOfQuickOrderFields: 3,
+				noOfOrdersPerPage: 3,
+				noOfQuotesPerPage: 3
+			}
 			// phone:'N/A'
 		});
 		console.log('New Profile:', newProfile);
-
 		const savedProfile = JSON.parse(JSON.stringify(await newProfile.save()));
 		console.log('Saved Profile:', savedProfile);
 
@@ -724,10 +724,8 @@ export const signUp = async (body, cookies) => {
 			attributes: {}
 		});
 
-		// Step 4: Create and set the session cookie
 		const sessionCookie = auth.createSessionCookie(session);
 		cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-
 		console.log('Signup successful');
 		// throw redirect(302, '/dashboard');
 	}
