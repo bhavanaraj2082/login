@@ -216,6 +216,14 @@ async function submitForm() {
 		goto(url)
 		// window.location.href = url;
 		isLiked = false;
+		isOpen = !isOpen;
+
+		if (url.includes('products') || url.includes('applications')) {
+        window.location.href = url;
+       } else {
+		goto(url)
+       }
+	   
 	}
 	let isOpen = false;
 
@@ -360,20 +368,21 @@ async function submitForm() {
 			</div>
 			{#if activeMenu === null}
 			{#each menus as menu}
+			<span class="flex flex-row hover:bg-primary-400 transition rounded transform hover:scale-105 duration-200">
 				<button
-					on:click={() =>
-						(menu.title === 'Products' ||
-							menu.title === 'Applications' ||
-							menu.title === 'Services') &&
-						menu.submenus
-							? toggleMenu(menu)
-							: navigateTo(menu.href)}
-					class="flex justify-between text-left  text-white transition duration-200 w-full py-2 px-2 ml-2">
-					{menu.title}
-					{#if menu.submenus && menu.submenus.length > 0}
-						<Icon icon="prime:chevron-down" class="w-5 h-5 mr-2 text-white "/>
-					{/if}
-				</button>
+				on:click={() =>
+					 navigateTo(menu.href)}
+				class="flex justify-between text-left text-white w-full py-2 px-2 ml-2">
+				{menu.title}
+				
+			</button>
+			{#if menu.submenus && menu.submenus.length > 0}
+			<button on:click={()=> toggleMenu(menu)}>
+				<Icon icon="prime:chevron-down" class="w-5 h-5 mr-2 text-white "/>
+			</button>
+				{/if}
+			</span>
+			
 			{/each}
 			<div class="flex flex-col font-semibold">
 				<!-- <button
@@ -383,7 +392,7 @@ async function submitForm() {
 				</button> -->
 				<button
 					on:click={() => navigateTo('/order-status')}
-					class="text-left text-white text-md transition duration-200 w-full py-2 px-4 font-medium">
+					class="text-left text-white text-md w-full py-2 px-4 font-medium hover:bg-primary-400 transition rounded transform hover:scale-105 duration-200 ">
 					Order Status
 				</button>
 			</div>

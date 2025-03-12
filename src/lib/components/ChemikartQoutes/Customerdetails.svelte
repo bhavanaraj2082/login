@@ -672,7 +672,7 @@ let searchTerm = "";
 <hr /><hr />
 <div class="bg-white ">
 	<span class="flex items-center gap-2 pt-10">
-		<Icon icon="mdi:user-details-outline" class="sm:w-8 sm:h-8 w-6 h-6 text-heading" />
+		<Icon icon="ph:user-list" class="sm:w-8 sm:h-8 w-6 h-6 text-heading" />
 	<h1 class="font-bold sm:text-2xl text-sm ">Step 5: Customer details</h1>
 	</span>
 	<div class="sm:ml-10 ml-0">
