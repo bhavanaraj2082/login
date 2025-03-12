@@ -7,7 +7,7 @@
 	import Cartrightside from '$lib/components/HeaderDropDownCart/Cartrightside.svelte';
 	import menusdata from '$lib/data/chemicalProducts.json';
 	import { enhance } from '$app/forms';
-	import { goto } from '$app/navigation';
+	import { goto,invalidate } from '$app/navigation';
 	import { slide, fade } from 'svelte/transition';
 	import { toast, Toaster } from 'svelte-sonner';	
 	import { guestCart } from '$lib/stores/cart.js';
@@ -212,9 +212,13 @@ async function submitForm() {
 			activeSubmenu = null;
 		}, 50000);
 	}
-	function navigateTo(url) {
-		goto(url)
-		window.location.href = url;
+	function navigateTo (url) {
+		//invalidate("data:cat")
+		goto(url);
+		// const newUrl = new URL(window.location.href)
+		// newUrl.searchParams.set('/',url)
+
+		// window.location.href = url;
 	// 	isLiked = false;
 	// 	isOpen = !isOpen;
 

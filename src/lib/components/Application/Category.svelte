@@ -2,8 +2,8 @@
   import Card from '$lib/components/Application/Card.svelte'; 
   export let data;
   
-  let categoryData = data.categoryData;
-  let subcategories = data.categoryData.subcategories;
+  $: categoryData = data.categoryData;
+  $: subcategories = data.categoryData.subcategories;
   
 </script>
 

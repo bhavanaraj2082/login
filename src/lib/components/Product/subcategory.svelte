@@ -1,6 +1,6 @@
 <script>
   export let data;
-  const subcategories = data.records;
+  $: subcategories = data.records;
   import Icon from "@iconify/svelte";
 
   let searchTerm = "";

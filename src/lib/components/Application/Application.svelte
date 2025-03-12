@@ -1,6 +1,6 @@
 <script>
   export let data;
-  let categoryData = data.categoryData;
+  $: categoryData = data.categoryData
   const getTruncatedDescription = (description, maxWords = 10) => {
     const words = description.split(' ');
     if (words.length > maxWords) {
