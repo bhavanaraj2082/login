@@ -10,7 +10,7 @@
   export let data;
   
   let returns = data.returns || [];
-//   console.log("returnsData======>",returns)
+//   console.log("returnsData page======>",returns)
   let expandedReturnId = null;
   let calendarComponent;
   
@@ -219,6 +219,11 @@
     };
   };
 
+  function truncateText(text, maxLength = 25) {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  }
+
   $: {
       if (returns) {
           filterReturns();
@@ -371,7 +376,7 @@
                                               <tbody class="bg-white divide-y divide-gray-200">
                                                   {#each item.returnItems?.selectedItems || [] as returnItem}
                                                       <tr class="hover:bg-gray-50">
-                                                          <td class="px-6 py-4 whitespace-nowrap text-sm">{returnItem?.productName || 'N/A'}</td>
+                                                          <td class="px-6 py-4 whitespace-nowrap text-sm">{truncateText(returnItem?.productName) || 'N/A'}</td>
                                                           <td class="px-6 py-4 whitespace-nowrap text-sm">{returnItem?.orderQty || 0}</td>
                                                           <td class="px-6 py-4 whitespace-nowrap text-sm">{returnItem?.returnqty || 0 }</td>
                                                           <td class="px-6 py-4 whitespace-nowrap text-sm">{returnItem?.reason || 'N/A'}</td>
@@ -422,16 +427,7 @@
                       Next
                   </button>
                 </div>
-            <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-              <div>
-                  <!-- <p class="text-sm text-gray-700">
-                      Showing <span class="font-medium">{($currentPage - 1) * $itemsPerPage + 1}</span> to{' '}
-                      <span class="font-medium">
-                          {Math.min($currentPage * $itemsPerPage, totalItems)}
-                      </span> of{' '}
-                      <span class="font-medium">{totalItems}</span> results
-                  </p> -->
-              </div>
+            <div class="hidden sm:flex sm:flex-1 sm:items-center justify-center">
               <div class="flex items-center gap-2">
                   <button
                       class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 bg-white text-gray-500 hover:bg-primary-50 disabled:opacity-50 disabled:cursor-not-allowed"

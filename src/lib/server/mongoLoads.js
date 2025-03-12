@@ -17,6 +17,7 @@ import Newsroom from '$lib/server/models/Newsroom';
 import User from "$lib/server/models/User.js";
 import Quotes from "$lib/server/models/Quotes.js";
 import Cart from "$lib/server/models/Cart.js";
+import Returns from "$lib/server/models/Return.js"
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -2106,17 +2107,19 @@ export async function getUserProfileData(userId) {
       throw new Error('Invalid userId provided');
     }
 
-    const [profile, orders, quotes, favoritesResult, cart] = await Promise.all([
+    const [profile, orders, returnsData, quotes, favoritesResult, cart ] = await Promise.all([
       Profile.findOne({ userId }).lean(),
       
       Order.find({ userId })
         .sort({ createdAt: -1 })
         .lean(),
-      
+      Return.find({userId})
+      .sort({ createdAt: -1 })
+        .lean(),
       Quotes.find({ userId })
         .sort({ createdAt: -1 })
         .lean(),
-      
+
       getUserFavorites(userId),
       getUserMycart(userId),
       // Cart.find({
@@ -2139,6 +2142,7 @@ export async function getUserProfileData(userId) {
       profile,
       orders,
       quotes,
+      returnsData,
       favorites: favoritesResult.success ? favoritesResult.data : [],
       cart: cart.success ? cart.data : []
     };
