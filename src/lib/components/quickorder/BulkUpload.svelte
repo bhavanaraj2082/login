@@ -2,7 +2,8 @@
   import Icon from "@iconify/svelte";
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
-  import * as XLSX from 'xlsx';
+  import * as XLSX from "xlsx";
+  import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
   export let data;
   let validationMessages = [];
   let duplicateEntries = [];
@@ -13,13 +14,17 @@
   let validatedProducts = [];
   let cartloading = false;
   let requestsent = false;
-
+  let form2;
+  let selectedFileName = "";
+  let isEditing = true;
+  let isValidated = false;
+  let invalidProductLines = [];
   function checkForDuplicates(fileContent) {
     if (!fileContent) return { duplicates: [], uniqueLines: [] };
 
     const lines = fileContent.split("\n").filter((line) => line.trim());
     const seenEntries = new Map();
-    
+
     const duplicates = [];
     const uniqueLines = [];
 
@@ -52,16 +57,16 @@
       const [currentProductInfo] = line.split(",").map((item) => item.trim());
       if (currentProductInfo === productInfo) {
         if (seenProducts.has(productInfo)) {
-          return false; 
+          return false;
         }
-        seenProducts.set(productInfo, true); 
+        seenProducts.set(productInfo, true);
       }
       return true;
     });
     const finalLines = deduplicatedLines.map((line) => {
       const [productInfo, quantity] = line
         .split(",")
-        .map((item) => item.trim()); 
+        .map((item) => item.trim());
       return `${productInfo},${quantity}`;
     });
     rawFileData = finalLines.join("\n");
@@ -92,266 +97,165 @@
     }
   }
 
-  function handleTextChange(event) {
-    rawFileData = event.target.value.trim();
-    const { duplicates } = checkForDuplicates(rawFileData);
-    duplicateEntries = duplicates;
+  function removeInvalidProduct(lineIndex) {
+    const lines = rawFileData.split("\n");
+    const lineContent = lines[lineIndex];
+    const [productInfo] = lineContent.split(",").map((item) => item.trim());
+
+    lines.splice(lineIndex, 1);
+    rawFileData = lines.join("\n");
+    invalidProductLines = invalidProductLines.filter(
+      (line) => line.index !== lineIndex,
+    );
+
+    validationMessages = validationMessages.filter(
+      (message) => !productInfo.includes(message.productNumber),
+    );
+
+    toast.success("Invalid product removed");
+    if (!validationMessages.some((message) => !message.isValid)) {
+      validateAndSubmitData();
+    }
   }
 
-  let selectedFileName = ""; 
+  function handleTextChange(event) {
+    rawFileData = event.target.value;
+    const { duplicates } = checkForDuplicates(rawFileData);
+    duplicateEntries = duplicates;
+    isValidated = false;
+    invalidProductLines = [];
+  }
 
-  // function handleFileInputChange(event) {
-  //   const file = event.target.files[0];
-
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onload = function (e) {
-  //       rawFileData = e.target.result;
-  //       fileError = "";
-  //       selectedFileName = file.name;
-  //       const { duplicates } = checkForDuplicates(rawFileData);
-  //       duplicateEntries = duplicates;
-
-  //       if (duplicates.length > 0) {
-  //         toast.error(
-  //           `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
-  //         );
-  //       } else {
-  //         const form = event.target.closest("form");
-  //         if (form) {
-  //           form.requestSubmit();
-  //         }
-  //       }
-  //     };
-
-  //     reader.onerror = function () {
-  //       fileError = "Error reading the file. Please try again.";
-  //     };
-
-  //     reader.readAsText(file);
-  //   } else {
-  //     fileError = "No file selected.";
-  //   }
-  // }
+  function validateCartInput() {
+    const validProducts = validatedProducts.filter(
+      (product) => product.isValid,
+    );
+    return validProducts.length > 0;
+  }
 
   function handleFileInputChange(event) {
     const file = event.target.files[0];
 
     if (file) {
-        const fileType = file.name.split('.').pop().toLowerCase();
-        selectedFileName = file.name;
-        
-        if (fileType === 'xlsx' || fileType === 'xls') {
-            fileError = "";
-            
-            if (typeof XLSX !== 'undefined') {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, {type: 'array'});
-                        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                        
-                        let csvData = XLSX.utils.sheet_to_csv(worksheet);
-                        const lines = csvData.split('\n').filter(line => line.trim());
-                        const transformedLines = lines.map(line => {
-                            const parts = line.split(',').map(part => part.trim());
-                            if (parts.length >= 2) {
-                                return `${parts[0]}-${parts[1]},${parts[2] || 1}`;
-                            }
-                            return line; 
-                        });
-                        
-                        rawFileData = transformedLines.join('\n');
-                        const csvFile = new File([rawFileData], file.name.replace(/\.xlsx$|\.xls$/i, '.csv'), {
-                            type: 'text/csv'
-                        });
-                        
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(csvFile);
-                        
-                        const fileInput = document.getElementById('bulkupload');
-                        if (fileInput) {
-                            fileInput.files = dataTransfer.files;
-                        }
-                        
-                        const { duplicates } = checkForDuplicates(rawFileData);
-                        duplicateEntries = duplicates;
-                        
-                        if (duplicates.length > 0) {
-                            toast.error(
-                                `Found ${duplicates.length} duplicate entries. Please review and remove them.`
-                            );
-                        } else {
-                            const form = event.target.closest("form");
-                            if (form) {
-                                form.requestSubmit();
-                            }
-                        }
-                    } catch (error) {
-                        console.error("Excel processing error:", error);
-                        fileError = "Error processing Excel file. Please check file format.";
-                    }
-                };
-                reader.onerror = function() {
-                    fileError = "Error reading the file. Please try again.";
-                };
-                reader.readAsArrayBuffer(file);
-            } else {
-                fileError = "Excel file support requires the SheetJS library. Please use CSV format instead.";
-            }
-        } else {
+      const fileType = file.name.split(".").pop().toLowerCase();
+      selectedFileName = file.name;
+      isValidated = false; 
+      invalidProductLines = []; 
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                rawFileData = e.target.result;
-                fileError = "";
-                
-                const { duplicates } = checkForDuplicates(rawFileData);
-                duplicateEntries = duplicates;
-                
-                if (duplicates.length > 0) {
-                    toast.error(
-                        `Found ${duplicates.length} duplicate entries. Please review and remove them.`
-                    );
-                } else {
-                    const form = event.target.closest("form");
-                    if (form) {
-                        form.requestSubmit();
-                    }
+      if (fileType === "xlsx" || fileType === "xls") {
+        fileError = "";
+
+        if (typeof XLSX !== "undefined") {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            try {
+              const data = new Uint8Array(e.target.result);
+              const workbook = XLSX.read(data, { type: "array" });
+              const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+              let csvData = XLSX.utils.sheet_to_csv(worksheet);
+              const lines = csvData.split("\n").filter((line) => line.trim());
+              const transformedLines = lines.map((line) => {
+                const parts = line.split(",").map((part) => part.trim());
+                if (parts.length >= 2) {
+                  return `${parts[0]}-${parts[1]},${parts[2] || 1}`;
                 }
-            };
-            reader.onerror = function() {
-                fileError = "Error reading the file. Please try again.";
-            };
-            reader.readAsText(file);
-        }
-    } else {
-        fileError = "No file selected.";
-    }
-}
+                return line;
+              });
 
-  async function addValidatedProductsToCart() {
-    cartloading = true;
-    try {
-      const authedUser = data.authedUser;
-      let productsAddedCount = 0;
-      const productsToAdd = [];
+              rawFileData = transformedLines.join("\n");
+              isEditing = true; 
+              const csvFile = new File(
+                [rawFileData],
+                file.name.replace(/\.xlsx$|\.xls$/i, ".csv"),
+                {
+                  type: "text/csv",
+                },
+              );
 
-      validatedProducts.forEach((product) => {
-        if (!product.isValid) {
-          console.log(
-            `Product ${product.productNumber} is not valid: ${product.message}`,
-          );
-          return;
-        }
+              const dataTransfer = new DataTransfer();
+              dataTransfer.items.add(csvFile);
 
-        if (
-          product.stockMessage ===
-            "Stock is sufficient for all uploaded quantities" ||
-          (product.productNumber &&
-            product.productName &&
-            product.pricing &&
-            product.pricing[0] &&
-            product.pricing[0].break &&
-            product.stock > 0)
-        ) {
-          console.log(`Product ${product.productName} passed validation check`);
+              const fileInput = document.getElementById("bulkupload");
+              if (fileInput) {
+                fileInput.files = dataTransfer.files;
+              }
 
-          const sizePriceInfo = product.pricing[0];
-          const size = sizePriceInfo.break;
-          const price = sizePriceInfo.price;
+              const { duplicates } = checkForDuplicates(rawFileData);
+              duplicateEntries = duplicates;
 
-          const newProduct = {
-            id: product.id,
-            manufacturerId: product.manufacturer,
-            distributerId: product.distributer ? product.distributer : null,
-            stockId: product.stockId,
-            productName: product.productName,
-            image: product.image,
-            partNumber: product.productNumber,
-            description: product.prodDesc,
-            priceSize: {
-              price: price,
-              size: size,
-            },
-            quantity: product.quantity,
-            backOrder: Math.max(product.quantity - product.stock),
-            stock: product.stock,
+              if (duplicates.length > 0) {
+                toast.error(
+                  `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+                );
+              }
+            } catch (error) {
+              console.error("Excel processing error:", error);
+              fileError =
+                "Error processing Excel file. Please check file format.";
+            }
           };
-
-          productsToAdd.push(newProduct);
-          productsAddedCount++;
-          console.log(
-            `Prepared product ${newProduct.productName} for cart addition`,
-          );
+          reader.onerror = function () {
+            fileError = "Error reading the file. Please try again.";
+          };
+          reader.readAsArrayBuffer(file);
         } else {
-          console.log(
-            `Product ${product.productName} did not pass validation.`,
-          );
-        }
-      });
-
-      if (productsAddedCount > 0) {
-        if (!authedUser || !authedUser.id) {
-          try {
-            const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
-            const updatedCart = [...existingCart, ...productsToAdd];
-            localStorage.setItem("cart", JSON.stringify(updatedCart));
-            cartloading = false;
-            toast.success(
-              `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} saved to cart.`,
-            );
-            setTimeout(() => {
-              location.reload();
-            }, 2000);
-            return;
-          } catch (err) {
-            console.error("Error saving to localStorage:", err);
-            cartloading = false;
-            toast.error("Failed to save items to cart");
-            return;
-          }
-        }
-        const form = new FormData();
-        form.append("cartItems", JSON.stringify(productsToAdd));
-
-        try {
-          const response = await fetch("?/addToCart", {
-            method: "POST",
-            body: form,
-          });
-
-          const textResponse = await response.text();
-          const result = JSON.parse(textResponse);
-          cartloading = false;
-          const resultData = JSON.parse(result.data);
-
-          if (resultData && resultData[0]?.success === 1) {
-            toast.success(
-              `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`,
-            );
-            setTimeout(() => {
-              location.reload();
-            }, 2000);
-          } else {
-            throw new Error(resultData[1] || "Failed to add items to cart");
-          }
-        } catch (err) {
-          console.error("Error adding to cart:", err);
-          cartloading = false;
-          toast.error("Failed to add items to cart");
-          return;
+          fileError =
+            "Excel file support requires the SheetJS library. Please use CSV format instead.";
         }
       } else {
-        toast.error("No valid items to add to cart");
-        cartloading = false;
-        console.log("No valid products to add to cart");
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          rawFileData = e.target.result;
+          fileError = "";
+          isEditing = true;  
+
+          const { duplicates } = checkForDuplicates(rawFileData);
+          duplicateEntries = duplicates;
+
+          if (duplicates.length > 0) {
+            toast.error(
+              `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+            );
+          }
+
+        };
+        reader.onerror = function () {
+          fileError = "Error reading the file. Please try again.";
+        };
+        reader.readAsText(file);
       }
-    } catch (err) {
-      console.error("Error in cart management:", err);
-      toast.error("Error adding items to cart.");
-      cartloading = false;
+    } else {
+      fileError = "No file selected.";
+    }
+  }
+
+  function validateAndSubmitData() {
+    if (!rawFileData.trim()) {
+      toast.error("Please enter product data before submitting");
+      return;
+    }
+
+    const { duplicates } = checkForDuplicates(rawFileData);
+    if (duplicates.length > 0) {
+      toast.error(
+        `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+      );
+      return;
+    }
+    const file = new File([rawFileData], "manual-entry.csv", {
+      type: "text/csv",
+    });
+
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    const fileInput = document.getElementById("bulkupload");
+    if (fileInput) {
+      fileInput.files = dataTransfer.files;
+    }
+
+    if (formElement) {
+      formElement.requestSubmit();
     }
   }
 
@@ -371,25 +275,21 @@
       });
     }
   }
+
   function prepareValidatedProductsForCart() {
     const productsToAdd = [];
-    
-    // Check if validatedProducts exists and has items
     if (!validatedProducts || validatedProducts.length === 0) {
-      console.log("No validated products found");
+      toast.error("No valid items to add to cart");
       return productsToAdd;
     }
-    
-    validatedProducts.forEach((product) => {
-      if (!product.isValid) {
-        console.log(
-          `Product ${product.productNumber} is not valid: ${product.message}`
-        );
-        return;
-      }
+    const validProducts = validatedProducts.filter(
+      (product) => product.isValid === true,
+    );
 
+    validProducts.forEach((product) => {
       if (
-        product.stockMessage === "Stock is sufficient for all uploaded quantities" ||
+        product.stockMessage ===
+          "Stock is sufficient for all uploaded quantities" ||
         (product.productNumber &&
           product.productName &&
           product.pricing &&
@@ -402,9 +302,9 @@
         const sizePriceInfo = product.pricing[0];
         const size = sizePriceInfo.break;
         const price = sizePriceInfo.price;
-           const rowQuantity = parseInt(product.quantity, 10) || 0;
-              const productStock = parseInt(product.stock, 10) || 0;
-              const backOrder = Math.max(rowQuantity - productStock, 0);
+        const rowQuantity = parseInt(product.quantity, 10) || 0;
+        const productStock = parseInt(product.stock, 10) || 0;
+        const backOrder = Math.max(rowQuantity - productStock, 0);
 
         const newProduct = {
           id: product.id,
@@ -426,47 +326,92 @@
 
         productsToAdd.push(newProduct);
         console.log(
-          `Prepared product ${newProduct.productName} for cart addition`
+          `Prepared product ${newProduct.productName} for cart addition`,
         );
       } else {
-        console.log(
-          `Product ${product.productName} did not pass validation.`
-        );
+        console.log(`Product ${product.productName} did not pass validation.`);
       }
     });
-    
+
     console.log(`Prepared ${productsToAdd.length} products for cart`);
     return productsToAdd;
   }
-  
-  // Handle local storage for non-authenticated users
+
+  function attemptAddToCart() {
+    if (!isValidated || duplicateEntries.length > 0) {
+      validateAndSubmitData();
+      return;
+    }
+    const validProducts = validatedProducts.filter(
+      (product) => product.isValid === true,
+    );
+
+    if (validProducts.length === 0) {
+      toast.error(
+        "No valid products to add to cart. Please remove invalid products and try again.",
+      );
+      return;
+    }
+
+
+    if (data?.authedUser && data?.authedUser?.id) {
+      const cartForm = document.getElementById("cartForm");
+      if (cartForm) cartForm.requestSubmit();
+    } else {
+      handleLocalStorage();
+      submitAlternateForm();
+    }
+  }
+  async function submitAlternateForm() {
+    const storedTotalComps = JSON.parse(localStorage.getItem("cart"));
+    localStorage.setItem("totalCompsChemi", storedTotalComps.length);
+    syncLocalStorageToStore();
+  }
+  function handleDataCart() {
+    return async ({ result }) => {
+      console.log("result from page server for carat data", result);
+
+      const totalComps = result?.data?.cartData?.cartItems.length;
+      console.log("totalComps", totalComps);
+      localStorage.setItem("totalCompsChemi", totalComps);
+      syncLocalStorageToStore();
+    };
+  }
+  function syncLocalStorageToStore() {
+    if (typeof window !== "undefined") {
+      const storedTotalComps = localStorage.getItem("totalCompsChemi");
+      if (storedTotalComps) {
+        cartTotalComps.set(Number(storedTotalComps));
+      }
+    }
+  }
   function handleLocalStorage() {
     try {
       cartloading = true;
       const productsToAdd = prepareValidatedProductsForCart();
       const simplifiedCartItems = productsToAdd.map((item) => ({
-      productId: item.id,
-      manufacturerId: item.manufacturerId,
-      stockId: item.stockId,
-      distributorId: item.distributerId,
-      quantity: item.quantity,
-      backOrder: item.backOrder,
-    }));
+        productId: item.id,
+        manufacturerId: item.manufacturerId,
+        stockId: item.stockId,
+        distributorId: item.distributerId,
+        quantity: item.quantity,
+        backOrder: item.backOrder,
+      }));
       if (productsToAdd.length === 0) {
         cartloading = false;
         toast.error("No valid items to add to cart");
         return;
       }
-      
+
       const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
       const updatedCart = [...existingCart, ...simplifiedCartItems];
       localStorage.setItem("cart", JSON.stringify(updatedCart));
-      
+
       const productsAddedCount = productsToAdd.length;
       toast.success(
-        `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} saved to cart.`
+        `${productsAddedCount} valid ${productsAddedCount === 1 ? "item" : "items"} saved to cart.`,
       );
-      
+
       cartloading = false;
       setTimeout(() => {
         location.reload();
@@ -477,12 +422,48 @@
       toast.error("Failed to save items to cart");
     }
   }
+
+  function mapInvalidProductsToLines() {
+    if (!isValidated || !validationMessages.length) return [];
+
+    const lines = rawFileData.split("\n");
+    const mappedInvalidLines = [];
+    validationMessages.forEach((message) => {
+      if (!message.isValid) {
+        const lineIndex = lines.findIndex((line) => {
+          const [productInfo] = line.split(",").map((item) => item.trim());
+          return productInfo.includes(message.productNumber);
+        });
+
+        if (lineIndex !== -1) {
+          mappedInvalidLines.push({
+            index: lineIndex,
+            line: lineIndex + 1,
+            content: lines[lineIndex],
+            productNumber: message.productNumber,
+            message: message.message,
+          });
+        }
+      }
+    });
+
+    return mappedInvalidLines;
+  }
 </script>
 
 <div class="text-black text-sm md:ml-2 mb-1">
-  *Kindly upload the file with the product number-size,quantity, without any
-  headers.
+
+  *Type or paste product number-size,quantity (e.g.,
+  4926896-5G,1), separated by commas*. Enter separate products on new lines.
 </div>
+<form
+  method="POST"
+  action="/?/getCartValue"
+  bind:this={form2}
+  use:enhance={handleDataCart}
+>
+  <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
+</form>
 <form
   bind:this={formElement}
   method="POST"
@@ -496,8 +477,10 @@
 
       if (duplicates.length > 0) {
         toast.error("Please remove duplicate entries before submitting");
+        requestsent = false;
         return;
       }
+
       let products = result.data;
       products.forEach((product) => {
         processProduct(product);
@@ -505,6 +488,7 @@
 
       validatedProducts = products;
       requestsent = false;
+      isValidated = true; 
 
       if (result.data && Array.isArray(result.data)) {
         validationMessages = result.data.map((item) => ({
@@ -512,6 +496,26 @@
           isValid: item.isValid,
           message: item.message || "Unknown message",
         }));
+        const hasInvalidProducts = validationMessages.some(
+          (message) => !message.isValid,
+        );
+
+        if (hasInvalidProducts) {
+          invalidProductLines = mapInvalidProductsToLines();
+          toast.warning(
+            "Some products are invalid. Please review before adding to cart.",
+          );
+        } else if (validatedProducts.length > 0) {
+          setTimeout(() => {
+            if (data?.authedUser && data?.authedUser?.id) {
+              const cartForm = document.getElementById("cartForm");
+              if (cartForm) cartForm.requestSubmit();
+            } else {
+              submitAlternateForm();
+              handleLocalStorage();
+            }
+          }, 100);
+        }
       }
     };
   }}
@@ -521,7 +525,6 @@
       class="fixed inset-0 bg-gray-800 bg-opacity-50 z-50 flex justify-center items-center"
     >
       <div class="flex flex-col justify-center items-center">
-        <!-- Spinner Circle -->
         <div class="relative">
           <div class="absolute rounded-full">
             <Icon
@@ -529,7 +532,6 @@
               class=" h-32 w-32  mr-1 border-8 border-t-8 border-orange-500 animate-spin"
             />
           </div>
-          <!-- Icon with orange color -->
           <Icon
             icon="tabler:letter-c"
             width="128"
@@ -543,66 +545,82 @@
 
   <section class="w-full mx-auto md:flex items-center gap-5">
     <div
-      class="md:w-3/5 h-72 border bg-white rounded overflow-hidden overflow-y-scroll p-5"
+      class="md:w-3/5 h-72 border bg-white rounded overflow-hidden overflow-y-scroll p-5 relative"
     >
-      {#if rawFileData}
-        <textarea
-          class="w-full h-full p-2 border border-gray-300 rounded"
-          bind:value={rawFileData}
-          on:input={handleTextChange}
-          placeholder="Edit the CSV content here..."
-          readonly
-        ></textarea>
-      {:else}
-        <div class="text-gray-300 text-sm">
-          <p>Example</p>
-          <p>7987565-50G,1</p>
-          <p>657890-100G,5</p>
-          <p>345678-25G,3</p>
-        </div>
+      <textarea
+        class="w-full h-full p-2 border border-gray-300 rounded focus:ring-0 focus:border-primary-500"
+        bind:value={rawFileData}
+        on:input={handleTextChange}
+        placeholder="Type or paste product data here...
+Example:
+7987565-50G,1
+657890-100G,5
+345678-25G,3"
+      ></textarea>
+
+      {#if isValidated && invalidProductLines.length > 0}
+        {#each invalidProductLines as line}
+          <div
+            class="absolute right-7 text-red-500 flex items-center"
+            style="top: calc(1.5rem + {line.index * 1.5}rem)"
+          >
+            <span class="text-xs mr-2">{line.message}</span>
+            <button
+              type="button"
+              class="text-red-500 hover:text-red-700"
+              title="Remove invalid product"
+              on:click={() => removeInvalidProduct(line.index)}
+            >
+              <Icon icon="mdi:close-circle" class="text-lg" />
+            </button>
+          </div>
+        {/each}
       {/if}
+
       {#if fileError}
         <p class="text-red-500 text-sm mt-2">{fileError}</p>
       {/if}
     </div>
 
     <section class="mt-3 md:mt-0 md:w-2/5">
-      <div
-        class="flex justify-center bg-white items-center h-12 border rounded"
-      >
-        <a
-          class="flex items-center gap-2 text-sm font-medium text-primary-500"
-          href="/quick_order_template.csv"
-          download
+      <div class="flex flex-col gap-3">
+        <div
+          class="flex justify-center bg-white items-center h-12 border rounded"
         >
-          <Icon icon="pajamas:download" class="text-lg" /> Download Template
-        </a>
-      </div>
+          <a
+            class="flex items-center gap-2 text-sm font-medium text-primary-500"
+            href="/quick_order_template.csv"
+            download
+          >
+            <Icon icon="pajamas:download" class="text-lg" /> Download Template
+          </a>
+        </div>
 
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div
-        class="w-full flex flex-col justify-center bg-white items-center rounded h-56 mt-3 space-y-2 py-10 border border-dashed"
-        on:click={() => document.getElementById("bulkupload").click()}
-      >
-        <Icon icon="uil:upload" class="text-7xl text-primary-500 -ml-4" />
-        <p class="text-sm">
-          Drag and Drop your CSV or XLS file to upload or Choose file
-        </p>
-
-        <label
-          for="bulkupload"
-          class="w-full h-full cursor-pointer flex flex-col justify-center items-center"
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <div
+          class="w-full flex flex-col justify-center bg-white items-center rounded h-[220px] mt-3 space-y-2 py-6 border border-dashed"
+          on:click={() => document.getElementById("bulkupload").click()}
         >
-          <input
-            type="file"
-            id="bulkupload"
-            name="file"
-            accept=".xlsx, .xls, .csv, .txt"
-            on:change={handleFileInputChange}
-            class="hidden"
-          />
-        </label>
+          <Icon icon="uil:upload" class="text-5xl text-primary-500 -ml-4" />
+          <p class="text-sm text-center px-2">
+            Or drag and drop your CSV or XLS file to upload
+          </p>
+
+          <label
+            for="bulkupload"
+            class="w-full h-full cursor-pointer flex flex-col justify-center items-center"
+          >
+            <input
+              type="file"
+              id="bulkupload"
+              name="file"
+              accept=".xlsx, .xls, .csv, .txt"
+              on:change={handleFileInputChange}
+              class="hidden"
+            />
+          </label>
+        </div>
       </div>
 
       {#if selectedFileName}
@@ -622,13 +640,7 @@
             <span class="text-red-600">
               Line {entry.line}: {entry.content}
             </span>
-            <!-- <button
-            type="button"
-            class="px-3 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600"
-            on:click={() => removeDuplicateEntry(entry.productInfo)}
-          >
-            Remove
-          </button> -->
+
             <button
               type="button"
               class="px-3 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600"
@@ -642,46 +654,50 @@
       </ul>
     </div>
   {/if}
-  {#if validationMessages.length > 0}
-    <ul class="mt-3 text-sm">
-      <!-- {#each validationMessages as message}
-        <li>
-          <p class={message.isValid ? "text-green-500" : "text-red-500"}>
-            Product: {message.productNumber} - {message.isValid
-              ? "Valid"
-              : "Invalid"} - {message.message}
+  {#if validationMessages.length > 0 && isValidated}
+    <div class="mt-4">
+      {#if validationMessages.some((message) => !message.isValid)}
+        <div class="p-4 bg-yellow-50 rounded-md">
+          <h3 class="text-yellow-700 font-medium mb-2">Invalid Products:</h3>
+          <ul class="space-y-2">
+            {#each validationMessages.filter((message) => !message.isValid) as message}
+              <li class="flex items-center justify-between">
+                <span class="text-yellow-600">
+                  Product: {message.productNumber} - {message.message}
+                </span>
+                <span class="text-yellow-600 font-medium"
+                  >Cannot be added to cart</span
+                >
+              </li>
+            {/each}
+          </ul>
+          <p class="mt-3 text-sm text-yellow-600">
+            Please remove invalid products using the X button in the text area
+            or proceed with only valid products.
           </p>
-        </li>
-      {/each} -->
-      {#each validationMessages.filter(message => !message.isValid) as message}
-  <li>
-    <p class="text-red-500">
-      Product: {message.productNumber} - Invalid - {message.message}
-    </p>
-  </li>
-{/each}
+        </div>
+      {/if}
 
-    </ul>
+      {#if validationMessages.some((message) => message.isValid)}
+        <div class="mt-3 p-4 bg-green-50 rounded-md">
+          <h3 class="text-green-700 font-medium mb-2">
+            Valid Products: {validationMessages.filter(
+              (message) => message.isValid,
+            ).length}
+          </h3>
+          <p class="text-sm text-green-600">
+            These products are ready to be added to cart.
+          </p>
+        </div>
+      {/if}
+    </div>
   {/if}
 </form>
-<!-- 
-<div class="flex justify-end">
-  <button
-    class="lg:ml-60 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
-    on:click={addValidatedProductsToCart}
-  >
-    {#if cartloading}
-      <span>Adding...</span>
-    {:else}
-      <Icon icon="ic:round-shopping-cart" class="text-2xl" />
-      <span>Add to Cart</span>
-    {/if}
-  </button>
-</div> -->
 
 <div class="flex justify-end">
   {#if data?.authedUser && data?.authedUser?.id}
     <form
+      id="cartForm"
       method="POST"
       action="?/addToCart"
       use:enhance={({ formData, cancel }) => {
@@ -690,24 +706,23 @@
         const productsToAdd = prepareValidatedProductsForCart();
 
         if (productsToAdd.length === 0) {
-          cancel();
           cartloading = false;
           toast.error("No valid items to add to cart");
-          return;
+          return cancel();
         }
-        
-        formData.set('cartItems', JSON.stringify(productsToAdd));
-        
+
+        formData.set("cartItems", JSON.stringify(productsToAdd));
+
         return async ({ result }) => {
           cartloading = false;
-          
+
           try {
             const resultData = result.data;
-            
+
             if (resultData && resultData.success === true) {
               const productsAddedCount = productsToAdd.length;
               toast.success(
-                `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`
+                `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`,
               );
               setTimeout(() => {
                 location.reload();
@@ -723,9 +738,13 @@
       }}
     >
       <button
-        type="submit"
-        class="lg:ml-60 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
-        disabled={cartloading}
+        type="button"
+              class="lg:ml-60 p-2 w-40  mr-5 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
+        on:click={attemptAddToCart}
+        disabled={cartloading ||
+          (isValidated &&
+            validatedProducts.length > 0 &&
+            !validatedProducts.some((p) => p.isValid))}
       >
         {#if cartloading}
           <span>Adding...</span>
@@ -737,9 +756,12 @@
     </form>
   {:else}
     <button
-      class="lg:ml-60 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
-      on:click={handleLocalStorage}
-      disabled={cartloading}
+              class="lg:ml-60  mr-5 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
+      on:click={attemptAddToCart}
+      disabled={cartloading ||
+        (isValidated &&
+          validatedProducts.length > 0 &&
+          !validatedProducts.some((p) => p.isValid))}
     >
       {#if cartloading}
         <span>Adding...</span>

@@ -372,7 +372,7 @@
                         >{product.productNumber || "--"}</a
                       >
                     </p>
-                    <p class="font-medium text-sm h-10 overflow-hidden">
+                    <p class="font-medium text-xs mt-2 overflow-hidden">
                       {product.prodDesc
                         ? product.prodDesc.slice(0, 35) + "..."
                         : "--"}
@@ -401,7 +401,7 @@
                         stockId: product.stockId,
                         variants: product.variants,
                       })}
-                    class="w-11/12 max-w-xs text-primary-500 py-1.5 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition px-1.5 mb-4"
+                    class="w-10/12 max-w-xs text-primary-500 py-1.5 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition px-1.5 mb-4"
                   >
                     View Price & Availability
                   </button>
@@ -505,8 +505,8 @@
               <div
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start"
               >
-                <p class="text-base sm:text-lg ml-2">
-                  Price: <span class="font-semibold text-2xl">
+                <p class="text-sm sm:text-lg ml-2">
+                  Price: <span class="font-semibold text-md">
                     {#if $currencyState === "inr"}
                       ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString(
                         "en-IN",
@@ -565,8 +565,8 @@
               <div
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start mb-4"
               >
-                <p class="text-base sm:text-lg ml-2">
-                  Price: <span class="font-semibold text-2xl">
+                <p class="text-sm sm:text-lg ml-2">
+                  Price: <span class="font-semibold text-md">
                     {#if $currencyState === "usd"}
                       $ {(selectedPrice?.priceUSD ?? 0).toLocaleString(
                         "en-US",
