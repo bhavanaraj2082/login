@@ -168,10 +168,10 @@ export const CancelOrder = async (body) => {
 // 		return { message: `Out of Stock`, type: 'error' };
 // 	}
 // }
+
+
 export async function checkavailabilityproduct(data) {
 	const { ProductId, quantity } = data;
-
-	// console.log('ProductId from actions:', ProductId);
 
 	if (!ProductId || !quantity) {
 		return {
@@ -182,16 +182,8 @@ export async function checkavailabilityproduct(data) {
 
 	const requestedQuantity = parseInt(quantity, 10);
 
-	
-
 	try {
-	
-		// console.log(`Querying stock with ProductId: ${ProductId}`);
-
-	
 		const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
-
-		// console.log('Stock Record:', stockRecord);
 
 		if (!stockRecord) {
 			console.log(`No stock record found for ProductId: ${ProductId}`);
@@ -202,27 +194,20 @@ export async function checkavailabilityproduct(data) {
 			};
 		}
 
-		const stockQuantity = stockRecord.stock;
+		const totalStock = stockRecord.stock;
+		const orderedQty = stockRecord.orderedQty || 0;
+		const availableStock = totalStock - orderedQty;
 
-		if (stockQuantity > 0) {
-			if (requestedQuantity <= stockQuantity) {
-				const remainingStock = stockQuantity - requestedQuantity;
-				if (remainingStock >= 0) {
-					return {
-						message: `${stockQuantity} Quantity is available to ship`,
-						stock: 'Available',
-						type: 'success'
-					};
-				} else {
-					return {
-						message: `Only ${stockQuantity} Quantity available.`,
-						stock: 'Limited Availability',
-						type: 'error'
-					};
-				}
+		if (availableStock > 0) {
+			if (requestedQuantity <= availableStock) {
+				return {
+					message: `${availableStock} is available to ship`,
+					stock: 'Available',
+					type: 'success'
+				};
 			} else {
 				return {
-					message: `Only ${stockQuantity} Quantity available.`,
+					message: `Only ${availableStock} units available.`,
 					stock: 'Limited Availability',
 					type: 'error'
 				};
@@ -243,7 +228,6 @@ export async function checkavailabilityproduct(data) {
 		};
 	}
 }
-
 export async function favorite(favdata) {
 	const authedUser = favdata.authedEmail;
   
@@ -1826,10 +1810,12 @@ export const getcancelreturn = async (id) => {
 // 		};
 // 	}
 // }
+
+
+
+
 export async function quickcheck(data) {
 	const { ProductId, quantity } = data;
-
-	// console.log('ProductId from actions:', ProductId);
 
 	if (!ProductId || !quantity) {
 		return {
@@ -1840,16 +1826,8 @@ export async function quickcheck(data) {
 
 	const requestedQuantity = parseInt(quantity, 10);
 
-	
-
 	try {
-	
-		// console.log(`Querying stock with ProductId: ${ProductId}`);
-
-	
 		const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
-
-		// console.log('Stock Record:', stockRecord);
 
 		if (!stockRecord) {
 			console.log(`No stock record found for ProductId: ${ProductId}`);
@@ -1860,27 +1838,20 @@ export async function quickcheck(data) {
 			};
 		}
 
-		const stockQuantity = stockRecord.stock;
+		const totalStock = stockRecord.stock;
+		const orderedQty = stockRecord.orderedQty || 0;
+		const availableStock = totalStock - orderedQty;
 
-		if (stockQuantity > 0) {
-			if (requestedQuantity <= stockQuantity) {
-				const remainingStock = stockQuantity - requestedQuantity;
-				if (remainingStock >= 0) {
-					return {
-						message: `${stockQuantity} Quantity is available to ship`,
-						stock: 'Available',
-						type: 'success'
-					};
-				} else {
-					return {
-						message: `Only ${stockQuantity} Quantity available.`,
-						stock: 'Limited Availability',
-						type: 'error'
-					};
-				}
+		if (availableStock > 0) {
+			if (requestedQuantity <= availableStock) {
+				return {
+					message: `${availableStock} is available to ship`,
+					stock: 'Available',
+					type: 'success'
+				};
 			} else {
 				return {
-					message: `Only ${stockQuantity} Quantity available.`,
+					message: `Only ${availableStock} units available.`,
 					stock: 'Limited Availability',
 					type: 'error'
 				};
@@ -1901,6 +1872,7 @@ export async function quickcheck(data) {
 		};
 	}
 }
+
 export const validateProductDetails = async (productNumber, size, quantity) => {
 	try {
 		const product = await Products.findOne({ productNumber });
