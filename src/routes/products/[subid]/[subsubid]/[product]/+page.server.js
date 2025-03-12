@@ -85,13 +85,22 @@ export const actions = {
           organisation: data.organisation,
           email: data.email,
           number: data.phone,
+          units: data.units
         },
       };
 
       const record = await CreateProductQuote(formattedData);
-      return record;
+      // return record;
+      return {
+        success: true,
+        message: "Submitted the quotes successfully!.",
+      };    
     } catch (error) {
       console.error("Error creating quote:", error);
+      return {
+        success: false,
+        message: "Something went wrong. Please try again later",
+      };
     }
   },
 
