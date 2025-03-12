@@ -566,14 +566,14 @@
 							        		on:click={() => removeItem(item.productDetails.productNumber,item._id,index)}
 							        		class=" text-lg sm:hidden text-primary-600"
 							        	>
-							        		<Icon icon="fluent-mdl2:delete" class=" text-xl" />
+							        		<Icon icon="mdi:delete-forever" class=" text-xl" />
 							        	</button>
 							        </div>
 								</div>
 								<button
 							        type="button" on:click={() => removeItem(item.productDetails.productNumber,item._id,index)}
 							        class=" text-lg hidden sm:block text-primary-600">
-							        <Icon icon="fluent-mdl2:delete" class=" text-lg" />
+							        <Icon icon="mdi:delete-forever" class=" text-2xl" />
 							    </button>
 						    </div>
 						</li>

@@ -136,6 +136,7 @@
         if(isNaN(quantity)){
             return
         }
+        if(quantity >10000000) quantity = 10000000
          clearTimeout(timeout)
          timeout = setTimeout(()=>{
             products = products.map(product => {
@@ -371,7 +372,7 @@
                 <Icon icon="ic:sharp-segment" class="text-2xl text-primary-500" />
                 <h1>Filter</h1>
                </div>
-               <Icon icon={toggleFilter ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-3xl p-0.5 rounded-full hover:bg-gray-100 md:hidden"/>
+               <Icon icon={toggleFilter ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-3xl p-0.5 rounded-full hover:bg-gray-100 xl:hidden"/>
             </div>
             <div class=" space-y-2 {toggleFilter ? "block":" hidden lg:block"}">
             <div class="relative">
@@ -463,7 +464,7 @@
         {:else}
        {#each paginatedProducts as product,index}
         <div class=" relative bg-white shadow p-2 sm:p-4 md:px-8 space-y-2 rounded">
-            <button on:click={()=>handleFavorites(product)} class=" absolute right-2">
+            <button on:click={()=>handleFavorites(product)} class=" absolute top-6 right-6">
                 <Icon icon={$myFavorites.find(x=> x === product._id) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
             </button>
             <div>
@@ -516,7 +517,7 @@
                             <div class="flex items-center">
                                 <input type="number" bind:value={product.quantity}
 					            on:input={e=>handleQty(product._id,parseInt(e.target.value))}
-					            class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
+					            class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
 					        <div class=" {tog === index ? "hidden" : ""} flex items-center border-1 border-primary-300 rounded">
 						    <button
 							on:click={() => decrementQuantity(product._id)}
@@ -550,7 +551,7 @@
                     <div class="flex items-center">
                         <input type="number" bind:value={product.quantity}
 					on:input={e=>handleQty(product._id,parseInt(e.target.value))}
-					class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
+					class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
 					<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded">
 						<button
 							on:click={() => decrementQuantity(product._id)}
