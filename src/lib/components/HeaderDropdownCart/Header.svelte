@@ -220,7 +220,7 @@ async function submitForm() {
 
 		// window.location.href = url;
 	// 	isLiked = false;
-	// 	isOpen = !isOpen;
+		isOpen = !isOpen;
 
 	// 	if (url.includes('products') || url.includes('applications')) {
     //     window.location.href = url;
@@ -345,7 +345,7 @@ async function submitForm() {
 	{#if isOpen}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div on:click={closeSidebar} class="fixed top-0 left-0 w-full h-full bg-gray-300/60 z-40 backdrop-blur-sm"></div>
+	<div on:click={closeSidebar} class="fixed sm:hidden block top-0 left-0 w-full h-full bg-gray-300/60 z-40 backdrop-blur-sm"></div>
 {/if}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
