@@ -41,7 +41,7 @@
     let currentPage = parseInt($page.url.searchParams.get('page')) || 1;
     let search = $page.url.searchParams.get('search') || null
     let selectedManufacturer = $page.url.searchParams.get('manufacturer') || null;
-    let totalPages = parseInt(productCount/10);
+    let totalPages = Math.ceil(productCount/10);
     let tog= null
     let form;
     let selectedSort =''
@@ -106,7 +106,6 @@
     try {
         loading = true;
         const newUrl = new URL(window.location.href);
-        console.log(checked,"PPPPPPPP");
         if (checked) {
             selectedManufacturer = manufacturerName;
             newUrl.searchParams.set('manufacturer', manufacturerName);
@@ -258,6 +257,7 @@
     })
      
   }
+
   function handleData() {
 		return async ({ result }) => {
 			// console.log("resultresultresultresultresultresultresult",result);
@@ -265,20 +265,22 @@
 			localStorage.setItem('totalCompsChemi', totalComps);
 			syncLocalStorageToStore();
 		};
-	}
-	function syncLocalStorageToStore() {
+  }
+
+  function syncLocalStorageToStore() {
 		const storedTotalComps = localStorage.getItem('totalCompsChemi');
 
 		if (storedTotalComps ) {
 			cartTotalComps.set(Number(storedTotalComps));
 		}
-	}
+  }
   async function submitForm() {
 		form.requestSubmit();
-	}
-let typingTimeout;
-let searchLoading = false
-const handleSearch = (searchName) => {
+  }
+
+  let typingTimeout;
+  let searchLoading = false
+  const handleSearch = (searchName) => {
     try{
     clearTimeout(typingTimeout);
     const newUrl = new URL(window.location.href);
@@ -305,9 +307,9 @@ const handleSearch = (searchName) => {
     } finally {
         searchLoading = false;
     }
-};
+  };
 
-const handleFavorites = (product)=>{
+  const handleFavorites = (product)=>{
     try {
        // console.log(product);
     addLocalToFavorites(product._id)
@@ -326,7 +328,28 @@ const handleFavorites = (product)=>{
         console.log(error);
     }
     
-}
+  }
+
+  const handlePrice = async(checked,price)=>{
+    const newUrl = new URL(window.location.href);
+        selectedSort = price
+        if (checked) {
+            newUrl.searchParams.set('price', price);
+        } else {
+            newUrl.searchParams.delete('price');
+        }
+        
+        newUrl.searchParams.set('page', '1');
+        
+        await goto(newUrl.toString(), {
+            invalidateAll: true, 
+            keepfocus: true, 
+            replaceState: true, 
+            noScroll: true 
+        });
+
+        currentPage = 1;
+  }
 
 </script>
 
@@ -419,11 +442,11 @@ const handleFavorites = (product)=>{
              <div class="p-3 border-1 rounded {showSortByDropdown ? "block" : "hidden"}">
                 <div class=" space-y-2.5 py-2.5 h-auto">
                     <label for="asc" class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
-                        <input type="checkbox" id='asc' on:change={(e)=>sortBy(e.target.checked,"asc")} checked={selectedSort === "asc"} class=" cursor-pointer outline-none rounded-full text-primary-500 focus:ring-0">
+                        <input type="checkbox" id='asc' on:change={(e)=>handlePrice(e.target.checked,"asc")} checked={selectedSort === "asc"} class=" cursor-pointer outline-none rounded-full text-primary-500 focus:ring-0">
                         <p>Price Ascending </p>
                     </label>
                     <label for="desc" class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
-                        <input type="checkbox" id="desc" on:change={(e)=>sortBy(e.target.checked,"desc")} checked={selectedSort === "desc"} class=" cursor-pointer outline-none rounded-full text-primary-500 focus:ring-0">
+                        <input type="checkbox" id="desc" on:change={(e)=>handlePrice(e.target.checked,"desc")} checked={selectedSort === "desc"} class=" cursor-pointer outline-none rounded-full text-primary-500 focus:ring-0">
                         <p>Price Descending </p>
                     </label>
                 </div>
@@ -559,7 +582,7 @@ const handleFavorites = (product)=>{
        {/if}
        
        <!-- pagination -->
-       <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {products.length< 10 ? "hidden": "flex"}">
+       <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {totalPages === 1 && products.length < 10 ? "hidden": "flex"}">
         <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
         on:click={() => goToPage(1)} 
         disabled={currentPage == 1}

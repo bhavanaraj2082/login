@@ -521,7 +521,8 @@ export const loadProductsubcategory = async (
   suburl,
   pageNum,
   manufacturer,
-  search
+  search,
+  price
 ) => {
   const page = pageNum || 1;
   const pageSize = 10;
@@ -563,72 +564,22 @@ export const loadProductsubcategory = async (
       ];
     }
 
+    let sortConditions = {}
+
+    if(price === "asc"){
+      sortConditions = {}
+      sortConditions["stockDetails.pricing.USD"] = 1
+    }else if(price === "desc"){
+      sortConditions = {}
+      sortConditions["stockDetails.pricing.USD"] = -1
+    }else{
+      sortConditions = {}
+      sortConditions.productName = 1
+    }
  
 
     const before = Date.now();
-    // const products = await Product.aggregate([
-    //   {
-    //     $lookup: {
-    //       from: "subcategories",
-    //       localField: "subCategory",
-    //       foreignField: "_id",
-    //       as: "subCategoryDetails",
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "manufacturers",
-    //       localField: "manufacturer",
-    //       foreignField: "_id",
-    //       as: "manufacturerDetails",
-    //     },
-    //   },
-    //   { $match: matchCondition },
-    //   {
-    //     $lookup: {
-    //       from: "categories",
-    //       localField: "category",
-    //       foreignField: "_id",
-    //       as: "categoryDetails",
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "stocks",
-    //       localField: "_id",
-    //       foreignField: "productid",
-    //       as: "stockDetails",
-    //     },
-    //   },
-
-    //   { $unwind: "$stockDetails" },
-    //   { $unwind: "$manufacturerDetails" },
-    //   { $unwind: "$categoryDetails" },
-    //   { $unwind: "$subCategoryDetails" },
-    //   {
-    //     $project: {
-    //       productNumber: 1,
-    //       productName: 1,
-    //       prodDesc: 1,
-    //       imageSrc: 1,
-    //       "categoryDetails.name": 1,
-    //       "categoryDetails.urlName": 1,
-    //       "manufacturerDetails.name": 1,
-    //       "manufacturerDetails._id": 1,
-    //       "stockDetails._id": 1,
-    //       "stockDetails.pricing": 1,
-    //       "stockDetails.stock": 1,
-    //       "stockDetails.orderMultiple": 1,
-    //       "stockDetails.distributor": 1,
-    //     },
-    //   },
-    //   {
-    //     $skip: (Number(page) - 1) * Number(pageSize),
-    //   },
-    //   {
-    //     $limit: Number(pageSize),
-    //   },
-    // ]);
+    
     const products = await Product.aggregate([
       {
         $lookup: {
@@ -688,7 +639,7 @@ export const loadProductsubcategory = async (
               },
             },
             {
-              $sort:{productName:1}
+              $sort:sortConditions
             },
             {
               $skip: (Number(page) - 1) * Number(pageSize),
@@ -1614,6 +1565,7 @@ export const getCart = async(userId,cartId)=>{
               productName: 1,
               productNumber: 1,
               imageSrc: 1,
+              returnPolicy:1
             }
           }
         ]

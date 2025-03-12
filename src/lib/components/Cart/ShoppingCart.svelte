@@ -199,12 +199,13 @@
 	
 	const handleQty = (quantity,stock,_id,indx)=>{
 		if(isNaN(quantity)){
-			calculateTotalPrice($cart)
+			//calculateTotalPrice($cart)
 			return
 		}
 		if (quantity > 10000000){
 			quantity = 10000000
 		}
+		//if(quantity < 0 || isNaN(quantity)) quantity = 1
 		clearTimeout(timeout)
         checkoutDisabled = true
 
@@ -218,8 +219,13 @@
 			return item
 		    })
 			calculateTotalPrice($cart)
-			return
+			timeout = setTimeout(()=>{
+			tog = null
+	        },1500)
+		return
+			
 		}
+		
 
 	    const index = $cart.findIndex((item) =>item._id === _id);
 		if (index !== -1) {
@@ -286,19 +292,22 @@
 	const decrementQuantity = (quantity,stock,_id,indx) => {
 		clearTimeout(timeout)
         checkoutDisabled = true
-
-		if(!isLoggedIn){
+           
+			if(!isLoggedIn){
 			cart.update(item=>{
+				if(item[indx].quantity === 1) return item
 				item[indx].quantity -= 1
 				return item
 			})
 			guestCart.update(item=>{
-			item[indx].quantity -= 1
-			return item
+			    if(item[indx].quantity === 1) return item
+			    item[indx].quantity -= 1
+			    return item
 		    })
 			calculateTotalPrice($cart)
 			return
 		}
+		
 	    const index = $cart.findIndex((item) =>item._id === _id);
 		if (index !== -1) {
 			if($cart[index]?.quantity !== 1){

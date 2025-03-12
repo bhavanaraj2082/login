@@ -6,8 +6,9 @@ export async function load({ params,url,depends }) {
 		const page = parseInt(url.searchParams.get('page')) || 1
 		const search = url.searchParams.get('search') || ""
 		const manufacturer = url.searchParams.get('manufacturer') || null
+		const price = url.searchParams.get('price') || ""
         depends("page:data")
-		return await loadProductsubcategory(params.subsubid,page,manufacturer,search);
+		return await loadProductsubcategory(params.subsubid,page,manufacturer,search,price);
 		
 	} catch (error) {
 		console.error('Error loading product data:', error);

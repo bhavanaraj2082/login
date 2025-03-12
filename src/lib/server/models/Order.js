@@ -43,6 +43,9 @@ const orderDetailsSchema = new mongoose.Schema({
   productNumber:{
 		type:String
 	},
+  returnPolicy:{
+		type:Boolean
+	},
 	manufacturerName:{
 		type:String
 	},
