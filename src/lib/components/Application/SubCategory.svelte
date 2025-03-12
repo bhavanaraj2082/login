@@ -3,10 +3,10 @@
   import Card from "$lib/components/Application/Card.svelte";
   export let data;
 
-  let categoryData = data?.categoryData ||{};
-  let subcategoryData = data?.subcategoryData||{};
-  let subsubcategories = data?.subsubcategories || [];
-  let relatedProducts = data?.relatedProducts ||{};
+  $: categoryData = data?.categoryData ||{};
+  $: subcategoryData = data?.subcategoryData||{};
+  $: subsubcategories = data?.subsubcategories || [];
+  $: relatedProducts = data?.relatedProducts ||{};
 //  console.log("categoryData",categoryData);
 //  console.log("subcategoryData",subcategoryData);
 //  console.log("subsubcategories",subsubcategories);

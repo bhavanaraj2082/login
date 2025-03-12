@@ -2,9 +2,9 @@
 	import subcategorydatas from '$lib/data/subcategorydatas.json';
 	export let data;
 
-	const subcategories = data;
-	const categoryName = subcategories[0]?.category?.name || "";
-	const subCategoryName = subcategories[0]?.subCategory?.name || "";
+	$: subcategories = data;
+	$: categoryName = subcategories[0]?.category?.name || "";
+	$: subCategoryName = subcategories[0]?.subCategory?.name || "";
 
 
 	const findContent = (categoryName, subCategoryName) => {
