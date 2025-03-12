@@ -15,27 +15,30 @@
 
 <div class="w-full mb-10 lg:px-8 md:w-11/12 mx-auto max-w-7xl">
   <div class="md:pl-0">
+   
+    <h1 class="sm:hidden block px-6 sm:px-0 mb-2 sm:mb-0 font-bold sm:text-2xl text-lg text-heading">
+      Our Category
+    </h1>
     <div class="text-center sm:flex px-6 sm:px-0 justify-between items-center mb-2">
-      <h1 class="mb-2 sm:mb-0 font-bold text-2xl text-heading">
+      <h1 class="sm:block hidden px-6 sm:px-0 mb-2 sm:mb-0 font-bold sm:text-2xl text-lg text-heading">
         Our Category
       </h1>
-
       <div class="relative">
         <input
           type="text"
           bind:value={searchTerm}
           placeholder="Search categories..."
-          class="w-full p-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent"
+          class="w-full sm:p-2 p-1 sm:pl-10 pl-7 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent placeholder:text-xs"
         />
         <div
           class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
         >
-          <Icon icon="si:search-line" width="20" height="20" />
+          <Icon icon="si:search-line" width="15" height="15" />
         </div>
       </div>
     </div>
 
-    <p class="mt-2 text-base text-content p-2 lg:p-0 text-center lg:text-left">
+    <p class="mt-2 md:text-base text-xs text-content p-2 lg:p-0 sm:pl-0 pl-7">
       Explore our high-quality chemical products, Classified into various
       categories, each playing a vital role in innovation and transformation.
     </p>
