@@ -214,15 +214,15 @@ async function submitForm() {
 	}
 	function navigateTo(url) {
 		goto(url)
-		// window.location.href = url;
-		isLiked = false;
-		isOpen = !isOpen;
+		window.location.href = url;
+	// 	isLiked = false;
+	// 	isOpen = !isOpen;
 
-		if (url.includes('products') || url.includes('applications')) {
-        window.location.href = url;
-       } else {
-		goto(url)
-       }
+	// 	if (url.includes('products') || url.includes('applications')) {
+    //     window.location.href = url;
+    //    } else {
+	// 	goto(url)
+    //    }
 	   
 	}
 	let isOpen = false;
