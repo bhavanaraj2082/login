@@ -1,7 +1,5 @@
 <script>
   import { onMount } from "svelte";
-  import { browser } from "$app/environment";
-  import { cartState } from "$lib/stores/cartStores.js";
   import { toast, Toaster } from "svelte-sonner";
   import { invalidate } from "$app/navigation";
   import Icon from "@iconify/svelte";
@@ -9,7 +7,12 @@
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
   import { authedUser } from "$lib/stores/mainStores.js";
   import { sendMessage } from "$lib/utils.js";
+  import ShowQuoteModal from "$lib/components/ProductInfoPopups/showQuoteModal.svelte";
   export let relatedProducts;
+  export let data;
+  let showQuoteModal = false;
+  let productQuote = null;
+  let form5;
   // console.log("relatedProducts",relatedProducts);
   import { enhance } from "$app/forms";
   $: displayPrice =
@@ -329,6 +332,12 @@ function nextSlide() {
       syncLocalStorageToStore();
     };
   }
+
+  function toggleQuoteModal(selectedProduct) {
+    closeModal();
+    showQuoteModal = !showQuoteModal;
+    productQuote = selectedProduct;
+  }
 </script>
 
 <form
@@ -560,15 +569,16 @@ function nextSlide() {
             <p class="text-gray-700 text-sm">
               The price for this product is unavailable. Please request a quote
             </p>
-            <a
+            <!-- <a
               href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
-            >
+            > -->
               <button
+              on:click={() => toggleQuoteModal(selectedProduct)}
                 class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-sm text-white mt-2"
               >
                 Request Quote
               </button>
-            </a>
+            <!-- </a> -->
           </div>
         {:else}
           <div class="mt-4">
@@ -829,3 +839,6 @@ function nextSlide() {
   </div>
 {/if}
 <Toaster position="bottom-right" richColors />
+{#if showQuoteModal}
+  <ShowQuoteModal {data} {toggleQuoteModal} {form5} {productQuote} {selectedProduct}/>
+{/if}
