@@ -589,6 +589,7 @@ onMount(() => {
             {/each}
         {/if}
     </div>
+    {#if totalPages > 1}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
         class="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-around border bg-white shadow px-4 py-4 rounded-b-md md:mt-2 my-1 md:m-0"
@@ -643,6 +644,7 @@ onMount(() => {
 			</button>
         </div>
      </div>
+     {/if}
     {/if}
     <Toaster position="bottom-right" richColors />
 </div>

@@ -1112,7 +1112,8 @@ function formatDate(dateString) {
 			</table>
 		</div>
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
-		<div
+		{#if totalPages > 1}
+			<div
 			class="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-around border bg-white shadow-sm px-4 py-4 rounded-b-md md:mt-1 my-1 md:m-0"
 			aria-label="pagination"
 			on:keydown={handleKeyDown}>
@@ -1168,7 +1169,8 @@ function formatDate(dateString) {
 					<Icon icon="charm:chevrons-right" class="w-4 h-4" />
 				</button>
 			</div>
-		</div>
+			</div>
+		{/if}
 	{/if}
 	<Toaster position="bottom-right" richColors />
 </section>

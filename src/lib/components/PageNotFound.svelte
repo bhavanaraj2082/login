@@ -4,11 +4,11 @@
 </script>
 
 
-<div class="min-h-screen overflow-hidden bg-gray-50 relative max-w-7xl mx-auto">
+<div class="min-h-[80%] overflow-hidden bg-gray-50 relative max-w-7xl mx-auto md:mb-20">
   <div class="absolute top-1/4 left-10 lg:w-72 w-20 lg:h-80 h-20 bg-primary-100 blur-sm clip-hexagon shadow"></div>
   <div class="absolute bottom-2 right-40 lg:w-40 w-20 lg:h-40 h-20 bg-primary-100 clip-hexagon"></div>
-  <div class="absolute top-0 right-12 w-20 h-20 bg-primary-200 clip-hexagon"></div>
-  <div class="flex flex-col justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8 relative z-10">
+  <div class="absolute top-0 md:right-20 right-6 w-20 h-20 bg-primary-200 clip-hexagon"></div>
+  <div class="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 relative z-10">
     <div class=" p-8 max-w-lg w-full mx-auto">
       <div class="text-center">
         <div class="flex justify-center mb-6">

@@ -16,11 +16,11 @@
   {:else if status === 503}
     <Error503 />
   {:else}
-  <div class="min-h-screen overflow-hidden bg-gray-50 relative">
+  <div class="min-h-[80%] overflow-hidden bg-gray-50 relative max-w-7xl mx-auto md:mb-20">
     <div class="absolute top-1/4 md:left-10 left-2 lg:w-72 w-20 lg:h-80 h-20 bg-primary-100 blur-sm clip-hexagon shadow"></div>
     <div class="absolute bottom-2 md:right-12 right-4 lg:w-40 w-20 lg:h-40 h-20 bg-primary-100 clip-hexagon"></div>
-    <div class="absolute top-0 md:right-12 right-4 md:w-20 w-10 md:h-20 h-10 bg-primary-200 clip-hexagon"></div>
-    <div class="flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="absolute top-0 md:right-20 right-4 md:w-20 w-10 md:h-20 h-10 bg-primary-200 clip-hexagon"></div>
+    <div class="flex items-center justify-center px-4 sm:px-6 lg:px-8 relative z-10">
       <div class="w-full max-w-5xl mx-auto">
         <div class="p-2 md:p-4">
           <div class="flex flex-col md:flex-row items-center">

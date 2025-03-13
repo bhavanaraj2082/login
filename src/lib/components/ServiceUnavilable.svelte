@@ -2,11 +2,11 @@
 	import Icon from '@iconify/svelte';
   </script>
 
-  <div class="min-h-screen overflow-hidden bg-gray-50 to-primary-900 relative">
+  <div class="min-h-[80%] overflow-hidden bg-gray-50 to-primary-900 relative md:mb-20">
 	<div class="absolute top-1/4 md:left-10 left-2 lg:w-72 w-20 lg:h-80 h-20 bg-primary-100 blur-sm clip-hexagon shadow"></div>
 	<div class="absolute bottom-2 md:right-12 right-4 lg:w-40 w-20 lg:h-40 h-20 bg-primary-100 clip-hexagon"></div>
 	<div class="absolute top-0 md:right-12 right-4  md:w-20 w-10 md:h-20 h-10 bg-primary-200 clip-hexagon"></div>
-	<div class="flex flex-col justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8 relative z-10">
+	<div class="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 relative z-10">
 	  <div class=" p-8 max-w-lg w-full mx-auto">
 		<div class="text-center">
 		  <div class="flex justify-center mb-6">
