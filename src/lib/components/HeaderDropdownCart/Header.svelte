@@ -215,6 +215,8 @@ async function submitForm() {
 	function navigateTo (url) {
 		//invalidate("data:cat")
 		goto(url);
+		handleMouseLeaveMenu();
+		handleMouseLeaveSubmenu();
 		// const newUrl = new URL(window.location.href)
 		// newUrl.searchParams.set('/',url)
 
@@ -345,7 +347,7 @@ async function submitForm() {
 	{#if isOpen}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div on:click={closeSidebar} class="fixed sm:hidden block top-0 left-0 w-full h-full bg-gray-300/60 z-40 backdrop-blur-sm"></div>
+	<div on:click={closeSidebar} class="fixed md:hidden block top-0 left-0 w-full h-full bg-gray-300/60 z-40 backdrop-blur-sm"></div>
 {/if}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -700,7 +702,7 @@ async function submitForm() {
 								class={`flex items-center hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-white scale-105' : 'text-white'}`}
 								role="menuitem">
 								{menu.title}
-								{#if index < 5 && menu.title !== 'Documents' && menu.title !== 'Support' && menu.title !== 'Quick Order'}
+								{#if index < 5 && menu.title !== 'Documents' && menu.title !== 'Quotes' && menu.title !== 'Quick Order'}
 									<Icon icon="prime:chevron-down" class="ml-1 w-5 h-5 " />
 								{/if}
 							</button>
