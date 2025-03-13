@@ -544,7 +544,7 @@ function downloadAsExcel(order) {
             </sup>
         </label> 
     </div>-->
-    <div class="overflow-x-auto rounded">
+    <div class="overflow-x-auto rounded shadow">
         <table class="w-full border-collapse border border-gray-100">
             <thead class="bg-gradient-to-r from-primary-500 to-primary-600 text-white uppercase text-xs tracking-wider">
                 <tr>
@@ -637,8 +637,8 @@ function downloadAsExcel(order) {
                                         <!-- <h4 class="font-bold text-heading mb-2">Order Items</h4> -->
                                         <div class="overflow-x-auto">
                                             <table class="w-full text-sm rounded">
-                                                <thead class="rounded">
-                                                    <tr class="bg-white">
+                                                <thead class="rounded ">
+                                                    <tr class="bg-gradient-to-r from-primary-500 to-primary-600 text-white uppercase text-xs tracking-wider">
                                                         <th class="border px-2 py-1 text-left">Product Name</th>
                                                         <th class="border px-2 py-1 text-center">Order Qty</th>
                                                         <!-- <th class="border px-2 py-1 text-center">Available</th> -->
