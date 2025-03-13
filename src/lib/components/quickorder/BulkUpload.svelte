@@ -72,7 +72,9 @@
     rawFileData = finalLines.join("\n");
     const { duplicates } = checkForDuplicates(rawFileData);
     duplicateEntries = duplicates;
-
+    if (isValidated) {
+    invalidProductLines = mapInvalidProductsToLines();
+  }
     toast.success(`Removed duplicate entry for ${productInfo}`);
     const formData = new FormData(event.target.closest("form"));
 
@@ -97,26 +99,43 @@
     }
   }
 
+  // function removeInvalidProduct(lineIndex) {
+  //   const lines = rawFileData.split("\n");
+  //   const lineContent = lines[lineIndex];
+  //   const [productInfo] = lineContent.split(",").map((item) => item.trim());
+
+  //   lines.splice(lineIndex, 1);
+  //   rawFileData = lines.join("\n");
+  //   invalidProductLines = invalidProductLines.filter(
+  //     (line) => line.index !== lineIndex,
+  //   );
+
+  //   validationMessages = validationMessages.filter(
+  //     (message) => !productInfo.includes(message.productNumber),
+  //   );
+
+  //   toast.success("Invalid product removed");
+ 
   function removeInvalidProduct(lineIndex) {
-    const lines = rawFileData.split("\n");
-    const lineContent = lines[lineIndex];
-    const [productInfo] = lineContent.split(",").map((item) => item.trim());
-
-    lines.splice(lineIndex, 1);
-    rawFileData = lines.join("\n");
-    invalidProductLines = invalidProductLines.filter(
-      (line) => line.index !== lineIndex,
-    );
-
-    validationMessages = validationMessages.filter(
-      (message) => !productInfo.includes(message.productNumber),
-    );
-
-    toast.success("Invalid product removed");
-    if (!validationMessages.some((message) => !message.isValid)) {
-      validateAndSubmitData();
-    }
+  const lines = rawFileData.split("\n");
+  const lineContent = lines[lineIndex];
+  const [productInfo] = lineContent.split(",").map((item) => item.trim());
+  lines.splice(lineIndex, 1);
+  rawFileData = lines.join("\n");
+  validationMessages = validationMessages.filter(
+    (message) => !productInfo.includes(message.productNumber) || message.isValid
+  );
+  invalidProductLines = mapInvalidProductsToLines();
+  const hasRemainingInvalidProducts = validationMessages.some(message => !message.isValid);
+  if (hasRemainingInvalidProducts) {
+    toast.success("Invalid product removed.");
+  } else {
+    toast.success("All invalid products removed. You can now add to cart.");
   }
+  if (validationMessages.length === 0) {
+    isValidated = false;
+  }
+}
 
   function handleTextChange(event) {
     rawFileData = event.target.value;
@@ -133,131 +152,265 @@
     return validProducts.length > 0;
   }
 
+  // function handleFileInputChange(event) {
+  //   const file = event.target.files[0];
+
+  //   if (file) {
+  //     const fileType = file.name.split(".").pop().toLowerCase();
+  //     selectedFileName = file.name;
+  //     isValidated = false; 
+  //     invalidProductLines = []; 
+
+  //     if (fileType === "xlsx" || fileType === "xls") {
+  //       fileError = "";
+
+  //       if (typeof XLSX !== "undefined") {
+  //         const reader = new FileReader();
+  //         reader.onload = function (e) {
+  //           try {
+  //             const data = new Uint8Array(e.target.result);
+  //             const workbook = XLSX.read(data, { type: "array" });
+  //             const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+  //             let csvData = XLSX.utils.sheet_to_csv(worksheet);
+  //             const lines = csvData.split("\n").filter((line) => line.trim());
+  //             const transformedLines = lines.map((line) => {
+  //               const parts = line.split(",").map((part) => part.trim());
+  //               if (parts.length >= 2) {
+  //                 return `${parts[0]}-${parts[1]},${parts[2] || 1}`;
+  //               }
+  //               return line;
+  //             });
+
+  //             rawFileData = transformedLines.join("\n");
+  //             isEditing = true; 
+  //             const csvFile = new File(
+  //               [rawFileData],
+  //               file.name.replace(/\.xlsx$|\.xls$/i, ".csv"),
+  //               {
+  //                 type: "text/csv",
+  //               },
+  //             );
+
+  //             const dataTransfer = new DataTransfer();
+  //             dataTransfer.items.add(csvFile);
+
+  //             const fileInput = document.getElementById("bulkupload");
+  //             if (fileInput) {
+  //               fileInput.files = dataTransfer.files;
+  //             }
+
+  //             const { duplicates } = checkForDuplicates(rawFileData);
+  //             duplicateEntries = duplicates;
+
+  //             if (duplicates.length > 0) {
+  //               toast.error(
+  //                 `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+  //               );
+  //             }
+  //           } catch (error) {
+  //             console.error("Excel processing error:", error);
+  //             fileError =
+  //               "Error processing Excel file. Please check file format.";
+  //           }
+  //         };
+  //         reader.onerror = function () {
+  //           fileError = "Error reading the file. Please try again.";
+  //         };
+  //         reader.readAsArrayBuffer(file);
+  //       } else {
+  //         fileError =
+  //           "Excel file support requires the SheetJS library. Please use CSV format instead.";
+  //       }
+  //     } else {
+  //       const reader = new FileReader();
+  //       reader.onload = function (e) {
+  //         rawFileData = e.target.result;
+  //         fileError = "";
+  //         isEditing = true;  
+
+  //         const { duplicates } = checkForDuplicates(rawFileData);
+  //         duplicateEntries = duplicates;
+
+  //         if (duplicates.length > 0) {
+  //           toast.error(
+  //             `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+  //           );
+  //         }
+
+  //       };
+  //       reader.onerror = function () {
+  //         fileError = "Error reading the file. Please try again.";
+  //       };
+  //       reader.readAsText(file);
+  //     }
+  //   } else {
+  //     fileError = "No file selected.";
+  //   }
+  // }
   function handleFileInputChange(event) {
-    const file = event.target.files[0];
+  const file = event.target.files[0];
 
-    if (file) {
-      const fileType = file.name.split(".").pop().toLowerCase();
-      selectedFileName = file.name;
-      isValidated = false; 
-      invalidProductLines = []; 
+  if (file) {
+    const fileType = file.name.split(".").pop().toLowerCase();
+    selectedFileName = file.name;
+    isValidated = false;
+    invalidProductLines = [];
 
-      if (fileType === "xlsx" || fileType === "xls") {
-        fileError = "";
+    if (fileType === "xlsx" || fileType === "xls") {
+      fileError = "";
 
-        if (typeof XLSX !== "undefined") {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            try {
-              const data = new Uint8Array(e.target.result);
-              const workbook = XLSX.read(data, { type: "array" });
-              const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-
-              let csvData = XLSX.utils.sheet_to_csv(worksheet);
-              const lines = csvData.split("\n").filter((line) => line.trim());
-              const transformedLines = lines.map((line) => {
-                const parts = line.split(",").map((part) => part.trim());
-                if (parts.length >= 2) {
-                  return `${parts[0]}-${parts[1]},${parts[2] || 1}`;
-                }
-                return line;
-              });
-
-              rawFileData = transformedLines.join("\n");
-              isEditing = true; 
-              const csvFile = new File(
-                [rawFileData],
-                file.name.replace(/\.xlsx$|\.xls$/i, ".csv"),
-                {
-                  type: "text/csv",
-                },
-              );
-
-              const dataTransfer = new DataTransfer();
-              dataTransfer.items.add(csvFile);
-
-              const fileInput = document.getElementById("bulkupload");
-              if (fileInput) {
-                fileInput.files = dataTransfer.files;
-              }
-
-              const { duplicates } = checkForDuplicates(rawFileData);
-              duplicateEntries = duplicates;
-
-              if (duplicates.length > 0) {
-                toast.error(
-                  `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
-                );
-              }
-            } catch (error) {
-              console.error("Excel processing error:", error);
-              fileError =
-                "Error processing Excel file. Please check file format.";
-            }
-          };
-          reader.onerror = function () {
-            fileError = "Error reading the file. Please try again.";
-          };
-          reader.readAsArrayBuffer(file);
-        } else {
-          fileError =
-            "Excel file support requires the SheetJS library. Please use CSV format instead.";
-        }
-      } else {
+      if (typeof XLSX !== "undefined") {
         const reader = new FileReader();
         reader.onload = function (e) {
-          rawFileData = e.target.result;
-          fileError = "";
-          isEditing = true;  
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: "array" });
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-          const { duplicates } = checkForDuplicates(rawFileData);
-          duplicateEntries = duplicates;
+            let csvData = XLSX.utils.sheet_to_csv(worksheet);
+            const lines = csvData.split("\n").filter((line) => line.trim());
+            
+            // Transform and trim all entries
+            const transformedLines = lines.map((line) => {
+              const parts = line.split(",").map((part) => part.trim());
+              if (parts.length >= 2) {
+                return `${parts[0]}-${parts[1]},${parts[2] || 1}`.trim();
+              }
+              return line.trim();
+            });
 
-          if (duplicates.length > 0) {
-            toast.error(
-              `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+            rawFileData = transformedLines.join("\n");
+            isEditing = true;
+            
+            // Create a new CSV file with the trimmed content
+            const csvFile = new File(
+              [rawFileData],
+              file.name.replace(/\.xlsx$|\.xls$/i, ".csv"),
+              {
+                type: "text/csv",
+              }
             );
-          }
 
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(csvFile);
+
+            const fileInput = document.getElementById("bulkupload");
+            if (fileInput) {
+              fileInput.files = dataTransfer.files;
+            }
+
+            const { duplicates } = checkForDuplicates(rawFileData);
+            duplicateEntries = duplicates;
+
+            if (duplicates.length > 0) {
+              toast.error(
+                `Found ${duplicates.length} duplicate entries. Please review and remove them.`
+              );
+            }
+          } catch (error) {
+            console.error("Excel processing error:", error);
+            fileError =
+              "Error processing Excel file. Please check file format.";
+          }
         };
         reader.onerror = function () {
           fileError = "Error reading the file. Please try again.";
         };
-        reader.readAsText(file);
+        reader.readAsArrayBuffer(file);
+      } else {
+        fileError =
+          "Excel file support requires the SheetJS library. Please use CSV format instead.";
       }
     } else {
-      fileError = "No file selected.";
+      // For CSV or other text files
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        // Get the raw file content
+        let fileContent = e.target.result;
+        fileError = "";
+        isEditing = true;
+        
+        // Split into lines, filter empty lines, and trim each entry
+        const lines = fileContent.split("\n").filter((line) => line.trim());
+        const trimmedLines = lines.map((line) => {
+          const [productInfo, quantity] = line.split(",").map((item) => item.trim());
+          return `${productInfo},${quantity}`;
+        });
+        
+        // Reassemble the trimmed content
+        rawFileData = trimmedLines.join("\n");
+
+        // Create a new file with the trimmed content
+        const trimmedFile = new File([rawFileData], file.name, {
+          type: "text/csv",
+        });
+
+        // Update the file input with the trimmed file
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(trimmedFile);
+        const fileInput = document.getElementById("bulkupload");
+        if (fileInput) {
+          fileInput.files = dataTransfer.files;
+        }
+
+        const { duplicates } = checkForDuplicates(rawFileData);
+        duplicateEntries = duplicates;
+
+        if (duplicates.length > 0) {
+          toast.error(
+            `Found ${duplicates.length} duplicate entries. Please review and remove them.`
+          );
+        }
+      };
+      reader.onerror = function () {
+        fileError = "Error reading the file. Please try again.";
+      };
+      reader.readAsText(file);
     }
+  } else {
+    fileError = "No file selected.";
+  }
+}
+
+function validateAndSubmitData() {
+  if (!rawFileData.trim()) {
+    toast.error("Please enter product data before submitting");
+    return;
   }
 
-  function validateAndSubmitData() {
-    if (!rawFileData.trim()) {
-      toast.error("Please enter product data before submitting");
-      return;
-    }
+  // Trim all entries again before submission
+  const lines = rawFileData.split("\n").filter((line) => line.trim());
+  const trimmedLines = lines.map((line) => {
+    const [productInfo, quantity] = line.split(",").map((item) => item.trim());
+    return `${productInfo},${quantity}`;
+  });
+  rawFileData = trimmedLines.join("\n");
 
-    const { duplicates } = checkForDuplicates(rawFileData);
-    if (duplicates.length > 0) {
-      toast.error(
-        `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
-      );
-      return;
-    }
-    const file = new File([rawFileData], "manual-entry.csv", {
-      type: "text/csv",
-    });
-
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(file);
-    const fileInput = document.getElementById("bulkupload");
-    if (fileInput) {
-      fileInput.files = dataTransfer.files;
-    }
-
-    if (formElement) {
-      formElement.requestSubmit();
-    }
+  const { duplicates } = checkForDuplicates(rawFileData);
+  if (duplicates.length > 0) {
+    toast.error(
+      `Found ${duplicates.length} duplicate entries. Please review and remove them.`
+    );
+    return;
   }
+  
+  const file = new File([rawFileData], "manual-entry.csv", {
+    type: "text/csv",
+  });
+
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  const fileInput = document.getElementById("bulkupload");
+  if (fileInput) {
+    fileInput.files = dataTransfer.files;
+  }
+
+  if (formElement) {
+    formElement.requestSubmit();
+  }
+}
+
 
   function processProduct(product) {
     const {
@@ -739,7 +892,7 @@ Example:
     >
       <button
         type="button"
-              class="lg:ml-60 p-2 w-40  mr-5 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
+                    class="lg:ml-60  mr-5 p-2 w-40 mt-4 h-9  border border-primary-500 text-primary-500  hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
         on:click={attemptAddToCart}
         disabled={cartloading ||
           (isValidated &&
@@ -756,7 +909,7 @@ Example:
     </form>
   {:else}
     <button
-              class="lg:ml-60  mr-5 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
+              class="lg:ml-60  mr-5 p-2 w-40 mt-4 h-9  border border-primary-500 text-primary-500  hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
       on:click={attemptAddToCart}
       disabled={cartloading ||
         (isValidated &&

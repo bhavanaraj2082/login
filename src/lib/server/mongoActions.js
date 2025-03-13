@@ -2552,6 +2552,111 @@ export const quicksearch = async ({ query }) => {
 	}
   };
 
+// export const uploadFile = async ({ query }) => {
+// 	const validQueries = query.filter(([productNumberAndSize, quantity]) =>
+// 		productNumberAndSize?.trim() && String(quantity)?.trim()
+// 	);
+// 	console.log(validQueries, "validone");
+
+// 	if (validQueries.length === 0) {
+// 		return validQueries.map(() => ({
+// 			productNumber: "Unknown",
+// 			isValid: false,
+// 			message: "Product number is invalid",
+// 		}));
+// 	}
+
+// 	const results = [];
+
+// 	for (const [productNumberAndSize, quantity] of validQueries) {
+// 		const parts = productNumberAndSize.split('-');
+// 		const productNumber = parts.slice(0, parts.length - 1).join('-');
+// 		const size = parts[parts.length - 1];
+
+// 		const product = await Product.findOne({ productNumber }).exec();
+
+// 		if (product) {
+// 			const stockInfo = await Stock.find({ productNumber: product.productNumber }).select('id stock pricing distributor manufacturer');
+// 			console.log(stockInfo, "asadsdsfsdfxdrdr********************8");
+
+// 			let convertedPricing = [];
+// 			for (let stock of stockInfo) {
+// 				const { pricing = [], distributor, manufacturer } = stock || [];
+
+// 				if (pricing && pricing[0] && pricing[0].INR) {
+// 					convertedPricing = convertedPricing.concat(pricing);
+// 				} else {
+// 					const converted = await convertToINR([pricing] || []);
+// 					convertedPricing = convertedPricing.concat(converted);
+// 				}
+
+// 				console.log('Distributor:', distributor);
+// 				console.log('Manufacturer:', manufacturer);
+// 			}
+
+// 			if (stockInfo.length === 0) {
+// 				results.push({
+// 					productNumber,
+// 					quantity: parseInt(quantity), // Add quantity to invalid result
+// 					isValid: false,
+// 					message: "Stock information missing",
+// 				});
+// 				continue;
+// 			}
+
+// 			const normalizedSize = size.replace(/\s+/g, '').toUpperCase();
+// 			const validSizePrice = convertedPricing.find(item =>
+// 				item.break.replace(/\s+/g, '').toUpperCase() === normalizedSize
+// 			);
+
+// 			if (!validSizePrice) {
+// 				console.log(`Size ${size} is invalid or not available for product ${productNumber}`);
+// 				results.push({
+// 					productNumber,
+// 					quantity: parseInt(quantity), // Add quantity to invalid size result
+// 					isValid: false,
+// 					message: `Size ${size} is invalid or not available for product ${productNumber}`,
+// 				});
+// 				continue;
+// 			}
+
+// 			let availableStock = Number(stockInfo[0]?.stock) || 0;
+
+// 			// Return valid product with quantity included
+// 			results.push({
+// 				id: product._id.toString(),
+// 				image: product.imageSrc || "No image available",
+// 				description: product.prodDesc || "No description available",
+// 				productName: product.productName || "No product name available",
+// 				productNumber,
+// 				quantity: parseInt(quantity), // Add quantity to valid result
+// 				stockId: stockInfo[0]?.id.toString() || null,
+// 				stock: availableStock,
+// 				manufacturer: stockInfo[0]?.manufacturer?.toString() || null,
+// 				distributer: stockInfo[0]?.distributor?.toString() || null,
+// 				isValid: true,
+// 				message: "Product number and size are valid",
+// 				pricing: [{
+// 					break: validSizePrice.break,
+// 					price: validSizePrice.INR || "N/A",
+// 				}],
+// 			});
+// 		} else {
+// 			results.push({
+// 				productNumber: productNumberAndSize,
+// 				quantity: parseInt(quantity), // Add quantity to not found result
+// 				isValid: false,
+// 				message: "Product number is invalid",
+// 			});
+// 		}
+// 	}
+// 	console.log(results, "results");
+
+
+// 	return results;
+// };
+
+
 export const uploadFile = async ({ query }) => {
 	const validQueries = query.filter(([productNumberAndSize, quantity]) =>
 		productNumberAndSize?.trim() && String(quantity)?.trim()
@@ -2572,11 +2677,15 @@ export const uploadFile = async ({ query }) => {
 		const parts = productNumberAndSize.split('-');
 		const productNumber = parts.slice(0, parts.length - 1).join('-');
 		const size = parts[parts.length - 1];
-
-		const product = await Product.findOne({ productNumber }).exec();
+		const product = await Product.findOne({ 
+			productNumber: new RegExp('^' + productNumber.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '$', 'i') 
+		}).exec();
 
 		if (product) {
-			const stockInfo = await Stock.find({ productNumber: product.productNumber }).select('id stock pricing distributor manufacturer');
+			const stockInfo = await Stock.find({ 
+				productNumber: product.productNumber 
+			}).select('id stock pricing distributor manufacturer');
+			
 			console.log(stockInfo, "asadsdsfsdfxdrdr********************8");
 
 			let convertedPricing = [];
@@ -2597,23 +2706,23 @@ export const uploadFile = async ({ query }) => {
 			if (stockInfo.length === 0) {
 				results.push({
 					productNumber,
-					quantity: parseInt(quantity), // Add quantity to invalid result
+					quantity: parseInt(quantity),
 					isValid: false,
 					message: "Stock information missing",
 				});
 				continue;
 			}
-
-			const normalizedSize = size.replace(/\s+/g, '').toUpperCase();
-			const validSizePrice = convertedPricing.find(item =>
-				item.break.replace(/\s+/g, '').toUpperCase() === normalizedSize
-			);
+			const normalizedUserSize = size.replace(/\s+/g, '').toLowerCase();
+			const validSizePrice = convertedPricing.find(item => {
+				const normalizedItemSize = (item.break || '').replace(/\s+/g, '').toLowerCase();
+				return normalizedItemSize === normalizedUserSize;
+			});
 
 			if (!validSizePrice) {
 				console.log(`Size ${size} is invalid or not available for product ${productNumber}`);
 				results.push({
 					productNumber,
-					quantity: parseInt(quantity), // Add quantity to invalid size result
+					quantity: parseInt(quantity),
 					isValid: false,
 					message: `Size ${size} is invalid or not available for product ${productNumber}`,
 				});
@@ -2621,15 +2730,13 @@ export const uploadFile = async ({ query }) => {
 			}
 
 			let availableStock = Number(stockInfo[0]?.stock) || 0;
-
-			// Return valid product with quantity included
 			results.push({
 				id: product._id.toString(),
 				image: product.imageSrc || "No image available",
 				description: product.prodDesc || "No description available",
 				productName: product.productName || "No product name available",
-				productNumber,
-				quantity: parseInt(quantity), // Add quantity to valid result
+				productNumber: product.productNumber, 
+				quantity: parseInt(quantity),
 				stockId: stockInfo[0]?.id.toString() || null,
 				stock: availableStock,
 				manufacturer: stockInfo[0]?.manufacturer?.toString() || null,
@@ -2637,14 +2744,14 @@ export const uploadFile = async ({ query }) => {
 				isValid: true,
 				message: "Product number and size are valid",
 				pricing: [{
-					break: validSizePrice.break,
+					break: validSizePrice.break, // Keep the original case for display
 					price: validSizePrice.INR || "N/A",
 				}],
 			});
 		} else {
 			results.push({
 				productNumber: productNumberAndSize,
-				quantity: parseInt(quantity), // Add quantity to not found result
+				quantity: parseInt(quantity),
 				isValid: false,
 				message: "Product number is invalid",
 			});
@@ -2652,10 +2759,8 @@ export const uploadFile = async ({ query }) => {
 	}
 	console.log(results, "results");
 
-
 	return results;
 };
-
 export const CreateProductQuote = async (formattedData) => {
 	const newQuote = new Quotes(formattedData);
 	await newQuote.save();
