@@ -169,7 +169,7 @@ const handleFileUpload = (event) => {
 		let inputValue1 = count.toString();
 		function handleInput1(event) {
 			const value = event.target.value;
-			if (/^\d*$/.test(value)) {
+			if (/^[0-9]\d*$/.test(value)) {
 				inputValue1 = value;
 				count = value === "" ? 0 : parseInt(value, 10);
 				updateUnits();
@@ -505,7 +505,7 @@ else if (selectedSolvent === "Yes") {
 		<div class=" bg-white">
 			<h1 class="font-bold sm:text-2xl text-sm ml-3 md:ml-10 py-5">How many units do you need?*</h1>
 			<div
-				class="counter mt-3 ml-3 md:ml-20 p-1  border-gray-300 bg-white inline-flex items-center space-x-1 border-1 rounded h-10 w-28 focus:ring-0 focus:outline-none focus:border-primary-500  "
+				class="counter mt-3 ml-3 md:ml-20 p-1  border-gray-300 bg-white inline-flex items-center space-x-1 border-1 rounded h-10 w-32 focus:ring-0 focus:outline-none focus:border-primary-500  "
 
 			>
 				<button
@@ -516,12 +516,60 @@ else if (selectedSolvent === "Yes") {
 				>
 					<Icon icon="ion:minus" class="text-primary-500 text-lg" />
 				</button>
-				<input
+				<!-- <input
 					type="text"
 					class="w-10 h-6 text-center border-0 rounded text-md"
 					bind:value={$formData.units}
 					on:input={handleInput1}
-				/>
+				/> -->
+				<input
+				type="text"
+				min="1"
+				maxlength="3"
+				class="h-6 w-14 text-center rounded text-md bg-white font-medium focus:ring-0 focus:outline-none border-none"
+				bind:value={$formData.units}
+				on:focus={(e) => {
+				  const currentValue = e.target.value;
+				  e.target.value = "";
+				  setTimeout(() => {
+					e.target.select();
+				  }, 10);
+				}}
+				on:blur={(e) => {
+				  if (e.target.value === "" || e.target.value === "0") {
+					$formData.units = 1;
+					e.target.value = "1";
+				  }
+				}}
+					on:input={(e) => {
+						const numericValue = e.target.value.replace(/[^0-9]/g, "");
+						e.target.value = numericValue;
+						
+						if (numericValue === "") {
+						  $formData.units = 0;
+						  updateUnits();
+						  return;
+						}
+						
+						const trimmedValue = numericValue.replace(/^0+/, "") || "0";
+						const parsedValue = parseInt(trimmedValue, 10);
+						
+						if (parsedValue >= 1 && parsedValue <= 999) {
+						  $formData.units = parsedValue;
+						  e.target.value = parsedValue.toString();
+						} else if (parsedValue > 999) {
+						  $formData.units = 999;
+						  e.target.value = "999";
+						} else {
+						  $formData.units = 0;
+						  e.target.value = "0";
+						}
+						
+						updateUnits();
+					  }}
+				aria-label="Quantity"
+				max="999"
+			  />
 				<button type="button" on:click={increment} class="p-1">
 					<Icon icon="ion:plus" class="text-primary-500 text-lg" />
 				</button>

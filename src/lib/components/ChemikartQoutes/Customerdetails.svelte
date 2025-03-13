@@ -583,6 +583,8 @@ onMount(() => {
 		// }
 
 		isEditable = false;
+		document.addEventListener('click', handleClickOutside);
+		return () => document.removeEventListener('click', handleClickOutside);
 	});
 	$: if (ProfileEmailVerified) {
     localStorage.setItem("ProfileEmailVerified", "true");
@@ -621,15 +623,69 @@ let searchTerm = "";
 		// delete errors.$Cusdetails.Country;
 	}
 
-	function handleInputChange(event) {
-    searchTerm = event.target.value;
-    filterCountries();
+// 	function handleInputChange(event) {
+//     searchTerm = event.target.value;
+//     filterCountries();
+// }
+
+function handleInputChange(event) {
+  // Get the current input value
+  searchTerm = event.target.value;
+  
+  // Track if user is deleting text
+  const isDeleting = event.inputType === 'deleteContentBackward' || 
+                     event.inputType === 'deleteContentForward';
+  
+  if (searchTerm.length > 0 && !isDeleting) {
+    // Filter countries
+    filterCountriesWithoutAutoSelect();
+    
+    // Show dropdown with filtered results
+    showDropdown = filteredCountries.length > 0;
+    
+    // Check for country code matches specifically
+    const codeSearch = searchTerm.replace('+', '').trim();
+    if (codeSearch.length > 0) {
+      const exactCodeMatches = filteredCountries.filter(
+        (country) => country.code.replace('+', '') === codeSearch
+      );
+
+      if (exactCodeMatches.length === 1) {
+        selectCountry(exactCodeMatches[0]);
+        return;
+      }
+    }
+
+    const countriesStartingWith = filteredCountries.filter(
+      (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+    );
+    
+    if (countriesStartingWith.length === 1) {
+      selectCountry(countriesStartingWith[0]);
+    }
+  } else {
+    filterCountriesWithoutAutoSelect();
+    showDropdown = filteredCountries.length > 0;
+  }
+}
+function filterCountriesWithoutAutoSelect() {
+  filteredCountries = countries.filter(
+    (country) =>
+      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
+  );
 }
 
 
     function toggleDropdown() {
         showDropdown = !showDropdown;
     }
+
+	function handleClickOutside(event) {
+		if (!event.target.closest('.dropdown-container')) {
+			showDropdown = false;
+		}
+	}
 
 	// function validatePhoneNumber(country, phone) {
 	// const pattern = phoneNumberPatterns[country];
