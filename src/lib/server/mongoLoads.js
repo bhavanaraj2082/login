@@ -124,27 +124,28 @@ export async function loadProductsInfo(productId) {
 }
 
 export const isProductFavorite = async (productNumber, locals) => {
-  let authedUser = {};
-  if (locals.authedUser && locals.authedUser?.username) {
-    authedUser = locals.authedUser;
-  }
-
+  let authedUser = locals?.authedUser ?? {};
   const authedEmail = authedUser.email;
-  let isFavorite = false;
   if (!authedEmail) {
-    return isFavorite;
+    return false;
   }
 
   const userId = authedUser.id;
-  const existingRecord = await MyFavourite.findOne({ userId: userId });
-  // console.log(existingRecord);
-  
-  if (existingRecord && Array.isArray(existingRecord.favorite)) {
-    isFavorite = existingRecord.favorite.some(
-      (item) => item.productNumber === productNumber
-    );
+  const product = await Product.findOne({ productNumber }).lean();
+  if (!product) {
+    console.log("Product not found:", productNumber);
+    return false;
   }
 
+  const productId = product._id.toString();
+  const existingRecord = await MyFavourite.findOne({ userId }).lean();
+  if (!existingRecord || !Array.isArray(existingRecord.favorite)) {
+    return false;
+  }
+
+  const isFavorite = existingRecord.favorite.some(
+    (item) => item.productId.toString() === productId
+  );
   // console.log(isFavorite, "isFavorite");
   return isFavorite;
 };
