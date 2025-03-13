@@ -34,7 +34,8 @@ export default {
 				"4s":"16px"
 			},
 			animation:{
-				'spin-slow': 'spin 3s linear infinite'
+				'spin-slow': 'spin 3s linear infinite',
+				'slow-bounce': 'bounce 3s infinite',
 			}
 		}
 	},

@@ -1,6 +1,6 @@
 
 import { redirect } from '@sveltejs/kit';
-import { getCart } from "$lib/server/mongoLoads.js"
+// import { getCart } from "$lib/server/mongoLoads.js"
 
 export const load = async({ url, cookies, locals,depends }) => {
     try {
