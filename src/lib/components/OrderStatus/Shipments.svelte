@@ -48,8 +48,11 @@
 
 <div class="col-span-2 mt-2">
   {#if !shipmentdetails.length > 0}
-    <div class="flex justify-center mt-8">
-      <p class="text-content font-light">No products have been shipped yet.</p>
+    <div class="flex items-center justify-center mt-8 p-8 rounded-md shadow bg-white">
+      <span class="bg-primary-50 rounded-full items-center">
+        <Icon icon="mdi:box-alert-outline" class="text-primary-500 md:text-xl text-sm m-2 "/>
+      </span>
+      <p class="md:text-content font-light ml-1 text-xs">No products have been shipped yet.</p>
     </div>
   {/if}
   {#each shipmentdetails as shipment, index}
@@ -60,9 +63,9 @@
         </h1>
       </div>
       {#each shipment.shipDetails as item}
-        <div class="border rounded-lg mb-5 bg-white">
+        <div class="rounded-lg mb-5 bg-white">
           <div
-            class="border flex justify-between items-center px-4 py-2 bg-white rounded-md"
+            class="flex justify-between items-center px-4 py-2 bg-white rounded-md shadow"
           >
             <div class="flex gap-3">
               <div>

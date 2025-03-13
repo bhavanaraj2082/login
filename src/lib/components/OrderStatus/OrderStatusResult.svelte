@@ -141,8 +141,7 @@
             <div>
               <button
                 on:click={showCancelConfirmation}
-                class="bg-red-500 hover:bg-red-600 text-white rounded-lg px-3 py-1"
-              >
+                class="bg-red-500 hover:bg-red-600 text-white rounded-md px-3 py-1 mb-1 shadow">
                 Cancel Order
               </button>
             </div>
@@ -158,9 +157,7 @@
       </div>
 
       {#if showCancelPopup}
-        <div
-          class="fixed inset-0 bg-gray-400 bg-opacity-75 flex items-center justify-center z-50"
-        >
+        <div class="fixed inset-0 bg-gray-400 bg-opacity-75 flex items-center justify-center z-50">
           <div class="bg-white rounded-sm p-5 shadow-lg w-80">
             <h2 class="text-lg text-heading font-semibold">Cancel Order</h2>
             <p class="mt-2 text-sm text-description">
@@ -169,26 +166,22 @@
             <div class="flex justify-end mt-4">
               <button
                 on:click={hideCancelPopup}
-                class="mr-2 bg-gray-300 text-white rounded px-4 py-2"
-              >
+                class="mr-2 bg-gray-300 text-white rounded px-4 py-2" >
                 Close
               </button>
               <div>
                 <form
                   method="POST"
                   action="?/cancelOrder"
-                  use:enhance={cancelOrder}
-                >
+                  use:enhance={cancelOrder}>
                   <input type="hidden" name="recordId" value={recordId} />
                   <input
                     type="hidden"
                     name="status"
-                    value="pending cancellation"
-                  />
+                    value="pending cancellation"/>
                   <button
                     type="submit"
-                    class="bg-red-500 text-white rounded px-4 py-2"
-                  >
+                    class="bg-red-500 text-white rounded px-4 py-2" >
                     Yes, cancel
                   </button>
                 </form>
@@ -198,48 +191,36 @@
         </div>
       {/if}
 
-      <div
-        class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8 bg-white border border-gray-200 rounded-lg pl-6 py-3 sm:p-6"
-      >
-        <div
-          class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"
-        >
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8 bg-white shadow rounded-md pl-6 py-3 sm:p-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
           <div class="text-sm font-medium text-gray-500">Order ID:</div>
           <p class="text-sm font-semibold text-heading">
             {order.orderid || "--"}
           </p>
         </div>
 
-        <div
-          class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"
-        >
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
           <div class="text-sm font-medium text-gray-500">Items:</div>
           <p class="text-sm font-semibold text-heading">
             {order.products.length || "--"}
           </p>
         </div>
 
-        <div
-          class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"
-        >
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
           <div class="text-sm font-medium text-gray-500">Total:</div>
           <p class="text-sm font-semibold text-heading">
             &#8377; {order.totalprice.toFixed(3) || "--"}
           </p>
         </div>
 
-        <div
-          class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"
-        >
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
           <h1 class="text-sm font-medium text-gray-500">Date:</h1>
           <p class="text-sm font-semibold text-heading">
             {formatDate(order.createdAt)}
           </p>
         </div>
 
-        <div
-          class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"
-        >
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
           <h1 class="text-sm font-medium text-gray-500">Status:</h1>
           <p class="text-sm font-semibold text-heading capitalize">
             {orderStatus || "--"}
@@ -248,25 +229,23 @@
       </div>
       <div class="flex flex-col sm:flex-row gap-3 mt-6">
         <button
-          class="px-6 py-2 border-1 font-semibold rounded-lg"
+          class="px-6 py-2 font-semibold rounded-md shadow"
           class:bg-gray-200={isAllActive}
           on:click={() => {
             isAllActive = true;
             isShippedActive = false;
             isPendingActive = false;
-          }}
-        >
+          }}>
           All
         </button>
         <button
-          class="px-3 py-2 border-1 font-semibold rounded-lg"
+          class="px-3 py-2 font-semibold rounded-md shadow "
           class:bg-gray-200={isShippedActive}
           on:click={() => {
             isShippedActive = true;
             isAllActive = false;
             isPendingActive = false;
-          }}
-        >
+          }}>
           <p>
             Shipments
             <span class="ml-2 rounded-3xl px-2 bg-gray-100 text-primary-400">
@@ -275,7 +254,7 @@
           </p>
         </button>
         <button
-          class="px-3 py-2 border-1 font-semibold rounded-lg"
+          class="px-3 py-2 font-semibold rounded-md shadow"
           class:bg-gray-200={isPendingActive}
           on:click={() => {
             isPendingActive = true;
@@ -301,9 +280,7 @@
             <h2 class="text-sm font-semibold mb-2 text-gray-600">
               Order Summary
             </h2>
-            <div
-              class="mb-4 px-4 py-4 rounded-lg border-1 bg-white border-gray-200 flex flex-col gap-1"
-            >
+            <div class="mb-4 px-4 py-4 rounded-md shadow bg-white flex flex-col gap-1">
               <div class="flex justify-between">
                 <p class="text-gray-500 text-sm font-medium">Subtotal:</p>
                 <p class="text-heading text-sm font-semibold">
@@ -331,7 +308,7 @@
               <h1 class="font-semibold mb-2 text-sm text-gray-600">
                 Billing Address
               </h1>
-              <div class=" rounded-lg py-3 px-3 border-1 bg-white text-gray-500">
+              <div class="rounded-md py-3 px-3 shadow bg-white text-gray-500">
                 <p class="font-medium text-sm text-gray-500">
                   {order.billingaddress || "--"}
                 </p>
@@ -339,7 +316,7 @@
               <h1 class="font-semibold mb-2 mt-2 text-sm text-gray-600">
                 Shipping Address
               </h1>
-              <div class=" rounded-lg py-3 px-3 border-1 bg-white text-gray-500">
+              <div class="rounded-md shadow py-3 px-3 bg-white text-gray-500">
                 <p class="font-medium text-sm text-gray-500">
                   {order.shippingaddress || "--"}
                 </p>
