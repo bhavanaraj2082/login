@@ -8,6 +8,7 @@
   export let toggleQuoteModal;
   export let form5;
   export let productQuote;
+  export let selectedProduct;
 
   let successMessage = "";
   let errorMessage = "";
@@ -127,7 +128,11 @@
           <div class="mb-4">
             <p class="text-sm">
               <strong class="text-sm">Product Name:</strong>
-              {productQuote.productName}
+              {#if productQuote.productName}
+                {productQuote.productName}
+              {:else}
+                {selectedProduct.name || "--"}
+              {/if}
             </p>
           </div>
         {/if}

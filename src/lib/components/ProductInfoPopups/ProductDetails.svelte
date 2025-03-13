@@ -574,7 +574,7 @@
 {/if}
 {#each data.records as record}
   {#if record?.variants && record?.variants?.length > 0}
-    <Variants {record} />
+    <Variants {record} {data}/>
   {/if}
 {/each}
 <Toaster position="bottom-right" richColors />
