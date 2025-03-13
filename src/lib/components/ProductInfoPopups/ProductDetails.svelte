@@ -341,39 +341,13 @@
                   };
                 }}
               >
-                <input
-                  type="hidden"
-                  name="productId"
-                  value={product.productId}
-                />
-                <input
-                  type="hidden"
-                  name="manufacturerId"
-                  value={product?.manufacturer?._id}
-                />
+                <input type="hidden" name="productId" value={product.productId} />
+                <input type="hidden" name="manufacturerId" value={product?.manufacturer?._id} />
                 <input type="hidden" name="authedEmail" value={authedEmail} />
                 <input type="hidden" name="stockId" value={selectedStockId} />
-                <input
-                  type="hidden"
-                  name="productNumber"
-                  value={product.productNumber}
-                />
-                <input
-                  type="hidden"
-                  name="distributorId"
-                  value={product?.distributorId}
-                />
-                <input
-                  type="hidden"
-                  name="quantity"
-                  value={product?.quantity || 1}
-                />
-                <input
-                  type="hidden"
-                  name="stock"
-                  value={product?.stockQuantity}
-                />
-
+                <input type="hidden" name="distributorId" value={product?.distributorId} />
+                <input type="hidden" name="quantity" value={product?.quantity || 1} />
+                <input type="hidden" name="stock" value={product?.stockQuantity} />
                 {#if authedEmail}
                   <button type="submit" class="p-2" on:click={toggleLike}>
                     <Icon
