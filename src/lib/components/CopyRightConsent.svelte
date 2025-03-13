@@ -64,9 +64,8 @@
 
     onMount(() => {
         if (data && data.profile) {
-            firstname =
-                `${data.profile.firstName || ""} `.trim();
-                lastname = `${data.profile.lastName || ""}`.trim();
+            firstname = `${data.profile.firstName || ""} `.trim();
+            lastname = `${data.profile.lastName || ""}`.trim();
             email = data.profile.email || "";
             phone = data.profile.cellPhone || "";
             company = data.profile.companyname || "";
@@ -394,9 +393,9 @@
         // }
         if (!fieldName || fieldName === "title") {
             if (!title) {
-                errors = { ...errors, title: "Title is required" };  
-                const { title, ...rest } = errors; 
-                errors = { ...rest }; 
+                errors = { ...errors, title: "Title is required" };
+                const { title, ...rest } = errors;
+                errors = { ...rest };
             }
         }
         if (!fieldName || fieldName === "firstname") {
@@ -753,7 +752,7 @@
     };
     function formValid() {
         console.log("Errors before validation:", errors);
-        validateField("title")
+        validateField("title");
         validateField("firstname");
         validateField("lastname");
         validateField("email");
@@ -791,31 +790,95 @@
     function toggleDropdown() {
         showDropdown = !showDropdown;
     }
-    function filterCountries() {
-        filteredCountries = countries.filter(
-            (country) =>
-                country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                country.code
-                    .replace("+", "")
-                    .includes(searchTerm.replace("+", "").toLowerCase()),
-        );
-        if (
-            filteredCountries.length === 1 &&
-            (filteredCountries[0].name.toLowerCase() ===
-                searchTerm.toLowerCase() ||
-                filteredCountries[0].code.replace("+", "").toLowerCase() ===
-                    searchTerm.replace("+", "").toLowerCase())
-        ) {
-            selectCountry(filteredCountries[0]);
-        } else {
-            showDropdown = filteredCountries.length > 0;
-        }
+    // function filterCountries() {
+    //     filteredCountries = countries.filter(
+    //         (country) =>
+    //             country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //             country.code
+    //                 .replace("+", "")
+    //                 .includes(searchTerm.replace("+", "").toLowerCase()),
+    //     );
+    //     if (
+    //         filteredCountries.length === 1 &&
+    //         (filteredCountries[0].name.toLowerCase() ===
+    //             searchTerm.toLowerCase() ||
+    //             filteredCountries[0].code.replace("+", "").toLowerCase() ===
+    //                 searchTerm.replace("+", "").toLowerCase())
+    //     ) {
+    //         selectCountry(filteredCountries[0]);
+    //     } else {
+    //         showDropdown = filteredCountries.length > 0;
+    //     }
+    // }
+	function filterCountries() {
+		filteredCountries = countries.filter(
+			(country) =>
+				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
+		);
+		if (
+			filteredCountries.length === 1 &&
+			(filteredCountries[0].name.toLowerCase() === searchTerm.toLowerCase() ||
+				filteredCountries[0].code.replace('+', '').toLowerCase() ===
+					searchTerm.replace('+', '').toLowerCase())
+		) {
+			selectCountry(filteredCountries[0]);
+		} else {
+			showDropdown = filteredCountries.length > 0; // Show dropdown only if results exist
+		}
+	}
+    // function handleInputChange(event) {
+    //     searchTerm = event.target.value;
+    //     filterCountries();
+    // }
+    function handleInputChange(event) {
+  // Get the current input value
+  searchTerm = event.target.value;
+  
+  // Track if user is deleting text
+  const isDeleting = event.inputType === 'deleteContentBackward' || 
+                     event.inputType === 'deleteContentForward';
+  
+  if (searchTerm.length > 0 && !isDeleting) {
+    // Filter countries
+    filterCountriesWithoutAutoSelect();
+    
+    // Show dropdown with filtered results
+    showDropdown = filteredCountries.length > 0;
+    
+    // Check for country code matches specifically
+    const codeSearch = searchTerm.replace('+', '').trim();
+    if (codeSearch.length > 0) {
+      const exactCodeMatches = filteredCountries.filter(
+        (country) => country.code.replace('+', '') === codeSearch
+      );
+
+      if (exactCodeMatches.length === 1) {
+        selectCountry(exactCodeMatches[0]);
+        return;
+      }
     }
 
-    function handleInputChange(event) {
-        searchTerm = event.target.value;
-        filterCountries();
+    const countriesStartingWith = filteredCountries.filter(
+      (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+    );
+    
+    if (countriesStartingWith.length === 1) {
+      selectCountry(countriesStartingWith[0]);
     }
+  } else {
+    filterCountriesWithoutAutoSelect();
+    showDropdown = filteredCountries.length > 0;
+  }
+}
+function filterCountriesWithoutAutoSelect() {
+  filteredCountries = countries.filter(
+    (country) =>
+      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
+  );
+}
+
 
     let filteredCountries = countries;
     let showDropdown = false;
@@ -911,40 +974,54 @@
         </a>
     </div>
 {:else}
-    <div class="lg:w-11/12 max-w-7xl px-3 mx-auto mb-4">
+    <div class="lg:w-11/12 max-w-7xl px-3 mx-auto mb-8">
         <div
-            class="bg-white mx-auto border rounded lg:w-full w-11/12 py-3 px-3 md:px-7 lg:px-7"
+            class="bg-white mx-auto border rounded-lg shadow-sm lg:w-full w-11/12 py-6 px-4 md:px-8 lg:px-10"
         >
-            <h1 class="text-2xl font-bold mb-4 mt-5 text-center">
+            <h1 class="text-3xl font-bold mb-6 mt-3 text-center text-gray-800">
                 Copyright Consent
             </h1>
-            <p class="mb-2 text-sm text-justify">
-                In case you are requesting our consent to use copyrighted
-                material available on our website, please make sure that you
-                have checked our <a
-                    href="/terms/site-and-terms"
-                    class="text-primary-500">Site Use Terms</a
-                >.
+
+            <div
+                class="bg-primary-50 border-l-4 border-primary-400 p-4 mb-6 rounded-r"
+            >
+                <p class="mb-2 text-sm text-gray-700">
+                    In case you are requesting our consent to use copyrighted
+                    material available on our website, please make sure that you
+                    have checked our
+                </p>
+                <p>
+                    <a
+                        href="/terms/site-and-terms"
+                        class="text-primary-500 hover:text-primary-600 font-sm"
+                        >Site Use Terms</a
+                    >.
+                </p>
+
+                <p class="mb-2 text-sm text-gray-700">
+                    If you are requesting copyright consent that is not already
+                    provided by the "Intellectual Property Rights" section, then
+                    please fill out the below form, and send it to us. We will
+                    review your request.
+                </p>
+                <p class="text-sm text-gray-700 font-medium">
+                    Please note that sending the below request form does NOT
+                    give you any license or consent, including implied, to use
+                    our copyrighted work unless you receive our explicit consent
+                    or if the consent is provided according to the Site Use
+                    Terms.
+                </p>
+            </div>
+
+            <p class="mb-4 text-sm text-gray-600">
+                Fields indicated by an * are required.
             </p>
-            <p class="mb-2 text-sm text-justify">
-                If you are requesting copyright consent that is not already
-                provided by the “Intellectual Property Rights” section, then
-                please fill out the below form, and send it to us. We will
-                review your request.
-            </p>
-            <p class="mb-2 text-sm text-justify">
-                Please note that sending the below request form does NOT give
-                you any license or consent, including implied, to use our
-                copyrighted work unless you receive our explicit consent or if
-                the consent is provided according to the Site Use Terms.
-            </p>
-            <p class="mb-2 text-sm">Fields indicated by an * are required.</p>
 
             <form
                 method="POST"
                 action="?/copyconsent"
                 enctype="multipart/form-data"
-                class="space-y-4"
+                class="space-y-6"
                 bind:this={form}
                 use:enhance={handlesubmit}
             >
@@ -952,8 +1029,9 @@
                 <div class="md:w-1/2">
                     <label
                         for="title"
-                        class="block text-gray-700 font-semibold text-sm py-2"
-                    >*Title</label>
+                        class="block text-gray-700 font-semibold text-sm mb-2"
+                        >*Title</label
+                    >
                     <select
                         id="title"
                         name="title"
@@ -961,10 +1039,10 @@
                         on:change={() => {
                             validateField("title");
                             if (errors?.title) {
-                                errors.title = '';  // Clear the error on change
+                                errors.title = ""; // Clear the error on change
                             }
                         }}
-                        class="focus:border-primary-500 bg-gray-50 border border-gray-300 text-sm focus:outline-none focus:ring-0 rounded mb-2 w-full md:w-4/5 p-2"
+                        class="focus:border-primary-500 bg-gray-50 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-primary-300 rounded-md mb-2 w-full md:w-4/5 p-2.5"
                     >
                         <option value="" disabled selected>Select Title</option>
                         <option value="Mr.">Mr.</option>
@@ -975,15 +1053,14 @@
                         <option value="Prof.">Prof.</option>
                         <option value="Rev.">Rev.</option>
                     </select>
+                    {#if errors?.title}
+                        <span class="text-red-500 text-xs">{errors.title}</span>
+                    {/if}
                 </div>
-                
-                {#if errors?.title}
-                    <span class="text-red-500 text-xs">{errors.title}</span>
-                {/if}
-                
+
                 <!-- Name fields -->
-                <div class="mb-4 flex flex-col md:flex-row gap-x-6">
-                    <div class="mb-3 md:mb-0 md:mr-12 w-full md:w-1/2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
                         <label
                             for="customerName"
                             class="text-sm font-semibold text-gray-700 mb-2 block"
@@ -994,7 +1071,7 @@
                             name="firstname"
                             id="firstname"
                             bind:value={firstname}
-                            class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
                             placeholder="First Name"
                             on:input={() => {
                                 validateField("firstname");
@@ -1006,12 +1083,12 @@
                             }}
                         />
                         {#if errors?.firstname}
-                            <span class="text-red-500 text-xs"
+                            <span class="text-red-500 text-xs mt-1 block"
                                 >{errors.firstname}</span
                             >
                         {/if}
                     </div>
-                    <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2">
+                    <div>
                         <label
                             for="lastname"
                             class="text-sm font-semibold text-gray-700 mb-2 block"
@@ -1022,7 +1099,7 @@
                             name="lastname"
                             id="lastname"
                             bind:value={lastname}
-                            class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
                             placeholder="Last Name"
                             on:input={() => {
                                 validateField("lastname");
@@ -1034,17 +1111,18 @@
                             }}
                         />
                         {#if errors?.lastname}
-                            <span class="text-red-500 text-xs"
+                            <span class="text-red-500 text-xs mt-1 block"
                                 >{errors.lastname}</span
                             >
                         {/if}
                     </div>
                 </div>
+
                 <!-- Company and address fields -->
-                <div class="mb-4 flex flex-col md:flex-row gap-x-6">
-                    <div class="mb-2 md:mb-0 md:mr-12 w-full md:w-1/2 my-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
                         <label
-                            for="lastname"
+                            for="company"
                             class="text-sm font-semibold text-gray-700 mb-2 block"
                             >*Company Name:</label
                         >
@@ -1053,7 +1131,7 @@
                             name="company"
                             id="company"
                             bind:value={company}
-                            class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
                             placeholder="Company Name"
                             on:input={() => {
                                 validateField("company");
@@ -1067,12 +1145,12 @@
                             }}
                         />
                         {#if errors?.company}
-                            <span class="text-red-500 text-xs"
+                            <span class="text-red-500 text-xs mt-1 block"
                                 >{errors.company}</span
                             >
                         {/if}
                     </div>
-                    <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2 my-2">
+                    <div>
                         <label
                             for="street"
                             class="text-sm font-semibold text-gray-700 mb-2 block"
@@ -1083,7 +1161,7 @@
                             name="street"
                             id="street"
                             bind:value={street}
-                            class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
                             placeholder="Street Name"
                             on:input={() => {
                                 validateField("street");
@@ -1097,14 +1175,15 @@
                             }}
                         />
                         {#if errors?.street}
-                            <span class="text-red-500 text-xs"
+                            <span class="text-red-500 text-xs mt-1 block"
                                 >{errors.street}</span
                             >
                         {/if}
                     </div>
                 </div>
-                <div class="mb-4 flex flex-col md:flex-row gap-x-6">
-                    <div class="mb-2 md:mb-0 md:mr-12 w-full md:w-1/2 my-2">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
                         <input
                             type="hidden"
                             name="email"
@@ -1155,7 +1234,7 @@
                                     }
                                 };
                             }}
-                            class="flex w-full items-center"
+                            class="w-full"
                             on:submit={() => {
                                 isLoading = true;
                             }}
@@ -1163,188 +1242,198 @@
                             <div class="relative w-full">
                                 <label
                                     for="email"
-                                    class="block text-gray-700 font-semibold text-sm my-2"
+                                    class="block text-gray-700 font-semibold text-sm mb-2"
                                     >*Email Address</label
                                 >
-                                <input
-                                    type="text"
-                                    name="email"
-                                    id="email"
-                                    bind:value={email}
-                                    class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-                                    placeholder="Email"
-                                    on:input={() => {
-                                        email = email.trim();
-                                        validateField("email");
-                                        errors.email = !email
-                                            ? "*Required"
-                                            : !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-                                                    email,
-                                                ) ||
+                                <div class="relative">
+                                    <input
+                                        type="text"
+                                        name="email"
+                                        id="email"
+                                        bind:value={email}
+                                        class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
+                                        placeholder="Email"
+                                        on:input={() => {
+                                            email = email.trim();
+                                            validateField("email");
+                                            errors.email = !email
+                                                ? "*Required"
+                                                : !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                                                        email,
+                                                    ) ||
+                                                    email
+                                                        .split("@")[1]
+                                                        .includes("gamil")
+                                                  ? "Please enter a valid email address"
+                                                  : "";
+                                            ProfileEmailVerified = false;
+                                            emailSent = false;
+                                            authedUserEmailVerified = false;
+                                        }}
+                                    />
+                                    {#if isLoading}
+                                        <span
+                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 flex items-center"
+                                        >
+                                            <Icon
+                                                icon="line-md:loading-alt-loop"
+                                                class="w-4 h-4 mr-1 animate-spin"
+                                            />
+                                            Verifying...
+                                        </span>
+                                        <!-- {:else if !ProfileEmailVerified && !emailSent && isEmailVerified !== true} -->
+                                    {:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
+                                        <button
+                                            type="submit"
+                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 hover:text-primary-800 hover:underline cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                                            disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                                                email,
+                                            ) ||
                                                 email
                                                     .split("@")[1]
-                                                    .includes("gamil")
-                                              ? "Please enter a valid email address"
-                                              : "";
-                                        ProfileEmailVerified = false;
-                                        emailSent = false;
-                                        authedUserEmailVerified = false;
-                                    }}
-                                />
-                                {#if errors?.email}
-                                <span class="text-red-500 text-xs"
-                                    >{errors.email}</span
-                                >
-                            {/if}
-                                {#if isLoading}
-                                    <span
-                                        class="absolute right-2 top-1/2 mt-4 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
-                                    >
-                                        <Icon
-                                            icon="line-md:loading-alt-loop"
-                                            class="w-4 h-4 mr-1"
-                                        />
-                                        Verifying...
-                                    </span>
-                                    <!-- {:else if !ProfileEmailVerified && !emailSent && isEmailVerified !== true} -->
-                                {:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
-                                    <button
-                                        type="submit"
-                                        class="absolute right-2 top-1/2 mt-4 transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
-                                        disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-                                            email,
-                                        ) ||
-                                            email
-                                                .split("@")[1]
-                                                .includes("gamil")}
-                                    >
-                                        Verify
-                                    </button>
-                                {:else if emailSent}
-                                    <span
-                                        class="absolute right-2 mt-4 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-                                    >
-                                        {#if isOtpVerified}
+                                                    .includes("gamil")}
+                                        >
+                                            Verify
+                                        </button>
+                                    {:else if emailSent}
+                                        <span
+                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-green-600 flex items-center"
+                                        >
+                                            {#if isOtpVerified}
+                                                Verified
+                                                <Icon
+                                                    icon="material-symbols:verified-rounded"
+                                                    class="w-4 h-4 ml-1"
+                                                />
+                                            {:else}
+                                                <Icon
+                                                    icon="fluent:mail-all-read-16-filled"
+                                                    class="w-4 h-4 mr-1"
+                                                />
+                                                Check your inbox
+                                            {/if}
+                                        </span>
+                                    {:else}
+                                        <span
+                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-green-600 flex items-center"
+                                        >
                                             Verified
                                             <Icon
                                                 icon="material-symbols:verified-rounded"
-                                                class="w-4 h-4 mt-2 ml-1"
+                                                class="w-4 h-4 ml-1"
                                             />
-                                        {:else}
-                                            <Icon
-                                                icon="fluent:mail-all-read-16-filled"
-                                                class="w-4  h-4 mr-1"
-                                            />
-                                            Check your inbox
-                                        {/if}
-                                    </span>
-                                {:else}
+                                        </span>
+                                    {/if}
+                                </div>
+                                {#if errors?.email}
                                     <span
-                                        class="absolute right-2 mt-4 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+                                        class="text-red-500 text-xs mt-1 block"
+                                        >{errors.email}</span
                                     >
-                                        Verified
-                                        <Icon
-                                            icon="material-symbols:verified-rounded"
-                                            class="w-4 h-4 ml-1"
-                                        />
-                                    </span>
                                 {/if}
                             </div>
                         </form>
                         {#if emailSent && isOtpVerified === false}
-                            <br />
-
-                            <form
-                                action="?/verifyOtpEmail"
-                                method="POST"
-                                use:enhance={() => {
-                                    return async ({ result }) => {
-                                        loadingotp = false; // Hide loading spinner when the request is complete
-                                        if (result.status === 200) {
-                                            if (result.data.status === 200) {
-                                                const verifiedMessage =
-                                                    result.data.message;
-                                                toast.success(verifiedMessage);
-                                                isOtpVerified =
-                                                    result.data.isEmailVerified;
-                                                enteredOtpemail = "";
-                                                ProfileEmailVerified = true;
-                                                console.log(
-                                                    isOtpVerified,
-                                                    "isOtpVerified",
-                                                );
+                            <div
+                                class="mt-3 bg-gray-50 p-3 rounded-md border border-gray-200"
+                            >
+                                <form
+                                    action="?/verifyOtpEmail"
+                                    method="POST"
+                                    use:enhance={() => {
+                                        return async ({ result }) => {
+                                            loadingotp = false; // Hide loading spinner when the request is complete
+                                            if (result.status === 200) {
+                                                if (
+                                                    result.data.status === 200
+                                                ) {
+                                                    const verifiedMessage =
+                                                        result.data.message;
+                                                    toast.success(
+                                                        verifiedMessage,
+                                                    );
+                                                    isOtpVerified =
+                                                        result.data
+                                                            .isEmailVerified;
+                                                    enteredOtpemail = "";
+                                                    ProfileEmailVerified = true;
+                                                    console.log(
+                                                        isOtpVerified,
+                                                        "isOtpVerified",
+                                                    );
+                                                } else {
+                                                    const errorMessage =
+                                                        result.data.message ||
+                                                        "An unknown error occurred!";
+                                                    toast.error(errorMessage);
+                                                }
                                             } else {
                                                 const errorMessage =
                                                     result.data.message ||
-                                                    "An unknown error occurred!";
+                                                    "Request failed. Please try again.";
                                                 toast.error(errorMessage);
                                             }
-                                        } else {
-                                            const errorMessage =
-                                                result.data.message ||
-                                                "Request failed. Please try again.";
-                                            toast.error(errorMessage);
-                                        }
-                                    };
-                                }}
-                                on:submit={() => {
-                                    loadingotp = true; // Show loading message when form is submitted
-                                }}
-                            >
-                                <div class="relative w-full">
-                                    <input
-                                        type="hidden"
-                                        name="email"
-                                        id="email"
-                                        bind:value={email}
-                                    />
-                                    <input
-                                        type="text"
-                                        name="enteredOtp"
-                                        bind:value={enteredOtpemail}
-                                        placeholder="Enter 6-digit OTP"
-                                        class="flex-1 outline-none w-full border-gray-300 border rounded focus:border-primary-400 focus:ring-0 p-2 text-sm"
-                                        on:input={() => {
-                                            enteredOtpemail = enteredOtpemail.trim();
-                                            enteredOtpemail = enteredOtpemail.replace(/\D/g, '').slice(0, 6);
-                                        }}
-                                        
-                                    />
-                                    <button
-                                        type="submit"
-                                        class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded hover:underline"
-                                        disabled={loadingotp}
-                                    >
-                                        <!-- {loadingotp ? 'Verifying...' : 'Verify'} -->
-                                        {#if loadingotp}
-                                            <span
-                                                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 flex items-center"
-                                            >
-                                                <Icon
-                                                    icon="line-md:loading-alt-loop"
-                                                    class="w-4 h-4 mr-1 animate-spin"
-                                                />
-                                                Verifying...
-                                            </span>
-                                        {:else}
-                                            Verify
-                                        {/if}
-                                    </button>
-                                </div>
-                                <div class="flex justify-end text-sm">
-                                    <button
-                                        type="button"
-                                        on:click={handleResendOtpemail}
-                                        disabled={loadingotp}
-                                        class="text-sm text-primary-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        Get a new code
-                                    </button>
-                                </div>
-                            </form>
+                                        };
+                                    }}
+                                    on:submit={() => {
+                                        loadingotp = true; // Show loading message when form is submitted
+                                    }}
+                                >
+                                    <div class="relative w-full mb-2">
+                                        <input
+                                            type="hidden"
+                                            name="email"
+                                            id="email"
+                                            bind:value={email}
+                                        />
+                                        <input
+                                            type="text"
+                                            name="enteredOtp"
+                                            bind:value={enteredOtpemail}
+                                            placeholder="Enter 6-digit OTP"
+                                            class="w-full text-sm border-gray-300 border rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-300 p-2.5"
+                                            on:input={() => {
+                                                enteredOtpemail =
+                                                    enteredOtpemail.trim();
+                                                enteredOtpemail =
+                                                    enteredOtpemail
+                                                        .replace(/\D/g, "")
+                                                        .slice(0, 6);
+                                            }}
+                                        />
+                                        <button
+                                            type="submit"
+                                            class="absolute top-1/2 right-3 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
+                                            disabled={loadingotp}
+                                        >
+                                            {#if loadingotp}
+                                                <span class="flex items-center">
+                                                    <Icon
+                                                        icon="line-md:loading-alt-loop"
+                                                        class="w-4 h-4 mr-1 animate-spin"
+                                                    />
+                                                    Verifying...
+                                                </span>
+                                            {:else}
+                                                Verify
+                                            {/if}
+                                        </button>
+                                    </div>
+                                    <div class="flex justify-end text-xs">
+                                        <button
+                                            type="button"
+                                            on:click={handleResendOtpemail}
+                                            disabled={loadingotp}
+                                            class="text-primary-600 hover:text-primary-800 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Get a new code
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         {/if}
                     </div>
-                    <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2 my-2">
+                    <div>
                         <label
                             for="city"
                             class="text-sm font-semibold text-gray-700 mb-2 block"
@@ -1355,7 +1444,7 @@
                             name="city"
                             id="city"
                             bind:value={city}
-                            class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
                             placeholder="City"
                             on:input={() => {
                                 validateField("city");
@@ -1367,71 +1456,76 @@
                             }}
                         />
                         {#if errors?.city}
-                            <span class="text-red-500 text-xs"
+                            <span class="text-red-500 text-xs mt-1 block"
                                 >{errors.city}</span
                             >
                         {/if}
                     </div>
                 </div>
 
-                <div class="mb-4 flex flex-col md:flex-row gap-x-6">
-                    <div class="mb-2 md:mb-0 md:mr-12 w-full md:w-1/2 my-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
                         <label
                             for="country"
-                            class="block text-gray-700 font-semibold text-sm my-2"
+                            class="block text-gray-700 font-semibold text-sm mb-2"
                             >*Country</label
                         >
-                        <input
-                            type="text"
-                            name="country"
-                            bind:value={country}
-                            placeholder="Search country"
-                            on:input={handleInputChange}
-                            on:click={toggleDropdown}
-                            class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-                          
-                        />
+                        <div class="relative">
+                            <input
+                                type="text"
+                                name="country"
+                                bind:value={country}
+                                placeholder="Search country"
+                                on:input={handleInputChange}
+                                on:click={toggleDropdown}
+                                class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
+                            />
 
-                        {#if showDropdown}
-                            <div
-                                class="absolute w-[2000] mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
-                            >
-                                <ul class="max-h-60 overflow-y-auto text-sm">
-                                    {#each filteredCountries as country (country.name)}
-                                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                                        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                                        <li
-                                            on:click={() =>
-                                                selectCountry(country)}
-                                            class="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                                        >
-                                            {country.name} ({country.code})
-                                        </li>
-                                    {/each}
-                                    {#if filteredCountries.length === 0}
-                                        <div
-                                            class="flex items-center px-2 py-4"
-                                        >
-                                            <Icon
-                                                icon="tabler:info-square-rounded-filled"
-                                                class="text-red-500 text-base mr-1"
-                                            />
-                                            <li class="text-gray-800 text-xs">
-                                                No matching countries found!
+                            {#if showDropdown}
+                                <div
+                                    class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
+                                >
+                                    <ul
+                                        class="max-h-60 overflow-y-auto text-sm"
+                                    >
+                                        {#each filteredCountries as country (country.name)}
+                                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                                            <li
+                                                on:click={() =>
+                                                    selectCountry(country)}
+                                                class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                                            >
+                                                {country.name} ({country.code})
                                             </li>
-                                        </div>
-                                    {/if}
-                                </ul>
-                            </div>
-                        {/if}
-                        {#if errors?.country}
-                            <p class="text-red-500 text-xs mt-1">
-                                {errors.country}
-                            </p>
-                        {/if}
+                                        {/each}
+                                        {#if filteredCountries.length === 0}
+                                            <div
+                                                class="flex items-center px-4 py-3"
+                                            >
+                                                <Icon
+                                                    icon="tabler:info-square-rounded-filled"
+                                                    class="text-red-500 text-base mr-2"
+                                                />
+                                                <li
+                                                    class="text-gray-800 text-xs"
+                                                >
+                                                    No matching countries found!
+                                                </li>
+                                            </div>
+                                        {/if}
+                                    </ul>
+                                </div>
+                            {/if}
+                            {#if errors?.country}
+                                <p class="text-red-500 text-xs mt-1">
+                                    {errors.country}
+                                </p>
+                            {/if}
+                        </div>
                     </div>
 
-                    <div class="mb-2 md:mb-0 md:ml-12 w-full md:w-1/2 my-2">
+                    <div>
                         <label
                             for="phone"
                             class="text-sm font-semibold text-gray-700 mb-2 block"
@@ -1441,7 +1535,7 @@
                             type="tel"
                             name="phone"
                             placeholder="Enter Contact Number"
-                            class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
                             bind:value={phone}
                             title="Please enter a valid phone number"
                             on:input={() => {
@@ -1458,99 +1552,71 @@
                     </div>
                 </div>
 
-<!--               
-                    <div class="font-semibold text-gray-700 mt-2 md:w-5/12">
-                        Please share the link so
-                        that we could allocate it.
-                    </div> -->
-                    <div class="mb-4 flex flex-col md:flex-row gap-x-6">
-                         
-                        <div class="mb-2 md:mb-0 w-full md:w-1/2 my-2">
-                            <label
-                                for="description"
-                               class="text-sm font-semibold text-gray-700 mb-2 block"
-                            >
-                                *Please describe the way and the purpose you are going to use our copyrighted work
-                            </label>
-                            <textarea
-                                id="description"
-                                name="description"
-                                rows="3"
-                                bind:value={description}
-                                on:input={() => {
-                                    validateField("description");
-                                    errors.description = !description
-                                        ? "*Required"
-                                        : /<script.*?>.*?<\/script>/i.test(description) // Regex to check for script tags
-                                        ? "Script tags are not allowed."
-                                        : !/^[A-Za-z" "/?().,:;""''*$#0-9\s]+$/.test(description)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label
+                            for="description"
+                            class="text-sm font-semibold text-gray-700 mb-2 block"
+                        >
+                            *Please describe the way and the purpose you are
+                            going to use our copyrighted work
+                        </label>
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="4"
+                            bind:value={description}
+                            on:input={() => {
+                                validateField("description");
+                                errors.description = !description
+                                    ? "*Required"
+                                    : /<script.*?>.*?<\/script>/i.test(
+                                            description,
+                                        ) // Regex to check for script tags
+                                      ? "Script tags are not allowed."
+                                      : !/^[A-Za-z" "/?().,:;""''*$#0-9\s]+$/.test(
+                                              description,
+                                          )
                                         ? "Please enter a valid description"
                                         : "";
-                                }}
-                                class="bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300 rounded w-full p-2 text-sm"
-                            ></textarea>
-                            {#if errors.description}
-                                <p class="text-red-500 text-sm mt-1">
-                                    {errors.description}
-                                </p>
-                            {/if}
-                        </div>
-                        
-                    <div class="mb-2 md:mb-0 md:ml-20 w-full md:w-1/2 my-2">
+                            }}
+                            class="bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300 rounded-md w-full p-3 text-sm"
+                        ></textarea>
+                        {#if errors.description}
+                            <p class="text-red-500 text-xs mt-1">
+                                {errors.description}
+                            </p>
+                        {/if}
+                    </div>
+
+                    <div>
                         <label
-                            for="phone"
+                            for="url"
                             class="text-sm font-semibold text-gray-700 mb-2 block"
-                            >Please share the link so
-                            that we could allocate it.</label
+                            >Please share the link so that we could allocate it:</label
                         >
                         <input
-                        name="url"
-                        type="url"
-                        placeholder="url"
-                        bind:value={url}
-                            class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-                        
-                            title="Please enter a valid phone number"
+                            name="url"
+                            type="url"
+                            id="url"
+                            placeholder="https://example.com/page"
+                            bind:value={url}
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
+                            title="Please enter a valid URL"
                             on:input={() => validateField("url")}
                         />
                         {#if errors.url}
-                        <p class="text-red-500 text-sm mt-1">
-                            {errors.url}
-                        </p>
-                    {/if}
+                            <p class="text-red-500 text-xs mt-1">
+                                {errors.url}
+                            </p>
+                        {/if}
                     </div>
-                        <!-- <div class="mb-2 md:mb-0 md:ml-16 w-full md:w-1/2 my-2">
-                            <label
-                            for="url"
-                            class="text-sm font-semibold text-gray-700 mb-2 block"
-                            >  Please share the link so
-                            that we could allocate it.</label
-                        >
-                            <div class="mb-4">
-                                <input
-                                    name="url"
-                                    type="url"
-                                    placeholder="url"
-                                    bind:value={url}
-                                    class="bg-gray-50 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
-                                    on:input={() => validateField("url")}
-                                />
-                                {#if errors.url}
-                                    <p class="text-red-500 text-sm mt-1">
-                                        {errors.url}
-                                    </p>
-                                {/if}
-                            </div>
-                        </div> -->
-                    
-                    </div>
-                    
-        
+                </div>
 
-                <div class="mb-3 rounded flex items-center justify-end">
+                <div class="flex items-center justify-end mt-6">
                     <button
-                    class="px-3 md:px-6 py-2 md:py-3 bg-primary-500 text-white text-md md:text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
-                    on:click={(event) => {
+                        class="px-6 py-3 bg-primary-400 text-white text-sm rounded-md transition duration-300 hover:bg-primary-600 font-semibold shadow-sm"
+                        on:click={(event) => {
                             // event.preventDefault();
                             if (!formValid()) {
                                 if (Object.keys(errors).length > 0) {
@@ -1583,20 +1649,20 @@
                         }}
                         disabled={submitting}
                     >
-                        {submitting ? "Submitting..." : "Submit"}
+                        {#if submitting}
+                            <span class="flex items-center justify-center">
+                                <Icon
+                                    icon="line-md:loading-alt-loop"
+                                    class="w-4 h-4 mr-2 animate-spin"
+                                />
+                                Submitting...
+                            </span>
+                        {:else}
+                            Submit Request
+                        {/if}
                     </button>
                 </div>
             </form>
-
-            <!-- Thank you message -->
-
-            {#if thankYouMessageVisible}
-                <div class="flex justify-center items-center">
-                    <p class="text-center font-semibold text-green-600 p-2">
-                        Thank you for submitting your request!
-                    </p>
-                </div>
-            {/if}
         </div>
     </div>
 {/if}

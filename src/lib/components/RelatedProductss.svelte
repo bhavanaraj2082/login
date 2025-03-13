@@ -61,14 +61,25 @@
   let logosPerSlide = 4;
   let totalSlides = Math.ceil(RelatedProductData.length / logosPerSlide);
 
-  function prevSlide() {
-    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-  }
+  // function prevSlide() {
+  //   currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+  // }
 
-  function nextSlide() {
+  // function nextSlide() {
+  //   currentIndex = (currentIndex + 1) % totalSlides;
+  // }
+// Modify these two functions
+function prevSlide() {
+  if (currentIndex > 0) {
+    currentIndex = (currentIndex - 1) % totalSlides;
+  }
+}
+
+function nextSlide() {
+  if (currentIndex < totalSlides - 1) {
     currentIndex = (currentIndex + 1) % totalSlides;
   }
-
+}
   function cartTogglePopup() {
     showCartPopup = !showCartPopup;
   }
@@ -335,12 +346,19 @@
 
   <div class="relative mt-1">
     <div class="flex items-center max-md:mx-0 mx-6">
-      <button
+      <!-- <button
         on:click={prevSlide}
         class="text-primary-500 p-1 pl-0.5 hover:bg-primary-100 hover:rounded-full"
       >
         <Icon class="text-2xl" icon="ion:chevron-back" />
-      </button>
+      </button> -->
+      <button
+  on:click={prevSlide}
+  class="text-primary-500 p-1 pl-0.5 hover:bg-primary-100 hover:rounded-full"
+  style={`cursor: ${currentIndex === 0 ? 'not-allowed' : 'pointer'}; opacity: ${currentIndex === 0 ? '0.5' : '1'}`}
+>
+  <Icon class="text-2xl" icon="ion:chevron-back" />
+</button>
 
       <div class="overflow-hidden flex-1">
         <div
@@ -412,12 +430,20 @@
         </div>
       </div>
 
-      <button
+      <!-- <button
         on:click={nextSlide}
         class="text-primary-500 p-1 pr-0.5 hover:bg-primary-100 hover:rounded-full"
       >
         <Icon class="text-2xl" icon="ion:chevron-forward" />
-      </button>
+      </button> -->
+      <button
+  on:click={nextSlide}
+  class="text-primary-500 p-1 pr-0.5 hover:bg-primary-100 hover:rounded-full"
+  style={`cursor: ${currentIndex === totalSlides - 1 ? 'not-allowed' : 'pointer'}; opacity: ${currentIndex === totalSlides - 1 ? '0.5' : '1'}`}
+>
+  <Icon class="text-2xl" icon="ion:chevron-forward" />
+</button>
+
     </div>
     <div class="flex justify-center mt-4 relative">
       {#each Array(totalSlides).fill(0) as _, slideIndex}
@@ -615,22 +641,20 @@
                   min="1"
                   maxlength="3"
                   bind:value={popupQuantity}
-                  class="w-12 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
-            
+                  class="w-12 h-6 p-0 text-center border-0 focus:border-0 focus:outline-none focus:ring-0 rounded-md"
+                  on:focus={(e) => {
+                    setTimeout(() => {
+                      e.target.select();
+                    }, 10);
+                  }}
                   on:input={(e) => { 
-                    // Ensure only numbers are allowed 
                     e.target.value = e.target.value.replace(/[^0-9]/g, ""); 
-                  
-                    // If the value starts with '0' but has more than one character, remove the leading zero 
                     if (e.target.value.startsWith("0") && e.target.value.length > 1) { 
                       e.target.value = e.target.value.slice(1); 
                     } 
-                  
-                    // Allow empty field during typing
                     if (e.target.value === "") { 
-                      popupQuantity = ""; // Allow empty value during typing
+                      popupQuantity = ""; 
                     } else {
-                      // Parse the input value and update quantity 
                       const parsedValue = parseInt(e.target.value, 10); 
                       
                       if (parsedValue >= 1 && parsedValue <= 999) { 
@@ -640,12 +664,8 @@
                         e.target.value = "999";
                       }
                     }
-                    
-                    // We're handling validation in onBlur now, so we don't need to call handlePopupInput here
                   }} 
-                  
                   on:blur={(e) => { 
-                    // Only validate when focus leaves the field
                     if (e.target.value === "" || e.target.value === "0") { 
                       popupQuantity = 1; 
                       e.target.value = "1"; 
@@ -674,7 +694,10 @@
                     cartTogglePopup();
                   }}
                 >
-                  Add to Cart
+                <div class="flex items-center justify-center">
+                  <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
+                  <span>Add to Cart</span>
+                </div>
                 </button>
               </form>
             {/if}
