@@ -140,13 +140,17 @@
           type="text"
           hidden
           name="productName"
-          value={productQuote.productName}
+          value={productQuote.productName
+            ? productQuote.productName
+            : selectedProduct.name || "--"}
         />
         <input
           type="text"
           hidden
           name="productNumber"
-          value={productQuote.productNumber}
+          value={productQuote.productNumber
+            ? productQuote.productNumber
+            : selectedProduct.partNumber || "--"}
         />
         <input type="text" hidden name="status" value="unread" />
         <div class="mb-4">

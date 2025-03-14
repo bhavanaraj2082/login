@@ -8,8 +8,13 @@
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
   import { authedUser } from "$lib/stores/mainStores.js";
   import { sendMessage } from "$lib/utils.js";
+  import ShowQuoteModal from "$lib/components/ProductInfoPopups/showQuoteModal.svelte";
   export let compareSimilarity;
   // console.log(compareSimilarity,"compare");
+  export let data;
+  let showQuoteModal = false;
+  let productQuote = null;
+  let form5;
 
   $: displayPrice =
     $currencyState === "usd"
@@ -292,6 +297,12 @@
     ).filter((val) => val !== "-");
     return values.filter((v) => v === value).length === 1;
   }
+
+  function toggleQuoteModal(selectedProduct) {
+    closeModal();
+    showQuoteModal = !showQuoteModal;
+    productQuote = selectedProduct;
+  }
 </script>
 
 <div class="max-w-7xl mx-auto my-10">
@@ -538,13 +549,14 @@
             <p class="text-gray-700 text-sm">
               The price for this product is unavailable. Please request a quote
             </p>
-            <a href={selectedProduct.partNumber}>
+            <!-- <a href={selectedProduct.partNumber}> -->
               <button
+              on:click={() => toggleQuoteModal(selectedProduct)}
                 class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-sm text-white mt-2"
               >
                 Request Quote
               </button>
-            </a>
+            <!-- </a> -->
           </div>
         {:else}
           <div class="mt-4">
@@ -817,3 +829,6 @@
   </div>
 {/if}
 <Toaster position="bottom-right" richColors />
+{#if showQuoteModal}
+  <ShowQuoteModal {data} {toggleQuoteModal} {form5} {productQuote} {selectedProduct}/>
+{/if}
