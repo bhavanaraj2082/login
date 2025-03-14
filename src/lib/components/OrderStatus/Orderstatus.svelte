@@ -42,7 +42,7 @@
 	};
 </script>
 
-<div class="flex items-center justify-center pb-12">
+<div class="flex items-center justify-center pb-6">
 	<div class="container mx-auto sm:py-6 p-6 max-w-7xl lg:w-11/12 rounded-lg">
 		<div class="flex items-center flex-col md:flex-row gap-8 rounded-md bg-white w-full shadow mb-10">
 			<img src="/OrderStatus.webp" alt="Order Status Banner" class="w-48 h-48 ml-5 m-4" />
@@ -115,11 +115,11 @@
 					If you do not have your order information handy, registered users visit Order History to
 					check an order status and access invoices.
 				</p>
-				<a href="/login">
+				<a href="/signin">
 					<button
 						type="button"
 						class="py-2 px-10 text-sm font-medium text-white rounded bg-primary-400 hover:bg-primary-500">
-						Login
+						Sign In
 					</button>
 				</a>
 			</div>

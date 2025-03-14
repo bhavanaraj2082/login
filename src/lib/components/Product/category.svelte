@@ -11,9 +11,13 @@
       category.productCount > 0 &&
       category.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  function clearSearch() {
+			searchTerm =  ''
+	}
 </script>
 
-<div class="w-full mb-10 lg:px-8 md:w-11/12 mx-auto max-w-7xl">
+<div class="w-full mb-10 lg:px-4 md:w-11/12 mx-auto max-w-7xl">
   <div class="md:pl-0">
    
     <h1 class="sm:hidden block px-6 sm:px-0 mb-2 sm:mb-0 font-bold sm:text-2xl text-lg text-heading">
@@ -24,17 +28,20 @@
         Our Category
       </h1>
       <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Icon icon="si:search-line" width="15" height="15" />
+        </div>
         <input
           type="text"
           bind:value={searchTerm}
           placeholder="Search categories..."
           class="w-full sm:p-2 p-1 sm:pl-10 pl-7 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent placeholder:text-xs"
         />
-        <div
-          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-        >
-          <Icon icon="si:search-line" width="15" height="15" />
-        </div>
+        {#if searchTerm}
+        <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded" style="color: #cb1919" on:click={clearSearch}>
+          <Icon icon="oui:cross" width="16" height="16" class="font-bold" />
+        </button>
+      {/if}
       </div>
     </div>
 
@@ -45,16 +52,10 @@
   </div>
 
   {#if filteredCategories.length > 0}
-    <div
-      class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-12 mx-8 sm:mx-0"
-    >
+    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-12 mx-8 sm:mx-0">
       {#each filteredCategories as category}
-        <div
-          class="relative group bg-white shadow-lg border border-gray-200 rounded-lg overflow-hidden transition-shadow duration-300"
-        >
-          <div
-            class="absolute inset-0 bg-opacity-20 transition-all duration-500 ease-in-out group-hover:bg-opacity-0 z-10 pointer-events-none"
-          ></div>
+        <div class="relative group bg-white shadow-lg border border-gray-200 rounded-lg overflow-hidden transition-shadow duration-300">
+          <div class="absolute inset-0 bg-opacity-20 transition-all duration-500 ease-in-out group-hover:bg-opacity-0 z-10 pointer-events-none"></div>
           <a href="/products/{category.urlName}" class="block relative z-10">
             <div class="relative">
               <img
@@ -67,8 +68,7 @@
               <div class="flex justify-between items-center">
                 <h4
                   class="font-semibold text-sm text-gray-500 hover:underline truncate"
-                  title={category.name}
-                >
+                  title={category.name}>
                   {category.name}
                 </h4>
                 {#if category.productCount}
@@ -83,7 +83,7 @@
       {/each}
     </div>
   {:else}
-    <div class="mt-8 flex flex-col items-center justify-center p-8 text-center">
+    <div class="mt-8 flex flex-col items-center bg-white shadow rounded-md justify-center p-8 text-center">
       <Icon
         icon="ph:package-duotone"
         width="64"
