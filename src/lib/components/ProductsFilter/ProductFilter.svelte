@@ -307,7 +307,7 @@ function handleMouseLeave() {
 
   const handleFavorites = (product)=>{
     try {
-       // console.log(product);
+     console.log(product);
     addLocalToFavorites(product.stockId)
     let formdata = new FormData()
     formdata.append("authedEmail",$authedUser.email)
@@ -315,7 +315,7 @@ function handleMouseLeave() {
     formdata.append("manufacturerId",product.manufacturerDetails._id)
     formdata.append("stockId",product.stockId)
     formdata.append("distributorId",product.distributorId)
-    formdata.append("quantity",product.stockDetails.orderMultiple)
+    formdata.append("quantity",product.orderMultiple)
     formdata.append("stock",product.stock)
     sendMessage("?/favorite",formdata,async(result)=>{
         console.log(result);
