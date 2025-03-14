@@ -8,15 +8,15 @@
 	let expandedCategories1 = {};
 	let expandedCategories2 = {};
 
-	let categories1 = [];
-	let categories2 = [];
-	let categories3 = [];
-	let categories4 = [];
+	let categories1 = updateCategoryNames(data1.categories1);
+	let categories2 = updateCategoryNames(data1.categories2);
+	let categories3 = data1.categories3;
+	let categories4 = data1.categories4;
 
-	let filteredCategories1 = [];
-	let filteredCategories2 = [];
-	let filteredCategories3 = [];
-	let filteredCategories4 = [];
+	let filteredCategories1 = [...categories1];
+	let filteredCategories2 = [...categories2];
+	let filteredCategories3 = [...categories3];
+	let filteredCategories4 = [...categories4];
 	let manuallyExpanded1 = {};
 	let manuallyExpanded2 = {};
 
@@ -130,11 +130,15 @@
 	$: {
 		if (!searchTerm.trim()) {
 			resetExpandedState();
-			filteredCategories1 = [...categories1];
-			filteredCategories2 = [...categories2];
-			filteredCategories3 = [...categories3];
-			filteredCategories4 = [...categories4];
+			filteredCategories1 = categories1;
+			filteredCategories2 = categories2;
+			filteredCategories3 = categories3;
+			filteredCategories4 = categories4;
 		} else {
+			let newExpandedCategories1 = {};
+			let newExpandedCategories2 = {};
+			manuallyExpanded1 = {};
+			manuallyExpanded2 = {};
 			filteredCategories1 = filterCategories(
 				categories1,
 				expandedCategories1,
@@ -167,10 +171,19 @@
 				"Resources",
 				false,
 			);
+			expandedCategories1 = {
+				...expandedCategories1,
+				...newExpandedCategories1,
+			};
+			expandedCategories2 = {
+				...expandedCategories2,
+				...newExpandedCategories2,
+			};
 		}
 	}
 
-	function toggleExpand(categoryIndex, categoryType) {
+	function toggleExpand(categoryIndex, categoryType, event) {
+		event.stopPropagation();
 		if (categoryType === 1) {
 			expandedCategories1[categoryIndex] =
 				!expandedCategories1[categoryIndex];
@@ -186,16 +199,17 @@
 		}
 	}
 
+	function handleClickOutside(event) {
+		if (event.target.closest(".see.more-btn")) {
+			return;
+		}
+		expandedCategories1 = {};
+		expandedCategories2 = {};
+	}
+
 	onMount(() => {
-		categories1 = updateCategoryNames(data1.categories1);
-		categories2 = updateCategoryNames(data1.categories2);
-		categories3 = data1.categories3;
-		categories4 = data1.categories4;
 		resetExpandedState();
-		filteredCategories1 = [...categories1];
-		filteredCategories2 = [...categories2];
-		filteredCategories3 = [...categories3];
-		filteredCategories4 = [...categories4];
+		document.addEventListener("click", handleClickOutside);
 	});
 </script>
 
@@ -209,8 +223,8 @@
 			<input
 				type="text"
 				bind:value={searchTerm}
-				placeholder="Search for categories, subcategories, or names..."
-				class="w-full py-2 pl-2 pr-7 sm:min-w-80 bg-white border border-gray-300 rounded-md focus:border-primary-500 focus:ring-0 text-sm placeholder:text-xs truncate"
+				placeholder="Search for categories, subcategories, or names"
+				class="w-full py-2 pl-2 pr-7 sm:min-w-80 bg-white border border-gray-300 rounded-md focus:border-primary-500 focus:ring-1 focus:ring-primary-500 focus:outline-none focus:border-transparent text-sm placeholder:text-xs truncate"
 			/>
 			<Icon
 				icon="feather:search"
@@ -261,8 +275,9 @@
 
 						{#if subcategories1.length > 3}
 							<button
-								on:click={() => toggleExpand(index, 1)}
-								class="mt-2 ml-2 text-xs text-primary-400 hover:underline"
+								on:click={(event) =>
+									toggleExpand(index, 1, event)}
+								class="mt-2 ml-2 text-xs text-primary-400 hover:underline see-more-btn"
 							>
 								{expandedCategories1[index]
 									? "Show Less"
@@ -317,8 +332,9 @@
 
 						{#if subcategories2.length > 3}
 							<button
-								on:click={() => toggleExpand(index, 2)}
-								class="mt-2 ml-2 text-xs text-primary-400 hover:underline"
+								on:click={(event) =>
+									toggleExpand(index, 2, event)}
+								class="mt-2 ml-2 text-xs text-primary-400 hover:underline see-more-btn"
 							>
 								{expandedCategories2[index]
 									? "Show Less"
@@ -400,4 +416,17 @@
 			{/if}
 		{/each}
 	</div>
+	{#if filteredCategories1.length === 0 && filteredCategories2.length === 0 && filteredCategories3.length === 0 && filteredCategories4.length === 0}
+		<div
+			class="flex items-center justify-center text-gray-600 font-semibold py-6"
+		>
+			<Icon
+				icon="iconoir:file-not-found"
+				width="24"
+				height="24"
+				class="text-primary-500"
+			/>
+			<span class="ml-2">No results found.</span>
+		</div>
+	{/if}
 </div>
