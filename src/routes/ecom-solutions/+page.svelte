@@ -28,7 +28,18 @@
   }
 
 
+  import SEO from "$lib/components/SEO.svelte";
+  import {
+    PUBLIC_WEBSITE_URL,
+    PUBLIC_COMPBUY_IMAGE_PATH,
+    PUBLIC_WEBSITE_NAME,
+  } from "$env/static/public";
+
+  let metadata = {
+    title: `Chemikart Solutions | ${PUBLIC_WEBSITE_NAME}` || "Default Product Title",
+  };
 </script>
+<SEO {metadata} />
 <div class="pt-5 max-w-7xl md:w-11/12 mx-auto sm:block hidden">
   <div class="fixed z-30 md:bottom-[75px] bottom-40 right-0 lg:right-10 py-6 lg:p-4">
     <button
