@@ -1,4 +1,6 @@
 <script>
+	import { sendMessage } from '$lib/utils.js';
+	import { myFavorites } from '$lib/stores/favorites.js';
 	import { invalidate } from '$app/navigation';
 	import { currencyState } from './../stores/mainStores.js';
     import { onMount } from 'svelte';
@@ -13,10 +15,17 @@
     let form;
     
     $: isAuthenticated = !!data?.locals?.user?.email;
-    // $: isAuthenticated = !!authedUser.email;
-
+    
+    const fetchMyFav = ()=>{
+        const formdata = new FormData()
+		sendMessage("/?/getFavorites",formdata,async(result)=>{
+			console.log(result.favorite);
+			myFavorites.set(result.favorite)
+			localStorage.setItem("myfavorites",JSON.stringify(result.favorite))
+		})
+    }
     $: favData = data?.favorites?.length ? data.favorites.map(item => {
-    if (!item?.productInfo?.productId) return null;
+    if (!item?.productInfo?.productId) return null;		
         return {
             id: item.productInfo.productId,
             name: item.productInfo.productName,
@@ -54,6 +63,7 @@
     let itemsPerPage = writable(10);
     const DOTS = '...';
     const VISIBLE_PAGES = 7;
+    let tog = null
 
     let filters = {
         searchTerm: '',
@@ -226,6 +236,19 @@ function calculateTotalPrice(price, quantity) {
     //     const numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
     //     return isNaN(numericPrice) ? 'N/A' : (numericPrice * quantity).toLocaleString("en-IN");
     // }
+    let timeout
+    function handleQty(item,quantity){
+        // if(isNaN(quantity)){
+        //     return
+        // }
+        // if(quantity >10000000) quantity = 10000000
+        //  clearTimeout(timeout)
+        //  timeout = setTimeout(()=>{
+        //  let selectedQty = Math.ceil(quantity/ item.stockInfo.orderMultiple) * item.stockInfo.orderMultiple;
+        //  item.quantity = selectedQty
+        //  tog = null
+        //  },1400);
+    }
 
     function increaseQuantity(item) {
        // const maxQuantity = Math.floor(item.stockInfo.stock / item.stockInfo.orderMultiple) * item.stockInfo.orderMultiple;
@@ -294,12 +317,14 @@ function calculateTotalPrice(price, quantity) {
 
     function handleRemoveItem() {
     return async ({ result }) => {
+        console.log(result);
         try{
         if (result.type === 'success') {
             toast.success('Item removed', {
                 description: `Product removed from favourites`
             });
         }
+        fetchMyFav()
         invalidate("data:fav")
     }
         catch (error) {
@@ -339,6 +364,7 @@ function handleClearAll() {
                 description: result.data?.message || 'Failed to clear favourites'
             });
         }
+        fetchMyFav()
         invalidate("data:fav")
     };
 }
@@ -397,8 +423,8 @@ onMount(() => {
         </a>
     </div>
     {:else}
-    <div class="flex flex-col lg:flex-row lg:gap-6 gap-4 mb-6 w-full">
-        <div class="w-full relative">
+    <div class="flex flex-col lg:flex-row lg:items-center gap-4 mb-4 w-full">
+        <div class="w-full lg:w-4/12 xl:w-1/3 relative">
             <Icon icon="ri:search-line" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="20" height="20"/>
             <input 
                 type="text" 
@@ -416,7 +442,7 @@ onMount(() => {
                 </button>
             {/if}
         </div>
-        <div class="flex flex-col lg:flex-row w-full lg:w-2/3 sm:flex-row gap-2 lg:items-center">
+        <div class="flex flex-col lg:flex-row lg:w-3/12 xl:w-1/3 w-full sm:flex-row gap-2 lg:items-center">
             <div class="relative w-full">
                 <Calender
                     bind:this={calendarComponent}
@@ -428,48 +454,49 @@ onMount(() => {
                     }}/>
             </div>
         </div>
+        <div class="flex w-fit self-end space-x-4 items-center text-primary-400 overflow-hidden font-semibold">
+            <form 
+                method="POST" 
+                action="?/addAllToCart"
+                use:enhance={handleAddAllToCart}>
+                <input type="hidden" name="items" value={JSON.stringify(
+                    favData
+                        .filter(item => item.stockInfo.stock > 0)
+                        .map(item => ({
+                            productId: item.id,
+                            stockId: item.stockInfo.id,
+                            manufacturerId: item.manufacturerInfo.id,
+                            distributorId: item.distributorInfo.id,
+                            quantity: item.quantity
+                        })))} />
+                <button 
+                    type="submit"
+                    class="flex w-full bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 px-5 py-2.5 rounded">
+                    <Icon icon="heroicons-solid:shopping-cart" width="20" />
+                    <span class=" text-sm font-medium">Add All to Cart</span>
+                </button>
+            </form>
+            <form 
+                method="POST" 
+                action="?/removeAllItem"
+                use:enhance={handleClearAll}>
+                <button 
+                    type="submit" 
+                    class="flex w-full bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2.5 rounded">
+                    <Icon icon="mdi:delete" width="20" />
+                    <span class=" font-medium text-sm">Remove All</span>
+                </button>
+            </form>
+        </div>
     </div>
-    <div class="flex space-x-4 items-center text-primary-400 overflow-hidden font-semibold mb-6">
-        <form 
-            method="POST" 
-            action="?/addAllToCart"
-            use:enhance={handleAddAllToCart}>
-            <input type="hidden" name="items" value={JSON.stringify(
-                favData
-                    .filter(item => item.stockInfo.stock > 0)
-                    .map(item => ({
-                        productId: item.id,
-                        stockId: item.stockInfo.id,
-                        manufacturerId: item.manufacturerInfo.id,
-                        distributorId: item.distributorInfo.id,
-                        quantity: item.quantity
-                    })))} />
-            <button 
-                type="submit"
-                class="flex bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 px-5 py-2 rounded">
-                <Icon icon="heroicons-solid:shopping-cart" width="20" />
-                <span class=" text-sm font-medium">Add All to Cart</span>
-            </button>
-        </form>
-        <form 
-            method="POST" 
-            action="?/removeAllItem"
-            use:enhance={handleClearAll}>
-            <button 
-                type="submit" 
-                class="flex bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2 rounded">
-                <Icon icon="mdi:delete" width="20" />
-                <span class=" font-medium text-sm">Remove All</span>
-            </button>
-        </form>
-    </div>
+   
     <div class="space-y-2">
         {#if !paginatedFavorites.length}
             <div class="w-full md:w-full border rounded border-primary-400 bg-white items-center px-4 py-8 md:col-span-2">
                 <p class="text-center text-gray-500">No related items found</p>
             </div>
 		{:else}
-            {#each paginatedFavorites as item (item.id)}
+            {#each paginatedFavorites as item,index}
                 <div class="flex flex-col md:flex-row items-center justify-between p-6 border bg-white border-gray-200 rounded w-full shadow">
                 <img 
                     src={item.image} 
@@ -558,20 +585,27 @@ onMount(() => {
                             </button>
                         </form>
                     </div>
-                    <div class="flex items-center justify-center md:justify-start space-x-4">
+                    <div class="flex items-center">
+                    <input type="number" bind:value={item.quantity}
+                    on:input={e=>handleQty(item,parseInt(e.target.value))}
+                    class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">   
+                    <div class=" {tog === index ? "hidden" : ""} flex items-center justify-center md:justify-start space-x-4">
                         <button 
                             on:click={() => decreaseQuantity(item)} 
                             class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                             disabled={item.quantity <= item.stockInfo.orderMultiple}>
                             -
                         </button>
-                        <span class="text-sm font-medium">{item.quantity}</span>
+                        <button  on:click={async()=>{
+                            tog = index
+                        }} class="text-sm font-medium">{item.quantity}</button>
                         <button 
                             on:click={() => increaseQuantity(item)} 
                             class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
                         >
                             +
                         </button>
+                    </div>
                     </div>
                     {#if item.stockInfo.pricing}
                         <p class="text-sm font-semibold text-gray-800">

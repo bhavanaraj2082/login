@@ -2036,7 +2036,7 @@ export const deleteFavoriteItem = async (itemId, userId) => {
         return {
             status: 'success',
             message: 'Item removed successfully',
-            favorite: updatedDoc.favorite
+            favorite: JSON.parse(JSON.stringify(updatedDoc.favorite))
         };
     } catch (error) {
         console.error('Error deleting favorite item:', error);
@@ -3304,6 +3304,6 @@ export const recurrenceCartActive = async(userId,body) =>{
 
 export const getMyFavorites = async(userId) => {
 	const myFav = await MyFavourites.findOne({userId},{favorite:1,_id:0}).lean()
-	let favorite = JSON.parse(JSON.stringify(myFav.favorite.map(x=>x.productId)))
+	let favorite = JSON.parse(JSON.stringify(myFav.favorite.map(x=>x.stockId)))
 	return {favorite}
 }
