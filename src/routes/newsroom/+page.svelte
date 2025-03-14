@@ -10,7 +10,7 @@
   } from "$env/static/public";
 
   let metadata = {
-    title: `${PUBLIC_WEBSITE_NAME}: Newsroom ` || "Default Product Title",
+    title: `${PUBLIC_WEBSITE_NAME} : Newsroom ` || "Default Product Title",
     description:
       `Find and read the latest news on chemical products and industry events and get the latest updates on what’s happening at ${PUBLIC_WEBSITE_NAME}.` ||
       "Default description",

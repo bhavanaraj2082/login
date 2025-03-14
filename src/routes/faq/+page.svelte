@@ -9,7 +9,7 @@
   } from "$env/static/public";
 
   let metadata = {
-    title: `${PUBLIC_WEBSITE_NAME}: FAQ` || "Default Product Title",
+    title: `${PUBLIC_WEBSITE_NAME} : FAQ` || "Default Product Title",
     description:
       `Frequently asked question's in ${PUBLIC_WEBSITE_NAME}.` ||
       "Default product description",
