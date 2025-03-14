@@ -14,8 +14,8 @@
 		</div> -->
 
 		<div class="flex flex-col items-center justify-center p-4">
-			<div class="w-16 h-16 border-8 border-primary-200 border-t-primary-600 rounded-full animate-spin-slow"></div>
-			<div class="mt-4 text-white font-medium flex items-center animate-pulse">
+			<div class="w-16 h-16 border-8 border-dashed border-primary-200 border-t-primary-600 rounded-full animate-spin-slow"></div>
+			<div class="mt-4 text-white font-semibold text-xl flex items-center animate-pulse">
 				<span class="animate-wave-1">C</span>
 				<span class="animate-wave-2">h</span>
 				<span class="animate-wave-3">e</span>
