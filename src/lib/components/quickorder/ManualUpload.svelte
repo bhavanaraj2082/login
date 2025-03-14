@@ -1296,47 +1296,49 @@
                   aria-label="Quantity"
                   max="999"
                 /> -->
-                <input
-                type="text"
-                min="1"
-                maxlength="3"
-                bind:value={row.quantity}
-                class="w-3/4 sm:ml-1 ml-3 grow text-center border-1 border-gray-200 rounded bg-white font-medium h-10 outline-none py-2 hover:border-primary-400 focus:border-primary-400 focus:ring-0"
-                on:focus={(e) => {
-                  const currentValue = e.target.value;
+                  <input
+                    type="text"
+                    min="1"
+                    maxlength="3"
+                    bind:value={row.quantity}
+                    class="w-3/4 sm:ml-1 ml-3 grow text-center border-1 border-gray-200 rounded bg-white font-medium h-10 outline-none py-2 hover:border-primary-400 focus:border-primary-400 focus:ring-0"
+                    on:focus={(e) => {
+                      const currentValue = e.target.value;
 
-                  setTimeout(() => {
-                    e.target.select();
-                  }, 10);
-                }}
-                on:blur={(e) => {
-                  if (e.target.value === "" || e.target.value === "0") {
-                    row.quantity = 1;
-                    e.target.value = "1";
-                  }
-                }}
-            on:input={(e) => {
+                      setTimeout(() => {
+                        e.target.select();
+                      }, 10);
+                    }}
+                    on:blur={(e) => {
+                      if (e.target.value === "" || e.target.value === "0") {
+                        row.quantity = 1;
+                        e.target.value = "1";
+                      }
+                    }}
+                    on:input={(e) => {
+                      e.target.value = e.target.value.replace(/[^0-9]/g, "");
 
-              e.target.value = e.target.value.replace(/[^0-9]/g, "");
-            
-              if (e.target.value.startsWith("0") && e.target.value.length > 1) {
-                e.target.value = e.target.value.slice(1);
-              }
-            
-              const parsedValue = parseInt(e.target.value, 10);
-            
-              if (parsedValue >= 1 && parsedValue <= 999) {
-                row.quantity = parsedValue;
-              } else {
-                row.quantity = (e.target.value === "" || parsedValue < 1) ? 1 : 0;
-                e.target.value = row.quantity === 1 ? "1" : ""; 
-              }
-              handlePopupInput(e);
-            }}
-            
-                aria-label="Quantity"
-                max="999"
-              />
+                      if (
+                        e.target.value.startsWith("0") &&
+                        e.target.value.length > 1
+                      ) {
+                        e.target.value = e.target.value.slice(1);
+                      }
+
+                      const parsedValue = parseInt(e.target.value, 10);
+
+                      if (parsedValue >= 1 && parsedValue <= 999) {
+                        row.quantity = parsedValue;
+                      } else {
+                        row.quantity =
+                          e.target.value === "" || parsedValue < 1 ? 1 : 0;
+                        e.target.value = row.quantity === 1 ? "1" : "";
+                      }
+                      handlePopupInput(e);
+                    }}
+                    aria-label="Quantity"
+                    max="999"
+                  />
                 </div>
                 <div class="w-1/4">
                   <button
@@ -1708,6 +1710,11 @@
               name="ProductId"
               value={selectedProduct.productNumber}
             />
+            <input
+              type="hidden"
+              name="quantity"
+              value={selectedProduct.quantity}
+            />
 
             <button
               class="flex justify-center items-center w-10 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
@@ -1716,74 +1723,52 @@
               <Icon icon="ic:round-minus" class="text-xl" />
             </button>
 
-            <!-- <input
+            <input
               type="text"
-              name="quantity"
+              min="1"
+              maxlength="4"
               bind:value={selectedProduct.quantity}
-              class="w-16 h-10 text-center p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary-400"
-              on:input={() => {
-                if (selectedProduct.quantity < 1) selectedProduct.quantity = 1;
-                if (selectedProduct.quantity > 9999)
-                  selectedProduct.quantity = 9999;
-                if (
-                  selectedProductIndex !== undefined &&
-                  selectedProductIndex !== null
-                ) {
-                  const updatedRows = [...rows];
-                  if (updatedRows[selectedProductIndex]) {
-                    updatedRows[selectedProductIndex] = {
-                      ...updatedRows[selectedProductIndex],
-                      quantity: selectedProduct.quantity,
-                    };
-                    rows = updatedRows;
-                  }
+              class="w-16 h-10 text-center p-2 border border-gray-300 rounded-lg outline-none focus:ring-0 focus:none focus:border-primary-400"
+              on:focus={(e) => {
+                setTimeout(() => {
+                  e.target.select();
+                }, 10);
+              }}
+              on:blur={(e) => {
+                if (e.target.value === "" || e.target.value === "0") {
+                  selectedProduct.quantity = 1;
+                  e.target.value = "1";
                 }
+              }}
+              on:input={(e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, "");
+
+                if (
+                  e.target.value.startsWith("0") &&
+                  e.target.value.length > 1
+                ) {
+                  e.target.value = e.target.value.slice(1);
+                }
+
+                if (e.target.value.length > 3) {
+                  e.target.value = e.target.value.slice(0, 3);
+                }
+
+                const parsedValue = parseInt(e.target.value, 10);
+
+                if (parsedValue >= 1 && parsedValue <= 999) {
+                  selectedProduct.quantity = parsedValue;
+                } else {
+                  selectedProduct.quantity =
+                    e.target.value === "" || parsedValue < 1 ? 1 : 0;
+                  e.target.value = selectedProduct.quantity === 1 ? "1" : "";
+                }
+
                 updateCartItemsValue();
               }}
-            /> -->
-            <input
-            type="text"
-            min="1"
-            maxlength="4"
-            bind:value={selectedProduct.quantity}
-            class="w-16 h-10 text-center p-2 border border-gray-300 rounded-lg outline-none  focus:ring-0 focus:none focus:border-primary-400"
-            on:focus={(e) => {
-              setTimeout(() => {
-                e.target.select();
-              }, 10);
-            }}
-            on:blur={(e) => {
-              if (e.target.value === "" || e.target.value === "0") {
-                selectedProduct.quantity = 1;
-                e.target.value = "1";
-              }
-            }}
-            on:input={(e) => {
-              e.target.value = e.target.value.replace(/[^0-9]/g, "");
-          
-              if (e.target.value.startsWith("0") && e.target.value.length > 1) {
-                e.target.value = e.target.value.slice(1);
-              }
-          
-              if (e.target.value.length > 3) {
-                e.target.value = e.target.value.slice(0, 3);  
-              }
-          
-              const parsedValue = parseInt(e.target.value, 10);
-          
-          
-              if (parsedValue >= 1 && parsedValue <= 999) {
-                selectedProduct.quantity = parsedValue;
-              } else {
-                selectedProduct.quantity = (e.target.value === "" || parsedValue < 1) ? 1 : 0;
-                e.target.value = selectedProduct.quantity === 1 ? "1" : "";  
-              }
-          
-              updateCartItemsValue();
-            }}
-            aria-label="Quantity"
-            max="9999"
-          />
+              aria-label="Quantity"
+              max="9999"
+            />
             <button
               class="flex justify-center items-center w-10 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
               on:click|preventDefault={increaseQuantity}

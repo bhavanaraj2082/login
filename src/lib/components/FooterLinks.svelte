@@ -45,7 +45,7 @@
 </script>
 <div class="lg:w-11/12 mx-auto max-w-7xl ">
 
-<div class="flex flex-col  md:flex-row lg:px-6 px-4 ">
+<div class="flex flex-col  md:flex-row pt-3 lg:px-4 px-4 ">
     <aside class="w-full md:w-1/3 lg:px-4">
         <h1 class="text-heading font-bold text-lg md:text-2xl">
             {#if contentComponent === Terms}
@@ -59,40 +59,56 @@
             {/if}
         </h1>
 
-        <hr class="border-t-1 border-gray-400 mb-2 mt-12" />
-
+        <hr class="border-b border-gray-100 mb-2 mt-8" />
 
         <button 
-            class={`text-xl font-semibold mb-2 ${contentComponent === Terms ? 'text-primary-400' : 'text-black'}`} 
-            on:click={() => showSection('siteTerms')}
-        >
-            Site Use Terms
-        </button>
-        <hr class="border-t-1 border-gray-400" />
-        
-        <button 
-            class={`text-xl mt-2 font-semibold mb-2 ${contentComponent === Conditions ? 'text-primary-400' : 'text-black'}`} 
-            on:click={() => showSection('conditions')}
-        >
-            General Terms of Sale  
-        </button>
-        <hr class="border-t-1 border-gray-400" />
+  class={`text-xl mt-2 font-semibold mb-2 whitespace-normal ${
+            contentComponent === Terms 
+                ? 'text-primary-400 border-l-4 border-primary-400 pl-2 bg-primary-50 rounded-r' 
+                : 'text-black'
+        }`} 
+        on:click={() => showSection('siteTerms')}
+    >
+        Site Use Terms
+    </button>
+    <hr class="border-b border-gray-300" />
     
-        <button 
-            class={`text-xl mt-2 font-semibold mb-2 ${contentComponent === Privacynotice ? 'text-primary-400' : 'text-black'}`} 
-            on:click={() => showSection('privacynotice')}
-        >
-            Privacy Notice
-        </button>
-        <hr class="border-t-1 border-gray-400" />
-        
-        <button 
-            class={`text-xl mt-2 font-semibold mb-2 ${contentComponent === ProductLicense ? 'text-primary-400' : 'text-black'}`} 
-            on:click={() => showSection('productLicense')}
-        >
-            Product Licenses
-        </button>
-        <hr class="border-t-1 border-gray-400" />
+    <button 
+        class={`text-xl mt-2 font-semibold mb-2 whitespace-normal ${
+            contentComponent === Conditions 
+                ? 'text-primary-400 border-l-4 border-primary-400 pl-2 bg-primary-50 rounded-r' 
+                : 'text-black'
+        }`}
+        on:click={() => showSection('conditions')}
+    >
+        General Terms of Sale  
+    </button>
+    <hr class="border-b border-gray-300" />
+    
+    <button 
+        class={`text-xl mt-2 font-semibold mb-2 whitespace-normal ${
+            contentComponent === Privacynotice 
+                ? 'text-primary-400 border-l-4 border-primary-400 pl-2 bg-primary-50 rounded-r' 
+                : 'text-black'
+        }`}
+        on:click={() => showSection('privacynotice')}
+    >
+        Privacy Notice
+    </button>
+    <hr class="border-b border-gray-300" />
+    
+    <button 
+        class={`text-xl mt-2 font-semibold mb-2 whitespace-normal ${
+            contentComponent === ProductLicense 
+                ? 'text-primary-400 border-l-4 border-primary-400 pl-2 bg-primary-50 rounded-r' 
+                : 'text-black'
+        }`}
+        on:click={() => showSection('productLicense')}
+    >
+        Product Licenses
+    </button>
+    <hr class="border-b border-gray-300" />
+
     </aside> 
 
     <!-- Content Section -->
