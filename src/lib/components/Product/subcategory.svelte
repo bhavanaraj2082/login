@@ -10,6 +10,9 @@
       subcategory.productCount > 0 &&
       subcategory.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  $: console.log("filteredSubcategories :",filteredSubcategories) 
+
 </script>
 
 <div class="w-full mb-8 px-6 lg:px-8 md:w-11/12 mx-auto">
@@ -57,7 +60,7 @@
           >
             <div class="relative">
               <img
-                src="/image/category.jpeg"
+                src="/category/{subcategory.category.name}.webp"
                 alt={subcategory.name}
                 class="w-full h-60 object-cover opacity-90 transition-transform duration-500 ease-in-out group-hover:scale-105 group-hover:opacity-100"
               />

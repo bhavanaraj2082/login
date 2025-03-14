@@ -40,7 +40,7 @@
     schema: {
       "@context": "https://schema.org",
       "@type": "Webpage",
-      name: `Why Register | ${PUBLIC_WEBSITE_NAME}` || "Default Product Title",
+      name: `Feedback | ${PUBLIC_WEBSITE_NAME}` || "Default Product Title",
       description:
         `${PUBLIC_WEBSITE_NAME} is an industry leader in the distribution of quality, chemical products - committed to product availability, service and performance.` ||
         "Default product description",
