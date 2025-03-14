@@ -72,24 +72,30 @@
 				<span><Icon icon="radix-icons:double-arrow-down" class="w-8 h-5 text-white" /></span>
 			</h2>
 			<div class="flex flex-col text-sm bg-primary-50 rounded-lg h-full">
-				<button
+				<!-- <button
 					on:click={() => handleClick('invoice')}
 					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
 				>
 					Invoice
-				</button>
+				</button> -->
 				<button
-					on:click={() => handleClick('quotes')}
-					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
-				>
-					Quotes
-				</button>
-				<button
+    on:click={() => window.location.href = '/quotes'}
+    class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
+>
+    Quotes
+</button>
+				<!-- <button
 					on:click={() => handleClick('order-status')}
 					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
 				>
-					Order Status
-				</button>
+				
+				</button> -->
+				<button
+				on:click={() => window.location.href = '/order-status'}
+				class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
+			>
+			Order Status
+			</button>
 				<button
 					on:click={() => handleClick('order-configuration')}
 					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
@@ -119,30 +125,37 @@
 				<span><Icon icon="radix-icons:double-arrow-down" class="w-8 h-5 text-white" /></span>
 			</h2>
 			<div class="flex flex-col text-sm bg-primary-50 rounded-lg h-full">
-				<button
+				<!-- <button
 					on:click={() => handleClick('update-billing')}
 					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
 				>
 					Update Billing
-				</button>
-				<button
+				</button> -->
+				<!-- <button
 					on:click={() => handleClick('shipping-info')}
 					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
 				>
 					Shipping info
-				</button>
+				</button> -->
 				<button
-					on:click={() => handleClick('password-reset')}
-					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
-				>
-					Password reset
-				</button>
-				<button
+				on:click={() => {
+					if (data && data?.profile?.email) {
+						window.location.href = '/reset-password';
+					} else {
+				
+						window.location.href = '/forgot';
+					}
+				}}
+				class="px-4 py-2 rounded m-2 hover:font-semibold shadow"
+			>
+				Password reset
+			</button>
+				<!-- <button
 					on:click={() => handleClick('update-email')}
 					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
 				>
 					Update Email
-				</button>
+				</button> -->
 				<button
 					on:click={() => handleClick('Other-account-issues')}
 					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
@@ -166,12 +179,18 @@
 				>
 					Pricing & Availability
 				</button>
-				<button
+				<!-- <button
 					on:click={() => handleClick('product-documentation')}
 					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
 				>
 					Product Documentation
-				</button>
+				</button> -->
+				<button
+				on:click={() => window.location.href = '/documents'}
+				class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
+			>
+			Product Documentation
+			</button>
 				<button
 					on:click={() => handleClick('product-technical-issues')}
 					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
