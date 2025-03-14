@@ -7,6 +7,9 @@ export default {
 				workSans:["Work Sans","sans-serif"],
 				montserrat:["Montserrat","sans-serif"]
 			},
+			screens:{
+				"xs":"400px"
+			},
 			colors:{
 				primary:{
 					"50":"#fff3f1",

@@ -1605,7 +1605,7 @@ export const getCart = async(userId,cartId)=>{
               stock: 1,
               orderedQty:1,
               pricing: 1,
-              ordermultiple: 1,
+              orderMultiple: 1,
             }
           }
         ],

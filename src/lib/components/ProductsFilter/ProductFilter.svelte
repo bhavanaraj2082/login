@@ -8,7 +8,7 @@
     import Icon from "@iconify/svelte";
 	import { authedUser,currencyState,cartTotalComps } from '$lib/stores/mainStores.js';
     import { enhance } from "$app/forms";
-    import { tick } from 'svelte';
+    import { onMount, tick } from 'svelte';
 
     export let products
     export let manufacturers
@@ -65,31 +65,18 @@ function handleMouseLeave() {
 		selectedImage = null;
 	}
 
-    const sortBy = (checked, sortType) => {
-    let sortedBy;
-    selectedSort = sortType
-    const productsCopy = [...products];
-
-    if (checked) { 
-        switch (sortType) {
-            case "desc":
-                sortedBy = productsCopy.sort((a, b) => b.pricing.INR - a.pricing.INR);
-                break;
-            case "asc":
-                sortedBy = productsCopy.sort((a, b) => a.pricing.INR - b.pricing.INR);
-                break;
-            case "name":
-                sortedBy = productsCopy.sort((a, b) => a.productName.localeCompare(b.productName));
-                break;
-            default:
-                sortedBy = [...products]; 
-        }
-    } else {
-        sortedBy = [...products];
+    const fetchMyFav = ()=>{
+        const formdata = new FormData()
+		sendMessage("/?/getFavorites",formdata,async(result)=>{
+			console.log(result.favorite);
+			myFavorites.set(result.favorite)
+			localStorage.setItem("myfavorites",JSON.stringify(result.favorite))
+		})
     }
 
-    paginatedProducts = sortedBy;
-    };
+    onMount(()=>{
+        fetchMyFav()
+    })
  
     const handleManufacturer = (searchTerm) => {
         if (!searchTerm) {
@@ -321,14 +308,14 @@ function handleMouseLeave() {
   const handleFavorites = (product)=>{
     try {
        // console.log(product);
-    addLocalToFavorites(product._id)
+    addLocalToFavorites(product.stockId)
     let formdata = new FormData()
     formdata.append("authedEmail",$authedUser.email)
     formdata.append("productId",product._id)
     formdata.append("manufacturerId",product.manufacturerDetails._id)
     formdata.append("stockId",product.stockId)
     formdata.append("distributorId",product.distributorId)
-    formdata.append("quantity",product.quantity)
+    formdata.append("quantity",product.stockDetails.orderMultiple)
     formdata.append("stock",product.stock)
     sendMessage("?/favorite",formdata,async(result)=>{
         console.log(result);
@@ -473,9 +460,9 @@ function handleMouseLeave() {
        {#each paginatedProducts as product,index}
         <div class=" relative bg-white shadow p-2 sm:p-4 md:px-8 space-y-2 rounded">
             <button on:click={()=>handleFavorites(product)} class=" absolute top-6 right-6">
-                <Icon icon={$myFavorites.find(x=> x === product._id) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
+                <Icon icon={$myFavorites.find(x=> x === product.stockId) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
             </button>
-            <div>
+            <div class=" w-10/12 ">
                 <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{product?.productName  || ""}</a>
             </div>
             <div class=" flex items-start gap-2 md:gap-8">
@@ -560,7 +547,7 @@ function handleMouseLeave() {
 							    class=" p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
 							    <Icon icon="rivet-icons:plus" class="text-xs" />
 						    </button>
-					</div>
+					        </div>
                             </div>
                         </div>
                         <button type="button" on:click={()=>addToCart(product)} class="text-xs flex items-center gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded transition ease-in-out duration-300">
@@ -600,7 +587,7 @@ function handleMouseLeave() {
                 </div>
                 <button type="button" on:click={()=>addToCart(product)} class=" text-xs sm:text-sm px-3 py-1 flex items-center gap-1 sm:p-1.5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded ">
                     <Icon icon="mdi:cart" class="text-xl" />
-                    Add to Cart
+                    <span class="hidden xs:block">Add to Cart</span>
                 </button>
             </div>
         </div>

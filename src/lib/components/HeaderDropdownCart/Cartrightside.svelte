@@ -94,15 +94,16 @@
 		clearTimeout(timeout);
 		if (quantity > 10000000) quantity = 10000000;
 		timeout = setTimeout(() => {
-		if(quantity < 1 ) quantity = 1
-			
+		if(quantity <= stock.orderMultiple ) quantity = stock.orderMultiple
+		const selectedQty = Math.ceil(quantity/ stock.orderMultiple) * stock.orderMultiple
+		
 		if (!isLoggedIn) {
 			cart.update((item) => {
-				item[indx].quantity = quantity;
+				item[indx].quantity = selectedQty;
 				return item;
 			});
 			guestCart.update((item) => {
-				item[indx].quantity = quantity;
+				item[indx].quantity = selectedQty;
 				return item;
 			});
 			calculateTotalPrice($cart);
@@ -113,14 +114,14 @@
 
 
 		const index = $cart.findIndex((item) => item._id === _id);
-		if (index !== -1) {
+		
+		timeout = setTimeout(() => {
+			if (index !== -1) {
 			cart.update((item) => {
-				item[index].quantity = quantity;
+				item[index].quantity = Math.ceil(quantity/ stock.orderMultiple) * stock.orderMultiple;
 				return item;
 			});
-		}
-
-		timeout = setTimeout(() => {
+		    }
 			const formdata = new FormData();
 			formdata.append("_id", _id);
 			formdata.append("stock", stock);
@@ -140,13 +141,13 @@
 		// console.log("indx",indx);
 		if (!isLoggedIn) {
 			cart.update((item) => {
-				item[indx].quantity += 1;
+				item[indx].quantity += item[indx].stockDetails.orderMultiple;
 				return item;
 			});
 			// console.log("afterrrrrrrrrrr updationn",$cart);
 
 			guestCart.update((item) => {
-				item[indx].quantity += 1;
+				item[indx].quantity += item[indx].stockDetails.orderMultiple;
 				return item;
 			});
 			calculateTotalPrice($cart);
@@ -156,7 +157,7 @@
 		const index = $cart.findIndex((item) => item._id === _id);
 		if (index !== -1) {
 			cart.update((item) => {
-				item[index].quantity += 1;
+				item[index].quantity += item[indx].stockDetails.orderMultiple;
 				return item;
 			});
 		}
@@ -176,19 +177,16 @@
 
 	const decrementQuantity = (stock, _id, indx) => {
 		clearTimeout(timeout);
-		// console.log("stock",stock);
-		// console.log("_id",_id);
-		// console.log("indx",indx);
 		if (!isLoggedIn) {
 
 			cart.update((item) => {
-				if(item[indx].quantity === 1) return item
-				item[indx].quantity -= 1;
+				if(item[indx].quantity <= stock.orderMultiple) return item
+				item[indx].quantity -= item[indx].stockDetails.orderMultiple;
 				return item;
 			});
 			guestCart.update((item) => {
-				if(item[indx].quantity === 1) return item
-				item[indx].quantity -= 1;
+				if(item[indx].quantity <= stock.orderMultiple) return item
+				item[indx].quantity -= item[indx].stockDetails.orderMultiple;
 				return item;
 			});
 			calculateTotalPrice($cart);
@@ -196,12 +194,11 @@
 		}
 		const index = $cart.findIndex((item) => item._id === _id);
 		if (index !== -1) {
-			if ($cart[index]?.quantity !== 1) {
 				cart.update((item) => {
-					item[index].quantity -= 1;
+				if(item[indx].quantity <= stock.orderMultiple) return item
+					item[index].quantity -= item[index].stockDetails.orderMultiple;
 					return item;
 				});
-			}
 		}
 		timeout = setTimeout(() => {
 			const formdata = new FormData();
@@ -500,7 +497,7 @@
 										on:input={(e) =>
 											handleQty(
 												parseInt(e.target.value),
-												item.stockDetails.stock,
+												item.stockDetails,
 												item._id,
 												index,
 											)}
@@ -520,7 +517,7 @@
 												item.isQuote}
 											on:click={() =>
 												decrementQuantity(
-													item.stockDetails.stock,
+													item.stockDetails,
 													item._id,
 													index,
 												)}
@@ -543,7 +540,7 @@
 												item.isQuote}
 											on:click={() =>
 												incrementQuantity(
-													item.stockDetails.stock,
+													item.stockDetails,
 													item._id,
 													index,
 												)}
