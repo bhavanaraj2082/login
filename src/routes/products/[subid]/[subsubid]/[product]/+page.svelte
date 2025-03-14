@@ -52,5 +52,5 @@
 <Description data={data.productData} />
 {/if}
 {#if data.compareSimilarity.length !== 0}
-    <CompSimItems compareSimilarity={data.compareSimilarity}/>
+    <CompSimItems compareSimilarity={data.compareSimilarity} data={data.productData}/>
 {/if} 

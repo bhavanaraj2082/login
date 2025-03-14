@@ -38,12 +38,10 @@
           class="items-center justify-between border-dotted border-b-2 border-gray-300 pb-2"
         >
           <div class="text-lg font-semibold relative">
-            {product?.productNumber} - {product?.priceSize[index]?.break}
             <div class="relative inline-block tooltip-container">
-              <button on:click={toggleTooltip} class="ml-1 text-primary-400">
+              <button on:click={toggleTooltip} class="text-primary-400">
                 <Icon icon="akar-icons:info-fill" class="text-md" />
               </button>
-
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               {#if showTooltip}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -75,6 +73,7 @@
                 </div>
               {/if}
             </div>
+            {product?.productNumber} - {product?.priceSize[index]?.break}
           </div>
           <span class="text-lg font-semibold">
             {#if $currencyState === "usd"}
@@ -218,16 +217,20 @@
           min="1"
           maxlength="3"
           bind:value={quantity}
-          class="w-12 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
+          class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
           on:focus={(e) => {
             const currentValue = e.target.value;
-            e.target.value = "";
             setTimeout(() => {
               e.target.select();
             }, 10);
           }}
           on:blur={(e) => {
-            if (e.target.value === "" || e.target.value === "0") {
+            if (
+              e.target.value === "" ||
+              e.target.value === "0" ||
+              e.target.value === "00" ||
+              e.target.value === "000"
+            ) {
               quantity = 1;
               e.target.value = "1";
             }
@@ -239,10 +242,15 @@
             }
             const parsedValue = parseInt(e.target.value, 10);
 
-            if (parsedValue && parsedValue >= 1 && parsedValue <= 999) {
+            if (parsedValue >= 1 && parsedValue <= 999) {
               quantity = parsedValue;
-            } else if (e.target.value === "") {
-              quantity = 0;
+            }
+            // else if (e.target.value === "") {
+            //   quantity = 1;
+            // }
+            else {
+              quantity = e.target.value === "" || parsedValue < 1 ? 1 : 0;
+              e.target.value = quantity === 1 ? "1" : "";
             }
 
             updateQuantity(e);

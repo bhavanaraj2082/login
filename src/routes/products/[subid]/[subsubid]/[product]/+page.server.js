@@ -7,6 +7,10 @@ import { sanitizeFormData } from "$lib/utils/sanitize.js";
 import Profile from "$lib/server/models/Profile.js";
 import TokenVerification from "$lib/server/models/TokenVerification.js";
 import { favorite, checkavailabilityproduct } from "$lib/server/mongoActions.js";
+import { APP_URL } from '$env/static/private';
+import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
+import sendemail from '$lib/data/sendemail.json';
+import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
 
 export async function load({ params, locals }) {
   let authedUser = {};
@@ -67,7 +71,13 @@ export const actions = {
   createQuote: async ({ request }) => {
     try {
       const data = Object.fromEntries(await request.formData());
-      // console.log("quotee data in server js",data);
+      console.log("quotee data in server js",data);
+      async function getClientIP() {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+      }
+      const ipAddress = await getClientIP();
       const components = {
         productName: data.productName,
         productNumber: data.productNumber,
@@ -89,8 +99,52 @@ export const actions = {
         },
       };
 
+
       const record = await CreateProductQuote(formattedData);
-      // return record;
+      const targetEmailContent = sendemail.emailTemplatequote
+      .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
+      .replaceAll('{{APP_URL}}', APP_URL)
+      .replaceAll('{{productName}}', formattedData.Configure_custom_solution.components.productName || '')
+      .replaceAll('{{productNumber}}', formattedData.Configure_custom_solution.components.productNumber || '')
+      .replaceAll('{{units}}', formattedData.Configure_custom_solution.units || '')
+      .replaceAll('{{Firstname}}', formattedData.Customer_details.Firstname || '')
+      .replaceAll('{{Lastname}}', formattedData.Customer_details.Lastname || '')
+      .replaceAll('{{organisation}}', formattedData.Customer_details.organisation || '')
+      .replaceAll('{{email}}', formattedData.Customer_details.email || '')
+      .replaceAll('{{phone}}', formattedData.Customer_details.number || '')
+      .replaceAll('{{futherdetails}}', formattedData.Additional_notes || '')
+      .replaceAll('{{ipAddress}}', formattedData.ipAddress || ''); 
+
+    try {
+      await sendNotificationEmail(
+        `New Quote Created – ${PUBLIC_WEBSITE_NAME}`,
+        targetEmailContent
+      );
+    } catch (error) {
+      console.error('Error sending notification email to the team:', error);
+    }
+    const userEmailContent = sendemail.emailTemplatequoteuser
+      .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
+      .replaceAll('{{APP_URL}}', APP_URL)
+      .replaceAll('{{productName}}', formattedData.Configure_custom_solution.components.productName || '')
+      .replaceAll('{{productNumber}}', formattedData.Configure_custom_solution.components.productNumber || '')
+      .replaceAll('{{units}}', formattedData.Configure_custom_solution.units || '')
+      .replaceAll('{{Firstname}}', formattedData.Customer_details.Firstname || '')
+      .replaceAll('{{Lastname}}', formattedData.Customer_details.Lastname || '')
+      .replaceAll('{{organisation}}', formattedData.Customer_details.organisation || '')
+      .replaceAll('{{email}}', formattedData.Customer_details.email || '')
+      .replaceAll('{{phone}}', formattedData.Customer_details.number || '')
+      .replaceAll('{{futherdetails}}', formattedData.Additional_notes || '');
+
+    try {
+      await sendEmailToUser(
+        `Your Quote Confirmation – ${PUBLIC_WEBSITE_NAME}`,
+        userEmailContent,
+        formattedData.Customer_details.email
+      );
+    } catch (error) {
+      console.error('Error sending confirmation email to the user:', error);
+    }
       return {
         success: true,
         message: "Submitted the quotes successfully!.",

@@ -1,8 +1,6 @@
 <script>
   import Icon from "@iconify/svelte";
-  import { onMount } from "svelte";
   import { enhance, applyAction } from "$app/forms";
-  import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
 
   export let data;
   export let CheckAvailabilityClose;
@@ -17,8 +15,6 @@
   let stockAvailability = "";
   let stockType = "";
   let stockUnAvailability = "";
-  let cartNotification = "";
-  let notificationTimeout;
 </script>
 
 {#each data.records as product}
@@ -65,39 +61,43 @@
             min="1"
             maxlength="3"
             bind:value={quantity}
-            class="w-12 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
+            class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
             on:focus={(e) => {
               const currentValue = e.target.value;
-              e.target.value = "";
               setTimeout(() => {
                 e.target.select();
               }, 10);
             }}
             on:blur={(e) => {
-              if (e.target.value === "" || e.target.value === "0") {
+              if (
+                e.target.value === "" ||
+                e.target.value === "0" ||
+                e.target.value === "00" ||
+                e.target.value === "000"
+              ) {
                 quantity = 1;
                 e.target.value = "1";
               }
             }}
             on:input={(e) => {
-              // Ensure only numbers are allowed
               e.target.value = e.target.value.replace(/[^0-9]/g, "");
-
-              // If the value starts with '0' but has more than one character, remove the leading zero
               if (e.target.value.startsWith("0") && e.target.value.length > 1) {
                 e.target.value = e.target.value.slice(1);
               }
-
-              // Parse the input value and update quantity
               const parsedValue = parseInt(e.target.value, 10);
 
-              if (parsedValue && parsedValue >= 1 && parsedValue <= 999) {
+              if (parsedValue >= 1 && parsedValue <= 999) {
                 quantity = parsedValue;
-              } else if (e.target.value === "") {
-                quantity = 0; // Set to 0 if empty
+              }
+              // else if (e.target.value === "") {
+              //   quantity = 1;
+              // }
+              else {
+                quantity = e.target.value === "" || parsedValue < 1 ? 1 : 0;
+                e.target.value = quantity === 1 ? "1" : "";
               }
 
-              updateQuantity(e); // Handle additional input logic if needed
+              updateQuantity(e);
             }}
             aria-label="Quantity"
             max="999"

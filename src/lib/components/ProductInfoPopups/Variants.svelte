@@ -71,12 +71,12 @@
             <th scope="col" class="py-3 px-6">Product Number</th>
             <th scope="col" class="py-3 px-6">Manufacturer</th>
 
-            {#if allVariants.some((variant) => {
+            <!-- {#if allVariants.some((variant) => {
               const { minPriceINR, maxPriceINR, minPriceUSD, maxPriceUSD } = getMinMaxPrices(variant.pricing);
               return minPriceINR !== "--" && maxPriceINR !== "--" && minPriceUSD !== "--" && maxPriceUSD !== "--";
-            })}
-              <th scope="col" class="py-3 px-6">Price Range</th>
-            {/if}
+            })} -->
+            <th scope="col" class="py-3 px-6">Price Range</th>
+            <!-- {/if} -->
             <th scope="col" class="py-3 px-6"></th>
           </tr>
         </thead>
@@ -110,50 +110,46 @@
                 {variant.productNumber}
               </td>
               <td class="py-4 px-6">{allManufacturer.name}</td>
-              {#if minPriceINR !== "--" && maxPriceINR !== "--" && minPriceUSD !== "--" && maxPriceUSD !== "--"}
-                <td class="py-4 px-6">
-                  <span>
-                    {#if $currencyState === "usd"}
-                      {#if minPriceUSD === maxPriceUSD && minPriceUSD !== "--"}
-                        <span class="font-semibold text-black">
-                          $ {minPriceUSD.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </span>
-                        <!-- {:else if minPriceUSD === "--" && maxPriceUSD === "--"}
+              <!-- {#if minPriceINR !== "--" && maxPriceINR !== "--" && minPriceUSD !== "--" && maxPriceUSD !== "--"} -->
+              <td class="py-4 px-6">
+                <span>
+                  {#if $currencyState === "usd"}
+                    {#if minPriceUSD === maxPriceUSD && minPriceUSD !== "--"}
                       <span class="font-semibold text-black">
-                        Request Quote
-                      </span> -->
-                      {:else}
-                        <span class="font-semibold text-black">
-                          $ {minPriceUSD.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })} - $ {maxPriceUSD.toLocaleString("en-US", {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
-                        </span>
-                      {/if}
-                    {:else if minPriceINR === maxPriceINR && minPriceINR !== "--"}
-                      <span class="font-semibold text-black">
-                        ₹ {minPriceINR.toLocaleString("en-IN")}
+                        $ {minPriceUSD.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                       </span>
-                      <!-- {:else if minPriceINR === "--" && maxPriceINR === "--"}
-                      <span class="font-semibold text-black">
-                        Request Quote
-                      </span> -->
+                    {:else if minPriceUSD === "--" && maxPriceUSD === "--"}
+                      <span class="font-bold text-black px-8"> -- </span>
                     {:else}
                       <span class="font-semibold text-black">
-                        ₹ {minPriceINR.toLocaleString("en-IN")} - ₹ {maxPriceINR.toLocaleString(
-                          "en-IN"
-                        )}
+                        $ {minPriceUSD.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })} - $ {maxPriceUSD.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                       </span>
                     {/if}
-                  </span>
-                </td>
-              {/if}
+                  {:else if minPriceINR === maxPriceINR && minPriceINR !== "--"}
+                    <span class="font-semibold text-black">
+                      ₹ {minPriceINR.toLocaleString("en-IN")}
+                    </span>
+                  {:else if minPriceINR === "--" && maxPriceINR === "--"}
+                    <span class="font-bold text-black px-8"> -- </span>
+                  {:else}
+                    <span class="font-semibold text-black">
+                      ₹ {minPriceINR.toLocaleString("en-IN")} - ₹ {maxPriceINR.toLocaleString(
+                        "en-IN"
+                      )}
+                    </span>
+                  {/if}
+                </span>
+              </td>
+              <!-- {/if} -->
               <td class="py-4 px-6 text-center sm:py-3 sm:px-4">
                 {#if minPriceINR === "--" && maxPriceINR === "--"}
                   <div class="relative group inline-block">
