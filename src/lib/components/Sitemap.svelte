@@ -22,6 +22,9 @@
 
 	function updateCategoryNames(categories) {
 		return categories.map((category) => {
+			if (category.name1 === "Chemistry And Biochemicals") {
+				category.name1 = "Chemistry & Biochemicals"
+			}
 			if (
 				category.name1 === "Molecular Biology And Functional Genomics"
 			) {
@@ -45,7 +48,7 @@
 				category.name2 = "EcoHygiene & Testing";
 			}
 			if (category.name2 === "Food & Beverage Testing & Manufacturing") {
-				category.name2 = "Food & Beverage Test MFG";
+				category.name2 = "Food Beverage Test MFG";
 			}
 			if (category.name2 === "Materials Science and Engineering") {
 				category.name2 = "Material Tech";
