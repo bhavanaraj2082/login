@@ -11,10 +11,11 @@ import { APP_URL } from '$env/static/private';
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import sendemail from '$lib/data/sendemail.json';
 import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
+import { error } from "@sveltejs/kit";
 
 export async function load({ params, locals }) {
   let authedUser = {};
-  if (locals.authedUser && locals.authedUser?.username) {
+  if (locals.authedUser?.username) {
     authedUser = locals.authedUser;
   }
   try {
@@ -26,14 +27,10 @@ export async function load({ params, locals }) {
     ]);
 
     const [productData, relatedProducts, compareSimilarity, isFavorite] =
-      results.map((result) =>
-        result.status === "fulfilled" ? result.value : []
-      );
+      results.map((result) => (result.status === "fulfilled" ? result.value : []));
 
-    if (productData.type === "error") {
-      return {
-        error: productData.message,
-      };
+    if (!productData || productData.type === "error" || Object.keys(productData).length === 0) {
+      throw error(404, "Product not found");
     }
     return {
       productData,
@@ -42,11 +39,12 @@ export async function load({ params, locals }) {
       isFavorite,
       authedUser,
     };
-  } catch (error) {
-    console.error("Error loading product data:", error);
-    return {
-      error: "Failed to load product data.",
-    };
+  } catch (err) {
+    console.error("Error loading product data:", err);
+    if (err.status === 404) {
+      throw err;
+    }
+    throw error(500, "Failed to load product data.");
   }
 }
 

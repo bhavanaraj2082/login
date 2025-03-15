@@ -7,12 +7,12 @@
     
     $: status = $page.status;
     $: message = $page.error?.message || "Something went wrong. Please try again later.";
-    
+    // console.log(message,"message");
     // console.log("Page error:", $page.error);
   </script>
   
   {#if status === 404}
-    <Error404 />
+    <Error404 {message} />
   {:else if status === 503}
     <Error503 />
   {:else}
