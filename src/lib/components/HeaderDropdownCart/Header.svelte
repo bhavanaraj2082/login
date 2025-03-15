@@ -262,8 +262,10 @@ async function submitForm() {
 
 	function handleInput(event) {
 		searchQuery = event.target.value;
+		if (searchQuery.length >= 3) {
 		isLoading = true;
 		debounce(handleSearchSubmit, 300);
+		}
 	}
 
 	function handleData() {
@@ -605,7 +607,7 @@ async function submitForm() {
 						<Icon icon="ei:spinner" class="w-8 h-8 animate-spin-slow text-primary-600 mx-2 text-5xl"/>
 						<span>Loading Products...</span>
 					</p>
-				{:else if searchQuery.trim() && searchResults && searchResults.length === 0}
+					{:else if searchQuery.trim().length >= 3 && searchResults && searchResults.length === 0}
 					<p class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-30 rounded">
 						No products found
 					</p>
