@@ -4,7 +4,6 @@
   let subsubcategoryData = data.subsubcategoryData;
   let relatedProducts = data?.relatedProducts;
   //console.log("form subsubcategory",relatedProducts);
-
 </script>
 
 <section class="w-11/12 mx-auto mb-3 max-w-7xl">
@@ -18,10 +17,10 @@
     </div>
 
     <div class="flex-grow w-full lg:w-2/3">
-      <h1 class="text-3xl font-semibold text-primary-400">
+      <h1 class="text-2xl font-semibold text-heading">
         {subsubcategoryData?.name}
       </h1>
-      <p class="mt-2 text-md text-gray-600">
+      <p class="mt-2 text-base text-gray-600">
         {subsubcategoryData?.description}
       </p>
     </div>
