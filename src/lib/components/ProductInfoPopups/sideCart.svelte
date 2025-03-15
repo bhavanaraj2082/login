@@ -1,6 +1,6 @@
 <script>
   import Icon from "@iconify/svelte";
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { enhance, applyAction } from "$app/forms";
   import { toast, Toaster } from "svelte-sonner";
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
@@ -9,11 +9,11 @@
   import CheckAvailability from "./CheckAvailability.svelte";
   import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
 
+  export let showTooltip;
   export let data;
   export let quantity;
   export let index;
   export let toggleTooltip;
-  export let showTooltip;
   export let togglePopup;
   export let showPopup;
   export let decreaseQuantity;
@@ -26,56 +26,46 @@
   function toggleSharePopup() {
     showSharePopup = !showSharePopup;
   }
+
 </script>
 
 {#each data.records as product}
-  <div
-    class="p-3 space-x-4 justify-between items-center flex-col lg:flex-row m-3 lg:w-3/12"
-  >
+  <div class="p-4 justify-between items-center flex-col lg:flex-row m-2 lg:w-3/12">
     <div class="flex flex-col w-full">
       <div class="text-gray-800">
-        <div
-          class="items-center justify-between border-dotted border-b-2 border-gray-300 pb-2"
-        >
-          <div class="text-lg font-semibold relative">
+        <div class="items-center justify-between border-dotted border-b-2 border-gray-300 pb-2">
+          <div class="text-md font-semibold relative flex">
             <div class="relative inline-block tooltip-container">
               <button on:click={toggleTooltip} class="text-primary-400">
-                <Icon icon="akar-icons:info-fill" class="text-md" />
+                <Icon icon="akar-icons:info-fill" class="text-sm font-semibold" />
               </button>
               <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
               {#if showTooltip}
-                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <div
-                  class="absolute border border-primary-200 bottom-full left-1/2 transform -translate-x-1/2 bg-white text-black text-center w-56 text-sm rounded-md p-2 shadow-lg animate-fadeIn"
-                >
+                <div class="absolute border border-primary-200 bottom-full left-1/2 transform -translate-x-1/2 bg-white text-black text-center w-56 text-sm rounded-md p-2 shadow-lg animate-fadeIn">
                   <button
                     on:click={() => (showTooltip = false)}
-                    class="absolute top-1 right-2 text-black"
-                  >
+                    class="absolute top-1 right-2 text-black">
                     <Icon
                       icon="mdi:close"
-                      class="absolute top-1 right-2 text-black text-sm font-bold"
-                    />
+                      class="absolute top-1 right-2 text-black text-sm font-bold"/>
                   </button>
-
                   <h2 class="font-semibold text-sm text-black text-left">
                     Product Information
                   </h2>
                   <p class="text-xs font-normal text-gray-800 mt-1 text-left">
                     Foreign Trade Commodity Code: <span
-                      class="text-gray-500 font-medium"
-                      >{product?.productNumber}</span
-                    >
+                      class="text-gray-500 font-medium">{product?.productNumber}</span>
                   </p>
-                  <div
-                    class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-gray-700 border-transparent border-t-primary-300"
-                  ></div>
+                  <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-gray-700 border-transparent border-t-primary-300"></div>
                 </div>
               {/if}
             </div>
-            {product?.productNumber} - {product?.priceSize[index]?.break}
+            <p class=" ml-2">
+              {product?.productNumber} - {product?.priceSize[index]?.break}
+            </p>
           </div>
-          <span class="text-lg font-semibold">
+          <span class="text-lg font-semibold mt-4">
             {#if $currencyState === "usd"}
               $ {(product?.priceSize[index]?.USD ?? 0).toLocaleString("en-US", {
                 minimumFractionDigits: 2,
@@ -92,26 +82,24 @@
       </div>
 
       <div class="border-dotted border-b-2 border-gray-300 pb-2 mb-2">
-        <p class="text-gray-800 font-semibold text-sm mt-4">Availability</p>
-        <p class="text-sm">
-          {#if product?.stockQuantity > 0}
-            Available <Icon
-              icon="ix:success-filled"
-              class="text-base text-green-500 inline font-bold"
-            />
-          {:else}
-            Out of stock <Icon
-              icon="ix:error-filled"
-              class="text-base text-red-500 font-bold inline"
-            />
-          {/if}
-        </p>
-        <div class="flex space-x-2 items-center mt-2">
+        <span class="flex justify-between items-center ">
+          <p class="text-heading font-semibold md:text-sm text-xs mt-4 whitespace-nowrap">Availability :</p>
+          <p class="md:text-sm text-xs font-medium mt-4 ml-2 whitespace-nowrap">
+            {#if product?.stockQuantity > 0}
+              Available <Icon
+                icon="ix:success-filled"
+                class="text-base text-green-500 inline font-bold"/>
+            {:else}
+              Out of stock <Icon
+                icon="ix:error-filled"
+                class="text-base text-red-500 font-bold inline"/>
+            {/if}
+          </p>
+        </span>
+        <div class="flex space-x-2 items-center mt-4 mb-2">
           <button
             on:click={togglePopup}
-            class="w-full text-sm font-semibold text-left text-primary-400"
-            >More Info</button
-          >
+            class="w-full text-sm font-semibold text-left text-primary-400">More Info</button>
           {#if showPopup}
             <CheckAvailability
               {data}
@@ -142,13 +130,13 @@
 
     <div class="w-full !ml-0">
       {#if quantity > 0}
-        <div class="mt-4 flex justify-between gap-3">
+        <div class="mt-2 flex justify-between gap-3">
           <div class="flex flex-col text-heading">
-            <p class="font-normal text-xs">Quantity</p>
-            <p class="font-semibold text-sm">{quantity}</p>
+            <p class="font-medium text-sm">Quantity</p>
+            <p class="font-semibold text-center text-md mt-4">{quantity}</p>
           </div>
           <div class="flex flex-col text-heading">
-            <p class="font-normal text-xs py-px">
+            <p class="font-normal flex justify-between items-center text-xs py-px  whitespace-nowrap">
               Base Price:
               <span class="font-medium text-xs">
                 {#if $currencyState === "usd"}
@@ -169,9 +157,7 @@
               </span>
             </p>
 
-            <p
-              class="font-normal text-xs border-b-1 border-gray-400 border-dotted pb-px"
-            >
+            <p class="font-normal flex justify-between items-center mt-2 text-xs border-b-1 border-gray-400 border-dotted pb-px whitespace-nowrap">
               GST (18%):
               <span class="font-medium text-xs">
                 {#if $currencyState === "usd"}
@@ -186,7 +172,7 @@
               </span>
             </p>
 
-            <p class="font-normal text-xs">
+            <p class="font-medium text-xs mt-2 flex justify-between items-center  whitespace-nowrap">
               Total Price:
               <span class="font-semibold text-xs">
                 {#if $currencyState === "usd"}
@@ -204,14 +190,10 @@
         </div>
       {/if}
 
-      <div
-        class="flex items-center border border-gray-300 rounded-sm justify-between w-full space-x-4 mt-6"
-      >
+      <div class="flex items-center border border-gray-300 justify-between w-full space-x-4 mt-5  rounded-md">
         <button
           on:click={decreaseQuantity}
-          class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
-          ><Icon icon="ic:round-minus" class="text-2xl" /></button
-        >
+          class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"><Icon icon="ic:round-minus" class="text-2xl" /></button>
         <input
           type="text"
           min="1"
@@ -273,12 +255,11 @@
               cartTogglePopup();
             }
           }}
-          class="w-full text-white border border-primary-400 rounded-lg py-2 px-2
-hover:bg-primary-400 bg-primary-400 hover:text-white
-{quantity < 1 ? 'cursor-not-allowed hover:opacity-65' : ''}"
-          disabled={quantity < 1}
-        >
-          <Icon icon="ic:round-shopping-cart" class="text-2xl inline mr-1" />
+          class="w-full text-white border flex justify-center items-center border-primary-400 rounded-md py-1.5 font-medium px-2
+          hover:bg-primary-400 bg-primary-400 hover:text-white
+          {quantity < 1 ? 'cursor-not-allowed hover:opacity-65' : ''}"
+          disabled={quantity < 1}>
+          <Icon icon="ic:round-shopping-cart" class=" inline text-xl mr-1" />
           Add To Cart
         </button>
       </div>
