@@ -102,7 +102,7 @@ errors.phoneNumber = 'Please select the country before entering the phone number
 return;
 }
 
-if (!phoneNumber || phoneNumber.trim() === '') {
+if (!phoneNumber || phoneNumber === '') {
 errors.phoneNumber = 'Required for the selected country';
 } else {
 const countryDetails = getCountryByCode(country);
@@ -130,7 +130,7 @@ if (!phoneRegex.test(phoneNumber)) {
 
 if (!fieldName || fieldName === 'country') {
 if (!country) {
-errors.country = 'Location is required';
+errors.country = 'Country is required';
 } else {
 delete errors.country;
 }
@@ -152,7 +152,7 @@ delete errors.companyName;
 }
 if (!fieldName || fieldName === 'issue') {
 if (!issue ) {
-errors.issue = 'Please select one of the reference options (PO Number, Order Number, or Invoice Number)';
+errors.issue = 'Please select one of the  options ';
 
 // toast.error('Please select the option');
 } else {
@@ -428,9 +428,59 @@ if (
 }
 }
 
+// function handleInputChange(event) {
+// searchTerm = event.target.value;
+// filterCountries();
+// }
+
+
+
 function handleInputChange(event) {
-searchTerm = event.target.value;
-filterCountries();
+  // Get the current input value
+  searchTerm = event.target.value;
+  
+  // Track if user is deleting text
+  const isDeleting = event.inputType === 'deleteContentBackward' || 
+                     event.inputType === 'deleteContentForward';
+  
+  if (searchTerm.length > 0 && !isDeleting) {
+    // Filter countries
+    filterCountriesWithoutAutoSelect();
+    
+    // Show dropdown with filtered results
+    showDropdown = filteredCountries.length > 0;
+    
+    // Check for country code matches specifically
+    const codeSearch = searchTerm.replace('+', '').trim();
+    if (codeSearch.length > 0) {
+      const exactCodeMatches = filteredCountries.filter(
+        (country) => country.code.replace('+', '') === codeSearch
+      );
+
+      if (exactCodeMatches.length === 1) {
+        selectCountry(exactCodeMatches[0]);
+        return;
+      }
+    }
+
+    const countriesStartingWith = filteredCountries.filter(
+      (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+    );
+    
+    if (countriesStartingWith.length === 1) {
+      selectCountry(countriesStartingWith[0]);
+    }
+  } else {
+    filterCountriesWithoutAutoSelect();
+    showDropdown = filteredCountries.length > 0;
+  }
+}
+function filterCountriesWithoutAutoSelect() {
+  filteredCountries = countries.filter(
+    (country) =>
+      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
+  );
 }
 
 let filteredCountries = countries;
@@ -666,7 +716,7 @@ Haiti: /^\d{8}$/,
 Tonga: /^\d{7}$/
 };
 function validatePhoneNumber(countryCode, phoneNumber) {
-if (!phoneNumber || !countryCode || phoneNumber.trim() === '') {
+if (!phoneNumber || !countryCode || phoneNumber === '') {
   // errors.contactNumber = `*Required`;
   return false;
 }
@@ -713,7 +763,7 @@ validateField('email');
 validateField('phoneNumber');
 validateField('companyName');
 validateField('country');
-validateField('accountNumber');
+// validateField('accountNumber');
 validateField('issue')
 validateField('assistance')
 
@@ -803,11 +853,11 @@ return () => document.removeEventListener('click', handleClickOutside);
 class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
 >
 <h3 class="text-2xl font-semibold text-green-600 mb-4">
-Copyright Consent Form Submission
-</h3>
-<p class="text-lg text-gray-700 mb-6">
-Thank you for submitting your copyright consent form! We have received your information and will process it shortly.
-</p>
+  Customer Support Form Submission
+  </h3>
+  <p class="text-lg text-gray-700 mb-6">
+  Thank you for reaching out to our customer support team! We have received your request and will get back to you as soon as possible.
+  </p>
 
 <div class="w-10/12 mx-auto my-6 border-t-2 border-green-300"></div>
 <div>
@@ -931,8 +981,8 @@ on:input={() => validateField('assistance')}
 {/if}
 </div>
 
-<div class="mt-4">
-  <!-- svelte-ignore a11y-label-has-associated-control -->
+<!-- <div class="mt-4">
+
   <label class="block text-sm pb-2"
     >Please attach any images or files that may assist in troubleshooting
     or investigation:</label
@@ -980,7 +1030,7 @@ on:input={() => validateField('assistance')}
   <p class="text-gray-400 text-sm">
     Attachments are limited to a combined size of 25MB
   </p>
-</div>
+</div> -->
 </div>
 <div class=" w-full pb-6 mx-auto h-full">
 <h2 class="text-primary-400 font-semibold text-base pb-6">
@@ -1114,7 +1164,7 @@ on:input={() => validateField('assistance')}
         <p class="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>
         {/if}
       </div>
-  <div class="flex flex-col">
+  <!-- <div class="flex flex-col">
     <input
     type="text"
     name="accountNumber"
@@ -1127,12 +1177,12 @@ on:input={() => validateField('assistance')}
     {#if errors.accountNumber}
     <p class="text-red-500 text-xs mt-1">{errors.accountNumber}</p>
     {/if}
-  </div>
+  </div> -->
   </div>
 
-  <div class="flex justify-center col-span-2 mt-2">
+  <div class="flex md:justify-end justify-center col-span-2  md:ml-5 mt-2">
   <button
-    class="w-full bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
+    class="md:w-1/2 w-full bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
    on:click={(event) => {
      // event.preventDefault();
 

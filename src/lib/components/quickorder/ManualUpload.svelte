@@ -1279,7 +1279,7 @@
                   >
                     <Icon
                       icon="ic:round-minus"
-                      class="text-lg border-1 rounded bg-white text-primary-500 lg:w-12 w-10 h-10 p-2"
+                      class="text-lg border-1 rounded-lg hover:bg-primary-50 transition bg-white text-primary-500 lg:w-12 w-10 h-10 p-2"
                     />
                   </button>
                 </div>
@@ -1304,7 +1304,7 @@
                     class="w-3/4 sm:ml-1 ml-3 grow text-center border-1 border-gray-200 rounded bg-white font-medium h-10 outline-none py-2 hover:border-primary-400 focus:border-primary-400 focus:ring-0"
                     on:focus={(e) => {
                       const currentValue = e.target.value;
-                      e.target.value = "";
+
                       setTimeout(() => {
                         e.target.select();
                       }, 10);
@@ -1317,22 +1317,22 @@
                     }}
                     on:input={(e) => {
                       e.target.value = e.target.value.replace(/[^0-9]/g, "");
+
                       if (
                         e.target.value.startsWith("0") &&
                         e.target.value.length > 1
                       ) {
                         e.target.value = e.target.value.slice(1);
                       }
+
                       const parsedValue = parseInt(e.target.value, 10);
 
-                      if (
-                        parsedValue &&
-                        parsedValue >= 1 &&
-                        parsedValue <= 999
-                      ) {
+                      if (parsedValue >= 1 && parsedValue <= 999) {
                         row.quantity = parsedValue;
-                      } else if (e.target.value === "") {
-                        row.quantity = 0;
+                      } else {
+                        row.quantity =
+                          e.target.value === "" || parsedValue < 1 ? 1 : 0;
+                        e.target.value = row.quantity === 1 ? "1" : "";
                       }
                       handlePopupInput(e);
                     }}
@@ -1348,7 +1348,7 @@
                   >
                     <Icon
                       icon="ic:round-plus"
-                      class="text-lg border-1 rounded bg-white text-primary-500 lg:w-12 w-10 h-10 p-2"
+                      class="text-lg border-1 rounded-lg hover:bg-primary-50 transition bg-white text-primary-500 lg:w-12 w-10 h-10 p-2"
                     />
                   </button>
                 </div>
@@ -1488,12 +1488,12 @@
               <button
                 type="button"
                 on:click={handleManualEntriesSubmit}
-                class="md:mr-16 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
+                class="lg:ml-60 mr-5 p-2 w-40 mt-4 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded flex items-center"
               >
                 {#if cartloading}
                   <span>Adding...</span>
                 {:else}
-                  <Icon icon="ic:round-shopping-cart" class="text-2xl" />
+                  <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
                   <span>Add to Cart</span>
                 {/if}
               </button>
@@ -1504,12 +1504,12 @@
                 cartloading = true;
                 handleLocalManualEntries();
               }}
-              class="lg:ml-60 p-2 w-40 mt-4 h-9 text-white bg-primary-400 hover:bg-primary-600 rounded flex items-center gap-2"
+              class="lg:ml-60 mr-5 p-2 w-40 mt-4 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
             >
               {#if cartloading}
                 <span>Adding...</span>
               {:else}
-                <Icon icon="ic:round-shopping-cart" class="text-2xl" />
+                <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
                 <span>Add to Cart</span>
               {/if}
             </button>
@@ -1681,7 +1681,7 @@
           {selectedProduct.productName} - {selectedProduct.productNumber}
         </h3>
         <p class="text-sm text-gray-600 mb-5">
-          Enter quantity to check availability and estimated ship date.
+          Enter quantity to check availability.
         </p>
 
         <form
@@ -1710,6 +1710,11 @@
               name="ProductId"
               value={selectedProduct.productNumber}
             />
+            <input
+              type="hidden"
+              name="quantity"
+              value={selectedProduct.quantity}
+            />
 
             <button
               class="flex justify-center items-center w-10 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
@@ -1720,30 +1725,50 @@
 
             <input
               type="text"
-              name="quantity"
+              min="1"
+              maxlength="4"
               bind:value={selectedProduct.quantity}
-              class="w-16 h-10 text-center p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-primary-400"
-              on:input={() => {
-                if (selectedProduct.quantity < 1) selectedProduct.quantity = 1;
-                if (selectedProduct.quantity > 9999)
-                  selectedProduct.quantity = 9999;
-                if (
-                  selectedProductIndex !== undefined &&
-                  selectedProductIndex !== null
-                ) {
-                  const updatedRows = [...rows];
-                  if (updatedRows[selectedProductIndex]) {
-                    updatedRows[selectedProductIndex] = {
-                      ...updatedRows[selectedProductIndex],
-                      quantity: selectedProduct.quantity,
-                    };
-                    rows = updatedRows;
-                  }
+              class="w-16 h-10 text-center p-2 border border-gray-300 rounded-lg outline-none focus:ring-0 focus:none focus:border-primary-400"
+              on:focus={(e) => {
+                setTimeout(() => {
+                  e.target.select();
+                }, 10);
+              }}
+              on:blur={(e) => {
+                if (e.target.value === "" || e.target.value === "0") {
+                  selectedProduct.quantity = 1;
+                  e.target.value = "1";
                 }
+              }}
+              on:input={(e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, "");
+
+                if (
+                  e.target.value.startsWith("0") &&
+                  e.target.value.length > 1
+                ) {
+                  e.target.value = e.target.value.slice(1);
+                }
+
+                if (e.target.value.length > 3) {
+                  e.target.value = e.target.value.slice(0, 3);
+                }
+
+                const parsedValue = parseInt(e.target.value, 10);
+
+                if (parsedValue >= 1 && parsedValue <= 999) {
+                  selectedProduct.quantity = parsedValue;
+                } else {
+                  selectedProduct.quantity =
+                    e.target.value === "" || parsedValue < 1 ? 1 : 0;
+                  e.target.value = selectedProduct.quantity === 1 ? "1" : "";
+                }
+
                 updateCartItemsValue();
               }}
+              aria-label="Quantity"
+              max="9999"
             />
-
             <button
               class="flex justify-center items-center w-10 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
               on:click|preventDefault={increaseQuantity}
@@ -1752,12 +1777,12 @@
             </button>
             <button
               type="submit"
-              class="flex justify-center text-sm items-center w-36 h-10 text-white bg-primary-400 rounded hover:bg-primary-500 transition"
+              class="flex justify-center rounded p-2 text-sm items-center w-44 h-10 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition"
             >
               {#if checking}
                 <span>Checking...</span>
               {:else}
-                <Icon icon="tabler:calendar-check" class="text-lg" />
+                <Icon icon="tabler:calendar-check" class="text-2xl mr-1" />
                 <span class="text-sm">Check Availability</span>
               {/if}
             </button>
@@ -1814,14 +1839,15 @@
             <div class="flex justify-end">
               <button
                 type="submit"
-                class="bg-primary-400 hover:bg-primary-500 text-white py-3 px-4 rounded-md flex items-center space-x-1"
+                class="  mr-5 p-2 w-40 mt-4 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
               >
                 {#if cartloadingpop}
                   <span>Adding...</span>
                 {:else}
-                  <Icon icon="ic:round-shopping-cart" class="text-xl" /><span
-                    class="text-sm">Add To Cart</span
-                  >
+                  <Icon
+                    icon="ic:round-shopping-cart"
+                    class="text-2xl mr-2"
+                  /><span class="text-sm">Add To Cart</span>
                 {/if}
               </button>
             </div>
@@ -1830,7 +1856,7 @@
           <div class=" flex ml-20 justify-center">
             <button
               on:click={handleLocalCart}
-              class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
+              class="  mr-5 p-2 w-40 mt-4 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
             >
               <Icon icon="ic:round-shopping-cart" class="text-xl" /><span
                 class="text-sm">Add To Cart</span

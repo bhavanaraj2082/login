@@ -230,7 +230,7 @@
       }
   }
   </script>
-  <section class="w-full lg:w-11/12 mx-auto max-w-7xl py-2 px-4">
+  <section class="w-full lg:w-11/12 mx-auto max-w-7xl py-2 px-2">
       <h1 class="text-2xl font-bold text-heading mb-6 text-left w-full">Return Orders</h1>
       {#if !returns.length}
       <div class="border-l-8 rounded-xl shadow-sm border mb-6 border-red-600 hover:bg-red-50 p-8 text-center">
@@ -350,7 +350,7 @@
                                   <span class={`px-3 py-1 rounded-full text-xs font-medium ${getStatusClass(item?.status) || 'N/A'}`}>
                                     {typeof item.status === 'string' ? item.status : item.status.status}
                                   </span>
-                                  <button class="text-primary-500 hover:text-primary-700 text-xs">
+                                  <button class="text-primary-500 hover:text-primary-700 text-xs whitespace-nowrap flex ">
                                       {expandedReturnId === item._id ? 'Hide Details' : 'Show Details'}
                                   </button>
                               </div>
@@ -414,8 +414,9 @@
                   </div>
               {/each}
           </div>
+          {#if totalPages > 1}
           <div class="flex items-center justify-between border border-gray-200 bg-white px-4 py-3 sm:px-6 rounded-b-lg shadow mb-2">
-              <div class="flex flex-1 justify-between sm:hidden ">
+            <div class="flex flex-1 justify-between sm:hidden ">
                   <button class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                           on:click={() => handlePageChange($currentPage - 1)}
                           disabled={$currentPage === 1}>
@@ -426,7 +427,7 @@
                           disabled={$currentPage === totalPages}>
                       Next
                   </button>
-                </div>
+            </div>
             <div class="hidden sm:flex sm:flex-1 sm:items-center justify-center">
               <div class="flex items-center gap-2">
                   <button
@@ -476,8 +477,9 @@
                       <Icon icon="charm:chevrons-right" width="16" height="16" />
                   </button>
               </div>
+            </div>
           </div>
-      </div>
+          {/if}
       {/if}
     {/if}
  <Toaster position="bottom-right" richColors />

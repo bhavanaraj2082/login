@@ -11,9 +11,9 @@
       <h1 class="text-base text-gray-600 font-semibold">All Products</h1>
     </div>
     {#each orderedproduct as product}
-      <div class="border rounded-lg mb-5 bg-white">
+      <div class="rounded-lg mb-5 bg-white">
         <div
-          class="border grid grid-cols-1 sm:grid-cols-4 gap-4 justify-between items-center px-4 py-2 rounded-md"
+          class="grid grid-cols-1 sm:grid-cols-4 gap-4 justify-between items-center px-4 py-2 rounded-md shadow"
         >
           <div
             class="flex gap-3 items-center col-span-3 sm:col-span-2 mb-2 sm:mb-0"

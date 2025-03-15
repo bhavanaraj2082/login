@@ -6,6 +6,7 @@
   let formLoading = false;
 
   let form;
+  export let data;
   let searchTerm = "";
   let errors = {};
   let technical_issue = "";
@@ -13,12 +14,12 @@
   let assistance = "";
   let attachments = [];
   let totalSize = 0;
-  let country = data?.profile?.country || "";
-  let firstName = data?.profile?.firstName || "";
-  let lastName = data?.profile?.lastName || "";
-  let email = data?.profile?.email || "";
-  let phoneNumber = data?.profile?.cellPhone || "";
-  let companyName = data?.profile?.companyName || "";
+  let country = "";
+  let firstName =  "";
+  let lastName =  "";
+  let email =  "";
+  let phoneNumber =  "";
+  let companyName =  "";
 
   let location = "";
   let accountNumber = "";
@@ -149,7 +150,7 @@
         return;
       }
 
-      if (!phoneNumber || phoneNumber.trim() === "") {
+      if (!phoneNumber || phoneNumber === "") {
         errors.phoneNumber = "Required for the selected country";
       } else {
         const countryDetails = getCountryByCode(country);
@@ -174,7 +175,7 @@
 
     if (!fieldName || fieldName === "country") {
       if (!country) {
-        errors.country = "Location is required";
+        errors.country = "Country is required";
       } else {
         delete errors.country;
       }
@@ -455,10 +456,49 @@
     }
   }
 
+  // function handleInputChange(event) {
+  //   searchTerm = event.target.value;
+  //   filterCountries();
+  // }
   function handleInputChange(event) {
-    searchTerm = event.target.value;
-    filterCountries();
+  searchTerm = event.target.value;
+  const isDeleting = event.inputType === 'deleteContentBackward' || 
+                     event.inputType === 'deleteContentForward';
+  
+  if (searchTerm.length > 0 && !isDeleting) {
+    filterCountriesWithoutAutoSelect();
+    showDropdown = filteredCountries.length > 0;
+    const codeSearch = searchTerm.replace('+', '').trim();
+    if (codeSearch.length > 0) {
+      const exactCodeMatches = filteredCountries.filter(
+        (country) => country.code.replace('+', '') === codeSearch
+      );
+
+      if (exactCodeMatches.length === 1) {
+        selectCountry(exactCodeMatches[0]);
+        return;
+      }
+    }
+
+    const countriesStartingWith = filteredCountries.filter(
+      (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+    );
+    
+    if (countriesStartingWith.length === 1) {
+      selectCountry(countriesStartingWith[0]);
+    }
+  } else {
+    filterCountriesWithoutAutoSelect();
+    showDropdown = filteredCountries.length > 0;
   }
+}
+function filterCountriesWithoutAutoSelect() {
+  filteredCountries = countries.filter(
+    (country) =>
+      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
+  );
+}
 
   let filteredCountries = countries;
   let showDropdown = false;
@@ -693,7 +733,7 @@
     Tonga: /^\d{7}$/,
   };
   function validatePhoneNumber(countryCode, phoneNumber) {
-    if (!phoneNumber || !countryCode || phoneNumber.trim() === "") {
+    if (!phoneNumber || !countryCode || phoneNumber === "") {
       // errors.contactNumber = `*Required`;
       return false;
     }
@@ -738,8 +778,8 @@
     validateField("phoneNumber");
     validateField("companyName");
     validateField("country");
-    validateField("accountNumber");
-    //   validateField('technical_issue');
+    // validateField("accountNumber");
+      validateField('technical_issue');
     validateField("issue");
     validateField("assistance");
 
@@ -750,7 +790,7 @@
 
   const handlesubmit = async (data) => {
     if (!formValid()) {
-      cancel();
+      // cancel();
       return;
     }
 
@@ -799,10 +839,56 @@
   };
   let showSuccesDiv = false;
   let showFailureDiv = false;
+  // onMount(() => {
+  //   document.addEventListener("click", handleClickOutside);
+  //   return () => document.removeEventListener("click", handleClickOutside);
+  // });
+  let isDataAvailable = false;
   onMount(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  });
+        if (data && data.profile) {
+          firstName = `${data.profile.firstName || ""} `.trim();
+          lastName = `${data.profile.lastName || ""}`.trim();
+            email = data.profile.email || "";
+            phoneNumber = data.profile.cellPhone || "";
+            companyName = data.profile.companyname || "";
+
+            const profileCountry = data.profile.country?.trim();
+            if (profileCountry) {
+                const foundCountry = countries.find(
+                    (c) =>
+                        c.name.toLowerCase() === profileCountry.toLowerCase(),
+                );
+                if (foundCountry) {
+                    country = foundCountry.name;
+                }
+            }
+
+            isDataAvailable = true;
+        } else {
+          firstName = "";
+          lastName = "";
+            email = data?.email || "";
+            phone = "";
+            company = "";
+            country = "";
+            isDataAvailable = false;
+
+            // if (data?.email) {
+            //     email = data.email;
+            //     const reloadFlag = sessionStorage.getItem("emailReloaded");
+            //     if (!reloadFlag) {
+            //         sessionStorage.setItem("emailReloaded", "true");
+            //         location.reload(); // This will reload the page only once to prevent infinite reload
+            //     } else {
+            //         sessionStorage.removeItem("emailReloaded");
+            //     }
+            // }
+        }
+
+        // isEditable = false;
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    });
 </script>
 
 {#if showSuccesDiv}
@@ -812,12 +898,11 @@
     <div
       class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
     >
-      <h3 class="text-2xl font-semibold text-green-600 mb-4">
-        Copyright Consent Form Submission
+    <h3 class="text-2xl font-semibold text-green-600 mb-4">
+      Customer Support Form Submission
       </h3>
       <p class="text-lg text-gray-700 mb-6">
-        Thank you for submitting your copyright consent form! We have received
-        your information and will process it shortly.
+      Thank you for reaching out to our customer support team! We have received your request and will get back to you as soon as possible.
       </p>
 
       <div class="w-10/12 mx-auto my-6 border-t-2 border-green-300"></div>
@@ -857,9 +942,8 @@
         </h2>
         <input hidden name="issueName" value="Technical Problems" />
         <div class="relative dropdown-container">
-          <label class="block text-sm pb-2"
-            >Where are you experiencing difficulties on our website?</label
-          >
+          <!-- svelte-ignore a11y-label-has-associated-control -->
+          <label class="block text-sm pb-2">Where are you experiencing difficulties on our website?</label>
           <div class="border rounded-md cursor-pointer">
             <input
               type="text"
@@ -889,9 +973,14 @@
                 </ul>
               </div>
             {/if}
+          
           </div>
+          {#if errors.technical_issue}
+          <p class="text-red-500 text-xs mt-1">{errors.technical_issue}</p>
+        {/if}
         </div>
         <div class="mt-4">
+          <!-- svelte-ignore a11y-label-has-associated-control -->
           <label class="block text-sm"
             >Please let us know how we may assist you:</label
           >
@@ -908,7 +997,7 @@
           {/if}
         </div>
 
-        <div class="mt-4">
+        <!-- <div class="mt-4">
           <label class="block text-sm pb-2"
             >Please attach any images or files that may assist in
             troubleshooting or investigation:</label
@@ -956,8 +1045,9 @@
           <p class="text-gray-400 text-sm">
             Attachments are limited to a combined size of 25MB
           </p>
-        </div>
+        </div> -->
         <div class="mt-4">
+          <!-- svelte-ignore a11y-label-has-associated-control -->
           <label class="block text-sm">*Would you like us to contact you?</label
           >
           <div class="mt-2">
@@ -1141,7 +1231,7 @@
               <p class="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>
             {/if}
           </div>
-          <div class="flex flex-col">
+          <!-- <div class="flex flex-col">
             <input
               type="text"
               name="accountNumber"
@@ -1154,12 +1244,12 @@
             {#if errors.accountNumber}
               <p class="text-red-500 text-xs mt-1">{errors.accountNumber}</p>
             {/if}
-          </div>
+          </div> -->
         </div>
 
-        <div class="flex justify-center col-span-2 mt-2">
+        <div class="flex justify-center md:justify-end md:ml-5 col-span-2 mt-2">
           <button
-            class="w-full bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
+            class="w-full md:w-1/2 bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
             on:click={(event) => {
               // event.preventDefault();
 

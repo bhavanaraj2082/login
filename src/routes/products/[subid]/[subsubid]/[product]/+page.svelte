@@ -46,11 +46,11 @@
 <Properties data={data.productData} />
 {/if} 
 {#if data.relatedProducts.length !== 0}
-    <RelatedProductss relatedProducts={data.relatedProducts}/>  
+    <RelatedProductss relatedProducts={data.relatedProducts} data={data.productData}/>  
 {/if} 
 {#if data.productData.length !== 0}
 <Description data={data.productData} />
 {/if}
 {#if data.compareSimilarity.length !== 0}
-    <CompSimItems compareSimilarity={data.compareSimilarity}/>
+    <CompSimItems compareSimilarity={data.compareSimilarity} data={data.productData}/>
 {/if} 

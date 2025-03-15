@@ -8,8 +8,13 @@
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
   import { authedUser } from "$lib/stores/mainStores.js";
   import { sendMessage } from "$lib/utils.js";
+  import ShowQuoteModal from "$lib/components/ProductInfoPopups/showQuoteModal.svelte";
   export let compareSimilarity;
   // console.log(compareSimilarity,"compare");
+  export let data;
+  let showQuoteModal = false;
+  let productQuote = null;
+  let form5;
 
   $: displayPrice =
     $currencyState === "usd"
@@ -292,6 +297,12 @@
     ).filter((val) => val !== "-");
     return values.filter((v) => v === value).length === 1;
   }
+
+  function toggleQuoteModal(selectedProduct) {
+    closeModal();
+    showQuoteModal = !showQuoteModal;
+    productQuote = selectedProduct;
+  }
 </script>
 
 <div class="max-w-7xl mx-auto my-10">
@@ -356,7 +367,7 @@
                         >{product.productNumber || "--"}</a
                       >
                     </p>
-                    <p class="font-medium text-sm h-10 overflow-hidden">
+                    <p class="font-medium text-xs mt-2 overflow-hidden">
                       {product.prodDesc
                         ? product.prodDesc.slice(0, 35) + "..."
                         : "--"}
@@ -385,7 +396,7 @@
                         stockId: product.stockId,
                         variants: product.variants,
                       })}
-                    class="w-11/12 max-w-xs text-primary-500 py-1.5 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition px-1.5 mb-4"
+                    class="w-10/12 max-w-xs text-primary-500 py-1.5 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition px-1.5 mb-4"
                   >
                     View Price & Availability
                   </button>
@@ -509,8 +520,8 @@
               <div
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start"
               >
-                <p class="text-base sm:text-lg ml-2">
-                  Price: <span class="font-semibold text-2xl">
+              <p class="text-sm sm:text-lg ml-2">
+                Price: <span class="font-semibold text-md">
                     {#if $currencyState === "inr"}
                       ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString(
                         "en-IN",
@@ -538,13 +549,14 @@
             <p class="text-gray-700 text-sm">
               The price for this product is unavailable. Please request a quote
             </p>
-            <a href={selectedProduct.partNumber}>
+            <!-- <a href={selectedProduct.partNumber}> -->
               <button
+              on:click={() => toggleQuoteModal(selectedProduct)}
                 class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-sm text-white mt-2"
               >
                 Request Quote
               </button>
-            </a>
+            <!-- </a> -->
           </div>
         {:else}
           <div class="mt-4">
@@ -567,8 +579,8 @@
               <div
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start mb-4"
               >
-                <p class="text-base sm:text-lg ml-2">
-                  Price: <span class="font-semibold text-2xl">
+              <p class="text-sm sm:text-lg ml-2">
+                Price: <span class="font-semibold text-md">
                     {#if $currencyState === "usd"}
                       $ {(selectedPrice?.priceUSD ?? 0).toLocaleString(
                         "en-US",
@@ -615,22 +627,21 @@
                   min="1"
                   maxlength="3"
                   bind:value={popupQuantity}
-                  class="w-12 h-6 p-0 text-center border-transparent focus:my-1 focus:border-gray-300 focus:ring-0 focus:outline-none rounded-md"
-            
+                  class="w-12 h-6 p-0 text-center border-0 focus:border-0 focus:outline-none focus:ring-0 rounded-md"
+                  on:focus={(e) => {
+                    // Select all text on focus with a small delay to ensure it works across browsers
+                    setTimeout(() => {
+                      e.target.select();
+                    }, 10);
+                  }}
                   on:input={(e) => { 
-                    // Ensure only numbers are allowed 
                     e.target.value = e.target.value.replace(/[^0-9]/g, ""); 
-                  
-                    // If the value starts with '0' but has more than one character, remove the leading zero 
                     if (e.target.value.startsWith("0") && e.target.value.length > 1) { 
                       e.target.value = e.target.value.slice(1); 
                     } 
-                  
-                    // Allow empty field during typing
                     if (e.target.value === "") { 
-                      popupQuantity = ""; // Allow empty value during typing
+                      popupQuantity = ""; 
                     } else {
-                      // Parse the input value and update quantity 
                       const parsedValue = parseInt(e.target.value, 10); 
                       
                       if (parsedValue >= 1 && parsedValue <= 999) { 
@@ -640,12 +651,8 @@
                         e.target.value = "999";
                       }
                     }
-                    
-                    // We're handling validation in onBlur now, so we don't need to call handlePopupInput here
                   }} 
-                  
                   on:blur={(e) => { 
-                    // Only validate when focus leaves the field
                     if (e.target.value === "" || e.target.value === "0") { 
                       popupQuantity = 1; 
                       e.target.value = "1"; 
@@ -662,7 +669,7 @@
                     +
                   </button>
                 </div>
-                <button
+                <!-- <button
                   type="button"
                   class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-500 hover:text-white transition {popupQuantity <
                   1
@@ -675,7 +682,22 @@
                   }}
                 >
                   Add to Cart
-                </button>
+                </button> -->
+                <button
+  type="button"
+  class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-500 hover:text-white transition {popupQuantity < 1 ? 'cursor-not-allowed hover:opacity-65' : ''}"
+  disabled={popupQuantity < 1}
+  on:click={() => {
+    addToCart(selectedProduct, selectedPriceIndex);
+    cartTogglePopup();
+  }}
+>
+  <div class="flex items-center justify-center">
+    <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
+    <span>Add to Cart</span>
+  </div>
+</button>
+
               </form>
             {/if}
           </div>
@@ -807,3 +829,6 @@
   </div>
 {/if}
 <Toaster position="bottom-right" richColors />
+{#if showQuoteModal}
+  <ShowQuoteModal {data} {toggleQuoteModal} {form5} {productQuote} {selectedProduct}/>
+{/if}

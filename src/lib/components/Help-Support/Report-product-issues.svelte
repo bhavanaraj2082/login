@@ -131,7 +131,7 @@ let companyName =  data?.profile?.companyName|| "";
   
 	if (!fieldName || fieldName === 'country') {
 	  if (!country) {
-		errors.country = 'Location is required';
+		errors.country = 'Country is required';
 	  } else {
 		delete errors.country;
 	  }
@@ -408,10 +408,49 @@ if (!fieldName || fieldName === 'issue') {
 		  }
 	  }
 	
-	  function handleInputChange(event) {
-		  searchTerm = event.target.value;
-		  filterCountries();
-	  }
+	//   function handleInputChange(event) {
+	// 	  searchTerm = event.target.value;
+	// 	  filterCountries();
+	//   }
+	function handleInputChange(event) {
+  searchTerm = event.target.value;
+  const isDeleting = event.inputType === 'deleteContentBackward' || 
+                     event.inputType === 'deleteContentForward';
+  
+  if (searchTerm.length > 0 && !isDeleting) {
+    filterCountriesWithoutAutoSelect();
+    showDropdown = filteredCountries.length > 0;
+    const codeSearch = searchTerm.replace('+', '').trim();
+    if (codeSearch.length > 0) {
+      const exactCodeMatches = filteredCountries.filter(
+        (country) => country.code.replace('+', '') === codeSearch
+      );
+
+      if (exactCodeMatches.length === 1) {
+        selectCountry(exactCodeMatches[0]);
+        return;
+      }
+    }
+
+    const countriesStartingWith = filteredCountries.filter(
+      (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+    );
+    
+    if (countriesStartingWith.length === 1) {
+      selectCountry(countriesStartingWith[0]);
+    }
+  } else {
+    filterCountriesWithoutAutoSelect();
+    showDropdown = filteredCountries.length > 0;
+  }
+}
+function filterCountriesWithoutAutoSelect() {
+  filteredCountries = countries.filter(
+    (country) =>
+      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
+  );
+}
   
 	let filteredCountries = countries;
 	  let showDropdown = false;
@@ -693,7 +732,7 @@ if (!fieldName || fieldName === 'issue') {
 	validateField('phoneNumber');
 	validateField('companyName');
 	validateField('country');
-	validateField('accountNumber');
+	// validateField('accountNumber');
   validateField('issue');
   validateField('assistance');
   
@@ -1054,7 +1093,7 @@ const submitForm = async (data) => {
               <p class="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>
               {/if}
             </div>
-        <div class="flex flex-col">
+        <!-- <div class="flex flex-col">
           <input
           type="text"
           name="accountNumber"
@@ -1067,12 +1106,12 @@ const submitForm = async (data) => {
           {#if errors.accountNumber}
           <p class="text-red-500 text-xs mt-1">{errors.accountNumber}</p>
           {/if}
-        </div>
+        </div> -->
         </div>
       
-        <div class="flex justify-center col-span-2 mt-2">
+        <div class="flex justify-center md:justify-end md:ml-5 col-span-2 mt-2">
 			<button
-			class="w-full bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
+			class="w-full md:w-1/2 bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
 		   on:click={(event) => {
 			 // event.preventDefault();
 	   

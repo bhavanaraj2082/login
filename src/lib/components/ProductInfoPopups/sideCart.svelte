@@ -1,0 +1,287 @@
+<script>
+  import Icon from "@iconify/svelte";
+  import { onMount } from "svelte";
+  import { enhance, applyAction } from "$app/forms";
+  import { toast, Toaster } from "svelte-sonner";
+  import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
+  import { currencyState } from "$lib/stores/mainStores.js";
+  import Sharepopup from "./Sharepopup.svelte";
+  import CheckAvailability from "./CheckAvailability.svelte";
+  import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
+
+  export let data;
+  export let quantity;
+  export let index;
+  export let toggleTooltip;
+  export let showTooltip;
+  export let togglePopup;
+  export let showPopup;
+  export let decreaseQuantity;
+  export let updateQuantity;
+  export let increaseQuantity;
+  export let addToCart;
+  export let cartTogglePopup;
+  let showSharePopup = false;
+
+  function toggleSharePopup() {
+    showSharePopup = !showSharePopup;
+  }
+</script>
+
+{#each data.records as product}
+  <div
+    class="p-3 space-x-4 justify-between items-center flex-col lg:flex-row m-3 lg:w-3/12"
+  >
+    <div class="flex flex-col w-full">
+      <div class="text-gray-800">
+        <div
+          class="items-center justify-between border-dotted border-b-2 border-gray-300 pb-2"
+        >
+          <div class="text-lg font-semibold relative">
+            <div class="relative inline-block tooltip-container">
+              <button on:click={toggleTooltip} class="text-primary-400">
+                <Icon icon="akar-icons:info-fill" class="text-md" />
+              </button>
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              {#if showTooltip}
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <div
+                  class="absolute border border-primary-200 bottom-full left-1/2 transform -translate-x-1/2 bg-white text-black text-center w-56 text-sm rounded-md p-2 shadow-lg animate-fadeIn"
+                >
+                  <button
+                    on:click={() => (showTooltip = false)}
+                    class="absolute top-1 right-2 text-black"
+                  >
+                    <Icon
+                      icon="mdi:close"
+                      class="absolute top-1 right-2 text-black text-sm font-bold"
+                    />
+                  </button>
+
+                  <h2 class="font-semibold text-sm text-black text-left">
+                    Product Information
+                  </h2>
+                  <p class="text-xs font-normal text-gray-800 mt-1 text-left">
+                    Foreign Trade Commodity Code: <span
+                      class="text-gray-500 font-medium"
+                      >{product?.productNumber}</span
+                    >
+                  </p>
+                  <div
+                    class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-gray-700 border-transparent border-t-primary-300"
+                  ></div>
+                </div>
+              {/if}
+            </div>
+            {product?.productNumber} - {product?.priceSize[index]?.break}
+          </div>
+          <span class="text-lg font-semibold">
+            {#if $currencyState === "usd"}
+              $ {(product?.priceSize[index]?.USD ?? 0).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            {:else}
+              ₹ {(product?.priceSize[index]?.INR ?? 0).toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            {/if}
+          </span>
+        </div>
+      </div>
+
+      <div class="border-dotted border-b-2 border-gray-300 pb-2 mb-2">
+        <p class="text-gray-800 font-semibold text-sm mt-4">Availability</p>
+        <p class="text-sm">
+          {#if product?.stockQuantity > 0}
+            Available <Icon
+              icon="ix:success-filled"
+              class="text-base text-green-500 inline font-bold"
+            />
+          {:else}
+            Out of stock <Icon
+              icon="ix:error-filled"
+              class="text-base text-red-500 font-bold inline"
+            />
+          {/if}
+        </p>
+        <div class="flex space-x-2 items-center mt-2">
+          <button
+            on:click={togglePopup}
+            class="w-full text-sm font-semibold text-left text-primary-400"
+            >More Info</button
+          >
+          {#if showPopup}
+            <CheckAvailability
+              {data}
+              {cartTogglePopup}
+              {addToCart}
+              {updateQuantity}
+              {increaseQuantity}
+              {decreaseQuantity}
+              CheckAvailabilityClose={togglePopup}
+              {quantity}
+              {index}
+            />
+          {/if}
+          <button
+            on:click={toggleSharePopup}
+            class="w-full text-sm font-semibold text-right text-primary-400"
+            >Share <Icon
+              icon="fluent:share-24-regular"
+              class="text-lg font-bold inline"
+            /></button
+          >
+          {#if showSharePopup}
+            <Sharepopup {data} SharePopup={toggleSharePopup} />
+          {/if}
+        </div>
+      </div>
+    </div>
+
+    <div class="w-full !ml-0">
+      {#if quantity > 0}
+        <div class="mt-4 flex justify-between gap-3">
+          <div class="flex flex-col text-heading">
+            <p class="font-normal text-xs">Quantity</p>
+            <p class="font-semibold text-sm">{quantity}</p>
+          </div>
+          <div class="flex flex-col text-heading">
+            <p class="font-normal text-xs py-px">
+              Base Price:
+              <span class="font-medium text-xs">
+                {#if $currencyState === "usd"}
+                  $ {(
+                    product?.priceSize[index]?.USD * quantity ?? 0
+                  ).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                {:else}
+                  ₹ {(
+                    product?.priceSize[index]?.INR * quantity ?? 0
+                  ).toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                {/if}
+              </span>
+            </p>
+
+            <p
+              class="font-normal text-xs border-b-1 border-gray-400 border-dotted pb-px"
+            >
+              GST (18%):
+              <span class="font-medium text-xs">
+                {#if $currencyState === "usd"}
+                  $ {(
+                    product?.priceSize[index]?.USD * 0.18 * quantity ?? 0
+                  ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                {:else}
+                  ₹ {(
+                    product?.priceSize[index]?.INR * 0.18 * quantity ?? 0
+                  ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                {/if}
+              </span>
+            </p>
+
+            <p class="font-normal text-xs">
+              Total Price:
+              <span class="font-semibold text-xs">
+                {#if $currencyState === "usd"}
+                  $ {(
+                    product?.priceSize[index]?.USD * 1.18 * quantity ?? 0
+                  ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                {:else}
+                  ₹ {(
+                    product?.priceSize[index]?.INR * 1.18 * quantity ?? 0
+                  ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                {/if}
+              </span>
+            </p>
+          </div>
+        </div>
+      {/if}
+
+      <div
+        class="flex items-center border border-gray-300 rounded-sm justify-between w-full space-x-4 mt-6"
+      >
+        <button
+          on:click={decreaseQuantity}
+          class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
+          ><Icon icon="ic:round-minus" class="text-2xl" /></button
+        >
+        <input
+          type="text"
+          min="1"
+          maxlength="3"
+          bind:value={quantity}
+          class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
+          on:focus={(e) => {
+            const currentValue = e.target.value;
+            setTimeout(() => {
+              e.target.select();
+            }, 10);
+          }}
+          on:blur={(e) => {
+            if (
+              e.target.value === "" ||
+              e.target.value === "0" ||
+              e.target.value === "00" ||
+              e.target.value === "000"
+            ) {
+              quantity = 1;
+              e.target.value = "1";
+            }
+          }}
+          on:input={(e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, "");
+            if (e.target.value.startsWith("0") && e.target.value.length > 1) {
+              e.target.value = e.target.value.slice(1);
+            }
+            const parsedValue = parseInt(e.target.value, 10);
+
+            if (parsedValue >= 1 && parsedValue <= 999) {
+              quantity = parsedValue;
+            }
+            // else if (e.target.value === "") {
+            //   quantity = 1;
+            // }
+            else {
+              quantity = e.target.value === "" || parsedValue < 1 ? 1 : 0;
+              e.target.value = quantity === 1 ? "1" : "";
+            }
+
+            updateQuantity(e);
+          }}
+          aria-label="Quantity"
+          max="999"
+        />
+
+        <button
+          on:click={increaseQuantity}
+          class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
+          ><Icon icon="ic:round-plus" class="text-2xl" /></button
+        >
+      </div>
+      <div class="w-full mt-3">
+        <button
+          on:click={() => {
+            if (quantity >= 1) {
+              addToCart(product, index);
+              cartTogglePopup();
+            }
+          }}
+          class="w-full text-white border border-primary-400 rounded-lg py-2 px-2
+hover:bg-primary-400 bg-primary-400 hover:text-white
+{quantity < 1 ? 'cursor-not-allowed hover:opacity-65' : ''}"
+          disabled={quantity < 1}
+        >
+          <Icon icon="ic:round-shopping-cart" class="text-2xl inline mr-1" />
+          Add To Cart
+        </button>
+      </div>
+    </div>
+  </div>
+{/each}

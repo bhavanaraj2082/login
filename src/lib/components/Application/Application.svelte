@@ -22,8 +22,8 @@
             class="w-full h-48 object-cover"/>
 
           <div class="p-4">
-            <h3 class="text-xl font-semibold text-gray-800">{category.name}</h3>
-            <p class="mt-2 text-sm text-gray-600">
+            <h3 class="sm:text-xl text-md font-semibold text-gray-800">{category.name}</h3>
+            <p class="mt-2 sm:text-sm text-xs text-gray-600">
               {getTruncatedDescription(category.description) || "No description available"}
             </p>
           </div>

@@ -4,9 +4,11 @@
 	import { sendMessage } from '$lib/utils.js';
 	import { cart,guestCart } from '$lib/stores/cart.js';
 	import { Toaster } from 'svelte-sonner';
-	import { page } from '$app/stores';
+	import { navigating , page } from '$app/stores';
 	import Header from '$lib/components/HeaderDropdownCart/Header.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
+	import LoadingBar from '$lib/components/LoadingBar.svelte';
+	import { isLoading } from '$lib/stores/mainStores.js';
 	import Footer from '$lib/components/Footer.svelte';
 	import { authedUser } from '$lib/stores/mainStores.js';
 	import AllowCookies from '$lib/components/AllowCookies.svelte';
@@ -44,11 +46,13 @@
 	// 	}
 
 	// });
+	$: $isLoading = $navigating !== null;
 	$: isAuthRoute = $page.url.pathname === '/login' || $page.url.pathname === '/signup' || $page.url.pathname === '/forgot' || $page.url.pathname === '/reset-password' || $page.url.pathname === '/signin';
 </script>
 {#if !isAuthRoute}
  <Header {data}/>
 <Breadcrumb/> 
+<LoadingBar />
 {/if}
 <div class="flex-grow xs:px-2 mx-auto {isAuthRoute ? 'w-full' : ''}">
 <slot />

@@ -65,7 +65,7 @@
         </p>
         <p class="flex items-center gap-2">
           <Icon icon="mdi:email" class="text-lg text-description" /> 
-          <a href="mailto:sales@partskey.com" class="hover:text-primary-500">sales@partskey.com</a>
+          <a href="mailto:sales@chemikart.com" class="hover:text-primary-500">sales@chemikart.com</a>
         </p>
       </div>
     </div>
@@ -103,7 +103,7 @@
         </p>
         <p class="flex items-center gap-2">
           <Icon icon="mdi:email" class="text-lg text-description" /> 
-          <a href="mailto:sales@partskey.com" class="hover:text-primary-500">sales@partskey.com</a>
+          <a href="mailto:sales@chemikart.com" class="hover:text-primary-500">sales@chemikart.com</a>
         </p>
       </div>
     </div>
@@ -139,7 +139,7 @@
         </p>
         <p class="flex items-center gap-2">
           <Icon icon="mdi:email" class="text-lg text-description" /> 
-          <a href="mailto:sales@partskey.com" class="hover:text-primary-500">sales@partskey.com</a>
+          <a href="mailto:sales@chemikart.com" class="hover:text-primary-500">sales@chemikart.com</a>
         </p>
       </div>
     </div>
@@ -175,7 +175,7 @@
         </p>
         <p class="flex items-center gap-2">
           <Icon icon="mdi:email" class="text-lg text-description" /> 
-          <a href="mailto:sales@partskey.com" class="hover:text-primary-500">sales@partskey.com</a>
+          <a href="mailto:sales@chemikart.com" class="hover:text-primary-500">sales@chemikart.com</a>
         </p>
       </div>
     </div>
@@ -219,7 +219,7 @@
         </p>
         <p class="flex items-center gap-2">
           <Icon icon="mdi:email" class="text-lg text-description" /> 
-          <a href="mailto:sales@partskey.com" class="hover:text-primary-500">sales@partskey.com</a>
+          <a href="mailto:sales@chemikart.com" class="hover:text-primary-500">sales@chemikart.com</a>
         </p>
       </div>
     </div>
@@ -262,7 +262,7 @@
         </p>
         <p class="flex items-center gap-2">
           <Icon icon="mdi:email" class="text-lg text-description" /> 
-          <a href="mailto:sales@partskey.com" class="hover:text-primary-500">sales@partskey.com</a>
+          <a href="mailto:sales@chemikart.com" class="hover:text-primary-500">sales@chemikart.com</a>
         </p>
       </div>
     </div>

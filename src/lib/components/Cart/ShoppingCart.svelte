@@ -50,6 +50,7 @@
 		});
 	};
 	let scrollTimeout
+
 	const handleScroll = (e) => {
 	isHide = true;
 	clearTimeout(scrollTimeout);
@@ -60,13 +61,13 @@
 
 	let hoveredItem = null; 
     function handleMouseEnter(imageSrc, index) {
-    hoveredItem = { imageSrc, index }; 
-  }
+       hoveredItem = { imageSrc, index }; 
+    }
 
-function handleMouseLeave() {
-  hoveredItem = null; 
-}
-	onMount(() => {
+    function handleMouseLeave() {
+      hoveredItem = null; 
+    }
+    onMount(() => {
 		//window.addEventListener('scroll', handleScroll)
 		filteredGuestCart = $guestCart.filter(guestItem => 
             !$cart.some(cartItem => cartItem.productId === guestItem.productId)
@@ -84,8 +85,7 @@ function handleMouseLeave() {
 			cart.set(cartData);
 		    calculateTotalPrice($cart);
 		}
-	});
-
+    });
 	let showModal = false;
 
 	const toggleModal = () => {
@@ -101,13 +101,13 @@ function handleMouseLeave() {
 	$:syncLocalStorageToStore($cart.length)
 	function syncLocalStorageToStore(count) {
     // Check if we are in the browser
-    if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined') {
         const storedTotalComps = localStorage.getItem('totalCompsChemi');
         if (storedTotalComps ) {
             cartTotalComps.set(Number(count));
         }
+     }
     }
-   }
 	const downloadExcel = () => {
     // Define the data (same as the original CSV content)
     const headers = [
@@ -214,17 +214,19 @@ function handleMouseLeave() {
 		if (quantity > 10000000){
 			quantity = 10000000
 		}
-		//if(quantity < 0 || isNaN(quantity)) quantity = 1
+		if(quantity <= stock.orderMultiple || isNaN(quantity)) quantity = stock.orderMultiple
 		clearTimeout(timeout)
         checkoutDisabled = true
 
 		if(!isLoggedIn){
+			const selectedQty = Math.ceil(quantity/ stock.orderMultiple) * stock.orderMultiple
+
 			cart.update(item=>{
-				item[indx].quantity = quantity
+				item[indx].quantity = selectedQty 
 				return item
 			})
 			guestCart.update(item=>{
-			item[indx].quantity = quantity
+			item[indx].quantity = selectedQty
 			return item
 		    })
 			calculateTotalPrice($cart)
@@ -235,16 +237,14 @@ function handleMouseLeave() {
 			
 		}
 		
-
-	    const index = $cart.findIndex((item) =>item._id === _id);
+		timeout = setTimeout(()=>{
+			const index = $cart.findIndex((item) =>item._id === _id);
 		if (index !== -1) {
 			cart.update(item=>{
-				item[index].quantity = quantity
+				item[index].quantity = Math.ceil(quantity/ item[index].stockDetails.orderMultiple) * item[index].stockDetails.orderMultiple
 				return item
 			})
 		}
-
-		timeout = setTimeout(()=>{
 		  const formdata = new FormData()
 		  formdata.append("_id",_id)
 		  formdata.append("stock",stock)
@@ -264,11 +264,11 @@ function handleMouseLeave() {
         checkoutDisabled = true
 		if(!isLoggedIn){
 			cart.update(item=>{
-				item[indx].quantity += 1
+				item[indx].quantity = quantity + item[indx].stockDetails.orderMultiple
 				return item
 			})
 			guestCart.update(item=>{
-			item[indx].quantity += 1
+			item[indx].quantity = quantity + item[indx].stockDetails.orderMultiple
 			return item
 		    })
 			calculateTotalPrice($cart)
@@ -278,7 +278,7 @@ function handleMouseLeave() {
 	    const index = $cart.findIndex((item) =>item._id === _id);
 		if (index !== -1) {
 			cart.update(item=>{
-				item[index].quantity += 1
+				item[index].quantity = quantity + item[index].stockDetails.orderMultiple
 				return item
 			})
 		}
@@ -304,13 +304,13 @@ function handleMouseLeave() {
            
 			if(!isLoggedIn){
 			cart.update(item=>{
-				if(item[indx].quantity === 1) return item
-				item[indx].quantity -= 1
+				if(item[indx].quantity <= stock.orderMultiple) return item
+				item[indx].quantity = quantity - item[indx].stockDetails.orderMultiple
 				return item
 			})
 			guestCart.update(item=>{
-			    if(item[indx].quantity === 1) return item
-			    item[indx].quantity -= 1
+			    if(item[indx].quantity <= stock.orderMultiple) return item
+			    item[indx].quantity = quantity - item[indx].stockDetails.orderMultiple
 			    return item
 		    })
 			calculateTotalPrice($cart)
@@ -319,12 +319,11 @@ function handleMouseLeave() {
 		
 	    const index = $cart.findIndex((item) =>item._id === _id);
 		if (index !== -1) {
-			if($cart[index]?.quantity !== 1){
-				cart.update(item=>{
-					item[index].quantity -= 1
-					return item
-			    })
-			}
+			cart.update(item=>{
+				if(item[indx].quantity <= stock.orderMultiple) return item
+				item[index].quantity = quantity - item[index].stockDetails.orderMultiple
+				return item
+			})
 		}
 		timeout = setTimeout(()=>{
 		  const formdata = new FormData()
@@ -412,7 +411,7 @@ function handleMouseLeave() {
 </script>
 
 
-<div on:scroll={handleScroll} class=" relative h-screen overflow-y-scroll hide mx-auto bg-gray-50 mb-5">
+<div on:scroll={handleScroll} class=" relative hide mx-auto bg-gray-50 mb-5">
 	<button class="{isHide ? "hidden" : ""} fixed xl:hidden {scrollto ? "top-48 sm:top-28 " : "top-24 sm:top-36"}   right-2 z-20 rounded border shrink-0 p-1.5 bg-primary-100 hover:text-white hover:bg-primary-600" 
 	on:click={()=>{
 	   scrollto = !scrollto
@@ -439,7 +438,7 @@ function handleMouseLeave() {
 			</div>
 		{:else}
 			<div bind:this={items} class="w-full lg:w-4/4 xl:w-3/4 bg-white p-3 sm:px-4 sm:py-3 rounded-lg shadow-sm h-fit">
-				<div class=" w-full sticky top-0 bg-white rounded flex items-center justify-between mb-4 sm:space-y-1">
+				<div class=" w-full sticky top-0 z-10 bg-white flex items-center justify-between mb-4 sm:space-y-1">
 					<div>
 						<h2 class=" text-xs sm:text-4s font-semibold">
 							Cart Items <span class="text-red-500">({$cart.length})</span>
@@ -491,16 +490,14 @@ function handleMouseLeave() {
 									<!-- <img src={item.productDetails.imageSrc}  class=" cursor-pointer w-20 h-20 object-contain rounded-md"
 									on:click={() => imagemodal(item.productDetails.imageSrc)} /> -->
 
-
 									<img 
 									src={item.productDetails.imageSrc} 
-									class="cursor-pointer w-20 h-20 sm:w-40 sm:h-40 object-contain" 
+									class="cursor-pointer w-24 h-24 objec-cover bg-red-200" 
 									alt={item.productDetails.productName}
 									on:click={() => imagemodal(item.productDetails.imageSrc)}
 									on:mouseenter={() => handleMouseEnter(item.productDetails.imageSrc , index)}
 									on:mouseleave={handleMouseLeave}
 								  />
-								
 								   {#if hoveredItem && hoveredItem.imageSrc === item.productDetails.imageSrc && hoveredItem.index === index}
 									<div
 									  class="absolute bottom-3/4 left-1/2 transform -translate-x-1/2 mb-2 z-50 whitespace-nowrap text-xs text-description font-medium py-1 px-4 rounded-md shadow-lg border leading-snug bg-black text-white"
@@ -508,12 +505,11 @@ function handleMouseLeave() {
 									  Click to view <br />larger image
 									  <div
 										class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-black"
-									  ></div>
+									  >
+									  
+									</div>
 									</div>
 								  {/if}
-
-
-
 									{#if showimage}
 									<!-- svelte-ignore a11y-click-events-have-key-events -->
 									<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -541,12 +537,15 @@ function handleMouseLeave() {
 								</div>
 								<div class="ml-2">
 									<p class="text-xs text-black font-semibold">{item.productDetails.productNumber}</p>
-									<p class=" text-gray-800 text-xs">{item.productDetails.productName}</p>
+									<div class="relative cursor-pointer text-gray-800 group text-xs">{item.productDetails.productName.length >40 ? item.productDetails.productName.substring(0,40)+"..." : item.productDetails.productName}
+                                       <p class=" absolute bg-white hidden border p-1.5 rounded shadow-md {item.productDetails.productName.length >40 ? "group-hover:block" :""}  w-max top-0">{item.productDetails.productName}</p>
+									</div>
 									<p class=" text-gray-800 text-2s font-semibold">{item.pricing.break}</p>
 									<p class=" {item.quantity > item.stockDetails.stock ? " text-red-500" :" text-green-500"} text-2s ext-red-600 font-semibold">
 										{item.quantity > item.stockDetails.stock ? item.quantity - item.stockDetails.stock + " Back Order" : item.stockDetails.stock + " In Stock"}
 										<span class="{item?.quantity > item.stockDetails.stock ? "" : " hidden"} text-green-500 ml-1">{item.stockDetails.stock + " In Stock"}</span>
 									</p>
+									<p class=" text-[10.5px] font-semibold">Order Multiple {item.stockDetails.orderMultiple}</p>
 								</div>
 							</div>
                             <div class=" lg:w-6/12 sm:flex justify-between items-center">
@@ -565,11 +564,11 @@ function handleMouseLeave() {
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Quantity</h3>
 							        <div class="flex items-center md:w-2/12">
 										<input type="number" bind:value={item.quantity}
-										on:input={e=>handleQty(parseInt(e.target.value),item.stockDetails.stock,item._id,index)}
+										on:input={e=>handleQty(parseInt(e.target.value),item.stockDetails,item._id,index)}
 										class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
 							        	<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded">
 							        		<button disabled={item.isCart || item.isQuote}
-							        			on:click={() => decrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}
+							        			on:click={() => decrementQuantity(item.quantity,item.stockDetails,item._id,index)}
 							        			class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							        			><Icon icon="rivet-icons:minus" class="text-xs" /></button
 							        		>
@@ -577,7 +576,7 @@ function handleMouseLeave() {
 							        			{item.quantity === null ? "" : item.quantity}
 							        		</button>
 							        		<button disabled={item.isCart || item.isQuote}
-							        			on:click={() => incrementQuantity(item.quantity,item.stockDetails.stock,item._id,index)}
+							        			on:click={() => incrementQuantity(item.quantity,item.stockDetails,item._id,index)}
 							        			class=" border-l-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
 												<Icon icon="rivet-icons:plus" class="text-xs" />
 											</button>
@@ -599,14 +598,14 @@ function handleMouseLeave() {
 							        		on:click={() => removeItem(item.productDetails.productNumber,item._id,index)}
 							        		class=" text-lg sm:hidden text-primary-600"
 							        	>
-							        		<Icon icon="fluent-mdl2:delete" class=" text-xl" />
+							        		<Icon icon="mdi:delete-forever" class=" text-xl" />
 							        	</button>
 							        </div>
 								</div>
 								<button
 							        type="button" on:click={() => removeItem(item.productDetails.productNumber,item._id,index)}
 							        class=" text-lg hidden sm:block text-primary-600">
-							        <Icon icon="fluent-mdl2:delete" class=" text-lg" />
+							        <Icon icon="mdi:delete-forever" class=" text-2xl" />
 							    </button>
 						    </div>
 						</li>
@@ -617,7 +616,7 @@ function handleMouseLeave() {
 		{/if}
 
 		
-		 <div bind:this={checkout} class="w-full sm:w-2/4 md:w-2/5 lg:w-2/6 xl:w-1/4 self-end xl:self-start bg-white p-3 rounded-lg shadow-sm">
+		 <div bind:this={checkout} class="w-full sticky top-0 sm:w-2/4 md:w-2/5 lg:w-2/6 xl:w-1/4 self-end xl:self-start bg-white p-3 rounded-lg shadow-sm">
 			<div class=" space-y-2">
 				<h2 class=" text-sm lg:text-lg font-bold">Your Order</h2>
 				<div class="space-y-2">

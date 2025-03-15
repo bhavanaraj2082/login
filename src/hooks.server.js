@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   MONGO_USERNAME,
   MONGO_PASSWORD,
@@ -52,19 +53,19 @@ export const main = async ({ event, resolve }) => {
 	}
 
   const response = await resolve(event);
-
   return response;
 };
 
 export async function handleError({ error, event, status, message }) {
   const errorId = crypto.randomUUID();
 
+  const isNotFound = !event.route.id && event.url.pathname !== '/';
+  
   return {
-    message: "Whoops!",
-    errorId,
+    message: error?.message || 'Whoops !',
+    status: isNotFound ? 404 : (error?.status || 500),
+    errorId
   };
 }
-
-
 
 export const handle = sequence(main);

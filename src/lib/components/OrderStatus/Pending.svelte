@@ -15,9 +15,9 @@
       <h1 class="text-base text-gray-600 font-semibold">Pending Products</h1>
     </div>
     {#each remainingProducts as product}
-      <div class="border rounded-lg mb-5 bg-white">
+      <div class="rounded-lg mb-5 bg-white">
         <div
-          class="border flex justify-between items-center px-4 py-2 rounded-md"
+          class="flex justify-between items-center px-4 py-2 rounded-md shadow"
         >
           <div class="flex gap-3 items-center w-[35%]">
             <img src={product.imgSrc} alt="img" class="w-16 rounded-lg" />

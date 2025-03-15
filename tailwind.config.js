@@ -7,6 +7,9 @@ export default {
 				workSans:["Work Sans","sans-serif"],
 				montserrat:["Montserrat","sans-serif"]
 			},
+			screens:{
+				"xs":"400px"
+			},
 			colors:{
 				primary:{
 					"50":"#fff3f1",
@@ -34,8 +37,38 @@ export default {
 				"4s":"16px"
 			},
 			animation:{
-				'spin-slow': 'spin 3s linear infinite'
-			}
+				'shimmer': 'shimmer 2s ease-in-out infinite',
+        		'progress-pulse': 'progress-pulse 1.5s ease-in-out infinite',
+				'loadingbar': 'loadingbar 1s ease-out infinite',
+				'spin-slow': 'spin 1.5s linear infinite',
+				'slow-bounce': 'bounce 3s infinite',
+				'pulse-delay' : 'pulse-delay 2.5s ease-in-out infinite',
+			},
+			keyframes: {
+				shimmer: {
+					'0%': { backgroundPosition: '-200% 0' },
+					'100%': { backgroundPosition: '200% 0' },
+				  },
+				  'progress-pulse': {
+					'0%, 100%': { opacity: 0 },
+					'50%': { opacity: 0.5 },
+					'25%': { opacity: 0.25 },
+					'75%': { opacity: 0.75 },
+
+				  },
+				wave: {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-5px)' },
+				},
+				loadingbar: {
+					'0%' : {  width: '20%',transform: 'translateX(20%)'},
+					'20%': { width: '30%', transform: 'translateX(30%)' },
+					'40%': { width: '60%', transform: 'translateX(30%)'},
+					'60%': { width: '70%', transform: 'translateX(40%)'},
+					'80%': { width: '80%', transform: 'translateX(40%)' },
+					'100%': { width: '100%', transform: 'translateX(60%)' },
+				}
+			},
 		}
 	},
 	plugins: [require('@tailwindcss/forms')]

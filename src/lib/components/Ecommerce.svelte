@@ -481,6 +481,8 @@ lname=data.profile.lastName || "";
 		}
 
 		isEditable = false;
+		document.addEventListener('click', handleClickOutside);
+		return () => document.removeEventListener('click', handleClickOutside);
 	});
 	let isChecked = false;
 	let phone = "";
@@ -604,14 +606,61 @@ lname=data.profile.lastName || "";
 		delete errors.location;
 	}
 
-    function handleInputChange(event) {
-        searchTerm = event.target.value;
-        filterCountries();
+    // function handleInputChange(event) {
+    //     searchTerm = event.target.value;
+    //     filterCountries();
+    // }
+
+	function filterCountriesWithoutAutoSelect() {
+    filteredCountries = countries.filter(
+      (country) =>
+        country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
+    );
+  }
+
+  function handleInputChange(event) {
+    searchTerm = event.target.value;
+    const isDeleting =
+      event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward';
+
+    if (searchTerm.length > 0 && !isDeleting) {
+      filterCountriesWithoutAutoSelect();
+      showDropdown = filteredCountries.length > 0;
+      const codeSearch = searchTerm.replace('+', '').trim();
+      if (codeSearch.length > 0) {
+        const exactCodeMatches = filteredCountries.filter(
+          (country) => country.code.replace('+', '') === codeSearch
+        );
+
+        if (exactCodeMatches.length === 1) {
+			selectlocation(exactCodeMatches[0]);
+          return;
+        }
+      }
+      const countriesStartingWith = filteredCountries.filter((country) =>
+        country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+      );
+
+      if (countriesStartingWith.length === 1) {
+        selectlocation(countriesStartingWith[0]);
+      }
+    } else {
+      filterCountriesWithoutAutoSelect();
+      showDropdown = filteredCountries.length > 0;
     }
+  }
 
     function toggleDropdown() {
         showDropdown = !showDropdown;
     }
+
+	function handleClickOutside(event) {
+		if (!event.target.closest('.dropdown-container')) {
+			showDropdown = false;
+		}
+	}
+
 </script>
 
 {#if showSuccesDiv}

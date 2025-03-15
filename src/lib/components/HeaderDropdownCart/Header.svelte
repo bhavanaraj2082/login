@@ -215,12 +215,14 @@ async function submitForm() {
 	function navigateTo (url) {
 		//invalidate("data:cat")
 		goto(url);
+		handleMouseLeaveMenu();
+		handleMouseLeaveSubmenu();
 		// const newUrl = new URL(window.location.href)
 		// newUrl.searchParams.set('/',url)
 
 		// window.location.href = url;
 	// 	isLiked = false;
-	// 	isOpen = !isOpen;
+		isOpen = !isOpen;
 
 	// 	if (url.includes('products') || url.includes('applications')) {
     //     window.location.href = url;
@@ -347,7 +349,7 @@ async function submitForm() {
 	{#if isOpen}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div on:click={closeSidebar} class="fixed top-0 left-0 w-full h-full bg-gray-300/60 z-40 backdrop-blur-sm"></div>
+	<div on:click={closeSidebar} class="fixed md:hidden block top-0 left-0 w-full h-full bg-gray-300/60 z-40 backdrop-blur-sm"></div>
 {/if}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -396,11 +398,24 @@ async function submitForm() {
 					class="text-left text-white text-md transition duration-200 w-full py-2 px-4 font-medium">
 					Quick Order
 				</button> -->
-				<button
+				<!-- <button
 					on:click={() => navigateTo('/order-status')}
 					class="text-left text-white text-md w-full py-2 px-4 font-medium hover:bg-primary-400 transition rounded transform hover:scale-105 duration-200 ">
 					Order Status
+				</button> -->
+				{#if $authedUser.email}
+				<button
+					on:click={() => navigateTo('/quotes')}
+					class="text-left text-white text-md w-full py-2 px-4 font-medium hover:bg-primary-400 transition rounded transform hover:scale-105 duration-200 ">
+					Quotes
 				</button>
+				{:else}
+				<button
+					on:click={() => navigateTo('/quote')}
+					class="text-left text-white text-md w-full py-2 px-4 font-medium hover:bg-primary-400 transition rounded transform hover:scale-105 duration-200 ">
+					Quotes
+				</button>
+				{/if}
 			</div>
 		{:else}
 			<button
@@ -702,7 +717,7 @@ async function submitForm() {
 								class={`flex items-center hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-white scale-105' : 'text-white'}`}
 								role="menuitem">
 								{menu.title}
-								{#if index < 5 && menu.title !== 'Documents' && menu.title !== 'Support' && menu.title !== 'Quick Order'}
+								{#if index < 5 && menu.title !== 'Documents' && menu.title !== 'Quotes' && menu.title !== 'Quick Order'}
 									<Icon icon="prime:chevron-down" class="ml-1 w-5 h-5 " />
 								{/if}
 							</button>
@@ -754,10 +769,29 @@ async function submitForm() {
 									{/if}
 								{/each}
 								
+								
 							</div>
+							
 						{/if}
 					</div>
 				{/each}
+				{#if $authedUser.email}
+				<a href="/quotes">
+					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap transform hover:scale-105 duration-200">
+						<span class="text-white font-medium text-xs lg:text-base">
+							Quotes
+						</span>
+					</button>
+				</a>
+				{:else}
+				<a href="/quote">
+					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap transform hover:scale-105 duration-200">
+						<span class="text-white font-medium text-xs lg:text-base">
+							Quotes
+						</span>
+					</button>
+				</a>
+				{/if}
 			</div>
 				
 			<div class="flex gap-1 text-gray-600 items-center ">
@@ -777,6 +811,7 @@ async function submitForm() {
 						</span>
 					</button>
 				</a> -->
+				
 				<div class="relative flex items-center justify-center lg:space-x-2 lg:pr-4">
 							<div class="relative flex items-center justify-between bg-primary-400 border-2 border-white w-28 lg:w-32 h-7 bottom-0.5 rounded-md cursor-pointer">
 								<div class="absolute flex items-center justify-between w-full h-full transition-all duration-300 ease-in-out">

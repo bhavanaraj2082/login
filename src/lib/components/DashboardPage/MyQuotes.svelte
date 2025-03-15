@@ -310,7 +310,8 @@ function getStatusColor (status) {
       </table>
   </div>
       <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div
+  {#if totalPages > 1}
+    <div
       class="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-around border bg-white shadow px-4 py-4 rounded-b-md mt-4"
       aria-label="pagination"
       on:keydown={handleKeyDown}>
@@ -361,12 +362,11 @@ function getStatusColor (status) {
           <Icon icon="charm:chevrons-right" class="w-4 h-4" />
       </button>
   </div>
-  
   <!-- <div class="text-sm text-gray-500">
       Showing {Math.min(($currentPage - 1) * $itemsPerPage + 1, filteredQuotes.length)} to {Math.min($currentPage * $itemsPerPage, filteredQuotes.length)} of {filteredQuotes.length} entries
   </div> -->
-</div>
-          
+    </div>
+ {/if}
 </div>
 
 {#if selectedQuote}

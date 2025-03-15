@@ -22,8 +22,10 @@
 	let formData
 	let isShowbox = true
 	let order = ''
+	let taxError = ''
 	let checkout
 	let onSubmit = false
+	let addressError = false
 	let cartdata = data?.cart?.cart[0]?.cartItems || []
 	//$:console.log(userData);
 	$: isGST = userData.country === "India" ? true : false
@@ -212,7 +214,7 @@
 		checkout = order;
 	}
 	$: handleCheckout($cart);
-
+    $:console.log($billingAddress,$shippingAddress === "");
 	const handleDispatchEvent =(e)=>{
 		console.log(e.detail,"detail");
 		//if(e.detail.success){
@@ -220,8 +222,12 @@
 		//}
 	}
 
-	const handleSubmit = ()=>{
+	const handleSubmit = ({cancel})=>{
 		onSubmit = true
+		if($billingAddress === "" || $shippingAddress === ""){
+			addressError = true
+			cancel()
+		} 
 		return async({result})=>{
 			console.log(result);
 			if(result.data.success){
@@ -236,6 +242,16 @@
 		console.log('clicked');
 		dispatch('orderData', order);
 	};
+
+	const validateTax = (taxNum)=>{
+	   if(taxNum.length < 3){
+          return
+	   } 
+       //if(taxType === "GST"){
+		   !/^[0-9]{2}[A-Za-z]{1}/.test(taxNum) || taxNum.length > 15 ? taxError = "invalid GST number": taxError = ""
+	   //}
+	}
+
 </script>
 
 
@@ -267,7 +283,8 @@
 					    <Icon icon="ic:round-mode-edit" class=" text-md" />
 					</button>
 				</div>
-				<input value={userData?.gstNumber || ""} disabled class="mt-2 w-full outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+				<input value={userData?.gstNumber || ""} on:input={e=>validateTax(e.target.value)} class="mt-2 w-full uppercase outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+		        <p class="{taxError.length ? "": "hidden text-green-400"} text-xs font-normal text-red-500 ">{taxError}</p>
 			</div>
 		 </div>
 		<div class=" lg:flex gap-4">
@@ -292,6 +309,7 @@
 					placeholder=""
 					bind:value={$billingAddress}
 				/>
+				<p class="{addressError && $billingAddress === '' ? "" :"hidden"} text-xs text-red-500">Please add billing address</p>
 			</div>
 			<div class="w-full ">
 				<div class=" flex justify-between items-center my-1.5">
@@ -314,6 +332,7 @@
 					placeholder=""
 					bind:value={$shippingAddress}
 				/>
+				<p class="{addressError && $shippingAddress === '' ? "" :"hidden"} text-xs text-red-500">Please add shipping address</p>
 			</div>
 		</div>
 	</div>
@@ -346,7 +365,7 @@
 						<form method="POST" action="?/checkout" use:enhance={handleSubmit} class=" col-span-2">
 							<input type="hidden" name="order" value={JSON.stringify(checkout)}/>
 							<button
-								type="submit" disabled={onSubmit}
+								type="submit" disabled={onSubmit || taxError.length}
 								class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
 							>
 								Proceed to Order
