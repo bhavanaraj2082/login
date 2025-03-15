@@ -1,5 +1,5 @@
 <section>
-  <div class="bg-gray-50 max-w-7xl w-11/12 px-3 mx-auto py-8">
+  <div class="bg-gray-50 max-w-7xl w-11/12 px-3 mx-auto py-8 text-justify">
     <h1 class="text-2xl text-heading font-bold mb-4">About Chemikart</h1>
     <div class="space-y-4">
       <div class="flex flex-col  sm:flex-row-reverse">
@@ -12,7 +12,7 @@
           <h4 class=" text-md py-2 text-heading font-semibold">
             Our Mission
           </h4>
-          <p>
+          <p class="text-justify">
             At Chemikart, our misssion is to provide high-quality chemical
             products with unparalleled service. We aim to be the trusted partner
             for industries by delivering reliable solutions that meet our
@@ -23,7 +23,7 @@
 
       <div>
         <h4 class="text-md py-2 text-heading font-semibold">Our Vision</h4>
-        <p>
+        <p class="text-justify">
           We envision a world where business thrive with access to premium
           chemical products and services. Our goal is to be the leading
           distributor in the chemical industry, know for our commitment to
