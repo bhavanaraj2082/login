@@ -423,52 +423,55 @@
 	// }
 
 	function handleInputChange(event) {
-  // Get the current input value
-  searchTerm = event.target.value;
-  
-  // Track if user is deleting text
-  const isDeleting = event.inputType === 'deleteContentBackward' || 
-                     event.inputType === 'deleteContentForward';
-  
-  if (searchTerm.length > 0 && !isDeleting) {
-    // Filter countries
-    filterCountriesWithoutAutoSelect();
-    
-    // Show dropdown with filtered results
-    showDropdown = filteredCountries.length > 0;
-    
-    // Check for country code matches specifically
-    const codeSearch = searchTerm.replace('+', '').trim();
-    if (codeSearch.length > 0) {
-      const exactCodeMatches = filteredCountries.filter(
-        (country) => country.code.replace('+', '') === codeSearch
-      );
+		// Get the current input value
+		searchTerm = event.target.value;
 
-      if (exactCodeMatches.length === 1) {
-        selectCountry(exactCodeMatches[0]);
-        return;
-      }
-    }
+		// Track if user is deleting text
+		const isDeleting =
+			event.inputType === "deleteContentBackward" ||
+			event.inputType === "deleteContentForward";
 
-    const countriesStartingWith = filteredCountries.filter(
-      (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-    );
-    
-    if (countriesStartingWith.length === 1) {
-      selectCountry(countriesStartingWith[0]);
-    }
-  } else {
-    filterCountriesWithoutAutoSelect();
-    showDropdown = filteredCountries.length > 0;
-  }
-}
-function filterCountriesWithoutAutoSelect() {
-  filteredCountries = countries.filter(
-    (country) =>
-      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
-  );
-}
+		if (searchTerm.length > 0 && !isDeleting) {
+			// Filter countries
+			filterCountriesWithoutAutoSelect();
+
+			// Show dropdown with filtered results
+			showDropdown = filteredCountries.length > 0;
+
+			// Check for country code matches specifically
+			const codeSearch = searchTerm.replace("+", "").trim();
+			if (codeSearch.length > 0) {
+				const exactCodeMatches = filteredCountries.filter(
+					(country) => country.code.replace("+", "") === codeSearch,
+				);
+
+				if (exactCodeMatches.length === 1) {
+					selectCountry(exactCodeMatches[0]);
+					return;
+				}
+			}
+
+			const countriesStartingWith = filteredCountries.filter((country) =>
+				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+			);
+
+			if (countriesStartingWith.length === 1) {
+				selectCountry(countriesStartingWith[0]);
+			}
+		} else {
+			filterCountriesWithoutAutoSelect();
+			showDropdown = filteredCountries.length > 0;
+		}
+	}
+	function filterCountriesWithoutAutoSelect() {
+		filteredCountries = countries.filter(
+			(country) =>
+				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				country.code
+					.replace("+", "")
+					.includes(searchTerm.replace("+", "").toLowerCase()),
+		);
+	}
 
 	let filteredCountries = countries;
 	let showDropdown = false;
@@ -776,15 +779,24 @@ function filterCountriesWithoutAutoSelect() {
 
 							// thankYouMessageVisible = true;
 							showSuccesDiv = true;
+							setTimeout(() => {
+								showSuccesDiv = false;
+							}, 5000);
 						} else if (status === 2) {
 							form = result.data;
 							await update();
 
 							showFailureDiv = true;
+							setTimeout(() => {
+								showFailureDiv = false;
+							}, 5000);
 						} else {
 							form = result.data;
 							await update();
 							showSuccesDiv = true;
+							setTimeout(() => {
+								showSuccesDiv = false;
+							}, 5000);
 						}
 					}
 				};
@@ -824,7 +836,7 @@ function filterCountriesWithoutAutoSelect() {
 		class="h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl"
 	>
 		<div
-			class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
+			class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
 		>
 			<h3 class="text-2xl font-semibold text-green-600 mb-4">
 				Customer Support Form Submission
@@ -930,8 +942,6 @@ function filterCountriesWithoutAutoSelect() {
 						</p>
 					{/if}
 				</div>
-
-			
 			</div>
 			<div class=" w-full pb-6 mx-auto h-full">
 				<h2 class="text-primary-400 font-semibold text-base pb-6">
@@ -1098,7 +1108,9 @@ function filterCountriesWithoutAutoSelect() {
 					</div> -->
 				</div>
 
-				<div class="flex justify-center md:justify-end md:ml-5 col-span-2 mt-2">
+				<div
+					class="flex justify-center md:justify-end md:ml-5 col-span-2 mt-2"
+				>
 					<button
 						class="w-full md:w-1/2 bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
 						on:click={(event) => {

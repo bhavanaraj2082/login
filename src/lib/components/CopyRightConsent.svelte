@@ -365,6 +365,9 @@
                     submitting = false;
 
                     showSuccesDiv = true;
+                    setTimeout(() => {
+                        showSuccesDiv = false;
+                    }, 5000);
                 }
             };
         } catch (error) {
@@ -394,8 +397,10 @@
         if (!fieldName || fieldName === "title") {
             if (!title) {
                 errors = { ...errors, title: "Title is required" };
-                const { title, ...rest } = errors;
-                errors = { ...rest };
+            } else {
+                // Only remove the error if title has a value
+                const { title: _, ...rest } = errors;
+                errors = rest;
             }
         }
         if (!fieldName || fieldName === "firstname") {
@@ -810,75 +815,80 @@
     //         showDropdown = filteredCountries.length > 0;
     //     }
     // }
-	function filterCountries() {
-		filteredCountries = countries.filter(
-			(country) =>
-				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
-		);
-		if (
-			filteredCountries.length === 1 &&
-			(filteredCountries[0].name.toLowerCase() === searchTerm.toLowerCase() ||
-				filteredCountries[0].code.replace('+', '').toLowerCase() ===
-					searchTerm.replace('+', '').toLowerCase())
-		) {
-			selectCountry(filteredCountries[0]);
-		} else {
-			showDropdown = filteredCountries.length > 0; // Show dropdown only if results exist
-		}
-	}
+    function filterCountries() {
+        filteredCountries = countries.filter(
+            (country) =>
+                country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                country.code
+                    .replace("+", "")
+                    .includes(searchTerm.replace("+", "").toLowerCase()),
+        );
+        if (
+            filteredCountries.length === 1 &&
+            (filteredCountries[0].name.toLowerCase() ===
+                searchTerm.toLowerCase() ||
+                filteredCountries[0].code.replace("+", "").toLowerCase() ===
+                    searchTerm.replace("+", "").toLowerCase())
+        ) {
+            selectCountry(filteredCountries[0]);
+        } else {
+            showDropdown = filteredCountries.length > 0; // Show dropdown only if results exist
+        }
+    }
     // function handleInputChange(event) {
     //     searchTerm = event.target.value;
     //     filterCountries();
     // }
     function handleInputChange(event) {
-  // Get the current input value
-  searchTerm = event.target.value;
-  
-  // Track if user is deleting text
-  const isDeleting = event.inputType === 'deleteContentBackward' || 
-                     event.inputType === 'deleteContentForward';
-  
-  if (searchTerm.length > 0 && !isDeleting) {
-    // Filter countries
-    filterCountriesWithoutAutoSelect();
-    
-    // Show dropdown with filtered results
-    showDropdown = filteredCountries.length > 0;
-    
-    // Check for country code matches specifically
-    const codeSearch = searchTerm.replace('+', '').trim();
-    if (codeSearch.length > 0) {
-      const exactCodeMatches = filteredCountries.filter(
-        (country) => country.code.replace('+', '') === codeSearch
-      );
+        // Get the current input value
+        searchTerm = event.target.value;
 
-      if (exactCodeMatches.length === 1) {
-        selectCountry(exactCodeMatches[0]);
-        return;
-      }
+        // Track if user is deleting text
+        const isDeleting =
+            event.inputType === "deleteContentBackward" ||
+            event.inputType === "deleteContentForward";
+
+        if (searchTerm.length > 0 && !isDeleting) {
+            // Filter countries
+            filterCountriesWithoutAutoSelect();
+
+            // Show dropdown with filtered results
+            showDropdown = filteredCountries.length > 0;
+
+            // Check for country code matches specifically
+            const codeSearch = searchTerm.replace("+", "").trim();
+            if (codeSearch.length > 0) {
+                const exactCodeMatches = filteredCountries.filter(
+                    (country) => country.code.replace("+", "") === codeSearch,
+                );
+
+                if (exactCodeMatches.length === 1) {
+                    selectCountry(exactCodeMatches[0]);
+                    return;
+                }
+            }
+
+            const countriesStartingWith = filteredCountries.filter((country) =>
+                country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+            );
+
+            if (countriesStartingWith.length === 1) {
+                selectCountry(countriesStartingWith[0]);
+            }
+        } else {
+            filterCountriesWithoutAutoSelect();
+            showDropdown = filteredCountries.length > 0;
+        }
     }
-
-    const countriesStartingWith = filteredCountries.filter(
-      (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-    );
-    
-    if (countriesStartingWith.length === 1) {
-      selectCountry(countriesStartingWith[0]);
+    function filterCountriesWithoutAutoSelect() {
+        filteredCountries = countries.filter(
+            (country) =>
+                country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                country.code
+                    .replace("+", "")
+                    .includes(searchTerm.replace("+", "").toLowerCase()),
+        );
     }
-  } else {
-    filterCountriesWithoutAutoSelect();
-    showDropdown = filteredCountries.length > 0;
-  }
-}
-function filterCountriesWithoutAutoSelect() {
-  filteredCountries = countries.filter(
-    (country) =>
-      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
-  );
-}
-
 
     let filteredCountries = countries;
     let showDropdown = false;
@@ -935,20 +945,27 @@ function filterCountriesWithoutAutoSelect() {
 </script>
 
 {#if showSuccesDiv}
-    <div class="mb-4 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl p-4">
+    <div
+        class="mb-4 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl p-4"
+    >
         <!-- <div class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"> -->
-        <div class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg">
+        <div
+            class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
+        >
             <h3 class="md:text-xl text-lg font-semibold text-green-600 mb-4">
                 Copyright Consent Form Submission
             </h3>
             <p class="md:text-md text-xs text-gray-700 mt-4 mb-6">
-                Thank you for submitting your copyright consent form ! <br> 
+                Thank you for submitting your copyright consent form ! <br />
                 We have received your information and will process it shortly.
             </p>
             <div class="w-10/12 mx-auto my-6 border-t-1 border-green-300"></div>
             <div class="flex items-center justify-center">
-                <a href="/" class="bg-white text-primary-500 border-1 border-primary-500 px-4 py-2 rounded-md font-medium hover:bg-primary-500 hover:text-white transition-all duration-300 flex justify-center items-center">
-                    <Icon icon="mdi:home" class="text-xl mr-2"/>Back to Home
+                <a
+                    href="/"
+                    class="bg-white text-primary-500 border-1 border-primary-500 px-4 py-2 rounded-md font-medium hover:bg-primary-500 hover:text-white transition-all duration-300 flex justify-center items-center"
+                >
+                    <Icon icon="mdi:home" class="text-xl mr-2" />Back to Home
                 </a>
             </div>
         </div>
@@ -1032,7 +1049,7 @@ function filterCountriesWithoutAutoSelect() {
                         on:change={() => {
                             validateField("title");
                             if (errors?.title) {
-                                errors.title = ""; 
+                                errors.title = "";
                             }
                         }}
                         class="focus:border-primary-500 bg-gray-50 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-primary-300 rounded-md mb-2 w-full md:w-4/5 p-2.5"
@@ -1046,10 +1063,10 @@ function filterCountriesWithoutAutoSelect() {
                         <option value="Prof.">Prof.</option>
                         <option value="Rev.">Rev.</option>
                     </select>
-                    {#if errors?.title}
-                        <span class="text-red-500 text-xs">{errors.title}</span>
-                    {/if}
                 </div>
+                {#if errors?.title}
+                    <span class="text-red-500 text-xs">{errors.title}</span>
+                {/if}
 
                 <!-- Name fields -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

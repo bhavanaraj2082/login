@@ -808,15 +808,24 @@ function filterCountriesWithoutAutoSelect() {
 
             // thankYouMessageVisible = true;
             showSuccesDiv = true;
+            setTimeout(() => {
+                        showSuccesDiv = false;
+                    }, 5000);
           } else if (status === 2) {
             form = result.data;
             await update();
 
             showFailureDiv = true;
+            setTimeout(() => {
+              showFailureDiv = false;
+                    }, 5000);
           } else {
             form = result.data;
             await update();
             showSuccesDiv = true;
+            setTimeout(() => {
+                        showSuccesDiv = false;
+                    }, 5000);
           }
         }
       };
@@ -868,8 +877,8 @@ function filterCountriesWithoutAutoSelect() {
           firstName = "";
           lastName = "";
             email = data?.email || "";
-            phone = "";
-            company = "";
+            phoneNumber = "";
+            companyName = "";
             country = "";
             isDataAvailable = false;
 
@@ -895,9 +904,9 @@ function filterCountriesWithoutAutoSelect() {
   <div
     class="h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl"
   >
-    <div
-      class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
-    >
+  <div
+  class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
+>
     <h3 class="text-2xl font-semibold text-green-600 mb-4">
       Customer Support Form Submission
       </h3>
