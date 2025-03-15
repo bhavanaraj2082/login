@@ -11,6 +11,12 @@
   let inputValue1 = ""; 
   let inputValue2 = ""; 
   let inputValue3 = ""; 
+  function handleInput(event) {
+    inputValue = event.target.value.toUpperCase();
+    inputValue1 = event.target.value.toUpperCase();
+    inputValue2 = event.target.value.toUpperCase();
+    inputValue3 = event.target.value.toUpperCase();
+  }
   let lotNumber="";
   let lotNumber1="";
   let lotNumber2="";
@@ -185,7 +191,7 @@ function toggleRotation(index) {
       </div>
       {/each}
     </nav> -->
-    <nav aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto rounded-t scroll">
+    <nav aria-label="Tabs" class="w-full flex space-x-0 overflow-x-auto rounded-t hide">
       {#each tabs as tab}
         <div class="inline-block w-full">
           <button
@@ -237,15 +243,18 @@ function toggleRotation(index) {
             <input
             type="text"
             bind:value={inputValue}
+            on:input={handleInput}
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. IPAKKIT00"
             class="flex w-full border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
           />
+          <!-- <p>{inputValue}</p> -->
+        
           <!-- class="block w-full p-3 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm mb-0" -->
           {#if showErrors && inputValue.length === 0}
           <div class="flex text-start">
-            <span class="text-red-400 text-xs">Order Number is required</span>
+            <span class="text-red-500 sm:text-xs text-2s font-medium">Product Number is required</span>
           </div>
           {/if}
             {#if sdsProductNumberError}
@@ -261,7 +270,7 @@ function toggleRotation(index) {
               </button>
               </div>
             </div>
-           
+            
           </div>
           <p class="sm:text-sm text-xs font-medium text-primary-500 my-2">
           {#if status === undefined}
@@ -303,15 +312,17 @@ function toggleRotation(index) {
           <div class="w-full">
             <input 
             bind:value={inputValue1}
+            on:input={handleInput}
             type="text"
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. IPAKKIT00"
             class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
           />
+          <!-- <p>{inputValue1}</p> -->
           {#if showErrors && inputValue1.length === 0}
           <div class="flex text-start">
-            <span class="text-red-400 text-xs">Order Number is required</span>
+            <span class="text-red-500 sm:text-xs text-2s font-medium">Product Number is required</span>
           </div>
         {/if}
           {#if sdsProductNumberError}
@@ -333,7 +344,7 @@ function toggleRotation(index) {
                 />
               {#if showErrors && lotNumber.length === 0}
               <div class="flex text-start">
-                <span class="text-red-400 text-xs">Lot Number is required</span>
+                <span class="text-red-500 sm:text-xs text-2s font-medium">Lot Number is required</span>
               </div>
             {/if}
             </div>
@@ -386,15 +397,17 @@ function toggleRotation(index) {
           <div class=" w-full">
             <input 
             bind:value={inputValue2}
+            on:input={handleInput}
             type="text"
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. IPAKKIT00"
             class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
           />
+          <!-- <p>{inputValue2}</p> -->
           {#if showErrors && inputValue2.length === 0}
           <div class="flex text-start">
-            <span class="text-red-400 text-xs">Order Number is required</span>
+            <span class="text-red-500 sm:text-xs text-2s font-medium">Product Number is required</span>
           </div>
           {/if}
           {#if sdsProductNumberError}
@@ -415,7 +428,7 @@ function toggleRotation(index) {
           />
           {#if showErrors && lotNumber1.length === 0}
           <div class="flex text-start">
-            <span class="text-red-400 text-xs">Lot Number is required</span>
+            <span class="text-red-500 sm:text-xs text-2s font-medium">Lot Number is required</span>
           </div>
         {/if}
           {#if lotNumber === '' || lotNumber === null}
@@ -470,15 +483,18 @@ function toggleRotation(index) {
           <div class=" w-full">
             <input 
             bind:value={inputValue3}
+            on:input={handleInput}
             type="text"
             id="product-number-sds"
             name="productNumber"
             placeholder="E.G. IPAKKIT00"
             class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
           />
+          <!-- <p>{inputValue3}</p> -->
+
           {#if showErrors && inputValue3.length === 0}
           <div class="flex text-start">
-            <span class="text-red-400 text-xs">Order Number is required</span>
+            <span class="text-red-500 sm:text-xs text-2s font-medium">Product Number is required</span>
           </div>
           {/if}
             <br>
@@ -496,7 +512,7 @@ function toggleRotation(index) {
           />
           {#if showErrors && lotNumber2.length === 0}
           <div class="flex text-start">
-            <span class="text-red-400 text-xs">Lot Number is required</span>
+            <span class="text-red-500 sm:text-xs text-2s font-medium">Lot Number is required</span>
           </div>
           {/if}
           {#if lotNumber === '' || lotNumber === null}
@@ -523,10 +539,10 @@ function toggleRotation(index) {
     </div>
     <div class="w-full lg:w-5/12 md:pl-2 pl-0"> 
       {#if activeTab === "SafetyData Sheets"}
-        <div class="bg-white p-4 border rounded shadow-md w-full self-start">
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                  <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
-          <div on:click={() => toggleProductDetails2("Safety Data Sheets")} class="flex items-center justify-between">
+        <div class="bg-white p-4 border rounded shadow-md w-full self-start cursor-pointer" on:click={() => toggleProductDetails2("Safety Data Sheets")}>
+          <div class="flex items-center justify-between">
             <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find the Product Number</h3>
                   <!-- svelte-ignore a11y-missing-attribute -->
             <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
@@ -572,11 +588,11 @@ function toggleRotation(index) {
         </div>
       {/if}
       {#if activeTab === "Certificates of Analysis"}
-      <div class="flex flex-wrap  space-y-4 ml-0 lg:ml-1">       
-        <div class="bg-white p-4 border rounded shadow w-full self-start"> 
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
-          <div on:click={() => toggleProductDetails2("Certificates of Analysis")} class="flex items-center justify-between">
+      <div class="flex flex-wrap  space-y-4 ml-0 lg:ml-1">   
+         <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->    
+        <div class="bg-white p-4 border rounded shadow w-full self-start cursor-pointer" on:click={() => toggleProductDetails2("Certificates of Analysis")} > 
+          <div class="flex items-center justify-between">
             <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find the Product Number</h3>
                   <!-- svelte-ignore a11y-missing-attribute -->
             <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
@@ -620,10 +636,10 @@ function toggleRotation(index) {
           </div>
         {/if}        
         </div>
-        <div class="bg-white p-4 border rounded shadow w-full self-start">
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
+         <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
-          <div on:click={() => toggleLotDetails("Certificates of Analysis")} class="flex items-center justify-between">
+        <div class="bg-white p-4 border rounded shadow w-full self-start cursor-pointer" on:click={() => toggleLotDetails("Certificates of Analysis")} >
+          <div class="flex items-center justify-between">
             <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find a Lot/Batch Number for COA</h3>
                   <!-- svelte-ignore a11y-missing-attribute -->
             <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
@@ -662,10 +678,10 @@ function toggleRotation(index) {
       {/if}   
 {#if activeTab === "Certificates of Origin"}
 <div class="flex flex-wrap space-y-4 ml-0 lg:ml-1">
-  <div class="bg-white p-4 border rounded shadow w-full  self-start">
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div on:click={() => toggleProductDetails2("Certificates of Origin")} class="flex items-center justify-between">
+   <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div class="bg-white p-4 border rounded shadow w-full  self-start cursor-pointer" on:click={() => toggleProductDetails2("Certificates of Origin")} >
+    <div class="flex items-center justify-between">
       <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find the Product Number</h3>
             <!-- svelte-ignore a11y-missing-attribute -->
       <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
@@ -709,10 +725,10 @@ function toggleRotation(index) {
     </div>
   {/if}
   </div>
-  <div class="bg-white p-4 border rounded shadow w-full  self-start">
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div on:click={() => toggleLotDetails("Certificates of Origin")} class="flex items-center justify-between">
+  <div class="bg-white p-4 border rounded shadow w-full  self-start cursor-pointer"  on:click={() => toggleLotDetails("Certificates of Origin")} >
+    <div class="flex items-center justify-between">
       <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find a Lot/Batch Number for COO</h3>
             <!-- svelte-ignore a11y-missing-attribute -->
       <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
@@ -756,8 +772,8 @@ function toggleRotation(index) {
 <div class="flex flex-wrap space-y-4 ml-0 lg:ml-1">
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div class="bg-white p-4 border rounded shadow w-full self-start"> 
-    <div class="flex items-center justify-between" on:click={() => toggleProductDetails2("Certificates of Quality")}>
+  <div class="bg-white p-4 border rounded shadow w-full self-start cursor-pointer" on:click={() => toggleProductDetails2("Certificates of Quality")}> 
+    <div class="flex items-center justify-between">
       <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find the Product Number</h3>
       <!-- svelte-ignore a11y-missing-attribute -->
       <a class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
@@ -801,10 +817,10 @@ function toggleRotation(index) {
     </div>
   {/if}
   </div>
-  <div class="bg-white p-4 border rounded shadow w-full  self-start">
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
+     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div on:click={() => toggleLotDetails("Certificates of Origin")} class="flex items-center justify-between">
+  <div class="bg-white p-4 border rounded shadow w-full  self-start cursor-pointer" on:click={() => toggleLotDetails("Certificates of Origin")}>
+    <div  class="flex items-center justify-between">
       <h3 class="sm:text-md text-sm font-medium text-gray-700">How to Find a Lot/Batch Number for COQ</h3>
       <!-- svelte-ignore a11y-missing-attribute -->
       <a  class="text-primary-400 hover:underline flex items-center ml-12 cursor-pointer">
