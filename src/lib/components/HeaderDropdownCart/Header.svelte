@@ -268,8 +268,10 @@ async function submitForm() {
 
 	function handleInput(event) {
 		searchQuery = event.target.value;
+		if (searchQuery.length >= 3) {
 		isLoading = true;
 		debounce(handleSearchSubmit, 300);
+		}
 	}
 
 	function handleData() {
@@ -407,19 +409,11 @@ async function submitForm() {
 					class="text-left text-white text-md w-full py-2 px-4 font-medium hover:bg-primary-400 transition rounded transform hover:scale-105 duration-200 ">
 					Order Status
 				</button> -->
-				{#if $authedUser.email}
 				<button
 					on:click={() => navigateTo('/quotes')}
 					class="text-left text-white text-md w-full py-2 px-4 font-medium hover:bg-primary-400 transition rounded transform hover:scale-105 duration-200 ">
 					Quotes
 				</button>
-				{:else}
-				<button
-					on:click={() => navigateTo('/quote')}
-					class="text-left text-white text-md w-full py-2 px-4 font-medium hover:bg-primary-400 transition rounded transform hover:scale-105 duration-200 ">
-					Quotes
-				</button>
-				{/if}
 			</div>
 		{:else}
 			<button
@@ -619,7 +613,7 @@ async function submitForm() {
 						<Icon icon="ei:spinner" class="w-8 h-8 animate-spin-slow text-primary-600 mx-2 text-5xl"/>
 						<span>Loading Products...</span>
 					</p>
-				{:else if searchQuery.trim() && searchResults && searchResults.length === 0}
+					{:else if searchQuery.trim().length >= 3 && searchResults && searchResults.length === 0}
 					<p class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-30 rounded">
 						No products found
 					</p>
@@ -779,7 +773,6 @@ async function submitForm() {
 						{/if}
 					</div>
 				{/each}
-				{#if $authedUser.email}
 				<a href="/quotes">
 					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap transform hover:scale-105 duration-200">
 						<span class="text-white font-medium text-xs lg:text-base">
@@ -787,15 +780,6 @@ async function submitForm() {
 						</span>
 					</button>
 				</a>
-				{:else}
-				<a href="/quote">
-					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap transform hover:scale-105 duration-200">
-						<span class="text-white font-medium text-xs lg:text-base">
-							Quotes
-						</span>
-					</button>
-				</a>
-				{/if}
 			</div>
 				
 			<div class="flex gap-1 text-gray-600 items-center ">

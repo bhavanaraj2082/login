@@ -15,8 +15,8 @@
       return text.split('\n').map(item => item + "<br>").join('');
     };
   </script>
-<div class="mx-auto w-11/12 mb-10">
-      <div class="overflow-hidden mb-8 p-7 bg-white rounded-lg shadow-lg">
+<div class="mx-auto w-11/12 mb-10 text-justify">
+      <div class="overflow-hidden mb-8 p-7 bg-white rounded-md shadow">
         <div class="mb-4">
           <h2 class="text-3xl font-semibold text-gray-800">{singleNewsData.title}</h2>
           <p class="text-sm text-gray-500 mt-2">

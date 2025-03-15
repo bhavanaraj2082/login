@@ -38,7 +38,7 @@
     let emailError = "";
     let form;
     const maxFileSize = 5 * 1024 * 1024; // 5MB
-    let title = "";
+    let title;
     let firstname = "";
     let lastname = "";
     let company = "";
@@ -935,27 +935,20 @@ function filterCountriesWithoutAutoSelect() {
 </script>
 
 {#if showSuccesDiv}
-    <div
-        class="h-4/5 mb-4 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl"
-    >
-        <div
-            class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
-        >
-            <h3 class="text-2xl font-semibold text-green-600 mb-4">
+    <div class="mb-4 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl p-4">
+        <!-- <div class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"> -->
+        <div class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg">
+            <h3 class="md:text-xl text-lg font-semibold text-green-600 mb-4">
                 Copyright Consent Form Submission
             </h3>
-            <p class="text-lg text-gray-700 mb-6">
-                Thank you for submitting your copyright consent form! We have
-                received your information and will process it shortly.
+            <p class="md:text-md text-xs text-gray-700 mt-4 mb-6">
+                Thank you for submitting your copyright consent form ! <br> 
+                We have received your information and will process it shortly.
             </p>
-
-            <div class="w-10/12 mx-auto my-6 border-t-2 border-green-300"></div>
-            <div>
-                <a
-                    href="/"
-                    class="bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
-                >
-                    Return to Home
+            <div class="w-10/12 mx-auto my-6 border-t-1 border-green-300"></div>
+            <div class="flex items-center justify-center">
+                <a href="/" class="bg-white text-primary-500 border-1 border-primary-500 px-4 py-2 rounded-md font-medium hover:bg-primary-500 hover:text-white transition-all duration-300 flex justify-center items-center">
+                    <Icon icon="mdi:home" class="text-xl mr-2"/>Back to Home
                 </a>
             </div>
         </div>
@@ -1039,7 +1032,7 @@ function filterCountriesWithoutAutoSelect() {
                         on:change={() => {
                             validateField("title");
                             if (errors?.title) {
-                                errors.title = ""; // Clear the error on change
+                                errors.title = ""; 
                             }
                         }}
                         class="focus:border-primary-500 bg-gray-50 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-primary-300 rounded-md mb-2 w-full md:w-4/5 p-2.5"

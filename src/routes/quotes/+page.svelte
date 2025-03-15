@@ -1,6 +1,9 @@
 <script>
   import Qoutescomponents from "$lib/components/ChemikartQoutes/Qoutescomponents.svelte";
+  import QoutesBeforeLogin from "$lib/components/ChemikartQoutes/QoutesBeforeLogin.svelte";
   export let data;
+  // console.log(data.authedUser, "data in page");
+  let isAuthedUserEmpty = Object.keys(data.authedUser).length === 0;
   import SEO from "$lib/components/SEO.svelte";
   import {
     PUBLIC_WEBSITE_URL,
@@ -30,8 +33,11 @@
     },
   };
 </script>
-
 <SEO {metadata} />
-<div class="pt-10 pb-5">
-  <Qoutescomponents {data} />
-</div>
+{#if isAuthedUserEmpty}
+  <QoutesBeforeLogin />
+{:else}
+  <div class="pt-10 pb-5">
+    <Qoutescomponents {data} />
+  </div>
+{/if}

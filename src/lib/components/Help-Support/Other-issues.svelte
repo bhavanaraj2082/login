@@ -791,7 +791,7 @@
 	  // validateField("accountNumber");
 	  //   validateField('technical_issue');
 	  // validateField("issue");
-    validateField('poNumber');
+    // validateField('poNumber');
     validateField('assistanceMessage');
   
 	  const isValid = Object.keys(errors).length === 0;
@@ -952,7 +952,7 @@ use:enhance={handlesubmit}
       Other Issues
     </h2>
     <input hidden name="issueName" value="Other Issues" />
-    <label for="PoNumber" class="block mb-2 text-sm">PO Number/Order Number</label>
+    <!-- <label for="PoNumber" class="block mb-2 text-sm">PO Number/Order Number</label>
     <input
       type="text"
       name="poNumber"
@@ -964,7 +964,7 @@ use:enhance={handlesubmit}
     />
     {#if errors.poNumber}
     <p class="text-red-500 text-xs mt-1">{errors.poNumber}</p>
-    {/if}
+    {/if} -->
   </div>
   <div>
     <label for="assistance-message" class="block mb-2 text-sm"

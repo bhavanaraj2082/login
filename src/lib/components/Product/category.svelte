@@ -2,7 +2,7 @@
   export let data;
   const categories = data.records;
   import Icon from "@iconify/svelte";
-  console.log("=======>cat", categories);
+  // console.log("=======>cat", categories);
 
   let searchTerm = "";
 
@@ -35,10 +35,10 @@
           type="text"
           bind:value={searchTerm}
           placeholder="Search categories..."
-          class="w-full sm:p-2 p-1 sm:pl-10 pl-7 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent placeholder:text-xs"
+          class="w-full pl-7 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent placeholder:text-xs text-xs p-3"
         />
         {#if searchTerm}
-        <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded" style="color: #cb1919" on:click={clearSearch}>
+        <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded bg-red-100 p-1" style="color: #cb1919" on:click={clearSearch}>
           <Icon icon="oui:cross" width="16" height="16" class="font-bold" />
         </button>
       {/if}
