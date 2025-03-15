@@ -22,13 +22,13 @@
     <circle cx="380" r="10" fill="#f9fafb"  cy="80"></circle>
   </svg>
   <div
-    class="absolute top-1/4 left-10 lg:w-72 w-20 lg:h-80 h-20 bg-primary-100 blur-sm clip-hexagon shadow"
+    class="absolute top-1/4 left-10 lg:w-72 w-20 lg:h-80 h-20 bg-primary-100 blur-sm clip-hexagon animate-pulse shadow"
   ></div>
   <div
-    class="absolute bottom-2 right-40 lg:w-40 w-20 lg:h-40 h-20 bg-primary-100 clip-hexagon"
+    class="absolute bottom-2 right-40 lg:w-40 w-20 lg:h-40 h-20 animate-pulse bg-primary-100 clip-hexagon"
   ></div>
   <div
-    class="absolute top-0 md:right-20 right-6 w-20 h-20 bg-primary-200 clip-hexagon"
+    class="absolute top-0 md:right-20 right-6 w-20 h-20 animate-pulse bg-primary-100 clip-hexagon"
   ></div>
   <div
     class="flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 relative z-10"
@@ -66,7 +66,7 @@
         <div class="flex justify-center z-50">
           <a
             href="/"
-            class="inline-flex bg-primary-500 sm:text-base text-xs text-white font-semibold py-3 px-8 rounded-full hover:bg-primary-600 transition-colors duration-300"
+            class="inline-flex items-center text-center bg-gradient-to-r from-primary-500 to-primary-600 text-white sm:text-base text-sm font-medium sm:py-3 py-2 sm:px-8 px-4 mb-4 rounded-full shadow hover:bg-primary-600 transition-all duration-500 transform hover:scale-105"
           >
             <Icon icon="mdi:home" class="text-xl mr-2" />
             <span class="text-sm">Back to Home</span>

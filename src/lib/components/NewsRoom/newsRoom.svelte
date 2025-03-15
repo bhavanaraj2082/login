@@ -59,7 +59,7 @@
                     <h2 class="font-semibold sm:text-md text-sm h-10">{item.title}</h2>
                     <p class="sm:text-sm text-xs text-gray-600 h-14 overflow-hidden text-ellipsis">{truncateText(item.previewText, 90)}</p>
                     <hr class="border-t-2 border-gray-300">
-                    <h2 class="font-medium h-10 sm:text-sm text-xs">TIME
+                    <h2 class="font-medium h-10 sm:text-sm text-xs">Date
                     <p class="sm:text-md sm:text-sm text-xs text-gray-600 h-14 overflow-hidden text-ellipsis"> {new Date(item.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
