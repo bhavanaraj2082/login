@@ -533,8 +533,7 @@ export const loadProductsubcategory = async (
     const subcategory = await SubCategory.findOne({ urlName: suburl })
       .populate({ path: "manufacturerIds", select: "-_id name" })
       .populate({ path: "subSubCategoryIds", select: "-_id name urlName" });
-    let af = Date.now();
-    //console.log(af - be, "milliseconds");
+
     const subCategoryDetails = {
       name: subcategory.name,
       urlName: subcategory.urlName,
@@ -546,17 +545,13 @@ export const loadProductsubcategory = async (
       };
     }
 
- 
-
     const matchCondition = {
-      "subCategoryDetails.urlName": subcategory.urlName,
-      inStock: { $exists: true, $gt: 0 },
+        subCategory: subcategory._id,
+      // inStock: { $exists: true, $gt: 0 },
     };
 
- 
-
     if (manufacturer) {
-      matchCondition["manufacturerDetails.name"] = manufacturer;
+      matchCondition.manufacturerName = manufacturer;
     }
     if (search) {
       matchCondition.$or = [
@@ -579,10 +574,8 @@ export const loadProductsubcategory = async (
       sortConditions.productName = 1
     }
  
-
-    const before = Date.now();
-    
     const products = await Product.aggregate([
+      { $match: matchCondition },
       {
         $lookup: {
           from: "subcategories",
@@ -599,7 +592,6 @@ export const loadProductsubcategory = async (
           as: "manufacturerDetails",
         },
       },
-      { $match: matchCondition },
       {
         $lookup: {
           from: "categories",
@@ -661,7 +653,6 @@ export const loadProductsubcategory = async (
     
     const after = Date.now();
 
-  //  console.log(products);
    if(!products[0].data.length && !products[0].totalCount.length ){
     return {
       products: [],
