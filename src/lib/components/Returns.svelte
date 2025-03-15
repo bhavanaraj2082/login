@@ -93,8 +93,7 @@
 			<img
 				class="p-4 w-36 h-36 md:w-48 md:h-48"
 				src="/return1.webp"
-				alt="Return Order Issue"
-			/>
+				alt="Return Order Issue"/>
 			<h2 class="text-2xl font-bold mb-4 md:mb-0 ml-4 text-center md:text-left text-heading">
 				Have an issue with an order? Start here!
 			</h2>
