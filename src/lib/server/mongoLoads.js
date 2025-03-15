@@ -566,9 +566,11 @@ export const loadProductsubcategory = async (
     if(price === "asc"){
       sortConditions = {}
       sortConditions["stockDetails.pricing.USD"] = 1
+      sortConditions["stockDetails.pricing.INR"] = 1
     }else if(price === "desc"){
       sortConditions = {}
       sortConditions["stockDetails.pricing.USD"] = -1
+      sortConditions["stockDetails.pricing.INR"] = -1
     }else{
       sortConditions = {}
       sortConditions.productName = 1
@@ -616,6 +618,9 @@ export const loadProductsubcategory = async (
         $facet: {
           data: [
             {
+              $sort:sortConditions
+            },
+            {
               $project: {
                 productNumber: 1,
                 productName: 1,
@@ -632,9 +637,7 @@ export const loadProductsubcategory = async (
                 "stockDetails.distributor": 1,
               },
             },
-            {
-              $sort:sortConditions
-            },
+           
             {
               $skip: (Number(page) - 1) * Number(pageSize),
             },

@@ -20,9 +20,11 @@ export const actions = {
     checkout:async({request,locals})=>{
         try {
             const userId = locals?.authedUser?.id || ""
+            const email = locals?.authedUser?.email || ""
             const body = Object.fromEntries(await request.formData())
             const parsedBody = JSON.parse(body.order)
             parsedBody.userId = userId
+            parsedBody.userEmail = email
             //console.log(parsedBody);
             return await checkoutOrder(parsedBody)   
         } catch (error) {

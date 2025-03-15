@@ -23,6 +23,7 @@
 	let isShowbox = true
 	let order = ''
 	let taxError = ''
+	let gstNumber = userData?.gstNumber || ''
 	let checkout
 	let onSubmit = false
 	let addressError = false
@@ -197,7 +198,7 @@
 				//distributorAlias:cart.distributorDetails.aliasname
 			});
 		});
-
+        console.log('object',gstNumber);
 		let order = {
 			invoice:generateInvoiceNumber(),
 			subtotalprice: $currencyState === "inr" ? priceINR : priceUSD,
@@ -207,7 +208,7 @@
 			orderdetails,
 			billingaddress:$billingAddress,
 			shippingaddress:$shippingAddress,
-			//carrier:{carrier,accountNumber},
+			gstNumber,
 			currency: $currencyState === "inr" ? "INR" : "USD",
 			profileId:userData._id
 		};
@@ -221,9 +222,16 @@
 			invalidate("data:checkout")
 		//}
 	}
-
+	$:console.log(gstNumber);
 	const handleSubmit = ({cancel})=>{
 		onSubmit = true
+		taxError = ''
+		if(!gstNumber.length){
+			console.log("gst Number",gstNumber);
+			taxError = "GST number is required"
+			cancel()
+		} 
+
 		if($billingAddress === "" || $shippingAddress === ""){
 			addressError = true
 			cancel()
@@ -244,12 +252,14 @@
 	};
 
 	const validateTax = (taxNum)=>{
+		taxError = ''
+		
 	   if(taxNum.length < 3){
           return
 	   } 
-       //if(taxType === "GST"){
-		   !/^[0-9]{2}[A-Za-z]{1}/.test(taxNum) || taxNum.length > 15 ? taxError = "invalid GST number": taxError = ""
-	   //}
+	   !/^[0-9]{2}[A-Za-z]{1}/.test(taxNum) || taxNum.length > 15 ? taxError = "invalid GST number": taxError = ""
+	   gstNumber = taxNum
+	   handleCheckout($cart)
 	}
 
 </script>
@@ -283,7 +293,7 @@
 					    <Icon icon="ic:round-mode-edit" class=" text-md" />
 					</button>
 				</div>
-				<input value={userData?.gstNumber || ""} on:input={e=>validateTax(e.target.value)} class="mt-2 w-full uppercase outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+				<input value={gstNumber} on:input={e=>validateTax(e.target.value)} class="mt-2 w-full uppercase outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
 		        <p class="{taxError.length ? "": "hidden text-green-400"} text-xs font-normal text-red-500 ">{taxError}</p>
 			</div>
 		 </div>
