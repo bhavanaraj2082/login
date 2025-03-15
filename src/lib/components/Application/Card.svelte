@@ -13,7 +13,7 @@
   };
   </script>
   
-  <div class="max-w-xs rounded-lg overflow-hidden shadow-lg bg-white mx-auto">
+  <div class="max-w-sm rounded-lg overflow-hidden shadow-md bg-white mx-auto">
     <a href={url} class="block">
       <img 
         src={imageSrc} 
