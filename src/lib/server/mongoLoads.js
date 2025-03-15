@@ -549,14 +549,14 @@ export const loadProductsubcategory = async (
  
 
     const matchCondition = {
-      "subCategoryDetails.urlName": subcategory.urlName,
-      inStock: { $exists: true, $gt: 0 },
+      subCategory: subcategory._id,
+      //inStock: { $exists: true, $gt: 0 },
     };
 
  
 
     if (manufacturer) {
-      matchCondition["manufacturerDetails.name"] = manufacturer;
+      matchCondition.manufacturerName = manufacturer;
     }
     if (search) {
       matchCondition.$or = [
@@ -571,9 +571,11 @@ export const loadProductsubcategory = async (
     if(price === "asc"){
       sortConditions = {}
       sortConditions["stockDetails.pricing.USD"] = 1
+      sortConditions["stockDetails.pricing.INR"] = 1
     }else if(price === "desc"){
       sortConditions = {}
       sortConditions["stockDetails.pricing.USD"] = -1
+      sortConditions["stockDetails.pricing.INR"] = -1
     }else{
       sortConditions = {}
       sortConditions.productName = 1
@@ -583,6 +585,7 @@ export const loadProductsubcategory = async (
     const before = Date.now();
     
     const products = await Product.aggregate([
+      { $match: matchCondition },
       {
         $lookup: {
           from: "subcategories",
@@ -599,7 +602,6 @@ export const loadProductsubcategory = async (
           as: "manufacturerDetails",
         },
       },
-      { $match: matchCondition },
       {
         $lookup: {
           from: "categories",
@@ -624,6 +626,9 @@ export const loadProductsubcategory = async (
         $facet: {
           data: [
             {
+              $sort:sortConditions
+            },
+            {
               $project: {
                 productNumber: 1,
                 productName: 1,
@@ -640,9 +645,7 @@ export const loadProductsubcategory = async (
                 "stockDetails.distributor": 1,
               },
             },
-            {
-              $sort:sortConditions
-            },
+           
             {
               $skip: (Number(page) - 1) * Number(pageSize),
             },
@@ -661,7 +664,7 @@ export const loadProductsubcategory = async (
     
     const after = Date.now();
 
-  //  console.log(products);
+   console.log(after-before,"ms");
    if(!products[0].data.length && !products[0].totalCount.length ){
     return {
       products: [],

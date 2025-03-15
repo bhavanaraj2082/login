@@ -115,6 +115,12 @@
 					if (!$authedUser.id) {
 						await submitAlternateForm();
 					} else {
+						const formdata = new FormData()
+					sendMessage("/?/getFavorites",formdata,async(result)=>{
+						console.log(result.favorite);
+						myFavorites.set(result.favorite)
+						localStorage.setItem("myfavorites",JSON.stringify(result.favorite))
+					})
 						await submitForm();	
 					}
 					const newExpirationTime = new Date();

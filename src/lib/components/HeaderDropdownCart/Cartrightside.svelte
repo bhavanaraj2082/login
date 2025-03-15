@@ -449,12 +449,10 @@
 									/>
 								</div>
 								<div class="flex-1">
-									<p class=" font-semibold text-sm">
+									<a href="/products/details/{item.productDetails.productNumber}" class="hover:text-primary-500 hover:underline font-semibold text-sm">
 										{item.productDetails.productNumber}
-									</p>
-									<p
-										class="font-medium text-xs text-gray-800"
-									>
+									</a>
+									<p class="font-medium text-xs text-gray-800">
 										{item.productDetails.productName}
 									</p>
 									<p class="text-xs text-gray-500">

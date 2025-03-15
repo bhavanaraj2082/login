@@ -357,7 +357,7 @@ function handleMouseLeave() {
   </form>
 <section class=" space-y-3 lg:flex items-start gap-4">
     <!-- filters -->
-    <div class=" w-full h-fit sticky top-0 lg:w-1/4">
+    <div class=" w-full h-fit sticky top-0 z-20 lg:w-1/4">
         <div class=" p-2 sm:p-4 bg-white shadow rounded space-y-3 mt-3">
             
             <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -472,7 +472,7 @@ function handleMouseLeave() {
                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                 <img 
                 src={product?.imageSrc} 
-                class="cursor-pointer w-20 h-20 sm:w-40 sm:h-40 object-contain" 
+                class="cursor-pointer w-32 h-32 sm:w-40 sm:h-40 object-contain" 
                 alt=""
                 on:click={() => imagemodal(product?.imageSrc)}
                 on:mouseenter={() => handleMouseEnter(product?.imageSrc , index)}
@@ -595,8 +595,8 @@ function handleMouseLeave() {
        {/if}
        
        <!-- pagination -->
-       <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {totalPages === 1 && products.length < 10 ? "hidden": "flex"}">
-        <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
+       <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {totalPages <= 1 || products.length < 10 ? "hidden": "flex"}">
+      <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
         on:click={() => goToPage(1)} 
         disabled={currentPage == 1}
       >

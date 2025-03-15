@@ -109,6 +109,9 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    gstNumber:{
+      type:String
+    },
     status: {
       type: String,
       enum: ['pending', 'shipped', 'completed', 'pending cancellation', 'cancelled'],
@@ -122,11 +125,6 @@ const orderSchema = new mongoose.Schema(
   }
 );
 delete mongoose.models.Order
-
-// Create a model based on the schema
-// if (!mongoose.models.Order && !orderSchema.paths.orderid.options.autoIncrement) {
-// 	orderSchema.plugin(AutoIncrement, { inc_field: 'orderid' });
-// }
 
 const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 

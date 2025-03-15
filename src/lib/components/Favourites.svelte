@@ -238,16 +238,17 @@ function calculateTotalPrice(price, quantity) {
     // }
     let timeout
     function handleQty(item,quantity){
-        // if(isNaN(quantity)){
-        //     return
-        // }
-        // if(quantity >10000000) quantity = 10000000
-        //  clearTimeout(timeout)
-        //  timeout = setTimeout(()=>{
-        //  let selectedQty = Math.ceil(quantity/ item.stockInfo.orderMultiple) * item.stockInfo.orderMultiple;
-        //  item.quantity = selectedQty
-        //  tog = null
-        //  },1400);
+        if(isNaN(quantity)){
+            return
+        }
+        if(quantity >10000000) quantity = 10000000
+         clearTimeout(timeout)
+         timeout = setTimeout(()=>{
+         let selectedQty = Math.ceil(quantity/ item.stockInfo.orderMultiple) * item.stockInfo.orderMultiple;
+         console.log(quantity);
+         item.quantity = selectedQty
+         tog = null
+         },1400);
     }
 
     function increaseQuantity(item) {
@@ -501,7 +502,7 @@ onMount(() => {
                 <img 
                     src={item.image} 
                     alt={item.name} 
-                    class="w-32 h-32 object-cover rounded-md mb-4 md:mb-0 md:mr-6"/>
+                    class=" w-32 h-32 object-cover rounded-md mb-3 md:mb-0 md:mr-4"/>
                 
                 <div class="flex-1 text-center md:text-left space-y-0.5">
                     <h2 class="text-sm font-bold text-gray-800">{item?.name || ''}</h2>
@@ -545,7 +546,7 @@ onMount(() => {
                     </div>
                 </div>
                 <div class="flex flex-col md:items-end items-center mt-4 md:mt-0 space-y-4">
-                    <div class="flex space-x-4 relative">
+                    <div class="flex md:flex-col lg:flex-row gap-3 space-x-4 relative">
                      {#if item.stockInfo.stock > 0}
                         <form 
                         method="POST" 
@@ -587,7 +588,7 @@ onMount(() => {
                     </div>
                     <div class="flex items-center">
                     <input type="number" bind:value={item.quantity}
-                    on:input={e=>handleQty(item,parseInt(e.target.value))}
+                    
                     class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">   
                     <div class=" {tog === index ? "hidden" : ""} flex items-center justify-center md:justify-start space-x-4">
                         <button 
@@ -596,9 +597,7 @@ onMount(() => {
                             disabled={item.quantity <= item.stockInfo.orderMultiple}>
                             -
                         </button>
-                        <button  on:click={async()=>{
-                            tog = index
-                        }} class="text-sm font-medium">{item.quantity}</button>
+                        <button class="text-sm font-medium">{item.quantity}</button>
                         <button 
                             on:click={() => increaseQuantity(item)} 
                             class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
