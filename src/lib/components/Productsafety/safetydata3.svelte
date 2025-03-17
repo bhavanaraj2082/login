@@ -8,7 +8,7 @@
           TSCA 8 Notification
         </h1> -->
 
-        <p class=" mb-4 sm:text-sm text-xs">
+        <p class=" mb-4 sm:text-sm text-justify text-xs">
           Thank you for your interest. Unfortunately, the webform you are accessing is no longer available.
         </p>
   
