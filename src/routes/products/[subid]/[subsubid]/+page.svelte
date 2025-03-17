@@ -2,7 +2,6 @@
   import { page } from "$app/stores";
   import { invalidate } from "$app/navigation";
   import Subsubcategory from "$lib/components/Product/subsubcategory.svelte";
-  import Filter from "$lib/components/productsFilter/Filter.svelte";
   import { sendMessage } from "$lib/utils.js";
   import { allProducts } from "$lib/stores/filter.js";
   import ProductFilter from "$lib/components/ProductsFilter/ProductFilter.svelte";
