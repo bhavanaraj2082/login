@@ -13,11 +13,11 @@
 //  $: console.log("subsubcategories",subsubcategories);
 //  console.log("relatedProducts",relatedProducts);
 
-$: filteredSubsubCategories = searchTerm.trim() === "" 
-  ? subsubcategories 
-  : subsubcategories.filter(
-      (subsubcategories) => subsubcategories.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  $: filteredSubsubCategories = searchTerm.trim() === "" 
+    ? subsubcategories 
+    : subsubcategories.filter(
+        (subsubcategories) => subsubcategories.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
 
   let searchTerm="";
 
@@ -91,10 +91,10 @@ $: filteredSubsubCategories = searchTerm.trim() === ""
           class="h-80 rounded-lg shadow"/>
       </div>
       <div class="flex-grow w-full md:w-2/3">
-        <h2 class="text-2xl text-heading font-semibold">
+        <h2 class="sm:text-2xl text-xl text-heading font-semibold">
           {subcategoryData?.name}
         </h2>
-        <p class="mt-2 text-md text-gray-600">{subcategoryData?.description}</p>
+        <p class="mt-2 sm:text-md  text-gray-600 text-justify">{subcategoryData?.description}</p>
       </div>
     </div>
     {#if subcategoryData.additionalInfo && subcategoryData.additionalInfo.length > 0}
@@ -104,7 +104,7 @@ $: filteredSubsubCategories = searchTerm.trim() === ""
           {#each subcategoryData?.additionalInfo as info}
             <div class="mb-4">
               <h4 class="text-md font-medium text-gray-800">{info?.title}</h4>
-              <p class="mt-2 text-sm">{@html info?.content}</p>
+              <p class="mt-2 sm:text-sm text-xs text-justify">{@html info?.content}</p>
             </div>
           {/each}
         </div>

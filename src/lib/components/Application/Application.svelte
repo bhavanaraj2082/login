@@ -61,7 +61,7 @@
 
           <div class="p-4">
             <h3 class="sm:text-xl text-md font-semibold text-gray-800">{category?.name}</h3>
-            <p class="mt-2 sm:text-sm text-xs text-gray-600">
+            <p class="mt-2 sm:text-sm text-xs text-gray-600 text-justify">
               {getTruncatedDescription(category?.description) || "No description available"}
             </p>
           </div>

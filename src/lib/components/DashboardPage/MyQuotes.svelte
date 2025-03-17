@@ -254,6 +254,9 @@ function getStatusColor (status) {
             />
         </div>
     </div>
+    <div class="pt-2">
+        <a href="/quotes" class="whitespace-nowrap justify-start items-center py-2.5 px-4 rounded-md text-white bg-primary-500 hover:bg-primary-600 transition-all duration-300">Create Quote</a>
+    </div>
 </div>
   <div class="overflow-x-auto bg-white shadow rounded overflow-hidden">
       <table class="min-w-full divide-y divide-gray-200">
