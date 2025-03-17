@@ -357,7 +357,7 @@ function handleMouseLeave() {
   </form>
 <section class=" space-y-3 lg:flex items-start gap-4">
     <!-- filters -->
-    <div class=" w-full h-fit sticky top-0 z-20 lg:w-1/4">
+    <div class=" w-full h-fit sticky top-0 z-19 lg:w-1/4">
         <div class=" p-2 sm:p-4 bg-white shadow rounded space-y-3 mt-3">
             
             <!-- svelte-ignore a11y-click-events-have-key-events -->
