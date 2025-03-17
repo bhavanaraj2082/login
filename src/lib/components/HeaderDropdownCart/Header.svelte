@@ -16,7 +16,7 @@
 	// console.log(data,"data");
 	let fullyReg='';
 
-	if (data.profile.firstName) {
+	if (data?.profile?.firstName) {
 	fullyReg=true;
 	// console.log(fullyReg);
 
@@ -54,8 +54,8 @@
 	const heartFilled = 'mdi:heart';
 	// $authedUser.email="rukhiyasameen@gmail.com"
 	// $authedUser.username="Sameena"
-	let userEmail = $authedUser.email;
-	let userName = $authedUser.username;
+	let userEmail = $authedUser?.email;
+	let userName = $authedUser?.username;
 	let form2;
 	let submitGuestForm;
 	$: showUserOptions = false;
@@ -105,7 +105,7 @@
 				currencyState.set('inr')
 			}
 			if (!existingExpiration) {
-				if (!$authedUser.id) {
+				if (!$authedUser?.id) {
 					await submitAlternateForm();
 					
 				} else {
@@ -125,7 +125,7 @@
 				const currentTime = new Date();
 				const currenctISo=currentTime.toISOString()
 				if (currenctISo > cartExpirationTime) {
-					if (!$authedUser.id) {
+					if (!$authedUser?.id) {
 						await submitAlternateForm();
 					} else {
 						const formdata = new FormData()
@@ -498,7 +498,7 @@ async function submitForm() {
 		</div>
 		<!-- SMALL -->
 		<div class="md:hidden flex items-center gap-0.5">
-			{#if $authedUser.email}
+			{#if $authedUser?.email}
 						<div class="relative " bind:this={dropdown}>
 				<button
 						class="sm:w-6 sm:h-6 w-4 h-4 flex items-center justify-center bg-white text-primary-400 font-semibold rounded-full text-sm sm:text-lg"
@@ -639,7 +639,7 @@ async function submitForm() {
 	
 		<!-- big-->
 		<div class="md:flex hidden w-1/10">
-			{#if $authedUser.email}
+			{#if $authedUser?.email}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div class="relative p-2 text-white hidden md:block cursor-pointer rounded-md hover:bg-primary-300 transition-all" on:click={handleProfile} bind:this={dropdown}>

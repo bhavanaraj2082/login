@@ -280,7 +280,7 @@
 
 	const toggleCart = () => {
 		// console.log("clicked");
-		if ($authedUser.id) {
+		if ($authedUser?.id) {
 			form.requestSubmit();
 		} else {
 			// observeLocalStorage();
@@ -449,9 +449,12 @@
 									/>
 								</div>
 								<div class="flex-1">
-									<a href="/products/details/{item.productDetails.productNumber}" class="hover:text-primary-500 hover:underline font-semibold text-sm">
+									<button on:click={()=>{
+										cartOpen = false
+										goto(`/products/details/${item.productDetails.productNumber}`)
+									}} class="hover:text-primary-500 hover:underline font-semibold text-sm">
 										{item.productDetails.productNumber}
-									</a>
+									</button>
 									<p class="font-medium text-xs text-gray-800">
 										{item.productDetails.productName}
 									</p>
