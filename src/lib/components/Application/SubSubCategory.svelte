@@ -20,7 +20,7 @@
       <h1 class="text-2xl font-semibold text-heading">
         {subsubcategoryData?.name}
       </h1>
-      <p class="mt-2 text-base text-gray-600">
+      <p class="mt-2 sm:text-base text-xs text-gray-600 text-justify">
         {subsubcategoryData?.description}
       </p>
     </div>
@@ -35,7 +35,7 @@
         {#each subsubcategoryData?.additionalInfo as info}
           <div class="mb-4">
             <h3 class="text-md font-medium text-gray-800">{info?.title}</h3>
-            <p class="mt-2 text-sm">{@html info?.content}</p>
+            <p class="mt-2 sm:text-sm text-xs text-justify">{@html info?.content}</p>
           </div>
         {/each}
       </div>

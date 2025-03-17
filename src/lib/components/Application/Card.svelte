@@ -22,7 +22,7 @@
       />
       <div class="p-4">
         <h3 class="text-xl font-semibold text-gray-800">{name}</h3>
-        <p class="mt-2 text-gray-600 ">{getTruncatedDescription(description)}</p>
+        <p class="mt-2 text-gray-600 text-justify">{getTruncatedDescription(description)}</p>
       </div>
     </a>
   </div>

@@ -47,7 +47,7 @@
     {/if}
     </div>
   </div>
-  <p class="mt-2 md:text-lg text-sm text-gray-600 sm:px-2 md:pl-0 mx-2 lg:mx-0">{categoryData.description}</p>
+  <p class="mt-2 md:text-lg text-sm text-gray-600 sm:px-2 md:pl-0 mx-2 lg:mx-0 text-justify">{categoryData.description}</p>
   {#if filteredSubCategories.length > 0}
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 lg:mx-0 mx-2.5 my-6">
     {#each filteredSubCategories as subcategory}
