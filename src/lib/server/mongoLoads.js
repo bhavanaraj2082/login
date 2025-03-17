@@ -573,14 +573,12 @@ export const loadProductsubcategory = async (
       sortConditions["stockDetails.pricing.INR"] = -1
     }else{
       sortConditions = {}
-      sortConditions.productName = 1
+      // sortConditions.productNumber = 1
+      sortConditions["productNumber"] = 1;
     }
  
-    const products = await Product.aggregate([
+    const aggregation = [
       { $match: matchCondition },
-      {
-        $sort: sortConditions,  
-      },
       {
         $lookup: {
           from: "subcategories",
@@ -613,10 +611,16 @@ export const loadProductsubcategory = async (
           as: "stockDetails",
         },
       },
+      
       { $unwind: "$stockDetails" },
       { $unwind: "$manufacturerDetails" },
       { $unwind: "$categoryDetails" },
       { $unwind: "$subCategoryDetails" },
+    ];
+    if (subcategory.name !== "Primary Antibodies") {
+      aggregation.push({ $sort: sortConditions });
+    }
+    aggregation.push(
       {
         $skip: (Number(page) - 1) * Number(pageSize),
       },
@@ -646,24 +650,11 @@ export const loadProductsubcategory = async (
                 "stockDetails.distributor": 1,
               },
             },
-            // {
-            //   $sort:sortConditions
-            // },
-            // {
-            //   $skip: (Number(page) - 1) * Number(pageSize),
-            // },
-            // {
-            //   $limit: Number(pageSize),
-            // },
-          ],
-          totalCount: [
-            {
-              $count: "total",
-            },
           ],
         },
       },
-    ]);
+    );
+    const products = await Product.aggregate(aggregation);
     const totalCount = await Product.countDocuments(matchCondition);
     const after = Date.now();
 
