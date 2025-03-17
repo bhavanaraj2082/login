@@ -35,6 +35,8 @@
   let quantity = 1;
   let minPrice = Infinity;
   let maxPrice = -Infinity;
+  let copyToastIndex = null;
+  let copyToastID = false;
 
   const updateWidth = () => {
     screenWidth = window.innerWidth;
@@ -244,6 +246,39 @@
   async function submitForm() {
     form.requestSubmit();
   }
+
+  function copyProductNumber(productNumber, index) {
+    if (!productNumber) return;
+
+    navigator.clipboard
+      .writeText(productNumber)
+      .then(() => {
+        copyToastIndex = index;
+        setTimeout(() => {
+          copyToastIndex = null;
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+      });
+  }
+
+  function copyProductID(productNumber) {
+    // ✅ Renamed function to avoid conflicts
+    if (!productNumber) return;
+
+    navigator.clipboard
+      .writeText(productNumber)
+      .then(() => {
+        copyToastID = true;
+        setTimeout(() => {
+          copyToastID = false;
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("Failed to copy: ", err);
+      });
+  }
 </script>
 
 <form
@@ -255,23 +290,35 @@
   <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
 </form>
 {#each data.records as product}
-  <div class="md:w-11/12 max-w-7xl md:flex lg:flex mx-auto bg-white shadow-md rounded-md m-2 p-2 w-full px-2 md:px-0">
-    <div class="p-3 flex space-x-4 justify-between flex-col lg:flex-row m-3
+  <div
+    class="md:w-11/12 max-w-7xl md:flex lg:flex mx-auto bg-white border border-gray-200 shadow-sm rounded-md w-full p-6 space-x-4"
+  >
+    <div
+      class="flex space-x-4 justify-between flex-col lg:flex-row md:w-full
       {(product?.variants && product?.variants.length > 0) ||
       product?.priceSize?.length === 0
         ? 'lg:w-full'
-        : 'lg:w-10/12'}">
-      <div class="flex flex-col space-y-4 lg:w-[30%] mt-3">
-        <div class="mb-3 flex justify-center items-center xl:block relative group">
-          <button on:click={toggleImagePopup} class="border border-gray-300 rounded-md p-3 max-lg:border-none relative">
+        : 'lg:w-10/12'}"
+    >
+      <div class="flex flex-col space-y-4 lg:w-[28%]">
+        <div class="flex justify-center items-center relative group">
+          <button
+            on:click={toggleImagePopup}
+            class="border border-gray-300 rounded-md p-2 max-lg:border-none relative"
+          >
             <!-- svelte-ignore a11y-img-redundant-alt -->
             <img
               src={product.imageSrc}
               alt="Product Image"
-              class="w-60 h-60 object-contain"/>
-            <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 w-max px-3 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap" >
+              class="w-56 h-56 object-contain"
+            />
+            <div
+              class="absolute bottom-full left-1/2 transform -translate-x-1/2 w-max px-3 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap"
+            >
               Click to view larger image
-              <div class="absolute left-1/2 transform -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-600"></div>
+              <div
+                class="absolute left-1/2 transform -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-600"
+              ></div>
             </div>
           </button>
           {#if showImagePopup}
@@ -279,33 +326,56 @@
           {/if}
         </div>
         {#if product?.safetyDatasheet}
-        <div class="w-full mb-4">
-          <button class="w-full text-left bg-white text-gray-900 font-medium p-2 pl-0">
-            Documents
-          </button>
-          <div class="rounded-lg space-y-1">
-            <!-- {#if showDropdown} -->
-            <div class="text-primary-400 text-sm text-left cursor-pointer">
-              <a href={product?.safetyDatasheet} target="_blank">
-                <Icon icon="ic:round-download" class="text-lg font-bold inline" />SDS
-              </a>
-            </div>
-            <!-- <div class="text-primary-400 text-sm text-left cursor-pointer">
+          <div class="w-full !mt-5">
+            <button
+              class="w-full text-left bg-white text-gray-900 font-medium p-2 pl-0"
+            >
+              Documents
+            </button>
+            <div class="rounded-lg space-y-1">
+              <!-- {#if showDropdown} -->
+              <div class="text-primary-400 text-sm text-left cursor-pointer">
+                <a href={product?.safetyDatasheet} target="_blank">
+                  <Icon
+                    icon="ic:round-download"
+                    class="text-lg font-bold inline"
+                  />SDS
+                </a>
+              </div>
+              <!-- <div class="text-primary-400 text-sm text-left cursor-pointer">
             <a href="/" target="_blank"
             ><i class="fa-solid fa-sheet-plastic mr-1"></i>Specifications
             Sheet</a
             >
           </div> -->
-            <!-- {/if} -->
+              <!-- {/if} -->
+            </div>
           </div>
-        </div>
         {/if}
       </div>
 
-      <div class="flex flex-col w-full lg:w-3/4 max-[991px]:mt-5 max-[991px]:!ml-0">
-      <!-- <div class="flex flex-col space-y-4 w-full lg:w-3/4"> -->
-        <div class="flex items-center justify-between space-x-4 mb-2" >
-          <span class="text-primary-400 font-semibold text-sm">{product?.productNumber}</span>
+      <div
+        class="flex flex-col w-full lg:w-3/4 max-[991px]:mt-5 max-[991px]:!ml-0"
+      >
+        <!-- <div class="flex flex-col space-y-4 w-full lg:w-3/4"> -->
+        <div class="flex justify-between space-x-4 relative">
+          <div class="relative">
+            {#if copyToastID}
+              <div
+                class="absolute -top-6 left-0 bg-gray-500 text-white py-1 px-2 rounded text-xs"
+              >
+                Copied!
+              </div>
+            {/if}
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <span
+              class="text-primary-400 font-bold text-sm cursor-pointer hover:bg-blue-200 hover:px-1"
+              on:click={() => copyProductID(product?.productNumber)}
+            >
+              {product?.productNumber}
+            </span>
+          </div>
           {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
             <div class="flex items-center gap-x-2">
               <form
@@ -322,22 +392,44 @@
                       // toast.error(result.data.message);
                     }
                   };
-                }}>
-                <input type="hidden" name="productId" value={product.productId} />
-                <input type="hidden" name="manufacturerId" value={product?.manufacturer?._id} />
+                }}
+              >
+                <input
+                  type="hidden"
+                  name="productId"
+                  value={product.productId}
+                />
+                <input
+                  type="hidden"
+                  name="manufacturerId"
+                  value={product?.manufacturer?._id}
+                />
                 <input type="hidden" name="authedEmail" value={authedEmail} />
                 <input type="hidden" name="stockId" value={selectedStockId} />
-                <input type="hidden" name="distributorId" value={product?.distributorId} />
-                <input type="hidden" name="quantity" value={product?.orderMultiple || 1} />
-                <input type="hidden" name="stock" value={product?.stockQuantity} />
+                <input
+                  type="hidden"
+                  name="distributorId"
+                  value={product?.distributorId}
+                />
+                <input
+                  type="hidden"
+                  name="quantity"
+                  value={product?.orderMultiple || 1}
+                />
+                <input
+                  type="hidden"
+                  name="stock"
+                  value={product?.stockQuantity}
+                />
                 {#if authedEmail}
-                  <button type="submit" class="p-2" on:click={toggleLike}>
+                  <button type="submit" on:click={toggleLike}>
                     <Icon
                       icon={isLiked ? "mdi:heart" : "mdi:heart-outline"}
-                      class="text-2xl text-primary-400"/>
+                      class="text-2xl text-primary-400"
+                    />
                   </button>
                 {:else}
-                  <button type="submit" class="p-2" on:click={toggleLikedPopup}>
+                  <button type="submit" on:click={toggleLikedPopup}>
                     <Icon
                       icon={isLiked ? "mdi:heart" : "mdi:heart-outline"}
                       class="text-2xl text-primary-400"
@@ -348,43 +440,70 @@
             </div>
           {/if}
         </div>
-        <h1 class="text-heading font-semibold md:text-xl text-base !mt-0">
-          {product?.productName}
-        </h1>
-        {#if product?.manufacturer?.name && product?.manufacturer?.name !== ""}
-          <p class="text-gray-800 font-medium text-sm mt-2 mb-6">
-            Manufacturer : 
-            <span class="font-normal">{product.manufacturer?.name}</span>
-          </p>
-        {/if}
-        {#if product?.CAS && product?.CAS !== ""}
-          <p class="text-gray-500 text-sm !mt-1 mb-1">
-            CAS Number: <span class="font-bold">{product?.CAS}</span>
-          </p>
-        {/if}
-        {#if product.prodDesc !== ""}
-          <p class="text-gray-500 text-sm !mt-1">
-            {product?.prodDesc}
-          </p>
-        {/if}
-        <!-- Product Returnable Section -->
-        {#if !product?.returnPolicy}
-          <!-- <div class="flex items-center gap-1 text-green-500 font-medium text-xs mt-2">
-            <Icon icon="material-symbols:verified" class="text-base text-green-600" />
-            <span>Returns Accepted</span>
-          </div>
-        {:else} -->
-          <div class="flex items-center gap-2 text-red-500 font-medium text-sm mt-2">
-            <Icon
-              icon="clarity:shopping-cart-solid-badged"
-              class="text-xl font-medium text-red-600"/>
-            <span>Non-Returnable</span>
-          </div>
-        {/if}
+        <div class="space-y-2">
+          <!-- ✅ Product Name -->
+          <h1
+            class="text-heading font-semibold md:text-xl text-base !mt-0 leading-tight"
+          >
+            {product?.productName}
+          </h1>
+
+          <!-- ✅ Manufacturer Name -->
+          {#if product?.manufacturer?.name && product?.manufacturer?.name !== ""}
+            <p class="text-gray-800 font-medium text-sm leading-relaxed">
+              Manufacturer: <span class="font-normal"
+                >{product.manufacturer?.name}</span
+              >
+            </p>
+          {/if}
+
+          <!-- ✅ CAS Number -->
+          {#if product?.CAS && product?.CAS !== ""}
+            <p class="text-gray-800 font-medium text-sm leading-relaxed">
+              CAS Number: <span class="font-normal">{product?.CAS}</span>
+            </p>
+          {/if}
+
+          <!-- ✅ Product Description -->
+          {#if product?.prodDesc && product.prodDesc !== ""}
+            <p class="text-gray-500 text-sm leading-relaxed">
+              {product?.prodDesc}
+            </p>
+          {/if}
+
+          <!-- ✅ Return Policy -->
+          {#if !product?.returnPolicy}
+            <div
+              class="flex items-center gap-2 text-red-500 font-medium text-sm mt-2"
+            >
+              <Icon
+                icon="clarity:shopping-cart-solid-badged"
+                class="text-xl font-medium text-red-600"
+              />
+              <span>Non-Returnable</span>
+            </div>
+          {/if}
+
+          <!-- ✅ Sign-In Prompt -->
+          {#if !authedEmail}
+            <div
+              class="p-2 bg-blue-100 rounded-sm text-black font-medium border-gray-200 border text-xs text-center !mt-6"
+            >
+              <a href="/signin">
+                <span class="text-blue-600 font-semibold cursor-pointer">
+                  SignIn
+                </span>
+              </a> to View Organizational & Contract Pricing
+            </div>
+          {/if}
+        </div>
+
         {#if product.productSynonym}
           <div class="flex justify-between !mt-3">
             <p class="text-gray-900 text-sm font-semibold text-start">
-              Synonym(S): <span class="text-gray-500 font-normal">{product?.productSynonym}</span>
+              Synonym(S): <span class="text-gray-500 font-normal"
+                >{product?.productSynonym}</span
+              >
             </p>
           </div>
         {/if}
@@ -413,10 +532,14 @@
           </div>
         {/if}
         {#if screenWidth >= 640 && !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
-          <div class="!mt-8">
-            <h2 class="bg-white font-semibold text-left">SELECT A SIZE</h2>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm sm:font-semibold font-medium text-gray-700 text-left border-b border-gray-300">
-              <div class="p-2  whitespace-nowrap">Pack Size</div>
+          <div class="!mt-6">
+            <h2 class="bg-white text-heading font-bold text-left">
+              Select a Size
+            </h2>
+            <div
+              class="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm sm:font-semibold font-medium text-gray-700 text-left border-b border-gray-300"
+            >
+              <div class="p-2 pl-0 whitespace-nowrap">Pack Size</div>
               <div class="p-2">SKU</div>
               <div class="p-2">Availability</div>
               <div class="p-2">Price</div>
@@ -425,29 +548,54 @@
               <div class="w-full mt-2">
                 <button
                   type="button"
-                  class={`w-full grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-700 cursor-pointer transition-transform border border-gray-100 rounded-sm ${index === i ? "border md:border-l-6 lg:border bg-primary-100" : "border-none"}`}
-                  on:click={() => handleThumbnailClick(i, product)}>
+                  class={`w-full grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-600 cursor-pointer transition-transform border border-gray-100 rounded-sm ${index === i ? "border md:border-l-6 lg:border bg-primary-100 border-gray-200" : "border-none"}`}
+                  on:click={() => handleThumbnailClick(i, product)}
+                >
                   <div class="col-span-1 p-2 text-left">
                     {priceItem?.break}
                   </div>
-                  <div class="col-span-1 p-2 text-left  whitespace-nowrap">
-                    <!-- {product?.productNumber}-{priceItem?.break} -->
-                    {product?.productNumber}
+                  <div
+                    class="col-span-1 p-2 text-left whitespace-nowrap relative"
+                  >
+                    <!-- ✅ Custom Toast (Appears above the copied product number) -->
+                    {#if copyToastIndex === i}
+                      <div
+                        class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-500 text-white py-1 px-2 rounded text-xs"
+                      >
+                        Copied!
+                      </div>
+                    {/if}
+
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <!-- svelte-ignore a11y-no-static-element-interactions -->
+                    <span
+                      on:click={() =>
+                        copyProductNumber(product?.productNumber, i)}
+                      class="hover:bg-blue-200 hover:p-px cursor-pointer"
+                    >
+                      {product?.productNumber}
+                    </span>
                   </div>
-                  <div class="flex flex-row flex-wrap items-center justify-center">
+                  <div
+                    class="flex flex-row flex-wrap items-center justify-center"
+                  >
                     <span class="items-center pr-6 whitespace-nowrap">
                       {#if product?.stockQuantity > 0}
                         Available <Icon
                           icon="ix:success-filled"
-                          class="text-base text-green-500 inline font-bold mb-1"/>
+                          class="text-base text-green-500 inline font-bold mb-1"
+                        />
                       {:else}
                         Out of stock <Icon
                           icon="ix:error-filled"
-                          class="text-base text-red-500 font-bold inline mb-1"/>
+                          class="text-base text-red-500 font-bold inline mb-1"
+                        />
                       {/if}
                     </span>
                   </div>
-                  <div class="col-span-1 p-2 text-left  whitespace-nowrap overflow-hidden">
+                  <div
+                    class="col-span-1 p-2 text-left whitespace-nowrap overflow-hidden"
+                  >
                     {#if $currencyState === "usd"}
                       $ {(priceItem.USD ?? 0).toLocaleString("en-US", {
                         minimumFractionDigits: 2,
@@ -467,13 +615,19 @@
         {/if}
 
         {#if screenWidth < 640}
-          <h2 class="bg-white font-semibold text-base text-left">SELECT A SIZE</h2>
+          <h2
+            class="bg-white font-bold text-heading text-base text-left max-md:mt-6"
+          >
+            Select a Size
+          </h2>
           <div class="grid grid-cols-3 !mt-1 gap-2 max-[350px]:grid-cols-2">
             {#each product?.priceSize as priceItem, i}
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <div class={`border border-gray-300 rounded w-28  p-2 shadow-sm hover:shadow-sm  cursor-pointer ${index === i ? "border-1 border-primary-500 bg-primary-50" : "border-1 border-gray-300"}`}
-                on:click={() => handleThumbnailClick(i, product)}>
+              <div
+                class={`border border-gray-300 rounded w-28  p-2 shadow-sm hover:shadow-sm  cursor-pointer ${index === i ? "border-1 border-primary-500 bg-primary-50" : "border-1 border-gray-300"}`}
+                on:click={() => handleThumbnailClick(i, product)}
+              >
                 <div class="text-lg font-bold text-gray-800">
                   {priceItem?.break}
                 </div>
@@ -501,7 +655,8 @@
             </p>
             <button
               on:click={() => toggleQuoteModal(product)}
-              class="bg-primary-500 py-2 px-3 hover:bg-primary-500 rounded text-sm text-white mt-2">
+              class="bg-primary-500 py-2 px-3 hover:bg-primary-500 rounded text-sm text-white mt-2"
+            >
               Request Quote
             </button>
           </div>
@@ -540,7 +695,7 @@
 {/if}
 {#each data.records as record}
   {#if record?.variants && record?.variants?.length > 0}
-    <Variants {record} {data}/>
+    <Variants {record} {data} />
   {/if}
 {/each}
 <Toaster position="bottom-right" richColors />

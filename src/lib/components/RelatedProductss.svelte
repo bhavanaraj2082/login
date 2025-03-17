@@ -71,18 +71,18 @@
   // function nextSlide() {
   //   currentIndex = (currentIndex + 1) % totalSlides;
   // }
-// Modify these two functions
-function prevSlide() {
-  if (currentIndex > 0) {
-    currentIndex = (currentIndex - 1) % totalSlides;
+  // Modify these two functions
+  function prevSlide() {
+    if (currentIndex > 0) {
+      currentIndex = (currentIndex - 1) % totalSlides;
+    }
   }
-}
 
-function nextSlide() {
-  if (currentIndex < totalSlides - 1) {
-    currentIndex = (currentIndex + 1) % totalSlides;
+  function nextSlide() {
+    if (currentIndex < totalSlides - 1) {
+      currentIndex = (currentIndex + 1) % totalSlides;
+    }
   }
-}
   function cartTogglePopup() {
     showCartPopup = !showCartPopup;
   }
@@ -217,27 +217,27 @@ function nextSlide() {
   //   selectedProduct.quantity = popupQuantity;
   // }
 
-  function handlePopupInput(event) { 
-  const value = parseInt(event.target.value, 10); 
+  function handlePopupInput(event) {
+    const value = parseInt(event.target.value, 10);
 
-  // Allow empty value during typing
-  if (event.target.value === "") {
-    popupQuantity = "";
-    return;
+    // Allow empty value during typing
+    if (event.target.value === "") {
+      popupQuantity = "";
+      return;
+    }
+
+    if (isNaN(value)) {
+      popupQuantity = 1;
+    } else {
+      if (value < 1) {
+        popupQuantity = 1;
+      } else if (value > 999) {
+        popupQuantity = 999;
+      } else {
+        popupQuantity = value;
+      }
+    }
   }
-
-  if (isNaN(value)) { 
-    popupQuantity = 1; 
-  } else { 
-    if (value < 1) { 
-      popupQuantity = 1; 
-    } else if (value > 999) { 
-      popupQuantity = 999; 
-    } else { 
-      popupQuantity = value; 
-    } 
-  } 
-}
 
   const guestCartFetch = () => {
     const formdata = new FormData();
@@ -348,26 +348,26 @@ function nextSlide() {
 >
   <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
 </form>
-<div class="max-w-7xl mx-auto my-10">
-  <h3 class="text-xl font-bold text-heading p-1 md:w-11/12 mx-auto">
-    Related Products
-  </h3>
+<div class="max-w-7xl mx-auto my-10 md:w-11/12">
+  <h3 class="text-xl font-bold text-heading p-1 mx-auto">Related Products</h3>
 
   <div class="relative mt-1">
-    <div class="flex items-center max-md:mx-0 mx-6">
+    <div class="flex items-center">
       <!-- <button
         on:click={prevSlide}
         class="text-primary-500 p-1 pl-0.5 hover:bg-primary-100 hover:rounded-full"
       >
         <Icon class="text-2xl" icon="ion:chevron-back" />
       </button> -->
-      <button
-  on:click={prevSlide}
-  class="text-primary-500 p-1 pl-0.5 hover:bg-primary-100 hover:rounded-full"
-  style={`cursor: ${currentIndex === 0 ? 'not-allowed' : 'pointer'}; opacity: ${currentIndex === 0 ? '0.5' : '1'}`}
->
-  <Icon class="text-2xl" icon="ion:chevron-back" />
-</button>
+      {#if RelatedProductData && RelatedProductData.length >= 4}
+        <button
+          on:click={prevSlide}
+          class="text-primary-500 p-1 pl-0.5 hover:bg-primary-100 hover:rounded-full"
+          style={`cursor: ${currentIndex === 0 ? "not-allowed" : "pointer"}; opacity: ${currentIndex === 0 ? "0.5" : "1"}`}
+        >
+          <Icon class="text-2xl" icon="ion:chevron-back" />
+        </button>
+      {/if}
 
       <div class="overflow-hidden flex-1">
         <div
@@ -445,23 +445,26 @@ function nextSlide() {
       >
         <Icon class="text-2xl" icon="ion:chevron-forward" />
       </button> -->
-      <button
-  on:click={nextSlide}
-  class="text-primary-500 p-1 pr-0.5 hover:bg-primary-100 hover:rounded-full"
-  style={`cursor: ${currentIndex === totalSlides - 1 ? 'not-allowed' : 'pointer'}; opacity: ${currentIndex === totalSlides - 1 ? '0.5' : '1'}`}
->
-  <Icon class="text-2xl" icon="ion:chevron-forward" />
-</button>
-
-    </div>
-    <div class="flex justify-center mt-4 relative">
-      {#each Array(totalSlides).fill(0) as _, slideIndex}
+      {#if RelatedProductData && RelatedProductData.length >= 4}
         <button
-          on:click={() => (currentIndex = slideIndex)}
-          class={`w-1.5 h-1.5 rounded-full mx-1 bg-gray-400 hover:bg-gray-600 ${currentIndex === slideIndex ? "bg-primary-400" : ""}`}
-        ></button>
-      {/each}
+          on:click={nextSlide}
+          class="text-primary-500 p-1 pr-0.5 hover:bg-primary-100 hover:rounded-full"
+          style={`cursor: ${currentIndex === totalSlides - 1 ? "not-allowed" : "pointer"}; opacity: ${currentIndex === totalSlides - 1 ? "0.5" : "1"}`}
+        >
+          <Icon class="text-2xl" icon="ion:chevron-forward" />
+        </button>
+      {/if}
     </div>
+    {#if RelatedProductData && RelatedProductData.length >= 4}
+      <div class="flex justify-center mt-4 relative">
+        {#each Array(totalSlides).fill(0) as _, slideIndex}
+          <button
+            on:click={() => (currentIndex = slideIndex)}
+            class={`w-1.5 h-1.5 rounded-full mx-1 bg-gray-400 hover:bg-gray-600 ${currentIndex === slideIndex ? "bg-primary-400" : ""}`}
+          ></button>
+        {/each}
+      </div>
+    {/if}
   </div>
 </div>
 
@@ -481,12 +484,12 @@ function nextSlide() {
       <div class="mt-2 absolute right-6 top-1">
         <button
           on:click={closeModal}
-          class="text-primary-500 hover:text-primary-500 hover:scale-110"
+          class="hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
         >
           <Icon
-            icon="ion:close"
-            class="text-xl font-bold hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"
-          ></Icon>
+            icon="mdi:close"
+            class="text-2xl font-bold text-red-600 border rounded hover:p-px"
+          />
         </button>
       </div>
       <div class="flex flex-row sm:flex-row gap-4 mb-3">
@@ -572,12 +575,12 @@ function nextSlide() {
             <!-- <a
               href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
             > -->
-              <button
+            <button
               on:click={() => toggleQuoteModal(selectedProduct)}
-                class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-sm text-white mt-2"
-              >
-                Request Quote
-              </button>
+              class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-sm text-white mt-2"
+            >
+              Request Quote
+            </button>
             <!-- </a> -->
           </div>
         {:else}
@@ -645,45 +648,47 @@ function nextSlide() {
                     class="w-16 sm:w-20 h-9 text-center border-none focus:outline-none focus:ring-0"
                   /> -->
 
-
                   <input
-                  type="text"
-                  min="1"
-                  maxlength="3"
-                  bind:value={popupQuantity}
-                  class="w-12 h-6 p-0 text-center border-0 focus:border-0 focus:outline-none focus:ring-0 rounded-md"
-                  on:focus={(e) => {
-                    setTimeout(() => {
-                      e.target.select();
-                    }, 10);
-                  }}
-                  on:input={(e) => { 
-                    e.target.value = e.target.value.replace(/[^0-9]/g, ""); 
-                    if (e.target.value.startsWith("0") && e.target.value.length > 1) { 
-                      e.target.value = e.target.value.slice(1); 
-                    } 
-                    if (e.target.value === "") { 
-                      popupQuantity = ""; 
-                    } else {
-                      const parsedValue = parseInt(e.target.value, 10); 
-                      
-                      if (parsedValue >= 1 && parsedValue <= 999) { 
-                        popupQuantity = parsedValue; 
-                      } else if (parsedValue > 999) {
-                        popupQuantity = 999;
-                        e.target.value = "999";
+                    type="text"
+                    min="1"
+                    maxlength="3"
+                    bind:value={popupQuantity}
+                    class="w-12 h-6 p-0 text-center border-0 focus:border-0 focus:outline-none focus:ring-0 rounded-md"
+                    on:focus={(e) => {
+                      setTimeout(() => {
+                        e.target.select();
+                      }, 10);
+                    }}
+                    on:input={(e) => {
+                      e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                      if (
+                        e.target.value.startsWith("0") &&
+                        e.target.value.length > 1
+                      ) {
+                        e.target.value = e.target.value.slice(1);
                       }
-                    }
-                  }} 
-                  on:blur={(e) => { 
-                    if (e.target.value === "" || e.target.value === "0") { 
-                      popupQuantity = 1; 
-                      e.target.value = "1"; 
-                    } 
-                  }}
-                  aria-label="popupQuantity"
-                  max="999"
-                />
+                      if (e.target.value === "") {
+                        popupQuantity = "";
+                      } else {
+                        const parsedValue = parseInt(e.target.value, 10);
+
+                        if (parsedValue >= 1 && parsedValue <= 999) {
+                          popupQuantity = parsedValue;
+                        } else if (parsedValue > 999) {
+                          popupQuantity = 999;
+                          e.target.value = "999";
+                        }
+                      }
+                    }}
+                    on:blur={(e) => {
+                      if (e.target.value === "" || e.target.value === "0") {
+                        popupQuantity = 1;
+                        e.target.value = "1";
+                      }
+                    }}
+                    aria-label="popupQuantity"
+                    max="999"
+                  />
                   <button
                     type="button"
                     class="pr-3 text-xl text-primary-500 hover:scale-110"
@@ -704,10 +709,10 @@ function nextSlide() {
                     cartTogglePopup();
                   }}
                 >
-                <div class="flex items-center justify-center">
-                  <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
-                  <span>Add to Cart</span>
-                </div>
+                  <div class="flex items-center justify-center">
+                    <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
+                    <span>Add to Cart</span>
+                  </div>
                 </button>
               </form>
             {/if}
@@ -840,5 +845,11 @@ function nextSlide() {
 {/if}
 <Toaster position="bottom-right" richColors />
 {#if showQuoteModal}
-  <ShowQuoteModal {data} {toggleQuoteModal} {form5} {productQuote} {selectedProduct}/>
+  <ShowQuoteModal
+    {data}
+    {toggleQuoteModal}
+    {form5}
+    {productQuote}
+    {selectedProduct}
+  />
 {/if}

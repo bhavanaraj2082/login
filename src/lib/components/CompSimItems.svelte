@@ -464,12 +464,12 @@
       <div class="mt-2 absolute right-6 top-1">
         <button
           on:click={closeModal}
-          class="text-primary-500 hover:text-primary-500 hover:scale-110"
+          class="hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
         >
           <Icon
-            icon="ion:close"
-            class="text-xl font-bold hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"
-          ></Icon>
+            icon="mdi:close"
+            class="text-2xl font-bold text-red-600 border rounded hover:p-px"
+          />
         </button>
       </div>
       <div class="flex flex-row sm:flex-row gap-4 mb-3">
@@ -520,8 +520,8 @@
               <div
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start"
               >
-              <p class="text-sm sm:text-lg ml-2">
-                Price: <span class="font-semibold text-md">
+                <p class="text-sm sm:text-lg ml-2">
+                  Price: <span class="font-semibold text-md">
                     {#if $currencyState === "inr"}
                       ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString(
                         "en-IN",
@@ -550,12 +550,12 @@
               The price for this product is unavailable. Please request a quote
             </p>
             <!-- <a href={selectedProduct.partNumber}> -->
-              <button
+            <button
               on:click={() => toggleQuoteModal(selectedProduct)}
-                class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-sm text-white mt-2"
-              >
-                Request Quote
-              </button>
+              class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-sm text-white mt-2"
+            >
+              Request Quote
+            </button>
             <!-- </a> -->
           </div>
         {:else}
@@ -579,8 +579,8 @@
               <div
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start mb-4"
               >
-              <p class="text-sm sm:text-lg ml-2">
-                Price: <span class="font-semibold text-md">
+                <p class="text-sm sm:text-lg ml-2">
+                  Price: <span class="font-semibold text-md">
                     {#if $currencyState === "usd"}
                       $ {(selectedPrice?.priceUSD ?? 0).toLocaleString(
                         "en-US",
@@ -623,44 +623,47 @@
                     class="w-16 sm:w-20 h-9 text-center border-none focus:outline-none focus:ring-0"
                   /> -->
                   <input
-                  type="text"
-                  min="1"
-                  maxlength="3"
-                  bind:value={popupQuantity}
-                  class="w-12 h-6 p-0 text-center border-0 focus:border-0 focus:outline-none focus:ring-0 rounded-md"
-                  on:focus={(e) => {
-                    // Select all text on focus with a small delay to ensure it works across browsers
-                    setTimeout(() => {
-                      e.target.select();
-                    }, 10);
-                  }}
-                  on:input={(e) => { 
-                    e.target.value = e.target.value.replace(/[^0-9]/g, ""); 
-                    if (e.target.value.startsWith("0") && e.target.value.length > 1) { 
-                      e.target.value = e.target.value.slice(1); 
-                    } 
-                    if (e.target.value === "") { 
-                      popupQuantity = ""; 
-                    } else {
-                      const parsedValue = parseInt(e.target.value, 10); 
-                      
-                      if (parsedValue >= 1 && parsedValue <= 999) { 
-                        popupQuantity = parsedValue; 
-                      } else if (parsedValue > 999) {
-                        popupQuantity = 999;
-                        e.target.value = "999";
+                    type="text"
+                    min="1"
+                    maxlength="3"
+                    bind:value={popupQuantity}
+                    class="w-12 h-6 p-0 text-center border-0 focus:border-0 focus:outline-none focus:ring-0 rounded-md"
+                    on:focus={(e) => {
+                      // Select all text on focus with a small delay to ensure it works across browsers
+                      setTimeout(() => {
+                        e.target.select();
+                      }, 10);
+                    }}
+                    on:input={(e) => {
+                      e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                      if (
+                        e.target.value.startsWith("0") &&
+                        e.target.value.length > 1
+                      ) {
+                        e.target.value = e.target.value.slice(1);
                       }
-                    }
-                  }} 
-                  on:blur={(e) => { 
-                    if (e.target.value === "" || e.target.value === "0") { 
-                      popupQuantity = 1; 
-                      e.target.value = "1"; 
-                    } 
-                  }}
-                  aria-label="popupQuantity"
-                  max="999"
-                />
+                      if (e.target.value === "") {
+                        popupQuantity = "";
+                      } else {
+                        const parsedValue = parseInt(e.target.value, 10);
+
+                        if (parsedValue >= 1 && parsedValue <= 999) {
+                          popupQuantity = parsedValue;
+                        } else if (parsedValue > 999) {
+                          popupQuantity = 999;
+                          e.target.value = "999";
+                        }
+                      }
+                    }}
+                    on:blur={(e) => {
+                      if (e.target.value === "" || e.target.value === "0") {
+                        popupQuantity = 1;
+                        e.target.value = "1";
+                      }
+                    }}
+                    aria-label="popupQuantity"
+                    max="999"
+                  />
                   <button
                     type="button"
                     class="pr-3 text-xl text-primary-500 hover:scale-110"
@@ -684,20 +687,22 @@
                   Add to Cart
                 </button> -->
                 <button
-  type="button"
-  class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-500 hover:text-white transition {popupQuantity < 1 ? 'cursor-not-allowed hover:opacity-65' : ''}"
-  disabled={popupQuantity < 1}
-  on:click={() => {
-    addToCart(selectedProduct, selectedPriceIndex);
-    cartTogglePopup();
-  }}
->
-  <div class="flex items-center justify-center">
-    <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
-    <span>Add to Cart</span>
-  </div>
-</button>
-
+                  type="button"
+                  class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-500 hover:text-white transition {popupQuantity <
+                  1
+                    ? 'cursor-not-allowed hover:opacity-65'
+                    : ''}"
+                  disabled={popupQuantity < 1}
+                  on:click={() => {
+                    addToCart(selectedProduct, selectedPriceIndex);
+                    cartTogglePopup();
+                  }}
+                >
+                  <div class="flex items-center justify-center">
+                    <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
+                    <span>Add to Cart</span>
+                  </div>
+                </button>
               </form>
             {/if}
           </div>
@@ -830,5 +835,11 @@
 {/if}
 <Toaster position="bottom-right" richColors />
 {#if showQuoteModal}
-  <ShowQuoteModal {data} {toggleQuoteModal} {form5} {productQuote} {selectedProduct}/>
+  <ShowQuoteModal
+    {data}
+    {toggleQuoteModal}
+    {form5}
+    {productQuote}
+    {selectedProduct}
+  />
 {/if}

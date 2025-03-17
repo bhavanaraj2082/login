@@ -17,12 +17,12 @@
     >
       <button
         on:click={toggleLikedPopup}
-        class="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+        class="absolute top-3 right-3 hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
         aria-label="Close"
       >
         <Icon
           icon="mdi:close"
-          class="text-2xl font-bold text-primary-400 hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"
+          class="text-2xl font-bold text-red-600 border rounded hover:p-px"
         />
       </button>
 
@@ -32,7 +32,7 @@
 
       <div class="mx-16">
         <button
-          class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-500 text-sm text-white font-medium py-2.5 px-2 rounded-lg shadow-lg mb-4"
+          class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-500 text-sm text-white font-medium py-2.5 px-2 rounded-lg shadow-sm mb-4"
         >
           <a href="/signin" class="block">SignIn</a>
         </button>
@@ -41,7 +41,7 @@
           Don’t have an account?
         </p>
         <button
-          class="w-full border border-primary-400 hover:bg-primary-500 hover:text-white text-primary-500 text-sm font-medium py-2 px-2 rounded-lg shadow-md mb-6"
+          class="w-full border border-primary-400 hover:bg-primary-500 hover:text-white text-primary-500 text-sm font-medium py-2 px-2 rounded-lg shadow-sm mb-6"
         >
           <a href="/signup" class="block">Register</a>
         </button>

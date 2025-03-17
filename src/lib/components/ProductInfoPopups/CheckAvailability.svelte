@@ -32,11 +32,11 @@
     >
       <button
         on:click={CheckAvailabilityClose}
-        class="absolute top-4 right-4 text-primary-400 text-xl font-bold"
+        class="absolute top-4 right-4 hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
       >
         <Icon
           icon="mdi:close"
-          class="text-xl font-bold hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"
+          class="text-2xl font-bold text-red-600 border rounded hover:p-px"
         />
       </button>
 
@@ -48,7 +48,7 @@
         Enter quantity to check availability.
       </p>
 
-      <div class="flex gap-10 mt-6">
+      <div class="flex justify-between mt-6">
         <div class="flex items-center space-x-4 border border-gray-300 rounded">
           <button
             on:click={decreaseQuantity}

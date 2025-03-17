@@ -38,17 +38,17 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="w-full md:max-w-lg bg-white rounded-md shadow-md p-1 relative"
+      class="w-full md:max-w-lg bg-white rounded-md shadow-md p-5 relative"
       on:click|stopPropagation
     >
       <div class="flex justify-end">
         <button
           on:click={ImageclosePopup}
-          class="text-primary-400 p-2 rounded-md"
+          class="hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
         >
           <Icon
             icon="mdi:close"
-            class="text-2xl font-bold text-primary-400 hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"
+            class="text-2xl font-bold text-red-600 border rounded hover:p-px"
           />
         </button>
       </div>
