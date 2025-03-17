@@ -13,6 +13,19 @@
 	import { guestCart } from '$lib/stores/cart.js';
 	import { page } from '$app/stores';
 	export let data;
+	// console.log(data,"data");
+	let fullyReg='';
+
+	if (data.profile.firstName) {
+	fullyReg=true;
+	// console.log(fullyReg);
+
+
+} else {
+	fullyReg=false;
+    // console.log(fullyReg);
+
+}
 	let isFavoritePage = false;
 
 	$: {
@@ -503,18 +516,21 @@ async function submitForm() {
 						My Dashboard
 					  </button>
 					  <button
-						on:click={() => navigateTo('/dashboard/mycart')}
-						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
-						My Carts
-					  </button>
+					  on:click={() => navigateTo('/dashboard/mycart')}
+					  class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50"
+					  class:hidden={!fullyReg}
+					>
+					  My Carts
+					</button>
+					
 					  <button
 						on:click={() => navigateTo('/dashboard/myorders')}
-						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50" class:hidden={!fullyReg}>
 						My Orders
 					  </button>
 					  <button
 						on:click={() => navigateTo('/dashboard/myquotes')}
-						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50" class:hidden={!fullyReg}>
 						My Quotes
 					  </button>
 					  <button
@@ -651,17 +667,17 @@ async function submitForm() {
 					  </button>
 					  <button
 						on:click={() => navigateTo('/dashboard/mycart')}
-						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50" class:hidden={!fullyReg}>
 						My Carts
 					  </button>
 					  <button
 						on:click={() => navigateTo('/dashboard/myorders')}
-						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50" class:hidden={!fullyReg}>
 						My Orders
 					  </button>
 					  <button
 						on:click={() => navigateTo('/dashboard/myquotes')}
-						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
+						class="block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left whitespace-nowrap font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50" class:hidden={!fullyReg}>
 						My Quotes
 					  </button>
 					  <button
