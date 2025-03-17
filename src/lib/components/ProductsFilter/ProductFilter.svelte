@@ -75,7 +75,9 @@ function handleMouseLeave() {
     }
 
     onMount(()=>{
+        if($authedUser?.id){
         fetchMyFav()
+        }
     })
  
     const handleManufacturer = (searchTerm) => {
@@ -459,7 +461,7 @@ function handleMouseLeave() {
         {:else}
        {#each paginatedProducts as product,index}
         <div class=" relative bg-white shadow p-2 sm:p-4 md:px-8 space-y-2 rounded">
-            <button on:click={()=>handleFavorites(product)} class=" absolute top-6 right-6">
+            <button on:click={()=>handleFavorites(product)} class="{$authedUser?.id ? "" : "hidden"} absolute top-6 right-6">
                 <Icon icon={$myFavorites.find(x=> x === product.stockId) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
             </button>
             <div class=" w-10/12 ">
