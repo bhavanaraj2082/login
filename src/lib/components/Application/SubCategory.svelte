@@ -91,15 +91,12 @@ $: filteredSubsubCategories = searchTerm.trim() === ""
           class="h-80 rounded-lg shadow"/>
       </div>
       <div class="flex-grow w-full md:w-2/3">
-        <h2 class="text-2xl text-primary-400 font-semibold">
+        <h2 class="text-2xl text-heading font-semibold">
           {subcategoryData?.name}
         </h2>
         <p class="mt-2 text-md text-gray-600">{subcategoryData?.description}</p>
       </div>
     </div>
-    {#if relatedProducts && relatedProducts.length > 0}
-      <RelatedProductss {relatedProducts} />
-    {/if}
     {#if subcategoryData.additionalInfo && subcategoryData.additionalInfo.length > 0}
       <div class="mt-8">
         <h3 class="text-xl font-semibold text-gray-800">Overview</h3>
@@ -113,5 +110,8 @@ $: filteredSubsubCategories = searchTerm.trim() === ""
         </div>
       </div>
     {/if}
+    {#if relatedProducts && relatedProducts.length > 0}
+    <RelatedProductss {relatedProducts} />
+  {/if}
   {/if}
 </section>
