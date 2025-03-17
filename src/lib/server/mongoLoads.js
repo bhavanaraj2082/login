@@ -579,6 +579,9 @@ export const loadProductsubcategory = async (
     const products = await Product.aggregate([
       { $match: matchCondition },
       {
+        $sort: sortConditions,  
+      },
+      {
         $lookup: {
           from: "subcategories",
           localField: "subCategory",
@@ -615,11 +618,17 @@ export const loadProductsubcategory = async (
       { $unwind: "$categoryDetails" },
       { $unwind: "$subCategoryDetails" },
       {
+        $skip: (Number(page) - 1) * Number(pageSize),
+      },
+  
+      {
+        $limit: Number(pageSize),
+      },
+  
+      {
         $facet: {
           data: [
-            {
-              $sort:sortConditions
-            },
+         
             {
               $project: {
                 productNumber: 1,
@@ -637,13 +646,15 @@ export const loadProductsubcategory = async (
                 "stockDetails.distributor": 1,
               },
             },
-           
-            {
-              $skip: (Number(page) - 1) * Number(pageSize),
-            },
-            {
-              $limit: Number(pageSize),
-            },
+            // {
+            //   $sort:sortConditions
+            // },
+            // {
+            //   $skip: (Number(page) - 1) * Number(pageSize),
+            // },
+            // {
+            //   $limit: Number(pageSize),
+            // },
           ],
           totalCount: [
             {
@@ -653,14 +664,14 @@ export const loadProductsubcategory = async (
         },
       },
     ]);
-    
+    const totalCount = await Product.countDocuments(matchCondition);
     const after = Date.now();
 
    if(!products[0].data.length && !products[0].totalCount.length ){
     return {
       products: [],
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
-      productCount: [],
+      productCount: totalCount,
       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
     };
    }
@@ -699,7 +710,7 @@ export const loadProductsubcategory = async (
     return {
       products: JSON.parse(JSON.stringify(filtered)),
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
-      productCount: products[0].totalCount[0].total,
+      productCount: totalCount,
       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
     };
   } catch (error) {
