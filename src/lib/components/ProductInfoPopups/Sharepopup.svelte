@@ -15,6 +15,9 @@
         setTimeout(() => {
           showToast = false;
         }, 2000);
+        setTimeout(() => {
+          SharePopup();
+        }, 4000);
       })
       .catch((err) => {
         console.error("Failed to copy text: ", err);
@@ -36,21 +39,24 @@
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="bg-white w-full max-w-md rounded-md shadow-lg p-4 relative mx-4"
+      class="bg-white w-full max-w-md rounded-md shadow-lg p-6 relative"
       on:click|stopPropagation
     >
       <button
         on:click={SharePopup}
-        class="absolute top-3 right-3 text-primary-400"
+        class="absolute top-3 right-3 hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
       >
         <Icon
           icon="mdi:close"
-          class="text-xl text-primary-400 font-bold hover:bg-primary-300 hover:text-white hover:rounded-md hover:p-px"
+          class="text-2xl font-bold text-red-600 border rounded hover:p-px"
         />
       </button>
 
-      <h2 class="text-base font-semibold text-heading mb-3">Share Product</h2>
-
+      <h2
+        class="text-lg font-bold text-heading border-b-1 border-gray-200 mb-4"
+      >
+        Share Product
+      </h2>
       <div class="flex items-start space-x-4">
         <div class="border-gray-300 border rounded-md">
           <!-- svelte-ignore a11y-img-redundant-alt -->

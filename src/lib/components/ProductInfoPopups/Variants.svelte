@@ -58,7 +58,7 @@
 
 <div
   id="productVariants"
-  class="md:w-11/12 max-w-7xl bg-white mx-auto shadow-sm border border-gray-200 rounded-lg m-10"
+  class="md:w-11/12 max-w-7xl bg-white mx-auto shadow-sm border border-gray-200 rounded-md m-10"
 >
   <h1 class="w-full text-left text-xl text-heading font-bold p-3">Products</h1>
 
