@@ -4,7 +4,7 @@
 <div class="w-11/12 mx-auto pb-10">
   <h1 class="text-heading font-bold text-lg md:text-2xl">Product Safety</h1>
   <div class="flex flex-col md:flex-row">
-    <div class="w-full md:w-1/4 h-fit border-t-2 border-b-2 sm:mb-0 mb-5 border-gray-300 mt-10 pt-7 pb-7">
+    <!-- <div class="w-full md:w-1/4 h-fit border-t-2 border-b-2 sm:mb-0 mb-5 border-gray-300 mt-10 pt-7 pb-7">
       <a href="/safety" 
          class=" font-medium sm:text-md text-sm mb-4 py-2 px-4 w-full text-left cursor-pointer transition duration-200 ease-in-out"
          class:text-primary-500={$page.url.pathname === "/safety"}
@@ -53,7 +53,50 @@
           </div>
         </li>
       </ul>
+    </div> -->
+   
+    <div class="w-full md:w-1/4 h-fit mt-10">
+      <a href="/safety" 
+         class="block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
+         class:text-primary-500={$page.url.pathname === "/safety"}
+         class:font-semibold={$page.url.pathname === "/safety"}>
+        Product Safety
+      </a>
+      <hr class="border-b border-gray-300" />
+      
+      <a href="/safety/understanding-product-labels" 
+         class="block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
+         class:text-primary-500={$page.url.pathname === "/safety/understanding-product-labels"}
+         class:font-semibold={$page.url.pathname === "/safety/understanding-product-labels"}>
+        Understanding Product Labels
+      </a>
+      <hr class="border-b border-gray-300" />
+      
+      <a href="/safety/globally-harmonized-system" 
+         class="block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
+         class:text-primary-500={$page.url.pathname === "/safety/globally-harmonized-system"}
+         class:font-semibold={$page.url.pathname === "/safety/globally-harmonized-system"}>
+        Globally Harmonized System
+      </a>
+      <hr class="border-b border-gray-300" />
+      
+      <a href="/safety/tsca-8-notification" 
+         class="block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
+         class:text-primary-500={$page.url.pathname === "/safety/tsca-8-notification"}
+         class:font-semibold={$page.url.pathname === "/safety/tsca-8-notification"}>
+        TSCA 8 Notification
+      </a>
+      <hr class="border-b border-gray-300" />
+      
+      <a href="/safety/hazard-and-precautionary-statements" 
+         class="block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
+         class:text-primary-500={$page.url.pathname === "/safety/hazard-and-precautionary-statements"}
+         class:font-semibold={$page.url.pathname === "/safety/hazard-and-precautionary-statements"}>
+        Hazard & Precautions
+      </a>
+      <hr class="border-b border-gray-300" />
     </div>
+   
     <div class="w-full md:w-3/4">
     {#if $page.url.pathname === '/safety'}
     <div class="container mx-auto sm:px-4 px-1 sm:py-8 py-1">
@@ -64,7 +107,7 @@
               class:font-semibold={$page.url.pathname === "/safety"}>
               Product Safety
           </a>
-          <p class="sm:text-sm text-xs text-heading mt-5">
+          <p class="sm:text-sm text-xs text-justify text-heading mt-5">
               Our worldwide Product Safety staff is comprised of scientists with extensive backgrounds in global compliance regulations. 
               We provide Safety Data Sheets with comprehensive safety and regulatory data to promote safe product usage and handling. 
               Our SDS documents are always current and available in over 50 languages.
@@ -79,7 +122,7 @@
             <img src="/productsafety/Understanding Product Labels.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-52" />
             Understanding Product Labels
           </a>
-          <p class="sm:text-sm text-xs text-heading">
+          <p class="sm:text-sm text-xs text-justify text-heading">
             Our product labels are designed to provide complete, up-to-date information on our products. 
             Information available when and where you need it most.
         </p>
@@ -93,7 +136,7 @@
             <img src="/productsafety/GHS.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-52" />
             Globally Harmonized System
           </a>
-          <p class="sm:text-sm text-xs text-heading">
+          <p class="sm:text-sm text-xs text-justify text-heading">
             GHS harmonizes most classification criteria for supply and transportation and is based on the intrinsic properties of substances. 
             GHS allows individual countries or regions to implement building blocks at their own discretion.
         </p>
@@ -108,7 +151,7 @@
             <img src="/productsafety/TSCA.webp" alt="img" class="mb-10 ml-1 sm:ml-10 w-52" />
             TSCA 8 Notification
           </a>
-          <p class="sm:text-sm text-xs text-heading">
+          <p class="sm:text-sm text-justify text-xs text-heading">
             SDS provide essential information for anyone handling laboratory chemicals, including all of the dangerous 
             and most non-dangerous products.
         </p>
@@ -122,7 +165,7 @@
             <img src="/productsafety/Hazard_Precaution.webp" alt="img" class="sm:mb-10 mb-5 ml-1 sm:ml-10 w-28 sm:mt-5 mt-0" />
             Hazard and Precautionary Statements
           </a>
-          <p class="sm:text-sm text-xs text-heading">
+          <p class="sm:text-sm  text-justify text-xs text-heading">
             These statements provide critical guidance on hazards and proper precautions to ensure safe handling and use of chemicals.
         </p>
         </div>

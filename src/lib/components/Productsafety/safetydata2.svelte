@@ -6,7 +6,7 @@
     <div class="w-full p-5">
       <!-- <h1 class="text-2xl font-bold mb-6">Globally Harmonized System (GHS)</h1> -->
 
-      <p class="sm:text-sm text-xs mb-4">
+      <p class="sm:text-sm text-xs text-justify mb-4">
         The 
           Globally Harmonized System of Classification and Labeling of
           Chemicals (GHS)
@@ -16,7 +16,7 @@
         across different countries and regions.
       </p>
 
-      <p class="sm:text-sm text-xs mb-4">
+      <p class="sm:text-sm text-xs text-justify mb-4">
         First established at the UN Conference on Environment and Development in
         Rio de Janeiro in 1992, GHS facilitates international trade and enhances
         safety through consistent and understandable classification of hazardous
