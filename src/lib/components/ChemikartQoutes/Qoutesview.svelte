@@ -2,6 +2,7 @@
 	import { tick } from 'svelte';
 	import { derived } from 'svelte/store'
 	import { resetFormData } from  '$lib/stores/solution_stores.js';
+	import Icon from "@iconify/svelte";
   import { toast, Toaster } from "svelte-sonner";
 		let successMessage = '';
 		let errorMessage = '';
@@ -52,31 +53,32 @@
 
 	</script>
 {#if showSuccesDiv}
-	<div
-		class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
-	>
-		<div
-			class="w-10/12 md:w-8/12 bg-gradient-to-r from-green-100 via-green-50 to-green-100 p-8 rounded-lg shadow-lg text-center"
-		>
-			<h3 class="sm:text-xl text-md font-semibold text-green-600 mb-4">
-				Quotes request Submission
-			</h3>
-			<p class="sm:text-md text-sm text-gray-700 mb-6">
-				Your form has been submitted successfully. We noted your requirements and will get back to you with quotes soon.
-			</p>
+  <div
+  class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
+>
+  <div
+      class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
+  >
+      <h3 class="md:text-xl text-lg font-semibold text-green-600 mb-4">
+        Quotes request Submission
+      </h3>
+      <p class="md:text-md text-xs text-gray-700 mt-4 mb-6">
+        Your form has been submitted successfully. We noted your requirements and will get back to you with quotes soon.
 
-			<div class="w-10/12 mx-auto my-6 border-t-2 border-green-300"></div>
-			<div>
-				<a
-					href="/"
-					class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
-				>
-					Return to Home
-				</a>
-			</div>
-		</div>
-	</div>
-{:else if showFailureDiv}
+      </p>
+      <div class="w-10/12 mx-auto my-6 border-t-1 border-green-300"></div>
+      <div class="flex items-center justify-center">
+          <a
+              href="/"
+              class="bg-white text-primary-500 border-1 border-primary-500 px-4 py-2 rounded-md font-medium hover:bg-primary-500 hover:text-white transition-all duration-300 flex justify-center items-center"
+          >
+              <Icon icon="mdi:home" class="text-xl mr-2" />Back to Home
+          </a>
+      </div>
+  </div>
+</div>
+
+  {:else if showFailureDiv}
 	<div
 		class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
 	>
