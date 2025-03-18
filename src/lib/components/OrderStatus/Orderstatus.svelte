@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { authedUser } from '$lib/stores/mainStores.js';
 
-	const user = $authedUser.email;
+	const user = $authedUser?.email;
 	let email = '';
 	let orderNumber = '';
 	let error = {};
