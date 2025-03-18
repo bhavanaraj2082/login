@@ -3,7 +3,7 @@
   import QoutesBeforeLogin from "$lib/components/ChemikartQoutes/QoutesBeforeLogin.svelte";
   export let data;
   // console.log(data.authedUser, "data in page");
-  let isAuthedUserEmpty = Object.keys(data.authedUser).length === 0;
+  let isAuthedUserEmpty = Object.keys(data.authedUser ?? {}).length === 0;
   import SEO from "$lib/components/SEO.svelte";
   import {
     PUBLIC_WEBSITE_URL,

@@ -11,6 +11,7 @@
   let inputValue1 = ""; 
   let inputValue2 = ""; 
   let inputValue3 = ""; 
+  let submitting = false;
   function handleInput(event) {
     inputValue = event.target.value.toUpperCase();
     inputValue1 = event.target.value.toUpperCase();
@@ -221,6 +222,7 @@ function toggleRotation(index) {
         action="?/document" 
         use:enhance={() => {
             return async ({ result }) => {
+              submitting = true;
               showErrors = inputValue.length === 0;
             if (showErrors) {
               return;
@@ -228,10 +230,12 @@ function toggleRotation(index) {
                 if (result.data) {
                     const safetyDatasheet = result.data.safetyDatasheet;
                     showMessage(safetyDatasheet);
+                    submitting = false;
                     console.log("pdf_url",safetyDatasheet);
                 } else if (result) {
                     console.log(result);
                     const errormssg = result.data.props.error;
+                    submitting = false;
                     showMessage(errormssg);
                 }
             };
@@ -266,7 +270,11 @@ function toggleRotation(index) {
                 type="submit"
                 class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
               >
-                SEARCH
+              {#if submitting}
+              Searching...
+              {:else}
+              Search
+              {/if}
               </button>
               </div>
             </div>
@@ -291,6 +299,7 @@ function toggleRotation(index) {
         action="?/document" 
         use:enhance={() => {
             return async ({ result }) => {
+              submitting = true;
               showErrors = inputValue1.length === 0 || lotNumber.length === 0;
             if (showErrors) {
               return;
@@ -298,11 +307,13 @@ function toggleRotation(index) {
                 if (result.data) {
                     const certificateOfAnalysis = result.data.certificateOfAnalysis;
                     showMessage(certificateOfAnalysis);
+                    submitting = false;
                     console.log(certificateOfAnalysis);
                 } else if (result) {
                     console.log(result);
                     const errormssg = result.data.props.error;
                     showMessage(errormssg);
+                    submitting = false;
                 }
             };
         }}>
@@ -353,7 +364,11 @@ function toggleRotation(index) {
               type="submit"
               class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
             >
-              SEARCH
+            {#if submitting}
+            Searching...
+            {:else}
+            Search
+            {/if}
             </button>
             </div>
           </div>
@@ -376,6 +391,7 @@ function toggleRotation(index) {
         action="?/document" 
         use:enhance={() => {
             return async ({ result }) => {
+              submitting = true;
               showErrors = inputValue2.length === 0 || lotNumber1.length === 0;
             if (showErrors) {
               return;
@@ -383,11 +399,13 @@ function toggleRotation(index) {
                 if (result.data) {
                     const certificateOfOrigin = result.data.certificateOfOrigin;
                     showMessage(certificateOfOrigin);
+                    submitting = false;
                     console.log(certificateOfOrigin);
                 } else if (result) {
                     console.log(result);
                     const errormssg = result.data.props.error;
                     showMessage(errormssg);
+                    submitting = false;
                 }
             };
         }}>
@@ -439,7 +457,11 @@ function toggleRotation(index) {
             type="submit"
             class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
           >
-            SEARCH
+          {#if submitting}
+          Searching...
+          {:else}
+          Search
+          {/if}
           </button>
           </div>
           </div>
@@ -462,6 +484,7 @@ function toggleRotation(index) {
         action="?/document" 
         use:enhance={() => {
             return async ({ result }) => {
+              submitting = true;
               showErrors = inputValue3.length === 0 || lotNumber2.length === 0;
             if (showErrors) {
               return;
@@ -470,10 +493,12 @@ function toggleRotation(index) {
                     const certificateOfQuality = result.data.certificateOfQuality;
                     showMessage(certificateOfQuality);
                     console.log(certificateOfQuality);
+                    submitting = false;
                 } else if (result) {
                     console.log(result);
                     const errormssg = result.data.props.error;
                     showMessage(errormssg);
+                    submitting = false;
                 }
             };
         }}>
@@ -523,7 +548,11 @@ function toggleRotation(index) {
             type="submit"
             class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
           >
-            SEARCH
+          {#if submitting}
+          Searching...
+          {:else}
+          Search
+          {/if}
           </button>
           </div>
         <p class="sm:text-sm text-xs font-medium text-primary-500 my-2">
