@@ -99,23 +99,6 @@
       }
     }
   }
-
-  // function removeInvalidProduct(lineIndex) {
-  //   const lines = rawFileData.split("\n");
-  //   const lineContent = lines[lineIndex];
-  //   const [productInfo] = lineContent.split(",").map((item) => item.trim());
-
-  //   lines.splice(lineIndex, 1);
-  //   rawFileData = lines.join("\n");
-  //   invalidProductLines = invalidProductLines.filter(
-  //     (line) => line.index !== lineIndex,
-  //   );
-
-  //   validationMessages = validationMessages.filter(
-  //     (message) => !productInfo.includes(message.productNumber),
-  //   );
-
-  //   toast.success("Invalid product removed");
  
   function removeInvalidProduct(lineIndex) {
   const lines = rawFileData.split("\n");
@@ -153,102 +136,6 @@
     return validProducts.length > 0;
   }
 
-  // function handleFileInputChange(event) {
-  //   const file = event.target.files[0];
-
-  //   if (file) {
-  //     const fileType = file.name.split(".").pop().toLowerCase();
-  //     selectedFileName = file.name;
-  //     isValidated = false; 
-  //     invalidProductLines = []; 
-
-  //     if (fileType === "xlsx" || fileType === "xls") {
-  //       fileError = "";
-
-  //       if (typeof XLSX !== "undefined") {
-  //         const reader = new FileReader();
-  //         reader.onload = function (e) {
-  //           try {
-  //             const data = new Uint8Array(e.target.result);
-  //             const workbook = XLSX.read(data, { type: "array" });
-  //             const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-
-  //             let csvData = XLSX.utils.sheet_to_csv(worksheet);
-  //             const lines = csvData.split("\n").filter((line) => line.trim());
-  //             const transformedLines = lines.map((line) => {
-  //               const parts = line.split(",").map((part) => part.trim());
-  //               if (parts.length >= 2) {
-  //                 return `${parts[0]}-${parts[1]},${parts[2] || 1}`;
-  //               }
-  //               return line;
-  //             });
-
-  //             rawFileData = transformedLines.join("\n");
-  //             isEditing = true; 
-  //             const csvFile = new File(
-  //               [rawFileData],
-  //               file.name.replace(/\.xlsx$|\.xls$/i, ".csv"),
-  //               {
-  //                 type: "text/csv",
-  //               },
-  //             );
-
-  //             const dataTransfer = new DataTransfer();
-  //             dataTransfer.items.add(csvFile);
-
-  //             const fileInput = document.getElementById("bulkupload");
-  //             if (fileInput) {
-  //               fileInput.files = dataTransfer.files;
-  //             }
-
-  //             const { duplicates } = checkForDuplicates(rawFileData);
-  //             duplicateEntries = duplicates;
-
-  //             if (duplicates.length > 0) {
-  //               toast.error(
-  //                 `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
-  //               );
-  //             }
-  //           } catch (error) {
-  //             console.error("Excel processing error:", error);
-  //             fileError =
-  //               "Error processing Excel file. Please check file format.";
-  //           }
-  //         };
-  //         reader.onerror = function () {
-  //           fileError = "Error reading the file. Please try again.";
-  //         };
-  //         reader.readAsArrayBuffer(file);
-  //       } else {
-  //         fileError =
-  //           "Excel file support requires the SheetJS library. Please use CSV format instead.";
-  //       }
-  //     } else {
-  //       const reader = new FileReader();
-  //       reader.onload = function (e) {
-  //         rawFileData = e.target.result;
-  //         fileError = "";
-  //         isEditing = true;  
-
-  //         const { duplicates } = checkForDuplicates(rawFileData);
-  //         duplicateEntries = duplicates;
-
-  //         if (duplicates.length > 0) {
-  //           toast.error(
-  //             `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
-  //           );
-  //         }
-
-  //       };
-  //       reader.onerror = function () {
-  //         fileError = "Error reading the file. Please try again.";
-  //       };
-  //       reader.readAsText(file);
-  //     }
-  //   } else {
-  //     fileError = "No file selected.";
-  //   }
-  // }
   function handleFileInputChange(event) {
   const file = event.target.files[0];
 
@@ -271,8 +158,6 @@
 
             let csvData = XLSX.utils.sheet_to_csv(worksheet);
             const lines = csvData.split("\n").filter((line) => line.trim());
-            
-            // Transform and trim all entries
             const transformedLines = lines.map((line) => {
               const parts = line.split(",").map((part) => part.trim());
               if (parts.length >= 2) {
@@ -283,8 +168,6 @@
 
             rawFileData = transformedLines.join("\n");
             isEditing = true;
-            
-            // Create a new CSV file with the trimmed content
             const csvFile = new File(
               [rawFileData],
               file.name.replace(/\.xlsx$|\.xls$/i, ".csv"),
@@ -324,30 +207,21 @@
           "Excel file support requires the SheetJS library. Please use CSV format instead.";
       }
     } else {
-      // For CSV or other text files
       const reader = new FileReader();
       reader.onload = function (e) {
-        // Get the raw file content
         let fileContent = e.target.result;
         fileError = "";
         isEditing = true;
-        
-        // Split into lines, filter empty lines, and trim each entry
         const lines = fileContent.split("\n").filter((line) => line.trim());
         const trimmedLines = lines.map((line) => {
           const [productInfo, quantity] = line.split(",").map((item) => item.trim());
           return `${productInfo},${quantity}`;
         });
-        
-        // Reassemble the trimmed content
-        rawFileData = trimmedLines.join("\n");
 
-        // Create a new file with the trimmed content
+        rawFileData = trimmedLines.join("\n");
         const trimmedFile = new File([rawFileData], file.name, {
           type: "text/csv",
         });
-
-        // Update the file input with the trimmed file
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(trimmedFile);
         const fileInput = document.getElementById("bulkupload");
@@ -380,11 +254,10 @@ function validateAndSubmitData() {
     return;
   }
 
-  // Trim all entries again before submission
   const lines = rawFileData.split("\n").filter((line) => line.trim());
   const trimmedLines = lines.map((line) => {
     const [productInfo, quantity] = line.split(",").map((item) => item.trim());
-    return `${productInfo},${quantity}`;
+    return `${productInfo},${quantity || 1}`;
   });
   rawFileData = trimmedLines.join("\n");
 
@@ -473,7 +346,7 @@ function validateAndSubmitData() {
             price: price,
             size: size,
           },
-          quantity: product.quantity,
+          quantity: product.quantity ||1,
           backOrder: backOrder,
           stock: product.stock,
         };
@@ -548,7 +421,7 @@ function validateAndSubmitData() {
         manufacturerId: item.manufacturerId,
         stockId: item.stockId,
         distributorId: item.distributerId,
-        quantity: item.quantity,
+        quantity: item.quantity || 1,
         backOrder: item.backOrder,
       }));
       if (productsToAdd.length === 0) {
@@ -625,7 +498,20 @@ function validateAndSubmitData() {
   enctype="multipart/form-data"
   use:enhance={() => {
     isLoading = true;
+    const lines = rawFileData.trim().split('\n');
+  const processedLines = lines.map(line => {
+    const parts = line.includes(',') ? line.split(',') : line.split(/\s+/);
+    const productNumberAndSize = parts[0]?.trim();
+    let quantity = parts[1]?.trim();
+    if (!quantity && productNumberAndSize) {
+      quantity = '1';
+      return `${productNumberAndSize},${quantity}`;
+    }
+    
+    return line;
+  });
 
+  rawFileData = processedLines.join('\n');
     return async ({ result }) => {
       const { duplicates } = checkForDuplicates(rawFileData);
 
@@ -637,7 +523,11 @@ function validateAndSubmitData() {
 
       let products = result.data;
       products.forEach((product) => {
+        if (!product.quantity || product.quantity === undefined) {
+        product.quantity = 1;
+      }
         processProduct(product);
+
       });
 
       validatedProducts = products;
