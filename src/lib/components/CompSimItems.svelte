@@ -11,7 +11,6 @@
   import ShowQuoteModal from "$lib/components/ProductInfoPopups/showQuoteModal.svelte";
   export let compareSimilarity;
   // console.log(compareSimilarity,"compare");
-  export let data;
   let showQuoteModal = false;
   let productQuote = null;
   let form5;
@@ -309,7 +308,7 @@
   <div class="flex justify-between items-center mb-4 md:w-11/12 mx-auto">
     <h3 class="text-xl font-bold text-heading p-1">Compare Similar Items</h3>
     <div class="flex items-center space-x-2 p-1">
-      <h3 class="text-xl font-bold text-heading">Show Difference</h3>
+      <h3 class="text-base font-bold text-heading">Show Difference</h3>
       <label class="relative inline-flex items-center cursor-pointer">
         <input
           type="checkbox"
@@ -345,7 +344,7 @@
           {#each CompareSimilarityData as product}
             <div class="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 p-1">
               <div
-                class="flex flex-col w-full bg-white shadow-sm border rounded-lg overflow-hidden"
+                class="flex flex-col w-full bg-white shadow rounded-lg overflow-hidden"
               >
                 <div class="flex items-center p-3">
                   <a
@@ -836,7 +835,6 @@
 <Toaster position="bottom-right" richColors />
 {#if showQuoteModal}
   <ShowQuoteModal
-    {data}
     {toggleQuoteModal}
     {form5}
     {productQuote}

@@ -4,7 +4,7 @@
   import { enhance, applyAction } from "$app/forms";
   import { toast, Toaster } from "svelte-sonner";
 
-  export let data;
+  export let productName;
   export let toggleQuoteModal;
   export let form5;
   export let productQuote;
@@ -104,7 +104,7 @@
   }
 </script>
 
-{#each data.records as product}
+<!-- {#each data.records as product} -->
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
@@ -124,18 +124,16 @@
         action="?/createQuote"
         use:enhance={handleQuoteSubmission}
       >
-        {#if product}
           <div class="mb-4">
             <p class="text-sm">
               <strong class="text-sm">Product Name:</strong>
-              {#if productQuote.productName}
+              {#if productName}
                 {productQuote.productName}
               {:else}
                 {selectedProduct.name || "--"}
               {/if}
             </p>
           </div>
-        {/if}
         <input
           type="text"
           hidden
@@ -495,5 +493,5 @@
       <!-- Close button -->
     </div>
   </div>
-{/each}
+<!-- {/each} -->
 <Toaster position="bottom-right" richColors />

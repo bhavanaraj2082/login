@@ -2,7 +2,7 @@
   import { currencyState } from "$lib/stores/mainStores.js";
   import ShowQuoteModal from "./showQuoteModal.svelte";
   export let record;
-  export let data;
+  export let productName;
   let showQuoteModal = false;
   let productQuote = null;
   let form5;
@@ -186,5 +186,5 @@
   </div>
 </div>
 {#if showQuoteModal}
-  <ShowQuoteModal {data} {toggleQuoteModal} {form5} {productQuote} />
+  <ShowQuoteModal {productName} {toggleQuoteModal} {form5} {productQuote} />
 {/if}

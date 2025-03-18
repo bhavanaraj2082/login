@@ -5,7 +5,7 @@
 {#each data.records as product}
   {#if product.description && ((Array.isArray(product.description) && product.description.length > 0) || (typeof product.description === "object" && Object.keys(product.description).length > 0))}
     <div
-      class="md:w-11/12 max-w-7xl p-4 mx-auto text-justify bg-white shadow-sm border border-gray-200 rounded-md m-10"
+      class="md:w-11/12 max-w-7xl p-4 mx-auto text-justify bg-white shadow rounded m-10"
       id="des"
     >
       <h3 class="text-xl font-bold text-heading mb-3">Description</h3>
