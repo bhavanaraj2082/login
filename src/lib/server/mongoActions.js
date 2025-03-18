@@ -2840,13 +2840,13 @@ export const getGuestCart = async(body)=>{
 	const productDetails = await Product.findOne({_id:productId},{imageSrc:1,productName:1,productNumber:1,_id:0})
 	const stockDetails = await Stock.findOne({productid:productId,distributor:distributorId},{_id:0,stock:1,orderMultiple:1,pricing:1})
 	const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
-	let pricing = stockDetails.pricing
+	console.log(stockDetails);
+	let pricing = stockDetails?.pricing
 	if(pricing.INR !== undefined && pricing.INR !== null){
 		pricing.USD = pricing.INR/currency.rate
 	  }else{
 	   pricing.INR = pricing.USD * currency.rate;
 	  }
-
 	 let totalINR = pricing.INR * quantity;
 	 let totalUSD = pricing.USD * quantity;
 

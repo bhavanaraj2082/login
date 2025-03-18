@@ -43,11 +43,12 @@
 		   togglePopup()
 		}
 	}
+
  let timeout
   function calculateFutureDate(intervals, date) {
+    if(date.length > 2) return
     isSave = true
     if(intervals === "Custom"){
-      console.log(intervals);
      month = intervals
       return
     }
@@ -65,65 +66,30 @@
 
     const today = new Date();
     const futureDate = new Date(today);
-
-    futureDate.setMonth(futureDate.getMonth() + parseInt(intervals));
+    let interval = parseInt(intervals) || 1
+    futureDate.setMonth(futureDate.getMonth() + interval);
 
     if (date) {
         lastDayOfMonth = new Date(futureDate.getFullYear(), futureDate.getMonth() + 1, 0).getDate();
-        console.log(lastDayOfMonth);
         if (date > lastDayOfMonth) {
           futureDate.setDate(lastDayOfMonth);
         } else {
-          futureDate.setDate(date); 
+          futureDate.setDate(parseInt(date)); 
         }
       }
 
-    // If the date is invalid, log it
-    // if (isNaN(futureDate)) {
-    //     console.error('Calculated future date is invalid');
-    //     return null; // Avoid returning an invalid date
-    // }
+    if (isNaN(futureDate)) {
+        console.error('Calculated future date is invalid');
+        return null; // Avoid returning an invalid date
+    }
     startingDate = new Date().toISOString()
-    recurringDate = futureDate.toISOString()
+    recurringDate = futureDate?.toISOString()
     recurring = parseInt(intervals)
     lastDay = futureDate.getDate()
-    console.log(recurring,"oo",recurringDate,"pp",startingDate,'object',lastDay);
     isSave = false
-    // Return the future date as a Date object
-    //return futureDate; // Return as Date, not as string
-    },1000)
-    
+     },1000)
   }
 
-  // const handleMonth = (months)=>{
-  //   if(months === "Custom"){
-  //     month = months
-  //     return
-  //   }
-  //   if(months === "1" || months === "3" || months === "6" || months === "12"){
-  //     month = months
-  //   }else{
-  //     month = "Custom"
-  //   }
-
-  //   error = ''
-  //   customError = ''
-  //   months = parseInt(months)
-  //   const d = oldDate.split('-')
-  //   const dateInUTC = new Date(parseInt(d[0]),parseInt(d[1])-1,parseInt(d[2]))
-  //   startingDate = new Date(dateInUTC.getTime() + (5.5 * 60 * 60 * 1000)).toISOString();
-  //   recurringDate = new Date(dateInUTC.getTime() + (5.5 * 60 * 60 * 1000));
-  //   recurringDate.setMonth(recurringDate.getMonth() + months )
-
-  //   if(recurrence?.recurringDate){
-  //     if(recurringDate.toISOString() < new Date().toISOString()){
-	// 		  error = "Please adjust the start date or period if the recurrence falls in the current or previous month."
-  //       return
-  //     }
-  //   }
-  //   recurring = months
-// }
-    
   function handleSubmit({cancel}) {
     if(error.length > 0 || month === "Custom" && !custom){
       customError = "Please select the custom interval"

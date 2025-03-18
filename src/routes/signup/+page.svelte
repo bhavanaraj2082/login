@@ -7,7 +7,7 @@
     PUBLIC_WEBSITE_NAME,
   } from "$env/static/public";
 
-  console.log($authedUser.email);
+  console.log($authedUser?.email);
 
   let metadata = {
     title: `SignUp | ${PUBLIC_WEBSITE_NAME}` || "Default Product Title",

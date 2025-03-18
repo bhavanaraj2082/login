@@ -254,10 +254,7 @@
 	const validateTax = (taxNum)=>{
 		taxError = ''
 		
-	   if(taxNum.length < 3){
-          return
-	   } 
-	   !/^[0-9]{2}[A-Za-z]{1}/.test(taxNum) || taxNum.length > 15 ? taxError = "invalid GST number": taxError = ""
+	   !/^[0-9]{2}[A-Za-z]{1}/.test(taxNum) || taxNum.length > 15 || taxNum.length < 12 ? taxError = "invalid GST number": taxError = ""
 	   gstNumber = taxNum
 	   handleCheckout($cart)
 	}
