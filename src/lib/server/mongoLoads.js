@@ -613,18 +613,25 @@ export const loadProductsubcategory = async (
       {
         $lookup: {
           from: "stocks",
-          localField: "_id",
-          foreignField: "productid",
+          let: { productId: "$_id" },  // use let to pass local field to the pipeline
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$productid", "$$productId"] },  // match the stock with product id
+              },
+            },
+            { $project: { _id: 1, pricing: 1, stock: 1, orderMultiple: 1, distributor: 1 } },  // choose fields you need
+          ],
           as: "stockDetails",
         },
       },
       
-      { $unwind: "$stockDetails" },
+      { $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true } },
       { $unwind: "$manufacturerDetails" },
       { $unwind: "$categoryDetails" },
       { $unwind: "$subCategoryDetails" },
     ];
-    if (subcategory.name !== "Primary Antibodies") {
+    if (subcategory.name !== "Primary Antibodies" && subcategory.name !== "Uncategorized") {
       aggregation.push({ $sort: sortConditions });
     }
     aggregation.push(
@@ -681,7 +688,7 @@ export const loadProductsubcategory = async (
         productNumber,
         prodDesc,
         imageSrc,
-        stockDetails,
+        stockDetails={},
         manufacturerDetails,
         categoryDetails,
       } = product;
