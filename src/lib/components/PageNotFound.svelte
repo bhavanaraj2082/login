@@ -2,9 +2,15 @@
   import { page } from "$app/stores";
   import Icon from "@iconify/svelte";
   
-  export let message;
+  export let message = "Page Not Found";
   $: currentPath = $page.url.pathname;
   $: isProductPage = currentPath.includes("/products/");
+
+  $: isProductError = message && (
+    message.includes("product") || 
+    message.includes("category") || 
+    message.includes("subcategory")
+  );
 </script>
 
 <div class="min-h-[80vh] bg-gray-50 flex items-center justify-center overflow-hidden relative">
@@ -44,7 +50,7 @@
         <div class="text-center">
           <h1 class="text-5xl md:text-7xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-500">404</h1>
           <h2 class="text-xl md:text-2xl font-bold mb-4 text-gray-800">
-            {#if isProductPage}
+            {#if isProductPage || isProductError}
               {message}
             {:else}
               Page Not Found
@@ -53,15 +59,15 @@
           <div class="max-w-md mx-auto bg-white/30 justify-center items-center p-4 mb-8 rounded-md shadow">
             <div class="text-gray-600 flex flex-col md:text-lg text-xs">
               <span class="md:text-lg text-xs">
-                The {#if isProductPage} 
-                <span class="font-semibold">Product</span> you are looking for may be temporarily unavailable..
-                  {:else} 
-                <span class="font-semibold">Page</span> you are looking is unavailable..
+                {#if isProductPage || isProductError}
+                  <span class="font-semibold">Product</span> you are looking for may be temporarily unavailable.
+                {:else} 
+                  <span class="font-semibold">Page</span> you are looking for is unavailable.
                 {/if}  
               </span>
-                <span class="pt-3">
-                  Please check back later..! 
-                </span>
+              <span class="pt-3">
+                Please check back later or try browsing our other products.
+              </span>
             </div>
           </div>
           <div class="flex flex-col sm:flex-row justify-center gap-4 sm:text-md text-xs">

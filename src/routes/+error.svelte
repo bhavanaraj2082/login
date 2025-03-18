@@ -5,16 +5,79 @@
   import Error404 from "$lib/components/PageNotFound.svelte";
   import Error503 from "$lib/components/ServiceUnavilable.svelte";
 
+  // Extract all possible error info
+  $: pageError = $page.error;
   $: status = $page.status;
-  $: message =
-  $page.error?.message || "Something went wrong. Please try again later.";
-  // console.log(message,"message");
-  console.log("Page error:", $page.error);
+  
+  // Deep error inspection - logs all parts for debugging
+  $: console.log("Full error object:", pageError);
+  $: console.log("Error status:", status);
+  
+  // Extract the real error message - digging into multiple possible locations
+  $: errorInfo = (() => {
+    // Default values
+    let message = "Something went wrong";
+    let statusCode = status || 500;
+    let isNotFound = false;
+    
+    // Check the error object structure
+    if (pageError) {
+      // Direct error.message
+      if (pageError.message) {
+        message = pageError.message;
+      }
+      
+      // Error in body.message (HttpError pattern)
+      if (pageError.body && pageError.body.message) {
+        message = pageError.body.message;
+      }
+      
+      // Check for nested error object
+      if (pageError.error && typeof pageError.error === 'object') {
+        if (pageError.error.message) {
+          message = pageError.error.message;
+        }
+        if (pageError.error.status) {
+          statusCode = pageError.error.status;
+        }
+      }
+      
+      // Set status code if available
+      if (pageError.status) {
+        statusCode = pageError.status;
+      }
+      
+      // Special handling for not found errors
+      isNotFound = statusCode === 404 || 
+        message.includes('not found') || 
+        message.includes('No Category') ||
+        message.includes('No SubCategories');
+    }
+    
+    // Create appropriate custom message
+    let customMessage = message;
+    if (message.includes('Subcategory not found') || message.includes('No SubCategories')) {
+      customMessage = 'The requested product subcategory could not be found.';
+      isNotFound = true;
+    } else if (message.includes('No Category found')) {
+      customMessage = 'The specified product category could not be found.';
+      isNotFound = true;
+    } else if (statusCode === 404) {
+      customMessage = 'The page you are looking for could not be found.';
+      isNotFound = true;
+    }
+    
+    return {
+      message: customMessage,
+      status: statusCode,
+      isNotFound: isNotFound
+    };
+  })();
 </script>
 
-{#if status === 404}
-  <Error404 {message} />
-{:else if status === 503}
+{#if errorInfo.isNotFound}
+  <Error404 message={errorInfo.message} />
+{:else if errorInfo.status === 503}
   <Error503 />
 {:else}
   <div class="min-h-[80vh] bg-gray-50 relative max-w-7xl mx-auto mb-12 py-16 px-4">
@@ -40,11 +103,10 @@
                 </span>
             </div>
             <div class="md:text-xl text-sm font-bold mb-6">
-              <span class="text-red-500">{status} - Internal Server Error</span>
+              <span class="text-red-500">{errorInfo.status} - Internal Server Error</span>
             </div>
             <p class="md:text-lg text-sm text-gray-700 mb-6 text-justify">
-              Sorry, something went wrong. Please try again later. If the issue
-              persists, contact support.
+              {errorInfo.message}
             </p>
             <div class="mb-8">
               <p class="text-md text-gray-600 font-semibold">
@@ -60,7 +122,7 @@
               </ul>
             </div>
             <p class="text-gray-700 mb-4 sm:text-lg text-xs">
-              Thank you for your understanding !
+              Thank you for your understanding!
             </p>
             <p class="font-semibold mb-6 text-gray-800">- The Chemikart Team</p>
             <div class="flex md:justify-start justify-center md:items-center">
