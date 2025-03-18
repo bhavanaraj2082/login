@@ -1,6 +1,6 @@
 import data from '$lib/data/applications.json';  
 import { RelatedApplicationData } from '$lib/server/mongoLoads.js';
-import { CreateProductQuote, addToCart } from '$lib/server/mongoActions.js';
+import { addToCart } from '$lib/server/mongoActions.js';
 
 
 function findData(items, key, value) {
