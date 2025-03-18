@@ -37,7 +37,8 @@
   let maxPrice = -Infinity;
   let copyToastIndex = null;
   let copyToastID = false;
-
+  const productName = data.records.map(prodName => prodName.productName);
+  
   const updateWidth = () => {
     screenWidth = window.innerWidth;
   };
@@ -264,7 +265,6 @@
   }
 
   function copyProductID(productNumber) {
-    // ✅ Renamed function to avoid conflicts
     if (!productNumber) return;
 
     navigator.clipboard
@@ -291,7 +291,7 @@
 </form>
 {#each data.records as product}
   <div
-    class="md:w-11/12 max-w-7xl md:flex lg:flex mx-auto bg-white border border-gray-200 shadow-sm rounded-md w-full p-6 space-x-4"
+    class="md:w-11/12 max-w-7xl md:flex lg:flex mx-auto bg-white shadow rounded w-full p-6 space-x-4"
   >
     <div
       class="flex space-x-4 justify-between flex-col lg:flex-row md:w-full
@@ -370,7 +370,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
             <span
-              class="text-primary-400 font-bold text-sm cursor-pointer hover:bg-blue-200 hover:px-1"
+              class="text-primary-400 font-bold text-sm cursor-pointer hover:bg-blue-100 p-1 rounded-sm"
               on:click={() => copyProductID(product?.productNumber)}
             >
               {product?.productNumber}
@@ -487,10 +487,10 @@
           <!-- ✅ Sign-In Prompt -->
           {#if !authedEmail}
             <div
-              class="p-2 bg-blue-100 rounded-sm text-black font-medium border-gray-200 border text-xs text-center !mt-6"
+              class="p-2 bg-green-100 rounded-sm text-heading font-medium text-xs text-center !mt-6"
             >
               <a href="/signin">
-                <span class="text-blue-600 font-semibold cursor-pointer">
+                <span class="text-primary-500 font-bold cursor-pointer">
                   SignIn
                 </span>
               </a> to View Organizational & Contract Pricing
@@ -509,7 +509,7 @@
         {/if}
         <!-- {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && ((variant.pricing.INR && variant.pricing.INR > 0) || (variant.pricing.USD && variant.pricing.USD > 0)))} -->
         {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant?.pricing && variant.pricing.length > 0 && variant.pricing.some((pricingItem) => (pricingItem.INR && Number(pricingItem.INR) > 0) || (pricingItem.USD && Number(pricingItem.USD) > 0)))}
-          <div class="flex justify-between !mt-3">
+          <div class="flex justify-between {!authedEmail ? '!mt-6' : '!mt-3'} ">
             <p class="text-gray-900 text-lg font-semibold text-start">
               {#if $currencyState === "usd"}
                 $ {minPrice.USD.toLocaleString("en-US", {
@@ -571,7 +571,7 @@
                     <span
                       on:click={() =>
                         copyProductNumber(product?.productNumber, i)}
-                      class="hover:bg-blue-200 hover:p-px cursor-pointer"
+                      class="hover:bg-blue-200 p-0.5 cursor-pointer rounded-sm"
                     >
                       {product?.productNumber}
                     </span>
@@ -579,7 +579,7 @@
                   <div
                     class="flex flex-row flex-wrap items-center justify-center"
                   >
-                    <span class="items-center pr-6 whitespace-nowrap">
+                    <span class="items-center pr-8 whitespace-nowrap">
                       {#if product?.stockQuantity > 0}
                         Available <Icon
                           icon="ix:success-filled"
@@ -650,7 +650,7 @@
         {/if}
         {#if !((product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && Object.keys(variant.pricing).length > 0)) || product?.priceSize?.length > 0)}
           <div>
-            <p class="text-gray-700 text-sm">
+            <p class="text-gray-700 text-sm { !authedEmail ? 'mt-6' : '' }">
               The price for this product is unavailable. Please request a quote
             </p>
             <button
@@ -691,11 +691,11 @@
   {/if}
 {/each}
 {#if showQuoteModal}
-  <ShowQuoteModal {data} {toggleQuoteModal} {form5} {productQuote} />
+  <ShowQuoteModal {productName} {toggleQuoteModal} {form5} {productQuote} />
 {/if}
 {#each data.records as record}
   {#if record?.variants && record?.variants?.length > 0}
-    <Variants {record} {data} />
+    <Variants {record} {productName} />
   {/if}
 {/each}
 <Toaster position="bottom-right" richColors />

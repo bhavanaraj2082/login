@@ -5,7 +5,7 @@
 {#each data.records as product}
   {#if product.properties && Object.keys(product.properties).length > 0}
     <div
-      class="md:w-11/12 max-w-7xl lg:flex mx-auto bg-white shadow-sm border border-gray-200 rounded-md my-8"
+      class="md:w-11/12 max-w-7xl lg:flex mx-auto bg-white shadow rounded my-8"
     >
       <div class="p-4 w-full">
         <button type="button" class="w-full text-left pb-2">
@@ -19,12 +19,12 @@
                   class="grid grid-cols-1 sm:grid-cols-3 sm:p-2 border-b border-gray-300"
                 >
                   <div>
-                    <h3 class="sm:text-sm text-sm max-sm:pt-1 font-semibold">
+                    <h3 class="sm:text-sm text-sm break-words max-sm:pt-1 font-semibold">
                       {key}
                     </h3>
                   </div>
                   <div class="col-span-2">
-                    <p class="sm:text-sm text-xs max-sm:py-1">{value}</p>
+                    <p class="sm:text-sm text-xs break-words max-sm:py-1">{value}</p>
                   </div>
                 </div>
               {/each}

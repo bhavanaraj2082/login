@@ -64,7 +64,7 @@
             <p class="text-heading font-semibold">
               {product?.productNumber} - {product?.priceSize[index]?.break}
             </p>
-            <button on:click={toggleTooltip} class="text-primary-400 ml-2">
+            <button on:click={toggleTooltip} class="text-primary-400 ml-2 pointer-events-none">
               <Icon
                 icon="akar-icons:info-fill"
                 class="text-base font-semibold"
@@ -127,7 +127,7 @@
             on:click={toggleSharePopup}
             class="w-full text-sm font-semibold text-right text-primary-400"
             >Share <Icon
-              icon="fluent:share-24-regular"
+              icon="fluent:share-24-filled"
               class="text-lg font-bold inline"
             /></button
           >

@@ -8,7 +8,7 @@
     import { PUBLIC_WEBSITE_URL,PUBLIC_WEBSITE_NAME } from '$env/static/public';
 
     export let data;
-    // console.log("Data  ==>(:", data); 
+    console.log("Data  ==>(:", data); 
 
     let productData = data?.productData?.records[0];
 
@@ -42,7 +42,7 @@
 <SEO {metadata} />
 
 <ProductDetails data={data.productData} isFavorite={data.isFavorite} isauthedUser={data.authedUser}/>
-{#if data.relatedProducts.length !== 0}
+{#if data.relatedProducts.length > 1}
     <RelatedProductss relatedProducts={data.relatedProducts} data={data.productData}/>  
 {/if}
 {#if data.productData.length !== 0}
@@ -51,6 +51,6 @@
 {#if data.productData.length !== 0}
 <Description data={data.productData} />
 {/if}
-{#if data.compareSimilarity.length !== 0}
+{#if data.compareSimilarity.length > 1}
     <CompSimItems compareSimilarity={data.compareSimilarity} data={data.productData}/>
 {/if} 

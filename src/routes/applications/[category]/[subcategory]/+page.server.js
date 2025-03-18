@@ -2,6 +2,7 @@ import { RelatedApplicationData } from '$lib/server/mongoLoads.js';
 import { addToCart } from '$lib/server/mongoActions.js';
 import data from '$lib/data/applications.json';  
 
+
 function findData(items, key, value) {
   const found = items.find(item => item[key] === value);
   if (!found) {
@@ -55,5 +56,6 @@ export const actions = {
 			return {success:false,message:"Something went wrong"}
 		}
 	},
+
 
 };
