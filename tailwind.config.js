@@ -37,12 +37,18 @@ export default {
 				"4s":"16px"
 			},
 			animation:{
-				'shimmer': 'shimmer 2s ease-in-out infinite',
+				shimmer : 'shimmer 2s ease-in-out infinite',
         		'progress-pulse': 'progress-pulse 1.5s ease-in-out infinite',
-				'loadingbar': 'loadingbar 1s ease-out infinite',
+				loadingbar: 'loadingbar 1s ease-out infinite',
 				'spin-slow': 'spin 3s linear infinite',
 				'slow-bounce': 'bounce 3s infinite',
-				'pulse-delay' : 'pulse-delay 2.5s ease-in-out infinite',
+				'pulse-delay': 'pulse-delay 2.5s ease-in-out infinite',
+				'float': 'float 6s ease-in-out infinite',
+				'float-delay': 'float 7s ease-in-out 1s infinite',
+				'float-slow': 'float 8s ease-in-out 2s infinite',
+				'bubble': 'bubble 4s ease-in-out infinite',
+				'bubble-delay': 'bubble 5s ease-in-out 1s infinite',
+				'bubble-slow': 'bubble 6s ease-in-out 2s infinite',
 			},
 			keyframes: {
 				shimmer: {
@@ -67,9 +73,22 @@ export default {
 					'60%': { width: '70%', transform: 'translateX(40%)'},
 					'80%': { width: '80%', transform: 'translateX(40%)' },
 					'100%': { width: '100%', transform: 'translateX(60%)' },
-				}
+				},
+				float: {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-20px)' },
+				  },
+				  bubble: {
+					'0%': { transform: 'translateY(0)', opacity: 0.5 },
+					'50%': { transform: 'translateY(-40px)', opacity: 0.8 },
+					'100%': { transform: 'translateY(-80px)', opacity: 0 },
+				  },
+				  fadeIn: {
+					'0%': { opacity: 0 },
+					'100%': { opacity: 1 },
+				  },
 			},
-		}
+		},
 	},
 	plugins: [require('@tailwindcss/forms')]
 };

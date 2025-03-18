@@ -9,9 +9,9 @@
 
 <div class="min-h-[80vh] bg-gray-50 flex items-center justify-center overflow-hidden relative">
   <div class="absolute inset-0 overflow-hidden">
-    <div class="absolute top-1/4 left-10 w-16 h-16 md:w-24 md:h-24 rounded-full bg-primary-200 opacity-40 animate-float"></div>
-    <div class="absolute top-1/3 right-20 w-12 h-12 md:w-20 md:h-20 rounded-full bg-green-200 opacity-40 animate-float-delay"></div>
-    <div class="absolute bottom-1/4 left-1/4 w-20 h-20 md:w-32 md:h-32 rounded-full bg-purple-200 opacity-40 animate-float-slow"></div>
+    <div class="absolute top-1/4 left-10 w-16 h-16 md:w-24 md:h-24 rounded-full bg-primary-200 opacity-40 blur-sm clip-hexagon animate-float"></div>
+    <div class="absolute top-1/3 right-20 w-12 h-12 md:w-20 md:h-20 rounded-full bg-green-200 opacity-40 blur-sm clip-hexagon animate-float-delay"></div>
+    <div class="absolute bottom-1/4 left-1/4 w-20 h-20 md:w-32 md:h-32 rounded-full bg-purple-200 opacity-40 blur-sm clip-hexagon animate-float-slow"></div>
     <div class="hidden md:block absolute bottom-0 right-0 w-32 h-64 bg-primary-100 opacity-30 rounded-t-3xl"></div>
     <div class="hidden md:block absolute bottom-10 right-10 w-6 h-6 bg-primary-300 opacity-50 rounded-full animate-bubble"></div>
     <div class="hidden md:block absolute bottom-20 right-14 w-4 h-4 bg-primary-300 opacity-50 rounded-full animate-bubble-delay"></div>
@@ -69,7 +69,7 @@
               <Icon icon="mdi:flask" class="mr-2 text-xl" />
               <span>Back to Home</span>
             </a>
-            <a href="/products" class="inline-flex items-center justify-center bg-white border-1 border-primary-400 text-gray-700 hover:text-white hover:bg-gradient-to-r from-primary-400 to-primary-500 hover:border-none font-medium py-3 px-6 rounded-xl shadow hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+            <a href="/products" class="inline-flex items-center justify-center bg-primary-50 text-gray-700 hover:text-white hover:scale-105 hover:bg-gradient-to-r from-primary-400 to-primary-500 hover:border-none font-medium py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform">
               <Icon icon="simple-line-icons:chemistry" class="mr-2 text-xl" />
               <span>Browse Products</span>
             </a>
@@ -79,45 +79,3 @@
     </div>
   </div>
 </div>
-
-<style>
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-  }
-  
-  @keyframes bubble {
-    0% { transform: translateY(0); opacity: 0.5; }
-    50% { transform: translateY(-40px); opacity: 0.8; }
-    100% { transform: translateY(-80px); opacity: 0; }
-  }
-  
-  @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-  
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-  
-  .animate-float-delay {
-    animation: float 7s ease-in-out 1s infinite;
-  }
-  
-  .animate-float-slow {
-    animation: float 8s ease-in-out 2s infinite;
-  }
-  
-  .animate-bubble {
-    animation: bubble 4s ease-in-out infinite;
-  }
-  
-  .animate-bubble-delay {
-    animation: bubble 5s ease-in-out 1s infinite;
-  }
-  
-  .animate-bubble-slow {
-    animation: bubble 6s ease-in-out 2s infinite;
-  }
-</style>
