@@ -9,6 +9,6 @@
 	};
 </script>
 <SEO {metadata} />
-<div class='bg-gray-50'>
+<div class='bg-gray-50 mx-auto max-w-7xl'>
     <SafetyDataSheets {data}/>
 </div>
