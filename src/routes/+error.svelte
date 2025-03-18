@@ -5,34 +5,27 @@
   import Error404 from "$lib/components/PageNotFound.svelte";
   import Error503 from "$lib/components/ServiceUnavilable.svelte";
 
-  // Extract all possible error info
   $: pageError = $page.error;
   $: status = $page.status;
   
-  // Deep error inspection - logs all parts for debugging
-  $: console.log("Full error object:", pageError);
-  $: console.log("Error status:", status);
+  // $: console.log("Full error object:", pageError);
+  // $: console.log("Error status:", status);
   
-  // Extract the real error message - digging into multiple possible locations
   $: errorInfo = (() => {
     // Default values
     let message = "Something went wrong";
     let statusCode = status || 500;
     let isNotFound = false;
     
-    // Check the error object structure
     if (pageError) {
-      // Direct error.message
       if (pageError.message) {
         message = pageError.message;
       }
       
-      // Error in body.message (HttpError pattern)
       if (pageError.body && pageError.body.message) {
         message = pageError.body.message;
       }
       
-      // Check for nested error object
       if (pageError.error && typeof pageError.error === 'object') {
         if (pageError.error.message) {
           message = pageError.error.message;
@@ -42,19 +35,16 @@
         }
       }
       
-      // Set status code if available
       if (pageError.status) {
         statusCode = pageError.status;
       }
       
-      // Special handling for not found errors
       isNotFound = statusCode === 404 || 
         message.includes('not found') || 
         message.includes('No Category') ||
         message.includes('No SubCategories');
     }
-    
-    // Create appropriate custom message
+
     let customMessage = message;
     if (message.includes('Subcategory not found') || message.includes('No SubCategories')) {
       customMessage = 'The requested product subcategory could not be found.';

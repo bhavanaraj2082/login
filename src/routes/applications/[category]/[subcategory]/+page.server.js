@@ -1,11 +1,11 @@
-import data from '$lib/data/applications.json';  
 import { RelatedApplicationData } from '$lib/server/mongoLoads.js';
 import { addToCart } from '$lib/server/mongoActions.js';
+import data from '$lib/data/applications.json';  
 
 function findData(items, key, value) {
   const found = items.find(item => item[key] === value);
   if (!found) {
-    return { status: 404, error: `${key.charAt(0).toUpperCase() + key.slice(1)} not found` };
+    throw { status: 404, error: `${key.charAt(0).toUpperCase() + key.slice(1)} not found` };
   }
   return found;
 }

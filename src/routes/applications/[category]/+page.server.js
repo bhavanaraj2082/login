@@ -6,7 +6,7 @@ export async function load({ params }) {
   const categoryData = data.find(cate => cate.url === category)
   
   if (!categoryData) {
-    return { status: 404, error: 'Category not found' };
+    throw { status: 404, error: 'Category not found' };
   }
 
   const subcategories = categoryData.subcategories;
