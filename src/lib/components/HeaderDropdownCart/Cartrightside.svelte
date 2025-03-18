@@ -57,7 +57,7 @@
 
 	const updateLocalStorage = () => {
 		if (typeof window !== "undefined" && window.localStorage) {
-			localStorage.setItem("cart", JSON.stringify(cartItems));
+			//localStorage.setItem("cart", JSON.stringify(cartItems));
 		}
 	};
 
@@ -102,10 +102,10 @@
 				item[indx].quantity = selectedQty;
 				return item;
 			});
-			guestCart.update((item) => {
-				item[indx].quantity = selectedQty;
-				return item;
-			});
+			// guestCart.update((item) => {
+			// 	item[indx].quantity = selectedQty;
+			// 	return item;
+			// });
 			calculateTotalPrice($cart);
 			tog = null;
 			return;
@@ -146,10 +146,11 @@
 			});
 			// console.log("afterrrrrrrrrrr updationn",$cart);
 
-			guestCart.update((item) => {
-				item[indx].quantity += item[indx].stockDetails.orderMultiple;
-				return item;
-			});
+			// guestCart.update((item) => {
+			// 	console.log(item,"llllllll");
+			// 	item[indx].quantity += item[indx].stockDetails.orderMultiple;
+			// 	return item;
+			// });
 			calculateTotalPrice($cart);
 			return;
 		}
@@ -184,11 +185,11 @@
 				item[indx].quantity -= item[indx].stockDetails.orderMultiple;
 				return item;
 			});
-			guestCart.update((item) => {
-				if(item[indx].quantity <= stock.orderMultiple) return item
-				item[indx].quantity -= item[indx].stockDetails.orderMultiple;
-				return item;
-			});
+			// guestCart.update((item) => {
+			// 	if(item[indx].quantity <= stock.orderMultiple) return item
+			// 	item[indx].quantity -= item[indx].stockDetails.orderMultiple;
+			// 	return item;
+			// });
 			calculateTotalPrice($cart);
 			return;
 		}
@@ -244,6 +245,7 @@
 		localStorage.setItem("totalCompsChemi", storedTotalComps.length);
 		syncLocalStorageToStore();
 	}
+
 	const emptyCart = () => {
 		if (!isLoggedIn) {
 			removeFromCart();
@@ -291,6 +293,7 @@
 		//   }
 		cartOpen = !cartOpen;
 	};
+
 	function handleDataCart() {
 		return async ({ result }) => {
 			// console.log("result from page server for carat data",result.data);
@@ -305,6 +308,7 @@
 			syncLocalStorageToStore();
 		};
 	}
+
 	function syncLocalStorageToStore() {
 		// Check if we are in the browser
 		if (typeof window !== "undefined") {
@@ -314,12 +318,14 @@
 			}
 		}
 	}
+
 	function handleDataGuestCart() {
 		return async ({ result }) => {
-			// console.log("result from page server for carat data",result.data.cart);
-			$cart = result.data.cart;
+			console.log("result from page server for carat data",result);
+			cart.set(result.data.cart)
 		};
 	}
+
 	const visitcart = () => {
 		goto("/cart");
 		cartOpen = !cartOpen;

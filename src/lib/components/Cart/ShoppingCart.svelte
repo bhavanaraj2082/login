@@ -225,10 +225,10 @@
 				item[indx].quantity = selectedQty 
 				return item
 			})
-			guestCart.update(item=>{
-			item[indx].quantity = selectedQty
-			return item
-		    })
+			// guestCart.update(item=>{
+			// item[indx].quantity = selectedQty
+			// return item
+		    // })
 			calculateTotalPrice($cart)
 			timeout = setTimeout(()=>{
 			tog = null
@@ -267,10 +267,10 @@
 				item[indx].quantity = quantity + item[indx].stockDetails.orderMultiple
 				return item
 			})
-			guestCart.update(item=>{
-			item[indx].quantity = quantity + item[indx].stockDetails.orderMultiple
-			return item
-		    })
+			// guestCart.update(item=>{
+			// item[indx].quantity = quantity + item[indx].stockDetails.orderMultiple
+			// return item
+		    // })
 			calculateTotalPrice($cart)
 			return
 		}
@@ -308,11 +308,11 @@
 				item[indx].quantity = quantity - item[indx].stockDetails.orderMultiple
 				return item
 			})
-			guestCart.update(item=>{
-			    if(item[indx].quantity <= stock.orderMultiple) return item
-			    item[indx].quantity = quantity - item[indx].stockDetails.orderMultiple
-			    return item
-		    })
+			// guestCart.update(item=>{
+			//     if(item[indx].quantity <= stock.orderMultiple) return item
+			//     item[indx].quantity = quantity - item[indx].stockDetails.orderMultiple
+			//     return item
+		    // })
 			calculateTotalPrice($cart)
 			return
 		}
@@ -588,7 +588,11 @@
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Total</h3>
 							        <div class=" w-full flex justify-between items-center">
 							        	<div class="{item.isCart || item.isQuote ? " text-green-500" : ""} text-xs flex gap-1 lg:flex-col lg:gap-0 font-semibold">
+											{#if $authedUser?.id}
 											{$currencyState === "inr" ? "₹" + item.itemTotalPrice.totalINR.toLocaleString("en-IN"): "$"+ item.itemTotalPrice.totalUSD.toLocaleString("en-IN")}
+											{:else}
+											{$currencyState === "inr" ? "₹" + (item.normalPrice.INR*item.quantity).toLocaleString("en-IN"): "$"+ (item.normalPrice.USD*item.quantity).toLocaleString("en-IN")}
+											{/if}
 										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">
 												{$currencyState === "inr" ? "₹" + (item.normalPrice.INR*item.quantity).toLocaleString("en-IN"): "$"+ (item.normalPrice.USD*item.quantity).toLocaleString("en-IN")}
 											</p>
