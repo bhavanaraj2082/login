@@ -1,5 +1,6 @@
-import { loadProductsubcategory } from '$lib/server/mongoLoads.js';
 import { addToCart,favorite } from '$lib/server/mongoActions.js';
+import { loadProductsubcategory } from '$lib/server/mongoLoads.js';
+import { error } from '@sveltejs/kit';
 
 export async function load({ params,url,depends }) {
 	try {
@@ -8,14 +9,22 @@ export async function load({ params,url,depends }) {
 		const manufacturer = url.searchParams.get('manufacturer') || null
 		const price = url.searchParams.get('price') || ""
         depends("page:data")
-		return await loadProductsubcategory(params.subsubid,page,manufacturer,search,price);
+
+		const result = await loadProductsubcategory(params.subsubid, page, manufacturer, search, price);
+
+   		if (result.status && result.status === 404) {
+   		  throw error(404, result.body?.message || "Subcategory not found");
+   		}
+	
+   		return result;
 		
-	} catch (error) {
+	} catch (err) {
 		console.error('Error loading product data:', error);
-		return {
-			data: [],
-			error: 'Failed to load product data.'
-		};
+		if (err.status === 404) {
+			throw error(404, err.body?.message || err.message || "Resource not found");
+		  }
+		  
+		  throw error(500, err.message || "Failed to load product data");
 	}
 }
 

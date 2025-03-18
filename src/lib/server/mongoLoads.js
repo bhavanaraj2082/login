@@ -18,6 +18,7 @@ import User from "$lib/server/models/User.js";
 import Quotes from "$lib/server/models/Quotes.js";
 import Cart from "$lib/server/models/Cart.js";
 import Returns from "$lib/server/models/Return.js"
+import { error } from "@sveltejs/kit";
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -45,10 +46,12 @@ export async function getSubCategoryDatas(subid) {
     return { records: JSON.parse(JSON.stringify(records)) };
   } catch (err) {
     console.error("Error fetching subcategory data:", err);
-    return { 
-      error: err.message || "Failed to retrieve subcategory data", 
-      status: err.status || 500 
-    };
+
+    if (err.status && err.body) {
+      throw err;
+    }
+    
+    throw error(err.status || 500, err.message || "Failed to retrieve subcategory data");
   }
 }
 
@@ -542,14 +545,11 @@ export const loadProductsubcategory = async (
       .populate({ path: "subSubCategoryIds", select: "-_id name urlName" });
 
     const subCategoryDetails = {
-      name: subcategory.name,
-      urlName: subcategory.urlName,
+      name: subcategory?.name,
+      urlName: subcategory?.urlName,
     };
-    if (!subcategory) {
-      return {
-        type: "error",
-        message: `Subcategory not found for URL: ${suburl}`,
-      };
+    if (!subcategory?.name || !subcategory?.urlName) {
+      throw error(404, "Subcategory not found for URL")
     }
 
     const matchCondition = {
@@ -711,12 +711,14 @@ export const loadProductsubcategory = async (
       productCount: totalCount,
       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
     };
-  } catch (error) {
-    console.error("Error loading product subcategory:", error);
-    return {
-      type: "error",
-      message: "An error occurred while loading product data.",
-    };
+  } catch (err) {
+    console.error("Error loading product subcategory:", err);
+    
+    if (err.status && err.body) {
+      throw err;
+    }
+
+    throw error(err.status || 500, err.message || "Failed to load product subcategory");
   }
 };
 
