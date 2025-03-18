@@ -36,7 +36,7 @@ function handleMouseLeave() {
 		syncLocalStorageToStore();	
 	};
 
-    $: paginatedProducts = products.length ? products.map(x=>x) : []
+    $: paginatedProducts = products?.length ? products.map(x=>x) : []
     let categoryName = products[0]?.categoryDetails.urlName
     let subCategoryName = products[0]?.subCategoryDetails.urlName
 
@@ -409,7 +409,7 @@ function handleMouseLeave() {
             
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <!-- svelte-ignore a11y-no-static-element-interactions -->
-             <div on:click={()=>showCategoryDropdown = !showCategoryDropdown} class=" {!subSubCategory.length ? "hidden" : "flex"} cursor-pointer font-semibold text-sm items-center justify-between p-2 rounded border-1 border-gray-300 ">
+             <div on:click={()=>showCategoryDropdown = !showCategoryDropdown} class=" {!subSubCategory?.length ? "hidden" : "flex"} cursor-pointer font-semibold text-sm items-center justify-between p-2 rounded border-1 border-gray-300 ">
                 <span>Categories</span>
                 <button type="button" on:click={()=>showCategoryDropdown = !showCategoryDropdown}>
                      <Icon icon={showCategoryDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
@@ -418,7 +418,7 @@ function handleMouseLeave() {
              <div class="p-3 border-1 rounded {showCategoryDropdown ? "block" : "hidden"}">
                 <input type="text" placeholder="Search..." on:input={e=>handleManufacturer(e.target.value)} class=" w-full rounded border focus:ring-0 focus:border-primary-500">
                 <div class=" space-y-2.5 py-2.5 h-40 overflow-y-scroll my-1 scroll">
-                    {#if !subSubCategory.length}
+                    {#if !subSubCategory?.length}
                         <p class=" text-sm text-center">No maunfacturer found</p>
                     {:else}
                         {#each subSubCategory as {name}}
@@ -524,9 +524,9 @@ function handleMouseLeave() {
                     <p>Sub Category : <span class=" font-semibold ">{product?.subCategoryDetails.name || ""}</span></p>
                     <p>Manufacturer : <span class=" font-semibold ">{product?.manufacturerDetails.name || ""}</span></p>
                     <!-- <p>Price : <span class=" font-semibold">{$currencyState === "inr" ? "₹" + product?.pricing.INR.toLocaleString("en-IN"): "$"+ product?.pricing.USD.toLocaleString("en-IN")}</span></p> -->
-                    <p>Size : <span class=" font-semibold">{product?.pricing.break || ""}</span></p>
+                    <p>Size : <span class=" font-semibold">{product?.pricing?.break || ""}</span></p>
                     <div class=" hidden sm:flex items-center justify-between">
-                        <p class=" font-bold text-4s">{$currencyState === "inr" ? "₹" + product?.totalPrice.priceINR.toLocaleString("en-IN"): "$"+ product?.totalPrice.priceUSD.toLocaleString("en-IN")}</p>
+                        <p class=" font-bold text-4s">{$currencyState === "inr" ? "₹" + product?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
                         <div class="flex items-center">
                             <div class="flex items-center">
                                 <input type="number" bind:value={product.quantity}
@@ -560,7 +560,7 @@ function handleMouseLeave() {
                 </div>
             </div>
             <div class=" flex sm:hidden items-center justify-between">
-                <p class=" text-xs font-bold">{$currencyState === "inr" ? "₹" + product?.totalPrice.priceINR.toLocaleString("en-IN"): "$"+ product?.totalPrice.priceUSD.toLocaleString("en-IN")}</p>
+                <p class=" text-xs font-bold">{$currencyState === "inr" ? "₹" + product?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
                 <div class="flex items-center">
                     <div class="flex items-center">
                         <input type="number" bind:value={product.quantity}
@@ -597,7 +597,7 @@ function handleMouseLeave() {
        {/if}
        
        <!-- pagination -->
-       <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {totalPages <= 1 || products.length < 10 ? "hidden": "flex"}">
+       <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {totalPages <= 1 || products?.length < 10 ? "hidden": "flex"}">
       <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
         on:click={() => goToPage(1)} 
         disabled={currentPage == 1}
