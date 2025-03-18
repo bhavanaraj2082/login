@@ -21,28 +21,35 @@ import Returns from "$lib/server/models/Return.js"
 
 export async function getProductdatas() {
   const records = await Category.find();
-
-  console.log("--->",records.length);
-
-  if (records.length > 0) {
-    return { records: JSON.parse(JSON.stringify(records)) };
-  } else {
-    return { error: "Product not found" };
+  
+  if (records.length === 0) {
+    throw { status: 404, message: "Product not found" };
   }
+  return JSON.parse(JSON.stringify(records));
 }
 
 export async function getSubCategoryDatas(subid) {
-  const category = await Category.findOne({ urlName: subid });
-  if (!category) {
-    return { error: "No Category found with the specified urlName" };
+  try {
+    const category = await Category.findOne({ urlName: subid });
+    
+    if (!category) {
+      throw { status: 404, message: "No Category found with the specified urlName" };
+    }
+    
+    const records = await SubCategory.find({ category: category._id }).populate("category");
+    
+    if (records.length === 0) {
+      throw { status: 404, message: "No SubCategories found matching the category" };
+    }
+    
+    return { records: JSON.parse(JSON.stringify(records)) };
+  } catch (err) {
+    console.error("Error fetching subcategory data:", err);
+    return { 
+      error: err.message || "Failed to retrieve subcategory data", 
+      status: err.status || 500 
+    };
   }
-  const records = await SubCategory.find({ category: category._id }).populate(
-    "category"
-  );
-
-  return records.length > 0
-    ? { records: JSON.parse(JSON.stringify(records)) }
-    : { error: "No SubCategories found matching the category" };
 }
 
 export async function getOrderStatusData(ordernumber) {
