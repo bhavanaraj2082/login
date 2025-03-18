@@ -639,6 +639,7 @@ export const loadProductsubcategory = async (
                 productName: 1,
                 prodDesc: 1,
                 imageSrc: 1,
+                variants:1,
                 "categoryDetails.name": 1,
                 "categoryDetails.urlName": 1,
                 "manufacturerDetails.name": 1,

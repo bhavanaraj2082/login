@@ -9,7 +9,7 @@
 	import { authedUser,currencyState,cartTotalComps } from '$lib/stores/mainStores.js';
     import { enhance } from "$app/forms";
     import { onMount, tick } from 'svelte';
-
+    import ShowQuoteModal from "$lib/components/productInfoPopups/showQuoteModal.svelte";
     export let products
     export let manufacturers
     export let productCount
@@ -21,7 +21,15 @@
     function handleMouseEnter(imageSrc, index) {
     hoveredItem = { imageSrc, index }; 
   }
-
+  let showQuoteModal= false;
+  let productQuote=null;
+  let form5;
+  let data = { records: [] };
+  function toggleQuoteModal(selectedProduct) {
+    showQuoteModal = !showQuoteModal;
+    productQuote = selectedProduct;
+    data.records=[productQuote]
+  }
 function handleMouseLeave() {
   hoveredItem = null; 
 }
@@ -75,7 +83,9 @@ function handleMouseLeave() {
     }
 
     onMount(()=>{
+        if($authedUser?.id){
         fetchMyFav()
+        }
     })
  
     const handleManufacturer = (searchTerm) => {
@@ -357,7 +367,7 @@ function handleMouseLeave() {
   </form>
 <section class=" space-y-3 lg:flex items-start gap-4">
     <!-- filters -->
-    <div class=" w-full h-fit sticky top-0 z-20 lg:w-1/4">
+    <div class=" w-full h-fit sticky top-0 z-19 lg:w-1/4">
         <div class=" p-2 sm:p-4 bg-white shadow rounded space-y-3 mt-3">
             
             <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -459,7 +469,7 @@ function handleMouseLeave() {
         {:else}
        {#each paginatedProducts as product,index}
         <div class=" relative bg-white shadow p-2 sm:p-4 md:px-8 space-y-2 rounded">
-            <button on:click={()=>handleFavorites(product)} class=" absolute top-6 right-6">
+            <button on:click={()=>handleFavorites(product)} class="{$authedUser?.id ? "" : "hidden"} absolute top-6 right-6">
                 <Icon icon={$myFavorites.find(x=> x === product.stockId) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
             </button>
             <div class=" w-10/12 ">
@@ -522,6 +532,7 @@ function handleMouseLeave() {
                     <p>Sub Category : <span class=" font-semibold ">{product?.subCategoryDetails.name || ""}</span></p>
                     <p>Manufacturer : <span class=" font-semibold ">{product?.manufacturerDetails.name || ""}</span></p>
                     <!-- <p>Price : <span class=" font-semibold">{$currencyState === "inr" ? "₹" + product?.pricing.INR.toLocaleString("en-IN"): "$"+ product?.pricing.USD.toLocaleString("en-IN")}</span></p> -->
+                    {#if product?.pricing && Object.keys(product.pricing).length > 0}
                     <p>Size : <span class=" font-semibold">{product?.pricing?.break || ""}</span></p>
                     <div class=" hidden sm:flex items-center justify-between">
                         <p class=" font-bold text-4s">{$currencyState === "inr" ? "₹" + product?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
@@ -555,6 +566,25 @@ function handleMouseLeave() {
                             Add to Cart
                         </button>
                     </div>
+                    {:else if product?.variants?.length > 0}
+                    <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`}>
+                        <button class="bg-primary-500 py-2 px-3 hover:bg-primary-500 rounded text-sm text-white mt-2">
+                          View variants
+                        </button>
+                      </a>                      
+                    {:else}
+                    <div>
+                        <p class="text-gray-700 text-sm">
+                          The price for this product is unavailable. Please request a quote
+                        </p>
+                        <button
+                          on:click={() => toggleQuoteModal(product)}
+                          class="bg-primary-500 py-2 px-3 hover:bg-primary-500 rounded text-sm text-white mt-2"
+                        >
+                          Request Quote
+                        </button>
+                      </div>
+                    {/if}
                 </div>
             </div>
             <div class=" flex sm:hidden items-center justify-between">
@@ -633,3 +663,6 @@ function handleMouseLeave() {
     </div>
 
 </section>
+{#if showQuoteModal}
+  <ShowQuoteModal {data} {toggleQuoteModal} {form5} {productQuote} />
+{/if}
