@@ -231,6 +231,8 @@ async function submitForm() {
 			activeSubmenu = null;
 		}, 50000);
 	}
+	let isOpen = false;
+
 	function navigateTo (url) {
 		//invalidate("data:cat")
 		goto(url);
@@ -241,7 +243,7 @@ async function submitForm() {
 
 		// window.location.href = url;
 	// 	isLiked = false;
-		isOpen = !isOpen;
+		isOpen = false;
 
 	// 	if (url.includes('products') || url.includes('applications')) {
     //     window.location.href = url;
@@ -250,7 +252,6 @@ async function submitForm() {
     //    }
 	   
 	}
-	let isOpen = false;
 
 	function toggleLogoMenu() {
 		isOpen = !isOpen;
@@ -440,13 +441,13 @@ async function submitForm() {
 					{#each activeMenu.submenus as submenu}
 						<button
 							on:click={() => navigateTo(`${activeMenu.href}${submenu.href}`)}
-							class="block text-white p-2 hover:bg-primary-50 hover:text-primary-400 w-full text-left rounded transition-all duration-300">
+							class="block text-white p-2 hover:bg-primary-50 hover:text-primary-400 w-full text-left rounded transition-all duration-300 text-sm">
 							{submenu.title}
 						</button>
 					{/each}
 				</div>
 			{/if}
-		{/if}
+		{/if} 
 		</div>
 	</div>
 	
@@ -562,12 +563,12 @@ async function submitForm() {
 						  <button
 							on:click={() => navigateTo('/signin')}
 							class="block px-4 font-workSans py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
-							SignIn
+							Sign In
 						  </button>
 						  <button
 							on:click={() => navigateTo('/signup')}
 							class="loginbtn block px-4 font-workSans py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
-							Register
+							Sign Up
 						  </button>
 						</div>
 					  </div>
