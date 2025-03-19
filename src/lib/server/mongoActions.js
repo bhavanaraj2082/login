@@ -1424,8 +1424,8 @@ export const emailVerificationToken = async (body, verifyType) => {
 
 export const passwordVerificationToken = async (body, verifyType) => {
 	const { email, userId } = body;
-	console.log(body, 'Body from actions');
-	console.log(email, 'Email received');
+	// console.log(body, 'Body from actions');
+	// console.log(email, 'Email received');
 	const user = await User.findOne({ email });
 	if (!user) {
 		return {
