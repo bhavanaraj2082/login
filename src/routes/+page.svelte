@@ -46,4 +46,6 @@
 <PopularProduct {PopularProducts} />
 <AboutSection />
 <Email />
-<Footerlinkcomp footerData={data.foolterinksdata} />
+{#if data.foolterLinksData.length > 0}
+  <Footerlinkcomp footerData={data.foolterLinksData} />
+{/if}
