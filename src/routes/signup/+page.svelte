@@ -25,16 +25,3 @@
   <div class="absolute top-12 right-10 lg:w-40 w-8 lg:h-40 h-8 bg-primary-700/10 blur-2xl clip-hexagon"></div>  
 <Signup />
 </div>
-
-<style>
-  .clip-hexagon {
-    clip-path: polygon(
-      50% 0%,  
-      100% 25%, 
-      100% 75%, 
-      50% 100%, 
-      0% 75%,   
-      0% 25% 
-    );
-  }
-</style>

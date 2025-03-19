@@ -20,16 +20,3 @@
 	<div class="absolute top-0 md:right-10 right-20 md:w-80 w-8 md:h-80 h-8 bg-primary-400/10 clip-hexagon"></div>
 	<Resetpassword {data} />
   </div>
-
- <style>
-	.clip-hexagon {
-	  clip-path: polygon(
-		50% 0%,  
-		100% 25%, 
-		100% 75%, 
-		50% 100%, 
-		0% 75%,   
-		0% 25% 
-	  );
-	}
-  </style>

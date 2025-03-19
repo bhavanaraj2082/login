@@ -91,7 +91,7 @@
 		</div>
 	</button>
   <div class="w-full max-w-5xl mt-10">
-    <div class="flex flex-col md:flex-row bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl border border-white/20">
+    <div class="flex flex-col md:flex-row bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl">
       <div class="w-full md:w-3/5 p-8 md:pb-12 md:px-12 flex flex-col justify-center relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary-500/80 via-primary-500/80 to-primary-600/80 z-0"></div>
         <div class="absolute top-6 md:right-10 right-4 w-20 h-20 rounded bg-primary-100/20 animate-pulse clip-hexagon flex md:justify-center justify-end items-center">
@@ -100,9 +100,9 @@
         <div class="absolute md:bottom-2 md:right-0 bottom-2 left-48 sm:w-80 sm:h-80 h-20 w-20 rounded bg-primary-100/10 animate-pulse clip-hexagon">
         </div>
         <div class="relative z-10">
-          <h1 class="text-3xl md:text-4xl font-bold text-white mb-6">Welcome Back!</h1>
+          <h1 class="text-2xl md:text-4xl font-bold text-white mb-6">Welcome Back!</h1>
           <div class="md:w-72 w-20 h-1 bg-primary-50 mb-8"></div>
-          <p class="text-white/90 sm:text-lg max-w-lg text-md mb-8">
+          <p class="text-white/90 sm:text-lg text-xs max-w-lg text-md mb-8">
             Sign in to continue your journey with us. Access your personalized dashboard and exclusive features.
           </p>
           <div class="space-y-6 md:pr-12 hidden md:block">
@@ -402,17 +402,3 @@
   </div>
   <Toaster position="bottom-right" richColors />
 </div>
-
-
-<style>
-  .clip-hexagon {
-    clip-path: polygon(
-      50% 0%,  
-      100% 25%, 
-      100% 75%, 
-      50% 100%, 
-      0% 75%,   
-      0% 25% 
-    );
-  }
-</style>

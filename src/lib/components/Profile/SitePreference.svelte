@@ -6,19 +6,27 @@
     const dispatch = createEventDispatcher()
 
     export let recordId
-    console.log('siteprfernece===>',recordId)
+    // console.log('siteprfernece===>',recordId)
     export let sitePreferences
-    console.log('sitepreference===>',sitePreferences)
+    // console.log('sitepreference===>',sitePreferences)
 
     let toggleEdit = false
 
     $: ({ productEntryType,noOfQuickOrderFields,noOfOrdersPerPage,noOfQuotesPerPage } = sitePreferences)
 
-    let productEntry = productEntryType || "Manual Entry"
-    let quickOrder = noOfQuickOrderFields || 3
-    let orderPage = noOfOrdersPerPage || 3
-    let quotePage = noOfQuotesPerPage || 3
+    let productEntry
+    let quickOrder
+    let orderPage 
+    let quotePage
 
+    $:if(productEntryType || noOfQuickOrderFields || noOfOrdersPerPage || noOfQuotesPerPage ){
+        productEntry = productEntryType || "Manual Entry"
+        quickOrder = noOfQuickOrderFields ? noOfQuickOrderFields : 3
+        orderPage = noOfOrdersPerPage ? noOfOrdersPerPage : 3
+        quotePage = noOfQuotesPerPage ? noOfQuotesPerPage : 3
+
+    }
+    
     const increment = (type)=>{
         if(type === 'quickorder') quickOrder++
         if(type === 'orderpage') orderPage++
@@ -33,10 +41,10 @@
     }
 
     $: preferences = {
-        productEntryType:productEntry,
-        noOfQuickOrderFields:quickOrder,
-        noOfOrdersPerPage:orderPage,
-        noOfQuotesPerPage:quotePage
+        productEntryType: productEntry,
+        noOfQuickOrderFields: quickOrder,
+        noOfOrdersPerPage: orderPage,
+        noOfQuotesPerPage: quotePage
     }
 
 const handleSubmit =()=>{
@@ -62,8 +70,8 @@ const handleSubmit =()=>{
           <div class=" space-y-2 my-4">
               <div class=" text-xs md:text-sm font-medium">Product Entry Preference : <span class=" font-semibold">{productEntryType}</span></div>
               <div class=" text-xs md:text-sm font-medium">Default number of entry fields on Quick Order : <span class=" font-semibold">{noOfQuickOrderFields}</span></div>
-              <div class=" text-xs md:text-sm font-medium">Display number of orders on Orders Page : <span class=" font-semibold">{noOfOrdersPerPage}</span></div>
-              <div class=" text-xs md:text-sm font-medium">Display number of orders on Orders Page: <span class=" font-semibold">{noOfQuotesPerPage}</span></div>
+              <!-- <div class=" text-xs md:text-sm font-medium">Display number of orders on Orders Page : <span class=" font-semibold">{noOfOrdersPerPage}</span></div> -->
+              <div class=" text-xs md:text-sm font-medium">Display number of orders on Quotes Page: <span class=" font-semibold">{noOfQuotesPerPage}</span></div>
           </div>
        </div>
     {/if}
@@ -80,7 +88,7 @@ const handleSubmit =()=>{
                 <select bind:value={productEntry}
                 class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500">
                     <option class=" hover:bg-primary-200" value="Manual Entry">Manual Entry</option>
-                    <option class=" hover:bg-primary-200" value="Bulk Upload">Bulk Upload</option>
+                    <!-- <option class=" hover:bg-primary-200" value="Bulk Upload">Bulk Upload</option> -->
                 </select>
             </div>
             <div class=" sm:w-full">
@@ -91,14 +99,14 @@ const handleSubmit =()=>{
                 <button type="button" on:click={() => increment('quickorder')} class=" border-l-1 border-gray-300 p-2.5 text-primary-500"><Icon icon="rivet-icons:plus" class="text-sm"/></button>
             </div>
             </div>
-            <div class=" sm:w-full">
+            <!-- <div class=" sm:w-full">
                 <p class=" text-xs md:text-sm font-medium">Display number of orders on Orders Page</p>
                 <div class=" w-fit flex items-center border-1 border-gray-300 rounded">
                     <button type="button" on:click={() => decrement('orderpage')} class=" border-r-1 p-2.5 border-gray-300 text-primary-500"><Icon icon="rivet-icons:minus" class="text-sm"/></button>
                     <p class="w-20 sm:w-40 mx-3 text-sm font-medium outline-none text-center">{orderPage}</p>
                     <button type="button" on:click={() => increment('orderpage')} class=" border-l-1 border-gray-300 p-2.5 text-primary-500"><Icon icon="rivet-icons:plus" class="text-sm"/></button>
                 </div>
-            </div>
+            </div> -->
             <div class=" sm:w-full">
                 <p class=" text-xs md:text-sm font-medium">Display number of quotes on Quote Page</p>
                 <div class="w-fit flex items-center border-1 border-gray-300 rounded">
