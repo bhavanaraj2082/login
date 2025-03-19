@@ -139,7 +139,7 @@
                                         class="text-gray-400 text-lg"
                                     />
                                 </div>
-                                {#if $authedUser.email}
+                                {#if $authedUser?.email}
                                     <input
                                         id="email"
                                         class="w-full text-sm border border-gray-300 p-3 pl-10 rounded-md  focus:ring-0 shadow-sm focus:ring-primary-500 focus:border-primary-500 focus:outline-none"
