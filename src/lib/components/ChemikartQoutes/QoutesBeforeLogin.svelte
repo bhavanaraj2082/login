@@ -1,4 +1,7 @@
 <script>
+	import {onMount}  from 'svelte';
+	import { page } from '$app/stores';
+
 	import Icon from '@iconify/svelte';
 	let showPopup = false;
 	let popupMessage = '';
@@ -6,6 +9,12 @@
     function clearStorage() {
 		logInPopup = true
 	}
+	
+	onMount(() => {
+		const currentUrl = $page.url.href;
+		document.cookie = `redirectUrl=${encodeURIComponent(currentUrl)}; path=/; max-age=30`;
+		
+	});
 
 </script>
 
