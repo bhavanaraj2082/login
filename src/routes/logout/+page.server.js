@@ -3,11 +3,9 @@ import { redirect } from '@sveltejs/kit';
 
 export async function load({ locals, cookies }) {
   try {
-
     let sessionIdToInvalidate = null;
 
     if (locals.authedUser) {
-
       sessionIdToInvalidate = locals.session?.sessionId;
 
       if (sessionIdToInvalidate) {
@@ -16,7 +14,6 @@ export async function load({ locals, cookies }) {
         for (const cookie of authCookies) {
           if (cookie.name.startsWith('auth_')) {
             cookies.delete(cookie.name, { path: '/' });
-            // console.log(`Deleted cookie: ${cookie.name}`);
           }
         }
 
@@ -28,13 +25,12 @@ export async function load({ locals, cookies }) {
     locals.session = undefined;
 
     console.log('Redirecting to login page');
-    // throw redirect(302, '/login');
-    throw redirect(302, '/signin');
+    // Redirect to signin with reload parameter
+    throw redirect(302, '/signin?reload=true');
   } catch (err) {
     if (err.status === 302) {
       throw err;
     }
-    // console.error('Error during logout:', err.message);
     throw redirect(302, '/signin');
   }
 }

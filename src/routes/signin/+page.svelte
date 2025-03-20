@@ -3,6 +3,19 @@
   import SEO from '$lib/components/SEO.svelte';
   import { PUBLIC_WEBSITE_URL,PUBLIC_WEBSITE_NAME } from '$env/static/public';
 
+  import { onMount } from 'svelte';
+
+  onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.has('reload') && urlParams.get('reload') === 'true') {
+      urlParams.delete('reload');
+      const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+      window.history.replaceState({}, '', newUrl); 
+      location.reload();
+    }
+  });
+
   let metadata = {
     title: `Login | ${PUBLIC_WEBSITE_NAME}` || "Default Product Title",
     urlPath: `${PUBLIC_WEBSITE_URL}/signin` || "Default URl",

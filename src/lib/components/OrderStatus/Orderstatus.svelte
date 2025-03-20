@@ -2,6 +2,14 @@
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { authedUser } from '$lib/stores/mainStores.js';
+	import {onMount} from "svelte";
+	import { page } from "$app/stores";
+
+	onMount(() => {
+		const currentUrl = $page.url.href;
+		document.cookie = `redirectUrl=${encodeURIComponent(currentUrl)}; path=/; max-age=30`;
+		
+	});
 
 	const user = $authedUser?.email;
 	let email = '';
