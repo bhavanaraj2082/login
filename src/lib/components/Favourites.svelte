@@ -2,12 +2,11 @@
 	import { sendMessage } from '$lib/utils.js';
 	import { myFavorites } from '$lib/stores/favorites.js';
 	import { invalidate } from '$app/navigation';
-	import { currencyState } from './../stores/mainStores.js';
     import { onMount } from 'svelte';
     import { enhance } from '$app/forms';
     import { toast, Toaster } from "svelte-sonner";
     import { writable } from 'svelte/store';
-    import { authedUser,cartTotalComps } from '$lib/stores/mainStores.js'
+    import { authedUser, cartTotalComps, currencyState } from '$lib/stores/mainStores.js'
     import Icon from "@iconify/svelte";
     import Calender from '$lib/components/Calender.svelte';
 
@@ -24,6 +23,7 @@
 			localStorage.setItem("myfavorites",JSON.stringify(result.favorite))
 		})
     }
+
     $: favData = data?.favorites?.length ? data.favorites.map(item => {
     if (!item?.productInfo?.productId) return null;		
         return {
@@ -380,8 +380,7 @@ onMount(() => {
 	method="POST"
 	action="/?/getCartData"
 	bind:this={form}
-	use:enhance={handleDataCart}
->
+	use:enhance={handleDataCart}>
 	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
 </form>
 <!-- {#if !isAuthenticated}
@@ -472,9 +471,9 @@ onMount(() => {
                         })))} />
                 <button 
                     type="submit"
-                    class="flex w-full bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 px-5 py-2.5 rounded">
+                    class="flex w-full bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 px-5 py-2.5 rounded whitespace-nowrap">
                     <Icon icon="heroicons-solid:shopping-cart" width="20" />
-                    <span class=" text-sm font-medium">Add All to Cart</span>
+                    <span class=" md:text-sm font-medium text-xs">Add All to Cart</span>
                 </button>
             </form>
             <form 
@@ -483,14 +482,13 @@ onMount(() => {
                 use:enhance={handleClearAll}>
                 <button 
                     type="submit" 
-                    class="flex w-full bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2.5 rounded">
-                    <Icon icon="mdi:delete" width="20" />
-                    <span class=" font-medium text-sm">Remove All</span>
+                    class="flex w-full bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2.5 rounded whitespace-nowrap">
+                    <Icon icon="mdi:delete-forever" width="20" />
+                    <span class=" font-medium md:text-sm text-xs">Remove All</span>
                 </button>
             </form>
         </div>
     </div>
-   
     <div class="space-y-2">
         {#if !paginatedFavorites.length}
             <div class="w-full md:w-full border rounded border-primary-400 bg-white items-center px-4 py-8 md:col-span-2">
@@ -526,7 +524,7 @@ onMount(() => {
                     </p>
                     {#if item.stockInfo.specification}
                         <p class="text-sm font-semibold">
-                            Specification: <span class=" font-normal">{item.stockInfo.specification}</span>
+                            Specification: <span class=" font-normal">{item.stockInfo?.specification}</span>
                         </p>
                     {/if}
                 </div>
@@ -540,7 +538,7 @@ onMount(() => {
                         <p class="{item.quantity > item.stockInfo.stock ? "" : "hidden"} text-xs font-semibold text-gray-500">Back Order: <span class=" text-sm text-red-500">{item.quantity > item.stockInfo.stock ? item.quantity - item.stockInfo.stock : 0}</span></p>
                         {#if item.stockInfo.orderMultiple > 1}
                             <p class="text-xs text-gray-500">
-                                Order Multiple: {item.stockInfo.orderMultiple}
+                                Order Multiple: {item.stockInfo?.orderMultiple}
                             </p>
                         {/if}
                     </div>
@@ -562,11 +560,11 @@ onMount(() => {
                     })} />
                         <button 
                             type="submit" 
-                            class="flex bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-primary-500 px-5 py-2 rounded"
+                            class="flex bg-primary-500 items-center text-white hover:scale-95 transition-all duration-300 border-primary-500 px-2.5 py-2 rounded"
                             disabled={item.stockInfo.stock <= 0}>
                             <Icon 
                             icon="heroicons-solid:shopping-cart" 
-                            class="w-5 h-5" 
+                            class="text-xl" 
                             aria-label="Add to Cart Icon" />
                             <span class="hidden text-xs font-medium md:inline">Add to Cart</span>
                            
@@ -580,8 +578,8 @@ onMount(() => {
                             <input type="hidden" name="itemId" value={item.id} />
                             <button 
                                 type="submit" 
-                                class="flex bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-primary-500 px-5 py-2 rounded">
-                                <Icon icon="mdi:delete" class="w-5 h-5" aria-label="Remove Icon" />
+                                class="flex bg-red-600 items-center text-white hover:scale-95 transition-all duration-300 border-red-600 px-2.5 py-2 rounded">
+                                <Icon icon="mdi:delete-forever" class="text-xl" aria-label="Remove Icon" />
                                 <span class="hidden text-xs font-medium md:inline">Remove</span>
                             </button>
                         </form>
