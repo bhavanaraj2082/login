@@ -121,7 +121,7 @@
       <!-- Form -->
       <form
         method="POST"
-        action="?/createQuote"
+        action="/products/subid/subsubid/product?/createQuote"
         use:enhance={handleQuoteSubmission}
       >
           <div class="mb-4">
@@ -130,7 +130,7 @@
               {#if productName}
                 {productQuote.productName}
               {:else}
-                {selectedProduct.name || "--"}
+                <!-- {selectedProduct.name || "--"} -->
               {/if}
             </p>
           </div>
@@ -281,7 +281,7 @@
           >
           <div class="relative">
             <form
-              action="?/verifyemail"
+             action="/products/subid/subsubid/product?/verifyemail"
               bind:this={form5}
               method="POST"
               use:enhance={({}) => {
