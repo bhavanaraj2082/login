@@ -50,18 +50,22 @@
   {#if filteredSubcategories.length > 0}
     <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-12 mx-8 sm:mx-0">
       {#each filteredSubcategories as subcategory}
-        <div class="relative group bg-white shadow-lg border border-gray-200 rounded-lg overflow-hidden transition-shadow duration-300">
+        <div class="relative group bg-white shadow-lg border border-gray-200 rounded-lg overflow-hidden transition-shadow duration-300 ">
           <div class="absolute inset-0 bg-opacity-20 transition-all duration-500 ease-in-out group-hover:bg-opacity-0 z-10 pointer-events-none"></div>
           <a
             href="/products/{subcategory.category
               .urlName}/{subcategory.urlName}"
             class="block relative z-10">
-            <div class="relative">
-              <img
+            <div class="relative bg-gray-100">
+
+              <div class="w-full h-56 flex justify-center items-center">
+                <h1 class="font-semibold text-2xl px-2 text-gray-600">{subcategory.name}</h1>
+              </div>
+              <!-- <img
                 src="/category/{subcategory.category.name}.webp"
                 alt={subcategory.name}
                 class="w-full h-60 object-cover opacity-90 transition-transform duration-500 ease-in-out group-hover:scale-105 group-hover:opacity-100"
-              />
+              /> -->
             </div>
             <div class="p-4">
               <div class="flex justify-between items-center">
