@@ -589,6 +589,7 @@ function handleMouseLeave() {
                     {/if}
                 </div>
             </div>
+            {#if product?.pricing && Object.keys(product.pricing).length > 0}
             <div class=" flex sm:hidden items-center justify-between">
                 <p class=" text-xs font-bold">{$currencyState === "inr" ? "₹" + product?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
                 <div class="flex items-center">
@@ -622,6 +623,7 @@ function handleMouseLeave() {
                     <span class="hidden xs:block">Add to Cart</span>
                 </button>
             </div>
+              {/if}
         </div>
        {/each}
        {/if}
