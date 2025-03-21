@@ -2,9 +2,11 @@
 	import { enhance, applyAction } from '$app/forms';
 	import { fade } from 'svelte/transition';
 	// import { goto } from '$app/navigation';
+	import { authedUser } from '$lib/stores/mainStores.js';
 	import policyData from '$lib/data/returnReasons.json';
 	import { toast, Toaster } from 'svelte-sonner';
 
+	const user = $authedUser?.email;
 	let email = '';
 	let invoiceNumber = '';
 	let error = {};
@@ -34,6 +36,7 @@
 		}
 		return Object.keys(error).length === 0;
 	};
+	
 	$: if (formSuccess || formError) {
 		setTimeout(() => {
 			formSuccess = '';
