@@ -71,7 +71,7 @@ const handleSubmit =()=>{
               <div class=" text-xs md:text-sm font-medium">Product Entry Preference : <span class=" font-semibold">{productEntryType}</span></div>
               <div class=" text-xs md:text-sm font-medium">Default number of entry fields on Quick Order : <span class=" font-semibold">{noOfQuickOrderFields}</span></div>
               <!-- <div class=" text-xs md:text-sm font-medium">Display number of orders on Orders Page : <span class=" font-semibold">{noOfOrdersPerPage}</span></div> -->
-              <div class=" text-xs md:text-sm font-medium">Display number of orders on Quotes Page: <span class=" font-semibold">{noOfQuotesPerPage}</span></div>
+              <!-- <div class=" text-xs md:text-sm font-medium">Display number of orders on Quotes Page: <span class=" font-semibold">{noOfQuotesPerPage}</span></div> -->
           </div>
        </div>
     {/if}
@@ -107,17 +107,17 @@ const handleSubmit =()=>{
                     <button type="button" on:click={() => increment('orderpage')} class=" border-l-1 border-gray-300 p-2.5 text-primary-500"><Icon icon="rivet-icons:plus" class="text-sm"/></button>
                 </div>
             </div> -->
-            <div class=" sm:w-full">
+            <!-- <div class=" sm:w-full">
                 <p class=" text-xs md:text-sm font-medium">Display number of quotes on Quote Page</p>
                 <div class="w-fit flex items-center border-1 border-gray-300 rounded">
                     <button type="button" on:click={() => decrement('quotepage')} class=" border-r-1 p-2.5 border-gray-300 text-primary-500"><Icon icon="rivet-icons:minus" class="text-sm"/></button>
                     <p class="w-20 sm:w-40 mx-3 text-sm font-medium outline-none text-center">{quotePage}</p>
                     <button type="button" on:click={() => increment('quotepage')} class=" border-l-1 border-gray-300 p-2.5 text-primary-500"><Icon icon="rivet-icons:plus" class="text-sm"/></button>
                 </div>
-            </div>
+            </div> -->
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
-                <button type="submit" class=" w-full rounded py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Save</button>
                 <button type="button" on:click={()=>toggleEdit = false} class=" w-full rounded py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
+                <button type="submit" class=" w-full rounded py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Save</button>
             </div>
         </form>
       </div>

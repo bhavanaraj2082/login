@@ -517,12 +517,14 @@ onMount(() => {
                     class=" w-32 h-32 object-cover rounded-md mb-3 md:mb-0 md:mr-4"/>
                 
                 <div class="flex-1 text-center md:text-left space-y-0.5">
-                    <h2 class="text-sm font-bold text-gray-800">{item?.name || ''}</h2>
+                    <h2 class="text-sm font-bold text-gray-800">
+                        <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline transition-all duration-300">{item?.name || ""}</a>
+                    </h2>
                     <!-- <div class=" w-10/12 ">
                         <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{item?.partNumber || ""}</a>
                     </div> -->
                     <p class="text-sm">
-                        <span class="font-semibold">Product Number:</span> <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{item?.partNumber || ""}</a>
+                        <span class="font-semibold">Product Number:</span> <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm:text-sm font-semibold hover:text-primary-500 hover:underline transition-all duration-300">{item?.partNumber || ""}</a>
                     </p>
                     <p class="text-sm">
                         <span class="font-semibold">Manufacturer:</span> {item?.manufacturerName || ''}

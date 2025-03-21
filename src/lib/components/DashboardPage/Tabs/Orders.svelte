@@ -465,7 +465,7 @@ function downloadAsExcel(order) {
                     <Icon icon="ri:search-line" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="20" height="20"/>
                     <input
                         type="text"
-                        placeholder="Search by Order Number or Purchase Order Number"
+                        placeholder="Search by Order Number"
                         class="w-full border rounded px-4 py-2 pl-10 focus:ring-0 focus:border-primary-500 transition-all outline-none duration-200"
                         value={filters.searchTerm}
                         on:input={handleSearch}/>
@@ -490,7 +490,7 @@ function downloadAsExcel(order) {
                 }} />
                 </div> 
                 <div class="flex-1 sm:max-w-[400px] mt-2 md:mt-0 md:ml-2">
-                    <select class="border w-full h-10 rounded focus:ring-0 focus:border-primary-500 transition-all outline-none duration-200 pb-2"
+                    <select class="border w-full h-10 text-xs rounded focus:ring-0 focus:border-primary-500 transition-all outline-none duration-200 pb-2"
                             bind:value={filters.status}
                             on:change={() => updateFilters('status', filters.status)}>
                         <option value="">All Status</option>
@@ -513,44 +513,15 @@ function downloadAsExcel(order) {
             </div>
         </div>
     </div>
-   <!--   <div class="mb-6 flex items-center gap-6">
-       <label class="inline-flex items-center {userOrderType === 'company' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
-            <input 
-                type="radio" 
-                class="form-radio text-primary-600 h-4 w-4" 
-                name="orderType" 
-                checked={filters.orderType === 'my'}
-                disabled={userOrderType === 'company'}
-                on:change={() => handleOrderTypeChange('my')}/>
-            <span class="m-2 md:text-md text-xs">My Orders</span>
-        </label>
-        <label class="inline-flex items-center {userOrderType === 'my' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}">
-            <input 
-                type="radio" 
-                class="form-radio text-primary-600 h-4 w-4" 
-                name="orderType"
-                checked={filters.orderType === 'company'}
-                disabled={userOrderType === 'my'}
-                on:change={() => handleOrderTypeChange('company')}/>
-            <span class="ml-2 md:text-md text-xs">Company Orders</span>
-            <sup>
-                <button 
-                    on:click={openInfoPopup} 
-                    class="text-xs" 
-                    aria-label="Information"
-                    disabled={userOrderType === 'my'}>
-                    <Icon icon="ri:question-line" width="16" height="16"/>
-                </button>
-            </sup>
-        </label> 
-    </div>-->
     <div class="overflow-x-auto rounded shadow">
         <table class="w-full border-collapse border border-gray-100">
             <thead class="bg-gradient-to-r from-primary-500 to-primary-600 text-white uppercase text-xs tracking-wider">
                 <tr>
                     <th class="px-4 py-2 text-sm font-semibold">DATE</th>
                     <th class="px-4 py-2 text-sm font-semibold">ORDER NUMBER</th>
+                    {#if order.some(order => order?.purchaseorder)}
                     <th class="px-4 py-2 text-sm font-semibold">PURCHASE ORDER NUMBER</th>
+                  {/if}
                     <th class="px-4 py-2 text-sm font-semibold">TOTAL</th>
                     <th class="px-4 py-2 text-sm font-semibold">STATUS</th>
                     <th class="px-4 py-2 text-sm font-semibold">ACTIONS</th>
@@ -568,7 +539,9 @@ function downloadAsExcel(order) {
                     <tr class="mr-6 bg-white text-center border-b cursor-pointer transition-colors duration-150" in:fade={{duration: 200}} on:click={() => toggleOrderDetails(order?._id)}>
                         <td class="px-4 py-2 text-xs">{formatDate(order?.createdAt) || 'N/A'}</td>
                         <td class="px-4 py-2 text-xs">{order?.orderid || 'N/A'}</td>
-                        <td class="px-4 py-2 text-xs font-semibold">{order?.purchaseorder || 'N/A'}</td>
+                        <!-- {#if order?.purchaseorder}
+                            <td class="px-4 py-2 text-xs font-semibold">{order?.purchaseorder || 'N/A'}</td>
+                        {/if} -->
                         <td class="px-4 py-2 text-xs">{formatCurrency(order?.totalprice || 0, order?.currency || 'INR')}</td>
                         <td class="px-4 py-2 text-xs">
                             <a href={`/order-status/${order?.orderid}?email=${userEmail}`} class="text-blue-500 hover:text-blue-700">
