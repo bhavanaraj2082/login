@@ -669,11 +669,14 @@ export const loadProductsubcategory = async (
         },
       },
     );
+    
     const products = await Product.aggregate(aggregation);
+    // console.log("products",products);
+    
     const totalCount = await Product.countDocuments(matchCondition);
     const after = Date.now();
 
-   if(!products[0].data.length && !products[0].totalCount.length ){
+   if(!products[0]?.data?.length && !products[0]?.totalCount?.length ){
     return {
       products: [],
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
@@ -958,8 +961,7 @@ export async function conversionRates() {
 export async function convertToINR(pricing) {
   if (typeof pricing !== 'object' || pricing === null) return {}; 
 
-  const currentRates = await conversionRates();
-
+  const currentRates = await conversionRates(); 
   const newPriceItem = { ...pricing }; 
 
   const { break: breakPoint, offer, ...currencies } = pricing;
@@ -969,6 +971,7 @@ export async function convertToINR(pricing) {
 
   if (currencies.INR) {
     newPriceItem.INR = currencies.INR;
+    newPriceItem.USD = Number(currencies.INR / currentRates.USD); 
     return newPriceItem;
   }
 
