@@ -31,20 +31,11 @@
           { "name1": "Biochemicals", "link1": "/products/chemistry-and-biochemicals/biochemicals" },
           { "name1": "Building Blocks", "link1": "/products/chemistry-and-biochemicals/building-blocks" },
           { "name1": "Catalysts", "link1": "/products/chemistry-and-biochemicals/catalysts" },
-          { "name1": "Chemical Biology", "link1": "/products/chemistry-and-biochemicals/chemical-biology" },
+          { "name1": "Chemical Biolog", "link1": "/products/chemistry-and-biochemicals/chemical-biolog" },
           { "name1": "Chemical Synthesis", "link1": "/products/chemistry-and-biochemicals/chemical-synthesis" },
           { "name1": "Formulation", "link1": "/products/chemistry-and-biochemicals/formulation" },
           { "name1": "Lab Chemicals", "link1": "/products/chemistry-and-biochemicals/lab-chemicals" },
           { "name1": "Lab Safety", "link1": "/products/chemistry-and-biochemicals/lab-safety" }
-      ]
-    },
-    {
-      "name1": "Clinical Diagnostics",
-      "link1": "/products/clinical-diagnostics",
-      "subcategories1":[
-          { "name1": "Blood Typing", "link1": "/products/clinical-diagnostics/blood-typing" },
-          { "name1": "Cell Marque", "link1": "/products/clinical-diagnostics/cell-marque" },
-          { "name1": "Tissue Diagnostics", "link1": "/products/clinical-diagnostics/tissue-diagnostics" }
       ]
     },
     {
@@ -63,8 +54,7 @@
       "link1": "/products/materials-science",
       "subcategories1": [
           { "name1": "Biomedical Materials", "link1": "/products/materials-science/biomedical-materials" },
-          { "name1": "Electronic Materials", "link1": "/products/materials-science/electronic-materials" },
-          { "name1": "Energy Materials", "link1": "/products/materials-science/energy-materials" }
+          { "name1": "Electronic Materials", "link1": "/products/materials-science/electronic-materials" }
       ]
     },
     {
@@ -157,7 +147,7 @@
           { "name2": "Clinical and Forensics Testing", "link2": "/applications/clinical-testing-diagnostics-manufacturing/clinical-forensics-testing" },
           { "name2": "Cytology & Cytodiagnosis", "link2": "/applications/clinical-testing-diagnostics-manufacturing/cytology-cytodiagnosis" },
           { "name2": "Hematology", "link2": "/applications/clinical-testing-diagnostics-manufacturing/hematology" },
-          { "name2": "Histology", "link2": "/applications/clinical-testing-diagnostics-manufacturing/Histology" },
+          { "name2": "Histology", "link2": "/applications/clinical-testing-diagnostics-manufacturing/histology" },
           { "name2": "Immunohistochemistry", "link2": "/applications/clinical-testing-diagnostics-manufacturing/immunohistochemistry" },
           { "name2": "IVD Manufacturing", "link2": "/applications/clinical-testing-diagnostics-manufacturing/ivd-manufacturing" }
       ]
