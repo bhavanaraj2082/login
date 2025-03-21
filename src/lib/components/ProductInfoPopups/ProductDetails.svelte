@@ -23,7 +23,6 @@
   let showQuoteModal = false;
   let productQuote = null;
   let showTooltip = false;
-  let screenWidth = 0;
   let isLoggedIn = $authedUser?.id ? true : false;
   let form5;
   let showPopup = false;
@@ -37,20 +36,7 @@
   let maxPrice = -Infinity;
   let copyToastIndex = null;
   let copyToastID = false;
-  const productName = data.records.map(prodName => prodName.productName);
-  
-  const updateWidth = () => {
-    screenWidth = window.innerWidth;
-  };
-
-  onMount(() => {
-    screenWidth = window.innerWidth;
-    window.addEventListener("resize", updateWidth);
-
-    return () => {
-      window.removeEventListener("resize", updateWidth);
-    };
-  });
+  const productName = data.records.map((prodName) => prodName.productName);
 
   function toggleTooltip() {
     showTooltip = !showTooltip;
@@ -531,8 +517,8 @@
             </p>
           </div>
         {/if}
-        {#if screenWidth >= 640 && !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
-          <div class="!mt-6">
+        {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
+          <div class="!mt-6 max-[640px]:hidden block">
             <h2 class="bg-white text-heading font-bold text-left">
               Select a Size
             </h2>
@@ -613,8 +599,7 @@
             {/each}
           </div>
         {/if}
-
-        {#if screenWidth < 640}
+        <div class="max-[640px]:block hidden">
           <h2
             class="bg-white font-bold text-heading text-base text-left max-md:mt-6"
           >
@@ -628,7 +613,7 @@
                 class={`border border-gray-300 rounded w-28  p-2 shadow-sm hover:shadow-sm  cursor-pointer ${index === i ? "border-1 border-primary-500 bg-primary-50" : "border-1 border-gray-300"}`}
                 on:click={() => handleThumbnailClick(i, product)}
               >
-                <div class="text-lg font-bold text-gray-800">
+                <div class="lg:text-lg text-base font-bold text-gray-800">
                   {priceItem?.break}
                 </div>
                 <div class="text-sm text-gray-700">
@@ -647,10 +632,10 @@
               </div>
             {/each}
           </div>
-        {/if}
+        </div>
         {#if !((product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && Object.keys(variant.pricing).length > 0)) || product?.priceSize?.length > 0)}
           <div>
-            <p class="text-gray-700 text-sm { !authedEmail ? 'mt-6' : '' }">
+            <p class="text-gray-700 text-sm {!authedEmail ? 'mt-6' : ''}">
               The price for this product is unavailable. Please request a quote
             </p>
             <button
