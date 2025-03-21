@@ -9,6 +9,7 @@
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { shippingAddress, billingAddress } from '$lib/stores/mainStores.js';
 	import AddressForm from '$lib/components/Cart/AddressForm.svelte';
+	import * as XLSX from 'xlsx';
 
 	export let data;
 	$: userData = data.result.profileData;
@@ -23,7 +24,10 @@
 	let isShowbox = true
 	let order = ''
 	let taxError = ''
-	let gstNumber = userData?.gstNumber || ''
+	let gstNumber
+	$:{
+	  gstNumber	= userData?.gstNumber || ''
+	} 
 	let checkout
 	let onSubmit = false
 	let addressError = false

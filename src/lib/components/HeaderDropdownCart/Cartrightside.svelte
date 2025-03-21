@@ -91,6 +91,7 @@
 			calculateTotalPrice($cart)
 			return
 		}
+		console.log(stock);
 		clearTimeout(timeout);
 		if (quantity > 10000000) quantity = 10000000;
 		timeout = setTimeout(() => {
@@ -99,6 +100,7 @@
 		
 		if (!isLoggedIn) {
 			cart.update((item) => {
+				console.log(item,"text");
 				item[indx].quantity = selectedQty;
 				return item;
 			});
@@ -110,12 +112,12 @@
 			tog = null;
 			return;
 		}
-	}, 1500);
+	//}, 1500);
 
 
 		const index = $cart.findIndex((item) => item._id === _id);
 		
-		timeout = setTimeout(() => {
+	//	timeout = setTimeout(() => {
 			if (index !== -1) {
 			cart.update((item) => {
 				item[index].quantity = Math.ceil(quantity/ stock.orderMultiple) * stock.orderMultiple;

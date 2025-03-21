@@ -168,7 +168,7 @@ async function submitForm() {
 	}
 	async function submitAlternateForm() {
 		// submitGuestForm.requestSubmit();
-		const storedTotalComps = JSON.parse(localStorage.getItem('cart'));;
+		const storedTotalComps = JSON.parse(localStorage.getItem('cart')) || []
 		localStorage.setItem('totalCompsChemi', storedTotalComps.length);
 		syncLocalStorageToStore();	
 	}
@@ -534,7 +534,12 @@ async function submitForm() {
 						My Quotes
 					  </button>
 					  <button
-						on:click={() => navigateTo('/logout')}
+						on:click={() =>{
+							 localStorage.clear()
+							 authedUser.set({})
+							 cartTotalComps.set(0)
+							 navigateTo('/logout')
+						}}
 						class="loginbtn block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
 						Logout
 					  </button>
@@ -681,14 +686,19 @@ async function submitForm() {
 						My Quotes
 					  </button>
 					  <button
-						on:click={() => navigateTo('/logout')}
+					    on:click={() =>{
+						    localStorage.clear()
+							authedUser.set({})
+							cartTotalComps.set(0)
+						    navigateTo('/logout')
+				        }}
 						class="loginbtn block px-4 py-2 sm:text-sm text-xs text-gray-700 hover:text-primary-500 w-full text-left font-medium border-l-4 border-transparent hover:border-primary-600 hover:bg-primary-50">
 						Logout
 					  </button>
 					</div>
 				  </div>
 				{/if}
-		</div>
+		    </div>
 			{:else}
 				<div class="flex items-center justify-between">
 					<!-- <button
