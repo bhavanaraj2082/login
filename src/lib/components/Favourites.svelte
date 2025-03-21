@@ -11,6 +11,7 @@
     import Calender from '$lib/components/Calender.svelte';
 
     export let data;
+    // console.log('favdata==>>', data)
     let form;
     
     $: isAuthenticated = !!data?.locals?.user?.email;
@@ -52,6 +53,7 @@
                 id: item.distributorInfo?.distributorId,
             },
             quantity: parseInt(item.quantity) || 1,
+            createdAt: item.createdDate || new Date(),
         };
     }).filter(Boolean) : [];
 
@@ -77,25 +79,26 @@ function filterFavorites(items, filterCriteria) {
         const searchTerm = filterCriteria.searchTerm.toLowerCase().trim();
         const matchesSearch =
             !searchTerm ||
-            item.name.toLowerCase().includes(searchTerm) ||
-            item.partNumber.toLowerCase().includes(searchTerm) ||
-            item.manufacturerName.toLowerCase().includes(searchTerm);
-
-        const createdDate = new Date(item.createdAt);
-        createdDate.setHours(0, 0, 0, 0);
+            (item.name && item.name.toLowerCase().includes(searchTerm)) ||
+            (item.partNumber && item.partNumber.toLowerCase().includes(searchTerm)) ||
+            (item.manufacturerName && item.manufacturerName.toLowerCase().includes(searchTerm));
 
         let matchesDateRange = true;
 
-        if (filterCriteria.dateFrom) {
-            const fromDate = new Date(filterCriteria.dateFrom);
-            fromDate.setHours(0, 0, 0, 0);
-            matchesDateRange = matchesDateRange && createdDate >= fromDate;
-        }
+        if (item.createdAt) {
+            const createdDate = new Date(item.createdAt);
+            
+            if (filterCriteria.dateFrom) {
+                const fromDate = new Date(filterCriteria.dateFrom);
+                fromDate.setHours(0, 0, 0, 0);
+                matchesDateRange = matchesDateRange && createdDate >= fromDate;
+            }
 
-        if (filterCriteria.dateTo) {
-            const toDate = new Date(filterCriteria.dateTo);
-            toDate.setHours(23, 59, 59, 999);
-            matchesDateRange = matchesDateRange && createdDate <= toDate;
+            if (filterCriteria.dateTo) {
+                const toDate = new Date(filterCriteria.dateTo);
+                toDate.setHours(23, 59, 59, 999);
+                matchesDateRange = matchesDateRange && createdDate <= toDate;
+            }
         }
 
         return matchesSearch && matchesDateRange;
@@ -119,9 +122,13 @@ function getEarliestFavoriteDate(items) {
 }
 
 function handleDateChange(event) {
-    const { dates, filters: eventFilters } = event.detail;
-    updateFilters('dateFrom', dates.from);
-    updateFilters('dateTo', dates.to);
+    // console.log("Date change event:", event.detail);
+    const { dates } = event.detail;
+    
+    if (dates) {
+        updateFilters('dateFrom', dates.from);
+        updateFilters('dateTo', dates.to);
+    }
 }
 
 function updateFilters(key, value) {
@@ -227,15 +234,19 @@ $: paginatedFavorites = getPaginatedData(filteredFavorites, $currentPage, $items
 
 function calculateTotalPrice(price, quantity) {
     if (!price || price === 'Price not available') return 'N/A';
-    const numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
+    
+    let numericPrice;
+    if (typeof price === 'number') {
+        numericPrice = price;
+    } else if (typeof price === 'string') {
+        numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
+    } else {
+        return 'N/A';
+    }
+    
     return isNaN(numericPrice) ? 'N/A' : (numericPrice * quantity).toLocaleString("en-IN");
 }
 
-    // function calculateTotalPrice(price, quantity) {
-    //     if (!price || price === 'Price not available') return 'N/A';
-    //     const numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
-    //     return isNaN(numericPrice) ? 'N/A' : (numericPrice * quantity).toLocaleString("en-IN");
-    // }
     let timeout
     function handleQty(item,quantity){
         if(isNaN(quantity)){
@@ -374,6 +385,7 @@ onMount(() => {
     const earliestDate = getEarliestFavoriteDate(favData);
 });
 
+
 </script> 
 
 <form
@@ -428,7 +440,7 @@ onMount(() => {
             <Icon icon="ri:search-line" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="20" height="20"/>
             <input 
                 type="text" 
-                placeholder="Search by Name, Part Number, or Manufacturer" 
+                placeholder="Search by Name, Prouduct Number, or Manufacturer" 
                 class="w-full h-10 border border-gray-400 focus:ring-0 focus:border-primary-500 rounded px-4 py-2 pl-10 text-sm outline-none transition-all duration-200" 
                 value={filters.searchTerm} 
                 on:input={handleSearch}/>
@@ -450,7 +462,9 @@ onMount(() => {
                     on:dateChange={handleDateChange}
                     initialFilters={{
                         firstTimeOnly: false,
-                        dateRange: 'custom'
+                        dateRange: 'custom',
+                        from: filters.dateFrom || '',
+                        to: filters.dateTo || ''
                     }}/>
             </div>
         </div>
@@ -504,12 +518,11 @@ onMount(() => {
                 
                 <div class="flex-1 text-center md:text-left space-y-0.5">
                     <h2 class="text-sm font-bold text-gray-800">{item?.name || ''}</h2>
-
-                    <div class=" w-10/12 ">
-                        <a href={`/products/${item.categoryName}/${item.subCategoryName}/${item.product?.productNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{item.product?.productName  || ""}</a>
-                    </div>
+                    <!-- <div class=" w-10/12 ">
+                        <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{item?.partNumber || ""}</a>
+                    </div> -->
                     <p class="text-sm">
-                        <span class="font-semibold">Product Number:</span> {item?.partNumber || ''}
+                        <span class="font-semibold">Product Number:</span> <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{item?.partNumber || ""}</a>
                     </p>
                     <p class="text-sm">
                         <span class="font-semibold">Manufacturer:</span> {item?.manufacturerName || ''}
