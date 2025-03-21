@@ -273,7 +273,7 @@ const handleSubmit = async (event) => {
 		</div>
 	</div>
 {:else}
-<h1 class="font-bold text-lg md:text-2xl pl-1 pt-10 pb-5 w-11/12 max-w-7xl justify-center mx-auto">Feedback</h1>
+<h1 class="font-bold text-lg md:text-2xl pl-1 pb-5 w-11/12 max-w-7xl justify-center mx-auto">Feedback</h1>
 <section class="w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto font-roboto bg-white mb-10">
 	<div class="w-full border border-gray-300 rounded-lg p-2">
 <form
