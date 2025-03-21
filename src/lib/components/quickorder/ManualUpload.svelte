@@ -359,140 +359,7 @@
     }
   }
 
-  async function addManualEntriesToCart() {
-    cartloading = true;
-    const validRows = rows.filter((row) => {
-      return row.sku.trim() !== "" && row.selectedSize;
-    });
 
-    if (validRows.length === 0) {
-      toast.error("No valid items to add to cart");
-      cartloading = false;
-      return;
-    }
-
-    const cartItems = validRows
-      .map((row) => {
-        const productNumber = row.sku.split(" -")[0].trim();
-        const validProduct = products.find(
-          (p) =>
-            String(p.productNumber).trim().toLowerCase() ===
-            productNumber.toLowerCase(),
-        );
-
-        if (!validProduct) {
-          toast.error(`Product ${productNumber} not found`);
-          return null;
-        }
-
-        const sizePriceInfo = validProduct.pricing?.find(
-          (item) =>
-            item.break.trim().toLowerCase() ===
-            row.selectedSize.trim().toLowerCase(),
-        );
-
-        if (!sizePriceInfo) {
-          toast.error(
-            `Size ${row.selectedSize} not available for ${productNumber}`,
-          );
-          return null;
-        }
-        const quantity =
-          selectedProduct &&
-          selectedProduct.productNumber === validProduct.productNumber
-            ? selectedProduct.quantity
-            : row.quantity > 0
-              ? row.quantity
-              : 1;
-
-        return {
-          id: validProduct.id,
-          image: validProduct.image,
-          productName: validProduct.productName,
-          manufacturerId: validProduct.manufacturer,
-          distributerId: validProduct.distributer,
-          stockId: validProduct.stockId,
-          stock: validProduct.stock,
-          productId: validProduct.id,
-          priceSize: {
-            price: sizePriceInfo.price,
-            size: row.selectedSize,
-          },
-          backOrder: Math.max(row.quantity - validProduct.stock),
-          quantity: quantity || row.quantity > 0 ? row.quantity : 1,
-        };
-      })
-      .filter(Boolean);
-
-    if (cartItems.length === 0) {
-      return;
-    }
-
-    const authedUser = data?.authedUser;
-
-    if (authedUser && authedUser?.id) {
-      const form = new FormData();
-      form.append("cartItems", JSON.stringify(cartItems));
-      cartloading = true;
-
-      try {
-        const response = await fetch("?/addToCart", {
-          method: "POST",
-          body: form,
-        });
-
-        const result = await response.json();
-        cartloading = false;
-
-        const resultData = JSON.parse(result.data);
-
-        if (resultData && resultData[0]?.success === 1) {
-          toast.success(resultData[2] || "Items added to cart successfully");
-          rows = rows.map((row) => ({
-            sku: "",
-            size: "",
-            quantity: 1,
-
-            error: "",
-            filteredProducts: [],
-            selectedSize: "",
-          }));
-
-          // showCartPopup(cartItems);
-        } else {
-          toast.error(resultData[1] || "Failed to add items to cart");
-          cartloading = false;
-        }
-      } catch (err) {
-        console.error("Error adding to cart:", err);
-        toast.error("Failed to add items to cart");
-        cartloading = false;
-      }
-    } else {
-      const simplifiedCartItems = cartItems.map((item) => ({
-        productId: item.productId,
-        manufacturerId: item.manufacturerId,
-        stockId: item.stockId,
-        distributorId: item.distributerId,
-
-        quantity: item.quantity,
-        backOrder: item.backOrder,
-      }));
-      rows = rows.map((row) => ({
-        sku: "",
-        size: "",
-        quantity: 1,
-
-        error: "",
-        filteredProducts: [],
-        selectedSize: "",
-      }));
-      localStorage.setItem("cart", JSON.stringify(simplifiedCartItems));
-      toast.success("Items added to cart successfully.");
-      // showCartPopup(cartItems);
-      cartloading = false;
-    }
-  }
 
   function cart() {
     if (userLoggedIn) {
@@ -867,7 +734,6 @@
     localStorage.setItem("cart", JSON.stringify(currentCart));
     cartRowIndexToBeCleared = currentIndex;
     showCartPopupdetails(cartItem);
-    // showCartPopup(cartItem);
 
     setTimeout(() => {
       clearSelectedProductcart(cartRowIndexToBeCleared);
@@ -1543,153 +1409,16 @@
           {/if}
         </div>
       </div>
-
-      <!-- svelte-ignore missing-declaration -->
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div
-        id="cart-popup-details"
-        class="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center"
-        style="display: {showCartPopupdetail ? 'flex' : 'none'}"
-        on:click={closeCartPopDetails}
-      >
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div
-          class="bg-white p-6 rounded-md shadow-lg max-w-md w-full relative"
-          on:click|stopPropagation
-        >
-          <button
-            on:click={closeCartPopDetails}
-            class="absolute top-4 right-4 text-primary-500 hover:scale-105"
-          >
-            <span class="text-xl font-semibold text-primary-500 hover:scale-105"
-              >✖</span
-            >
-          </button>
-
-          <div class="flex flex-col items-center">
-            <h3 class="text-xl font-semibold mb-4">Items Added to Cart</h3>
-            <div id="cart-items-list" class="mb-4"></div>
-            <div class="flex justify-end gap-5 mt-6 pt-3 border-t">
-              <button
-                on:click={continueShopping}
-                class="bg-primary-500 text-white px-5 py-1.5 rounded font-normal hover:bg-primary-600 transition-all ease-in-out duration-300 shadow-sm"
-              >
-                Continue Shopping
-              </button>
-              <a href="/cart">
-                <button
-                  on:click={viewCart}
-                  class="text-primary-600 px-5 py-1.5 rounded font-normal flex gap-2 border-1 border-primary-600 hover:bg-primary-600 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
-                >
-                  View Cart
-                  <Icon icon="mdi:cart" width="20" height="20" />
-                </button>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+      
     {/if}
   </div>
 
-  <!-- {#if userLoggedIn}
-    <div
-      class="w-full sm:w-full md:w-1/4 lg:w-1/4 h-1/2 ml-0 sm:ml-0 mt-8 md:mt-24 bg-gray-50 border rounded-lg border-gray-400 p-4"
-    >
-      <h2 class="font-semibold text-xl mb-2">
-        Hello,
-      </h2>
-
-      <div class="mb-2">
-        <div class="flex items-center space-x-2">
-          <h3 class="font-semibold text-lg">Saved Carts</h3>
-          <button
-            class="text-primary-500"
-            on:click={() => (showSavedCarts = !showSavedCarts)}
-          >
-            <Icon
-              icon={showSavedCarts
-                ? "iconamoon:arrow-up-2-duotone"
-                : "iconamoon:arrow-down-2-duotone"}
-              class="text-3xl"
-            />
-          </button>
-        </div>
-
-        {#if showSavedCarts}
-          {#if cart.length > 0}
-            <ul>
-              {#if cart.length <= 3}
-                {#each cart as cartItem}
-                  <li class="text-sm mt-2 text-gray-700">
-                    {cartItem.name} ({cartItem.quantity} items)
-                  </li>
-                {/each}
-              {:else}
-                <li class="mt-1">
-                  <button class="text-primary-400 font-semibold">
-                    You have {cart.length} items
-                  </button>
-                </li>
-                <li>
-                  <a
-                    href="/cart"
-                    class="text-primary-400 hover:underline font-semibold"
-                    >See your items</a
-                  >
-                </li>
-              {/if}
-            </ul>
-          {:else}
-            <p class="text-sm text-gray-500">No saved carts found.</p>
-          {/if}
-        {/if}
-      </div>
-
-      <div class="flex items-center space-x-2">
-        <h3 class="font-semibold text-lg">Lists</h3>
-        <button
-          class="text-primary-500"
-          on:click={() => (showLists = !showLists)}
-        >
-          <Icon
-            icon={showLists
-              ? "iconamoon:arrow-up-2-duotone"
-              : "iconamoon:arrow-down-2-duotone"}
-            class="text-3xl"
-          />
-        </button>
-      </div>
-      {#if showLists}
-        <a href="/lists" class="text-gray-500">See Lists# </a>
-      {/if}
-      <div class="flex items-center space-x-2 mt-2">
-        <h3 class="font-semibold text-lg">Quotes</h3>
-        <button
-          class="text-primary-500"
-          on:click={() => (showquotes = !showquotes)}
-        >
-          <Icon
-            icon={showquotes
-              ? "iconamoon:arrow-up-2-duotone"
-              : "iconamoon:arrow-down-2-duotone"}
-            class="text-3xl"
-          />
-        </button>
-      </div>
-      {#if showquotes}
-        <a href="/quotes" class="text-gray-500">See Quotes # </a>
-      {/if}
-    </div>
-  {/if} -->
 
   {#if showDetailsModal && selectedProduct}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="fixed !ml-0 inset-0 bg-black bg-opacity-40 flex justify-center items-center backdrop-blur-sm z-50 px-4 transition-opacity sm:px-5"
+    class="fixed inset-0  w-full flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity !ml-0"
       on:click|self={hideDetails}
     >
       <div
@@ -1701,13 +1430,16 @@
           on:click={hideDetails}
           aria-label="Close"
         >
-          ✖
+        <Icon
+        icon="mdi:close"
+        class="text-2xl font-bold text-red-600 border rounded hover:p-px"
+      />
         </button>
 
-        <h3 class="text-2xl font-semibold mb-4 text-gray-800">
-          {selectedProduct.productName} - {selectedProduct.productNumber}
+        <h3 class="text-xl font-bold text-left">
+          Availability for {selectedProduct.productNumber} - {selectedProduct.size}
         </h3>
-        <p class="text-sm text-gray-600 mb-5">
+        <p class="text-gray-500 mb-10 text-left mt-2">
           Enter quantity to check availability.
         </p>
 
@@ -1744,7 +1476,7 @@
             />
 
             <button
-              class="flex justify-center items-center w-10 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
+              class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
               on:click|preventDefault={decreaseQuantity}
             >
               <Icon icon="ic:round-minus" class="text-xl" />
@@ -1816,22 +1548,25 @@
               max="9999"
             />
             <button
-              class="flex justify-center items-center w-10 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
+              class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
               on:click|preventDefault={increaseQuantity}
             >
               <Icon icon="ic:round-plus" class="text-xl" />
             </button>
-            <button
-              type="submit"
-              class="flex justify-center rounded p-2 text-sm items-center w-44 h-10 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition"
-            >
-              {#if checking}
-                <span>Checking...</span>
-              {:else}
-                <Icon icon="tabler:calendar-check" class="text-2xl mr-1" />
+            <div class="flex justify-end w-full">
+              <button
+                type="submit"
+                class="bg-primary-400 text-white p-2 rounded flex items-center space-x-1"
+              >
+                {#if checking}
+                  <span>Checking...</span>
+                {:else}
+                <Icon icon="tabler:calendar-check" class="text-lg" />
                 <span class="text-sm">Check Availability</span>
-              {/if}
-            </button>
+                {/if}
+              </button>
+            </div>
+            
           </div>
           <p class="mt-4 text-sm text-gray-600 flex items-center">
             <span class="ml-2">{stockStatus}</span>
@@ -1885,7 +1620,7 @@
             <div class="flex justify-end">
               <button
                 type="submit"
-                class="  mr-5 p-2 w-40 mt-4 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
+                class="  bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
               >
                 {#if cartloadingpop}
                   <span>Adding...</span>
@@ -1899,10 +1634,10 @@
             </div>
           </form>
         {:else}
-          <div class=" flex ml-20 justify-center">
+          <div class=" flex justify-end">
             <button
               on:click={handleLocalCart}
-              class="  mr-5 p-2 w-40 mt-4 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
+              class=" bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
             >
               <Icon icon="ic:round-shopping-cart" class="text-xl" /><span
                 class="text-sm">Add To Cart</span
@@ -2408,21 +2143,28 @@
   <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
-class={`fixed !ml-0 inset-0 bg-black bg-opacity-40 flex justify-center items-center backdrop-blur-sm z-50 px-4 transition-opacity sm:px-5" ${!isCartPopupVisible ? "hidden" : ""}`}
-bind:this={cartPopupOverlay}
-transition:fade={{ duration: 200 }}
+class={`fixed inset-0 w-full flex items-center justify-center bg-black bg-opacity-40 z-50 !ml-0 m-0 p-0 " ${!isCartPopupVisible ? "hidden" : ""}`}
 on:click={hideCartPopup}
 >
-<div class="bg-white  rounded-lg shadow-lg w-full max-w-xl overflow-hidden">
+<div class="bg-white rounded-lg w-full max-w-xl m-0 p-0 overflow-hidden">
   <!-- Popup Header -->
   <div class="flex justify-between items-center p-4 border-b border-gray-200">
     <h3 class="text-lg font-semibold text-gray-800">Added to Cart</h3>
-    <button
+    <!-- <button
       class="text-gray-500 hover:text-gray-700 text-2xl font-bold"
       on:click={hideCartPopup}
     >
       &times;
-    </button>
+    </button> -->
+    <button
+    on:click={hideCartPopup}
+    class="hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
+  >
+    <Icon
+      icon="mdi:close"
+      class="text-2xl font-bold text-red-600 border rounded hover:p-px"
+    />
+  </button>
   </div>
 
   <!-- Popup Content -->
@@ -2506,13 +2248,13 @@ on:click={hideCartPopup}
   <div class="flex justify-between p-4 border-t border-gray-200">
     <button
       on:click={hideCartPopup}
-      class="bg-primary-400 text-white px-3 py-1.5 rounded font-normal hover:bg-primary-500 transition-all ease-in-out duration-300 shadow-sm"
+      class="bg-primary-400 text-white px-3 py-1.5 rounded font-normal hover:bg-primary-500 transition-all ease-in-out duration-300"
     >
       Continue Shopping
     </button>
 
     <button
-      class="text-primary-400 px-3 py-1.5 rounded font-normal flex gap-2 border-1 border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
+      class="text-primary-400 px-3 py-1.5 rounded font-normal flex gap-2 border-1 border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300"
       on:click={() => (window.location.href = "/cart")}
     >
       View Cart
@@ -2525,25 +2267,33 @@ on:click={hideCartPopup}
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-class={`fixed !ml-0  inset-0 bg-black bg-opacity-40 flex justify-center items-center backdrop-blur-sm z-50 px-4 transition-opacity sm:px-5" ${!isCartPopupVisible ? "hidden" : ""}`}
+class={`fixed inset-0 w-full flex items-center justify-center bg-black bg-opacity-40 z-50 !ml-0 m-0 p-0 " ${!isCartPopupVisible ? "hidden" : ""}`}
 bind:this={cartPopupOverlay}
-transition:fade={{ duration: 200 }}
 on:click={hideCartPopup}
 >
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-  class="bg-white rounded-lg shadow-xl w-full max-w-xl overflow-hidden"
+  class="bg-white rounded-lg shadow-xl w-full max-w-xl overflow-hidden m-0 p-0"
   on:click|stopPropagation
 >
   <div class="flex justify-between items-center p-4 border-b border-gray-200">
     <h3 class="text-lg font-semibold text-gray-800">Added to Cart</h3>
-    <button
+    <!-- <button
       class="text-gray-500 hover:text-gray-700 text-2xl font-bold"
       on:click={hideCartPopup}
     >
       &times;
-    </button>
+    </button> -->
+    <button
+    on:click={hideCartPopup}
+    class="hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
+  >
+    <Icon
+      icon="mdi:close"
+      class="text-2xl font-bold text-red-600 border rounded hover:p-px"
+    />
+  </button>
   </div>
 
   <div class="p-1">

@@ -679,21 +679,21 @@ Example:
     <section class="mt-3 md:mt-0 md:w-2/5">
       <div class="flex flex-col gap-3">
         <div
-          class="flex justify-center bg-white items-center h-12 border rounded"
+          class="flex justify-center bg-white items-center h-12 border rounded hover:bg-primary-200 hover:text-primary-600"
         >
           <a
-            class="flex items-center gap-2 text-sm font-medium text-primary-500"
+            class="flex items-center gap-2 text-sm font-medium text-primary-500  "
             href="/quick_order_template.csv"
             download
           >
-            <Icon icon="pajamas:download" class="text-lg" /> Download Template
+            <Icon icon="pajamas:download" class="text-lg " /> Download Template
           </a>
         </div>
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div
-          class="w-full flex flex-col justify-center bg-white items-center rounded h-[220px] mt-3 space-y-2 py-6 border border-dashed"
+          class="w-full flex flex-col justify-center bg-white items-center rounded h-[220px] mt-3 space-y-2 py-6 border border-dashed hover:bg-primary-100 hover:text-primary-600"
           on:click={() => document.getElementById("bulkupload").click()}
         >
           <Icon icon="uil:upload" class="text-5xl text-primary-500 -ml-4" />
