@@ -167,9 +167,9 @@ export const actions = {
 
 			const sessionCookie = auth.createSessionCookie(session);
 			cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-			// const redirectTo = '/dashboard';
+			const redirectTo = '/dashboard';
 
-			return { type: 'success', redirectUrls };
+			return { type: 'success', redirectTo };
 		} catch (error) {
 			console.error('Unexpected error in verifyOtp:', error);
 			return fail(500, { errorMsg: 'An unexpected error occurred. Please try again later.' });
