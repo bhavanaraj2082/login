@@ -711,9 +711,9 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 		</div>
 	</div>
 {:else}
-	<section class="md:w-11/12 mx-auto max-w-7xl bg-gray-50 sm:pb-0 px-1 pb-10">
-		<section class="mt-6">
-			<div class="font-bold text-lg md:text-2xl py-4">
+	<section class="md:w-11/12 mx-auto max-w-7xl bg-gray-50 sm:pb-0 px-2 pb-10">
+		<section >
+			<div class="font-bold text-xl md:text-2xl pb-4">
 				Chemikart Solutions
 			</div>
 			<p class="sm:text-sm text-xs leading-6 text-content mx-auto text-justify-center">

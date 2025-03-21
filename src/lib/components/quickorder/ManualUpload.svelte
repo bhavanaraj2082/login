@@ -1127,7 +1127,7 @@
 </form>
 <div class="w-11/12 mx-auto px-2 md:flex md:space-x-8 max-w-7xl">
   <div class="md:w-full">
-    <h1 class="font-semibold text-lg md:text-2xl">Quick Order</h1>
+    <h1 class="font-bold text-lg md:text-2xl px-2">Quick Order</h1>
 
     <div class="my-4 lg:ml-4">
       <button
@@ -1520,8 +1520,8 @@
                 {#if cartloading}
                   <span>Adding...</span>
                 {:else}
-                  <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
-                  <span>Add to Cart</span>
+                  <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2 ml-1" />
+                  <span class ="ml-2">Add to Cart</span>
                 {/if}
               </button>
             </form>
@@ -1536,8 +1536,8 @@
               {#if cartloading}
                 <span>Adding...</span>
               {:else}
-                <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
-                <span>Add to Cart</span>
+                <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2 ml-1" />
+                <span class="ml-2">Add to Cart</span>
               {/if}
             </button>
           {/if}
@@ -2408,7 +2408,7 @@
   <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
-class={`fixed !ml-0 inset-0 bg-black bg-opacity-40 flex justify-center items-center backdrop-blur-sm z-50 px-4 transition-opacity sm:px-5" ${!isCartPopupVisible ? "hidden" : ""}`}
+class={`fixed !ml-0 inset-0 bg-gray-400 bg-opacity-40 flex justify-center items-center backdrop-blur-sm z-50 px-4 transition-opacity sm:px-5" ${!isCartPopupVisible ? "hidden" : ""}`}
 bind:this={cartPopupOverlay}
 transition:fade={{ duration: 200 }}
 on:click={hideCartPopup}
@@ -2432,13 +2432,13 @@ on:click={hideCartPopup}
         <!-- Display up to 3 items -->
         {#each cartPopupItems.slice(0, 3) as item, i}
           <div
-            class="flex items-center py-2 {i !== 0
+            class="flex items-center px-2 py-2 {i !== 0
               ? 'border-t border-gray-100'
               : ''}"
           >
             <!-- Product Image -->
             <div
-              class="w-20 h-20 bg-gray-100 rounded flex items-center justify-center mr-3 overflow-hidden"
+              class="w-20 h-20 bg-gray-100 rounded flex items-center justify-center mx-3 overflow-hidden"
             >
               <img
                 src={item.image}

@@ -504,6 +504,10 @@ onMount(() => {
                 
                 <div class="flex-1 text-center md:text-left space-y-0.5">
                     <h2 class="text-sm font-bold text-gray-800">{item?.name || ''}</h2>
+
+                    <div class=" w-10/12 ">
+                        <a href={`/products/${item.categoryName}/${item.subCategoryName}/${item.product?.productNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{item.product?.productName  || ""}</a>
+                    </div>
                     <p class="text-sm">
                         <span class="font-semibold">Product Number:</span> {item?.partNumber || ''}
                     </p>
