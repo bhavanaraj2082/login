@@ -31,12 +31,24 @@
     status = "";
     showErrors = false;
   }
-  function showMessage(s) {
-    status = s;
-    if (status && status.includes("http")) {
-      location.assign(status);
-    }
+  // function showMessage(s) {
+  //   status = s;
+  //   if (status && status.includes("http")) {
+  //     location.assign(status);
+  //   }
+  // }
+  function showMessage(safetyDatasheet) {
+  if (typeof safetyDatasheet === "string" && safetyDatasheet.startsWith("http")) {
+    const link = document.createElement("a");
+    link.href = safetyDatasheet;
+    link.target = "_blank"; 
+    link.innerText = "Open Safety Datasheet"; 
+    document.body.appendChild(link);
+    link.click(); 
+  } else {
+    alert("Invalid datasheet URL");
   }
+}
   function toggleProductDetails() {
     showProductDetails = !showProductDetails;
   }
@@ -169,6 +181,10 @@
   };
   const scrollRight = () => {
     scrollContainer.scrollBy({ left: 200, behavior: "smooth" });
+  };
+
+  const handleClick = () => {
+    goto('/contact-us'); // Navigate to a specific route
   };
 </script>
 
@@ -862,9 +878,9 @@
               <button
                 type="submit"
                 class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
-                onclick="window.location.href='https://chemikart.partskeys.com/help-support'"
+                on:click={handleClick}
               >
-                Request COA
+                Contact Us
               </button>
             </div>
           </div>
@@ -978,14 +994,13 @@
                   Lot and Batch Numbers can be found on a product's label
                   following the words 'Lot' or 'Batch'.
                 </p>
-                <h4 class="font-bold mt-2">Sigma Products</h4>
+                <h4 class="font-bold mt-2">chemikart Products</h4>
                 <p>
                   If the letter is preceded by only two numbers (e.g. 62K1064),
                   insert a '0' to the beginning and enter it as <code
                     >062K1064</code
                   >.
                 </p>
-                <h4 class="font-bold mt-2">Aldrich Products</h4>
                 <ul class="list-disc ml-5">
                   <li>
                     For a lot number such as <code>TO09019TO</code>, enter it as
@@ -1021,9 +1036,9 @@
               <button
                 type="submit"
                 class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
-                onclick="window.location.href='https://chemikart.partskeys.com/help-support'"
+                on:click={handleClick}
               >
-                Request COO
+                Contact Us
               </button>
             </div>
           </div>
@@ -1137,7 +1152,7 @@
                   Lot and Batch Numbers can be found on a product's label
                   following the words 'Lot' or 'Batch'.
                 </p>
-                <h4 class="font-bold mt-2">Sigma Products</h4>
+                <h4 class="font-bold mt-2">chemikart Products</h4>
                 <p>
                   If the letter is preceded by only two numbers (e.g. 62K1064),
                   insert a '0' to the beginning and enter it as <code
@@ -1180,9 +1195,9 @@
               <button
                 type="submit"
                 class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
-                onclick="window.location.href='https://chemikart.partskeys.com/help-support'"
+                on:click={handleClick}
               >
-                Request COQ
+                Contact Us
               </button>
             </div>
           </div>

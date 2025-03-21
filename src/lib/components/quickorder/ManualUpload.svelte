@@ -1134,7 +1134,7 @@
   <div class="md:w-full">
     <h1 class="font-bold text-lg md:text-2xl px-2">Quick Order</h1>
 
-    <div class="w-1/4 inline-flex rounded mb-8 mt-5">
+    <div class="sm:w-1/2 w-full lg:w-1/4 inline-flex rounded mb-8 mt-5">
       <nav
         aria-label="Tabs"
         class="w-full flex space-x-0 overflow-x-auto rounded-t hide"
@@ -1143,7 +1143,7 @@
     <div class="inline-block w-full">
       <button
         on:click={() => (activeTab = tab.name)}
-        class="w-full py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300
+        class="w-full sm:py-2 py-1 h-12 sm:px-2  px-1 sm:text-sm text-xs focus:outline-none transition duration-300
           {activeTab === tab.name
           ? 'bg-gray-50 text-primary-500 font-bold'
           : 'bg-primary-100 text-black'}
