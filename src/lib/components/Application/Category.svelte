@@ -37,7 +37,7 @@
       <input
         type="text"
         bind:value={searchTerm}
-        placeholder="Search categories..."
+        placeholder="Search Sub categories..."
         class="w-full pl-7 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent placeholder:text-xs text-xs p-3"
       />
       {#if searchTerm}

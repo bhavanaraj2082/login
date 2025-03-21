@@ -32,6 +32,10 @@ const favoriteItemSchema = new Schema(
       type: Number,
       default: 0,
     },
+    createdDate: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { _id: false } // Prevents creating an extra `_id` for subdocuments
 );

@@ -43,7 +43,7 @@
         <input
           type="text"
           bind:value={searchTerm}
-          placeholder="Search categories..."
+          placeholder="Search Sub Sub categories..."
           class="w-full pl-7 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent placeholder:text-xs text-xs p-3"/>
         {#if searchTerm}
           <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded bg-red-50 p-1" style="color: #cb1919" on:click={clearSearch}>

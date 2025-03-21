@@ -8,7 +8,7 @@
     import { PUBLIC_WEBSITE_URL,PUBLIC_WEBSITE_NAME } from '$env/static/public';
 
     export let data;
-    console.log("Data  ==>(:", data); 
+    // console.log("Data  ==>(:", data); 
 
     let productData = data?.productData?.records[0];
 

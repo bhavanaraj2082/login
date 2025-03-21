@@ -30,22 +30,24 @@
       class="bg-white rounded-lg w-full max-w-lg p-6 md:p-8 mx-4 md:mx-0 relative shadow-lg"
       on:click|stopPropagation
     >
-      <button
-        on:click={CheckAvailabilityClose}
-        class="absolute top-4 right-4 hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
-      >
-        <Icon
-          icon="mdi:close"
-          class="text-2xl font-bold text-red-600 border rounded hover:p-px"
-        />
-      </button>
+      <div class="flex justify-between items-center mb-2 border-b-1 pb-3">
+        <h2 class="text-xl font-bold text-left">
+          Availability for {product?.productNumber}-{product?.priceSize[index]
+            ?.break}
+        </h2>
+        <button
+          on:click={CheckAvailabilityClose}
+          class="hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
+        >
+          <Icon
+            icon="mdi:close"
+            class="text-2xl font-bold text-red-600 border rounded hover:p-px"
+          />
+        </button>
+      </div>
 
-      <h2 class="text-xl font-bold text-left">
-        Availability for {product?.productNumber}-{product?.priceSize[index]
-          ?.break}
-      </h2>
-      <p class="text-gray-500 text-left mt-2">
-        Enter quantity to check availability.
+      <p class="text-gray-500 font-normal text-left mt-2">
+        Enter quantity to check availability
       </p>
 
       <div class="flex justify-between mt-6">

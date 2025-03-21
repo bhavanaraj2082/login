@@ -111,6 +111,8 @@
       priceSize: product.priceSize,
       quantity: product.quantity || 1,
       stock: product.stock,
+      category: product.category,
+      subCategory: product.subCategory,
       manufacturerId:
         product.manufacturerId || product.manufacturerInfo?.[0]?._id,
       distributorId:
@@ -301,6 +303,11 @@
     closeModal();
     showQuoteModal = !showQuoteModal;
     productQuote = selectedProduct;
+  }
+
+  function viewProduct() {
+    closeModal();
+    location.href = `/products/${selectedProduct.category}/${selectedProduct.subCategory}/${selectedProduct.partNumber}#productVariants`;
   }
 </script>
 
@@ -504,14 +511,12 @@
               prices. View more details below.
             </p>
 
-            <a href="{selectedProduct.partNumber}#productVariants">
               <button
-                on:click={closeModal}
+                on:click={viewProduct}
                 class="bg-primary-500 py-2 px-4 hover:bg-primary-600 text-sm rounded text-white mt-2"
               >
                 View Products
               </button>
-            </a>
           {/if}
 
           {#if selectedProduct?.variants?.length === 0}

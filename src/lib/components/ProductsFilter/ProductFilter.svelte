@@ -329,9 +329,11 @@ function handleMouseLeave() {
     formdata.append("stock",product.stock)
     sendMessage("?/favorite",formdata,async(result)=>{
         console.log(result);
+        toast.success(result.message)
     }) 
     } catch (error) {
         console.log(error);
+        // toast.error(error.message)
     }
     
   }
@@ -587,6 +589,7 @@ function handleMouseLeave() {
                     {/if}
                 </div>
             </div>
+            {#if product?.pricing && Object.keys(product.pricing).length > 0}
             <div class=" flex sm:hidden items-center justify-between">
                 <p class=" text-xs font-bold">{$currencyState === "inr" ? "₹" + product?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
                 <div class="flex items-center">
@@ -620,19 +623,20 @@ function handleMouseLeave() {
                     <span class="hidden xs:block">Add to Cart</span>
                 </button>
             </div>
+              {/if}
         </div>
        {/each}
        {/if}
        
        <!-- pagination -->
        <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {totalPages <= 1 || products?.length < 10 ? "hidden": "flex"}">
-      <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
+      <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
         on:click={() => goToPage(1)} 
         disabled={currentPage == 1}
       >
       <Icon icon="charm:chevrons-left" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded disabled:text-gray-300" />
       </button>
-        <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
+        <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
           on:click={() => goToPage(currentPage - 1)} 
           disabled={currentPage == 1}
         >
@@ -642,19 +646,19 @@ function handleMouseLeave() {
         {#each getPageNumbers(currentPage,totalPages) as page}
           <button
             on:click={() => goToPage(page)}
-            class="{page === currentPage ? "text-white bg-primary-500 border-primary-500" : "border-gray-300 bg-white"}  border shadow-md  rounded-md px-2.5 sm:px-3.5 text-xs sm:text-sm font-medium"
+            class="{page === currentPage ? "text-white bg-primary-500 border-primary-500" : "border-gray-300 bg-white"}  border shadow-md  rounded-md px-2.5 sm:px-3.5 text-xs sm:text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
           >
             {page}
           </button>
         {/each}
       
-        <button class=" border shadow-md bg-white border-gray-300 rounded-md text-gray-400 hover:bg-gray-100 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
+        <button class=" border shadow-md bg-white border-gray-300 rounded-md text-gray-400 hover:bg-gray-100 disabled:border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
           on:click={() => goToPage(currentPage + 1)}
           disabled={currentPage == totalPages}
         >
         <Icon icon="charm:chevron-right" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded disabled:text-gray-300" />
         </button>
-        <button class=" border shadow-md bg-white border-gray-300 rounded-md text-gray-400 hover:bg-gray-100 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
+        <button class=" border shadow-md bg-white border-gray-300 rounded-md text-gray-400 hover:bg-gray-100 disabled:border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
           on:click={() => goToPage(totalPages)}
         >
         <Icon icon="charm:chevrons-right" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded disabled:text-gray-300" />
