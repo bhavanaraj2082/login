@@ -281,7 +281,7 @@
           >
           <div class="relative">
             <form
-              action="?/verifyemail"
+              action="/signup?/verifyemail"
               bind:this={form5}
               method="POST"
               use:enhance={({}) => {
@@ -396,7 +396,7 @@
 
         {#if emailSent && isOtpVerified === false}
           <form
-            action="?/verifyOtp"
+            action="/signup?/verifyOtp"
             method="POST"
             use:enhance={() => {
               return async ({ result }) => {

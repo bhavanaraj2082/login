@@ -118,7 +118,7 @@
   let showModal = false;
 
   function openModal(product) {
-    console.log("Product Data in openModal:", product);
+    // console.log("Product Data in openModal:", product);
     selectedProduct = {
       productId: product.productId || product._id,
       brand: product.brand,
@@ -337,6 +337,11 @@
     showQuoteModal = !showQuoteModal;
     productQuote = selectedProduct;
   }
+
+  function viewProduct() {
+    closeModal();
+    location.href = `/products/${selectedProduct.category}/${selectedProduct.subCategory}/${selectedProduct.partNumber}#productVariants`;
+  }
 </script>
 
 <form
@@ -358,7 +363,7 @@
       >
         <Icon class="text-2xl" icon="ion:chevron-back" />
       </button> -->
-      {#if RelatedProductData && RelatedProductData.length >= 4}
+      {#if RelatedProductData && RelatedProductData.length > 4}
         <button
           on:click={prevSlide}
           class="text-primary-500 p-1 pl-0.5 hover:bg-primary-100 hover:rounded-full"
@@ -444,7 +449,7 @@
       >
         <Icon class="text-2xl" icon="ion:chevron-forward" />
       </button> -->
-      {#if RelatedProductData && RelatedProductData.length >= 4}
+      {#if RelatedProductData && RelatedProductData.length > 4}
         <button
           on:click={nextSlide}
           class="text-primary-500 p-1 pr-0.5 hover:bg-primary-100 hover:rounded-full"
@@ -454,7 +459,7 @@
         </button>
       {/if}
     </div>
-    {#if RelatedProductData && RelatedProductData.length >= 4}
+    {#if RelatedProductData && RelatedProductData.length > 4}
       <div class="flex justify-center mt-4 relative">
         {#each Array(totalSlides).fill(0) as _, slideIndex}
           <button
@@ -525,16 +530,12 @@
               prices. View more details below.
             </p>
 
-            <a
-              href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}#productVariants"
-            >
               <button
-                on:click={closeModal}
+                on:click={viewProduct}
                 class="bg-primary-500 py-2 px-4 hover:bg-primary-600 text-sm rounded text-white mt-2"
               >
                 View Products
               </button>
-            </a>
           {/if}
 
           {#if selectedProduct?.variants?.length === 0}
