@@ -27,7 +27,7 @@
       </button>
 
       <h2 class="text-xl font-bold text-gray-900 text-center mb-6">
-        Please SignIn or Register to Continue
+        Please SignIn to Continue
       </h2>
 
       <div class="mx-16">
