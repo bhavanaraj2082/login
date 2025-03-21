@@ -28,7 +28,8 @@ export async function load({ params }) {
     }
 
     const subsubcategoryData = await findSubcategoryData(categoryData, subcategory, subsubcategory);
-    const relatedProducts = await RelatedApplicationData(subsubcategoryData.name);
+    // const relatedProducts = await RelatedApplicationData(subsubcategoryData.name);
+    const relatedProducts = {}
     // console.log("relatedProducts",relatedProducts);
     
     return {

@@ -27,7 +27,8 @@ export async function load({ params }) {
     const subsubcategories = subcategoryData.subsubcategories || [];
     let relatedProducts = [];
     if (subsubcategories.length ===0) {
-     relatedProducts = await RelatedApplicationData(subcategoryData.name);
+    //  relatedProducts = await RelatedApplicationData(subcategoryData.name);
+        relatedProducts = {}
     //  console.log(relatedProducts);
      
     }
