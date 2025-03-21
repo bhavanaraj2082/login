@@ -49,7 +49,7 @@
         </div>
         <div class="text-center">
           <h1 class="text-5xl md:text-7xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-500">404</h1>
-          <h2 class="text-xl md:text-2xl font-bold mb-4 text-gray-800">
+          <h2 class="text-xl md:text-2xl capitalize font-bold mb-4 text-gray-800">
             {#if isProductPage || isProductError}
               {message}
             {:else}

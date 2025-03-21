@@ -1,3 +1,4 @@
+// favourites redirection
 import { fail, redirect } from "@sveltejs/kit";
 import { auth } from "$lib/server/lucia.js";
 import { LuciaError } from "lucia";
@@ -6,6 +7,8 @@ import Profile from '$lib/server/models/Profile.js';
 import { sendEmailOTP, verifyOtp } from '$lib/server/emailOtpHandler.js';
 export const actions = {
   login: async ({ request, cookies }) => {
+	const redirectUrls =
+		cookies.get('redirectUrl') || "/dashboard";
     const formData = Object.fromEntries(await request.formData());
     // console.log('formData', formData);
 
@@ -53,8 +56,8 @@ export const actions = {
         });
       }
     }
-    const redirectTo = "/dashboard";
-    throw redirect(302, redirectTo);
+    // const redirectTo = "/dashboard";
+    throw redirect(302, redirectUrls);
   },
 
   	/************** Login with email OTP ***************/
@@ -112,6 +115,8 @@ export const actions = {
 	},
 
 	verifyOtp: async ({ request, cookies }) => {
+		const redirectUrls =
+		cookies.get('redirectUrl') || "/dashboard";
 		const body = Object.fromEntries(await request.formData());
 		const { email, enteredOtp } = body;
 		if (!email) {
@@ -162,9 +167,9 @@ export const actions = {
 
 			const sessionCookie = auth.createSessionCookie(session);
 			cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-			const redirectTo = '/dashboard';
+			// const redirectTo = '/dashboard';
 
-			return { type: 'success', redirectTo };
+			return { type: 'success', redirectUrls };
 		} catch (error) {
 			console.error('Unexpected error in verifyOtp:', error);
 			return fail(500, { errorMsg: 'An unexpected error occurred. Please try again later.' });

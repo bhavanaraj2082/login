@@ -2,16 +2,16 @@
 	import { sendMessage } from '$lib/utils.js';
 	import { myFavorites } from '$lib/stores/favorites.js';
 	import { invalidate } from '$app/navigation';
-	import { currencyState } from './../stores/mainStores.js';
     import { onMount } from 'svelte';
     import { enhance } from '$app/forms';
     import { toast, Toaster } from "svelte-sonner";
     import { writable } from 'svelte/store';
-    import { authedUser,cartTotalComps } from '$lib/stores/mainStores.js'
+    import { authedUser, cartTotalComps, currencyState } from '$lib/stores/mainStores.js'
     import Icon from "@iconify/svelte";
     import Calender from '$lib/components/Calender.svelte';
 
     export let data;
+    // console.log('favdata==>>', data)
     let form;
     
     $: isAuthenticated = !!data?.locals?.user?.email;
@@ -24,6 +24,7 @@
 			localStorage.setItem("myfavorites",JSON.stringify(result.favorite))
 		})
     }
+
     $: favData = data?.favorites?.length ? data.favorites.map(item => {
     if (!item?.productInfo?.productId) return null;		
         return {
@@ -52,6 +53,7 @@
                 id: item.distributorInfo?.distributorId,
             },
             quantity: parseInt(item.quantity) || 1,
+            createdAt: item.createdDate || new Date(),
         };
     }).filter(Boolean) : [];
 
@@ -77,25 +79,26 @@ function filterFavorites(items, filterCriteria) {
         const searchTerm = filterCriteria.searchTerm.toLowerCase().trim();
         const matchesSearch =
             !searchTerm ||
-            item.name.toLowerCase().includes(searchTerm) ||
-            item.partNumber.toLowerCase().includes(searchTerm) ||
-            item.manufacturerName.toLowerCase().includes(searchTerm);
-
-        const createdDate = new Date(item.createdAt);
-        createdDate.setHours(0, 0, 0, 0);
+            (item.name && item.name.toLowerCase().includes(searchTerm)) ||
+            (item.partNumber && item.partNumber.toLowerCase().includes(searchTerm)) ||
+            (item.manufacturerName && item.manufacturerName.toLowerCase().includes(searchTerm));
 
         let matchesDateRange = true;
 
-        if (filterCriteria.dateFrom) {
-            const fromDate = new Date(filterCriteria.dateFrom);
-            fromDate.setHours(0, 0, 0, 0);
-            matchesDateRange = matchesDateRange && createdDate >= fromDate;
-        }
+        if (item.createdAt) {
+            const createdDate = new Date(item.createdAt);
+            
+            if (filterCriteria.dateFrom) {
+                const fromDate = new Date(filterCriteria.dateFrom);
+                fromDate.setHours(0, 0, 0, 0);
+                matchesDateRange = matchesDateRange && createdDate >= fromDate;
+            }
 
-        if (filterCriteria.dateTo) {
-            const toDate = new Date(filterCriteria.dateTo);
-            toDate.setHours(23, 59, 59, 999);
-            matchesDateRange = matchesDateRange && createdDate <= toDate;
+            if (filterCriteria.dateTo) {
+                const toDate = new Date(filterCriteria.dateTo);
+                toDate.setHours(23, 59, 59, 999);
+                matchesDateRange = matchesDateRange && createdDate <= toDate;
+            }
         }
 
         return matchesSearch && matchesDateRange;
@@ -119,9 +122,13 @@ function getEarliestFavoriteDate(items) {
 }
 
 function handleDateChange(event) {
-    const { dates, filters: eventFilters } = event.detail;
-    updateFilters('dateFrom', dates.from);
-    updateFilters('dateTo', dates.to);
+    // console.log("Date change event:", event.detail);
+    const { dates } = event.detail;
+    
+    if (dates) {
+        updateFilters('dateFrom', dates.from);
+        updateFilters('dateTo', dates.to);
+    }
 }
 
 function updateFilters(key, value) {
@@ -227,15 +234,19 @@ $: paginatedFavorites = getPaginatedData(filteredFavorites, $currentPage, $items
 
 function calculateTotalPrice(price, quantity) {
     if (!price || price === 'Price not available') return 'N/A';
-    const numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
+    
+    let numericPrice;
+    if (typeof price === 'number') {
+        numericPrice = price;
+    } else if (typeof price === 'string') {
+        numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
+    } else {
+        return 'N/A';
+    }
+    
     return isNaN(numericPrice) ? 'N/A' : (numericPrice * quantity).toLocaleString("en-IN");
 }
 
-    // function calculateTotalPrice(price, quantity) {
-    //     if (!price || price === 'Price not available') return 'N/A';
-    //     const numericPrice = parseFloat(price.replace(/[^\d.]/g, ''));
-    //     return isNaN(numericPrice) ? 'N/A' : (numericPrice * quantity).toLocaleString("en-IN");
-    // }
     let timeout
     function handleQty(item,quantity){
         if(isNaN(quantity)){
@@ -374,14 +385,14 @@ onMount(() => {
     const earliestDate = getEarliestFavoriteDate(favData);
 });
 
+
 </script> 
 
 <form
 	method="POST"
 	action="/?/getCartData"
 	bind:this={form}
-	use:enhance={handleDataCart}
->
+	use:enhance={handleDataCart}>
 	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
 </form>
 <!-- {#if !isAuthenticated}
@@ -429,7 +440,7 @@ onMount(() => {
             <Icon icon="ri:search-line" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="20" height="20"/>
             <input 
                 type="text" 
-                placeholder="Search by Name, Part Number, or Manufacturer" 
+                placeholder="Search by Name, Prouduct Number, or Manufacturer" 
                 class="w-full h-10 border border-gray-400 focus:ring-0 focus:border-primary-500 rounded px-4 py-2 pl-10 text-sm outline-none transition-all duration-200" 
                 value={filters.searchTerm} 
                 on:input={handleSearch}/>
@@ -451,7 +462,9 @@ onMount(() => {
                     on:dateChange={handleDateChange}
                     initialFilters={{
                         firstTimeOnly: false,
-                        dateRange: 'custom'
+                        dateRange: 'custom',
+                        from: filters.dateFrom || '',
+                        to: filters.dateTo || ''
                     }}/>
             </div>
         </div>
@@ -472,9 +485,9 @@ onMount(() => {
                         })))} />
                 <button 
                     type="submit"
-                    class="flex w-full bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 px-5 py-2.5 rounded">
+                    class="flex w-full bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 px-5 py-2.5 rounded whitespace-nowrap">
                     <Icon icon="heroicons-solid:shopping-cart" width="20" />
-                    <span class=" text-sm font-medium">Add All to Cart</span>
+                    <span class=" md:text-sm font-medium text-xs">Add All to Cart</span>
                 </button>
             </form>
             <form 
@@ -483,14 +496,13 @@ onMount(() => {
                 use:enhance={handleClearAll}>
                 <button 
                     type="submit" 
-                    class="flex w-full bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2.5 rounded">
-                    <Icon icon="mdi:delete" width="20" />
-                    <span class=" font-medium text-sm">Remove All</span>
+                    class="flex w-full bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2.5 rounded whitespace-nowrap">
+                    <Icon icon="mdi:delete-forever" width="20" />
+                    <span class=" font-medium md:text-sm text-xs">Remove All</span>
                 </button>
             </form>
         </div>
     </div>
-   
     <div class="space-y-2">
         {#if !paginatedFavorites.length}
             <div class="w-full md:w-full border rounded border-primary-400 bg-white items-center px-4 py-8 md:col-span-2">
@@ -506,8 +518,11 @@ onMount(() => {
                 
                 <div class="flex-1 text-center md:text-left space-y-0.5">
                     <h2 class="text-sm font-bold text-gray-800">{item?.name || ''}</h2>
+                    <!-- <div class=" w-10/12 ">
+                        <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{item?.partNumber || ""}</a>
+                    </div> -->
                     <p class="text-sm">
-                        <span class="font-semibold">Product Number:</span> {item?.partNumber || ''}
+                        <span class="font-semibold">Product Number:</span> <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{item?.partNumber || ""}</a>
                     </p>
                     <p class="text-sm">
                         <span class="font-semibold">Manufacturer:</span> {item?.manufacturerName || ''}
@@ -526,7 +541,7 @@ onMount(() => {
                     </p>
                     {#if item.stockInfo.specification}
                         <p class="text-sm font-semibold">
-                            Specification: <span class=" font-normal">{item.stockInfo.specification}</span>
+                            Specification: <span class=" font-normal">{item.stockInfo?.specification}</span>
                         </p>
                     {/if}
                 </div>
@@ -540,7 +555,7 @@ onMount(() => {
                         <p class="{item.quantity > item.stockInfo.stock ? "" : "hidden"} text-xs font-semibold text-gray-500">Back Order: <span class=" text-sm text-red-500">{item.quantity > item.stockInfo.stock ? item.quantity - item.stockInfo.stock : 0}</span></p>
                         {#if item.stockInfo.orderMultiple > 1}
                             <p class="text-xs text-gray-500">
-                                Order Multiple: {item.stockInfo.orderMultiple}
+                                Order Multiple: {item.stockInfo?.orderMultiple}
                             </p>
                         {/if}
                     </div>
@@ -562,11 +577,11 @@ onMount(() => {
                     })} />
                         <button 
                             type="submit" 
-                            class="flex bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-primary-500 px-5 py-2 rounded"
+                            class="flex bg-primary-500 items-center text-white hover:scale-95 transition-all duration-300 border-primary-500 px-2.5 py-2 rounded"
                             disabled={item.stockInfo.stock <= 0}>
                             <Icon 
                             icon="heroicons-solid:shopping-cart" 
-                            class="w-5 h-5" 
+                            class="text-xl" 
                             aria-label="Add to Cart Icon" />
                             <span class="hidden text-xs font-medium md:inline">Add to Cart</span>
                            
@@ -580,8 +595,8 @@ onMount(() => {
                             <input type="hidden" name="itemId" value={item.id} />
                             <button 
                                 type="submit" 
-                                class="flex bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-primary-500 px-5 py-2 rounded">
-                                <Icon icon="mdi:delete" class="w-5 h-5" aria-label="Remove Icon" />
+                                class="flex bg-red-600 items-center text-white hover:scale-95 transition-all duration-300 border-red-600 px-2.5 py-2 rounded">
+                                <Icon icon="mdi:delete-forever" class="text-xl" aria-label="Remove Icon" />
                                 <span class="hidden text-xs font-medium md:inline">Remove</span>
                             </button>
                         </form>

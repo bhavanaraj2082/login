@@ -102,12 +102,18 @@
 				>
 					Order Configuration
 				</button>
-				<button
+				<!-- <button
 					on:click={() => handleClick('return-exchange-items')}
 					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
 				>
 					Return & Exchange Items
-				</button>
+				</button> -->
+				<button
+				on:click={() => window.location.href = '/returns'}
+				class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"
+			>
+			Return & Exchange Items
+			</button>
 				<button
 					on:click={() => handleClick('other-issues')}
 					class=" px-4 py-2 rounded m-2 hover:font-semibold shadow"

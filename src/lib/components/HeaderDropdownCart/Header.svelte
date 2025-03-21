@@ -581,7 +581,7 @@ async function submitForm() {
 					on:click={toggleLike}
 					aria-label={isLiked ? 'Remove from favorites' : 'Add to favorites'}
 					class="py-2 ml-1.5 md:ml-0 rounded-full transition-all duration-300 ease-in-out relative overflow-hidden ${isLiked ? 'heartFilled' : 'heartOutline'}">
-					<Icon icon={isFavoritePage ? heartFilled : heartOutline} class="text-2xl sm:text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out" />
+					<Icon icon={heartFilled } class="text-2xl sm:text-2xl transition-colors duration-300 hover:text-primary-100 hover:scale-105 text-white ease-in-out" />
 				</button>
 			</a>
 			<Cartrightside {cartId}/>	
@@ -702,14 +702,14 @@ async function submitForm() {
 						on:click={() => {
 							navigateTo('/signin');
 						}}
-						class="loginbtn  font-workSans text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
+						class="loginbtn font-medium sm:text-sm text-xs lg:text-base font-workSans text-md border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
 						>Sign In</button>
 					<Icon icon="vaadin:line-v" class="mr-0 text-white font-semibold" />
 					<button
 						on:click={() => {
 							navigateTo('/signup');
 						}}
-						class=" registerbtn font-workSans pr-2  text-md font-medium border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
+						class=" registerbtn font-medium sm:text-sm text-xs lg:text-base font-workSans pr-2  text-md border-b-2 border-b-transparent hover:text-primary-100 hover:scale-105 text-white"
 						>Sign Up</button>
 				</div>
 			{/if}
@@ -729,7 +729,7 @@ async function submitForm() {
 						<div class={`py-0 pr-2 pl-3 ${activeMenu === menu ? 'text-orange-500' : 'text-gray-600'}`}>
 							<button
 								on:click={() => navigateTo(menu.href)}
-								class={`flex items-center hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-white scale-105' : 'text-white'}`}
+								class={`flex items-center hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap sm:text-sm text-xs lg:text-base font-medium text-left w-full ${activeMenu === menu ? 'text-white scale-105' : 'text-white'}`}
 								role="menuitem">
 								{menu.title}
 								{#if index < 5 && menu.title !== 'Documents' && menu.title !== 'Quotes' && menu.title !== 'Quick Order'}
@@ -792,7 +792,7 @@ async function submitForm() {
 				{/each}
 				<a href="/quotes">
 					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap transform hover:scale-105 duration-200">
-						<span class="text-white font-medium text-xs lg:text-base">
+						<span class="text-white font-medium sm:text-sm text-xs lg:text-base">
 							Quotes
 						</span>
 					</button>

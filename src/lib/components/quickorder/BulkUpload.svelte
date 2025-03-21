@@ -100,7 +100,27 @@
     }
   }
  
-  function removeInvalidProduct(lineIndex) {
+//   function removeInvalidProduct(lineIndex) {
+//   const lines = rawFileData.split("\n");
+//   const lineContent = lines[lineIndex];
+//   const [productInfo] = lineContent.split(",").map((item) => item.trim());
+//   lines.splice(lineIndex, 1);
+//   rawFileData = lines.join("\n");
+//   validationMessages = validationMessages.filter(
+//     (message) => !productInfo.includes(message.productNumber) || message.isValid
+//   );
+//   invalidProductLines = mapInvalidProductsToLines();
+//   const hasRemainingInvalidProducts = validationMessages.some(message => !message.isValid);
+//   if (hasRemainingInvalidProducts) {
+//     toast.success("Invalid product removed.");
+//   } else {
+//     toast.success("All invalid products removed. You can now add to cart.");
+//   }
+//   if (validationMessages.length === 0) {
+//     isValidated = false;
+//   }
+// }
+function removeInvalidProduct(lineIndex) {
   const lines = rawFileData.split("\n");
   const lineContent = lines[lineIndex];
   const [productInfo] = lineContent.split(",").map((item) => item.trim());
@@ -110,16 +130,24 @@
     (message) => !productInfo.includes(message.productNumber) || message.isValid
   );
   invalidProductLines = mapInvalidProductsToLines();
-  const hasRemainingInvalidProducts = validationMessages.some(message => !message.isValid);
-  if (hasRemainingInvalidProducts) {
-    toast.success("Invalid product removed.");
+  
+  if (!rawFileData.trim()) {
+    toast.success("All invalid items removed. Please add valid product number and size to add to cart.");
+    isValidated = false;
   } else {
-    toast.success("All invalid products removed. You can now add to cart.");
+    const hasRemainingInvalidProducts = validationMessages.some(message => !message.isValid);
+    if (hasRemainingInvalidProducts) {
+      toast.success("Invalid product removed.");
+    } else {
+      toast.success("All invalid products removed. You can now add to cart.");
+    }
   }
+  
   if (validationMessages.length === 0) {
     isValidated = false;
   }
 }
+
 
   function handleTextChange(event) {
     rawFileData = event.target.value;
