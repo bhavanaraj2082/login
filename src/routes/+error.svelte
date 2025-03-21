@@ -40,6 +40,7 @@
       }
       
       isNotFound = statusCode === 404 || 
+        message.includes('Product not found') ||
         message.includes('not found') || 
         message.includes('No Category') ||
         message.includes('No SubCategories');
@@ -52,7 +53,10 @@
     } else if (message.includes('No Category found')) {
       customMessage = 'The specified product category could not be found.';
       isNotFound = true;
-    } else if (statusCode === 404) {
+    } else if (message.includes('Product not found')) {
+      customMessage = 'The specified product could not be found';
+      isNotFound = true;
+    }else if (statusCode === 404) {
       customMessage = 'The page you are looking for could not be found.';
       isNotFound = true;
     }
