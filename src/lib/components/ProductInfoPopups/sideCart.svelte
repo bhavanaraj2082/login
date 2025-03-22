@@ -1,17 +1,13 @@
 <script>
   import Icon from "@iconify/svelte";
-  import { onMount, onDestroy } from "svelte";
-  import { enhance, applyAction } from "$app/forms";
-  import { toast, Toaster } from "svelte-sonner";
-  import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
   import { currencyState } from "$lib/stores/mainStores.js";
   import Sharepopup from "./Sharepopup.svelte";
+  import ShowCartPopup from "./showCartPopup.svelte";
   import CheckAvailability from "./CheckAvailability.svelte";
-  import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
-
   // export let showTooltip;
   export let data;
   export let quantity;
+  export let addedQuantity;
   export let index;
   export let toggleTooltip;
   export let togglePopup;
@@ -20,6 +16,7 @@
   export let updateQuantity;
   export let increaseQuantity;
   export let addToCart;
+  export let showCartPopup;
   export let cartTogglePopup;
   let showSharePopup = false;
 
@@ -215,52 +212,44 @@
           ><Icon icon="ic:round-minus" class="text-2xl" /></button
         >
         <input
-          type="text"
-          min="1"
-          maxlength="3"
-          bind:value={quantity}
-          class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
-          on:focus={(e) => {
-            const currentValue = e.target.value;
-            setTimeout(() => {
-              e.target.select();
-            }, 10);
-          }}
-          on:blur={(e) => {
-            if (
-              e.target.value === "" ||
-              e.target.value === "0" ||
-              e.target.value === "00" ||
-              e.target.value === "000"
-            ) {
-              quantity = 1;
-              e.target.value = "1";
-            }
-          }}
-          on:input={(e) => {
-            e.target.value = e.target.value.replace(/[^0-9]/g, "");
-            if (e.target.value.startsWith("0") && e.target.value.length > 1) {
-              e.target.value = e.target.value.slice(1);
-            }
-            const parsedValue = parseInt(e.target.value, 10);
-
-            if (parsedValue >= 1 && parsedValue <= 999) {
-              quantity = parsedValue;
-            }
-            // else if (e.target.value === "") {
-            //   quantity = 1;
-            // }
-            else {
-              quantity = e.target.value === "" || parsedValue < 1 ? 1 : 0;
-              e.target.value = quantity === 1 ? "1" : "";
-            }
-
-            updateQuantity(e);
-          }}
-          aria-label="Quantity"
-          max="999"
-        />
-
+        type="text"
+        min="1"
+        maxlength="3"
+        bind:value={quantity}
+        class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
+        on:focus={(e) => {
+          setTimeout(() => e.target.select(), 10);
+        }}
+        on:blur={(e) => {
+          if (!e.target.value || parseInt(e.target.value, 10) < 1) {
+            quantity = 1;
+            e.target.value = "1";
+          }
+        }}
+        on:input={(e) => {
+          e.target.value = e.target.value.replace(/[^1-9]/g, "");
+            if (e.target.value === "") {
+            quantity = "";
+            return;
+          }
+      
+          if (e.target.value.startsWith("0") && e.target.value.length > 1) {
+            e.target.value = e.target.value.slice(1);
+          }
+      
+          const parsedValue = parseInt(e.target.value, 10);
+      
+          if (parsedValue > 999) {
+            quantity = 999;
+            e.target.value = "999";
+          } else {
+            quantity = parsedValue;
+          }
+          updateQuantity(e);
+        }}
+        aria-label="Quantity"
+        max="999"
+      />
         <button
           on:click={increaseQuantity}
           class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
@@ -287,3 +276,6 @@
     </div>
   </div>
 {/each}
+{#if showCartPopup}
+<ShowCartPopup {data} {cartTogglePopup} {addedQuantity} {index} />
+{/if}

@@ -1,9 +1,8 @@
 <script>
-  import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
+  import { addItemToCart} from "$lib/stores/cart.js";
   import { sendMessage } from "$lib/utils.js";
   import { invalidate } from "$app/navigation";
-  import { onMount } from "svelte";
-  import { enhance, applyAction } from "$app/forms";
+  import { enhance} from "$app/forms";
   import Imageinfo from "./Imageinfo.svelte";
   import Icon from "@iconify/svelte";
   import { currencyState } from "$lib/stores/mainStores.js";
@@ -13,13 +12,11 @@
   import SideCart from "./sideCart.svelte";
   import LikedPopup from "./LikedPopup.svelte";
   import { toast, Toaster } from "svelte-sonner";
-  import ShowCartPopup from "./showCartPopup.svelte";
   export let data;
   export let isauthedUser;
   export let isFavorite;
   export let profile;
   let form;
-  let showDropdown = false;
   let showImagePopup = false;
   let showQuoteModal = false;
   let productQuote = null;
@@ -37,6 +34,7 @@
   let maxPrice = -Infinity;
   let copyToastIndex = null;
   let copyToastID = false;
+  let addedQuantity = 1;
   const productName = data.records.map((prodName) => prodName.productName);
 
   function toggleTooltip() {
@@ -192,25 +190,25 @@
       manufacturerId: product.manufacturer._id,
       distributorId: product.distributorId,
       stockId: selectedStockId || "NA",
-      quantity: quantity,
+      quantity: quantity, 
       backOrder,
     };
+    addedQuantity = quantity;
 
     if (!isLoggedIn) {
       addItemToCart(cartItem);
-      // toast.success("Product added to cart");
       guestCartFetch();
+      quantity = 1;
       return;
     }
 
     const formdata = new FormData();
     formdata.append("items", JSON.stringify(cartItem));
     sendMessage("?/addtocart", formdata, async (result) => {
-      // console.log("result",result);
       if (result.success) {
         await submitForm();
+        quantity = 1;
       }
-      // toast.success(result.message);
       invalidate("/");
     });
   }
@@ -653,6 +651,7 @@
       <SideCart
         {data}
         {quantity}
+        {addedQuantity}
         {index}
         {cartTogglePopup}
         {toggleTooltip}
@@ -662,14 +661,11 @@
         {showTooltip}
         {togglePopup}
         {showPopup}
+        {showCartPopup}
         {decreaseQuantity}
       />
     {/if}
   </div>
-  {#if showCartPopup}
-    <ShowCartPopup {data} {cartTogglePopup} {quantity} {index} />
-  {/if}
-
   {#if authedEmail === "" || !authedEmail}
     {#if showLikedPopup}
       <LikedPopup {data} {toggleLikedPopup} />

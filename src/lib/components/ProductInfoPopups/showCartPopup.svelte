@@ -3,7 +3,7 @@
   import { currencyState } from "$lib/stores/mainStores.js";
   export let data;
   export let cartTogglePopup;
-  export let quantity;
+  export let addedQuantity;
   export let index;
 </script>
 
@@ -51,7 +51,7 @@
         >
           <div class="text-center">
             <p class="text-sm font-semibold text-gray-700">Quantity</p>
-            <p class="text-base font-semibold text-gray-800">{quantity}</p>
+            <p class="text-base font-semibold text-gray-800">{addedQuantity}</p>
           </div>
           <div class="text-center">
             <p class="text-sm font-semibold text-gray-700">Total Price</p>
@@ -59,11 +59,11 @@
               <p class="text-base font-semibold text-gray-800">
                 {#if $currencyState === "usd"}
                   $ {(
-                    product?.priceSize[index]?.USD * 0.18 * quantity ?? 0
+                    product?.priceSize[index]?.USD * 0.18 * addedQuantity ?? 0
                   ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 {:else}
                   ₹ {(
-                    product?.priceSize[index]?.INR * 0.18 * quantity ?? 0
+                    product?.priceSize[index]?.INR * 0.18 * addedQuantity ?? 0
                   ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 {/if}
               </p>
@@ -76,14 +76,14 @@
               <p class="text-sm font-bold text-gray-500">
                 {#if $currencyState === "usd"}
                   $ {(
-                    product?.priceSize[index]?.USD * quantity ?? 0
+                    product?.priceSize[index]?.USD * addedQuantity ?? 0
                   ).toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 {:else}
                   ₹ {(
-                    product?.priceSize[index]?.INR * quantity ?? 0
+                    product?.priceSize[index]?.INR * addedQuantity ?? 0
                   ).toLocaleString("en-IN", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
