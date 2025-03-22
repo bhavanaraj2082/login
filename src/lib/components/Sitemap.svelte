@@ -222,7 +222,7 @@
 			Chemikart Site Map
 		</h1>
 
-		<div class="relative mx-2 mt-2 mb-2 sm:mt-0 sm:mr-3">
+		<div class="relative mx-2 mt-2 mb-2 sm:mt-0 sm:mr-2">
 			<input
 				type="text"
 				bind:value={searchTerm}
@@ -421,15 +421,16 @@
 	</div>
 	{#if filteredCategories1.length === 0 && filteredCategories2.length === 0 && filteredCategories3.length === 0 && filteredCategories4.length === 0}
 		<div
-			class="flex items-center justify-center text-gray-600 font-semibold py-6"
+			class="flex flex-col items-center justify-center text-gray-600 font-semibold py-6 mx-2 my-4 border rounded-md border-primary-100 bg-primary-100"
 		>
 			<Icon
 				icon="iconoir:file-not-found"
-				width="24"
-				height="24"
+				width="34"
+				height="34"
 				class="text-primary-500"
 			/>
-			<span class="ml-2">No results found.</span>
+			<span class="mx-2">No results found.</span>
+			<span class="text-sm text-gray-500">Please try a different search.</span>
 		</div>
 	{/if}
 </div>
