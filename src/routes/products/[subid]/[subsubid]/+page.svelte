@@ -5,10 +5,7 @@
   import { sendMessage } from "$lib/utils.js";
   import { allProducts } from "$lib/stores/filter.js";
   import ProductFilter from "$lib/components/ProductsFilter/ProductFilter.svelte";
-  import {
-    PUBLIC_WEBSITE_URL,
-    PUBLIC_WEBSITE_NAME,
-  } from "$env/static/public";
+  import { PUBLIC_WEBSITE_URL, PUBLIC_WEBSITE_NAME } from "$env/static/public";
   import SEO from "$lib/components/SEO.svelte";
 
   export let data;
@@ -20,10 +17,19 @@
   let SubCatName = data?.products[0]?.subCategoryDetails?.name;
   let SubCatUrl = data?.products[0]?.subCategoryDetails?.urlName;
 
-  let keys = data?.products.flatMap((item) => {
-    return [item.productName, item.productNumber];
-  });
+  const result = data?.products?.map((product) => ({
+    manufacturerName: product.manufacturerDetails.name,
+    productName: product.productName,
+    productNumber: product.productNumber,
+  }));
 
+  const formattedStrings = result.map(
+    (item) =>
+      `Buy ${item.manufacturerName} ${item.productNumber} ${item.productName} at ${PUBLIC_WEBSITE_NAME}`
+  );
+
+  const resultString = formattedStrings.join(", ");
+  
   $: ({ manufacturers, products, productCount, subSubCategory } = data);
   const handlePage = (e) => {
     invalidate("page:data");
@@ -36,8 +42,7 @@
     description:
       `Check ${catName} ${SubCatName} products online at ${PUBLIC_WEBSITE_NAME}.` ||
       "Default product description",
-    keywords:
-      `${catName},${SubCatName}, ${keys}` || "default, product, keywords",
+    keywords: `Chemical Distributor, Authorized distributor, Chemical supply, Buy chemicals, Chemical solutions, Chemical supplier, Buy chemical products ${resultString}` || "default, product, keywords",
     urlPath:
       `${PUBLIC_WEBSITE_URL}/products/${catUrl}/${SubCatUrl}` || "Default URl",
     schema: {
