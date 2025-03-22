@@ -12,19 +12,19 @@
   let successMessage = "";
   let errorMessage = "";
   let units = "";
-  let firstName = profile.firstName || "";
-  let lastName = profile.lastName || "";
-  let organisation = profile.companyName || "";
-  let phone = profile.cellPhone || "";
+  let firstName = profile?.firstName || "";
+  let lastName = profile?.lastName || "";
+  let organisation = profile?.companyName || "";
+  let phone = profile?.cellPhone || "";
   let message = "";
   let isLoading = false;
   let emailSent = false;
   let verificationMessage = "";
-  let ProfileEmailVerified = profile.isEmailVerified || false;
-  let isOtpVerified = profile.isEmailVerified || false;
+  let ProfileEmailVerified = profile?.isEmailVerified || false;
+  let isOtpVerified = profile?.isEmailVerified || false;
   let displayMessage = "";
   let enteredOtp = "";
-  let email = profile.email || "";
+  let email = profile?.email || "";
   let formErrors = {};
 
   const handleResendemailOtp = () => {
