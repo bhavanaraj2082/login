@@ -487,10 +487,10 @@ function selectCountry(selectedCountry) {
         filteredCountries = countries; // Reset the filtered list
         showDropdown = false; // Hide dropdown after selection
         validateForm('location');
-		validatePhoneNumber(location, phone); 
-		validatePostalCode(location, postalCode); 
+		    validatePhoneNumber(location, phone); 
+		    validatePostalCode(location, postalCode); 
         delete errors.location; // Clear any existing errors
-    }
+}
 
 	function toggleDropdown() {
 		showDropdown = !showDropdown; // Toggle the dropdown visibility
@@ -528,7 +528,7 @@ function validatePhoneNumber(countryCode, phone) {
     if (!phonePattern) {
         errors.phone = 'Phone number pattern for country not found';
         return false;
-    }
+    } 
 
     const phoneRegex = new RegExp(phonePattern);
     if (!phoneRegex.test(phone)) {
@@ -555,6 +555,7 @@ function validatePhoneNumber(countryCode, phone) {
 
 	let isValid = true;
   	
+  $:console.log(organizationName,department,attentionTo);
  function validateForm(fieldName) {
   if (!fieldName || fieldName === 'street') {
     if (!street || !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(street)) {
@@ -563,6 +564,25 @@ function validatePhoneNumber(countryCode, phone) {
       delete errors.street;
     }
   }
+
+  if (!organizationName || !/^[A-Za-z ]+$/.test(organizationName)) {
+      console.log('object');
+      errors.organizationName = 'Company name is required and can contain only letters';
+    } else {
+      delete errors.organizationName;
+    }
+
+    if (!department || !/^[A-Za-z ]+$/.test(department)) {
+      errors.department = 'Department name is required and can contain only letters';
+    } else {
+      delete errors.department;
+    }
+
+    if (!attentionTo || !/^[A-Za-z ]+$/.test(attentionTo)) {
+      errors.attentionTo = 'Person name is required and can contain only letters';
+    } else {
+      delete errors.attentionTo;
+    }
 
 //   if (!fieldName || fieldName === 'phone') {
 //     if (!country) {
@@ -659,7 +679,10 @@ $: show= isShowbox ? `Edit ${name} Address` : `Add ${name} Address`;
 			method="POST"
 			action={`?/${actionName}`}
 			on:click|stopPropagation
-      use:enhance={() => {
+      use:enhance={({cancel}) => {
+        if (!validateForm()) {
+            cancel()
+        }
         return async({ result , update}) => {
           console.log(result,"uytrewq");
           if (result.type === 'success') {
@@ -684,13 +707,15 @@ $: show= isShowbox ? `Edit ${name} Address` : `Add ${name} Address`;
 				class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text"
 				name="attentionTo"
-				value={attentionTo}/>
+				bind:value={attentionTo}/>
+        <p class="{!errors?.attentionTo ? "hidden" : ""} text-red-500 text-xs">{errors?.attentionTo}</p>
 			<label class="w-full text-xs md:text-sm font-medium mt-1" for="lastname">Company Name</label>
 			<input
 				class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text"
 				name="organizationName"
-				value={organizationName}/>
+				bind:value={organizationName}/>
+        <p class="{!errors?.organizationName ? "hidden" : ""} text-red-500 text-xs">{errors?.organizationName}</p>
 				<!-- <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="email">Email</label>
 		             <input type="email" name="email" required
 			         class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
@@ -724,13 +749,7 @@ $: show= isShowbox ? `Edit ${name} Address` : `Add ${name} Address`;
         <input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
           type="text" name="department"
           bind:value={department}/>
-              {#if department.length > 0 && !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(department)}
-          <span class="text-red-500 text-xs block">Please enter a valid department</span>
-        {/if}
-              {#if showErrors && department.length === 0}
-          <span class="text-red-500 text-xs block">Address is required</span>
-          {/if}
-          	
+          <p class="{!errors?.department ? "hidden" : ""} text-red-500 text-xs">{errors?.department}</p>
       <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Building</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text" name="building"

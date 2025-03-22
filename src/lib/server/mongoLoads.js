@@ -572,10 +572,12 @@ export const loadProductsubcategory = async (
 
     if(price === "asc"){
       sortConditions = {}
+      sortConditions.isEmptyPricing = 1
       sortConditions["stockDetails.pricing.USD"] = 1
       sortConditions["stockDetails.pricing.INR"] = 1
     }else if(price === "desc"){
       sortConditions = {}
+      sortConditions.isEmptyPricing = 1
       sortConditions["stockDetails.pricing.USD"] = -1
       sortConditions["stockDetails.pricing.INR"] = -1
     }else{
@@ -630,6 +632,22 @@ export const loadProductsubcategory = async (
       { $unwind: "$manufacturerDetails" },
       { $unwind: "$categoryDetails" },
       { $unwind: "$subCategoryDetails" },
+      {
+        $addFields: {
+          // Check if pricing is an empty object
+          isEmptyPricing: {
+            $cond: {
+              if: {
+                $eq: [
+                  { $size: { $objectToArray: { $ifNull: ["$stockDetails.pricing", {}] } } }, 0
+                ], // If pricing is an empty object
+              },
+              then: true,
+              else: false,
+            },
+          },
+        },
+      },
     ];
     if (subcategory.name !== "Primary Antibodies" && subcategory.name !== "Uncategorized") {
       aggregation.push({ $sort: sortConditions });
