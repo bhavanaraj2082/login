@@ -732,7 +732,7 @@ async function submitForm() {
 				{#each menus as menu, index}
 					<!-- svelte-ignore a11y-interactive-supports-focus -->
 					<div
-						class="relative group"
+						class="relative z-50 group"
 						role="menu"
 						on:mouseenter={() => handleMouseEnterMenu(menu)}
 						on:mouseleave={handleMouseLeaveMenu}>
