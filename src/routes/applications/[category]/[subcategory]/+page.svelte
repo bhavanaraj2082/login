@@ -34,4 +34,4 @@
   
 </script>
 <SEO {metadata} />
-<SubCategory {data} />
+<SubCategory {data} profile={data.profile} />

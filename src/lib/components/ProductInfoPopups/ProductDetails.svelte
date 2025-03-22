@@ -17,6 +17,7 @@
   export let data;
   export let isauthedUser;
   export let isFavorite;
+  export let profile;
   let form;
   let showDropdown = false;
   let showImagePopup = false;
@@ -676,7 +677,7 @@
   {/if}
 {/each}
 {#if showQuoteModal}
-  <ShowQuoteModal {productName} {toggleQuoteModal} {form5} {productQuote} />
+  <ShowQuoteModal {profile} {productName} {toggleQuoteModal} {form5} {productQuote} />
 {/if}
 {#each data.records as record}
   {#if record?.variants && record?.variants?.length > 0}
