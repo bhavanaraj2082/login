@@ -10,6 +10,7 @@
   import { sendMessage } from "$lib/utils.js";
   import ShowQuoteModal from "$lib/components/ProductInfoPopups/showQuoteModal.svelte";
   export let compareSimilarity;
+  export let profile;
   // console.log(compareSimilarity,"compare");
   let showQuoteModal = false;
   let productQuote = null;
@@ -844,5 +845,6 @@
     {form5}
     {productQuote}
     {selectedProduct}
+    {profile}
   />
 {/if}

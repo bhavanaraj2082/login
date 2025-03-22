@@ -41,9 +41,9 @@
 
 <SEO {metadata} />
 
-<ProductDetails data={data.productData} isFavorite={data.isFavorite} isauthedUser={data.authedUser}/>
+<ProductDetails data={data.productData} isFavorite={data.isFavorite} isauthedUser={data.authedUser} profile={data.profile}/>
 {#if data.relatedProducts.length > 1}
-    <RelatedProductss relatedProducts={data.relatedProducts} data={data.productData}/>  
+    <RelatedProductss relatedProducts={data.relatedProducts} data={data.productData} profile={data.profile}/>  
 {/if}
 {#if data.productData.length !== 0}
 <Properties data={data.productData} />
@@ -52,5 +52,5 @@
 <Description data={data.productData} />
 {/if}
 {#if data.compareSimilarity.length > 1}
-    <CompSimItems compareSimilarity={data.compareSimilarity} data={data.productData}/>
+    <CompSimItems compareSimilarity={data.compareSimilarity} data={data.productData} profile={data.profile}/>
 {/if} 

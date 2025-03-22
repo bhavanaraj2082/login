@@ -3,7 +3,9 @@
   import RelatedProductss from "$lib/components/RelatedProductss.svelte";
   import Card from "$lib/components/Application/Card.svelte";
   export let data;
-
+  export let profile;
+  // console.log("profile",profile);
+  
   $: categoryData = data?.categoryData ||{};
   $: subcategoryData = data?.subcategoryData||{};
   $: subsubcategories = data?.subsubcategories || [];
@@ -111,7 +113,7 @@
       </div>
     {/if}
     {#if relatedProducts && relatedProducts.length > 0}
-    <RelatedProductss {relatedProducts} />
+    <RelatedProductss {relatedProducts} {profile} />
   {/if}
   {/if}
 </section>

@@ -9,6 +9,7 @@
   import { sendMessage } from "$lib/utils.js";
   import ShowQuoteModal from "$lib/components/ProductInfoPopups/showQuoteModal.svelte";
   export let relatedProducts;
+  export let profile;
   let showQuoteModal = false;
   let productQuote = null;
   let form5;
@@ -850,5 +851,6 @@
     {form5}
     {productQuote}
     {selectedProduct}
+    {profile}
   />
 {/if}
