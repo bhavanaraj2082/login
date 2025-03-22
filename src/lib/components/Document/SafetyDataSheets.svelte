@@ -14,11 +14,16 @@
   let submitting = false;
   function handleInput(event) {
     inputValue = event.target.value.toUpperCase();
+  }
+  function handleInput1(event) {
     inputValue1 = event.target.value.toUpperCase();
+  }
+  function handleInput2(event) {
     inputValue2 = event.target.value.toUpperCase();
+  }
+  function handleInput3(event) {
     inputValue3 = event.target.value.toUpperCase();
   }
-
   let lotNumber = "";
   let lotNumber1 = "";
   let lotNumber2 = "";
@@ -31,12 +36,6 @@
     status = "";
     showErrors = false;
   }
-  // function showMessage(s) {
-  //   status = s;
-  //   if (status && status.includes("http")) {
-  //     location.assign(status);
-  //   }
-  // }
   function showMessage(safetyDatasheet) {
   if (typeof safetyDatasheet === "string" && safetyDatasheet.startsWith("http")) {
     const link = document.createElement("a");
@@ -104,7 +103,7 @@
     } else if (tab === "Certificates of Origin") {
       showLotDetailsOrigin = !showLotDetailsOrigin;
     } else if (tab === "Certificates of Quality") {
-      showProductDetailsQuality = !showProductDetailsQuality;
+      showLotDetailsQuality = !showLotDetailsQuality;
     }
   }
   function validateSDSForm(event) {
@@ -190,7 +189,6 @@
 
 <div class="w-[90%] mx-auto pb-10">
   <h1 class="text-2xl font-bold mb-8">Documents</h1>
-
   <div class="w-full inline-flex rounded mb-8">
     <nav
       aria-label="Tabs"
@@ -218,8 +216,11 @@
       {/each}
     </nav>
   </div>
+
+
+
   <div class="flex flex-col lg:flex-row lg:space-y-0 space-y-5">
-    <div class="w-full lg:w-7/12 px-3 pt-3 rounded bg-white shadow">
+    <div class="w-full lg:w-7/12 px-3 pt-3 rounded bg-white shadow h-1/4">
       {#if activeTab === "SafetyData Sheets"}
         <div class="mb-2 max-sm:w-full">
           <h2 class="sm:text-lg text-md font-semibold mb-4 text-heading">
@@ -238,12 +239,13 @@
                 return;
               }
               return async ({ result }) => {
-                submitting = true;
+                
 
                 try {
                   if (result.data) {
                     const safetyDatasheet = result.data.safetyDatasheet;
                     showMessage(safetyDatasheet);
+                    submitting = true;
                     console.log("pdf_url", safetyDatasheet);
                   } else if (result) {
                     console.log(result);
@@ -298,11 +300,7 @@
                     type="submit"
                     class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
                   >
-                    {#if submitting}
-                      Searching...
-                    {:else}
-                      Search
-                    {/if}
+                   Search
                   </button>
                 </div>
               </div>
@@ -332,7 +330,6 @@
             action="?/document"
             use:enhance={() => {
               return async ({ result }) => {
-                submitting = true;
                 showErrors = inputValue1.length === 0 || lotNumber.length === 0;
                 if (showErrors) {
                   return;
@@ -363,7 +360,7 @@
             <div class="w-full">
               <input
                 bind:value={inputValue1}
-                on:input={handleInput}
+                on:input={handleInput1}
                 type="text"
                 id="product-number-sds"
                 name="productNumber"
@@ -413,11 +410,7 @@
                   type="submit"
                   class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
                 >
-                  {#if submitting}
-                    Searching...
-                  {:else}
-                    Search
-                  {/if}
+                Search
                 </button>
               </div>
             </div>
@@ -477,7 +470,7 @@
             <div class=" w-full">
               <input
                 bind:value={inputValue2}
-                on:input={handleInput}
+                on:input={handleInput2}
                 type="text"
                 id="product-number-sds"
                 name="productNumber"
@@ -528,11 +521,7 @@
                     type="submit"
                     class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
                   >
-                    {#if submitting}
-                      Searching...
-                    {:else}
-                      Search
-                    {/if}
+                  Search
                   </button>
                 </div>
               </div>
@@ -593,7 +582,7 @@
             <div class=" w-full">
               <input
                 bind:value={inputValue3}
-                on:input={handleInput}
+                on:input={handleInput3}
                 type="text"
                 id="product-number-sds"
                 name="productNumber"
@@ -642,11 +631,7 @@
                     type="submit"
                     class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
                   >
-                    {#if submitting}
-                      Searching...
-                    {:else}
-                      Search
-                    {/if}
+                    Search
                   </button>
                 </div>
                 <p class="sm:text-sm text-xs font-medium text-primary-500 my-2">
@@ -665,6 +650,15 @@
         </div>
       {/if}
     </div>
+
+
+
+
+
+
+
+
+
     <div class="w-full lg:w-5/12 md:pl-2 pl-0">
       {#if activeTab === "SafetyData Sheets"}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -1128,7 +1122,7 @@
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
             class="bg-white p-4 border rounded shadow w-full self-start cursor-pointer"
-            on:click={() => toggleLotDetails("Certificates of Origin")}
+            on:click={() => toggleLotDetails("Certificates of Quality")}
           >
             <div class="flex items-center justify-between">
               <h3 class="sm:text-md text-sm font-medium text-gray-700">
@@ -1142,11 +1136,11 @@
                   icon="mynaui:arrow-right"
                   width="1.8em"
                   height="1.8em"
-                  class={`transition-transform duration-400 ${showLotDetailsOrigin ? "rotate-45" : "-rotate-45"}`}
+                  class={`transition-transform duration-400 ${showLotDetailsQuality ? "rotate-45" : "-rotate-45"}`}
                 />
               </a>
             </div>
-            {#if showLotDetailsOrigin}
+            {#if showLotDetailsQuality}
               <div class="mt-4 sm:text-sm text-xs text-description">
                 <p>
                   Lot and Batch Numbers can be found on a product's label

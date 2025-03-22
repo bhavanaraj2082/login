@@ -325,18 +325,25 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
         <div class="mt-2 space-y-4 text-xs">
 
           <!-- {#if !selectedRating} -->
-          {#each ['Website design & usability', 'User Experience & Website Functionality'] as rating}
-  <div class="flex items-center gap-x-3">
-    <input
-      type="radio"
-      class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500 cursor-pointer"
-      bind:group={selectedRating} 
-      value={rating}
-    />
-    <!-- svelte-ignore a11y-label-has-associated-control -->
-    <label class="block sm:text-sm text-xs font-base text-gray-900">{rating}</label>
-  </div>
-{/each}
+          {#each ['Website design & usability', 'User Experience & Website Functionality'] as rating, index}
+          <div class="flex items-center gap-x-3">
+            <input
+              type="radio"
+              id="rating-{index}" 
+              class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500 cursor-pointer"
+              bind:group={selectedRating} 
+              value={rating}
+            />
+            <!-- Link the label to the input by using 'for' attribute matching the input's id -->
+            <label 
+              class="block sm:text-sm text-xs font-base text-gray-900 cursor-pointer" 
+              for="rating-{index}"  
+            >
+              {rating}
+            </label>
+          </div>
+        {/each}
+        
 <!-- {/if} -->
 
 
@@ -353,7 +360,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
                 bind:group={formData.issue}
                 on:change={() => showIssueError = false} 
               />
-              <label for={issue} class="font-base text-gray-900">{issue}</label>
+              <label for={issue} class="font-base text-gray-900 cursor-pointer">{issue}</label>
             </div>
           {/each}
 
@@ -370,7 +377,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
               bind:group={formData.issue}
               on:change={() => showIssueError = false} 
             />
-            <label for={issue} class="font-base text-gray-900">{issue}</label>
+            <label for={issue} class="font-base text-gray-900 cursor-pointer">{issue}</label>
           </div>
         {/each}
         {/if}
@@ -703,7 +710,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
                     on:input={() => showRatingError = false} 
                   />
                   
-                  <label for={rating} class="block sm:text-sm text-xs font-base text-gray-900">{rating}</label>
+                  <label for={rating} class="block sm:text-sm text-xs font-base text-gray-900 cursor-pointer">{rating}</label>
                 </div>
               {/each}
               {#if showRatingError}
