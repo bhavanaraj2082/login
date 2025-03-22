@@ -217,30 +217,22 @@
       rows[index].error = "";
     }
   }
-  // function clearSelectedProduct(index) {
-  //   rows[index].sku = "";
-  //   rows[index].size = "";
-  //   rows[index].filteredProducts = [];
-  //   rows[index].error = "";
-
-  //   selectedProduct = null;
-  // }
   function clearSelectedProduct(index) {
-  rows[index] = {
-    ...rows[index],
-    sku: "",
-    filteredProducts: [],
-    selectedSize: "",
-    selectedProduct: null,
-    quantity: 1  // Reset quantity if needed
-  };
+    rows[index] = {
+      ...rows[index],
+      sku: "",
+      filteredProducts: [],
+      selectedSize: "",
+      selectedProduct: null,
+      quantity: 1, 
+    };
 
-  if (selectedProducts[index]) {
-    selectedProducts[index] = null;
+    if (selectedProducts[index]) {
+      selectedProducts[index] = null;
+    }
+
+    rows = [...rows]; // Trigger reactivity
   }
-  
-  rows = [...rows]; // Trigger reactivity
-}
 
   let selectedProducts = {};
   function selectProduct(product, index, size) {
@@ -268,21 +260,17 @@
     checkAvailability();
   }
 
-  // function clearSearch(index) {
-  //   rows[index].sku = "";
-  //   rows[index].filteredProducts = [];
-  //   rows[index].error = "";
-  // }
+
   function clearSearch(index) {
-  rows[index] = {
-    ...rows[index],
-    sku: "",
-    filteredProducts: [],
-    selectedSize: "",
-    selectedProduct: null  // Reset selectedProduct here
-  };
-  rows = [...rows]; // Trigger reactivity
-}
+    rows[index] = {
+      ...rows[index],
+      sku: "",
+      filteredProducts: [],
+      selectedSize: "",
+      selectedProduct: null, // Reset selectedProduct here
+    };
+    rows = [...rows]; // Trigger reactivity
+  }
 
   function incrementQuantity(index) {
     if (rows[index].quantity < 9999) {
@@ -302,13 +290,6 @@
     isCartPopupVisible = false;
   }
 
-  function viewCart() {
-    window.location.href = "/cart";
-  }
-
-  function continueShopping() {
-    hideCartPopup();
-  }
   $: {
     if (products && products.length > 0) {
       console.log("Products loaded:", products.length);
@@ -358,8 +339,6 @@
       // console.log("Index is undefined, cannot clear product.");
     }
   }
-
-
 
   function cart() {
     if (userLoggedIn) {
@@ -495,13 +474,6 @@
   let showQuoteModal = false;
   let productQuote = {};
 
-  // function toggleQuoteModal(selectedProduct) {
-  //   console.log(selectProduct,"selectedProduct");
-
-  //   showQuoteModal = !showQuoteModal;
-  //   productQuote = selectedProduct;
-  // }
-
   function toggleQuoteModal(index, selectedProduct) {
     console.log("Index:", index);
     // console.log("Selected Product:", selectedProduct);
@@ -594,8 +566,17 @@
     const loadingStartTime = Date.now();
     return async ({ result }) => {
       let processingEndTime = 0;
+      // if (Array.isArray(result.data)) {
+      //   products = [...products, ...result.data];
+      // }
       if (Array.isArray(result.data)) {
-        products = [...products, ...result.data];
+        const existingProductNumbers = new Set(
+          products.map((p) => p.productNumber),
+        );
+        const newProducts = result.data.filter(
+          (p) => !existingProductNumbers.has(p.productNumber),
+        );
+        products = [...products, ...newProducts];
       }
 
       if (result && result.data) {
@@ -642,10 +623,12 @@
     console.log("Index:", index);
 
     if (rows && index >= 0 && index < rows.length) {
+      rows[index].selectedProduct = null;
       rows[index].sku = "";
       rows[index].size = "";
       rows[index].filteredProducts = [];
       rows[index].error = "";
+      rows[index].selectedSize = null;
       rows[index].quantity = 1;
       if (selectedProducts && selectedProducts[index]) {
         selectedProducts[index].quantity = 1;
@@ -932,21 +915,7 @@
     };
   }
   let popupQuantity = 1;
-  // function handlePopupInput(event) {
-  //   const value = parseInt(event.target.value, 3);
-  //   if (isNaN(value)) {
-  //     popupQuantity = 1;
-  //   } else {
-  //     if (value < 1) {
-  //       popupQuantity = 1;
-  //     } else if (value > 999) {
-  //       popupQuantity = 999;
-  //     } else {
-  //       popupQuantity = value;
-  //     }
-  //   }
-  //   selectedProduct.quantity = popupQuantity;
-  // }
+
   function handlePopupInput(event) {
     const value = parseInt(event.target.value, 10);
 
@@ -981,11 +950,6 @@
       currentIndexqoute = null;
     }
   };
-  const tabs = [
-    { name: "Manual Entry" },
-    { name: "Bulk Upload" }
-  ];
-  let activeTab = "Manual Entry";
 </script>
 
 <form
@@ -998,38 +962,29 @@
 </form>
 <div class="w-11/12 mx-auto px-2 md:flex md:space-x-8 max-w-7xl">
   <div class="md:w-full">
-    <h1 class="font-bold text-lg md:text-2xl px-2">Quick Order</h1>
+    <h1 class="font-semibold text-lg md:text-2xl">Quick Order</h1>
 
-    <div class="sm:w-1/2 w-full lg:w-1/4 inline-flex rounded mb-8 mt-5">
-      <nav
-        aria-label="Tabs"
-        class="w-full flex space-x-0 overflow-x-auto rounded-t hide"
-      >
-    {#each tabs as tab}
-    <div class="inline-block w-full">
+    <div class="my-4 lg:ml-4">
       <button
-        on:click={() => (activeTab = tab.name)}
-        class="w-full sm:py-2 py-1 h-12 sm:px-2  px-1 sm:text-sm text-xs focus:outline-none transition duration-300
-          {activeTab === tab.name
-          ? 'bg-gray-50 text-primary-500 font-bold'
-          : 'bg-primary-100 text-black'}
-          hover:bg-gray-50 hover:text-primary-500 whitespace-nowrap"
+        on:click={() => (toggle = false)}
+        class="px-5 py-2 text-sm font-semibold {toggle
+          ? 'bg-primary-200'
+          : 'bg-white border-b-2 border-primary-500 text-primary-500'}"
       >
-        {tab.name}
+        Manual Entry
       </button>
-      <div
-        class="h-0.5 bg-primary-300
-        {activeTab === tab.name
-          ? 'w-full'
-          : 'w-0'} transition-all duration-300 ease-in-out"
-      ></div>
-    </div>
-      {/each}
-      </nav>
+      <button
+        on:click={() => (toggle = true)}
+        class="px-5 py-2 text-sm font-semibold {toggle
+          ? 'bg-white border-b-2 border-primary-500 text-primary-500'
+          : 'bg-primary-200'}"
+      >
+        Bulk Upload
+      </button>
     </div>
 
     <!-- svelte-ignore empty-block -->
-    {#if activeTab === "Bulk Upload"}
+    {#if toggle}
       <Bulkupload {data} />
     {:else}
       <div class="text-black text-sm md:ml-5">
@@ -1345,7 +1300,7 @@
           {/if}
         {/each}
         <div
-          class="mt-2 flex mb-5  items-center justify-between space-x-2 lg:space-x-54"
+          class="mt-2 flex mb-5 items-center justify-between space-x-2 lg:space-x-54"
         >
           <button on:click={addRows} class="text-primary-500 text-md mt-6 ml-5">
             + Add More</button
@@ -1400,8 +1355,8 @@
                 {#if cartloading}
                   <span>Adding...</span>
                 {:else}
-                  <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2 ml-1" />
-                  <span class ="ml-2">Add to Cart</span>
+                  <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
+                  <span>Add to Cart</span>
                 {/if}
               </button>
             </form>
@@ -1416,23 +1371,21 @@
               {#if cartloading}
                 <span>Adding...</span>
               {:else}
-                <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2 ml-1" />
-                <span class="ml-2">Add to Cart</span>
+                <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
+                <span>Add to Cart</span>
               {/if}
             </button>
           {/if}
         </div>
       </div>
-      
     {/if}
   </div>
-
 
   {#if showDetailsModal && selectedProduct}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-    class="fixed inset-0  w-full flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity !ml-0"
+      class="fixed inset-0 w-full flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity !ml-0"
       on:click|self={hideDetails}
     >
       <div
@@ -1444,10 +1397,10 @@
           on:click={hideDetails}
           aria-label="Close"
         >
-        <Icon
-        icon="mdi:close"
-        class="text-2xl font-bold text-red-600 border rounded hover:p-px"
-      />
+          <Icon
+            icon="mdi:close"
+            class="text-2xl font-bold text-red-600 border rounded hover:p-px"
+          />
         </button>
 
         <h3 class="text-xl font-bold text-left">
@@ -1575,12 +1528,11 @@
                 {#if checking}
                   <span>Checking...</span>
                 {:else}
-                <Icon icon="tabler:calendar-check" class="text-lg" />
-                <span class="text-sm">Check Availability</span>
+                  <Icon icon="tabler:calendar-check" class="text-lg" />
+                  <span class="text-sm">Check Availability</span>
                 {/if}
               </button>
             </div>
-            
           </div>
           <p class="mt-4 text-sm text-gray-600 flex items-center">
             <span class="ml-2">{stockStatus}</span>
@@ -2155,99 +2107,90 @@
     </div>
   {/if}
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<div
-class={`fixed inset-0 w-full flex items-center justify-center bg-black bg-opacity-40 z-50 !ml-0 m-0 p-0 " ${!isCartPopupVisible ? "hidden" : ""}`}
-on:click={hideCartPopup}
->
-<div class="bg-white rounded-lg w-full max-w-xl m-0 p-0 overflow-hidden">
-  <!-- Popup Header -->
-  <div class="flex justify-between items-center p-4 border-b border-gray-200">
-    <h3 class="text-lg font-semibold text-gray-800">Added to Cart</h3>
-    <!-- <button
-      class="text-gray-500 hover:text-gray-700 text-2xl font-bold"
-      on:click={hideCartPopup}
-    >
-      &times;
-    </button> -->
-    <button
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <div
+    class={`fixed inset-0 w-full flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 !ml-0 m-0 p-0 transition-opacity ${!isCartPopupVisible ? "hidden" : ""}`}
     on:click={hideCartPopup}
-    class="hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
   >
-    <Icon
-      icon="mdi:close"
-      class="text-2xl font-bold text-red-600 border rounded hover:p-px"
-    />
-  </button>
-  </div>
+    <div
+      class="bg-white rounded-lg w-full max-w-xl p-4 md:p-6 mx-4 md:mx-0 relative shadow-lg"
+      on:click|stopPropagation
+    >
+      <!-- Popup Header -->
+      <div
+        class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200"
+      >
+        <h2 class="text-lg font-semibold text-gray-800">Added to Cart</h2>
+        <button
+          on:click={hideCartPopup}
+          class="hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
+        >
+          <Icon
+            icon="mdi:close"
+            class="text-2xl font-bold text-red-600 border rounded hover:p-px"
+          />
+        </button>
+      </div>
 
-  <!-- Popup Content -->
-  <div class="p-4">
-    {#if cartPopupItems && cartPopupItems.length > 0}
-      <div class="space-y-4">
-        <!-- Display up to 3 items -->
-        {#each cartPopupItems.slice(0, 3) as item, i}
-          <div
-            class="flex items-center px-2 py-2 {i !== 0
-              ? 'border-t border-gray-100'
-              : ''}"
-          >
-            <!-- Product Image -->
-            <div
-              class="w-20 h-20 bg-gray-100 rounded flex items-center justify-center mx-3 overflow-hidden"
-            >
-              <img
-                src={item.image}
-                alt={item.productName}
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
+      <!-- Popup Content with Tailwind Scrollbar -->
+      <div
+        class="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-primary-400 scrollbar-track-gray-100 scrollbar-thumb-rounded-full scrollbar-track-rounded-full"
+      >
+        {#if cartPopupItems && cartPopupItems.length > 0}
+          <div class="space-y-4">
+            <!-- Display all items with better spacing -->
+            {#each cartPopupItems as item, i}
+              <div
+                class="flex items-center py-2 {i !== 0
+                  ? 'border-t border-gray-100'
+                  : ''}"
+              >
+                <!-- Product Image -->
+                <div
+                  class="w-20 h-20 flex items-center justify-center overflow-hidden mr-3"
+                >
+                  <img
+                    src={item.image}
+                    alt={item.productName}
+                    class="w-20 h-20 object-contain p-1 border rounded"
+                  />
+                </div>
 
-            <!-- Product Details -->
-            <div class="flex-1">
-              <p class="text-xs text-gray-600">
-                Product Number: {item.productNumber}
-              </p>
-              <p class="text-sm font-semibold text-gray-800">
-                {item.productName}
-              </p>
-              <div class="flex justify-between mt-1">
-                <p class="text-xs text-gray-700">Qty: {item.quantity}</p>
-                <!-- <p class="text-sm font-medium text-gray-900">${item.price}</p> -->
-                {#if item.usdPrice !== undefined && item.inrPrice !== undefined}
-                  <div class="mt-2">
-                    <p class="text-sm text-gray-800 font-medium">
-                      {#if $currencyState === "usd"}
-                        Total Price: ${formatPrice(
-                          item.usdPrice,
-                          item.quantity,
-                        )}
-                        <!-- USD Price -->
-                      {:else}
-                        Total Price: ₹{formatPrice(
-                          item.inrPrice,
-                          item.quantity,
-                        )}
-                        <!-- INR Price -->
+                <!-- Product Details -->
+                <div class="flex-1">
+                  <p class="font-semibold text-primary-500 text-sm">
+                    {item.productNumber}
+                  </p>
+                  <p class="text-sm text-gray-800">{item.productName}</p>
+
+                  <div class="flex justify-between mt-2">
+                    <div>
+                      <span class="text-xs text-gray-600">Qty: </span>
+                      <span class="text-sm font-medium">{item.quantity}</span>
+                    </div>
+                    <div>
+                      <span class="text-xs text-gray-600">Size: </span>
+                      <span class="text-sm font-medium">{item.size}</span>
+                    </div>
+                    <div>
+                      {#if item.usdPrice !== undefined && item.inrPrice !== undefined}
+                        <p class="text-sm font-semibold">
+                          {#if $currencyState === "usd"}
+                            ${formatPrice(item.usdPrice, item.quantity)}
+                          {:else}
+                            ₹{formatPrice(item.inrPrice, item.quantity)}
+                          {/if}
+                        </p>
                       {/if}
-                    </p>
+                    </div>
                   </div>
-                {/if}
+                </div>
               </div>
-              <p class="text-xs text-gray-700">Size: {item.size}</p>
-            </div>
+            {/each}
           </div>
-        {/each}
 
-        <!-- Summary message if more than 3 items -->
-        {#if cartPopupItems.length > 3}
-          <div class="text-center py-2 border-t border-gray-200">
-            <p class="text-sm text-gray-600 font-medium">
-              {cartPopupItems.length} items have been added to your cart
-            </p>
-          </div>
-        {:else}
-          <div class="text-center py-2 border-t border-gray-200">
+          <!-- Summary message -->
+          <div class="text-center py-3 mt-3 border-t border-gray-200">
             <p class="text-sm text-gray-600 font-medium">
               {cartPopupItems.length}
               {cartPopupItems.length === 1 ? "item" : "items"} added to your cart
@@ -2255,152 +2198,27 @@ on:click={hideCartPopup}
           </div>
         {/if}
       </div>
-    {/if}
-  </div>
 
-  <!-- Popup Actions -->
-  <div class="flex justify-between p-4 border-t border-gray-200">
-    <button
-      on:click={hideCartPopup}
-      class="bg-primary-400 text-white px-3 py-1.5 rounded font-normal hover:bg-primary-500 transition-all ease-in-out duration-300"
-    >
-      Continue Shopping
-    </button>
+      <!-- Popup Actions -->
+      <div
+        class="flex justify-between gap-4 mt-4 pt-3 border-t border-gray-200"
+      >
+        <button
+          on:click={hideCartPopup}
+          class="bg-primary-400 text-white px-3 py-1.5 rounded font-normal hover:bg-primary-500 transition-all ease-in-out duration-300 shadow-sm"
+        >
+          Continue Shopping
+        </button>
 
-    <button
-      class="text-primary-400 px-3 py-1.5 rounded font-normal flex gap-2 border-1 border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300"
-      on:click={() => (window.location.href = "/cart")}
-    >
-      View Cart
-      <Icon icon="ic:round-shopping-cart" class="text-2xl inline mr-1" />
-    </button>
-  </div>
-</div>
-</div>
-
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div
-class={`fixed inset-0 w-full flex items-center justify-center bg-black bg-opacity-40 z-50 !ml-0 m-0 p-0 " ${!isCartPopupVisible ? "hidden" : ""}`}
-bind:this={cartPopupOverlay}
-on:click={hideCartPopup}
->
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div
-  class="bg-white rounded-lg shadow-xl w-full max-w-xl overflow-hidden m-0 p-0"
-  on:click|stopPropagation
->
-  <div class="flex justify-between items-center p-4 border-b border-gray-200">
-    <h3 class="text-lg font-semibold text-gray-800">Added to Cart</h3>
-    <!-- <button
-      class="text-gray-500 hover:text-gray-700 text-2xl font-bold"
-      on:click={hideCartPopup}
-    >
-      &times;
-    </button> -->
-    <button
-    on:click={hideCartPopup}
-    class="hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
-  >
-    <Icon
-      icon="mdi:close"
-      class="text-2xl font-bold text-red-600 border rounded hover:p-px"
-    />
-  </button>
-  </div>
-
-  <div class="p-1">
-    {#if cartPopupItems && cartPopupItems.length > 0}
-      <div class="space-y-4">
-        {#each cartPopupItems.slice(0, 3) as item, i}
-          <div
-            class="flex items-center py- {i !== 0
-              ? 'border-t border-gray-100'
-              : ''}"
+        <a href="/cart">
+          <button
+            class="text-primary-400 px-3 py-1.5 rounded font-normal flex items-center gap-2 border border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
           >
-            <div
-              class="w-20 h-20 bg-gray-100 rounded flex items-center justify-center mr-3 overflow-hidden"
-            >
-              <img
-                src={item.image}
-                alt={item.productName}
-                class="max-w-full max-h-full object-contain"
-              />
-            </div>
-
-            <div class="flex-1 p-3">
-              <p class="text-xs text-gray-600">
-                Product Number: {item.productNumber}
-              </p>
-              <p class="text-sm font-semibold text-gray-800 mt-1">
-                {item.productName}
-              </p>
-
-              <div class="flex justify-between mt-2">
-                <p class="text-xs text-gray-700">Qty: {item.quantity}</p>
-
-                {#if item.usdPrice !== undefined && item.inrPrice !== undefined}
-                  <div class="mt-2">
-                    <p class="text-sm text-gray-800 font-medium">
-                      {#if $currencyState === "usd"}
-                        Total Price: ${formatPrice(
-                          item.usdPrice,
-                          item.quantity,
-                        )}
-                        <!-- USD Price -->
-                      {:else}
-                        Total Price: ₹{formatPrice(
-                          item.inrPrice,
-                          item.quantity,
-                        )}
-                        <!-- INR Price -->
-                      {/if}
-                    </p>
-                  </div>
-                {/if}
-              </div>
-              <p class="text-xs text-gray-700">Size: {item.size}</p>
-            </div>
-          </div>
-        {/each}
-
-        <!-- Summary message if more than 3 items -->
-        {#if cartPopupItems.length > 3}
-          <div class="text-center py-2 border-t border-gray-200">
-            <p class="text-sm text-gray-600 font-medium">
-              {cartPopupItems.length} items have been added to your cart
-            </p>
-          </div>
-        {:else}
-          <div class="text-center py-2 border-t border-gray-200">
-            <p class="text-sm text-gray-600 font-medium">
-              {cartPopupItems.length}
-              {cartPopupItems.length === 1 ? "item" : "items"} added to your cart
-            </p>
-          </div>
-        {/if}
+            View Cart
+            <Icon icon="ic:round-shopping-cart" class="text-xl inline" />
+          </button>
+        </a>
       </div>
-    {/if}
-  </div>
-
-  <div class="flex justify-between p-4 border-t border-gray-200">
-    <button
-      on:click={hideCartPopup}
-      class="bg-primary-400 text-white px-3 py-1.5 rounded font-normal hover:bg-primary-500 transition-all ease-in-out duration-300 shadow-sm"
-    >
-      Continue Shopping
-    </button>
-    <button
-      class="text-primary-400 px-3 py-1.5 rounded font-normal flex gap-2 border-1 border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
-      on:click={() => (window.location.href = "/cart")}
-    >
-      View Cart
-      <Icon icon="ic:round-shopping-cart" class="text-2xl inline mr-1" />
-    </button>
+    </div>
   </div>
 </div>
-</div>
-
-</div>
-<!-- Cart Popup with multiple items support -->
