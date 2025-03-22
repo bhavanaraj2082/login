@@ -10,7 +10,7 @@ export async function load({ locals }) {
 		locals.authedUser.email === 'guest@partskeys.com'
 	) {
 		// throw redirect(307, '/login');
-		throw redirect(307, '/signin');
+		return redirect(307, '/signin');
 	}
 
 	return;
