@@ -111,7 +111,7 @@ export const actions = {
       .replaceAll('{{email}}', formattedData.Customer_details.email || '')
       .replaceAll('{{phone}}', formattedData.Customer_details.number || '')
       .replaceAll('{{futherdetails}}', formattedData.Additional_notes || '')
-      .replaceAll('{{ipAddress}}', formattedData.ipAddress || ''); 
+      .replaceAll('{{ipAddress}}', ipAddress || ''); 
 
     try {
       await sendNotificationEmail(

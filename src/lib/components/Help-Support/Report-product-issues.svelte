@@ -766,26 +766,20 @@ function filterCountriesWithoutAutoSelect() {
                 
                     // thankYouMessageVisible = true;
                     showSuccesDiv = true;
-					setTimeout(() => {
-                        showSuccesDiv = false;
-                    }, 5000);
+					
                 } else if (status === 2) {
 
                     form = result.data;
                     await update();
                     
                     showFailureDiv = true;
-					setTimeout(() => {
-                        showFailureDiv = false;
-                    }, 5000);
+					
                 } else {
                   
                     form = result.data;
                     await update();
 					showSuccesDiv=true;
-					setTimeout(() => {
-                        showSuccesDiv = false;
-                    }, 5000);
+					
                 }
             }
         };

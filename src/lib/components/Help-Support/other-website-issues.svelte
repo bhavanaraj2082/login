@@ -15,11 +15,11 @@
   let attachments = [];
   let totalSize = 0;
   let country = "";
-  let firstName =  "";
-  let lastName =  "";
-  let email =  "";
-  let phoneNumber =  "";
-  let companyName =  "";
+  let firstName = "";
+  let lastName = "";
+  let email = "";
+  let phoneNumber = "";
+  let companyName = "";
 
   let location = "";
   let accountNumber = "";
@@ -461,44 +461,47 @@
   //   filterCountries();
   // }
   function handleInputChange(event) {
-  searchTerm = event.target.value;
-  const isDeleting = event.inputType === 'deleteContentBackward' || 
-                     event.inputType === 'deleteContentForward';
-  
-  if (searchTerm.length > 0 && !isDeleting) {
-    filterCountriesWithoutAutoSelect();
-    showDropdown = filteredCountries.length > 0;
-    const codeSearch = searchTerm.replace('+', '').trim();
-    if (codeSearch.length > 0) {
-      const exactCodeMatches = filteredCountries.filter(
-        (country) => country.code.replace('+', '') === codeSearch
+    searchTerm = event.target.value;
+    const isDeleting =
+      event.inputType === "deleteContentBackward" ||
+      event.inputType === "deleteContentForward";
+
+    if (searchTerm.length > 0 && !isDeleting) {
+      filterCountriesWithoutAutoSelect();
+      showDropdown = filteredCountries.length > 0;
+      const codeSearch = searchTerm.replace("+", "").trim();
+      if (codeSearch.length > 0) {
+        const exactCodeMatches = filteredCountries.filter(
+          (country) => country.code.replace("+", "") === codeSearch,
+        );
+
+        if (exactCodeMatches.length === 1) {
+          selectCountry(exactCodeMatches[0]);
+          return;
+        }
+      }
+
+      const countriesStartingWith = filteredCountries.filter((country) =>
+        country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
       );
 
-      if (exactCodeMatches.length === 1) {
-        selectCountry(exactCodeMatches[0]);
-        return;
+      if (countriesStartingWith.length === 1) {
+        selectCountry(countriesStartingWith[0]);
       }
+    } else {
+      filterCountriesWithoutAutoSelect();
+      showDropdown = filteredCountries.length > 0;
     }
-
-    const countriesStartingWith = filteredCountries.filter(
-      (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-    );
-    
-    if (countriesStartingWith.length === 1) {
-      selectCountry(countriesStartingWith[0]);
-    }
-  } else {
-    filterCountriesWithoutAutoSelect();
-    showDropdown = filteredCountries.length > 0;
   }
-}
-function filterCountriesWithoutAutoSelect() {
-  filteredCountries = countries.filter(
-    (country) =>
-      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
-  );
-}
+  function filterCountriesWithoutAutoSelect() {
+    filteredCountries = countries.filter(
+      (country) =>
+        country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        country.code
+          .replace("+", "")
+          .includes(searchTerm.replace("+", "").toLowerCase()),
+    );
+  }
 
   let filteredCountries = countries;
   let showDropdown = false;
@@ -808,25 +811,15 @@ function filterCountriesWithoutAutoSelect() {
 
             // thankYouMessageVisible = true;
             showSuccesDiv = true;
-            setTimeout(() => {
-                        showSuccesDiv = false;
-                    }, 5000);
-
           } else if (status === 2) {
             form = result.data;
             await update();
 
             showFailureDiv = true;
-            setTimeout(() => {
-              showFailureDiv = false;
-                    }, 5000);
           } else {
             form = result.data;
             await update();
             showSuccesDiv = true;
-            setTimeout(() => {
-                        showSuccesDiv = false;
-                    }, 5000);
           }
         }
       };
@@ -855,64 +848,64 @@ function filterCountriesWithoutAutoSelect() {
   // });
   let isDataAvailable = false;
   onMount(() => {
-        if (data && data.profile) {
-          firstName = `${data.profile.firstName || ""} `.trim();
-          lastName = `${data.profile.lastName || ""}`.trim();
-            email = data.profile.email || "";
-            phoneNumber = data.profile.cellPhone || "";
-            companyName = data.profile.companyname || "";
+    if (data && data.profile) {
+      firstName = `${data.profile.firstName || ""} `.trim();
+      lastName = `${data.profile.lastName || ""}`.trim();
+      email = data.profile.email || "";
+      phoneNumber = data.profile.cellPhone || "";
+      companyName = data.profile.companyname || "";
 
-            const profileCountry = data.profile.country?.trim();
-            if (profileCountry) {
-                const foundCountry = countries.find(
-                    (c) =>
-                        c.name.toLowerCase() === profileCountry.toLowerCase(),
-                );
-                if (foundCountry) {
-                    country = foundCountry.name;
-                }
-            }
-
-            isDataAvailable = true;
-        } else {
-          firstName = "";
-          lastName = "";
-            email = data?.email || "";
-            phoneNumber = "";
-            companyName = "";
-            country = "";
-            isDataAvailable = false;
-
-            // if (data?.email) {
-            //     email = data.email;
-            //     const reloadFlag = sessionStorage.getItem("emailReloaded");
-            //     if (!reloadFlag) {
-            //         sessionStorage.setItem("emailReloaded", "true");
-            //         location.reload(); // This will reload the page only once to prevent infinite reload
-            //     } else {
-            //         sessionStorage.removeItem("emailReloaded");
-            //     }
-            // }
+      const profileCountry = data.profile.country?.trim();
+      if (profileCountry) {
+        const foundCountry = countries.find(
+          (c) => c.name.toLowerCase() === profileCountry.toLowerCase(),
+        );
+        if (foundCountry) {
+          country = foundCountry.name;
         }
+      }
 
-        // isEditable = false;
-        document.addEventListener("click", handleClickOutside);
-        return () => document.removeEventListener("click", handleClickOutside);
-    });
+      isDataAvailable = true;
+    } else {
+      firstName = "";
+      lastName = "";
+      email = data?.email || "";
+      phoneNumber = "";
+      companyName = "";
+      country = "";
+      isDataAvailable = false;
+
+      // if (data?.email) {
+      //     email = data.email;
+      //     const reloadFlag = sessionStorage.getItem("emailReloaded");
+      //     if (!reloadFlag) {
+      //         sessionStorage.setItem("emailReloaded", "true");
+      //         location.reload(); // This will reload the page only once to prevent infinite reload
+      //     } else {
+      //         sessionStorage.removeItem("emailReloaded");
+      //     }
+      // }
+    }
+
+    // isEditable = false;
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  });
 </script>
 
 {#if showSuccesDiv}
   <div
     class="h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl"
   >
-  <div
-  class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
->
-    <h3 class="text-2xl font-semibold text-green-600 mb-4">
-      Customer Support Form Submission
+    <div
+      class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
+    >
+      <h3 class="text-2xl font-semibold text-green-600 mb-4">
+        Customer Support Form Submission
       </h3>
       <p class="text-lg text-gray-700 mb-6">
-      Thank you for reaching out to our customer support team! We have received your request and will get back to you as soon as possible.
+        Thank you for reaching out to our customer support team! We have
+        received your request and will get back to you as soon as possible.
       </p>
 
       <div class="w-10/12 mx-auto my-6 border-t-2 border-green-300"></div>
@@ -949,9 +942,9 @@ function filterCountriesWithoutAutoSelect() {
       <div class=" w-full pb-6 h-full">
         <h2 class="text-primary-400 font-semibold text-base pb-6">
           Other Website Issues
-          </h2>
+        </h2>
         <input hidden name="issueName" value="Technical Problems" />
-    
+
         <div class="mt-4">
           <!-- svelte-ignore a11y-label-has-associated-control -->
           <label class="block text-sm"
@@ -1019,7 +1012,6 @@ function filterCountriesWithoutAutoSelect() {
             Attachments are limited to a combined size of 25MB
           </p>
         </div> -->
-    
       </div>
       <div class=" w-full pb-6 mx-auto h-full">
         <h2 class="text-primary-400 font-semibold text-base pb-6">

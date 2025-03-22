@@ -365,9 +365,7 @@
                     submitting = false;
 
                     showSuccesDiv = true;
-                    setTimeout(() => {
-                        showSuccesDiv = false;
-                    }, 5000);
+                  
                 }
             };
         } catch (error) {
@@ -1295,7 +1293,7 @@
                                     {:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
                                         <button
                                             type="submit"
-                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 hover:text-primary-800 hover:underline cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-500 hover:text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                                             disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
                                                 email,
                                             ) ||
@@ -1430,13 +1428,14 @@
                                         </button>
                                     </div>
                                     <div class="flex justify-end text-xs">
+                                        <span> Didn't receive the code?</span>
                                         <button
                                             type="button"
                                             on:click={handleResendOtpemail}
                                             disabled={loadingotp}
-                                            class="text-primary-600 hover:text-primary-800 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                                            class="text-primary-400 hover:text-primary-500 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            Get a new code
+                                          Get a new code
                                         </button>
                                     </div>
                                 </form>

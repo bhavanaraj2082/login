@@ -5,7 +5,7 @@
   import * as XLSX from "xlsx";
   import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
   export let data;
-  import { fade } from 'svelte/transition';
+  import { fade } from "svelte/transition";
   let validationMessages = [];
   let duplicateEntries = [];
   let rawFileData = "";
@@ -74,8 +74,8 @@
     const { duplicates } = checkForDuplicates(rawFileData);
     duplicateEntries = duplicates;
     if (isValidated) {
-    invalidProductLines = mapInvalidProductsToLines();
-  }
+      invalidProductLines = mapInvalidProductsToLines();
+    }
     toast.success(`Removed duplicate entry for ${productInfo}`);
     const formData = new FormData(event.target.closest("form"));
 
@@ -99,55 +99,59 @@
       }
     }
   }
- 
-//   function removeInvalidProduct(lineIndex) {
-//   const lines = rawFileData.split("\n");
-//   const lineContent = lines[lineIndex];
-//   const [productInfo] = lineContent.split(",").map((item) => item.trim());
-//   lines.splice(lineIndex, 1);
-//   rawFileData = lines.join("\n");
-//   validationMessages = validationMessages.filter(
-//     (message) => !productInfo.includes(message.productNumber) || message.isValid
-//   );
-//   invalidProductLines = mapInvalidProductsToLines();
-//   const hasRemainingInvalidProducts = validationMessages.some(message => !message.isValid);
-//   if (hasRemainingInvalidProducts) {
-//     toast.success("Invalid product removed.");
-//   } else {
-//     toast.success("All invalid products removed. You can now add to cart.");
-//   }
-//   if (validationMessages.length === 0) {
-//     isValidated = false;
-//   }
-// }
-function removeInvalidProduct(lineIndex) {
-  const lines = rawFileData.split("\n");
-  const lineContent = lines[lineIndex];
-  const [productInfo] = lineContent.split(",").map((item) => item.trim());
-  lines.splice(lineIndex, 1);
-  rawFileData = lines.join("\n");
-  validationMessages = validationMessages.filter(
-    (message) => !productInfo.includes(message.productNumber) || message.isValid
-  );
-  invalidProductLines = mapInvalidProductsToLines();
-  
-  if (!rawFileData.trim()) {
-    toast.success("All invalid items removed. Please add valid product number and size to add to cart.");
-    isValidated = false;
-  } else {
-    const hasRemainingInvalidProducts = validationMessages.some(message => !message.isValid);
-    if (hasRemainingInvalidProducts) {
-      toast.success("Invalid product removed.");
+
+  //   function removeInvalidProduct(lineIndex) {
+  //   const lines = rawFileData.split("\n");
+  //   const lineContent = lines[lineIndex];
+  //   const [productInfo] = lineContent.split(",").map((item) => item.trim());
+  //   lines.splice(lineIndex, 1);
+  //   rawFileData = lines.join("\n");
+  //   validationMessages = validationMessages.filter(
+  //     (message) => !productInfo.includes(message.productNumber) || message.isValid
+  //   );
+  //   invalidProductLines = mapInvalidProductsToLines();
+  //   const hasRemainingInvalidProducts = validationMessages.some(message => !message.isValid);
+  //   if (hasRemainingInvalidProducts) {
+  //     toast.success("Invalid product removed.");
+  //   } else {
+  //     toast.success("All invalid products removed. You can now add to cart.");
+  //   }
+  //   if (validationMessages.length === 0) {
+  //     isValidated = false;
+  //   }
+  // }
+  function removeInvalidProduct(lineIndex) {
+    const lines = rawFileData.split("\n");
+    const lineContent = lines[lineIndex];
+    const [productInfo] = lineContent.split(",").map((item) => item.trim());
+    lines.splice(lineIndex, 1);
+    rawFileData = lines.join("\n");
+    validationMessages = validationMessages.filter(
+      (message) =>
+        !productInfo.includes(message.productNumber) || message.isValid,
+    );
+    invalidProductLines = mapInvalidProductsToLines();
+
+    if (!rawFileData.trim()) {
+      toast.success(
+        "All invalid items removed. Please add valid product number and size to add to cart.",
+      );
+      isValidated = false;
     } else {
-      toast.success("All invalid products removed. You can now add to cart.");
+      const hasRemainingInvalidProducts = validationMessages.some(
+        (message) => !message.isValid,
+      );
+      if (hasRemainingInvalidProducts) {
+        toast.success("Invalid product removed.");
+      } else {
+        toast.success("All invalid products removed. You can now add to cart.");
+      }
+    }
+
+    if (validationMessages.length === 0) {
+      isValidated = false;
     }
   }
-  
-  if (validationMessages.length === 0) {
-    isValidated = false;
-  }
-}
-
 
   function handleTextChange(event) {
     rawFileData = event.target.value;
@@ -165,154 +169,157 @@ function removeInvalidProduct(lineIndex) {
   }
 
   function handleFileInputChange(event) {
-  const file = event.target.files[0];
+    const file = event.target.files[0];
 
-  if (file) {
-    const fileType = file.name.split(".").pop().toLowerCase();
-    selectedFileName = file.name;
-    isValidated = false;
-    invalidProductLines = [];
+    if (file) {
+      const fileType = file.name.split(".").pop().toLowerCase();
+      selectedFileName = file.name;
+      isValidated = false;
+      invalidProductLines = [];
 
-    if (fileType === "xlsx" || fileType === "xls") {
-      fileError = "";
+      if (fileType === "xlsx" || fileType === "xls") {
+        fileError = "";
 
-      if (typeof XLSX !== "undefined") {
+        if (typeof XLSX !== "undefined") {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            try {
+              const data = new Uint8Array(e.target.result);
+              const workbook = XLSX.read(data, { type: "array" });
+              const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+              let csvData = XLSX.utils.sheet_to_csv(worksheet);
+              const lines = csvData.split("\n").filter((line) => line.trim());
+              const transformedLines = lines.map((line) => {
+                const parts = line.split(",").map((part) => part.trim());
+                if (parts.length >= 2) {
+                  return `${parts[0]}-${parts[1]},${parts[2] || 1}`.trim();
+                }
+                return line.trim();
+              });
+
+              rawFileData = transformedLines.join("\n");
+              isEditing = true;
+              const csvFile = new File(
+                [rawFileData],
+                file.name.replace(/\.xlsx$|\.xls$/i, ".csv"),
+                {
+                  type: "text/csv",
+                },
+              );
+
+              const dataTransfer = new DataTransfer();
+              dataTransfer.items.add(csvFile);
+
+              const fileInput = document.getElementById("bulkupload");
+              if (fileInput) {
+                fileInput.files = dataTransfer.files;
+              }
+
+              const { duplicates } = checkForDuplicates(rawFileData);
+              duplicateEntries = duplicates;
+
+              if (duplicates.length > 0) {
+                toast.error(
+                  `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+                );
+              }
+            } catch (error) {
+              console.error("Excel processing error:", error);
+              fileError =
+                "Error processing Excel file. Please check file format.";
+            }
+          };
+          reader.onerror = function () {
+            fileError = "Error reading the file. Please try again.";
+          };
+          reader.readAsArrayBuffer(file);
+        } else {
+          fileError =
+            "Excel file support requires the SheetJS library. Please use CSV format instead.";
+        }
+      } else {
         const reader = new FileReader();
         reader.onload = function (e) {
-          try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: "array" });
-            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          let fileContent = e.target.result;
+          fileError = "";
+          isEditing = true;
+          const lines = fileContent.split("\n").filter((line) => line.trim());
+          const trimmedLines = lines.map((line) => {
+            const [productInfo, quantity] = line
+              .split(",")
+              .map((item) => item.trim());
+            return `${productInfo},${quantity}`;
+          });
 
-            let csvData = XLSX.utils.sheet_to_csv(worksheet);
-            const lines = csvData.split("\n").filter((line) => line.trim());
-            const transformedLines = lines.map((line) => {
-              const parts = line.split(",").map((part) => part.trim());
-              if (parts.length >= 2) {
-                return `${parts[0]}-${parts[1]},${parts[2] || 1}`.trim();
-              }
-              return line.trim();
-            });
+          rawFileData = trimmedLines.join("\n");
+          const trimmedFile = new File([rawFileData], file.name, {
+            type: "text/csv",
+          });
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(trimmedFile);
+          const fileInput = document.getElementById("bulkupload");
+          if (fileInput) {
+            fileInput.files = dataTransfer.files;
+          }
 
-            rawFileData = transformedLines.join("\n");
-            isEditing = true;
-            const csvFile = new File(
-              [rawFileData],
-              file.name.replace(/\.xlsx$|\.xls$/i, ".csv"),
-              {
-                type: "text/csv",
-              }
+          const { duplicates } = checkForDuplicates(rawFileData);
+          duplicateEntries = duplicates;
+
+          if (duplicates.length > 0) {
+            toast.error(
+              `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
             );
-
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(csvFile);
-
-            const fileInput = document.getElementById("bulkupload");
-            if (fileInput) {
-              fileInput.files = dataTransfer.files;
-            }
-
-            const { duplicates } = checkForDuplicates(rawFileData);
-            duplicateEntries = duplicates;
-
-            if (duplicates.length > 0) {
-              toast.error(
-                `Found ${duplicates.length} duplicate entries. Please review and remove them.`
-              );
-            }
-          } catch (error) {
-            console.error("Excel processing error:", error);
-            fileError =
-              "Error processing Excel file. Please check file format.";
           }
         };
         reader.onerror = function () {
           fileError = "Error reading the file. Please try again.";
         };
-        reader.readAsArrayBuffer(file);
-      } else {
-        fileError =
-          "Excel file support requires the SheetJS library. Please use CSV format instead.";
+        reader.readAsText(file);
       }
     } else {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        let fileContent = e.target.result;
-        fileError = "";
-        isEditing = true;
-        const lines = fileContent.split("\n").filter((line) => line.trim());
-        const trimmedLines = lines.map((line) => {
-          const [productInfo, quantity] = line.split(",").map((item) => item.trim());
-          return `${productInfo},${quantity}`;
-        });
-
-        rawFileData = trimmedLines.join("\n");
-        const trimmedFile = new File([rawFileData], file.name, {
-          type: "text/csv",
-        });
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(trimmedFile);
-        const fileInput = document.getElementById("bulkupload");
-        if (fileInput) {
-          fileInput.files = dataTransfer.files;
-        }
-
-        const { duplicates } = checkForDuplicates(rawFileData);
-        duplicateEntries = duplicates;
-
-        if (duplicates.length > 0) {
-          toast.error(
-            `Found ${duplicates.length} duplicate entries. Please review and remove them.`
-          );
-        }
-      };
-      reader.onerror = function () {
-        fileError = "Error reading the file. Please try again.";
-      };
-      reader.readAsText(file);
+      fileError = "No file selected.";
     }
-  } else {
-    fileError = "No file selected.";
-  }
-}
-
-function validateAndSubmitData() {
-  if (!rawFileData.trim()) {
-    toast.error("Please enter product data before submitting");
-    return;
   }
 
-  const lines = rawFileData.split("\n").filter((line) => line.trim());
-  const trimmedLines = lines.map((line) => {
-    const [productInfo, quantity] = line.split(",").map((item) => item.trim());
-    return `${productInfo},${quantity || 1}`;
-  });
-  rawFileData = trimmedLines.join("\n");
+  function validateAndSubmitData() {
+    if (!rawFileData.trim()) {
+      toast.error("Please enter product data before submitting");
+      return;
+    }
 
-  const { duplicates } = checkForDuplicates(rawFileData);
-  if (duplicates.length > 0) {
-    toast.error(
-      `Found ${duplicates.length} duplicate entries. Please review and remove them.`
-    );
-    return;
+    const lines = rawFileData.split("\n").filter((line) => line.trim());
+    const trimmedLines = lines.map((line) => {
+      const [productInfo, quantity] = line
+        .split(",")
+        .map((item) => item.trim());
+      return `${productInfo},${quantity || 1}`;
+    });
+    rawFileData = trimmedLines.join("\n");
+
+    const { duplicates } = checkForDuplicates(rawFileData);
+    if (duplicates.length > 0) {
+      toast.error(
+        `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+      );
+      return;
+    }
+
+    const file = new File([rawFileData], "manual-entry.csv", {
+      type: "text/csv",
+    });
+
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    const fileInput = document.getElementById("bulkupload");
+    if (fileInput) {
+      fileInput.files = dataTransfer.files;
+    }
+
+    if (formElement) {
+      formElement.requestSubmit();
+    }
   }
-  
-  const file = new File([rawFileData], "manual-entry.csv", {
-    type: "text/csv",
-  });
-
-  const dataTransfer = new DataTransfer();
-  dataTransfer.items.add(file);
-  const fileInput = document.getElementById("bulkupload");
-  if (fileInput) {
-    fileInput.files = dataTransfer.files;
-  }
-
-  if (formElement) {
-    formElement.requestSubmit();
-  }
-}
-
 
   function processProduct(product) {
     const {
@@ -374,7 +381,7 @@ function validateAndSubmitData() {
             price: price,
             size: size,
           },
-          quantity: product.quantity ||1,
+          quantity: product.quantity || 1,
           backOrder: backOrder,
           stock: product.stock,
         };
@@ -407,7 +414,6 @@ function validateAndSubmitData() {
       );
       return;
     }
-
 
     if (data?.authedUser && data?.authedUser?.id) {
       const cartForm = document.getElementById("cartForm");
@@ -507,9 +513,8 @@ function validateAndSubmitData() {
 </script>
 
 <div class="text-black text-sm md:ml-2 mb-1">
-
-  *Type or paste product number-size,quantity (e.g.,
-  4926896-5G,1), separated by commas*. Enter separate products on new lines.
+  *Type or paste product number-size,quantity (e.g., PV4384-each of 1,1),
+  separated by commas*. Enter separate products on new lines.
 </div>
 <form
   method="POST"
@@ -526,20 +531,20 @@ function validateAndSubmitData() {
   enctype="multipart/form-data"
   use:enhance={() => {
     isLoading = true;
-    const lines = rawFileData.trim().split('\n');
-  const processedLines = lines.map(line => {
-    const parts = line.includes(',') ? line.split(',') : line.split(/\s+/);
-    const productNumberAndSize = parts[0]?.trim();
-    let quantity = parts[1]?.trim();
-    if (!quantity && productNumberAndSize) {
-      quantity = '1';
-      return `${productNumberAndSize},${quantity}`;
-    }
-    
-    return line;
-  });
+    const lines = rawFileData.trim().split("\n");
+    const processedLines = lines.map((line) => {
+      const parts = line.includes(",") ? line.split(",") : line.split(/\s+/);
+      const productNumberAndSize = parts[0]?.trim();
+      let quantity = parts[1]?.trim();
+      if (!quantity && productNumberAndSize) {
+        quantity = "1";
+        return `${productNumberAndSize},${quantity}`;
+      }
 
-  rawFileData = processedLines.join('\n');
+      return line;
+    });
+
+    rawFileData = processedLines.join("\n");
     return async ({ result }) => {
       const { duplicates } = checkForDuplicates(rawFileData);
 
@@ -552,15 +557,14 @@ function validateAndSubmitData() {
       let products = result.data;
       products.forEach((product) => {
         if (!product.quantity || product.quantity === undefined) {
-        product.quantity = 1;
-      }
+          product.quantity = 1;
+        }
         processProduct(product);
-
       });
 
       validatedProducts = products;
       isLoading = false;
-      isValidated = true; 
+      isValidated = true;
 
       if (result.data && Array.isArray(result.data)) {
         validationMessages = result.data.map((item) => ({
@@ -613,36 +617,43 @@ function validateAndSubmitData() {
         </div>
       </div>
     </div> -->
-  	<div class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-500/40 backdrop-blur-sm"
-		transition:fade={{ duration: 300 }}>
-		<div class="flex flex-col items-center justify-center p-4">
-			<div class="relative w-32 h-32">
-				<div class="absolute inset-0 w-full h-full border-8 border-dashed border-primary-200 border-t-primary-600 rounded-full animate-spin-slow"></div>
-				<div class="loader loader-large absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"></div>
-			</div>
-			<div class="mt-4 text-white font-medium flex items-center animate-pulse">
-				<span class="animate-wave-1">L</span>
-				<span class="animate-wave-2">o</span>
-				<span class="animate-wave-3">a</span>
-				<span class="animate-wave-4">d</span>
-				<span class="animate-wave-5">i</span>
-				<span class="animate-wave-6">n</span>
-				<span class="animate-wave-7">g</span>
-				<span class="animate-wave-8">.</span>
-				<span class="animate-wave-9">.</span>
-				<span class="animate-wave-10">.</span>
-			</div>
-		</div>
-	</div>
-  
-    {/if}
+    <div
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-500/40 backdrop-blur-sm"
+      transition:fade={{ duration: 300 }}
+    >
+      <div class="flex flex-col items-center justify-center p-4">
+        <div class="relative w-32 h-32">
+          <div
+            class="absolute inset-0 w-full h-full border-8 border-dashed border-primary-200 border-t-primary-600 rounded-full animate-spin-slow"
+          ></div>
+          <div
+            class="loader loader-large absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"
+          ></div>
+        </div>
+        <div
+          class="mt-4 text-white font-medium flex items-center animate-pulse"
+        >
+          <span class="animate-wave-1">L</span>
+          <span class="animate-wave-2">o</span>
+          <span class="animate-wave-3">a</span>
+          <span class="animate-wave-4">d</span>
+          <span class="animate-wave-5">i</span>
+          <span class="animate-wave-6">n</span>
+          <span class="animate-wave-7">g</span>
+          <span class="animate-wave-8">.</span>
+          <span class="animate-wave-9">.</span>
+          <span class="animate-wave-10">.</span>
+        </div>
+      </div>
+    </div>
+  {/if}
 
   <section class="w-full mx-auto md:flex items-center gap-5">
     <div
       class="md:w-3/5 h-72 border bg-white rounded overflow-hidden overflow-y-scroll p-5 relative"
     >
       <textarea
-        class="w-full h-full p-2 border border-gray-300 rounded focus:ring-0 focus:border-primary-500"
+        class="w-full h-full p-2 border placeholder:text-sm placeholder:text-gray-400 border-gray-300 rounded focus:ring-0 focus:border-primary-500"
         bind:value={rawFileData}
         on:input={handleTextChange}
         placeholder="Type or paste product data here...
@@ -682,7 +693,7 @@ Example:
           class="flex justify-center bg-white items-center h-12 border rounded hover:bg-primary-200 hover:text-primary-600"
         >
           <a
-            class="flex items-center gap-2 text-sm font-medium text-primary-500  "
+            class="flex items-center gap-2 text-sm font-medium text-primary-500"
             href="/quick_order_template.csv"
             download
           >
@@ -833,7 +844,7 @@ Example:
     >
       <button
         type="button"
-                    class="lg:ml-60  mr-5 p-2 w-40 mt-4 mb-5 h-9  border border-primary-500 text-primary-500  hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
+        class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
         on:click={attemptAddToCart}
         disabled={cartloading ||
           (isValidated &&
@@ -850,7 +861,7 @@ Example:
     </form>
   {:else}
     <button
-              class="lg:ml-60  mr-5 p-2 w-40 mt-4  mb-5 h-9  border border-primary-500 text-primary-500  hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
+      class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
       on:click={attemptAddToCart}
       disabled={cartloading ||
         (isValidated &&
@@ -874,129 +885,155 @@ Example:
   </div>
 {/if}
 
-
 <style>
-	@keyframes shimmer {
-		0% {
-			background-position: -200% 0;
-		}
-		100% {
-			background-position: 200% 0;
-		}
-	}
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
 
-	@keyframes progress-pulse {
-		0%, 100% {
-			opacity: 0;
-		}
-		50% {
-			opacity: 0.5;
-		}
-	}
+  @keyframes progress-pulse {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
 
-	@keyframes wave {
-		0%, 100% {
-			transform: translateY(0);
-		}
-		50% {
-			transform: translateY(-5px);
-		}
-	}
+  @keyframes wave {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
 
-	@keyframes loader-bubbles {
-		0% {
-			box-shadow: 0 -10px var(--bubble-color, #ffffff),
-					3px 0 var(--bubble-color, #ffffff),
-					5px 0 var(--primary-color, #fe5939);
-		}
-		30% {
-			box-shadow: 3px -20px rgba(239,223,255,0),
-					5px -10px var(--bubble-color, #ffffff),
-					5px 0 var(--primary-color, #fe5939);
-		}
-		60% {
-			box-shadow: 3px 0 rgba(239,223,255,0),
-					4px -20px rgba(239,223,255,0),
-					3px -10px var(--bubble-color, #ffffff);
-		}
-		61% {
-			box-shadow: 3px 0 var(--primary-color, #fe5939),
-					4px -20px rgba(239,223,255,0),
-					3px -10px var(--bubble-color, #ffffff);
-		}
-		100% {
-			box-shadow: 0 -10px var(--primary-color, #fe5939),
-					4px -20px rgba(239,223,255,0),
-					5px -20px rgba(239,223,255,0);
-		}
-	}
+  @keyframes loader-bubbles {
+    0% {
+      box-shadow:
+        0 -10px var(--bubble-color, #ffffff),
+        3px 0 var(--bubble-color, #ffffff),
+        5px 0 var(--primary-color, #fe5939);
+    }
+    30% {
+      box-shadow:
+        3px -20px rgba(239, 223, 255, 0),
+        5px -10px var(--bubble-color, #ffffff),
+        5px 0 var(--primary-color, #fe5939);
+    }
+    60% {
+      box-shadow:
+        3px 0 rgba(239, 223, 255, 0),
+        4px -20px rgba(239, 223, 255, 0),
+        3px -10px var(--bubble-color, #ffffff);
+    }
+    61% {
+      box-shadow:
+        3px 0 var(--primary-color, #fe5939),
+        4px -20px rgba(239, 223, 255, 0),
+        3px -10px var(--bubble-color, #ffffff);
+    }
+    100% {
+      box-shadow:
+        0 -10px var(--primary-color, #fe5939),
+        4px -20px rgba(239, 223, 255, 0),
+        5px -20px rgba(239, 223, 255, 0);
+    }
+  }
 
-	.loader {
-		display: inline-block;
-		vertical-align: middle;
-		position: relative;
-		width: 10px;
-		height: 20px;
-		background: var(--primary-color, #fe5939);
-	}
+  .loader {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    width: 10px;
+    height: 20px;
+    background: var(--primary-color, #fe5939);
+  }
 
-	.loader-large {
-		width: 15px;     
-		height: 30px;    
-	}
+  .loader-large {
+    width: 15px;
+    height: 30px;
+  }
 
-	.loader:before,
-	.loader:after {
-		content: '';
-		position: absolute;
-	}
+  .loader:before,
+  .loader:after {
+    content: "";
+    position: absolute;
+  }
 
-	.loader:before {
-		top: -8px;
-		left: -13px;
-		width: 0;
-		height: 0;
-		border: 18px solid transparent;
-		border-bottom: 20px solid var(--primary-color, #fe5939);
-		border-radius: 3px;
-	}
+  .loader:before {
+    top: -8px;
+    left: -13px;
+    width: 0;
+    height: 0;
+    border: 18px solid transparent;
+    border-bottom: 20px solid var(--primary-color, #fe5939);
+    border-radius: 3px;
+  }
 
-	.loader-large:before {
-		top: -12px;
-		left: -20px;
-		border: 27px solid transparent;
-		border-bottom: 30px solid var(--primary-color, #fe5939);
-		border-radius: 4px;
-	}
+  .loader-large:before {
+    top: -12px;
+    left: -20px;
+    border: 27px solid transparent;
+    border-bottom: 30px solid var(--primary-color, #fe5939);
+    border-radius: 4px;
+  }
 
-	.loader:after {
-		top: -1;
-		left: -1;
-		width: px;
-		height: 4px;
-		background: var(--bubble-color, #fe5939);
-		border-radius: 50%;
-		animation: loader-bubbles 1s linear infinite forwards;
-	}
+  .loader:after {
+    top: -1;
+    left: -1;
+    width: px;
+    height: 4px;
+    background: var(--bubble-color, #fe5939);
+    border-radius: 50%;
+    animation: loader-bubbles 1s linear infinite forwards;
+  }
 
-	.loader-large:after {
-		width: 6px;
-		height: 6px;
-	}
+  .loader-large:after {
+    width: 6px;
+    height: 6px;
+  }
 
-	:global(.animate-shimmer) {
-		background-size: 200% 100%;
-		animation: shimmer 2s ease-in-out infinite;
-	}
+  :global(.animate-shimmer) {
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
 
-	:global(.animate-wave-1) { animation: wave 1s ease-in-out infinite; }
-	:global(.animate-wave-2) { animation: wave 1s ease-in-out infinite 0.1s; }
-	:global(.animate-wave-3) { animation: wave 1s ease-in-out infinite 0.2s; }
-	:global(.animate-wave-4) { animation: wave 1s ease-in-out infinite 0.3s; }
-	:global(.animate-wave-5) { animation: wave 1s ease-in-out infinite 0.4s; }
-	:global(.animate-wave-6) { animation: wave 1s ease-in-out infinite 0.5s; }
-	:global(.animate-wave-7) { animation: wave 1s ease-in-out infinite 0.6s; }
-	:global(.animate-wave-8) { animation: wave 1s ease-in-out infinite 0.7s; }
-	:global(.animate-wave-9) { animation: wave 1s ease-in-out infinite 0.8s; }
-	:global(.animate-wave-10) { animation: wave 1s ease-in-out infinite 0.9s; }
+  :global(.animate-wave-1) {
+    animation: wave 1s ease-in-out infinite;
+  }
+  :global(.animate-wave-2) {
+    animation: wave 1s ease-in-out infinite 0.1s;
+  }
+  :global(.animate-wave-3) {
+    animation: wave 1s ease-in-out infinite 0.2s;
+  }
+  :global(.animate-wave-4) {
+    animation: wave 1s ease-in-out infinite 0.3s;
+  }
+  :global(.animate-wave-5) {
+    animation: wave 1s ease-in-out infinite 0.4s;
+  }
+  :global(.animate-wave-6) {
+    animation: wave 1s ease-in-out infinite 0.5s;
+  }
+  :global(.animate-wave-7) {
+    animation: wave 1s ease-in-out infinite 0.6s;
+  }
+  :global(.animate-wave-8) {
+    animation: wave 1s ease-in-out infinite 0.7s;
+  }
+  :global(.animate-wave-9) {
+    animation: wave 1s ease-in-out infinite 0.8s;
+  }
+  :global(.animate-wave-10) {
+    animation: wave 1s ease-in-out infinite 0.9s;
+  }
 </style>
