@@ -1262,9 +1262,9 @@
                 </span>
 
                 {#if row.selectedProduct.pricing?.[0]?.usd || row.selectedProduct.pricing?.[0]?.inr}
-                  <span>
+                  <!-- <span>
                     1 Estimated to ship on {estimatedShipDate}
-                  </span>
+                  </span> -->
 
                   <button
                     class="text-primary-400 rounded"
