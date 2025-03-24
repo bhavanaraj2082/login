@@ -11,6 +11,7 @@
   export let decreaseQuantity;
   export let addToCart;
   export let cartTogglePopup;
+  export let orderMultiple;
   let stockStatus = "";
   let stockAvailability = "";
   let stockType = "";
@@ -68,13 +69,23 @@
               setTimeout(() => e.target.select(), 10);
             }}
             on:blur={(e) => {
-              if (!e.target.value || parseInt(e.target.value, 10) < 1) {
-                quantity = 1;
-                e.target.value = "1";
+              let inputValue = parseInt(e.target.value, 10);
+
+              if (!inputValue) {
+                quantity = orderMultiple ? orderMultiple : 1;
+                e.target.value = quantity;
+                return;
+              }
+
+              if (orderMultiple) {
+                quantity =
+                  Math.ceil(inputValue / orderMultiple) * orderMultiple;
+                e.target.value = quantity;
               }
             }}
             on:input={(e) => {
               e.target.value = e.target.value.replace(/[^1-9]/g, "");
+
               if (e.target.value === "") {
                 quantity = "";
                 return;
@@ -83,7 +94,8 @@
               if (e.target.value.startsWith("0") && e.target.value.length > 1) {
                 e.target.value = e.target.value.slice(1);
               }
-              const parsedValue = parseInt(e.target.value, 10);
+
+              let parsedValue = parseInt(e.target.value, 10);
 
               if (parsedValue > 999) {
                 quantity = 999;
@@ -91,12 +103,10 @@
               } else {
                 quantity = parsedValue;
               }
-              updateQuantity(e);
             }}
             aria-label="Quantity"
             max="999"
           />
-
           <input type="hidden" name="ProductId" value={product.productNumber} />
           <button
             on:click={increaseQuantity}

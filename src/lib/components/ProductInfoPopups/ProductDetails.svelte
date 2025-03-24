@@ -645,6 +645,7 @@
       <SideCart
         {data}
         {quantity}
+        {orderMultiple}
         {addedQuantity}
         {index}
         {cartTogglePopup}
