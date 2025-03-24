@@ -2,7 +2,7 @@
     export let product;
 </script>
 
-<div class="shadow-sm flex flex-col justify-between gap-2 border bg-white rounded-lg px-5 py-5 lg:px-10 overflow-hidden">
+<div class="shadow flex flex-col justify-between gap-2 bg-white rounded-lg px-5 py-5 lg:px-10 overflow-hidden hover:shadow-md">
     <img
         src={product?.imageSrc}
         alt=/default.png
@@ -13,7 +13,7 @@
     </div>
     <a
     href={product?.productNumber ?`products/${product?.category.urlName}/${product?.subCategory.urlName}/${product.productNumber}` : '#'}
-        class="bg-primary-400 text-white md:w-full w-10/12 mx-auto text-sm font-medium py-2 rounded hover:bg-primary-500">
+        class="bg-primary-400 text-white md:w-full w-10/12 mx-auto text-sm font-medium py-2 rounded hover:bg-primary-500 md:mb-2.5 mb-2 transition-all duration-300">
         View Details
     </a>
 </div>

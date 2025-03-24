@@ -54,30 +54,30 @@
   {#if filteredCategories.length > 0}
     <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-12 mx-8 sm:mx-0">
       {#each filteredCategories as category}
-        <div class="relative group bg-white shadow-lg border border-gray-200 rounded-lg overflow-hidden transition-shadow duration-300">
+        <div class="relative group bg-white shadow-lg rounded-lg overflow-hidden transition-shadow duration-300 hover:shadow-xl">
           <div class="absolute inset-0 bg-opacity-20 transition-all duration-500 ease-in-out group-hover:bg-opacity-0 z-10 pointer-events-none"></div>
           <a href="/products/{category.urlName}" class="block relative z-10">
             <div class="relative">
               <img
                 src="/category/{category.name}.webp"
                 alt={category.name}
-                class="w-full h-60 object-cover opacity-90 transition-transform duration-500 ease-in-out group-hover:scale-105 group-hover:opacity-100"
+                class="w-full h-60 object-cover opacity-90 transition-transform duration-1000 ease-in-out group-hover:scale-105 group-hover:opacity-100"
               />
             </div>
-            <div class="p-4">
-              <div class="flex justify-between items-center">
-                <h4
-                  class="font-semibold text-sm text-gray-500 hover:underline truncate"
-                  title={category.name}>
-                  {category.name}
-                </h4>
-                {#if category.productCount}
-                  <span class="text-1s text-gray-400">
-                    ({category.productCount})
-                  </span>
-                {/if}
+              <div class="p-4 bg-white">
+                <div class="flex justify-between items-center">
+                  <h4
+                    class="text-sm font-semibold text-gray-700 group-hover:text-primary-600 transition-colors duration-500 truncate"
+                    title={category.name}>
+                    {category.name}
+                  </h4>
+                  {#if category.productCount}
+                    <span class="text-xs font-medium px-2 py-1 bg-gray-100 rounded-full text-gray-600">
+                      {category.productCount}
+                    </span>
+                  {/if}
+                </div>
               </div>
-            </div>
           </a>
         </div>
       {/each}

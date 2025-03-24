@@ -39,8 +39,7 @@
             type="button"
             class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded bg-red-100 p-1"
             style="color: #cb1919"
-            on:click={clearSearch}
-          >
+            on:click={clearSearch}>
             <Icon icon="oui:cross" width="16" height="16" class="font-bold" />
           </button>
         {/if}
@@ -55,14 +54,14 @@
   {#if filteredSubcategories.length > 0}
     <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-12 mx-8 sm:mx-0">
       {#each filteredSubcategories as subcategory}
-        <div class="relative group bg-white shadow-lg border border-gray-200 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1">
+        <div class="relative group bg-white shadow-lg rounded-lg overflow-hidden transition-transform duration-500 ease-out hover:shadow-xl transform hover:-translate-y-0.5">
           <a
             href="/products/{subcategory.category.urlName}/{subcategory.urlName}"
             class="block h-full">
             <div 
               class="relative h-64 bg-cover bg-center"
               style="background-image: url('/category/{subcategory.category.name}.webp');">
-              <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/10 group-hover:from-black/80 group-hover:via-black/50 transition-all duration-300"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/10 group-hover:from-black/80 group-hover:via-black/70 transition-all duration-500"></div>
               <img
                 src="/category/{subcategory.category.name}.webp"
                 alt={subcategory.name}
@@ -85,7 +84,7 @@
                 </h4>
                 {#if subcategory.productCount}
                   <span class="text-xs font-medium px-2 py-1 bg-gray-100 rounded-full text-gray-600">
-                    {subcategory.productCount}
+                    {subcategory?.productCount}
                   </span>
                 {/if}
               </div>
@@ -100,8 +99,7 @@
         icon="ph:package-duotone"
         width="64"
         height="64"
-        class="text-primary-400 mb-4"
-      />
+        class="text-primary-400 mb-4"/>
       <h3 class="text-xl font-medium text-gray-900 mb-2">
         No subcategories available
       </h3>

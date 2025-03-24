@@ -447,7 +447,7 @@ function getStatusColor (status) {
                           </div>
                           <div>
                             <p class="text-sm font-semibold text-heading">Units</p>
-                            <p class="mt-1 text-sm text-gray-900">{selectedQuote.Configure_custom_solution?.Units || 0 }</p>
+                            <p class="mt-1 text-sm text-gray-900">{selectedQuote.Configure_custom_solution?.units || 0 }</p>
                           </div>
                         </div>
                       </div>

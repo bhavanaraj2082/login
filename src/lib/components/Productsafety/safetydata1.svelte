@@ -4,7 +4,7 @@
 <div class="w-full mx-auto">
   <div class="flex flex-col md:flex-row">
     <div class="w-full p-5">
-      <!-- <p class="sm:sm:text-md text-sm text-md font-medium mb-6">Understanding Product Labels</p> -->
+      <p class="sm:text-xl text-md font-semibold mb-6">Understanding Product Labels</p>
 
       <p class="sm:text-sm text-xs mb-4 font-medium text-heading">
         GHS Compliant Product Label
@@ -55,7 +55,7 @@
               ><strong>Exploding Bomb</strong></td
             >
             <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
-              ><img src="/productsafety/bomb.jpg" alt="img" class="w-52" /></td
+              ><img src="/productsafety/bomb.webp" alt="img" class="w-52" /></td
             >
             <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Unstable explosives<br />
@@ -69,7 +69,7 @@
               ><strong>Flame</strong></td
             >
             <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
-              ><img src="/productsafety/flame.jpg" alt="img" class="w-52" /></td
+              ><img src="/productsafety/flame.webp" alt="img" class="w-52" /></td
             >
             <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Aerosols, cat. 1,2<br />
@@ -97,7 +97,7 @@
             >
             <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img
-                src="/productsafety/flamecircle.jpg"
+                src="/productsafety/flamecircle.webp"
                 alt="img"
                 class="w-52"
               /></td
@@ -114,7 +114,7 @@
             >
             <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img
-                src="/productsafety/cylinder.jpg"
+                src="/productsafety/cylinder.webp"
                 alt="img"
                 class="w-52"
               /></td
@@ -129,12 +129,10 @@
             </td>
           </tr>
           <tr>
-            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
-              ><strong>Corrosion</strong></td
-            >
+            <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"><strong>Corrosion</strong></td>
             <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img
-                src="/productsafety/Corrosion.jpg"
+                src="/productsafety/Corrosion.webp"
                 alt="img"
                 class="w-52"
               /></td
@@ -150,7 +148,7 @@
               ><strong>Skull and Crossbones</strong></td
             >
             <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
-              ><img src="/productsafety/skull.jpg" alt="img" class="w-52" /></td
+              ><img src="/productsafety/skull.webp" alt="img" class="w-52" /></td
             >
             <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300">
               Acute toxicity, cat. 1,2,3 (Oral, Dermal, Inhalation)
@@ -162,7 +160,7 @@
             >
             <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img
-                src="/productsafety/exclamation.jpg"
+                src="/productsafety/exclamation.webp"
                 alt="img"
                 class="w-52"
               /></td
@@ -182,7 +180,7 @@
             >
             <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img
-                src="/productsafety/healthhazard.jpg"
+                src="/productsafety/healthhazard.webp"
                 alt="img"
                 class="w-52"
               /></td
@@ -203,7 +201,7 @@
             >
             <td class="sm:text-sm text-xs px-4 py-2 border border-gray-300"
               ><img
-                src="/productsafety/environment.jpg"
+                src="/productsafety/environment.webp"
                 alt="img"
                 class="w-52"
               /></td

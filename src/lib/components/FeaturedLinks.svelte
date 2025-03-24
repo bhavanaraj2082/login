@@ -11,13 +11,13 @@
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-8">
         {#each FeaturedData as { name, description, image, buttonLabel, link }}
-            <div class="shadow flex flex-col  bg-white justify-between items-center rounded-lg overflow-hidden p-6 text-center">
+            <div class="shadow flex flex-col  bg-white justify-between items-center rounded-lg overflow-hidden p-6 text-center hover:shadow-md">
                 <img src={image} alt={name} class="w-8/12 h-auto object-cover rounded mb-4">
                 <div class="flex-1">
                     <h3 class="text-xl font-semibold mb-2">{name}</h3>
                     <p class="text-gray-600 m-2 text-sm justify-center">{description}</p>
                 </div>
-                <a href={link} class="text-primary-400 border border-primary-400 w-10/12 md:py-2 py-2 mt-2 rounded hover:bg-primary-500 hover:text-gray-100 transition-colors duration-500">
+                <a href={link} class="text-primary-500 border border-primary-500 w-11/12 py-1.5 my-2 rounded hover:bg-primary-500 hover:text-gray-100 transition-colors font-medium duration-500">
                     {buttonLabel}
                 </a>
             </div>
