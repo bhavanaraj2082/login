@@ -1256,7 +1256,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 							<!-- {#if number.length > 0 && !/^\+?[0-9]{10}$/.test(number)}
                                     <span class="text-red-500 sm:text-xs text-2s font-medium">Please enter a valid number number.</span>
                                 {/if} -->
-							{#if number.length > 0 && !validatePhoneNumber(location, number)}
+							{#if number?.length > 0 && !validatePhoneNumber(location, number)}
 								<span class="text-red-500 sm:text-xs text-2s font-medium"
 									>Please enter a valid phone number for {location}</span
 								>

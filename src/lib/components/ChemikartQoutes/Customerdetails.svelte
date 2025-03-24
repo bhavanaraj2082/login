@@ -548,11 +548,11 @@ onMount(() => {
     }
 		if (data && data.profile) {
 			// Updating Cusdetails store values
-			$Cusdetails.FirstName = `${data.profile.firstName }`.trim();
-			$Cusdetails.LastName = `${data.profile.lastName }`.trim();
-			$Cusdetails.Email = data.profile.email ;
-			$Cusdetails.Number = data.profile.cellPhone || data.profile.primaryPhone;
-			$Cusdetails.userId = data.profile.userId ;
+			$Cusdetails.FirstName = `${data.profile.firstName || "" }`.trim();
+			$Cusdetails.LastName = `${data.profile.lastName || ""}`.trim();
+			$Cusdetails.Email = data.profile.email || "";
+			$Cusdetails.Number = data.profile.cellPhone || data.profile.primaryPhone || "";
+			$Cusdetails.userId = data.profile.userId || "" ;
 
 			// Country logic
 			const profileCountry = data.profile.country?.trim();
@@ -721,7 +721,7 @@ function filterCountriesWithoutAutoSelect() {
 <hr /><hr />
 <div class="py-10 bg-white  flex justify-between">
 	<span class="flex items-center gap-2">
-		<Icon icon="arcticons:youdao-note" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300"  style="stroke-width: 2;" />
+		<Icon icon="material-symbols:add-notes-outline-rounded" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300"  style="stroke-width: 2;" />
 	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 4: Additional notes</h1>
 	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog3()}>Edit</button>
 </div>
@@ -1125,7 +1125,7 @@ function filterCountriesWithoutAutoSelect() {
                     Company name is required</div>
                 {/if}
 	</div>
-	<div class="mt-2 mb-2">
+	<!-- <div class="mt-2 mb-2">
 		<label for="" class="sm:text-sm text-xs">Invoice number</label>
 		<br />
 		<input
@@ -1135,7 +1135,7 @@ function filterCountriesWithoutAutoSelect() {
 			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 			bind:value={$Cusdetails.LGC}
 		/>
-	</div>
+	</div> -->
     <!-- {#if errorMessage}
 		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
 			{errorMessage}</div>
@@ -1152,7 +1152,7 @@ function filterCountriesWithoutAutoSelect() {
 </div>
 <div class="py-10 bg-white  flex justify-between">
 	<span class="flex items-center gap-2">
-		<Icon icon="material-symbols-light:delivery-truck-speed-outline" class="sm:w-9 sm:h-9 w-7 h-7 text-gray-300" />
+		<Icon icon="material-symbols-light:delivery-truck-speed-outline-rounded" class="sm:w-9 sm:h-9 w-7 h-7 text-gray-300" />
 	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">Step 6: Delivery information</h1>
 	</span>
 </div>
