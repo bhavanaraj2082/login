@@ -116,7 +116,7 @@
                   {#if $currencyState === "usd"}
                     {#if minPriceUSD === maxPriceUSD && minPriceUSD !== "--"}
                       <span class="font-semibold text-black">
-                        $ {minPriceUSD.toLocaleString("en-US", {
+                        $ {(Number(minPriceUSD) || 0).toLocaleString("en-US", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
@@ -125,25 +125,38 @@
                       <span class="font-bold text-black px-8"> -- </span>
                     {:else}
                       <span class="font-semibold text-black">
-                        $ {minPriceUSD.toLocaleString("en-US", {
+                        $ {(Number(minPriceUSD) || 0).toLocaleString("en-US", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
-                        })} - $ {maxPriceUSD.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
+                        })} - $ {(Number(maxPriceUSD) || 0).toLocaleString(
+                          "en-US",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        )}
                       </span>
                     {/if}
                   {:else if minPriceINR === maxPriceINR && minPriceINR !== "--"}
                     <span class="font-semibold text-black">
-                      ₹ {minPriceINR.toLocaleString("en-IN")}
+                      ₹ {(Number(minPriceINR) || 0).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </span>
                   {:else if minPriceINR === "--" && maxPriceINR === "--"}
                     <span class="font-bold text-black px-8"> -- </span>
                   {:else}
                     <span class="font-semibold text-black">
-                      ₹ {minPriceINR.toLocaleString("en-IN")} - ₹ {maxPriceINR.toLocaleString(
-                        "en-IN"
+                      ₹ {(Number(minPriceINR) || 0).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })} - ₹ {(Number(maxPriceINR) || 0).toLocaleString(
+                        "en-IN",
+                        {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }
                       )}
                     </span>
                   {/if}

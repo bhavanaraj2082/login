@@ -59,11 +59,15 @@
               <p class="text-base font-semibold text-gray-800">
                 {#if $currencyState === "usd"}
                   $ {(
-                    product?.priceSize[index]?.USD * 0.18 * addedQuantity ?? 0
+                    (Number(product?.priceSize[index]?.USD) || 0) *
+                    0.18 *
+                    (addedQuantity || 0)
                   ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 {:else}
                   ₹ {(
-                    product?.priceSize[index]?.INR * 0.18 * addedQuantity ?? 0
+                    (Number(product?.priceSize[index]?.INR) || 0) *
+                    0.18 *
+                    (addedQuantity || 0)
                   ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 {/if}
               </p>
@@ -76,14 +80,16 @@
               <p class="text-sm font-bold text-gray-500">
                 {#if $currencyState === "usd"}
                   $ {(
-                    product?.priceSize[index]?.USD * addedQuantity ?? 0
+                    (Number(product?.priceSize[index]?.USD) || 0) *
+                    (addedQuantity || 0)
                   ).toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 {:else}
                   ₹ {(
-                    product?.priceSize[index]?.INR * addedQuantity ?? 0
+                    (Number(product?.priceSize[index]?.INR) || 0) *
+                    (addedQuantity || 0)
                   ).toLocaleString("en-IN", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
