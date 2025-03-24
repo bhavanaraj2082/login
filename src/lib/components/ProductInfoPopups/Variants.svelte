@@ -100,9 +100,10 @@
               <td class="py-4 px-6">
                 <a href={variant.productNumber}>
                   <img
-                    src={variant.imageSrc}
+                    src={`https://img.partskeys.com/chemikart/imgs/prod/${variant?.imageSrc}`}
                     alt={variant.productNumber}
-                    class="w-20"
+                    class="w-20 h-20 object-contain"
+                    onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg-250.jpg'"
                   />
                 </a>
               </td>

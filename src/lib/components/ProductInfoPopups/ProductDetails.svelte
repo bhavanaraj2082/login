@@ -286,16 +286,17 @@
         : 'lg:w-10/12'}"
     >
       <div class="flex flex-col space-y-4 lg:w-[28%]">
-        <div class="flex justify-center items-center relative group">
+        <div class="flex justify-center items-center relative group mt-[7px]">
           <button
             on:click={toggleImagePopup}
-            class="border border-gray-300 rounded-md p-2 max-lg:border-none relative"
+            class="border border-gray-200 rounded-md p-1.5 max-lg:border-none relative"
           >
             <!-- svelte-ignore a11y-img-redundant-alt -->
             <img
-              src={product.imageSrc}
+              src={`https://img.partskeys.com/chemikart/imgs/prod/${product?.imageSrc}`}
               alt="Product Image"
               class="w-56 h-56 object-contain"
+              onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg-250.jpg'"
             />
             <div
               class="absolute bottom-full left-1/2 transform -translate-x-1/2 w-max px-3 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap"
@@ -407,14 +408,14 @@
                   value={product?.stockQuantity}
                 />
                 {#if authedEmail}
-                  <button type="submit" on:click={toggleLike}>
+                  <button class="mt-0.5" type="submit" on:click={toggleLike}>
                     <Icon
                       icon={isLiked ? "mdi:heart" : "mdi:heart-outline"}
                       class="text-2xl text-primary-400"
                     />
                   </button>
                 {:else}
-                  <button type="submit" on:click={toggleLikedPopup}>
+                  <button class="mt-0.5" type="submit" on:click={toggleLikedPopup}>
                     <Icon
                       icon={isLiked ? "mdi:heart" : "mdi:heart-outline"}
                       class="text-2xl text-primary-400"
@@ -516,24 +517,25 @@
               Select a Size
             </h2>
             <div
-              class="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm sm:font-semibold font-medium text-gray-700 text-left border-b border-gray-300"
+              class="grid grid-cols-[1fr_2fr_1fr_1fr] gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm sm:font-semibold font-medium text-gray-700 text-left border-b border-gray-300"
             >
-              <div class="p-2 pl-0 whitespace-nowrap">Pack Size</div>
-              <div class="p-2">SKU</div>
-              <div class="p-2">Availability</div>
-              <div class="p-2">Price</div>
+              <div class="px-1 pl-0 py-2 whitespace-nowrap">Pack Size</div>
+              <div class="px-1 py-2">SKU</div>
+              <div class="px-1 py-2">Availability</div>
+              <div class="py-2 px-1">Price</div>
             </div>
             {#each product?.priceSize as priceItem, i}
               <div class="w-full mt-2">
                 <button
                   type="button"
-                  class={`w-full grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-600 cursor-pointer transition-transform border border-gray-100 rounded-sm ${index === i ? "border md:border-l-6 lg:border bg-primary-100 border-gray-200" : "border-none"}`}
+                  class={`w-full grid grid-cols-[1fr_2fr_1fr_1fr] gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-600 cursor-pointer transition-transform border border-gray-100 rounded-sm ${index === i ? "border md:border-l-6 lg:border bg-primary-100 border-gray-200" : "border-none"}`}
                   on:click={() => handleThumbnailClick(i, product)}
                 >
-                  <div class="col-span-1 p-2 pl-1 text-left">
+                  <div class="px-1 py-2 pl-1 text-left">
                     {priceItem?.break}
                   </div>
-                  <div class="col-span-1 p-2 text-left relative">
+
+                  <div class="px-1 py-2 text-left relative">
                     {#if copyToastIndex === i}
                       <div
                         class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-500 text-white py-1 px-2 rounded text-xs"
@@ -542,9 +544,9 @@
                       </div>
                     {/if}
 
-                    <!-- svelte-ignore a11y-no-static-element-interactions -->
                     {#if product?.sku[i]}
                       <!-- svelte-ignore a11y-click-events-have-key-events -->
+                      <!-- svelte-ignore a11y-no-static-element-interactions -->
                       <span
                         on:click={() => {
                           handleThumbnailClick(i, product);
@@ -556,8 +558,7 @@
                       </span>
                     {/if}
                   </div>
-
-                  <div class="col-span-1 p-2 text-left">
+                  <div class="px-1 py-2 text-left">
                     {#if product?.stockQuantity > 0}
                       In Stock
                       <Icon
@@ -573,7 +574,7 @@
                     {/if}
                   </div>
                   <div
-                    class="col-span-1 p-2 text-left whitespace-nowrap overflow-hidden"
+                    class="px-1.5 py-2 text-left whitespace-nowrap overflow-hidden"
                   >
                     {#if $currencyState === "usd"}
                       $ {(Number(priceItem.USD) || 0).toLocaleString("en-US", {
@@ -645,6 +646,7 @@
       <SideCart
         {data}
         {quantity}
+        {orderMultiple}
         {addedQuantity}
         {index}
         {cartTogglePopup}

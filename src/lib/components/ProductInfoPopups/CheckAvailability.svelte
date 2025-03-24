@@ -6,11 +6,11 @@
   export let CheckAvailabilityClose;
   export let quantity;
   export let index;
-  export let updateQuantity;
   export let increaseQuantity;
   export let decreaseQuantity;
   export let addToCart;
   export let cartTogglePopup;
+  export let orderMultiple;
   let stockStatus = "";
   let stockAvailability = "";
   let stockType = "";
@@ -68,13 +68,23 @@
               setTimeout(() => e.target.select(), 10);
             }}
             on:blur={(e) => {
-              if (!e.target.value || parseInt(e.target.value, 10) < 1) {
-                quantity = 1;
-                e.target.value = "1";
+              let inputValue = parseInt(e.target.value, 10);
+
+              if (!inputValue) {
+                quantity = orderMultiple ? orderMultiple : 1;
+                e.target.value = quantity;
+                return;
+              }
+
+              if (orderMultiple) {
+                quantity =
+                  Math.ceil(inputValue / orderMultiple) * orderMultiple;
+                e.target.value = quantity;
               }
             }}
             on:input={(e) => {
               e.target.value = e.target.value.replace(/[^1-9]/g, "");
+
               if (e.target.value === "") {
                 quantity = "";
                 return;
@@ -83,7 +93,8 @@
               if (e.target.value.startsWith("0") && e.target.value.length > 1) {
                 e.target.value = e.target.value.slice(1);
               }
-              const parsedValue = parseInt(e.target.value, 10);
+
+              let parsedValue = parseInt(e.target.value, 10);
 
               if (parsedValue > 999) {
                 quantity = 999;
@@ -91,12 +102,10 @@
               } else {
                 quantity = parsedValue;
               }
-              updateQuantity(e);
             }}
             aria-label="Quantity"
             max="999"
           />
-
           <input type="hidden" name="ProductId" value={product.productNumber} />
           <button
             on:click={increaseQuantity}
@@ -153,10 +162,7 @@
       {:else if stockType === "error"}
         <div class="mt-6 space-y-2 text-sm">
           <div class="flex items-center space-x-2">
-            <Icon
-              icon="meteor-icons:circle-xmark"
-              class="text-sm text-primary-500"
-            />
+            <Icon icon="ix:error-filled" class="text-lg text-red-500" />
             <p>{stockAvailability}</p>
           </div>
         </div>
