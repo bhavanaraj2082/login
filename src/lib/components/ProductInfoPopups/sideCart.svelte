@@ -61,7 +61,10 @@
             <p class="text-heading font-semibold">
               {product?.productNumber} - {product?.priceSize[index]?.break}
             </p>
-            <button on:click={toggleTooltip} class="text-primary-400 ml-2 pointer-events-none">
+            <button
+              on:click={toggleTooltip}
+              class="text-primary-400 ml-2 pointer-events-none"
+            >
               <Icon
                 icon="akar-icons:info-fill"
                 class="text-base font-semibold"
@@ -70,15 +73,21 @@
           </div>
           <span class="text-lg font-bold mt-4">
             {#if $currencyState === "usd"}
-              $ {(product?.priceSize[index]?.USD ?? 0).toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
+              $ {(Number(product?.priceSize[index]?.USD) || 0).toLocaleString(
+                "en-US",
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}
             {:else}
-              ₹ {(product?.priceSize[index]?.INR ?? 0).toLocaleString("en-IN", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
+              ₹ {(Number(product?.priceSize[index]?.INR) || 0).toLocaleString(
+                "en-IN",
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }
+              )}
             {/if}
           </span>
         </div>
@@ -89,7 +98,7 @@
           <!-- <p class="text-heading font-semibold md:text-sm text-xs whitespace-nowrap">Availability :</p> -->
           <p class="md:text-sm text-xs whitespace-nowrap font-medium">
             {#if product?.stockQuantity > 0}
-              Instock <Icon
+              In Stock <Icon
                 icon="ix:success-filled"
                 class="text-base text-green-500 inline font-bold"
               />
@@ -150,14 +159,16 @@
               <span class="font-medium text-xs">
                 {#if $currencyState === "usd"}
                   $ {(
-                    product?.priceSize[index]?.USD * quantity ?? 0
+                    (Number(product?.priceSize[index]?.USD) || 0) *
+                    (Number(quantity) || 0)
                   ).toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 {:else}
                   ₹ {(
-                    product?.priceSize[index]?.INR * quantity ?? 0
+                    (Number(product?.priceSize[index]?.INR) || 0) *
+                    (Number(quantity) || 0)
                   ).toLocaleString("en-IN", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
@@ -173,11 +184,15 @@
               <span class="font-medium text-xs">
                 {#if $currencyState === "usd"}
                   $ {(
-                    product?.priceSize[index]?.USD * 0.18 * quantity ?? 0
+                    (Number(product?.priceSize[index]?.USD) || 0) *
+                    0.18 *
+                    (Number(quantity) || 0)
                   ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 {:else}
                   ₹ {(
-                    product?.priceSize[index]?.INR * 0.18 * quantity ?? 0
+                    (Number(product?.priceSize[index]?.INR) || 0) *
+                    0.18 *
+                    (Number(quantity) || 0)
                   ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 {/if}
               </span>
@@ -190,11 +205,15 @@
               <span class="font-semibold text-xs">
                 {#if $currencyState === "usd"}
                   $ {(
-                    product?.priceSize[index]?.USD * 1.18 * quantity ?? 0
+                    (Number(product?.priceSize[index]?.USD) || 0) *
+                    1.18 *
+                    (Number(quantity) || 0)
                   ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 {:else}
                   ₹ {(
-                    product?.priceSize[index]?.INR * 1.18 * quantity ?? 0
+                    (Number(product?.priceSize[index]?.INR) || 0) *
+                    1.18 *
+                    (Number(quantity) || 0)
                   ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 {/if}
               </span>
@@ -212,44 +231,44 @@
           ><Icon icon="ic:round-minus" class="text-2xl" /></button
         >
         <input
-        type="text"
-        min="1"
-        maxlength="3"
-        bind:value={quantity}
-        class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
-        on:focus={(e) => {
-          setTimeout(() => e.target.select(), 10);
-        }}
-        on:blur={(e) => {
-          if (!e.target.value || parseInt(e.target.value, 10) < 1) {
-            quantity = 1;
-            e.target.value = "1";
-          }
-        }}
-        on:input={(e) => {
-          e.target.value = e.target.value.replace(/[^1-9]/g, "");
+          type="text"
+          min="1"
+          maxlength="3"
+          bind:value={quantity}
+          class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
+          on:focus={(e) => {
+            setTimeout(() => e.target.select(), 10);
+          }}
+          on:blur={(e) => {
+            if (!e.target.value || parseInt(e.target.value, 10) < 1) {
+              quantity = 1;
+              e.target.value = "1";
+            }
+          }}
+          on:input={(e) => {
+            e.target.value = e.target.value.replace(/[^1-9]/g, "");
             if (e.target.value === "") {
-            quantity = "";
-            return;
-          }
-      
-          if (e.target.value.startsWith("0") && e.target.value.length > 1) {
-            e.target.value = e.target.value.slice(1);
-          }
-      
-          const parsedValue = parseInt(e.target.value, 10);
-      
-          if (parsedValue > 999) {
-            quantity = 999;
-            e.target.value = "999";
-          } else {
-            quantity = parsedValue;
-          }
-          updateQuantity(e);
-        }}
-        aria-label="Quantity"
-        max="999"
-      />
+              quantity = "";
+              return;
+            }
+
+            if (e.target.value.startsWith("0") && e.target.value.length > 1) {
+              e.target.value = e.target.value.slice(1);
+            }
+
+            const parsedValue = parseInt(e.target.value, 10);
+
+            if (parsedValue > 999) {
+              quantity = 999;
+              e.target.value = "999";
+            } else {
+              quantity = parsedValue;
+            }
+            updateQuantity(e);
+          }}
+          aria-label="Quantity"
+          max="999"
+        />
         <button
           on:click={increaseQuantity}
           class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
@@ -277,5 +296,5 @@
   </div>
 {/each}
 {#if showCartPopup}
-<ShowCartPopup {data} {cartTogglePopup} {addedQuantity} {index} />
+  <ShowCartPopup {data} {cartTogglePopup} {addedQuantity} {index} />
 {/if}

@@ -58,20 +58,10 @@
     };
   });
 
-  // console.log(RelatedProductData,"RelatedProductData from svelte");
-
   let currentIndex = 0;
   let logosPerSlide = 4;
   let totalSlides = Math.ceil(RelatedProductData.length / logosPerSlide);
 
-  // function prevSlide() {
-  //   currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-  // }
-
-  // function nextSlide() {
-  //   currentIndex = (currentIndex + 1) % totalSlides;
-  // }
-  // Modify these two functions
   function prevSlide() {
     if (currentIndex > 0) {
       currentIndex = (currentIndex - 1) % totalSlides;
@@ -156,18 +146,6 @@
     showModal = false;
   }
 
-  // function selectPrice(index, size) {
-  //   selectedPrice = selectedProduct.priceSize[index];
-  //   selectedPriceIndex = index;
-  //   selectedStockId = selectedProduct.stockId[index] || "NA";
-
-  //   // console.log("Selected Price:", selectedPrice);
-  //   // console.log("Updated Stock ID:", selectedStockId);
-  // }
-
-  // console.log('Selected Product:', selectedProduct);
-  //       console.log('Variants:', selectedProduct?.variants);
-  //       console.log('Price Size:', selectedProduct?.priceSize);
   let popupQuantity = 1;
 
   function decrementPopupQuantity() {
@@ -192,30 +170,6 @@
     selectedPriceIndex = index;
     selectedStockId = selectedProduct.stockId[index] || "NA";
   }
-
-  // function handlePopupInput(event) {
-  //   let value = event.target.value;
-
-  //   // Remove non-numeric characters
-  //   value = value.replace(/\D/g, "");
-
-  //   // Convert to integer
-  //   value = parseInt(value, 10);
-
-  //   // Ensure value is within limits
-  //   if (isNaN(value) || value < 1) {
-  //     popupQuantity = null;
-  //   } else if (value > 999) {
-  //     popupQuantity = 999;
-  //   } else {
-  //     popupQuantity = value;
-  //   }
-
-  //   // Update input field value to prevent invalid entries
-  //   event.target.value = popupQuantity;
-
-  //   selectedProduct.quantity = popupQuantity;
-  // }
 
   function handlePopupInput(event) {
     const value = parseInt(event.target.value, 10);
@@ -531,12 +485,12 @@
               prices. View more details below.
             </p>
 
-              <button
-                on:click={viewProduct}
-                class="bg-primary-500 py-2 px-4 hover:bg-primary-600 text-sm rounded text-white mt-2"
-              >
-                View Products
-              </button>
+            <button
+              on:click={viewProduct}
+              class="bg-primary-500 py-2 px-4 hover:bg-primary-600 text-sm rounded text-white mt-2"
+            >
+              View Products
+            </button>
           {/if}
 
           {#if selectedProduct?.variants?.length === 0}
@@ -545,9 +499,10 @@
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start"
               >
                 <p class="text-sm sm:text-lg ml-2">
-                  Price: <span class="font-semibold text-md">
+                  Price:
+                  <span class="font-semibold text-md">
                     {#if $currencyState === "inr"}
-                      ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString(
+                      ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
                         "en-IN",
                         {
                           minimumFractionDigits: 2,
@@ -555,7 +510,7 @@
                         }
                       )}
                     {:else if $currencyState === "usd"}
-                      $ {(selectedPrice?.priceUSD ?? 0).toLocaleString(
+                      $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
                         "en-US",
                         {
                           minimumFractionDigits: 2,
@@ -606,9 +561,10 @@
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start mb-4"
               >
                 <p class="text-sm sm:text-lg ml-2">
-                  Price: <span class="font-semibold text-md">
+                  Price:
+                  <span class="font-semibold text-md">
                     {#if $currencyState === "usd"}
-                      $ {(selectedPrice?.priceUSD ?? 0).toLocaleString(
+                      $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
                         "en-US",
                         {
                           minimumFractionDigits: 2,
@@ -616,7 +572,7 @@
                         }
                       )}
                     {:else}
-                      ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString(
+                      ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
                         "en-IN",
                         {
                           minimumFractionDigits: 2,
@@ -783,8 +739,8 @@
               <p class="text-base font-semibold text-gray-800">
                 {#if $currencyState === "usd"}
                   $ {(
-                    (selectedPrice?.priceUSD ?? 0) *
-                    popupQuantity *
+                    Number(selectedPrice?.priceUSD || 0) *
+                    Number(popupQuantity || 1) *
                     1.18
                   ).toLocaleString("en-US", {
                     minimumFractionDigits: 2,
@@ -792,8 +748,8 @@
                   })}
                 {:else}
                   ₹ {(
-                    (selectedPrice?.priceINR ?? 0) *
-                    popupQuantity *
+                    Number(selectedPrice?.priceINR || 0) *
+                    Number(popupQuantity || 1) *
                     1.18
                   ).toLocaleString("en-IN", {
                     minimumFractionDigits: 2,
@@ -810,15 +766,21 @@
             <div class="flex flex-col items-center gap-1 mt-1">
               <p class="text-sm font-bold text-gray-500">
                 {#if $currencyState === "usd"}
-                  $ {(selectedPrice?.priceUSD ?? 0).toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
+                    "en-US",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
                 {:else}
-                  ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString("en-IN", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
+                    "en-IN",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
                 {/if}
               </p>
               <p class="text-xs text-gray-400">without GST</p>

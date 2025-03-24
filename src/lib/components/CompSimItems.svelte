@@ -512,12 +512,12 @@
               prices. View more details below.
             </p>
 
-              <button
-                on:click={viewProduct}
-                class="bg-primary-500 py-2 px-4 hover:bg-primary-600 text-sm rounded text-white mt-2"
-              >
-                View Products
-              </button>
+            <button
+              on:click={viewProduct}
+              class="bg-primary-500 py-2 px-4 hover:bg-primary-600 text-sm rounded text-white mt-2"
+            >
+              View Products
+            </button>
           {/if}
 
           {#if selectedProduct?.variants?.length === 0}
@@ -528,7 +528,7 @@
                 <p class="text-sm sm:text-lg ml-2">
                   Price: <span class="font-semibold text-md">
                     {#if $currencyState === "inr"}
-                      ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString(
+                      ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
                         "en-IN",
                         {
                           minimumFractionDigits: 2,
@@ -536,7 +536,7 @@
                         }
                       )}
                     {:else if $currencyState === "usd"}
-                      $ {(selectedPrice?.priceUSD ?? 0).toLocaleString(
+                      $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
                         "en-US",
                         {
                           minimumFractionDigits: 2,
@@ -587,7 +587,7 @@
                 <p class="text-sm sm:text-lg ml-2">
                   Price: <span class="font-semibold text-md">
                     {#if $currencyState === "usd"}
-                      $ {(selectedPrice?.priceUSD ?? 0).toLocaleString(
+                      $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
                         "en-US",
                         {
                           minimumFractionDigits: 2,
@@ -595,7 +595,7 @@
                         }
                       )}
                     {:else}
-                      ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString(
+                      ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
                         "en-IN",
                         {
                           minimumFractionDigits: 2,
@@ -777,8 +777,8 @@
               <p class="text-base font-semibold text-gray-800">
                 {#if $currencyState === "usd"}
                   $ {(
-                    (selectedPrice?.priceUSD ?? 0) *
-                    popupQuantity *
+                    (Number(selectedPrice?.priceUSD) || 0) *
+                    (Number(popupQuantity) || 0) *
                     1.18
                   ).toLocaleString("en-US", {
                     minimumFractionDigits: 2,
@@ -786,8 +786,8 @@
                   })}
                 {:else}
                   ₹ {(
-                    (selectedPrice?.priceINR ?? 0) *
-                    popupQuantity *
+                    (Number(selectedPrice?.priceINR) || 0) *
+                    (Number(popupQuantity) || 0) *
                     1.18
                   ).toLocaleString("en-IN", {
                     minimumFractionDigits: 2,
@@ -804,15 +804,21 @@
             <div class="flex flex-col items-center gap-1 mt-1">
               <p class="text-sm font-bold text-gray-500">
                 {#if $currencyState === "usd"}
-                  $ {(selectedPrice?.priceUSD ?? 0).toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
+                    "en-US",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
                 {:else}
-                  ₹ {(selectedPrice?.priceINR ?? 0).toLocaleString("en-IN", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
+                    "en-IN",
+                    {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }
+                  )}
                 {/if}
               </p>
               <p class="text-xs text-gray-400">without GST</p>

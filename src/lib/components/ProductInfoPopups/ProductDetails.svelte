@@ -464,7 +464,7 @@
             </div>
           {/if}
 
-          {#if !authedEmail}
+          <!-- {#if !authedEmail}
             <div
               class="p-2 bg-green-100 rounded-sm text-heading font-medium text-xs text-center !mt-6"
             >
@@ -474,7 +474,7 @@
                 </span>
               </a> to View Organizational & Contract Pricing
             </div>
-          {/if}
+          {/if} -->
         </div>
 
         {#if product.productSynonym}
@@ -491,18 +491,18 @@
           <div class="flex justify-between {!authedEmail ? '!mt-6' : '!mt-3'} ">
             <p class="text-gray-900 text-lg font-semibold text-start">
               {#if $currencyState === "usd"}
-                $ {minPrice.USD.toLocaleString("en-US", {
+                $ {(Number(minPrice.USD) || 0).toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                })} - $ {maxPrice.USD.toLocaleString("en-US", {
+                })} - $ {(Number(maxPrice.USD) || 0).toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
               {:else}
-                ₹ {minPrice.INR.toLocaleString("en-IN", {
+                ₹ {(Number(minPrice.INR) || 0).toLocaleString("en-IN", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
-                })} - ₹ {maxPrice.INR.toLocaleString("en-IN", {
+                })} - ₹ {(Number(maxPrice.INR) || 0).toLocaleString("en-IN", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
@@ -559,7 +559,7 @@
 
                   <div class="col-span-1 p-2 text-left">
                     {#if product?.stockQuantity > 0}
-                      Instock
+                      In Stock
                       <Icon
                         icon="ix:success-filled"
                         class="text-base text-green-500 inline font-bold mb-1"
@@ -576,12 +576,12 @@
                     class="col-span-1 p-2 text-left whitespace-nowrap overflow-hidden"
                   >
                     {#if $currencyState === "usd"}
-                      $ {(priceItem.USD ?? 0).toLocaleString("en-US", {
+                      $ {(Number(priceItem.USD) || 0).toLocaleString("en-US", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
                     {:else}
-                      ₹ {(priceItem.INR ?? 0).toLocaleString("en-IN", {
+                      ₹ {(Number(priceItem.INR) || 0).toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
@@ -611,12 +611,12 @@
                 </div>
                 <div class="text-sm text-gray-700">
                   {#if $currencyState === "usd"}
-                    $ {(priceItem.USD ?? 0).toLocaleString("en-US", {
+                    $ {(Number(priceItem.USD) || 0).toLocaleString("en-US", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
                   {:else}
-                    ₹ {(priceItem.INR ?? 0).toLocaleString("en-IN", {
+                    ₹ {(Number(priceItem.INR) || 0).toLocaleString("en-IN", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
