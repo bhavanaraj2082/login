@@ -394,7 +394,7 @@ export const checkoutOrder = async (order) => {
 		}
 	} catch (error) {
 		//console.error('Error creating order:', error);
-		return { success: false, message: 'Something went wrong' };
+		return { success: false, message: 'Something went wrong',error };
 	}
 };
 
