@@ -65,40 +65,32 @@
             bind:value={quantity}
             class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
             on:focus={(e) => {
-              const currentValue = e.target.value;
-              setTimeout(() => {
-                e.target.select();
-              }, 10);
+              setTimeout(() => e.target.select(), 10);
             }}
             on:blur={(e) => {
-              if (
-                e.target.value === "" ||
-                e.target.value === "0" ||
-                e.target.value === "00" ||
-                e.target.value === "000"
-              ) {
+              if (!e.target.value || parseInt(e.target.value, 10) < 1) {
                 quantity = 1;
                 e.target.value = "1";
               }
             }}
             on:input={(e) => {
-              e.target.value = e.target.value.replace(/[^0-9]/g, "");
+              e.target.value = e.target.value.replace(/[^1-9]/g, "");
+              if (e.target.value === "") {
+                quantity = "";
+                return;
+              }
+
               if (e.target.value.startsWith("0") && e.target.value.length > 1) {
                 e.target.value = e.target.value.slice(1);
               }
               const parsedValue = parseInt(e.target.value, 10);
 
-              if (parsedValue >= 1 && parsedValue <= 999) {
+              if (parsedValue > 999) {
+                quantity = 999;
+                e.target.value = "999";
+              } else {
                 quantity = parsedValue;
               }
-              // else if (e.target.value === "") {
-              //   quantity = 1;
-              // }
-              else {
-                quantity = e.target.value === "" || parsedValue < 1 ? 1 : 0;
-                e.target.value = quantity === 1 ? "1" : "";
-              }
-
               updateQuantity(e);
             }}
             aria-label="Quantity"
@@ -163,7 +155,7 @@
           <div class="flex items-center space-x-2">
             <Icon
               icon="meteor-icons:circle-xmark"
-              class="text-sm text-primary-400"
+              class="text-sm text-primary-500"
             />
             <p>{stockAvailability}</p>
           </div>

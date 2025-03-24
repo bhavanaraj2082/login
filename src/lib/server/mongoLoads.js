@@ -1022,7 +1022,7 @@ export async function DifferentProds(productId) {
   let stockId = [];
   let stock = 0;
   let distributorId = "";
-  let sku = "";
+  let sku = [];
 
   if (productid) {
     const stockRecords = await Stock.find({ productid }).exec(); 
@@ -1031,7 +1031,9 @@ export async function DifferentProds(productId) {
         if (typeof stockRecord.stock !== "undefined") {
           stockQuantity = stockRecord.stock;
           orderMultiple = stockRecord.orderMultiple;
-          sku = stockRecord.sku; // Fetch SKU
+          if (stockRecord.sku) {
+            sku.push(stockRecord.sku);
+          }
 
           const convertedPricing = await convertToINR(stockRecord.pricing);
           const { break: breakPoint, offer, ...currencies } = stockRecord.pricing;
