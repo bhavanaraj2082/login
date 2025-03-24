@@ -14,6 +14,7 @@
 	import AllowCookies from '$lib/components/AllowCookies.svelte';
 
 	export let data;
+	// console.log(data);
     $authedUser = data?.authedUser;
 	//let cartData;
 	// $:console.log(data,"---------")
