@@ -512,7 +512,7 @@ function handleMouseLeave() {
 							}
 						}}
 						class="fixed inset-0 bg-gray-900 bg-opacity-10 backdrop-blur-xs flex items-center justify-center z-50">
-						<div class="bg-white rounded-lg shadow-md p-6 mx-4 w-full md:w-1/2 lg:w-1/3">
+						<div class="bg-white rounded-lg shadow-md p-6 mx-4 w-full xs:w-2/3 md:w-1/2 lg:w-2/5">
 							<div class="flex justify-end items-center mb-2">
 								<button
 									on:click={closePopup}
@@ -522,7 +522,7 @@ function handleMouseLeave() {
 								</button>
 							</div>
 							<!-- svelte-ignore a11y-img-redundant-alt -->
-							<img src={selectedImage} alt="image" onerror="this.src='/partskeys.jpeg'" class="" />
+							<img src={selectedImage} alt="image" onerror="this.src='/partskeys.jpeg'" class=" w-56 h-56 md:w-96 md:h-96 mx-auto object-cover" />
 						</div>
 					</div>
 				{/if}
