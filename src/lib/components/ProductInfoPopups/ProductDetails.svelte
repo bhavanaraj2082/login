@@ -1,8 +1,8 @@
 <script>
-  import { addItemToCart} from "$lib/stores/cart.js";
+  import { addItemToCart } from "$lib/stores/cart.js";
   import { sendMessage } from "$lib/utils.js";
   import { invalidate } from "$app/navigation";
-  import { enhance} from "$app/forms";
+  import { enhance } from "$app/forms";
   import Imageinfo from "./Imageinfo.svelte";
   import Icon from "@iconify/svelte";
   import { currencyState } from "$lib/stores/mainStores.js";
@@ -190,7 +190,7 @@
       manufacturerId: product.manufacturer._id,
       distributorId: product.distributorId,
       stockId: selectedStockId || "NA",
-      quantity: quantity, 
+      quantity: quantity,
       backOrder,
     };
     addedQuantity = quantity;
@@ -426,14 +426,12 @@
           {/if}
         </div>
         <div class="space-y-2">
-          <!-- ✅ Product Name -->
           <h1
             class="text-heading font-semibold md:text-xl text-base !mt-0 leading-tight"
           >
             {product?.productName}
           </h1>
 
-          <!-- ✅ Manufacturer Name -->
           {#if product?.manufacturer?.name && product?.manufacturer?.name !== ""}
             <p class="text-gray-800 font-medium text-sm leading-relaxed">
               Manufacturer: <span class="font-normal"
@@ -442,21 +440,18 @@
             </p>
           {/if}
 
-          <!-- ✅ CAS Number -->
           {#if product?.CAS && product?.CAS !== ""}
             <p class="text-gray-800 font-medium text-sm leading-relaxed">
               CAS Number: <span class="font-normal">{product?.CAS}</span>
             </p>
           {/if}
 
-          <!-- ✅ Product Description -->
           {#if product?.prodDesc && product.prodDesc !== ""}
             <p class="text-gray-500 text-sm leading-relaxed">
               {product?.prodDesc}
             </p>
           {/if}
 
-          <!-- ✅ Return Policy -->
           {#if !product?.returnPolicy}
             <div
               class="flex items-center gap-2 text-red-500 font-medium text-sm mt-2"
@@ -469,7 +464,6 @@
             </div>
           {/if}
 
-          <!-- ✅ Sign-In Prompt -->
           {#if !authedEmail}
             <div
               class="p-2 bg-green-100 rounded-sm text-heading font-medium text-xs text-center !mt-6"
@@ -536,13 +530,10 @@
                   class={`w-full grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-600 cursor-pointer transition-transform border border-gray-100 rounded-sm ${index === i ? "border md:border-l-6 lg:border bg-primary-100 border-gray-200" : "border-none"}`}
                   on:click={() => handleThumbnailClick(i, product)}
                 >
-                  <div class="col-span-1 p-2 text-left">
+                  <div class="col-span-1 p-2 pl-1 text-left">
                     {priceItem?.break}
                   </div>
-                  <div
-                    class="col-span-1 p-2 text-left whitespace-nowrap relative"
-                  >
-                    <!-- ✅ Custom Toast (Appears above the copied product number) -->
+                  <div class="col-span-1 p-2 text-left relative">
                     {#if copyToastIndex === i}
                       <div
                         class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-500 text-white py-1 px-2 rounded text-xs"
@@ -551,32 +542,35 @@
                       </div>
                     {/if}
 
-                    <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <!-- svelte-ignore a11y-no-static-element-interactions -->
-                    <span
-                      on:click={() =>
-                        copyProductNumber(product?.productNumber, i)}
-                      class="hover:bg-blue-200 p-0.5 cursor-pointer rounded-sm"
-                    >
-                      {product?.productNumber}
-                    </span>
+                    {#if product?.sku[i]}
+                      <!-- svelte-ignore a11y-click-events-have-key-events -->
+                      <span
+                        on:click={() => {
+                          handleThumbnailClick(i, product);
+                          copyProductNumber(product.sku[i], i);
+                        }}
+                        class="hover:bg-blue-200 p-0.5 cursor-pointer rounded-sm block sm:inline break-all"
+                      >
+                        {product.sku[i]}
+                      </span>
+                    {/if}
                   </div>
-                  <div
-                    class="flex flex-row flex-wrap items-center justify-center"
-                  >
-                    <span class="items-center pr-8 whitespace-nowrap">
-                      {#if product?.stockQuantity > 0}
-                        Available <Icon
-                          icon="ix:success-filled"
-                          class="text-base text-green-500 inline font-bold mb-1"
-                        />
-                      {:else}
-                        Out of stock <Icon
-                          icon="ix:error-filled"
-                          class="text-base text-red-500 font-bold inline mb-1"
-                        />
-                      {/if}
-                    </span>
+
+                  <div class="col-span-1 p-2 text-left">
+                    {#if product?.stockQuantity > 0}
+                      Instock
+                      <Icon
+                        icon="ix:success-filled"
+                        class="text-base text-green-500 inline font-bold mb-1"
+                      />
+                    {:else}
+                      Out of stock
+                      <Icon
+                        icon="ix:error-filled"
+                        class="text-base text-red-500 font-bold inline mb-1"
+                      />
+                    {/if}
                   </div>
                   <div
                     class="col-span-1 p-2 text-left whitespace-nowrap overflow-hidden"
@@ -673,7 +667,13 @@
   {/if}
 {/each}
 {#if showQuoteModal}
-  <ShowQuoteModal {profile} {productName} {toggleQuoteModal} {form5} {productQuote} />
+  <ShowQuoteModal
+    {profile}
+    {productName}
+    {toggleQuoteModal}
+    {form5}
+    {productQuote}
+  />
 {/if}
 {#each data.records as record}
   {#if record?.variants && record?.variants?.length > 0}

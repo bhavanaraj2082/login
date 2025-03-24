@@ -158,7 +158,7 @@
           max="999"
           name="units"
           bind:value={units}
-          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
           placeholder="Units Required"
           on:input={() => {
             if (!units || units < 1 || units > 999) {
@@ -180,7 +180,7 @@
           type="text"
           name="Firstname"
           bind:value={firstName}
-          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm mt-1 placeholder:text-sm"
           placeholder="First Name"
           on:input={() => {
             if (!firstName.trim()) {
@@ -204,7 +204,7 @@
           type="text"
           name="lastname"
           bind:value={lastName}
-          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 text-sm placeholder:text-sm"
           placeholder="Last Name"
           on:input={() => {
             if (!lastName.trim()) {
@@ -229,7 +229,7 @@
           type="text"
           name="organisation"
           bind:value={organisation}
-          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
           placeholder="Organisation Name"
           on:input={() => {
             if (!organisation.trim()) {
@@ -254,7 +254,7 @@
           type="tel"
           name="phone"
           bind:value={phone}
-          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
           placeholder="Phone Number"
           on:input={() => {
             if (!phone.trim()) {
@@ -319,7 +319,7 @@
               type="email"
               name="email"
               bind:value={email}
-              class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
               placeholder="Your email"
               on:input={() => {
                 if (!email.trim()) {
@@ -455,7 +455,7 @@
           class="block text-sm font-medium text-gray-700">Message</label
         >
         <textarea
-          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
           placeholder="Your message"
           name="futherdetails"
         ></textarea>
@@ -474,13 +474,13 @@
       <div class="flex justify-between items-center mt-4">
         <button
           on:click={toggleQuoteModal}
-          class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition duration-300 ease-in-out"
+          class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-5 rounded"
         >
           ✖ Close
         </button>
         <button
           type="submit"
-          class="bg-gradient-to-r from-primary-400 to-primary-500 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
+          class="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded py-2 px-6"
         >
           Submit
         </button>

@@ -160,12 +160,15 @@
                       Request Quote
                     </button>
                     <div
-                      class="absolute left-1/2 bottom-full border border-gray-300 mb-1 w-60 -translate-x-1/2 hidden group-hover:block bg-white text-heading text-xs px-3 py-2 rounded shadow-lg text-center"
+                      class="absolute left-1/2 bottom-full border border-gray-300 mb-2.5 w-60 -translate-x-1/2 hidden group-hover:block bg-white text-heading text-xs px-3 py-2 rounded shadow-lg text-center"
                     >
-                      This product's price is unavailable click to request a
+                      This product's price is unavailable, click to request a
                       quote
                       <div
-                        class="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-500"
+                        class="absolute left-1/2 top-full -translate-x-1/2 w-3 h-3
+                      border-l-[8px] border-l-transparent
+                      border-r-[8px] border-r-transparent
+                      border-t-[8px] border-t-white"
                       ></div>
                     </div>
                   </div>
