@@ -36,7 +36,7 @@ export const load = async ({ locals }) => {
         lastname: profileData.profileData?.lastName || '',
         phone: profileData.profileData?.cellPhone || ''
       },
-      profile: profileData.profileData,
+      // profile: profileData.profileData,
       orders: userData.orders || [],
       // quotes: userData.quotes || [],
 	    // favourites: userData.favourites || [],

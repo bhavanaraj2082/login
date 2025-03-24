@@ -18,8 +18,7 @@
       <img 
         src={imageSrc} 
         alt={altText} 
-        class="w-full h-48 object-cover"
-      />
+        class="w-full h-48 object-cover"/>
       <div class="p-4">
         <h3 class="text-xl font-semibold text-gray-800">{name}</h3>
         <p class="mt-2 text-gray-600 text-justify">{getTruncatedDescription(description)}</p>

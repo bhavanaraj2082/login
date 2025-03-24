@@ -69,7 +69,7 @@
       class="text-primary-400 mb-4"
     />
     <h3 class="text-xl font-medium text-gray-900 mb-2">
-      No Search related Category available
+      No Search related sub Category available
     </h3>
     <p class="text-gray-500 max-w-md">
       We couldn't find any categories matching your search criteria. Please

@@ -48,7 +48,7 @@
 	<div class="text-center mb-16 mx-2">
 		<h2 class="text-2xl font-extrabold text-gray-800 mb-6">Advanced Features</h2>
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-			{#each [{ icon: 'ph:test-tube-fill', title: 'Select custom solution type', desc: 'Customers can choose the specific type of solution that fits their needs. By this customers can tailor their choices based on their unique requirements.' }, { icon: 'wpf:edit-file', title: 'Select custom format', desc: 'You can actively choose your preferences between a pure substance or a solvent substance. ' }, { icon: 'hugeicons:test-tube', title: 'Configure custom solution', desc: 'Easily upload file format (XLSX) , download example XLSX and create your quote.' }, { icon: 'material-symbols:add-notes-outline-rounded', title: 'Additional notes', desc: 'You can describe your preferences with more detail under additional notes.' }, { icon: 'ph:user-list', title: 'Customer details', desc: 'A customer can fill in their details, which helps personalization and ensure smooth communication.' }, { icon: 'material-symbols-light:delivery-truck-speed-outline-rounded', title: 'Delivery information', desc: 'Customers can provide their delivery details to ensure accurate shipping, timely updates, and a seamless order fulfillment process..' }] as feature}
+			{#each [{ icon: 'ph:test-tube-fill', title: 'Select custom solution type', desc: 'Customers can choose the specific type of solution that fits their needs. By this customers can tailor their choices based on their unique requirements.' }, { icon: 'wpf:edit-file', title: 'Select custom format', desc: 'You can actively choose your preferences between a pure substance or a solvent substance. ' }, { icon: 'hugeicons:test-tube', title: 'Configure custom solution', desc: 'Easily upload file format (XLSX) , download example XLSX and create your quote.' }, { icon: 'material-symbols:add-notes-outline-rounded', title: 'Additional notes', desc: 'You can describe your preferences with more detail under additional notes.' }, { icon: 'ph:user-list-bold', title: 'Customer details', desc: 'A customer can fill in their details, which helps personalization and ensure smooth communication.' }, { icon: 'material-symbols:delivery-truck-speed-outline-rounded', title: 'Delivery information', desc: 'Customers can provide their delivery details to ensure accurate shipping, timely updates, and a seamless order fulfillment process..' }] as feature}
 				<div
 					class="flex flex-col items-center text-center border rounded-md p-6 shadow hover:shadow-md transition-shadow">
 					<Icon icon={feature.icon} class="text-primary-300 text-5xl mb-4" />
@@ -70,8 +70,8 @@
                 <li><strong>Delivery Information:</strong> Can provide address, postal code, and GST</li>
             </ul>
 			<p class="md:text-sm text-xs">
-				<a href="/signin" class="text-primary-400 hover:underline underline-offset-2">Login</a> or
-				<a href="/signup" class="text-primary-400 hover:underline underline-offset-2">Register</a> to access all the features
+				<a href="/signin" class="text-primary-500 hover:underline underline-offset-2">Sign In</a> or
+				<a href="/signup" class="text-primary-500 hover:underline underline-offset-2">Sign Up</a> to access all the features
 				of My Quote.
 			</p>
 		</div>
@@ -93,9 +93,9 @@
 		<p class="md:text-sm text-xs font-medium text-gray-700 mb-2">We love having you here!</p>
 		<h3 class="md:text-sm text-xs font-medium mb-6">
 			To Create a Quote, you need to be registered. Please 
-			<a href="/signin" class="text-primary-400 hover:underline underline-offset-2">Login</a> 
+			<a href="/signin" class="text-primary-500 hover:underline underline-offset-2">Sign In</a> 
 			or 
-			<a href="/signup" class="text-primary-400 hover:underline underline-offset-2">Register</a>.
+			<a href="/signup" class="text-primary-500 hover:underline underline-offset-2">Sign Up</a>.
 		</h3>
 		<button
 			on:click={() => (logInPopup = false)}
@@ -103,6 +103,5 @@
 			Close
 		</button>
 	</div>
-	
 	</div>
 {/if}

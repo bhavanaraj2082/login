@@ -4,7 +4,7 @@
     export let PopularProducts;
 </script>
 
-<section class="w-11/12 mx-auto py-12 max-w-7xl rounded-lg">
+<section class="w-11/12 mx-auto pb-4 max-w-7xl">
     <div class="flex flex-wrap w-full justify-between py-6">
         <div class="sm:w-3/6 w-full pb-4">
             <h1 class="text-xl font-bold">Most Popular Products</h1>
@@ -17,7 +17,7 @@
         <div class="flex items-center gap-2 mt-3">
             <a
                 href="/products"
-                class="flex text-sm justify-center items-center font-medium rounded-md bg-primary-400 text-gray-100 px-10 hover:bg-primary-500 p-2">
+                class="flex text-sm justify-center items-center font-medium rounded-md bg-primary-400 text-gray-100 px-10 hover:bg-primary-500 p-2 transition-all duration-300">
                 View All
                 <Icon icon="zondicons:cheveron-right" class=" text-lg"/>
             </a>

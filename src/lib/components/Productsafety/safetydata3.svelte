@@ -4,9 +4,9 @@
     <div class="flex flex-col md:flex-row">
       
       <div class="w-full p-5">
-        <!-- <h1 class="text-2xl font-bold mb-6">
+        <h1 class="text-xl font-semibold mb-6">
           TSCA 8 Notification
-        </h1> -->
+        </h1>
 
         <p class=" mb-4 sm:text-sm text-justify text-xs">
           Thank you for your interest. Unfortunately, the webform you are accessing is no longer available.

@@ -9,11 +9,11 @@
             </p>
             <div class="flex md:justify-start justify-center gap-8 mt-3">
             <a href="/products" 
-                class="px-6 rounded bg-primary-400 text-primary-50 text-xs py-2 font-semibold hover:bg-primary-400 transition">
+                class="px-6 rounded bg-primary-400 text-primary-50 text-xs py-2 font-semibold hover:bg-primary-500 hover:text-primary-50 transition-all duration-300">
                 Shop Now
             </a>
             <a href="/products" 
-                class="px-6 rounded border border-primary-400 text-primary-400 bg-primary-50 text-xs py-2 font-semibold hover:bg-primary-400 hover:text-primary-50 transition" >
+                class="px-6 rounded border border-primary-500 text-primary-400 bg-primary-50 text-xs py-2 font-semibold hover:bg-primary-500 hover:text-primary-50 transition-all duration-300 " >
                 View All
             </a>
         </div>
@@ -22,7 +22,7 @@
                 <img 
                     src="/hero.webp"
                     class="w-full "  
-                    alt="img" />
+                    alt="CHEMIKART" />
             </div>
     </section>
 </div>
