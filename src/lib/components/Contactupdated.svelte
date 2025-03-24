@@ -803,6 +803,12 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 					};
 				}}
 			>
+			<input
+										type="hidden"
+										name="country"
+										id="country"
+										bind:value={country}
+									/>
 				<section class="flex flex-col md:flex-row p-2">
 					<div class="md:w-2/5 p-0 mt-0 ">
 						<div class="flex items-start sm:mt-6 mt-3 sm:mb-6 mb-3 sm:ml-4 ml-0">
@@ -1255,7 +1261,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 											>Phone number is required</span
 										>
 									{/if}
-									{#if phone.length > 0 && !validatePhoneNumber(country, phone)}
+									{#if phone?.length > 0 && !validatePhoneNumber(country, phone)}
 										<span
 											class="text-red-500 sm:text-xs text-2s font-medium "
 											>Please enter a valid phone number

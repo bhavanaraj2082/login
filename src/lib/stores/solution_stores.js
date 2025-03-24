@@ -17,7 +17,7 @@ export const Cusdetails = writable({
     LastName: '',
     Organisation: '',
     Country: '',
-    LGC: '',
+    // LGC: '',
     Email: '',
     Number: '',
 });
@@ -51,7 +51,7 @@ export function resetFormData() {
         LastName: '',
         Organisation: '',
         Country: '',
-        LGC: '',
+        // LGC: '',
         Email: '',
         Number: '',
     });

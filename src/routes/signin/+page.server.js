@@ -115,8 +115,7 @@ export const actions = {
 	},
 
 	verifyOtp: async ({ request, cookies }) => {
-		const redirectUrls =
-		cookies.get('redirectUrl') || "/dashboard";
+		
 		const body = Object.fromEntries(await request.formData());
 		const { email, enteredOtp } = body;
 		if (!email) {
@@ -167,7 +166,9 @@ export const actions = {
 
 			const sessionCookie = auth.createSessionCookie(session);
 			cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-			const redirectTo = '/dashboard';
+
+			const redirectUrls =cookies.get('redirectUrl') || "/dashboard";
+			const redirectTo = redirectUrls;
 
 			return { type: 'success', redirectTo };
 		} catch (error) {

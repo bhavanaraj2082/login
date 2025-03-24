@@ -1229,7 +1229,7 @@ export const Addquotes = async (data) => {
             Lastname: data.last,
             organisation: data.organisation,
 			country: data.country,
-            invoiceNumber: data.lgc,
+            // invoiceNumber: data.lgc,
             email: data.email,
             number: data.number
 			// userId: data.userId

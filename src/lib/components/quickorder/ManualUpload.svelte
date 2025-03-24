@@ -1520,7 +1520,7 @@
             >
               <Icon icon="ic:round-plus" class="text-xl" />
             </button>
-            <div class="flex justify-end w-full">
+            <!-- <div class="flex justify-end w-full">
               <button
                 type="submit"
                 class="bg-primary-400 text-white p-2 rounded flex items-center space-x-1"
@@ -1532,7 +1532,20 @@
                   <span class="text-sm">Check Availability</span>
                 {/if}
               </button>
+            </div> -->
+            <div class="flex justify-end w-full">
+              <button
+                type="submit"
+                class="bg-primary-400 text-white p-2 rounded flex items-center justify-center w-full sm:w-[160px] min-h-[40px]"
+              >
+                <span class="{checking ? 'hidden' : 'flex items-center space-x-1'}">
+                  <Icon icon="tabler:calendar-check" class="text-lg" />
+                  <span class="text-sm">Check Availability</span>
+                </span>
+                <span class="{checking ? 'block' : 'hidden'}">Checking...</span>
+              </button>
             </div>
+            
           </div>
           <p class="mt-4 text-sm text-gray-600 flex items-center">
             <span class="ml-2">{stockStatus}</span>
