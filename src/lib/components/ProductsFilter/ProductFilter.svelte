@@ -471,7 +471,7 @@ function handleMouseLeave() {
         {:else}
        {#each paginatedProducts as product,index}
         <div class=" relative bg-white shadow p-2 sm:p-4 md:px-8 space-y-2 rounded">
-            <button on:click={()=>handleFavorites(product)} class="{$authedUser?.id ? "" : "hidden"} absolute top-6 right-6">
+            <button on:click={()=>handleFavorites(product)} class="{$authedUser?.id && Object.keys(product.pricing).length > 0 ? "" : "hidden"} absolute top-6 right-6">
                 <Icon icon={$myFavorites.find(x=> x === product.stockId) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
             </button>
             <div class=" w-10/12 ">
@@ -629,7 +629,7 @@ function handleMouseLeave() {
        {/if}
        
        <!-- pagination -->
-       <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {totalPages <= 1 || products?.length < 10 ? "hidden": "flex"}">
+       <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {totalPages <= 1 || productCount <= 10 ? "hidden": "flex"}">
       <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
         on:click={() => goToPage(1)} 
         disabled={currentPage == 1}
@@ -660,6 +660,7 @@ function handleMouseLeave() {
         </button>
         <button class=" border shadow-md bg-white border-gray-300 rounded-md text-gray-400 hover:bg-gray-100 disabled:border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
           on:click={() => goToPage(totalPages)}
+          disabled={currentPage == totalPages}
         >
         <Icon icon="charm:chevrons-right" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded disabled:text-gray-300" />
         </button>

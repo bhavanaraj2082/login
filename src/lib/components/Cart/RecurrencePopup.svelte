@@ -20,19 +20,8 @@
   let recurring
   let isSave = true
   let lastDayOfMonth
+  let timeout
   let lastDay =  new Date(recurrence?.recurringDate).getDate()||''
-
-  let oldDate = recurrence?.previousRecurringDate ? new Date(recurrence.previousRecurringDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-
-  // let plus15 = new Date(oldDate)
-  // let minus15 = new Date(oldDate)
-  // minus15.setDate(minus15.getDate() - 15);
-  // plus15.setDate(plus15.getDate() + 15);
-
-  // minus15 = new Date(minus15).toISOString().split("T")[0]
-  // plus15 = new Date(plus15).toISOString().split("T")[0]
-
-   console.log(month,custom,'object');
 
   const handleClick = (e)=>{
 		if(!popup.contains(e.target)){
@@ -44,7 +33,6 @@
 		}
 	}
 
- let timeout
   function calculateFutureDate(intervals, date) {
     if(date.length > 2) return
     isSave = true
@@ -176,7 +164,7 @@
          </div>
          {/if}
         <div class="flex gap-4 justify-between text-sm font-medium mt-4">
-          <button disabled={isSave} type="submit" class="w-full py-2 bg-primary-600 text-white rounded hover:bg-primary-700 focus:outline-none disabled:bg-gray-100 disabled:cursor-not-allowed">
+          <button disabled={isSave} type="submit" class="w-full py-2 bg-primary-600 text-white rounded hover:bg-primary-700 focus:outline-none disabled:bg-gray-400 disabled:cursor-not-allowed">
             Save
           </button>
           <button formaction="?/deleteRecurring" type="submit" class="{!recurrence?.recurring ? "hidden":""} w-full py-2 bg-white text-primary-600 border-1 border-primary-600 rounded hover:bg-primary-100 focus:outline-none">

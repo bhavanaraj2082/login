@@ -1711,14 +1711,11 @@ export const getCart = async(userId,cartId)=>{
       }
     }
   ]);
-  // console.log(cart.length,"OOOO");
+  
   if(cart.length === 0){
-  //   const cartData = await Cart.findOne({ userId: userId, isActiveCart: true })
-  //  return {cart:JSON.parse(JSON.stringify([cartData]))};
    return {cart:[]}
   }
   const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
- // console.log(JSON.stringify(cartData,null,2));
   const updatedcart = cart[0]?.cartItems?.map((crt) => {
 
     let { ...cartItemsData } = crt;
@@ -1727,51 +1724,57 @@ export const getCart = async(userId,cartId)=>{
    if(crt.stockDetails.orderedQty !== undefined){
    crt.stockDetails.stock = crt.stockDetails.orderedQty > crt.stockDetails.stock ? 0 : crt.stockDetails.stock - crt.stockDetails.orderedQty
    }
- // console.log('before',pricing);
+
    if(pricing.INR !== undefined && pricing.INR !== null){
      pricing.USD = pricing.INR/currency.rate
    }else{
     pricing.INR = pricing.USD * currency.rate;
    }
 
-    const quoteExpiryDate = cartItemsData?.quoteExpiryTime ? cartItemsData?.quoteExpiryTime.getTime() : Date.now()+1000
-    const cartExpiryDate = cartItemsData?.cartExpiryTime ? cartItemsData?.cartExpiryTime.getTime() : Date.now()+1000
-    if(cartItemsData.isQuote && Date.now() > quoteExpiryDate){
+   const quoteExpiryDate = cartItemsData?.quoteExpiryTime ? cartItemsData?.quoteExpiryTime.getTime() : Date.now()+1000
+   const cartExpiryDate = cartItemsData?.cartExpiryTime ? cartItemsData?.cartExpiryTime.getTime() : Date.now()+1000
+   if(cartItemsData.isQuote && Date.now() > quoteExpiryDate){
      cartItemsData.isQuote = false
-     //updateIsQuote(cartId,cartItemsData.componentId,"quote")
-    }
-    if(cartItemsData.isCart && Date.now() > cartExpiryDate){
-   cartItemsData.isCart = false
-   //updateIsQuote(cartId,cartItemsData.componentId,"cart")
+     updateIsQuote(cartId,cartItemsData.productId,"quote")
+   }
+   if(cartItemsData.isCart && Date.now() > cartExpiryDate){
+     cartItemsData.isCart = false
+     updateIsQuote(cartId,cartItemsData.productId,"cart")
    }
 
-    let totalINR,totalUSD,price
-    const {INR,USD} = pricing
+   let totalINR,totalUSD,price
+   const {INR,USD} = pricing
 
-    if(cartItemsData.isQuote){
+   if(cartItemsData.isQuote){
 			 price = {INR:cartItemsData.quoteOfferPrice.INR,USD:cartItemsData.quoteOfferPrice.USD}
        totalINR = cartItemsData.quoteOfferPrice.INR * cartItemsData.quantity;
        totalUSD = cartItemsData.quoteOfferPrice.USD * cartItemsData.quantity;
-    }else if(cartItemsData.isCart){
+   }else if(cartItemsData.isCart){
 				price = {INR:cartItemsData.cartOfferPrice.INR,USD:cartItemsData.cartOfferPrice.USD}
        totalINR = cartItemsData.cartOfferPrice.INR * cartItemsData.quantity;
        totalUSD = cartItemsData.cartOfferPrice.USD * cartItemsData.quantity; 
-    }else{
+   }else{
        price = {INR,USD}
        totalINR = INR * cartItemsData.quantity;
        totalUSD = USD * cartItemsData.quantity;
-    }
+   }
 
-    let itemTotalPrice = {totalINR,totalUSD}
+   let itemTotalPrice = {totalINR,totalUSD}
      
-    return { ...cartItemsData, pricing, currentPrice:price,normalPrice:{INR,USD}, itemTotalPrice };
-  });
+   return { ...cartItemsData, pricing, currentPrice:price,normalPrice:{INR,USD}, itemTotalPrice };
+ });
   cart[0].cartItems = updatedcart
-  //console.log(cart,"+++++");
- // console.log(updatedcart,"result");
   return {cart:JSON.parse(JSON.stringify(cart))}
 }
-
+const updateIsQuote = async(cartId,componentId,type) =>{
+	let cart
+	if(type === "quote") {
+			cart = await Cart.updateOne({cartId,isActiveCart:true,'cartItems.productId':componentId},{$set:{'cartItems.$.isQuote':false}})
+	}else{
+			cart = await Cart.updateOne({cartId,isActiveCart:true,'cartItems.productId':componentId},{$set:{'cartItems.$.isOffered':false}})
+	}
+   console.log(cart,"updateIsQuote");
+}
 export async function getProfileDetails(userId) {
   try {
     const record = await Profile.findOne({ userId });
