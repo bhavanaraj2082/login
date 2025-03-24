@@ -7,14 +7,126 @@ import { APP_URL } from '$env/static/private';
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import sendemail from '$lib/data/sendemail.json';
 import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
+import { APP_URL } from '$env/static/private';
+import sendemail from '$lib/data/sendemail.json';
+import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
 export const actions = {
+    // qoutes: async ({ request }) => {
+    //     try {
+    //         const data = Object.fromEntries(await request.formData());
+    //         console.log(data, "data");
+        
+
+    //         const record = await Addquotes(data);
+    //         return {
+    //             type: "success",
+    //             data: {
+    //                 message: "Quote request submitted successfully!",
+    //                 record,
+    //             },
+    //         };
+    //     } catch (error) {
+    //         console.error("Error creating quote:", error);
+    //         return {
+    //             type: "error",
+    //             data: {
+    //                 error: "Error submitting your data. Please try again later!",
+    //             },
+    //         };
+    //     }
+    // },
     qoutes: async ({ request }) => {
         try {
             const data = Object.fromEntries(await request.formData());
             console.log(data, "data");
-        
+            async function getClientIP() {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+              }
+              const ipAddress = await getClientIP();
+            const components = JSON.parse(data.components);
 
+            const componentsList = components.map(component => {
+              return `Component Name: ${component['Component Name']}, CAS Number ${component.CasNumber}, Concentration: ${component.Concentration}%</li>`;
+            }).join('');
             const record = await Addquotes(data);
+            const targetEmailContent = sendemail.emailTemplatequotes
+                .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
+                .replaceAll('{{APP_URL}}', APP_URL)
+                .replaceAll('{{solutionValue}}', data.solutionValue || '')
+                .replaceAll('{{selectedColor}}', data.selectedColor || '')
+                .replaceAll('{{components}}',componentsList || '')
+                .replaceAll('{{qualityLevel}}', data.qualityLevel || '')
+                .replaceAll('{{analyticalTechnique}}', data.analyticalTechnique || '')
+                .replaceAll('{{solvent}}', data.solvent || '')
+                .replaceAll('{{packagingType}}', data.packagingType || '')
+                .replaceAll('{{volume}}', data.volume || '')
+                .replaceAll('{{units}}', data.units || '')
+                .replaceAll('{{futherdetails}}', data.futherdetails || '')
+                .replaceAll('{{title}}', data.title || '')
+                .replaceAll('{{first}}', data.first || '')
+                .replaceAll('{{last}}', data.last || '')
+                .replaceAll('{{organisation}}', data.organisation || '')
+                .replaceAll('{{country}}', data.country || '')
+                .replaceAll('{{email}}', data.email || '')
+                .replaceAll('{{number}}', data.number || '')
+                .replaceAll('{{userId}}', data.userId || '')
+                .replaceAll('{{address1}}', data.address1 || '')
+                .replaceAll('{{address2}}', data.address2 || '')
+                .replaceAll('{{country1}}', data.country1 || '')
+                .replaceAll('{{county}}', data.county || '')
+                .replaceAll('{{city}}', data.city || '')
+                .replaceAll('{{post}}', data.post || '')
+                .replaceAll('{{ipAddress}}', ipAddress || '');  
+            try {
+                await sendNotificationEmail(
+                    `New Quote Request – ${PUBLIC_WEBSITE_NAME}`,
+                    targetEmailContent
+                );
+            } catch (error) {
+                console.error('Error sending notification email to the team:', error);
+            }
+    
+            const userEmailContent = sendemail.emailTemplatequotesuser
+                .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
+                .replaceAll('{{APP_URL}}', APP_URL)
+                .replaceAll('{{solutionValue}}', data.solutionValue || '')
+                .replaceAll('{{selectedColor}}', data.selectedColor || '')
+                .replaceAll('{{components}}',componentsList || '')
+                .replaceAll('{{qualityLevel}}', data.qualityLevel || '')
+                .replaceAll('{{analyticalTechnique}}', data.analyticalTechnique || '')
+                .replaceAll('{{solvent}}', data.solvent || '')
+                .replaceAll('{{packagingType}}', data.packagingType || '')
+                .replaceAll('{{volume}}', data.volume || '')
+                .replaceAll('{{units}}', data.units || '')
+                .replaceAll('{{futherdetails}}', data.futherdetails || '')
+                .replaceAll('{{title}}', data.title || '')
+                .replaceAll('{{first}}', data.first || '')
+                .replaceAll('{{last}}', data.last || '')
+                .replaceAll('{{organisation}}', data.organisation || '')
+                .replaceAll('{{country}}', data.country || '')
+                .replaceAll('{{email}}', data.email || '')
+                .replaceAll('{{number}}', data.number || '')
+                .replaceAll('{{userId}}', data.userId || '')
+                .replaceAll('{{address1}}', data.address1 || '')
+                .replaceAll('{{address2}}', data.address2 || '')
+                .replaceAll('{{country1}}', data.country1 || '')
+                .replaceAll('{{county}}', data.county || '')
+                .replaceAll('{{city}}', data.city || '')
+                .replaceAll('{{post}}', data.post || '')
+               
+    
+            try {
+                await sendEmailToUser(
+                    `Your Quote Request Confirmation – ${PUBLIC_WEBSITE_NAME}`,
+                    userEmailContent,
+                    data.email
+                );
+            } catch (error) {
+                console.error('Error sending confirmation email to the user:', error);
+            }
+
             return {
                 type: "success",
                 data: {
@@ -32,6 +144,9 @@ export const actions = {
             };
         }
     },
+    
+    
+    
     verifyemail: async ({ request }) => {
         const rawData = Object.fromEntries(await request.formData());
         console.log(rawData, "rawData");

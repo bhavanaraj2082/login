@@ -5,10 +5,10 @@
   import { toast } from "svelte-sonner";
   import { Toaster } from "svelte-sonner";
   export let data;
-  // console.log(data,"ddataaa");
+  console.log(data,"ddataaa");
   // console.log(data.authedUser,"authedUser");
   let token = data?.token || "";
-  // console.log(token,"tpoken");
+  console.log(token,"tpoken");
   let userEmail = data.authedUser?.id;
   // console.log(userId,"userId");
   let message = "";
@@ -315,7 +315,7 @@ on:click={() => goto('/')}
 
           <input type="hidden" name="token" value={token} />
           <input type="hidden" name="userEmail" value={userEmail} />
-          <input type="hidden" name="email" value={$authedUser.email} />
+          <input type="hidden" name="email" value={$authedUser?.email} />
 
           <div class="mt-6">
             <button
