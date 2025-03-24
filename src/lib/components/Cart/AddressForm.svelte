@@ -13,8 +13,6 @@
 let message="At least one address must be default";
   // export let accounttype;
 	export let handlePopupAddress;
-	export let firstname;
-	export let lastname;
   let showErrors = false;
 	let email='';
 	let phone='';
@@ -514,6 +512,7 @@ function validatePhoneNumber(countryCode, phone) {
 
     if (!phone || phone.trim() === '') {
         errors.phone = ``;
+        delete errors.phone
         return false;
     }
 
@@ -555,8 +554,8 @@ function validatePhoneNumber(countryCode, phone) {
 
 	let isValid = true;
   	
-  $:console.log(organizationName,department,attentionTo);
  function validateForm(fieldName) {
+
   if (!fieldName || fieldName === 'street') {
     if (!street || !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(street)) {
       errors.street = 'Address is required and can contain only letters, numbers, and a few special characters.';
@@ -614,12 +613,10 @@ function validatePhoneNumber(countryCode, phone) {
 
 if (!fieldName || fieldName === 'country') {
 	if (!location || location === 'country') {
-		if (!location || location === "") {
       errors.location = 'Please select a country';
     } else {
       delete errors.location;
     }
-	}
   }
   if (!fieldName || fieldName === 'state') {
     if (!state || !/^[a-zA-Z\s.'-]+$/.test(state)) {
@@ -638,7 +635,7 @@ if (!fieldName || fieldName === 'country') {
   }
 
 if (Object.keys(errors).length > 0) {
-   
+   console.log(errors);
     return false; 
   }
 
@@ -668,6 +665,8 @@ function handleSubmit(event) {
 }
 $: show= isShowbox ? `Edit ${name} Address` : `Add ${name} Address`;
 
+$:console.log(location,"location");
+
 </script>
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -681,6 +680,7 @@ $: show= isShowbox ? `Edit ${name} Address` : `Add ${name} Address`;
 			on:click|stopPropagation
       use:enhance={({cancel}) => {
         if (!validateForm()) {
+            console.log(validateForm(),"kkk");
             cancel()
         }
         return async({ result , update}) => {
@@ -772,7 +772,7 @@ $: show= isShowbox ? `Edit ${name} Address` : `Add ${name} Address`;
 				<span class="text-red-500 text-xs block">Address is required</span>
 		    {/if}
 
-				
+    
             <label class="w-full text-xs md:text-sm font-medium mt-1" for="country">Country</label>
             <div class="relative z-10">
             <div class="flex items-center border border-gray-300 rounded my-1 overflow-hidden">
@@ -811,8 +811,8 @@ $: show= isShowbox ? `Edit ${name} Address` : `Add ${name} Address`;
                 {/if}
             </div>
                             
-                {#if errors?.country}
-                    <p class="text-red-500 text-xs mt-1">{errors.country}</p>
+                {#if errors?.location}
+                    <p class="text-red-500 text-xs mt-1">{errors.location}</p>
                 {/if}
             
             <label class="w-full text-xs md:text-sm font-medium mt-1" for="city">City</label>
