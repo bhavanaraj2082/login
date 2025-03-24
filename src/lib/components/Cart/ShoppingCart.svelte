@@ -126,18 +126,19 @@
         item.mfrDetails.name,
         item.quantity,
         item.quantity - item.stockDetails.stock < 0 ? 0 : item.quantity - item.stockDetails.stock,
-        "₹ " + item.pricing.INR.toLocaleString("en-IN"),
-        "₹ " + (item.pricing.INR * item.quantity).toLocaleString("en-IN"),
-    ]);
+		$currencyState === "inr" ? "₹ "+item.currentPrice.INR.toLocaleString("en-IN") : "$ "+item.currentPrice.USD.toLocaleString("en-IN"),
+        $currencyState === "inr" ? "₹ "+(item.pricing.INR * item.quantity).toLocaleString("en-IN") : "$ "+ (item.pricing.USD * item.quantity).toLocaleString("en-IN"),
+      ]);
 
     // Calculate total price (sum of the last column - 'Extended Price')
     const totalPrice = $cart.reduce((total, item) => {
-        return total + item.pricing.INR * item.quantity;
+        return total + ($currencyState === "inr" ? (item.pricing.INR * item.quantity) : (item.pricing.USD * item.quantity));
     }, 0);
-
+	console.log(totalPrice,"PPP");
+    
     // Add a new row for the total price at the bottom
     const totalRow = [
-        '', '', '', '', 'Total Price', "₹ "+totalPrice.toLocaleString("en-IN")
+        '', '', '', '', 'Total Price',($currencyState === "inr" ? "₹ " : "$")+totalPrice.toLocaleString("en-IN")
     ];
 
     // Prepare the data for SheetJS
