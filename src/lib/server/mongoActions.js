@@ -207,18 +207,12 @@ export async function checkavailabilityproduct(data) {
 				};
 			} else {
 				return {
-					message: `Only ${availableStock} units available.`,
-					stock: 'Limited Availability',
+					message: 'Out of Stock',
+					stock: 'Unavailable',
 					type: 'error'
 				};
 			}
-		} else {
-			return {
-				message: 'Out of Stock',
-				stock: 'Unavailable',
-				type: 'error'
-			};
-		}
+		} 
 	} catch (error) {
 		console.error('Error during stock check:', error);
 		return {
@@ -1229,7 +1223,7 @@ export const Addquotes = async (data) => {
             Lastname: data.last,
             organisation: data.organisation,
 			country: data.country,
-            invoiceNumber: data.lgc,
+            // invoiceNumber: data.lgc,
             email: data.email,
             number: data.number
 			// userId: data.userId

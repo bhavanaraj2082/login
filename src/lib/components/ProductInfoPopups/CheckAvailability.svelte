@@ -6,7 +6,6 @@
   export let CheckAvailabilityClose;
   export let quantity;
   export let index;
-  export let updateQuantity;
   export let increaseQuantity;
   export let decreaseQuantity;
   export let addToCart;
@@ -163,10 +162,7 @@
       {:else if stockType === "error"}
         <div class="mt-6 space-y-2 text-sm">
           <div class="flex items-center space-x-2">
-            <Icon
-              icon="meteor-icons:circle-xmark"
-              class="text-sm text-primary-500"
-            />
+            <Icon icon="ix:error-filled" class="text-lg text-red-500" />
             <p>{stockAvailability}</p>
           </div>
         </div>

@@ -74,7 +74,7 @@
 	<hr /><hr />
 	<li>
 		<span class="flex items-center gap-2">
-			<Icon icon="arcticons:youdao-note" class="sm:w-8 sm:h-8 w-6 h-6 text-gray-300"  style="stroke-width: 2;" />
+			<Icon icon="material-symbols:add-notes-outline-rounded" class="sm:w-8 sm:h-8 w-6 h-6 text-gray-300"  style="stroke-width: 2;" />
 		<h1 class="font-bold sm:text-2xl text-sm my-10 text-black text-opacity-25">Step 4: Additional notes</h1>
 		</span>
 	</li>
@@ -88,7 +88,7 @@
 	<hr /><hr />
 	<li>
 		<span class="flex items-center gap-2">
-			<Icon icon="material-symbols-light:delivery-truck-speed-outline" class="sm:w-9 sm:h-9 w-7 h-7 text-gray-300" />
+			<Icon icon="material-symbols-light:delivery-truck-speed-outline-rounded" class="sm:w-9 sm:h-9 w-7 h-7 text-gray-300" />
 		<h1 class="font-bold sm:text-2xl text-sm my-10 text-black text-opacity-25">
 			Step 6: Delivery information
 		</h1>

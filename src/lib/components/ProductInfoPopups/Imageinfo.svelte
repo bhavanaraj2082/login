@@ -64,13 +64,14 @@
         >
           <!-- svelte-ignore a11y-img-redundant-alt -->
           <img
-            src={product.imageSrc}
+            src={`https://img.partskeys.com/chemikart/imgs/prod/${product?.imageSrc}`}
             alt="Product Image"
             class="w-full h-full object-contain transition-transform duration-300"
             class:scale-150={isZoomed}
             class:cursor-zoom-in={!isZoomed}
             class:cursor-zoom-out={isZoomed}
             style="transform-origin: {offsetX}% {offsetY}%;"
+            onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg-250.jpg'"
           />
         </div>
       </div>

@@ -61,12 +61,12 @@
         <div class="border-gray-300 border rounded-md">
           <!-- svelte-ignore a11y-img-redundant-alt -->
           <img
-            src={product.imageSrc}
+            src={`https://img.partskeys.com/chemikart/imgs/prod/${product?.imageSrc}`}
             alt="Product Image"
-            class="w-32 h-20 p-1 object-contain"
+            class="w-32 h-28 p-1 object-contain"
+            onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg-250.jpg'"
           />
         </div>
-
         <div>
           <p class="text-sm font-semibold text-primary-500">
             {product.productNumber}

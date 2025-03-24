@@ -26,6 +26,7 @@
   let enteredOtp = "";
   let email = profile?.email || "";
   let formErrors = {};
+  let isSubmitting = false;
 
   const handleResendemailOtp = () => {
     form5.requestSubmit();
@@ -87,6 +88,7 @@
       cancel();
       return;
     }
+    isSubmitting = true;
     return async ({ result, update }) => {
       console.log("result", result);
 
@@ -99,6 +101,7 @@
           toast.error(result.data.message);
         }
       }
+      isSubmitting = false;
     };
   }
 </script>
@@ -474,15 +477,20 @@
       <div class="flex justify-between items-center mt-4">
         <button
           on:click={toggleQuoteModal}
-          class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-5 rounded"
+          class="bg-teal-500 hover:bg-teal-600 text-white font-medium py-1.5 px-4 rounded"
         >
           ✖ Close
         </button>
         <button
           type="submit"
-          class="bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded py-2 px-6"
+          class="bg-primary-500 hover:bg-primary-600 text-white font-medium rounded py-1.5 px-4"
         >
-          Submit
+        {#if isSubmitting}
+        <Icon icon="line-md:loading-alt-loop" class="w-5 h-5 mr-2 animate-spin inline" />
+        Submitting..
+      {:else}
+        Submit
+      {/if}
         </button>
       </div>
     </form>

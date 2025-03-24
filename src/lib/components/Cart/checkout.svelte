@@ -25,6 +25,7 @@
 	let order = ''
 	let taxError = ''
 	let gstNumber
+	let orderLoad = false
 	$:{
 	  gstNumber	= userData?.gstNumber || ''
 	} 
@@ -228,6 +229,7 @@
 	}
 	$:console.log(gstNumber);
 	const handleSubmit = ({cancel})=>{
+		orderLoad = true
 		onSubmit = true
 		taxError = ''
 		if(!gstNumber.length){
@@ -241,6 +243,7 @@
 			cancel()
 		} 
 		return async({result})=>{
+			orderLoad = false
 			console.log(result);
 			if(result.data.success){
 				goto('checkout/success')
@@ -375,12 +378,19 @@
 					{#if $authedUser.email}
 						<form method="POST" action="?/checkout" use:enhance={handleSubmit} class=" col-span-2">
 							<input type="hidden" name="order" value={JSON.stringify(checkout)}/>
+							{#if orderLoad}
+							<button class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-1.5 rounded font-semibold ">
+								<Icon icon="line-md:loading-loop" class=" text-xl"/>
+							</button>
+							{:else}
 							<button
 								type="submit" disabled={onSubmit || taxError.length}
-								class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
+								class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold "
 							>
 								Proceed to Order
 							</button>
+							{/if}
+							
 						</form>
 					{/if}
 				</div>

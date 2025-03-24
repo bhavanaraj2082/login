@@ -35,9 +35,10 @@
       <div class="flex flex-col items-center">
         <div class="flex items-center mb-6 justify-around w-full">
           <img
-            src={product.imageSrc}
+            src={`https://img.partskeys.com/chemikart/imgs/prod/${product?.imageSrc}`}
             alt="Img"
             class="w-24 h-24 object-contain p-1 mt-2 border rounded"
+            onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg-250.jpg'"
           />
           <div class="text-sm m-4">
             <p class="font-semibold text-primary-500">
