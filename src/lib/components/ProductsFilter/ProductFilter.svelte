@@ -14,6 +14,7 @@
     export let manufacturers
     export let productCount
     export let subSubCategory
+    export let profile
 
 	let isLoggedIn = $authedUser?.id ? true : false
 
@@ -522,7 +523,7 @@ function handleMouseLeave() {
 								</button>
 							</div>
 							<!-- svelte-ignore a11y-img-redundant-alt -->
-							<img src={selectedImage} alt="image" onerror="this.src='/partskeys.jpeg'" class=" w-56 h-56 md:w-96 md:h-96 mx-auto object-cover" />
+							<img src={selectedImage} alt="image" class=" w-56 h-56 md:w-96 md:h-96 mx-auto object-contain" />
 						</div>
 					</div>
 				{/if}
@@ -550,8 +551,6 @@ function handleMouseLeave() {
 							><Icon icon="rivet-icons:minus" class="text-xs" /></button>
 						    <button on:click={async()=>{
                                 tog = index
-                                await tick();
-                                point.focus()
                                 }} class="w-fit px-3 py-1 text-sm font-medium outline-none text-center">
 							    {product.quantity}
 						    </button>
@@ -605,8 +604,6 @@ function handleMouseLeave() {
 						>
 						<button on:click={async()=>{
                             tog = index
-                                await tick();
-                                point.focus()
                         }} class="w-fit px-3 py-0.5 text-sm font-medium outline-none text-center">
 							{product.quantity}
 						</button>
@@ -669,5 +666,5 @@ function handleMouseLeave() {
 
 </section>
 {#if showQuoteModal}
-  <ShowQuoteModal {data} {toggleQuoteModal} {form5} {productQuote} />
+  <ShowQuoteModal {data} {profile} {toggleQuoteModal} {form5} {productQuote} />
 {/if}

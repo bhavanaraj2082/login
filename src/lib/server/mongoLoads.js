@@ -534,7 +534,8 @@ export const loadProductsubcategory = async (
   pageNum,
   manufacturer,
   search,
-  price
+  price,
+  userId
 ) => {
   const page = pageNum || 1;
   const pageSize = 10;
@@ -734,11 +735,13 @@ export const loadProductsubcategory = async (
       };
     })
   )
+    const profile = await Profile.findOne({userId},{firstName:1,lastName:2,cellPhone:1,email:1,isEmailVerified:1,companyName:1,_id:0})
     return {
       products: JSON.parse(JSON.stringify(filtered)),
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
       productCount: totalCount,
       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
+      profile:JSON.parse(JSON.stringify(profile))
     };
   } catch (err) {
     console.error("Error loading product subcategory:", err);

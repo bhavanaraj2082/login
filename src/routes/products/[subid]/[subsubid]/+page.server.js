@@ -2,15 +2,16 @@ import { addToCart,favorite } from '$lib/server/mongoActions.js';
 import { loadProductsubcategory } from '$lib/server/mongoLoads.js';
 import { error } from '@sveltejs/kit';
 
-export async function load({ params,url,depends }) {
+export async function load({ params,url,depends,locals }) {
 	try {
+		let userId = locals?.authedUser?.id || ""
 		const page = parseInt(url.searchParams.get('page')) || 1
 		const search = url.searchParams.get('search') || ""
 		const manufacturer = url.searchParams.get('manufacturer') || null
 		const price = url.searchParams.get('price') || ""
         depends("page:data")
 
-		const result = await loadProductsubcategory(params.subsubid, page, manufacturer, search, price);
+		const result = await loadProductsubcategory(params.subsubid, page, manufacturer, search, price, userId);
 
    		if (result.status && result.status === 404) {
    		  throw error(404, result.body?.message || "Subcategory not found");

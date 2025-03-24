@@ -20,7 +20,7 @@
 	// 	if(browser){
 	// 	    const storedTotalComps = JSON.parse(localStorage.getItem('cart')) || []
 	// 	    localStorage.setItem('totalCompsChemi', storedTotalComps.length)
-	// 	    syncLocalStorageToStore();	
+	// 	    syncLocalStorageToStore(b);	
 	// 	}
 		
 	// }

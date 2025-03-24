@@ -30,11 +30,10 @@
 
   const resultString = formattedStrings.join(", ");
   
-  $: ({ manufacturers, products, productCount, subSubCategory } = data);
+  $: ({ manufacturers, products, productCount, subSubCategory,profile } = data);
   const handlePage = (e) => {
     invalidate("page:data");
   };
-
   let metadata = {
     title:
       `${catName} | ${SubCatName} | ${PUBLIC_WEBSITE_NAME} ` ||
@@ -76,6 +75,7 @@
       {products}
       {productCount}
       {subSubCategory}
+      {profile}
     />
   </div>
 </section>
