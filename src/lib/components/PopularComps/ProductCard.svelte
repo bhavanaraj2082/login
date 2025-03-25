@@ -1,11 +1,13 @@
 <script>
     export let product;
+    import {PUBLIC_IMAGE_URL} from "$env/static/public"
 </script>
 
 <div class="shadow flex flex-col justify-between gap-2 bg-white rounded-lg px-5 py-5 lg:px-10 overflow-hidden hover:shadow-md">
     <img
-        src={product?.imageSrc}
-        alt=/default.png
+        src={`${PUBLIC_IMAGE_URL}/${product?.image}`}
+        alt={product?.productName}
+        onerror="this.src='/fallback.jpg'"
         class=" w-44 h-44 mx-auto object-contain rounded-t-lg"/>
     <div class="grow space-y-1 mt-4">
         <h3 class=" text-sm font-semibold">{product?.productName}</h3>
