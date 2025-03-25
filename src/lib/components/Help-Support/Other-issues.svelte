@@ -868,7 +868,7 @@
 			lastName = `${data.profile.lastName || ""}`.trim();
 			email = data.profile.email || "";
 			phoneNumber = data.profile.cellPhone || "";
-			companyName = data.profile.companyname || "";
+			companyName = data.profile.companyName || "";
 
 			const profileCountry = data.profile.country?.trim();
 			if (profileCountry) {
