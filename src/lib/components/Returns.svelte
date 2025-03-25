@@ -104,15 +104,15 @@
 		</div>
 	</div>
 	<section class="mt-10">
-		<h2 class="text-lg sm:text-xl md:text-2xl font-bold text-heading text-left">
+		<h2 class="text-lg md:text-2xl font-bold text-heading text-left">
 			Issue with an order you have received:
 		</h2>
 		<div class="bg-white rounded-lg shadow mt-4 flex flex-col md:flex-row items-center md:items-start p-4 sm:p-6">
 			<div class="w-full md:w-1/2 p-4 sm:p-6">
-				<ul class="space-y-2 sm:space-y-3 pl-4 sm:pl-6">
+				<ul class="space-y-2 sm:space-y-3 sm:pl-6">
 					{#each reasons as reason}
-						<li class="flex items-center text-gray-description text-sm sm:text-base">
-							<span class="bg-primary-400 w-3 h-3 mr-2 rounded-full"></span>{reason}
+						<li class="flex items-center text-gray-description text-xs sm:text-base">
+							<span class="bg-primary-400 w-3 h-3 mr-2 rounded-full overflow-hidden whitespace-nowrap"></span>{reason}
 						</li>
 					{/each}
 				</ul>
@@ -163,21 +163,21 @@
 			action="?/returns"
 			use:enhance={handleSubmit}
 			class="w-full md:flex gap-4 py-3">
-			<div class="flex flex-col w-full"> 
+			<div class="flex flex-col w-full md:w-1/3"> 
 				<label for="email" class="mb-1 text-sm font-medium text-gray-700">Email</label>
 				<input
 					type="email"
 					name="email"
 					bind:value={email}
-					class="w-full p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"/>
+					class="w-full p-1.5 border-1 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"/>
 			</div>
-			<div class="flex flex-col w-full">
+			<div class="flex flex-col w-full md:w-1/3 mt-4 sm:mt-0">
 				<label for="invoiceNumber" class="mb-1 text-sm font-medium text-gray-700">Invoice Number</label>
 				<input
 					type="text"
 					name="invoiceNumber"
 					bind:value={invoiceNumber}
-					class="w-full p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"/>
+					class="w-full p-1.5 border-1 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"/>
 			</div>
 			<div class="flex flex-col w-full sm:w-auto mt-6">
 				<button
