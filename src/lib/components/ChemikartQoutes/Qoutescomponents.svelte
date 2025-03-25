@@ -38,7 +38,7 @@
   };
 </script>
 
-<div class="w-11/12 mx-auto max-w-7xl border rounded rounded-t-xl bg-white mb-6">
+<div class="w-11/12 mx-auto max-w-7xl border rounded rounded-t-xl bg-white mb-6 shadow-md">
   {#if currentView === "qoutes"}
   <div class="w-full mx-auto max-w-7xl rounded-t-lg mb-10">
     <div class="flex flex-col sm:flex-row gap-4">
@@ -55,7 +55,7 @@
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button> -->
       </div>
-      <div class="w-full sm:w-1/3 rounded-lg bg-gray-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
+      <div class="w-full sm:w-1/3 rounded-md bg-primary-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
         <h1 class="pb-2 sm:text-lg text-sm font-bold text-description">
           Need help?
         </h1>
@@ -93,7 +93,7 @@
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
-      <div class="w-full sm:w-1/3 rounded-lg bg-gray-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
+      <div class="w-full sm:w-1/3 rounded-md bg-primary-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
         <h1 class="pb-2 sm:text-lg text-sm font-bold text-description">
           Need help?
         </h1>
@@ -129,7 +129,7 @@
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
-      <div class="w-full sm:w-1/3 rounded-lg bg-gray-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
+      <div class="w-full sm:w-1/3 rounded-md bg-primary-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
         <h1 class="pb-2 sm:text-lg text-sm font-bold text-description">
           Need help?
         </h1>
@@ -165,7 +165,7 @@
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
-      <div class="w-full sm:w-1/3 rounded-lg bg-gray-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
+      <div class="w-full sm:w-1/3 rounded-md bg-primary-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
         <h1 class="pb-2 sm:text-lg text-sm font-bold text-description">
           Need help?
         </h1>
@@ -209,7 +209,7 @@
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
-      <div class="w-full sm:w-1/3 rounded-lg bg-gray-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
+      <div class="w-full sm:w-1/3 rounded-md bg-primary-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
         <h1 class="pb-2 sm:text-lg text-sm font-bold text-description">
           Need help?
         </h1>
@@ -252,7 +252,7 @@
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
-      <div class="w-full sm:w-1/3 rounded-lg bg-gray-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
+      <div class="w-full sm:w-1/3 rounded-md bg-primary-100 m-5 mx-auto p-4 mr-5 text-left sm:block hidden">
         <h1 class="pb-2 sm:text-lg text-sm font-bold text-description">
           Need help?
         </h1>

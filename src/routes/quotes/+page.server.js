@@ -7,9 +7,6 @@ import { APP_URL } from '$env/static/private';
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import sendemail from '$lib/data/sendemail.json';
 import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
-import { APP_URL } from '$env/static/private';
-import sendemail from '$lib/data/sendemail.json';
-import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
 export const actions = {
     // qoutes: async ({ request }) => {
     //     try {
