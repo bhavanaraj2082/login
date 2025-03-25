@@ -51,16 +51,21 @@
   </div>
   {#if filteredCategories.length > 0}
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-12 mt-6 mb-3">
-    {#each filteredCategories  as category}
-      <div class="max-w-sm rounded-lg overflow-hidden shadow-md bg-white">
-        <a href={`/applications/${category?.url}`} class="block">
-          <img
-            src={category.image}
-            alt={category.name}
-            class="w-full h-48 object-cover"/>
-
-          <div class="p-4">
-            <h3 class="sm:text-xl text-md font-semibold text-gray-800">{category?.name}</h3>
+    {#each filteredCategories as category}
+      <div class="group relative max-w-sm rounded-lg overflow-hidden shadow-md bg-white transition-shadow duration-300 hover:shadow-xl">
+        <a href={`/applications/${category?.url}`} class="block relative z-10">
+          <div class="relative">
+            <img
+              src={category.image}
+              alt={category.name}
+              class="w-full h-48 object-cover opacity-90 transition-transform duration-1000 ease-in-out group-hover:scale-105 group-hover:opacity-100"
+            />
+          </div>
+          <div class="absolute inset-0 bg-opacity-20 transition-all duration-500 ease-in-out group-hover:bg-opacity-0 z-10 pointer-events-none"></div>
+          <div class="p-4 bg-white">
+            <h3 class="sm:text-xl text-md font-semibold text-gray-800 group-hover:text-primary-600 transition-colors duration-500">
+              {category?.name}
+            </h3>
             <p class="mt-2 sm:text-sm text-xs text-gray-600 text-justify">
               {getTruncatedDescription(category?.description) || "No description available"}
             </p>
