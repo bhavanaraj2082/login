@@ -60,7 +60,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> 
         <div class="p-6 rounded-lg shadow flex flex-col justify-center items-center hover:shadow-md">
           <a href="/safety/understanding-product-labels" 
-              class=" font-medium sm:text-md text-sm mb-2 py-1 w-full text-left cursor-pointer flex flex-col transition duration-200 ease-in-out hover:text-primary-500 text-heading decoration-2 underline-offset-4"
+              class="font-semibold sm:text-lg text-sm   mb-2 py-1 w-full text-left cursor-pointer flex flex-col transition duration-200 ease-in-out hover:text-primary-500 text-heading decoration-2 underline-offset-4"
               class:text-primary-500={$page.url.pathname === "/safety/understanding-product-labels"}
               class:font-semibold={$page.url.pathname === "/safety/understanding-product-labels"}>
             <img src="/productsafety/Understanding Product Labels.webp" alt="Understanding Product Labels IMG" class="mb-10 ml-1 w-52 rounded-md" />
@@ -74,7 +74,7 @@
         
         <div class="p-4 rounded-lg shadow flex flex-col justify-center items-center hover:shadow-md">
           <a href="/safety/globally-harmonized-system" 
-              class="font-medium sm:text-md text-sm mb-2 py-1 w-full text-left cursor-pointer flex flex-col transition duration-200 ease-in-out hover:text-primary-500 text-heading decoration-2 underline-offset-4"
+              class="font-semibold sm:text-lg text-sm mb-2 py-1 w-full text-left cursor-pointer flex flex-col transition duration-200 ease-in-out hover:text-primary-500 text-heading decoration-2 underline-offset-4"
               class:text-primary-500={$page.url.pathname === "/safety/globally-harmonized-system"}
               class:font-semibold={$page.url.pathname === "/safety/globally-harmonized-system"}>
             <img src="/productsafety/GHS.webp" alt="GHS IMG" class="mb-10 ml-1 w-52 rounded-md" />
@@ -89,7 +89,7 @@
 
         <div class="p-4 rounded-lg shadow flex flex-col justify-center items-center hover:shadow-md">
           <a href="/safety/tsca-8-notification" 
-              class="font-medium sm:text-md text-sm mb-2 py-1 w-full text-left cursor-pointer flex flex-col transition duration-200 ease-in-out hover:text-primary-500 text-heading decoration-2 underline-offset-4"
+              class="font-semibold sm:text-lg text-sm mb-2 py-1 w-full text-left cursor-pointer flex flex-col transition duration-200 ease-in-out hover:text-primary-500 text-heading decoration-2 underline-offset-4"
               class:text-primary-500={$page.url.pathname === "/safety/tsca-8-notification"}
               class:font-semibold={$page.url.pathname === "/safety/tsca-8-notification"}>
             <img src="/productsafety/TSCA.webp" alt="TSCA IMG" class="mb-10 ml-1 w-52 rounded-md" />
@@ -103,7 +103,7 @@
 
         <div class="p-4 rounded-lg shadow flex flex-col justify-center items-center hover:shadow-md">
           <a href="/safety/hazard-and-precautionary-statements" 
-              class="font-medium sm:text-md text-sm mb-2 py-1 w-full text-left cursor-pointer flex flex-col transition duration-200 ease-in-out hover:text-primary-500 text-heading decoration-2 underline-offset-4"
+              class="font-semibold sm:text-lg text-sm mb-2 py-1 w-full text-left cursor-pointer flex flex-col transition duration-200 ease-in-out hover:text-primary-500 text-heading decoration-2 underline-offset-4"
               class:text-primary-500={$page.url.pathname === "/safety/hazard-and-precautionary-statements"}
               class:font-semibold={$page.url.pathname === "/safety/hazard-and-precautionary-statements"}>
             <!-- <img src="/productsafety/Hazard_Precaution.webp" alt="img" class="sm:mb-10 mb-5 ml-1 sm:ml-10 w-28 sm:mt-5 mt-0" /> -->

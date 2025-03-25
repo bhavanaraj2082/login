@@ -746,16 +746,16 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 
 	{:else}
 	<section
-		class="my-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto sm:p-0 font-roboto bg-white"
+		class="mt-6 mb-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto sm:p-0  font-roboto bg-white"
 	>
-		<div class="w-full border border-gray-300 rounded-lg">
+		<div class="w-full shadow rounded-lg">
 			<h1 class="sm:text-2xl text-md font-bold bg-primary-400 text-white py-4 pl-4 rounded-t-lg">
 				Get in Touch with Us
 			</h1>
 			<form
 				method="POST"
 				action="?/contactus"
-				class="space-y-4"
+				class="space-y-4 p-3"
 				bind:this={form}
 				use:enhance={(event) => {
 						
@@ -812,7 +812,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 				<section class="flex flex-col md:flex-row p-2">
 					<div class="md:w-2/5 p-0 mt-0 ">
 						<div class="flex items-start sm:mt-6 mt-3 sm:mb-6 mb-3 sm:ml-4 ml-0">
-							<Icon icon="prime:phone" class="text-black sm:w-5 w-4 h-5 mr-2" />
+							<Icon icon="mdi:phone" class="text-heading sm:w-5 w-4 h-5 mr-2" />
 							<div>
 								<p class="sm
 							:text-lg text-sm text-heading mb-2 font-semibold">Phone number</p>
@@ -823,7 +823,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 						</div>
 						<hr class="my-2" />
 						<div class="flex items-start sm:mt-6 mt-3 sm:mb-6 mb-3 sm:ml-4 ml-0">
-							<Icon icon="mdi-light:email" class="text-black sm:w-5 w-4 h-5 mr-2" />
+							<Icon icon="material-symbols:mail-rounded" class="text-heading sm:w-5 w-4 h-5 mr-2" />
 							<div>
 								<p class="sm
 							:text-lg text-sm text-heading mb-2 font-semibold">Email</p>
@@ -832,7 +832,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 						</div>
 						<hr class="my-2" />
 						<div class="flex items-start sm:mt-6 mt-3 sm:mb-6 mb-3 sm:ml-4 ml-0">
-							<Icon icon="ep:location" class="text-black sm:w-5 w-4 h-5 mr-2 shrink-0" />
+							<Icon icon="ic:sharp-location-on" class="text-heading sm:w-5 w-4 h-5 mr-2 shrink-0" />
 							<div>
 								<p class="sm
 							:text-lg text-sm text-heading mb-2 font-semibold">Location</p>							
@@ -842,16 +842,15 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 							</div>
 						</div>
 					</div>
-					<div class="md:w-3/5 md:mr-2 md:ml-10 mr-0 p-0">
+					<div class="md:w-3/5 md:mr-2 md:ml-10 mr-0 px-4">
 						<div class="p-0 sm:p-0 md:p-0">
-							<div class="sm:mt-5 mt-0">
-								<p class="sm
-								:text-lg text-sm text-heading font-semibold">Send a Message</p>
+							<div class="mt-3">
+								<p class="sm:text-lg text-md text-heading font-bold">Send a Message</p>
 								<p class="sm:text-sm text-xs text-heading mt-3 mb-3">We’d love to hear from you! Send us a message, and let’s stay connected.</p>
 							</div>
 							<div class="flex flex-col md:flex-row md:space-x-4">
 								<div class="flex-1 mb-4">
-									<input type="text" name="name" id="name" bind:value={name} class="flex w-full border-1 sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="User Name" />
+									<input type="text" name="name" id="name" bind:value={name} class="flex w-full border-1 sm:text-sm text-xs border-gray-200 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="User Name" />
 									{#if showErrors && name.length === 0}
 										<span class="text-red-500 sm:text-xs text-2s font-medium"
 											>Name is required</span
@@ -939,7 +938,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 												name="email"
 												id="email"
 												bind:value={email}
-												class="flex w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+												class="flex w-full border-1 border-gray-200 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 												placeholder="Email"
 												on:input={() => {
 													email = email.trim();
@@ -1193,14 +1192,14 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 											placeholder="Country"
 											on:input={handleInputChange}
 											on:click={toggleDropdown}
-											class="block w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+											class="block w-full sm:text-sm text-xs border-1 border-gray-200 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 											required
 										/>
 										<Icon
 											icon={showDropdown
 												? "ep:arrow-up-bold"
 												: "ep:arrow-down-bold"}
-											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
 											on:click={toggleDropdown}
 										/>
 									</div>
@@ -1208,7 +1207,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 									<!-- Dropdown Suggestions -->
 									{#if showDropdown}
 										<div
-											class="absolute w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 mt-1"
+											class="absolute w-full bg-white border-1 border-gray-300 rounded-md shadow-lg z-10 mt-1"
 										>
 											<ul
 												class="max-h-60 overflow-y-auto text-sm"
@@ -1252,7 +1251,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 										name="phone"
 										id="phone"
 										bind:value={phone}
-										class="block w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										class="block w-full sm:text-sm text-xs border-1 border-gray-200 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 										placeholder="Phone"
 									/>
 									{#if showErrors && phone.length === 0}
@@ -1278,7 +1277,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 										name="subject"
 										id="subject"
 										bind:value={subject}
-										class="block w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										class="block w-full sm:text-sm text-xs border-1 border-gray-200 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 										placeholder="Subject"
 									/>
 									{#if showErrors && subject.length === 0}
@@ -1289,7 +1288,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								</div>
 							</div>
 							<div class="flex-1 mb-4">
-								<textarea name="message" id="message" bind:value={message} class="w-full sm:text-sm text-xs p-1 border-1 border-gray-300 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400 h-32" placeholder="Message"></textarea>
+								<textarea name="message" id="message" bind:value={message} class="w-full sm:text-sm text-xs p-2 border-1 border-gray-200 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400 h-32" placeholder="Message"></textarea>
 								{#if showErrors && message.length === 0}
 									<span class="text-red-500 sm:text-xs text-2s font-medium"
 										>Message is required</span
@@ -1301,7 +1300,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								<button
 									type="submit"
 									on:click={handleSubmit}
-									class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+									class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-400 text-white sm:text-md text-xs rounded-md transition-all duration-300 hover:bg-primary-500 sm:w-auto font-semibold"
 									>
 									{#if submitting}
 									Sending...

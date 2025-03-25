@@ -89,24 +89,25 @@
 			// }
 		};
 	};
+
 </script>
 <section class="w-full mx-auto max-w-7xl">
-	<div class="bg-white border rounded flex justify-center items-center py-4">
+	<div class="bg-white shadow rounded-md flex justify-center items-center py-4">
 		<div class="flex flex-col md:flex-row w-full items-center">
 			<img
 				class="p-4 w-36 h-36 md:w-48 md:h-48"
 				src="/return1.webp"
 				alt="Return Order Issue"/>
-			<h2 class="text-2xl font-bold mb-4 md:mb-0 ml-4 text-center md:text-left text-heading">
+			<h2 class="sm:text-2xl text-xl font-bold mb-4 md:mb-0 ml-4 text-left text-heading">
 				Have an issue with an order? Start here!
 			</h2>
 		</div>
 	</div>
-	<section class="mt-16">
-		<h2 class="text-lg sm:text-xl md:text-2xl font-bold text-heading text-center md:text-left">
+	<section class="mt-10">
+		<h2 class="text-lg sm:text-xl md:text-2xl font-bold text-heading text-left">
 			Issue with an order you have received:
 		</h2>
-		<div class="bg-white border rounded mt-4 flex flex-col md:flex-row items-center md:items-start p-4 sm:p-6">
+		<div class="bg-white rounded-lg shadow mt-4 flex flex-col md:flex-row items-center md:items-start p-4 sm:p-6">
 			<div class="w-full md:w-1/2 p-4 sm:p-6">
 				<ul class="space-y-2 sm:space-y-3 pl-4 sm:pl-6">
 					{#each reasons as reason}
@@ -118,7 +119,7 @@
 				<div class="pl-4 sm:pl-6 mt-6 sm:mt-8">
 					<button
 						on:click={scrollToForm}
-						class="bg-primary-400 hover:bg-primary-600 text-white text-sm sm:text-base py-2 px-4 rounded">
+						class="bg-primary-400 hover:bg-primary-500 text-white text-sm sm:text-base py-2 px-4 rounded-md transition-all duration-300">
 						Start Here
 					</button>
 				</div>
@@ -131,59 +132,60 @@
 			</div>
 		</div>
 	</section>
-	<section class="mt-16">
-		<h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-700 text-center md:text-left">
+	<section class="mt-10 ">
+		<h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-700 text-left">
 			Chemikart Return Policy At A Glance
 		</h2>
-		<div class="bg-white border rounded mt-4 flex flex-col md:flex-row items-center md:items-start p-4 sm:p-6">
+		<div class="bg-white rounded-lg shadow mt-4 flex flex-col md:flex-row items-center md:items-start p-4 sm:p-6">
 			<div class="flex-none w-full md:w-1/3 h-auto flex items-center justify-center mb-4 md:mb-0">
 				<img
-					class="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 object-contain"
+					class="w-48 h-48 md:w-60 md:h-60 object-contain"
 					src="/return2.webp"
-					alt="Policy illustration"
-				/>
+					alt="Policy illustration"/>
 			</div>
 			<div class="p-4 sm:p-6 text-gray-600 text-center md:text-left md:w-2/3">
-				<p class="text-sm sm:text-base md:text-lg leading-relaxed">
+				<p class="text-xs sm:text-sm md:text-base leading-relaxed text-justify">
 					{truncateText(returnPolicy.policy1)}
 				</p>
-				<p class="mt-2 text-sm sm:text-base md:text-lg pt-4 leading-relaxed">
+				<p class="mt-2 text-xs sm:text-md md:text-base pt-4 leading-relaxed text-justify">
 					{truncateText(returnPolicy.policy2)}
 				</p>
 			</div>
 		</div>
 	</section>
-	<section id="formReturn" class="bg-white border rounded m-10 p-6 mx-auto">
-		<h2 class="text-xl font-bold mt-2">Request a return or resolve an order issue</h2>
-		<p class="text-description p-2 mb-6">
+	<section id="formReturn" class="bg-white rounded-lg shadow m-10 p-8 mx-auto">
+		<h2 class="md:text-xl text-lg font-bold mt-2">Request a return or resolve an order issue</h2>
+		<p class="text-description py-2 mb-4">
 			Enter the email , invoice number associated with the shipment.
 		</p>
 		<form
 			method="POST"
 			action="?/returns"
 			use:enhance={handleSubmit}
-			class="w-full md:flex gap-4 pt-4">
-			<input
-				type="email"
-				name="email"
-				bind:value={email}
-				class="w-full sm:w-1/3 p-2 m-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"
-				required
-				placeholder="Email"
-			/>
-			<input
-				type="text"
-				name="invoiceNumber"
-				bind:value={invoiceNumber}
-				class="w-full sm:w-1/3 p-2 m-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"
-				required
-				placeholder="Invoice Number"
-			/>
-			<button
-				type="submit"
-				class="bg-primary-400 text-white py-2 m-2 px-6 rounded border border-primary hover:bg-primary-600 transition">
-				Continue
-			</button>
+			class="w-full md:flex gap-4 py-3">
+			<div class="flex flex-col w-full"> 
+				<label for="email" class="mb-1 text-sm font-medium text-gray-700">Email</label>
+				<input
+					type="email"
+					name="email"
+					bind:value={email}
+					class="w-full p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"/>
+			</div>
+			<div class="flex flex-col w-full">
+				<label for="invoiceNumber" class="mb-1 text-sm font-medium text-gray-700">Invoice Number</label>
+				<input
+					type="text"
+					name="invoiceNumber"
+					bind:value={invoiceNumber}
+					class="w-full p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"/>
+			</div>
+			<div class="flex flex-col w-full sm:w-auto mt-6">
+				<button
+					type="submit"
+					class="bg-primary-400 text-white py-2 md:w-40 sm:w-auto rounded-md hover:bg-primary-500 transition-all duration-300">
+					Continue
+				</button>
+			</div>
 		</form>
 	</section>
 	<Toaster position="bottom-right" richColors />
