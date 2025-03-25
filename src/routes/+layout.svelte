@@ -55,7 +55,7 @@
 <Breadcrumb/> 
 <LoadingBar />
 {/if}
-<div class="flex-grow sm:px-0 mx-auto min-h-screen {isAuthRoute ? 'w-full' : ''}">
+<div class="flex-grow sm:px-0 mx-auto {isAuthRoute ? 'w-full' : ''}">
 <slot />
 </div>
 {#if !isAuthRoute}
