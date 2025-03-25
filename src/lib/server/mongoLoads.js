@@ -293,7 +293,7 @@ export async function popularProducts() {
     .sort("order")
     .populate({
       path: "product",
-      select: "-_id prodDesc productName imageSrc productNumber",
+      select: "-_id prodDesc productName imageSrc productNumber image",
       populate: [
         { path: "category", select: "-_id urlName" },
         { path: "subCategory", select: "-_id urlName" },

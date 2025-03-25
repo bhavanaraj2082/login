@@ -5,13 +5,13 @@
 	export let data;
 	import { enhance } from '$app/forms';
 	import Icon from '@iconify/svelte';
-	console.log(data);
+	// console.log(data);
 	let errorMessage = '';
 	let isLoading = false;
 	let successMessage = '';
 	let emailSubmitted = '';
 		let errors = {};
-
+  import {PUBLIC_IMAGE_URL} from "$env/static/public"
 	let verificationMessage = '';
 	let email = data?.userProfile?.email || "";
 	let isLoadingemail = false;
@@ -33,7 +33,7 @@
 	let isEditable = false;
 	// console.log(data,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 	let authedUserEmailVerified = data?.userProfile?.isEmailVerified;
-	console.log('authedUserEmailVerified', authedUserEmailVerified);
+	// console.log('authedUserEmailVerified', authedUserEmailVerified);
 
 	
 	let components, categories, subcategories, manufacturers;
@@ -355,8 +355,9 @@
 							class="flex gap-3 border rounded p-4 cursor-pointer hover:border-gray-400"
 						>
 							<img
-								src={item?.imageSrc}
+							    src={`${PUBLIC_IMAGE_URL}/${item?.image}`}
 								class="w-20 h-20 object-cover rounded-md text-sm"
+								onerror="this.src='/fallback.jpg'"
 								alt={item?.productName}
 							/>
 							<div class="">
