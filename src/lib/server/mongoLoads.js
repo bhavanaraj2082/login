@@ -240,7 +240,7 @@ export async function RelatedProductData(productId) {
           stockPriceSize: { $ifNull: ['$stockInfo.pricing', []] },
           orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
           priceSize: 1,
-          imageSrc: 1,
+          image: 1,
           productUrl: 1,
           productNumber: 1,
           variants: { $ifNull: ["$variants", []] }
@@ -1311,7 +1311,7 @@ export async function CompareSimilarityData(productId) {
           stockPriceSize: { $ifNull: ['$stockInfo.pricing', []] },
           orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
           priceSize: 1,
-          imageSrc: 1,
+          image: 1,
           productUrl: 1,
           productNumber: 1,
           variants: { $ifNull: ["$variants", []] }

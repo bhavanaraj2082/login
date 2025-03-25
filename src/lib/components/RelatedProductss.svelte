@@ -39,7 +39,7 @@
               offer: size.offer || "0",
             }))
           : [],
-      image: product.imageSrc,
+      image: product.image,
       manufacturer: product.manufacturerInfo[0]?.name,
       manufacturerId: product.manufacturerInfo[0]?._id,
       distributorId: product.stockInfo?.[0]?.distributor || "",
@@ -115,7 +115,7 @@
       brand: product.brand,
       description: product.description,
       name: product.productName || product.name,
-      image: product.imageSrc || product.image,
+      image: product.image || product.image,
       partNumber: product.partNumber,
       priceSize: product.priceSize,
       // quantity: product.quantity || 1,
@@ -343,7 +343,8 @@
                     href="/products/{product.category}/{product.subCategory}/{product.productNumber}"
                   >
                     <img
-                      src={product.image}
+                      src={`https://img.partskeys.com/chemikart/imgs/prod/${product?.image}`}
+                      onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg'"
                       alt="Img"
                       class="w-20 h-20 object-contain rounded-sm"
                     /></a
@@ -453,7 +454,8 @@
       </div>
       <div class="flex flex-row sm:flex-row gap-4 mb-3">
         <img
-          src={selectedProduct.image}
+          src={`https://img.partskeys.com/chemikart/imgs/prod/${selectedProduct?.image}`}
+          onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg'"
           alt="ProductImage"
           class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border mx-auto sm:mx-0"
         />
@@ -711,7 +713,8 @@
       <div class="flex flex-col items-center">
         <div class="flex items-center mb-6 justify-around w-full">
           <img
-            src={selectedProduct.image}
+            src={`https://img.partskeys.com/chemikart/imgs/prod/${selectedProduct?.image}`}
+            onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg'"
             alt="Img"
             class="w-24 h-24 object-contain p-1 mt-2 border rounded"
           />
