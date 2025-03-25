@@ -713,7 +713,7 @@ else if (selectedSolvent === "Yes") {
 		<hr /><hr />
 		<div class="bg-white py-10 flex justify-between">
 			<span class="flex items-center gap-2">
-				<Icon icon="ph:user-list" class="sm:w-8 sm:h-8 w-6 h-6 text-gray-300" />
+				<Icon icon="ph:user-list-bold" class="sm:w-8 sm:h-8 w-6 h-6 text-gray-300" />
 			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 5: Customer details
 			</h1>
@@ -722,7 +722,7 @@ else if (selectedSolvent === "Yes") {
 		<hr /><hr />
 		<div class="bg-white py-10 flex justify-between">
 			<span class="flex items-center gap-2">
-				<Icon icon="material-symbols-light:delivery-truck-speed-outline-rounded" class="sm:w-9 sm:h-9 w-7 h-7 text-gray-300" />
+				<Icon icon="material-symbols:delivery-truck-speed-outline-rounded" class="sm:w-9 sm:h-9 w-7 h-7 text-gray-300" />
 			<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 				Step 6: Delivery information
 			</h1>
