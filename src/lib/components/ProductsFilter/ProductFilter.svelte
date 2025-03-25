@@ -8,8 +8,10 @@
     import Icon from "@iconify/svelte";
 	import { authedUser,currencyState,cartTotalComps } from '$lib/stores/mainStores.js';
     import { enhance } from "$app/forms";
-    import { onMount, tick } from 'svelte';
+    import { onMount } from 'svelte';
     import ShowQuoteModal from "$lib/components/productInfoPopups/showQuoteModal.svelte";
+    import {PUBLIC_IMAGE_URL} from "$env/static/public"
+
     export let products
     export let manufacturers
     export let productCount
@@ -484,15 +486,15 @@ function handleMouseLeave() {
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                 <img 
-                src={product?.imageSrc} 
+                src="{PUBLIC_IMAGE_URL}/{product?.image}"
                 class="cursor-pointer w-32 h-32 sm:w-40 sm:h-40 object-contain" 
                 alt=""
-                on:click={() => imagemodal(product?.imageSrc)}
-                on:mouseenter={() => handleMouseEnter(product?.imageSrc , index)}
+                on:click={() => imagemodal(product?.image)}
+                on:mouseenter={() => handleMouseEnter(product?.image , index)}
                 on:mouseleave={handleMouseLeave}
               />
             
-               {#if hoveredItem && hoveredItem.imageSrc === product?.imageSrc && hoveredItem.index === index}
+               {#if hoveredItem && hoveredItem.image === product?.image && hoveredItem.index === index}
                 <div
                   class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 z-50 whitespace-nowrap text-xs text-description font-medium py-1 px-4 rounded-md shadow-lg border leading-snug bg-black text-white"
                 >
@@ -523,7 +525,7 @@ function handleMouseLeave() {
 								</button>
 							</div>
 							<!-- svelte-ignore a11y-img-redundant-alt -->
-							<img src={selectedImage} alt="image" class=" w-56 h-56 md:w-96 md:h-96 mx-auto object-contain" />
+							<img src="{PUBLIC_IMAGE_URL}/{selectedImage}" alt="image" class=" w-56 h-56 md:w-96 md:h-96 mx-auto object-contain" />
 						</div>
 					</div>
 				{/if}

@@ -28,6 +28,7 @@ const productSchema = new Schema({
     subsubCategory: { type: Schema.Types.ObjectId, ref: 'SubSubCategory' },
     subsubsubCategory: { type: Schema.Types.ObjectId, ref: 'SubSubSubCategory' },
     imageSrc: { type: String, required: false },
+    image: { type: String, required: false },
     returnPolicy: { type: Boolean, default: false },
     filteredProductData: { type: Schema.Types.Mixed, required:false },
     safetyDatasheet: { type: String, trim: true },
@@ -46,7 +47,6 @@ productSchema.index({ manufacturerName: 1 });
 productSchema.index({ category: 1 });
 productSchema.index({ subCategory: 1 });
 productSchema.index({ subsubCategory: 1 });
-
 
 // Fixed model definition
 const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
