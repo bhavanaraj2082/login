@@ -104,10 +104,10 @@
                 class="text-base text-green-500 inline font-bold"
               />
             {:else}
-              Out of stock <Icon
+              <Icon
                 icon="ix:error-filled"
-                class="text-base text-red-500 font-bold inline"
-              />
+                class="text-base text-red-500 font-bold mb-1 inline"
+              /> Out of stock
             {/if}
           </p>
         </span>
@@ -147,11 +147,11 @@
     </div>
 
     <div class="w-full !ml-0">
-      {#if quantity > 0}
+      {#if $quantity > 0}
         <div class="mt-2 flex justify-between gap-3">
           <div class="flex flex-col text-heading">
             <p class="font-medium text-sm">Quantity</p>
-            <p class="font-semibold text-center text-md mt-4">{quantity}</p>
+            <p class="font-semibold text-center text-md mt-4">{$quantity}</p>
           </div>
           <div class="flex flex-col text-heading">
             <p
@@ -162,7 +162,7 @@
                 {#if $currencyState === "usd"}
                   $ {(
                     (Number(product?.priceSize[index]?.USD) || 0) *
-                    (Number(quantity) || 0)
+                    (Number($quantity) || 0)
                   ).toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
@@ -170,7 +170,7 @@
                 {:else}
                   ₹ {(
                     (Number(product?.priceSize[index]?.INR) || 0) *
-                    (Number(quantity) || 0)
+                    (Number($quantity) || 0)
                   ).toLocaleString("en-IN", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
@@ -188,13 +188,13 @@
                   $ {(
                     (Number(product?.priceSize[index]?.USD) || 0) *
                     0.18 *
-                    (Number(quantity) || 0)
+                    (Number($quantity) || 0)
                   ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 {:else}
                   ₹ {(
                     (Number(product?.priceSize[index]?.INR) || 0) *
                     0.18 *
-                    (Number(quantity) || 0)
+                    (Number($quantity) || 0)
                   ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 {/if}
               </span>
@@ -209,13 +209,13 @@
                   $ {(
                     (Number(product?.priceSize[index]?.USD) || 0) *
                     1.18 *
-                    (Number(quantity) || 0)
+                    (Number($quantity) || 0)
                   ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 {:else}
                   ₹ {(
                     (Number(product?.priceSize[index]?.INR) || 0) *
                     1.18 *
-                    (Number(quantity) || 0)
+                    (Number($quantity) || 0)
                   ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 {/if}
               </span>
@@ -223,7 +223,6 @@
           </div>
         </div>
       {/if}
-
       <div
         class="flex items-center border border-gray-300 justify-between w-full space-x-4 mt-5 rounded-md"
       >
@@ -236,30 +235,28 @@
           type="text"
           min="1"
           maxlength="3"
-          bind:value={quantity}
+          bind:value={$quantity}
           class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
-          on:focus={(e) => {
-            setTimeout(() => e.target.select(), 10);
-          }}
           on:blur={(e) => {
             let inputValue = parseInt(e.target.value, 10);
 
-            if (!inputValue) {
-              quantity = orderMultiple ? orderMultiple : 1;
-              e.target.value = quantity;
-              return;
+            if (!inputValue || inputValue < 1) {
+              $quantity = orderMultiple ?? 1;
+              e.target.value = $quantity;
+            } else if (orderMultiple) {
+              let adjustedQuantity =
+                Math.round(inputValue / orderMultiple) * orderMultiple;
+              $quantity = adjustedQuantity > 999 ? 999 : adjustedQuantity;
+              e.target.value = $quantity;
             }
 
-            if (orderMultiple) {
-              quantity = Math.ceil(inputValue / orderMultiple) * orderMultiple;
-              e.target.value = quantity;
-            }
+            updateQuantity($quantity);
           }}
           on:input={(e) => {
-            e.target.value = e.target.value.replace(/[^1-9]/g, "");
+            e.target.value = e.target.value.replace(/[^0-9]/g, "");
 
             if (e.target.value === "") {
-              quantity = "";
+              $quantity = "";
               return;
             }
 
@@ -268,13 +265,8 @@
             }
 
             let parsedValue = parseInt(e.target.value, 10);
-
-            if (parsedValue > 999) {
-              quantity = 999;
-              e.target.value = "999";
-            } else {
-              quantity = parsedValue;
-            }
+            $quantity = parsedValue > 999 ? 999 : parsedValue;
+            e.target.value = $quantity;
           }}
           aria-label="Quantity"
           max="999"
@@ -288,15 +280,15 @@
       <div class="w-full mt-3">
         <button
           on:click={() => {
-            if (quantity >= 1) {
+            if ($quantity >= 1) {
               addToCart(product, index);
               cartTogglePopup();
             }
           }}
           class="w-full text-white border flex justify-center items-center border-primary-400 rounded-md py-1.5 font-medium px-2
           hover:bg-primary-400 bg-primary-400 hover:text-white
-          {quantity < 1 ? 'cursor-not-allowed hover:opacity-65' : ''}"
-          disabled={quantity < 1}
+          {$quantity < 1 ? 'cursor-not-allowed hover:opacity-65' : ''}"
+          disabled={$quantity < 1}
         >
           <Icon icon="ic:round-shopping-cart" class=" inline text-xl mr-1" />
           Add To Cart

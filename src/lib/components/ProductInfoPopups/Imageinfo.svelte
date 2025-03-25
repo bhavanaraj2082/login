@@ -71,7 +71,7 @@
             class:cursor-zoom-in={!isZoomed}
             class:cursor-zoom-out={isZoomed}
             style="transform-origin: {offsetX}% {offsetY}%;"
-            onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg-250.jpg'"
+            onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg'"
           />
         </div>
       </div>

@@ -1021,6 +1021,8 @@ export async function DifferentProds(productId) {
 
   let stockQuantity = 0;
   let orderMultiple = 0;
+  let orderedQty = 0;
+  let availableStock = 0;
   let priceSize = [];
   let stockId = [];
   let stock = 0;
@@ -1034,6 +1036,8 @@ export async function DifferentProds(productId) {
         if (typeof stockRecord.stock !== "undefined") {
           stockQuantity = stockRecord.stock;
           orderMultiple = stockRecord.orderMultiple;
+          orderedQty = stockRecord.orderedQty;
+          availableStock = stockQuantity - orderedQty;
           if (stockRecord.sku) {
             sku.push(stockRecord.sku);
           }
@@ -1153,7 +1157,8 @@ export async function DifferentProds(productId) {
     safetyInfo: product?.safetyInfo || {},
     filteredProductData: product?.filteredProductData || {},
     productSynonym: product?.filteredProductData?.["Synonym(S)"] || "",
-    stockQuantity,
+    stockQuantity: availableStock,
+    availableStock,
     orderMultiple,
     manufacturer: product?.manufacturer || {},
     stockId,
