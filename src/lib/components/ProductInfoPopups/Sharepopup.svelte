@@ -64,7 +64,7 @@
             src={`https://img.partskeys.com/chemikart/imgs/prod/${product?.imageSrc}`}
             alt="Product Image"
             class="w-32 h-28 p-1 object-contain"
-            onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg-250.jpg'"
+            onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg'"
           />
         </div>
         <div>

@@ -176,15 +176,13 @@ export async function checkavailabilityproduct(data) {
 	if (!ProductId || !quantity) {
 		return {
 			type: 'error',
-			message: 'Product ID and Quantity are required.'
+			message: 'Product and Quantity are required'
 		};
 	}
-
 	const requestedQuantity = parseInt(quantity, 10);
 
 	try {
 		const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
-
 		if (!stockRecord) {
 			console.log(`No stock record found for ProductId: ${ProductId}`);
 			return {
@@ -194,25 +192,35 @@ export async function checkavailabilityproduct(data) {
 			};
 		}
 
-		const totalStock = stockRecord.stock;
-		const orderedQty = stockRecord.orderedQty || 0;
+		const totalStock = stockRecord.stock ?? 0;
+		const orderedQty = stockRecord.orderedQty ?? 0;
 		const availableStock = totalStock - orderedQty;
-
-		if (availableStock > 0) {
-			if (requestedQuantity <= availableStock) {
-				return {
-					message: `${availableStock} is available to ship`,
-					stock: 'Available',
-					type: 'success'
-				};
-			} else {
-				return {
-					message: 'Out of Stock',
-					stock: 'Unavailable',
-					type: 'error'
-				};
-			}
-		} 
+		if (availableStock <= 0) {
+			return {
+				message: 'Out of Stock',
+				stock: 'Unavailable',
+				type: 'error'
+			};
+		}
+		if (requestedQuantity <= availableStock) {
+			return {
+				message: 'In Stock',
+				stock: 'Available',
+				type: 'success'
+			};
+		} else if(requestedQuantity > availableStock){
+			return {
+				message: `Only ${availableStock} units are available to ship out of the requested ${requestedQuantity}`,
+				stock: 'Available',
+				type: 'success'
+			};
+		} else {
+			return {
+				message: `Only ${availableStock} units are available, requested ${requestedQuantity}`,
+				stock: 'Limited Stock',
+				type: 'success'
+			};
+		}
 	} catch (error) {
 		console.error('Error during stock check:', error);
 		return {
@@ -222,6 +230,7 @@ export async function checkavailabilityproduct(data) {
 		};
 	}
 }
+
 export async function favorite(favdata) {
 	const authedUser = favdata.authedEmail;
   
