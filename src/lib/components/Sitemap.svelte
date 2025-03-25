@@ -280,7 +280,7 @@
 							<button
 								on:click={(event) =>
 									toggleExpand(index, 1, event)}
-								class="mt-2 ml-2 text-xs text-primary-400 hover:underline see-more-btn"
+								class="mt-2 ml-2 text-xs text-primary-400 hover:text-white hover:bg-primary-400 hover:border-primary-400 p-1 border border-primary-400 rounded font-semibold see-more-btn"
 							>
 								{expandedCategories1[index]
 									? "Show Less"
@@ -337,7 +337,7 @@
 							<button
 								on:click={(event) =>
 									toggleExpand(index, 2, event)}
-								class="mt-2 ml-2 text-xs text-primary-400 hover:underline see-more-btn"
+								class="mt-2 ml-2 text-xs text-primary-400 hover:text-white hover:bg-primary-400 hover:border-primary-400 p-1 border border-primary-400 rounded font-semibold see-more-btn"
 							>
 								{expandedCategories2[index]
 									? "Show Less"
