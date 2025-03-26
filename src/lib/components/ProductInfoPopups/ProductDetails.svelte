@@ -1,5 +1,5 @@
 <script>
-  import {PUBLIC_IMAGE_URL} from "$env/static/public"
+  import { PUBLIC_IMAGE_URL } from "$env/static/public";
   import { writable } from "svelte/store";
   import { addItemToCart } from "$lib/stores/cart.js";
   import { sendMessage } from "$lib/utils.js";
@@ -14,6 +14,7 @@
   import SideCart from "./sideCart.svelte";
   import LikedPopup from "./LikedPopup.svelte";
   import { toast, Toaster } from "svelte-sonner";
+  import AboutTheItem from "./AboutTheItem.svelte";
   export let data;
   export let isauthedUser;
   export let isFavorite;
@@ -471,9 +472,17 @@
             </p>
           {/if}
 
+          {#if product.productSynonym}
+            <p class="text-gray-800 text-sm font-semibold text-start">
+              Synonym(S): <span class="text-gray-500 font-normal"
+                >{product?.productSynonym}</span
+              >
+            </p>
+          {/if}
+
           {#if !product?.returnPolicy}
             <div
-              class="flex items-center gap-2 text-red-500 font-medium text-sm mt-2"
+              class="flex items-center gap-2 text-red-500 font-medium text-sm"
             >
               <Icon
                 icon="clarity:shopping-cart-solid-badged"
@@ -495,16 +504,6 @@
             </div>
           {/if} -->
         </div>
-
-        {#if product.productSynonym}
-          <div class="flex justify-between !mt-3">
-            <p class="text-gray-900 text-sm font-semibold text-start">
-              Synonym(S): <span class="text-gray-500 font-normal"
-                >{product?.productSynonym}</span
-              >
-            </p>
-          </div>
-        {/if}
         <!-- {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && ((variant.pricing.INR && variant.pricing.INR > 0) || (variant.pricing.USD && variant.pricing.USD > 0)))} -->
         {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant?.pricing && variant.pricing.length > 0 && variant.pricing.some((pricingItem) => (pricingItem.INR && Number(pricingItem.INR) > 0) || (pricingItem.USD && Number(pricingItem.USD) > 0)))}
           <div class="flex justify-between {!authedEmail ? '!mt-6' : '!mt-3'} ">
@@ -531,7 +530,7 @@
         {/if}
         {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
           <div class="!mt-6 max-[640px]:hidden block">
-            <h4 class="bg-white text-heading font-bold text-left">
+            <h4 class="bg-white text-heading font-bold text-left uppercase">
               Select a Size
             </h4>
             <div
@@ -613,7 +612,7 @@
         {/if}
         <div class="max-[640px]:block hidden">
           <h4
-            class="bg-white font-bold text-heading text-base text-left max-md:mt-6"
+            class="bg-white font-bold text-heading text-base uppercase text-left max-md:mt-6"
           >
             Select a Size
           </h4>
@@ -658,6 +657,7 @@
             </button>
           </div>
         {/if}
+        <AboutTheItem {data} />
       </div>
     </div>
     {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
