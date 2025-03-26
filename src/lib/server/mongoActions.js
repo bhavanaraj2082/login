@@ -16,7 +16,7 @@ import Cart from '$lib/server/models/cart.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '$lib/server/models/MyFavourite.js';
 import SearchQueries from '$lib/server/models/SearchQueries.js';
-import Curcurrency from "$lib/server/models/Curconversion.js";
+import Curconversion from "$lib/server/models/Curconversion.js";
 import Feedback from '$lib/server/models/Feedback.js'
 import { redirect, error } from '@sveltejs/kit';
 import Distributor from "$lib/server/models/Distributor.js"
@@ -370,7 +370,7 @@ export const checkoutOrder = async (order) => {
 			orderid = await Counter.create({counter:1})
 		}
 		order.orderid = orderid.counter
-		const currency = await Curcurrency.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+		const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
 		order.currentUsdRate = currency.rate
 		const newOrder = await Order.create(order);
         for(let rec of order.orderdetails){
