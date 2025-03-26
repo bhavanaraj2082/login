@@ -1,4 +1,5 @@
 <script>
+  import {PUBLIC_IMAGE_URL} from "$env/static/public"
   import { writable } from "svelte/store";
   import { addItemToCart } from "$lib/stores/cart.js";
   import { sendMessage } from "$lib/utils.js";
@@ -306,10 +307,10 @@
           >
             <!-- svelte-ignore a11y-img-redundant-alt -->
             <img
-              src={`https://img.partskeys.com/chemikart/imgs/prod/${product?.imageSrc}`}
+              src="{PUBLIC_IMAGE_URL}/{product?.imageSrc}"
               alt="Product Image"
               class="w-56 h-56 object-contain"
-              onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg'"
+              onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
             />
             <div
               class="absolute bottom-full left-1/2 transform -translate-x-1/2 w-max px-3 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap"

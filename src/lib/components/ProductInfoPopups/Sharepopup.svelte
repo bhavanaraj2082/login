@@ -1,6 +1,7 @@
 <script>
   import Icon from "@iconify/svelte";
   import { onMount } from "svelte";
+  import {PUBLIC_IMAGE_URL} from "$env/static/public"
 
   export let data;
   export let SharePopup;
@@ -61,10 +62,10 @@
         <div class="border-gray-300 border rounded-md">
           <!-- svelte-ignore a11y-img-redundant-alt -->
           <img
-            src={`https://img.partskeys.com/chemikart/imgs/prod/${product?.imageSrc}`}
+            src="{PUBLIC_IMAGE_URL}/{product?.imageSrc}"
             alt="Product Image"
             class="w-32 h-28 p-1 object-contain"
-            onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg'"
+            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
           />
         </div>
         <div>

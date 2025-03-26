@@ -12,9 +12,10 @@
   let isOtpLogin = false;
   let email = "";
   let password = "";
-  let validErrorpass = '';
+  let validErrorpass = "";
   let otpStatus = "";
   let showPassword = false;
+  let isLoading = false;
   let enteredOtp = "";
   let errors = {};
   let form4;
@@ -72,7 +73,7 @@
   onDestroy(() => {
     if (timerInterval) clearInterval(timerInterval);
   });
-  
+
   const handleResendOtp = () => {
     if (timeLeft === 0 && !loadingPhone) {
       form4.requestSubmit();
@@ -81,82 +82,126 @@
   };
 </script>
 
-<div class="min-h-screen bg-gradient-to-br from-gray-100 via-primary-50 to-primary-300 flex items-center justify-center p-4">
-  <button 
-	on:click={() => goto('/')}
-		class="absolute top-1 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-3 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
-		<div class="flex items-center space-x-2">
-			<Icon icon="mdi:home" class="text-xl" />
-			<span class="hidden sm:inline text-sm font-medium">Back to Home</span>
-		</div>
-	</button>
+<div
+  class="min-h-screen bg-gradient-to-br from-gray-100 via-primary-50 to-primary-300 flex items-center justify-center p-4"
+>
+  <button
+    on:click={() => goto("/")}
+    class="absolute top-1 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-3 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md"
+  >
+    <div class="flex items-center space-x-2">
+      <Icon icon="mdi:home" class="text-xl" />
+      <span class="hidden sm:inline text-sm font-medium">Back to Home</span>
+    </div>
+  </button>
   <div class="w-full max-w-5xl mt-10">
-    <div class="flex flex-col md:flex-row bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl">
-      <div class="w-full md:w-3/5 p-8 md:pb-12 md:px-12 flex flex-col justify-center relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-primary-500/80 via-primary-500/80 to-primary-600/80 z-0"></div>
-        <div class="absolute top-6 md:right-10 right-4 w-20 h-20 rounded bg-primary-100/20 animate-pulse clip-hexagon flex md:justify-center justify-end items-center">
-          <Icon icon="lets-icons:chemistry-light" class="text-gray-100 text-5xl" />
+    <div
+      class="flex flex-col md:flex-row bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl"
+    >
+      <div
+        class="w-full md:w-3/5 p-8 md:pb-12 md:px-12 flex flex-col justify-center relative overflow-hidden"
+      >
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-primary-500/80 via-primary-500/80 to-primary-600/80 z-0"
+        ></div>
+        <div
+          class="absolute top-6 md:right-10 right-4 w-20 h-20 rounded bg-primary-100/20 animate-pulse clip-hexagon flex md:justify-center justify-end items-center"
+        >
+          <Icon
+            icon="lets-icons:chemistry-light"
+            class="text-gray-100 text-5xl"
+          />
         </div>
-        <div class="absolute md:bottom-2 md:right-0 bottom-2 left-48 sm:w-80 sm:h-80 h-20 w-20 rounded bg-primary-100/10 animate-pulse clip-hexagon">
-        </div>
+        <div
+          class="absolute md:bottom-2 md:right-0 bottom-2 left-48 sm:w-80 sm:h-80 h-20 w-20 rounded bg-primary-100/10 animate-pulse clip-hexagon"
+        ></div>
         <div class="relative z-10">
-          <h1 class="text-2xl md:text-4xl font-bold text-white mb-6">Welcome Back!</h1>
+          <h1 class="text-2xl md:text-4xl font-bold text-white mb-6">
+            Welcome Back!
+          </h1>
           <div class="md:w-72 w-20 h-1 bg-primary-50 mb-8"></div>
           <p class="text-white/90 sm:text-lg text-xs max-w-lg text-md mb-8">
-            Sign in to continue your journey with us. Access your personalized dashboard and exclusive features.
+            Sign in to continue your journey with us. Access your personalized
+            dashboard and exclusive features.
           </p>
           <div class="space-y-6 md:pr-12 hidden md:block">
             <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-full bg-primary-50/20 shadow-md flex items-center justify-center">
+              <div
+                class="w-10 h-10 rounded-full bg-primary-50/20 shadow-md flex items-center justify-center"
+              >
                 <Icon icon="ph:shield-check-bold" class="text-lg text-white" />
               </div>
-              <span class="text-white md:text-lg text-xs">Secure authentication</span>
+              <span class="text-white md:text-lg text-xs"
+                >Secure authentication</span
+              >
             </div>
             <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-full bg-primary-50/20 shadow-md flex items-center justify-center">
+              <div
+                class="w-10 h-10 rounded-full bg-primary-50/20 shadow-md flex items-center justify-center"
+              >
                 <Icon icon="ph:lightning-bold" class="text-lg text-white" />
               </div>
-              <span class="text-white md:text-lg text-xs">Fast and reliable access</span>
+              <span class="text-white md:text-lg text-xs"
+                >Fast and reliable access</span
+              >
             </div>
             <div class="flex items-center space-x-3">
-              <div class="w-10 h-10 rounded-full bg-primary-50/20 shadow-md flex items-center justify-center">
+              <div
+                class="w-10 h-10 rounded-full bg-primary-50/20 shadow-md flex items-center justify-center"
+              >
                 <Icon icon="ph:devices-bold" class="text-lg text-white" />
               </div>
-              <span class="text-white md:text-lg text-xs">Works across all your devices</span>
+              <span class="text-white md:text-lg text-xs"
+                >Works across all your devices</span
+              >
             </div>
           </div>
         </div>
       </div>
-      <div class="w-full md:w-2/5 bg-white md:rounded-r-xl relative z-10 p-4 md:p-10">
+      <div
+        class="w-full md:w-2/5 bg-white md:rounded-r-xl relative z-10 p-4 md:p-10"
+      >
         <div class="max-w-md mx-auto">
           <h2 class="text-2xl font-bold text-primary-600 mb-2">Sign In</h2>
           <p class="mb-6 sm:text-sm text-xs text-gray-600">
             Don't have an account? <a
               href="/signup"
-              class="text-primary-500 hover:text-primary-600 font-medium">Create a new one</a>
+              class="text-primary-500 hover:text-primary-600 font-medium"
+              >Create a new one</a
+            >
           </p>
           {#if isOtpLogin}
             <form
               method="POST"
               action="?/sendOtp"
               use:enhance={() => {
+                isLoading = true;
                 return async ({ result, update }) => {
                   console.log(result);
                   otpStatus = result.status;
                   if (result.type === "failure") {
+                    isLoading = false;
                     toast.error(result.data.errorMsg);
                   } else if (result.type === "success") {
                     toast.success(result.data.errorMsg);
                     startTimer();
                   }
                   await applyAction(result);
+                  isLoading = false;
                 };
               }}
-              class="space-y-4">
+              class="space-y-4"
+            >
               <div class="space-y-1">
-                <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                <label
+                  for="email"
+                  class="block text-sm font-medium text-gray-700"
+                  >Email address</label
+                >
                 <div class="relative">
-                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <div
+                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                  >
                     <Icon icon="heroicons:envelope" class="text-gray-400" />
                   </div>
                   <input
@@ -173,13 +218,23 @@
                   <p class="text-red-500 text-xs mt-1">{errors.email}</p>
                 {/if}
               </div>
-              
+
               {#if otpStatus !== 200}
                 <button
                   type="submit"
-                  class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-md py-2 font-medium transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center">
-                  <Icon icon="heroicons:paper-airplane" class="mr-2" />
-                  Send OTP
+                  class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-md py-2 font-medium transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center"
+                  disabled={isLoading}
+                >
+                  {#if isLoading}
+                    <Icon
+                      icon="line-md:loading-alt-loop"
+                      class="w-5 h-5 mr-2 animate-spin inline"
+                    />
+                    Sending..
+                  {:else}
+                    <Icon icon="heroicons:paper-airplane" class="mr-2" />
+                    Send OTP
+                  {/if}
                 </button>
               {/if}
 
@@ -210,15 +265,20 @@
                   }}
                   class="space-y-4"
                 >
-                  <div class="bg-primary-50 p-4 rounded-md border border-primary-100">
+                  <div
+                    class="bg-primary-50 p-4 rounded-md border border-primary-100"
+                  >
                     <p class="text-gray-700 text-sm mb-3">
-                      Enter the 6-digit OTP sent to your email to complete verification.
+                      Enter the 6-digit OTP sent to your email to complete
+                      verification.
                     </p>
                     <input type="hidden" name="email" bind:value={email} />
 
                     <div class="flex gap-2 items-center">
                       <div class="relative flex-1">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <div
+                          class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                        >
                           <Icon icon="heroicons:key" class="text-gray-400" />
                         </div>
                         <input
@@ -226,12 +286,18 @@
                           maxlength="6"
                           name="enteredOtp"
                           bind:value={enteredOtp}
-                          on:input={() => (enteredOtp = enteredOtp.trim())}
+                          on:input={(e) => {
+                            enteredOtp = e.target.value
+                              .replace(/[^0-9]/g, "")
+                              .trim();
+                          }}
                           placeholder="6-digit OTP"
                           class="pl-10 w-full rounded-md border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
                         />
                       </div>
-                      <button class="bg-primary-500 text-white text-sm py-2.5 px-4 rounded-md font-medium hover:bg-primary-600 transition-colors">
+                      <button
+                        class="bg-primary-500 text-white text-sm py-2 px-4 rounded-md font-medium hover:bg-primary-600 transition-colors"
+                      >
                         Verify
                       </button>
                     </div>
@@ -253,11 +319,13 @@
                       }
                       await applyAction(result);
                     };
-                  }}>
+                  }}
+                >
                   {#if timeLeft > 0}
                     <div class="flex justify-center">
                       <span
-                        class="text-sm px-4 py-2 rounded-full bg-gradient-to-r from-primary-100 to-primary-200 text-primary-800 border border-primary-300 flex items-center">
+                        class="text-sm px-4 py-2 rounded-full bg-gradient-to-r from-primary-100 to-primary-200 text-primary-800 border border-primary-300 flex items-center"
+                      >
                         <Icon icon="heroicons:clock" class="mr-2" />
                         Resend in {formatTime(timeLeft)}
                       </span>
@@ -268,7 +336,8 @@
                       <button
                         on:click={handleResendOtp}
                         type="submit"
-                        class="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline flex items-center">
+                        class="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline flex items-center"
+                      >
                         <Icon icon="heroicons:arrow-path" class="mr-1" />
                         Resend OTP
                       </button>
@@ -278,11 +347,22 @@
               {/if}
             </form>
           {:else}
-            <form method="POST" action="?/login" use:enhance={handleFormSubmit} class="space-y-4">
+            <form
+              method="POST"
+              action="?/login"
+              use:enhance={handleFormSubmit}
+              class="space-y-4"
+            >
               <div class="space-y-1">
-                <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+                <label
+                  for="email"
+                  class="block text-sm font-medium text-gray-700"
+                  >Email address</label
+                >
                 <div class="relative">
-                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <div
+                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                  >
                     <Icon icon="heroicons:envelope" class="text-gray-400" />
                   </div>
                   <input
@@ -300,9 +380,15 @@
                 {/if}
               </div>
               <div class="space-y-1">
-                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <label
+                  for="password"
+                  class="block text-sm font-medium text-gray-700"
+                  >Password</label
+                >
                 <div class="relative">
-                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <div
+                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                  >
                     <Icon icon="heroicons:lock-closed" class="text-gray-400" />
                   </div>
                   {#if showPassword}
@@ -314,7 +400,9 @@
                       bind:value={password}
                       on:input={() => {
                         password = password.trim();
-                        validErrorpass = !password ? 'Please enter a valid Password' : '';
+                        validErrorpass = !password
+                          ? "Please enter a valid Password"
+                          : "";
                       }}
                       class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
                     />
@@ -327,7 +415,9 @@
                       bind:value={password}
                       on:input={() => {
                         password = password.trim();
-                        validErrorpass = !password ? 'Please enter a valid Password' : '';
+                        validErrorpass = !password
+                          ? "Please enter a valid Password"
+                          : "";
                       }}
                       class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
                     />
@@ -335,7 +425,8 @@
                   <button
                     type="button"
                     class="absolute top-3 right-2.5 text-gray-500 hover:text-gray-700 focus:outline-none"
-                    on:click={() => (showPassword = !showPassword)} >
+                    on:click={() => (showPassword = !showPassword)}
+                  >
                     {#if showPassword}
                       <Icon icon="mdi:eye-off-outline" class="w-5 h-5" />
                     {:else}
@@ -352,24 +443,26 @@
                 <a
                   href="/forgot"
                   class="md:text-sm text-xs text-primary-600 hover:text-primary-700 hover:underline underline-offset-2"
-                >Forgot password?</a>
+                  >Forgot password?</a
+                >
               </div>
 
               <button
                 type="submit"
-                class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-md py-2 font-medium transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center">
+                class="w-full bg-gradient-to-r from-primary-400 to-primary-500 hover:from-primary-500 hover:to-primary-600 text-white rounded-md py-2 font-medium transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center"
+              >
                 <Icon icon="material-symbols:open-in-phone" class="mr-2" />
                 Sign In
               </button>
             </form>
           {/if}
-          
+
           <div class="relative flex py-5 items-center">
             <div class="flex-grow border-t border-gray-300"></div>
             <span class="flex-shrink mx-4 text-gray-500 text-sm">OR</span>
             <div class="flex-grow border-t border-gray-300"></div>
           </div>
-          
+
           {#if isOtpLogin}
             <button
               on:click={() => (isOtpLogin = false)}
@@ -387,7 +480,7 @@
               <span class="text-sm">Sign In with OTP</span>
             </button>
           {/if}
-          
+
           <button
             class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200 font-medium"
           >

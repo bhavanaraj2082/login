@@ -1,5 +1,6 @@
 <script>
-  import Icon from "@iconify/svelte";
+  import Icon from "@iconify/svelte"
+  import {PUBLIC_IMAGE_URL} from "$env/static/public"
   export let data;
   let product = data.records;
   export let ImageclosePopup;
@@ -64,14 +65,14 @@
         >
           <!-- svelte-ignore a11y-img-redundant-alt -->
           <img
-            src={`https://img.partskeys.com/chemikart/imgs/prod/${product?.imageSrc}`}
+            src="{PUBLIC_IMAGE_URL}/{product?.imageSrc}"
             alt="Product Image"
             class="w-full h-full object-contain transition-transform duration-300"
             class:scale-150={isZoomed}
             class:cursor-zoom-in={!isZoomed}
             class:cursor-zoom-out={isZoomed}
             style="transform-origin: {offsetX}% {offsetY}%;"
-            onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg'"
+            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
           />
         </div>
       </div>
