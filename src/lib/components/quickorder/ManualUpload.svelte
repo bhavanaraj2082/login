@@ -950,6 +950,12 @@
       currentIndexqoute = null;
     }
   };
+
+  const tabs = [
+    { name: "Manual Entry" },
+    { name: "Bulk Upload" }
+  ];
+  let activeTab = "Manual Entry";
 </script>
 
 <form
@@ -963,28 +969,33 @@
 <div class="w-11/12 mx-auto px-2 md:flex md:space-x-8 max-w-7xl">
   <div class="md:w-full">
     <h1 class="font-semibold text-lg md:text-2xl">Quick Order</h1>
-
-    <div class="my-4 lg:ml-4">
-      <button
-        on:click={() => (toggle = false)}
-        class="px-5 py-2 text-sm font-semibold {toggle
-          ? 'bg-primary-200'
-          : 'bg-white border-b-2 border-primary-500 text-primary-500'}"
+    <div class="sm:w-1/2 w-full lg:w-1/4 inline-flex rounded mb-8 mt-5">
+      <nav
+        aria-label="Tabs"
+        class="w-full flex space-x-0 overflow-x-auto rounded-t hide"
       >
-        Manual Entry
-      </button>
-      <button
-        on:click={() => (toggle = true)}
-        class="px-5 py-2 text-sm font-semibold {toggle
-          ? 'bg-white border-b-2 border-primary-500 text-primary-500'
-          : 'bg-primary-200'}"
+      {#each tabs as tab}
+    <div class="inline-block w-full">
+      <button   on:click={() => (activeTab = tab.name)}
+        class="w-full sm:py-2 py-1 h-12 sm:px-2  px-1 sm:text-sm text-xs focus:outline-none transition duration-300
+          {activeTab === tab.name
+          ? 'bg-gray-50 text-primary-500 font-bold'
+          : 'bg-primary-100 text-black'}
+          hover:bg-gray-50 hover:text-primary-500 whitespace-nowrap"
       >
-        Bulk Upload
+        {tab.name}
       </button>
+      <div
+        class="h-0.5 bg-primary-300
+        {activeTab === tab.name
+          ? 'w-full'
+          : 'w-0'} transition-all duration-300 ease-in-out"
+      ></div>
     </div>
-
-    <!-- svelte-ignore empty-block -->
-    {#if toggle}
+      {/each}
+      </nav>
+    </div>
+    {#if activeTab === "Bulk Upload"}
       <Bulkupload {data} />
     {:else}
       <div class="text-black text-sm md:ml-5">
