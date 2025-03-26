@@ -59,29 +59,34 @@
       >
         Frequently Asked Questions
       </h1>
-      <div class="flex gap-3 mb-4 sm:mx-2 md:ml-0 lg:mx-0 relative">
+      <div class="sm:w-1/2 w-full lg:w-1/4 inline-flex rounded mb-8 mt-5">
+        <nav
+          aria-label="Tabs"
+          class="w-full flex space-x-0 overflow-x-auto rounded-t hide"
+        >
         {#each sections as { title }, index}
-          <div
-            class="relative w-full sm:w-32"
-            bind:this={sectionElements[index]}
-          >
-            <button
-              class={`flex flex-col justify-center items-center rounded p-2 w-full pb-4 relative text-base lg:text-lg ${
-                activeIndex === index
-                  ? "font-semibold bg-white"
-                  : "bg-primary-200"
-              }`}
-              on:click={() => selectSection(index)}
-              style="transition: background-color 0.3s, transform 0.3s;"
-            >
-              {title}
-            </button>
-          </div>
-        {/each}
+      <div class="inline-block w-full" bind:this={sectionElements[index]}>
+        <button                 on:click={() => selectSection(index)}
+        
+          class="w-full sm:py-2 py-1 h-12 sm:px-2  px-1 sm:text-lg text-md focus:outline-none transition duration-300
+            {activeIndex === index
+            ? 'bg-gray-50 text-primary-500 font-bold'
+            : 'bg-primary-100 text-black'}
+            hover:bg-gray-50 hover:text-primary-500 whitespace-nowrap"
+        >
+          {title}
+        </button>
+
         <div
-          class="absolute bottom-2 h-1 bg-primary-400 rounded transition-all duration-300 ease-in-out"
-          bind:this={barElement}
-        />
+        class="h-0.5 bg-primary-300
+        {activeIndex === index
+          ? 'w-full'
+          : 'w-0'} transition-all duration-300 ease-in-out"
+      ></div>
+       
+      </div>
+        {/each}
+        </nav>
       </div>
       <div>
         <div class="py-6" bind:this={faqContainer}>
