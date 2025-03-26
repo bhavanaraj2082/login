@@ -727,7 +727,7 @@ async function submitForm() {
 	</div>
 	<div class="hidden md:flex mx-auto w-full !z-0">
 		<!-- Menu Section -->
-		<div class="md:flex mx-auto justify-between w-11/12 max-w-7xl">
+		<div class="md:flex mx-auto justify-between w-11/12 max-w-7xl z-50">
 			<div class="md:flex justify-around items-center lg:gap-2 hidden">
 				{#each menus as menu, index}
 					<!-- svelte-ignore a11y-interactive-supports-focus -->
