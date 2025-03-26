@@ -174,9 +174,9 @@
   let typing = false;
 
   function handleInput() {
-    typing = true;
-    enteredOtp = enteredOtp.trim();
-  }
+  typing = true;
+  enteredOtp = enteredOtp.replace(/[^0-9]/g, "").trim();
+}
 
   const countryCurrencyMap = {
     Afghanistan: "AFN",
