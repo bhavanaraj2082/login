@@ -2328,136 +2328,12 @@ export const addAllToCart = async (items, userId, userEmail) => {
 //Myfavouries actions ends
 
 
-
-// export const quicksearch = async ({ query }) => {
-// 	try {
-// 	  const baseProducts = await Product.find({
-// 		productNumber: { $regex: query, $options: 'i' }
-// 	  })
-// 		.select('_id productName productNumber prodDesc imageSrc')
-// 		.limit(20)
-// 		.lean()
-// 		.exec();
-// 	  const enrichedProducts = [];
-// 	  for (const baseProduct of baseProducts) {
-// 		const stockEntries = await Stock.find({ 
-// 		  productNumber: baseProduct.productNumber 
-// 		})
-// 		  .select('_id stock pricing distributor manufacturer')
-// 		  .lean()
-// 		  .exec();
-  
-// 		if (!stockEntries || stockEntries.length === 0) {
-// 		  enrichedProducts.push({
-// 			id: baseProduct._id.toString(),
-// 			image: baseProduct.imageSrc || null,
-// 			description: baseProduct.prodDesc || null,
-// 			productName: baseProduct.productName,
-// 			productNumber: baseProduct.productNumber,
-// 			stockId: null,
-// 			manufacturer: null,
-// 			distributer: null,
-// 			stock: 0,
-// 			priceone: "",
-// 			pricing: []
-// 		  });
-// 		  continue;
-// 		}
-// 		for (const entry of stockEntries) {
-// 		  // Log the original pricing object structure
-// 		  console.log('Original pricing data:', JSON.stringify(entry.pricing, null, 2));
-		  
-// 		  let processedPricing = [];
-// 		  let priceoneValue = "";
-		  
-// 		  if (entry.pricing) {
-// 			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
-			
-// 			if (originalPricing[0]?.INR) {
-// 			  // If pricing already has INR, use it directly
-// 			  processedPricing = originalPricing;
-// 			  priceoneValue = originalPricing[0]?.INR || "";
-			  
-// 			  // Log pricing that already has INR
-// 			  console.log('Using existing INR pricing:', JSON.stringify(processedPricing, null, 2));
-// 			} else {
-// 			  try {
-// 				// Convert to INR but keep original values
-// 				const originalPricingArray = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
-				
-// 				// Log pricing before conversion
-// 				console.log('Before conversion:', JSON.stringify(originalPricingArray, null, 2));
-				
-// 				const convertedPricing = await convertToINR(originalPricingArray);
-				
-// 				// Log pricing after conversion
-// 				console.log('After conversion:', JSON.stringify(convertedPricing, null, 2));
-				
-// 				// For each pricing object, add the INR value while keeping original currency
-// 				processedPricing = originalPricingArray.map((origPrice, index) => {
-// 				  const convertedPrice = convertedPricing[index];
-// 				  const result = {
-// 					...origPrice,  // Keep all original properties (USD, break, offer, etc.)
-// 					inr: convertedPrice.INR  // Add the converted INR value
-// 				  };
-				  
-// 				  return result;
-// 				});
-				
-// 				// Log the final processed pricing objects
-// 				console.log('Final processed pricing:', JSON.stringify(processedPricing, null, 2));
-				
-// 				// Set the priceone value from the first item's INR price
-// 				priceoneValue = processedPricing[0]?.inr || "";
-// 			  } catch (error) {
-// 				console.error('Error converting pricing to INR:', error);
-// 				processedPricing = originalPricing;
-// 				console.log('Using original pricing due to error:', JSON.stringify(processedPricing, null, 2));
-// 			  }
-// 			}
-// 		  }
-  
-// 		  const productEntry = {
-// 			id: baseProduct._id.toString(),
-// 			image: baseProduct.imageSrc || null,
-// 			description: baseProduct.prodDesc || null,
-// 			productName: baseProduct.productName,
-// 			productNumber: baseProduct.productNumber,
-// 			stockId: entry._id.toString(),
-// 			manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
-// 			distributer: entry.distributor ? entry.distributor.toString() : null,
-// 			stock: entry.stock || 0,
-// 			priceone: priceoneValue, // Add the top-level price converted to INR
-// 			pricing: processedPricing
-// 		  };
-		  
-// 		  // Log the final product entry
-// 		  console.log('Final product entry structure:', JSON.stringify({
-// 			id: productEntry.id,
-// 			productName: productEntry.productName,
-// 			priceone: productEntry.priceone,
-// 			pricing: productEntry.pricing
-// 		  }, null, 2));
-		  
-// 		  enrichedProducts.push(productEntry);
-// 		}
-// 	  }
-// 	  console.log('Total enriched products:', enrichedProducts.length);
-  
-// 	  return enrichedProducts;
-// 	} catch (error) {
-// 	  console.error('Error during quicksearch function call:', error);
-// 	  throw new Error('An error occurred while processing the quicksearch.');
-// 	}
-//   };
-
-
 export const quicksearch = async ({ query }) => {
 	try {
 	  const baseProducts = await Product.find({
 		productNumber: { $regex: query, $options: 'i' }
 	  })
-		.select('_id productName productNumber prodDesc imageSrc')
+		.select('_id productName productNumber prodDesc image')
 		.limit(20)
 		.lean()
 		.exec();
@@ -2473,7 +2349,7 @@ export const quicksearch = async ({ query }) => {
 		if (!stockEntries || stockEntries.length === 0) {
 		  enrichedProducts.push({
 			id: baseProduct._id.toString(),
-			image: baseProduct.imageSrc || null,
+			image: baseProduct.image || null,
 			description: baseProduct.prodDesc || null,
 			productName: baseProduct.productName,
 			productNumber: baseProduct.productNumber,
@@ -2527,7 +2403,7 @@ export const quicksearch = async ({ query }) => {
   
 		  const productEntry = {
 			id: baseProduct._id.toString(),
-			image: baseProduct.imageSrc || null,
+			image: baseProduct.image || null,
 			description: baseProduct.prodDesc || null,
 			productName: baseProduct.productName,
 			productNumber: baseProduct.productNumber,
@@ -2663,7 +2539,6 @@ export const quicksearch = async ({ query }) => {
 
 // 	return results;
 // };
-//mongoActions
 export const uploadFile = async ({ query }) => {
 	const validQueries = query.filter(([productNumberAndSize, quantity]) =>
 		productNumberAndSize?.trim() && String(quantity)?.trim()
@@ -2689,8 +2564,24 @@ export const uploadFile = async ({ query }) => {
 		const complexSizeMatch = inputStr.match(complexSizePattern);
 		const measurementPattern = /^(.*?)-(\d+[-]?[A-Za-z]+)$/;
 		const measurementMatch = inputStr.match(measurementPattern);
-		const eachPattern = /^(.*?)[-\s]+(each\s*(?:of)?\s*[-\s]*\d+|each[-\s]*of[-\s]*\d+|\d+\s*(?:each|pcs|units|items))$/i;
-		const eachMatch = inputStr.match(eachPattern);
+
+		// Updated pattern to handle both "each" and "case" with more flexibility
+		const quantityPatterns = [
+			/^(.*?)[-\s]+(each\s*(?:of)?\s*[-\s]*\d+|each[-\s]*of[-\s]*\d+|\d+\s*(?:each|pcs|units|items))$/i,
+			/^(.*?)[-\s]+(case\s*(?:of)?\s*[-\s]*\d+|case[-\s]*of[-\s]*\d+|\d+\s*(?:case|pcs|units|items))$/i,
+			/^(.*?)[-\s]+(pack\s*(?:of)?\s*[-\s]*\d+|pack[-\s]*of[-\s]*\d+|\d+\s*(?:pack|pcs|units|items))$/i
+
+		];
+
+		let eachMatch = null;
+		for (const pattern of quantityPatterns) {
+			const match = inputStr.match(pattern);
+			if (match) {
+				eachMatch = match;
+				break;
+			}
+		}
+
 		if (spaceHyphenMatch) {
 			productNumber = spaceHyphenMatch[1].trim();
 			size = spaceHyphenMatch[2].trim();
@@ -2716,22 +2607,22 @@ export const uploadFile = async ({ query }) => {
 
 		const sizeWithQuantityPattern = /^(.*?)(\d+)$/;
 		const sizeWithQuantityMatch = size.match(sizeWithQuantityPattern);
-		
+
 		if (sizeWithQuantityMatch && !quantity) {
 			size = sizeWithQuantityMatch[1].trim();
 		}
-		
+
 		console.log(`Parsed: Product Number = "${productNumber}", Size = "${size}"`);
-		
-		const product = await Product.findOne({ 
-			productNumber: new RegExp('^' + productNumber.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '$', 'i') 
+
+		const product = await Product.findOne({
+			productNumber: new RegExp('^' + productNumber.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '$', 'i')
 		}).exec();
 
 		if (product) {
-			const stockInfo = await Stock.find({ 
-				productNumber: product.productNumber 
+			const stockInfo = await Stock.find({
+				productNumber: product.productNumber
 			}).select('id stock pricing distributor manufacturer');
-			
+
 			console.log(stockInfo, "asadsdsfsdfxdrdr********************8");
 
 			let convertedPricing = [];
@@ -2761,20 +2652,28 @@ export const uploadFile = async ({ query }) => {
 			const normalizedUserSize = size
 				.toLowerCase()
 				.replace(/\s+/g, '')
-				.replace(/[-_]/g, '') 
-				.replace(/of/g, '')  
-				.replace(/each/g, 'each') 
-				.replace(/ea/g, 'each'); 
-			
+				.replace(/[-_]/g, '')
+				.replace(/of/g, '')
+				.replace(/each/g, 'each')
+				.replace(/ea/g, 'each')
+				.replace(/pack/g, 'pack')
+				.replace(/pa/g, 'pack')
+				.replace(/case/g, 'case')
+				.replace(/ca/g, 'case');
+
 			let validSizePrice = convertedPricing.find(item => {
 				const normalizedItemSize = (item.break || '')
 					.toLowerCase()
-					.replace(/\s+/g, '') 
-					.replace(/[-_]/g, '') 
-					.replace(/of/g, '')   
-					.replace(/each/g, 'each') 
-					.replace(/ea/g, 'each'); 
-					
+					.replace(/\s+/g, '')
+					.replace(/[-_]/g, '')
+					.replace(/of/g, '')
+					.replace(/each/g, 'each')
+					.replace(/ea/g, 'each')
+					.replace(/pack/g, 'pack')
+					.replace(/pa/g, 'pack')
+					.replace(/case/g, 'case')
+					.replace(/ca/g, 'case');
+
 				return normalizedItemSize === normalizedUserSize;
 			});
 
@@ -2787,11 +2686,15 @@ export const uploadFile = async ({ query }) => {
 						.replace(/[-_]/g, '')
 						.replace(/of/g, '')
 						.replace(/each/g, 'each')
-						.replace(/ea/g, 'each');
-					return normalizedItemSize.includes(normalizedUserSize) || 
-						   normalizedUserSize.includes(normalizedItemSize);
+						.replace(/ea/g, 'each')
+						.replace(/pack/g, 'pack')
+						.replace(/pa/g, 'pack')
+						.replace(/case/g, 'case')
+						.replace(/ca/g, 'case');
+					return normalizedItemSize.includes(normalizedUserSize) ||
+						normalizedUserSize.includes(normalizedItemSize);
 				});
-				
+
 				if (partialMatch) {
 					console.log(`Found partial match: ${partialMatch.break}`);
 					validSizePrice = partialMatch;
@@ -2812,10 +2715,10 @@ export const uploadFile = async ({ query }) => {
 			let availableStock = Number(stockInfo[0]?.stock) || 0;
 			results.push({
 				id: product._id.toString(),
-				image: product.imageSrc || "No image available",
+				image: product.image || "No image available",
 				description: product.prodDesc || "No description available",
 				productName: product.productName || "No product name available",
-				productNumber: product.productNumber, 
+				productNumber: product.productNumber,
 				quantity: parseInt(quantity),
 				stockId: stockInfo[0]?.id.toString() || null,
 				stock: availableStock,
@@ -2824,7 +2727,7 @@ export const uploadFile = async ({ query }) => {
 				isValid: true,
 				message: "Product number and size are valid",
 				pricing: [{
-					break: validSizePrice.break, 
+					break: validSizePrice.break,
 					price: validSizePrice.INR || "N/A",
 				}],
 			});

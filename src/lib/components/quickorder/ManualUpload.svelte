@@ -7,6 +7,7 @@
   import { cartState } from "$lib/stores/cartStores.js";
   import Bulkupload from "./Bulkupload.svelte";
   import { toast } from "svelte-sonner";
+  import { PUBLIC_IMAGE_URL } from "$env/static/public";
   let uploadedRows = [];
   let showSavedCarts = false;
   // console.log(currencyState, "currencyState");
@@ -125,9 +126,7 @@
         selectedProduct: null,
       });
     }
-  } else {
-    console.log("Using default rows: ", rows.length);
-  }
+  } 
 
   let validationMessages = [];
 
@@ -224,7 +223,7 @@
       filteredProducts: [],
       selectedSize: "",
       selectedProduct: null,
-      quantity: 1, 
+      quantity: 1,
     };
 
     if (selectedProducts[index]) {
@@ -259,7 +258,6 @@
 
     checkAvailability();
   }
-
 
   function clearSearch(index) {
     rows[index] = {
@@ -1393,251 +1391,239 @@
   </div>
 
   {#if showDetailsModal && selectedProduct}
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div
+    class="fixed inset-0 w-full flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity !ml-0"
+    on:click|self={hideDetails}
+  >
     <div
-      class="fixed inset-0 w-full flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity !ml-0"
+      class="bg-white p-8 rounded-lg relative shadow-lg max-w-xl w-full sm:w-auto mx-4 sm:mx-0"
       on:click|self={hideDetails}
     >
-      <div
-        class="bg-white p-8 rounded-lg relative shadow-lg max-w-xl w-full sm:w-auto mx-4 sm:mx-0"
-        on:click|self={hideDetails}
+      <button
+        class="absolute top-2 right-2 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
+        on:click={hideDetails}
+        aria-label="Close"
       >
-        <button
-          class="absolute top-2 right-2 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
-          on:click={hideDetails}
-          aria-label="Close"
-        >
-          <Icon
-            icon="mdi:close"
-            class="text-2xl font-bold text-red-600 border rounded hover:p-px"
+        <Icon
+          icon="mdi:close"
+          class="text-2xl font-bold text-red-600 border rounded hover:p-px"
+        />
+      </button>
+
+      <h3 class="text-xl font-bold text-left">
+        Availability for {selectedProduct.productNumber} - {selectedProduct.size}
+      </h3>
+      <p class="text-gray-500 mb-10 text-left mt-2">
+        Enter quantity to check availability.
+      </p>
+
+      <form
+        method="POST"
+        action="?/quickcheck"
+        use:enhance={() => {
+          checking = true;
+          return async ({ result }) => {
+            checking = false;
+            console.log(result, "result");
+            const { message, stock, type } = result.data.record;
+            stockStatus = message;
+            if (stock === "Available" && type === "success") {
+              stockStatus = ` ✔️${message}`;
+            } else if (stock === "Limited Availability") {
+              stockStatus = `⚠️ ${message} `;
+            } else if (stock === "Unavailable" || type === "error") {
+              stockStatus = `❌ ${message}`;
+            }
+          };
+        }}
+      >
+        <div class="flex items-center gap-4 mb-6">
+          <input
+            type="hidden"
+            name="ProductId"
+            value={selectedProduct.productNumber}
           />
-        </button>
+          <input
+            type="hidden"
+            name="quantity"
+            value={selectedProduct.quantity}
+          />
 
-        <h3 class="text-xl font-bold text-left">
-          Availability for {selectedProduct.productNumber} - {selectedProduct.size}
-        </h3>
-        <p class="text-gray-500 mb-10 text-left mt-2">
-          Enter quantity to check availability.
+          <button
+            class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
+            on:click|preventDefault={decreaseQuantity}
+          >
+            <Icon icon="ic:round-minus" class="text-xl" />
+          </button>
+
+          <input
+            type="text"
+            min="1"
+            maxlength="4"
+            bind:value={selectedProduct.quantity}
+            class="w-16 h-10 text-center p-2 border border-gray-300 rounded-lg outline-none focus:ring-0 focus:none focus:border-primary-400"
+            on:focus={(e) => {
+              e.target.dataset.previousValue = e.target.value;
+
+              setTimeout(() => {
+                e.target.select();
+              }, 10);
+            }}
+            on:blur={(e) => {
+              if (e.target.value === "" || e.target.value === "0") {
+                selectedProduct.quantity = 1;
+                e.target.value = "1";
+              } else {
+                const parsedValue = parseInt(e.target.value, 10);
+                if (
+                  !isNaN(parsedValue) &&
+                  parsedValue >= 1 &&
+                  parsedValue <= 999
+                ) {
+                  selectedProduct.quantity = parsedValue;
+                } else {
+                  selectedProduct.quantity = parseInt(
+                    e.target.dataset.previousValue || "1",
+                    10,
+                  );
+                  e.target.value = selectedProduct.quantity.toString();
+                }
+              }
+            }}
+            on:input={(e) => {
+              e.target.value = e.target.value.replace(/[^0-9]/g, "");
+
+              if (
+                e.target.value.startsWith("0") &&
+                e.target.value.length > 1
+              ) {
+                e.target.value = e.target.value.slice(1);
+              }
+
+              if (e.target.value.length > 3) {
+                e.target.value = e.target.value.slice(0, 3);
+              }
+
+              const parsedValue = parseInt(e.target.value, 10);
+
+              if (parsedValue >= 1 && parsedValue <= 999) {
+                selectedProduct.quantity = parsedValue;
+              } else if (e.target.value === "" || parsedValue < 1) {
+                selectedProduct.quantity =
+                  e.target.value === "" ? "" : parsedValue;
+              } else {
+                selectedProduct.quantity = 999;
+                e.target.value = "999";
+              }
+
+              updateCartItemsValue();
+            }}
+            aria-label="Quantity"
+            max="9999"
+          />
+          <button
+            class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
+            on:click|preventDefault={increaseQuantity}
+          >
+            <Icon icon="ic:round-plus" class="text-xl" />
+          </button>
+          <div class="flex justify-end w-full">
+            <button
+              type="submit"
+              class="bg-primary-400 text-white p-2 rounded flex items-center justify-center w-full sm:w-[160px] min-h-[40px]"
+            >
+              <span
+                class={checking ? "hidden" : "flex items-center space-x-1"}
+              >
+                <Icon icon="tabler:calendar-check" class="text-lg" />
+                <span class="text-sm">Check Availability</span>
+              </span>
+              <span class={checking ? "block" : "hidden"}>Checking...</span>
+            </button>
+          </div>
+        </div>
+        <p class="mt-4 text-sm text-gray-600 flex items-center">
+          <span class="ml-2">{stockStatus}</span>
         </p>
+      </form>
 
+      {#if data?.authedUser && data?.authedUser?.id}
         <form
           method="POST"
-          action="?/quickcheck"
+          action="?/addToCart"
+          bind:this={form}
           use:enhance={() => {
-            checking = true;
+            cartloadingpop = true;
             return async ({ result }) => {
-              checking = false;
               console.log(result, "result");
-              const { message, stock, type } = result.data.record;
-              stockStatus = message;
-              if (stock === "Available" && type === "success") {
-                stockStatus = ` ✔️${message}`;
-              } else if (stock === "Limited Availability") {
-                stockStatus = `⚠️ ${message} `;
-              } else if (stock === "Unavailable" || type === "error") {
-                stockStatus = `❌ ${message}`;
-              }
-            };
-          }}
-        >
-          <div class="flex items-center gap-4 mb-6">
-            <input
-              type="hidden"
-              name="ProductId"
-              value={selectedProduct.productNumber}
-            />
-            <input
-              type="hidden"
-              name="quantity"
-              value={selectedProduct.quantity}
-            />
 
-            <button
-              class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
-              on:click|preventDefault={decreaseQuantity}
-            >
-              <Icon icon="ic:round-minus" class="text-xl" />
-            </button>
+              if (result.type === "success") {
+                const resultData = result.data;
 
-            <input
-              type="text"
-              min="1"
-              maxlength="4"
-              bind:value={selectedProduct.quantity}
-              class="w-16 h-10 text-center p-2 border border-gray-300 rounded-lg outline-none focus:ring-0 focus:none focus:border-primary-400"
-              on:focus={(e) => {
-                e.target.dataset.previousValue = e.target.value;
+                if (resultData && resultData.success === true) {
+                  const cartItem = prepareCartItem();
+                  cartloadingpop = false;
 
-                setTimeout(() => {
-                  e.target.select();
-                }, 10);
-              }}
-              on:blur={(e) => {
-                if (e.target.value === "" || e.target.value === "0") {
-                  selectedProduct.quantity = 1;
-                  e.target.value = "1";
+                  toast.success(`Product added to the cart!`);
+                  cartRowIndexToBeCleared = cartItem.rowIndex;
+
+                  hideDetails();
+                  showCartPopupdetails(cartItem);
+
+                  setTimeout(() => {
+                    clearSelectedProductcart(cartRowIndexToBeCleared);
+                  }, 1000);
+
+                  showCartMessage = true;
+                  cartloadingpop = false;
                 } else {
-                  const parsedValue = parseInt(e.target.value, 10);
-                  if (
-                    !isNaN(parsedValue) &&
-                    parsedValue >= 1 &&
-                    parsedValue <= 999
-                  ) {
-                    selectedProduct.quantity = parsedValue;
-                  } else {
-                    selectedProduct.quantity = parseInt(
-                      e.target.dataset.previousValue || "1",
-                      10,
-                    );
-                    e.target.value = selectedProduct.quantity.toString();
-                  }
-                }
-              }}
-              on:input={(e) => {
-                e.target.value = e.target.value.replace(/[^0-9]/g, "");
-
-                if (
-                  e.target.value.startsWith("0") &&
-                  e.target.value.length > 1
-                ) {
-                  e.target.value = e.target.value.slice(1);
-                }
-
-                if (e.target.value.length > 3) {
-                  e.target.value = e.target.value.slice(0, 3);
-                }
-
-                const parsedValue = parseInt(e.target.value, 10);
-
-                if (parsedValue >= 1 && parsedValue <= 999) {
-                  selectedProduct.quantity = parsedValue;
-                } else if (e.target.value === "" || parsedValue < 1) {
-                  selectedProduct.quantity =
-                    e.target.value === "" ? "" : parsedValue;
-                } else {
-                  selectedProduct.quantity = 999;
-                  e.target.value = "999";
-                }
-
-                updateCartItemsValue();
-              }}
-              aria-label="Quantity"
-              max="9999"
-            />
-            <button
-              class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
-              on:click|preventDefault={increaseQuantity}
-            >
-              <Icon icon="ic:round-plus" class="text-xl" />
-            </button>
-            <!-- <div class="flex justify-end w-full">
-              <button
-                type="submit"
-                class="bg-primary-400 text-white p-2 rounded flex items-center space-x-1"
-              >
-                {#if checking}
-                  <span>Checking...</span>
-                {:else}
-                  <Icon icon="tabler:calendar-check" class="text-lg" />
-                  <span class="text-sm">Check Availability</span>
-                {/if}
-              </button>
-            </div> -->
-            <div class="flex justify-end w-full">
-              <button
-                type="submit"
-                class="bg-primary-400 text-white p-2 rounded flex items-center justify-center w-full sm:w-[160px] min-h-[40px]"
-              >
-                <span class="{checking ? 'hidden' : 'flex items-center space-x-1'}">
-                  <Icon icon="tabler:calendar-check" class="text-lg" />
-                  <span class="text-sm">Check Availability</span>
-                </span>
-                <span class="{checking ? 'block' : 'hidden'}">Checking...</span>
-              </button>
-            </div>
-            
-          </div>
-          <p class="mt-4 text-sm text-gray-600 flex items-center">
-            <span class="ml-2">{stockStatus}</span>
-          </p>
-        </form>
-
-        {#if data?.authedUser && data?.authedUser?.id}
-          <form
-            method="POST"
-            action="?/addToCart"
-            bind:this={form}
-            use:enhance={() => {
-              cartloadingpop = true;
-              return async ({ result }) => {
-                console.log(result, "result");
-
-                if (result.type === "success") {
-                  const resultData = result.data;
-
-                  if (resultData && resultData.success === true) {
-                    const cartItem = prepareCartItem();
-                    cartloadingpop = false;
-
-                    toast.success(`Product added to the cart!`);
-                    cartRowIndexToBeCleared = cartItem.rowIndex;
-
-                    hideDetails();
-                    showCartPopupdetails(cartItem);
-
-                    setTimeout(() => {
-                      clearSelectedProductcart(cartRowIndexToBeCleared);
-                    }, 1000);
-
-                    showCartMessage = true;
-                    cartloadingpop = false;
-                  } else {
-                    toast.error(
-                      resultData.message || "Failed to add item to cart",
-                    );
-                    cartloadingpop = false;
-                  }
-                } else {
-                  toast.error("Failed to add item to cart");
+                  toast.error(
+                    resultData.message || "Failed to add item to cart",
+                  );
                   cartloadingpop = false;
                 }
-              };
-              cartloadingpop = false;
-            }}
-          >
-            <input type="hidden" name="cartItems" value={cartItemsValue} />
-            <div class="flex justify-end">
-              <button
-                type="submit"
-                class="  bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
-              >
-                {#if cartloadingpop}
-                  <span>Adding...</span>
-                {:else}
-                  <Icon
-                    icon="ic:round-shopping-cart"
-                    class="text-2xl mr-2"
-                  /><span class="text-sm">Add To Cart</span>
-                {/if}
-              </button>
-            </div>
-          </form>
-        {:else}
-          <div class=" flex justify-end">
+              } else {
+                toast.error("Failed to add item to cart");
+                cartloadingpop = false;
+              }
+            };
+            cartloadingpop = false;
+          }}
+        >
+          <input type="hidden" name="cartItems" value={cartItemsValue} />
+          <div class="flex justify-end">
             <button
-              on:click={handleLocalCart}
-              class=" bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
+              type="submit"
+              class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
             >
-              <Icon icon="ic:round-shopping-cart" class="text-xl" /><span
-                class="text-sm">Add To Cart</span
-              >
+              {#if cartloadingpop}
+                <span>Adding...</span>
+              {:else}
+                <Icon
+                  icon="ic:round-shopping-cart"
+                  class="text-2xl mr-2"
+                /><span class="text-sm">Add To Cart</span>
+              {/if}
             </button>
           </div>
-        {/if}
-      </div>
+        </form>
+      {:else}
+        <div class=" flex justify-end">
+          <button
+            on:click={handleLocalCart}
+            class=" bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
+          >
+            <Icon icon="ic:round-shopping-cart" class="text-xl" /><span
+              class="text-sm">Add To Cart</span
+            >
+          </button>
+        </div>
+      {/if}
     </div>
-  {/if}
+  </div>
+{/if}
   {#if showQuoteModal}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -1734,7 +1720,7 @@
               max="999"
               name="units"
               bind:value={units}
-              class="w-full px-4 py-2 border border-gray-300 hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 rounded-md mt-1"
+              class="w-full px-4 py-2 border border-gray-300 hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 rounded mt-1"
               placeholder="Units Required"
               on:input={() => {
                 if (!units || units < 1 || units > 999) {
@@ -2072,7 +2058,7 @@
               >Further Details</label
             >
             <textarea
-              class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
+              class="w-full px-4 py-2 border hover:border-primary-500 h-20 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
               placeholder="Your message"
               name="futherdetails"
               bind:value={futherdetails}
@@ -2173,9 +2159,10 @@
                 <div
                   class="w-20 h-20 flex items-center justify-center overflow-hidden mr-3"
                 >
+                  <!-- svelte-ignore a11y-missing-attribute -->
                   <img
-                    src={item.image}
-                    alt={item.productName}
+                    src={`${PUBLIC_IMAGE_URL}/${item.image}`}
+                    onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg'"
                     class="w-20 h-20 object-contain p-1 border rounded"
                   />
                 </div>
