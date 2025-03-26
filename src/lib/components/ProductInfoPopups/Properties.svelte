@@ -32,7 +32,7 @@
           </div>
         </div>
       </div>
-      {#if product.filteredProductData && Object.keys(product.filteredProductData).length > 0}
+      <!-- {#if product.filteredProductData && Object.keys(product.filteredProductData).length > 0}
         <div class="p-4 w-full lg:w-2/5">
           <button type="button" class="w-full text-left pb-2">
             <h2 class="text-xl font-bold text-heading">About This Item</h2>
@@ -54,7 +54,7 @@
             </div>
           </div>
         </div>
-      {/if}
+      {/if} -->
     </div>
   {/if}
 {/each}

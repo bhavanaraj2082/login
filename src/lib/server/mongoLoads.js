@@ -127,7 +127,7 @@ export async function loadProductsInfo(productId) {
     description: product.description || {},
     safetyInfo: product.safetyInfo || {},
     filteredProductData: product.filteredProductData || {},
-    productSynonym: product.filteredProductData?.["Synonym(S)"] || "",
+    productSynonym: product.filteredProductData?.["Synonym(s)"] || "",
     stockQuantity,
   };
   return { records: [formattedRecord] };
@@ -1162,7 +1162,7 @@ export async function DifferentProds(productId) {
     description: product?.description || {},
     safetyInfo: product?.safetyInfo || {},
     filteredProductData: product?.filteredProductData || {},
-    productSynonym: product?.filteredProductData?.["Synonym(S)"] || "",
+    productSynonym: product?.filteredProductData?.["Synonym(s)"] || "",
     stockQuantity: availableStock,
     availableStock,
     orderMultiple,
