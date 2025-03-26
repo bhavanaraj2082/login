@@ -1,4 +1,5 @@
 <script>
+	import { PUBLIC_IMAGE_URL } from '$env/static/public';
 	import { sendMessage } from '$lib/utils.js';
 	import { myFavorites } from '$lib/stores/favorites.js';
 	import { invalidate } from '$app/navigation';
@@ -36,7 +37,7 @@
                 ? item.productInfo.description
                 : 'No description available',
             partNumber: item.productInfo.productNumber,
-            image: item.productInfo.imageSrc || '/default-product-image.jpg',
+            image: item.productInfo.image || '/default-product-image.jpg',
             manufacturerName: item.manufacturerInfo?.name || 'Unknown Manufacturer',
             distributorName: item.distributorInfo?.aliasName || 'Direct Supply',
             stockInfo: {
@@ -512,7 +513,8 @@ onMount(() => {
             {#each paginatedFavorites as item,index}
                 <div class="flex flex-col md:flex-row items-center justify-between p-6 border bg-white border-gray-200 rounded w-full shadow">
                 <img 
-                    src={item.image} 
+                    src="{PUBLIC_IMAGE_URL}/{item.image}"
+                  onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
                     alt={item.name} 
                     class=" w-32 h-32 object-cover rounded-md mb-3 md:mb-0 md:mr-4"/>
                 

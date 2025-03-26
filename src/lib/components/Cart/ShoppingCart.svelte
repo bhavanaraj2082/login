@@ -11,6 +11,7 @@
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/stores';
 	import * as XLSX from 'xlsx';
+	import { PUBLIC_IMAGE_URL } from "$env/static/public"
 
 	export let data
 	let loading = false;
@@ -492,14 +493,15 @@
 									on:click={() => imagemodal(item.productDetails.imageSrc)} /> -->
 
 									<img 
-									src={item.productDetails.imageSrc} 
+									src="{PUBLIC_IMAGE_URL}/{item.productDetails.image}"
+									onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
 									class="cursor-pointer w-24 h-24 objec-cover bg-red-200" 
 									alt={item.productDetails.productName}
-									on:click={() => imagemodal(item.productDetails.imageSrc)}
-									on:mouseenter={() => handleMouseEnter(item.productDetails.imageSrc , index)}
+									on:click={() => imagemodal(item.productDetails.image)}
+									on:mouseenter={() => handleMouseEnter(item.productDetails.image , index)}
 									on:mouseleave={handleMouseLeave}
 								  />
-								   {#if hoveredItem && hoveredItem.imageSrc === item.productDetails.imageSrc && hoveredItem.index === index}
+								   {#if hoveredItem && hoveredItem.image === item.productDetails.image && hoveredItem.index === index}
 									<div
 									  class="absolute bottom-3/4 left-1/2 transform -translate-x-1/2 mb-2 z-50 whitespace-nowrap text-xs text-description font-medium py-1 px-4 rounded-md shadow-lg border leading-snug bg-black text-white"
 									>
@@ -531,7 +533,9 @@
 												</button>
 											</div>
 											<!-- svelte-ignore a11y-img-redundant-alt -->
-											<img src={selectedImage} alt="image" onerror="this.src='/partskeys.jpeg'" class="" />
+											<img src="{PUBLIC_IMAGE_URL}/{selectedImage}" 
+											onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
+											alt="image" class="" />
 										</div>
 									</div>
 								{/if}
@@ -747,9 +751,8 @@
 	</div>
 
 {/if}
-{#if showimage}
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- {#if showimage}
+
 <div on:click={(e) => {
 	if (e.target === e.currentTarget) {
 	showimage = false;}
@@ -762,7 +765,6 @@
 		<Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
 	  </button>
 </div>
-<!-- svelte-ignore a11y-img-redundant-alt -->
 <img src={selectedImage} alt="image" class="" /></div>
 </div>
-{/if}
+{/if} -->

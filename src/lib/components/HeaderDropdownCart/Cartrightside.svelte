@@ -3,18 +3,13 @@
 	import { cart, guestCart, removeFromCart } from "$lib/stores/cart.js";
 	import { goto, invalidate } from "$app/navigation";
 	import { enhance } from "$app/forms";
-	let cartId;
-	// import { updateCartState } from '$lib/stores/cart.js';
 	import { onMount, onDestroy } from "svelte";
 	import Icon from "@iconify/svelte";
 	import { toast } from "svelte-sonner";
-	import {
-		authedUser,
-		currencyState,
-		cartTotalComps,
-	} from "$lib/stores/mainStores.js";
-	//   console.log("hey im guest cart from side cart",$guestCart);
+	import { authedUser, currencyState, cartTotalComps	} from "$lib/stores/mainStores.js";
+	import {PUBLIC_IMAGE_URL} from "$env/static/public"
 
+	let cartId;
 	let cartOpen = false;
 	let cartItems = [];
 	let subtotal = 0;
@@ -451,7 +446,7 @@
 									class="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-stone-300 rounded-md overflow-hidden"
 								>
 									<img
-										src={item.productDetails.imageSrc}
+										src="{PUBLIC_IMAGE_URL}/{item.productDetails.image}"
 										alt="img"
 										class="w-full h-full object-cover"
 									/>

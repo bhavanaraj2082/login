@@ -112,6 +112,9 @@ const orderSchema = new mongoose.Schema(
     gstNumber:{
       type:String
     },
+    currentUsdRate:{
+			type:Number
+		},
     status: {
       type: String,
       enum: ['pending', 'shipped', 'completed', 'pending cancellation', 'cancelled'],

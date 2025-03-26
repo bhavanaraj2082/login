@@ -10,6 +10,7 @@
 	import { shippingAddress, billingAddress } from '$lib/stores/mainStores.js';
 	import AddressForm from '$lib/components/Cart/AddressForm.svelte';
 	import * as XLSX from 'xlsx';
+	import {PUBLIC_IMAGE_URL} from "$env/static/public"
 
 	export let data;
 	$: userData = data.result.profileData;
@@ -220,14 +221,14 @@
 		checkout = order;
 	}
 	$: handleCheckout($cart);
-    $:console.log($billingAddress,$shippingAddress === "");
+
 	const handleDispatchEvent =(e)=>{
 		console.log(e.detail,"detail");
 		//if(e.detail.success){
 			invalidate("data:checkout")
 		//}
 	}
-	$:console.log(gstNumber);
+
 	const handleSubmit = ({cancel})=>{
 		orderLoad = true
 		onSubmit = true
@@ -379,7 +380,7 @@
 						<form method="POST" action="?/checkout" use:enhance={handleSubmit} class=" col-span-2">
 							<input type="hidden" name="order" value={JSON.stringify(checkout)}/>
 							{#if orderLoad}
-							<button class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-1.5 rounded font-semibold ">
+							<button type="button" class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-1.5 rounded font-semibold ">
 								<Icon icon="line-md:loading-loop" class=" text-xl"/>
 							</button>
 							{:else}
@@ -444,7 +445,7 @@
 					
 							<h3 class=" lg:hidden font-medium text-xs sm:text-sm">Product</h3>
 							<div class="flex items-center w-full md:w-6/12 md:pr-2">
-								<img src={item.productDetails.imageSrc} alt={item.productDetails.productName} class="w-20 h-20 shrink-0 object-cover rounded-md" />
+				<img src="{PUBLIC_IMAGE_URL}/{item.productDetails.image}" onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"  alt={item.productDetails.productName} class="w-20 h-20 shrink-0 object-cover rounded-md" />
 								<div class="ml-2">
 									<p class="text-sm text-black font-semibold">{item.productDetails.productNumber}</p>
 									<p class=" text-gray-800 text-xs lg:text-3s font-medium">{item.productDetails.productName}</p>
