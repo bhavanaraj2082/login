@@ -28,6 +28,9 @@ const subCategorySchema = new Schema(
       ref: 'SubSubCategory', // Reference to the Seller model
       default:[]
     }],
+    specifications:{
+      type:Object
+    },
     productCount:{
       type:Number
     }

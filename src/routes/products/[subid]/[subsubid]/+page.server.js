@@ -5,13 +5,31 @@ import { error } from '@sveltejs/kit';
 export async function load({ params,url,depends,locals }) {
 	try {
 		let userId = locals?.authedUser?.id || ""
+		let filter = {}
+		let searchParams
+			searchParams = new URLSearchParams(url.searchParams);
+			
+			searchParams.forEach((value, key) => {
+				console.log(value,key,"pppp");
+				if (key !== "manufacturer" && key !== "page" && key !== "search" && key !== "price") {
+				  if (filter[`properties.${key}`]) {
+					// If the property already exists, update it to be an object with $all
+					filter[`properties.${key}`] = { $in: [...filter[`properties.${key}`], value] };
+				  } else {
+					// Otherwise, create a new entry with $in
+					filter[`properties.${key}`] = { $in: [value] };
+				  }
+				}
+			  });
+			  
+		console.log(filter,"filter");
 		const page = parseInt(url.searchParams.get('page')) || 1
 		const search = url.searchParams.get('search') || ""
 		const manufacturer = url.searchParams.get('manufacturer') || null
 		const price = url.searchParams.get('price') || ""
         depends("page:data")
 
-		const result = await loadProductsubcategory(params.subsubid, page, manufacturer, search, price, userId);
+		const result = await loadProductsubcategory(params.subsubid, page, manufacturer, search, price, userId,filter);
 
    		if (result.status && result.status === 404) {
    		  throw error(404, result.body?.message || "Subcategory not found");
@@ -20,7 +38,7 @@ export async function load({ params,url,depends,locals }) {
    		return result;
 		
 	} catch (err) {
-		console.error('Error loading product data:', error);
+		console.error('Error loading product data:', err);
 		if (err.status === 404) {
 			throw error(404, err.body?.message || err.message || "Resource not found");
 		  }

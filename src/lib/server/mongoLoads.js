@@ -535,25 +535,25 @@ export const loadProductsubcategory = async (
   manufacturer,
   search,
   price,
-  userId
+  userId,
+  filter
 ) => {
   const page = pageNum || 1;
   const pageSize = 10;
   try {
-    let be = Date.now();
     const subcategory = await SubCategory.findOne({ urlName: suburl })
       .populate({ path: "manufacturerIds", select: "-_id name" })
       .populate({ path: "subSubCategoryIds", select: "-_id name urlName" });
-
     const subCategoryDetails = {
       name: subcategory?.name,
       urlName: subcategory?.urlName,
+      specifications: subcategory?.specifications,
     };
     if (!subcategory?.name || !subcategory?.urlName) {
       throw error(404, "Subcategory not found for URL")
     }
 
-    const matchCondition = {
+    let matchCondition = {
         subCategory: subcategory._id,
       // inStock: { $exists: true, $gt: 0 },
     };
@@ -567,6 +567,9 @@ export const loadProductsubcategory = async (
         { productNumber: { $regex: search, $options: "i" } },
         { productName: { $regex: search, $options: "i" } },
       ];
+    }
+    if(filter){
+      matchCondition.$and =[filter]
     }
 
     let sortConditions = {}
@@ -583,7 +586,7 @@ export const loadProductsubcategory = async (
       sortConditions["stockDetails.pricing.INR"] = -1
     }else{
       sortConditions = {}
-      // sortConditions.productNumber = 1
+      sortConditions.isEmptyPricing = 1
       sortConditions["productNumber"] = 1;
     }
  
@@ -690,10 +693,11 @@ export const loadProductsubcategory = async (
     );
     
     const products = await Product.aggregate(aggregation);
-    // console.log("products",products);
     
     const totalCount = await Product.countDocuments(matchCondition);
-    const after = Date.now();
+    console.log("products",totalCount);
+    const profile = await Profile.findOne({userId},{firstName:1,lastName:2,cellPhone:1,email:1,isEmailVerified:1,companyName:1,_id:0})
+    
 
    if(!products[0]?.data?.length && !products[0]?.totalCount?.length ){
     return {
@@ -701,6 +705,8 @@ export const loadProductsubcategory = async (
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
       productCount: totalCount,
       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
+      specifications: JSON.parse(JSON.stringify(subcategory.specifications)),
+      profile:JSON.parse(JSON.stringify(profile))
     };
    }
 
@@ -735,12 +741,12 @@ export const loadProductsubcategory = async (
       };
     })
   )
-    const profile = await Profile.findOne({userId},{firstName:1,lastName:2,cellPhone:1,email:1,isEmailVerified:1,companyName:1,_id:0})
     return {
       products: JSON.parse(JSON.stringify(filtered)),
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
       productCount: totalCount,
       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
+      specifications: JSON.parse(JSON.stringify(subcategory.specifications)),
       profile:JSON.parse(JSON.stringify(profile))
     };
   } catch (err) {
@@ -1389,7 +1395,7 @@ export const getCart = async(userId,cartId)=>{
               _id: 0,
               productName: 1,
               productNumber: 1,
-              imageSrc: 1,
+              image: 1,
               returnPolicy:1
             }
           }
@@ -1554,6 +1560,7 @@ export const getCart = async(userId,cartId)=>{
   cart[0].cartItems = updatedcart
   return {cart:JSON.parse(JSON.stringify(cart))}
 }
+
 const updateIsQuote = async(cartId,componentId,type) =>{
 	let cart
 	if(type === "quote") {
@@ -1563,6 +1570,7 @@ const updateIsQuote = async(cartId,componentId,type) =>{
 	}
    console.log(cart,"updateIsQuote");
 }
+
 export async function getProfileDetails(userId) {
   try {
     const record = await Profile.findOne({ userId });
@@ -1826,7 +1834,7 @@ export async function getUserFavorites(userId) {
             productName: { $arrayElemAt: ['$productDetails.productName', 0] },
             description: { $arrayElemAt: ['$productDetails.description', 0] },
             properties: { $arrayElemAt: ['$productDetails.properties', 0] },
-            imageSrc: { $arrayElemAt: ['$productDetails.imageSrc', 0] },
+            image: { $arrayElemAt: ['$productDetails.image', 0] },
             priceSize: { $arrayElemAt: ['$productDetails.priceSize', 0] }
           },
           manufacturerInfo: {

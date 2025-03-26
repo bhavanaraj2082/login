@@ -1,4 +1,6 @@
 <script>
+	import { browser } from '$app/environment';
+    import { writable } from 'svelte/store';
 	import { addLocalToFavorites,myFavorites } from '$lib/stores/favorites.js';
 	import { addItemToCart,cart,guestCart } from '$lib/stores/cart.js';
 	import { sendMessage } from '$lib/utils.js';
@@ -16,6 +18,7 @@
     export let manufacturers
     export let productCount
     export let subSubCategory
+    export let specifications
     export let profile
 
 	let isLoggedIn = $authedUser?.id ? true : false
@@ -53,20 +56,19 @@ function handleMouseLeave() {
 
     let searchManufacture = manufacturers
     
-	let point
-	let showCategoryDropdown = false;
+	let arr
 	let showSortByDropdown = false;
     let toggleFilter = false
     let currentPage = parseInt($page.url.searchParams.get('page')) || 1;
     let search = $page.url.searchParams.get('search') || null
     let selectedManufacturer = $page.url.searchParams.get('manufacturer') || null;
-    let totalPages = Math.ceil(productCount/10);
+    $: totalPages = Math.ceil(productCount/10);
     let tog= null
     let form;
     let selectedSort =''
-
 	let selectedImage = null;
 	let showimage = false;
+
 	function imagemodal(imageSrc) {
 		selectedImage = imageSrc;
 		showimage = true;
@@ -362,6 +364,46 @@ function handleMouseLeave() {
         currentPage = 1;
   }
 
+  const handleFilters = (num)=>{
+    if(arr === num){
+      arr = null
+    }else{
+      arr = num
+    }
+  }
+  let selectedValues = browser && localStorage.getItem("specs") ? JSON.parse(localStorage.getItem("specs")) : {}
+  function handleCheckboxChange(index, value,key, event) {
+    const newUrl = new URL(window.location.href);
+    
+    if (event.target.checked) {
+      if (!selectedValues[key]) {
+        selectedValues[key] = [];
+      }
+      selectedValues[key] = [value];
+    } else {
+      selectedValues[key] = selectedValues[key].filter(item => item !== value);
+      newUrl.searchParams.delete(key); 
+      
+    }
+    browser ? localStorage.setItem("specs",JSON.stringify(selectedValues)) : ""
+    Object.entries(selectedValues).forEach(([key, value]) => {
+        //searchParams.append(key, value);
+
+      if (Array.isArray(value)) {
+        value.forEach(item => {
+          newUrl.searchParams.set(key, item); 
+        });
+      } else{
+        newUrl.searchParams.set(key, value);
+      }
+  })
+  goto(newUrl.toString(),{
+        invalidateAll:true,
+        keepfocus: true, 
+        replaceState: true, 
+        noScroll: true 
+      })
+  }
 </script>
 
 <!-- <div>
@@ -373,7 +415,7 @@ function handleMouseLeave() {
 <section class=" space-y-3 lg:flex items-start gap-4">
     <!-- filters -->
     <div class=" w-full h-fit sticky top-0 z-20 lg:w-1/4">
-        <div class=" p-2 sm:p-4 bg-white shadow rounded space-y-3 mt-3">
+        <div class=" p-2 sm:p-4 bg-white shadow rounded space-y-2 mt-3">
             
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -384,19 +426,19 @@ function handleMouseLeave() {
                </div>
                <Icon icon={toggleFilter ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-3xl p-0.5 rounded-full hover:bg-gray-100 xl:hidden"/>
             </div>
-            <div class=" space-y-2 {toggleFilter ? "block":" hidden lg:block"}">
-            <div class="relative">
-                <input type="text" placeholder="Search..." bind:value={search} on:input={e=>handleSearch(e.target.value)} class=" w-full text-sm font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500"/>
+            <div class=" h-[84vh] overflow-y-scroll scroll space-y-2 {toggleFilter ? "block":" hidden lg:block"}">
+            <div class="relative pr-1">
+                <input type="text" placeholder="Search..." bind:value={search} on:input={e=>handleSearch(e.target.value)} class=" w-full text-xs font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500"/>
                 {#if searchLoading}
                     <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
                 {/if}
              </div>
-            <p class=" font-semibold text-sm">Manufacturer</p>
-           <div class="relative">
+            <p class=" font-semibold text-xs">Manufacturer</p>
+           <div class="relative pr-1">
                <input type="text" bind:value={selectedManufacturer}
                       placeholder="Search manufacturers..." 
                       on:input={e => handleManufacturer(e.target.value)} 
-                      class="w-full text-sm rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
+                      class="w-full text-xs rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
                       {#if loading}
                         <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
                       {/if}
@@ -419,38 +461,14 @@ function handleMouseLeave() {
                    {/if}
                </div>
            </div>
-            
-             <!-- svelte-ignore a11y-click-events-have-key-events -->
-             <!-- svelte-ignore a11y-no-static-element-interactions -->
-             <div on:click={()=>showCategoryDropdown = !showCategoryDropdown} class=" {!subSubCategory?.length ? "hidden" : "flex"} cursor-pointer font-semibold text-sm items-center justify-between p-2 rounded border-1 border-gray-300 ">
-                <span>Categories</span>
-                <button type="button" on:click={()=>showCategoryDropdown = !showCategoryDropdown}>
-                     <Icon icon={showCategoryDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
-                </button>
-             </div>
-             <div class="p-3 border-1 rounded {showCategoryDropdown ? "block" : "hidden"}">
-                <input type="text" placeholder="Search..." on:input={e=>handleManufacturer(e.target.value)} class=" w-full rounded border focus:ring-0 focus:border-primary-500">
-                <div class=" space-y-2.5 py-2.5 h-40 overflow-y-scroll my-1 scroll">
-                    {#if !subSubCategory?.length}
-                        <p class=" text-sm text-center">No maunfacturer found</p>
-                    {:else}
-                        {#each subSubCategory as {name}}
-                            <div class=" flex items-center gap-2 text-xs font-medium">
-                                <input type="checkbox" class=" cursor-pointer text-primary-500 focus:ring-0">
-                                <p>{name}</p>
-                            </div>
-                        {/each}
-                    {/if}
-                </div>
-             </div>
              
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <!-- svelte-ignore a11y-no-static-element-interactions -->
-             <div on:click={()=>showSortByDropdown = !showSortByDropdown} class=" cursor-pointer font-semibold text-xs sm:text-sm flex items-center justify-between p-1 md:p-1.5 rounded border-1 border-gray-300 ">
+             <div on:click={()=>showSortByDropdown = !showSortByDropdown} class="mr-1 cursor-pointer font-semibold text-xs flex items-center justify-between p-1 rounded border-1 border-gray-300 ">
                 <span class="ml-2">Sort By</span>
                 <Icon icon={showSortByDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
              </div>
-             <div class="p-3 border-1 rounded {showSortByDropdown ? "block" : "hidden"}">
+             <div class="p-3 mr-1 border-1 rounded {showSortByDropdown ? "block" : "hidden"}">
                 <div class=" space-y-2.5 py-2.5 h-auto">
                     <label for="asc" class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
                         <input type="checkbox" id='asc' on:change={(e)=>handlePrice(e.target.checked,"asc")} checked={selectedSort === "asc"} class=" cursor-pointer outline-none rounded-full text-primary-500 focus:ring-0">
@@ -462,14 +480,42 @@ function handleMouseLeave() {
                     </label>
                 </div>
              </div>
+             <div class="mr-1 space-y-2">
+                {#each Object.entries(specifications) as [key,values],index }
+                <button on:click={()=>handleFilters(index)} class="cursor-pointer w-full font-semibold text-xs flex items-center justify-between p-1 rounded border-1 border-gray-300 ">
+                    <div class="ml-2 flex items-center gap-1.5">{key}
+                      {#if selectedValues[key] && selectedValues[key].length > 0}
+                        <Icon icon="icomoon-free:checkbox-checked" class="text-sm text-primary-600"/>
+                      {/if}
+                     </div>
+                    <Icon icon={arr === index ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
+                </button>
+                <div class="p-3 border-1 rounded { arr === index ? "block" : "hidden"}">
+                    {#each values as value }
+                       <div class=" py-1 h-auto">
+                          <label for={value.replaceAll(" ","-")} class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
+                            <input type="checkbox" id={value.replaceAll(" ","-")}
+                            on:change={(e) => handleCheckboxChange(index, value,key, e)}
+                            checked={selectedValues[key] && selectedValues[key].includes(value)} 
+                            class=" cursor-pointer outline-none rounded-full text-primary-500 focus:ring-0">
+                            <p>{value}</p>
+                           </label>
+                       </div>
+                    {/each}
+                   
+                 </div>
+                {/each}
+                
             </div>
+            </div>
+           
         </div>
     </div>
     <!-- products -->
     <div class=" w-full h-auto space-y-3 lg:w-3/4">
         {#if paginatedProducts.length === 0}
         <div>
-            <p class=" text-center font-medium pt-10">No Product Found</p>
+            <p class=" text-center font-medium pt-44">No Product Found</p>
         </div>
         {:else}
        {#each paginatedProducts as product,index}
@@ -487,6 +533,7 @@ function handleMouseLeave() {
                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                 <img 
                 src="{PUBLIC_IMAGE_URL}/{product?.image}"
+                onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
                 class="cursor-pointer w-32 h-32 sm:w-40 sm:h-40 object-contain" 
                 alt=""
                 on:click={() => imagemodal(product?.image)}
