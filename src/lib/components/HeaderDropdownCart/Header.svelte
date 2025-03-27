@@ -617,7 +617,7 @@ async function submitForm() {
 					</button>
 				</div>
 				{#if searchQuery.trim() && searchResults && searchResults.length > 0}
-					<ul class="absolute w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-100 max-h-60 overflow-y-auto">
+					<ul class="absolute w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-50 max-h-60 overflow-y-auto">
 						{#each searchResults as product}
 							<!-- svelte-ignore a11y-click-events-have-key-events -->
 							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
@@ -631,12 +631,12 @@ async function submitForm() {
 						{/each}
 					</ul>
 				{:else if searchQuery.trim() && isLoading}
-					<p class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-100 rounded flex items-center justify-start">
+					<p class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-50 rounded flex items-center justify-start">
 						<Icon icon="ei:spinner" class="w-8 h-8 animate-spin-slow text-primary-600 mx-2 text-5xl"/>
 						<span>Loading Products...</span>
 					</p>
 					{:else if searchQuery.trim().length >= 3 && searchResults && searchResults.length === 0}
-					<p class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-100 rounded">
+					<p class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-50 rounded">
 						No products found
 					</p>
 				{/if}
