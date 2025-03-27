@@ -538,15 +538,20 @@ export const loadProductsubcategory = async (
   userId,
   filter
 ) => {
+
+  console.log(search,"search");
   const page = pageNum || 1;
   const pageSize = 10;
   try {
     const subcategory = await SubCategory.findOne({ urlName: suburl })
       .populate({ path: "manufacturerIds", select: "-_id name" })
-      .populate({ path: "subSubCategoryIds", select: "-_id name urlName" });
+      .populate({ path: "subSubCategoryIds", select: "-_id name urlName" })
+      .populate({ path: "category", select: "-_id name urlName" });
     const subCategoryDetails = {
-      name: subcategory?.name,
-      urlName: subcategory?.urlName,
+      subCatName: subcategory?.name,
+      subCatUrlName: subcategory?.urlName,
+      catName:subcategory?.category.name,
+      catUrlName:subcategory?.category.urlName,
       specifications: subcategory?.specifications,
     };
     if (!subcategory?.name || !subcategory?.urlName) {
@@ -562,14 +567,15 @@ export const loadProductsubcategory = async (
       matchCondition.manufacturerName = manufacturer;
     }
     if (search) {
+      console.log('object',typeof(search));
       matchCondition.$or = [
         { CAS: { $regex: search, $options: "i" } },
         { productNumber: { $regex: search, $options: "i" } },
         { productName: { $regex: search, $options: "i" } },
       ];
     }
-    if(filter){
-      matchCondition.$and =[filter]
+    if(Object.entries(filter).length>0){
+      matchCondition.$or = [ filter]
     }
 
     let sortConditions = {}
@@ -589,7 +595,7 @@ export const loadProductsubcategory = async (
       sortConditions.isEmptyPricing = 1
       sortConditions["productNumber"] = 1;
     }
- 
+     console.log(matchCondition,"LL");
     const aggregation = [
       { $match: matchCondition },
       {
@@ -705,7 +711,8 @@ export const loadProductsubcategory = async (
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
       productCount: totalCount,
       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
-      specifications: JSON.parse(JSON.stringify(subcategory.specifications)),
+      subCategoryDetails,
+      specifications:  subcategory?.specifications ? JSON.parse(JSON.stringify(subcategory?.specifications)) : {},
       profile:JSON.parse(JSON.stringify(profile))
     };
    }
@@ -745,8 +752,9 @@ export const loadProductsubcategory = async (
       products: JSON.parse(JSON.stringify(filtered)),
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
       productCount: totalCount,
+      subCategoryDetails,
       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
-      specifications: JSON.parse(JSON.stringify(subcategory.specifications)),
+      specifications: subcategory?.specifications ? JSON.parse(JSON.stringify(subcategory?.specifications)) : {},
       profile:JSON.parse(JSON.stringify(profile))
     };
   } catch (err) {

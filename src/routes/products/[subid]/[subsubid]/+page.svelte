@@ -30,7 +30,7 @@
 
   const resultString = formattedStrings.join(", ");
   
-  $: ({ manufacturers, products, productCount, subSubCategory,profile,specifications } = data);
+  $: ({ manufacturers, products, productCount, subCategoryDetails,profile,specifications } = data);
   const handlePage = (e) => {
     invalidate("page:data");
   };
@@ -74,7 +74,7 @@
       {manufacturers}
       {products}
       {productCount}
-      {subSubCategory}
+      {subCategoryDetails}
       {specifications}
       {profile}
     />
