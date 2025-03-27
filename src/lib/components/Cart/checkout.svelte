@@ -233,14 +233,15 @@
 		orderLoad = true
 		onSubmit = true
 		taxError = ''
-		if(!gstNumber.length){
-			console.log("gst Number",gstNumber);
-			taxError = "GST number is required"
-			cancel()
-		} 
+		// if(!gstNumber.length){
+		// 	console.log("gst Number",gstNumber);
+		// 	taxError = "GST number is required"
+		// 	cancel()
+		// } 
 
 		if($billingAddress === "" || $shippingAddress === ""){
 			addressError = true
+			orderLoad =false
 			cancel()
 		} 
 		return async({result})=>{
