@@ -624,10 +624,11 @@ async function submitForm() {
 							<li class="px-0 py-0 text-sm text-gray-800 hover:bg-primary-200 cursor-pointer" on:click={() => selectProduct(product)}>
 								<a href={`/products/${product?.category?.urlName}/${product?.subCategory?.urlName}/${product?.productNumber}`}
 									class="block w-full text-sm text-gray-900 px-4 py-2">
-									<p class="text-md">{product?.productName}</p>
-									<p class="text-sm text-gray-400">{product?.manufacturerName}</p>
+									<p class="text-md ">{product?.productName}</p>
+									<p class="text-md text-gray-900 ">{product?.productNumber}   <span class="text-sm text-gray-700 italic pl-2"> - {product?.manufacturerName}</span> </p>
 								</a>
 							</li>
+							<!-- <hr class=""> -->
 						{/each}
 					</ul>
 				{:else if searchQuery.trim() && isLoading}
