@@ -725,9 +725,9 @@ async function submitForm() {
 			{/if}
 		</div>
 	</div>
-	<div class="hidden md:flex mx-auto w-full !z-0">
+	<div class="hidden md:flex mx-auto w-full">
 		<!-- Menu Section -->
-		<div class="md:flex mx-auto justify-between w-11/12 max-w-7xl z-50">
+		<div class="md:flex mx-auto justify-between w-11/12 max-w-7xl">
 			<div class="md:flex justify-around items-center lg:gap-2 hidden">
 				{#each menus as menu, index}
 					<!-- svelte-ignore a11y-interactive-supports-focus -->
@@ -749,7 +749,7 @@ async function submitForm() {
 						</div>
 						{#if menu.submenus && menu.submenus.length > 0}
 							<div
-								class={`absolute shadow-md z-20 rounded-sm mt-0 ml-2 bg-white transition-opacity duration-200 w-60 ${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+								class={`absolute shadow-md z-50 rounded-sm mt-0 ml-2 bg-white transition-opacity duration-200 w-60 ${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
 								role="menu">
 								{#each menu.submenus as submenu}
 									<!-- svelte-ignore a11y-interactive-supports-focus -->
