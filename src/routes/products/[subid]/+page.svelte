@@ -6,6 +6,7 @@
     PUBLIC_WEBSITE_NAME,
   } from "$env/static/public";
   import SEO from "$lib/components/SEO.svelte";
+    import { onMount } from "svelte";
 
   let catName = data?.records[0]?.category?.name;
   let catUrl = data?.records[0]?.category?.urlName;
@@ -14,6 +15,9 @@
     .map((item) => item.name)
     .filter((value, index, self) => self.indexOf(value) === index);
 
+  onMount(()=>{
+    localStorage.removeItem("specs")
+  })
   let metadata = {
     title: `${catName} | ${PUBLIC_WEBSITE_NAME} ` || "Default Product Title",
     description:

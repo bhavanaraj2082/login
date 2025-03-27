@@ -10,7 +10,7 @@
     import Icon from "@iconify/svelte";
 	import { authedUser,currencyState,cartTotalComps } from '$lib/stores/mainStores.js';
     import { enhance } from "$app/forms";
-    import { onMount } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
     import ShowQuoteModal from "$lib/components/productInfoPopups/showQuoteModal.svelte";
     import {PUBLIC_IMAGE_URL} from "$env/static/public"
 
@@ -58,6 +58,7 @@ function handleMouseLeave() {
     
 	let arr
 	let showSortByDropdown = false;
+	let showMfrDropdown = false;
     let toggleFilter = false
     let currentPage = parseInt($page.url.searchParams.get('page')) || 1;
     let search = $page.url.searchParams.get('search') || null
@@ -68,6 +69,7 @@ function handleMouseLeave() {
     let selectedSort =''
 	let selectedImage = null;
 	let showimage = false;
+  $: selectedValues = browser && localStorage.getItem("specs") ? JSON.parse(localStorage.getItem("specs")) : {}
 
 	function imagemodal(imageSrc) {
 		selectedImage = imageSrc;
@@ -89,8 +91,19 @@ function handleMouseLeave() {
 
     onMount(()=>{
         if($authedUser?.id){
-        fetchMyFav()
+          fetchMyFav()
         }
+        const newUrl = new URL(window.location.href)
+        Object.entries(selectedValues).forEach(([key,value])=>{
+          newUrl.searchParams.set(key,value)
+        })
+        goto(newUrl.toString(),{
+          invalidateAll:true,
+          keepfocus: true, 
+          replaceState: true, 
+          noScroll: true 
+        })
+       
     })
  
     const handleManufacturer = (searchTerm) => {
@@ -118,6 +131,8 @@ function handleMouseLeave() {
         const newUrl = new URL(window.location.href);
         if (checked) {
             selectedManufacturer = manufacturerName;
+            newUrl.searchParams.delete('search');
+            search = null
             newUrl.searchParams.set('manufacturer', manufacturerName);
         } else {
             selectedManufacturer = null;
@@ -298,6 +313,10 @@ function handleMouseLeave() {
     typingTimeout = setTimeout( async() => {
     searchLoading = true
         if (searchName.length >= 3) {
+          newUrl.searchParams.forEach((value, name) => {
+              newUrl.searchParams.delete(name);
+          });
+          selectedValues = {}
             newUrl.searchParams.set('search', searchName);
         } else {
             newUrl.searchParams.delete('search');
@@ -371,24 +390,30 @@ function handleMouseLeave() {
       arr = num
     }
   }
-  let selectedValues = browser && localStorage.getItem("specs") ? JSON.parse(localStorage.getItem("specs")) : {}
+
   function handleCheckboxChange(index, value,key, event) {
     const newUrl = new URL(window.location.href);
     
     if (event.target.checked) {
+      
       if (!selectedValues[key]) {
-        selectedValues[key] = [];
+         selectedValues[key] = [value];
       }
-      selectedValues[key] = [value];
+      selectedValues[key].push(value);
     } else {
       selectedValues[key] = selectedValues[key].filter(item => item !== value);
       newUrl.searchParams.delete(key); 
       
     }
+    for (let key in selectedValues) {
+        if (Array.isArray(selectedValues[key]) && selectedValues[key].length === 0) {
+            delete selectedValues[key];
+        }
+    }
     browser ? localStorage.setItem("specs",JSON.stringify(selectedValues)) : ""
     Object.entries(selectedValues).forEach(([key, value]) => {
         //searchParams.append(key, value);
-
+      newUrl.searchParams.delete("search")
       if (Array.isArray(value)) {
         value.forEach(item => {
           newUrl.searchParams.set(key, item); 
@@ -404,11 +429,20 @@ function handleMouseLeave() {
         noScroll: true 
       })
   }
+  let showAllForIndex = false // Track whether to show all values for each specification
+  let maxItems = 5;         // Limit the number of items to 5 initially
+
+  const handleShowMore = () => {
+    // Toggle the showAll state for a specific specification (index)
+    showAllForIndex = !showAllForIndex
+  };
+  // onDestroy(()=>{
+  //   localStorage.removeItem("specs")
+  //   selectedValues = {}
+  // })
 </script>
 
-<!-- <div>
-    product filter
-</div> -->
+
 <form method="POST" action="/?/getCartValue" bind:this={form} use:enhance={handleData}>
     <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
   </form>
@@ -423,18 +457,30 @@ function handleMouseLeave() {
                <div class=" flex gap-2 items-center">
                 <Icon icon="ic:sharp-segment" class="text-2xl text-primary-500" />
                 <h1>Filter</h1>
+                <button on:click={()=>{
+                  localStorage.removeItem("specs")
+                  selectedValues = {}
+                  selectedSort = ""
+                  selectedManufacturer = null
+                  goto(`/products/${categoryName}/${subCategoryName}`)
+                  }} class="{Object.entries(selectedValues).length > 0 || selectedManufacturer !== null || selectedSort.length ? "" : "hidden"} bg-primary-500 text-[11px] px-2 rounded text-white font-normal">Clear All</button>
                </div>
                <Icon icon={toggleFilter ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-3xl p-0.5 rounded-full hover:bg-gray-100 xl:hidden"/>
             </div>
-            <div class=" h-[84vh] overflow-y-scroll scroll space-y-2 {toggleFilter ? "block":" hidden lg:block"}">
+            <div class=" max-h-[84vh] overflow-y-auto scroll space-y-2 {toggleFilter ? "block":" hidden lg:block"}">
             <div class="relative pr-1">
                 <input type="text" placeholder="Search..." bind:value={search} on:input={e=>handleSearch(e.target.value)} class=" w-full text-xs font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500"/>
                 {#if searchLoading}
                     <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
                 {/if}
              </div>
-            <p class=" font-semibold text-xs">Manufacturer</p>
-           <div class="relative pr-1">
+             <!-- svelte-ignore a11y-click-events-have-key-events -->
+             <!-- svelte-ignore a11y-no-static-element-interactions -->
+             <div on:click={()=>showMfrDropdown = !showMfrDropdown} class="mr-1 cursor-pointer font-semibold text-xs flex items-center justify-between p-1 rounded border-1 border-gray-300 ">
+              <span class="ml-2">Manufacturer</span>
+              <Icon icon={showMfrDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
+             </div>
+           <div class="relative pr-1 {showMfrDropdown ? "block" : "hidden"}">
                <input type="text" bind:value={selectedManufacturer}
                       placeholder="Search manufacturers..." 
                       on:input={e => handleManufacturer(e.target.value)} 
@@ -442,7 +488,7 @@ function handleMouseLeave() {
                       {#if loading}
                         <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
                       {/if}
-               <div class="space-y-2.5 py-2.5 max-h-48 px-2 overflow-y-auto my-1 scroll">
+               <div class="space-y-2.5 py-2.5 border-1 rounded px-2 overflow-y-auto my-1 scroll">
                    {#if !searchManufacture.length}
                        <p class="text-sm text-center">No manufacturer found</p>
                    {:else}
@@ -480,9 +526,9 @@ function handleMouseLeave() {
                     </label>
                 </div>
              </div>
-             <div class="mr-1 space-y-2">
-                {#each Object.entries(specifications) as [key,values],index }
-                <button on:click={()=>handleFilters(index)} class="cursor-pointer w-full font-semibold text-xs flex items-center justify-between p-1 rounded border-1 border-gray-300 ">
+             <div class="mr-1 flex flex-col space-y-2">
+                {#each Object.entries(specifications).slice(0, showAllForIndex ? Object.entries(specifications).length : maxItems) as [key,values],index }
+                <button on:click={()=>handleFilters(index)} class="cursor-pointer w-full font-semibold text-xs flex items-center justify-between p-1 rounded border-1 border-gray-200 ">
                     <div class="ml-2 flex items-center gap-1.5">{key}
                       {#if selectedValues[key] && selectedValues[key].length > 0}
                         <Icon icon="icomoon-free:checkbox-checked" class="text-sm text-primary-600"/>
@@ -505,8 +551,10 @@ function handleMouseLeave() {
                    
                  </div>
                 {/each}
-                
-            </div>
+                <button on:click={() => handleShowMore()} class="text-xs self-end text-primary-600 hover:text-primary-400 mt-3">
+                  {showAllForIndex ? '- Show Less' : '+ Show More'}
+                </button>
+             </div>
             </div>
            
         </div>

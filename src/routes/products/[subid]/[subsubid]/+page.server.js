@@ -10,7 +10,7 @@ export async function load({ params,url,depends,locals }) {
 			searchParams = new URLSearchParams(url.searchParams);
 			
 			searchParams.forEach((value, key) => {
-				console.log(value,key,"pppp");
+				//console.log(value,key,"pppp");
 				if (key !== "manufacturer" && key !== "page" && key !== "search" && key !== "price") {
 				  if (filter[`properties.${key}`]) {
 					// If the property already exists, update it to be an object with $all

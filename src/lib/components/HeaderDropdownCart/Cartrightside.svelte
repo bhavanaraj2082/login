@@ -447,6 +447,7 @@
 								>
 									<img
 										src="{PUBLIC_IMAGE_URL}/{item.productDetails.image}"
+										onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
 										alt="img"
 										class="w-full h-full object-cover"
 									/>
