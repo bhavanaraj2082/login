@@ -7,11 +7,13 @@ import { APP_URL } from '$env/static/private';
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import sendemail from '$lib/data/sendemail.json';
 import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
+import { sanitizeFormData } from '$lib/utils/sanitize.js';
 export const actions = {
 
   contactus: async ({ request }, event) => {
     try {
-      const body = Object.fromEntries(await request.formData());
+      const rawData = Object.fromEntries(await request.formData());
+      const body = sanitizeFormData(rawData);
       // console.log("body", body);
       await submitContactInfo(body);
       async function getClientIP() {
