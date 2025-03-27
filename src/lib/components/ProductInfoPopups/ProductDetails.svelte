@@ -452,6 +452,12 @@
             {product?.productName}
           </h1>
 
+          {#if product?.prodDesc && product.prodDesc !== ""}
+            <p class="text-gray-500 text-sm leading-relaxed">
+              {product?.prodDesc}
+            </p>
+          {/if}
+
           {#if product?.manufacturer?.name && product?.manufacturer?.name !== ""}
             <p class="text-gray-800 font-medium text-sm leading-relaxed">
               Manufacturer: <span class="font-normal"
@@ -466,15 +472,9 @@
             </p>
           {/if}
 
-          {#if product?.prodDesc && product.prodDesc !== ""}
-            <p class="text-gray-500 text-sm leading-relaxed">
-              {product?.prodDesc}
-            </p>
-          {/if}
-
           {#if product.productSynonym}
-            <p class="text-gray-800 text-sm font-semibold text-start">
-              Synonym(S): <span class="text-gray-500 font-normal"
+            <p class="text-gray-800 text-sm font-medium text-start">
+              Synonym(S): <span class="text-gray-500 font-normal text-left"
                 >{product?.productSynonym}</span
               >
             </p>

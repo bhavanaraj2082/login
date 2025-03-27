@@ -19,7 +19,7 @@
                   class="grid grid-cols-1 sm:grid-cols-3 sm:p-2 border-b border-gray-300"
                 >
                   <div>
-                    <h3 class="sm:text-sm text-sm break-words max-sm:pt-1 font-semibold">
+                    <h3 class="sm:text-sm text-sm break-words max-sm:pt-1 font-semibold capitalize">
                       {key}
                     </h3>
                   </div>
