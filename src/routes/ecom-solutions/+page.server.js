@@ -7,33 +7,14 @@ import { APP_URL } from '$env/static/private';
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import sendemail from '$lib/data/sendemail.json';
 import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
+import { sanitizeFormData } from '$lib/utils/sanitize.js';
 export const actions = {
-  // contactus: async ({ request }) => {
-  //   try {
-  //     const body = Object.fromEntries(await request.formData());
-  //     console.log(body,"body");
-      
-  //     await submitContactData(body);
-  //     return {
-  //       type: "success",
-  //       data: {
-  //         message: "Contact details submitted successfully!",
-  //       },
-  //     };
-  //   } catch (error) {
-  //     console.error("Error creating contact:", error);
-  //     return {
-  //       type: "error",
-  //       data: {
-  //         error: "Error submitting your data. Please try again later!",
-  //       },
-  //     };
-  //   }
-  // },
   contactus: async ({ request }) => {
     try {
-      // Retrieve form data from the request
-      const body = Object.fromEntries(await request.formData());
+      // const body = Object.fromEntries(await request.formData());
+
+      const rawData = Object.fromEntries(await request.formData());
+      const body = sanitizeFormData(rawData);
       console.log(body, "body");
       
       // Submit the contact data (your business logic)

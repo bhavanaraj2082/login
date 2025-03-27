@@ -10,7 +10,7 @@
       <div class="transition-all duration-300">
         <div class="flex max-md:block gap-4">
           <div class="col-span-1 w-full">
-            {#each Object.entries(product.filteredProductData).filter(([key]) => key !== "Synonym(s)") as [key, value]}
+            {#each Object.entries(product.filteredProductData).filter(([key]) => key !== "Synonym(s)" && key !== "CAS Number") as [key, value]}
               <div class="grid grid-cols-[130px_1fr] gap-x-2 py-0.5 w-full">
                 <h4 class="text-sm font-medium text-gray-800 break-words">
                   {key}

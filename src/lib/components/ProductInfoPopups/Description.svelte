@@ -25,7 +25,7 @@
         <ul>
           {#each Object.entries(product.description) as [key, value]}
             <li class="text-gray-700 text-sm mt-2">
-              <strong class="text-sm font-bold">{key}:</strong>
+              <strong class="text-sm font-bold capitalize">{key}:</strong>
               {value}
             </li>
           {/each}
