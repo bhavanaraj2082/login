@@ -12,6 +12,8 @@
   let showSavedCarts = false;
   // console.log(currencyState, "currencyState");
   export let data;
+  console.log(data,"i am data");
+  
   let cartPopupItems;
   let checking = false;
   let index;
@@ -434,7 +436,7 @@
   function hideDetails() {
     showDetailsModal = false;
     // selectProduct = null;
-    stockStatus = ""; // Reset stockStatus when closing the modal
+    stockStatus = ""; 
     console.log("Modal closed and stockStatus reset");
   }
 
@@ -487,14 +489,13 @@
   const handleResendOtpemail = () => {
     if (!loadingotp) {
       form3.requestSubmit();
-      // startTimer();
     }
   };
   let units = "";
-  let firstName = "";
-  let lastName = "";
-  let organisation = "";
-  let phone = "";
+  let firstName = data?.profile?.firstName||"";
+  let lastName = data?.profile?.lastName||"";
+  let organisation = data?.profile?.companyName||"";
+  let phone = data?.profile?.cellPhone|| "";
   let futherdetails = "";
   let formErrors = {};
 
@@ -540,10 +541,9 @@
       delete formErrors.futherdetails;
     }
 
-    if (!phone.match(/^\+?[1-9]\d{1,14}$/)) {
-      formErrors.phone =
-        "Enter a valid phone number with country code (e.g. +919876543210)";
-    }
+    if (!String(phone).match(/^\+?[1-9]\d{1,14}$/)) {
+    formErrors.phone = "Enter a valid phone number";
+}
 
     if (!email.trim()) {
       formErrors.email = "Email is required.";
@@ -966,7 +966,7 @@
 </form>
 <div class="w-11/12 mx-auto px-2 md:flex md:space-x-8 max-w-7xl">
   <div class="md:w-full">
-    <h1 class="font-semibold text-lg md:text-2xl">Quick Order</h1>
+    <h1 class="font-bold text-lg md:text-2xl">Quick Order</h1>
     <div class="sm:w-1/2 w-full lg:w-1/4 inline-flex rounded mb-8 mt-5">
       <nav
         aria-label="Tabs"
@@ -975,7 +975,7 @@
       {#each tabs as tab}
     <div class="inline-block w-full">
       <button   on:click={() => (activeTab = tab.name)}
-        class="w-full sm:py-2 py-1 h-12 sm:px-2  px-1 sm:text-sm text-xs focus:outline-none transition duration-300
+        class="w-full sm:py-2 py-1 h-12 sm:px-2  px-1 sm:text-sm text-md focus:outline-none transition duration-300
           {activeTab === tab.name
           ? 'bg-gray-50 text-primary-500 font-bold'
           : 'bg-primary-100 text-black'}
@@ -1017,7 +1017,7 @@
                   bind:value={row.sku}
                   placeholder="Product SKU-Size"
                   on:input={(event) => handleInput(event, row.sku, index)}
-                  class="w-full hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 rounded px-2 items-center text-sm border-1 border-gray-200 transition duration-200"
+                  class="w-full hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 rounded-md px-2 items-center text-sm border-1 border-gray-200 transition duration-200"
                 />
 
                 {#if loadingState[index]}
@@ -1130,7 +1130,7 @@
                   >
                     <Icon
                       icon="ic:round-minus"
-                      class="text-lg border-1 rounded-lg hover:bg-primary-50 transition bg-white text-primary-500 lg:w-12 w-10 h-10 p-2"
+                      class="text-lg border-1 rounded-md hover:bg-primary-50 transition bg-white text-primary-500 lg:w-12 w-10 h-10 p-2"
                     />
                   </button>
                 </div>
@@ -1219,7 +1219,7 @@
                   >
                     <Icon
                       icon="ic:round-plus"
-                      class="text-lg border-1 rounded-lg hover:bg-primary-50 transition bg-white text-primary-500 lg:w-12 w-10 h-10 p-2"
+                      class="text-lg border-1 rounded-md hover:bg-primary-50 transition bg-white text-primary-500 lg:w-12 w-10 h-10 p-2"
                     />
                   </button>
                 </div>
@@ -1452,7 +1452,7 @@
           />
 
           <button
-            class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
+            class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-md border border-gray-300 hover:bg-primary-50 transition"
             on:click|preventDefault={decreaseQuantity}
           >
             <Icon icon="ic:round-minus" class="text-xl" />
@@ -1463,7 +1463,7 @@
             min="1"
             maxlength="4"
             bind:value={selectedProduct.quantity}
-            class="w-16 h-10 text-center p-2 border border-gray-300 rounded-lg outline-none focus:ring-0 focus:none focus:border-primary-400"
+            class="w-16 h-10 text-center p-2 border border-gray-300 rounded-md outline-none focus:ring-0 focus:none focus:border-primary-400"
             on:focus={(e) => {
               e.target.dataset.previousValue = e.target.value;
 
@@ -1524,7 +1524,7 @@
             max="9999"
           />
           <button
-            class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-lg border border-gray-300 hover:bg-primary-50 transition"
+            class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-md border border-gray-300 hover:bg-primary-50 transition"
             on:click|preventDefault={increaseQuantity}
           >
             <Icon icon="ic:round-plus" class="text-xl" />
