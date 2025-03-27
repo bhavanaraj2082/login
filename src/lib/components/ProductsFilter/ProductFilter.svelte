@@ -17,7 +17,7 @@
     export let products
     export let manufacturers
     export let productCount
-    export let subSubCategory
+    export let subCategoryDetails
     export let specifications
     export let profile
 
@@ -51,8 +51,8 @@ function handleMouseLeave() {
 	};
 
     $: paginatedProducts = products?.length ? products.map(x=>x) : []
-    let categoryName = products[0]?.categoryDetails.urlName
-    let subCategoryName = products[0]?.subCategoryDetails.urlName
+    let categoryName = subCategoryDetails.catUrlName
+    let subCategoryName = subCategoryDetails.subCatUrlName
 
     let searchManufacture = manufacturers
     
@@ -94,9 +94,31 @@ function handleMouseLeave() {
           fetchMyFav()
         }
         const newUrl = new URL(window.location.href)
-        Object.entries(selectedValues).forEach(([key,value])=>{
-          newUrl.searchParams.set(key,value)
-        })
+        Object.entries(selectedValues).forEach(([key, value]) => {
+  if (Array.isArray(value)) {
+    value.forEach(item => {
+      // Only append the value if it doesn't already exist in the searchParams
+      if (!newUrl.searchParams.has(key) || !newUrl.searchParams.getAll(key).includes(item)) {
+        newUrl.searchParams.append(key, item);
+      }
+    });
+  } else {
+    // Only set the value if it doesn't already exist
+    if (!newUrl.searchParams.has(key) || newUrl.searchParams.get(key) !== value) {
+      newUrl.searchParams.set(key, value);
+    }
+  }
+});
+
+      //   Object.entries(selectedValues).forEach(([key,value])=>{
+      //     if (Array.isArray(value)) {
+      //      value.forEach(item => {
+      //     newUrl.searchParams.append(key, item); 
+      //   });
+      // } else{
+      //   newUrl.searchParams.set(key, value);
+      // }
+      //   })
         goto(newUrl.toString(),{
           invalidateAll:true,
           keepfocus: true, 
@@ -331,7 +353,7 @@ function handleMouseLeave() {
         });
         currentPage = 1;
         searchLoading = false;
-    }, 1000)
+    }, 1500)
 } catch (error) {
         console.error('Error filtering products:', error);
     } finally {
@@ -398,8 +420,9 @@ function handleMouseLeave() {
       
       if (!selectedValues[key]) {
          selectedValues[key] = [value];
-      }
+      }else{
       selectedValues[key].push(value);
+      }
     } else {
       selectedValues[key] = selectedValues[key].filter(item => item !== value);
       newUrl.searchParams.delete(key); 
@@ -416,7 +439,10 @@ function handleMouseLeave() {
       newUrl.searchParams.delete("search")
       if (Array.isArray(value)) {
         value.forEach(item => {
-          newUrl.searchParams.set(key, item); 
+          // Only append the value if it doesn't already exist in the searchParams
+          if (!newUrl.searchParams.has(key) || !newUrl.searchParams.getAll(key).includes(item)) {
+             newUrl.searchParams.append(key, item);
+           }
         });
       } else{
         newUrl.searchParams.set(key, value);
@@ -526,6 +552,7 @@ function handleMouseLeave() {
                     </label>
                 </div>
              </div>
+             {#if Object.entries(specifications).length > 0}
              <div class="mr-1 flex flex-col space-y-2">
                 {#each Object.entries(specifications).slice(0, showAllForIndex ? Object.entries(specifications).length : maxItems) as [key,values],index }
                 <button on:click={()=>handleFilters(index)} class="cursor-pointer w-full font-semibold text-xs flex items-center justify-between p-1 rounded border-1 border-gray-200 ">
@@ -555,6 +582,7 @@ function handleMouseLeave() {
                   {showAllForIndex ? '- Show Less' : '+ Show More'}
                 </button>
              </div>
+             {/if}
             </div>
            
         </div>
