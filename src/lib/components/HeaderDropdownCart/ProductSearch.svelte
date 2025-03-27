@@ -363,6 +363,7 @@
 							<div class="">
 								<p class="text-sm font-medium">{item?.productName}</p>
 								<p class="text-sm">{item?.productNumber}</p>
+								<p class="text-sm italic">{item?.manufacturerName}</p>
 							</div>
 						</div>
 					</a>
