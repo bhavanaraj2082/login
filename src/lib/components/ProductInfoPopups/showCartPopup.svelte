@@ -1,7 +1,7 @@
 <script>
   import Icon from "@iconify/svelte";
   import { currencyState } from "$lib/stores/mainStores.js";
-  import {PUBLIC_IMAGE_URL} from "$env/static/public"
+  import { PUBLIC_IMAGE_URL } from "$env/static/public";
   export let data;
   export let cartTogglePopup;
   export let addedQuantity;
@@ -62,13 +62,13 @@
                 {#if $currencyState === "usd"}
                   $ {(
                     (Number(product?.priceSize[index]?.USD) || 0) *
-                    0.18 *
-                    (addedQuantity || 0)
+                    1.18 *
+                    Number(addedQuantity || 0)
                   ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 {:else}
                   ₹ {(
                     (Number(product?.priceSize[index]?.INR) || 0) *
-                    0.18 *
+                    1.18 *
                     (addedQuantity || 0)
                   ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 {/if}

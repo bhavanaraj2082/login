@@ -130,7 +130,7 @@
           {#if productName}
             {productQuote.productName}
           {:else}
-            <!-- {selectedProduct.name || "--"} -->
+            {selectedProduct.name || "--"}
           {/if}
         </p>
       </div>

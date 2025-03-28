@@ -9,7 +9,7 @@
     >
       <div class="p-4 w-full">
         <button type="button" class="w-full text-left pb-2">
-          <h2 class="text-xl font-bold text-heading">Properties</h2>
+          <h2 class="text-xl font-bold text-heading uppercase">Properties</h2>
         </button>
         <div class="transition-all duration-300">
           <div class="flex max-md:block gap-4">

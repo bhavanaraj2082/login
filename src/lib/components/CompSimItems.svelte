@@ -808,7 +808,7 @@
             <div class="flex flex-col items-center gap-1 mt-1">
               <p class="text-sm font-bold text-gray-500">
                 {#if $currencyState === "usd"}
-                  $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
+                  $ {(Number(selectedPrice?.priceUSD || 0) * Number(popupQuantity || 1)).toLocaleString(
                     "en-US",
                     {
                       minimumFractionDigits: 2,
@@ -816,7 +816,7 @@
                     }
                   )}
                 {:else}
-                  ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
+                  ₹ {(Number(selectedPrice?.priceINR || 0) * Number(popupQuantity || 1)).toLocaleString(
                     "en-IN",
                     {
                       minimumFractionDigits: 2,
