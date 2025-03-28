@@ -309,7 +309,7 @@
   <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
 </form>
 <div class="max-w-7xl mx-auto my-10 md:w-11/12">
-  <h3 class="text-xl font-bold text-heading p-1 mx-auto">Related Products</h3>
+  <h3 class="text-xl font-bold text-heading p-1 mx-auto uppercase">Related Products</h3>
 
   <div class="relative mt-1">
     <div class="flex items-center">
@@ -770,7 +770,7 @@
             <div class="flex flex-col items-center gap-1 mt-1">
               <p class="text-sm font-bold text-gray-500">
                 {#if $currencyState === "usd"}
-                  $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
+                  $ {(Number(selectedPrice?.priceUSD || 0) * Number(popupQuantity || 1)).toLocaleString(
                     "en-US",
                     {
                       minimumFractionDigits: 2,
@@ -778,7 +778,7 @@
                     }
                   )}
                 {:else}
-                  ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
+                  ₹ {(Number(selectedPrice?.priceINR || 0) * Number(popupQuantity || 1)).toLocaleString(
                     "en-IN",
                     {
                       minimumFractionDigits: 2,

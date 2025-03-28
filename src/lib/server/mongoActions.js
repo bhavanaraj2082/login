@@ -830,56 +830,66 @@ const sendVerificationEmailSignup = async (email, verificationUrl) => {
 
 const sendVerificationEmailform = async (email, verificationUrl) => {
 	const transporter = nodemailer.createTransport({
-		service: 'partskeys',
-		host: MAIL_HOST,
-		port: 587,
-		secure: false,
-		auth: {
-			user: SENDER_EMAIL,
-			pass: SENDER_PASSWORD
-		}
+	  service: "partskeys",
+	  host: MAIL_HOST,
+	  port: 587,
+	  secure: false,
+	  auth: {
+		user: SENDER_EMAIL,
+		pass: SENDER_PASSWORD,
+	  },
 	});
-
+  
 	const mailOptions = {
-		from: SENDER_EMAIL,
-		to: email,
-		subject: 'Email Verification for Your Account',
-		html: `
-		<html>
-			<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-				<div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-					<h2 style="color: #333333; text-align: center; font-size: 24px;">Verify Your Email Address</h2>
-					<p style="font-size: 16px; color: #555555; line-height: 1.5; text-align: center;">
-						Hi there,<br/><br/>
-						Welcome to ${PUBLIC_WEBSITE_NAME}! Please verify your email address by using the OTP below.
-					</p>
-					<div style="text-align: center; margin: 20px 0;">
-						<span style="display: inline-block; font-size: 20px; font-weight: bold; color: #333333; padding: 10px 20px; background-color: #f0f0f0; border-radius: 4px;">
-							${verificationUrl}
-						</span>
-					</div>
-					<p style="font-size: 14px; color: #777777; text-align: center; margin-top: 30px;">
-						If you didn't sign up for this account, you can ignore this email.
-					</p>
-					<p style="font-size: 14px; color: #777777; text-align: center;">
-						Thanks,<br/>
-						The ${PUBLIC_WEBSITE_NAME} Team
-					</p>
-				</div>
-			</body>
-		</html>
-		`
+	  from: SENDER_EMAIL,
+	  to: email,
+	  subject: "Email Verification for Your Account",
+	  html: `
+<html>
+  <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f2f2f2;">
+	  <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" style="background-color: #f2f2f2; padding: 20px;">
+		  <tr>
+			  <td align="center">
+				  <table width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 5px; overflow: hidden;">
+					  <tr>
+						  <td style="background-color: #fe5939; padding: 20px; text-align: center;">
+							  <p style="display: block; margin: auto;color: white;font-size: 25px;font-weight: bold;">${PUBLIC_WEBSITE_NAME}</p>
+						  </td>
+					  </tr>
+					  <tr>
+						  <td style="padding: 30px; text-align: center;">
+							  <h2 style="font-size: 22px; color: #333333; margin-bottom: 10px;">Verify your email address</h2>
+							  <p style="font-size: 16px; color: #555555; line-height: 1.5; margin-bottom: 20px;">
+								  Thank you for connecting with ${PUBLIC_WEBSITE_NAME}. To verify the email address you provided, we have sent you a verification code. Please enter the code when prompted to proceed. If you did not request this verification, you may safely ignore this message.
+							  </p>
+							  <h4 style="font-size: 16px; color: #333333; font-weight: bold; margin-bottom: 5px;">Verification code</h4>
+							  <p style="font-size: 32px; color: #333333; font-weight: bold; margin: 0;">${verificationUrl}</p>
+							  <p style="font-size: 14px; color: #777777; margin-top: 10px;">(This code is valid for 5 minutes)</p>
+						  </td>
+					  </tr>
+					  <tr>
+						  <td style="background-color: #f8f8f8; padding: 20px; text-align: center; font-size: 14px; color: #555555;">
+							  ${PUBLIC_WEBSITE_NAME} will never email you and ask you to disclose your password, credit card, or banking account number.<br>
+							  Visit our website: <a href="${APP_URL}" style="color: #0281ff; text-decoration: none; font-weight: normal;">${APP_URL}</a>
+						  </td>
+					  </tr>
+				  </table>
+			  </td>
+		  </tr>
+	  </table>
+  </body>
+</html> `,
 	};
-
+  
 	try {
-		const result = await transporter.sendMail(mailOptions);
-		console.log('Verification email sent: ', result);
-		return true;
+	  const result = await transporter.sendMail(mailOptions);
+	  console.log("Verification email sent: ", result);
+	  return true;
 	} catch (error) {
-		console.error('Error sending verification email:', error);
-		return false;
+	  console.error("Error sending verification email:", error);
+	  return false;
 	}
-};
+  };
 
 export const sendemailOtp = async (email) => {
 	const otp = Math.floor(100000 + Math.random() * 900000).toString();
