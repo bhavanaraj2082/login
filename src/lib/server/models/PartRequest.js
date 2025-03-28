@@ -5,7 +5,10 @@ const productSchema = new mongoose.Schema(
   {
     productName: String,
     productNumber: String,
-    status: String,
+    status: {
+      type: String,
+      default: "unread"  // Default value for the status field
+    },
     units: Number,
     Firstname: String,
     lastname: String,
