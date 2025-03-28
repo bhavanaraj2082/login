@@ -111,7 +111,7 @@ export const actions = {
       await sendEmailToUser(
         `Your Quote Confirmation – ${PUBLIC_WEBSITE_NAME}`,
         userEmailContent,
-        data.Customer_details.email
+        data.email
       );
     } catch (error) {
       console.error('Error sending confirmation email to the user:', error);
