@@ -447,6 +447,7 @@
 lname=data.profile.lastName || "";
 			email = data.profile.email || "";
 			number = data.profile.cellPhone || data.profile.primaryPhone;
+			company=data.profile.companyName || "";
 
 			const profileCountry = data.profile.country?.trim();
 			if (profileCountry) {

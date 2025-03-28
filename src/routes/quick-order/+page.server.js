@@ -36,49 +36,7 @@ export const actions = {
       };
     }
   },
-//  quicksearch: async ({ request }) => {
-//     const data = Object.fromEntries(await request.formData());
-//     const { quickSearch } = data;
-  
-//     if (quickSearch && quickSearch.length >= 0) {
-//       try {
-//         const results = await quicksearch({ query: quickSearch });
-//         console.log('Raw results:', results);
-  
-//         const processedResults = results.map(product => {
-//           if (product.pricing && Array.isArray(product.pricing)) {
-//             product.pricing = product.pricing.map(item => ({
-//               break: item.break || 'N/A',
-//               price: item.INR || 'N/A',
-//             }));
-//           }
-//           return {
-//             id: product.id,
-//             image: product.image,
-//             description: product.description,
-//             productName: product.productName,
-//             productNumber: product.productNumber,
-//             stockId: product.stockId,
-//             manufacturer: product.manufacturer,
-//             distributer: product.distributer,
-//             stock: product.stock || 0,
-//             pricing: product.pricing,
-//             priceone:product.priceone,
-//           };
-//         });
-  
-//         // console.log('Processed results:', processedResults);
-  
-//         return processedResults;
-//       } catch (error) {
-//         console.error('Error in quicksearch action:', error);
-//         return { error: 'An error occurred while fetching search results.' };
-//       }
-//     } else {
-//       console.log('Search query is invalid:', quickSearch);
-//       return { error: 'Search query must be at least 2 characters.' };
-//     }
-//   },
+
 quicksearch: async ({ request }) => {
   const data = Object.fromEntries(await request.formData());
   const { quickSearch } = data;

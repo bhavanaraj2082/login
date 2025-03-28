@@ -841,10 +841,7 @@ function filterCountriesWithoutAutoSelect() {
   };
   let showSuccesDiv = false;
   let showFailureDiv = false;
-  // onMount(() => {
-  //   document.addEventListener("click", handleClickOutside);
-  //   return () => document.removeEventListener("click", handleClickOutside);
-  // });
+
   let isDataAvailable = false;
   onMount(() => {
         if (data && data.profile) {
@@ -852,7 +849,7 @@ function filterCountriesWithoutAutoSelect() {
           lastName = `${data.profile.lastName || ""}`.trim();
             email = data.profile.email || "";
             phoneNumber = data.profile.cellPhone || "";
-            companyName = data.profile.companyname || "";
+            companyName = data.profile.companyName || "";
 
             const profileCountry = data.profile.country?.trim();
             if (profileCountry) {
@@ -875,19 +872,7 @@ function filterCountriesWithoutAutoSelect() {
             country = "";
             isDataAvailable = false;
 
-            // if (data?.email) {
-            //     email = data.email;
-            //     const reloadFlag = sessionStorage.getItem("emailReloaded");
-            //     if (!reloadFlag) {
-            //         sessionStorage.setItem("emailReloaded", "true");
-            //         location.reload(); // This will reload the page only once to prevent infinite reload
-            //     } else {
-            //         sessionStorage.removeItem("emailReloaded");
-            //     }
-            // }
         }
-
-        // isEditable = false;
         document.addEventListener("click", handleClickOutside);
         return () => document.removeEventListener("click", handleClickOutside);
     });

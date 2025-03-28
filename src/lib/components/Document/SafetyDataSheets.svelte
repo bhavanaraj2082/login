@@ -220,7 +220,7 @@
 
 
   <div class="flex flex-col lg:flex-row lg:space-y-0 space-y-5">
-    <div class="w-full lg:w-7/12 px-3 pt-3 rounded bg-white shadow h-1/4">
+    <div class="w-full lg:w-7/12 px-4 py-2  pt-3 rounded-md bg-white shadow h-1/4">
       {#if activeTab === "SafetyData Sheets"}
         <div class="mb-2 max-sm:w-full">
           <h2 class="sm:text-lg text-md font-semibold mb-4 text-heading">
@@ -279,7 +279,7 @@
                 id="product-number-sds"
                 name="productNumber"
                 placeholder="E.G. IPAKKIT00"
-                class="flex w-full border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+                class="flex w-full border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
               />
               <!-- <p>{inputValue}</p> -->
 
@@ -298,7 +298,7 @@
                 <div class="flex items-center justify-end mt-2">
                   <button
                     type="submit"
-                    class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+                    class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
                   >
                    Search
                   </button>
@@ -365,7 +365,7 @@
                 id="product-number-sds"
                 name="productNumber"
                 placeholder="E.G. IPAKKIT00"
-                class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+                class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
               />
               <!-- <p>{inputValue1}</p> -->
               {#if showErrors && inputValue1.length === 0}
@@ -395,7 +395,7 @@
                   name="product-number"
                   bind:value={lotNumber}
                   placeholder="E.G. 708371"
-                  class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+                  class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
                 />
                 {#if showErrors && lotNumber.length === 0}
                   <div class="flex text-start">
@@ -408,7 +408,7 @@
               <div class="flex items-center justify-end mt-2">
                 <button
                   type="submit"
-                  class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+                  class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
                 >
                 Search
                 </button>
@@ -475,7 +475,7 @@
                 id="product-number-sds"
                 name="productNumber"
                 placeholder="E.G. IPAKKIT00"
-                class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+                class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
               />
               <!-- <p>{inputValue2}</p> -->
               {#if showErrors && inputValue2.length === 0}
@@ -504,7 +504,7 @@
                   name="product-number"
                   bind:value={lotNumber1}
                   placeholder="E.G. 708371"
-                  class="flex w-full border-1 mt-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+                  class="flex w-full border-1 mt-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
                 />
                 {#if showErrors && lotNumber1.length === 0}
                   <div class="flex text-start">
@@ -519,7 +519,7 @@
                 <div class="flex items-center justify-end mt-2">
                   <button
                     type="submit"
-                    class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+                    class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
                   >
                   Search
                   </button>
@@ -587,7 +587,7 @@
                 id="product-number-sds"
                 name="productNumber"
                 placeholder="E.G. IPAKKIT00"
-                class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+                class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
               />
               <!-- <p>{inputValue3}</p> -->
 
@@ -614,7 +614,7 @@
                   name="product-number"
                   bind:value={lotNumber2}
                   placeholder="E.G. 708371"
-                  class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+                  class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
                 />
                 {#if showErrors && lotNumber2.length === 0}
                   <div class="flex text-start">
@@ -629,7 +629,7 @@
                 <div class="flex items-center justify-end mt-2">
                   <button
                     type="submit"
-                    class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+                    class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
                   >
                     Search
                   </button>
@@ -664,7 +664,7 @@
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div
-          class="bg-white p-4 border rounded shadow-md w-full self-start cursor-pointer"
+          class="bg-white p-4 rounded-md  shadow w-full self-start cursor-pointer"
           on:click={() => toggleProductDetails2("Safety Data Sheets")}
         >
           <div class="flex items-center justify-between">
@@ -745,7 +745,7 @@
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
-            class="bg-white p-4 border rounded shadow w-full self-start cursor-pointer"
+            class="bg-white p-4 rounded-md shadow w-full self-start cursor-pointer"
             on:click={() => toggleProductDetails2("Certificates of Analysis")}
           >
             <div class="flex items-center justify-between">
@@ -823,7 +823,7 @@
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
-            class="bg-white p-4 border rounded shadow w-full self-start cursor-pointer"
+            class="bg-white p-4 rounded-md shadow w-full self-start cursor-pointer"
             on:click={() => toggleLotDetails("Certificates of Analysis")}
           >
             <div class="flex items-center justify-between">
@@ -857,7 +857,7 @@
               </div>
             {/if}
           </div>
-          <div class="bg-white p-4 border rounded shadow w-full self-start">
+          <div class="bg-white p-4 rounded-md shadow w-full self-start">
             <div class="flex items-center justify-between">
               <h3 class="sm:text-md text-sm font-medium text-gray-700">
                 Not Finding What You Are Looking For?
@@ -871,7 +871,7 @@
             <div class="flex items-center justify-end mt-4">
               <button
                 type="submit"
-                class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+                class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
                 on:click={handleClick}
               >
                 Contact Us
@@ -885,7 +885,7 @@
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
-            class="bg-white p-4 border rounded shadow w-full self-start cursor-pointer"
+            class="bg-white p-4 rounded-md shadow w-full self-start cursor-pointer"
             on:click={() => toggleProductDetails2("Certificates of Origin")}
           >
             <div class="flex items-center justify-between">
@@ -963,7 +963,7 @@
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
-            class="bg-white p-4 border rounded shadow w-full self-start cursor-pointer"
+            class="bg-white p-4 rounded-md shadow w-full self-start cursor-pointer"
             on:click={() => toggleLotDetails("Certificates of Origin")}
           >
             <div class="flex items-center justify-between">
@@ -1016,7 +1016,7 @@
               </div>
             {/if}
           </div>
-          <div class="bg-white p-4 border rounded shadow w-full self-start">
+          <div class="bg-white p-4 rounded-md shadow w-full self-start">
             <div class="flex items-center justify-between">
               <h3 class="sm:text-md text-sm font-medium text-gray-700">
                 Not Finding What You Are Looking For?
@@ -1029,7 +1029,7 @@
             <div class="flex items-center justify-end mt-4">
               <button
                 type="submit"
-                class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+                class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
                 on:click={handleClick}
               >
                 Contact Us
@@ -1043,7 +1043,7 @@
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
-            class="bg-white p-4 border rounded shadow w-full self-start cursor-pointer"
+            class="bg-white p-4 rounded-md shadow w-full self-start cursor-pointer"
             on:click={() => toggleProductDetails2("Certificates of Quality")}
           >
             <div class="flex items-center justify-between">
@@ -1121,7 +1121,7 @@
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
-            class="bg-white p-4 border rounded shadow w-full self-start cursor-pointer"
+            class="bg-white p-4 rounded-md shadow w-full self-start cursor-pointer"
             on:click={() => toggleLotDetails("Certificates of Quality")}
           >
             <div class="flex items-center justify-between">
@@ -1175,7 +1175,7 @@
               </div>
             {/if}
           </div>
-          <div class="bg-white p-4 border rounded shadow w-full self-start">
+          <div class="bg-white p-4 rounded-md shadow w-full self-start">
             <div class="flex items-center justify-between">
               <h3 class="sm:text-md text-sm font-medium text-gray-700">
                 Not Finding What You Are Looking For?
@@ -1188,7 +1188,7 @@
             <div class="flex items-center justify-end mt-4">
               <button
                 type="submit"
-                class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+                class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
                 on:click={handleClick}
               >
                 Contact Us

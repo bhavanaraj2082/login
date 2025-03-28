@@ -14,13 +14,13 @@
   let firstName = "";
   let currency = "";
   let isAccountSelected = false;
-  let password = '';
+  let isTermsAccepted = false;
+  let password = "";
   let passwordConfirm = "";
   let searchTerm = "";
   let phone = "";
   let form5;
   let error = {};
-  let termsAccepted = false;
   let isLoading = false;
   let emailSent = false;
   let verificationMessage = "";
@@ -102,31 +102,32 @@
   //     delete errors.password;
   //   }
   // }
-  let errors = { password: ''};
-
+  let errors = { password: "" };
 
   if (!password) {
-			error.password = '*Required';
-		} else if (
-			!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(password)
-		) {
-			error.password = 'Ensure your password matches the format outlined below.';
-		} else {
-			delete error.password;
-		}
+    error.password = "*Required";
+  } else if (
+    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
+      password
+    )
+  ) {
+    error.password = "Ensure your password matches the format outlined below.";
+  } else {
+    delete error.password;
+  }
 
   let passwordStrength = 0;
 
   function validatePassword() {
-    typing = password.length > 0; 
-    errors.password = ''; 
+    typing = password.length > 0;
+    errors.password = "";
 
     if (password.length < 8) {
-      errors.password = 'Password must be at least 8 characters long.';
+      errors.password = "Password must be at least 8 characters long.";
     }
     // Check if the password contains the word 'password'
-    else if (password.includes('password')) {
-      errors.password = 'Password cannot contain common or guessable text.';
+    else if (password.includes("password")) {
+      errors.password = "Password cannot contain common or guessable text.";
     }
 
     if (!password) {
@@ -155,7 +156,7 @@
     return strength;
   }
 
-  $: calculateStrength(password)
+  $: calculateStrength(password);
 
   function validateConfirmPassword() {
     if (!passwordConfirm) {
@@ -175,7 +176,7 @@
 
   function handleInput() {
     typing = true;
-    enteredOtp = enteredOtp.trim();
+    enteredOtp = enteredOtp.replace(/[^0-9]/g, "").trim();
   }
 
   const countryCurrencyMap = {
@@ -1080,55 +1081,55 @@
   //   filterCountries();
   // }
   function handleInputChange(event) {
-        // Get the current input value
-        searchTerm = event.target.value;
+    // Get the current input value
+    searchTerm = event.target.value;
 
-        // Track if user is deleting text
-        const isDeleting =
-            event.inputType === "deleteContentBackward" ||
-            event.inputType === "deleteContentForward";
+    // Track if user is deleting text
+    const isDeleting =
+      event.inputType === "deleteContentBackward" ||
+      event.inputType === "deleteContentForward";
 
-        if (searchTerm.length > 0 && !isDeleting) {
-            // Filter countries
-            filterCountriesWithoutAutoSelect();
+    if (searchTerm.length > 0 && !isDeleting) {
+      // Filter countries
+      filterCountriesWithoutAutoSelect();
 
-            // Show dropdown with filtered results
-            showDropdown = filteredCountries.length > 0;
+      // Show dropdown with filtered results
+      showDropdown = filteredCountries.length > 0;
 
-            // Check for country code matches specifically
-            const codeSearch = searchTerm.replace("+", "").trim();
-            if (codeSearch.length > 0) {
-                const exactCodeMatches = filteredCountries.filter(
-                    (country) => country.code.replace("+", "") === codeSearch,
-                );
-
-                if (exactCodeMatches.length === 1) {
-                    selectCountry(exactCodeMatches[0]);
-                    return;
-                }
-            }
-
-            const countriesStartingWith = filteredCountries.filter((country) =>
-                country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
-            );
-
-            if (countriesStartingWith.length === 1) {
-                selectCountry(countriesStartingWith[0]);
-            }
-        } else {
-            filterCountriesWithoutAutoSelect();
-            showDropdown = filteredCountries.length > 0;
-        }
-    }
-    function filterCountriesWithoutAutoSelect() {
-        filteredCountries = countries.filter(
-            (country) =>
-                country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                country.code
-                    .replace("+", "")
-                    .includes(searchTerm.replace("+", "").toLowerCase()),
+      // Check for country code matches specifically
+      const codeSearch = searchTerm.replace("+", "").trim();
+      if (codeSearch.length > 0) {
+        const exactCodeMatches = filteredCountries.filter(
+          (country) => country.code.replace("+", "") === codeSearch
         );
+
+        if (exactCodeMatches.length === 1) {
+          selectCountry(exactCodeMatches[0]);
+          return;
+        }
+      }
+
+      const countriesStartingWith = filteredCountries.filter((country) =>
+        country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+      );
+
+      if (countriesStartingWith.length === 1) {
+        selectCountry(countriesStartingWith[0]);
+      }
+    } else {
+      filterCountriesWithoutAutoSelect();
+      showDropdown = filteredCountries.length > 0;
     }
+  }
+  function filterCountriesWithoutAutoSelect() {
+    filteredCountries = countries.filter(
+      (country) =>
+        country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        country.code
+          .replace("+", "")
+          .includes(searchTerm.replace("+", "").toLowerCase())
+    );
+  }
 
   function filterCountries() {
     filteredCountries = countries.filter(
@@ -1363,7 +1364,6 @@
       delete errors.tanNumber;
     }
 
-    // Username validation
     if (!username) {
       errors.username = "*Required";
     } else if (username.length < 3) {
@@ -1383,7 +1383,6 @@
       delete errors.username;
     }
 
-    // Email validation
     if (!email) {
       errors.email = "*Required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -1392,7 +1391,6 @@
       delete errors.email;
     }
 
-    // Phone validation
     if (!phone) {
       errors.phone = "*Required";
     } else {
@@ -1406,14 +1404,12 @@
       }
     }
 
-    // Country validation
     if (!country) {
       errors.country = "*Required";
     } else {
       delete errors.country;
     }
 
-    // Password validation
     if (!password) {
       errors.password = "*Required";
     } else if (
@@ -1427,7 +1423,6 @@
       delete errors.password;
     }
 
-    // Password Confirm validation
     if (!passwordConfirm) {
       errors.passwordConfirm = "*Required";
     } else if (passwordConfirm !== password) {
@@ -1436,13 +1431,16 @@
       delete errors.passwordConfirm;
     }
 
-    // Terms and Conditions validation
-    if (!termsAccepted) {
+    const checkbox = document.querySelector('input[type="checkbox"]');
+    if (!checkbox) {
+      errors.termsAndConditions = "*Required";
+    } else if (!checkbox.checked) {
       errors.termsAndConditions =
         "You need to agree to the Terms of Service and Privacy Policy to proceed";
+    } else {
+      delete errors.termsAndConditions;
     }
 
-    // OTP Verification check
     if (!(isOtpVerified === true)) {
       toast.error("Please verify your email to proceed");
     }
@@ -1454,6 +1452,17 @@
 
     return Object.keys(errors).length === 0 && isOtpVerified === true;
   }
+
+  const handleCheckboxChange = (event) => {
+    isTermsAccepted = event.target.checked;
+    //   console.log("isTermsAccepted",isTermsAccepted)
+    if (isTermsAccepted) {
+      delete errors.termsAndConditions;
+    } else {
+      errors.termsAndConditions =
+        "You need to agree to the Terms of Service and Privacy Policy to proceed";
+    }
+  };
 
   async function handleFormSubmission({ cancel }) {
     if (!validateForm()) {
@@ -1516,21 +1525,28 @@
   });
 </script>
 
-<div class="flex flex-col w-11/12 md:flex-row justify-center z-50 items-start shadow-md mt-20 mb-12 rounded-lg max-w-3xl bg-white mx-auto border-gray-300 border">
-  <button 
-	on:click={() => goto('/')}
-		class="absolute top-0.5 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-3 text-primary-500 bg-white hover:bg-primary-600 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
-		<div class="flex items-center space-x-2">
-			<Icon icon="mdi:home" class="text-xl" />
-			<span class="hidden sm:inline text-sm font-medium">Back to Home</span>
-		</div>
-	</button>
-  <div class="content w-full p-4 md:p-10 flex flex-col justify-center rounded-tr-lg rounded-b-lg md:rounded-l-lg md:rounded-tl-none" >
-    <h2 class="text-2xl font-bold text-primary-500 sm:pt-0 pt-2 sm:pb-2 pb-4">Sign Up</h2>
+<div
+  class="flex flex-col w-11/12 md:flex-row justify-center z-50 items-start shadow-md mt-20 mb-12 rounded-lg max-w-3xl bg-white mx-auto border-gray-300 border"
+>
+  <button
+    on:click={() => goto("/")}
+    class="absolute top-0.5 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-3 text-primary-500 bg-white hover:bg-primary-600 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md"
+  >
+    <div class="flex items-center space-x-2">
+      <Icon icon="mdi:home" class="text-xl" />
+      <span class="hidden sm:inline text-sm font-medium">Back to Home</span>
+    </div>
+  </button>
+  <div
+    class="content w-full p-4 md:p-10 flex flex-col justify-center rounded-tr-lg rounded-b-lg md:rounded-l-lg md:rounded-tl-none"
+  >
+    <h2 class="text-2xl font-bold text-primary-500 sm:pt-0 pt-2 sm:pb-2 pb-4">
+      Sign Up
+    </h2>
     <p class="text-gray-500 mb-5 md:text-sm text-xs">
       Already have an account? <a
         href="/signin"
-        class="underline text-primary-500 hover:text-primary-600">SignIn.</a
+        class="text-primary-500 hover:text-primary-600 font-semibold">SignIn</a
       >
     </p>
     <!-- <p class="text-gray-500 mb-5">
@@ -1599,7 +1615,8 @@
         </div>
         <div class="flex-1 mb-2 md:mb-0 relative">
           <label for="email" class="block text-sm font-medium text-gray-600"
-            >Email</label>
+            >Email</label
+          >
           <div class="relative">
             <form
               action="?/verifyemail"
@@ -2068,89 +2085,106 @@
       </div>
 
       {#if typing}
-      <div class="bg-primary-50 px-2 mt-3 py-2 rounded-md border border-gray-200">
-        <ul class="w-full text-xs text-gray-500 text-left list-none ml-1 ">
-          <li class="flex justify-start items-center sm:text-xs text-2s py-1">
-            {#if password.length >= 8} 
-              <span class="text-green-500">
-                <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
-              </span>
-            {:else}
-              <span class="text-red-500">
-                <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1" />
-              </span>
-            {/if}
-            Contain at least 8 characters
-          </li>
-          <li class="flex justify-start items-center sm:text-xs text-2s py-1">
-            {#if !password.includes('password')}
-              <span class="text-green-500">
-                <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
-              </span>
-            {:else}
-              <span class="text-red-500">
-                <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1" />
-              </span>
-            {/if}
-            Cannot contain common or guessable text
-          </li>
-          <li class="flex justify-start items-center sm:text-xs text-2s py-1">
-            {#if /[!@#$%_*\\-]/.test(password)} 
-            <span class="text-green-500">
-              <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
-            </span>
-            {:else}
-            <span class="text-red-500">
-              <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1" />
-            </span>
-            {/if}
-            Contain one of the following special characters !@#$%_-*
-          </li>
-          <li class="flex justify-start items-center sm:text-xs text-2s py-1">
-            {#if /[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password)}
-              <span class="text-green-500">
-                <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
-              </span>
-            {:else}
-              <span class="text-red-500">
-                <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1" />
-              </span>
-            {/if}
-            Contain at least one uppercase letter, one lowercase letter, one number
-          </li>
-        </ul>
-      </div>
-    {/if}
-    <div class="mt-2">
-      <div class="relative pt-1">
-        <div class="flex mb-2 items-center justify-between"></div>
-        <div class="flex mb-2">
-          <div class="w-full bg-gray-200 rounded-full h-2.5">
-            <div
-              class="h-2.5 rounded-full transition-all duration-300 ease-in-out"
-              style="width: {passwordStrength}%"
-              class:bg-red-500={passwordStrength <= 33}
-              class:bg-yellow-500={passwordStrength > 33 && passwordStrength <= 66}
-              class:bg-green-500={passwordStrength > 66} >
+        <div
+          class="bg-primary-50 px-2 mt-3 py-2 rounded-md border border-gray-200"
+        >
+          <ul class="w-full text-xs text-gray-500 text-left list-none ml-1">
+            <li class="flex justify-start items-center sm:text-xs text-2s py-1">
+              {#if password.length >= 8}
+                <span class="text-green-500">
+                  <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+                </span>
+              {:else}
+                <span class="text-red-500">
+                  <Icon
+                    icon="lets-icons:close-ring-duotone"
+                    class="w-4 h-4 mr-1"
+                  />
+                </span>
+              {/if}
+              Contain at least 8 characters
+            </li>
+            <li class="flex justify-start items-center sm:text-xs text-2s py-1">
+              {#if !password.includes("password")}
+                <span class="text-green-500">
+                  <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+                </span>
+              {:else}
+                <span class="text-red-500">
+                  <Icon
+                    icon="lets-icons:close-ring-duotone"
+                    class="w-4 h-4 mr-1"
+                  />
+                </span>
+              {/if}
+              Cannot contain common or guessable text
+            </li>
+            <li class="flex justify-start items-center sm:text-xs text-2s py-1">
+              {#if /[!@#$%_*\\-]/.test(password)}
+                <span class="text-green-500">
+                  <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+                </span>
+              {:else}
+                <span class="text-red-500">
+                  <Icon
+                    icon="lets-icons:close-ring-duotone"
+                    class="w-4 h-4 mr-1"
+                  />
+                </span>
+              {/if}
+              Contain one of the following special characters !@#$%_-*
+            </li>
+            <li class="flex justify-start items-center sm:text-xs text-2s py-1">
+              {#if /[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password)}
+                <span class="text-green-500">
+                  <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+                </span>
+              {:else}
+                <span class="text-red-500">
+                  <Icon
+                    icon="lets-icons:close-ring-duotone"
+                    class="w-4 h-4 mr-1"
+                  />
+                </span>
+              {/if}
+              Contain at least one uppercase letter, one lowercase letter, one number
+            </li>
+          </ul>
+        </div>
+      {/if}
+      <div class="mt-2">
+        <div class="relative pt-1">
+          <div class="flex mb-2 items-center justify-between"></div>
+          <div class="flex mb-2">
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+              <div
+                class="h-2.5 rounded-full transition-all duration-300 ease-in-out"
+                style="width: {passwordStrength}%"
+                class:bg-red-500={passwordStrength <= 33}
+                class:bg-yellow-500={passwordStrength > 33 &&
+                  passwordStrength <= 66}
+                class:bg-green-500={passwordStrength > 66}
+              ></div>
             </div>
           </div>
-        </div>
-        <div class="mt-1 md:text-xs text-2s font-medium pb-2">
-          {#if passwordStrength <= 33}
-            <span class="text-red-500">Weak</span>
-          {:else if passwordStrength <= 66}
-            <span class="text-yellow-500">Moderate</span>
-          {:else}
-            <span class="text-green-500">Strong</span>
-          {/if}
+          <div class="mt-1 md:text-xs text-2s font-medium pb-2">
+            {#if passwordStrength <= 33}
+              <span class="text-red-500">Weak</span>
+            {:else if passwordStrength <= 66}
+              <span class="text-yellow-500">Moderate</span>
+            {:else}
+              <span class="text-green-500">Strong</span>
+            {/if}
+          </div>
         </div>
       </div>
-    </div>
       <div class="mb-4 relative">
         <label
           for="passwordConfirm"
-          class="block text-sm font-medium text-gray-600">
-          Confirm Password</label>
+          class="block text-sm font-medium text-gray-600"
+        >
+          Confirm Password</label
+        >
         <div class="relative">
           <input
             id="passwordConfirm"
@@ -2193,13 +2227,12 @@
           committed to protecting the privacy of your personal data.
         </p>
       </div>
-      <div class="flex gap-2 {errors.termsAndConditions ? 'mb-1' : 'mb-4'}">
+      <div class="flex gap-2 {errors.termsAndConditions ? 'mb-1' : 'mb-6'}">
         <input
           type="checkbox"
           name="termsAndConditions"
           value={true}
-          bind:checked={termsAccepted}
-          on:change={validateForm}
+          on:change={handleCheckboxChange}
           class="mt-0.5 text-primary-500 rounded focus:ring-0 outline-none"
         />
         <div class=" sm:text-sm text-xs">
@@ -2217,7 +2250,7 @@
           >
         </div>
       </div>
-      {#if errors.termsAndConditions}
+      {#if !isTermsAccepted && errors.termsAndConditions}
         <div class="text-red-500 text-xs block mb-4">
           {errors.termsAndConditions}
         </div>
@@ -2225,36 +2258,42 @@
 
       <button
         type="submit"
-        class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center sm:hidden ">
+        class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center sm:hidden"
+      >
         <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
         Create Account
       </button>
       <div class="hidden sm:flex sm:space-x-4 sm:justify-between w-full py-2">
-        <div class="flex items-center justify-center py-2 px-6 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200">
+        <div
+          class="flex items-center justify-center py-2 px-6 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200"
+        >
           <a href={linkedinUrl} class="flex items-center space-x-2">
             <Icon icon="bi:linkedin" class="text-xl" />
             <span class="text-sm font-medium">Continue with LinkedIn</span>
           </a>
         </div>
-      <div class="relative flex items-center py-1 w-1/6">
-        <div class="flex-grow border-t border-gray-300"></div>
-        <span class="px-2 text-sm text-gray-500 font-bold bg-white">OR</span>
-        <div class="flex-grow border-t border-gray-300"></div>
+        <div class="relative flex items-center py-1 w-1/6">
+          <div class="flex-grow border-t border-gray-300"></div>
+          <span class="px-2 text-sm text-gray-500 font-bold bg-white">OR</span>
+          <div class="flex-grow border-t border-gray-300"></div>
+        </div>
+        <button
+          type="submit"
+          class="w-full sm:w-auto bg-primary-400 text-white py-2 px-6 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center"
+        >
+          <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
+          Create Account
+        </button>
       </div>
-      <button
-      type="submit"
-      class="w-full sm:w-auto bg-primary-400 text-white py-2 px-6 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center">
-      <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
-      Create Account
-    </button>
-
     </form>
     <div class="relative flex items-center my-4 w-full sm:hidden">
       <div class="flex-grow border-t border-gray-300"></div>
       <span class="px-2 text-sm text-gray-500 font-bold bg-white">OR</span>
       <div class="flex-grow border-t border-gray-300"></div>
     </div>
-    <button class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-600 rounded-md transition duration-200 sm:hidden">
+    <button
+      class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-600 rounded-md transition duration-200 sm:hidden"
+    >
       <a href={linkedinUrl} class="flex items-center space-x-2">
         <Icon icon="bi:linkedin" class="text-2xl" />
         <span class="text-sm font-medium">Continue with LinkedIn</span>

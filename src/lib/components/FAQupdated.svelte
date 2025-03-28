@@ -51,37 +51,36 @@
   });
 </script>
 
-<section class="m-3 md:my-3 md:mx-0">
+<section class="md:mx-0">
   <div>
     <div class="pt-0 sm:p-3 w-11/12 max-w-7xl mx-auto">
       <h1
-        class="sm:text-2xl text-xl font-bold text-black mb-6 sm:mb-4 md:mb-8 lg:mb-12 sm:ml-2 md:ml-0 lg:ml-0"
-      >
+        class="sm:text-2xl text-lg font-bold text-black mb-4 md:mb-6 lg:mb-8 sm:ml-2 md:ml-0 lg:ml-0" >
         Frequently Asked Questions
       </h1>
-      <div class="flex gap-3 mb-4 sm:mx-2 md:ml-0 lg:mx-0 relative">
+      <div class="sm:w-1/2 w-full lg:w-1/3 inline-flex rounded mb-2 mt-2 md:text-md text-xs">
+        <nav
+          aria-label="Tabs"
+          class="w-full flex md:space-x-3 space-x-2 overflow-x-auto rounded-t hide">
         {#each sections as { title }, index}
-          <div
-            class="relative w-full sm:w-32"
-            bind:this={sectionElements[index]}
-          >
-            <button
-              class={`flex flex-col justify-center items-center rounded p-2 w-full pb-4 relative text-base lg:text-lg ${
-                activeIndex === index
-                  ? "font-semibold bg-white"
-                  : "bg-primary-200"
-              }`}
-              on:click={() => selectSection(index)}
-              style="transition: background-color 0.3s, transform 0.3s;"
-            >
-              {title}
-            </button>
-          </div>
-        {/each}
+      <div class="inline-block w-full" bind:this={sectionElements[index]}>
+        <button on:click={() => selectSection(index)}
+          class="w-full sm:py-2 py-1 sm:h-12 h-8 sm:px-2  px-1 sm:text-lg text-md focus:outline-none transition duration-300
+            {activeIndex === index
+            ? 'bg-primary-100 text-primary-500 font-semibold'
+            : 'bg-primary-200 text-black'}
+            hover:bg-primary-400 hover:text-white whitespace-nowrap">
+          {title}
+        </button>
         <div
-          class="absolute bottom-2 h-1 bg-primary-400 rounded transition-all duration-300 ease-in-out"
-          bind:this={barElement}
-        />
+        class="h-0.5 bg-primary-500 
+        {activeIndex === index
+          ? 'w-full '
+          : 'w-0'} transition-all duration-300 ease-in-out">
+          </div>
+      </div>
+        {/each}
+        </nav>
       </div>
       <div>
         <div class="py-6" bind:this={faqContainer}>
@@ -89,7 +88,7 @@
             <div class="space-y-3">
               {#each sections[activeIndex].faqs as { question, answer1, answer2 }, index}
                 <div
-                  class="relative shadow-md rounded-md p-4 cursor-pointer border"
+                  class="relative shadow-md rounded-md p-4 cursor-pointer"
                   on:click={() => toggleFAQ(index)}
                   role="button"
                   tabindex="0"

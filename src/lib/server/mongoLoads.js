@@ -127,7 +127,7 @@ export async function loadProductsInfo(productId) {
     description: product.description || {},
     safetyInfo: product.safetyInfo || {},
     filteredProductData: product.filteredProductData || {},
-    productSynonym: product.filteredProductData?.["Synonym(S)"] || "",
+    productSynonym: product.filteredProductData?.["Synonym(s)"] || "",
     stockQuantity,
   };
   return { records: [formattedRecord] };
@@ -240,7 +240,7 @@ export async function RelatedProductData(productId) {
           stockPriceSize: { $ifNull: ['$stockInfo.pricing', []] },
           orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
           priceSize: 1,
-          imageSrc: 1,
+          image: 1,
           productUrl: 1,
           productNumber: 1,
           variants: { $ifNull: ["$variants", []] }
@@ -293,7 +293,7 @@ export async function popularProducts() {
     .sort("order")
     .populate({
       path: "product",
-      select: "-_id prodDesc productName imageSrc productNumber",
+      select: "-_id prodDesc productName imageSrc productNumber image",
       populate: [
         { path: "category", select: "-_id urlName" },
         { path: "subCategory", select: "-_id urlName" },
@@ -1034,6 +1034,8 @@ export async function DifferentProds(productId) {
 
   let stockQuantity = 0;
   let orderMultiple = 0;
+  let orderedQty = 0;
+  let availableStock = 0;
   let priceSize = [];
   let stockId = [];
   let stock = 0;
@@ -1047,6 +1049,8 @@ export async function DifferentProds(productId) {
         if (typeof stockRecord.stock !== "undefined") {
           stockQuantity = stockRecord.stock;
           orderMultiple = stockRecord.orderMultiple;
+          orderedQty = stockRecord.orderedQty;
+          availableStock = stockQuantity - orderedQty;
           if (stockRecord.sku) {
             sku.push(stockRecord.sku);
           }
@@ -1165,8 +1169,9 @@ export async function DifferentProds(productId) {
     description: product?.description || {},
     safetyInfo: product?.safetyInfo || {},
     filteredProductData: product?.filteredProductData || {},
-    productSynonym: product?.filteredProductData?.["Synonym(S)"] || "",
-    stockQuantity,
+    productSynonym: product?.filteredProductData?.["Synonym(s)"] || "",
+    stockQuantity: availableStock,
+    availableStock,
     orderMultiple,
     manufacturer: product?.manufacturer || {},
     stockId,
@@ -1319,7 +1324,7 @@ export async function CompareSimilarityData(productId) {
           stockPriceSize: { $ifNull: ['$stockInfo.pricing', []] },
           orderMultiple: { $ifNull: [{ $arrayElemAt: ['$stockInfo.orderMultiple', 0] }, 1] },
           priceSize: 1,
-          imageSrc: 1,
+          image: 1,
           productUrl: 1,
           productNumber: 1,
           variants: { $ifNull: ["$variants", []] }

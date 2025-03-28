@@ -597,26 +597,7 @@
   }}
 >
   {#if isLoading}
-    <!-- <div
-      class="fixed inset-0 bg-gray-800 bg-opacity-50 z-50 flex justify-center items-center"
-    >
-      <div class="flex flex-col justify-center items-center">
-        <div class="relative">
-          <div class="absolute rounded-full">
-            <Icon
-              icon="line-md:loading-alt-loop"
-              class=" h-32 w-32  mr-1 border-8 border-t-8 border-orange-500 animate-spin"
-            />
-          </div>
-          <Icon
-            icon="tabler:letter-c"
-            width="128"
-            height="128"
-            class="text-orange-500 z-10"
-          />
-        </div>
-      </div>
-    </div> -->
+   
     <div
       class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-500/40 backdrop-blur-sm"
       transition:fade={{ duration: 300 }}
@@ -650,10 +631,10 @@
 
   <section class="w-full mx-auto md:flex items-center gap-5">
     <div
-      class="md:w-3/5 h-72 border bg-white rounded overflow-hidden overflow-y-scroll p-5 relative"
+      class="md:w-3/5 h-72 border bg-white rounded-md overflow-hidden overflow-y-scroll p-5 relative"
     >
       <textarea
-        class="w-full h-full p-2 border placeholder:text-sm placeholder:text-gray-400 border-gray-300 rounded focus:ring-0 focus:border-primary-500"
+        class="w-full h-full p-2 border placeholder:text-sm placeholder:text-gray-400 border-gray-300 rounded-md focus:ring-0 focus:border-primary-500"
         bind:value={rawFileData}
         on:input={handleTextChange}
         placeholder="Type or paste product data here...
@@ -690,7 +671,7 @@ Example:
     <section class="mt-3 md:mt-0 md:w-2/5">
       <div class="flex flex-col gap-3">
         <div
-          class="flex justify-center bg-white items-center h-12 border rounded hover:bg-primary-200 hover:text-primary-600"
+          class="flex justify-center bg-white items-center h-12 border rounded-md hover:bg-primary-200 hover:text-primary-600"
         >
           <a
             class="flex items-center gap-2 text-sm font-medium text-primary-500"
@@ -704,7 +685,7 @@ Example:
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div
-          class="w-full flex flex-col justify-center bg-white items-center rounded h-[220px] mt-3 space-y-2 py-6 border border-dashed hover:bg-primary-100 hover:text-primary-600"
+          class="w-full flex flex-col justify-center bg-white items-center rounded-md h-[220px] mt-3 space-y-2 py-6 border border-dashed hover:bg-primary-100 hover:text-primary-600"
           on:click={() => document.getElementById("bulkupload").click()}
         >
           <Icon icon="uil:upload" class="text-5xl text-primary-500 -ml-4" />
@@ -748,7 +729,7 @@ Example:
 
             <button
               type="button"
-              class="px-3 py-1 text-sm text-white bg-red-500 rounded hover:bg-red-600"
+              class="px-3 py-1 text-sm text-white bg-red-500 rounded-md hover:bg-red-600"
               on:click={(event) =>
                 removeDuplicateEntry(entry.productInfo, event)}
             >
@@ -844,7 +825,7 @@ Example:
     >
       <button
         type="button"
-        class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
+        class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center gap-2"
         on:click={attemptAddToCart}
         disabled={cartloading ||
           (isValidated &&
@@ -861,7 +842,7 @@ Example:
     </form>
   {:else}
     <button
-      class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
+      class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center gap-2"
       on:click={attemptAddToCart}
       disabled={cartloading ||
         (isValidated &&

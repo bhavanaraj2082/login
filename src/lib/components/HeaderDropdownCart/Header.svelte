@@ -617,26 +617,27 @@ async function submitForm() {
 					</button>
 				</div>
 				{#if searchQuery.trim() && searchResults && searchResults.length > 0}
-					<ul class="absolute w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-30 max-h-60 overflow-y-auto">
+					<ul class="absolute w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-50 max-h-60 overflow-y-auto">
 						{#each searchResults as product}
 							<!-- svelte-ignore a11y-click-events-have-key-events -->
 							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 							<li class="px-0 py-0 text-sm text-gray-800 hover:bg-primary-200 cursor-pointer" on:click={() => selectProduct(product)}>
 								<a href={`/products/${product?.category?.urlName}/${product?.subCategory?.urlName}/${product?.productNumber}`}
 									class="block w-full text-sm text-gray-900 px-4 py-2">
-									<p class="text-md">{product?.productName}</p>
-									<p class="text-sm text-gray-400">{product?.manufacturerName}</p>
+									<p class="text-md ">{product?.productName}</p>
+									<p class="text-md text-gray-900 ">{product?.productNumber}   <span class="text-sm text-gray-700 italic pl-2"> - {product?.manufacturerName}</span> </p>
 								</a>
 							</li>
+							<!-- <hr class=""> -->
 						{/each}
 					</ul>
 				{:else if searchQuery.trim() && isLoading}
-					<p class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-30 rounded flex items-center justify-start">
+					<p class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-50 rounded flex items-center justify-start">
 						<Icon icon="ei:spinner" class="w-8 h-8 animate-spin-slow text-primary-600 mx-2 text-5xl"/>
 						<span>Loading Products...</span>
 					</p>
 					{:else if searchQuery.trim().length >= 3 && searchResults && searchResults.length === 0}
-					<p class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-30 rounded">
+					<p class="absolute w-full bg-white text-sm text-gray-500 py-2 px-4 mt-1 border border-gray-300 z-50 rounded">
 						No products found
 					</p>
 				{/if}
@@ -732,7 +733,7 @@ async function submitForm() {
 				{#each menus as menu, index}
 					<!-- svelte-ignore a11y-interactive-supports-focus -->
 					<div
-						class="relative z-50 group"
+						class="group"
 						role="menu"
 						on:mouseenter={() => handleMouseEnterMenu(menu)}
 						on:mouseleave={handleMouseLeaveMenu}>
@@ -749,7 +750,7 @@ async function submitForm() {
 						</div>
 						{#if menu.submenus && menu.submenus.length > 0}
 							<div
-								class={`absolute shadow-md z-20 rounded-sm mt-0 ml-2 bg-white transition-opacity duration-200 ${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+								class={`absolute shadow-md z-50 rounded-sm mt-0 ml-2 bg-white transition-opacity duration-200 w-60 ${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
 								role="menu">
 								{#each menu.submenus as submenu}
 									<!-- svelte-ignore a11y-interactive-supports-focus -->
@@ -800,13 +801,16 @@ async function submitForm() {
 						{/if}
 					</div>
 				{/each}
-				<a href="/quotes">
-					<button class="hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap transform hover:scale-105 duration-200">
+				<!-- <a href="/quotes"> -->
+					<div class="group" role="menu"><div class="py-0 pr-2 pl-3 text-gray-600">
+					<button on:click={() => goto('/quotes')} class="flex items-center hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap sm:text-sm text-xs lg:text-base font-medium text-left w-full text-white">
 						<span class="text-white font-medium sm:text-sm text-xs lg:text-base">
 							Quotes
 						</span>
 					</button>
-				</a>
+				</div>
+			</div>
+				<!-- </a> -->
 			</div>
 				
 			<div class="flex gap-1 text-gray-600 items-center ">

@@ -11,6 +11,7 @@
   export let addToCart;
   export let cartTogglePopup;
   export let orderMultiple;
+  export let updateQuantity;
   let stockStatus = "";
   let stockAvailability = "";
   let stockType = "";
@@ -62,31 +63,28 @@
             type="text"
             min="1"
             maxlength="3"
-            bind:value={quantity}
+            bind:value={$quantity}
             class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
-            on:focus={(e) => {
-              setTimeout(() => e.target.select(), 10);
-            }}
             on:blur={(e) => {
               let inputValue = parseInt(e.target.value, 10);
 
-              if (!inputValue) {
-                quantity = orderMultiple ? orderMultiple : 1;
-                e.target.value = quantity;
-                return;
+              if (!inputValue || inputValue < 1) {
+                $quantity = orderMultiple ?? 1;
+                e.target.value = $quantity;
+              } else if (orderMultiple) {
+                let adjustedQuantity =
+                  Math.round(inputValue / orderMultiple) * orderMultiple;
+                $quantity = adjustedQuantity > 999 ? 999 : adjustedQuantity;
+                e.target.value = $quantity;
               }
 
-              if (orderMultiple) {
-                quantity =
-                  Math.ceil(inputValue / orderMultiple) * orderMultiple;
-                e.target.value = quantity;
-              }
+              updateQuantity($quantity);
             }}
             on:input={(e) => {
-              e.target.value = e.target.value.replace(/[^1-9]/g, "");
+              e.target.value = e.target.value.replace(/[^0-9]/g, "");
 
               if (e.target.value === "") {
-                quantity = "";
+                $quantity = "";
                 return;
               }
 
@@ -95,13 +93,8 @@
               }
 
               let parsedValue = parseInt(e.target.value, 10);
-
-              if (parsedValue > 999) {
-                quantity = 999;
-                e.target.value = "999";
-              } else {
-                quantity = parsedValue;
-              }
+              $quantity = parsedValue > 999 ? 999 : parsedValue;
+              e.target.value = $quantity;
             }}
             aria-label="Quantity"
             max="999"
@@ -129,15 +122,15 @@
             };
           }}
         >
-          <input type="hidden" name="quantity" value={quantity} />
+          <input type="hidden" name="quantity" value={$quantity} />
           <input type="hidden" name="ProductId" value={product.productNumber} />
           <button
             type="submit"
-            class="bg-primary-400 text-white p-2 rounded flex items-center space-x-1 {quantity <
+            class="bg-primary-400 text-white p-2 rounded flex items-center space-x-1 {$quantity <
             1
               ? 'cursor-not-allowed hover:opacity-65'
               : ''}"
-            disabled={quantity < 1}
+            disabled={$quantity < 1}
           >
             <Icon icon="tabler:calendar-check" class="text-lg" />
             <span class="text-sm">Check Availability</span>
@@ -170,17 +163,17 @@
       <div class="mt-8 flex justify-end">
         <button
           on:click={() => {
-            if (quantity >= 1) {
+            if ($quantity >= 1) {
               addToCart(product, index);
               CheckAvailabilityClose();
               cartTogglePopup();
             }
           }}
-          class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1 {quantity <
+          class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1 {$quantity <
           1
             ? 'cursor-not-allowed hover:opacity-65'
             : ''}"
-          disabled={quantity < 1}
+          disabled={$quantity < 1}
         >
           <Icon icon="ic:round-shopping-cart" class="text-xl" /><span
             class="text-sm">Add To Cart</span

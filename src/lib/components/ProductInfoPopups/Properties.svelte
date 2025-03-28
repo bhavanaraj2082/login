@@ -19,7 +19,7 @@
                   class="grid grid-cols-1 sm:grid-cols-3 sm:p-2 border-b border-gray-300"
                 >
                   <div>
-                    <h3 class="sm:text-sm text-sm break-words max-sm:pt-1 font-semibold">
+                    <h3 class="sm:text-sm text-sm break-words max-sm:pt-1 font-semibold capitalize">
                       {key}
                     </h3>
                   </div>
@@ -32,7 +32,7 @@
           </div>
         </div>
       </div>
-      {#if product.filteredProductData && Object.keys(product.filteredProductData).length > 0}
+      <!-- {#if product.filteredProductData && Object.keys(product.filteredProductData).length > 0}
         <div class="p-4 w-full lg:w-2/5">
           <button type="button" class="w-full text-left pb-2">
             <h2 class="text-xl font-bold text-heading">About This Item</h2>
@@ -54,7 +54,7 @@
             </div>
           </div>
         </div>
-      {/if}
+      {/if} -->
     </div>
   {/if}
 {/each}

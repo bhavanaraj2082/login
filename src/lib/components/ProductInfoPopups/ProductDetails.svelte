@@ -1,4 +1,6 @@
 <script>
+  import { PUBLIC_IMAGE_URL } from "$env/static/public";
+  import { writable } from "svelte/store";
   import { addItemToCart } from "$lib/stores/cart.js";
   import { sendMessage } from "$lib/utils.js";
   import { invalidate } from "$app/navigation";
@@ -12,6 +14,7 @@
   import SideCart from "./sideCart.svelte";
   import LikedPopup from "./LikedPopup.svelte";
   import { toast, Toaster } from "svelte-sonner";
+  import AboutTheItem from "./AboutTheItem.svelte";
   export let data;
   export let isauthedUser;
   export let isFavorite;
@@ -29,7 +32,7 @@
   let authedEmail = isauthedUser.email;
   let showLikedPopup = false;
   let orderMultiple = null;
-  let quantity = 1;
+  let quantity = writable(1);
   let minPrice = Infinity;
   let maxPrice = -Infinity;
   let copyToastIndex = null;
@@ -45,14 +48,14 @@
     productQuote = selectedProduct;
   }
 
-  $: {
-    if (data.records.length > 0 && quantity === 1) {
-      orderMultiple = data.records[0].orderMultiple;
-      quantity = orderMultiple;
-    } else if (data.records.length === 0) {
-      quantity = null;
-    }
-  }
+  // $: {
+  //   if (data.records.length > 0 && quantity === 1) {
+  //     orderMultiple = data.records[0].orderMultiple;
+  //     quantity = orderMultiple;
+  //   } else if (data.records.length === 0) {
+  //     quantity = null;
+  //   }
+  // }
 
   $: {
     if (
@@ -140,33 +143,43 @@
     isFavorite = !isFavorite;
   }
 
-  const updateQuantity = (event) => {
-    let value = parseInt(event.target.value);
-    if (isNaN(value) || value < 1) {
-      quantity = null;
-    } else if (value > 999) {
-      quantity = 999;
+  // const updateQuantity = (event) => {
+  //   let value = parseInt(event.target.value);
+  //   if (isNaN(value) || value < 1) {
+  //     quantity = null;
+  //   } else if (value > 999) {
+  //     quantity = 999;
+  //   } else {
+  //     quantity = value;
+  //   }
+  // };
+
+  $: {
+    if (data.records.length > 0) {
+      orderMultiple = data.records[0].orderMultiple;
+      quantity.set(orderMultiple);
     } else {
-      quantity = value;
+      quantity.set(null);
     }
+  }
+
+  const updateQuantity = (newQuantity) => {
+    // console.log("Updating quantity:", newQuantity);
+    quantity.set(newQuantity);
   };
 
   const increaseQuantity = () => {
-    if (quantity === null) {
-      quantity = 1;
-    } else if (quantity + orderMultiple <= 999) {
-      quantity += orderMultiple;
-    } else {
-      quantity = 999;
-    }
+    quantity.update((q) => {
+      let newQuantity = q + orderMultiple;
+      return newQuantity > 999 ? 999 : newQuantity;
+    });
   };
 
   const decreaseQuantity = () => {
-    if (quantity === null || quantity - orderMultiple < 1) {
-      quantity = 1;
-    } else {
-      quantity -= orderMultiple;
-    }
+    quantity.update((q) => {
+      let newQuantity = q - orderMultiple;
+      return newQuantity < orderMultiple ? orderMultiple : newQuantity;
+    });
   };
 
   function toggleImagePopup() {
@@ -184,30 +197,32 @@
   };
 
   export function addToCart(product) {
-    const backOrder = quantity > product.stock ? quantity - product.stock : 0;
+    const backOrder = $quantity > product.stock ? $quantity - product.stock : 0;
     const cartItem = {
       productId: product.productId,
       manufacturerId: product.manufacturer._id,
       distributorId: product.distributorId,
       stockId: selectedStockId || "NA",
-      quantity: quantity,
+      quantity: $quantity,
       backOrder,
     };
-    addedQuantity = quantity;
+
+    addedQuantity = $quantity;
 
     if (!isLoggedIn) {
       addItemToCart(cartItem);
       guestCartFetch();
-      quantity = 1;
+      quantity.set(orderMultiple ?? 1);
       return;
     }
 
     const formdata = new FormData();
     formdata.append("items", JSON.stringify(cartItem));
+
     sendMessage("?/addtocart", formdata, async (result) => {
       if (result.success) {
         await submitForm();
-        quantity = 1;
+        quantity.set(orderMultiple ?? 1);
       }
       invalidate("/");
     });
@@ -293,10 +308,10 @@
           >
             <!-- svelte-ignore a11y-img-redundant-alt -->
             <img
-              src={`https://img.partskeys.com/chemikart/imgs/prod/${product?.imageSrc}`}
+              src="{PUBLIC_IMAGE_URL}/{product?.imageSrc}"
               alt="Product Image"
               class="w-56 h-56 object-contain"
-              onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg-250.jpg'"
+              onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
             />
             <div
               class="absolute bottom-full left-1/2 transform -translate-x-1/2 w-max px-3 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap"
@@ -415,7 +430,11 @@
                     />
                   </button>
                 {:else}
-                  <button class="mt-0.5" type="submit" on:click={toggleLikedPopup}>
+                  <button
+                    class="mt-0.5"
+                    type="submit"
+                    on:click={toggleLikedPopup}
+                  >
                     <Icon
                       icon={isLiked ? "mdi:heart" : "mdi:heart-outline"}
                       class="text-2xl text-primary-400"
@@ -433,6 +452,12 @@
             {product?.productName}
           </h1>
 
+          {#if product?.prodDesc && product.prodDesc !== ""}
+            <p class="text-gray-500 text-sm leading-relaxed">
+              {product?.prodDesc}
+            </p>
+          {/if}
+
           {#if product?.manufacturer?.name && product?.manufacturer?.name !== ""}
             <p class="text-gray-800 font-medium text-sm leading-relaxed">
               Manufacturer: <span class="font-normal"
@@ -447,15 +472,17 @@
             </p>
           {/if}
 
-          {#if product?.prodDesc && product.prodDesc !== ""}
-            <p class="text-gray-500 text-sm leading-relaxed">
-              {product?.prodDesc}
+          {#if product.productSynonym}
+            <p class="text-gray-800 text-sm font-medium text-start">
+              Synonym(S): <span class="text-gray-500 font-normal text-left"
+                >{product?.productSynonym}</span
+              >
             </p>
           {/if}
 
           {#if !product?.returnPolicy}
             <div
-              class="flex items-center gap-2 text-red-500 font-medium text-sm mt-2"
+              class="flex items-center gap-2 text-red-500 font-medium text-sm"
             >
               <Icon
                 icon="clarity:shopping-cart-solid-badged"
@@ -477,16 +504,6 @@
             </div>
           {/if} -->
         </div>
-
-        {#if product.productSynonym}
-          <div class="flex justify-between !mt-3">
-            <p class="text-gray-900 text-sm font-semibold text-start">
-              Synonym(S): <span class="text-gray-500 font-normal"
-                >{product?.productSynonym}</span
-              >
-            </p>
-          </div>
-        {/if}
         <!-- {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && ((variant.pricing.INR && variant.pricing.INR > 0) || (variant.pricing.USD && variant.pricing.USD > 0)))} -->
         {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant?.pricing && variant.pricing.length > 0 && variant.pricing.some((pricingItem) => (pricingItem.INR && Number(pricingItem.INR) > 0) || (pricingItem.USD && Number(pricingItem.USD) > 0)))}
           <div class="flex justify-between {!authedEmail ? '!mt-6' : '!mt-3'} ">
@@ -513,9 +530,9 @@
         {/if}
         {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
           <div class="!mt-6 max-[640px]:hidden block">
-            <h2 class="bg-white text-heading font-bold text-left">
+            <h4 class="bg-white text-heading font-bold text-left uppercase">
               Select a Size
-            </h2>
+            </h4>
             <div
               class="grid grid-cols-[1fr_2fr_1fr_1fr] gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm sm:font-semibold font-medium text-gray-700 text-left border-b border-gray-300"
             >
@@ -566,11 +583,11 @@
                         class="text-base text-green-500 inline font-bold mb-1"
                       />
                     {:else}
-                      Out of stock
                       <Icon
                         icon="ix:error-filled"
                         class="text-base text-red-500 font-bold inline mb-1"
                       />
+                      Out of stock
                     {/if}
                   </div>
                   <div
@@ -594,11 +611,11 @@
           </div>
         {/if}
         <div class="max-[640px]:block hidden">
-          <h2
-            class="bg-white font-bold text-heading text-base text-left max-md:mt-6"
+          <h4
+            class="bg-white font-bold text-heading text-base uppercase text-left max-md:mt-6"
           >
             Select a Size
-          </h2>
+          </h4>
           <div class="grid grid-cols-3 !mt-1 gap-2 max-[350px]:grid-cols-2">
             {#each product?.priceSize as priceItem, i}
               <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -640,6 +657,7 @@
             </button>
           </div>
         {/if}
+        <AboutTheItem {data} />
       </div>
     </div>
     {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}

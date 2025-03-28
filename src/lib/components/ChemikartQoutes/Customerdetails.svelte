@@ -468,7 +468,7 @@
 		Haiti: /^\d{8}$/,
 		Tonga: /^\d{7}$/
 	};
-    let errorMessage1, errorMessage2,errorMessage3,errorMessage4,errorMessage7;	
+    let errorMessage1, errorMessage2,errorMessage3,errorMessage4,errorMessage7,errorMessage5;	
 	
     //VALIDATIONS
     function validateFirstName(event) {
@@ -489,6 +489,15 @@ function validateLastName(event) {
         errorMessage2 = '';
     }
 }
+function validatecompany(event) {
+    const input = event.target.value;
+    const regex = /^[a-zA-Z0-9\s]*$/; 
+    if (!regex.test(input)) {
+        errorMessage5 = 'Company Name cannot contain special characters';
+    } else {
+        errorMessage5 = '';
+    }
+}
 function validateEmail(event) {
     const input = event.target.value;
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -503,7 +512,7 @@ function validatePhNo(country, number) {
     if (!pattern) {
         errorMessage4 = 'No validation pattern found for this country';
     } else if (!pattern.test(number)) { 
-        errorMessage4 = 'Please enter a valid phone number for ${country}';
+        errorMessage4 = `Please enter a valid phone number for ${country}`;
     } else {
         errorMessage4 = ''; 
     }
@@ -524,6 +533,7 @@ if (!isFormData) {
 validateFirstName({ target: { value: $Cusdetails.FirstName } });
 validateLastName({ target: { value: $Cusdetails.LastName } });
 validateEmail({ target: { value: $Cusdetails.Email } });
+validatecompany({ target: { value: $Cusdetails.Organisation } });
 
 return !errorMessage1 && !errorMessage2 && !errorMessage3 && !errorMessage4;
 };
@@ -553,6 +563,7 @@ onMount(() => {
 			$Cusdetails.Email = data.profile.email || "";
 			$Cusdetails.Number = data.profile.cellPhone || data.profile.primaryPhone || "";
 			$Cusdetails.userId = data.profile.userId || "" ;
+			$Cusdetails.Organisation = data.profile.companyName || "N/a";
 
 			// Country logic
 			const profileCountry = data.profile.country?.trim();
@@ -562,8 +573,8 @@ onMount(() => {
 						c.name.toLowerCase() === profileCountry.toLowerCase(),
 				);
 				if (foundCountry) {
-					country = foundCountry.name;
-					$Cusdetails.Country = country; // Assigning the country to the store
+					$Cusdetails.Country = foundCountry.name;
+					// $Cusdetails.Country = country; // Assigning the country to the store
 				}
 			}
 
@@ -619,8 +630,9 @@ let searchTerm = "";
 		searchTerm = `${selectedCountry.name} `;
 		showDropdown = false;
 		// validatePhoneNumber(country, phone);
-		validatePhNo($Cusdetails.Country, number);
+		// validatePhNo($Cusdetails.Country, number);
 		// delete errors.$Cusdetails.Country;
+		validatePhNo($Cusdetails.Country, $Cusdetails.Number);
 	}
 
 // 	function handleInputChange(event) {
@@ -728,7 +740,7 @@ function filterCountriesWithoutAutoSelect() {
 <hr /><hr />
 <div class="bg-white ">
 	<span class="flex items-center gap-2 pt-10">
-		<Icon icon="ph:user-list" class="sm:w-8 sm:h-8 w-6 h-6 text-heading" />
+		<Icon icon="ph:user-list-bold" class="sm:w-8 sm:h-8 w-6 h-6 text-heading" />
 	<h1 class="font-bold sm:text-2xl text-sm ">Step 5: Customer details</h1>
 	</span>
 	<div class="sm:ml-10 ml-0">
@@ -1118,12 +1130,18 @@ function filterCountriesWithoutAutoSelect() {
 			name="organisation"
 			id=""
 			bind:value={$Cusdetails.Organisation}
+			on:input={validatecompany}
+			
 			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 		/>
         {#if errorMessage && !$Cusdetails.Organisation}
                 <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
                     Company name is required</div>
                 {/if}
+				{#if errorMessage5}
+				<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1 md:hidden block">
+					{errorMessage5}</div>
+				{/if}
 	</div>
 	<!-- <div class="mt-2 mb-2">
 		<label for="" class="sm:text-sm text-xs">Invoice number</label>
@@ -1152,7 +1170,7 @@ function filterCountriesWithoutAutoSelect() {
 </div>
 <div class="py-10 bg-white  flex justify-between">
 	<span class="flex items-center gap-2">
-		<Icon icon="material-symbols-light:delivery-truck-speed-outline-rounded" class="sm:w-9 sm:h-9 w-7 h-7 text-gray-300" />
+		<Icon icon="material-symbols:delivery-truck-speed-outline-rounded" class="sm:w-9 sm:h-9 w-7 h-7 text-gray-300" />
 	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">Step 6: Delivery information</h1>
 	</span>
 </div>

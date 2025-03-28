@@ -1,6 +1,7 @@
 <script>
   import { currencyState } from "$lib/stores/mainStores.js";
   import ShowQuoteModal from "./showQuoteModal.svelte";
+  import {PUBLIC_IMAGE_URL} from "$env/static/public"
   export let record;
   export let productName;
   let showQuoteModal = false;
@@ -100,10 +101,10 @@
               <td class="py-4 px-6">
                 <a href={variant.productNumber}>
                   <img
-                    src={`https://img.partskeys.com/chemikart/imgs/prod/${variant?.imageSrc}`}
+                    src="{PUBLIC_IMAGE_URL}/{variant?.imageSrc}"
                     alt={variant.productNumber}
                     class="w-20 h-20 object-contain"
-                    onerror="this.src='https://img.partskeys.com/chemikart/imgs/prod/default.jpg-250.jpg'"
+                    onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
                   />
                 </a>
               </td>
