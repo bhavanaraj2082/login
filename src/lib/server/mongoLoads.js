@@ -538,8 +538,6 @@ export const loadProductsubcategory = async (
   userId,
   filter
 ) => {
-
-  console.log(search,"search");
   const page = pageNum || 1;
   const pageSize = 10;
   try {
@@ -567,7 +565,6 @@ export const loadProductsubcategory = async (
       matchCondition.manufacturerName = manufacturer;
     }
     if (search) {
-      console.log('object',typeof(search));
       matchCondition.$or = [
         { CAS: { $regex: search, $options: "i" } },
         { productNumber: { $regex: search, $options: "i" } },
@@ -595,7 +592,7 @@ export const loadProductsubcategory = async (
       sortConditions.isEmptyPricing = 1
       sortConditions["productNumber"] = 1;
     }
-     console.log(matchCondition,"LL");
+     
     const aggregation = [
       { $match: matchCondition },
       {
@@ -701,7 +698,7 @@ export const loadProductsubcategory = async (
     const products = await Product.aggregate(aggregation);
     
     const totalCount = await Product.countDocuments(matchCondition);
-    console.log("products",totalCount);
+    console.log("products",JSON.stringify(products,null,2));
     const profile = await Profile.findOne({userId},{firstName:1,lastName:2,cellPhone:1,email:1,isEmailVerified:1,companyName:1,_id:0})
     
 
@@ -724,6 +721,7 @@ export const loadProductsubcategory = async (
         productNumber,
         prodDesc,
         image,
+        variants,
         stockDetails={},
         manufacturerDetails,
         categoryDetails,
@@ -735,6 +733,7 @@ export const loadProductsubcategory = async (
         productNumber,
         prodDesc,
         image,
+        variants,
         pricing: priceConversion,
         totalPrice:{ priceINR:priceConversion.INR*stockDetails.orderMultiple,priceUSD:priceConversion.USD*stockDetails.orderMultiple},
         quantity: stockDetails.orderMultiple,

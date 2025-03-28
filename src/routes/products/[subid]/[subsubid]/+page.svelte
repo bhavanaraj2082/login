@@ -11,11 +11,11 @@
   export let data;
   //console.log(data.products, "object->");
 
-  let catName = data?.products[0]?.categoryDetails?.name;
-  let catUrl = data?.products[0]?.categoryDetails?.urlName;
+  let catName = data.subCategoryDetails.catName;
+  let catUrl = data.subCategoryDetails.catUrlName;
 
-  let SubCatName = data?.products[0]?.subCategoryDetails?.name;
-  let SubCatUrl = data?.products[0]?.subCategoryDetails?.urlName;
+  let SubCatName = data.subCategoryDetails.subCatName;
+  let SubCatUrl = data.subCategoryDetails.subCatUrlName;
 
   const result = data?.products?.map((product) => ({
     manufacturerName: product.manufacturerDetails.name,
