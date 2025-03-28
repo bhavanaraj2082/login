@@ -53,6 +53,8 @@ function handleMouseLeave() {
     $: paginatedProducts = products?.length ? products.map(x=>x) : []
     let categoryName = subCategoryDetails.catUrlName
     let subCategoryName = subCategoryDetails.subCatUrlName
+    let subCatName = subCategoryDetails.subCatName
+    let catName = subCategoryDetails.catName
 
     let searchManufacture = manufacturers
     
@@ -110,15 +112,6 @@ function handleMouseLeave() {
   }
 });
 
-      //   Object.entries(selectedValues).forEach(([key,value])=>{
-      //     if (Array.isArray(value)) {
-      //      value.forEach(item => {
-      //     newUrl.searchParams.append(key, item); 
-      //   });
-      // } else{
-      //   newUrl.searchParams.set(key, value);
-      // }
-      //   })
         goto(newUrl.toString(),{
           invalidateAll:true,
           keepfocus: true, 
@@ -483,17 +476,28 @@ function handleMouseLeave() {
                <div class=" flex gap-2 items-center">
                 <Icon icon="ic:sharp-segment" class="text-2xl text-primary-500" />
                 <h1>Filter</h1>
-                <button on:click={()=>{
-                  localStorage.removeItem("specs")
-                  selectedValues = {}
-                  selectedSort = ""
-                  selectedManufacturer = null
-                  goto(`/products/${categoryName}/${subCategoryName}`)
-                  }} class="{Object.entries(selectedValues).length > 0 || selectedManufacturer !== null || selectedSort.length ? "" : "hidden"} bg-primary-500 text-[11px] px-2 rounded text-white font-normal">Clear All</button>
-               </div>
-               <Icon icon={toggleFilter ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-3xl p-0.5 rounded-full hover:bg-gray-100 xl:hidden"/>
+                <p class=" lg:hidden font-normal text-xs"><span class=" font-semibold text-sm">{productCount}</span> Products</p>
+              <button on:click={()=>{
+                localStorage.removeItem("specs")
+                selectedValues = {}
+                selectedSort = ""
+                selectedManufacturer = null
+                goto(`/products/${categoryName}/${subCategoryName}`)
+                }} class="{Object.entries(selectedValues).length > 0 || selectedManufacturer !== null || selectedSort.length ? "" : "hidden"} lg:hidden bg-primary-500 text-xs px-2 py-1 rounded text-white font-normal">Clear All</button>
+              </div>
+               <Icon icon={toggleFilter ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-3xl p-0.5 rounded-full hover:bg-gray-100 lg:hidden"/>
             </div>
-            <div class=" max-h-[84vh] overflow-y-auto scroll space-y-2 {toggleFilter ? "block":" hidden lg:block"}">
+            <div class="hidden lg:flex justify-between items-center">
+              <p class=" text-xs"><span class=" font-semibold text-sm">{productCount}</span> Products</p>
+              <button on:click={()=>{
+                localStorage.removeItem("specs")
+                selectedValues = {}
+                selectedSort = ""
+                selectedManufacturer = null
+                goto(`/products/${categoryName}/${subCategoryName}`)
+                }} class="{Object.entries(selectedValues).length > 0 || selectedManufacturer !== null || selectedSort.length ? "" : "hidden"} bg-primary-500 text-[11px] px-2 py-1 rounded text-white font-normal">Clear All</button>
+            </div>
+            <div class=" max-h-[80vh] overflow-y-auto scroll space-y-2 {toggleFilter ? "block":" hidden lg:block"}">
             <div class="relative pr-1">
                 <input type="text" placeholder="Search..." bind:value={search} on:input={e=>handleSearch(e.target.value)} class=" w-full text-xs font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500"/>
                 {#if searchLoading}
@@ -518,7 +522,7 @@ function handleMouseLeave() {
                    {#if !searchManufacture.length}
                        <p class="text-sm text-center">No manufacturer found</p>
                    {:else}
-                       {#each searchManufacture as {name}}
+                       {#each searchManufacture.sort((a, b) => a.name.localeCompare(b.name))  as {name}}
                            <label for={name} class="flex cursor-pointer items-center gap-2 text-xs font-medium">
                                <input 
                                    id={name}
@@ -526,7 +530,7 @@ function handleMouseLeave() {
                                    type="checkbox" 
                                    checked={name === selectedManufacturer}
                                    on:change={(e) => handleManufacturerSelect(name, e.target.checked)}
-                                   class="cursor-pointer rounded-full text-primary-500 focus:ring-0 outline-none">
+                                   class="cursor-pointer rounded text-primary-500 focus:ring-0 outline-none">
                                {name}
                            </label>
                        {/each}
@@ -543,11 +547,11 @@ function handleMouseLeave() {
              <div class="p-3 mr-1 border-1 rounded {showSortByDropdown ? "block" : "hidden"}">
                 <div class=" space-y-2.5 py-2.5 h-auto">
                     <label for="asc" class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
-                        <input type="checkbox" id='asc' on:change={(e)=>handlePrice(e.target.checked,"asc")} checked={selectedSort === "asc"} class=" cursor-pointer outline-none rounded-full text-primary-500 focus:ring-0">
+                        <input type="checkbox" id='asc' on:change={(e)=>handlePrice(e.target.checked,"asc")} checked={selectedSort === "asc"} class=" cursor-pointer outline-none rounded text-primary-500 focus:ring-0">
                         <p>Price Ascending </p>
                     </label>
                     <label for="desc" class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
-                        <input type="checkbox" id="desc" on:change={(e)=>handlePrice(e.target.checked,"desc")} checked={selectedSort === "desc"} class=" cursor-pointer outline-none rounded-full text-primary-500 focus:ring-0">
+                        <input type="checkbox" id="desc" on:change={(e)=>handlePrice(e.target.checked,"desc")} checked={selectedSort === "desc"} class=" cursor-pointer outline-none rounded text-primary-500 focus:ring-0">
                         <p>Price Descending </p>
                     </label>
                 </div>
@@ -564,13 +568,13 @@ function handleMouseLeave() {
                     <Icon icon={arr === index ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
                 </button>
                 <div class="p-3 border-1 rounded { arr === index ? "block" : "hidden"}">
-                    {#each values as value }
+                    {#each values.sort((a, b) => a.localeCompare(b)) as value }
                        <div class=" py-1 h-auto">
                           <label for={value.replaceAll(" ","-")} class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
                             <input type="checkbox" id={value.replaceAll(" ","-")}
                             on:change={(e) => handleCheckboxChange(index, value,key, e)}
                             checked={selectedValues[key] && selectedValues[key].includes(value)} 
-                            class=" cursor-pointer outline-none rounded-full text-primary-500 focus:ring-0">
+                            class=" cursor-pointer outline-none rounded text-primary-500 focus:ring-0">
                             <p>{value}</p>
                            </label>
                        </div>
@@ -656,8 +660,8 @@ function handleMouseLeave() {
                 </div>
                 <div class=" text-xs md:text-sm space-y-1 grow font-medium">
                     <p>Product Number : <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.productNumber || ""}</a></p>
-                    <p>Category : <a href={`/products/${categoryName}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.categoryDetails.name || ""}</a></p>
-                    <p>Sub Category : <span class=" font-semibold ">{product?.subCategoryDetails.name || ""}</span></p>
+                    <p>Category : <a href={`/products/${categoryName}`} class=" font-semibold hover:text-primary-500 hover:underline">{catName || ""}</a></p>
+                    <p>Sub Category : <span class=" font-semibold ">{subCatName || ""}</span></p>
                     <p>Manufacturer : <span class=" font-semibold ">{product?.manufacturerDetails.name || ""}</span></p>
                     <!-- <p>Price : <span class=" font-semibold">{$currencyState === "inr" ? "₹" + product?.pricing.INR.toLocaleString("en-IN"): "$"+ product?.pricing.USD.toLocaleString("en-IN")}</span></p> -->
                     {#if product?.pricing && Object.keys(product.pricing).length > 0}
@@ -692,7 +696,7 @@ function handleMouseLeave() {
                             Add to Cart
                         </button>
                     </div>
-                    {:else if product?.variants?.length > 0}
+                    {:else if  product?.variants && product?.variants?.length > 0}
                     <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`}>
                         <button class="bg-primary-500 py-2 px-3 hover:bg-primary-500 rounded text-sm text-white mt-2">
                           View variants
@@ -745,7 +749,7 @@ function handleMouseLeave() {
                     <span class="hidden xs:block">Add to Cart</span>
                 </button>
             </div>
-              {/if}
+            {/if}
         </div>
        {/each}
        {/if}

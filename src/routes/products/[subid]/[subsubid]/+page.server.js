@@ -8,7 +8,6 @@ export async function load({ params,url,depends,locals }) {
 		let filter = {}
 		let searchParams = new URLSearchParams(url.searchParams);
 			searchParams.forEach((value, key) => {
-				console.log(value,key,"ppp");
 				// Skip certain keys
 				if (key !== "manufacturer" && key !== "page" && key !== "search" && key !== "price") {
 				  // Check if `filter['properties.' + key]` exists and is an array
@@ -22,20 +21,7 @@ export async function load({ params,url,depends,locals }) {
 				  }
 				}
 			  });
-			// searchParams.forEach((value, key) => {
-			// 	//console.log(value,key,"pppp");
-			// 	if (key !== "manufacturer" && key !== "page" && key !== "search" && key !== "price") {
-			// 	  if (filter[`properties.${key}`]) {
-			// 		// If the property already exists, update it to be an object with $all
-			// 		filter[`properties.${key}`] = { $in: [...filter[`properties.${key}`], value] };
-			// 	  } else {
-			// 		// Otherwise, create a new entry with $in
-			// 		filter[`properties.${key}`] = { $in: [value] };
-			// 	  }
-			// 	}
-			//   });
 			  
-		console.log(filter,"filter");
 		const page = parseInt(url.searchParams.get('page')) || 1
 		const search = url.searchParams.get('search') || ""
 		const manufacturer = url.searchParams.get('manufacturer') || null

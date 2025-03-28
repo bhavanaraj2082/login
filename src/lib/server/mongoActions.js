@@ -363,14 +363,15 @@ export async function favorite(favdata) {
 export const checkoutOrder = async (order) => {
 	try {
         let orderid 
-		const counter = await Counter.findOne({})
+		const counter = JSON.parse(JSON.stringify(await Counter.findOne({})))
 		if(counter?._id){
-			orderid = await Counter.findOneAndUpdate({_id:counter._id},{$inc:{counter:1}},{new:true})
+			orderid = JSON.parse(JSON.stringify(await Counter.findOneAndUpdate({_id:counter._id},{$inc:{counter:1}},{new:true})))
 		}else{
-			orderid = await Counter.create({counter:1})
+			orderid = JSON.parse(JSON.stringify(await Counter.create({counter:1})))
 		}
 		order.orderid = orderid.counter
-		const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+		const currency = JSON.parse(JSON.stringify(await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 })))
+
 		order.currentUsdRate = currency.rate
 		const newOrder = await Order.create(order);
         for(let rec of order.orderdetails){
