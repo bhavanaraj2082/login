@@ -56,9 +56,6 @@
 {#if isHelpVisible}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
   class="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-30"
   on:click={handleClickOutside} transition:fade
@@ -92,9 +89,9 @@
             &nbsp; &nbsp; Hi! there
         </div>
         <div class="slide flex justify-start items-start text-center text-lg font-semibold font-serif">
-          We 
+          We value your Feedback
         </div>
-        <div class="slide flex justify-start items-start text-center text-lg font-semibold font-serif">
+        <!-- <div class="slide flex justify-start items-start text-center text-lg font-semibold font-serif">
            value 
         </div>
         <div class="slide flex justify-start items-start text-center text-lg font-semibold font-serif">
@@ -102,13 +99,13 @@
         </div>
         <div class="slide flex justify-start items-start text-center text-lg font-semibold font-serif">
         Feedback
-        </div>
+        </div> -->
         <div class="slide mb-4 mt-4 flex justify-start items-start text-center lg:text-sm md:text-xs text-3s font-semibold font-montserrat">
           Please take a moment to fill out our form      
         </div>
   
-        <div class="relative w-full h-16 flex items-center justify-end cursor-pointer" on:click={togglePage} >
-          <button class="absolute text-md text-primary-500 font-semibold border-1 p-2 rounded-md mb-7" type='submit'>
+        <div class="relative w-full h-10 flex items-center justify-end cursor-pointer" on:click={togglePage} >
+          <button class="absolute text-md text-primary-500 font-semibold border-1 p-2 rounded-md mb-5" type='submit'>
             Click here
           </button>
             <Icon icon="ph:hand-pointing-thin" class="absolute text-bold text-3xl text-gray-500 icon-1 mt-6" />
