@@ -20,6 +20,7 @@ const productSchema = new mongoose.Schema(
   { timestamps: true } // Adds createdAt and updatedAt fields
 );
 
+
 // Create the Mongoose model with the specified collection name 'partsrequests'
 const PartRequest = mongoose.models.PartRequest || mongoose.model("PartRequest", productSchema, 'partsrequests');
 
