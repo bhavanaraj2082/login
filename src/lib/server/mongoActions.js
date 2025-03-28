@@ -37,7 +37,7 @@ import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import Return from '$lib/server/models/Return.js';
 import Counter from '$lib/server/models/Counter.js';
 import { sendEmail } from '$lib/server/utils/sendEmail.js';
-
+import PartRequest from '$lib/server/models/PartRequest.js';
 async function conversionRates() {
 	const rates = await Curconversion.find().exec();
 	const currentRates = {};
@@ -2747,7 +2747,9 @@ export const uploadFile = async ({ query }) => {
 };
 
 export const CreateProductQuote = async (formattedData) => {
-	const newQuote = new Quotes(formattedData);
+	console.log("formattedData",formattedData);
+	
+	const newQuote = new PartRequest(formattedData);
 	await newQuote.save();
 	return { status: 200 };
 };
