@@ -57,10 +57,10 @@
 {#if contentComponent === PageNotFound}
     <PageNotFound />
 {:else}
-    <div class="lg:w-11/12 mx-auto max-w-7xl">
+    <div class="w-11/12 mx-auto max-w-7xl">
         <div class="flex flex-col md:flex-row pt-3 lg:px-4 px-4">
             <aside class="w-full md:w-1/3 lg:px-4">
-                <h1 class="text-heading font-bold text-lg md:text-2xl">
+                <h1 class="text-heading font-bold text-xl md:text-2xl">
                     {#if contentComponent === Terms}
                         Site Use Terms
                     {:else if contentComponent === ProductLicense}
@@ -72,58 +72,52 @@
                     {/if}
                 </h1>
 
-                <hr class="border-b border-gray-100 mb-2 mt-8" />
+                <hr class="border-b border-gray-300 mb-2 mt-4" />
 
                 <button
-                    class={`text-xl mt-2 font-semibold mb-2 whitespace-normal ${
+                    class={`sm:text-xl text-sm mt-2 font-semibold mb-2 whitespace-normal transition-all duration-300 ease-in-out transform hover:bg-primary-100 rounded-r hover:scale-105 p-1 ${
                         contentComponent === Terms
-                            ? "text-primary-400 border-l-4 border-primary-400 pl-2 bg-primary-50 rounded-r"
+                            ? "text-primary-400 border-l-4 border-primary-400 px-2 bg-primary-50 rounded-r"
                             : "text-black"
                     }`}
-                    on:click={() => showSection("siteTerms")}
-                >
+                    on:click={() => showSection("siteTerms")}>
                     Site Use Terms
                 </button>
                 <hr class="border-b border-gray-300" />
 
                 <button
-                    class={`text-xl mt-2 font-semibold mb-2 whitespace-normal ${
+                    class={`sm:text-xl text-sm mt-2 font-semibold mb-2 whitespace-normal transition-all duration-300 ease-in-out transform hover:bg-primary-100 rounded-r hover:scale-105 p-1 ${
                         contentComponent === Conditions
-                            ? "text-primary-400 border-l-4 border-primary-400 pl-2 bg-primary-50 rounded-r"
+                            ? "text-primary-400 border-l-4 border-primary-400 px-2 bg-primary-50 rounded-r"
                             : "text-black"
                     }`}
-                    on:click={() => showSection("conditions")}
-                >
+                    on:click={() => showSection("conditions")}>
                     General Terms of Sale
                 </button>
                 <hr class="border-b border-gray-300" />
 
                 <button
-                    class={`text-xl mt-2 font-semibold mb-2 whitespace-normal ${
+                    class={`sm:text-xl text-sm mt-2 font-semibold mb-2 whitespace-normal transition-all duration-300 ease-in-out transform hover:bg-primary-100 rounded-r hover:scale-105 p-1 ${
                         contentComponent === Privacynotice
-                            ? "text-primary-400 border-l-4 border-primary-400 pl-2 bg-primary-50 rounded-r"
+                            ? "text-primary-400 border-l-4 border-primary-400 px-2 bg-primary-50 rounded-r"
                             : "text-black"
                     }`}
-                    on:click={() => showSection("privacynotice")}
-                >
+                    on:click={() => showSection("privacynotice")}>
                     Privacy Notice
                 </button>
                 <hr class="border-b border-gray-300" />
 
                 <button
-                    class={`text-xl mt-2 font-semibold mb-2 whitespace-normal ${
+                    class={`sm:text-xl text-sm mt-2 font-semibold mb-2 whitespace-normal transition-all duration-300 ease-in-out transform hover:bg-primary-100 rounded-r hover:scale-105 p-1 ${
                         contentComponent === ProductLicense
-                            ? "text-primary-400 border-l-4 border-primary-400 pl-2 bg-primary-50 rounded-r"
+                            ? "text-primary-400 border-l-4 border-primary-400 px-2 bg-primary-50 rounded-r"
                             : "text-black"
                     }`}
-                    on:click={() => showSection("productLicense")}
-                >
+                    on:click={() => showSection("productLicense")}>
                     Product Licenses
                 </button>
                 <hr class="border-b border-gray-300" />
             </aside>
-
-            <!-- Content Section -->
             <div class="w-full md:w-3/4 lg:p-2">
                 {#if contentComponent}
                     <svelte:component this={contentComponent} />

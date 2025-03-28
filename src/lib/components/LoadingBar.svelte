@@ -1,4 +1,5 @@
 <script>
+	  import Icon from "@iconify/svelte";
 	import { isLoading } from '$lib/stores/mainStores.js';
 	import { fade } from 'svelte/transition';
 </script>
@@ -8,7 +9,8 @@
 		transition:fade={{ duration: 300 }}>
 		<div class="flex flex-col items-center justify-center p-4">
 			<div class="relative w-32 h-32">
-				<div class="absolute inset-0 w-full h-full border-8 border-dashed border-primary-200 border-t-primary-600 rounded-full animate-spin-slow"></div>
+				<Icon icon="eos-icons:bubble-loading" class="absolute inset-0 w-full h-full text-6xl text-primary-50 animate-spin-slow"/>
+				<!-- <div class="absolute inset-0 w-full h-full border-8 border-dashed border-primary-200 border-t-primary-600 rounded-full animate-spin-slow"></div> -->
 				<div class="loader loader-large absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"></div>
 			</div>
 			<div class="mt-4 text-white font-medium flex items-center animate-pulse">

@@ -984,21 +984,17 @@
 {:else}
     <div class="lg:w-11/12 max-w-7xl px-3 mx-auto mb-8">
         <div
-            class="bg-white mx-auto border rounded-lg shadow-sm lg:w-full w-11/12 py-6 px-4 md:px-8 lg:px-10"
-        >
-            <h1 class="text-3xl font-bold mb-6 mt-3 text-center text-gray-800">
+            class="bg-white mx-auto shadow rounded-lg  lg:w-full w-11/12 py-6 px-4 md:px-8 lg:px-10">
+            <h1 class="sm:text-3xl text-xl font-bold mb-6 mt-3 text-center text-gray-800">
                 Copyright Consent
             </h1>
 
             <div
-                class="bg-primary-50 border-l-4 border-primary-400 p-4 mb-6 rounded-r"
-            >
-                <p class="mb-2 text-sm text-gray-700">
+                class="bg-primary-50 border-l-4 border-primary-400 p-4 mb-6 rounded-r">
+                <p class="mb-2 sm:text-sm text-xs text-gray-700">
                     In case you are requesting our consent to use copyrighted
                     material available on our website, please make sure that you
-                    have checked our
-                </p>
-                <p>
+                    have checked our <br>
                     <a
                         href="/terms/site-and-terms"
                         class="text-primary-500 hover:text-primary-600 font-sm"
@@ -1006,13 +1002,13 @@
                     >.
                 </p>
 
-                <p class="mb-2 text-sm text-gray-700">
+                <p class="mb-2 sm:text-sm text-xs text-gray-700">
                     If you are requesting copyright consent that is not already
                     provided by the "Intellectual Property Rights" section, then
                     please fill out the below form, and send it to us. We will
                     review your request.
                 </p>
-                <p class="text-sm text-gray-700 font-medium">
+                <p class="sm:text-sm text-xs text-gray-700 font-medium">
                     Please note that sending the below request form does NOT
                     give you any license or consent, including implied, to use
                     our copyrighted work unless you receive our explicit consent
@@ -1021,7 +1017,7 @@
                 </p>
             </div>
 
-            <p class="mb-4 text-sm text-gray-600">
+            <p class="mb-4 sm:text-sm tet-xs text-gray-600">
                 Fields indicated by an * are required.
             </p>
 
@@ -1050,7 +1046,7 @@
                                 errors.title = "";
                             }
                         }}
-                        class="focus:border-primary-500 bg-gray-50 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-primary-300 rounded-md mb-2 w-full md:w-4/5 p-2.5"
+                        class="bg-gray-50 border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 rounded-md mb-2 w-full md:w-4/5 p-2.5"
                     >
                         <option value="" disabled selected>Select Title</option>
                         <option value="Mr.">Mr.</option>
@@ -1079,7 +1075,7 @@
                             name="firstname"
                             id="firstname"
                             bind:value={firstname}
-                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="First Name"
                             on:input={() => {
                                 validateField("firstname");
@@ -1107,7 +1103,7 @@
                             name="lastname"
                             id="lastname"
                             bind:value={lastname}
-                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Last Name"
                             on:input={() => {
                                 validateField("lastname");
@@ -1139,7 +1135,7 @@
                             name="company"
                             id="company"
                             bind:value={company}
-                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Company Name"
                             on:input={() => {
                                 validateField("company");
@@ -1169,7 +1165,7 @@
                             name="street"
                             id="street"
                             bind:value={street}
-                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Street Name"
                             on:input={() => {
                                 validateField("street");
@@ -1259,7 +1255,7 @@
                                         name="email"
                                         id="email"
                                         bind:value={email}
-                                        class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
+                                        class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                                         placeholder="Email"
                                         on:input={() => {
                                             email = email.trim();
@@ -1399,7 +1395,7 @@
                                             name="enteredOtp"
                                             bind:value={enteredOtpemail}
                                             placeholder="Enter 6-digit OTP"
-                                            class="w-full text-sm border-gray-300 border rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-300 p-2.5"
+                                            class="w-full text-sm border-gray-300 border rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 p-2.5"
                                             on:input={() => {
                                                 enteredOtpemail =
                                                     enteredOtpemail.trim();
@@ -1453,7 +1449,7 @@
                             name="city"
                             id="city"
                             bind:value={city}
-                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="City"
                             on:input={() => {
                                 validateField("city");
@@ -1487,7 +1483,7 @@
                                 placeholder="Search country"
                                 on:input={handleInputChange}
                                 on:click={toggleDropdown}
-                                class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
+                                class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             />
 
                             {#if showDropdown}
@@ -1544,7 +1540,7 @@
                             type="tel"
                             name="phone"
                             placeholder="Enter Contact Number"
-                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             bind:value={phone}
                             title="Please enter a valid phone number"
                             on:input={() => {
@@ -1565,7 +1561,7 @@
                     <div>
                         <label
                             for="description"
-                            class="text-sm font-semibold text-gray-700 mb-2 block"
+                            class="sm:text-sm text-xs font-semibold text-gray-700 mb-2 block"
                         >
                             *Please describe the way and the purpose you are
                             going to use our copyrighted work
@@ -1589,7 +1585,7 @@
                                         ? "Please enter a valid description"
                                         : "";
                             }}
-                            class="bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300 rounded-md w-full p-3 text-sm"
+                            class="bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 rounded-md w-full p-3 text-sm"
                         ></textarea>
                         {#if errors.description}
                             <p class="text-red-500 text-xs mt-1">
@@ -1601,7 +1597,7 @@
                     <div>
                         <label
                             for="url"
-                            class="text-sm font-semibold text-gray-700 mb-2 block"
+                            class="md:text-sm text-xs font-semibold text-gray-700 mb-2 block"
                             >Please share the link so that we could allocate it:</label
                         >
                         <input
@@ -1610,7 +1606,7 @@
                             id="url"
                             placeholder="https://example.com/page"
                             bind:value={url}
-                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-300 focus:border-primary-300"
+                            class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             title="Please enter a valid URL"
                             on:input={() => validateField("url")}
                         />
@@ -1624,7 +1620,7 @@
 
                 <div class="flex items-center justify-end mt-6">
                     <button
-                        class="px-6 py-3 bg-primary-400 text-white text-sm rounded-md transition duration-300 hover:bg-primary-600 font-semibold shadow-sm"
+                        class="px-6 py-3 bg-primary-400 text-white text-sm rounded-md transition duration-300 hover:bg-primary-600 font-semibold sm:text-sm text-xs shadow-sm"
                         on:click={(event) => {
                             // event.preventDefault();
                             if (!formValid()) {

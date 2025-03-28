@@ -1155,7 +1155,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								name="fname"
 								id="fname"
 								bind:value={fname}
-								class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="First Name*"
 							/>
 							{#if showErrors && fname.length === 0}
@@ -1176,7 +1176,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								name="lname"
 								id="lname"
 								bind:value={lname}
-								class="flex w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="flex w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Last Name*"
 							/>
 							{#if showErrors && lname.length === 0}
@@ -1203,7 +1203,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								placeholder="Location"
 								on:input={handleInputChange}
 								on:click={toggleDropdown}
-								class="w-full sm:text-sm text-xs px-2 py-2 placeholder-gray-400 rounded  border-1 border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
+								class="w-full sm:text-sm text-xs px-2 py-2 placeholder-gray-400 rounded-md  border-1 border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
 								required
 							/>
 						
@@ -1216,7 +1216,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 						
 							<!-- Dropdown Suggestions -->
 							{#if showDropdown}
-								<div class="absolute w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 mt-1">
+								<div class="absolute w-full bg-white border border-gray-300 rounded-md-md shadow-lg z-10 mt-1">
 									<ul class="max-h-60 overflow-y-auto sm:text-sm text-xs">
 										{#each filteredCountries as location (location.name)}
 											<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -1246,7 +1246,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								name="number"
 								id="number"
 								bind:value={number}
-								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Phone Number*"
 							/>
 							{#if showErrors && number.length === 0}
@@ -1271,7 +1271,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								name="company"
 								id="company"
 								bind:value={company}
-								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Company Name*"
 							/>
 							{#if showErrors && company.length === 0}
@@ -1286,7 +1286,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								name="role"
 								id="role"
 								bind:value={role}
-								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Role*"
 							/>
 							{#if showErrors && role.length === 0}
@@ -1298,7 +1298,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
-							<!-- <input type="text" name="email" id="email" bind:value={email} class="block w-full border-1 border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email Address*" /> -->
+							<!-- <input type="text" name="email" id="email" bind:value={email} class="block w-full border-1 border-gray-300 text-sm p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email Address*" /> -->
 							<input
 								type="hidden"
 								name="email"
@@ -1362,7 +1362,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 										name="email"
 										id="email"
 										bind:value={email}
-										class="flex w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										class="flex w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 										placeholder="Email"
 										on:input={() => {
 											email = email.trim();
@@ -1383,13 +1383,10 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 										>
 									{/if}
 									{#if isLoading}
-										<span
-											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
-										>
+										<span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center">
 											<Icon
 												icon="line-md:loading-alt-loop"
-												class="w-4 h-4 mr-1"
-											/>
+												class="w-4 h-4 mr-1"/>
 											Verifying...
 										</span>
 									{:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
@@ -1401,35 +1398,30 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 											) ||
 												email
 													.split("@")[1]
-													.includes("gamil")}
-										>
+													.includes("gamil")}>
 											Verify
 										</button>
 									{:else if emailSent}
 										<span
-											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-										>
+											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center">
 											{#if isOtpVerified}
 												Verified
 												<Icon
-													icon="material-symbols:verified-rounded"
-													class="w-4 h-4 mt-2 ml-1"
-												/>
+													icon="material-symbols:verified-rounded-md"
+													class="w-4 h-4 mt-2 ml-1"/>
 											{:else}
 												<Icon
 													icon="fluent:mail-all-read-16-filled"
-													class="w-4  h-4 mr-1"
-												/>
+													class="w-4  h-4 mr-1"/>
 												Check your inbox
 											{/if}
 										</span>
 									{:else}
 										<span
-											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-										>
+											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center">
 											Verified
 											<Icon
-												icon="material-symbols:verified-rounded"
+												icon="material-symbols:verified-rounded-md"
 												class="w-4 h-4 ml-1"
 											/>
 										</span>
@@ -1479,36 +1471,30 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 									}}
 									on:submit={() => {
 										loadingotp = true; // Show loading message when form is submitted
-									}}
-								>
+									}}>
 									<div class="relative w-full">
 										<input
 											type="hidden"
 											name="email"
 											id="email"
-											bind:value={email}
-										/>
+											bind:value={email}/>
 										<input
 											type="text"
 											name="enteredOtp"
 											bind:value={enteredOtpemail}
 											placeholder="Enter 6-digit OTP"
-											class="flex w-full border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+											class="flex w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
 											on:input={() => {
 												enteredOtpemail =
 													enteredOtpemail.trim();
-											}}
-										/>
+											}}/>
 										<button
 											type="submit"
-											class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded hover:underline"
-											disabled={loadingotp}
-										>
+											class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded-md hover:underline"
+											disabled={loadingotp}>
 											<!-- {loadingotp ? 'Verifying...' : 'Verify'} -->
 											{#if loadingotp}
-												<span
-													class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 flex items-center"
-												>
+												<span class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 flex items-center">
 													<Icon
 														icon="line-md:loading-alt-loop"
 														class="w-4 h-4 mr-1 animate-spin"
@@ -1525,8 +1511,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 											type="button"
 											on:click={handleResendOtpemail}
 											disabled={loadingotp}
-											class="text-sm text-primary-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-										>
+											class="text-sm text-primary-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed">
 											Get a new code
 										</button>
 									</div>
@@ -1545,13 +1530,11 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 							name="details"
 							id="details"
 							bind:value={details}
-							class="w-full sm:text-sm text-xs p-2 border-1 border-gray-300 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 mb-4 h-32"
-							placeholder="Additional Details*"
-						></textarea>
+							class="w-full sm:text-sm text-xs p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 mb-4 h-32"
+							placeholder="Additional Details*"></textarea>
 						{#if showErrors && details.length === 0}
-							<span class="text-red-500 sm:text-xs text-2s font-medium"
-								>Additional Details are required</span
-							>
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+								Additional Details are required</span>
 						{/if}
 					</div>
 					<div>
@@ -1561,39 +1544,32 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								name="query"
 								bind:value={reason}
 								bind:checked={isChecked}
-								class="w-4 h-4 mb-5 ml-1 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0"
-							/>
-
-							<span class="mb-5 text-xs"
-								>I confirm that I have selected the correct
-								queries</span
-							>
+								class="w-4 h-4 mb-5 ml-1 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0"/>
+							<span class="mb-5 text-xs">
+								I confirm that I have selected the correct
+								queries</span>
 						</label>
 						{#if showErrors && reason.length === 0}
-							<span class="text-red-500 sm:text-xs text-2s font-medium"
-								>Please select one of the above reasons</span
-							>
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+								Please select one of the above reasons</span>
 						{/if}
 						{#if showErrors && !isChecked}
-							<span class="text-red-500 sm:text-xs text-2s font-medium"
-								>confirm the above statement</span
-							>
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+								confirm the above statement
+							</span>
 						{/if}
 						<input type="hidden" name="status" value="unread" />
 					</div>
 					<div class="mt-0 flex items-center justify-end gap-x-6">
-						<button
-  type="submit"
-  on:click={handleSubmit}
-  class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
-  >
-  {#if submitting}
-    Sending...
-  {:else}
-    Send Message
-  {/if}
-</button>
-
+						<button type="submit"
+  							on:click={handleSubmit}
+  							class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold">
+  							{#if submitting}
+  							  Sending...
+  							{:else}
+  							  Send Message
+  							{/if}
+						</button>
 					</div>
 				</div>
 			</form>
