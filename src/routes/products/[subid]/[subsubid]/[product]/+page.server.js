@@ -64,48 +64,26 @@ export const actions = {
   createQuote: async ({ request }) => {
     try {
       const data = Object.fromEntries(await request.formData());
-      console.log("quotee data in server js",data);
+      // console.log("quotee data in server js",data);
       async function getClientIP() {
         const response = await fetch('https://api.ipify.org?format=json');
         const data = await response.json();
         return data.ip;
       }
       const ipAddress = await getClientIP();
-      const components = {
-        productName: data.productName,
-        productNumber: data.productNumber,
-      };
-      const formattedData = {
-        Configure_custom_solution: {
-          components: components,
-          units: data.units,
-        },
-        Additional_notes: data.futherdetails,
-        status: data.status,
-        Customer_details: {
-          Firstname: data.Firstname,
-          Lastname: data.lastname,
-          organisation: data.organisation,
-          email: data.email,
-          number: data.phone,
-          units: data.units
-        },
-      };
-
-
-      const record = await CreateProductQuote(formattedData);
+      const record = await CreateProductQuote(data);
       const targetEmailContent = sendemail.emailTemplatequote
       .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
       .replaceAll('{{APP_URL}}', APP_URL)
-      .replaceAll('{{productName}}', formattedData.Configure_custom_solution.components.productName || '')
-      .replaceAll('{{productNumber}}', formattedData.Configure_custom_solution.components.productNumber || '')
-      .replaceAll('{{units}}', formattedData.Configure_custom_solution.units || '')
-      .replaceAll('{{Firstname}}', formattedData.Customer_details.Firstname || '')
-      .replaceAll('{{Lastname}}', formattedData.Customer_details.Lastname || '')
-      .replaceAll('{{organisation}}', formattedData.Customer_details.organisation || '')
-      .replaceAll('{{email}}', formattedData.Customer_details.email || '')
-      .replaceAll('{{phone}}', formattedData.Customer_details.number || '')
-      .replaceAll('{{futherdetails}}', formattedData.Additional_notes || '')
+      .replaceAll('{{productName}}', data.productName || '')
+      .replaceAll('{{productNumber}}', data.productNumber || '')
+      .replaceAll('{{units}}', data.units || '')
+      .replaceAll('{{Firstname}}', data.Firstname || '')
+      .replaceAll('{{Lastname}}', data.Lastname || '')
+      .replaceAll('{{organisation}}', data.organisation || '')
+      .replaceAll('{{email}}', data.email || '')
+      .replaceAll('{{phone}}', data.number || '')
+      .replaceAll('{{futherdetails}}', data.Additional_notes || '')
       .replaceAll('{{ipAddress}}', ipAddress || ''); 
 
     try {
@@ -117,23 +95,23 @@ export const actions = {
       console.error('Error sending notification email to the team:', error);
     }
     const userEmailContent = sendemail.emailTemplatequoteuser
-      .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
+      .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME) 
       .replaceAll('{{APP_URL}}', APP_URL)
-      .replaceAll('{{productName}}', formattedData.Configure_custom_solution.components.productName || '')
-      .replaceAll('{{productNumber}}', formattedData.Configure_custom_solution.components.productNumber || '')
-      .replaceAll('{{units}}', formattedData.Configure_custom_solution.units || '')
-      .replaceAll('{{Firstname}}', formattedData.Customer_details.Firstname || '')
-      .replaceAll('{{Lastname}}', formattedData.Customer_details.Lastname || '')
-      .replaceAll('{{organisation}}', formattedData.Customer_details.organisation || '')
-      .replaceAll('{{email}}', formattedData.Customer_details.email || '')
-      .replaceAll('{{phone}}', formattedData.Customer_details.number || '')
-      .replaceAll('{{futherdetails}}', formattedData.Additional_notes || '');
+      .replaceAll('{{productName}}', data.productName || '')
+      .replaceAll('{{productNumber}}', data.productNumber || '')
+      .replaceAll('{{units}}', data.units || '')
+      .replaceAll('{{Firstname}}', data.Firstname || '')
+      .replaceAll('{{Lastname}}', data.Lastname || '')
+      .replaceAll('{{organisation}}', data.organisation || '')
+      .replaceAll('{{email}}', data.email || '')
+      .replaceAll('{{phone}}', data.number || '')
+      .replaceAll('{{futherdetails}}', data.Additional_notes || '');
 
     try {
       await sendEmailToUser(
         `Your Quote Confirmation – ${PUBLIC_WEBSITE_NAME}`,
         userEmailContent,
-        formattedData.Customer_details.email
+        data.Customer_details.email
       );
     } catch (error) {
       console.error('Error sending confirmation email to the user:', error);
