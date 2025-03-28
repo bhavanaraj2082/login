@@ -155,17 +155,34 @@
     }
   }
 
-  function filterProducts(query) {
-    if (!Array.isArray(products)) {
-      return [];
-    }
+  // function filterProducts(query) {
+  //   if (!Array.isArray(products)) {
+  //     return [];
+  //   }
 
-    return products.filter(
-      (product) =>
-        product.productNumber && product.productNumber.includes(query),
-    );
+  //   return products.filter(
+  //     (product) =>
+  //       product.productNumber && product.productNumber.includes(query),
+  //   );
+  // }
+function filterProducts(query) {
+  if (!Array.isArray(products) || !query) {
+    return [];
   }
 
+  const searchValue = query.trim().toLowerCase();
+  return products.filter(product => {
+    if (!product.productNumber) return false;
+    
+    const productNumber = String(product.productNumber).toLowerCase();
+    
+    return (
+      productNumber.includes(searchValue) ||
+      productNumber.startsWith(searchValue) ||
+      searchValue.split('').every(char => productNumber.includes(char))
+    );
+  });
+}
   let debounceTimeout;
 
   function handleInput(event, sku, index) {
@@ -232,7 +249,7 @@
       selectedProducts[index] = null;
     }
 
-    rows = [...rows]; // Trigger reactivity
+    rows = [...rows]; 
   }
 
   let selectedProducts = {};
@@ -267,9 +284,9 @@
       sku: "",
       filteredProducts: [],
       selectedSize: "",
-      selectedProduct: null, // Reset selectedProduct here
+      selectedProduct: null, 
     };
-    rows = [...rows]; // Trigger reactivity
+    rows = [...rows]; 
   }
 
   function incrementQuantity(index) {
@@ -295,7 +312,7 @@
       console.log("Products loaded:", products.length);
       console.log(
         "Sample product numbers:",
-        products.slice(0, 5).map((p) => p.productNumber),
+        products.map((p) => p.productNumber),
       );
     }
   }
