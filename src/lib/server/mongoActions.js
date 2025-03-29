@@ -379,6 +379,7 @@ export const checkoutOrder = async (order) => {
 			//console.log(stock);
 			await StockLog.create({
                  productId:rec.productId,
+                 stockId:rec.stockId,
 				 manufacturerId:rec.manufacturerId,
 				 distributorId:rec.distributorId,
 				 quantity:rec.orderQty,
