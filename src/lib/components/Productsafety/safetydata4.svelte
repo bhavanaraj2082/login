@@ -4,7 +4,7 @@
     <div class="w-full  p-4">
       <h1 class="text-xl font-semibold mb-6">Hazard and Precautionary Statements</h1> 
       <div class="mb-8">
-        <h2 class="sm:text-md text-sm font-medium mb-4">Hazard Statements</h2>
+        <h2 id="hazard-statements" class="sm:text-md text-sm font-medium mb-4">Hazard Statements</h2>
         <p class="sm:text-sm text-justify text-xs mb-4">
           There are 72 individual and 17 combined hazard statements. These are assigned a unique alphanumerical code consisting of:
         </p>
@@ -34,7 +34,7 @@
       </div>
   
       <div class="mb-8">
-        <h2 class="sm:text-md text-sm font-medium mb-4">Precautionary Statements</h2>
+        <h2 id="precautionary-statements" class="sm:text-md text-sm font-medium mb-4">Precautionary Statements</h2>
         <p class="sm:text-sm text-xs text-justify mb-4">
           There are 116 individual and 33 combined precautionary statements. These are assigned a unique alphanumerical code consisting of:
         </p>
@@ -53,7 +53,10 @@
         </ul>
       </div>
       <div>
-        <h2 class="sm:text-md text-sm font-medium mb-4">Pictograms and Hazard Codes</h2>
+        <h2 
+        id="pictograms"
+        class="sm:text-md text-sm font-medium mb-4 ">
+        Pictograms and Hazard Codes</h2>
         <p class="sm:text-sm text-xs text-justify">Compared to the current EU system the most noticeable change are the pictograms (formerly: hazard symbols). While the most of the GHS pictograms have an equivalent in the old system, the pictograms GHS 04, GHS 07 and GHS 08 are completely new.</p>
       </div>
     </div>

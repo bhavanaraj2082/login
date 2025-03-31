@@ -12,8 +12,8 @@
   let showSavedCarts = false;
   // console.log(currencyState, "currencyState");
   export let data;
-  console.log(data,"i am data");
-  
+  console.log(data, "i am data");
+
   let cartPopupItems;
   let checking = false;
   let index;
@@ -128,7 +128,7 @@
         selectedProduct: null,
       });
     }
-  } 
+  }
 
   let validationMessages = [];
 
@@ -165,24 +165,24 @@
   //       product.productNumber && product.productNumber.includes(query),
   //   );
   // }
-function filterProducts(query) {
-  if (!Array.isArray(products) || !query) {
-    return [];
-  }
+  function filterProducts(query) {
+    if (!Array.isArray(products) || !query) {
+      return [];
+    }
 
-  const searchValue = query.trim().toLowerCase();
-  return products.filter(product => {
-    if (!product.productNumber) return false;
-    
-    const productNumber = String(product.productNumber).toLowerCase();
-    
-    return (
-      productNumber.includes(searchValue) ||
-      productNumber.startsWith(searchValue) ||
-      searchValue.split('').every(char => productNumber.includes(char))
-    );
-  });
-}
+    const searchValue = query.trim().toLowerCase();
+    return products.filter((product) => {
+      if (!product.productNumber) return false;
+
+      const productNumber = String(product.productNumber).toLowerCase();
+
+      return (
+        productNumber.includes(searchValue) ||
+        productNumber.startsWith(searchValue) ||
+        searchValue.split("").every((char) => productNumber.includes(char))
+      );
+    });
+  }
   let debounceTimeout;
 
   function handleInput(event, sku, index) {
@@ -249,7 +249,7 @@ function filterProducts(query) {
       selectedProducts[index] = null;
     }
 
-    rows = [...rows]; 
+    rows = [...rows];
   }
 
   let selectedProducts = {};
@@ -284,9 +284,9 @@ function filterProducts(query) {
       sku: "",
       filteredProducts: [],
       selectedSize: "",
-      selectedProduct: null, 
+      selectedProduct: null,
     };
-    rows = [...rows]; 
+    rows = [...rows];
   }
 
   function incrementQuantity(index) {
@@ -453,7 +453,7 @@ function filterProducts(query) {
   function hideDetails() {
     showDetailsModal = false;
     // selectProduct = null;
-    stockStatus = ""; 
+    stockStatus = "";
     console.log("Modal closed and stockStatus reset");
   }
 
@@ -509,10 +509,10 @@ function filterProducts(query) {
     }
   };
   let units = "";
-  let firstName = data?.profile?.firstName||"";
-  let lastName = data?.profile?.lastName||"";
-  let organisation = data?.profile?.companyName||"";
-  let phone = data?.profile?.cellPhone|| "";
+  let firstName = data?.profile?.firstName || "";
+  let lastName = data?.profile?.lastName || "";
+  let organisation = data?.profile?.companyName || "";
+  let phone = data?.profile?.cellPhone || "";
   let futherdetails = "";
   let formErrors = {};
 
@@ -559,8 +559,8 @@ function filterProducts(query) {
     }
 
     if (!String(phone).match(/^\+?[1-9]\d{1,14}$/)) {
-    formErrors.phone = "Enter a valid phone number";
-}
+      formErrors.phone = "Enter a valid phone number";
+    }
 
     if (!email.trim()) {
       formErrors.email = "Email is required.";
@@ -574,24 +574,46 @@ function filterProducts(query) {
 
     return Object.keys(formErrors).length === 0;
   }
-
   const enhanceForm = (index) => {
     const requestStartTime = Date.now();
     loadingState[index] = true;
     const loadingStartTime = Date.now();
+
     return async ({ result }) => {
       let processingEndTime = 0;
-      // if (Array.isArray(result.data)) {
-      //   products = [...products, ...result.data];
-      // }
+
       if (Array.isArray(result.data)) {
+        // Create a Set to track unique product numbers
+        const uniqueProductNumbers = new Set();
+
+        // Filter out duplicates before adding to products
+        const newProducts = result.data.filter((product) => {
+          // If this product number hasn't been seen before, add it to the set
+          if (!uniqueProductNumbers.has(product.productNumber)) {
+            uniqueProductNumbers.add(product.productNumber);
+            return true;
+          }
+          // If duplicate, return false to filter it out
+          return false;
+        });
+
+        // Combine existing products with new unique products
         const existingProductNumbers = new Set(
           products.map((p) => p.productNumber),
         );
-        const newProducts = result.data.filter(
+
+        const filteredNewProducts = newProducts.filter(
           (p) => !existingProductNumbers.has(p.productNumber),
         );
-        products = [...products, ...newProducts];
+
+        // Add filtered new products to the existing products
+        products = [...products, ...filteredNewProducts];
+
+        // Log number of duplicates removed
+        const duplicatesRemoved = result.data.length - newProducts.length;
+        if (duplicatesRemoved > 0) {
+          console.log(`Removed ${duplicatesRemoved} duplicate products`);
+        }
       }
 
       if (result && result.data) {
@@ -600,7 +622,10 @@ function filterProducts(query) {
         if (result.data.length === 0) {
           toast.error("No Components found");
         } else {
-          productNumbers = result.data.map((record) => record.productNumber);
+          // Use the filtered set of unique product numbers
+          productNumbers = Array.from(
+            new Set(result.data.map((record) => record.productNumber)),
+          );
         }
       } else {
         productNumbers = [];
@@ -621,6 +646,50 @@ function filterProducts(query) {
       });
     };
   };
+  // const enhanceForm = (index) => {
+  //   const requestStartTime = Date.now();
+  //   loadingState[index] = true;
+  //   const loadingStartTime = Date.now();
+  //   return async ({ result }) => {
+  //     let processingEndTime = 0;
+
+  //     if (Array.isArray(result.data)) {
+  //       const existingProductNumbers = new Set(
+  //         products.map((p) => p.productNumber),
+  //       );
+  //       const newProducts = result.data.filter(
+  //         (p) => !existingProductNumbers.has(p.productNumber),
+  //       );
+  //       products = [...products, ...newProducts];
+  //     }
+
+  //     if (result && result.data) {
+  //       console.log(result, "result");
+
+  //       if (result.data.length === 0) {
+  //         toast.error("No Components found");
+  //       } else {
+  //         productNumbers = result.data.map((record) => record.productNumber);
+  //       }
+  //     } else {
+  //       productNumbers = [];
+  //       toast.error("No Components found");
+  //     }
+
+  //     const loadingEndTime = Date.now();
+  //     loadingState[index] = false;
+
+  //     const loadingDuration = (loadingEndTime - loadingStartTime) / 1000;
+
+  //     processingEndTime = Date.now();
+  //     const totalRequestDuration =
+  //       (processingEndTime - requestStartTime) / 1000;
+
+  //     rows.forEach((row, rowIndex) => {
+  //       row.filteredProducts = filterProducts(row.sku);
+  //     });
+  //   };
+  // };
   const closeCartPopDetails = (index) => {
     const cartPopup = document.getElementById("cart-popup-details");
     if (cartPopup) {
@@ -715,18 +784,19 @@ function filterProducts(query) {
     };
 
     const existingItemIndex = currentCart.findIndex(
-      (item) => item.productId === cartItem.productId,
+      (item) =>
+        item.productId === cartItem.productId &&
+        item.stockId === cartItem.stockId &&
+        item.manufacturerId === cartItem.manufacturerId,
     );
 
     if (existingItemIndex > -1) {
-      currentCart[existingItemIndex].quantity = cartItem.quantity;
-      currentCart[existingItemIndex].backOrder = cartItem.backOrder;
-      toast.success(`Product added to the cart`);
-      showCartPopupdetails(cartItem);
+      currentCart[existingItemIndex].quantity += cartItem.quantity;
+      currentCart[existingItemIndex].backOrder += cartItem.backOrder;
+      toast.success(`Product quantity updated in the cart`);
     } else {
       currentCart.push(simplifiedCartItem);
       toast.success(`Product added to the cart`);
-      showCartPopupdetails(cartItem);
     }
 
     localStorage.setItem("cart", JSON.stringify(currentCart));
@@ -845,11 +915,54 @@ function filterProducts(query) {
     }));
   }
 
+  // function handleLocalManualEntries() {
+  //   const cartItems = prepareManualEntriesToCart();
+  //   if (cartItems.length === 0) return;
+
+  //   let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
+  //   for (const item of cartItems) {
+  //     const simplifiedItem = {
+  //       productId: item.productId,
+  //       manufacturerId: item.manufacturerId,
+  //       stockId: item.stockId,
+  //       distributorId: item.distributerId,
+  //       quantity: item.quantity,
+  //       backOrder: item.backOrder,
+  //     };
+
+  //     const existingItemIndex = currentCart.findIndex(
+  //       (cartItem) => cartItem.productId === item.productId,
+  //     );
+
+  //     if (existingItemIndex > -1) {
+  //       currentCart[existingItemIndex].quantity = item.quantity;
+  //       currentCart[existingItemIndex].backOrder = item.backOrder;
+  //     } else {
+  //       currentCart.push(simplifiedItem);
+  //     }
+  //   }
+
+  //   localStorage.setItem("cart", JSON.stringify(currentCart));
+  //   toast.success(`Product added to the cart`);
+  //   if (typeof showCartPopup === "function") {
+  //     showCartPopup(cartItems);
+  //   } else {
+  //     console.error("showCartPopup is not a function:", showCartPopup);
+  //   }
+
+  //   setTimeout(() => {
+  //     resetRows();
+  //   }, 1000);
+
+  //   showCartMessage = true;
+  //   cartloading = false;
+  // }
   function handleLocalManualEntries() {
     const cartItems = prepareManualEntriesToCart();
     if (cartItems.length === 0) return;
 
     let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
+
     for (const item of cartItems) {
       const simplifiedItem = {
         productId: item.productId,
@@ -861,12 +974,16 @@ function filterProducts(query) {
       };
 
       const existingItemIndex = currentCart.findIndex(
-        (cartItem) => cartItem.productId === item.productId,
+        (cartItem) =>
+          cartItem.productId === item.productId &&
+          cartItem.stockId === item.stockId &&
+          cartItem.manufacturerId === item.manufacturerId,
       );
 
       if (existingItemIndex > -1) {
-        currentCart[existingItemIndex].quantity = item.quantity;
-        currentCart[existingItemIndex].backOrder = item.backOrder;
+        // Add the new quantity to the existing quantity
+        currentCart[existingItemIndex].quantity += item.quantity;
+        currentCart[existingItemIndex].backOrder += item.backOrder;
       } else {
         currentCart.push(simplifiedItem);
       }
@@ -874,6 +991,7 @@ function filterProducts(query) {
 
     localStorage.setItem("cart", JSON.stringify(currentCart));
     toast.success(`Product added to the cart`);
+
     if (typeof showCartPopup === "function") {
       showCartPopup(cartItems);
     } else {
@@ -966,10 +1084,7 @@ function filterProducts(query) {
     }
   };
 
-  const tabs = [
-    { name: "Manual Entry" },
-    { name: "Bulk Upload" }
-  ];
+  const tabs = [{ name: "Manual Entry" }, { name: "Bulk Upload" }];
   let activeTab = "Manual Entry";
 </script>
 
@@ -989,25 +1104,26 @@ function filterProducts(query) {
         aria-label="Tabs"
         class="w-full flex space-x-0 overflow-x-auto rounded-t hide"
       >
-      {#each tabs as tab}
-    <div class="inline-block w-full">
-      <button   on:click={() => (activeTab = tab.name)}
-        class="w-full sm:py-2 py-1 h-12 sm:px-2  px-1 sm:text-sm text-md focus:outline-none transition duration-300
+        {#each tabs as tab}
+          <div class="inline-block w-full">
+            <button
+              on:click={() => (activeTab = tab.name)}
+              class="w-full sm:py-2 py-1 h-12 sm:px-2 px-1 sm:text-sm text-md focus:outline-none transition duration-300
           {activeTab === tab.name
-          ? 'bg-gray-50 text-primary-500 font-bold'
-          : 'bg-primary-100 text-black'}
+                ? 'bg-gray-50 text-primary-500 font-bold'
+                : 'bg-primary-100 text-black'}
           hover:bg-gray-50 hover:text-primary-500 whitespace-nowrap"
-      >
-        {tab.name}
-      </button>
-      <div
-        class="h-0.5 bg-primary-300
+            >
+              {tab.name}
+            </button>
+            <div
+              class="h-0.5 bg-primary-300
         {activeTab === tab.name
-          ? 'w-full'
-          : 'w-0'} transition-all duration-300 ease-in-out"
-      ></div>
-    </div>
-      {/each}
+                ? 'w-full'
+                : 'w-0'} transition-all duration-300 ease-in-out"
+            ></div>
+          </div>
+        {/each}
       </nav>
     </div>
     {#if activeTab === "Bulk Upload"}
@@ -1068,9 +1184,27 @@ function filterProducts(query) {
                             {#each result.pricing as size}
                               {#if size.break !== "N/A"}
                                 <div class="flex items-center gap-2">
+                                  <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                  <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                                  <!-- svelte-ignore a11y-label-has-associated-control -->
+                                  <label
+                                    class="cursor-pointer transition-colors"
+                                    class:text-primary-400={row.selectedSize ===
+                                      `${result.productNumber}-${size.break}`}
+                                    class:font-bold={row.selectedSize ===
+                                      `${result.productNumber}-${size.break}`}
+                                    class:hover:text-primary-400={row.selectedSize !==
+                                      `${result.productNumber}-${size.break}`}
+                                    class:hover:font-bold={row.selectedSize !==
+                                      `${result.productNumber}-${size.break}`}
+                                    on:click={() =>
+                                      selectProduct(result, index, size)}
+                                  >
+                                    {result.productNumber} - {size.break}
+                                  </label>
                                   <input
                                     type="radio"
-                                    class="form-radio rounded text-primary-600 sm:text-sm mr-2 focus:outline-none focus:ring-2 focus:ring-primary-600"
+                                    class="hidden"
                                     id="size-{size.break}"
                                     name="size-{result.productNumber}"
                                     value={size.break}
@@ -1080,17 +1214,34 @@ function filterProducts(query) {
                                     on:change={() =>
                                       selectProduct(result, index, size)}
                                   />
-                                  <label for="size-{size.break}"
-                                    >{result.productNumber} - {size.break}</label
-                                  >
                                 </div>
                               {/if}
                             {/each}
                           {:else}
+                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                             <div class="flex items-center gap-2">
+                              <!-- svelte-ignore a11y-click-events-have-key-events -->
+                              <!-- svelte-ignore a11y-label-has-associated-control -->
+                              <label
+                                class="cursor-pointer transition-colors"
+                                class:text-primary-400={row.selectedSize ===
+                                  result.productNumber}
+                                class:font-bold={row.selectedSize ===
+                                  result.productNumber}
+                                class:hover:text-primary-400={row.selectedSize !==
+                                  result.productNumber}
+                                class:hover:font-bold={row.selectedSize !==
+                                  result.productNumber}
+                                on:click={() =>
+                                  selectProduct(result, index, { break: null })}
+                              >
+                                {result.productNumber}
+                              </label>
                               <input
                                 type="radio"
-                                class="form-radio rounded text-primary-600 mr-2 sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-600"
+                                class="hidden"
                                 id="product-{result.productNumber}"
                                 name="size-{result.productNumber}"
                                 value={result.productNumber}
@@ -1100,35 +1251,14 @@ function filterProducts(query) {
                                 on:change={() =>
                                   selectProduct(result, index, { break: null })}
                               />
-                              <label for="product-{result.productNumber}"
-                                >{result.productNumber}</label
-                              >
                             </div>
                           {/if}
 
-                          {#if result.pricing?.every((size) => size.break === "N/A")}
-                            <div class="flex items-center gap-2">
-                              <input
-                                type="radio"
-                                class="form-radio rounded text-primary-600 sm:text-sm mr-2 focus:outline-none focus:ring-2 focus:ring-primary-600"
-                                id="product-{result.productNumber}"
-                                name="size-{result.productNumber}"
-                                value={result.productNumber}
-                                bind:group={row.selectedSize}
-                                checked={row.selectedSize ===
-                                  result.productNumber}
-                                on:change={() =>
-                                  selectProduct(result, index, { break: null })}
-                              />
-                              <label for="product-{result.productNumber}"
-                                >{result.productNumber}</label
-                              >
-                            </div>
-
+                          <!-- {#if result.pricing?.every((size) => size.break === "N/A")}
                             <div class="text-primary-600 mt-2">
                               Request a Quote
                             </div>
-                          {/if}
+                          {/if} -->
                         </div>
                       </div>
                     {/each}
@@ -1408,239 +1538,239 @@ function filterProducts(query) {
   </div>
 
   {#if showDetailsModal && selectedProduct}
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div
-    class="fixed inset-0 w-full flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity !ml-0"
-    on:click|self={hideDetails}
-  >
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="bg-white p-8 rounded-lg relative shadow-lg max-w-xl w-full sm:w-auto mx-4 sm:mx-0"
+      class="fixed inset-0 w-full flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity !ml-0"
       on:click|self={hideDetails}
     >
-      <button
-        class="absolute top-2 right-2 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
-        on:click={hideDetails}
-        aria-label="Close"
+      <div
+        class="bg-white p-8 rounded-lg relative shadow-lg max-w-xl w-full sm:w-auto mx-4 sm:mx-0"
+        on:click|self={hideDetails}
       >
-        <Icon
-          icon="mdi:close"
-          class="text-2xl font-bold text-red-600 border rounded hover:p-px"
-        />
-      </button>
-
-      <h3 class="text-xl font-bold text-left">
-        Availability for {selectedProduct.productNumber} - {selectedProduct.size}
-      </h3>
-      <p class="text-gray-500 mb-10 text-left mt-2">
-        Enter quantity to check availability.
-      </p>
-
-      <form
-        method="POST"
-        action="?/quickcheck"
-        use:enhance={() => {
-          checking = true;
-          return async ({ result }) => {
-            checking = false;
-            console.log(result, "result");
-            const { message, stock, type } = result.data.record;
-            stockStatus = message;
-            if (stock === "Available" && type === "success") {
-              stockStatus = ` ✔️${message}`;
-            } else if (stock === "Limited Availability") {
-              stockStatus = `⚠️ ${message} `;
-            } else if (stock === "Unavailable" || type === "error") {
-              stockStatus = `❌ ${message}`;
-            }
-          };
-        }}
-      >
-        <div class="flex items-center gap-4 mb-6">
-          <input
-            type="hidden"
-            name="ProductId"
-            value={selectedProduct.productNumber}
+        <button
+          class="absolute top-2 right-2 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
+          on:click={hideDetails}
+          aria-label="Close"
+        >
+          <Icon
+            icon="mdi:close"
+            class="text-2xl font-bold text-red-600 border rounded hover:p-px"
           />
-          <input
-            type="hidden"
-            name="quantity"
-            value={selectedProduct.quantity}
-          />
+        </button>
 
-          <button
-            class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-md border border-gray-300 hover:bg-primary-50 transition"
-            on:click|preventDefault={decreaseQuantity}
-          >
-            <Icon icon="ic:round-minus" class="text-xl" />
-          </button>
-
-          <input
-            type="text"
-            min="1"
-            maxlength="4"
-            bind:value={selectedProduct.quantity}
-            class="w-16 h-10 text-center p-2 border border-gray-300 rounded-md outline-none focus:ring-0 focus:none focus:border-primary-400"
-            on:focus={(e) => {
-              e.target.dataset.previousValue = e.target.value;
-
-              setTimeout(() => {
-                e.target.select();
-              }, 10);
-            }}
-            on:blur={(e) => {
-              if (e.target.value === "" || e.target.value === "0") {
-                selectedProduct.quantity = 1;
-                e.target.value = "1";
-              } else {
-                const parsedValue = parseInt(e.target.value, 10);
-                if (
-                  !isNaN(parsedValue) &&
-                  parsedValue >= 1 &&
-                  parsedValue <= 999
-                ) {
-                  selectedProduct.quantity = parsedValue;
-                } else {
-                  selectedProduct.quantity = parseInt(
-                    e.target.dataset.previousValue || "1",
-                    10,
-                  );
-                  e.target.value = selectedProduct.quantity.toString();
-                }
-              }
-            }}
-            on:input={(e) => {
-              e.target.value = e.target.value.replace(/[^0-9]/g, "");
-
-              if (
-                e.target.value.startsWith("0") &&
-                e.target.value.length > 1
-              ) {
-                e.target.value = e.target.value.slice(1);
-              }
-
-              if (e.target.value.length > 3) {
-                e.target.value = e.target.value.slice(0, 3);
-              }
-
-              const parsedValue = parseInt(e.target.value, 10);
-
-              if (parsedValue >= 1 && parsedValue <= 999) {
-                selectedProduct.quantity = parsedValue;
-              } else if (e.target.value === "" || parsedValue < 1) {
-                selectedProduct.quantity =
-                  e.target.value === "" ? "" : parsedValue;
-              } else {
-                selectedProduct.quantity = 999;
-                e.target.value = "999";
-              }
-
-              updateCartItemsValue();
-            }}
-            aria-label="Quantity"
-            max="9999"
-          />
-          <button
-            class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-md border border-gray-300 hover:bg-primary-50 transition"
-            on:click|preventDefault={increaseQuantity}
-          >
-            <Icon icon="ic:round-plus" class="text-xl" />
-          </button>
-          <div class="flex justify-end w-full">
-            <button
-              type="submit"
-              class="bg-primary-400 text-white p-2 rounded flex items-center justify-center w-full sm:w-[160px] min-h-[40px]"
-            >
-              <span
-                class={checking ? "hidden" : "flex items-center space-x-1"}
-              >
-                <Icon icon="tabler:calendar-check" class="text-lg" />
-                <span class="text-sm">Check Availability</span>
-              </span>
-              <span class={checking ? "block" : "hidden"}>Checking...</span>
-            </button>
-          </div>
-        </div>
-        <p class="mt-4 text-sm text-gray-600 flex items-center">
-          <span class="ml-2">{stockStatus}</span>
+        <h3 class="text-xl font-bold text-left">
+          Availability for {selectedProduct.productNumber} - {selectedProduct.size}
+        </h3>
+        <p class="text-gray-500 mb-10 text-left mt-2">
+          Enter quantity to check availability.
         </p>
-      </form>
 
-      {#if data?.authedUser && data?.authedUser?.id}
         <form
           method="POST"
-          action="?/addToCart"
-          bind:this={form}
+          action="?/quickcheck"
           use:enhance={() => {
-            cartloadingpop = true;
+            checking = true;
             return async ({ result }) => {
+              checking = false;
               console.log(result, "result");
-
-              if (result.type === "success") {
-                const resultData = result.data;
-
-                if (resultData && resultData.success === true) {
-                  const cartItem = prepareCartItem();
-                  cartloadingpop = false;
-
-                  toast.success(`Product added to the cart!`);
-                  cartRowIndexToBeCleared = cartItem.rowIndex;
-
-                  hideDetails();
-                  showCartPopupdetails(cartItem);
-
-                  setTimeout(() => {
-                    clearSelectedProductcart(cartRowIndexToBeCleared);
-                  }, 1000);
-
-                  showCartMessage = true;
-                  cartloadingpop = false;
-                } else {
-                  toast.error(
-                    resultData.message || "Failed to add item to cart",
-                  );
-                  cartloadingpop = false;
-                }
-              } else {
-                toast.error("Failed to add item to cart");
-                cartloadingpop = false;
+              const { message, stock, type } = result.data.record;
+              stockStatus = message;
+              if (stock === "Available" && type === "success") {
+                stockStatus = ` ✔️${message}`;
+              } else if (stock === "Limited Availability") {
+                stockStatus = `⚠️ ${message} `;
+              } else if (stock === "Unavailable" || type === "error") {
+                stockStatus = `❌ ${message}`;
               }
             };
-            cartloadingpop = false;
           }}
         >
-          <input type="hidden" name="cartItems" value={cartItemsValue} />
-          <div class="flex justify-end">
+          <div class="flex items-center gap-4 mb-6">
+            <input
+              type="hidden"
+              name="ProductId"
+              value={selectedProduct.productNumber}
+            />
+            <input
+              type="hidden"
+              name="quantity"
+              value={selectedProduct.quantity}
+            />
+
             <button
-              type="submit"
-              class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
+              class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-md border border-gray-300 hover:bg-primary-50 transition"
+              on:click|preventDefault={decreaseQuantity}
             >
-              {#if cartloadingpop}
-                <span>Adding...</span>
-              {:else}
-                <Icon
-                  icon="ic:round-shopping-cart"
-                  class="text-2xl mr-2"
-                /><span class="text-sm">Add To Cart</span>
-              {/if}
+              <Icon icon="ic:round-minus" class="text-xl" />
+            </button>
+
+            <input
+              type="text"
+              min="1"
+              maxlength="4"
+              bind:value={selectedProduct.quantity}
+              class="w-16 h-10 text-center p-2 border border-gray-300 rounded-md outline-none focus:ring-0 focus:none focus:border-primary-400"
+              on:focus={(e) => {
+                e.target.dataset.previousValue = e.target.value;
+
+                setTimeout(() => {
+                  e.target.select();
+                }, 10);
+              }}
+              on:blur={(e) => {
+                if (e.target.value === "" || e.target.value === "0") {
+                  selectedProduct.quantity = 1;
+                  e.target.value = "1";
+                } else {
+                  const parsedValue = parseInt(e.target.value, 10);
+                  if (
+                    !isNaN(parsedValue) &&
+                    parsedValue >= 1 &&
+                    parsedValue <= 999
+                  ) {
+                    selectedProduct.quantity = parsedValue;
+                  } else {
+                    selectedProduct.quantity = parseInt(
+                      e.target.dataset.previousValue || "1",
+                      10,
+                    );
+                    e.target.value = selectedProduct.quantity.toString();
+                  }
+                }
+              }}
+              on:input={(e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, "");
+
+                if (
+                  e.target.value.startsWith("0") &&
+                  e.target.value.length > 1
+                ) {
+                  e.target.value = e.target.value.slice(1);
+                }
+
+                if (e.target.value.length > 3) {
+                  e.target.value = e.target.value.slice(0, 3);
+                }
+
+                const parsedValue = parseInt(e.target.value, 10);
+
+                if (parsedValue >= 1 && parsedValue <= 999) {
+                  selectedProduct.quantity = parsedValue;
+                } else if (e.target.value === "" || parsedValue < 1) {
+                  selectedProduct.quantity =
+                    e.target.value === "" ? "" : parsedValue;
+                } else {
+                  selectedProduct.quantity = 999;
+                  e.target.value = "999";
+                }
+
+                updateCartItemsValue();
+              }}
+              aria-label="Quantity"
+              max="9999"
+            />
+            <button
+              class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-md border border-gray-300 hover:bg-primary-50 transition"
+              on:click|preventDefault={increaseQuantity}
+            >
+              <Icon icon="ic:round-plus" class="text-xl" />
+            </button>
+            <div class="flex justify-end w-full">
+              <button
+                type="submit"
+                class="bg-primary-400 text-white p-2 rounded flex items-center justify-center w-full sm:w-[160px] min-h-[40px]"
+              >
+                <span
+                  class={checking ? "hidden" : "flex items-center space-x-1"}
+                >
+                  <Icon icon="tabler:calendar-check" class="text-lg" />
+                  <span class="text-sm">Check Availability</span>
+                </span>
+                <span class={checking ? "block" : "hidden"}>Checking...</span>
+              </button>
+            </div>
+          </div>
+          <p class="mt-4 text-sm text-gray-600 flex items-center">
+            <span class="ml-2">{stockStatus}</span>
+          </p>
+        </form>
+
+        {#if data?.authedUser && data?.authedUser?.id}
+          <form
+            method="POST"
+            action="?/addToCart"
+            bind:this={form}
+            use:enhance={() => {
+              cartloadingpop = true;
+              return async ({ result }) => {
+                console.log(result, "result");
+
+                if (result.type === "success") {
+                  const resultData = result.data;
+
+                  if (resultData && resultData.success === true) {
+                    const cartItem = prepareCartItem();
+                    cartloadingpop = false;
+
+                    toast.success(`Product added to the cart!`);
+                    cartRowIndexToBeCleared = cartItem.rowIndex;
+
+                    hideDetails();
+                    showCartPopupdetails(cartItem);
+
+                    setTimeout(() => {
+                      clearSelectedProductcart(cartRowIndexToBeCleared);
+                    }, 1000);
+
+                    showCartMessage = true;
+                    cartloadingpop = false;
+                  } else {
+                    toast.error(
+                      resultData.message || "Failed to add item to cart",
+                    );
+                    cartloadingpop = false;
+                  }
+                } else {
+                  toast.error("Failed to add item to cart");
+                  cartloadingpop = false;
+                }
+              };
+              cartloadingpop = false;
+            }}
+          >
+            <input type="hidden" name="cartItems" value={cartItemsValue} />
+            <div class="flex justify-end">
+              <button
+                type="submit"
+                class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
+              >
+                {#if cartloadingpop}
+                  <span>Adding...</span>
+                {:else}
+                  <Icon
+                    icon="ic:round-shopping-cart"
+                    class="text-2xl mr-2"
+                  /><span class="text-sm">Add To Cart</span>
+                {/if}
+              </button>
+            </div>
+          </form>
+        {:else}
+          <div class=" flex justify-end">
+            <button
+              on:click={handleLocalCart}
+              class=" bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
+            >
+              <Icon icon="ic:round-shopping-cart" class="text-xl" /><span
+                class="text-sm">Add To Cart</span
+              >
             </button>
           </div>
-        </form>
-      {:else}
-        <div class=" flex justify-end">
-          <button
-            on:click={handleLocalCart}
-            class=" bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
-          >
-            <Icon icon="ic:round-shopping-cart" class="text-xl" /><span
-              class="text-sm">Add To Cart</span
-            >
-          </button>
-        </div>
-      {/if}
+        {/if}
+      </div>
     </div>
-  </div>
-{/if}
+  {/if}
   {#if showQuoteModal}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->

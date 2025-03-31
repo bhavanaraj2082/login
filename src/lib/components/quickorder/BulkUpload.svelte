@@ -168,6 +168,120 @@
     return validProducts.length > 0;
   }
 
+  // function handleFileInputChange(event) {
+  //   const file = event.target.files[0];
+
+  //   if (file) {
+  //     const fileType = file.name.split(".").pop().toLowerCase();
+  //     selectedFileName = file.name;
+  //     isValidated = false;
+  //     invalidProductLines = [];
+
+  //     if (fileType === "xlsx" || fileType === "xls") {
+  //       fileError = "";
+
+  //       if (typeof XLSX !== "undefined") {
+  //         const reader = new FileReader();
+  //         reader.onload = function (e) {
+  //           try {
+  //             const data = new Uint8Array(e.target.result);
+  //             const workbook = XLSX.read(data, { type: "array" });
+  //             const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+  //             let csvData = XLSX.utils.sheet_to_csv(worksheet);
+  //             const lines = csvData.split("\n").filter((line) => line.trim());
+  //             const transformedLines = lines.map((line) => {
+  //               const parts = line.split(",").map((part) => part.trim());
+  //               if (parts.length >= 2) {
+  //                 return `${parts[0]}-${parts[1]},${parts[2] || 1}`.trim();
+  //               }
+  //               return line.trim();
+  //             });
+
+  //             rawFileData = transformedLines.join("\n");
+  //             isEditing = true;
+  //             const csvFile = new File(
+  //               [rawFileData],
+  //               file.name.replace(/\.xlsx$|\.xls$/i, ".csv"),
+  //               {
+  //                 type: "text/csv",
+  //               },
+  //             );
+
+  //             const dataTransfer = new DataTransfer();
+  //             dataTransfer.items.add(csvFile);
+
+  //             const fileInput = document.getElementById("bulkupload");
+  //             if (fileInput) {
+  //               fileInput.files = dataTransfer.files;
+  //             }
+
+  //             const { duplicates } = checkForDuplicates(rawFileData);
+  //             duplicateEntries = duplicates;
+
+  //             if (duplicates.length > 0) {
+  //               toast.error(
+  //                 `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+  //               );
+  //             }
+  //           } catch (error) {
+  //             console.error("Excel processing error:", error);
+  //             fileError =
+  //               "Error processing Excel file. Please check file format.";
+  //           }
+  //         };
+  //         reader.onerror = function () {
+  //           fileError = "Error reading the file. Please try again.";
+  //         };
+  //         reader.readAsArrayBuffer(file);
+  //       } else {
+  //         fileError =
+  //           "Excel file support requires the SheetJS library. Please use CSV format instead.";
+  //       }
+  //     } else {
+  //       const reader = new FileReader();
+  //       reader.onload = function (e) {
+  //         let fileContent = e.target.result;
+  //         fileError = "";
+  //         isEditing = true;
+  //         const lines = fileContent.split("\n").filter((line) => line.trim());
+  //         const trimmedLines = lines.map((line) => {
+  //           const [productInfo, quantity] = line
+  //             .split(",")
+  //             .map((item) => item.trim());
+  //           return `${productInfo},${quantity}`;
+  //         });
+
+  //         rawFileData = trimmedLines.join("\n");
+  //         const trimmedFile = new File([rawFileData], file.name, {
+  //           type: "text/csv",
+  //         });
+  //         const dataTransfer = new DataTransfer();
+  //         dataTransfer.items.add(trimmedFile);
+  //         const fileInput = document.getElementById("bulkupload");
+  //         if (fileInput) {
+  //           fileInput.files = dataTransfer.files;
+  //         }
+
+  //         const { duplicates } = checkForDuplicates(rawFileData);
+  //         duplicateEntries = duplicates;
+
+  //         if (duplicates.length > 0) {
+  //           toast.error(
+  //             `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+  //           );
+  //         }
+  //       };
+  //       reader.onerror = function () {
+  //         fileError = "Error reading the file. Please try again.";
+  //       };
+  //       reader.readAsText(file);
+  //     }
+  //   } else {
+  //     fileError = "No file selected.";
+  //   }
+  // }
+
   function handleFileInputChange(event) {
     const file = event.target.files[0];
 
@@ -192,10 +306,21 @@
               const lines = csvData.split("\n").filter((line) => line.trim());
               const transformedLines = lines.map((line) => {
                 const parts = line.split(",").map((part) => part.trim());
-                if (parts.length >= 2) {
-                  return `${parts[0]}-${parts[1]},${parts[2] || 1}`.trim();
+
+                // If only SKU-size is present, add quantity 1
+                if (parts.length === 1) {
+                  return `${parts[0]},1`;
                 }
-                return line.trim();
+
+                // If quantity is missing or empty, set to 1
+                if (
+                  parts.length === 2 &&
+                  (!parts[1] || isNaN(parseInt(parts[1])))
+                ) {
+                  return `${parts[0]},1`;
+                }
+
+                return line;
               });
 
               rawFileData = transformedLines.join("\n");
@@ -246,10 +371,22 @@
           isEditing = true;
           const lines = fileContent.split("\n").filter((line) => line.trim());
           const trimmedLines = lines.map((line) => {
-            const [productInfo, quantity] = line
-              .split(",")
-              .map((item) => item.trim());
-            return `${productInfo},${quantity}`;
+            const parts = line.split(",").map((item) => item.trim());
+
+            // If only SKU-size is present, add quantity 1
+            if (parts.length === 1) {
+              return `${parts[0]},1`;
+            }
+
+            // If quantity is missing or empty, set to 1
+            if (
+              parts.length === 2 &&
+              (!parts[1] || isNaN(parseInt(parts[1])))
+            ) {
+              return `${parts[0]},1`;
+            }
+
+            return line;
           });
 
           rawFileData = trimmedLines.join("\n");
@@ -281,7 +418,6 @@
       fileError = "No file selected.";
     }
   }
-
   function validateAndSubmitData() {
     if (!rawFileData.trim()) {
       toast.error("Please enter product data before submitting");
@@ -458,6 +594,7 @@
         quantity: item.quantity || 1,
         backOrder: item.backOrder,
       }));
+
       if (productsToAdd.length === 0) {
         cartloading = false;
         toast.error("No valid items to add to cart");
@@ -465,7 +602,25 @@
       }
 
       const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
-      const updatedCart = [...existingCart, ...simplifiedCartItems];
+      const updatedCart = [...existingCart];
+
+      // Merge quantities for existing products
+      simplifiedCartItems.forEach((newItem) => {
+        const existingItemIndex = updatedCart.findIndex(
+          (cartItem) =>
+            cartItem.productId === newItem.productId &&
+            cartItem.stockId === newItem.stockId &&
+            cartItem.manufacturerId === newItem.manufacturerId,
+        );
+
+        if (existingItemIndex !== -1) {
+          updatedCart[existingItemIndex].quantity += newItem.quantity;
+          updatedCart[existingItemIndex].backOrder += newItem.backOrder;
+        } else {
+          updatedCart.push(newItem);
+        }
+      });
+
       localStorage.setItem("cart", JSON.stringify(updatedCart));
 
       const productsAddedCount = productsToAdd.length;
@@ -475,7 +630,7 @@
 
       cartloading = false;
       setTimeout(() => {
-        location.reload();
+        window.location.href = "/cart";
       }, 2000);
     } catch (err) {
       cartloading = false;
@@ -483,7 +638,6 @@
       toast.error("Failed to save items to cart");
     }
   }
-
   function mapInvalidProductsToLines() {
     if (!isValidated || !validationMessages.length) return [];
 
@@ -597,7 +751,6 @@
   }}
 >
   {#if isLoading}
-   
     <div
       class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-500/40 backdrop-blur-sm"
       transition:fade={{ duration: 300 }}
@@ -644,7 +797,7 @@ Example:
 345678-25G,3"
       ></textarea>
 
-      {#if isValidated && invalidProductLines.length > 0}
+      <!-- {#if isValidated && invalidProductLines.length > 0}
         {#each invalidProductLines as line}
           <div
             class="absolute right-7 text-red-500 flex items-center"
@@ -660,6 +813,47 @@ Example:
               <Icon icon="mdi:close-circle" class="text-lg" />
             </button>
           </div>
+        {/each}
+      {/if} -->
+      {#if isValidated && validationMessages.length > 0}
+        {#each validationMessages as message}
+          {#if message.isValid}
+            <div
+              class="absolute right-7 text-green-500 flex items-center"
+              style="top: calc(1.5rem + {rawFileData
+                .split('\n')
+                .findIndex((line) => line.includes(message.productNumber)) *
+                1.5}rem)"
+            >
+              <span class="text-xs mr-2">Valid Product</span>
+              <Icon icon="mdi:check-circle" class="text-lg" />
+            </div>
+          {:else}
+            <div
+              class="absolute right-7 text-red-500 flex items-center"
+              style="top: calc(1.5rem + {rawFileData
+                .split('\n')
+                .findIndex((line) => line.includes(message.productNumber)) *
+                1.5}rem)"
+            >
+              <span class="text-xs mr-2">{message.message}</span>
+              <button
+                type="button"
+                class="text-red-500 hover:text-red-700"
+                title="Remove invalid product"
+                on:click={() =>
+                  removeInvalidProduct(
+                    rawFileData
+                      .split("\n")
+                      .findIndex((line) =>
+                        line.includes(message.productNumber),
+                      ),
+                  )}
+              >
+                <Icon icon="mdi:close-circle" class="text-lg" />
+              </button>
+            </div>
+          {/if}
         {/each}
       {/if}
 
@@ -811,7 +1005,7 @@ Example:
                 `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`,
               );
               setTimeout(() => {
-                location.reload();
+                window.location.href = "/cart";
               }, 2000);
             } else {
               throw new Error(resultData[1] || "Failed to add items to cart");

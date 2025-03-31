@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
-import { uploadFile, quicksearch, quickcheck, addToCartquick, CreateProductQuote } from '$lib/server/mongoActions';
+import { uploadFile, quicksearch, quickcheck, addToCart, CreateProductQuote } from '$lib/server/mongoActions';
 import { error, fail } from '@sveltejs/kit';
 import { nanoid } from 'nanoid';
 import Profile from '$lib/server/models/Profile.js';
@@ -205,7 +205,7 @@ export const actions = {
         };
 
         // console.log('Prepared Cart Item:', cartItem);
-        const result = await addToCartquick(cartItem, userId, userEmail);
+        const result = await addToCart(cartItem, userId, userEmail);
         // console.log('Add to Cart Result:', result);
 
         if (!result.success) {
