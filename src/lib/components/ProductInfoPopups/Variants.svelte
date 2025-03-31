@@ -88,14 +88,7 @@
             <tr
               class="bg-white border-b hover:bg-gray-50 cursor-pointer"
               on:click={() => {
-                if (
-                  minPriceINR !== "--" &&
-                  maxPriceINR !== "--" &&
-                  minPriceUSD !== "--" &&
-                  maxPriceUSD !== "--"
-                ) {
                   window.location.href = variant.productNumber;
-                }
               }}
             >
               <td class="py-4 px-6">
