@@ -300,7 +300,15 @@ async function submitForm() {
 	}
 	const handleSubmitBtn = () => {
 		if (searchQuery !== '') {
-			goto('/search?query=' + searchQuery);
+			const cleanedSearchQuery = searchQuery.replace(/[^\w\s\-]/g, '');
+			const searchQueryUpperCase = cleanedSearchQuery.toUpperCase();
+			if (searchQueryUpperCase.trim() !== '') {
+				let url = `/search?query=${searchQueryUpperCase}`;
+				if ($authedUser && $authedUser?.id) {
+				url += `&userId=${$authedUser.id}`;
+			}
+			goto(url);
+		}
 			searchQuery = '';
 		}
 	};
