@@ -29,23 +29,57 @@
     </div>
   {/if}
 
-  {#if product.safetyInfo && Object.keys(product.safetyInfo).length}
-  <section class="md:w-11/12 max-w-7xl p-4 mx-auto text-justify bg-white shadow rounded m-10">
-      <h2 class="text-xl font-bold mb-3">SAFETY INFORMATION</h2>
-      <div class="grid grid-cols-2 gap-9 md:grid-cols-3">
-          {#each Object.entries(product.safetyInfo).filter(([key, value]) => value && value.trim()) as [key, value]}
-              <div>
-                  <h3 class="font-semibold text-base">{key}</h3>
-                  {#if ["Pictograms", "Precautionary Statements", "Hazard Statements"].includes(key)}
-                      <p class="text-primary-500 text-sm font-medium mt-1 cursor-pointer">
-                          <a href="{PUBLIC_WEBSITE_URL}/safety/hazard-and-precautionary-statements#{key.toLowerCase().replace(' ', '-')}">{value}</a>
-                      </p>
-                  {:else}
-                      <p class="text-gray-600 text-sm font-normal mt-1">{value}</p>
-                  {/if}
-              </div>
+  {#if product.safetyInfo}
+    {#if Array.isArray(product.safetyInfo)}
+      {#if product.safetyInfo.length > 0}
+        <section
+          class="md:w-11/12 max-w-7xl p-4 mx-auto text-justify bg-white shadow rounded m-10"
+        >
+          <h2 class="text-xl font-bold mb-3">SAFETY INFORMATION</h2>
+          <ul class="list-disc pl-5">
+            {#each product.safetyInfo as item}
+              {#if item.includes(":")}
+                <li class="text-gray-600 text-sm font-normal mt-1">
+                  <strong class="font-semibold">
+                    {@html item.split(/:(.+)/)[0]}:
+                  </strong>
+                  {@html item.split(/:(.+)/)[1].trim()}
+                </li>
+              {:else}
+                <li class="text-gray-600 text-sm font-normal mt-1">{item}</li>
+              {/if}
+            {/each}
+          </ul>
+        </section>
+      {/if}
+    {:else if Object.values(product.safetyInfo).filter( (value) => value?.trim() ).length > 0}
+      <section
+        class="md:w-11/12 max-w-7xl p-4 mx-auto text-justify bg-white shadow rounded m-10"
+      >
+        <h2 class="text-xl font-bold mb-3">SAFETY INFORMATION</h2>
+        <div class="grid grid-cols-2 gap-9 md:grid-cols-3">
+          {#each Object.entries(product.safetyInfo).filter( ([key, value]) => value?.trim() ) as [key, value]}
+            <div>
+              <h3 class="font-semibold text-base">{key}</h3>
+              {#if ["Pictograms", "Precautionary Statements", "Hazard Statements"].includes(key)}
+                <p
+                  class="text-primary-500 text-sm font-medium mt-1 cursor-pointer"
+                >
+                  <a
+                    href="{PUBLIC_WEBSITE_URL}/safety/hazard-and-precautionary-statements#{key
+                      .toLowerCase()
+                      .replace(' ', '-')}"
+                  >
+                    {value}
+                  </a>
+                </p>
+              {:else}
+                <p class="text-gray-600 text-sm font-normal mt-1">{value}</p>
+              {/if}
+            </div>
           {/each}
-      </div>
-  </section>
-  {/if}  
+        </div>
+      </section>
+    {/if}
+  {/if}
 {/each}
