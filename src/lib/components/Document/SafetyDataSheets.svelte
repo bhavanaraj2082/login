@@ -732,9 +732,10 @@
                 </ul>
               </div>
               <p class="mt-3">
-                Having trouble? Feel free to contact <strong
-                  >Technical Service</strong
-                > for assistance.
+                Having trouble? Feel free to 
+                <span class="text-primary-500 font-semibold hover:underline">
+                  <a href="/contact-us">Contact Us </a>
+                </span>
               </p>
             </div>
           {/if}
@@ -813,9 +814,10 @@
                   </ul>
                 </div>
                 <p class="mt-3">
-                  Having trouble? Feel free to contact <strong
-                    >Technical Service</strong
-                  > for assistance.
+                  Having trouble? Feel free to 
+                  <span class="text-primary-500 font-semibold hover:underline">
+                    <a href="/contact-us">Contact Us </a>
+                  </span>
                 </p>
               </div>
             {/if}
@@ -848,11 +850,13 @@
                   Lot and Batch Numbers can be found on a product's label
                   following the words 'Lot' or 'Batch'.
                 </p>
-                <h4 class="font-bold mt-2">Mallipore Products</h4>
+                <h4 class="font-bold mt-2">Chemikart Products</h4>
                 <h2>
-                  For assistance obtaining the Lot or batch number for Millipore
-                  products, please contact
-                  <span class="font-bold">customer support</span>.
+                  For assistance obtaining the Lot or batch number for Chemikart Products, please contact
+                  <span class="text-primary-500 font-semibold hover:underline">
+                    <a href="/contact-us">Contact Us </a>
+                  
+                  </span>
                 </h2>
               </div>
             {/if}
@@ -953,9 +957,10 @@
                   </ul>
                 </div>
                 <p class="mt-3">
-                  Having trouble? Feel free to contact <strong
-                    >Technical Service</strong
-                  > for assistance.
+                  Having trouble? Feel free to 
+                  <span class="text-primary-500 font-semibold hover:underline">
+                    <a href="/contact-us">Contact Us </a>
+                  </span>
                 </p>
               </div>
             {/if}
@@ -1111,9 +1116,10 @@
                   </ul>
                 </div>
                 <p class="mt-3">
-                  Having trouble? Feel free to contact <strong
-                    >Technical Service</strong
-                  > for assistance.
+                  Having trouble? Feel free to 
+                  <span class="text-primary-500 font-semibold hover:underline">
+                    <a href="/contact-us">Contact Us </a>
+                  </span>
                 </p>
               </div>
             {/if}
@@ -1153,7 +1159,7 @@
                     >062K1064</code
                   >.
                 </p>
-                <h4 class="font-bold mt-2">Aldrich Products</h4>
+                <h4 class="font-bold mt-2">Chemikart Products</h4>
                 <ul class="list-disc ml-5">
                   <li>
                     For a lot number such as <code>TO09019TO</code>, enter it as
