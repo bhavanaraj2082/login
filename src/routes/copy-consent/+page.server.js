@@ -66,7 +66,7 @@ export const actions = {
 				.replaceAll('{{phone}}', updatedBodyWithIP.phone || '')
 				.replaceAll('{{email}}', updatedBodyWithIP.email || '')
 				.replaceAll('{{description}}', updatedBodyWithIP.description || '')
-				.replaceAll('{{ipAddress}}', ipAddress);
+
 
 
 

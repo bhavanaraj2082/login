@@ -6,6 +6,17 @@
     export let data;
     console.log(data, "i a consent");
     let submitting = false;
+    let isChecked =  false;
+	let mathQuestion = '';
+	let mathAnswer = 0;
+	let userAnswer = '';
+	let mathError = '';
+    let submittingForm = false;
+	let isLoadingemail = false;
+	let progress = 0;
+	let errorMessagecap = '';
+	let inputReadOnly = false;
+    let captchaToken = '';
 
     let isLoadingPhone = false;
     let isEmailVerified = false;
@@ -27,7 +38,8 @@
     let enteredOtpemail = "";
     let isOtpVerified = false;
     let form3;
-
+    let errorMessage = '';
+	let rotationClass = '';
     let thankYouMessageVisible = false;
     let uploadOption = "";
     let email = "";
@@ -37,6 +49,7 @@
     let isValid = false;
     let emailError = "";
     let form;
+    let captchaVerified = false;
     const maxFileSize = 5 * 1024 * 1024; // 5MB
     let title;
     let firstname = "";
@@ -56,12 +69,113 @@
     let ExtractedData = null;
     let image = null;
     let fileName = "";
+    let successMessage = '';
+    let showCaptchaPopup = false;
+    let loading=false;
+    function submitFormAutomatically() {
+		loading = false;
+		if (form) {
+			const formData = new FormData(form);
+
+			fetch(form.action, {
+				method: form.method,
+				body: formData
+			})
+				.then((response) => response.json())
+				.then((data) => {
+					// console.log("respose Status",data.status);
+					window.scrollTo({ top: 0, behavior: 'smooth' });
+					if (data.status === 200) {
+						showSuccesDiv = true;
+						window.scrollTo({ top: 0, behavior: 'smooth' });
+					} else {
+						showFailureDiv = true;
+						window.scrollTo({ top: 0, behavior: 'smooth' });
+					}
+				});
+		}
+	}
+    
+	function generateMathQuestion() {
+		const num1 = Math.floor(Math.random() * 10) + 1;
+		const num2 = Math.floor(Math.random() * 10) + 1;
+		const operations = ['+', '-', '*'];
+		const randomOperation = operations[Math.floor(Math.random() * operations.length)];
+
+		if (randomOperation === '-') {
+			const larger = Math.max(num1, num2);
+			const smaller = Math.min(num1, num2);
+			mathQuestion = `What is ${larger} - ${smaller}?`;
+			mathAnswer = larger - smaller;
+		} else if (randomOperation === '+') {
+			mathQuestion = `What is ${num1} + ${num2}?`;
+			mathAnswer = num1 + num2;
+		} else if (randomOperation === '*') {
+			mathQuestion = `What is ${num1} * ${num2}?`;
+			mathAnswer = num1 * num2;
+		}
+	}
+    function validateMathCaptcha(e) {
+		const userResponse = parseInt(userAnswer.trim());
+		if (userResponse === mathAnswer) {
+			submittingForm = true;
+			if (submittingForm) {
+				const interval = setInterval(() => {
+					progress += 5;
+					if ((progress = 96)) {
+						clearInterval(interval);
+					}
+				}, 500);
+			}
+			errorMessagecap = '';
+			successMessage = 'Captcha verified Successfully!!!';
+			isChecked = true;
+			captchaVerified = true;
+			loading = true;
+			inputReadOnly = true;
+
+			const tokenPayload = {
+				question: mathQuestion,
+				answer: mathAnswer
+			};
+			captchaToken = btoa(JSON.stringify(tokenPayload));
+
+			setTimeout(() => {
+				submitFormAutomatically();
+			}, 50);
+		} else {
+			successMessage = '';
+			errorMessagecap = 'Incorrect answer, try again.';
+			isChecked = false;
+
+			setTimeout(() => {
+				generateMathQuestion();
+				userAnswer = '';
+				errorMessagecap = '';
+				// setActionMessage('Something went wrong while processing your message', false);
+			}, 4000);
+		}
+	}
     function handleClickOutside(event) {
         if (!event.target.closest(".dropdown-container")) {
             showDropdown = false;
         }
     }
+    function refreshMathQuestion() {
+		rotationClass = 'rotate-[360deg]';
 
+		setTimeout(() => {
+			generateMathQuestion();
+			rotationClass = '';
+		}, 1000);
+	}
+
+	function showPopup() {
+		if (isChecked) {
+			showCaptchaPopup = true;
+			generateMathQuestion();
+		}
+	}
     onMount(() => {
         if (data && data.profile) {
             firstname = `${data.profile.firstName || ""} `.trim();
@@ -301,6 +415,25 @@
         { name: "Zambia", code: "+260" },
         { name: "Zimbabwe", code: "+263" },
     ];
+	function onInputChange() {
+		if (userAnswer.trim()) {
+			validateMathCaptcha();
+		} else {
+			errorMessagecap = '';
+		}
+	}
+
+	function closeCaptchaPopup() {
+		showCaptchaPopup = false;
+
+		userAnswer = '';
+
+		if (successMessage) {
+			isChecked = true;
+		} else {
+			isChecked = false;
+		}
+	}
 
     function handleFileChange(event) {
         const file = event.target.files[0];
@@ -451,19 +584,32 @@
             }
         }
 
+        // if (!fieldName || fieldName === "email") {
+        //     if (
+        //         !email ||
+        //         !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+        //             email,
+        //         ) ||
+        //         email.split("@")[1].includes("gamil")
+        //     ) {
+        //         errors.email = "Please enter a valid email address ";
+        //     } else {
+        //         delete errors.email;
+        //     }
+        // }
+
         if (!fieldName || fieldName === "email") {
-            if (
-                !email ||
-                !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-                    email,
-                ) ||
-                email.split("@")[1].includes("gamil")
-            ) {
-                errors.email = "Please enter a valid email address ";
-            } else {
-                delete errors.email;
-            }
-        }
+    if (!email) {
+        errors.email = "Email is required.";
+    } else if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)) {
+        errors.email = "Please enter a valid email address.";
+    } else if (email.split("@")[1].includes("gmail")) {
+        errors.email = "Email domain cannot be gmail.com.";
+    } else {
+        delete errors.email;
+    }
+}
+
 
         if (!fieldName || fieldName === "phone") {
             const phoneRegex =
@@ -788,6 +934,12 @@
         validatePhoneNumber(country, phone);
 
         delete errors.country;
+        if (!phone || phone === "") {
+        errors.phone = "Required for the selected country.";
+
+    } else {
+        delete errors.phone; // Remove any errors if conditions are satisfied
+    }
         // console.log('Selected Country:', country);
     }
     function toggleDropdown() {
@@ -1577,7 +1729,7 @@
                                     ? "*Required"
                                     : /<script.*?>.*?<\/script>/i.test(
                                             description,
-                                        ) // Regex to check for script tags
+                                        ) 
                                       ? "Script tags are not allowed."
                                       : !/^[A-Za-z" "/?().,:;""''*$#0-9\s]+$/.test(
                                               description,
@@ -1617,8 +1769,181 @@
                         {/if}
                     </div>
                 </div>
+                <div class="flex-1 mb-4">
+                    <label for="recaptcha" class="block text-sm font-medium text-gray-700">
+                    </label>
+                    <input type="hidden" name="token" value={captchaToken} />
+                    <div id="g-recaptcha-response">
+                        <label class="flex mt-5 md:mt-6 items-center justify-end space-x-2 mb-4 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="captcha"
+                                value="captcha"
+                                class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded cursor-pointer hover:border-primary-500 transition-colors duration-300"
+                                bind:checked={isChecked}
+                                on:click={(event) => {
+                                    event.preventDefault();
+                                    if (formValid()) {
+                                        isChecked = true;
+                                        showPopup();
+                                    } else {
+                                        if (Object.keys(errors).length > 0) {
+                                            toast.error('Please fill all the required fields.');
+                                            return;
+                                        }
+                                        if (!(ProfileEmailVerified || authedUserEmailVerified === true)) {
+                                            {
+                                                toast.error('Please verify your email to proceed');
+                                                return;
+                                            }
+                                        }
+                
+                                        isChecked = false;
+                                    }
+                                }}
+                            />
+                            <span class="text-gray-700 font-medium text-sm">Please verify you are human</span>
+                        </label>
 
-                <div class="flex items-center justify-end mt-6">
+                        <div class="mt-4 rounded flex items-center justify-end">
+                            <button
+                                class="px-4 py-3 rounded bg-primary-400 to-primary-500 text-white font-medium shadow-lg hover:shadow-xl  md:w-1/4 w-1/2 transform transition hover:bg-primary-600"
+                                on:click={(event) => {
+                                    event.preventDefault();
+                
+                            
+                                    if (!formValid()) {
+                                        if (Object.keys(errors).length > 0) {
+                                            toast.error('Please fill all the required fields.');
+                                            return;
+                                        }
+                
+                                        if (!(ProfileEmailVerified || authedUserEmailVerified === true)) {
+                                            {
+                                                toast.error(
+                                                    'Please verify either your email or your phone number to proceed'
+                                                );
+                                                return;
+                                            }
+                                        }
+                                    }
+                
+                                    if (!isChecked) {
+                                        toast.error(
+                                            'Please complete the CAPTCHA to proceed with the submission.'
+                                        );
+                                        return;
+                                    }
+                
+                                    handlesubmit({ event });
+                                }}
+                                on:keydown={(event) => {
+                                    if (event.key === 'Enter') {
+                                        event.preventDefault();
+                                    }
+                                }}
+                            >
+                                {#if submitting}
+                                    <span class="flex items-center justify-center">
+                                        <Icon
+                                            icon="line-md:loading-alt-loop"
+                                            class="w-4 h-4 mr-2 animate-spin"
+                                        />
+                                        Submitting...
+                                    </span>
+                                {:else}
+                                    Submit Request
+                                {/if}
+                            </button>
+                        </div>
+                
+                        {#if errorMessage}
+                            <p class="text-red-500 text-sm mt-2">{errorMessage}</p>
+                        {/if}
+                    </div>
+                </div>
+                {#if showCaptchaPopup}
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                <div
+                    class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
+                    on:click={closeCaptchaPopup}
+                >
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <!-- svelte-ignore a11y-no-static-element-interactions -->
+                    <div
+                        class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm"
+                        on:click|stopPropagation
+                    >
+                        <h2 class="text-lg font-semibold mb-4 text-gray-800">
+                            Verify You're Human
+                        </h2>
+
+                        <p class="mb-2 text-gray-700 flex items-center">
+                            {mathQuestion}
+                            <button
+                                class="ml-4 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+                                on:click={refreshMathQuestion}
+                            >
+                                <Icon
+                                    icon="ic:round-refresh"
+                                    class={`w-6 h-6 text-primary-600 cursor-pointer hover:scale-110 transition transform ${rotationClass}`}
+                                />
+                            </button>
+                        </p>
+                        <input
+                            type="text"
+                            bind:value={userAnswer}
+                            placeholder="Your Answer"
+                            class="border border-gray-300 rounded w-full p-2 mb-4"
+                            on:input={onInputChange}
+                            readonly={inputReadOnly}
+                        />
+
+                        {#if errorMessagecap}
+                            <p class="text-red-500 text-sm mb-4">{errorMessagecap}</p>
+                        {/if}
+                        {#if successMessage}
+                            <p class="text-green-500 text-sm mb-4">{successMessage}</p>
+                        {/if}
+                        {#if submittingForm}
+                            <div class="w-full mt-4">
+                                <p class="text-sm mb-4 inline-flex items-center">Submitting form</p>
+                                <div class="relative pt-1">
+                                    <div class="flex mb-2">
+                                        <div class="w-full bg-gray-200 rounded-full">
+                                            <!-- Bind the width of the progress bar to the progress variable -->
+                                            <div
+                                                class="bg-teal-500 text-xs font-medium text-teal-100 text-center p-0.5 leading-none rounded-full"
+                                                style="width: {progress}%;"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {/if}
+                        <button
+                            class="w-full bg-gradient-to-r from-primary-500 to-primary-500 text-white py-2 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition mt-4"
+                            on:click={() => {
+                                onInputChange();
+                                if (!errorMessagecap && userAnswer) {
+                                    submittingForm = true;
+
+                                    setTimeout(() => {
+                                        submittingForm = false;
+                                        successMessage = 'Verification successful!';
+                                    }, 2000);
+                                } else {
+                                    errorMessagecap = '*Please answer the question correctly';
+                                }
+                            }}
+                        >
+                            Verify
+                        </button>
+                    </div>
+                </div>
+            {/if}
+                <!-- <div class="flex items-center justify-end mt-6">
                     <button
                         class="px-6 py-3 bg-primary-400 text-white text-sm rounded-md transition duration-300 hover:bg-primary-600 font-semibold sm:text-sm text-xs shadow-sm"
                         on:click={(event) => {
@@ -1666,7 +1991,7 @@
                             Submit Request
                         {/if}
                     </button>
-                </div>
+                </div> -->
             </form>
         </div>
     </div>
