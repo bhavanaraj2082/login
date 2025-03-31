@@ -30,7 +30,7 @@
     <div class="w-full md:w-1/4 h-fit sm:mt-6 mt-3">
       <a
         href="/safety"
-        class="block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
+        class="block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r hover:scale-105"
         class:text-primary-500={$page.url.pathname === "/safety"}
         class:font-semibold={$page.url.pathname === "/safety"}
       >
@@ -40,7 +40,7 @@
 
       <a
         href="/safety/understanding-product-labels"
-        class="block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
+        class="block text-md mt-3 font-medium mb-2 hover:scale-105 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
         class:text-primary-500={$page.url.pathname ===
           "/safety/understanding-product-labels"}
         class:font-semibold={$page.url.pathname ===
@@ -52,7 +52,7 @@
 
       <a
         href="/safety/globally-harmonized-system"
-        class="block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
+        class="block text-md mt-3 font-medium mb-2 hover:scale-105 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
         class:text-primary-500={$page.url.pathname ===
           "/safety/globally-harmonized-system"}
         class:font-semibold={$page.url.pathname ===
@@ -64,7 +64,7 @@
 
       <a
         href="/safety/tsca-8-notification"
-        class="block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
+        class="block text-md mt-3 hover:scale-105 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
         class:text-primary-500={$page.url.pathname ===
           "/safety/tsca-8-notification"}
         class:font-semibold={$page.url.pathname ===
@@ -76,7 +76,7 @@
 
       <a
         href="/safety/hazard-and-precautionary-statements"
-        class="block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
+        class="block text-md mt-3 hover:scale-105 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition duration-200 ease-in-out hover:text-primary-500 hover:border-l-4 hover:border-primary-400 hover:pl-2 hover:bg-primary-50 hover:rounded-r"
         class:text-primary-500={$page.url.pathname ===
           "/safety/hazard-and-precautionary-statements"}
         class:font-semibold={$page.url.pathname ===
