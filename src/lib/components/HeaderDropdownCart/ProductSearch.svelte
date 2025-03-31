@@ -5,7 +5,7 @@
 	export let data;
 	import { enhance } from '$app/forms';
 	import Icon from '@iconify/svelte';
-	// console.log(data);
+	// console.log('searchdata==>',data);
 	let errorMessage = '';
 	let isLoading = false;
 	let successMessage = '';
@@ -73,12 +73,17 @@
 			// startTimer();
 		}
 	};
+
+	function truncateText(text, maxLength = 25) {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  }
 </script>
 
-<section class="mx-auto pt-3">
-	<div class="w-full p-5 space-y-6">
+<section class="mx-auto w-11/12 max-w-7xl">
+	<div class="px-4 pb-8">
 		{#if components?.length > 0 || categories?.length > 0 || subcategories?.length > 0 || manufacturers?.length > 0}
-			<h3 class="text-2xl font-semibold mb-4">Matched Results</h3>
+			<h3 class="text-2xl font-bold mb-4">Matched Results</h3>
 		{:else}
 		{#if !emailSubmitted}
 		<div class="lg:w-8/12 w-full mx-auto md:p-5 rounded-md text-center">
@@ -347,41 +352,35 @@
 		{/if}
 
 		{#if components && components.length > 0}
-			<h3 class="text-xl font-bold">Products</h3>
-			<section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+			<h3 class="text-xl font-bold mb-4">Products</h3>
+			<section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-4">
 				{#each components as item}
 					<a href="/products/{item?.category?.urlName}/{item?.subCategory?.urlName}/{item?.productNumber}" class="block">
-						<div
-							class="flex gap-3 border rounded p-4 cursor-pointer hover:border-gray-400"
-						>
+						<div class="flex gap-3 shadow rounded-md p-4 cursor-pointer hover:shadow-md transition-all duration-300 ease-in-out">
 							<img
 							    src={`${PUBLIC_IMAGE_URL}/${item?.image}`}
 								class="w-20 h-20 object-cover rounded-md text-sm"
 								onerror="this.src='/fallback.jpg'"
-								alt={item?.productName}
-							/>
-							<div class="">
-								<p class="text-sm font-medium">{item?.productName}</p>
-								<p class="text-sm">{item?.productNumber}</p>
-								<p class="text-sm italic">{item?.manufacturerName}</p>
+								alt={item?.productName}/>
+							<div class="overflow-hidden">
+								<p class="text-sm font-medium text-justify whitespace-nowrap">{truncateText(item?.productName,30)}</p>
+								<p class="text-sm pt-1">{item?.productNumber}</p>
+								<p class="text-heading text-sm font-medium pt-3">{item?.manufacturerName}</p>
 							</div>
 						</div>
 					</a>
 				{/each}
 			</section>
 		{/if}
-
 		<SearchSection
 			title="Categories"
 			items={categories}
 			linkPrefix="/products/"
-			isSubcategory={false}
-		/>
+			isSubcategory={false}/>
 		<SearchSection
 			title="Sub Categories"
 			items={subcategories}
 			linkPrefix="/products/"
-			isSubcategory={true}
-		/>
+			isSubcategory={true}/>
 	</div>
 </section>
