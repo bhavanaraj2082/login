@@ -2,6 +2,7 @@
   import Icon from "@iconify/svelte";
   export let orderedproduct;
   export let orderStatus;
+  import {PUBLIC_IMAGE_URL} from "$env/static/public"
   // console.log("orderProduct====>", orderedproduct);
 </script>
 
@@ -18,7 +19,11 @@
           <div
             class="flex gap-3 items-center col-span-3 sm:col-span-2 mb-2 sm:mb-0"
           >
-            <img src={product.imgSrc} alt="img" class="w-16 rounded-lg" />
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <img  
+            src="{PUBLIC_IMAGE_URL}/{product?.image}"
+            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
+            class="w-16 rounded-lg" />
             <div class="flex flex-col">
               <p class="text-gray-600 text-sm font-semibold">
                 {product.productName || "--"}

@@ -1,6 +1,7 @@
 <script>
   export let data;
   import Icon from "@iconify/svelte";
+  import {PUBLIC_IMAGE_URL} from "$env/static/public"
   let products = data?.order?.products || [];
   let shipments = data?.order?.shipdetails || [];
 
@@ -69,7 +70,11 @@
           >
             <div class="flex gap-3">
               <div>
-                <img src={item.imgSrc} alt="img" class="w-16 rounded-lg" />
+                  <!-- svelte-ignore a11y-missing-attribute -->
+            <img  
+            src="{PUBLIC_IMAGE_URL}/{item?.image}"
+            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
+            class="w-16 rounded-lg" />
               </div>
               <div class="flex flex-col">
                 <p class="text-gray-600 text-sm font-semibold">

@@ -55,9 +55,9 @@ export async function getSubCategoryDatas(subid) {
   }
 }
 
-export async function getOrderStatusData(ordernumber) {
+export async function getOrderStatusData(ordernumber,Email) {
   try {
-    const records = await Order.findOne({ orderid: ordernumber })
+    const records = await Order.findOne({ orderid: ordernumber,userEmail : Email })
       .populate("products")
       .populate("shipdetails");
     if (records) {

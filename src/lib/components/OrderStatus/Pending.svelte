@@ -1,6 +1,7 @@
 <script>
   import Icon from "@iconify/svelte";
   export let remainingProducts;
+  import {PUBLIC_IMAGE_URL} from "$env/static/public"
   // console.log("remainingProducts",remainingProducts);
 </script>
 
@@ -20,7 +21,11 @@
           class="flex justify-between items-center px-4 py-2 rounded-md shadow"
         >
           <div class="flex gap-3 items-center w-[35%]">
-            <img src={product.imgSrc} alt="img" class="w-16 rounded-lg" />
+              <!-- svelte-ignore a11y-missing-attribute -->
+              <img  
+              src="{PUBLIC_IMAGE_URL}/{product?.image}"
+              onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
+              class="w-16 rounded-lg" />
             <div class="flex flex-col">
               <p class="text-gray-600 text-sm font-semibold">
                 {product.productName || "--"}

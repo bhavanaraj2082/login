@@ -141,7 +141,7 @@
             <div>
               <button
                 on:click={showCancelConfirmation}
-                class="bg-red-500 hover:bg-red-600 text-white rounded-md px-3 py-1 mb-1 shadow">
+                class="bg-red-500 hover:bg-red-600 text-white rounded-md px-3 py-1 my-3 shadow">
                 Cancel Order
               </button>
             </div>
