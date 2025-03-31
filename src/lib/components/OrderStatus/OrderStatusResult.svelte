@@ -16,7 +16,7 @@
   let orderStatus;
 
   $: orderStatus = data?.order?.status;
-  const user = $authedUser.email;
+  const user = $authedUser?.email;
 
   const productDetails = products.map((product) => ({
     id: product._id,
