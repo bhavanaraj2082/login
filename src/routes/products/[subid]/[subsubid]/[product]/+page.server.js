@@ -79,11 +79,11 @@ export const actions = {
       .replaceAll('{{productNumber}}', data.productNumber || '')
       .replaceAll('{{units}}', data.units || '')
       .replaceAll('{{Firstname}}', data.Firstname || '')
-      .replaceAll('{{Lastname}}', data.Lastname || '')
+      .replaceAll('{{Lastname}}', data.lastname || '')
       .replaceAll('{{organisation}}', data.organisation || '')
       .replaceAll('{{email}}', data.email || '')
-      .replaceAll('{{phone}}', data.number || '')
-      .replaceAll('{{futherdetails}}', data.Additional_notes || '')
+      .replaceAll('{{phone}}', data.phone || '')
+      .replaceAll('{{futherdetails}}', data.futherdetails || '')
       .replaceAll('{{ipAddress}}', ipAddress || ''); 
 
     try {
@@ -101,11 +101,11 @@ export const actions = {
       .replaceAll('{{productNumber}}', data.productNumber || '')
       .replaceAll('{{units}}', data.units || '')
       .replaceAll('{{Firstname}}', data.Firstname || '')
-      .replaceAll('{{Lastname}}', data.Lastname || '')
+      .replaceAll('{{Lastname}}', data.lastname || '')
       .replaceAll('{{organisation}}', data.organisation || '')
       .replaceAll('{{email}}', data.email || '')
-      .replaceAll('{{phone}}', data.number || '')
-      .replaceAll('{{futherdetails}}', data.Additional_notes || '');
+      .replaceAll('{{phone}}', data.phone || '')
+      .replaceAll('{{futherdetails}}', data.futherdetails || '');
 
     try {
       await sendEmailToUser(
