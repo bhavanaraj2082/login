@@ -32,8 +32,8 @@
     form5.requestSubmit();
   };
 
-  function handleInput() {
-    enteredOtp = enteredOtp.trim();
+  function handleInput(e) {
+    enteredOtp = e.target.value.replace(/[^0-9]/g, "").trim();
   }
 
   function validateForm() {
@@ -485,12 +485,15 @@
           type="submit"
           class="bg-primary-500 hover:bg-primary-600 text-white font-medium rounded py-1.5 px-4"
         >
-        {#if isSubmitting}
-        <Icon icon="line-md:loading-alt-loop" class="w-5 h-5 mr-2 animate-spin inline" />
-        Submitting..
-      {:else}
-        Submit
-      {/if}
+          {#if isSubmitting}
+            <Icon
+              icon="line-md:loading-alt-loop"
+              class="w-5 h-5 mr-2 animate-spin inline"
+            />
+            Submitting..
+          {:else}
+            Submit
+          {/if}
         </button>
       </div>
     </form>

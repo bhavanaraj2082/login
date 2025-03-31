@@ -22,7 +22,7 @@
     export let profile
 
 	let isLoggedIn = $authedUser?.id ? true : false
-
+  let selectedProductName = "";
     let hoveredItem = null; 
     function handleMouseEnter(imageSrc, index) {
     hoveredItem = { imageSrc, index }; 
@@ -35,6 +35,7 @@
     showQuoteModal = !showQuoteModal;
     productQuote = selectedProduct;
     data.records=[productQuote]
+    selectedProductName = selectedProduct?.productName || "";
   }
 function handleMouseLeave() {
   hoveredItem = null; 
@@ -50,7 +51,7 @@ function handleMouseLeave() {
 		syncLocalStorageToStore();	
 	};
 
-    $: paginatedProducts = products?.length ? products.map(x=>x) : []
+    $: paginatedProducts = products?.length ? products.map(x=>x) : []    
     let categoryName = subCategoryDetails.catUrlName
     let subCategoryName = subCategoryDetails.subCatUrlName
     let subCatName = subCategoryDetails.subCatName
@@ -795,5 +796,5 @@ function handleMouseLeave() {
 
 </section>
 {#if showQuoteModal}
-  <ShowQuoteModal {data} {profile} {toggleQuoteModal} {form5} {productQuote} />
+  <ShowQuoteModal {data} {profile} {toggleQuoteModal} {form5} {productQuote} productName={selectedProductName} />
 {/if}

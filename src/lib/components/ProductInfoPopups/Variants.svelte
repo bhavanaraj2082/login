@@ -61,7 +61,7 @@
   id="productVariants"
   class="md:w-11/12 max-w-7xl bg-white mx-auto shadow-sm border border-gray-200 rounded-md m-10"
 >
-  <h1 class="w-full text-left text-xl text-heading font-bold p-3">Products</h1>
+  <h1 class="w-full text-left text-xl text-heading font-bold p-3 uppercase">Products</h1>
 
   <div class="bg-white shadow-md rounded-lg overflow-hidden">
     <div class="overflow-x-auto">
