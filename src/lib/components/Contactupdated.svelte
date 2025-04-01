@@ -170,23 +170,29 @@
 			}
 		}
 
-		if (!fieldName || fieldName === "company") {
-    		if (company && company.trim() !== "") {
-    		  if (
-    		    !/^[A-Za-z0-9&@!#$%^&*\(\)_+\-=\[\]\{\};:,.?\/\\|<>~`"'\s]+$/.test(company)
-    		  ) {
-    		    errors.company = "Company name can only contain letters, numbers, and special characters.";
-    		  } else if (company.length < 3) {
-    		    errors.company = "Company name must be at least 3 characters long.";
-    		  } else if (company.length > 100) {
-    		    errors.company = "Company name should not exceed 100 characters.";
-    		  } else {
-    		    delete errors.company;
-    		  }
-    		} else {
-    		  delete errors.company;
-    		}
-  		}
+		if (fieldName === "company") {
+    	  if (company && company.trim() !== "") {
+    	    if (
+    	      !/^[A-Za-z0-9&@!#$%^&*\(\)_+\-=\[\]\{\};:,.?\/\\|<>~`"'\s]+$/.test(company)
+    	    ) {
+    	      errors.company = "Company name can only contain letters, numbers, and certain special characters.";
+    	    } else if (company.length < 3) {
+    	      errors.company = "Company name must be at least 3 characters long.";
+    	    } else if (company.length > 100) {
+    	      errors.company = "Company name should not exceed 100 characters.";
+    	    } else {
+    	      delete errors.company;
+    	    }
+
+    	    if (errors.company) {
+    	      setTimeout(() => {
+    	        delete errors.company;
+    	      }, 2000);
+    	    }
+    	  } else {
+    	    delete errors.company; 
+    	  }
+    	}
 
 		if (!fieldName || fieldName === "captcha") {
 			if (!isChecked) {
@@ -1629,8 +1635,12 @@
 										const trimmedName = company.trim();
 										company = trimmedName;
 										validateField("company");
+										
 									  }}
-									/>
+									  />
+									  {#if errors?.company}
+									  <span class="text-red-500 text-xs">{errors.company}</span>
+								  {/if}
 								</div>
 								<!-- Subject field -->
 								<div class="flex flex-col md:flex-row md:space-x-4">
