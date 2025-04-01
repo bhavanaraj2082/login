@@ -38,8 +38,7 @@ const contactUSSchema = new Schema(
     },
     status: {
       type: String,
-      required: false,
-      trim: true,
+      default: "unread"  
     },
   },
   {
