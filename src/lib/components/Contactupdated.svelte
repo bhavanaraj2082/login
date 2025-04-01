@@ -33,6 +33,7 @@
 	let phone = "";
 	let email = "";
 	let name = "";
+	let company = "";
 
 	let message = "";
 	let subject = "";
@@ -168,6 +169,30 @@
 				delete errors.subject;
 			}
 		}
+
+		if (fieldName === "company") {
+    	  if (company && company.trim() !== "") {
+    	    if (
+    	      !/^[A-Za-z0-9&@!#$%^&*\(\)_+\-=\[\]\{\};:,.?\/\\|<>~`"'\s]+$/.test(company)
+    	    ) {
+    	      errors.company = "Company name can only contain letters, numbers, and certain special characters.";
+    	    } else if (company.length < 3) {
+    	      errors.company = "Company name must be at least 3 characters long.";
+    	    } else if (company.length > 100) {
+    	      errors.company = "Company name should not exceed 100 characters.";
+    	    } else {
+    	      delete errors.company;
+    	    }
+
+    	    if (errors.company) {
+    	      setTimeout(() => {
+    	        delete errors.company;
+    	      }, 2000);
+    	    }
+    	  } else {
+    	    delete errors.company; 
+    	  }
+    	}
 
 		if (!fieldName || fieldName === "captcha") {
 			if (!isChecked) {
@@ -708,6 +733,7 @@
 			showDropdown = filteredCountries.length > 0;
 		}
 	}
+
 	function filterCountriesWithoutAutoSelect() {
 		filteredCountries = countries.filter(
 			(country) =>
@@ -733,7 +759,7 @@
 	}
 
 	function validatePhoneNumber(countryCode, phone) {
-		if (!phone || !countryCode || phone.trim() === "") {
+		if (!phone || !countryCode === "") {
 			// errors.contactNumber = `*Required`;
 			return false;
 		}
@@ -896,6 +922,7 @@
 		validateField("message");
 		validateField("subject");
 		validateField("country");
+		validateField("company");
 
 		const isEmailVerified = ProfileEmailVerified;
 		const isOtpPhoneVerified = ProfilePhoneVerified;
@@ -936,15 +963,19 @@
 		if (data && data.authedUser && data.profile) {
 			//  name = data.authedUser.username || '';
 			name =
-				`${data.profile.firstname || ""} ${data.profile.lastname || ""}`.trim();
+				`${data.profile.firstName || ""} ${data.profile.lastName || ""}`.trim();
 			email = data.profile.email || "";
-			phone = data.profile.phone || "";
+			phone = data.profile.cellPhone || "";
+			country = data.profile.country || "";
+			company = data.profile.companyName || "";
 
 			isDataAvailable = true;
 		} else {
 			name = "";
 			email = data.email || "";
 			phone = "";
+			country = "";
+			company = "";
 
 			isDataAvailable = false;
 			if (data?.email) {
@@ -959,6 +990,8 @@
 			}
 		}
 		isEditable = false;
+		document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
 
 		setTimeout(() => {
 			isChecked = false;
@@ -1005,12 +1038,8 @@
 </script>
 
 {#if showSuccesDiv}
-	<div
-		class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
-	>
-		<div
-			class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
-		>
+	<div class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4">
+		<div class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg">
 			<h3 class="md:text-xl text-lg font-semibold text-green-600 mb-4">
 				Contact Us Form Submission
 			</h3>
@@ -1020,49 +1049,35 @@
 			</p>
 			<div class="w-10/12 mx-auto my-6 border-t-1 border-green-300"></div>
 			<div class="flex items-center justify-center">
-				<a
-					href="/"
-					class="bg-white text-primary-500 border-1 border-primary-500 px-4 py-2 rounded-md font-medium hover:bg-primary-500 hover:text-white transition-all duration-300 flex justify-center items-center"
-				>
+				<a href="/"
+					class="bg-white text-primary-500 border-1 border-primary-500 px-4 py-2 rounded-md font-medium hover:bg-primary-500 hover:text-white transition-all duration-300 flex justify-center items-center">
 					<Icon icon="mdi:home" class="text-xl mr-2" />Back to Home
 				</a>
 			</div>
 		</div>
 	</div>
 {:else if showFailureDiv}
-	<div
-		class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
-	>
-		<div
-			class="w-10/12 md:w-8/12 bg-gradient-to-r from-red-100 via-red-50 to-red-100 p-8 rounded-lg shadow-lg text-center"
-		>
+	<div class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs">
+		<div class="w-10/12 md:w-8/12 bg-gradient-to-r from-red-100 via-red-50 to-red-100 p-8 rounded-lg shadow-lg text-center">
 			<p class="sm:text-md text-sm text-gray-700 mb-6">
 				There was an issue with submitting the form. Please try again
 				after a while.
 			</p>
-
 			<div class="w-10/12 mx-auto my-6 border-t-2 border-red-300"></div>
 			<div>
-				<a
-					href="/feedback"
-					class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
-				>
+				<a href="/feedback"
+				class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition">
 					Report Issue
 				</a>
 			</div>
 		</div>
 	</div>
 {:else}
-	<section
-		class="mt-6 mb-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto sm:p-0 font-roboto bg-white"
-	>
+	<section class="mt-6 mb-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto sm:p-0 font-roboto bg-white">
 		<div class="w-full shadow rounded-lg">
-			<h1
-				class="sm:text-2xl text-md font-bold bg-primary-400 text-white py-4 pl-4 rounded-t-lg"
-			>
+			<h1 class="sm:text-2xl text-md font-bold bg-primary-400 text-white py-4 pl-4 rounded-t-lg">
 				Get in Touch with Us
 			</h1>
-
 			<form
 				method="POST"
 				action="?/contactus"
@@ -1109,8 +1124,7 @@
 
 						showMessage(message1, keywordError);
 					};
-				}}
-			>
+				}}>
 				<div class="flex flex-col md:flex-row p-4">
 					<div class="md:w-2/5 p-2">
 						<div
@@ -1199,36 +1213,34 @@
 							<div>
 								<div class="mb-4">
 									<input
-										type="text"
-										name="name"
-										id="name"
-										bind:value={name}
-										class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-										placeholder="User Name"
-										on:input={() => {
-											validateField("name");
-											errors.name = !name
-												? "*Required"
-												: !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(
-															name,
-													  )
-													? "Please enter a valid name"
-													: "";
-										}}
+									  type="text"
+									  name="name"
+									  id="name"
+									  bind:value={name}
+									  class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+									  placeholder="User Name"
+									  on:input={() => {
+										const trimmedName = name.trim();
+										name = trimmedName;
+										validateField("name");
+										errors.name = !name
+										  ? "*Required"
+										  : !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(name)
+										  ? "Please enter a valid name"
+										  : "";
+									  }}
 									/>
 									{#if errors?.name}
-										<span class="text-red-500 text-xs"
-											>{errors.name}</span
-										>
+									  <span class="text-red-500 text-xs">
+										{errors.name}
+									  </span>
 									{/if}
-								</div>
+								  </div>
 								<input
 									type="hidden"
 									name="email"
 									id="email"
-									bind:value={email}
-								/>
-
+									bind:value={email}/>
 								<div class="flex-1 mb-4">
 									<div class="flex-1 mb-4">
 										<form
@@ -1596,8 +1608,7 @@
 											title="Please enter a valid phone number"
 											on:input={() => {
 												phone = phone
-													.replace(/[^+\d]/g, "")
-													.trim();
+													.replace(/[^+\d]/g, "");
 												validateField("phone");
 												validatePhoneNumber(
 													country,
@@ -1606,19 +1617,33 @@
 											}}
 										/>
 										{#if errors?.phone}
-											<p
-												class="text-red-500 text-xs mt-1"
-											>
+											<p class="text-red-500 text-xs mt-1">
 												{errors.phone}
 											</p>
 										{/if}
 									</div>
 								</div>
-
+								<div class="pb-4">
+									<input
+									  type="text"
+									  name="company"
+									  placeholder="Enter Company Name"
+									  class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+									  bind:value={company}
+									  title="Please enter a valid company name"
+									  on:input={() => {
+										const trimmedName = company.trim();
+										company = trimmedName;
+										validateField("company");
+										
+									  }}
+									  />
+									  {#if errors?.company}
+									  <span class="text-red-500 text-xs">{errors.company}</span>
+								  {/if}
+								</div>
 								<!-- Subject field -->
-								<div
-									class="flex flex-col md:flex-row md:space-x-4"
-								>
+								<div class="flex flex-col md:flex-row md:space-x-4">
 									<div class="flex-1 mb-4">
 										<input
 											type="text"
@@ -1776,7 +1801,7 @@
 																)
 															) {
 																toast.error(
-																	"Please verify either your email or your phone number to proceed",
+																	"Please verify either your email to proceed",
 																);
 																return;
 															}
@@ -1817,9 +1842,7 @@
 											</div>
 
 											{#if errorMessage}
-												<p
-													class="text-red-500 text-sm mt-2"
-												>
+												<p class="text-red-500 text-sm mt-2">
 													{errorMessage}
 												</p>
 											{/if}
@@ -1829,34 +1852,24 @@
 									{#if showCaptchaPopup}
 										<!-- svelte-ignore a11y-click-events-have-key-events -->
 										<!-- svelte-ignore a11y-no-static-element-interactions -->
-										<div
-											class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
-											on:click={closeCaptchaPopup}
-										>
+										<div class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
+											on:click={closeCaptchaPopup}>
 											<!-- svelte-ignore a11y-click-events-have-key-events -->
 											<!-- svelte-ignore a11y-no-static-element-interactions -->
 											<div
 												class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm"
-												on:click|stopPropagation
-											>
-												<h2
-													class="text-lg font-semibold mb-4 text-gray-800"
-												>
+												on:click|stopPropagation>
+												<h2 class="text-lg font-semibold mb-4 text-gray-800">
 													Verify You're Human
 												</h2>
-
-												<p
-													class="mb-2 text-gray-700 flex items-center"
-												>
+												<p class="mb-2 text-gray-700 flex items-center">
 													{mathQuestion}
 													<button
 														class="ml-4 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
-														on:click={refreshMathQuestion}
-													>
+														on:click={refreshMathQuestion}>
 														<Icon
 															icon="ic:round-refresh"
-															class={`w-6 h-6 text-primary-600 cursor-pointer hover:scale-110 transition transform ${rotationClass}`}
-														/>
+															class={`w-6 h-6 text-primary-600 cursor-pointer hover:scale-110 transition transform ${rotationClass}`}/>
 													</button>
 												</p>
 												<input
@@ -1865,39 +1878,25 @@
 													placeholder="Your Answer"
 													class="border border-gray-300 rounded-md w-full p-2 mb-4"
 													on:input={onInputChange}
-													readonly={inputReadOnly}
-												/>
-
+													readonly={inputReadOnly}/>
 												{#if errorMessagecap}
-													<p
-														class="text-red-500 text-sm mb-4"
-													>
+													<p class="text-red-500 text-sm mb-4">
 														{errorMessagecap}
 													</p>
 												{/if}
 												{#if successMessage}
-													<p
-														class="text-green-500 text-sm mb-4"
-													>
+													<p class="text-green-500 text-sm mb-4">
 														{successMessage}
 													</p>
 												{/if}
 												{#if submittingForm}
 													<div class="w-full mt-4">
-														<p
-															class="text-sm mb-4 inline-flex items-center"
-														>
+														<p class="text-sm mb-4 inline-flex items-center">
 															Submitting form
 														</p>
-														<div
-															class="relative pt-1"
-														>
-															<div
-																class="flex mb-2"
-															>
-																<div
-																	class="w-full bg-gray-200 rounded-full"
-																>
+														<div class="relative pt-1">
+															<div class="flex mb-2">
+																<div class="w-full bg-gray-200 rounded-full">
 																	<!-- Bind the width of the progress bar to the progress variable -->
 																	<div
 																		class="bg-teal-500 text-xs font-medium text-teal-100 text-center p-0.5 leading-none rounded-full"
@@ -1927,8 +1926,7 @@
 															errorMessagecap =
 																"*Please answer the question correctly";
 														}
-													}}
-												>
+													}}>
 													Verify
 												</button>
 											</div>
