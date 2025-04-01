@@ -23,3 +23,5 @@ export const addLocalToFavorites =(item)=>{
     return data
     })
 }
+
+export const isFavoriteStore = writable(false);
