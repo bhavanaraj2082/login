@@ -4,7 +4,7 @@
     <div class="flex flex-col md:flex-row">
       
       <div class="w-full p-5">
-        <h1 class="text-xl font-semibold mb-6">
+        <h1 class="text-xl font-semibold mb-6 text-heading">
           TSCA 8 Notification
         </h1>
 

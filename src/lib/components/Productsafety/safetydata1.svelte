@@ -4,7 +4,7 @@
 <div class="w-full mx-auto">
   <div class="flex flex-col md:flex-row">
     <div class="w-full p-5">
-      <p class="sm:text-xl text-md font-semibold mb-6">Understanding Product Labels</p>
+      <p class="sm:text-xl text-md font-semibold mb-6 text-heading">Understanding Product Labels</p>
 
       <p class="sm:text-sm text-xs mb-4 font-medium text-heading">
         GHS Compliant Product Label

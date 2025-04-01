@@ -2,7 +2,7 @@
 </script>
 <div class="container mx-auto">
     <div class="w-full  p-4">
-      <h1 class="text-xl font-semibold mb-6">Hazard and Precautionary Statements</h1> 
+      <h1 class="text-xl font-semibold mb-6 text-heading">Hazard and Precautionary Statements</h1> 
       <div class="mb-8">
         <h2 id="hazard-statements" class="sm:text-md text-sm font-medium mb-4">Hazard Statements</h2>
         <p class="sm:text-sm text-justify text-xs mb-4">

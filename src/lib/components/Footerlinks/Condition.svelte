@@ -64,7 +64,7 @@
     <div class="gap-6 lg:ml-5">
         {#each Object.entries(productlicence) as [key, value]}
             <div class="mt-4">
-                <h3 class="font-bold text-gray-700 text-justify mb-2">{value.Heading}</h3>
+                <h3 class="font-semibold text-gray-700 text-justify mb-2">{value.Heading}</h3>
                 <p class="sm:text-sm text-xs text-justify  ">{value.Description}</p>
                 <p class="mt-3 text-justify sm:text-sm text-xs mb-5">{value.Description2}</p>
             </div>
