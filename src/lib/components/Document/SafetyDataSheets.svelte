@@ -192,28 +192,29 @@
   <div class="w-full inline-flex rounded mb-8">
     <nav
       aria-label="Tabs"
-      class="w-full flex space-x-0 overflow-x-auto rounded-t hide"
+      class="w-full flex space-x-5 overflow-x-auto rounded-t hide"
     >
-      {#each tabs as tab}
-        <div class="inline-block w-full">
-          <button
-            on:click={() => (activeTab = tab.name)}
-            class="w-full py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300
-              {activeTab === tab.name
-              ? 'bg-gray-50 text-primary-500 font-bold'
-              : 'bg-primary-100 text-black'}
-              hover:bg-gray-50 hover:text-primary-500 whitespace-nowrap"
-          >
-            {tab.name}
-          </button>
-          <div
-            class="h-0.5 bg-primary-300
-            {activeTab === tab.name
-              ? 'w-full'
-              : 'w-0'} transition-all duration-300 ease-in-out"
-          ></div>
-        </div>
-      {/each}
+    {#each tabs as tab}
+    <div class="inline-block w-full">
+      <button
+        on:click={() => (activeTab = tab.name)}
+        class="w-full py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300 rounded-md
+          {activeTab === tab.name
+          ? 'bg-white text-black font-bold'
+          : 'bg-primary-100 text-black'}
+           whitespace-nowrap"
+      >
+        {tab.name}
+      
+      <div
+        class="h-1 bg-primary-400 
+        {activeTab === tab.name
+          ? 'w-full'
+          : 'w-0'} transition-all duration-300 ease-in-out"
+      ></div>
+    </button>
+    </div>
+  {/each}
     </nav>
   </div>
 
