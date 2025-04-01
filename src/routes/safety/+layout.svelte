@@ -48,7 +48,7 @@
     <div class="w-full md:w-1/4 h-fit sm:mt-6 mt-3">
       <a
           href="/safety"
-          class={`block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition-all duration-300 ease-in-out hover:bg-primary-100 hover:scale-105 rounded-r p-1 ${
+          class={`block sm:text-md text-sm mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition-all duration-300 ease-in-out hover:bg-primary-100 hover:scale-105 rounded-r p-1 ${
               $page.url.pathname === "/safety"
                   ? "text-primary-400 border-l-4 border-primary-400 px-2 bg-primary-50 rounded-r"
                   : "text-black"
@@ -59,7 +59,7 @@
       <hr class="border-b border-gray-200" />
       <a
           href="/safety/understanding-product-labels"
-          class={`block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition-all duration-300 ease-in-out hover:bg-primary-100 hover:scale-105 rounded-r p-1 ${
+          class={`block sm:text-md text-sm mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition-all duration-300 ease-in-out hover:bg-primary-100 hover:scale-105 rounded-r p-1 ${
               $page.url.pathname === "/safety/understanding-product-labels"
                   ? "text-primary-400 border-l-4 border-primary-400 px-2 bg-primary-50 rounded-r"
                   : "text-black"
@@ -70,7 +70,7 @@
       <hr class="border-b border-gray-200" />
       <a
           href="/safety/globally-harmonized-system"
-          class={`block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition-all duration-300 ease-in-out hover:bg-primary-100 hover:scale-105 rounded-r p-1 ${
+          class={`block sm:text-md text-sm mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition-all duration-300 ease-in-out hover:bg-primary-100 hover:scale-105 rounded-r p-1 ${
               $page.url.pathname === "/safety/globally-harmonized-system"
                   ? "text-primary-400 border-l-4 border-primary-400 px-2 bg-primary-50 rounded-r"
                   : "text-black"
@@ -81,7 +81,7 @@
       <hr class="border-b border-gray-200" />
       <a
           href="/safety/tsca-8-notification"
-          class={`block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition-all duration-300 ease-in-out hover:bg-primary-100 hover:scale-105 rounded-r p-1 ${
+          class={`block sm:text-md text-sm mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition-all duration-300 ease-in-out hover:bg-primary-100 hover:scale-105 rounded-r p-1 ${
               $page.url.pathname === "/safety/tsca-8-notification"
                   ? "text-primary-400 border-l-4 border-primary-400 px-2 bg-primary-50 rounded-r"
                   : "text-black"
@@ -92,7 +92,7 @@
       <hr class="border-b border-gray-200" />
       <a
           href="/safety/hazard-and-precautionary-statements"
-          class={`block text-md mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition-all duration-300 ease-in-out hover:bg-primary-100 hover:scale-105 rounded-r p-1 ${
+          class={`block sm:text-md text-sm mt-3 font-medium mb-2 whitespace-normal text-black w-full text-left pl-3 cursor-pointer transition-all duration-300 ease-in-out hover:bg-primary-100 hover:scale-105 rounded-r p-1 ${
               $page.url.pathname === "/safety/hazard-and-precautionary-statements"
                   ? "text-primary-400 border-l-4 border-primary-400 px-2 bg-primary-50 rounded-r"
                   : "text-black"

@@ -3,10 +3,6 @@
   export let items = [];
   export let isSubcategory = false;
   export let linkPrefix;
-
-  console.log("items---------", items);
-
-  console.log("items---------", title);
 </script>
 
 {#if items.length > 0}
@@ -18,28 +14,21 @@
           href="{linkPrefix}{isSubcategory
             ? item?.category?.urlName + '/' + item?.urlName
             : item?.urlName}"
-          class="block group"
-        >
-          <div class="flex">
+          class="block group transform transition-all ease-in-out duration-700">
+          <div class="flex bg-white rounded-md shadow overflow-hidden transition-all group-hover:shadow-md">
             {#if title === "Categories"}
               <img
                 src="/category/{item.name}.webp"
                 alt={item?.name}
-                class="w-32 h-38 object-cover rounded-l-xl opacity-90 transition-transform duration-1000 ease-in-out group-hover:scale-105 group-hover:opacity-100"
-              />
+                class="w-28 h-28 object-cover opacity-90 transition-transform duration-500 ease-in-out group-hover:scale-105 group-hover:opacity-100" />
             {:else}
               <img
                 src="/category/{item.category.name}.webp"
                 alt={item?.name}
-                class="w-32 h-38 object-cover rounded-l-xl opacity-90 transition-transform duration-1000 ease-in-out group-hover:scale-105 group-hover:opacity-100"
-              />
+                class="w-28 h-28 object-cover opacity-90 transition-transform duration-500 ease-in-out group-hover:scale-105 group-hover:opacity-100"/>
             {/if}
-            <div
-              class="flex flex-col justify-center items-center rounded-r-xl h-40 w-full gap-4 shadow-md p-6 hover:scale-100 cursor-pointer transform transition-all ease-in-out group-hover:shadow-xl group-hover:bg-gradient-to-br from-gray-100 via-primary-50 to-primary-300 group-hover:from-primary-300 group-hover:to-primary-400 group-hover:text-white bg-white"
-            >
-              <p
-                class="text-lg font-semibold text-gray-700 group-hover:text-white text-center"
-              >
+            <div class="flex flex-col justify-center items-center rounded-r-md h-28 w-full gap-4 shadow-md p-6 cursor-pointer transform transition-all ease-in-out group-hover:shadow-md group-hover:text-primary-500 bg-white" >
+              <p class="text-lg font-semibold text-gray-700 group-hover:text-primary-600 text-center transition-all duration-300">
                 {item?.name}
               </p>
             </div>

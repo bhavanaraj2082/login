@@ -1203,7 +1203,7 @@
 										name="name"
 										id="name"
 										bind:value={name}
-										class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+										class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 										placeholder="User Name"
 										on:input={() => {
 											validateField("name");
@@ -1301,7 +1301,7 @@
 													name="email"
 													id="email"
 													bind:value={email}
-													class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+													class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 													placeholder="Email"
 													on:input={() => {
 														email = email.trim();
@@ -1455,7 +1455,7 @@
 															enteredOtpemail
 														}
 														placeholder="Enter 6-digit OTP"
-														class="w-full placeholder:text-xs mt-4 text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+														class="w-full placeholder:text-xs mt-4 text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 														on:input={() => {
 															enteredOtpemail =
 																enteredOtpemail.trim();
@@ -1473,7 +1473,7 @@
 													/>
 													<button
 														type="submit"
-														class="absolute top-1/2 right-3 mt-2 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
+														class="absolute top-1/2 right-3 mt-2 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded-md hover:text-primary-800 hover:underline disabled:opacity-50"
 														disabled={loadingotp}
 													>
 														{#if loadingotp}
@@ -1532,7 +1532,7 @@
 												placeholder="Search country"
 												on:input={handleInputChange}
 												on:click={toggleDropdown}
-												class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+												class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											/>
 
 											{#if showDropdown}
@@ -1591,7 +1591,7 @@
 											type="tel"
 											name="phone"
 											placeholder="Enter Contact Number"
-											class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+											class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											bind:value={phone}
 											title="Please enter a valid phone number"
 											on:input={() => {
@@ -1625,7 +1625,7 @@
 											name="subject"
 											id="subject"
 											bind:value={subject}
-											class="w-full text-sm placeholder:text-xs px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+											class="w-full text-sm placeholder:text-xs px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											placeholder="Subject"
 											on:input={() => {
 												validateField("subject");
@@ -1658,7 +1658,7 @@
 											name="message"
 											id="message"
 											bind:value={message}
-											class="w-full text-sm h-24 placeholder:text-xs px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+											class="w-full text-sm h-24 placeholder:text-xs px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											placeholder="Message"
 											on:input={() => {
 												validateField("message");
@@ -1705,7 +1705,7 @@
 													type="checkbox"
 													name="captcha"
 													value="captcha"
-													class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded cursor-pointer hover:border-primary-500 transition-colors duration-300"
+													class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded-md cursor-pointer hover:border-primary-500 transition-colors duration-300"
 													bind:checked={isChecked}
 													on:click={(event) => {
 														event.preventDefault();
@@ -1752,7 +1752,7 @@
 												class="mt-4 rounded flex items-center justify-end"
 											>
 												<button
-													class="px-6 py-3 rounded bg-primary-400 text-white font-medium shadow-md hover:shadow-xl transform transition hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-300"
+													class="px-6 py-3 rounded-md bg-primary-400 text-white font-medium shadow-md hover:shadow-xl transform transition hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-300"
 													on:click={(event) => {
 														event.preventDefault();
 
@@ -1850,7 +1850,7 @@
 												>
 													{mathQuestion}
 													<button
-														class="ml-4 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+														class="ml-4 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
 														on:click={refreshMathQuestion}
 													>
 														<Icon
@@ -1863,7 +1863,7 @@
 													type="text"
 													bind:value={userAnswer}
 													placeholder="Your Answer"
-													class="border border-gray-300 rounded w-full p-2 mb-4"
+													class="border border-gray-300 rounded-md w-full p-2 mb-4"
 													on:input={onInputChange}
 													readonly={inputReadOnly}
 												/>
@@ -1909,7 +1909,7 @@
 													</div>
 												{/if}
 												<button
-													class="w-full bg-gradient-to-r from-primary-500 to-primary-500 text-white py-2 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition mt-4"
+													class="w-full bg-gradient-to-r from-primary-500 to-primary-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-primary-600 transform transition mt-4"
 													on:click={() => {
 														onInputChange();
 														if (

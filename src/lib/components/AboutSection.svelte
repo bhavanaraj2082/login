@@ -10,7 +10,7 @@
       <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold">
         Learn About Us And What Sets Us Apart
       </h2>
-      <p class="lg:text-lg text-xs text-gray-600">
+      <p class="lg:text-lg text-xs text-gray-600 text-justify">
         At Chemicart, we are committed to providing high-quality chemicals and laboratory supplies
         to empower scientists and researchers in their pursuits. Our mission is rooted in safety,
         reliability, and innovation, ensuring that our customers have access to the best products available.

@@ -93,7 +93,6 @@
 			<p class="text-sm mb-4 text-heading">
 				Please enter your Email, and we'll contact you when it's available.
 			</p>
-
 			<form
 				method="POST"
 				action="?/noresults"
@@ -353,9 +352,9 @@
 
 		{#if components && components.length > 0}
 			<h3 class="text-xl font-bold mb-4">Products</h3>
-			<section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-4">
+			<section class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-4 ">
 				{#each components as item}
-					<a href="/products/{item?.category?.urlName}/{item?.subCategory?.urlName}/{item?.productNumber}" class="block">
+					<a href="/products/{item?.category?.urlName}/{item?.subCategory?.urlName}/{item?.productNumber}" class="block bg-white">
 						<div class="flex gap-3 shadow rounded-md p-4 cursor-pointer hover:shadow-md transition-all duration-300 ease-in-out">
 							<img
 							    src={`${PUBLIC_IMAGE_URL}/${item?.image}`}
@@ -363,9 +362,9 @@
 								onerror="this.src='/fallback.jpg'"
 								alt={item?.productName}/>
 							<div class="overflow-hidden">
-								<p class="text-sm font-medium text-justify whitespace-nowrap">{truncateText(item?.productName,30)}</p>
-								<p class="text-sm pt-1">{item?.productNumber}</p>
-								<p class="text-heading text-sm font-medium pt-3">{item?.manufacturerName}</p>
+								<p class="text-sm text-heading font-semibold text-justify whitespace-nowrap">{truncateText(item?.productName,30)}</p>
+								<p class="text-xs pt-1">{item?.productNumber}</p>
+								<p class="text-gray-500 text-sm font-medium pt-3">{item?.manufacturerName}</p>
 							</div>
 						</div>
 					</a>
