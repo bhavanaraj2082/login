@@ -43,35 +43,70 @@
   const phoneRegex = /^[6-9]\d{9}$/;
 
   function validateUsername() {
-    if (!username) {
-      errors.username = "*Required";
-    } else if (username.length < 3) {
-      errors.username = "Please enter at least 3 characters";
-    } else if (/^[^a-zA-Z]/.test(username)) {
-      errors.username = "Username must start with a letter";
-    } else if (/[^a-zA-Z0-9_]/.test(username)) {
-      errors.username =
-        "Username can include only letters, numbers, and underscore ( _ )";
-    } else if (/^[0-9]+$/.test(username)) {
-      errors.username = "Username cannot contain only numbers";
-    } else if (/^[_]+$/.test(username)) {
-      errors.username = "Username cannot contain only underscores ( _ )";
-    } else if (!/^(?=(.*[a-zA-Z]){3,})[a-zA-Z0-9_]+$/.test(username.trim())) {
-      errors.username = "Username must contain at least 3 letters";
-    } else {
-      delete errors.username;
-    }
+  let newErrors = { ...errors }; // Create a new object for reactivity
+
+  if (!username) {
+    newErrors.username = "*Required";
+  } else if (username.length < 3) {
+    newErrors.username = "Please enter at least 3 characters";
+  } else if (/^[^a-zA-Z]/.test(username)) {
+    newErrors.username = "Username must start with a letter";
+  } else if (/[^a-zA-Z0-9_]/.test(username)) {
+    newErrors.username = "Username can include only letters, numbers, and underscore ( _ )";
+  } else if (/^[0-9]+$/.test(username)) {
+    newErrors.username = "Username cannot contain only numbers";
+  } else if (/^[_]+$/.test(username)) {
+    newErrors.username = "Username cannot contain only underscores ( _ )";
+  } else if (!/^(?=(.*[a-zA-Z]){3,})[a-zA-Z0-9_]+$/.test(username.trim())) {
+    newErrors.username = "Username must contain at least 3 letters";
+  } else {
+    delete newErrors.username;
   }
 
-  function validateEmail() {
-    if (!email) {
-      errors.email = "*Required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = "Please enter a valid email.";
-    } else {
-      delete errors.email;
-    }
+  errors = newErrors; // Reassign errors to trigger reactivity
+}
+
+function validateEmail() {
+  let newErrors = { ...errors }; // Create a new object for reactivity
+
+  if (!email) {
+    newErrors.email = "*Required";
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    newErrors.email = "Please enter a valid email.";
+  } else {
+    delete newErrors.email;
   }
+
+  errors = newErrors; // Reassign errors to trigger reactivity
+}
+
+function validateFirstName() {
+  let newErrors = { ...errors }; // Ensure reactivity
+
+  if (!firstName) {
+    newErrors.firstName = "*Required";
+  } else if (!/^[a-zA-Z\s]+$/.test(firstName)) {
+    newErrors.firstName = "First name can only contain letters and spaces";
+  } else {
+    delete newErrors.firstName;
+  }
+
+  errors = newErrors; // Update errors object to trigger reactivity
+}
+
+function validateLastName() {
+  let newErrors = { ...errors }; // Ensure reactivity
+
+  if (!lastName) {
+    newErrors.lastName = "*Required";
+  } else if (!/^[a-zA-Z\s]+$/.test(lastName)) {
+    newErrors.lastName = "Last name can only contain letters and spaces";
+  } else {
+    delete newErrors.lastName;
+  }
+
+  errors = newErrors; // Update errors object to trigger reactivity
+}
 
   function validatePhone() {
     if (!phone) {
@@ -88,64 +123,36 @@
     }
   }
 
-  // function validatePassword() {
-  //   if (!password) {
-  //     errors.password = "*Required";
-  //   } else if (
-  //     !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-  //       password
-  //     )
-  //   ) {
-  //     errors.password =
-  //       "Ensure your password matches the format outlined below.";
-  //   } else {
-  //     delete errors.password;
-  //   }
-  // }
-  let errors = { password: "" };
-
-  if (!password) {
-    error.password = "*Required";
-  } else if (
-    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-      password
-    )
-  ) {
-    error.password = "Ensure your password matches the format outlined below.";
-  } else {
-    delete error.password;
-  }
-
+  let errors = {};
   let passwordStrength = 0;
 
   function validatePassword() {
-    typing = password.length > 0;
-    errors.password = "";
+  typing = password.length > 0;
 
-    if (password.length < 8) {
-      errors.password = "Password must be at least 8 characters long.";
-    }
-    // Check if the password contains the word 'password'
-    else if (password.includes("password")) {
-      errors.password = "Password cannot contain common or guessable text.";
-    }
+  let newErrors = { ...errors }; 
 
-    if (!password) {
-      errors.password = "*Required";
-      passwordStrength = 0;
-    } else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-        password
-      )
-    ) {
-      errors.password =
-        "Ensure your password matches the format outlined below.";
-      passwordStrength = 50;
-    } else {
-      delete errors.password;
-      passwordStrength = calculateStrength(password);
-    }
+  if (!password) {
+    newErrors.password = "*Required";
+    passwordStrength = 0;
+  } else if (password.length < 8) {
+    newErrors.password = "Password must be at least 8 characters long.";
+  } 
+  // Check if the password contains the word 'password'
+  else if (password.toLowerCase().includes("password")) {
+    newErrors.password = "Password cannot contain common or guessable text.";
+  } 
+  else if (
+    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(password)
+  ) {
+    newErrors.password = "Ensure your password matches the format outlined below.";
+    passwordStrength = 50;
+  } else {
+    delete newErrors.password;
+    passwordStrength = calculateStrength(password);
   }
+
+  errors = newErrors; // Reassign to trigger reactivity
+}
 
   function calculateStrength(password) {
     let strength = 0;
@@ -159,13 +166,15 @@
   $: calculateStrength(password);
 
   function validateConfirmPassword() {
+    let newErrors = { ...errors };
     if (!passwordConfirm) {
-      errors.passwordConfirm = "*Required";
+      newErrors.passwordConfirm = "*Required";
     } else if (passwordConfirm !== password) {
-      errors.passwordConfirm = "Passwords do not match";
+      newErrors.passwordConfirm = "Passwords do not match";
     } else {
-      delete errors.passwordConfirm;
+      delete newErrors.passwordConfirm;
     }
+    errors = newErrors; // Reassign to trigger reactivity
   }
 
   const handleResendemailOtp = () => {
@@ -1012,30 +1021,26 @@
   }
 
   function validatePhoneNumber(countryName, phone) {
-    if (!phone) {
-      errors.phone = "*Required";
-      return;
-    } else {
-      errors.phone = "";
-    }
+  let newErrors = { ...errors }; // Ensure reactivity
 
-    if (!countryName) {
-      errors.phone = "Select a country before entering your phone number";
-      return;
-    } else {
-      errors.phone = "";
-    }
-
+  if (!phone) {
+    newErrors.phone = "*Required";
+  } else if (!countryName) {
+    newErrors.phone = "Select a country before entering your phone number";
+  } else {
     const countryCode = countries.find((c) => c.name === countryName)?.code;
     const phonePattern = getPhonePattern(countryCode);
     const phoneRegex = new RegExp(phonePattern);
 
     if (!phoneRegex.test(phone)) {
-      errors.phone = `Please enter a valid phone number for ${countryName}.`;
+      newErrors.phone = `Please enter a valid phone number for ${countryName}.`;
     } else {
-      errors.phone = "";
+      delete newErrors.phone;
     }
   }
+
+  errors = newErrors; // Update errors object to trigger reactivity
+}
 
   const countriesLength = countries.length;
   const phoneNumberPatternsLength = Object.keys(phoneNumberPatterns).length;
@@ -1201,144 +1206,12 @@
     }
   }
 
-  // function validateForm() {
-  //   errors = {};
-  //   if (!username) {
-  //     errors.username = "*Required";
-  //   } else if (username.length < 3) {
-  //     errors.username = "Please enter at least 3 characters";
-  //   } else if (/^[^a-zA-Z]/.test(username)) {
-  //     errors.username = "Username must start with a letter";
-  //   } else if (/[^a-zA-Z0-9_]/.test(username)) {
-  //     errors.username =
-  //       "Username can include only letters, numbers, and underscore ( _ )";
-  //   } else if (/^[0-9]+$/.test(username)) {
-  //     errors.username = "Username cannot contain only numbers";
-  //   } else if (/^[_]+$/.test(username)) {
-  //     errors.username = "Username cannot contain only underscores ( _ )";
-  //   } else if (!/^(?=(.*[a-zA-Z]){3,})[a-zA-Z0-9_]+$/.test(username.trim())) {
-  //     errors.username = "Username must contain at least 3 letters";
-  //   } else {
-  //     delete errors.username;
-  //   }
-
-  //   if (!email) {
-  //     errors.email = "*Required";
-  //   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-  //     errors.email = "Please enter a valid email.";
-  //   } else {
-  //     delete errors.email;
-  //   }
-
-  //   if (!phone) {
-  //     errors.phone = "*Required";
-  //   } else {
-  //     const phonePattern = getPhonePattern(country);
-  //     const phoneRegex = new RegExp(phonePattern);
-
-  //     if (!phoneRegex.test(phone)) {
-  //       errors.phone = `Please enter a valid phone number for ${country}.`;
-  //     } else {
-  //       delete errors.phone;
-  //     }
-  //   }
-
-  //   if (!country) {
-  //     errors.phone =
-  //       "Please select the country before entering the phone number";
-  //   } else {
-  //     delete errors.phone;
-  //   }
-
-  //   if (!country) {
-  //     errors.country = "*Required";
-  //   } else {
-  //     delete errors.country;
-  //   }
-
-  //   if (!password) {
-  //     errors.password = "*Required";
-  //   } else if (
-  //     !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-  //       password
-  //     )
-  //   ) {
-  //     errors.password =
-  //       "Ensure your password matches the format outlined below.";
-  //   } else {
-  //     delete errors.password;
-  //   }
-
-  //   if (!passwordConfirm) {
-  //     errors.passwordConfirm = "*Required";
-  //   } else if (passwordConfirm !== password) {
-  //     errors.passwordConfirm = "Passwords do not match";
-  //   } else {
-  //     delete errors.passwordConfirm;
-  //   }
-
-  //   if (!termsAccepted) {
-  //     errors.termsAndConditions =
-  //       "You need to agree to the Terms of Service and Privacy Policy to proceed";
-  //   }
-
-  //   if (gstNumber) {
-  //     if (!/^[0-9]{2}[A-Z0-9]+$/.test(gstNumber)) {
-  //       errors.gstNumber = "Please provide a valid GST Number.";
-  //     } else {
-  //       delete errors.gstNumber;
-  //     }
-  //   } else {
-  //     delete errors.gstNumber;
-  //   }
-
-  //   if (tanNumber) {
-  //     if (!/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(tanNumber)) {
-  //       errors.tanNumber = "Please provide a valid TAN Number";
-  //     } else {
-  //       delete errors.tanNumber;
-  //     }
-  //   } else {
-  //     delete errors.tanNumber;
-  //   }
-
-  //   if (!(isOtpVerified === true)) {
-  //     // toast.error('Please verify your email or phone number to proceed');
-  //     toast.error("Please verify your email to proceed");
-  //   }
-
-  //   console.log(isOtpVerified, "isOtpVerified");
-  //   console.log("Error object:", errors);
-  //   errorCount = Object.keys(errors).length;
-  //   console.log("Number of errors:", errorCount);
-
-  //   return (
-  //     Object.keys(errors).length === 0 && isOtpVerified === true
-  //     // (isOtpVerified === true || isEmailVerified || isOtpPhoneVerified || ProfilePhoneVerified)
-  //   );
-  // }
-
   function validateForm() {
     errors = {};
     if (companyName && !/^[a-zA-Z\s]+$/.test(companyName)) {
       errors.companyName = "Company name can only contain letters and spaces";
     } else {
       delete errors.companyName;
-    }
-
-    if (!lastName) {
-      errors.lastName = "*Required";
-    } else if (!/^[a-zA-Z\s]+$/.test(lastName)) {
-      errors.lastName = "Last name can only contain letters.";
-    } else {
-      delete errors.lastName;
-    }
-    if (!firstName) {
-      errors.firstName = "*Required";
-    } else if (!/^[a-zA-Z\s]+$/.test(firstName)) {
-      errors.firstName = "First name can only contain letters.";
-    } else {
-      delete errors.firstName;
     }
 
     if (companyType && !/^[a-zA-Z\s]+$/.test(companyType)) {
@@ -1364,72 +1237,19 @@
       delete errors.tanNumber;
     }
 
-    if (!username) {
-      errors.username = "*Required";
-    } else if (username.length < 3) {
-      errors.username = "Please enter at least 3 characters";
-    } else if (/^[^a-zA-Z]/.test(username)) {
-      errors.username = "Username must start with a letter";
-    } else if (/[^a-zA-Z0-9_]/.test(username)) {
-      errors.username =
-        "Username can include only letters, numbers, and underscore ( _ )";
-    } else if (/^[0-9]+$/.test(username)) {
-      errors.username = "Username cannot contain only numbers";
-    } else if (/^[_]+$/.test(username)) {
-      errors.username = "Username cannot contain only underscores ( _ )";
-    } else if (!/^(?=(.*[a-zA-Z]){3,})[a-zA-Z0-9_]+$/.test(username.trim())) {
-      errors.username = "Username must contain at least 3 letters";
-    } else {
-      delete errors.username;
-    }
-
-    if (!email) {
-      errors.email = "*Required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = "Please enter a valid email.";
-    } else {
-      delete errors.email;
-    }
-
-    if (!phone) {
-      errors.phone = "*Required";
-    } else {
-      const phonePattern = getPhonePattern(country);
-      const phoneRegex = new RegExp(phonePattern);
-
-      if (!phoneRegex.test(phone)) {
-        errors.phone = `Please enter a valid phone number for ${country}.`;
-      } else {
-        delete errors.phone;
-      }
-    }
-
     if (!country) {
       errors.country = "*Required";
     } else {
       delete errors.country;
     }
-
-    if (!password) {
-      errors.password = "*Required";
-    } else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-        password
-      )
-    ) {
-      errors.password =
-        "Ensure your password matches the format outlined below.";
-    } else {
-      delete errors.password;
-    }
-
-    if (!passwordConfirm) {
-      errors.passwordConfirm = "*Required";
-    } else if (passwordConfirm !== password) {
-      errors.passwordConfirm = "Passwords do not match";
-    } else {
-      delete errors.passwordConfirm;
-    }
+    
+    validateUsername();
+    validateEmail();
+    validateFirstName();
+    validateLastName(); 
+    validatePhoneNumber(country, phone)
+    validatePassword();
+    validateConfirmPassword();
 
     const checkbox = document.querySelector('input[type="checkbox"]');
     if (!checkbox) {
@@ -1445,7 +1265,7 @@
       toast.error("Please verify your email to proceed");
     }
 
-    console.log(isOtpVerified, "isOtpVerified");
+    // console.log(isOtpVerified, "isOtpVerified");
     console.log("Error object:", errors);
     errorCount = Object.keys(errors).length;
     console.log("Number of errors:", errorCount);
@@ -1455,7 +1275,6 @@
 
   const handleCheckboxChange = (event) => {
     isTermsAccepted = event.target.checked;
-    //   console.log("isTermsAccepted",isTermsAccepted)
     if (isTermsAccepted) {
       delete errors.termsAndConditions;
     } else {
@@ -1849,13 +1668,7 @@
             name="firstName"
             bind:value={firstName}
             placeholder="First Name"
-            on:input={() => {
-              errors.firstName = !firstName
-                ? "*Required"
-                : !/^[a-zA-Z\s]+$/.test(firstName)
-                  ? "First name can only contain letters and spaces"
-                  : "";
-            }}
+            on:input={validateFirstName}
           />
           <p class=" text-red-500 text-left text-xs">
             {errors?.firstName || ""}
@@ -1871,13 +1684,7 @@
             name="lastName"
             bind:value={lastName}
             placeholder="Last Name"
-            on:input={() => {
-              errors.lastName = !lastName
-                ? "*Required"
-                : !/^[a-zA-Z\s]+$/.test(lastName)
-                  ? "Lastname can only contain letters and spaces"
-                  : "";
-            }}
+            on:input={validateLastName}
           />
           <p class=" text-red-500 text-left text-xs">
             {errors?.lastName || ""}
@@ -2191,7 +1998,7 @@
             name="confirmpassword"
             type="password"
             bind:value={passwordConfirm}
-            on:input={() => validateConfirmPassword()}
+            on:input={validateConfirmPassword}
             placeholder="Confirm your password"
             class="mt-1 block w-full p-2 pr-10 border text-sm border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10"
           />

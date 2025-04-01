@@ -15,9 +15,11 @@
   import LikedPopup from "./LikedPopup.svelte";
   import { toast, Toaster } from "svelte-sonner";
   import AboutTheItem from "./AboutTheItem.svelte";
+	import { isFavoriteStore } from "$lib/stores/favorites.js";
+
   export let data;
   export let isauthedUser;
-  export let isFavorite;
+  // export let isFavorite;
   export let profile;
   let form;
   let showImagePopup = false;
@@ -28,7 +30,7 @@
   let form5;
   let showPopup = false;
   let showCartPopup = false;
-  $: isLiked = isFavorite;
+  $: isLiked = $isFavoriteStore;
   let authedEmail = isauthedUser.email;
   let showLikedPopup = false;
   let orderMultiple = null;
@@ -47,15 +49,6 @@
     showQuoteModal = !showQuoteModal;
     productQuote = selectedProduct;
   }
-
-  // $: {
-  //   if (data.records.length > 0 && quantity === 1) {
-  //     orderMultiple = data.records[0].orderMultiple;
-  //     quantity = orderMultiple;
-  //   } else if (data.records.length === 0) {
-  //     quantity = null;
-  //   }
-  // }
 
   $: {
     if (
@@ -140,19 +133,8 @@
   }
 
   function toggleLike() {
-    isFavorite = !isFavorite;
+    isFavoriteStore.update(n => !n);  
   }
-
-  // const updateQuantity = (event) => {
-  //   let value = parseInt(event.target.value);
-  //   if (isNaN(value) || value < 1) {
-  //     quantity = null;
-  //   } else if (value > 999) {
-  //     quantity = 999;
-  //   } else {
-  //     quantity = value;
-  //   }
-  // };
 
   $: {
     if (data.records.length > 0) {
