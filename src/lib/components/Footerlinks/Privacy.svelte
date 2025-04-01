@@ -90,7 +90,7 @@ let showTooltip = false;
 	<p class="sm:text-sm text-xs text-justify">{dataPrivacyNotice.dataPrivacyNotice.general_information}</p>
 	<h4 class="font-medium text-gray-700 mt-2 mb-2">2.1 Controller</h4>
 	<p class="text-justify text-sm">{dataPrivacyNotice.dataPrivacyNotice.controller}</p>
-	<h4 class="font-bold text-gray-700 mt-2 mb-2">2.2 Data Privacy Officer</h4>
+	<h4 class="font-medium text-gray-700 mt-2 mb-2">2.2 Data Privacy Officer</h4>
 	<p class="text-justify sm:text-sm text-xs">
 		We have appointed a Data Privacy Officer. You can contact this person and the team at any time:
 	</p>
