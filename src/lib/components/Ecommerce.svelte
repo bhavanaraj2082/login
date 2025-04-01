@@ -5,6 +5,7 @@
 	import { toast, Toaster } from "svelte-sonner";
 	let selectedNames = [];
 	let reason = [];
+	let carrn=false;
 	let submitting = false;
 	let inputReadOnly = false;
 	let progress = 0;
@@ -657,7 +658,10 @@
 			rotationClass = "";
 		}, 1000);
 	}
-
+function carrnchange() {
+	carrn=true;
+	
+}
 	function onInputChange() {
 		if (userAnswer.trim()) {
 			validateMathCaptcha();
@@ -1434,25 +1438,30 @@
 								name="number"
 								id="number"
 								bind:value={number}
+								on:input={carrnchange}
 								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Phone Number*"
 							/>
-							{#if showErrors && number.length === 0}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-									>Number is required</span
-								>
+							<!-- Show error if country (location) is not selected -->
+							{#if location.length === 0 && carrn}
+								<span class="text-red-500 sm:text-xs text-2s font-medium">
+									Please select the country before entering the phone number
+								</span>
 							{/if}
-							<!-- {#if number.length > 0 && !/^\+?[0-9]{10}$/.test(number)}
-                                    <span class="text-red-500 sm:text-xs text-2s font-medium">Please enter a valid number number.</span>
-                                {/if} -->
+							<!-- Show error if the phone number is empty -->
+							{#if showErrors && number.length === 0}
+								<span class="text-red-500 sm:text-xs text-2s font-medium">
+									Number is required
+								</span>
+							{/if}
+							<!-- Show error if the phone number is invalid based on the location -->
 							{#if number?.length > 0 && !validatePhoneNumber(location, number)}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-									>Please enter a valid phone number for {location}</span
-								>
+								<span class="text-red-500 sm:text-xs text-2s font-medium">
+									Please enter a valid phone number for {location}
+								</span>
 							{/if}
 						</div>
+						
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">

@@ -295,28 +295,32 @@ else if (selectedSolvent === "Yes") {
 		</div>
 		<div class="bg-white">
 			<button
-				class="box-content rounded h-25 w-4/5 p-4 border-dashed border-primary-500 border-2 ml-3 md:ml-8 py-10 bg-white"
-				type="button"
-				on:click={triggerFileInput}
-			>
+			class="box-content rounded h-25 w-4/5 p-4 border-dashed border-primary-500 border-2 ml-3 md:ml-8 py-10 bg-white"
+			type="button"
+			on:click={triggerFileInput}
+		>
 			<div class="flex items-center font-bold sm:text-2xl text-sm justify-center">
 				<span>Add Components</span>
 				<Icon icon="material-symbols-light:upload" class="sm:text-3xl text-lg text-bold text-primary-500 ml-2" />
 			</div>
-			
+		
 			<div class="sm:text-lg text-sm">
-				Upload an Excel
+				Upload an Excel 
 				<a 
 					href={fileLink} 
 					download="Custom_Quote_Template.xls" 
 					class="text-primary-500 underline ml-1.5 mr-1.5 sm:text-lg text-sm"
-					role="button">
+					role="button"
+					on:click|stopPropagation
+				>
 					download template
-				</a>
-				of CAS numbers or component names that you wish to add
+				</a> 
+				of CAS numbers or component names that you wish to add.
 			</div>
-				<div class="sm:text-lg text-sm">or browse if you already have a file prepared.</div>
-			</button>
+		
+			<div class="sm:text-lg text-sm">or browse if you already have a file prepared.</div>
+		</button>
+		
 			<label>
 				<input
 					name="file"
