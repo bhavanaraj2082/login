@@ -5,7 +5,7 @@
   <section class="w-11/12 mx-auto py-12 max-w-7xl">
     <div>
         <h1 class="font-bold text-xl pb-4">Featured Links</h1>
-        <p class="text-sm text-gray-700">
+        <p class="sm:text-sm text-xs text-justify text-gray-700">
             Access our card for essential information at your fingertips, reach out to us for prompt assistance with any questions, and explore our comprehensive documentation for detailed guidance and support.
         </p>
     </div>
@@ -17,7 +17,7 @@
                     <h3 class="text-xl font-semibold mb-2">{name}</h3>
                     <p class="text-gray-600 m-2 text-sm justify-center">{description}</p>
                 </div>
-                <a href={link} class="text-primary-500 border border-primary-500 w-11/12 py-1.5 my-2 rounded hover:bg-primary-500 hover:text-gray-100 transition-colors font-medium duration-500">
+                <a href={link} class="text-primary-500 border border-primary-500 w-11/12 py-1.5 my-2 rounded-md hover:bg-primary-500 hover:text-gray-100 transition-colors font-medium duration-500">
                     {buttonLabel}
                 </a>
             </div>

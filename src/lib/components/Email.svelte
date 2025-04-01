@@ -38,12 +38,12 @@
         name="email"
         bind:value={email}
         placeholder="Enter your email"
-        class="w-full px-4 sm:px-4 py-2 text-gray-600 border border-primary-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"
+        class="w-full px-4 sm:py-2.5 py-2 text-gray-600 border border-primary-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"
         required
       />
       <button
         type="submit"
-        class="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 bg-primary-400 hover:bg-primary-500 text-primary-50 font-bold rounded-r transition-all duration-300 w-12 h-8 flex items-center justify-center"
+        class="absolute right-1.5 top-1/2 transform -translate-y-1/2 p-1 bg-primary-400 hover:bg-primary-500 text-primary-50 font-bold rounded-r-md transition-all duration-300 sm:w-14 w-12 sm:h-9 h-8 flex items-center justify-center"
         disabled={isSubmitting}>
         {#if isSubmitting}
           <span class="text-xl">...</span>

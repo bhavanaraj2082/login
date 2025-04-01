@@ -372,7 +372,7 @@ async function submitForm() {
 >
 	<input type="hidden" name="guestCart" value={JSON.stringify($guestCart)} />
 </form> -->
-<nav class="bg-primary-400 font-workSans">
+<nav class="bg-primary-400 font-workSans px-0.5">
 	<Toaster position="bottom-right" richColors />
 	{#if isOpen}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -840,19 +840,19 @@ async function submitForm() {
 				</a> -->
 				
 				<div class="relative flex items-center justify-center lg:space-x-2 lg:pr-4">
-							<div class="relative flex items-center justify-between bg-primary-400 border-2 border-white w-28 lg:w-32 h-7 bottom-0.5 rounded-md cursor-pointer">
+							<div class="relative flex items-center justify-between bg-primary-400 border-2 border-white w-16 lg:w-32 h-7 bottom-0.5 rounded-md cursor-pointer">
 								<div class="absolute flex items-center justify-between w-full h-full transition-all duration-300 ease-in-out">
 									<button 
 										class="w-1/2 h-full flex items-center justify-center bg-white text-gray-400 z-10 text-xs"
-										on:click={setINR} 
-									>
-										₹ <span class="text-2s ml-1 font-medium">INR</span>
+										on:click={setINR} >
+										<span class="text-2s lg:text-xs">₹</span>
+										<span class="text-2s ml-1 font-medium hidden lg:inline">INR</span>
 									</button>
 									<button 
 										class="w-1/2 h-full flex items-center justify-center bg-white text-gray-400 z-10 text-xs"
-										on:click={setUSD} 
-									>
-										$ <span class="text-2s ml-1 font-medium">USD</span>
+										on:click={setUSD} >
+										<span class="text-2s lg:text-xs">$</span>
+										<span class="text-2s ml-1 font-medium hidden lg:inline">USD</span>
 									</button>
 							</div>
 							
@@ -862,7 +862,7 @@ async function submitForm() {
 								class="absolute w-1/2 h-full rounded bg-primary-500 transition-all duration-300 ease-in-out flex items-center justify-center"
 								style="top: 50%; left: {$currencyState === 'inr' ? '25%' : '75%'}; transform: translate(-50%, -50%); z-index: 10;"
 							on:click={toggleCurrency}>
-								<button class="text-white text-2s font-medium">{$currencyState === 'inr' ? '₹ INR' : '$ USD'}
+								<button class="text-white lg:text-2s text-1s font-medium whitespace-nowrap">{$currencyState === 'inr' ? '₹ INR' : '$ USD'}
 								</button>
 							</div>
 						</div>
