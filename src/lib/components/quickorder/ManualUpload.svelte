@@ -1281,7 +1281,7 @@
                     Loading...
                   </span>
                 {/if}
-                {#if row.sku.length >= 2 && row.filteredProducts.length > 0}
+                {#if row.sku.length >= 2 && row.filteredProducts.length > 0 && !loadingState[index]}
                   <div
                     class="absolute top-full w-full max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-md z-10"
                   >
@@ -1465,10 +1465,9 @@
                       if (parsedValue >= 1 && parsedValue <= 999) {
                         row.quantity = parsedValue;
                       } else if (e.target.value === "" || parsedValue < 1) {
-                        // Don't immediately reset to 1 while typing
                         row.quantity = e.target.value === "" ? "" : parsedValue;
                       } else {
-                        row.quantity = 999; // Cap at maximum
+                        row.quantity = 999;
                         e.target.value = "999";
                       }
                       handlePopupInput(e);
@@ -1900,7 +1899,7 @@
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
-        class="bg-white rounded-lg p-6 w-2/5 h-5/6 overflow-y-auto"
+        class="bg-white rounded-lg p-6 md:w-2/5 w-full md:h-5/6 h-2/5  overflow-y-auto"
         on:click|stopPropagation
       >
         <h2 class="text-xl font-semibold mb-4 text-primary-400">

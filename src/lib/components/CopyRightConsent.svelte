@@ -4,7 +4,7 @@
     import { toast, Toaster } from "svelte-sonner";
     import Icon from "@iconify/svelte";
     export let data;
-    console.log(data, "i a consent");
+    // console.log(data, "i a consent");
     let submitting = false;
     let isChecked =  false;
 	let mathQuestion = '';
@@ -29,7 +29,7 @@
     let isEditable = false;
     // console.log(data,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
     let authedUserEmailVerified = data?.profile?.isEmailVerified;
-    console.log("authedUserEmailVerified", authedUserEmailVerified);
+    // console.log("authedUserEmailVerified", authedUserEmailVerified);
 
     let verificationMessage = "";
     let emailSent = false;
@@ -481,6 +481,7 @@
     }
 
     const handlesubmit = async (data) => {
+        
         if (!formValid()) {
             cancel();
             return;
@@ -942,6 +943,13 @@
     }
         // console.log('Selected Country:', country);
     }
+    
+function handleKeyDown(event) {
+    if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
+        selectCountry(filteredCountries[0]);
+        event.preventDefault();
+    }
+}
     function toggleDropdown() {
         showDropdown = !showDropdown;
     }
@@ -1173,6 +1181,7 @@
                 Fields indicated by an * are required.
             </p>
 
+            <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
             <form
                 method="POST"
                 action="?/copyconsent"
@@ -1180,6 +1189,11 @@
                 class="space-y-6"
                 bind:this={form}
                 use:enhance={handlesubmit}
+                on:keydown={(event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                    }
+                }}
             >
                 <!-- Title -->
                 <div class="md:w-1/2">
@@ -1227,6 +1241,7 @@
                             name="firstname"
                             id="firstname"
                             bind:value={firstname}
+                            maxlength="50"
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="First Name"
                             on:input={() => {
@@ -1255,6 +1270,7 @@
                             name="lastname"
                             id="lastname"
                             bind:value={lastname}
+                            maxlength="50"
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Last Name"
                             on:input={() => {
@@ -1287,6 +1303,7 @@
                             name="company"
                             id="company"
                             bind:value={company}
+                            maxlength="50"
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Company Name"
                             on:input={() => {
@@ -1317,6 +1334,7 @@
                             name="street"
                             id="street"
                             bind:value={street}
+                            maxlength="50"
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Street Name"
                             on:input={() => {
@@ -1345,6 +1363,7 @@
                             name="email"
                             id="email"
                             bind:value={email}
+                            
                         />
                         <form
                             action="?/verifyemail"
@@ -1407,6 +1426,7 @@
                                         name="email"
                                         id="email"
                                         bind:value={email}
+                                        maxlength="50"
                                         class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                                         placeholder="Email"
                                         on:input={() => {
@@ -1601,6 +1621,7 @@
                             name="city"
                             id="city"
                             bind:value={city}
+                            maxlength="50"
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="City"
                             on:input={() => {
@@ -1635,6 +1656,7 @@
                                 placeholder="Search country"
                                 on:input={handleInputChange}
                                 on:click={toggleDropdown}
+                                on:keydown={handleKeyDown}
                                 class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             />
 
@@ -1723,6 +1745,7 @@
                             name="description"
                             rows="4"
                             bind:value={description}
+                            maxlength="200"
                             on:input={() => {
                                 validateField("description");
                                 errors.description = !description
@@ -1769,7 +1792,7 @@
                         {/if}
                     </div>
                 </div>
-                <div class="flex-1 mb-4">
+                <span class="flex-1 w-1/3 mb-4">
                     <label for="recaptcha" class="block text-sm font-medium text-gray-700">
                     </label>
                     <input type="hidden" name="token" value={captchaToken} />
@@ -1801,6 +1824,11 @@
                                         isChecked = false;
                                     }
                                 }}
+                                	on:keydown={(event) => {
+                                        if (event.key === 'Enter') {
+                                            event.preventDefault();
+                                        }
+                                    }}
                             />
                             <span class="text-gray-700 font-medium text-sm">Please verify you are human</span>
                         </label>
@@ -1837,7 +1865,7 @@
                 
                                     handlesubmit({ event });
                                 }}
-                                on:keydown={(event) => {
+                              	on:keydown={(event) => {
                                     if (event.key === 'Enter') {
                                         event.preventDefault();
                                     }
@@ -1861,7 +1889,7 @@
                             <p class="text-red-500 text-sm mt-2">{errorMessage}</p>
                         {/if}
                     </div>
-                </div>
+                </span>
                 {#if showCaptchaPopup}
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -1872,63 +1900,79 @@
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <!-- svelte-ignore a11y-no-static-element-interactions -->
                     <div
-                        class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm"
+                        class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100"
                         on:click|stopPropagation
                     >
-                        <h2 class="text-lg font-semibold mb-4 text-gray-800">
+                        <h2 class="text-xl font-bold mb-6 text-gray-800 text-center">
                             Verify You're Human
                         </h2>
-
-                        <p class="mb-2 text-gray-700 flex items-center">
-                            {mathQuestion}
-                            <button
-                                class="ml-4 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
-                                on:click={refreshMathQuestion}
+            
+                        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <p class="flex items-center justify-between text-gray-700 font-medium">
+                                <span class="text-lg">{mathQuestion}</span>
+                                <button
+                                class="ml-4 text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-all duration-300 {submittingForm ? 'opacity-50 cursor-not-allowed' : ''}"
+                                on:click={submittingForm ? null : refreshMathQuestion}
+                                disabled={submittingForm}
                             >
                                 <Icon
                                     icon="ic:round-refresh"
-                                    class={`w-6 h-6 text-primary-600 cursor-pointer hover:scale-110 transition transform ${rotationClass}`}
+                                    class={`w-5 h-5 text-primary-600 ${submittingForm ? '' : 'cursor-pointer hover:scale-110'} transition transform ${rotationClass}`}
                                 />
                             </button>
-                        </p>
-                        <input
-                            type="text"
-                            bind:value={userAnswer}
-                            placeholder="Your Answer"
-                            class="border border-gray-300 rounded w-full p-2 mb-4"
-                            on:input={onInputChange}
-                            readonly={inputReadOnly}
-                        />
-
-                        {#if errorMessagecap}
-                            <p class="text-red-500 text-sm mb-4">{errorMessagecap}</p>
-                        {/if}
-                        {#if successMessage}
-                            <p class="text-green-500 text-sm mb-4">{successMessage}</p>
-                        {/if}
+                            </p>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <input
+                                type="text"
+                                bind:value={userAnswer}
+                                placeholder="Your Answer"
+                                class="border border-gray-300 rounded-lg w-full p-3 text-gray-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all"
+                                on:input={onInputChange}
+                                readonly={inputReadOnly}
+                            />
+            
+                            {#if errorMessagecap}
+                                <p class="text-red-500 text-sm mt-2 flex items-center">
+                                    <Icon icon="mdi:alert-circle" class="w-4 h-4 mr-1" />
+                                    {errorMessagecap}
+                                </p>
+                            {/if}
+                            
+                            {#if successMessage}
+                                <p class="text-green-500 text-sm mt-2 flex items-center">
+                                    <Icon icon="mdi:check-circle" class="w-4 h-4 mr-1" />
+                                    {successMessage}
+                                </p>
+                            {/if}
+                        </div>
+                        
                         {#if submittingForm}
-                            <div class="w-full mt-4">
-                                <p class="text-sm mb-4 inline-flex items-center">Submitting form</p>
-                                <div class="relative pt-1">
-                                    <div class="flex mb-2">
-                                        <div class="w-full bg-gray-200 rounded-full">
-                                            <!-- Bind the width of the progress bar to the progress variable -->
-                                            <div
-                                                class="bg-teal-500 text-xs font-medium text-teal-100 text-center p-0.5 leading-none rounded-full"
-                                                style="width: {progress}%;"
-                                            ></div>
-                                        </div>
+                            <div class="w-full mb-4">
+                                <p class="text-sm mb-2 flex items-center text-gray-600">
+                                    <Icon icon="mdi:loading" class="w-4 h-4 mr-2 animate-spin" />
+                                    Submitting form
+                                </p>
+                                <div class="relative">
+                                    <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <!-- Bind the width of the progress bar to the progress variable -->
+                                        <div
+                                            class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
+                                            style="width: {progress}%;"
+                                        ></div>
                                     </div>
                                 </div>
                             </div>
                         {/if}
+                        
                         <button
-                            class="w-full bg-gradient-to-r from-primary-500 to-primary-500 text-white py-2 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition mt-4"
+                            class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base"
                             on:click={() => {
                                 onInputChange();
                                 if (!errorMessagecap && userAnswer) {
                                     submittingForm = true;
-
+            
                                     setTimeout(() => {
                                         submittingForm = false;
                                         successMessage = 'Verification successful!';
@@ -1938,7 +1982,7 @@
                                 }
                             }}
                         >
-                            Verify
+                            Verify Now
                         </button>
                     </div>
                 </div>
