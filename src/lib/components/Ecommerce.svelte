@@ -1828,7 +1828,7 @@ $: disabled = location.length === 0;
 							name="details"
 							id="details"
 							bind:value={details}
-							class="w-full sm:text-sm text-xs p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 mb-4 h-32"
+							class="w-full sm:text-sm text-xs p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 h-32"
 							placeholder="Additional Details*"
 						></textarea>
 						{#if showErrors && details.length === 0}
