@@ -148,7 +148,6 @@
     return validProducts.length > 0;
   }
 
-
   function handleFileInputChange(event) {
     const file = event.target.files[0];
 
@@ -587,57 +586,65 @@
     return mappedInvalidLines;
   }
   // Add a scroll event listener to the textarea
-function initScrollListener() {
-  const textarea = document.querySelector('textarea');
-  if (textarea) {
-    textarea.addEventListener('scroll', updateValidationMessagePositions);
-  }
-}
-
-// Function to update positions of validation messages
-function updateValidationMessagePositions() {
-  const textarea = document.querySelector('textarea');
-  if (!textarea) return;
-  
-  const container = textarea.parentElement;
-  const scrollTop = textarea.scrollTop;
-  
-  // Use a more accurate line height calculation
-  // Calculate actual line height based on textarea height and number of lines
-  const lines = textarea.value.split('\n');
-  const lineHeight = textarea.clientHeight / (lines.length || 1);
-  
-  // Get all validation message elements
-  const validationElements = container.querySelectorAll('[class*="absolute right-7"]');
-  
-  validationElements.forEach(element => {
-    const productNumber = element.dataset.productNumber;
-    if (!productNumber) return;
-    
-    // Find the line index for this product
-    const lineIndex = lines.findIndex(line => line.includes(productNumber));
-    
-    if (lineIndex !== -1) {
-      // Calculate position based on actual textarea properties
-      const linePosition = lineIndex * lineHeight;
-      const adjustedPosition = linePosition - scrollTop + 12; // Add small offset for alignment
-      
-      // Only show if the message is within the visible area
-      if (adjustedPosition >= 0 && adjustedPosition <= textarea.clientHeight - 20) {
-        element.style.display = 'flex';
-        element.style.top = `${adjustedPosition}px`; // Use pixels for more precise positioning
-      } else {
-        element.style.display = 'none';
-      }
+  function initScrollListener() {
+    const textarea = document.querySelector("textarea");
+    if (textarea) {
+      textarea.addEventListener("scroll", updateValidationMessagePositions);
     }
-  });
-}
-  
+  }
+
+  // Function to update positions of validation messages
+  function updateValidationMessagePositions() {
+    const textarea = document.querySelector("textarea");
+    if (!textarea) return;
+
+    const container = textarea.parentElement;
+    const scrollTop = textarea.scrollTop;
+
+    // Use a more accurate line height calculation
+    // Calculate actual line height based on textarea height and number of lines
+    const lines = textarea.value.split("\n");
+    const lineHeight = textarea.clientHeight / (lines.length || 1);
+
+    // Get all validation message elements
+    const validationElements = container.querySelectorAll(
+      '[class*="absolute right-7"]',
+    );
+
+    validationElements.forEach((element) => {
+      const productNumber = element.dataset.productNumber;
+      if (!productNumber) return;
+
+      // Find the line index for this product
+      const lineIndex = lines.findIndex((line) => line.includes(productNumber));
+
+      if (lineIndex !== -1) {
+        // Calculate position based on actual textarea properties
+        const linePosition = lineIndex * lineHeight;
+        const adjustedPosition = linePosition - scrollTop + 12; // Add small offset for alignment
+
+        // Only show if the message is within the visible area
+        if (
+          adjustedPosition >= 0 &&
+          adjustedPosition <= textarea.clientHeight - 20
+        ) {
+          element.style.display = "flex";
+          element.style.top = `${adjustedPosition}px`; // Use pixels for more precise positioning
+        } else {
+          element.style.display = "none";
+        }
+      }
+    });
+  }
 </script>
 
-<div class="text-black text-sm md:ml-2 mb-1">
+<!-- <div class="text-black text-sm md:ml-2 mb-1">
   *Type or paste product number-size,quantity (e.g., PV4384-each of 1,1),
   separated by commas*. Enter separate products on new lines.
+</div> -->
+<div class="text-black text-sm md:ml-2 mb-1">
+  *Upload a file containing product data (e.g., PV4384-each of 1,1). Each
+  product should be on a new line.*
 </div>
 <form
   method="POST"
@@ -720,35 +727,28 @@ function updateValidationMessagePositions() {
   }}
 >
   {#if isLoading}
-    <div
-      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-500/40 backdrop-blur-sm"
-      transition:fade={{ duration: 300 }}
-    >
-      <div class="flex flex-col items-center justify-center p-4">
-        <div class="relative w-32 h-32">
-          <div
-            class="absolute inset-0 w-full h-full border-8 border-dashed border-primary-200 border-t-primary-600 rounded-full animate-spin-slow"
-          ></div>
-          <div
-            class="loader loader-large absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"
-          ></div>
-        </div>
-        <div
-          class="mt-4 text-white font-medium flex items-center animate-pulse"
-        >
-          <span class="animate-wave-1">L</span>
-          <span class="animate-wave-2">o</span>
-          <span class="animate-wave-3">a</span>
-          <span class="animate-wave-4">d</span>
-          <span class="animate-wave-5">i</span>
-          <span class="animate-wave-6">n</span>
-          <span class="animate-wave-7">g</span>
-          <span class="animate-wave-8">.</span>
-          <span class="animate-wave-9">.</span>
-          <span class="animate-wave-10">.</span>
-        </div>
-      </div>
+  <div class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-500/40 backdrop-blur-sm"
+  transition:fade={{ duration: 300 }}>
+  <div class="flex flex-col items-center justify-center p-4">
+    <div class="relative w-32 h-32">
+      <Icon icon="eos-icons:bubble-loading" class="absolute inset-0 w-full h-full text-6xl text-primary-50 animate-spin-slow"/>
+      <!-- <div class="absolute inset-0 w-full h-full border-8 border-dashed border-primary-200 border-t-primary-600 rounded-full animate-spin-slow"></div> -->
+      <div class="loader loader-large absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"></div>
     </div>
+    <div class="mt-4 text-white font-medium flex items-center animate-pulse">
+      <span class="animate-wave-1">L</span>
+      <span class="animate-wave-2">o</span>
+      <span class="animate-wave-3">a</span>
+      <span class="animate-wave-4">d</span>
+      <span class="animate-wave-5">i</span>
+      <span class="animate-wave-6">n</span>
+      <span class="animate-wave-7">g</span>
+      <span class="animate-wave-8">.</span>
+      <span class="animate-wave-9">.</span>
+      <span class="animate-wave-10">.</span>
+    </div>
+  </div>
+</div>
   {/if}
 
   <section class="w-full mx-auto md:flex items-center gap-5">
@@ -759,8 +759,9 @@ function updateValidationMessagePositions() {
         class="w-full h-full p-2 border placeholder:text-sm placeholder:text-gray-400 border-gray-300 rounded-md focus:ring-0 focus:border-primary-500"
         bind:value={rawFileData}
         on:input={handleTextChange}
-        placeholder="Type or paste product data here...
-Example:
+        readonly
+        placeholder="Upload a file containing product data...
+Example file content:
 7987565-50G,1
 657890-100G,5
 345678-25G,3"
@@ -921,8 +922,9 @@ Example:
           <ul class="space-y-2">
             <li class="flex items-center">
               <Icon icon="mdi:close-circle" class="text-red-500 text-lg mr-2" />
-              <span class="text-yellow-600">Products shown with this icon cannot be added to cart. </span>
-            
+              <span class="text-yellow-600"
+                >Marked products cannot be added to the cart.
+              </span>
             </li>
           </ul>
           <p class="mt-3 text-sm text-yellow-600">
@@ -1036,154 +1038,128 @@ Example:
 {/if}
 
 <style>
-  @keyframes shimmer {
-    0% {
-      background-position: -200% 0;
-    }
-    100% {
-      background-position: 200% 0;
-    }
-  }
+	@keyframes shimmer {
+		0% {
+			background-position: -200% 0;
+		}
+		100% {
+			background-position: 200% 0;
+		}
+	}
 
-  @keyframes progress-pulse {
-    0%,
-    100% {
-      opacity: 0;
-    }
-    50% {
-      opacity: 0.5;
-    }
-  }
+	@keyframes progress-pulse {
+		0%, 100% {
+			opacity: 0;
+		}
+		50% {
+			opacity: 0.5;
+		}
+	}
 
-  @keyframes wave {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-5px);
-    }
-  }
+	@keyframes wave {
+		0%, 100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-5px);
+		}
+	}
 
-  @keyframes loader-bubbles {
-    0% {
-      box-shadow:
-        0 -10px var(--bubble-color, #ffffff),
-        3px 0 var(--bubble-color, #ffffff),
-        5px 0 var(--primary-color, #fe5939);
-    }
-    30% {
-      box-shadow:
-        3px -20px rgba(239, 223, 255, 0),
-        5px -10px var(--bubble-color, #ffffff),
-        5px 0 var(--primary-color, #fe5939);
-    }
-    60% {
-      box-shadow:
-        3px 0 rgba(239, 223, 255, 0),
-        4px -20px rgba(239, 223, 255, 0),
-        3px -10px var(--bubble-color, #ffffff);
-    }
-    61% {
-      box-shadow:
-        3px 0 var(--primary-color, #fe5939),
-        4px -20px rgba(239, 223, 255, 0),
-        3px -10px var(--bubble-color, #ffffff);
-    }
-    100% {
-      box-shadow:
-        0 -10px var(--primary-color, #fe5939),
-        4px -20px rgba(239, 223, 255, 0),
-        5px -20px rgba(239, 223, 255, 0);
-    }
-  }
+	@keyframes loader-bubbles {
+		0% {
+			box-shadow: 0 -10px var(--bubble-color, #ffffff),
+					3px 0 var(--bubble-color, #ffffff),
+					5px 0 var(--primary-color, #fe5939);
+		}
+		30% {
+			box-shadow: 3px -20px rgba(239,223,255,0),
+					5px -10px var(--bubble-color, #ffffff),
+					5px 0 var(--primary-color, #fe5939);
+		}
+		60% {
+			box-shadow: 3px 0 rgba(239,223,255,0),
+					4px -20px rgba(239,223,255,0),
+					3px -10px var(--bubble-color, #ffffff);
+		}
+		61% {
+			box-shadow: 3px 0 var(--primary-color, #fe5939),
+					4px -20px rgba(239,223,255,0),
+					3px -10px var(--bubble-color, #ffffff);
+		}
+		100% {
+			box-shadow: 0 -10px var(--primary-color, #fe5939),
+					4px -20px rgba(239,223,255,0),
+					5px -20px rgba(239,223,255,0);
+		}
+	}
 
-  .loader {
-    display: inline-block;
-    vertical-align: middle;
-    position: relative;
-    width: 10px;
-    height: 20px;
-    background: var(--primary-color, #fe5939);
-  }
+	.loader {
+		display: inline-block;
+		vertical-align: middle;
+		position: relative;
+		width: 10px;
+		height: 20px;
+		background: var(--primary-color, #fe5939);
+	}
 
-  .loader-large {
-    width: 15px;
-    height: 30px;
-  }
+	.loader-large {
+		width: 15px;     
+		height: 30px;    
+	}
 
-  .loader:before,
-  .loader:after {
-    content: "";
-    position: absolute;
-  }
+	.loader:before,
+	.loader:after {
+		content: '';
+		position: absolute;
+	}
 
-  .loader:before {
-    top: -8px;
-    left: -13px;
-    width: 0;
-    height: 0;
-    border: 18px solid transparent;
-    border-bottom: 20px solid var(--primary-color, #fe5939);
-    border-radius: 3px;
-  }
+	.loader:before {
+		top: -8px;
+		left: -13px;
+		width: 0;
+		height: 0;
+		border: 18px solid transparent;
+		border-bottom: 20px solid var(--primary-color, #fe5939);
+		border-radius: 3px;
+	}
 
-  .loader-large:before {
-    top: -12px;
-    left: -20px;
-    border: 27px solid transparent;
-    border-bottom: 30px solid var(--primary-color, #fe5939);
-    border-radius: 4px;
-  }
+	.loader-large:before {
+		top: -12px;
+		left: -20px;
+		border: 27px solid transparent;
+		border-bottom: 30px solid var(--primary-color, #fe5939);
+		border-radius: 4px;
+	}
 
-  .loader:after {
-    top: -1;
-    left: -1;
-    width: px;
-    height: 4px;
-    background: var(--bubble-color, #fe5939);
-    border-radius: 50%;
-    animation: loader-bubbles 1s linear infinite forwards;
-  }
+	.loader:after {
+		top: -1;
+		left: -1;
+		width: px;
+		height: 4px;
+		background: var(--bubble-color, #fe5939);
+		border-radius: 50%;
+		animation: loader-bubbles 1s linear infinite forwards;
+	}
 
-  .loader-large:after {
-    width: 6px;
-    height: 6px;
-  }
+	.loader-large:after {
+		width: 6px;
+		height: 6px;
+	}
 
-  :global(.animate-shimmer) {
-    background-size: 200% 100%;
-    animation: shimmer 2s ease-in-out infinite;
-  }
+	:global(.animate-shimmer) {
+		background-size: 200% 100%;
+		animation: shimmer 2s ease-in-out infinite;
+	}
 
-  :global(.animate-wave-1) {
-    animation: wave 1s ease-in-out infinite;
-  }
-  :global(.animate-wave-2) {
-    animation: wave 1s ease-in-out infinite 0.1s;
-  }
-  :global(.animate-wave-3) {
-    animation: wave 1s ease-in-out infinite 0.2s;
-  }
-  :global(.animate-wave-4) {
-    animation: wave 1s ease-in-out infinite 0.3s;
-  }
-  :global(.animate-wave-5) {
-    animation: wave 1s ease-in-out infinite 0.4s;
-  }
-  :global(.animate-wave-6) {
-    animation: wave 1s ease-in-out infinite 0.5s;
-  }
-  :global(.animate-wave-7) {
-    animation: wave 1s ease-in-out infinite 0.6s;
-  }
-  :global(.animate-wave-8) {
-    animation: wave 1s ease-in-out infinite 0.7s;
-  }
-  :global(.animate-wave-9) {
-    animation: wave 1s ease-in-out infinite 0.8s;
-  }
-  :global(.animate-wave-10) {
-    animation: wave 1s ease-in-out infinite 0.9s;
-  }
+	:global(.animate-wave-1) { animation: wave 1s ease-in-out infinite; }
+	:global(.animate-wave-2) { animation: wave 1s ease-in-out infinite 0.1s; }
+	:global(.animate-wave-3) { animation: wave 1s ease-in-out infinite 0.2s; }
+	:global(.animate-wave-4) { animation: wave 1s ease-in-out infinite 0.3s; }
+	:global(.animate-wave-5) { animation: wave 1s ease-in-out infinite 0.4s; }
+	:global(.animate-wave-6) { animation: wave 1s ease-in-out infinite 0.5s; }
+	:global(.animate-wave-7) { animation: wave 1s ease-in-out infinite 0.6s; }
+	:global(.animate-wave-8) { animation: wave 1s ease-in-out infinite 0.7s; }
+	:global(.animate-wave-9) { animation: wave 1s ease-in-out infinite 0.8s; }
+	:global(.animate-wave-10) { animation: wave 1s ease-in-out infinite 0.9s; }
 </style>
+

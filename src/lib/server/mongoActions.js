@@ -697,7 +697,6 @@ export const signUp = async (body, cookies) => {
 			email: userData.email,
 			isEmailVerified: userData.isEmailVerified,
 			country: 'N/A',
-			needsPasswordSetup: true,
 			sitePreferences: {
 				productEntryType : "Manual Entry",
 				noOfQuickOrderFields: 3,
@@ -2340,217 +2339,111 @@ export const addAllToCart = async (items, userId, userEmail) => {
 
 //Myfavouries actions ends
 
-
-// export const quicksearch = async ({ query }) => {
-// 	console.log(query);
-	
-// 	try {
-// 	  const baseProducts = await Product.find({
-// 		productNumber: { $regex: query, $options: 'i' }
-// 	  })
-// 		.select('_id productName productNumber prodDesc image')
-// 		.limit(20)
-// 		.lean()
-// 		.exec();
-// 	  const enrichedProducts = [];
-// 	  for (const baseProduct of baseProducts) {
-// 		const stockEntries = await Stock.find({ 
-// 		  productNumber: baseProduct.productNumber 
-// 		})
-// 		  .select('_id stock pricing distributor manufacturer')
-// 		  .lean()
-// 		  .exec();
-  
-// 		if (!stockEntries || stockEntries.length === 0) {
-// 		  enrichedProducts.push({
-// 			id: baseProduct._id.toString(),
-// 			image: baseProduct.image || null,
-// 			description: baseProduct.prodDesc || null,
-// 			productName: baseProduct.productName,
-// 			productNumber: baseProduct.productNumber,
-// 			stockId: null,
-// 			manufacturer: null,
-// 			distributer: null,
-// 			stock: 0,
-// 			priceone: "",
-// 			pricing: []
-// 		  });
-// 		  continue;
-// 		}
-// 		for (const entry of stockEntries) {
-
-		  
-// 		  let processedPricing = [];
-// 		  let priceoneValue = "";
-		  
-// 		  if (entry.pricing) {
-// 			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
-// 			const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
-		
-// 			if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
-// 				processedPricing = originalPricing.map(price => {
-// 					const inrValue = price.INR;
-// 					const usdValue = inrValue / currency.rate; 
-// 					return {
-// 						...price,
-// 						USD: usdValue.toFixed(2) 
-// 					};
-// 				});
-		
-// 				priceoneValue = originalPricing[0]?.INR || "";
-		
-// 			} else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
-// 				processedPricing = originalPricing.map(price => {
-// 					const usdValue = price.USD;
-// 					const inrValue = usdValue * currency.rate; 
-// 					return {
-// 						...price,
-// 						INR: inrValue.toFixed(2) 
-// 					};
-// 				});
-		
-// 				priceoneValue = originalPricing[0]?.USD || "";
-// 			} else {
-// 				processedPricing = originalPricing;
-// 			}
-// 		}
-		
-  
-// 		  const productEntry = {
-// 			id: baseProduct._id.toString(),
-// 			image: baseProduct.image || null,
-// 			description: baseProduct.prodDesc || null,
-// 			productName: baseProduct.productName,
-// 			productNumber: baseProduct.productNumber,
-// 			stockId: entry._id.toString(),
-// 			manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
-// 			distributer: entry.distributor ? entry.distributor.toString() : null,
-// 			stock: entry.stock || 0,
-// 			priceone: priceoneValue, 
-// 			pricing: processedPricing
-// 		  };
-		  
-// 		  console.log('Final product entry structure:', JSON.stringify({
-// 			id: productEntry.id,
-// 			productName: productEntry.productName,
-// 			priceone: productEntry.priceone,
-// 			pricing: productEntry.pricing
-// 		  }, null, 2));
-		  
-// 		  enrichedProducts.push(productEntry);
-// 		}
-// 	  }
-  
-// 	  return enrichedProducts;
-// 	} catch (error) {
-// 	  throw new Error('An error occurred while processing the quicksearch.');
-// 	}
-//   };
-
-
 export const quicksearch = async ({ query }) => {
-  console.log("Original Query:", query);
-  let cleanedQuery = query.trim().replace(/\s*-\s*[\w\s]+$/, '');
-  console.log("Processed Query:", cleanedQuery);
+	// console.log("Original Query:", query);
+	let cleanedQuery = query.trim().replace(/\s*-\s*[\w\s]+$/, '');
+	// console.log("Processed Query:", cleanedQuery);
+  
+	try {
+	  const baseProducts = await Product.find({
+		productNumber: { $regex: cleanedQuery, $options: 'i' }
+	  })
+		.select('_id productName productNumber prodDesc image')
+		.limit(20)
+		.lean()
+		.exec();
+  
+	  const enrichedProducts = [];
+  
+	  for (const baseProduct of baseProducts) {
+		const stockEntries = await Stock.find({ 
+		  productNumber: baseProduct.productNumber 
+		})
+		  .select('_id stock pricing distributor manufacturer')
+		  .lean()
+		  .exec();
+  
+		if (!stockEntries || stockEntries.length === 0) {
+		  enrichedProducts.push({
+			id: baseProduct._id.toString(),
+			image: baseProduct.image || null,
+			description: baseProduct.prodDesc || null,
+			productName: baseProduct.productName,
+			productNumber: baseProduct.productNumber,
+			stockId: null,
+			manufacturer: null,
+			distributer: null,
+			stock: 0,
+			priceone: "",
+			pricing: []
+		  });
+		  continue;
+		}
+  
+		for (const entry of stockEntries) {
+		  let processedPricing = [];
+		  let priceoneValue = "";
+  
+		  if (entry.pricing) {
+			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
+			const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+  
+			if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
+			  processedPricing = originalPricing.map(price => {
+				const inrValue = price.INR;
+				const usdValue = inrValue / currency.rate;
+				return {
+				  ...price,
+				  USD: usdValue.toFixed(2)
+				};
+			  });
+  
+			  priceoneValue = originalPricing[0]?.INR || "";
+  
+			} else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
+			  processedPricing = originalPricing.map(price => {
+				const usdValue = price.USD;
+				const inrValue = usdValue * currency.rate;
+				return {
+				  ...price,
+				  INR: inrValue.toFixed(2)
+				};
+			  });
+  
+			  priceoneValue = originalPricing[0]?.USD || "";
+			} else {
+			  processedPricing = originalPricing;
+			}
+		  }
+  
+		  const productEntry = {
+			id: baseProduct._id.toString(),
+			image: baseProduct.image || null,
+			description: baseProduct.prodDesc || null,
+			productName: baseProduct.productName,
+			productNumber: baseProduct.productNumber,
+			stockId: entry._id.toString(),
+			manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
+			distributer: entry.distributor ? entry.distributor.toString() : null,
+			stock: entry.stock || 0,
+			priceone: priceoneValue,
+			pricing: processedPricing
+		  };
+  
+		  console.log("Final Product Entry:", JSON.stringify(productEntry, null, 2));
+  
+		  enrichedProducts.push(productEntry);
+		}
+	  }
+  
+	  return enrichedProducts;
+	} catch (error) {
+	  console.error("Error in quicksearch:", error);
+	  throw new Error("An error occurred while processing the quicksearch.");
+	}
+  };
+  
 
-  try {
-    const baseProducts = await Product.find({
-      productNumber: { $regex: cleanedQuery, $options: 'i' }
-    })
-      .select('_id productName productNumber prodDesc image')
-      .limit(20)
-      .lean()
-      .exec();
-
-    const enrichedProducts = [];
-
-    for (const baseProduct of baseProducts) {
-      const stockEntries = await Stock.find({ 
-        productNumber: baseProduct.productNumber 
-      })
-        .select('_id stock pricing distributor manufacturer')
-        .lean()
-        .exec();
-
-      if (!stockEntries || stockEntries.length === 0) {
-        enrichedProducts.push({
-          id: baseProduct._id.toString(),
-          image: baseProduct.image || null,
-          description: baseProduct.prodDesc || null,
-          productName: baseProduct.productName,
-          productNumber: baseProduct.productNumber,
-          stockId: null,
-          manufacturer: null,
-          distributer: null,
-          stock: 0,
-          priceone: "",
-          pricing: []
-        });
-        continue;
-      }
-
-      for (const entry of stockEntries) {
-        let processedPricing = [];
-        let priceoneValue = "";
-
-        if (entry.pricing) {
-          const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
-          const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
-
-          if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
-            processedPricing = originalPricing.map(price => {
-              const inrValue = price.INR;
-              const usdValue = inrValue / currency.rate;
-              return {
-                ...price,
-                USD: usdValue.toFixed(2)
-              };
-            });
-
-            priceoneValue = originalPricing[0]?.INR || "";
-
-          } else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
-            processedPricing = originalPricing.map(price => {
-              const usdValue = price.USD;
-              const inrValue = usdValue * currency.rate;
-              return {
-                ...price,
-                INR: inrValue.toFixed(2)
-              };
-            });
-
-            priceoneValue = originalPricing[0]?.USD || "";
-          } else {
-            processedPricing = originalPricing;
-          }
-        }
-
-        const productEntry = {
-          id: baseProduct._id.toString(),
-          image: baseProduct.image || null,
-          description: baseProduct.prodDesc || null,
-          productName: baseProduct.productName,
-          productNumber: baseProduct.productNumber,
-          stockId: entry._id.toString(),
-          manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
-          distributer: entry.distributor ? entry.distributor.toString() : null,
-          stock: entry.stock || 0,
-          priceone: priceoneValue,
-          pricing: processedPricing
-        };
-
-        console.log("Final Product Entry:", JSON.stringify(productEntry, null, 2));
-
-        enrichedProducts.push(productEntry);
-      }
-    }
-
-    return enrichedProducts;
-  } catch (error) {
-    console.error("Error in quicksearch:", error);
-    throw new Error("An error occurred while processing the quicksearch.");
-  }
-};
 
 
 // export const uploadFile = async ({ query }) => {
