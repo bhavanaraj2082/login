@@ -125,7 +125,7 @@
 			} else {
 				const countryDetails = getCountryByCode(country);
 				if (!countryDetails) {
-					errors.phone = "Invalid country selected";
+					errors.phone = "Invalid Number for the selected country";
 					errors.country = "Invalid country selected";
 				} else {
 					const phonePattern = getPhonePattern(country);
@@ -170,29 +170,42 @@
 			}
 		}
 
-		if (fieldName === "company") {
-    	  if (company && company.trim() !== "") {
-    	    if (
-    	      !/^[A-Za-z0-9&@!#$%^&*\(\)_+\-=\[\]\{\};:,.?\/\\|<>~`"'\s]+$/.test(company)
-    	    ) {
-    	      errors.company = "Company name can only contain letters, numbers, and certain special characters.";
-    	    } else if (company.length < 3) {
-    	      errors.company = "Company name must be at least 3 characters long.";
-    	    } else if (company.length > 100) {
-    	      errors.company = "Company name should not exceed 100 characters.";
-    	    } else {
-    	      delete errors.company;
-    	    }
+		// if (fieldName === "company") {
+    	//   if (company && company.trim() !== "") {
+    	//     if (
+    	//       !/^[A-Za-z0-9&@!#$%^&*\(\)_+\-=\[\]\{\};:,.?\/\\|<>~`"'\s]+$/.test(company)
+    	//     ) {
+    	//       errors.company = "Company name can only contain letters, numbers, and certain special characters.";
+    	//     } else if (company.length < 3) {
+    	//       errors.company = "Company name must be at least 3 characters long.";
+    	//     } else if (company.length > 100) {
+    	//       errors.company = "Company name should not exceed 100 characters.";
+    	//     } else {
+    	//       delete errors.company;
+    	//     }
 
-    	    if (errors.company) {
-    	      setTimeout(() => {
-    	        delete errors.company;
-    	      }, 2000);
-    	    }
-    	  } else {
-    	    delete errors.company; 
-    	  }
-    	}
+    	//     if (errors.company) {
+    	//       setTimeout(() => {
+    	//         delete errors.company;
+    	//       }, 2000);
+    	//     }
+    	//   } else {
+    	//     delete errors.company; 
+    	//   }
+    	// }
+
+		if (!fieldName || fieldName === "company") {
+			if (
+				!company ||
+				company.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) ||
+				/<[^>]*>/.test(company)
+			) {
+				errors.company = "company is required";
+			} else {
+				delete errors.company;
+			}
+		}
 
 		if (!fieldName || fieldName === "captcha") {
 			if (!isChecked) {
@@ -236,6 +249,12 @@
 			showDropdown = false;
 		}
 	}
+	function handleKeyDown(event) {
+    if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
+        selectCountry(filteredCountries[0]);
+        event.preventDefault();
+    }
+}
 	const countries = [
 		{ name: "Afghanistan", code: "+93" },
 		{ name: "Albania", code: "+355" },
@@ -769,7 +788,7 @@
 		// console.log('Validating phone number for country:', country);
 
 		if (!country) {
-			errors.phone = "Invalid country selected";
+			errors.phone = "Select your country before entering number";
 			errors.country = "Invalid country selected";
 			return false;
 		}
@@ -1544,6 +1563,7 @@
 												placeholder="Search country"
 												on:input={handleInputChange}
 												on:click={toggleDropdown}
+												on:keydown={handleKeyDown}
 												class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											/>
 
@@ -1632,8 +1652,8 @@
 									  bind:value={company}
 									  title="Please enter a valid company name"
 									  on:input={() => {
-										const trimmedName = company.trim();
-										company = trimmedName;
+										// const trimmedName = company.trim();
+										// company = trimmedName;
 										validateField("company");
 										
 									  }}
@@ -1801,7 +1821,7 @@
 																)
 															) {
 																toast.error(
-																	"Please verify either your email to proceed",
+																	"Please verify your email to proceed",
 																);
 																return;
 															}
@@ -1850,88 +1870,102 @@
 									</div>
 
 									{#if showCaptchaPopup}
+									<!-- svelte-ignore a11y-click-events-have-key-events -->
+									<!-- svelte-ignore a11y-no-static-element-interactions -->
+									<div
+										class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
+										on:click={closeCaptchaPopup}
+									>
 										<!-- svelte-ignore a11y-click-events-have-key-events -->
 										<!-- svelte-ignore a11y-no-static-element-interactions -->
-										<div class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
-											on:click={closeCaptchaPopup}>
-											<!-- svelte-ignore a11y-click-events-have-key-events -->
-											<!-- svelte-ignore a11y-no-static-element-interactions -->
-											<div
-												class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm"
-												on:click|stopPropagation>
-												<h2 class="text-lg font-semibold mb-4 text-gray-800">
-													Verify You're Human
-												</h2>
-												<p class="mb-2 text-gray-700 flex items-center">
-													{mathQuestion}
+										<div
+											class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100"
+											on:click|stopPropagation
+										>
+											<h2 class="text-xl font-bold mb-6 text-gray-800 text-center">
+												Verify You're Human
+											</h2>
+								
+											<div class="bg-gray-50 p-4 rounded-lg mb-6">
+												<p class="flex items-center justify-between text-gray-700 font-medium">
+													<span class="text-lg">{mathQuestion}</span>
 													<button
-														class="ml-4 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
-														on:click={refreshMathQuestion}>
-														<Icon
-															icon="ic:round-refresh"
-															class={`w-6 h-6 text-primary-600 cursor-pointer hover:scale-110 transition transform ${rotationClass}`}/>
-													</button>
+													class="ml-4 text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-all duration-300 {submittingForm ? 'opacity-50 cursor-not-allowed' : ''}"
+													on:click={submittingForm ? null : refreshMathQuestion}
+													disabled={submittingForm}
+												>
+													<Icon
+														icon="ic:round-refresh"
+														class={`w-5 h-5 text-primary-600 ${submittingForm ? '' : 'cursor-pointer hover:scale-110'} transition transform ${rotationClass}`}
+													/>
+												</button>
 												</p>
+											</div>
+											
+											<div class="mb-6">
 												<input
 													type="text"
 													bind:value={userAnswer}
 													placeholder="Your Answer"
-													class="border border-gray-300 rounded-md w-full p-2 mb-4"
+													class="border border-gray-300 rounded-lg w-full p-3 text-gray-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all"
 													on:input={onInputChange}
-													readonly={inputReadOnly}/>
+													readonly={inputReadOnly}
+												/>
+								
 												{#if errorMessagecap}
-													<p class="text-red-500 text-sm mb-4">
+													<p class="text-red-500 text-sm mt-2 flex items-center">
+														<Icon icon="mdi:alert-circle" class="w-4 h-4 mr-1" />
 														{errorMessagecap}
 													</p>
 												{/if}
+												
 												{#if successMessage}
-													<p class="text-green-500 text-sm mb-4">
+													<p class="text-green-500 text-sm mt-2 flex items-center">
+														<Icon icon="mdi:check-circle" class="w-4 h-4 mr-1" />
 														{successMessage}
 													</p>
 												{/if}
-												{#if submittingForm}
-													<div class="w-full mt-4">
-														<p class="text-sm mb-4 inline-flex items-center">
-															Submitting form
-														</p>
-														<div class="relative pt-1">
-															<div class="flex mb-2">
-																<div class="w-full bg-gray-200 rounded-full">
-																	<!-- Bind the width of the progress bar to the progress variable -->
-																	<div
-																		class="bg-teal-500 text-xs font-medium text-teal-100 text-center p-0.5 leading-none rounded-full"
-																		style="width: {progress}%;"
-																	></div>
-																</div>
-															</div>
+											</div>
+											
+											{#if submittingForm}
+												<div class="w-full mb-4">
+													<p class="text-sm mb-2 flex items-center text-gray-600">
+														<Icon icon="mdi:loading" class="w-4 h-4 mr-2 animate-spin" />
+														Submitting form
+													</p>
+													<div class="relative">
+														<div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+															<!-- Bind the width of the progress bar to the progress variable -->
+															<div
+																class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
+																style="width: {progress}%;"
+															></div>
 														</div>
 													</div>
-												{/if}
-												<button
-													class="w-full bg-gradient-to-r from-primary-500 to-primary-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-primary-600 transform transition mt-4"
-													on:click={() => {
-														onInputChange();
-														if (
-															!errorMessagecap &&
-															userAnswer
-														) {
-															submittingForm = true;
-
-															setTimeout(() => {
-																submittingForm = false;
-																successMessage =
-																	"Verification successful!";
-															}, 2000);
-														} else {
-															errorMessagecap =
-																"*Please answer the question correctly";
-														}
-													}}>
-													Verify
-												</button>
-											</div>
+												</div>
+											{/if}
+											
+											<button
+												class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base"
+												on:click={() => {
+													onInputChange();
+													if (!errorMessagecap && userAnswer) {
+														submittingForm = true;
+								
+														setTimeout(() => {
+															submittingForm = false;
+															successMessage = 'Verification successful!';
+														}, 2000);
+													} else {
+														errorMessagecap = '*Please answer the question correctly';
+													}
+												}}
+											>
+												Verify Now
+											</button>
 										</div>
-									{/if}
+									</div>
+								{/if}
 								</div>
 							</div>
 						</div>

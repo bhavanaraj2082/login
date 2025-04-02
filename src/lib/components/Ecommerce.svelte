@@ -535,15 +535,26 @@
 		role = "";
 		selectedNames = [];
 	}
+	function handleKeyDown(event) {
+    if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
+        selectlocation(filteredCountries[0]);
+        event.preventDefault();
+    }
+}
 	function handleSubmit(event) {
+		const isFnameValid = fname.length > 0 && /^[A-Za-z\s]+$/.test(fname);
+  const isLnameValid = lname.length > 0 && /^[A-Za-z\s]+$/.test(lname);
 		if (
 			number.length === 0 ||
 			email.length === 0 ||
-			fname.length === 0 ||
-			company.length === 0 ||
+			!isFnameValid ||
+			company.length === 0 || 
+			company.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) ||
+				/<[^>]*>/.test(company) ||
 			details.length === 0 ||
 			role.length === 0 ||
-			lname.length === 0 ||
+			!isLnameValid ||			
 			reason.length === 0 ||
 			!isChecked
 		) {
@@ -660,8 +671,8 @@
 	}
 function carrnchange() {
 	carrn=true;
-	
 }
+$: disabled = location.length === 0;
 	function onInputChange() {
 		if (userAnswer.trim()) {
 			validateMathCaptcha();
@@ -803,7 +814,16 @@ function carrnchange() {
 			showDropdown = false;
 		}
 	}
+	 function handleFocus() {
+		showErrors = false; // Hide error on focus (if you want to show it only after the user types)
+  }
 </script>
+<style>
+	/* Custom cursor when the input is disabled */
+	input:disabled {
+	  cursor: not-allowed;  /* Shows the 'not-allowed' cursor */
+	}
+  </style>
 
 {#if showSuccesDiv}
 	<div
@@ -1169,12 +1189,14 @@ function carrnchange() {
 			>
 				Contact Our Team
 			</h2>
+			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			<form
 				method="POST"
 				action="?/contactus"
 				bind:this={form}
 				class="w-full md:mt-3 mt-0 max-w-3xl sm:ml-3 ml-0"
 				use:enhance={(event) => {
+					
 					const isEmailVerified = ProfileEmailVerified; // Assuming this is the first email verification check
 					const isAuthedUserEmailVerified = authedUserEmailVerified; // The second email verification check
 					console.log(
@@ -1189,6 +1211,7 @@ function carrnchange() {
 						// Return a function that does nothing to prevent form submission
 						return () => {};
 					}
+					
 					submitting = true;
 					return async ({ result }) => {
 						let message1 = "";
@@ -1216,9 +1239,14 @@ function carrnchange() {
 						}, 100);
 					};
 				}}
+				  on:keydown={(event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                    }
+                }}
 			>
 				<!-- <div class="message-container mt-3">
-        {#if errorMessage === "success"}
+        {#if errorMessage === "success"}locatio
             <div class="text-center bg-green-100 text-green-700 py-2 mb-4 rounded-md">
                 {successMessage}
             </div>
@@ -1370,7 +1398,26 @@ function carrnchange() {
 							{/if}
 						</div>
 					</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 					<div class="flex flex-col md:flex-row md:space-x-4">
+					
+				
+
+
+
 						<div class="flex-1 mb-4 relative w-full">
 							<div class="relative">
 								<input
@@ -1381,6 +1428,7 @@ function carrnchange() {
 									placeholder="Location*"
 									on:input={handleInputChange}
 									on:click={toggleDropdown}
+									on:keydown={handleKeyDown}
 									class="w-full sm:text-sm text-xs px-2 py-2 placeholder-gray-400 rounded-md border-1 border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
 									required
 								/>
@@ -1393,7 +1441,6 @@ function carrnchange() {
 									on:click={toggleDropdown}
 								/>
 							</div>
-
 							<!-- Dropdown Suggestions -->
 							{#if showDropdown}
 								<div
@@ -1432,29 +1479,28 @@ function carrnchange() {
 								>
 							{/if}
 						</div>
+
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
 								type="tel"
 								name="number"
 								id="number"
 								bind:value={number}
-								on:input={carrnchange}
+								on:hover={handleFocus}
 								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Phone Number*"
+								{disabled}
 							/>
-							<!-- Show error if country (location) is not selected -->
-							{#if location.length === 0 && carrn}
+							<!-- {#if location.length === 0 && !showErrors}
 								<span class="text-red-500 sm:text-xs text-2s font-medium">
-									Please select the country before entering the phone number
+									Select your country before entering your number
 								</span>
-							{/if}
-							<!-- Show error if the phone number is empty -->
+							{/if} -->
 							{#if showErrors && number.length === 0}
 								<span class="text-red-500 sm:text-xs text-2s font-medium">
 									Number is required
 								</span>
 							{/if}
-							<!-- Show error if the phone number is invalid based on the location -->
 							{#if number?.length > 0 && !validatePhoneNumber(location, number)}
 								<span class="text-red-500 sm:text-xs text-2s font-medium">
 									Please enter a valid phone number for {location}
@@ -1463,6 +1509,30 @@ function carrnchange() {
 						</div>
 						
 					</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
@@ -1473,12 +1543,11 @@ function carrnchange() {
 								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Company Name*"
 							/>
-							{#if showErrors && company.length === 0}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-									>Company Name is required</span
-								>
-							{/if}
+							{#if showErrors && (!company || company.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) || /<[^>]*>/.test(company))}
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+							  Company Name is required.
+							</span>
+						  {/if}
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
@@ -1770,7 +1839,10 @@ function carrnchange() {
 							>
 						{/if}
 					</div>
-
+					<span class="flex-1 w-1/3 mb-4">
+						<label for="recaptcha" class="block text-sm font-medium text-gray-700">
+						</label>
+						<input type="hidden" name="token" value={captchaToken} />
 					<div id="g-recaptcha-response">
 						<label
 							class="flex mt-5 md:mt-6 items-center justify-end space-x-2 mb-4 cursor-pointer"
@@ -1782,6 +1854,7 @@ function carrnchange() {
 								class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded cursor-pointer hover:border-primary-500 transition-colors duration-300"
 								bind:checked={isCheckedcap}
 								on:click={(event) => {
+									
 									event.preventDefault();
 									handleSubmit(event);
 
@@ -1813,6 +1886,11 @@ function carrnchange() {
 									isCheckedcap = true;
 									showPopup();
 								}}
+								  on:keydown={(event) => {
+									if (event.key === 'Enter') {
+										event.preventDefault();
+									}
+								}}
 							/>
 							<span class="text-gray-600 font-medium text-sm"
 								>Please verify you are human</span
@@ -1842,6 +1920,11 @@ function carrnchange() {
 										return;
 									}
 								}}
+								  on:keydown={(event) => {
+									if (event.key === 'Enter') {
+										event.preventDefault();
+									}
+								}}
 								class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
 							>
 								{#if submitting}
@@ -1852,101 +1935,104 @@ function carrnchange() {
 							</button>
 						</div>
 					</div>
+					</span>
 					{#if showCaptchaPopup}
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
+					<div
+						class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
+						on:click={closeCaptchaPopup}
+					>
 						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<!-- svelte-ignore a11y-no-static-element-interactions -->
 						<div
-							class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
-							on:click={closeCaptchaPopup}
+							class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100"
+							on:click|stopPropagation
 						>
-							<!-- svelte-ignore a11y-click-events-have-key-events -->
-							<!-- svelte-ignore a11y-no-static-element-interactions -->
-							<div
-								class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm"
-								on:click|stopPropagation
-							>
-								<h2
-									class="text-lg font-semibold mb-4 text-gray-800"
-								>
-									Verify You're Human
-								</h2>
-
-								<p class="mb-2 text-gray-700 flex items-center">
-									{mathQuestion}
+							<h2 class="text-xl font-bold mb-6 text-gray-800 text-center">
+								Verify You're Human
+							</h2>
+				
+							<div class="bg-gray-50 p-4 rounded-lg mb-6">
+								<p class="flex items-center justify-between text-gray-700 font-medium">
+									<span class="text-lg">{mathQuestion}</span>
 									<button
-										class="ml-4 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
-										on:click={refreshMathQuestion}
-									>
-										<Icon
-											icon="ic:round-refresh"
-											class={`w-6 h-6 text-primary-600 cursor-pointer hover:scale-110 transition transform ${rotationClass}`}
-										/>
-									</button>
+									class="ml-4 text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-all duration-300 {submittingForm ? 'opacity-50 cursor-not-allowed' : ''}"
+									on:click={submittingForm ? null : refreshMathQuestion}
+									disabled={submittingForm}
+								>
+									<Icon
+										icon="ic:round-refresh"
+										class={`w-5 h-5 text-primary-600 ${submittingForm ? '' : 'cursor-pointer hover:scale-110'} transition transform ${rotationClass}`}
+									/>
+								</button>
 								</p>
+							</div>
+							
+							<div class="mb-6">
 								<input
 									type="text"
 									bind:value={userAnswer}
 									placeholder="Your Answer"
-									class="border border-gray-300 rounded w-full p-2 mb-4"
+									class="border border-gray-300 rounded-lg w-full p-3 text-gray-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all"
 									on:input={onInputChange}
 									readonly={inputReadOnly}
 								/>
-
+				
 								{#if errorMessagecap}
-									<p class="text-red-500 text-sm mb-4">
+									<p class="text-red-500 text-sm mt-2 flex items-center">
+										<Icon icon="mdi:alert-circle" class="w-4 h-4 mr-1" />
 										{errorMessagecap}
 									</p>
 								{/if}
+								
 								{#if successMessage}
-									<p class="text-green-500 text-sm mb-4">
+									<p class="text-green-500 text-sm mt-2 flex items-center">
+										<Icon icon="mdi:check-circle" class="w-4 h-4 mr-1" />
 										{successMessage}
 									</p>
 								{/if}
-								{#if submittingForm}
-									<div class="w-full mt-4">
-										<p
-											class="text-sm mb-4 inline-flex items-center"
-										>
-											Submitting form
-										</p>
-										<div class="relative pt-1">
-											<div class="flex mb-2">
-												<div
-													class="w-full bg-gray-200 rounded-full"
-												>
-													<!-- Bind the width of the progress bar to the progress variable -->
-													<div
-														class="bg-teal-500 text-xs font-medium text-teal-100 text-center p-0.5 leading-none rounded-full"
-														style="width: {progress}%;"
-													></div>
-												</div>
-											</div>
+							</div>
+							
+							{#if submittingForm}
+								<div class="w-full mb-4">
+									<p class="text-sm mb-2 flex items-center text-gray-600">
+										<Icon icon="mdi:loading" class="w-4 h-4 mr-2 animate-spin" />
+										Submitting form
+									</p>
+									<div class="relative">
+										<div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+											<!-- Bind the width of the progress bar to the progress variable -->
+											<div
+												class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
+												style="width: {progress}%;"
+											></div>
 										</div>
 									</div>
-								{/if}
-								<button
-									class="w-full bg-gradient-to-r from-primary-500 to-primary-500 text-white py-2 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition mt-4"
-									on:click={() => {
-										onInputChange();
-										if (!errorMessagecap && userAnswer) {
-											submittingForm = true;
-
-											setTimeout(() => {
-												submittingForm = false;
-												successMessage =
-													"Verification successful!";
-											}, 2000);
-										} else {
-											errorMessagecap =
-												"*Please answer the question correctly";
-										}
-									}}
-								>
-									Verify
-								</button>
-							</div>
+								</div>
+							{/if}
+							
+							<button
+								class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base"
+								on:click={() => {
+									onInputChange();
+									if (!errorMessagecap && userAnswer) {
+										submittingForm = true;
+				
+										setTimeout(() => {
+											submittingForm = false;
+											successMessage = 'Verification successful!';
+										}, 2000);
+									} else {
+										errorMessagecap = '*Please answer the question correctly';
+									}
+								}}
+							>
+								Verify Now
+							</button>
 						</div>
-					{/if}
+					</div>
+				{/if}
 				</div>
 			</form>
 			<Toaster position="bottom-right" richColors />

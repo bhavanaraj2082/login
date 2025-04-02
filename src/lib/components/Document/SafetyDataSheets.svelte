@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { goto } from "$app/navigation";
   import Icon from "@iconify/svelte";
+  import { toast, Toaster } from "svelte-sonner";
   let showNav = false;
   let showErrors = false;
   let showProductDetails = false;
@@ -45,7 +46,7 @@
     document.body.appendChild(link);
     link.click(); 
   } else {
-    alert("Invalid datasheet URL");
+    toast.error("Invalid datasheet URL");
   }
 }
   function toggleProductDetails() {
@@ -1206,3 +1207,4 @@
     </div>
   </div>
 </div>
+<Toaster position="bottom-right" richColors />
