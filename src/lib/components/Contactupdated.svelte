@@ -116,7 +116,7 @@
 		if (!fieldName || fieldName === "phone") {
 			if (!country) {
 				errors.phone =
-					"Please select the country before entering the phone number";
+					"Number is required";
 				return;
 			}
 
