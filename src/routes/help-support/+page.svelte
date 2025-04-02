@@ -9,7 +9,7 @@
 	} from '$env/static/public';
 
     let metadata = {
-		title: `Help and Support | ${PUBLIC_WEBSITE_NAME}` || 'Default Product Title',
+		title: `Help Support | ${PUBLIC_WEBSITE_NAME}` || 'Default Product Title',
 		description:
 			`We are here to help!  Use ${PUBLIC_WEBSITE_NAME} Help & Support to answer your questions around ordering, shipping, delivering and more.` ||
 			'Default description',
