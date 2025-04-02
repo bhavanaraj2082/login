@@ -273,7 +273,7 @@
 </form>
 {#each data.records as product}
   <div
-    class="md:w-11/12 max-w-7xl md:flex lg:flex mx-auto bg-white shadow rounded w-full p-6 space-x-4"
+    class="md:w-11/12 max-w-7xl md:flex lg:flex mx-auto bg-white shadow rounded w-full p-6 mb-6 space-x-4"
   >
     <div
       class="flex space-x-4 justify-between flex-col lg:flex-row md:w-full

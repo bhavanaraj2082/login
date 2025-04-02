@@ -14,10 +14,30 @@
   $: tick().then(() => {
     isFavoriteStore.set(data.isFavorite);
   });
+
+  function generateProgressiveStrings(input) {
+  const parts = input.split('-');
+  const baseString = parts.slice(0, 2).join('-');
+  const remainingPart = input.substring(baseString.length + 1);
+  const result = [baseString];
   
+  let current = '';
+  for (let i = 0; i < remainingPart.length; i++) {
+    current += remainingPart[i];
+    result.push(`${baseString}-${current}`);
+  }
+
+  const filteredResult = result.filter(item => !item.endsWith('-'));
+  return filteredResult.join(', ');
+}
+
   let productData = data?.productData?.records[0];
   let categoryUrl = data?.relatedProducts[0]?.categoryInfo[0]?.urlName;
   let subCategoryUrl = data?.relatedProducts[0]?.subCategoryInfo[0]?.urlName;
+
+  let sliceNum = data?.productData?.records[0]?.productNumber;
+  const slicedNumber = generateProgressiveStrings(sliceNum);
+
   let metadata = {
     title:
       `${productData?.productName} | ${productData?.manufacturer?.name} | ${PUBLIC_WEBSITE_NAME} ` ||
@@ -26,7 +46,7 @@
       `Order ${productData?.manufacturer?.name} manufacturers ${productData?.productName} partnumber online at ${PUBLIC_WEBSITE_NAME}.` ||
       "Default product description",
     keywords:
-      `${productData?.manufacturer?.name}, ${productData?.productName},${productData?.description}` ||
+      `${slicedNumber},${productData?.manufacturer?.name}, ${productData?.productName},${productData?.description}` ||
       "default, product, keywords",
     urlPath:
       `${PUBLIC_WEBSITE_URL}/products/${categoryUrl}/${subCategoryUrl}/${productData?.productNumber}` ||
