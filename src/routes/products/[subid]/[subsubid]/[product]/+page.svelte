@@ -16,27 +16,26 @@
   });
 
   function generateProgressiveStrings(input) {
-  const parts = input.split('-');
-  const baseString = parts.slice(0, 2).join('-');
-  const remainingPart = input.substring(baseString.length + 1);
-  const result = [baseString];
-  
-  let current = '';
-  for (let i = 0; i < remainingPart.length; i++) {
-    current += remainingPart[i];
-    result.push(`${baseString}-${current}`);
+  if (input.length < 5) {
+    return input; 
   }
-
-  const filteredResult = result.filter(item => !item.endsWith('-'));
-  return filteredResult.join(', ');
-}
+  const progressiveSlices = Array.from({ length: input.length - 4 }, (_, index) => {
+    return input.slice(0, index + 5); 
+  });
+  const filteredSlices = progressiveSlices.filter(item => !item.endsWith('-'));
+  return filteredSlices.join(', ');
+}   
 
   let productData = data?.productData?.records[0];
   let categoryUrl = data?.relatedProducts[0]?.categoryInfo[0]?.urlName;
   let subCategoryUrl = data?.relatedProducts[0]?.subCategoryInfo[0]?.urlName;
 
   let sliceNum = data?.productData?.records[0]?.productNumber;
+
+  console.log("slicenum-->",sliceNum);
   const slicedNumber = generateProgressiveStrings(sliceNum);
+  console.log("slicenum-->",slicedNumber);
+  
 
   let metadata = {
     title:

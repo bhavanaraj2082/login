@@ -5,7 +5,7 @@
   export let data;
 
   let metadata = {
-		title: `${PUBLIC_WEBSITE_NAME}: Application` || 'Default Product Title',
+		title: `Application | ${PUBLIC_WEBSITE_NAME}` || 'Default Product Title',
 		description:
 			`Application from ${PUBLIC_WEBSITE_NAME}. ${PUBLIC_WEBSITE_NAME} offers more chemical Applications.` ||
 			'Default product description',
@@ -14,7 +14,7 @@
 		schema: {
 			'@context': 'https://schema.org',
 			'@type': 'Webpage',
-			name: `${PUBLIC_WEBSITE_NAME}: Applications` || 'Default Product Title',
+			name: `Application | ${PUBLIC_WEBSITE_NAME}` || 'Default Product Title',
 			description:
 				`Application from ${PUBLIC_WEBSITE_NAME}. ${PUBLIC_WEBSITE_NAME} offers more chemical Applications.` ||
 				'Default product description',
