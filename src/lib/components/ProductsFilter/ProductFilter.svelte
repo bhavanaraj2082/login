@@ -177,6 +177,7 @@ function handleMouseLeave() {
         if(isNaN(quantity)){
             return
         }
+        quantity = Math.abs(quantity)
         if(quantity >10000000) quantity = 10000000
          clearTimeout(timeout)
          timeout = setTimeout(()=>{

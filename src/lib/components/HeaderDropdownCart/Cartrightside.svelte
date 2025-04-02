@@ -86,7 +86,7 @@
 			calculateTotalPrice($cart)
 			return
 		}
-		console.log(stock);
+		quantity = Math.abs(quantity)
 		clearTimeout(timeout);
 		if (quantity > 10000000) quantity = 10000000;
 		timeout = setTimeout(() => {

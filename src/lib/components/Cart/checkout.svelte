@@ -4,7 +4,7 @@
 	import { cart } from '$lib/stores/cart.js';
 	import { sendMessage,generateInvoiceNumber } from '$lib/utils.js';
 	import { enhance } from '$app/forms';
-	import { authedUser, currencyState } from '$lib/stores/mainStores.js';
+	import { authedUser, currencyState,cartTotalComps } from '$lib/stores/mainStores.js';
 	import Icon from '@iconify/svelte';
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { shippingAddress, billingAddress } from '$lib/stores/mainStores.js';
@@ -248,6 +248,8 @@
 			orderLoad = false
 			console.log(result);
 			if(result.data.success){
+				localStorage.removeItem("totalCompsChemi")
+				cartTotalComps.set(0)
 				goto('checkout/success')
 			}else{
 				goto('checkout/failure')
