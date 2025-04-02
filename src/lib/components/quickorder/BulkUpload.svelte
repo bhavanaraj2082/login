@@ -932,6 +932,7 @@ Example file content:
             or proceed with only valid products.
           </p>
         </div>
+        
       {/if}
 
       {#if validationMessages.some((message) => message.isValid)}

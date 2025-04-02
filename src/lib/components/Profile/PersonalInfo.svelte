@@ -17,6 +17,7 @@
         cellPhone,
         alternatePhone,
         gstNumber,
+        needsPasswordSetup,
         companyName
     } = contact
 
@@ -174,6 +175,14 @@
                 <p class=" text-sm ml-2">{email || "N/A"}</p>
                 <Icon icon="tdesign:verified-filled" class=" text-xl ml-2 {isEmailVerified ? "text-green-500":"text-gray-400"}"/>
                 </div>
+                {#if needsPasswordSetup}
+                <div class="w-full flex items-center bg-red-50 border border-red-200 rounded-lg p-2">
+                    <p class="text-sm text-red-600">
+                        We noticed you haven’t set up a password yet. To keep your account safe, please create one now. 
+                        <a href="/reset-password" class="text-red-600 text-xs font-semibold hover:underline hover:text-red-700">Click here to setup your password</a>
+                    </p>
+                </div>
+                {:else}
                 <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
                     <h4 class="font-medium">Password :</h4>
                     <a href="/reset-password" class="text-xs text-primary-500 font-semibold ml-2">Reset Password</a>
@@ -181,6 +190,7 @@
                         <!-- <p class="pt-2 text-lg ml-2">*******</p> -->
                     </div>
                 </div>
+                {/if}
             </section>
             <div class="mt-4">
                 <h2 class="font-semibold text-lg border-b-1 pb-2">Business Information</h2>
