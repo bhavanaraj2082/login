@@ -697,6 +697,7 @@ export const signUp = async (body, cookies) => {
 			email: userData.email,
 			isEmailVerified: userData.isEmailVerified,
 			country: 'N/A',
+			needsPasswordSetup: true,
 			sitePreferences: {
 				productEntryType : "Manual Entry",
 				noOfQuickOrderFields: 3,
