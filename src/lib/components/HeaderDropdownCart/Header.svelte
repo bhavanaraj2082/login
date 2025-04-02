@@ -612,7 +612,7 @@ async function submitForm() {
 						bind:value={searchQuery}
 						name="query"
 						on:input={handleInput}
-						class=" border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 w-full px-3 py-2 md:py-3 text-sm placeholder:text-xs truncate pr-12 sm:pr-10"/>
+						class=" border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 w-full px-3 py-2 md:py-3 text-sm placeholder:text-xs truncate pr-12 sm:pr-10"/>
 					{#if isLoading}
 						<div class="absolute right-3 top-1/2 transform -translate-y-1/2">
 							<Icon icon="ei:spinner" class="w-8 h-8 animate-spin text-primary-600 opacity-75 text-5xl"/>
@@ -662,7 +662,7 @@ async function submitForm() {
 						class="mr-2 flex flex-row justify-center cursor-pointer z-10 gap-2 m-1">
 						<p class="w-7 h-7 flex items-center justify-center bg-white text-primary-400 rounded-full font-semibold text-lg">{getInitial(userName)}
 					</p>
-						<h2 class="text-sm text-white mt-1 capitalize">{userName}</h2>
+						<h2 class="text-sm text-white mt-1 capitalize">{$authedUser.firstname}</h2>
 						<button on:click={handleProfile}>
 							<Icon
 								icon={showUserOptions ? 'ion:chevron-up' : 'ion:chevron-down'}

@@ -46,7 +46,7 @@
     {#each profileSections as { title, desc, logo },index}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div class="shadow rounded px-4 py-4 bg-white hover:scale-105 transition-all duration-300 ease-in-out hover:shadow-primary-100 cursor-pointer" on:click={changeTabs(index)}>
+        <div class="shadow rounded-md px-4 py-4 bg-white hover:scale-105 transition-all duration-300 ease-in-out hover:shadow-primary-100 cursor-pointer" on:click={changeTabs(index)}>
             <div class=" flex items-center gap-2 text-primary-500 mb-2">
                 <Icon icon={logo} class=" text-xl md:text-2xl bg-primary-50 rounded-full p-1" />
                 <button on:click={changeTabs(index)} class="font-semibold text-xs lg:text-sm text-primary-500 text-left">{title}</button>
