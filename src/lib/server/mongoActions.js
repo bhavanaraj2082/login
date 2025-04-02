@@ -1578,7 +1578,11 @@ export const ResetPassword = async (body) => {
 
 			// Reset password using the email
 			await auth.updateKeyPassword('email', email, newPassword);
-			
+			await Profile.findOneAndUpdate(
+				{ email: email },
+				{ needsPasswordSetup: false },
+				{ new: true, upsert: false }
+			);
 			// Invalidate session and delete token record
 			await auth.invalidateSession(email);
 			await TokenVerification.deleteOne({ token });
@@ -1589,6 +1593,11 @@ export const ResetPassword = async (body) => {
 		// Case 2: If no token but userEmail is provided, reset password directly
 		if (email) {
 			await auth.updateKeyPassword('email', email, newPassword);
+			await Profile.findOneAndUpdate(
+				{ email: email },
+				{ needsPasswordSetup: false },
+				{ new: true, upsert: false }
+			);
 			// Invalidate user session
 			await auth.invalidateSession(email);
 
