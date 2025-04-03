@@ -18,47 +18,50 @@
   import { enhance } from "$app/forms";
   $: displayPrice =
     $currencyState === "usd"
-      ? selectedProduct.priceUSD
-      : selectedProduct.priceINR;
+      ? selectedProduct.USD
+      : selectedProduct.INR;
   $: currencySymbol = $currencyState === "usd" ? "$" : "₹";
 
-  const productsData = relatedProducts;
+  // const productsData = relatedProducts;
   let isLoggedIn = $authedUser?.id ? true : false;
   let showCartPopup = false;
-  let RelatedProductData = productsData.map((product) => {
-    return {
-      productId: product._id,
-      prodDesc: product.prodDesc,
-      productName: product.productName,
-      priceSize:
-        Array.isArray(product.stockPriceSize) &&
-        product.stockPriceSize.length > 0
-          ? product.stockPriceSize.map((size) => ({
-              size: size.break || "N/A",
-              priceINR: size.inr || 0,
-              priceUSD: size.usd || 0,
-              offer: size.offer || "0",
-            }))
-          : [],
-      image: product.image,
-      manufacturer: product.manufacturerInfo[0]?.name,
-      manufacturerId: product.manufacturerInfo[0]?._id,
-      distributorId: product.stockInfo?.[0]?.distributor || "",
-      stockInfo: Array.isArray(product.stockInfo) ? product.stockInfo : [],
-      stockId:
-        Array.isArray(product.stockInfo) && product.stockInfo.length > 0
-          ? product.stockInfo.map((stock) => stock._id)
-          : [],
-      stock: product.stockQuantity,
-      category: product.categoryInfo[0]?.urlName,
-      subCategory: product.subCategoryInfo[0]?.urlName,
-      subsubCategory: product.subsubCategoryInfo[0]?.urlName,
-      productUrl: product.productUrl,
-      productNumber: product.productNumber,
-      variants: Array.isArray(product.variants) ? product.variants : [],
-    };
-  });
+  // let RelatedProductData = productsData.map((product) => {
+  //   return {
+  //     productId: product._id,
+  //     prodDesc: product.prodDesc,
+  //     productName: product.productName,
+  //     priceSize:
+  //       Array.isArray(product.stockPriceSize) &&
+  //       product.stockPriceSize.length > 0
+  //         ? product.stockPriceSize.map((size) => ({
+  //             size: size.break || "N/A",
+  //             priceINR: size.inr || 0,
+  //             priceUSD: size.usd || 0,
+  //             offer: size.offer || "0",
+  //           }))
+  //         : [],
+  //     image: product.image,
+  //     manufacturer: product.manufacturerInfo[0]?.name,
+  //     manufacturerId: product.manufacturerInfo[0]?._id,
+  //     distributorId: product.stockInfo?.[0]?.distributor || "",
+  //     stockInfo: Array.isArray(product.stockInfo) ? product.stockInfo : [],
+  //     stockId:
+  //       Array.isArray(product.stockInfo) && product.stockInfo.length > 0
+  //         ? product.stockInfo.map((stock) => stock._id)
+  //         : [],
+  //     stock: product.stockQuantity,
+  //     category: product.categoryInfo[0]?.urlName,
+  //     subCategory: product.subCategoryInfo[0]?.urlName,
+  //     subsubCategory: product.subsubCategoryInfo[0]?.urlName,
+  //     productUrl: product.productUrl,
+  //     productNumber: product.productNumber,
+  //     variants: Array.isArray(product.variants) ? product.variants : [],
+  //   };
+  // });
 
+  let RelatedProductData = relatedProducts;
+  // console.log("final RelatedProductData",RelatedProductData);
+  
   let currentIndex = 0;
   let logosPerSlide = 4;
   let totalSlides = Math.ceil(RelatedProductData.length / logosPerSlide);
@@ -505,7 +508,7 @@
                   Price:
                   <span class="font-semibold text-md">
                     {#if $currencyState === "inr"}
-                      ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
+                      ₹ {(Number(selectedPrice?.INR) || 0).toLocaleString(
                         "en-IN",
                         {
                           minimumFractionDigits: 2,
@@ -513,7 +516,7 @@
                         }
                       )}
                     {:else if $currencyState === "usd"}
-                      $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
+                      $ {(Number(selectedPrice?.USD) || 0).toLocaleString(
                         "en-US",
                         {
                           minimumFractionDigits: 2,
@@ -546,7 +549,7 @@
           <div class="mt-4">
             <h1 class="font-semibold">Select Size</h1>
             <div class="flex gap-3 mt-3 flex-wrap mb-4">
-              {#each selectedProduct.priceSize as { size }, index}
+              {#each selectedProduct.priceSize as { break: size }, index}
                 <button
                   class="focus:bg-primary-400 hover:scale-105 focus:text-white border px-3 py-1 rounded-full {selectedPriceIndex ===
                   index
@@ -567,7 +570,7 @@
                   Price:
                   <span class="font-semibold text-md">
                     {#if $currencyState === "usd"}
-                      $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
+                      $ {(Number(selectedPrice?.USD) || 0).toLocaleString(
                         "en-US",
                         {
                           minimumFractionDigits: 2,
@@ -575,7 +578,7 @@
                         }
                       )}
                     {:else}
-                      ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
+                      ₹ {(Number(selectedPrice?.INR) || 0).toLocaleString(
                         "en-IN",
                         {
                           minimumFractionDigits: 2,
@@ -743,7 +746,7 @@
               <p class="text-base font-semibold text-gray-800">
                 {#if $currencyState === "usd"}
                   $ {(
-                    Number(selectedPrice?.priceUSD || 0) *
+                    Number(selectedPrice?.USD || 0) *
                     Number(popupQuantity || 1) *
                     1.18
                   ).toLocaleString("en-US", {
@@ -752,7 +755,7 @@
                   })}
                 {:else}
                   ₹ {(
-                    Number(selectedPrice?.priceINR || 0) *
+                    Number(selectedPrice?.INR || 0) *
                     Number(popupQuantity || 1) *
                     1.18
                   ).toLocaleString("en-IN", {
@@ -770,7 +773,7 @@
             <div class="flex flex-col items-center gap-1 mt-1">
               <p class="text-sm font-bold text-gray-500">
                 {#if $currencyState === "usd"}
-                  $ {(Number(selectedPrice?.priceUSD || 0) * Number(popupQuantity || 1)).toLocaleString(
+                  $ {(Number(selectedPrice?.USD || 0) * Number(popupQuantity || 1)).toLocaleString(
                     "en-US",
                     {
                       minimumFractionDigits: 2,
@@ -778,7 +781,7 @@
                     }
                   )}
                 {:else}
-                  ₹ {(Number(selectedPrice?.priceINR || 0) * Number(popupQuantity || 1)).toLocaleString(
+                  ₹ {(Number(selectedPrice?.INR || 0) * Number(popupQuantity || 1)).toLocaleString(
                     "en-IN",
                     {
                       minimumFractionDigits: 2,
