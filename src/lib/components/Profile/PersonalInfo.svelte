@@ -99,7 +99,7 @@
                 <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                 type="text" name="cellPhone" bind:value={cellPhone}/>
                 {#if errors?.cellPhone}
-				<span class="text-red-400 text-xs">{errors.cellPhone}</span>
+				    <span class="text-red-400 text-xs">{errors.cellPhone}</span>
 			    {/if}
             </div>
             <div class=" w-full">
@@ -141,7 +141,6 @@
 
      </div>
     {/if}
-    
 
     {#if !toggleEdit}
     <!-- contact inforation -->
@@ -157,12 +156,43 @@
             <section class=" w-full flex flex-col sm:flex-row flex-wrap gap-y-4 py-3">
                 <div class="flex sm:flex-row items-center text-sm md:text-4s w-full sm:w-1/2">
                     <h4 class="font-medium">Name :</h4>
-                    <p class="ml-2 text-sm">{firstName || "NA"} {lastName || ""}</p>
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <!-- svelte-ignore a11y-no-static-element-interactions -->
+                    <!-- svelte-ignore a11y-missing-attribute -->
+                    {#if !firstName}
+                    <a on:click={() => toggleEdit = true} class="text-primary-500 font-medium ml-2 text-sm hover:underline">
+                        Update Name
+                    </a>
+                    {:else}
+                        <p class="ml-2 text-sm">{firstName || "Update Name"} {lastName || ""}</p>
+                    {/if}
                 </div>
-                <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
+                <div class="w-full flex sm:flex-row items-center sm:w-1/2">
+                    <label class="text-xs md:text-sm font-medium" for="cellPhone">
+                        <span class="text-sm font-bold text-red-500">*</span>Primary Phone :
+                    </label><br>
+                    {#if !cellPhone && (firstName && lastName && email || email)}
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <!-- svelte-ignore a11y-missing-attribute -->
+                        <p class="text-sm text-gray-600 p-2 bg-red-50 border border-red-300 rounded-md">
+                            It looks like you haven't updated your phone number yet. 
+                            <a on:click={() => toggleEdit = true} class="text-primary-500 font-semibold hover:underline cursor-pointer">
+                                Update Phone Number
+                            </a>
+                        </p>
+                    {:else}
+                    <!-- <h4 class="font-medium">Primary Phone :</h4> -->
+                    <p class=" text-sm ml-2">{cellPhone || "N/A"}</p>
+                        {#if errors?.cellPhone}
+                            <span class="text-red-400 text-xs">{errors.cellPhone}</span>
+                        {/if}
+                    {/if}
+                </div>
+                <!-- <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
                     <h4 class="font-medium">Primary Phone :</h4>
-                    <p class=" text-sm ml-2">{cellPhone || "NA"}</p>
-                </div>
+                    <p class=" text-sm ml-2">{cellPhone || "update cellPhone"}</p>
+                </div> -->
                 <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
                     <h4 class="font-medium">Alternative Phone :</h4>
                     <p class=" text-sm ml-2">{alternatePhone || "--"}</p>
