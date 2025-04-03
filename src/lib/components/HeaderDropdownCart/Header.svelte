@@ -662,7 +662,7 @@ async function submitForm() {
 						class="mr-2 flex flex-row justify-center cursor-pointer z-10 gap-2 m-1">
 						<p class="w-7 h-7 flex items-center justify-center bg-white text-primary-400 rounded-full font-semibold text-lg">{getInitial(userName)}
 					</p>
-						<h2 class="text-sm text-white mt-1 capitalize">{$authedUser.firstname}</h2>
+						<h2 class="text-sm text-white mt-1 capitalize">{$authedUser.firstname || userName}</h2>
 						<button on:click={handleProfile}>
 							<Icon
 								icon={showUserOptions ? 'ion:chevron-up' : 'ion:chevron-down'}

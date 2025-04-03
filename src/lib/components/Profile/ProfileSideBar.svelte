@@ -51,7 +51,7 @@
                 <Icon icon={logo} class=" text-xl md:text-2xl bg-primary-50 rounded-full p-1" />
                 <button on:click={changeTabs(index)} class="font-semibold text-xs lg:text-sm text-primary-500 text-left">{title}</button>
             </div>
-            <p class=" text-xs text-content">{desc}</p>
+            <p class="text-2s text-content text-justify">{desc}</p>
         </div>
     {/each}
 </nav>
