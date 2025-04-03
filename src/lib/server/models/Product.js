@@ -41,6 +41,7 @@ const productSchema = new Schema({
     CAS:{ type: String, default: null },
     currency: { type: String, default: 'USD' },
     variants: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
+    relatedProducts: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
     prefixes: { type: Schema.Types.Mixed, required:false },
     cleanedName: { type: String, required: false },
 }, { timestamps: false, collection: "products" });

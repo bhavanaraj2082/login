@@ -27,16 +27,11 @@
 }   
 
   let productData = data?.productData?.records[0];
-  let categoryUrl = data?.relatedProducts[0]?.categoryInfo[0]?.urlName;
-  let subCategoryUrl = data?.relatedProducts[0]?.subCategoryInfo[0]?.urlName;
-
+  let categoryUrl = data?.relatedProducts?.category;
+  let subCategoryUrl = data?.relatedProducts?.subCategory;
   let sliceNum = data?.productData?.records[0]?.productNumber;
-
-  console.log("slicenum-->",sliceNum);
   const slicedNumber = generateProgressiveStrings(sliceNum);
-  console.log("slicenum-->",slicedNumber);
   
-
   let metadata = {
     title:
       `${productData?.productName} | ${productData?.manufacturer?.name} | ${PUBLIC_WEBSITE_NAME} ` ||
