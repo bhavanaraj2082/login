@@ -897,9 +897,9 @@ function formatDate(dateString) {
 			<!-- <div class="flex flex-col gap-4 mb-6"> -->
 			<div class="w-full relative">
 				<Icon icon="ri:search-line" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="20" height="20"/>
-				<input type="text" placeholder="Search by Cart Name" class="w-full h-10 border border-gray-400 focus:ring-0 focus:border-primary-500 rounded px-4 py-2 pl-10 text-sm outline-none transition-all duration-200" value={filters.searchTerm} on:input={handleSearch}/>
+				<input type="text" placeholder="Search by Cart Name" class="w-full h-10 border border-gray-400 focus:ring-0 focus:border-primary-500 rounded-md px-4 py-2 pl-10 text-sm outline-none transition-all duration-200" value={filters.searchTerm} on:input={handleSearch}/>
 				{#if filters.searchTerm}
-					<button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded" style="color: #cb1919" on:click={clearSearch}>
+					<button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded-md" style="color: #cb1919" on:click={clearSearch}>
 						<Icon icon="oui:cross" width="16" height="16" class="font-bold" />
 					</button>
 				{/if}
@@ -919,7 +919,7 @@ function formatDate(dateString) {
 			</div>
 			<div class="w-full lg:max-w-xs flex md:max-w-xs items-start lg:items-center">
 				<button
-					class="w-full lg:w-auto h-10 bg-primary-500 text-white hover:bg-primary-700 flex items-center justify-center px-4 rounded transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm gap-2"
+					class="w-full lg:w-auto h-10 bg-primary-500 text-white hover:bg-primary-700 flex items-center justify-center px-4 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm gap-2"
 					on:click={handleNewCart}>
 					<Icon icon="mdi:add-shopping-cart" width="20" height="20" />
 					<span>Create New Cart</span>
@@ -928,12 +928,12 @@ function formatDate(dateString) {
 		</div>
 		<div class="grid md:grid-cols-2 lg:hidden gap-4">
 			{#if !paginatedCartItems.length}
-				<div class="w-full md:w-full border rounded border-yellow-400 items-center px-4 py-8 md:col-span-2">
+				<div class="w-full md:w-full border rounded-md border-yellow-400 items-center px-4 py-8 md:col-span-2">
 					<p class="text-center text-gray-500">No items found</p>
 				</div>
 			{:else}
 				{#each paginatedCartItems as cart}
-					<div class="border rounded shadow p-4 bg-white">
+					<div class="border rounded-md shadow p-4 bg-white">
 						<div class="flex justify-between items-start mb-4">
 							<div class="">
 								<span class="flex items-center my-1.5 gap-1">
@@ -977,7 +977,7 @@ function formatDate(dateString) {
 						</div>
 						<div class="flex justify-center space-x-2">
 							<button
-								class="flex-1 border border-primary-500 text-primary-500 hover:text-white px-1 py-2 text-xs rounded hover:bg-primary-600 flex items-center justify-center"
+								class="flex-1 border border-primary-500 text-primary-500 hover:text-white px-1 py-2 text-xs rounded-md hover:bg-primary-600 flex items-center justify-center"
 								type="button"
 								disabled={isLoading}
 								on:click={() => openPopup(cart)}>
@@ -985,7 +985,7 @@ function formatDate(dateString) {
 								View
 							</button>
 							<button
-								class="flex-1 border border-green-500 text-green-500 px-1 py-2 text-xs rounded hover:bg-green-600 hover:text-white flex items-center justify-center whitespace-nowrap"
+								class="flex-1 border border-green-500 text-green-500 px-1 py-2 text-xs rounded-md hover:bg-green-600 hover:text-white flex items-center justify-center whitespace-nowrap"
 								type="button"
 								disabled={isLoading}
 								on:click={() => handleRecurrenceClick(cart)}>
@@ -993,7 +993,7 @@ function formatDate(dateString) {
 								Recurrence
 							</button>
 							<button
-								class="flex-1 border border-red-600 text-red-600 hover:text-white px-1 py-2 rounded text-xs hover:bg-red-700 flex items-center justify-center whitespace-nowrap"
+								class="flex-1 border border-red-600 text-red-600 hover:text-white px-1 py-2 rounded-md text-xs hover:bg-red-700 flex items-center justify-center whitespace-nowrap"
 								type="button"
 								disabled={isLoading}
 								on:click={() => handleDelete(cart._id)}>
@@ -1046,7 +1046,7 @@ function formatDate(dateString) {
 								<!-- <td class="border px-4 py-1 text-center">
                   {cart.cartId || 'N/A'}</td> -->
 								<td class="border-b text-center">
-									<span class="inline-flex items-center justify-center px-4 py-2 bg-primary-100 text-primary-800 rounded" style="width: 40px; text-align: center; line-height: 1.2;">
+									<span class="inline-flex items-center justify-center px-4 py-2 bg-primary-100 text-primary-800 rounded-md" style="width: 40px; text-align: center; line-height: 1.2;">
 										{cart.cartItems?.length || 0}
 									</span>
 								</td>
@@ -1070,10 +1070,10 @@ function formatDate(dateString) {
 										type="button"
 										disabled={isLoading}
 										on:click={() => openPopup(cart)}
-										class="px-2 py-1 border text-primary-600 hover:text-white rounded hover:bg-primary-700 transition-all duration-300 flex items-center gap-1 relative group">
+										class="px-2 py-1 border text-primary-600 hover:text-white rounded-md hover:bg-primary-700 transition-all duration-300 flex items-center gap-1 relative group">
 										<span class="relative">
 											<Icon icon={isLoading ? 'mdi:loading' : 'hugeicons:file-view'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
-											<span class="absolute left-1/2 transform -translate-x-1/2 z-50 whitespace-nowrap top-full mt-2 px-2 bg-gray-200 text-gray-600 text-xs py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+											<span class="absolute left-1/2 transform -translate-x-1/2 z-50 whitespace-nowrap top-full mt-2 px-2 bg-gray-200 text-gray-600 text-xs py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
 												View Cart
 											</span>
 										</span>
@@ -1083,7 +1083,7 @@ function formatDate(dateString) {
 										type="button"
 										disabled={isLoading}
 										on:click={() => handleRecurrenceClick(cart)}
-										class="px-2 py-1 border text-green-600 hover:text-white rounded hover:bg-green-700 transition-all duration-300 flex items-center gap-1 relative group">
+										class="px-2 py-1 border text-green-600 hover:text-white rounded-md hover:bg-green-700 transition-all duration-300 flex items-center gap-1 relative group">
 										<span class="relative">
 											<Icon icon={isLoading ? 'mdi:loading' : 'mdi:refresh'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
 											<span class="absolute left-1/2 transform -translate-x-1/2 z-auto whitespace-nowrap top-full mt-2 px-2 bg-gray-200 text-gray-600 text-xs py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1096,10 +1096,10 @@ function formatDate(dateString) {
 										type="button"
 										disabled={isLoading}
 										on:click={() => handleDelete(cart._id)}
-										class="px-2 py-1 border text-red-600 rounded hover:bg-red-700 hover:text-white transition-all duration-300 flex items-center gap-1 relative group">
+										class="px-2 py-1 border text-red-600 rounded-md hover:bg-red-700 hover:text-white transition-all duration-300 flex items-center gap-1 relative group">
 										<span class="relative">
 											<Icon icon={isLoading ? 'mdi:loading' : 'mdi:delete'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
-											<span class="absolute left-1/2 transform -translate-x-1/2 z-auto whitespace-nowrap top-full mt-2 px-2 bg-gray-200 text-gray-600 text-xs py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+											<span class="absolute left-1/2 transform -translate-x-1/2 z-auto whitespace-nowrap top-full mt-2 px-2 bg-gray-200 text-gray-600 text-xs py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
 												Delete
 											</span>
 										</span>
@@ -1226,7 +1226,7 @@ function formatDate(dateString) {
               min="1" 
               max="31"
               placeholder="Enter day (1-31)" 
-              class="border border-gray-300 rounded w-full p-2 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none"/>
+              class="border border-gray-300 rounded-md w-full p-2 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none"/>
             {#if dateError}
               <p class="text-red-500 text-xs mt-1">{dateError}</p>
             {/if}
@@ -1240,7 +1240,7 @@ function formatDate(dateString) {
               bind:value={month} 
               id="recurrence" 
               on:change={calculateNextDate}
-              class="border border-gray-300 rounded w-full p-2 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none">
+              class="border border-gray-300 rounded-md w-full p-2 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none">
               <option selected hidden value="">Select Interval</option>
               <option value="1">Monthly</option>
               <option value="3">Quarterly (3 months)</option>
@@ -1263,7 +1263,7 @@ function formatDate(dateString) {
                   bind:value={custom} 
                   id="custom" 
                   on:change={calculateNextDate}
-                  class="border border-gray-300 rounded p-2 w-1/2 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none">
+                  class="border border-gray-300 rounded-md p-2 w-1/2 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none">
                   <option selected hidden value="">Select</option>
                   <option value="2">2</option>
                   <option value="4">4</option>
@@ -1295,13 +1295,13 @@ function formatDate(dateString) {
             <button 
               type="button" 
               on:click={toggleRecurrencePopup} 
-              class="w-1/2 py-2 px-4 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400" >
+              class="w-1/2 py-2 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400" >
               Cancel
             </button>
             <button 
               type="submit" 
               disabled={processingRequest || !nextRecurrenceDate}
-              class="w-1/2 py-2 px-4 bg-primary-600 text-white rounded hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-gray-300 disabled:cursor-not-allowed">
+              class="w-1/2 py-2 px-4 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 disabled:bg-gray-300 disabled:cursor-not-allowed">
               {existingRecurrence ? 'Update' : 'Save'}
             </button>
           </div>
@@ -1312,7 +1312,7 @@ function formatDate(dateString) {
 			<button 
 					type="submit"					
 					disabled={processingRequest}
-					class="w-full py-2 px-4 bg-white text-red-600 border border-red-600 rounded hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50">
+					class="w-full py-2 px-4 bg-white text-red-600 border border-red-600 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50">
 					{processingRequest ? 'Deleting...' : 'Delete Recurrence'}
 			  </button>
 			{/if}
@@ -1346,7 +1346,7 @@ function formatDate(dateString) {
 										name="cartName"
 										value={newCartName}
 										on:input={handleNameChange}
-										class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:border-transparent {!newCartName.trim()
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent {!newCartName.trim()
 											? 'border-red-300'
 											: ''}"
 										placeholder="Enter new cart name"
@@ -1359,7 +1359,7 @@ function formatDate(dateString) {
 									<button
 										type="submit"
 										disabled={!canSave}
-										class="px-3 py-2 bg-primary-500 text-white rounded hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-20 justify-center">
+										class="px-3 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-20 justify-center">
 										{#if isLoading}
 											<Icon icon="mdi:loading" class="animate-spin" />
 											<span>Saving...</span>
@@ -1378,7 +1378,7 @@ function formatDate(dateString) {
 								<p class="font-medium text-primary-600">
 									- {$selectedCart?.cartName || 'Loading...'}
 								</p>
-								<button on:click={startEditing} class="p-2 text-primary-500 rounded hover:bg-primary-50 transition-colors duration-200 group relative">
+								<button on:click={startEditing} class="p-2 text-primary-500 rounded-md hover:bg-primary-50 transition-colors duration-200 group relative">
 									<span class="relative">
 										<Icon icon={isLoading ? 'mdi:loading' : 'mdi:edit-outline'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
 										<span class="absolute transform -translate-x-1/2 z-auto whitespace-nowrap top-full mt-3 px-2 bg-gray-200 text-gray-600 text-xs py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1390,7 +1390,7 @@ function formatDate(dateString) {
 						{/if}
 					</div>
 					<button
-						class="p-1 hover:bg-gray-100 rounded transition-colors duration-200"
+						class="p-1 hover:bg-gray-100 rounded-md transition-colors duration-200"
 						on:click={closePopup}>
 						<Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
 					</button>
@@ -1434,7 +1434,7 @@ function formatDate(dateString) {
 											</td>
 											<td class="p-3 text-center">
 												<span
-													class="inline-flex items-center justify-center px-3 py-1 bg-primary-100 text-primary-800 rounded-full font-medium">
+													class="inline-flex items-center justify-center px-3 py-1 bg-primary-100 text-primary-800 rounded-md font-medium">
 													{item.quantity || '0'}
 												</span>
 											</td>
@@ -1450,7 +1450,7 @@ function formatDate(dateString) {
 						type="button"
 						disabled={isLoading}
 						on:click={() => handleDelete($selectedCart._id)}
-						class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded hover:bg-red-50 hover:border-red-700 hover:text-red-700 transition-colors duration-200 disabled:opacity-50">
+						class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-50 hover:border-red-700 hover:text-red-700 transition-colors duration-200 disabled:opacity-50">
 						<Icon icon={isLoading ? 'mdi:loading' : 'mdi:delete'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
 						Delete Cart
 					</button>
@@ -1459,7 +1459,7 @@ function formatDate(dateString) {
 							<button
 								on:click={() => handleShareCart($selectedCart.cartId)}
 								disabled={isLoading || !$selectedCart.cartItems.length}
-								class="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded
+								class="w-full sm:w-auto px-6 py-2 bg-primary-600 text-white rounded-md
 								{!$selectedCart.cartItems.length
 									? 'opacity-50 cursor-not-allowed'
 									: 'hover:bg-primary-700'} 
@@ -1478,12 +1478,12 @@ function formatDate(dateString) {
 							<button
 								type="submit"
 								disabled={isLoading}
-								class="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors duration-200 flex items-center justify-center gap-2">
+								class="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors duration-200 flex items-center justify-center gap-2">
 								<Icon icon={isLoading ? 'mdi:loading' : 'mdi:cart'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
 								{isLoading ? 'Resuming...' : 'Resume Cart'}
 							</button>
 						</form>
-						<button class="w-full sm:w-auto px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors duration-200" on:click={closePopup}>
+						<button class="w-full sm:w-auto px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200" on:click={closePopup}>
 							Cancel
 						</button>
 					</div>
@@ -1502,12 +1502,12 @@ function formatDate(dateString) {
 			<h2 class="text-xl font-semibold mb-4">Delete this Cart</h2>
 			<p class="text-gray-600 mb-6">Are you sure you want to delete this Cart?</p>
 			<div class="flex justify-end space-x-4">
-				<button class="px-4 py-2 border rounded bg-gray-200 text-description hover:bg-gray-300" on:click={cancelDelete}>
+				<button class="px-4 py-2 border rounded-md bg-gray-200 text-description hover:bg-gray-300" on:click={cancelDelete}>
 					Keep it
 				</button>
 				<form method="POST" action="?/deleteCart" use:enhance={handleDeleteCart}>
 					<input type="hidden" name="cartId" value={selectedCartId} />
-					<button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+					<button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
 						Delete
 					</button>
 				</form>
@@ -1530,7 +1530,7 @@ function formatDate(dateString) {
 						<h3 class="text-lg font-semibold">Share Cart</h3>
 						<button
 							on:click={closeSharePopup}
-							class="p-1 hover:bg-gray-50 rounded transition-colors duration-200">
+							class="p-1 hover:bg-gray-50 rounded-md transition-colors duration-200">
 							<Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
 						</button>
 					</div>
@@ -1546,8 +1546,8 @@ function formatDate(dateString) {
 						</span>
 					</div>
 					<div class="flex items-center gap-2">
-						<input type="text" readonly value={$shareUrl} class="flex-1 p-2 border rounded bg-white text-sm focus:ring-0"/>
-						<button on:click={copyShareLink} class="flex bg-primary-500 text-white px-4 py-1.5 rounded hover:bg-primary-600 duration-300 items-center gap-2">
+						<input type="text" readonly value={$shareUrl} class="flex-1 p-2 border rounded-md bg-white text-sm focus:ring-0"/>
+						<button on:click={copyShareLink} class="flex bg-primary-500 text-white px-4 py-1.5 rounded-md hover:bg-primary-600 duration-300 items-center gap-2">
 							<Icon icon="oui:editor-link" width="20" height="24" />
 							<span class="text-sm">{message || 'Copy'}</span>
 						</button>
@@ -1563,10 +1563,10 @@ function formatDate(dateString) {
 	<div
 		class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 z-10 overflow-y-auto animate-fadeIn backdrop-blur-sm"
 		on:click={cancelNewCart}>
-		<div class="bg-white rounded shadow-lg p-6 w-11/12 max-w-md animate-fadeIn" on:click|stopPropagation>
+		<div class="bg-white rounded-md shadow-lg p-6 w-11/12 max-w-md animate-fadeIn" on:click|stopPropagation>
 			<div class="flex justify-between items-center mb-4">
 				<h2 class="text-md sm:text-lg font-medium">Create a new cart</h2>
-				<button class="p-1 hover:bg-gray-100 rounded transition-colors duration-200" on:click={cancelNewCart}>
+				<button class="p-1 hover:bg-gray-100 rounded-md transition-colors duration-200" on:click={cancelNewCart}>
 					<Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
 				</button>
 			</div>
@@ -1579,15 +1579,15 @@ function formatDate(dateString) {
 				<input type="hidden" name="cartName" value={newCartName} />
 				<input type="hidden" name="cartId" value={generateCartId()} />
 				<input type="hidden" name="isActiveCart" value={true} />
-				<p class="text-xs text-gray-600 p-2 bg-primary-50 rounded">
+				<p class="text-xs text-gray-600 p-2 bg-primary-50 rounded-md">
 					<span class="font-bold text-red-500">Note:</span>
 					This will deactivate the current cart and create a new one
 				</p>
 				<div class="flex gap-4 justify-between pt-4">
-					<button type="button" on:click={cancelNewCart} class="px-4 py-2 border rounded bg-gray-200 text-gray-700 hover:bg-gray-300" disabled={isCreatingCart}>
+					<button type="button" on:click={cancelNewCart} class="px-4 py-2 border rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300" disabled={isCreatingCart}>
 						Cancel
 					</button>
-					<button type="submit" disabled={isCreatingCart} class="px-4 py-2 bg-primary-500 text-white rounded hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+					<button type="submit" disabled={isCreatingCart} class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
 						{#if isCreatingCart}
 							<Icon icon="mdi:loading" class="animate-spin" />
 							Creating...

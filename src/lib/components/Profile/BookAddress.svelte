@@ -124,7 +124,7 @@
     }
 }
  </script>
- <div class="shadow  rounded p-5 bg-white">
+ <div class="shadow  rounded-md p-5 bg-white">
     {#if toggleEdit}
       <!-- address edit form -->
         <div class=" max-w-2xl">
@@ -136,7 +136,7 @@
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="organizationName"><span class=" text-sm font-bold text-red-500">*</span>Organization</label><br>
-                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500"
+                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500"
                      type="text" name="organizationName" bind:value={ activeAddress.organizationName }/>
                      {#if errors?.organizationName}
                      <span class="text-red-400 text-xs">{errors.organizationName}</span>
@@ -144,7 +144,7 @@
                 </div>
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="attentionTo"><span class=" text-sm font-bold text-red-500">*</span>Attention To</label><br>
-                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500"
+                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500"
                      type="text" name="attentionTo" bind:value={activeAddress.attentionTo }/>
                      {#if errors?.attentionTo}
                      <span class="text-red-400 text-xs">{errors.attentionTo}</span>
@@ -155,7 +155,7 @@
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="department">
                         <span class=" text-sm font-bold text-red-500">*</span>Department</label><br>
-                        <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
+                        <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                          type="text" name="department" bind:value={activeAddress.department }/>
                          {#if errors?.department}
                      <span class="text-red-400 text-xs">{errors.department}</span>
@@ -164,7 +164,7 @@
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="building">
                         Building/Room</label><br>
-                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
+                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                     type="text" name="building" bind:value={activeAddress.building }/>
                     {#if errors?.building}
                      <span class="text-red-400 text-xs">{errors.building}</span>
@@ -175,7 +175,7 @@
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="street">
                         <span class=" text-sm font-bold text-red-500">*</span>Street</label><br>
-                        <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
+                        <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                         type="text" name="street" bind:value={activeAddress.street }/>
                         {#if errors?.street}
                      <span class="text-red-400 text-xs">{errors.street}</span>
@@ -184,7 +184,7 @@
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="city">
                         <span class=" text-sm font-bold text-red-500">*</span>City</label><br>
-                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
+                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                     type="text" name="city" bind:value={activeAddress.city }/>
                     {#if errors?.city}
                      <span class="text-red-400 text-xs">{errors.city}</span>
@@ -195,7 +195,7 @@
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="state"><span class=" text-sm font-bold text-red-500">*</span>State</label><br>
                     <select name="state" id="" bind:value={activeAddress.state }
-                    class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500">
+                    class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500">
                         {#each states as state}
                             <option value={state}>{state}</option>
                         {/each}
@@ -208,7 +208,7 @@
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="postalCode">
                         <span class=" text-sm font-bold text-red-500">*</span>Postal Code</label><br>
-                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
+                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                     type="text" name="postalCode" bind:value={activeAddress.postalCode }/>
                     {#if errors?.postalCode}
                      <span class="text-red-400 text-xs">{errors.postalCode}</span>
@@ -220,7 +220,7 @@
                     <label class=" text-xs md:text-sm font-medium" for="location">
                         <span class=" text-sm font-bold text-red-500">*</span>Location</label><br>
                     <select name="location" bind:value={activeAddress.location }
-                    class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500">
+                    class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500">
                         {#each countries as country}
                             <option value={country}>{country}</option>
                         {/each}
@@ -233,8 +233,8 @@
             </div>
            
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
-                <button type="button" on:click={()=>toggleEdit = false} class=" w-full rounded py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
-                <button type="submit" class=" w-full rounded py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Submit</button>
+                <button type="button" on:click={()=>toggleEdit = false} class=" w-full rounded-md py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
+                <button type="submit" class=" w-full rounded-md py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Submit</button>
             </div>
         </form>
         </div>
@@ -247,10 +247,10 @@
                 <button on:click={()=>activeBook(3,"billing")} class="{3 === active ? " border-b-2 border-primary-500 text-primary-500 transition duration-300 " :"border-white"} border-b-2 shrink-0 font-semibold px-4 py-1">Billing</button>
             </section>
             <div class=" w-full flex flex-col gap-3">
-                <div class=" w-full h-40 border-1 font-medium capitalize rounded border-gray-300 p-4 md:p-5 text-xs md:text-sm leading-5">
+                <div class=" w-full h-40 border-1 font-medium capitalize rounded-md border-gray-300 p-4 md:p-5 text-xs md:text-sm leading-5">
                    {activeAddress?.organizationName || ""} {activeAddress?.attentionTo || ""} {activeAddress?.department || "" } {activeAddress?.building || ""} {activeAddress?.street || ""} {activeAddress?.city || ""} {activeAddress?.state || ""} {activeAddress?.postalCode || ""} {activeAddress?.location || ""}
                 </div>
-                <button on:click={()=>toggleEdit = true} class=" w-20 rounded py-2 self-end font-medium text-xs md:text-sm text-white bg-primary-400 hover:bg-primary-500">Edit</button>
+                <button on:click={()=>toggleEdit = true} class=" w-20 rounded-md py-2 self-end font-medium text-xs md:text-sm text-white bg-primary-400 hover:bg-primary-500">Edit</button>
             </div>
         </div>
         {/if}

@@ -466,11 +466,11 @@ function downloadAsExcel(order) {
                     <input
                         type="text"
                         placeholder="Search by Order Number"
-                        class="w-full border rounded px-4 py-2 pl-10 focus:ring-0 focus:border-primary-500 transition-all outline-none duration-200"
+                        class="w-full border rounded-md px-4 py-3 pl-10 focus:ring-0 focus:border-primary-500 text-xs transition-all outline-none duration-200"
                         value={filters.searchTerm}
                         on:input={handleSearch}/>
                         {#if filters.searchTerm}
-                        <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded" style="color: #cb1919" on:click={clearSearch}>
+                        <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded-md" style="color: #cb1919" on:click={clearSearch}>
                             <Icon icon="oui:cross" width="16" height="16" class="font-bold" />
                         </button>
                     {/if}  
@@ -490,12 +490,12 @@ function downloadAsExcel(order) {
                 }} />
                 </div> 
                 <div class="flex-1 sm:max-w-[400px] mt-2 md:mt-0 md:ml-2">
-                    <select class="border w-full h-10 text-xs rounded focus:ring-0 focus:border-primary-500 transition-all outline-none duration-200 pb-2"
+                    <select class="border w-full h-10 text-xs rounded-md focus:ring-0 focus:border-primary-500 transition-all outline-none duration-200 pb-2"
                             bind:value={filters.status}
                             on:change={() => updateFilters('status', filters.status)}>
                         <option value="">All Status</option>
                         <option value="pending">Pending</option>
-                        <option value="canceled">Canceled</option>
+                        <option value="cancelled">Cancelled</option>
                         <option value="shipped">Shipped</option>
                         <option value="received">Received</option>
                     </select>
@@ -506,14 +506,14 @@ function downloadAsExcel(order) {
                     disabled={!isAnyFilterActive}>
                     Apply Filters
                 </button> -->
-                <button class="border border-primary-500 flex items-center justify-center  md:mt-0 mt-2  w-1/2 h-10 px-2 py-2 rounded hover:bg-primary-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed" on:click={clearFilters} disabled={!isAnyFilterActive}>
+                <button class="border border-primary-500 flex items-center justify-center  md:mt-0 mt-2  w-1/2 h-10 px-2 py-2 rounded-md hover:bg-primary-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed" on:click={clearFilters} disabled={!isAnyFilterActive}>
                     <Icon icon="hugeicons:filter-remove" class="mr-2 hover:text-white" width="20" height="20" />
                     <span class="text-sm">Clear</span>
                 </button>
             </div>
         </div>
     </div>
-    <div class="overflow-x-auto rounded shadow">
+    <div class="overflow-x-auto rounded-md shadow">
         <table class="w-full border-collapse border border-gray-100">
             <thead class="bg-gradient-to-r from-primary-500 to-primary-600 text-white uppercase text-xs tracking-wider">
                 <tr>
@@ -547,14 +547,14 @@ function downloadAsExcel(order) {
                             <a href={`/order-status/${order?.orderid}?email=${userEmail}`} class="text-blue-500 hover:text-blue-700">
                                 <span class={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1 ${
                                     order?.status === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
-                                    order?.status === 'canceled' ? 'bg-red-100 text-red-800 border border-red-200' :
+                                    order?.status === 'cancelled' ? 'bg-red-100 text-red-800 border border-red-200' :
                                     order?.status === 'pending cancellation' ? 'bg-red-100 text-red-600 border border-red-100' :
                                     order?.status === 'shipped' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
                                     order?.status === 'received' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
                                     'bg-gray-100 text-gray-800 border border-gray-200'
                                 }`}>
                                     <Icon icon={order?.status === 'pending' ? 'ri:time-line' :
-                                        order?.status === 'canceled' ? 'ri:close-circle-line' :
+                                        order?.status === 'cancelled' ? 'ri:close-circle-line' :
                                         order?.status === 'pending cancellation' ? 'fluent:calendar-cancel-20-regular' :
                                         order?.status === 'shipped' ? 'la:shipping-fast' :
                                         order?.status === 'received' ? 'ri:checkbox-circle-line' :
@@ -576,7 +576,7 @@ function downloadAsExcel(order) {
                                 <div transition:slide={{duration: 300, easing: quintOut}} 
                                      class="transition-all duration-300">
                                     <div class="p-4 space-y-4">
-                                    <div class="bg-white p-4 rounded  shadow">
+                                    <div class="bg-white p-4 rounded-md  shadow">
                                         <h4 class="text-heading font-bold mb-2">Order Summary</h4>
                                         <div class="grid grid-cols-3 gap-4 text-sm">
                                             <div>
@@ -603,23 +603,23 @@ function downloadAsExcel(order) {
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="bg-white p-4 rounded shadow">
+                                    <div class="bg-white p-4 rounded-md shadow">
                                         <div class="flex justify-between items-center">
                                             <h4 class="font-bold text-heading mb-2">Order Items</h4>
                                           </div>
                                         <!-- <h4 class="font-bold text-heading mb-2">Order Items</h4> -->
-                                        <div class="overflow-x-auto">
-                                            <table class="w-full text-sm rounded">
-                                                <thead class="rounded ">
+                                        <div class="overflow-x-auto rounded-t-md">
+                                            <table class="w-full sm:text-sm text-xs ">
+                                                <thead class="rounded-md ">
                                                     <tr class="bg-gradient-to-r from-primary-500 to-primary-600 text-white uppercase text-xs tracking-wider">
-                                                        <th class="border px-2 py-1 text-left">Product Name</th>
-                                                        <th class="border px-2 py-1 text-center">Order Qty</th>
+                                                        <th class="border px-2 py-1 text-left whitespace-nowrap">Product Name</th>
+                                                        <th class="border px-2 py-1 text-center whitespace-nowrap">Order Qty</th>
                                                         <!-- <th class="border px-2 py-1 text-center">Available</th> -->
                                                         <th class="border px-2 py-1 text-center">Ready</th>
-                                                        <th class="border px-2 py-1 text-center">Back Order</th>
-                                                        <th class="border px-2 py-1 text-center">Lead Time</th>
+                                                        <th class="border px-2 py-1 text-center whitespace-nowrap">Back Order</th>
+                                                        <th class="border px-2 py-1 text-center whitespace-nowrap">Lead Time</th>
                                                         <!-- <th class="border px-2 py-1 text-center">Customer Ref</th> -->
-                                                        <th class="border px-2 py-1 text-right">Unit Price</th>
+                                                        <th class="border px-2 py-1 text-right whitespace-nowrap">Unit Price</th>
                                                         <th class="border px-2 py-1 text-right">Total</th>
                                                     </tr>
                                                 </thead>
@@ -641,7 +641,7 @@ function downloadAsExcel(order) {
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="bg-white rounded shadow p-4">
+                                    <div class="bg-white rounded-md shadow p-4">
                                         <h3 class="font-bold mb-2 text-heading">Shipping Details</h3>
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div>
@@ -663,7 +663,7 @@ function downloadAsExcel(order) {
                                         </div>
                                     </div>
                                     {#if order?.transactionid && order?.transdetails}
-                                        <div class="bg-white p-4 rounded shadow">
+                                        <div class="bg-white p-4 rounded-md shadow">
                                         <h4 class="text-heading font-bold mb-2">Transaction Details</h4>
                                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div>
@@ -715,7 +715,7 @@ function downloadAsExcel(order) {
                                 <td colspan="6" class="border px-4 py-1 text-end bg-white">
                                     <button 
                                         on:click={() => downloadAsExcel(order)} 
-                                        class="bg-white text-heading px-3 py-1 border rounded shadow my-1 md:text-sm text-2s hover:text-white hover:bg-green-700 transition-all">
+                                        class="bg-white text-heading px-3 py-1 border rounded-md shadow my-1 md:text-sm text-2s hover:text-white hover:bg-green-700 transition-all">
                                         Download as Excel
                                     </button>
                                 </td>

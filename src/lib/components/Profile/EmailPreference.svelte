@@ -57,7 +57,7 @@
     }
 </script>
 
-<div class="shadow rounded p-5 bg-white">
+<div class="shadow rounded-md p-5 bg-white">
     {#if toggleEdit}
         <div class="">
     <h1 class=" text-xl font-bold"> Manage your Email Preferences</h1>
@@ -68,31 +68,31 @@
          <input type="hidden" name="preference" value={JSON.stringify(preferences)}>
         <div class=" text-xs md:text-sm flex flex-col gap-1.5">
             <label for="">
-                <input type="checkbox" bind:checked={isOption1} on:change={e=>handleCheckbox(e.target.checked,'option1')} class=" focus:ring-0 text-primary-500 mr-1" id="">
+                <input type="checkbox" bind:checked={isOption1} on:change={e=>handleCheckbox(e.target.checked,'option1')} class=" focus:ring-0 text-primary-500 mr-1 rounded" id="">
                 Send shipment tracking information to my email address.
             </label>
             <label for="">
-                <input type="checkbox" bind:checked={isOption2} on:change={e=>handleCheckbox(e.target.checked,'option2')} class=" focus:ring-0 text-primary-500 mr-1" id="">
+                <input type="checkbox" bind:checked={isOption2} on:change={e=>handleCheckbox(e.target.checked,'option2')} class=" focus:ring-0 text-primary-500 mr-1 rounded" id="">
                 Send my order confirmation via email.
             </label>
             <label for="">
-                <input type="checkbox" bind:checked={isOption3} on:change={e=>handleCheckbox(e.target.checked,'option3')} class=" focus:ring-0 text-primary-500 mr-1" id="">
+                <input type="checkbox" bind:checked={isOption3} on:change={e=>handleCheckbox(e.target.checked,'option3')} class=" focus:ring-0 text-primary-500 mr-1 rounded" id="">
                 Send repromise notifications to my email address.
             </label>
             <label for="">
-                <input type="checkbox" bind:checked={isOption4} on:change={e=>handleCheckbox(e.target.checked,'option4')} class=" focus:ring-0 text-primary-500 mr-1" id="">
+                <input type="checkbox" bind:checked={isOption4} on:change={e=>handleCheckbox(e.target.checked,'option4')} class=" focus:ring-0 text-primary-500 mr-1 rounded" id="">
                 Include the confirmation as an attachment with my order.
             </label>
         </div>
         <div class=" w-full">
             <label class=" text-xs md:text-sm font-medium" for="ccAddress">
             CC Addresses <span class=" text-xs">(comma "," separated addresses)</span></label><br>
-            <textarea placeholder="example@gmail.com,example2@gmail.com" class=" placeholder:text-gray-300 outline-none focus:ring-0 border-gray-300 w-full h-28 border-1 font-medium rounded p-2 text-sm focus:border-primary-500" 
+            <textarea placeholder="example@gmail.com,example2@gmail.com" class=" placeholder:text-gray-300 outline-none focus:ring-0 border-gray-300 w-full h-28 border-1 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
               bind:value={addresses} />
         </div>
         <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
-            <button type="button" on:click={()=>toggleEdit = false} class=" w-full rounded py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
-            <button type="submit" class=" w-full rounded py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Submit</button>
+            <button type="button" on:click={()=>toggleEdit = false} class=" w-full rounded-md py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
+            <button type="submit" class=" w-full rounded-md py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Submit</button>
         </div>
     </form>
 
@@ -106,7 +106,7 @@
             {#if emailPreferences === null}
         <div class=" space-y-3">
              <p class=" text-xs md:text-sm">No email Preferences are selected</p>
-             <button type="button" on:click={()=>toggleEdit = true} class=" w-40 md:w-48 rounded py-2 self-end font-medium text-xs md:text-sm text-white bg-primary-500 hover:bg-primary-600">Select Preferences</button>
+             <button type="button" on:click={()=>toggleEdit = true} class=" w-40 md:w-48 rounded-md py-2 self-end font-medium text-xs md:text-sm text-white bg-primary-500 hover:bg-primary-600">Select Preferences</button>
         </div>
         {:else}
             <div class=" space-y-2 md:space-y-3">
@@ -129,13 +129,13 @@
             </div>
             <div class="">
                 <p class=" font-semibold text-sm md:text-4s">CC Addresses</p>
-                <div class=" space-y-1 text-sm md:text-4s font-medium border-1 rounded p-2 sm:p-3 md:p-4">
+                <div class=" space-y-1 text-sm md:text-4s font-medium border-1 rounded-md p-2 sm:p-3 md:p-4">
                     {#each emailPreferences?.ccAddresses as address }
                     <p class=" w-full">{address}</p>
                     {/each}
                 </div>
             </div> 
-            <button type="button" on:click={()=>toggleEdit = true} class=" w-20 rounded py-2 self-end font-medium text-xs md:text-sm text-white bg-primary-500 hover:bg-primary-600">Edit</button>
+            <button type="button" on:click={()=>toggleEdit = true} class=" w-20 rounded-md py-2 self-end font-medium text-xs md:text-sm text-white bg-primary-500 hover:bg-primary-600">Edit</button>
     {/if}
         </div>
     {/if}

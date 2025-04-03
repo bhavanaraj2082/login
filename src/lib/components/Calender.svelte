@@ -1,7 +1,7 @@
 <script>
   import { onMount, createEventDispatcher } from 'svelte'
   import Icon from '@iconify/svelte';
-  import { slide,fade } from 'svelte/transition';
+  import { slide, fade } from 'svelte/transition';
   
   export let selectedDates = {
     from: '',
@@ -18,10 +18,16 @@
   const dispatch = createEventDispatcher();
   let dropdownOpen = false;
   let currentMonth = new Date();
+  let initialMonth = new Date();
   let selectedPreset = 'all';
   let filters = { ...initialFilters };
   let previousDates = null;
   let showCalendar = false;
+  
+  let calendarHistory = {
+    month: new Date(),
+    year: new Date().getFullYear()
+  };
   
   if (!maxDate) {
     maxDate = new Date();
@@ -51,12 +57,19 @@
     for (let i = 1; i <= daysInMonth; i++) {
       const currentDate = new Date(date.getFullYear(), date.getMonth(), i);
       currentDate.setHours(12, 0, 0, 0); 
+      
+      const isDisabled = (minDate && currentDate < minDate) || 
+                         (maxDate && currentDate > maxDate);
+      
+      const isDisabledBySelection = selectedDates.from && !selectedDates.to && 
+                                    parseDate(selectedDates.from) && 
+                                    currentDate < parseDate(selectedDates.from);
+      
       days.push({
         day: i,
         date: currentDate,
         isToday: currentDate.toDateString() === today.toDateString(),
-        disabled: (minDate && currentDate < minDate) || 
-                 (maxDate && currentDate > maxDate)
+        disabled: isDisabled || isDisabledBySelection
       });
     }
     
@@ -167,6 +180,11 @@
     previousDates = { ...selectedDates };
     
     if (preset === 'custom') {
+      calendarHistory = {
+        month: new Date(currentMonth),
+        year: currentMonth.getFullYear()
+      };
+      
       showCalendar = true;
       selectedDates = { from: '', to: '' };
     } else {
@@ -231,22 +249,49 @@
     filters = { ...initialFilters };
     dropdownOpen = false;
     showCalendar = false;
+    resetCalendarToCurrentMonth();
     dispatch('dateChange', {
       dates: selectedDates,
       filters
     });
   }
   
+  function resetCalendarToCurrentMonth() {
+    currentMonth = new Date();
+    initialMonth = new Date();
+    selectedYear = currentMonth.getFullYear();
+  }
+  
   function handleClickOutside(event) {
     const dropdown = document.querySelector('.date-dropdown-container');
     if (dropdown && !dropdown.contains(event.target)) {
       dropdownOpen = false;
+      if (showCalendar && (!selectedDates.from || !selectedDates.to)) {
+        resetCalendarView();
+      }
+      
       showCalendar = false;
     }
   }
   
+  function resetCalendarView() {
+    currentMonth = new Date(calendarHistory.month);
+    selectedYear = calendarHistory.year;
+  }
+  
+  function handleCancel() {
+    selectedDates = { ...previousDates };
+    resetCalendarView();
+    showCalendar = false;
+  }
+  
   onMount(() => {
     document.addEventListener('click', handleClickOutside);
+    calendarHistory = {
+      month: new Date(currentMonth),
+      year: currentMonth.getFullYear()
+    };
+    initialMonth = new Date();
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
@@ -299,7 +344,7 @@
       <div class="flex items-center space-x-2">
         <button
           type="button"
-          class="flex items-center w-full justify-between px-3 py-2.5 border border-primary-400 rounded text-xs bg-white hover:bg-gray-50 focus:outline-none focus:ring-primary-500 whitespace-nowrap"
+          class="flex items-center w-full justify-between px-3 py-2.5 border border-primary-400 rounded-md text-xs bg-white hover:bg-gray-50 focus:outline-none focus:ring-primary-500 whitespace-nowrap"
           on:click|stopPropagation={() => dropdownOpen = !dropdownOpen}>
           <span class="flex items-center">
             <Icon icon="famicons:today" class="w-5 h-5 text-gray-400 mr-2" />
@@ -310,7 +355,7 @@
         {#if selectedDates.from || selectedDates.to }
           <button
             type="button"
-            class="p-2 bg-white border border-primary-500 rounded active:scale-95 hover"
+            class="p-2 bg-white border border-primary-500 rounded-md active:scale-95 hover"
             on:click={clearFilters}>
             <Icon icon="heroicons:x-mark" class="w-5 h-5 font-bold text-xl text-red-600 hover:text-red-700" />
           </button>
@@ -318,14 +363,14 @@
       </div>
       {#if dropdownOpen}
         <div 
-          class="absolute z-50 mt-1 bg-white rounded shadow-lg border w-full sm:max-w-sm lg:w-full"
-          transition:slide={{ duration: 200 }}>
+          class="absolute z-50 mt-1 bg-white rounded-md shadow-lg border w-full sm:max-w-sm lg:w-full"
+          transition:slide={{ duration: 250 }}>
           {#if !showCalendar}
-            <div class="p-2" transition:fade>
+            <div class="p-2" transition:slide={{ duration: 250 }}>
               <div class="grid gap-1">
                 {#each Object.entries(presets) as [key, _]}
                   <button
-                    class="w-full px-3 py-2 text-left text-xs rounded hover:bg-gray-50
+                    class="w-full px-3 py-2 text-left text-xs rounded-md hover:bg-gray-50
                       {selectedPreset === key ? 'bg-primary-50 text-primary-600' : 'text-gray-700'}"
                     on:click={() => handlePresetChange(key)}>
                     {key === 'all' ? 'All Dates' :
@@ -343,27 +388,27 @@
             </div>
           {/if}
           {#if showCalendar}
-          <div class="p-4" transition:fade>
+          <div class="p-4" transition:slide={{ duration: 250 }}>
             <div class="flex items-center justify-between mb-4">
               <button
-                class="p-1.5 hover:bg-gray-100 rounded transition-colors"
+                class="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
                 on:click={() => currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)}>
                 <Icon icon="heroicons:chevron-left" class="w-4 h-4" />
               </button>
               <div class="flex items-center space-x-1">
                 <button 
-                  class="text-sm font-medium text-gray-700 px-2 py-1 hover:bg-gray-100 rounded transition-colors"
+                  class="text-sm font-medium text-gray-700 px-2 py-1 hover:bg-gray-100 rounded-md transition-colors"
                   on:click={toggleMonthSelector}>
                   {currentMonth.toLocaleString('default', { month: 'long' })}
                 </button>
                 <button 
-                  class="text-sm font-medium text-gray-700 px-2 py-1 hover:bg-gray-100 rounded transition-colors"
+                  class="text-sm font-medium text-gray-700 px-2 py-1 hover:bg-gray-100 rounded-md transition-colors"
                   on:click={toggleYearSelector}>
                   {currentMonth.getFullYear()}
                 </button>
               </div>
               <button
-                class="p-1.5 hover:bg-gray-100 rounded transition-colors"
+                class="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
                 on:click={() => currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)}>
                 <Icon icon="heroicons:chevron-right" class="w-4 h-4" />
               </button>
@@ -375,7 +420,7 @@
                    <div class="grid grid-cols-3 gap-2.5">
                      {#each months as month, index}
                        <button
-                         class="p-2 text-sm rounded hover:bg-gray-100 transition-colors
+                         class="p-2 text-sm rounded-md hover:bg-gray-100 transition-colors
                            {currentMonth.getMonth() === index 
                              ? 'bg-primary-50 text-primary-600 font-medium' 
                              : 'text-gray-700'}"
@@ -415,7 +460,7 @@
                 <div class="grid grid-cols-7 gap-0.5 w-full md:max-w-xs lg:w-full">
                   {#each calendarDays as { day, date, disabled, isToday }}
                     <button
-                      class="aspect-square flex items-center justify-center px-2 py-1 text-xs rounded
+                      class="aspect-square flex items-center justify-center px-2 py-1 text-xs rounded-md
                         {disabled ? 'text-gray-300 cursor-not-allowed' :
                          isToday ? 'font-semibold text-primary-600' :
                          date && selectedDates.from === formatDate(date) ? 'bg-primary-600 text-white' :
@@ -439,11 +484,8 @@
               {/if}
               <div class="flex items-center justify-around pt-3 border-t">
                 <button
-                  class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                  on:click={() => {
-                    selectedDates = { ...previousDates };
-                    showCalendar = false;
-                  }}>
+                  class="px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                  on:click={handleCancel}>
                   Cancel
                 </button>
               </div>

@@ -75,7 +75,7 @@
   });
 </script>
 
-<nav class="bg-white shadow rounded transition-all duration-300 ease-in-out lg:py-4 lg:max-w-xl">
+<nav class="bg-white shadow rounded-md transition-all duration-300 ease-in-out lg:py-4 lg:max-w-xl">
   {#if loading}
   <div class="hidden lg:flex my-1 items-center justify-center px-2 py-3 w-44 animate-pulse">
     <div class="h-6 bg-gray-300 rounded w-3/4"></div>
@@ -88,13 +88,13 @@
   <div class="lg:hidden flex justify-between items-center p-4 border-b">
     {#if loading}
     <div class="flex my-1 items-center justify-between px-2 py-3 w-full animate-pulse">
-      <div class="h-6 bg-gray-300 rounded w-3/4"></div>
-      <div class="h-6 w-6 bg-gray-300 rounded ml-6"></div>
+      <div class="h-6 bg-gray-300 rounded-md w-3/4"></div>
+      <div class="h-6 w-6 bg-gray-300 rounded-md ml-6"></div>
     </div>
     {:else}
     <h1 class="text-xl font-bold text-heading">Chemikart</h1>
     <button
-    class="md:p-2 p-1.5 rounded bg-primary-50 hover:bg-primary-200 transition-all duration-300 ease-in-out"
+    class="md:p-2 p-1.5 rounded-md bg-primary-50 hover:bg-primary-200 transition-all duration-300 ease-in-out"
     aria-label="Toggle menu"
     on:click={() => isMenuOpen.update((v) => !v)}>
     <Icon icon={$isMenuOpen ? 'mdi:close' : 'mdi:menu'} class="text-primary-700 hover:scale-95 text-2xl" />
@@ -109,7 +109,7 @@
     {#each Array(8) as _, i}
         <div class="flex my-1 items-center gap-2 px-6 py-3 w-full animate-pulse">
           <div class="w-5 h-5 bg-gray-300 rounded-full"></div>
-          <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+          <div class="h-4 bg-gray-300 rounded-md w-3/4"></div>
         </div>
       {/each}
     {:else}
@@ -120,7 +120,7 @@
       <div class="m-1">
         {#each group.items as item}
           <button
-            class="flex my-1 items-center gap-2 px-6 py-3 w-full text-left text-sm rounded 
+            class="flex my-1 items-center gap-2 px-6 py-3 w-full text-left text-sm rounded-md 
               {isActive(item) ? 'bg-primary-100 text-primary-700 font-semibold' : 'text-gray-700'}
               {isItemDisabled(item) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-100 hover:scale-95 transition-all duration-500 ease-in-out'}
               {hovered ? 'py-1' : 'py-2'}"

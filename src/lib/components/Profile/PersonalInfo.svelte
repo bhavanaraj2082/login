@@ -65,7 +65,7 @@
     <!-- edit form for contact information -->
     <div class="">
         <h1 class=" text-xl font-bold"> Edit Contact Information <span class=" text-xs font-normal"> <span class=" text-sm font-bold text-red-500">*</span>Represent required fields</span></h1>
-        <form class="my-3 flex flex-col sm:flex-row flex-wrap gap-y-3"
+        <form class="my-3 flex flex-col sm:flex-row flex-wrap gap-y-3 px-2"
         method="POST" action="?/editContact" use:enhance={handleSubmit}>
             <input type="hidden" name="recordId" value={recordId}>
             <!-- <div class=" w-full">
@@ -77,17 +77,16 @@
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="firstName">
                         <span class=" text-sm font-bold text-red-500">*</span>First Name</label><br>
-                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500"
+                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500"
                      type="text" name="firstName" bind:value={firstName}/>
                      {#if errors?.firstName}
 					<span class="text-red-400 text-xs">{errors.firstName}</span>
 				     {/if}
                 </div>
-                
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="lastName">
                         Last Name</label><br>
-                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
+                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                     type="text" name="lastName" bind:value={lastName}/>
                     <!-- {#if errors?.lastName}
 					<span class="text-red-400 text-xs">{errors.lastName}</span>
@@ -97,7 +96,7 @@
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
             <div class=" w-full">
                 <label class=" text-xs md:text-sm font-medium" for="cellPhone"><span class=" text-sm font-bold text-red-500">*</span>Primary Phone</label><br>
-                <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
+                <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                 type="text" name="cellPhone" bind:value={cellPhone}/>
                 {#if errors?.cellPhone}
 				<span class="text-red-400 text-xs">{errors.cellPhone}</span>
@@ -105,7 +104,7 @@
             </div>
             <div class=" w-full">
                 <label class=" text-xs md:text-sm font-medium" for="alternatePhone"><span class=" text-sm font-bold text-red-500"></span>Alternative Phone </label><br>
-                <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
+                <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                 type="text" name="alternatePhone" bind:value={alternatePhone}/>
                 <!-- {#if errors?.cellPhone}
 				<span class="text-red-400 text-xs">{errors.cellPhone}</span>
@@ -115,27 +114,27 @@
             <div class="w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4 pb-4">
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="companyName">Company Name</label><br>
-                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
+                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                     type="text" name="companyName" bind:value={companyName}/>
                     {#if errors?.companyName}
-                    <span class="text-red-400 text-xs">{errors.companyName}</span>
+                        <span class="text-red-400 text-xs">{errors.companyName}</span>
                     {/if}
                 </div>
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="gstNumber">GST Number</label><br>
-                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500" 
+                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                     type="text" name="gstNumber" bind:value={gstNumber}/>
                     {#if errors?.gstNumber}
-                    <span class="text-red-400 text-xs">{errors.gstNumber}</span>
+                        <span class="text-red-400 text-xs">{errors.gstNumber}</span>
                     {/if}
                 </div>
             </div>
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
                 <button type="button" on:click={()=>{
                     toggleEdit = false
-                    // window.location.reload()
-                }} class=" w-full rounded py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
-                <button type="submit" class=" w-full rounded py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Submit</button>
+                    window.location.reload()
+                }} class=" w-full rounded-md py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
+                <button type="submit" class=" w-full rounded-md py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Submit</button>
             </div>
 
         </form>
@@ -150,10 +149,10 @@
         <h1 class=" font-bold text-4s md:text-lg mb-2">
             Manage Your Personal Information
         </h1>
-        <div class="mt-4">
+        <div class="mt-4 px-2">
             <div class=" flex items-center justify-between border-b-1 mt-2 pb-2">
                 <h2 class=" font-semibold text-4s">Contact Information</h2>
-                <button on:click={()=>toggleEdit = true} class=" w-20 rounded py-1.5 font-medium text-xs md:text-sm text-white bg-primary-500 hover:bg-primary-600">Edit</button>
+                <button on:click={()=>toggleEdit = true} class=" w-20 rounded-md py-1.5 font-medium text-xs md:text-sm text-white bg-primary-500 hover:bg-primary-600">Edit</button>
             </div>
             <section class=" w-full flex flex-col sm:flex-row flex-wrap gap-y-4 py-3">
                 <div class="flex sm:flex-row items-center text-sm md:text-4s w-full sm:w-1/2">

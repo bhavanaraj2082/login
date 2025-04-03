@@ -45,12 +45,12 @@
     <div class="flex flex-col lg:flex-row gap-4 pb-2">
       <Navigation {...navigationProps} />
       <div class="flex-1 space-y-6">
-        <div class="bg-white rounded shadow p-4">
+        <div class="bg-white rounded-md shadow p-4">
           <div class="flex flex-col sm:flex-row justify-between">
             {#if isLoading}
             <!-- <div class="flex flex-col"> -->
-              <div class="h-4 bg-gray-200 rounded md:w-1/3 w-full mb-2"></div>
-              <div class="h-4 bg-gray-200 rounded md:w-1/4 w-full"></div>
+              <div class="h-4 bg-gray-200 rounded-md md:w-1/3 w-full mb-2"></div>
+              <div class="h-4 bg-gray-200 rounded-md md:w-1/4 w-full"></div>
             <!-- </div> -->
             {:else}
             <div>
@@ -62,7 +62,7 @@
             {/if}
             {#if !isRegistrationComplete}
               <button 
-                class="sm:px-6 sm:py-2.5 px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-500 transition-all duration-200 shadow-sm hover:scale-95 flex items-center gap-2 mt-4 sm:mt-0"
+                class="sm:px-6 sm:py-2.5 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-500 transition-all duration-200 shadow-sm hover:scale-95 flex items-center gap-2 mt-4 sm:mt-0"
                 on:click={handleCompleteRegistration}>
                 <Icon icon="heroicons:user-circle" class="text-xl"/>
                 Complete Profile
@@ -71,7 +71,7 @@
           </div>
         </div>
         {#if !isRegistrationComplete}
-          <div class="bg-amber-50 border-l-4 border-amber-300 border sm:p-6 p-2 rounded">
+          <div class="bg-amber-50 border-l-4 border-amber-300 border sm:p-6 p-2 rounded-md">
             <div class="flex flex-col sm:flex-row justify-start items-center sm:text-base text-xs">
               <Icon icon="marketeq:warning-alt" class="text-4xl sm:my-0 mb-2 bg-gray-100 p-0.5 rounded-md"/>
               <p class="text-amber-700 sm:text-base text-xs ml-2">
@@ -91,8 +91,8 @@
                 <div class="flex items-start gap-3 mb-4">
                   <div class="h-5 w-5 mt-1 rounded-full bg-gray-200 flex-shrink-0"></div>
                   <div class="w-full">
-                    <div class="h-4 bg-gray-200 rounded w-11/12 mb-2"></div>
-                    <div class="h-4 bg-gray-200 rounded w-4/5"></div>
+                    <div class="h-4 bg-gray-200 rounded-md w-11/12 mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded-md w-4/5"></div>
                   </div>
                 </div>
               {/each}
@@ -106,8 +106,8 @@
                 <div class="flex items-start gap-3 mb-4">
                   <div class="h-5 w-5 mt-1 rounded-full bg-gray-200 flex-shrink-0"></div>
                   <div class="w-full">
-                    <div class="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                    <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div class="h-4 bg-gray-200 rounded-md w-full mb-2"></div>
+                    <div class="h-4 bg-gray-200 rounded-md w-3/4"></div>
                   </div>
                 </div>
               {/each}
@@ -135,16 +135,16 @@
                 </div>
                 <div class="grid grid-cols-5 gap-4 mb-4 px-2">
                   {#each Array(5) as _, i}
-                    <div class="h-5 bg-gray-200 rounded w-3/4"></div>
+                    <div class="h-5 bg-gray-200 rounded-md w-3/4"></div>
                   {/each}
                 </div>
                 {#each Array(2) as _, i}
                   <div class="grid grid-cols-5 gap-4 py-4 px-2 border-t border-gray-100">
-                    <div class="h-5 bg-gray-200 rounded w-8"></div>
-                    <div class="h-5 bg-gray-200 rounded w-28"></div>
-                    <div class="h-5 bg-gray-200 rounded w-24"></div>
-                    <div class="h-5 bg-gray-200 rounded w-12"></div>
-                    <div class="h-5 bg-gray-200 rounded w-24"></div>
+                    <div class="h-5 bg-gray-200 rounded-md w-8"></div>
+                    <div class="h-5 bg-gray-200 rounded-md w-28"></div>
+                    <div class="h-5 bg-gray-200 rounded-md w-24"></div>
+                    <div class="h-5 bg-gray-200 rounded-md w-12"></div>
+                    <div class="h-5 bg-gray-200 rounded-md w-24"></div>
                   </div>
                 {/each}
               </div>
@@ -154,10 +154,10 @@
                 <div class="flex items-start gap-4">
                   <div class="h-12 w-12 bg-gray-200 rounded-md"></div>
                   <div class="w-full">
-                    <div class="h-6 bg-gray-200 rounded w-1/4 mb-3"></div>
-                    <div class="h-5 bg-gray-200 rounded w-1/3 mb-3"></div>
-                    <div class="h-5 bg-gray-200 rounded w-1/2 mb-2"></div>
-                    <div class="h-5 bg-gray-200 rounded w-2/3"></div>
+                    <div class="h-6 bg-gray-200 rounded-md w-1/4 mb-3"></div>
+                    <div class="h-5 bg-gray-200 rounded-md w-1/3 mb-3"></div>
+                    <div class="h-5 bg-gray-200 rounded-md w-1/2 mb-2"></div>
+                    <div class="h-5 bg-gray-200 rounded-md w-2/3"></div>
                   </div>
                 </div>
               </div>
@@ -170,7 +170,7 @@
         {:else if isRegistrationComplete}
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {#each cardsData as card}
-              <div class="bg-white rounded shadow hover:shadow-md transition-shadow duration-200 overflow-hidden group">
+              <div class="bg-white rounded-md shadow hover:shadow-md transition-shadow duration-200 overflow-hidden group">
                 <div class="p-6">
                   <div class="flex items-start justify-between mb-4">
                     <h3 class="sm:text-xl text-md font-semibold text-gray-800 group-hover:text-primary-600 transition-colors">
@@ -190,12 +190,12 @@
               </div>
             {/each}
           </div>
-          <div class="bg-white rounded shadow overflow-hidden">
+          <div class="bg-white rounded-md shadow overflow-hidden">
             <div class="p-3 border-b-1 border-gray-100">
               <div class="flex items-center justify-between">
                 <h2 class="sm:text-xl text-sm font-semibold text-gray-800">Recent Orders</h2>
                 <a href="/dashboard/myorders" 
-                   class="inline-flex items-center gap-2 sm:px-4 sm:py-2 px-2 py-1 bg-primary-600 text-white rounded hover:bg-primary-700 transition-all sm:text-sm text-2s hover:scale-95 whitespace-nowrap duration-300">
+                   class="inline-flex items-center gap-2 sm:px-4 sm:py-2 px-2 py-1 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-all sm:text-sm text-2s hover:scale-95 whitespace-nowrap duration-300">
                   <Icon icon="heroicons:eye" class="sm:text-xl text-sm" />
                   View All Orders
                 </a>
@@ -249,9 +249,9 @@
               </div>
             {/if}
           </div>
-          <div class="bg-white rounded shadow p-6">
+          <div class="bg-white rounded-md shadow p-6">
             <div class="flex items-start gap-4">
-              <div class="hidden sm:block p-1 sm:p-3 bg-primary-50 rounded">
+              <div class="hidden sm:block p-1 sm:p-3 bg-primary-50 rounded-md">
                 <Icon icon="heroicons:building-office-2" class="sm:text-2xl text-xs text-primary-600"/>
               </div>
               <div>
