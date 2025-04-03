@@ -925,31 +925,79 @@
     let errors = {};
 
     let searchTerm = "";
-
     function selectCountry(selectedCountry) {
-        country = selectedCountry.name;
-        // filteredCountries = countries;
-        searchTerm = `${selectedCountry.name} `;
-        showDropdown = false;
-        validateField("country");
-        validatePhoneNumber(country, phone);
+		country = selectedCountry.name;
+		searchTerm = selectedCountry.name;
+		showDropdown = false;
+		validateField('country');
+		validatePhoneNumber(country, contactNumber);
 
-        delete errors.country;
+		delete errors.country;
+		const countryInput = document.querySelector('input[name="country"]');
+		if (countryInput) {
+			countryInput.value = selectedCountry.name;
+		}
         if (!phone || phone === "") {
-        errors.phone = "Required for the selected country.";
-
-    } else {
+               errors.phone = "Required for the selected country.";
+        }
+        else {
         delete errors.phone; // Remove any errors if conditions are satisfied
     }
-        // console.log('Selected Country:', country);
-    }
+	}
+
+    // function selectCountry(selectedCountry) {
+    //     country = selectedCountry.name;
+    //     // filteredCountries = countries;
+    //     searchTerm = `${selectedCountry.name} `;
+    //     showDropdown = false;
+    //     validateField("country");
+    //     validatePhoneNumber(country, phone);
+
+    //     delete errors.country;
+    //     if (!phone || phone === "") {
+    //     errors.phone = "Required for the selected country.";
+
+    // } else {
+    //     delete errors.phone; // Remove any errors if conditions are satisfied
+    // }
+    //     // console.log('Selected Country:', country);
+    // }
     
+// function handleKeyDown(event) {
+//     if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
+//         selectCountry(filteredCountries[0]);
+//         event.preventDefault();
+//     }
+// }
 function handleKeyDown(event) {
-    if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
-        selectCountry(filteredCountries[0]);
-        event.preventDefault();
-    }
-}
+		const exactCountryMatch = countries.some((c) => c.name === country && c.name === searchTerm);
+		if (
+			exactCountryMatch &&
+			!(
+				event.key === 'Backspace' ||
+				event.key === 'Delete' ||
+				event.key === 'ArrowLeft' ||
+				event.key === 'ArrowRight' ||
+				event.key === 'Home' ||
+				event.key === 'End' ||
+				event.key === 'Tab' ||
+				event.key === 'Escape' ||
+				event.ctrlKey
+			)
+		) {
+			// Block adding characters to an exact match
+			event.preventDefault();
+			return false;
+		}
+
+		if (event.key === 'Enter' && searchTerm.length >= 3 && filteredCountries.length > 0) {
+			selectCountry(filteredCountries[0]);
+			event.preventDefault();
+		} else if (event.key === 'Escape') {
+			showDropdown = false;
+		}
+		// Allow backspace/delete to work normally - no special handling needed
+	}
     function toggleDropdown() {
         showDropdown = !showDropdown;
     }
@@ -997,47 +1045,38 @@ function handleKeyDown(event) {
     //     searchTerm = event.target.value;
     //     filterCountries();
     // }
-    function handleInputChange(event) {
-        // Get the current input value
-        searchTerm = event.target.value;
+	function handleInputChange(event) {
+		searchTerm = event.target.value;
+		const isDeleting =
+			event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward';
 
-        // Track if user is deleting text
-        const isDeleting =
-            event.inputType === "deleteContentBackward" ||
-            event.inputType === "deleteContentForward";
+		if (searchTerm.length > 0 && !isDeleting) {
+			filterCountriesWithoutAutoSelect();
+			showDropdown = filteredCountries.length > 0;
+			const codeSearch = searchTerm.replace('+', '').trim();
+			if (codeSearch.length > 0) {
+				const exactCodeMatches = filteredCountries.filter(
+					(country) => country.code.replace('+', '') === codeSearch
+				);
 
-        if (searchTerm.length > 0 && !isDeleting) {
-            // Filter countries
-            filterCountriesWithoutAutoSelect();
+				if (exactCodeMatches.length === 1) {
+					selectCountry(exactCodeMatches[0]);
+					return;
+				}
+			}
 
-            // Show dropdown with filtered results
-            showDropdown = filteredCountries.length > 0;
+			const countriesStartingWith = filteredCountries.filter((country) =>
+				country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+			);
 
-            // Check for country code matches specifically
-            const codeSearch = searchTerm.replace("+", "").trim();
-            if (codeSearch.length > 0) {
-                const exactCodeMatches = filteredCountries.filter(
-                    (country) => country.code.replace("+", "") === codeSearch,
-                );
-
-                if (exactCodeMatches.length === 1) {
-                    selectCountry(exactCodeMatches[0]);
-                    return;
-                }
-            }
-
-            const countriesStartingWith = filteredCountries.filter((country) =>
-                country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
-            );
-
-            if (countriesStartingWith.length === 1) {
-                selectCountry(countriesStartingWith[0]);
-            }
-        } else {
-            filterCountriesWithoutAutoSelect();
-            showDropdown = filteredCountries.length > 0;
-        }
-    }
+			if (countriesStartingWith.length === 1) {
+				selectCountry(countriesStartingWith[0]);
+			}
+		} else {
+			filterCountriesWithoutAutoSelect();
+			showDropdown = filteredCountries.length > 0;
+		}
+	}
     function filterCountriesWithoutAutoSelect() {
         filteredCountries = countries.filter(
             (country) =>
@@ -1657,6 +1696,11 @@ function handleKeyDown(event) {
                                 on:input={handleInputChange}
                                 on:click={toggleDropdown}
                                 on:keydown={handleKeyDown}
+                                on:input={() => {
+                                    validateField("country");
+                                    errors.country = !country
+                                      
+                                }}
                                 class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             />
 
