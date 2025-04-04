@@ -1,7 +1,9 @@
 <script>
+	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
     import { fly, fade } from 'svelte/transition';
     import Icon from '@iconify/svelte';
+    console.log($page);
 </script>
 
 <section class="bg-gray-50 flex items-center justify-center p-6">
@@ -20,7 +22,7 @@
         </div>
         <button 
           class="bg-primary-500 hover:bg-primary-600 text-white font-medium rounded px-4 py-2 mt-4 max-w-sm transition ease-in-out duration-300" 
-          on:click={() => goto(`/order-status`)}
+          on:click={() => goto(`/order-status/${$page.params.orderid}`)}
           in:fly={{ y: 10, duration: 600 }}>
           View Order Status
         </button>
