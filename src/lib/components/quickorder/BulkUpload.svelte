@@ -147,151 +147,224 @@
     );
     return validProducts.length > 0;
   }
-
   function handleFileInputChange(event) {
     const file = event.target.files[0];
 
-    if (file) {
-      const fileType = file.name.split(".").pop().toLowerCase();
-      selectedFileName = file.name;
-      isValidated = false;
-      invalidProductLines = [];
+    if (!file) {
+      fileError = "No file selected.";
+      return;
+    }
 
-      if (fileType === "xlsx" || fileType === "xls") {
-        fileError = "";
+    const fileType = file.name.split(".").pop().toLowerCase();
+    selectedFileName = file.name;
+    isEditing = true;
 
-        if (typeof XLSX !== "undefined") {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            try {
-              const data = new Uint8Array(e.target.result);
-              const workbook = XLSX.read(data, { type: "array" });
-              const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    const reader = new FileReader();
 
-              let csvData = XLSX.utils.sheet_to_csv(worksheet);
-              const lines = csvData.split("\n").filter((line) => line.trim());
-              const transformedLines = lines.map((line) => {
-                const parts = line.split(",").map((part) => part.trim());
-                if (parts.length === 1) {
-                  return `${parts[0]},1`;
-                }
-                if (
-                  parts.length === 2 &&
-                  (!parts[1] || isNaN(parseInt(parts[1])))
-                ) {
-                  return `${parts[0]},1`;
-                }
+    reader.onerror = () => {
+      fileError = "Error reading the file. Please try again.";
+    };
 
-                return line;
-              });
+    if (["xlsx", "xls"].includes(fileType)) {
+      if (typeof XLSX === "undefined") {
+        fileError = "Excel support requires SheetJS. Use CSV instead.";
+        return;
+      }
 
-              rawFileData = transformedLines.join("\n");
-              isEditing = true;
-              const csvFile = new File(
-                [rawFileData],
-                file.name.replace(/\.xlsx$|\.xls$/i, ".csv"),
-                {
-                  type: "text/csv",
-                },
-              );
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          let csvData = XLSX.utils.sheet_to_csv(worksheet);
 
-              const dataTransfer = new DataTransfer();
-              dataTransfer.items.add(csvFile);
-
-              const fileInput = document.getElementById("bulkupload");
-              if (fileInput) {
-                fileInput.files = dataTransfer.files;
+          const transformed = csvData
+            .split("\n")
+            .filter((l) => l.trim())
+            .map((line) => {
+              const parts = line.split(",").map((p) => p.trim());
+              if (parts.length === 1 || (parts.length === 2 && isNaN(+parts[1]))) {
+                return `${parts[0]},1`;
               }
+              return line;
+            });
 
-              const { duplicates } = checkForDuplicates(rawFileData);
-              duplicateEntries = duplicates;
+          rawFileData = transformed.join("\n");
 
-              if (duplicates.length > 0) {
-                toast.error(
-                  `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
-                );
-              } else {
-                // Auto-submit the form if no duplicates
-                setTimeout(() => {
-                  if (formElement) {
-                    formElement.requestSubmit();
-                  }
-                }, 100);
-              }
-            } catch (error) {
-              console.error("Excel processing error:", error);
-              fileError =
-                "Error processing Excel file. Please check file format.";
-            }
-          };
-          reader.onerror = function () {
-            fileError = "Error reading the file. Please try again.";
-          };
-          reader.readAsArrayBuffer(file);
-        } else {
-          fileError =
-            "Excel file support requires the SheetJS library. Please use CSV format instead.";
+          // handle duplicates here
+        } catch (err) {
+          fileError = "Error processing Excel file.";
+          console.error(err);
         }
-      } else {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          let fileContent = e.target.result;
-          fileError = "";
-          isEditing = true;
-          const lines = fileContent.split("\n").filter((line) => line.trim());
-          const trimmedLines = lines.map((line) => {
-            const parts = line.split(",").map((item) => item.trim());
+      };
 
-            // If only SKU-size is present, add quantity 1
-            if (parts.length === 1) {
+      reader.readAsArrayBuffer(file);
+    } else {
+      reader.onload = (e) => {
+        const content = e.target.result;
+        const lines = content
+          .split("\n")
+          .filter((line) => line.trim())
+          .map((line) => {
+            const parts = line.split(",").map((p) => p.trim());
+            if (parts.length === 1 || (parts.length === 2 && isNaN(+parts[1]))) {
               return `${parts[0]},1`;
             }
-            if (
-              parts.length === 2 &&
-              (!parts[1] || isNaN(parseInt(parts[1])))
-            ) {
-              return `${parts[0]},1`;
-            }
-
             return line;
           });
 
-          rawFileData = trimmedLines.join("\n");
-          const trimmedFile = new File([rawFileData], file.name, {
-            type: "text/csv",
-          });
-          const dataTransfer = new DataTransfer();
-          dataTransfer.items.add(trimmedFile);
-          const fileInput = document.getElementById("bulkupload");
-          if (fileInput) {
-            fileInput.files = dataTransfer.files;
-          }
+        rawFileData = lines.join("\n");
 
-          const { duplicates } = checkForDuplicates(rawFileData);
-          duplicateEntries = duplicates;
+        // handle duplicates here
+      };
 
-          if (duplicates.length > 0) {
-            toast.error(
-              `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
-            );
-          } else {
-            // Auto-submit the form if no duplicates
-            setTimeout(() => {
-              if (formElement) {
-                formElement.requestSubmit();
-              }
-            }, 100);
-          }
-        };
-        reader.onerror = function () {
-          fileError = "Error reading the file. Please try again.";
-        };
-        reader.readAsText(file);
-      }
-    } else {
-      fileError = "No file selected.";
+      reader.readAsText(file);
     }
   }
+  // function handleFileInputChange(event) {
+  //   const file = event.target.files[0];
+
+  //   if (file) {
+  //     const fileType = file.name.split(".").pop().toLowerCase();
+  //     selectedFileName = file.name;
+  //     isValidated = false;
+  //     invalidProductLines = [];
+
+  //     if (fileType === "xlsx" || fileType === "xls") {
+  //       fileError = "";
+
+  //       if (typeof XLSX !== "undefined") {
+  //         const reader = new FileReader();
+  //         reader.onload = function (e) {
+  //           try {
+  //             const data = new Uint8Array(e.target.result);
+  //             const workbook = XLSX.read(data, { type: "array" });
+  //             const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+  //             let csvData = XLSX.utils.sheet_to_csv(worksheet);
+  //             const lines = csvData.split("\n").filter((line) => line.trim());
+  //             const transformedLines = lines.map((line) => {
+  //               const parts = line.split(",").map((part) => part.trim());
+  //               if (parts.length === 1) {
+  //                 return `${parts[0]},1`;
+  //               }
+  //               if (
+  //                 parts.length === 2 &&
+  //                 (!parts[1] || isNaN(parseInt(parts[1])))
+  //               ) {
+  //                 return `${parts[0]},1`;
+  //               }
+
+  //               return line;
+  //             });
+
+  //             rawFileData = transformedLines.join("\n");
+  //             isEditing = true;
+  //             const csvFile = new File(
+  //               [rawFileData],
+  //               file.name.replace(/\.xlsx$|\.xls$/i, ".csv"),
+  //               {
+  //                 type: "text/csv",
+  //               },
+  //             );
+
+  //             const dataTransfer = new DataTransfer();
+  //             dataTransfer.items.add(csvFile);
+
+  //             const fileInput = document.getElementById("bulkupload");
+  //             if (fileInput) {
+  //               fileInput.files = dataTransfer.files;
+  //             }
+
+  //             const { duplicates } = checkForDuplicates(rawFileData);
+  //             duplicateEntries = duplicates;
+
+  //             if (duplicates.length > 0) {
+  //               toast.error(
+  //                 `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+  //               );
+  //             } else {
+  //               // Auto-submit the form if no duplicates
+  //               setTimeout(() => {
+  //                 if (formElement) {
+  //                   formElement.requestSubmit();
+  //                 }
+  //               }, 100);
+  //             }
+  //           } catch (error) {
+  //             console.error("Excel processing error:", error);
+  //             fileError =
+  //               "Error processing Excel file. Please check file format.";
+  //           }
+  //         };
+  //         reader.onerror = function () {
+  //           fileError = "Error reading the file. Please try again.";
+  //         };
+  //         reader.readAsArrayBuffer(file);
+  //       } else {
+  //         fileError =
+  //           "Excel file support requires the SheetJS library. Please use CSV format instead.";
+  //       }
+  //     } else {
+  //       const reader = new FileReader();
+  //       reader.onload = function (e) {
+  //         let fileContent = e.target.result;
+  //         fileError = "";
+  //         isEditing = true;
+  //         const lines = fileContent.split("\n").filter((line) => line.trim());
+  //         const trimmedLines = lines.map((line) => {
+  //           const parts = line.split(",").map((item) => item.trim());
+
+  //           // If only SKU-size is present, add quantity 1
+  //           if (parts.length === 1) {
+  //             return `${parts[0]},1`;
+  //           }
+  //           if (
+  //             parts.length === 2 &&
+  //             (!parts[1] || isNaN(parseInt(parts[1])))
+  //           ) {
+  //             return `${parts[0]},1`;
+  //           }
+
+  //           return line;
+  //         });
+
+  //         rawFileData = trimmedLines.join("\n");
+  //         const trimmedFile = new File([rawFileData], file.name, {
+  //           type: "text/csv",
+  //         });
+  //         const dataTransfer = new DataTransfer();
+  //         dataTransfer.items.add(trimmedFile);
+  //         const fileInput = document.getElementById("bulkupload");
+  //         if (fileInput) {
+  //           fileInput.files = dataTransfer.files;
+  //         }
+
+  //         const { duplicates } = checkForDuplicates(rawFileData);
+  //         duplicateEntries = duplicates;
+
+  //         if (duplicates.length > 0) {
+  //           toast.error(
+  //             `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+  //           );
+  //         } else {
+  //           // Auto-submit the form if no duplicates
+  //           setTimeout(() => {
+  //             if (formElement) {
+  //               formElement.requestSubmit();
+  //             }
+  //           }, 100);
+  //         }
+  //       };
+  //       reader.onerror = function () {
+  //         fileError = "Error reading the file. Please try again.";
+  //       };
+  //       reader.readAsText(file);
+  //     }
+  //   } else {
+  //     fileError = "No file selected.";
+  //   }
+  // }
 
   // New function to remove all duplicates at once
   function removeAllDuplicates(event) {
@@ -636,6 +709,30 @@
       }
     });
   }
+  let fileInput;
+  let dropzone;
+  function triggerUpload() {
+    fileInput.click();
+  }
+
+  function handleDrop(event) {
+    event.preventDefault();
+    dropzone.classList.remove("bg-primary-100", "text-primary-600");
+
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      handleFileInputChange({ target: { files: [file] } });
+    }
+  }
+
+  function handleDragOver(event) {
+    event.preventDefault();
+    dropzone.classList.add("bg-primary-100", "text-primary-600");
+  }
+
+  function handleDragLeave() {
+    dropzone.classList.remove("bg-primary-100", "text-primary-600");
+  }
 </script>
 
 <!-- <div class="text-black text-sm md:ml-2 mb-1">
@@ -829,7 +926,7 @@ Example file content:
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div
+        <!-- <div
           class="w-full flex flex-col justify-center bg-white items-center rounded-md h-[220px] mt-3 space-y-2 py-6 border border-dashed hover:bg-primary-100 hover:text-primary-600"
         >
           <Icon icon="uil:upload" class="text-5xl text-primary-500 -ml-4" />
@@ -851,8 +948,41 @@ Example file content:
             />
           </label>
         </div>
-      </div>
+      </div> -->
+      <div
+      on:click={triggerUpload}
+      bind:this={dropzone}
+      class="w-full flex flex-col justify-center bg-white items-center rounded-md h-[210px] mt-2 space-y-2 py-6 border border-dashed hover:bg-primary-100 hover:text-primary-600"
+      on:drop={handleDrop}
+      on:dragover={handleDragOver}
+      on:dragleave={handleDragLeave}
+    >
+    <Icon icon="uil:upload" class="text-4xl text-primary-500 -ml-4" />
+      <div class="flex flex-col items-center pointer-events-none text-primary-500">
 
+        <p class="text-sm font-medium text-center px-2">
+          Or drag and drop your CSV or XLS file to upload
+        </p>
+      </div>
+    
+      <input
+        bind:this={fileInput}
+        type="file"
+        name="file"
+        accept=".xlsx, .xls, .csv, .txt"
+        class="hidden"
+        on:change={handleFileInputChange}
+      />
+    
+      <button
+        type="button"
+        on:click={triggerUpload}
+        hidden
+        class="mt-2 text-primary-600 underline"
+      >
+        Click to select a file
+      </button>
+    </div>
       {#if selectedFileName && rawFileData.length !== 0}
         <p class="text-sm text-primary-500 mt-2">{selectedFileName}</p>
       {/if}
