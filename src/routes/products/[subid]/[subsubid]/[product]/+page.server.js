@@ -28,6 +28,8 @@ export async function load({ params, locals }) {
     if (!productData || productData.type === "error" || Object.keys(productData).length === 0) {
       throw error(404, "Product not found");
     }
+    console.log(compareSimilarity,"compareSimilarity from server");
+    
     return {
       productData,
       relatedProducts,
