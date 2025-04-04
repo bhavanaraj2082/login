@@ -811,7 +811,7 @@ async function submitForm() {
 				{/each}
 				<!-- <a href="/quotes"> -->
 					<div class="group" role="menu"><div class="py-0 pr-2 pl-3 text-gray-600">
-					<button on:click={() => goto('/quotes')} class="flex items-center hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap sm:text-sm text-xs lg:text-base font-medium text-left w-full text-white">
+					<button on:click={() => goto('/quotes')} class="flex items-center hover:bg-gray-200/25 p-2 cursor-pointer hover:scale-105 rounded-t-md text-nowrap sm:text-sm text-xs lg:text-base font-medium text-left w-full text-white">
 						<span class="text-white font-medium sm:text-sm text-xs lg:text-base">
 							Quotes
 						</span>

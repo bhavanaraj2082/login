@@ -275,11 +275,22 @@
   }
 
   let specificKeys = [
-    "material",
-    "Agency",
-    "matrix active group",
-    "technique(s)",
+    
+
+    "Plug Shape",
+    "Noise Reduction Rating (NRR)",
+    "Disposable",
+    "Size",
+    "Dielectric",
     "application(s)",
+    "technique(s)",
+    "matrix active group",
+    "packaging",
+    "product line",
+    "material",
+    "Agency"
+    
+    
   ];
   let showDifference = false;
   function toggleDifference(event) {
@@ -291,16 +302,13 @@
     }
     return text;
   }
-  function isUnique(value, key) {
-    if (value === "-" || value === undefined) {
-      return false;
-    }
-    const values = CompareSimilarityData.map(
-      (product) => product.properties[key]
-    ).filter((val) => val !== "-");
-    return values.filter((v) => v === value).length === 1;
+  function isSameAsFirst(value, key) {
+    if (CompareSimilarityData.length === 0 ) {
+    return false; 
   }
-
+  const firstValue = CompareSimilarityData[0].properties[key];
+  return value === firstValue;
+}
   function toggleQuoteModal(selectedProduct) {
     closeModal();
     showQuoteModal = !showQuoteModal;
@@ -311,6 +319,7 @@
     closeModal();
     location.href = `/products/${selectedProduct.category}/${selectedProduct.subCategory}/${selectedProduct.partNumber}#productVariants`;
   }
+
 </script>
 
 <div class="max-w-7xl mx-auto my-10">
@@ -405,39 +414,30 @@
                         stockId: product.stockId,
                         variants: product.variants,
                       })}
-                    class="w-10/12 max-w-xs text-primary-500 py-1.5 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition px-1.5 mb-4"
+                    class="w-10/12 max-w-xs text-primary-500 py-1.5 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition px-1.5 mb-3"
                   >
                     View Price & Availability
                   </button>
                 </div>
-
-                <div class="px-3 mb-3">
+                <div class="px-3 mb-1">
                   <h3 class="text-gray-700">
-                    {#each specificKeys as key}
-                      <div
-                        class="grid grid-cols-2 gap-4 mb-2 mt-2 rounded-sm p-2 {showDifference &&
-                        isUnique(product.properties[key], key)
-                          ? 'bg-primary-100 border border-gray-200'
-                          : 'bg-white'}"
-                      >
-                        <span class="text-left text-xs font-semibold"
-                          >{key}:</span
-                        >
-                        <span
-                          class="text-gray-500 text-right text-xs font-normal"
-                        >
+                    {#each Object.keys(product.properties).slice(0,5) as key}
+                      <hr class="border-t border-gray-300" />
+                      <div class="py-2
+                        {showDifference && !isSameAsFirst(product.properties[key], key) && product.properties[key] && product.properties[key] !== '--' ? 'bg-primary-100 ' : 'bg-white'}">
+                        <div class="text-left text-xs font-semibold">{key}:</div>
+                        <div class="text-gray-500 text-xs pt-1 font-normal">
                           {#if product.properties && product.properties[key]}
                             {#if typeof product.properties[key] === "object"}
                               {JSON.stringify(product.properties[key])}
                             {:else}
-                              {truncateByLength(product.properties[key], 10)}
+                              {product.properties[key]}
                             {/if}
                           {:else}
                             -
                           {/if}
-                        </span>
+                        </div>
                       </div>
-                      <hr class="border-t border-gray-300" />
                     {/each}
                   </h3>
                 </div>
