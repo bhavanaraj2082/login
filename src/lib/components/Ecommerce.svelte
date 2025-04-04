@@ -542,19 +542,37 @@
     }
 }
 	function handleSubmit(event) {
-		const isFnameValid = fname.length > 0 && /^[A-Za-z\s]+$/.test(fname);
-  const isLnameValid = lname.length > 0 && /^[A-Za-z\s]+$/.test(lname);
+// 		const isFnameValid = fname.length > 0 && /^[A-Za-z\s]+$/.test(fname);
+//   const isLnameValid = lname.length > 0 && /^[A-Za-z\s]+$/.test(lname);
 		if (
 			number.length === 0 ||
 			email.length === 0 ||
-			!isFnameValid ||
+
+			fname.length === 0 || 
+			fname.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(fname) ||
+				/<[^>]*>/.test(fname) ||
+
+				lname.length === 0 || 
+			lname.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(lname) ||
+				/<[^>]*>/.test(lname) ||
+			
 			company.length === 0 || 
 			company.trim() === "" ||
 				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) ||
 				/<[^>]*>/.test(company) ||
+
 			details.length === 0 ||
-			role.length === 0 ||
-			!isLnameValid ||			
+			details.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) ||
+				/<[^>]*>/.test(details) ||
+			
+			role.length === 0 || 
+			role.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(role) ||
+				/<[^>]*>/.test(role) ||
+
 			reason.length === 0 ||
 			!isChecked
 		) {
@@ -1360,19 +1378,24 @@ $: disabled = location.length === 0;
 								class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="First Name*"
 							/>
-							{#if showErrors && fname.length === 0}
+							<!-- {#if showErrors && fname.length === 0}
 								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
 									>First Name is required</span
 								>
-							{/if}
-							{#if fname.length > 0 && !/^[A-Za-z\s]+$/.test(fname)}
+							{/if} -->
+							{#if showErrors && (!fname || fname.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(fname) || /<[^>]*>/.test(fname))}
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+								First Name is required.
+							</span>
+						  {/if}
+							<!-- {#if fname.length > 0 && !/^[A-Za-z\s]+$/.test(fname)}
 								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
 									>First Name cannot contain numbers or
 									special characters</span
 								>
-							{/if}
+							{/if} -->
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
@@ -1383,7 +1406,7 @@ $: disabled = location.length === 0;
 								class="flex w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Last Name*"
 							/>
-							{#if showErrors && lname.length === 0}
+							<!-- {#if showErrors && lname.length === 0}
 								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
 									>Last Name is required</span
@@ -1395,7 +1418,12 @@ $: disabled = location.length === 0;
 									>Last Name cannot contain numbers or special
 									characters</span
 								>
-							{/if}
+							{/if} -->
+							{#if showErrors && (!lname || lname.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(lname) || /<[^>]*>/.test(lname))}
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+								Last Name is required.
+							</span>
+						  {/if}
 						</div>
 					</div>
 
@@ -1558,12 +1586,17 @@ $: disabled = location.length === 0;
 								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Role*"
 							/>
-							{#if showErrors && role.length === 0}
+							<!-- {#if showErrors && role.length === 0}
 								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
 									>Role is required</span
 								>
-							{/if}
+							{/if} -->
+							{#if showErrors && (!role || role.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(role) || /<[^>]*>/.test(role))}
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+								Role is required.
+							</span>
+						  {/if}
 						</div>
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
@@ -1831,13 +1864,18 @@ $: disabled = location.length === 0;
 							class="w-full sm:text-sm text-xs p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 h-32"
 							placeholder="Additional Details*"
 						></textarea>
-						{#if showErrors && details.length === 0}
+						<!-- {#if showErrors && details.length === 0}
 							<span
 								class="text-red-500 sm:text-xs text-2s font-medium"
 							>
 								Additional Details are required</span
 							>
-						{/if}
+						{/if} -->
+						{#if showErrors && (!details || details.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) || /<[^>]*>/.test(details))}
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+								Additional Details are required.
+							</span>
+						  {/if}
 					</div>
 					<span class="flex-1 w-1/3 mb-4">
 						<label for="recaptcha" class="block text-sm font-medium text-gray-700">
