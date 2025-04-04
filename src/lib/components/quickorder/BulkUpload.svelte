@@ -3,7 +3,6 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import * as XLSX from "xlsx";
-  import { onMount } from "svelte";
   import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
   export let data;
   import { fade } from "svelte/transition";
@@ -52,38 +51,37 @@
     return { duplicates, uniqueLines };
   }
 
-
   function removeDuplicateEntry(productInfo, event) {
-  if (!productInfo) return;
-  
-  const lines = rawFileData.split("\n").filter((line) => line.trim());
-  const seenProducts = new Map();
-  const deduplicatedLines = lines.filter((line) => {
-    const [currentProductInfo] = line.split(",").map((item) => item.trim());
-    if (currentProductInfo === productInfo) {
-      if (seenProducts.has(productInfo)) {
-        return false;
+    if (!productInfo) return;
+
+    const lines = rawFileData.split("\n").filter((line) => line.trim());
+    const seenProducts = new Map();
+    const deduplicatedLines = lines.filter((line) => {
+      const [currentProductInfo] = line.split(",").map((item) => item.trim());
+      if (currentProductInfo === productInfo) {
+        if (seenProducts.has(productInfo)) {
+          return false;
+        }
+        seenProducts.set(productInfo, true);
       }
-      seenProducts.set(productInfo, true);
+      return true;
+    });
+
+    rawFileData = deduplicatedLines.join("\n");
+
+    const { duplicates } = checkForDuplicates(rawFileData);
+    duplicateEntries = duplicates;
+
+    if (isValidated) {
+      invalidProductLines = mapInvalidProductsToLines();
     }
-    return true;
-  });
-  
-  rawFileData = deduplicatedLines.join("\n");
-  
-  const { duplicates } = checkForDuplicates(rawFileData);
-  duplicateEntries = duplicates;
-  
-  if (isValidated) {
-    invalidProductLines = mapInvalidProductsToLines();
+
+    toast.success(`Removed duplicate entry for ${productInfo}`);
+
+    if (duplicateEntries.length === 0) {
+      submitFileData();
+    }
   }
-  
-  toast.success(`Removed duplicate entry for ${productInfo}`);
-  
-  if (duplicateEntries.length === 0) {
-    submitFileData();
-  }
-}
   function removeInvalidProduct(lineIndex) {
     const lines = rawFileData.split("\n");
     const lineContent = lines[lineIndex];
@@ -125,178 +123,138 @@
     invalidProductLines = [];
   }
 
-  function validateCartInput() {
-    const validProducts = validatedProducts.filter(
-      (product) => product.isValid,
-    );
-    return validProducts.length > 0;
-  }
-
-function handleFileInputChange(event) {
-  let file;
-  if (event.dataTransfer) {
-    file = event.dataTransfer.files[0];
-  } else {
-    file = event.target.files[0];
-  }
-
-  if (!file) {
-    fileError = "No file selected.";
-    return;
-  }
-
-  const fileType = file.name.split(".").pop().toLowerCase();
-  selectedFileName = file.name;
-  isEditing = true;
-
-  const reader = new FileReader();
-
-  reader.onerror = () => {
-    fileError = "Error reading the file. Please try again.";
-  };
-
-  const processFileData = (content) => {
-    const lines = content
-      .split("\n")
-      .filter((line) => line.trim())
-      .map((line) => {
-        const parts = line.split(",").map((p) => p.trim());
-        if (parts.length === 1 || (parts.length === 2 && isNaN(+parts[1]))) {
-          return `${parts[0]},1`;
-        }
-        return line;
-      });
-
-    rawFileData = lines.join("\n");
-
-    const { duplicates } = checkForDuplicates(rawFileData);
-    duplicateEntries = duplicates;
-
-    if (duplicates.length > 0) {
-      toast.error(`Found ${duplicates.length} duplicate entries. Please review and remove them.`);
+  function handleFileInputChange(event) {
+    let file;
+    if (event.dataTransfer) {
+      file = event.dataTransfer.files[0];
     } else {
-      // Create a file from the processed data
-      submitFileData();
+      file = event.target.files[0];
     }
-  };
 
-  if (["xlsx", "xls"].includes(fileType)) {
-    if (typeof XLSX === "undefined") {
-      fileError = "Excel support requires SheetJS. Use CSV instead.";
+    if (!file) {
+      fileError = "No file selected.";
       return;
     }
 
-    reader.onload = (e) => {
-      try {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        let csvData = XLSX.utils.sheet_to_csv(worksheet);
-        processFileData(csvData);
-      } catch (err) {
-        fileError = "Error processing Excel file.";
-        console.error(err);
+    const fileType = file.name.split(".").pop().toLowerCase();
+    selectedFileName = file.name;
+    isEditing = true;
+
+    const reader = new FileReader();
+
+    reader.onerror = () => {
+      fileError = "Error reading the file. Please try again.";
+    };
+
+    const processFileData = (content) => {
+      const lines = content
+        .split("\n")
+        .filter((line) => line.trim())
+        .map((line) => {
+          const parts = line.split(",").map((p) => p.trim());
+          if (parts.length === 1 || (parts.length === 2 && isNaN(+parts[1]))) {
+            return `${parts[0]},1`;
+          }
+          return line;
+        });
+
+      rawFileData = lines.join("\n");
+
+      const { duplicates } = checkForDuplicates(rawFileData);
+      duplicateEntries = duplicates;
+
+      if (duplicates.length > 0) {
+        toast.error(
+          `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+        );
+      } else {
+        // Create a file from the processed data
+        submitFileData();
       }
     };
 
-    reader.readAsArrayBuffer(file);
-  } else {
-    reader.onload = (e) => {
-      processFileData(e.target.result);
-    };
+    if (["xlsx", "xls"].includes(fileType)) {
+      if (typeof XLSX === "undefined") {
+        fileError = "Excel support requires SheetJS. Use CSV instead.";
+        return;
+      }
 
-    reader.readAsText(file);
-  }
-}
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          let csvData = XLSX.utils.sheet_to_csv(worksheet);
+          processFileData(csvData);
+        } catch (err) {
+          fileError = "Error processing Excel file.";
+          console.error(err);
+        }
+      };
 
-// New function to submit the file data
-function submitFileData() {
-  // Create a new file with the current rawFileData
-  const updatedFile = new File([rawFileData], selectedFileName || "upload.csv", {
-    type: "text/csv",
-  });
-  
-  // Set the file to the file input
-  const dataTransfer = new DataTransfer();
-  dataTransfer.items.add(updatedFile);
-  
-  // Find the file input element and update its files
-  const fileInput = document.getElementById("bulkupload") || 
-                   document.querySelector('input[type="file"]');
-                   
-  if (fileInput) {
-    fileInput.files = dataTransfer.files;
-    
-    // Find the form
-    const form = fileInput.closest('form');
-    
-    if (form) {
-      // Submit the form after a short delay to allow the UI to update
-      setTimeout(() => {
-        form.requestSubmit();
-      }, 100);
+      reader.readAsArrayBuffer(file);
     } else {
-      console.error("Form not found");
+      reader.onload = (e) => {
+        processFileData(e.target.result);
+      };
+
+      reader.readAsText(file);
     }
-  } else {
-    console.error("File input element not found");
   }
-}
 
-  // function removeAllDuplicates(event) {
-  //   if (duplicateEntries.length === 0) return;
+  function submitFileData() {
+    const updatedFile = new File(
+      [rawFileData],
+      selectedFileName || "upload.csv",
+      {
+        type: "text/csv",
+      },
+    );
 
-  //   const lines = rawFileData.split("\n").filter((line) => line.trim());
-  //   const uniqueProductInfos = new Set();
-  //   const deduplicatedLines = [];
-  //   lines.forEach((line) => {
-  //     const [productInfo] = line.split(",").map((item) => item.trim());
-  //     if (!uniqueProductInfos.has(productInfo)) {
-  //       uniqueProductInfos.add(productInfo);
-  //       deduplicatedLines.push(line);
-  //     }
-  //   });
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(updatedFile);
 
-  //   rawFileData = deduplicatedLines.join("\n");
-  //   const deduplicatedFile = new File([rawFileData], "deduplicated.csv", {
-  //     type: "text/csv",
-  //   });
-  //   const dataTransfer = new DataTransfer();
-  //   dataTransfer.items.add(deduplicatedFile);
-  //   const fileInput = document.getElementById("bulkupload");
-  //   if (fileInput) {
-  //     fileInput.files = dataTransfer.files;
-  //   }
-  //   duplicateEntries = [];
-  //   toast.success(`Removed all duplicate entries`);
-  //   if (formElement) {
-  //     setTimeout(() => {
-  //       formElement.requestSubmit();
-  //     }, 100);
-  //   }
-  // }
-  function removeAllDuplicates(event) {
-  if (duplicateEntries.length === 0) return;
+    const fileInput =
+      document.getElementById("bulkupload") ||
+      document.querySelector('input[type="file"]');
 
-  const lines = rawFileData.split("\n").filter((line) => line.trim());
-  const uniqueProductInfos = new Set();
-  const deduplicatedLines = [];
-  
-  lines.forEach((line) => {
-    const [productInfo] = line.split(",").map((item) => item.trim());
-    if (!uniqueProductInfos.has(productInfo)) {
-      uniqueProductInfos.add(productInfo);
-      deduplicatedLines.push(line);
+    if (fileInput) {
+      fileInput.files = dataTransfer.files;
+
+      const form = fileInput.closest("form");
+
+      if (form) {
+        setTimeout(() => {
+          form.requestSubmit();
+        }, 100);
+      } else {
+        console.error("Form not found");
+      }
+    } else {
+      console.error("File input element not found");
     }
-  });
+  }
 
-  rawFileData = deduplicatedLines.join("\n");
-  duplicateEntries = [];
-  toast.success(`Removed all duplicate entries`);
-  
-  // Use the common submitFileData function
-  submitFileData();
-}
+  function removeAllDuplicates(event) {
+    if (duplicateEntries.length === 0) return;
+
+    const lines = rawFileData.split("\n").filter((line) => line.trim());
+    const uniqueProductInfos = new Set();
+    const deduplicatedLines = [];
+
+    lines.forEach((line) => {
+      const [productInfo] = line.split(",").map((item) => item.trim());
+      if (!uniqueProductInfos.has(productInfo)) {
+        uniqueProductInfos.add(productInfo);
+        deduplicatedLines.push(line);
+      }
+    });
+
+    rawFileData = deduplicatedLines.join("\n");
+    duplicateEntries = [];
+    toast.success(`Removed all duplicate entries`);
+    submitFileData();
+  }
   function validateAndSubmitData() {
     if (!rawFileData.trim()) {
       toast.error("Please enter product data before submitting");
@@ -482,8 +440,6 @@ function submitFileData() {
 
       const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
       const updatedCart = [...existingCart];
-
-      // Merge quantities for existing products
       simplifiedCartItems.forEach((newItem) => {
         const existingItemIndex = updatedCart.findIndex(
           (cartItem) =>
@@ -543,77 +499,26 @@ function submitFileData() {
 
     return mappedInvalidLines;
   }
-  // Add a scroll event listener to the textarea
-  function initScrollListener() {
-    const textarea = document.querySelector("textarea");
-    if (textarea) {
-      textarea.addEventListener("scroll", updateValidationMessagePositions);
-    }
-  }
 
-  // Function to update positions of validation messages
-  function updateValidationMessagePositions() {
-    const textarea = document.querySelector("textarea");
-    if (!textarea) return;
-
-    const container = textarea.parentElement;
-    const scrollTop = textarea.scrollTop;
-
-    // Use a more accurate line height calculation
-    // Calculate actual line height based on textarea height and number of lines
-    const lines = textarea.value.split("\n");
-    const lineHeight = textarea.clientHeight / (lines.length || 1);
-
-    // Get all validation message elements
-    const validationElements = container.querySelectorAll(
-      '[class*="absolute right-7"]',
-    );
-
-    validationElements.forEach((element) => {
-      const productNumber = element.dataset.productNumber;
-      if (!productNumber) return;
-
-      // Find the line index for this product
-      const lineIndex = lines.findIndex((line) => line.includes(productNumber));
-
-      if (lineIndex !== -1) {
-        // Calculate position based on actual textarea properties
-        const linePosition = lineIndex * lineHeight;
-        const adjustedPosition = linePosition - scrollTop + 12; // Add small offset for alignment
-
-        // Only show if the message is within the visible area
-        if (
-          adjustedPosition >= 0 &&
-          adjustedPosition <= textarea.clientHeight - 20
-        ) {
-          element.style.display = "flex";
-          element.style.top = `${adjustedPosition}px`; // Use pixels for more precise positioning
-        } else {
-          element.style.display = "none";
-        }
-      }
-    });
-  }
   let fileInput;
   let dropzone;
   function triggerUpload() {
     fileInput.click();
   }
   function handleDrop(event) {
-  event.preventDefault();
-  if (dropzone) {
-    dropzone.classList.remove("bg-primary-100", "text-primary-600");
-  }
+    event.preventDefault();
+    if (dropzone) {
+      dropzone.classList.remove("bg-primary-100", "text-primary-600");
+    }
 
-  const file = event.dataTransfer.files[0];
-  if (file) {
-    // Create a mock event with the dataTransfer property
-    const mockEvent = {
-      dataTransfer: event.dataTransfer
-    };
-    handleFileInputChange(mockEvent);
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      const mockEvent = {
+        dataTransfer: event.dataTransfer,
+      };
+      handleFileInputChange(mockEvent);
+    }
   }
-}
 
   function handleDragOver(event) {
     event.preventDefault();
@@ -623,6 +528,7 @@ function submitFileData() {
   function handleDragLeave() {
     dropzone.classList.remove("bg-primary-100", "text-primary-600");
   }
+  let scrollContainer;
 </script>
 
 <!-- <div class="text-black text-sm md:ml-2 mb-1">
@@ -658,7 +564,7 @@ function submitFileData() {
         return `${productNumberAndSize},${quantity}`;
       }
 
-      return line;
+      return line.trim();
     });
 
     rawFileData = processedLines.join("\n");
@@ -689,16 +595,13 @@ function submitFileData() {
           isValid: item.isValid,
           message: item.message || "Unknown message",
         }));
+
         const hasInvalidProducts = validationMessages.some(
           (message) => !message.isValid,
         );
+        console.log(validationMessages, "validationMessages");
 
-        if (hasInvalidProducts) {
-          invalidProductLines = mapInvalidProductsToLines();
-          toast.warning(
-            "Some products are invalid. Please review before adding to cart.",
-          );
-        } else if (validatedProducts.length > 0) {
+        if (validatedProducts.length > 0) {
           setTimeout(() => {
             if (data?.authedUser && data?.authedUser?.id) {
               const cartForm = document.getElementById("cartForm");
@@ -714,86 +617,104 @@ function submitFileData() {
   }}
 >
   {#if isLoading}
-  <div class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-500/40 backdrop-blur-sm"
-  transition:fade={{ duration: 300 }}>
-  <div class="flex flex-col items-center justify-center p-4">
-    <div class="relative w-32 h-32">
-      <Icon icon="eos-icons:bubble-loading" class="absolute inset-0 w-full h-full text-6xl text-primary-50 animate-spin-slow"/>
-      <!-- <div class="absolute inset-0 w-full h-full border-8 border-dashed border-primary-200 border-t-primary-600 rounded-full animate-spin-slow"></div> -->
-      <div class="loader loader-large absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"></div>
+    <div
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-500/40 backdrop-blur-sm"
+      transition:fade={{ duration: 300 }}
+    >
+      <div class="flex flex-col items-center justify-center p-4">
+        <div class="relative w-32 h-32">
+          <Icon
+            icon="eos-icons:bubble-loading"
+            class="absolute inset-0 w-full h-full text-6xl text-primary-50 animate-spin-slow"
+          />
+          <!-- <div class="absolute inset-0 w-full h-full border-8 border-dashed border-primary-200 border-t-primary-600 rounded-full animate-spin-slow"></div> -->
+          <div
+            class="loader loader-large absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"
+          ></div>
+        </div>
+        <div
+          class="mt-4 text-white font-medium flex items-center animate-pulse"
+        >
+          <span class="animate-wave-1">L</span>
+          <span class="animate-wave-2">o</span>
+          <span class="animate-wave-3">a</span>
+          <span class="animate-wave-4">d</span>
+          <span class="animate-wave-5">i</span>
+          <span class="animate-wave-6">n</span>
+          <span class="animate-wave-7">g</span>
+          <span class="animate-wave-8">.</span>
+          <span class="animate-wave-9">.</span>
+          <span class="animate-wave-10">.</span>
+        </div>
+      </div>
     </div>
-    <div class="mt-4 text-white font-medium flex items-center animate-pulse">
-      <span class="animate-wave-1">L</span>
-      <span class="animate-wave-2">o</span>
-      <span class="animate-wave-3">a</span>
-      <span class="animate-wave-4">d</span>
-      <span class="animate-wave-5">i</span>
-      <span class="animate-wave-6">n</span>
-      <span class="animate-wave-7">g</span>
-      <span class="animate-wave-8">.</span>
-      <span class="animate-wave-9">.</span>
-      <span class="animate-wave-10">.</span>
-    </div>
-  </div>
-</div>
   {/if}
 
   <section class="w-full mx-auto md:flex items-center gap-5">
     <div
       class="md:w-3/5 h-72 border bg-white rounded-md overflow-hidden p-5 relative"
     >
-      <textarea
-        class="w-full h-full p-2 border placeholder:text-sm placeholder:text-gray-400 border-gray-300 rounded-md focus:ring-0 focus:border-primary-500"
-        bind:value={rawFileData}
-        on:input={handleTextChange}
-        readonly
-        placeholder="Upload a file containing product data...
-Example file content:
-7987565-50G,1
-657890-100G,5
-345678-25G,3"
-      ></textarea>
-      {#if isValidated && validationMessages.length > 0}
-        {#each validationMessages as message}
-          {#if message.isValid}
-            <div
-              class="absolute right-7 text-green-500 flex items-center"
-              style="top: calc(1.5rem + {rawFileData
-                .split('\n')
-                .findIndex((line) => line.includes(message.productNumber)) *
-                1.5}rem)"
-            >
-              <span class="text-xs mr-2">Valid Product</span>
-              <Icon icon="mdi:check-circle" class="text-lg" />
+      <div
+        class="w-full h-full relative overflow-hidden border border-gray-300 rounded-md"
+      >
+        <div class="overflow-auto h-full" bind:this={scrollContainer}>
+          {#if rawFileData.length === 0}
+            <div class="p-2 text-gray-400 text-sm">
+              <p>Upload a file containing product data...</p>
+
+              Example file content:
+
+              <p>7987565-50G,1</p>
+              <p>657890-100G,5</p>
+              <p>345678-25G,3</p>
             </div>
           {:else}
-            <div
-              class="absolute right-7 text-red-500 flex items-center"
-              style="top: calc(1.5rem + {rawFileData
-                .split('\n')
-                .findIndex((line) => line.includes(message.productNumber)) *
-                1.5}rem)"
-            >
-              <span class="text-xs mr-2">{message.message}</span>
-              <button
-                type="button"
-                class="text-red-500 hover:text-red-700"
-                title="Remove invalid product"
-                on:click={() =>
-                  removeInvalidProduct(
-                    rawFileData
-                      .split("\n")
-                      .findIndex((line) =>
-                        line.includes(message.productNumber),
-                      ),
-                  )}
-              >
-                <Icon icon="mdi:close-circle" class="text-lg" />
-              </button>
-            </div>
+            {#each rawFileData.trim().split("\n") as line, index}
+              <div class="flex items-center p-1 relative hover:bg-gray-100">
+                <pre class="flex-grow">{line.trim()}</pre>
+
+                {#if isValidated}
+                  {#if validationMessages.some( (msg) => line.includes(msg.productNumber), )}
+                    {@const message = validationMessages.find((msg) =>
+                      line.includes(msg.productNumber),
+                    )}
+                    {#if message?.isValid}
+                      <div
+                        class="flex items-center text-green-500 ml-2 whitespace-nowrap"
+                      >
+                        <span class="text-xs mr-2">Valid Product</span>
+                        <Icon icon="mdi:check-circle" class="text-lg" />
+                      </div>
+                    {:else}
+                      <div
+                        class="flex items-center text-red-500 ml-2 whitespace-nowrap"
+                      >
+                        <span class="text-xs mr-2">{message?.message}</span>
+                        <button
+                          type="button"
+                          class="text-red-500 hover:text-red-700"
+                          title="Remove invalid product"
+                          on:click={() => removeInvalidProduct(index)}
+                        >
+                          <Icon icon="mdi:close-circle" class="text-lg" />
+                        </button>
+                      </div>
+                    {/if}
+                  {/if}
+                {/if}
+              </div>
+            {/each}
+            <textarea
+              bind:value={rawFileData}
+              on:input={handleTextChange}
+              readonly
+              class="sr-only"
+              tabindex="-1"
+              aria-hidden="true"
+            ></textarea>
           {/if}
-        {/each}
-      {/if}
+        </div>
+      </div>
 
       {#if fileError}
         <p class="text-red-500 text-sm mt-2">{fileError}</p>
@@ -801,6 +722,8 @@ Example file content:
     </div>
 
     <section class="mt-3 md:mt-0 md:w-2/5">
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div class="flex flex-col gap-3">
         <div
           class="flex justify-center bg-white items-center h-12 border rounded-md hover:bg-primary-200 hover:text-primary-600"
@@ -815,70 +738,48 @@ Example file content:
         </div>
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <!-- <div
-          class="w-full flex flex-col justify-center bg-white items-center rounded-md h-[220px] mt-3 space-y-2 py-6 border border-dashed hover:bg-primary-100 hover:text-primary-600"
+        <div
+          on:click={triggerUpload}
+          bind:this={dropzone}
+          class="w-full flex flex-col justify-center bg-white items-center rounded-md h-[210px] mt-2 space-y-2 py-6 border hover:bg-primary-100 hover:text-primary-600"
+          on:drop={handleDrop}
+          on:dragover={handleDragOver}
+          on:dragleave={handleDragLeave}
         >
-          <Icon icon="uil:upload" class="text-5xl text-primary-500 -ml-4" />
-          <p class="text-sm text-center px-2">
-            Or drag and drop your CSV or XLS file to upload
-          </p>
-
-          <label
-            for="bulkupload"
-            class="w-full h-full cursor-pointer flex flex-col justify-center items-center"
+          <Icon icon="uil:upload" class="text-4xl text-primary-500 -ml-4" />
+          <div
+            class="flex flex-col items-center pointer-events-none text-primary-500"
           >
-            <input
-              type="file"
-              id="bulkupload"
-              name="file"
-              accept=".xlsx, .xls, .csv, .txt"
-              on:change={handleFileInputChange}
-              class="hidden"
-            />
-          </label>
-        </div>
-      </div> -->
-      <div
-      on:click={triggerUpload}
-      bind:this={dropzone}
-      class="w-full flex flex-col justify-center bg-white items-center rounded-md h-[210px] mt-2 space-y-2 py-6 border border-dashed hover:bg-primary-100 hover:text-primary-600"
-      on:drop={handleDrop}
-      on:dragover={handleDragOver}
-      on:dragleave={handleDragLeave}
-    >
-    <Icon icon="uil:upload" class="text-5xl text-primary-500 -ml-4" />
-      <div class="flex flex-col items-center pointer-events-none text-primary-500">
+            <p class="text-sm font-medium text-center px-2">
+              Upload or drag and drop your CSV or XLS file to upload
+            </p>
+          </div>
 
-        <p class="text-sm font-medium text-center px-2">
-         Upload or drag and drop your CSV or XLS file to upload
-        </p>
+          <input
+            bind:this={fileInput}
+            type="file"
+            name="file"
+            accept=".xlsx, .xls, .csv, .txt"
+            class="hidden"
+            on:change={handleFileInputChange}
+          />
+
+          <button
+            type="button"
+            on:click={triggerUpload}
+            hidden
+            class="mt-2 text-primary-600 underline"
+          >
+            Click to select a file
+          </button>
+        </div>
+        {#if selectedFileName && rawFileData.length !== 0}
+          <p class="text-sm text-primary-500 mt-2">{selectedFileName}</p>
+        {/if}
+        {#if fileError}
+          <p class="text-sm text-red-500 mt-2">{fileError}</p>
+        {/if}
       </div>
-    
-      <input
-        bind:this={fileInput}
-        type="file"
-        name="file"
-        accept=".xlsx, .xls, .csv, .txt"
-        class="hidden"
-        on:change={handleFileInputChange}
-      />
-    
-      <button
-        type="button"
-        on:click={triggerUpload}
-        hidden
-        class="mt-2 text-primary-600 underline"
-      >
-        Click to select a file
-      </button>
-    </div>
-      {#if selectedFileName && rawFileData.length !== 0}
-        <p class="text-sm text-primary-500 mt-2">{selectedFileName}</p>
-      {/if}
-      {#if fileError}
-        <p class="text-sm text-red-500 mt-2">{fileError}</p>
-      {/if}
     </section>
   </section>
   {#if duplicateEntries.length >= 2}
@@ -918,7 +819,7 @@ Example file content:
   {#if validationMessages.length > 0 && isValidated}
     <div class="mt-4">
       {#if validationMessages.some((message) => !message.isValid)}
-        <!-- <div class="p-4 bg-yellow-50 rounded-md">
+        <div class="p-4 bg-yellow-50 rounded-md">
           <h3 class="text-yellow-700 font-medium mb-2">Invalid Products:</h3>
           <ul class="space-y-2">
             {#each validationMessages.filter((message) => !message.isValid) as message}
@@ -936,23 +837,7 @@ Example file content:
             Please remove invalid products using the X button in the text area
             or proceed with only valid products.
           </p>
-        </div> -->
-        <div class="p-4 bg-yellow-50 rounded-md">
-          <h3 class="text-yellow-700 font-medium mb-2">Invalid Products:</h3>
-          <ul class="space-y-2">
-            <li class="flex items-center">
-              <Icon icon="mdi:close-circle" class="text-red-500 text-lg mr-2" />
-              <span class="text-yellow-600"
-                >Marked products cannot be added to the cart.
-              </span>
-            </li>
-          </ul>
-          <p class="mt-3 text-sm text-yellow-600">
-            Please remove invalid products using the X button in the text area
-            or proceed with only valid products.
-          </p>
         </div>
-        
       {/if}
 
       {#if validationMessages.some((message) => message.isValid)}
@@ -1058,128 +943,154 @@ Example file content:
 {/if}
 
 <style>
-	@keyframes shimmer {
-		0% {
-			background-position: -200% 0;
-		}
-		100% {
-			background-position: 200% 0;
-		}
-	}
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
 
-	@keyframes progress-pulse {
-		0%, 100% {
-			opacity: 0;
-		}
-		50% {
-			opacity: 0.5;
-		}
-	}
+  @keyframes progress-pulse {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
 
-	@keyframes wave {
-		0%, 100% {
-			transform: translateY(0);
-		}
-		50% {
-			transform: translateY(-5px);
-		}
-	}
+  @keyframes wave {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
 
-	@keyframes loader-bubbles {
-		0% {
-			box-shadow: 0 -10px var(--bubble-color, #ffffff),
-					3px 0 var(--bubble-color, #ffffff),
-					5px 0 var(--primary-color, #fe5939);
-		}
-		30% {
-			box-shadow: 3px -20px rgba(239,223,255,0),
-					5px -10px var(--bubble-color, #ffffff),
-					5px 0 var(--primary-color, #fe5939);
-		}
-		60% {
-			box-shadow: 3px 0 rgba(239,223,255,0),
-					4px -20px rgba(239,223,255,0),
-					3px -10px var(--bubble-color, #ffffff);
-		}
-		61% {
-			box-shadow: 3px 0 var(--primary-color, #fe5939),
-					4px -20px rgba(239,223,255,0),
-					3px -10px var(--bubble-color, #ffffff);
-		}
-		100% {
-			box-shadow: 0 -10px var(--primary-color, #fe5939),
-					4px -20px rgba(239,223,255,0),
-					5px -20px rgba(239,223,255,0);
-		}
-	}
+  @keyframes loader-bubbles {
+    0% {
+      box-shadow:
+        0 -10px var(--bubble-color, #ffffff),
+        3px 0 var(--bubble-color, #ffffff),
+        5px 0 var(--primary-color, #fe5939);
+    }
+    30% {
+      box-shadow:
+        3px -20px rgba(239, 223, 255, 0),
+        5px -10px var(--bubble-color, #ffffff),
+        5px 0 var(--primary-color, #fe5939);
+    }
+    60% {
+      box-shadow:
+        3px 0 rgba(239, 223, 255, 0),
+        4px -20px rgba(239, 223, 255, 0),
+        3px -10px var(--bubble-color, #ffffff);
+    }
+    61% {
+      box-shadow:
+        3px 0 var(--primary-color, #fe5939),
+        4px -20px rgba(239, 223, 255, 0),
+        3px -10px var(--bubble-color, #ffffff);
+    }
+    100% {
+      box-shadow:
+        0 -10px var(--primary-color, #fe5939),
+        4px -20px rgba(239, 223, 255, 0),
+        5px -20px rgba(239, 223, 255, 0);
+    }
+  }
 
-	.loader {
-		display: inline-block;
-		vertical-align: middle;
-		position: relative;
-		width: 10px;
-		height: 20px;
-		background: var(--primary-color, #fe5939);
-	}
+  .loader {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    width: 10px;
+    height: 20px;
+    background: var(--primary-color, #fe5939);
+  }
 
-	.loader-large {
-		width: 15px;     
-		height: 30px;    
-	}
+  .loader-large {
+    width: 15px;
+    height: 30px;
+  }
 
-	.loader:before,
-	.loader:after {
-		content: '';
-		position: absolute;
-	}
+  .loader:before,
+  .loader:after {
+    content: "";
+    position: absolute;
+  }
 
-	.loader:before {
-		top: -8px;
-		left: -13px;
-		width: 0;
-		height: 0;
-		border: 18px solid transparent;
-		border-bottom: 20px solid var(--primary-color, #fe5939);
-		border-radius: 3px;
-	}
+  .loader:before {
+    top: -8px;
+    left: -13px;
+    width: 0;
+    height: 0;
+    border: 18px solid transparent;
+    border-bottom: 20px solid var(--primary-color, #fe5939);
+    border-radius: 3px;
+  }
 
-	.loader-large:before {
-		top: -12px;
-		left: -20px;
-		border: 27px solid transparent;
-		border-bottom: 30px solid var(--primary-color, #fe5939);
-		border-radius: 4px;
-	}
+  .loader-large:before {
+    top: -12px;
+    left: -20px;
+    border: 27px solid transparent;
+    border-bottom: 30px solid var(--primary-color, #fe5939);
+    border-radius: 4px;
+  }
 
-	.loader:after {
-		top: -1;
-		left: -1;
-		width: px;
-		height: 4px;
-		background: var(--bubble-color, #fe5939);
-		border-radius: 50%;
-		animation: loader-bubbles 1s linear infinite forwards;
-	}
+  .loader:after {
+    top: -1;
+    left: -1;
+    width: px;
+    height: 4px;
+    background: var(--bubble-color, #fe5939);
+    border-radius: 50%;
+    animation: loader-bubbles 1s linear infinite forwards;
+  }
 
-	.loader-large:after {
-		width: 6px;
-		height: 6px;
-	}
+  .loader-large:after {
+    width: 6px;
+    height: 6px;
+  }
 
-	:global(.animate-shimmer) {
-		background-size: 200% 100%;
-		animation: shimmer 2s ease-in-out infinite;
-	}
+  :global(.animate-shimmer) {
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
 
-	:global(.animate-wave-1) { animation: wave 1s ease-in-out infinite; }
-	:global(.animate-wave-2) { animation: wave 1s ease-in-out infinite 0.1s; }
-	:global(.animate-wave-3) { animation: wave 1s ease-in-out infinite 0.2s; }
-	:global(.animate-wave-4) { animation: wave 1s ease-in-out infinite 0.3s; }
-	:global(.animate-wave-5) { animation: wave 1s ease-in-out infinite 0.4s; }
-	:global(.animate-wave-6) { animation: wave 1s ease-in-out infinite 0.5s; }
-	:global(.animate-wave-7) { animation: wave 1s ease-in-out infinite 0.6s; }
-	:global(.animate-wave-8) { animation: wave 1s ease-in-out infinite 0.7s; }
-	:global(.animate-wave-9) { animation: wave 1s ease-in-out infinite 0.8s; }
-	:global(.animate-wave-10) { animation: wave 1s ease-in-out infinite 0.9s; }
+  :global(.animate-wave-1) {
+    animation: wave 1s ease-in-out infinite;
+  }
+  :global(.animate-wave-2) {
+    animation: wave 1s ease-in-out infinite 0.1s;
+  }
+  :global(.animate-wave-3) {
+    animation: wave 1s ease-in-out infinite 0.2s;
+  }
+  :global(.animate-wave-4) {
+    animation: wave 1s ease-in-out infinite 0.3s;
+  }
+  :global(.animate-wave-5) {
+    animation: wave 1s ease-in-out infinite 0.4s;
+  }
+  :global(.animate-wave-6) {
+    animation: wave 1s ease-in-out infinite 0.5s;
+  }
+  :global(.animate-wave-7) {
+    animation: wave 1s ease-in-out infinite 0.6s;
+  }
+  :global(.animate-wave-8) {
+    animation: wave 1s ease-in-out infinite 0.7s;
+  }
+  :global(.animate-wave-9) {
+    animation: wave 1s ease-in-out infinite 0.8s;
+  }
+  :global(.animate-wave-10) {
+    animation: wave 1s ease-in-out infinite 0.9s;
+  }
 </style>
-
