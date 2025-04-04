@@ -6,9 +6,14 @@
   import Properties from "$lib/components/ProductInfoPopups/Properties.svelte";
   import Description from "$lib/components/ProductInfoPopups/Description.svelte";
   import { PUBLIC_WEBSITE_URL, PUBLIC_WEBSITE_NAME } from "$env/static/public";
-
+  import { isFavoriteStore } from "$lib/stores/favorites.js";
+  import { tick } from "svelte";
   export let data;
   // console.log("Data  ==>(:", data);
+
+  $: tick().then(() => {
+    isFavoriteStore.set(data.isFavorite);
+  });
 
   function generateProgressiveStrings(input) {
   if (input.length < 5) {
@@ -19,18 +24,14 @@
   });
   const filteredSlices = progressiveSlices.filter(item => !item.endsWith('-'));
   return filteredSlices.join(', ');
-}  
+}   
 
   let productData = data?.productData?.records[0];
-
-  let categoryUrl = data?.relatedProducts[0]?.categoryInfo[0]?.urlName;
-
-  let subCategoryUrl = data?.relatedProducts[0]?.subCategoryInfo[0]?.urlName;
-
+  let categoryUrl = data?.relatedProducts?.category;
+  let subCategoryUrl = data?.relatedProducts?.subCategory;
   let sliceNum = data?.productData?.records[0]?.productNumber;
-
   const slicedNumber = generateProgressiveStrings(sliceNum);
-
+  
   let metadata = {
     title:
       `${productData?.productName} | ${productData?.manufacturer?.name} | ${PUBLIC_WEBSITE_NAME} ` ||
@@ -71,18 +72,26 @@
 
 <ProductDetails
   data={data.productData}
-  isFavorite={data.isFavorite}
   isauthedUser={data.authedUser}
+  profile={data.profile}
 />
+{#if data.relatedProducts.length > 1}
+  <RelatedProductss
+    relatedProducts={data.relatedProducts}
+    data={data.productData}
+    profile={data.profile}
+  />
+{/if}
 {#if data.productData.length !== 0}
   <Properties data={data.productData} />
-{/if}
-{#if data.relatedProducts.length !== 0}
-  <RelatedProductss relatedProducts={data.relatedProducts} />
 {/if}
 {#if data.productData.length !== 0}
   <Description data={data.productData} />
 {/if}
-{#if data.compareSimilarity.length !== 0}
-  <CompSimItems compareSimilarity={data.compareSimilarity} />
+{#if data.compareSimilarity.length > 1}
+  <CompSimItems
+    compareSimilarity={data.compareSimilarity}
+    data={data.productData}
+    profile={data.profile}
+  />
 {/if}
