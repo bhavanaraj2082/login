@@ -1,907 +1,1185 @@
 <script>
-  import { onMount } from 'svelte';
-import Icon from "@iconify/svelte";
-import {enhance} from "$app/forms"
-import { authedUser } from '$lib/stores/mainStores.js';
-import { cartState } from '$lib/stores/cartStores.js';
-let uploadedRows=[];
+  import Icon from "@iconify/svelte";
+  import { enhance } from "$app/forms";
+  import { toast } from "svelte-sonner";
+  import * as XLSX from "xlsx";
+  import { onMount } from "svelte";
+  import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
+  export let data;
+  import { fade } from "svelte/transition";
+  let validationMessages = [];
+  let duplicateEntries = [];
+  let rawFileData = "";
+  let fileError = "";
+  let cartNotification = "";
+  let formElement;
+  let validatedProducts = [];
+  let cartloading = false;
+  let isLoading = false;
+  let form2;
+  let selectedFileName = "";
+  let isEditing = true;
+  let isValidated = false;
+  let invalidProductLines = [];
+  function checkForDuplicates(fileContent) {
+    if (!fileContent) return { duplicates: [], uniqueLines: [] };
 
-import * as XLSX from "xlsx";
-let stockAvailability ="";
-      let stockUnAvailability = "";
-      let stockType = "";
-export let data;
-let email = '';
-let products = data?.data || [];  
-// console.log("**************************");
-//console.log("i am quick",products);
-let selectedProduct = null;
-let stockStatus = '';
-let searchQuery = "";
-let rawFileData = "";
-let toggle=false;
-let showSavedCarts=false;
-let showRecentOrders=false;
-let showLists=false;
-let showquotes=false;
-let showDetailsModal=false;
-let fileError = "";
-let quantity=1;
-let cartNotification = '';
-let notificationTimeout;
+    const lines = fileContent.split("\n").filter((line) => line.trim());
+    const seenEntries = new Map();
 
+    const duplicates = [];
+    const uniqueLines = [];
 
+    lines.forEach((line, index) => {
+      const [productInfo, quantity] = line
+        .split(",")
+        .map((item) => item.trim());
+      if (productInfo && quantity) {
+        if (seenEntries.has(productInfo)) {
+          duplicates.push({
+            line: index + 1,
+            content: line,
+            productInfo,
+            originalIndex: seenEntries.get(productInfo).index,
+          });
+        } else {
+          seenEntries.set(productInfo, { index, line });
+          uniqueLines.push(line);
+        }
+      }
+    });
 
-let rows = [
-      { sku: "", size: '', quantity: 1, error: "", filteredProducts: [], selectedSize: null },
-      { sku: "", size: '', quantity: 1, error: "", filteredProducts: [], selectedSize: null },
-      { sku: "", size: '', quantity: 1, error: "", filteredProducts: [], selectedSize: null }
-  ];
-let recentOrders = []; 
-let validationMessages = [];
-let showCartMessage = false;
-
-
-let userLoggedIn = false;
-$: {
-    const user = $authedUser;
-    userLoggedIn = user && user.email;
-    email = user?.email || '';
-}
-function checkAvailability() {
-  if (!selectedProduct) {
-    stockStatus = "No product selected.";
-    return;
+    return { duplicates, uniqueLines };
   }
 
-  const productStock = products.find(product => product.productNumber === selectedProduct.productNumber);
+
+  function removeDuplicateEntry(productInfo, event) {
+  if (!productInfo) return;
   
-  if (productStock) {
-    if (productStock.stockQuantity > 0) {
-      stockStatus = "In Stock"; // Product is in stock
-    } else {
-      stockStatus = "Out of Stock"; // Product is out of stock
+  const lines = rawFileData.split("\n").filter((line) => line.trim());
+  const seenProducts = new Map();
+  const deduplicatedLines = lines.filter((line) => {
+    const [currentProductInfo] = line.split(",").map((item) => item.trim());
+    if (currentProductInfo === productInfo) {
+      if (seenProducts.has(productInfo)) {
+        return false;
+      }
+      seenProducts.set(productInfo, true);
     }
-  } else {
-    stockStatus = "In Stock"; // Default message if no stock data is found
+    return true;
+  });
+  
+  rawFileData = deduplicatedLines.join("\n");
+  
+  const { duplicates } = checkForDuplicates(rawFileData);
+  duplicateEntries = duplicates;
+  
+  if (isValidated) {
+    invalidProductLines = mapInvalidProductsToLines();
+  }
+  
+  toast.success(`Removed duplicate entry for ${productInfo}`);
+  
+  if (duplicateEntries.length === 0) {
+    submitFileData();
   }
 }
-function handleTextChange(event) {
-  rawFileData = event.target.value;
-  cleanRawData(); 
-  validateProductNumbers();
-}
-function validateProductNumbers() {
-  const rows = rawFileData.split("\n");
-  const validationResults = [];
-
-  for (let row of rows) {
-    const columns = row.split(",");
-    const productNumber = columns[0]?.trim(); 
-
-    const product = products.find(p => p.productNumber === productNumber);
-    
-    if (product) {
-      validationResults.push({
-        productNumber,
-        message: "Valid",
-        isValid: true
-      });
-    } else {
-      validationResults.push({
-        productNumber,
-        message: "Invalid product number",
-        isValid: false
-      });
-    }
-  }
-
-
-  validationMessages = validationResults;
-}
-
-function formatDate(date) {
-const options = { year: 'numeric', month: 'short', day: 'numeric' };
-return date.toLocaleDateString('en-IN', options);
-}
-
-let currentDate = new Date();
-currentDate.setDate(currentDate.getDate() + 7);
-let estimatedShipDate = formatDate(currentDate);
-
-
-function findProductBySku(sku) {
-    const productNumber = sku.split('-')[0].trim();  
-    console.log('Searching for product with SKU:', productNumber);
-    return products.find(product => String(product.productNumber).trim() === productNumber);
-}
-
-
-function handleProductFilter(sku, index) {
-    rows[index].filteredProducts = [];
-    searchQuery = sku.trim();
-
-    if (searchQuery === '') {
-        rows[index].error = "";
-        return;
-    }
-    const searchQueryNumber = Number(searchQuery);
-    const matchedProducts = products.filter(product =>
-        product.productNumber.toString().includes(searchQuery)
+  function removeInvalidProduct(lineIndex) {
+    const lines = rawFileData.split("\n");
+    const lineContent = lines[lineIndex];
+    const [productInfo] = lineContent.split(",").map((item) => item.trim());
+    lines.splice(lineIndex, 1);
+    rawFileData = lines.join("\n");
+    validationMessages = validationMessages.filter(
+      (message) =>
+        !productInfo.includes(message.productNumber) || message.isValid,
     );
+    invalidProductLines = mapInvalidProductsToLines();
 
-    rows[index].filteredProducts = matchedProducts;
-
-    if (matchedProducts.length === 0) {
-        rows[index].error = "Invalid product number";
+    if (!rawFileData.trim()) {
+      toast.success(
+        "All invalid items removed. Please add valid product number and size to add to cart.",
+      );
+      isValidated = false;
     } else {
-        rows[index].error = "";
+      const hasRemainingInvalidProducts = validationMessages.some(
+        (message) => !message.isValid,
+      );
+      if (hasRemainingInvalidProducts) {
+        toast.success("Invalid product removed.");
+      } else {
+        toast.success("All invalid products removed. You can now add to cart.");
+      }
     }
-}
 
-function clearSelectedProduct(index) {
-rows[index].sku = '';
-rows[index].size = '';
-rows[index].filteredProducts = [];
-rows[index].error = '';
-
-
-selectedProduct = null;
-}
-
-
-function selectProduct(product, index, size) {
-    rows[index].sku = `${product.productNumber} - ${size.size}`;
-    rows[index].size = size.size;
-    rows[index].filteredProducts = [];
-    rows[index].selectedSize = size.size;
-    selectedProduct = product;
-    rows[index].quantity = 1;
-    checkAvailability();
-}
-
-
-
-function clearSearch(index) {
-    rows[index].sku = '';
-    rows[index].filteredProducts = [];
-    rows[index].error = "";
-}
-
-
-function incrementQuantity(index) {
-    if (rows[index].quantity < 9999) {
-        rows[index].quantity += 1;
+    if (validationMessages.length === 0) {
+      isValidated = false;
     }
-}
-
-
-function decrementQuantity(index) {
-    if (rows[index].quantity > 1) {
-        rows[index].quantity -= 1;
-    }
-}
-
-
-
-
-
-
-
-
-function addManualEntriesToCart() {
-addToCart(rows); 
-}
-
-function addUploadedEntriesToCart() {
-addToCart(uploadedRows); 
-}
-
-function cart() {
-    if (userLoggedIn) {
-      cart = JSON.parse(localStorage.getItem("cart")) || [];
-    }
-}
-
-
-onMount(() => {
-    if (userLoggedIn) {
-      cart();
-    }
-});
-
-
-function showDetails() {
-    selectedProduct = { ...selectedProduct, quantity: 1 };
-    showDetailsModal = true;
-}
-
-
-function hideDetails() {
-    showDetailsModal = false;
-}
-function handleDrop(event) {
-  event.preventDefault();
-  const files = event.dataTransfer.files;
-  if (files.length > 0) {
-    handleFileUpload(files[0]);
   }
-}
-function addRows() {
-  const newRows = Array(3) 
-      .fill()
-      .map(() => ({
-          sku: "",
-          size: '',
-          quantity: 1,
-          error: "",
-          filteredProducts: [],
-          selectedSize: null,
-      }));
-  rows = [...rows, ...newRows]; 
-}
+
+  function handleTextChange(event) {
+    rawFileData = event.target.value;
+    const { duplicates } = checkForDuplicates(rawFileData);
+    duplicateEntries = duplicates;
+    isValidated = false;
+    invalidProductLines = [];
+  }
+
+  function validateCartInput() {
+    const validProducts = validatedProducts.filter(
+      (product) => product.isValid,
+    );
+    return validProducts.length > 0;
+  }
 
 function handleFileInputChange(event) {
-    const files = event.target.files;
-    if (files.length > 0) {
-        handleFileUpload(files[0]);
-    }
-}
+  let file;
+  if (event.dataTransfer) {
+    file = event.dataTransfer.files[0];
+  } else {
+    file = event.target.files[0];
+  }
 
-
-async function handleFileUpload(selectedFile) {
-const file = selectedFile;
-fileError = "";  
-rawFileData = "";  
-
-if (!file) {
+  if (!file) {
     fileError = "No file selected.";
-    console.error("No file selected.");
     return;
-}
+  }
 
+  const fileType = file.name.split(".").pop().toLowerCase();
+  selectedFileName = file.name;
+  isEditing = true;
 
-const validFileTypes = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv', 'text/plain'];
-if (!validFileTypes.includes(file.type)) {
-    fileError = "Invalid file type. Please upload a CSV, XLS, .txt, or XLSX file.";
-    console.error("Invalid file type:", file.type);
-    return;
-}
+  const reader = new FileReader();
 
-const reader = new FileReader();
-reader.onload = async (e) => {
-    try {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]];  // Get the first sheet
-        
-        
-        rawFileData = XLSX.utils.sheet_to_csv(worksheet);
-        
-        if (!rawFileData.trim()) {
-            fileError = "File is empty or incorrectly formatted.";
-            console.error("File is empty or incorrectly formatted.");
-            return;
+  reader.onerror = () => {
+    fileError = "Error reading the file. Please try again.";
+  };
+
+  const processFileData = (content) => {
+    const lines = content
+      .split("\n")
+      .filter((line) => line.trim())
+      .map((line) => {
+        const parts = line.split(",").map((p) => p.trim());
+        if (parts.length === 1 || (parts.length === 2 && isNaN(+parts[1]))) {
+          return `${parts[0]},1`;
         }
-
-        cleanRawData();
-        validateProductNumbers();  
-    } catch (err) {
-        fileError = "Error parsing the file.";
-        console.error("Error parsing the file:", err);
-    }
-};
-
-reader.onerror = (err) => {
-    fileError = "Error reading the file.";
-    console.error("Error reading the file:", err);
-};
-
-reader.readAsArrayBuffer(file);  
-}
-function cleanRawData() {
-
-const rowsData = rawFileData.trim().split('\n');
-
-
-uploadedRows = rowsData.map((line, index) => {
-    const [sku, quantity] = line.split(',').map(item => item.trim());
-    return {
-        sku: sku || "", 
-        quantity: quantity ? parseInt(quantity, 10) : 1, 
-        error: "", 
-        filteredProducts: [], 
-        selectedSize: null,
-    };
-});
-validateProductNumbers();
-}
-function decreaseQuantity() {
-if (selectedProduct && selectedProduct.quantity > 1) {
-    selectedProduct.quantity -= 1;
-  }
-}
-
-
-function increaseQuantity() {
-  if (selectedProduct && selectedProduct.quantity < 9999) {
-    selectedProduct.quantity += 1;
-  }
-}
-
-
-function addToCart(rowsToProcess) {
-  const validRows = rowsToProcess.filter(row => row.sku.trim() !== '');
-  const newCartItems = validRows.map(row => {
-      const sku = row.sku.trim();
-      const product = findProductBySku(sku);
-
-      if (product) {
-          const selectedSize = row.size || product.priceSize?.[0]?.size; 
-          const sizePriceInfo = product.priceSize?.find(item => item.size === selectedSize);
-
-          if (!sizePriceInfo) {
-              console.warn(`No size/price info for size: ${selectedSize}. Skipping product.`);
-              return null;
-          }
-
-          return {
-              description: product.prodDesc,
-              id: product.id,
-              name: product.productName,
-              image: product.imageSrc,
-              partNumber: product.productNumber,
-              priceSize: {
-                  price: sizePriceInfo.price,
-                  size: selectedSize,
-              },
-              quantity: row.quantity > 0 ? row.quantity : 1,
-              stock: product.stockQuantity,
-          };
-      } else {
-          console.log(`No matching product found for SKU: ${sku}`);
-          return null;
-      }
-  }).filter(item => item !== null);
-
-  if (newCartItems.length === 0) {
-      console.log('No valid products to add to the cart.');
-      return;
-  }
-
-  try {
-      // Retrieve the current cart from localStorage or initialize an empty array
-      let currentCart = JSON.parse(localStorage.getItem('cart')) || [];
-
-      newCartItems.forEach(newItem => {
-          const existingItem = currentCart.find(item =>
-              item.partNumber === newItem.partNumber &&
-              item.priceSize.size === newItem.priceSize.size
-          );
-
-          if (existingItem) {
-              // Update quantity if the product already exists
-              existingItem.quantity += newItem.quantity;
-          } else {
-              // Add new item if it does not already exist
-              currentCart.push(newItem);
-          }
+        return line;
       });
 
-      // Save the updated cart to localStorage
-      localStorage.setItem('cart', JSON.stringify(currentCart));
+    rawFileData = lines.join("\n");
 
-      // Update the `cartState` store
-      cartState.set(currentCart);
+    const { duplicates } = checkForDuplicates(rawFileData);
+    duplicateEntries = duplicates;
 
-      // Calculate the total number of distinct items in the cart
-      const totalItems = currentCart.length;
-      cartNotification = `You have ${totalItems} item(s) in your cart.`;
-  } catch (err) {
-      console.error('Error saving to localStorage:', err);
+    if (duplicates.length > 0) {
+      toast.error(`Found ${duplicates.length} duplicate entries. Please review and remove them.`);
+    } else {
+      // Create a file from the processed data
+      submitFileData();
+    }
+  };
+
+  if (["xlsx", "xls"].includes(fileType)) {
+    if (typeof XLSX === "undefined") {
+      fileError = "Excel support requires SheetJS. Use CSV instead.";
+      return;
+    }
+
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        let csvData = XLSX.utils.sheet_to_csv(worksheet);
+        processFileData(csvData);
+      } catch (err) {
+        fileError = "Error processing Excel file.";
+        console.error(err);
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+  } else {
+    reader.onload = (e) => {
+      processFileData(e.target.result);
+    };
+
+    reader.readAsText(file);
   }
-
-  // Clear the notification after a timeout
-  if (notificationTimeout) clearTimeout(notificationTimeout);
-  notificationTimeout = setTimeout(() => {
-      cartNotification = '';
-
-      // Clear fields after the timeout
-      rows = [
-          { sku: "", size: '', quantity: 1, error: "", filteredProducts: [], selectedSize: null },
-          { sku: "", size: '', quantity: 1, error: "", filteredProducts: [], selectedSize: null },
-          { sku: "", size: '', quantity: 1, error: "", filteredProducts: [], selectedSize: null }
-      ];
-      uploadedRows = [];
-      validationMessages = [];
-      rawFileData = "";
-      stockStatus = '';
-  }, 3000);
 }
 
+// New function to submit the file data
+function submitFileData() {
+  // Create a new file with the current rawFileData
+  const updatedFile = new File([rawFileData], selectedFileName || "upload.csv", {
+    type: "text/csv",
+  });
+  
+  // Set the file to the file input
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(updatedFile);
+  
+  // Find the file input element and update its files
+  const fileInput = document.getElementById("bulkupload") || 
+                   document.querySelector('input[type="file"]');
+                   
+  if (fileInput) {
+    fileInput.files = dataTransfer.files;
+    
+    // Find the form
+    const form = fileInput.closest('form');
+    
+    if (form) {
+      // Submit the form after a short delay to allow the UI to update
+      setTimeout(() => {
+        form.requestSubmit();
+      }, 100);
+    } else {
+      console.error("Form not found");
+    }
+  } else {
+    console.error("File input element not found");
+  }
+}
 
+  // function removeAllDuplicates(event) {
+  //   if (duplicateEntries.length === 0) return;
 
+  //   const lines = rawFileData.split("\n").filter((line) => line.trim());
+  //   const uniqueProductInfos = new Set();
+  //   const deduplicatedLines = [];
+  //   lines.forEach((line) => {
+  //     const [productInfo] = line.split(",").map((item) => item.trim());
+  //     if (!uniqueProductInfos.has(productInfo)) {
+  //       uniqueProductInfos.add(productInfo);
+  //       deduplicatedLines.push(line);
+  //     }
+  //   });
 
+  //   rawFileData = deduplicatedLines.join("\n");
+  //   const deduplicatedFile = new File([rawFileData], "deduplicated.csv", {
+  //     type: "text/csv",
+  //   });
+  //   const dataTransfer = new DataTransfer();
+  //   dataTransfer.items.add(deduplicatedFile);
+  //   const fileInput = document.getElementById("bulkupload");
+  //   if (fileInput) {
+  //     fileInput.files = dataTransfer.files;
+  //   }
+  //   duplicateEntries = [];
+  //   toast.success(`Removed all duplicate entries`);
+  //   if (formElement) {
+  //     setTimeout(() => {
+  //       formElement.requestSubmit();
+  //     }, 100);
+  //   }
+  // }
+  function removeAllDuplicates(event) {
+  if (duplicateEntries.length === 0) return;
+
+  const lines = rawFileData.split("\n").filter((line) => line.trim());
+  const uniqueProductInfos = new Set();
+  const deduplicatedLines = [];
+  
+  lines.forEach((line) => {
+    const [productInfo] = line.split(",").map((item) => item.trim());
+    if (!uniqueProductInfos.has(productInfo)) {
+      uniqueProductInfos.add(productInfo);
+      deduplicatedLines.push(line);
+    }
+  });
+
+  rawFileData = deduplicatedLines.join("\n");
+  duplicateEntries = [];
+  toast.success(`Removed all duplicate entries`);
+  
+  // Use the common submitFileData function
+  submitFileData();
+}
+  function validateAndSubmitData() {
+    if (!rawFileData.trim()) {
+      toast.error("Please enter product data before submitting");
+      return;
+    }
+
+    const lines = rawFileData.split("\n").filter((line) => line.trim());
+    const trimmedLines = lines.map((line) => {
+      const [productInfo, quantity] = line
+        .split(",")
+        .map((item) => item.trim());
+      return `${productInfo},${quantity || 1}`;
+    });
+    rawFileData = trimmedLines.join("\n");
+
+    const { duplicates } = checkForDuplicates(rawFileData);
+    if (duplicates.length > 0) {
+      toast.error(
+        `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
+      );
+      return;
+    }
+
+    const file = new File([rawFileData], "manual-entry.csv", {
+      type: "text/csv",
+    });
+
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    const fileInput = document.getElementById("bulkupload");
+    if (fileInput) {
+      fileInput.files = dataTransfer.files;
+    }
+
+    if (formElement) {
+      formElement.requestSubmit();
+    }
+  }
+
+  function processProduct(product) {
+    const {
+      id,
+      image,
+      productName,
+      productNumber,
+      description,
+      pricing,
+      stock,
+    } = product;
+    if (Array.isArray(pricing) && pricing.length > 0) {
+      pricing.forEach((priceInfo) => {
+        const { break: size, price } = priceInfo;
+      });
+    }
+  }
+
+  function prepareValidatedProductsForCart() {
+    const productsToAdd = [];
+    if (!validatedProducts || validatedProducts.length === 0) {
+      toast.error("No valid items to add to cart");
+      return productsToAdd;
+    }
+    const validProducts = validatedProducts.filter(
+      (product) => product.isValid === true,
+    );
+
+    validProducts.forEach((product) => {
+      if (
+        product.stockMessage ===
+          "Stock is sufficient for all uploaded quantities" ||
+        (product.productNumber &&
+          product.productName &&
+          product.pricing &&
+          product.pricing[0] &&
+          product.pricing[0].break &&
+          product.stock > 0)
+      ) {
+        console.log(`Product ${product.productName} passed validation check`);
+
+        const sizePriceInfo = product.pricing[0];
+        const size = sizePriceInfo.break;
+        const price = sizePriceInfo.price;
+        const rowQuantity = parseInt(product.quantity, 10) || 0;
+        const productStock = parseInt(product.stock, 10) || 0;
+        const backOrder = Math.max(rowQuantity - productStock, 0);
+
+        const newProduct = {
+          id: product.id,
+          manufacturerId: product.manufacturer,
+          distributerId: product.distributer ? product.distributer : null,
+          stockId: product.stockId,
+          productName: product.productName,
+          image: product.image,
+          partNumber: product.productNumber,
+          description: product.prodDesc,
+          priceSize: {
+            price: price,
+            size: size,
+          },
+          quantity: product.quantity || 1,
+          backOrder: backOrder,
+          stock: product.stock,
+        };
+
+        productsToAdd.push(newProduct);
+        console.log(
+          `Prepared product ${newProduct.productName} for cart addition`,
+        );
+      } else {
+        console.log(`Product ${product.productName} did not pass validation.`);
+      }
+    });
+
+    console.log(`Prepared ${productsToAdd.length} products for cart`);
+    return productsToAdd;
+  }
+
+  function attemptAddToCart() {
+    if (!isValidated || duplicateEntries.length > 0) {
+      validateAndSubmitData();
+      return;
+    }
+    const validProducts = validatedProducts.filter(
+      (product) => product.isValid === true,
+    );
+
+    if (validProducts.length === 0) {
+      toast.error(
+        "No valid products to add to cart. Please remove invalid products and try again.",
+      );
+      return;
+    }
+
+    if (data?.authedUser && data?.authedUser?.id) {
+      const cartForm = document.getElementById("cartForm");
+      if (cartForm) cartForm.requestSubmit();
+    } else {
+      handleLocalStorage();
+      submitAlternateForm();
+    }
+  }
+  async function submitAlternateForm() {
+    const storedTotalComps = JSON.parse(localStorage.getItem("cart"));
+    localStorage.setItem("totalCompsChemi", storedTotalComps.length);
+    syncLocalStorageToStore();
+  }
+  function handleDataCart() {
+    return async ({ result }) => {
+      console.log("result from page server for carat data", result);
+
+      const totalComps = result?.data?.cartData?.cartItems.length;
+      console.log("totalComps", totalComps);
+      localStorage.setItem("totalCompsChemi", totalComps);
+      syncLocalStorageToStore();
+    };
+  }
+  function syncLocalStorageToStore() {
+    if (typeof window !== "undefined") {
+      const storedTotalComps = localStorage.getItem("totalCompsChemi");
+      if (storedTotalComps) {
+        cartTotalComps.set(Number(storedTotalComps));
+      }
+    }
+  }
+  function handleLocalStorage() {
+    try {
+      cartloading = true;
+      const productsToAdd = prepareValidatedProductsForCart();
+      const simplifiedCartItems = productsToAdd.map((item) => ({
+        productId: item.id,
+        manufacturerId: item.manufacturerId,
+        stockId: item.stockId,
+        distributorId: item.distributerId,
+        quantity: item.quantity || 1,
+        backOrder: item.backOrder,
+      }));
+
+      if (productsToAdd.length === 0) {
+        cartloading = false;
+        toast.error("No valid items to add to cart");
+        return;
+      }
+
+      const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+      const updatedCart = [...existingCart];
+
+      // Merge quantities for existing products
+      simplifiedCartItems.forEach((newItem) => {
+        const existingItemIndex = updatedCart.findIndex(
+          (cartItem) =>
+            cartItem.productId === newItem.productId &&
+            cartItem.stockId === newItem.stockId &&
+            cartItem.manufacturerId === newItem.manufacturerId,
+        );
+
+        if (existingItemIndex !== -1) {
+          updatedCart[existingItemIndex].quantity += newItem.quantity;
+          updatedCart[existingItemIndex].backOrder += newItem.backOrder;
+        } else {
+          updatedCart.push(newItem);
+        }
+      });
+
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+      const productsAddedCount = productsToAdd.length;
+      toast.success(
+        `${productsAddedCount} valid ${productsAddedCount === 1 ? "item" : "items"} saved to cart.`,
+      );
+
+      cartloading = false;
+      setTimeout(() => {
+        window.location.href = "/cart";
+      }, 2000);
+    } catch (err) {
+      cartloading = false;
+      console.error("Error saving to localStorage:", err);
+      toast.error("Failed to save items to cart");
+    }
+  }
+  function mapInvalidProductsToLines() {
+    if (!isValidated || !validationMessages.length) return [];
+
+    const lines = rawFileData.split("\n");
+    const mappedInvalidLines = [];
+    validationMessages.forEach((message) => {
+      if (!message.isValid) {
+        const lineIndex = lines.findIndex((line) => {
+          const [productInfo] = line.split(",").map((item) => item.trim());
+          return productInfo.includes(message.productNumber);
+        });
+
+        if (lineIndex !== -1) {
+          mappedInvalidLines.push({
+            index: lineIndex,
+            line: lineIndex + 1,
+            content: lines[lineIndex],
+            productNumber: message.productNumber,
+            message: message.message,
+          });
+        }
+      }
+    });
+
+    return mappedInvalidLines;
+  }
+  // Add a scroll event listener to the textarea
+  function initScrollListener() {
+    const textarea = document.querySelector("textarea");
+    if (textarea) {
+      textarea.addEventListener("scroll", updateValidationMessagePositions);
+    }
+  }
+
+  // Function to update positions of validation messages
+  function updateValidationMessagePositions() {
+    const textarea = document.querySelector("textarea");
+    if (!textarea) return;
+
+    const container = textarea.parentElement;
+    const scrollTop = textarea.scrollTop;
+
+    // Use a more accurate line height calculation
+    // Calculate actual line height based on textarea height and number of lines
+    const lines = textarea.value.split("\n");
+    const lineHeight = textarea.clientHeight / (lines.length || 1);
+
+    // Get all validation message elements
+    const validationElements = container.querySelectorAll(
+      '[class*="absolute right-7"]',
+    );
+
+    validationElements.forEach((element) => {
+      const productNumber = element.dataset.productNumber;
+      if (!productNumber) return;
+
+      // Find the line index for this product
+      const lineIndex = lines.findIndex((line) => line.includes(productNumber));
+
+      if (lineIndex !== -1) {
+        // Calculate position based on actual textarea properties
+        const linePosition = lineIndex * lineHeight;
+        const adjustedPosition = linePosition - scrollTop + 12; // Add small offset for alignment
+
+        // Only show if the message is within the visible area
+        if (
+          adjustedPosition >= 0 &&
+          adjustedPosition <= textarea.clientHeight - 20
+        ) {
+          element.style.display = "flex";
+          element.style.top = `${adjustedPosition}px`; // Use pixels for more precise positioning
+        } else {
+          element.style.display = "none";
+        }
+      }
+    });
+  }
+  let fileInput;
+  let dropzone;
+  function triggerUpload() {
+    fileInput.click();
+  }
+  function handleDrop(event) {
+  event.preventDefault();
+  if (dropzone) {
+    dropzone.classList.remove("bg-primary-100", "text-primary-600");
+  }
+
+  const file = event.dataTransfer.files[0];
+  if (file) {
+    // Create a mock event with the dataTransfer property
+    const mockEvent = {
+      dataTransfer: event.dataTransfer
+    };
+    handleFileInputChange(mockEvent);
+  }
+}
+
+  function handleDragOver(event) {
+    event.preventDefault();
+    dropzone.classList.add("bg-primary-100", "text-primary-600");
+  }
+
+  function handleDragLeave() {
+    dropzone.classList.remove("bg-primary-100", "text-primary-600");
+  }
 </script>
 
+<!-- <div class="text-black text-sm md:ml-2 mb-1">
+  *Type or paste product number-size,quantity (e.g., PV4384-each of 1,1),
+  separated by commas*. Enter separate products on new lines.
+</div> -->
+<div class="text-black text-sm md:ml-2 mb-1">
+  *Upload a file containing product data (e.g., PV4384-each of 1,1). Each
+  product should be on a new line.*
+</div>
+<form
+  method="POST"
+  action="/?/getCartValue"
+  bind:this={form2}
+  use:enhance={handleDataCart}
+>
+  <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
+</form>
+<form
+  bind:this={formElement}
+  method="POST"
+  action="?/uploadFile"
+  enctype="multipart/form-data"
+  use:enhance={() => {
+    isLoading = true;
+    const lines = rawFileData.trim().split("\n");
+    const processedLines = lines.map((line) => {
+      const parts = line.includes(",") ? line.split(",") : line.split(/\s+/);
+      const productNumberAndSize = parts[0]?.trim();
+      let quantity = parts[1]?.trim();
+      if (!quantity && productNumberAndSize) {
+        quantity = "1";
+        return `${productNumberAndSize},${quantity}`;
+      }
 
+      return line;
+    });
 
-<div class="w-11/12 mx-auto py-5 px-2 md:flex md:space-x-8 max-w-7xl">
+    rawFileData = processedLines.join("\n");
+    return async ({ result }) => {
+      const { duplicates } = checkForDuplicates(rawFileData);
 
-<div class="md:w-full">
-    <h1 class="font-bold text-lg md:text-2xl">Quick Order</h1>
+      if (duplicates.length > 0) {
+        toast.error("Please remove duplicate entries before submitting");
+        isLoading = false;
+        return;
+      }
 
- 
-    {#if !userLoggedIn}
-        <div class="flex justify-normal md:justify-end">
-            <div class="flex items-center gap-2 w-72 text-xs rounded-md p-3 border border-primary-100 shadow-sm bg-white shadow-primary-100 my-1">
-                <Icon icon="mingcute:warning-line" class="text-primary-500 text-4xl shrink-0" />
-                <a href="/signin"><span class="hover:text-primary-600 text-primary-400">Sign in  </span> to import items from your recent orders and quotes.</a>
-                <!-- <a href="/login"><span class="hover:text-primary-600 text-primary-400">Sign in  </span> to import items from your recent orders and quotes.</a> -->
+      let products = result.data;
+      products.forEach((product) => {
+        if (!product.quantity || product.quantity === undefined) {
+          product.quantity = 1;
+        }
+        processProduct(product);
+      });
+
+      validatedProducts = products;
+      isLoading = false;
+      isValidated = true;
+
+      if (result.data && Array.isArray(result.data)) {
+        validationMessages = result.data.map((item) => ({
+          productNumber: item.productNumber || "Unknown",
+          isValid: item.isValid,
+          message: item.message || "Unknown message",
+        }));
+        const hasInvalidProducts = validationMessages.some(
+          (message) => !message.isValid,
+        );
+
+        if (hasInvalidProducts) {
+          invalidProductLines = mapInvalidProductsToLines();
+          toast.warning(
+            "Some products are invalid. Please review before adding to cart.",
+          );
+        } else if (validatedProducts.length > 0) {
+          setTimeout(() => {
+            if (data?.authedUser && data?.authedUser?.id) {
+              const cartForm = document.getElementById("cartForm");
+              if (cartForm) cartForm.requestSubmit();
+            } else {
+              submitAlternateForm();
+              handleLocalStorage();
+            }
+          }, 100);
+        }
+      }
+    };
+  }}
+>
+  {#if isLoading}
+  <div class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gray-500/40 backdrop-blur-sm"
+  transition:fade={{ duration: 300 }}>
+  <div class="flex flex-col items-center justify-center p-4">
+    <div class="relative w-32 h-32">
+      <Icon icon="eos-icons:bubble-loading" class="absolute inset-0 w-full h-full text-6xl text-primary-50 animate-spin-slow"/>
+      <!-- <div class="absolute inset-0 w-full h-full border-8 border-dashed border-primary-200 border-t-primary-600 rounded-full animate-spin-slow"></div> -->
+      <div class="loader loader-large absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10"></div>
+    </div>
+    <div class="mt-4 text-white font-medium flex items-center animate-pulse">
+      <span class="animate-wave-1">L</span>
+      <span class="animate-wave-2">o</span>
+      <span class="animate-wave-3">a</span>
+      <span class="animate-wave-4">d</span>
+      <span class="animate-wave-5">i</span>
+      <span class="animate-wave-6">n</span>
+      <span class="animate-wave-7">g</span>
+      <span class="animate-wave-8">.</span>
+      <span class="animate-wave-9">.</span>
+      <span class="animate-wave-10">.</span>
+    </div>
+  </div>
+</div>
+  {/if}
+
+  <section class="w-full mx-auto md:flex items-center gap-5">
+    <div
+      class="md:w-3/5 h-72 border bg-white rounded-md overflow-hidden p-5 relative"
+    >
+      <textarea
+        class="w-full h-full p-2 border placeholder:text-sm placeholder:text-gray-400 border-gray-300 rounded-md focus:ring-0 focus:border-primary-500"
+        bind:value={rawFileData}
+        on:input={handleTextChange}
+        readonly
+        placeholder="Upload a file containing product data...
+Example file content:
+7987565-50G,1
+657890-100G,5
+345678-25G,3"
+      ></textarea>
+      {#if isValidated && validationMessages.length > 0}
+        {#each validationMessages as message}
+          {#if message.isValid}
+            <div
+              class="absolute right-7 text-green-500 flex items-center"
+              style="top: calc(1.5rem + {rawFileData
+                .split('\n')
+                .findIndex((line) => line.includes(message.productNumber)) *
+                1.5}rem)"
+            >
+              <span class="text-xs mr-2">Valid Product</span>
+              <Icon icon="mdi:check-circle" class="text-lg" />
             </div>
-        </div>
-    {/if}
+          {:else}
+            <div
+              class="absolute right-7 text-red-500 flex items-center"
+              style="top: calc(1.5rem + {rawFileData
+                .split('\n')
+                .findIndex((line) => line.includes(message.productNumber)) *
+                1.5}rem)"
+            >
+              <span class="text-xs mr-2">{message.message}</span>
+              <button
+                type="button"
+                class="text-red-500 hover:text-red-700"
+                title="Remove invalid product"
+                on:click={() =>
+                  removeInvalidProduct(
+                    rawFileData
+                      .split("\n")
+                      .findIndex((line) =>
+                        line.includes(message.productNumber),
+                      ),
+                  )}
+              >
+                <Icon icon="mdi:close-circle" class="text-lg" />
+              </button>
+            </div>
+          {/if}
+        {/each}
+      {/if}
 
- 
-    <div class="my-4 lg:ml-4">
-        <button on:click={() => (toggle = false)} class="px-5 py-2 text-sm font-semibold {toggle ? 'bg-primary-200' : 'bg-white border-b-2 border-primary-500 text-primary-500'}">
-            Manual Entry
-        </button>
-        <button on:click={() => (toggle = true)} class="px-5 py-2 text-sm font-semibold {toggle ? 'bg-white border-b-2 border-primary-500 text-primary-500' : 'bg-primary-200'}">
-            Bulk Upload
-        </button>
+      {#if fileError}
+        <p class="text-red-500 text-sm mt-2">{fileError}</p>
+      {/if}
     </div>
 
- 
-    {#if toggle}
-    
+    <section class="mt-3 md:mt-0 md:w-2/5">
+      <div class="flex flex-col gap-3">
+        <div
+          class="flex justify-center bg-white items-center h-12 border rounded-md hover:bg-primary-200 hover:text-primary-600"
+        >
+          <a
+            class="flex items-center gap-2 text-sm font-medium text-primary-500"
+            href="/quick_order_template.csv"
+            download
+          >
+            <Icon icon="pajamas:download" class="text-lg " /> Download Template
+          </a>
+        </div>
 
- <div class="w-full   lg:px-5">
-        
-        
-          <p class="text-2s md:text-xs font-medium py-1.5">
-            Type or paste product SKU (product number and pack size), quantity, promo code, and reference number separated by commas*.
-            Enter separate products on new lines.
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <!-- <div
+          class="w-full flex flex-col justify-center bg-white items-center rounded-md h-[220px] mt-3 space-y-2 py-6 border border-dashed hover:bg-primary-100 hover:text-primary-600"
+        >
+          <Icon icon="uil:upload" class="text-5xl text-primary-500 -ml-4" />
+          <p class="text-sm text-center px-2">
+            Or drag and drop your CSV or XLS file to upload
           </p>
-        
-          <section class="w-full mx-auto md:flex items-center gap-5">
-            
-            <div class="md:w-3/5 h-72 border-1 bg-white rounded overflow-hidden overflow-y-scroll p-5">
-              {#if rawFileData}
-                <textarea 
-                  class="w-full h-full p-2 border border-gray-300 rounded"
-                  bind:value={rawFileData} 
-                  on:input={handleTextChange}
-                  placeholder="Edit the CSV content here..."
-                ></textarea>
-              {:else}
-                <div class="text-gray-300 text-sm">
-                  <p>Example</p>
-                  <p>7987565,1</p>
-                  <p>657890,5</p>
-                  <p>345678,3</p>
-                </div>
-              {/if}
-        
-              {#if fileError}
-                <p class="text-red-500 text-sm mt-2">{fileError}</p>
-              {/if}
-        
-            </div>
-        
-            
-            <section class="mt-3 md:mt-0 md:w-2/5">
-              <div class="flex justify-center bg-white items-center h-12 border-1 rounded">
-                <a class="flex items-center gap-2 text-sm font-medium text-primary-500" href="/quick_order_template.csv" download>
-                  <Icon icon="pajamas:download" class="text-lg" /> Download Template 
-                </a>
-              </div>
-        
-              <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <div
-                on:drop={handleDrop}
-                on:dragover={(event) => event.preventDefault()} 
-                class="w-full flex flex-col justify-center bg-white items-center rounded h-56 mt-3 space-y-2 py-10 border-1 border-dashed"
-              >
-                <Icon icon="uil:upload" class="text-3xl text-primary-500 -ml-4" />
-                <p class="text-xs">Drag and Drop your CSV or XLS file to upload or</p>
-                <label for="bulkupload" class="text-xs mr-3">
-                  <span class="font-medium text-primary-600">Choose File</span>
-                  <input
-                    id="bulkupload"
-                    class="hidden"
-                    type="file"
-                    accept=".xlsx, .xls, .csv,.txt"
-                    on:change={handleFileInputChange}
-                  />
-                </label>
-              </div>
-            </section>
-          </section>
-        
-          <p class="text-2s md:text-xs font-medium py-1.5">
-            *Promo codes and references numbers cannot be used when requesting quotes.
-          </p>
-          
-          {#if validationMessages.length > 0}
-          <ul class="mt-3">
-            {#each validationMessages as { productNumber, message, isValid }}
-              <li class={isValid ? "text-green-500" : "text-red-500"}>
-                {productNumber}: {message}
+
+          <label
+            for="bulkupload"
+            class="w-full h-full cursor-pointer flex flex-col justify-center items-center"
+          >
+            <input
+              type="file"
+              id="bulkupload"
+              name="file"
+              accept=".xlsx, .xls, .csv, .txt"
+              on:change={handleFileInputChange}
+              class="hidden"
+            />
+          </label>
+        </div>
+      </div> -->
+      <div
+      on:click={triggerUpload}
+      bind:this={dropzone}
+      class="w-full flex flex-col justify-center bg-white items-center rounded-md h-[210px] mt-2 space-y-2 py-6 border border-dashed hover:bg-primary-100 hover:text-primary-600"
+      on:drop={handleDrop}
+      on:dragover={handleDragOver}
+      on:dragleave={handleDragLeave}
+    >
+    <Icon icon="uil:upload" class="text-5xl text-primary-500 -ml-4" />
+      <div class="flex flex-col items-center pointer-events-none text-primary-500">
+
+        <p class="text-sm font-medium text-center px-2">
+         Upload or drag and drop your CSV or XLS file to upload
+        </p>
+      </div>
+    
+      <input
+        bind:this={fileInput}
+        type="file"
+        name="file"
+        accept=".xlsx, .xls, .csv, .txt"
+        class="hidden"
+        on:change={handleFileInputChange}
+      />
+    
+      <button
+        type="button"
+        on:click={triggerUpload}
+        hidden
+        class="mt-2 text-primary-600 underline"
+      >
+        Click to select a file
+      </button>
+    </div>
+      {#if selectedFileName && rawFileData.length !== 0}
+        <p class="text-sm text-primary-500 mt-2">{selectedFileName}</p>
+      {/if}
+      {#if fileError}
+        <p class="text-sm text-red-500 mt-2">{fileError}</p>
+      {/if}
+    </section>
+  </section>
+  {#if duplicateEntries.length >= 2}
+    <div class="mt-4">
+      <button
+        type="button"
+        class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+        on:click={removeAllDuplicates}
+      >
+        Remove All Duplicates
+      </button>
+    </div>
+  {/if}
+  {#if duplicateEntries.length > 0}
+    <div class="mt-4 p-4 bg-red-50 rounded-md">
+      <h3 class="text-red-700 font-medium mb-2">Duplicate Entries Found:</h3>
+      <ul class="space-y-2">
+        {#each duplicateEntries as entry}
+          <li class="flex items-center justify-between">
+            <span class="text-red-600">
+              Line {entry.line}: {entry.content}
+            </span>
+
+            <button
+              type="button"
+              class="px-3 py-1 text-sm text-white bg-red-500 rounded-md hover:bg-red-600"
+              on:click={(event) =>
+                removeDuplicateEntry(entry.productInfo, event)}
+            >
+              Remove
+            </button>
+          </li>
+        {/each}
+      </ul>
+    </div>
+  {/if}
+  {#if validationMessages.length > 0 && isValidated}
+    <div class="mt-4">
+      {#if validationMessages.some((message) => !message.isValid)}
+        <!-- <div class="p-4 bg-yellow-50 rounded-md">
+          <h3 class="text-yellow-700 font-medium mb-2">Invalid Products:</h3>
+          <ul class="space-y-2">
+            {#each validationMessages.filter((message) => !message.isValid) as message}
+              <li class="flex items-center justify-between">
+                <span class="text-yellow-600">
+                  Product: {message.productNumber} - {message.message}
+                </span>
+                <span class="text-yellow-600 font-medium"
+                  >Cannot be added to cart</span
+                >
               </li>
             {/each}
           </ul>
-        {/if}
-
-     
-        <div class="mt-2 flex items-center justify-between space-x-2 lg:space-x-54">
-       
-          <button 
-              on:click={addUploadedEntriesToCart}
-              class="lg:w-1/5 w-1/2 mt-6 lg:px-4 py-2 bg-primary-500 text-white rounded-md shadow-md hover:bg-primary-600 flex items-center justify-center ml-auto">
-              <span>Add to Cart</span>
-              <Icon icon="ion:cart-outline" class="text-2xl shrink-0" />
-          </button>
-      </div>
-          
-  
-     
-      {#if cartNotification}
-      <div class="fixed bottom-4 left-4 p-4 bg-primary-400 text-white rounded-md shadow-lg z-50">
-          {cartNotification}
-      </div>
-    {/if}
-  </div>
-
-{:else}
-    <div class="space-y-2 lg:px-5 ">
-        {#each rows as row, index}
-        <div class="flex sm:w-full  gap-2 items-center relative ">
-        <input
-            type="text"
-            bind:value={row.sku}
-            placeholder="Product SKU"
-            on:input={() => handleProductFilter(row.sku, index)}
-                class="hover:border-primary-500 h-10 mt-2 focus:border-primary-400  focus:outline-none focus:ring-0 mb-2 rounded p-2 items-center ml-4 w-10/12 text-sm   border-1 border-gray-200 transition duration-200"
-          />
-          {#if searchQuery && row.filteredProducts.length > 0}
-          <div class="absolute top-full w-full mt-1 ml-4 max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-md z-10">
-             <button
-              class="absolute top-2 right-2 bg-transparent text-primary-400 hover:text-gray-600 p-1"
-              on:click={() => clearSearch(index)}
-            >
-              <Icon icon="cuida:x-outline" class="w-5 h-5" />
-            </button> 
-    
-
-    
-            {#each row.filteredProducts as result (result.productNumber)}
-              <div class="p-4 border-b border-gray-300 last:border-b-0 hover:bg-gray-100 cursor-pointer">
-                <div class="space-y-1 mt-2">
-                  {#each result.priceSize as size}
-                    <div class="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        class="form-radio rounded text-primary-600 mr-2 focus:outline-none focus:ring-2 focus:ring-primary-600"
-                        id="size-{size.size}"
-                        name="size-{result.productNumber}"
-                        value={size.size}
-                        bind:group={row.selectedSize}
-                        checked={row.selectedSize === size.size}
-                        on:change={() => selectProduct(result, index, size)}
-                      />
-                      <label for="size-{size.size}">{result.productNumber} - ({size.size})</label>
-                    </div>
-                  {/each}
-                </div>
-              </div>
-            {/each}
-          </div>
-        {/if}
-    
-    
-       
-
-    
-       
-          <div class="w-full md:w-72  md:mt-0 flex items-center gap-2">
-            <input
-              type="text"
-              min="1"
-              bind:value={row.quantity}
-          class="w-2/3 grow text-center border-1 border-gray-200 rounded bg-white font-medium h-10 outline-none py-2 hover:border-primary-400 focus:border-primary-400 focus:ring-0"
-              on:input={() => row.quantity = Math.max(1, Math.min(9999, row.quantity))}
-            />
-            <button class="outline-none" on:click={() => incrementQuantity(index)}>
-              <Icon icon="ic:round-plus" class="text-lg border-1 rounded bg-white text-primary-500 lg:w-12 w-10 h-10 p-2" />
-            </button>
-            <button class="outline-none" on:click={() => decrementQuantity(index)}>
-              <Icon icon="ic:round-minus" class="text-lg border-1 rounded bg-white text-primary-500 lg:w-12 w-10 h-10 p-2" />
-            </button>
-          </div>
+          <p class="mt-3 text-sm text-yellow-600">
+            Please remove invalid products using the X button in the text area
+            or proceed with only valid products.
+          </p>
+        </div> -->
+        <div class="p-4 bg-yellow-50 rounded-md">
+          <h3 class="text-yellow-700 font-medium mb-2">Invalid Products:</h3>
+          <ul class="space-y-2">
+            <li class="flex items-center">
+              <Icon icon="mdi:close-circle" class="text-red-500 text-lg mr-2" />
+              <span class="text-yellow-600"
+                >Marked products cannot be added to the cart.
+              </span>
+            </li>
+          </ul>
+          <p class="mt-3 text-sm text-yellow-600">
+            Please remove invalid products using the X button in the text area
+            or proceed with only valid products.
+          </p>
         </div>
-    
-        {#if cartNotification}
-        <div class="fixed bottom-4 left-4 p-4 bg-primary-400 text-white rounded-md shadow-lg z-50">
-            {cartNotification}
-        </div>
+        
       {/if}
-     
-         
-      {#if row.error}
-      <div class="text-red-500 ml-5 text-medium mt-2">
-        {row.error}
-      </div>
-    {/if}
 
-      {#if selectedProduct && selectedProduct.productNumber === row.sku.split('-')[0].trim()} 
-    <div class="w-full mt-3 flex  ml-5 gap-4 items-center hidden md:flex lg:flex xl:flex">
-  <span class="font-semibold">{selectedProduct.productName}</span>
-  <span>Size: {selectedProduct.priceSize?.[0]?.size || 'No Size Available'}</span>
-  <span>Price: {selectedProduct.priceSize?.[0]?.price}</span>
-  <span>
-      1 Estimated to ship on {estimatedShipDate} 
-  </span>
-  <button class="p-2 text-primary-400 rounded" on:click={showDetails}>
-    Details
-  </button>
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div
-    class="p-2 text-red-500 cursor-pointer hover:text-red-700"
-    on:click={() => clearSelectedProduct(index)}
-  >
-    <Icon icon="mdi:close-circle" class="w-6 h-6" />
-  </div>
-</div>
-<hr/>
-{/if}
-    {/each}
-    
-    
-    
-        <div class="mt-2 flex items-center justify-between space-x-2 lg:space-x-54">
-            <button on:click={addRows} class="text-primary-500 text-md mt-6 ml-5"> + Add More</button>
-            
-            <button 
-                on:click={addManualEntriesToCart} 
-                class="lg:w-1/5 w-1/2 mt-6 lg:px-4 py-2 bg-primary-500 text-white rounded-md shadow-md hover:bg-primary-600 flex items-center justify-center " >
-                <span>Add to Cart</span>
-                <Icon icon="ion:cart-outline" class="text-2xl shrink-0" />
-            </button>
-        </div>
-    
-       
-        {#if cartNotification}
-        <div class="fixed bottom-4 left-4 p-4 bg-primary-400 text-white rounded-md shadow-lg z-50">
-            {cartNotification}
+      {#if validationMessages.some((message) => message.isValid)}
+        <div class="mt-3 p-4 bg-green-50 rounded-md">
+          <h3 class="text-green-700 font-medium mb-2">
+            Valid Products: {validationMessages.filter(
+              (message) => message.isValid,
+            ).length}
+          </h3>
+          <p class="text-sm text-green-600">
+            These products are ready to be added to cart.
+          </p>
         </div>
       {/if}
     </div>
-    
-    
-    {/if}
-</div>
+  {/if}
+</form>
 
-{#if userLoggedIn}
-    
-    <div class="w-full sm:w-full md:w-1/4 lg:w-1/4 h-1/2 ml-0 sm:ml-0 mt-8 md:mt-24 bg-gray-50 border rounded-lg border-gray-400 p-4 ">
-
-        <h2 class="font-semibold text-xl mb-2">
-            Hello, {email.split('@')[0].replace(/\d+/g, '')}
-          </h2>
-          
-        <div class="mb-2">
-     
-            <div class="flex items-center space-x-2">
-                <h3 class="font-semibold text-lg">Saved Carts</h3>
-                <button 
-                    class="text-primary-500"
-                    on:click={() => showSavedCarts = !showSavedCarts}>
-                    <Icon 
-                        icon={showSavedCarts ? 'iconamoon:arrow-up-2-duotone' : 'iconamoon:arrow-down-2-duotone'} 
-                        class="text-3xl" 
-                    />
-                </button>
-              
-            </div>
-        
-          
-            {#if showSavedCarts}
-                {#if cart.length > 0}
-                    <ul>
-                        {#each cart as cart}
-                            <li class="text-sm mt-2 text-gray-700">
-                                {cart.name} ({cart.quantity} items)
-                            </li>
-                        {/each}
-                    </ul>
-                {:else}
-                    <p class="text-sm text-gray-500">No saved carts found.</p>
-                {/if}
-            {/if}
-        </div>
-        <!-- <div class="mb-2">
-           
-            <div class="flex items-center space-x-2">
-                <h3 class="font-semibold text-lg">Recent Orders</h3>
-                <button 
-                    class="text-primary-500"
-                    on:click={() => showRecentOrders = !showRecentOrders}>
-                    <Icon 
-                        icon={showRecentOrders ? 'iconamoon:arrow-up-2-duotone' : 'iconamoon:arrow-down-2-duotone'} 
-                        class="text-3xl" 
-                    />
-                </button>
-            </div>
-        
-           
-            {#if showRecentOrders}
-                {#if recentOrders.length > 0}
-                    <ul>
-                        {#each recentOrders as order}
-                            <li class="text-sm text-gray-700">
-                                Order Number: {order.orderNumber} - {order.productName}
-                            </li>
-                        {/each}
-                    </ul>
-                {:else}
-                    <p class="text-sm text-gray-500">No results found.</p>
-                {/if}
-            {/if}
-        </div>
--->
-
-
-
-        <div class="flex items-center space-x-2">
-            <h3 class="font-semibold text-lg">Lists</h3>
-            <button 
-                class="text-primary-500"
-                on:click={() => showLists = !showLists}>
-                <Icon 
-                    icon={showLists ? 'iconamoon:arrow-up-2-duotone' : 'iconamoon:arrow-down-2-duotone'} 
-                    class="text-3xl" 
-                />
-            </button>
-          
-        </div>
-        {#if showLists}
-       <a href="/lists" class="text-gray-500 ">See Lists# </a>
-    {/if}
-    <div class="flex items-center space-x-2 mt-2">
-        <h3 class="font-semibold text-lg">Quotes</h3>
-        <button 
-            class="text-primary-500"
-            on:click={() => showquotes = !showquotes}>
-            <Icon 
-                icon={showquotes ? 'iconamoon:arrow-up-2-duotone' : 'iconamoon:arrow-down-2-duotone'} 
-                class="text-3xl" 
-            />
-        </button>
-      
-    </div>
-    {#if showquotes}
-   <a href="/lists" class="text-gray-500 " >See Quotes # </a>
-{/if}
-        
-    </div>
-
-{/if}
-
-
-
-{#if showDetailsModal && selectedProduct}
-<div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center !ml-0 z-50">
-  <div class="bg-white p-6 rounded-lg w-1/2 relative">
-    <button
-      class="absolute top-2 right-2 text-primary-500 hover:text-primary-700"
-      on:click={hideDetails}
-      aria-label="Close"
-    >
-      <Icon icon="cuida:x-outline" class="w-5 h-5" />
-    </button>
-
-    <h3 class="text-xl font-semibold">
-      {selectedProduct.productName} - {selectedProduct.productNumber}
-    </h3>
-    <p class="mt-2">Enter quantity to check availability and estimated ship date.</p>
-
+<div class="flex justify-end">
+  {#if data?.authedUser && data?.authedUser?.id}
     <form
+      id="cartForm"
       method="POST"
-      action="?/quickcheck"
-      use:enhance={() => {
-        return async ({ result }) => {
-          if (!selectedProduct) return;
-          selectedProduct.stockStatus = result.data.record.stock;
-          selectedProduct.stockAvailability = result.data.record.message;
-          selectedProduct.stockUnAvailability = result.data.record.message1;
-          selectedProduct.stockType = result.data.record.type;
+      action="?/addToCart"
+      use:enhance={({ formData, cancel }) => {
+        cartloading = true;
 
-          console.log("Updated Product Data:", selectedProduct);
+        const productsToAdd = prepareValidatedProductsForCart();
+
+        if (productsToAdd.length === 0) {
+          cartloading = false;
+          toast.error("No valid items to add to cart");
+          return cancel();
+        }
+
+        formData.set("cartItems", JSON.stringify(productsToAdd));
+
+        return async ({ result }) => {
+          cartloading = false;
+
+          try {
+            const resultData = result.data;
+
+            if (resultData && resultData.success === true) {
+              const productsAddedCount = productsToAdd.length;
+              toast.success(
+                `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`,
+              );
+              setTimeout(() => {
+                window.location.href = "/cart";
+              }, 2000);
+            } else {
+              throw new Error(resultData[1] || "Failed to add items to cart");
+            }
+          } catch (err) {
+            console.error("Error processing cart response:", err);
+            toast.error("Failed to add items to cart");
+          }
         };
       }}
     >
-      <div class="flex items-center mt-2 gap-5">
-        <input type="hidden" name="ProductId" value={selectedProduct.id} />
-
-       
-        <button
-          class="flex justify-center items-center w-12 h-12 bg-white text-primary-500 rounded border border-gray-300"
-          on:click={decreaseQuantity}
-        >
-          <Icon icon="ic:round-minus" class="text-lg" />
-        </button>
-
-        <input
-          type="text"
-          name="quantity"
-          bind:value={selectedProduct.quantity}
-          class="w-20 h-12 text-center p-2 border border-gray-300 rounded"
-          on:input={() => {
-            if (selectedProduct.quantity < 1) selectedProduct.quantity = 1;
-            if (selectedProduct.quantity > 9999) selectedProduct.quantity = 9999;
-          }}
-        />
-
-        <button
-          class="flex justify-center items-center w-12 h-12 bg-white text-primary-500 rounded border border-gray-300"
-          on:click={increaseQuantity}
-        >
-          <Icon icon="ic:round-plus" class="text-lg" />
-        </button>
-
-        <button
-          class="flex justify-center items-center w-40 h-12 text-white bg-primary-500 rounded"
-          type="submit"
-        >
-          Check Availability
-        </button>
-      </div>
-    </form>
-
-    <p class="mt-2">
-      Estimated to ship on {estimatedShipDate || "N/A"} for quantity {selectedProduct.quantity} from Bangalore Non-Bonded Warehouse
-    </p>
-
-    {#if selectedProduct.stockType === 'success'}
-    <div class="mt-6 space-y-2 text-sm">
-      <div class="flex items-center space-x-2">
-        <i class="fa-regular fa-check-circle text-primary-400"></i>
-        <p>{selectedProduct.stockAvailability}</p>
-      </div>
-      {#if selectedProduct.stockUnAvailability !== ''}
-        <div class="flex items-center space-x-2">
-          <i class="fa-regular fa-check-circle text-primary-400"></i>
-          <p>{selectedProduct.stockUnAvailability}</p>
-        </div>
-      {/if}
-    </div>
-    {:else if selectedProduct.stockType === 'error'}
-    <div class="mt-6 space-y-2 text-sm">
-      <div class="flex items-center space-x-2">
-        <i class="fa-regular fa-xmark-circle text-primary-400"></i>
-        <p>{selectedProduct.stockAvailability}</p>
-      </div>
-    </div>
-    {/if}
-
-  
-    <button
-        class="mt-3 p-2 text-white bg-primary-500 rounded flex items-center gap-2"
-        on:click={() => {
-        addToCart(rows, products);  
-        showCartMessage = true;     
-        hideDetails();              
-        }}
-        >
-        <span>Add to Cart</span>
-      <Icon icon="ion:cart-outline" class="text-2xl shrink-0" />
+      <button
+        type="button"
+        class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center gap-2"
+        on:click={attemptAddToCart}
+        disabled={cartloading ||
+          (isValidated &&
+            validatedProducts.length > 0 &&
+            !validatedProducts.some((p) => p.isValid))}
+      >
+        {#if cartloading}
+          <span>Adding...</span>
+        {:else}
+          <Icon icon="ic:round-shopping-cart" class="text-2xl" />
+          <span>Add to Cart</span>
+        {/if}
       </button>
+    </form>
+  {:else}
+    <button
+      class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center gap-2"
+      on:click={attemptAddToCart}
+      disabled={cartloading ||
+        (isValidated &&
+          validatedProducts.length > 0 &&
+          !validatedProducts.some((p) => p.isValid))}
+    >
+      {#if cartloading}
+        <span>Adding...</span>
+      {:else}
+        <Icon icon="ic:round-shopping-cart" class="text-2xl" />
+        <span>Add to Cart</span>
+      {/if}
+    </button>
+  {/if}
+</div>
+{#if cartNotification}
+  <div
+    class="fixed bottom-4 left-4 p-4 bg-primary-400 text-white rounded-md shadow-lg z-50"
+  >
+    {cartNotification}
   </div>
-</div>
 {/if}
-</div>
 
+<style>
+	@keyframes shimmer {
+		0% {
+			background-position: -200% 0;
+		}
+		100% {
+			background-position: 200% 0;
+		}
+	}
 
+	@keyframes progress-pulse {
+		0%, 100% {
+			opacity: 0;
+		}
+		50% {
+			opacity: 0.5;
+		}
+	}
+
+	@keyframes wave {
+		0%, 100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-5px);
+		}
+	}
+
+	@keyframes loader-bubbles {
+		0% {
+			box-shadow: 0 -10px var(--bubble-color, #ffffff),
+					3px 0 var(--bubble-color, #ffffff),
+					5px 0 var(--primary-color, #fe5939);
+		}
+		30% {
+			box-shadow: 3px -20px rgba(239,223,255,0),
+					5px -10px var(--bubble-color, #ffffff),
+					5px 0 var(--primary-color, #fe5939);
+		}
+		60% {
+			box-shadow: 3px 0 rgba(239,223,255,0),
+					4px -20px rgba(239,223,255,0),
+					3px -10px var(--bubble-color, #ffffff);
+		}
+		61% {
+			box-shadow: 3px 0 var(--primary-color, #fe5939),
+					4px -20px rgba(239,223,255,0),
+					3px -10px var(--bubble-color, #ffffff);
+		}
+		100% {
+			box-shadow: 0 -10px var(--primary-color, #fe5939),
+					4px -20px rgba(239,223,255,0),
+					5px -20px rgba(239,223,255,0);
+		}
+	}
+
+	.loader {
+		display: inline-block;
+		vertical-align: middle;
+		position: relative;
+		width: 10px;
+		height: 20px;
+		background: var(--primary-color, #fe5939);
+	}
+
+	.loader-large {
+		width: 15px;     
+		height: 30px;    
+	}
+
+	.loader:before,
+	.loader:after {
+		content: '';
+		position: absolute;
+	}
+
+	.loader:before {
+		top: -8px;
+		left: -13px;
+		width: 0;
+		height: 0;
+		border: 18px solid transparent;
+		border-bottom: 20px solid var(--primary-color, #fe5939);
+		border-radius: 3px;
+	}
+
+	.loader-large:before {
+		top: -12px;
+		left: -20px;
+		border: 27px solid transparent;
+		border-bottom: 30px solid var(--primary-color, #fe5939);
+		border-radius: 4px;
+	}
+
+	.loader:after {
+		top: -1;
+		left: -1;
+		width: px;
+		height: 4px;
+		background: var(--bubble-color, #fe5939);
+		border-radius: 50%;
+		animation: loader-bubbles 1s linear infinite forwards;
+	}
+
+	.loader-large:after {
+		width: 6px;
+		height: 6px;
+	}
+
+	:global(.animate-shimmer) {
+		background-size: 200% 100%;
+		animation: shimmer 2s ease-in-out infinite;
+	}
+
+	:global(.animate-wave-1) { animation: wave 1s ease-in-out infinite; }
+	:global(.animate-wave-2) { animation: wave 1s ease-in-out infinite 0.1s; }
+	:global(.animate-wave-3) { animation: wave 1s ease-in-out infinite 0.2s; }
+	:global(.animate-wave-4) { animation: wave 1s ease-in-out infinite 0.3s; }
+	:global(.animate-wave-5) { animation: wave 1s ease-in-out infinite 0.4s; }
+	:global(.animate-wave-6) { animation: wave 1s ease-in-out infinite 0.5s; }
+	:global(.animate-wave-7) { animation: wave 1s ease-in-out infinite 0.6s; }
+	:global(.animate-wave-8) { animation: wave 1s ease-in-out infinite 0.7s; }
+	:global(.animate-wave-9) { animation: wave 1s ease-in-out infinite 0.8s; }
+	:global(.animate-wave-10) { animation: wave 1s ease-in-out infinite 0.9s; }
+</style>
 
