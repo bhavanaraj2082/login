@@ -91,14 +91,12 @@
 			}
 		}
 		if (!fieldName || fieldName === "country") {
-			if (!country || country === "country") {
-				if (!country || country === "") {
-					errors.country = "Please select a country";
-				} else {
-					delete errors.country;
-				}
-			}
-		}
+    if (!country || country === "") {
+        errors.country = "Please select a country";
+    } else {
+        delete errors.country;
+    }
+}
 		if (!fieldName || fieldName === "email") {
 			if (
 				!email ||
@@ -115,10 +113,9 @@
 
 		if (!fieldName || fieldName === "phone") {
 			if (!country) {
-				errors.phone =
-					"Number is required";
-				return;
-			}
+        errors.phone = "Please select the country before entering the phone number";
+        return;
+    }
 
 			if (!phone || phone === "") {
 				errors.phone = "Required for the selected country";
@@ -135,7 +132,8 @@
 					} else {
 						const phoneRegex = new RegExp(phonePattern);
 						if (!phoneRegex.test(phone)) {
-							errors.phone = `Please enter a valid phone number for ${countryDetails.name}.`;
+							const countryName = countryDetails.name || country || "selected country";
+							errors.phone = `Please enter a valid phone number for ${countryName}.`;
 						} else {
 							delete errors.phone;
 						}
@@ -698,13 +696,19 @@
 		searchTerm = `${selectedCountry.name} `;
 		showDropdown = false;
 		validateField("country");
+		validateField("phone");
+
 		validatePhoneNumber(country, phone);
-		if (!phone || phone === "") {
-			errors.phone = "Required for the selected country.";
-		} else {
-			delete errors.phone; // Remove any errors if conditions are satisfied
+		const countryInput = document.querySelector('input[name="country"]');
+		if (countryInput) {
+			countryInput.value = selectedCountry.name;
 		}
-		delete errors.country;
+        if (!phone || phone === "") {
+               errors.phone = "Required for the selected country.";
+        }
+        else {
+        delete errors.phone; // Remove any errors if conditions are satisfied
+    }
 		// console.log('Selected Country:', country);
 	}
 	function toggleDropdown() {
@@ -1018,17 +1022,7 @@
 		generateMathQuestion();
 	});
 	let isEmailModified = false;
-	const handleInput = () => {
-		isEmailModified = true;
 
-		validateField("email");
-		errors.email = !email
-			? "*Required"
-			: !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email) ||
-				  email.split("@")[1].includes("gamil")
-				? "Please enter a valid email address"
-				: "";
-	};
 
 	let timeLeft = 60;
 	let timerInterval;
@@ -1054,6 +1048,9 @@
 			form3.requestSubmit();
 		}
 	};
+	$: if (country) {
+    validateField("phone");
+}
 </script>
 
 {#if showSuccesDiv}
@@ -1564,6 +1561,11 @@
 												on:input={handleInputChange}
 												on:click={toggleDropdown}
 												on:keydown={handleKeyDown}
+												on:input={() => {
+													validateField("country");
+													
+													  
+												}}
 												class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											/>
 
