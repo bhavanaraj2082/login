@@ -1335,67 +1335,36 @@ export const quick = async () => {
 
 export async function CompareSimilarityData(productId) {
   try {
+    // Fetch the given product
     const product = await Product.findOne({ productNumber: productId }).populate("subsubCategory");
+
+    console.log("product",product);
+    
     
     if (!product) {
       return { error: "Product not found" };
     }
+    
     if (!product.subsubCategory) {
       console.warn(`No subsubCategory found for product: ${product.productName}`);
       return [];
     }
+    
     const subsubCategoryId = product.subsubCategory._id;
     
     if (!subsubCategoryId) {
       return [];
     }
+
+    // Retrieve related products based on the subsubCategory
     const relatedProducts = await Product.aggregate([
-      {
-        $match: { 'subsubCategory': subsubCategoryId }
-      },
-      {
-        $limit: 4
-      },
-      {
-        $lookup: {
-          from: 'categories',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'categoryInfo'
-        }
-      },
-      {
-        $lookup: {
-          from: 'subcategories',
-          localField: 'subCategory',
-          foreignField: '_id',
-          as: 'subCategoryInfo'
-        }
-      },
-      {
-        $lookup: {
-          from: 'manufacturers',
-          localField: 'manufacturer',
-          foreignField: '_id',
-          as: 'manufacturerInfo'
-        }
-      },
-      {
-        $lookup: {
-          from: 'subsubcategories',
-          localField: 'subsubCategory',
-          foreignField: '_id',
-          as: 'subsubCategoryInfo'
-        }
-      },
-      {
-        $lookup: {
-          from: 'stocks',
-          localField: '_id',
-          foreignField: 'productid',
-          as: 'stockInfo'
-        }
-      },
+      { $match: { 'subsubCategory': subsubCategoryId } },
+      { $limit: 3 },
+      { $lookup: { from: 'categories', localField: 'category', foreignField: '_id', as: 'categoryInfo' } },
+      { $lookup: { from: 'subcategories', localField: 'subCategory', foreignField: '_id', as: 'subCategoryInfo' } },
+      { $lookup: { from: 'manufacturers', localField: 'manufacturer', foreignField: '_id', as: 'manufacturerInfo' } },
+      { $lookup: { from: 'subsubcategories', localField: 'subsubCategory', foreignField: '_id', as: 'subsubCategoryInfo' } },
+      { $lookup: { from: 'stocks', localField: '_id', foreignField: 'productid', as: 'stockInfo' } },
       {
         $project: {
           _id: 1,
@@ -1420,22 +1389,24 @@ export async function CompareSimilarityData(productId) {
         }
       }
     ]);
+
+    // Process related products
     let relatedProductsJson = await Promise.all(relatedProducts.map(async (item) => {
       if (item.stockPriceSize && item.stockPriceSize.length > 0) {
         const convertedPricing = await Promise.all(
           item.stockPriceSize.map(async (price) => {
             if (price.USD) {
-                        const conversionResult = await convertToINR(price);
-                        return {
-                          usd: price.USD || 0,
-                          inr: conversionResult.INR,  
-                          break: price.break,
-                          offer: price.offer || "0"
-                        };
-                      }
+              const conversionResult = await convertToINR(price);
+              return {
+                usd: price.USD || 0,
+                inr: conversionResult.INR,  
+                break: price.break,
+                offer: price.offer || "0"
+              };
+            }
             else if (price.INR) {
               const currentRates = await conversionRates();
-              const usdRate = currentRates["USD"] ? 1/currentRates["USD"] : null;
+              const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;
               
               return {
                 inr: parseFloat(price.INR).toFixed(2),
@@ -1447,19 +1418,44 @@ export async function CompareSimilarityData(productId) {
             return price;
           })
         );
-    
         item.stockPriceSize = convertedPricing;
       }
-    
       return item;
     }));
-    
+
+    // Now include the given product in the results (assuming you want it first in the array)
+    const productJson = {
+      _id: product._id,
+      productName: product.productName,
+      prodDesc: product.prodDesc,
+      properties: product.properties || {},
+      categoryInfo: product.categoryInfo || [],
+      subCategoryInfo: product.subCategoryInfo || [],
+      manufacturerInfo: product.manufacturerInfo || [],
+      subsubCategoryInfo: product.subsubCategoryInfo || [],
+      stockInfo: product.stockInfo || [],
+      stockQuantity: product.stockQuantity || 0,
+      stockPriceSize: product.stockPriceSize || [],
+      orderMultiple: product.stockInfo?.[0]?.orderMultiple || 1,
+      priceSize: product.priceSize || [],
+      image: product.image || "",
+      productUrl: product.productUrl || "",
+      productNumber: product.productNumber || "",
+      variants: product.variants || [],
+    };
+
+    // Combine the given product with the related products
+    relatedProductsJson.unshift(productJson); // Adds the given product at the beginning of the list
+
     return JSON.parse(JSON.stringify(relatedProductsJson));
+
   } catch (error) {
     console.error("Error in Compare similar products:", error);
     return { error: "An error occurred while fetching related products" };
   }
 }
+
+
 export const getCart = async(userId,cartId)=>{
    //if(!userId) return { cart:[]}
    let matchConditions = {}
