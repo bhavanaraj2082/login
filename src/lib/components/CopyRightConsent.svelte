@@ -519,18 +519,11 @@
     };
 
     const validateField = (fieldName) => {
-        // if (!fieldName || fieldName === "title") {
-        //     if (!title) {
-        //         errors.title = "Title is required";
-        //     } else {
-        //         delete errors.title;
-        //     }
-        // }
+    
         if (!fieldName || fieldName === "title") {
             if (!title) {
                 errors = { ...errors, title: "Title is required" };
             } else {
-                // Only remove the error if title has a value
                 const { title: _, ...rest } = errors;
                 errors = rest;
             }
@@ -585,26 +578,13 @@
             }
         }
 
-        // if (!fieldName || fieldName === "email") {
-        //     if (
-        //         !email ||
-        //         !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-        //             email,
-        //         ) ||
-        //         email.split("@")[1].includes("gamil")
-        //     ) {
-        //         errors.email = "Please enter a valid email address ";
-        //     } else {
-        //         delete errors.email;
-        //     }
-        // }
 
         if (!fieldName || fieldName === "email") {
     if (!email) {
         errors.email = "Email is required.";
     } else if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)) {
         errors.email = "Please enter a valid email address.";
-    } else if (email.split("@")[1].includes("gmail")) {
+    } else if (email.split("@")[1].includes("gamil")) {
         errors.email = "Email domain cannot be gmail.com.";
     } else {
         delete errors.email;
@@ -612,17 +592,7 @@
 }
 
 
-        if (!fieldName || fieldName === "phone") {
-            const phoneRegex =
-                /^(\+?\d{1,4}[\s\-]?)?(\(?\d{1,4}\)?[\s\-]?)?(\d{1,4}[\s\-]?)?(\d{1,4})$/;
-
-            if (!phone || !phoneRegex.test(phone) || phone.length > 16) {
-                errors.phone = "Phone number is required";
-            } else {
-                delete errors.phone;
-            }
-        }
-
+       
         if (!fieldName || fieldName === "description") {
             if (
                 !description ||
@@ -638,46 +608,41 @@
         }
 
         if (!fieldName || fieldName === "country") {
-            if (!country || country === "country") {
-                if (!country || country === "") {
-                    errors.country = "Please select a country";
-                } else {
-                    delete errors.country;
-                }
-            }
-        }
-
+    if (!country || country === "") {
+        errors.country = "Please select a country";
+    } else {
+        delete errors.country;
+    }
+}
         if (!fieldName || fieldName === "phone") {
-            if (!country) {
-                errors.phone =
-                    "Please select the country before entering the phone number";
-                return;
-            }
-
-            if (!phone || phone === "") {
-                errors.phone = "Required for the selected country";
+    if (!country) {
+        errors.phone = "Please select the country before entering the phone number";
+        return;
+    }
+    if (!phone || phone === "") {
+        errors.phone = "Required for the selected country";
+    } else {
+        const countryDetails = getCountryByCode(country);
+        
+        if (!countryDetails) {
+            errors.phone = "Invalid country selected. Please reselect country.";
+            errors.country = "Invalid country selected";
+        } else {
+            const phonePattern = getPhonePattern(country);
+            if (!phonePattern) {
+                errors.phone = "Phone number pattern for country not found";
             } else {
-                const countryDetails = getCountryByCode(country);
-                if (!countryDetails) {
-                    errors.phone = "Invalid country selected";
-                    errors.country = "Invalid country selected";
+                const phoneRegex = new RegExp(phonePattern);
+                if (!phoneRegex.test(phone)) {
+                    const countryName = countryDetails.name || country || "selected country";
+                    errors.phone = `Please enter a valid phone number for ${countryName}.`;
                 } else {
-                    const phonePattern = getPhonePattern(country);
-                    if (!phonePattern) {
-                        errors.phone =
-                            "Phone number pattern for country not found";
-                    } else {
-                        const phoneRegex = new RegExp(phonePattern);
-                        if (!phoneRegex.test(phone)) {
-                            errors.phone = `Please enter a valid phone number for ${countryDetails.name}.`;
-                        } else {
-                            delete errors.phone;
-                        }
-                    }
+                    delete errors.phone;
                 }
             }
         }
-
+    }
+}
         if (Object.keys(errors).length > 0) {
             isValid = false;
         }
@@ -931,6 +896,7 @@
 		showDropdown = false;
 		validateField('country');
 		validatePhoneNumber(country, contactNumber);
+        validateField("phone");
 
 		delete errors.country;
 		const countryInput = document.querySelector('input[name="country"]');
@@ -945,30 +911,7 @@
     }
 	}
 
-    // function selectCountry(selectedCountry) {
-    //     country = selectedCountry.name;
-    //     // filteredCountries = countries;
-    //     searchTerm = `${selectedCountry.name} `;
-    //     showDropdown = false;
-    //     validateField("country");
-    //     validatePhoneNumber(country, phone);
 
-    //     delete errors.country;
-    //     if (!phone || phone === "") {
-    //     errors.phone = "Required for the selected country.";
-
-    // } else {
-    //     delete errors.phone; // Remove any errors if conditions are satisfied
-    // }
-    //     // console.log('Selected Country:', country);
-    // }
-    
-// function handleKeyDown(event) {
-//     if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
-//         selectCountry(filteredCountries[0]);
-//         event.preventDefault();
-//     }
-// }
 function handleKeyDown(event) {
 		const exactCountryMatch = countries.some((c) => c.name === country && c.name === searchTerm);
 		if (
@@ -1139,6 +1082,9 @@ function handleKeyDown(event) {
             // startTimer();
         }
     };
+    $: if (country) {
+    validateField("phone");
+}
 </script>
 
 {#if showSuccesDiv}
@@ -1698,7 +1644,7 @@ function handleKeyDown(event) {
                                 on:keydown={handleKeyDown}
                                 on:input={() => {
                                     validateField("country");
-                                    errors.country = !country
+                                    
                                       
                                 }}
                                 class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
