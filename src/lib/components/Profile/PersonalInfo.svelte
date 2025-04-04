@@ -144,7 +144,7 @@
 
     {#if !toggleEdit}
     <!-- contact inforation -->
-    <div class="">
+    <div class="overflow-hidden">
         <h1 class=" font-bold text-4s md:text-lg mb-2">
             Manage Your Personal Information
         </h1>
