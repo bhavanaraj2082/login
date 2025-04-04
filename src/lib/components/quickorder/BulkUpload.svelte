@@ -3,6 +3,7 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import * as XLSX from "xlsx";
+  import { onMount } from "svelte";
   import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
   export let data;
   import { fade } from "svelte/transition";
@@ -51,55 +52,38 @@
     return { duplicates, uniqueLines };
   }
 
+
   function removeDuplicateEntry(productInfo, event) {
-    const lines = rawFileData.split("\n").filter((line) => line.trim());
-    const seenProducts = new Map();
-    const deduplicatedLines = lines.filter((line) => {
-      const [currentProductInfo] = line.split(",").map((item) => item.trim());
-      if (currentProductInfo === productInfo) {
-        if (seenProducts.has(productInfo)) {
-          return false;
-        }
-        seenProducts.set(productInfo, true);
+  if (!productInfo) return;
+  
+  const lines = rawFileData.split("\n").filter((line) => line.trim());
+  const seenProducts = new Map();
+  const deduplicatedLines = lines.filter((line) => {
+    const [currentProductInfo] = line.split(",").map((item) => item.trim());
+    if (currentProductInfo === productInfo) {
+      if (seenProducts.has(productInfo)) {
+        return false;
       }
-      return true;
-    });
-    const finalLines = deduplicatedLines.map((line) => {
-      const [productInfo, quantity] = line
-        .split(",")
-        .map((item) => item.trim());
-      return `${productInfo},${quantity}`;
-    });
-    rawFileData = finalLines.join("\n");
-    const { duplicates } = checkForDuplicates(rawFileData);
-    duplicateEntries = duplicates;
-    if (isValidated) {
-      invalidProductLines = mapInvalidProductsToLines();
+      seenProducts.set(productInfo, true);
     }
-    toast.success(`Removed duplicate entry for ${productInfo}`);
-    const formData = new FormData(event.target.closest("form"));
-
-    const deduplicatedFile = new File([rawFileData], "updated.csv", {
-      type: "text/csv",
-    });
-
-    formData.set("file", deduplicatedFile);
-
-    if (duplicateEntries.length === 0) {
-      const form = event.target.closest("form");
-      if (form) {
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(deduplicatedFile);
-        const fileInput = form.querySelector('input[type="file"]');
-        if (fileInput) {
-          fileInput.files = dataTransfer.files;
-        }
-
-        form.requestSubmit();
-      }
-    }
+    return true;
+  });
+  
+  rawFileData = deduplicatedLines.join("\n");
+  
+  const { duplicates } = checkForDuplicates(rawFileData);
+  duplicateEntries = duplicates;
+  
+  if (isValidated) {
+    invalidProductLines = mapInvalidProductsToLines();
   }
-
+  
+  toast.success(`Removed duplicate entry for ${productInfo}`);
+  
+  if (duplicateEntries.length === 0) {
+    submitFileData();
+  }
+}
   function removeInvalidProduct(lineIndex) {
     const lines = rawFileData.split("\n");
     const lineContent = lines[lineIndex];
@@ -147,271 +131,172 @@
     );
     return validProducts.length > 0;
   }
-  function handleFileInputChange(event) {
-    const file = event.target.files[0];
 
-    if (!file) {
-      fileError = "No file selected.";
+function handleFileInputChange(event) {
+  let file;
+  if (event.dataTransfer) {
+    file = event.dataTransfer.files[0];
+  } else {
+    file = event.target.files[0];
+  }
+
+  if (!file) {
+    fileError = "No file selected.";
+    return;
+  }
+
+  const fileType = file.name.split(".").pop().toLowerCase();
+  selectedFileName = file.name;
+  isEditing = true;
+
+  const reader = new FileReader();
+
+  reader.onerror = () => {
+    fileError = "Error reading the file. Please try again.";
+  };
+
+  const processFileData = (content) => {
+    const lines = content
+      .split("\n")
+      .filter((line) => line.trim())
+      .map((line) => {
+        const parts = line.split(",").map((p) => p.trim());
+        if (parts.length === 1 || (parts.length === 2 && isNaN(+parts[1]))) {
+          return `${parts[0]},1`;
+        }
+        return line;
+      });
+
+    rawFileData = lines.join("\n");
+
+    const { duplicates } = checkForDuplicates(rawFileData);
+    duplicateEntries = duplicates;
+
+    if (duplicates.length > 0) {
+      toast.error(`Found ${duplicates.length} duplicate entries. Please review and remove them.`);
+    } else {
+      // Create a file from the processed data
+      submitFileData();
+    }
+  };
+
+  if (["xlsx", "xls"].includes(fileType)) {
+    if (typeof XLSX === "undefined") {
+      fileError = "Excel support requires SheetJS. Use CSV instead.";
       return;
     }
 
-    const fileType = file.name.split(".").pop().toLowerCase();
-    selectedFileName = file.name;
-    isEditing = true;
-
-    const reader = new FileReader();
-
-    reader.onerror = () => {
-      fileError = "Error reading the file. Please try again.";
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        let csvData = XLSX.utils.sheet_to_csv(worksheet);
+        processFileData(csvData);
+      } catch (err) {
+        fileError = "Error processing Excel file.";
+        console.error(err);
+      }
     };
 
-    if (["xlsx", "xls"].includes(fileType)) {
-      if (typeof XLSX === "undefined") {
-        fileError = "Excel support requires SheetJS. Use CSV instead.";
-        return;
-      }
+    reader.readAsArrayBuffer(file);
+  } else {
+    reader.onload = (e) => {
+      processFileData(e.target.result);
+    };
 
-      reader.onload = (e) => {
-        try {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: "array" });
-          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-          let csvData = XLSX.utils.sheet_to_csv(worksheet);
-
-          const transformed = csvData
-            .split("\n")
-            .filter((l) => l.trim())
-            .map((line) => {
-              const parts = line.split(",").map((p) => p.trim());
-              if (parts.length === 1 || (parts.length === 2 && isNaN(+parts[1]))) {
-                return `${parts[0]},1`;
-              }
-              return line;
-            });
-
-          rawFileData = transformed.join("\n");
-
-          // handle duplicates here
-        } catch (err) {
-          fileError = "Error processing Excel file.";
-          console.error(err);
-        }
-      };
-
-      reader.readAsArrayBuffer(file);
-    } else {
-      reader.onload = (e) => {
-        const content = e.target.result;
-        const lines = content
-          .split("\n")
-          .filter((line) => line.trim())
-          .map((line) => {
-            const parts = line.split(",").map((p) => p.trim());
-            if (parts.length === 1 || (parts.length === 2 && isNaN(+parts[1]))) {
-              return `${parts[0]},1`;
-            }
-            return line;
-          });
-
-        rawFileData = lines.join("\n");
-
-        // handle duplicates here
-      };
-
-      reader.readAsText(file);
-    }
+    reader.readAsText(file);
   }
-  // function handleFileInputChange(event) {
-  //   const file = event.target.files[0];
+}
 
-  //   if (file) {
-  //     const fileType = file.name.split(".").pop().toLowerCase();
-  //     selectedFileName = file.name;
-  //     isValidated = false;
-  //     invalidProductLines = [];
+// New function to submit the file data
+function submitFileData() {
+  // Create a new file with the current rawFileData
+  const updatedFile = new File([rawFileData], selectedFileName || "upload.csv", {
+    type: "text/csv",
+  });
+  
+  // Set the file to the file input
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(updatedFile);
+  
+  // Find the file input element and update its files
+  const fileInput = document.getElementById("bulkupload") || 
+                   document.querySelector('input[type="file"]');
+                   
+  if (fileInput) {
+    fileInput.files = dataTransfer.files;
+    
+    // Find the form
+    const form = fileInput.closest('form');
+    
+    if (form) {
+      // Submit the form after a short delay to allow the UI to update
+      setTimeout(() => {
+        form.requestSubmit();
+      }, 100);
+    } else {
+      console.error("Form not found");
+    }
+  } else {
+    console.error("File input element not found");
+  }
+}
 
-  //     if (fileType === "xlsx" || fileType === "xls") {
-  //       fileError = "";
+  // function removeAllDuplicates(event) {
+  //   if (duplicateEntries.length === 0) return;
 
-  //       if (typeof XLSX !== "undefined") {
-  //         const reader = new FileReader();
-  //         reader.onload = function (e) {
-  //           try {
-  //             const data = new Uint8Array(e.target.result);
-  //             const workbook = XLSX.read(data, { type: "array" });
-  //             const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-
-  //             let csvData = XLSX.utils.sheet_to_csv(worksheet);
-  //             const lines = csvData.split("\n").filter((line) => line.trim());
-  //             const transformedLines = lines.map((line) => {
-  //               const parts = line.split(",").map((part) => part.trim());
-  //               if (parts.length === 1) {
-  //                 return `${parts[0]},1`;
-  //               }
-  //               if (
-  //                 parts.length === 2 &&
-  //                 (!parts[1] || isNaN(parseInt(parts[1])))
-  //               ) {
-  //                 return `${parts[0]},1`;
-  //               }
-
-  //               return line;
-  //             });
-
-  //             rawFileData = transformedLines.join("\n");
-  //             isEditing = true;
-  //             const csvFile = new File(
-  //               [rawFileData],
-  //               file.name.replace(/\.xlsx$|\.xls$/i, ".csv"),
-  //               {
-  //                 type: "text/csv",
-  //               },
-  //             );
-
-  //             const dataTransfer = new DataTransfer();
-  //             dataTransfer.items.add(csvFile);
-
-  //             const fileInput = document.getElementById("bulkupload");
-  //             if (fileInput) {
-  //               fileInput.files = dataTransfer.files;
-  //             }
-
-  //             const { duplicates } = checkForDuplicates(rawFileData);
-  //             duplicateEntries = duplicates;
-
-  //             if (duplicates.length > 0) {
-  //               toast.error(
-  //                 `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
-  //               );
-  //             } else {
-  //               // Auto-submit the form if no duplicates
-  //               setTimeout(() => {
-  //                 if (formElement) {
-  //                   formElement.requestSubmit();
-  //                 }
-  //               }, 100);
-  //             }
-  //           } catch (error) {
-  //             console.error("Excel processing error:", error);
-  //             fileError =
-  //               "Error processing Excel file. Please check file format.";
-  //           }
-  //         };
-  //         reader.onerror = function () {
-  //           fileError = "Error reading the file. Please try again.";
-  //         };
-  //         reader.readAsArrayBuffer(file);
-  //       } else {
-  //         fileError =
-  //           "Excel file support requires the SheetJS library. Please use CSV format instead.";
-  //       }
-  //     } else {
-  //       const reader = new FileReader();
-  //       reader.onload = function (e) {
-  //         let fileContent = e.target.result;
-  //         fileError = "";
-  //         isEditing = true;
-  //         const lines = fileContent.split("\n").filter((line) => line.trim());
-  //         const trimmedLines = lines.map((line) => {
-  //           const parts = line.split(",").map((item) => item.trim());
-
-  //           // If only SKU-size is present, add quantity 1
-  //           if (parts.length === 1) {
-  //             return `${parts[0]},1`;
-  //           }
-  //           if (
-  //             parts.length === 2 &&
-  //             (!parts[1] || isNaN(parseInt(parts[1])))
-  //           ) {
-  //             return `${parts[0]},1`;
-  //           }
-
-  //           return line;
-  //         });
-
-  //         rawFileData = trimmedLines.join("\n");
-  //         const trimmedFile = new File([rawFileData], file.name, {
-  //           type: "text/csv",
-  //         });
-  //         const dataTransfer = new DataTransfer();
-  //         dataTransfer.items.add(trimmedFile);
-  //         const fileInput = document.getElementById("bulkupload");
-  //         if (fileInput) {
-  //           fileInput.files = dataTransfer.files;
-  //         }
-
-  //         const { duplicates } = checkForDuplicates(rawFileData);
-  //         duplicateEntries = duplicates;
-
-  //         if (duplicates.length > 0) {
-  //           toast.error(
-  //             `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
-  //           );
-  //         } else {
-  //           // Auto-submit the form if no duplicates
-  //           setTimeout(() => {
-  //             if (formElement) {
-  //               formElement.requestSubmit();
-  //             }
-  //           }, 100);
-  //         }
-  //       };
-  //       reader.onerror = function () {
-  //         fileError = "Error reading the file. Please try again.";
-  //       };
-  //       reader.readAsText(file);
+  //   const lines = rawFileData.split("\n").filter((line) => line.trim());
+  //   const uniqueProductInfos = new Set();
+  //   const deduplicatedLines = [];
+  //   lines.forEach((line) => {
+  //     const [productInfo] = line.split(",").map((item) => item.trim());
+  //     if (!uniqueProductInfos.has(productInfo)) {
+  //       uniqueProductInfos.add(productInfo);
+  //       deduplicatedLines.push(line);
   //     }
-  //   } else {
-  //     fileError = "No file selected.";
+  //   });
+
+  //   rawFileData = deduplicatedLines.join("\n");
+  //   const deduplicatedFile = new File([rawFileData], "deduplicated.csv", {
+  //     type: "text/csv",
+  //   });
+  //   const dataTransfer = new DataTransfer();
+  //   dataTransfer.items.add(deduplicatedFile);
+  //   const fileInput = document.getElementById("bulkupload");
+  //   if (fileInput) {
+  //     fileInput.files = dataTransfer.files;
+  //   }
+  //   duplicateEntries = [];
+  //   toast.success(`Removed all duplicate entries`);
+  //   if (formElement) {
+  //     setTimeout(() => {
+  //       formElement.requestSubmit();
+  //     }, 100);
   //   }
   // }
-
-  // New function to remove all duplicates at once
   function removeAllDuplicates(event) {
-    if (duplicateEntries.length === 0) return;
+  if (duplicateEntries.length === 0) return;
 
-    const lines = rawFileData.split("\n").filter((line) => line.trim());
-    const uniqueProductInfos = new Set();
-    const deduplicatedLines = [];
-
-    // Keep only the first occurrence of each product
-    lines.forEach((line) => {
-      const [productInfo] = line.split(",").map((item) => item.trim());
-      if (!uniqueProductInfos.has(productInfo)) {
-        uniqueProductInfos.add(productInfo);
-        deduplicatedLines.push(line);
-      }
-    });
-
-    // Update file data with deduplicated content
-    rawFileData = deduplicatedLines.join("\n");
-
-    // Create new file with deduplicated content
-    const deduplicatedFile = new File([rawFileData], "deduplicated.csv", {
-      type: "text/csv",
-    });
-
-    // Update file input with new deduplicated file
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(deduplicatedFile);
-    const fileInput = document.getElementById("bulkupload");
-    if (fileInput) {
-      fileInput.files = dataTransfer.files;
+  const lines = rawFileData.split("\n").filter((line) => line.trim());
+  const uniqueProductInfos = new Set();
+  const deduplicatedLines = [];
+  
+  lines.forEach((line) => {
+    const [productInfo] = line.split(",").map((item) => item.trim());
+    if (!uniqueProductInfos.has(productInfo)) {
+      uniqueProductInfos.add(productInfo);
+      deduplicatedLines.push(line);
     }
+  });
 
-    // Clear duplicate entries list
-    duplicateEntries = [];
-
-    // Show success message
-    toast.success(`Removed all duplicate entries`);
-
-    // Automatically submit the form for validation
-    if (formElement) {
-      setTimeout(() => {
-        formElement.requestSubmit();
-      }, 100);
-    }
-  }
+  rawFileData = deduplicatedLines.join("\n");
+  duplicateEntries = [];
+  toast.success(`Removed all duplicate entries`);
+  
+  // Use the common submitFileData function
+  submitFileData();
+}
   function validateAndSubmitData() {
     if (!rawFileData.trim()) {
       toast.error("Please enter product data before submitting");
@@ -714,16 +599,21 @@
   function triggerUpload() {
     fileInput.click();
   }
-
   function handleDrop(event) {
-    event.preventDefault();
+  event.preventDefault();
+  if (dropzone) {
     dropzone.classList.remove("bg-primary-100", "text-primary-600");
-
-    const file = event.dataTransfer.files[0];
-    if (file) {
-      handleFileInputChange({ target: { files: [file] } });
-    }
   }
+
+  const file = event.dataTransfer.files[0];
+  if (file) {
+    // Create a mock event with the dataTransfer property
+    const mockEvent = {
+      dataTransfer: event.dataTransfer
+    };
+    handleFileInputChange(mockEvent);
+  }
+}
 
   function handleDragOver(event) {
     event.preventDefault();
@@ -957,11 +847,11 @@ Example file content:
       on:dragover={handleDragOver}
       on:dragleave={handleDragLeave}
     >
-    <Icon icon="uil:upload" class="text-4xl text-primary-500 -ml-4" />
+    <Icon icon="uil:upload" class="text-5xl text-primary-500 -ml-4" />
       <div class="flex flex-col items-center pointer-events-none text-primary-500">
 
         <p class="text-sm font-medium text-center px-2">
-          Or drag and drop your CSV or XLS file to upload
+         Upload or drag and drop your CSV or XLS file to upload
         </p>
       </div>
     
