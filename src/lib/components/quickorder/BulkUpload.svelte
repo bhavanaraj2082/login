@@ -474,30 +474,30 @@
     }
   }
   function mapInvalidProductsToLines() {
-    if (!isValidated || !validationMessages.length) return [];
+    // if (!isValidated || !validationMessages.length) return [];
 
-    const lines = rawFileData.split("\n");
-    const mappedInvalidLines = [];
-    validationMessages.forEach((message) => {
-      if (!message.isValid) {
-        const lineIndex = lines.findIndex((line) => {
-          const [productInfo] = line.split(",").map((item) => item.trim());
-          return productInfo.includes(message.productNumber);
-        });
+    // const lines = rawFileData.split("\n");
+    // const mappedInvalidLines = [];
+    // validationMessages.forEach((message) => {
+    //   if (!message.isValid) {
+    //     const lineIndex = lines.findIndex((line) => {
+    //       const [productInfo] = line.split(",").map((item) => item.trim());
+    //       return productInfo.includes(message.productNumber);
+    //     });
 
-        if (lineIndex !== -1) {
-          mappedInvalidLines.push({
-            index: lineIndex,
-            line: lineIndex + 1,
-            content: lines[lineIndex],
-            productNumber: message.productNumber,
-            message: message.message,
-          });
-        }
-      }
-    });
+    //     if (lineIndex !== -1) {
+    //       mappedInvalidLines.push({
+    //         index: lineIndex,
+    //         line: lineIndex + 1,
+    //         content: lines[lineIndex],
+    //         productNumber: message.productNumber,
+    //         message: message.message,
+    //       });
+    //     }
+    //   }
+    // });
 
-    return mappedInvalidLines;
+    // return mappedInvalidLines;
   }
 
   let fileInput;
@@ -600,7 +600,12 @@
           (message) => !message.isValid,
         );
         console.log(validationMessages, "validationMessages");
-
+        if (hasInvalidProducts) {
+          invalidProductLines = mapInvalidProductsToLines();
+          toast.warning(
+            "Some products are invalid. Please review before adding to cart.",
+          );
+        } else
         if (validatedProducts.length > 0) {
           setTimeout(() => {
             if (data?.authedUser && data?.authedUser?.id) {
