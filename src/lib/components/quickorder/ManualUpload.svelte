@@ -1219,7 +1219,7 @@
     <div class="sm:w-1/2 w-full lg:w-1/4 inline-flex rounded mb-8 mt-5">
       <nav
         aria-label="Tabs"
-        class="w-full flex space-x-3 rounded-t overflow-hidden pb-1 lg:overflow-x-hidden overflow-x-scroll scroll"
+        class="w-full flex space-x-3 rounded-t overflow-hidden pb-1 lg:overflow-x-hidden"
       >
         {#each tabs as tab}
           <div class="inline-block w-full">
