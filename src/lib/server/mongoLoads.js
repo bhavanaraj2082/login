@@ -1455,39 +1455,75 @@ export const quick = async () => {
 //   }
 // }
 export async function CompareSimilarityData(productId) {
-  
   try {
+    // Fetch the parent product using the productId
     const product = await Product.findOne({ productNumber: productId }).populate({
-      path: "relatedProducts",
-      populate: [
-        { path: "category", select: "urlName" },
-        { path: "subCategory", select: "urlName" },
-        { path: "subsubCategory", select: "urlName" },
-        { path: "manufacturer", select: "name _id" }
-      ],
-      select: "_id productName prodDesc priceSize image productUrl productNumber variants category subCategory subsubCategory manufacturer"
-    });
+      path: "category",
+      select: "urlName",
+    }).populate({
+      path: "subCategory",
+      select: "urlName",
+    }).populate({
+      path: "subsubCategory",
+      select: "urlName",
+    }).populate({
+      path: "manufacturer",
+      select: "name _id",
+    }).select(
+      "_id productName prodDesc priceSize image productUrl productNumber variants category subCategory subsubCategory manufacturer properties"
+    );
 
+    // If no product is found, return an error
     if (!product) {
       return { error: "Product not found" };
     }
 
+    // Extract the keys from the parent product's properties
+    const parentPropertyKeys = product.properties ? Object.keys(product.properties) : [];
+
+    // Fetch the next 3 products based on the productNumber
+    const nextProducts = await Product.find({
+      productNumber: { $gt: product.productNumber }
+    })
+      .sort({ productNumber: 1 }) 
+      .limit(3)
+      .populate({
+        path: "category",
+        select: "urlName",
+      }).populate({
+        path: "subCategory",
+        select: "urlName",
+      }).populate({
+        path: "subsubCategory",
+        select: "urlName",
+      }).populate({
+        path: "manufacturer",
+        select: "name _id",
+      }).select(
+        "_id productName prodDesc priceSize image productUrl productNumber variants category subCategory subsubCategory manufacturer properties"
+      );
+
+    // If no next products are found, return an error
+    if (nextProducts.length === 0) {
+      return { error: "No next products found" };
+    }
+
+    // Combine the given product with the next 3 products
+    const allProducts = [product, ...nextProducts];
+
     let comproduct = await Promise.all(
-      product.relatedProducts.map(async (prod) => {
+      allProducts.map(async (prod) => {
         const stockData = await Stock.find({ productid: prod._id }).select(
           "_id distributor stock pricing orderMultiple"
         );
-
 
         const convertedStockPriceSize = await Promise.all(
           stockData.map(async (stock) => {
             if (stock.pricing && (stock.pricing.INR || stock.pricing.USD)) {
               const convertedPricing = await Promise.all(
                 [stock.pricing].map(async (price) => {
-        
                   if (price.USD) {
                     const conversionResult = await convertToINR(price);
-        
                     return {
                       USD: price.USD || 0,
                       INR: conversionResult.INR,
@@ -1496,9 +1532,8 @@ export async function CompareSimilarityData(productId) {
                     };
                   } else if (price.INR) {
                     const currentRates = await conversionRates();
-                    const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;        
+                    const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;
                     const usdValue = usdRate ? parseFloat(price.INR * usdRate).toFixed(2) : "N/A";
-        
                     return {
                       INR: parseFloat(price.INR).toFixed(2),
                       USD: usdValue,
@@ -1506,23 +1541,27 @@ export async function CompareSimilarityData(productId) {
                       offer: price.offer || "0"
                     };
                   }
-        
-                  return price; 
                 })
               );
               return { ...stock, pricing: convertedPricing };
             } else {
-              return stock; 
+              return stock;
             }
           })
         );
+
+        // Ensure only parent product property keys are retained in the properties object
+        const updatedProperties = {};
+        parentPropertyKeys.forEach((key) => {
+          updatedProperties[key] = prod.properties?.[key] ?? "__";
+        });
 
         return {
           productId: prod._id,
           productName: prod.productName,
           prodDesc: prod.prodDesc,
           image: prod.image,
-      properties: product.properties || {},
+          properties: updatedProperties,
           manufacturer: prod.manufacturer?.name || "",
           manufacturerId: prod.manufacturer?._id || "",
           category: prod.category?.urlName || "",
@@ -1531,21 +1570,24 @@ export async function CompareSimilarityData(productId) {
           productUrl: prod.productUrl,
           productNumber: prod.productNumber,
           variants: Array.isArray(prod.variants) ? prod.variants : [],
-          stockId: stockData.map(stock => stock._id), 
-          stock: stockData.length > 0 ? stockData[0].stock : 0, 
+          stockId: stockData.map(stock => stock._id),
+          stock: stockData.length > 0 ? stockData[0].stock : 0,
           distributorId: stockData.map(stock => stock.distributor),
           priceSize: convertedStockPriceSize.flatMap(stock => stock.pricing),
-          orderMultiple: stockData.length > 0 ? stockData[0].orderMultiple : 1 
-          
+          orderMultiple: stockData.length > 0 ? stockData[0].orderMultiple : 1
         };
       })
     );
+
     return JSON.parse(JSON.stringify(comproduct));
+
   } catch (error) {
-    console.error("Error in RelatedProductData:", error);
-    return { error: "An error occurred while fetching related products" };
+    console.error("Error in CompareSimilarityData:", error);
+    return { error: "An error occurred while fetching the next products" };
   }
 }
+
+
 
 
 export const getCart = async(userId,cartId)=>{

@@ -343,6 +343,15 @@
     closeModal();
     location.href = `/products/${selectedProduct.category}/${selectedProduct.subCategory}/${selectedProduct.partNumber}#productVariants`;
   }
+
+  function isSameAsFirst(value, key) {
+    if (CompareSimilarityData.length === 0 ) {
+    return false; 
+  }
+
+  const firstValue = CompareSimilarityData[0].properties[key];
+  return value === firstValue;
+}
 </script>
 
 <form
@@ -452,11 +461,13 @@
                 </div>
                 <div class="px-3 mb-3">
                   <h3 class="text-gray-700">
-                    {#each Object.keys(product.properties).slice(0,5) as key}
+                    {#each Object.keys(product.properties) as key}
                     <hr class="border-t border-gray-300" />
-                    <div
+                    <!-- <div
                     class="py-2 {showDifference && isUnique(product.properties[key], key) ? 'bg-primary-100 border border-gray-200' : 'bg-white'}"
-                  >
+                  > -->
+                  <div class="py-2
+                  {showDifference && !isSameAsFirst(product.properties[key], key) && product.properties[key] && product.properties[key] !== '__' ? 'bg-primary-100 ' : 'bg-white'}">
                     <div class="text-left text-xs font-semibold">{key}:</div>
                     <div class="text-gray-500 text-xs pt-1 font-normal">
                           {#if product.properties[key]}

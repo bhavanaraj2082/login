@@ -1518,6 +1518,7 @@ $: disabled = location.length === 0;
 								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Phone Number*"
 								{disabled}
+								required
 							/>
 							<!-- {#if location.length === 0 && !showErrors}
 								<span class="text-red-500 sm:text-xs text-2s font-medium">

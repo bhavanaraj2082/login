@@ -477,7 +477,7 @@
       <div class="flex justify-between items-center mt-4">
         <button
           on:click={toggleQuoteModal}
-          class="bg-teal-500 hover:bg-teal-600 text-white font-medium py-1.5 px-4 rounded"
+          class="bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium py-1.5 px-4 rounded"
         >
           ✖ Close
         </button>
