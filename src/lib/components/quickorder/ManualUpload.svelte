@@ -398,15 +398,15 @@
     isCartPopupVisible = false;
   }
 
-  $: {
-    if (products && products.length > 0) {
-      console.log("Products loaded:", products.length);
-      console.log(
-        "Sample product numbers:",
-        products.map((p) => p.productNumber),
-      );
-    }
-  }
+  // $: {
+  //   if (products && products.length > 0) {
+  //     console.log("Products loaded:", products.length);
+  //     console.log(
+  //       "Sample product numbers:",
+  //       products.map((p) => p.productNumber),
+  //     );
+  //   }
+  // }
   let cartRowIndexToBeCleared = null;
 
   let cartItemsValue = "";
@@ -662,78 +662,6 @@
 
     return Object.keys(formErrors).length === 0;
   }
-  const enhanceForm = (index) => {
-    const requestStartTime = Date.now();
-    loadingState[index] = true;
-    const loadingStartTime = Date.now();
-
-    return async ({ result }) => {
-      let processingEndTime = 0;
-
-      if (Array.isArray(result.data)) {
-        const uniqueProductNumbers = new Set();
-        const newProducts = result.data.filter((product) => {
-          if (!uniqueProductNumbers.has(product.productNumber)) {
-            uniqueProductNumbers.add(product.productNumber);
-            return true;
-          }
-          return false;
-        });
-
-        const existingProductNumbers = new Set(
-          products.map((p) => p.productNumber),
-        );
-
-        const filteredNewProducts = newProducts.filter(
-          (p) => !existingProductNumbers.has(p.productNumber),
-        );
-
-        products = [...products, ...filteredNewProducts];
-
-        const duplicatesRemoved = result.data.length - newProducts.length;
-        if (duplicatesRemoved > 0) {
-          // console.log(`Removed ${duplicatesRemoved} duplicate products`);
-        }
-      }
-
-      if (result && result.data) {
-        console.log(result, "result");
-
-        if (result.data.length === 0) {
-          toast.error("No Components found");
-        } else {
-          productNumbers = Array.from(
-            new Set(result.data.map((record) => record.productNumber)),
-          );
-        }
-      } else {
-        productNumbers = [];
-        toast.error("No Components found");
-      }
-
-      const loadingEndTime = Date.now();
-      loadingState[index] = false;
-
-      const loadingDuration = (loadingEndTime - loadingStartTime) / 1000;
-
-      processingEndTime = Date.now();
-      const totalRequestDuration =
-        (processingEndTime - requestStartTime) / 1000;
-      const currentValue = rows[index].sku;
-      if (currentValue.trim().length > 2) {
-        const filteredProds = filterProducts(currentValue);
-        rows = rows.map((row, i) => {
-          if (i === index) {
-            return {
-              ...row,
-              filteredProducts: filteredProds,
-            };
-          }
-          return row;
-        });
-      }
-    };
-  };
   // const enhanceForm = (index) => {
   //   const requestStartTime = Date.now();
   //   loadingState[index] = true;
@@ -743,21 +671,15 @@
   //     let processingEndTime = 0;
 
   //     if (Array.isArray(result.data)) {
-  //       // Create a Set to track unique product numbers
   //       const uniqueProductNumbers = new Set();
-
-  //       // Filter out duplicates before adding to products
   //       const newProducts = result.data.filter((product) => {
-  //         // If this product number hasn't been seen before, add it to the set
   //         if (!uniqueProductNumbers.has(product.productNumber)) {
   //           uniqueProductNumbers.add(product.productNumber);
   //           return true;
   //         }
-  //         // If duplicate, return false to filter it out
   //         return false;
   //       });
 
-  //       // Combine existing products with new unique products
   //       const existingProductNumbers = new Set(
   //         products.map((p) => p.productNumber),
   //       );
@@ -766,13 +688,11 @@
   //         (p) => !existingProductNumbers.has(p.productNumber),
   //       );
 
-  //       // Add filtered new products to the existing products
   //       products = [...products, ...filteredNewProducts];
 
-  //       // Log number of duplicates removed
   //       const duplicatesRemoved = result.data.length - newProducts.length;
   //       if (duplicatesRemoved > 0) {
-  //         console.log(`Removed ${duplicatesRemoved} duplicate products`);
+  //         // console.log(`Removed ${duplicatesRemoved} duplicate products`);
   //       }
   //     }
 
@@ -782,7 +702,6 @@
   //       if (result.data.length === 0) {
   //         toast.error("No Components found");
   //       } else {
-  //         // Use the filtered set of unique product numbers
   //         productNumbers = Array.from(
   //           new Set(result.data.map((record) => record.productNumber)),
   //         );
@@ -800,13 +719,76 @@
   //     processingEndTime = Date.now();
   //     const totalRequestDuration =
   //       (processingEndTime - requestStartTime) / 1000;
-
-  //     rows.forEach((row, rowIndex) => {
-  //       row.filteredProducts = filterProducts(row.sku,);
-  //     });
+  //     const currentValue = rows[index].sku;
+  //     if (currentValue.trim().length > 2) {
+  //       const filteredProds = filterProducts(currentValue);
+  //       rows = rows.map((row, i) => {
+  //         if (i === index) {
+  //           return {
+  //             ...row,
+  //             filteredProducts: filteredProds,
+  //           };
+  //         }
+  //         return row;
+  //       });
+  //     }
   //   };
   // };
+  const enhanceForm = (index) => {
+  const requestStartTime = Date.now();
+  loadingState[index] = true;
+  const loadingStartTime = Date.now();
+  
+  return async ({ result }) => {
+    if (result && result.data) {
+      console.log(result, "result");
+      if (Array.isArray(result.data)) {
+        const uniqueProductNumbers = new Set();
+        const newProducts = result.data.filter((product) => {
+          if (!uniqueProductNumbers.has(product.productNumber)) {
+            uniqueProductNumbers.add(product.productNumber);
+            return true;
+          }
+          return false;
+        });
+        rows = rows.map((row, i) => {
+          if (i === index) {
+            return {
+              ...row,
+              filteredProducts: newProducts  
+            };
+          }
+          return row;
+        });
+        const existingProductNumbers = new Set(products.map((p) => p.productNumber));
+        const filteredNewProducts = newProducts.filter(
+          (p) => !existingProductNumbers.has(p.productNumber)
+        );
+        products = [...products, ...filteredNewProducts];
+        
+        if (result.data.length === 0) {
+          toast.error("No Components found");
+        } else {
+          productNumbers = Array.from(
+            new Set(result.data.map((record) => record.productNumber))
+          );
+        }
+      } else {
+        productNumbers = [];
+        toast.error("No Components found");
+      }
+    }
+    
+    const loadingEndTime = Date.now();
+    loadingState[index] = false;
+    const loadingDuration = (loadingEndTime - loadingStartTime) / 1000;
+    const processingEndTime = Date.now();
+    const totalRequestDuration = (processingEndTime - requestStartTime) / 1000;
+    
 
+  };
+};
+ 
   const closeCartPopDetails = (index) => {
     const cartPopup = document.getElementById("cart-popup-details");
     if (cartPopup) {
@@ -2488,6 +2470,7 @@
 
         <a href="/cart">
           <button
+          on:click={hideCartPopup}
             class="text-primary-400 px-3 py-1.5 rounded font-normal flex items-center gap-2 border border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
           >
             View Cart
