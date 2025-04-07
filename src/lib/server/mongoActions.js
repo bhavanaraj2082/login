@@ -2350,13 +2350,12 @@ export const addAllToCart = async (items, userId, userEmail) => {
 //Myfavouries actions ends
 
 export const quicksearch = async ({ query }) => {
-	// console.log("Original Query:", query);
-	let cleanedQuery = query.trim().replace(/\s*-\s*[\w\s]+$/, '');
-	// console.log("Processed Query:", cleanedQuery);
+console.log(query,"query");
+
   
 	try {
 	  const baseProducts = await Product.find({
-		productNumber: { $regex: cleanedQuery, $options: 'i' }
+		productNumber: { $regex: query, $options: 'i' }
 	  })
 		.select('_id productName productNumber prodDesc image')
 		.limit(20)
@@ -2455,111 +2454,6 @@ export const quicksearch = async ({ query }) => {
   
 
 
-
-// export const uploadFile = async ({ query }) => {
-// 	const validQueries = query.filter(([productNumberAndSize, quantity]) =>
-// 		productNumberAndSize?.trim() && String(quantity)?.trim()
-// 	);
-// 	console.log(validQueries, "validone");
-
-// 	if (validQueries.length === 0) {
-// 		return validQueries.map(() => ({
-// 			productNumber: "Unknown",
-// 			isValid: false,
-// 			message: "Product number is invalid",
-// 		}));
-// 	}
-
-// 	const results = [];
-
-// 	for (const [productNumberAndSize, quantity] of validQueries) {
-// 		const parts = productNumberAndSize.split('-');
-// 		const productNumber = parts.slice(0, parts.length - 1).join('-');
-// 		const size = parts[parts.length - 1];
-// 		const product = await Product.findOne({ 
-// 			productNumber: new RegExp('^' + productNumber.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '$', 'i') 
-// 		}).exec();
-
-// 		if (product) {
-// 			const stockInfo = await Stock.find({ 
-// 				productNumber: product.productNumber 
-// 			}).select('id stock pricing distributor manufacturer');
-			
-// 			console.log(stockInfo, "asadsdsfsdfxdrdr********************8");
-
-// 			let convertedPricing = [];
-// 			for (let stock of stockInfo) {
-// 				const { pricing = [], distributor, manufacturer } = stock || [];
-
-// 				if (pricing && pricing[0] && pricing[0].INR) {
-// 					convertedPricing = convertedPricing.concat(pricing);
-// 				} else {
-// 					const converted = await convertToINR([pricing] || []);
-// 					convertedPricing = convertedPricing.concat(converted);
-// 				}
-
-// 				console.log('Distributor:', distributor);
-// 				console.log('Manufacturer:', manufacturer);
-// 			}
-
-// 			if (stockInfo.length === 0) {
-// 				results.push({
-// 					productNumber,
-// 					quantity: parseInt(quantity),
-// 					isValid: false,
-// 					message: "Stock information missing",
-// 				});
-// 				continue;
-// 			}
-// 			const normalizedUserSize = size.replace(/\s+/g, '').toLowerCase();
-// 			const validSizePrice = convertedPricing.find(item => {
-// 				const normalizedItemSize = (item.break || '').replace(/\s+/g, '').toLowerCase();
-// 				return normalizedItemSize === normalizedUserSize;
-// 			});
-
-// 			if (!validSizePrice) {
-// 				console.log(`Size ${size} is invalid or not available for product ${productNumber}`);
-// 				results.push({
-// 					productNumber,
-// 					quantity: parseInt(quantity),
-// 					isValid: false,
-// 					message: `Size ${size} is invalid or not available for product ${productNumber}`,
-// 				});
-// 				continue;
-// 			}
-
-// 			let availableStock = Number(stockInfo[0]?.stock) || 0;
-// 			results.push({
-// 				id: product._id.toString(),
-// 				image: product.imageSrc || "No image available",
-// 				description: product.prodDesc || "No description available",
-// 				productName: product.productName || "No product name available",
-// 				productNumber: product.productNumber, 
-// 				quantity: parseInt(quantity),
-// 				stockId: stockInfo[0]?.id.toString() || null,
-// 				stock: availableStock,
-// 				manufacturer: stockInfo[0]?.manufacturer?.toString() || null,
-// 				distributer: stockInfo[0]?.distributor?.toString() || null,
-// 				isValid: true,
-// 				message: "Product number and size are valid",
-// 				pricing: [{
-// 					break: validSizePrice.break, // Keep the original case for display
-// 					price: validSizePrice.INR || "N/A",
-// 				}],
-// 			});
-// 		} else {
-// 			results.push({
-// 				productNumber: productNumberAndSize,
-// 				quantity: parseInt(quantity),
-// 				isValid: false,
-// 				message: "Product number is invalid",
-// 			});
-// 		}
-// 	}
-// 	console.log(results, "results");
-
-// 	return results;
-// };
 export const uploadFile = async ({ query }) => {
 	const validQueries = query.filter(([productNumberAndSize, quantity]) =>
 		productNumberAndSize?.trim() && String(quantity)?.trim()

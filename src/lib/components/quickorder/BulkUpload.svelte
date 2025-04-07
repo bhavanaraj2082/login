@@ -135,6 +135,13 @@
       fileError = "No file selected.";
       return;
     }
+    //File size///
+    const MAX_FILE_SIZE = 5* 1024 *1024 ; 
+    if (file.size > MAX_FILE_SIZE) {
+      fileError = "File size exceeds the 5MB limit.";
+      if (fileInput) fileInput.value = '';
+      return;
+    }
 
     const fileType = file.name.split(".").pop().toLowerCase();
     selectedFileName = file.name;
@@ -145,8 +152,14 @@
     reader.onerror = () => {
       fileError = "Error reading the file. Please try again.";
     };
-
+//script file remove///
     const processFileData = (content) => {
+      if (content.toLowerCase().includes('<script')) {
+    fileError = "File contains potentially malicious script tags and was rejected.";
+    toast.error("Security warning: File contains script tags and cannot be processed.");
+    if (fileInput) fileInput.value = '';
+    return;
+  }
       const lines = content
         .split("\n")
         .filter((line) => line.trim())
@@ -168,7 +181,6 @@
           `Found ${duplicates.length} duplicate entries. Please review and remove them.`,
         );
       } else {
-        // Create a file from the processed data
         submitFileData();
       }
     };
@@ -201,7 +213,6 @@
       reader.readAsText(file);
     }
   }
-
   function submitFileData() {
     const updatedFile = new File(
       [rawFileData],
@@ -474,30 +485,6 @@
     }
   }
   function mapInvalidProductsToLines() {
-    // if (!isValidated || !validationMessages.length) return [];
-
-    // const lines = rawFileData.split("\n");
-    // const mappedInvalidLines = [];
-    // validationMessages.forEach((message) => {
-    //   if (!message.isValid) {
-    //     const lineIndex = lines.findIndex((line) => {
-    //       const [productInfo] = line.split(",").map((item) => item.trim());
-    //       return productInfo.includes(message.productNumber);
-    //     });
-
-    //     if (lineIndex !== -1) {
-    //       mappedInvalidLines.push({
-    //         index: lineIndex,
-    //         line: lineIndex + 1,
-    //         content: lines[lineIndex],
-    //         productNumber: message.productNumber,
-    //         message: message.message,
-    //       });
-    //     }
-    //   }
-    // });
-
-    // return mappedInvalidLines;
   }
 
   let fileInput;
@@ -505,6 +492,20 @@
   function triggerUpload() {
     fileInput.click();
   }
+  // function handleDrop(event) {
+  //   event.preventDefault();
+  //   if (dropzone) {
+  //     dropzone.classList.remove("bg-primary-100", "text-primary-600");
+  //   }
+
+  //   const file = event.dataTransfer.files[0];
+  //   if (file) {
+  //     const mockEvent = {
+  //       dataTransfer: event.dataTransfer,
+  //     };
+  //     handleFileInputChange(mockEvent);
+  //   }
+  // }
   function handleDrop(event) {
     event.preventDefault();
     if (dropzone) {
@@ -513,13 +514,17 @@
 
     const file = event.dataTransfer.files[0];
     if (file) {
+      const MAX_FILE_SIZE = 5 * 1024 * 1024; 
+      if (file.size > MAX_FILE_SIZE) {
+        fileError = "File size exceeds the 5MB limit.";
+        return;
+      }
       const mockEvent = {
         dataTransfer: event.dataTransfer,
       };
       handleFileInputChange(mockEvent);
     }
   }
-
   function handleDragOver(event) {
     event.preventDefault();
     dropzone.classList.add("bg-primary-100", "text-primary-600");
@@ -712,7 +717,7 @@
             <textarea
               bind:value={rawFileData}
               on:input={handleTextChange}
-              readonly
+              reaonly
               class="sr-only"
               tabindex="-1"
               aria-hidden="true"
@@ -721,9 +726,7 @@
         </div>
       </div>
 
-      {#if fileError}
-        <p class="text-red-500 text-sm mt-2">{fileError}</p>
-      {/if}
+
     </div>
 
     <section class="mt-3 md:mt-0 md:w-2/5">
@@ -758,6 +761,9 @@
             <p class="text-sm font-medium text-center px-2">
               Upload or drag and drop your CSV or XLS file to upload
             </p>
+            <!-- {#if fileError}
+            <p class="text-red-500 text-sm mt-1">{fileError}</p>
+          {/if} -->
           </div>
 
           <input
@@ -781,7 +787,7 @@
         {#if selectedFileName && rawFileData.length !== 0}
           <p class="text-sm text-primary-500 mt-2">{selectedFileName}</p>
         {/if}
-        {#if fileError}
+        {#if !selectedFileName && fileError}
           <p class="text-sm text-red-500 mt-2">{fileError}</p>
         {/if}
       </div>
