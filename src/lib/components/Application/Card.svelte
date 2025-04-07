@@ -25,10 +25,10 @@
     </div>
     <div class="absolute inset-0 bg-opacity-20 transition-all duration-500 ease-in-out group-hover:bg-opacity-0 z-10 pointer-events-none"></div>
     <div class="p-4">
-      <h3 class="text-xl font-semibold text-gray-800 group-hover:text-primary-600 transition-colors duration-500">
+      <h3 class="sm:text-xl text-md font-semibold text-gray-800 group-hover:text-primary-600 transition-colors duration-500">
         {name}
       </h3>
-      <p class="mt-2 text-gray-600 text-justify">
+      <p class="mt-2 text-gray-600 text-justify sm:text-sm text-xs">
         {getTruncatedDescription(description) || "No description available"}
       </p>
     </div>
