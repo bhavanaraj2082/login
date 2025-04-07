@@ -563,7 +563,7 @@ onMount(() => {
 			$Cusdetails.Email = data.profile.email || "";
 			$Cusdetails.Number = data.profile.cellPhone || data.profile.primaryPhone || "";
 			$Cusdetails.userId = data.profile.userId || "" ;
-			$Cusdetails.Organisation = data.profile.companyName || "N/a";
+			$Cusdetails.Organisation = data.profile.companyName || "";
 
 			// Country logic
 			const profileCountry = data.profile.country?.trim();

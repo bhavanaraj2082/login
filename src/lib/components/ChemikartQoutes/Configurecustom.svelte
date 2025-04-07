@@ -377,53 +377,58 @@ else if (selectedSolvent === "Yes") {
 		</div>
 	{/if}		<div class="bg-white">
 			<h1 class="font-bold sm:text-2xl text-sm ml-3 md:ml-10 py-5">Would you like to specify a solvent?*</h1>
-			<div class="mt-4 ml-3 md:ml-20 ">
+		
+			<div class="mt-4 ml-3 md:ml-20">
 				<input
-					type="radio"
-					id="yes"
-					name="solvent"
-					class="form-radio sm:w-3.5 sm:h-3.5 w-2 h-2 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
-					bind:group={selectedSolvent}
-					value="Yes"
-					on:change={() => {
-						setSolvent("Yes");
-						showSolventDropdown = true;
-					}}
-					style="transform: scale(1.5); margin-right: 10px;"
-				/>
-				<label for="yes" class="sm:text-lg text-xs">Yes</label>
-				<input
-				class="form-radio sm:w-3.5 sm:h-3.5 w-2 h-2 text-primary-500 ml-10 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
-				type="radio"
-					id="no"
-					name="solvent"
-					value="No"
-					
-					bind:group={selectedSolvent}
-					on:change={() => {
-						setSolvent("No");
-						showSolventDropdown = false;
-					}}
-					style="transform: scale(1.5); margin-right: 10px;"
-				/>
-				<label for="no" class="sm:text-lg text-xs">No</label>
-				{#if showSolventDropdown}
-					<select
-					class="box-content border-1 sm:mt-4 mt-0 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 rounded focus:border-primary-500 bg-white sm:text-sm text-2s h-5 ml-4"
-						id="solvent"
-						name="solvent"
-						
-						on:change={(e) => {
-							updateSelectedSolvent(e.target.value);
-							setSolvent(e.target.value);
-						}}
-					>
-						<option value="" disabled>Select solvent</option>
-						{#each solvent as title}
-							<option value={title}>{title}</option>
-						{/each}
-					</select>
-				{/if}
+  type="radio"
+  id="yes"
+  name="solvent"
+  value="Yes"
+  	class="form-radio sm:w-3.5 sm:h-3.5 w-2 h-2 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+  bind:group={selectedSolvent}
+  on:change={() => {
+    setSolvent("Yes");
+    showSolventDropdown = true; // Show the dropdown when 'Yes' is selected
+  }}
+  style="transform: scale(1.5); margin-right: 10px;"
+/>
+<label for="yes" class="sm:text-lg text-xs">Yes</label>
+
+<input
+  type="radio"
+  id="no"
+  name="solvent"
+  value="No"
+  bind:group={selectedSolvent}
+  on:change={() => {
+    setSolvent("No");
+    showSolventDropdown = false; // Hide the dropdown when 'No' is selected
+  }}
+  class="form-radio sm:w-3.5 sm:h-3.5 w-2 h-2 text-primary-500 ml-10 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500"
+  style="transform: scale(1.5); margin-right: 10px;"
+/>
+<label for="no" class="sm:text-lg text-xs">No</label>
+
+<!-- Conditionally Render Dropdown -->
+{#if showSolventDropdown || (selectedSolvent !== "No" && selectedSolvent)}
+  <select
+    class="box-content border-1 sm:mt-4 mt-0 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 rounded focus:border-primary-500 bg-white sm:text-sm text-2s h-5 ml-4"
+    id="solvent"
+    name="solvent"
+    bind:value={selectedSolvent} 
+    on:change={(e) => {
+      updateSelectedSolvent(e.target.value);
+      setSolvent(e.target.value);
+    }}
+  >
+    <option value="" disabled>Select solvent</option>
+    {#each solvent as title}
+      <option value={title}>{title}</option>
+    {/each}
+  </select>
+  <!-- <p>{selectedSolvent}</p> -->
+{/if}
+
 			</div>
 		</div>
 		<div class=" bg-white">
