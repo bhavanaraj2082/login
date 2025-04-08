@@ -7,7 +7,8 @@
   import Shipments from "./Shipments.svelte";
 
   export let data;
-  // console.log("-------------->",data);
+  const currencyType = data?.order?.currency?.toLowerCase();
+
   let order = data?.order;
   let recordId = data?.order?._id;
   let products = data?.order?.products || [];
@@ -125,6 +126,21 @@
 	let param = $page.url;
 	let url = new URL(param);
 	let email = url.searchParams.get('email');
+
+  function priceShowing(price, currency) {
+    if (price === undefined || price === null || price === 0) {
+        return '--';
+    }
+    const formattedPrice = price.toFixed(3);
+    if (currency === "inr") {
+        return `₹ ${formattedPrice}`;
+    }
+    if (currency === "usd") {
+        return `$ ${formattedPrice}`;
+    }
+    return formattedPrice; 
+}
+
 </script>
 
 <div class="">
@@ -209,7 +225,7 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
           <div class="text-sm font-medium text-gray-500">Total:</div>
           <p class="text-sm font-semibold text-heading">
-            &#8377; {order.totalprice.toFixed(3) || "--"}
+            {priceShowing(order.totalprice , currencyType)}
           </p>
         </div>
 
@@ -268,11 +284,11 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
         {#if isAllActive}
-          <AllOrders {orderedproduct} {orderStatus} />
+          <AllOrders {orderedproduct} {orderStatus} {currencyType} />
         {:else if isShippedActive}
-          <Shipments {data} />
+          <Shipments {data} {currencyType} />
         {:else}
-          <Pending {remainingProducts} />
+          <Pending {remainingProducts} {currencyType} />
         {/if}
 
         <div>
@@ -283,8 +299,8 @@
             <div class="mb-4 px-4 py-4 rounded-md shadow bg-white flex flex-col gap-1">
               <div class="flex justify-between">
                 <p class="text-gray-500 text-sm font-medium">Subtotal:</p>
-                <p class="text-heading text-sm font-semibold">
-                  &#8377; {order.subtotalprice.toFixed(3) || "0.00"}
+                <p class="text-heading text-sm font-semibold">               
+                  {priceShowing(order.subtotalprice, currencyType)}
                 </p>
               </div>
               <div class="flex justify-between mb-2">
@@ -292,14 +308,14 @@
                   Shipping Charge:
                 </p>
                 <p class="text-heading text-sm font-semibold">
-                  &#8377; {order.shippingprice.toFixed(3) || "0.00"}
+                  {priceShowing(order.shippingprice, currencyType)}
                 </p>
               </div>
               <hr />
               <div class="flex justify-between mt-2">
                 <p class="text-gray-500 text-sm font-medium">Total:</p>
                 <p class="text-heading text-sm font-semibold">
-                  &#8377; {order.totalprice.toFixed(3) || "0.00"}
+                  {priceShowing(order.totalprice, currencyType)}  
                 </p>
               </div>
             </div>

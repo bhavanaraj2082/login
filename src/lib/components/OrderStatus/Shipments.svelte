@@ -2,6 +2,7 @@
   export let data;
   import Icon from "@iconify/svelte";
   import {PUBLIC_IMAGE_URL} from "$env/static/public"
+  export let currencyType;
   let products = data?.order?.products || [];
   let shipments = data?.order?.shipdetails || [];
 
@@ -45,6 +46,20 @@
     return date.toLocaleDateString("en-US", options);
   }
   // console.log("shipmenet ---->",shipmentdetails);
+
+  function priceShowing(price, currency) {
+    if (price === undefined || price === null || price === 0) {
+        return '--';
+    }
+    const formattedPrice = price.toFixed(3);
+    if (currency === "inr") {
+        return `₹ ${formattedPrice}`;
+    }
+    if (currency === "usd") {
+        return `$ ${formattedPrice}`;
+    }
+    return formattedPrice; 
+}
 </script>
 
 <div class="col-span-2 mt-2">
@@ -85,7 +100,7 @@
                   >
                 </p>
                 <p class="font-medium text-sm text-gray-700">
-                  &#8377; <span>{item.price || "--"}</span>
+                  {priceShowing(item.price, currencyType)}
                 </p>
               </div>
             </div>

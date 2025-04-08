@@ -3,6 +3,21 @@
   export let remainingProducts;
   import {PUBLIC_IMAGE_URL} from "$env/static/public"
   // console.log("remainingProducts",remainingProducts);
+  export let currencyType;
+
+  function priceShowing(price, currency) {
+    if (price === undefined || price === null || price === 0) {
+        return '--';
+    }
+    const formattedPrice = price.toFixed(3);
+    if (currency === "inr") {
+        return `₹ ${formattedPrice}`;
+    }
+    if (currency === "usd") {
+        return `$ ${formattedPrice}`;
+    }
+    return formattedPrice; 
+}
 </script>
 
 <div class="col-span-2 mt-6"> 
@@ -36,7 +51,7 @@
                 >
               </p>
               <p class="font-medium text-sm text-gray-700">
-                &#8377; <span>{product.unitPrice || "--"}</span>
+                {priceShowing(product.unitPrice , currencyType)}
               </p>
             </div>
           </div>

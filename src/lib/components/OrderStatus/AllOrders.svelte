@@ -4,6 +4,21 @@
   export let orderStatus;
   import {PUBLIC_IMAGE_URL} from "$env/static/public"
   // console.log("orderProduct====>", orderedproduct);
+  export let currencyType;
+
+  function priceShowing(price, currency) {
+    if (price === undefined || price === null || price === 0) {
+        return '--';
+    }
+    const formattedPrice = price.toFixed(3);
+    if (currency === "inr") {
+        return `₹ ${formattedPrice}`;
+    }
+    if (currency === "usd") {
+        return `$ ${formattedPrice}`;
+    }
+    return formattedPrice; 
+}
 </script>
 
 <div class="col-span-2 mt-2">
@@ -34,7 +49,7 @@
                 >
               </p>
               <p class="font-medium text-sm text-gray-700">
-                &#8377; <span>{product.unitPrice.toFixed(3) || "--"}</span>
+                {priceShowing(product.unitPrice, currencyType)}
               </p>
             </div>
           </div>
@@ -44,7 +59,7 @@
           >
             <p class="font-medium text-sm text-gray-600">Ext.price</p>
             <p class="font-medium text-sm text-gray-700">
-              &#8377; <span>{product.extendedPrice.toFixed(3) || "--"}</span>
+              {priceShowing(product.extendedPrice, currencyType)}
             </p>
           </div>
 
