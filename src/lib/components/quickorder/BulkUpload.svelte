@@ -549,9 +549,9 @@
       );
 
       cartloading = false;
-      // setTimeout(() => {
-      //   window.location.href = "/cart";
-      // }, 2000);
+      setTimeout(() => {
+        window.location.href = "/cart";
+      }, 2000);
     } catch (err) {
       cartloading = false;
       console.error("Error saving to localStorage:", err);
@@ -1030,9 +1030,9 @@ Example file content:
               toast.success(
                 `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`,
               );
-              // setTimeout(() => {
-              //   window.location.href = "/cart";
-              // }, 2000);
+              setTimeout(() => {
+                window.location.href = "/cart";
+              }, 2000);
             } else {
               throw new Error(resultData[1] || "Failed to add items to cart");
             }
