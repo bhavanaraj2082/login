@@ -20,6 +20,7 @@ const stockSchema = new Schema(
         collection: 'stocks'
     }
 );
+stockSchema.index({ sku: 1 });
 //delete mongoose.models.Stock
 export const Stock = mongoose.models.Stock || mongoose.model('Stock', stockSchema);
 export default Stock;
