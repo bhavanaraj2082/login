@@ -26,8 +26,8 @@ function updateCell(rowIndex, cellIndex, event) {
 		let uploadedFiles = false;	
 		const requiredHeaders = ["Component Name", "CasNumber", "Concentration"];
 
-const isValidCasNumber = (value) => {
-	return /^\d+$/.test(value);
+		const isValidCasNumber = (value) => {
+  return /^[\d-]+$/.test(value);
 };
 
 const handleFileUpload = (event) => {
