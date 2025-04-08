@@ -2702,6 +2702,7 @@ export const uploadFile = async ({ query }) => {
 		  pricing: 1,
 		  distributor: 1,
 		  manufacturer: 1,
+		  productName:1,
 		  productNumber: 1,
 		  sku: 1,
 		  normalizedSku: 1
@@ -2737,6 +2738,7 @@ export const uploadFile = async ({ query }) => {
 		  id: matchedStock._id.toString(),
 		  productId: matchedStock.productid.toString(),
 		  productNumber: matchedStock.productNumber,
+		  productName:matchedStock.productName,
 		  sku: matchedStock.sku,
 		  stockId: matchedStock._id.toString(),
 		  stock: availableStock,

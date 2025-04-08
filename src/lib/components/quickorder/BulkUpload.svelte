@@ -509,7 +509,8 @@
       cartloading = true;
       const productsToAdd = prepareValidatedProductsForCart();
       const simplifiedCartItems = productsToAdd.map((item) => ({
-        productId: item.productId,
+        productId: item.id,
+        productName:item.productName,
         manufacturerId: item.manufacturerId,
         stockId: item.stockId,
         distributorId: item.distributerId,
