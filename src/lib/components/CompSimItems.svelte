@@ -465,17 +465,15 @@
                     View Price & Availability
                   </button>
                 </div>
+
+              <!-- details div -->
                 <div class="px-3 mb-3">
                   <h3 class="text-gray-700">
                     {#each Object.keys(product.properties) as key}
-                    <hr class="border-t border-gray-300" />
-                    <!-- <div
-                    class="py-2 {showDifference && isUnique(product.properties[key], key) ? 'bg-primary-100 border border-gray-200' : 'bg-white'}"
-                  > -->
-                  <div class="py-2
-                  {showDifference && !isSameAsFirst(product.properties[key], key) && product.properties[key] && product.properties[key] !== '__' ? 'bg-primary-100 ' : 'bg-white'}">
-                    <div class="text-left text-xs font-semibold">{key}:</div>
-                    <div class="text-gray-500 text-xs pt-1 font-normal">
+                      <hr class="border-t border-gray-300" />
+                      <div class="py-2 {showDifference && !isSameAsFirst(product.properties[key], key) && product.properties[key] && product.properties[key] !== '__' ? 'bg-primary-100 ' : 'bg-white'} min-h-[60px] max-h-[60px] overflow-hidden">
+                        <div class="text-left text-xs font-semibold">{key}:</div>
+                        <div class="text-gray-500 text-xs pt-1 font-normal">
                           {#if product.properties[key]}
                             {#if typeof product.properties[key] === "object"}
                               {JSON.stringify(product.properties[key])}
@@ -485,11 +483,13 @@
                           {:else}
                             -
                           {/if}
-                    </div>
+                        </div>
                       </div>
                     {/each}
                   </h3>
                 </div>
+                
+
               </div>
             </div>
           {/each}
