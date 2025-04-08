@@ -4,6 +4,7 @@
   import { toast, Toaster } from "svelte-sonner";
   import { invalidate } from "$app/navigation";
   import Icon from "@iconify/svelte";
+  import { goto } from '$app/navigation';
   import { currencyState, cartTotalComps } from "$lib/stores/mainStores.js";
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
   import { authedUser } from "$lib/stores/mainStores.js";
@@ -25,46 +26,17 @@
   // const productsData = relatedProducts;
   let isLoggedIn = $authedUser?.id ? true : false;
   let showCartPopup = false;
-  // let RelatedProductData = productsData.map((product) => {
-  //   return {
-  //     productId: product._id,
-  //     prodDesc: product.prodDesc,
-  //     productName: product.productName,
-  //     priceSize:
-  //       Array.isArray(product.stockPriceSize) &&
-  //       product.stockPriceSize.length > 0
-  //         ? product.stockPriceSize.map((size) => ({
-  //             size: size.break || "N/A",
-  //             priceINR: size.inr || 0,
-  //             priceUSD: size.usd || 0,
-  //             offer: size.offer || "0",
-  //           }))
-  //         : [],
-  //     image: product.image,
-  //     manufacturer: product.manufacturerInfo[0]?.name,
-  //     manufacturerId: product.manufacturerInfo[0]?._id,
-  //     distributorId: product.stockInfo?.[0]?.distributor || "",
-  //     stockInfo: Array.isArray(product.stockInfo) ? product.stockInfo : [],
-  //     stockId:
-  //       Array.isArray(product.stockInfo) && product.stockInfo.length > 0
-  //         ? product.stockInfo.map((stock) => stock._id)
-  //         : [],
-  //     stock: product.stockQuantity,
-  //     category: product.categoryInfo[0]?.urlName,
-  //     subCategory: product.subCategoryInfo[0]?.urlName,
-  //     subsubCategory: product.subsubCategoryInfo[0]?.urlName,
-  //     productUrl: product.productUrl,
-  //     productNumber: product.productNumber,
-  //     variants: Array.isArray(product.variants) ? product.variants : [],
-  //   };
-  // });
-
   let RelatedProductData = relatedProducts;
   // console.log("final RelatedProductData",RelatedProductData);
   
   let currentIndex = 0;
   let logosPerSlide = 4;
   let totalSlides = Math.ceil(RelatedProductData.length / logosPerSlide);
+
+  function handleViewCartClick() {
+    showCartPopup = false;
+    goto('/cart');
+  }
 
   function prevSlide() {
     if (currentIndex > 0) {
@@ -348,7 +320,7 @@
                   >
                     <img
                       src="{PUBLIC_IMAGE_URL}/{product?.image}"
-                      onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+                      onerror="this.src='/fallback.jpg'"
                       alt="Img"
                       class="w-20 h-20 object-contain rounded-sm"
                     /></a
@@ -459,7 +431,7 @@
       <div class="flex flex-row sm:flex-row gap-4 mb-3">
         <img
           src="{PUBLIC_IMAGE_URL}/{selectedProduct?.image}"
-          onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+          onerror="this.src='/fallback.jpg'"
           alt="ProductImage"
           class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border mx-auto sm:mx-0"
         />
@@ -710,7 +682,7 @@
         <button on:click={cartTogglePopup} class="text-primary-400 font-bold">
           <Icon
             icon="mdi:close"
-            class="text-2xl font-bold hover:bg-primary-400 hover:text-white hover:rounded-md hover:p-px"
+            class="text-2xl font-bold hover:bg-red-100 text-red-600 border rounded hover:p-px"
           />
         </button>
       </div>
@@ -718,7 +690,7 @@
         <div class="flex items-center mb-6 justify-around w-full">
           <img
             src="{PUBLIC_IMAGE_URL}/{selectedProduct?.image}"
-            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+            onerror="this.src='/fallback.jpg'"
             alt="Img"
             class="w-24 h-24 object-contain p-1 mt-2 border rounded"
           />
@@ -804,7 +776,7 @@
         </button>
         <button
           class="text-primary-400 px-3 py-1.5 rounded font-normal flex gap-2 border-1 border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
-          on:click={() => (window.location.href = "/cart")}
+          on:click={handleViewCartClick}
         >
           View Cart
           <Icon icon="ic:round-shopping-cart" class="text-2xl inline mr-1" />

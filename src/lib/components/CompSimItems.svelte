@@ -2,6 +2,7 @@
   import {PUBLIC_IMAGE_URL} from "$env/static/public"
   import { onMount } from "svelte";
   import { toast, Toaster } from "svelte-sonner";
+  import { goto } from '$app/navigation';
   import { invalidate } from "$app/navigation";
   import Icon from "@iconify/svelte";
   import { currencyState, cartTotalComps } from "$lib/stores/mainStores.js";
@@ -62,6 +63,11 @@
       (product) => product.properties[key]
     ).filter((val) => val !== "-");
     return values.filter((v) => v === value).length === 1;
+  }
+
+  function handleViewCartClick() {
+    showCartPopup = false;
+    goto('/cart');
   }
 
   // const productsData = compareSimilarity;
@@ -410,7 +416,7 @@
                   >
                     <img
                       src="{PUBLIC_IMAGE_URL}/{product?.image}"
-                      onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+                      onerror="this.src='/fallback.jpg'"
                       alt="Img"
                       class="w-20 h-20 object-contain rounded-sm"
                     /></a
@@ -527,7 +533,7 @@
       <div class="flex flex-row sm:flex-row gap-4 mb-3">
         <img
           src="{PUBLIC_IMAGE_URL}/{selectedProduct?.image}"
-          onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+          onerror="this.src='/fallback.jpg'"
           alt="ProductImage"
           class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border mx-auto sm:mx-0"
         />
@@ -778,7 +784,7 @@
         <button on:click={cartTogglePopup} class="text-primary-400 font-bold">
           <Icon
             icon="mdi:close"
-            class="text-2xl font-bold hover:bg-primary-400 hover:text-white hover:rounded-md hover:p-px"
+            class="text-2xl font-bold hover:bg-red-100 text-red-600 border rounded hover:p-px"
           />
         </button>
       </div>
@@ -786,7 +792,7 @@
         <div class="flex items-center mb-6 justify-around w-full">
           <img
             src="{PUBLIC_IMAGE_URL}/{selectedProduct?.image}"
-            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+            onerror="this.src='/fallback.jpg'"
             alt="Img"
             class="w-24 h-24 object-contain p-1 mt-2 border rounded"
           />
@@ -872,7 +878,7 @@
         </button>
         <button
           class="text-primary-400 px-3 py-1.5 rounded font-normal flex gap-2 border-1 border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
-          on:click={() => (window.location.href = "/cart")}
+          on:click={handleViewCartClick}
         >
           View Cart
           <Icon icon="ic:round-shopping-cart" class="text-2xl inline mr-1" />

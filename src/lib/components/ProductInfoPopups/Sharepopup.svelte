@@ -64,8 +64,8 @@
           <img
             src="{PUBLIC_IMAGE_URL}/{product?.imageSrc}"
             alt="Product Image"
-            class="w-32 h-28 p-1 object-contain"
-            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+            class="w-32 h-20 p-1 object-contain"
+            onerror="this.src='/fallback.jpg'"
           />
         </div>
         <div>
