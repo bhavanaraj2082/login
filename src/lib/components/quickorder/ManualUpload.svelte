@@ -662,110 +662,59 @@
 
     return Object.keys(formErrors).length === 0;
   }
-  // const enhanceForm = (index) => {
-  //   const requestStartTime = Date.now();
-  //   loadingState[index] = true;
-  //   const loadingStartTime = Date.now();
 
-  //   return async ({ result }) => {
-  //     let processingEndTime = 0;
 
-  //     if (Array.isArray(result.data)) {
-  //       const uniqueProductNumbers = new Set();
-  //       const newProducts = result.data.filter((product) => {
-  //         if (!uniqueProductNumbers.has(product.productNumber)) {
-  //           uniqueProductNumbers.add(product.productNumber);
-  //           return true;
-  //         }
-  //         return false;
-  //       });
-
-  //       const existingProductNumbers = new Set(
-  //         products.map((p) => p.productNumber),
-  //       );
-
-  //       const filteredNewProducts = newProducts.filter(
-  //         (p) => !existingProductNumbers.has(p.productNumber),
-  //       );
-
-  //       products = [...products, ...filteredNewProducts];
-
-  //       const duplicatesRemoved = result.data.length - newProducts.length;
-  //       if (duplicatesRemoved > 0) {
-  //         // console.log(`Removed ${duplicatesRemoved} duplicate products`);
-  //       }
-  //     }
-
-  //     if (result && result.data) {
-  //       console.log(result, "result");
-
-  //       if (result.data.length === 0) {
-  //         toast.error("No Components found");
-  //       } else {
-  //         productNumbers = Array.from(
-  //           new Set(result.data.map((record) => record.productNumber)),
-  //         );
-  //       }
-  //     } else {
-  //       productNumbers = [];
-  //       toast.error("No Components found");
-  //     }
-
-  //     const loadingEndTime = Date.now();
-  //     loadingState[index] = false;
-
-  //     const loadingDuration = (loadingEndTime - loadingStartTime) / 1000;
-
-  //     processingEndTime = Date.now();
-  //     const totalRequestDuration =
-  //       (processingEndTime - requestStartTime) / 1000;
-  //     const currentValue = rows[index].sku;
-  //     if (currentValue.trim().length > 2) {
-  //       const filteredProds = filterProducts(currentValue);
-  //       rows = rows.map((row, i) => {
-  //         if (i === index) {
-  //           return {
-  //             ...row,
-  //             filteredProducts: filteredProds,
-  //           };
-  //         }
-  //         return row;
-  //       });
-  //     }
-  //   };
-  // };
-  const enhanceForm = (index) => {
+const enhanceForm = (index) => {
   const requestStartTime = Date.now();
   loadingState[index] = true;
   const loadingStartTime = Date.now();
-  
+
   return async ({ result }) => {
     if (result && result.data) {
-      console.log(result, "result");
+      console.log("Raw result:", result); 
       if (Array.isArray(result.data)) {
-        const uniqueProductNumbers = new Set();
+        const uniqueKeys = new Set();
+
         const newProducts = result.data.filter((product) => {
-          if (!uniqueProductNumbers.has(product.productNumber)) {
-            uniqueProductNumbers.add(product.productNumber);
+          const breakSize = product?.pricing?.[0]?.break || '';
+          const uniqueKey = `${product.productNumber}_${breakSize}`;
+          
+          if (!uniqueKeys.has(uniqueKey)) {
+            uniqueKeys.add(uniqueKey);
             return true;
           }
           return false;
         });
+
+        // console.log("New unique products by productNumber & break size:", newProducts);
+
         rows = rows.map((row, i) => {
           if (i === index) {
             return {
               ...row,
-              filteredProducts: newProducts  
+              filteredProducts: newProducts,
             };
           }
           return row;
         });
-        const existingProductNumbers = new Set(products.map((p) => p.productNumber));
-        const filteredNewProducts = newProducts.filter(
-          (p) => !existingProductNumbers.has(p.productNumber)
+
+        const existingKeys = new Set(
+          products.map((p) => {
+            const breakSize = p?.pricing?.[0]?.break || '';
+            return `${p.productNumber}_${breakSize}`;
+          })
         );
+
+        const filteredNewProducts = newProducts.filter((p) => {
+          const breakSize = p?.pricing?.[0]?.break || '';
+          const key = `${p.productNumber}_${breakSize}`;
+          return !existingKeys.has(key);
+        });
+
+        console.log("Filtered new products to be added to global list:", filteredNewProducts);
+
         products = [...products, ...filteredNewProducts];
-        
+
         if (result.data.length === 0) {
           toast.error("No Components found");
         } else {
@@ -778,17 +727,19 @@
         toast.error("No Components found");
       }
     }
-    
+
     const loadingEndTime = Date.now();
     loadingState[index] = false;
+
     const loadingDuration = (loadingEndTime - loadingStartTime) / 1000;
     const processingEndTime = Date.now();
     const totalRequestDuration = (processingEndTime - requestStartTime) / 1000;
-    
 
+    console.log(`Loading duration: ${loadingDuration}s`);
+    console.log(`Total request processing time: ${totalRequestDuration}s`);
   };
 };
- 
+
   const closeCartPopDetails = (index) => {
     const cartPopup = document.getElementById("cart-popup-details");
     if (cartPopup) {

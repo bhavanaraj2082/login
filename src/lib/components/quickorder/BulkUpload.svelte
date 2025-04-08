@@ -2,6 +2,7 @@
   import Icon from "@iconify/svelte";
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
+  import { onMount, afterUpdate } from "svelte";
   import * as XLSX from "xlsx";
   import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
   export let data;
@@ -115,6 +116,68 @@
     }
   }
 
+  function removeAllInvalidProducts() {
+    // Get all the invalid product numbers
+    const invalidProductNumbers = validationMessages
+      .filter((message) => !message.isValid)
+      .map((message) => message.productNumber);
+
+    if (invalidProductNumbers.length === 0) {
+      toast.info("No invalid products to remove.");
+      return;
+    }
+
+    // Split the raw file data into lines
+    let lines = rawFileData.split("\n");
+
+    // Keep track of the lines to remove
+    const linesToRemove = [];
+
+    // Identify which lines contain invalid products
+    lines.forEach((line, index) => {
+      const [productInfo] = line.split(",").map((item) => item.trim());
+
+      // Check if this line contains any of the invalid product numbers
+      const containsInvalidProduct = invalidProductNumbers.some(
+        (invalidProduct) => productInfo.includes(invalidProduct),
+      );
+
+      if (containsInvalidProduct) {
+        linesToRemove.push(index);
+      }
+    });
+
+    // Remove lines in reverse order to maintain correct indices
+    linesToRemove.reverse().forEach((lineIndex) => {
+      lines.splice(lineIndex, 1);
+    });
+
+    // Join the remaining lines back together
+    rawFileData = lines.join("\n");
+
+    // Update validation messages to remove entries for removed products
+    validationMessages = validationMessages.filter(
+      (message) => message.isValid,
+    );
+
+    // Update the mapping of invalid products to lines
+    invalidProductLines = mapInvalidProductsToLines();
+
+    // Show appropriate toast message
+    if (!rawFileData.trim()) {
+      toast.success(
+        "All invalid items removed. Please add valid product number and size to add to cart.",
+      );
+      isValidated = false;
+    } else {
+      toast.success("All invalid products removed. You can now add to cart.");
+    }
+
+    // Reset validation state if there are no more validation messages
+    if (validationMessages.length === 0) {
+      isValidated = false;
+    }
+  }
   function handleTextChange(event) {
     rawFileData = event.target.value;
     const { duplicates } = checkForDuplicates(rawFileData);
@@ -136,10 +199,10 @@
       return;
     }
     //File size///
-    const MAX_FILE_SIZE = 5* 1024 *1024 ; 
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
     if (file.size > MAX_FILE_SIZE) {
       fileError = "File size exceeds the 5MB limit.";
-      if (fileInput) fileInput.value = '';
+      if (fileInput) fileInput.value = "";
       return;
     }
 
@@ -152,14 +215,17 @@
     reader.onerror = () => {
       fileError = "Error reading the file. Please try again.";
     };
-//script file remove///
+    //script file remove///
     const processFileData = (content) => {
-      if (content.toLowerCase().includes('<script')) {
-    fileError = "File contains potentially malicious script tags and was rejected.";
-    toast.error("Security warning: File contains script tags and cannot be processed.");
-    if (fileInput) fileInput.value = '';
-    return;
-  }
+      if (content.toLowerCase().includes("<script")) {
+        fileError =
+          "File contains potentially malicious script tags and was rejected.";
+        toast.error(
+          "Security warning: File contains script tags and cannot be processed.",
+        );
+        if (fileInput) fileInput.value = "";
+        return;
+      }
       const lines = content
         .split("\n")
         .filter((line) => line.trim())
@@ -214,6 +280,10 @@
     }
   }
   function submitFileData() {
+    if (!rawFileData.trim()) {
+      toast.error("Please enter product data before submitting");
+      return;
+    }
     const updatedFile = new File(
       [rawFileData],
       selectedFileName || "upload.csv",
@@ -272,7 +342,9 @@
       return;
     }
 
-    const lines = rawFileData.split("\n").filter((line) => line.trim());
+    const lines =
+      rawFileData.split("\n").filter((line) => line.trim()) ||
+      textareaElement.split("\n").filter((line) => line.trim());
     const trimmedLines = lines.map((line) => {
       const [productInfo, quantity] = line
         .split(",")
@@ -336,24 +408,25 @@
       if (
         product.stockMessage ===
           "Stock is sufficient for all uploaded quantities" ||
+        "SKU is valid" ||
         (product.productNumber &&
           product.productName &&
-          product.pricing &&
-          product.pricing[0] &&
-          product.pricing[0].break &&
+          // product.pricing &&
+          // product.pricing[0] &&
+          // product.pricing[0].break &&
           product.stock > 0)
       ) {
         console.log(`Product ${product.productName} passed validation check`);
 
-        const sizePriceInfo = product.pricing[0];
-        const size = sizePriceInfo.break;
-        const price = sizePriceInfo.price;
+        // const sizePriceInfo = product.pricing[0];
+        // const size = sizePriceInfo.break;
+        // const price = sizePriceInfo.price;
         const rowQuantity = parseInt(product.quantity, 10) || 0;
         const productStock = parseInt(product.stock, 10) || 0;
         const backOrder = Math.max(rowQuantity - productStock, 0);
 
         const newProduct = {
-          id: product.id,
+          id: product.productId,
           manufacturerId: product.manufacturer,
           distributerId: product.distributer ? product.distributer : null,
           stockId: product.stockId,
@@ -361,10 +434,10 @@
           image: product.image,
           partNumber: product.productNumber,
           description: product.prodDesc,
-          priceSize: {
-            price: price,
-            size: size,
-          },
+          // priceSize: {
+          //   price: price,
+          //   size: size,
+          // },
           quantity: product.quantity || 1,
           backOrder: backOrder,
           stock: product.stock,
@@ -385,7 +458,8 @@
 
   function attemptAddToCart() {
     if (!isValidated || duplicateEntries.length > 0) {
-      validateAndSubmitData();
+      // validateAndSubmitData();
+      submitFileData();
       return;
     }
     const validProducts = validatedProducts.filter(
@@ -435,7 +509,7 @@
       cartloading = true;
       const productsToAdd = prepareValidatedProductsForCart();
       const simplifiedCartItems = productsToAdd.map((item) => ({
-        productId: item.id,
+        productId: item.productId,
         manufacturerId: item.manufacturerId,
         stockId: item.stockId,
         distributorId: item.distributerId,
@@ -484,8 +558,7 @@
       toast.error("Failed to save items to cart");
     }
   }
-  function mapInvalidProductsToLines() {
-  }
+  function mapInvalidProductsToLines() {}
 
   let fileInput;
   let dropzone;
@@ -514,7 +587,7 @@
 
     const file = event.dataTransfer.files[0];
     if (file) {
-      const MAX_FILE_SIZE = 5 * 1024 * 1024; 
+      const MAX_FILE_SIZE = 5 * 1024 * 1024;
       if (file.size > MAX_FILE_SIZE) {
         fileError = "File size exceeds the 5MB limit.";
         return;
@@ -534,6 +607,52 @@
     dropzone.classList.remove("bg-primary-100", "text-primary-600");
   }
   let scrollContainer;
+  let textareaElement;
+  let overlayElement;
+  let lineHeight = 24;
+  let scrollTop = 0;
+  let viewportHeight = 0;
+  function handleScroll() {
+    if (textareaElement) {
+      scrollTop = textareaElement.scrollTop;
+    }
+  }
+  onMount(() => {
+    // Initialize component
+    calculateLineHeight();
+
+    if (textareaElement) {
+      viewportHeight = textareaElement.clientHeight;
+    }
+
+    // Set initial scroll position
+    handleScroll();
+  });
+
+  afterUpdate(() => {
+    // Recalculate positions after content changes
+    if (isValidated) {
+      calculateLineHeight();
+    }
+
+    if (textareaElement) {
+      viewportHeight = textareaElement.clientHeight;
+    }
+  });
+  function calculateLineHeight() {
+    if (textareaElement) {
+      const style = window.getComputedStyle(textareaElement);
+      const computedLineHeight = style.lineHeight;
+
+      if (computedLineHeight !== "normal") {
+        lineHeight = parseInt(computedLineHeight, 10);
+      } else {
+        // Estimate line height based on font size if 'normal'
+        const fontSize = parseInt(style.fontSize, 10);
+        lineHeight = Math.floor(fontSize * 1.2);
+      }
+    }
+  }
 </script>
 
 <!-- <div class="text-black text-sm md:ml-2 mb-1">
@@ -610,8 +729,7 @@
           toast.warning(
             "Some products are invalid. Please review before adding to cart.",
           );
-        } else
-        if (validatedProducts.length > 0) {
+        } else if (validatedProducts.length > 0) {
           setTimeout(() => {
             if (data?.authedUser && data?.authedUser?.id) {
               const cartForm = document.getElementById("cartForm");
@@ -661,73 +779,78 @@
   {/if}
 
   <section class="w-full mx-auto md:flex items-center gap-5">
-    <div
+    <!-- <div
       class="md:w-3/5 h-72 border bg-white rounded-md overflow-hidden p-5 relative"
+    > -->
+    <div
+      class="w-full relative overflow-hidden border border-primary-200 focus:ring-0 focus:border-primary-400 h-72 md:w-3/5 rounded-md"
     >
-      <div
-        class="w-full h-full relative overflow-hidden border border-gray-300 rounded-md"
-      >
-        <div class="overflow-auto h-full" bind:this={scrollContainer}>
-          {#if rawFileData.length === 0}
-            <div class="p-2 text-gray-400 text-sm">
-              <p>Upload a file containing product data...</p>
+      <div class="overflow-hidden" bind:this={scrollContainer}>
+        <div class="relative">
+          <!-- Main textarea for product entry -->
+          <textarea
+            bind:value={rawFileData}
+            on:input={handleTextChange}
+            on:scroll={handleScroll}
+            class="w-full h-72 p-3 font-mono border-primary-200 focus:ring-0 focus:border-primary-400"
+            bind:this={textareaElement}
+            placeholder="Upload a file containing product data...
+Example file content:
+7987565-50G,1
+657890-100G,5
+345678-25G,3"
+          ></textarea>
 
-              Example file content:
-
-              <p>7987565-50G,1</p>
-              <p>657890-100G,5</p>
-              <p>345678-25G,3</p>
-            </div>
-          {:else}
-            {#each rawFileData.trim().split("\n") as line, index}
-              <div class="flex items-center p-1 relative hover:bg-gray-100">
-                <pre class="flex-grow">{line.trim()}</pre>
-
-                {#if isValidated}
-                  {#if validationMessages.some( (msg) => line.includes(msg.productNumber), )}
-                    {@const message = validationMessages.find((msg) =>
-                      line.includes(msg.productNumber),
-                    )}
-                    {#if message?.isValid}
-                      <div
-                        class="flex items-center text-green-500 ml-2 whitespace-nowrap"
-                      >
-                        <span class="text-xs mr-2">Valid Product</span>
-                        <Icon icon="mdi:check-circle" class="text-lg" />
-                      </div>
-                    {:else}
-                      <div
-                        class="flex items-center text-red-500 ml-2 whitespace-nowrap"
-                      >
-                        <span class="text-xs mr-2">{message?.message}</span>
-                        <button
-                          type="button"
-                          class="text-red-500 hover:text-red-700"
-                          title="Remove invalid product"
-                          on:click={() => removeInvalidProduct(index)}
+          {#if isValidated && rawFileData.trim()}
+            <div
+              class="absolute mt-2 top-0 left-0 w-full h-full pointer-events-none"
+              bind:this={overlayElement}
+              style="transform: translateY({-scrollTop}px);"
+            >
+              {#each rawFileData.trim().split("\n") as line, index}
+                {#if index * lineHeight >= scrollTop - lineHeight * 2 && index * lineHeight <= scrollTop + viewportHeight}
+                  <div
+                    class="flex items-center pointer-events-auto"
+                    style="position: absolute; top: {3 +
+                      index * lineHeight}px; right: 10px;"
+                  >
+                    {#if validationMessages.some( (msg) => line.includes(msg.productNumber), )}
+                      {@const message = validationMessages.find((msg) =>
+                        line.includes(msg.productNumber),
+                      )}
+                      {#if message?.isValid}
+                        <div
+                          class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
                         >
-                          <Icon icon="mdi:close-circle" class="text-lg" />
-                        </button>
-                      </div>
+                          <span class="text-xs mr-1">Valid</span>
+                          <Icon icon="mdi:check-circle" class="text-base" />
+                        </div>
+                      {:else}
+                        <div
+                          class="flex items-center mt-2 text-red-500 bg-white bg-opacity-75 rounded px-1 mr-3"
+                        >
+                          <span class="text-xs mr-1">{message?.message}</span>
+                          <button
+                            type="button"
+                            class="text-red-500 hover:text-red-700 pointer-events-auto"
+                            title="Remove invalid product"
+                            on:click={() => removeInvalidProduct(index)}
+                          >
+                            <Icon icon="mdi:close-circle" class="text-base" />
+                          </button>
+                        </div>
+                      {/if}
                     {/if}
-                  {/if}
+                  </div>
                 {/if}
-              </div>
-            {/each}
-            <textarea
-              bind:value={rawFileData}
-              on:input={handleTextChange}
-              reaonly
-              class="sr-only"
-              tabindex="-1"
-              aria-hidden="true"
-            ></textarea>
+              {/each}
+            </div>
           {/if}
         </div>
       </div>
-
-
     </div>
+
+    <!-- </div> -->
 
     <section class="mt-3 md:mt-0 md:w-2/5">
       <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -830,23 +953,33 @@
   {#if validationMessages.length > 0 && isValidated}
     <div class="mt-4">
       {#if validationMessages.some((message) => !message.isValid)}
+        <button
+          type="button"
+          class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+          on:click={removeAllInvalidProducts}
+        >
+          Remove All Invalid Products
+        </button>
         <div class="p-4 bg-yellow-50 rounded-md">
           <h3 class="text-yellow-700 font-medium mb-2">Invalid Products:</h3>
-          <ul class="space-y-2">
-            {#each validationMessages.filter((message) => !message.isValid) as message}
-              <li class="flex items-center justify-between">
-                <span class="text-yellow-600">
-                  Product: {message.productNumber} - {message.message}
-                </span>
-                <span class="text-yellow-600 font-medium"
-                  >Cannot be added to cart</span
-                >
-              </li>
-            {/each}
-          </ul>
+          {#if validationMessages.filter((message) => !message.isValid).length < 10}
+            <ul class="space-y-2">
+              {#each validationMessages.filter((message) => !message.isValid) as message}
+                <li class="flex items-center justify-between">
+                  <span class="text-yellow-600">
+                    Product: {message.productNumber} - {message.message}
+                  </span>
+                  <span class="text-yellow-600 font-medium"
+                    >Cannot be added to cart</span
+                  >
+                </li>
+              {/each}
+            </ul>
+          {/if}
           <p class="mt-3 text-sm text-yellow-600">
-            Please remove invalid products using the X button in the text area
-            or proceed with only valid products.
+            Please remove invalid products using the <span
+              ><Icon icon="mdi:close-circle" class="text-base inline" /></span
+            > button in the text area or proceed with only valid products.
           </p>
         </div>
       {/if}
