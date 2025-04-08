@@ -12,7 +12,7 @@
 	});
 
 	const user = $authedUser?.email;
-	let email = '';
+	let email = user;
 	let orderNumber = '';
 	let error = {};
 	let showErrorPopup = false;
