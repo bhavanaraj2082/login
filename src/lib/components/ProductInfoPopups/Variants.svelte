@@ -97,7 +97,7 @@
                     src="{PUBLIC_IMAGE_URL}/{variant?.imageSrc}"
                     alt={variant.productNumber}
                     class="w-20 h-20 object-contain"
-                    onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+                    onerror="this.src='/fallback.jpg'"
                   />
                 </a>
               </td>

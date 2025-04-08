@@ -293,7 +293,7 @@
               src="{PUBLIC_IMAGE_URL}/{product?.imageSrc}"
               alt="Product Image"
               class="w-56 h-56 object-contain"
-              onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+              onerror="this.src='/fallback.jpg'"
             />
             <div
               class="absolute bottom-full left-1/2 transform -translate-x-1/2 w-max px-3 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap"
