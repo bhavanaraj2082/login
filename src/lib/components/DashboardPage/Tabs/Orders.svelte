@@ -17,6 +17,7 @@
     let userOrderType = null;
     let userEmail = data.authedUser.email
     let calendarComponent;
+    let isLoading = false;
     
     let filters = {
         status: '',
@@ -513,18 +514,18 @@ function downloadAsExcel(order) {
             </div>
         </div>
     </div>
-    <div class="overflow-x-auto rounded-md shadow">
+    <div class="overflow-x-auto rounded-md shadow hide">
         <table class="w-full border-collapse border border-gray-100">
             <thead class="bg-gradient-to-r from-primary-500 to-primary-600 text-white uppercase text-xs tracking-wider">
                 <tr>
-                    <th class="px-4 py-2 text-sm font-semibold">DATE</th>
-                    <th class="px-4 py-2 text-sm font-semibold">ORDER NUMBER</th>
+                    <th class="px-4 py-2 text-sm font-medium">DATE</th>
+                    <th class="px-4 py-2 text-sm font-medium">ORDER NUMBER</th>
                     {#if order.some(order => order?.purchaseorder)}
-                    <th class="px-4 py-2 text-sm font-semibold">PURCHASE ORDER NUMBER</th>
+                    <th class="px-4 py-2 text-sm font-medium">PURCHASE ORDER NUMBER</th>
                   {/if}
-                    <th class="px-4 py-2 text-sm font-semibold">TOTAL</th>
-                    <th class="px-4 py-2 text-sm font-semibold">STATUS</th>
-                    <th class="px-4 py-2 text-sm font-semibold">ACTIONS</th>
+                    <th class="px-4 py-2 text-sm font-medium">TOTAL</th>
+                    <th class="px-4 py-2 text-sm font-medium">STATUS</th>
+                    <th class="px-4 py-2 text-sm font-medium">ACTIONS</th>
                 </tr>
             </thead>
             <tbody>
@@ -544,7 +545,7 @@ function downloadAsExcel(order) {
                         {/if} -->
                         <td class="px-4 py-2 text-xs">{formatCurrency(order?.totalprice || 0, order?.currency || 'INR')}</td>
                         <td class="px-4 py-2 text-xs">
-                            <a href={`/order-status/${order?.orderid}?email=${userEmail}`} class="text-blue-500 hover:text-blue-700">
+                            <!-- <a href={`/order-status/${order?.orderid}?email=${userEmail}`} class="text-blue-500 hover:text-blue-700"> -->
                                 <span class={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1 ${
                                     order?.status === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
                                     order?.status === 'cancelled' ? 'bg-red-100 text-red-800 border border-red-200' :
@@ -562,13 +563,39 @@ function downloadAsExcel(order) {
                                     } width="16" height="16" />
                                     {order?.status.charAt(0).toUpperCase() + order?.status.slice(1)}
                              </span>
-                            </a>
+                            <!-- </a> -->
                         </td>
-                        <td class="px-4 py-2">
-                            <button class="text-primary-500 text-xs hover:text-primary-700 transition-colors duration-200">
-                                {expandedOrderId === order?._id ? 'Hide Details' : 'Show Details'}
+                        <td class="text-center px-1 py-4 flex justify-center gap-1">
+                            <button
+                              type="button"
+                              disabled={isLoading}
+                              on:click={() => toggleOrderDetails(order?._id)}
+                              class="px-2 py-1 border text-primary-500 hover:text-white rounded hover:bg-primary-600 transition-all duration-300 flex items-center gap-1 relative group">
+                              <!-- svelte-ignore a11y-click-events-have-key-events -->
+                              <!-- svelte-ignore a11y-no-static-element-interactions -->
+                              <span class="relative" on:click={() => toggleOrderDetails(order?._id)}>
+                                <Icon
+                                  icon={isLoading ? 'mdi:loading' : (expandedOrderId === order?._id ? 'mdi:chevron-up' : 'mdi:chevron-down')}
+                                  class="text-xl {isLoading ? 'animate-spin' : ''}"/>
+                                  <span class="absolute left-1/2 transform -translate-x-1/2 z-50 whitespace-nowrap top-full mt-2 px-2 bg-gray-200 text-gray-600 text-2s py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                      {expandedOrderId === order?._id ? 'Hide Details' : 'Show Details'}
+                                    </span>
+                              </span>
                             </button>
-                        </td>
+                              <span class="text-gray-400 px-2">|</span>
+                              <a href={`/order-status/${order?.orderid}?email=${userEmail}`} >
+                                  <button
+                                      type="button"
+                                      class="px-2 py-1 border text-primary-500 hover:text-white rounded hover:bg-primary-600 transition-all duration-300 flex items-center gap-1 relative group">
+                                      <span class="relative">
+                                          <Icon icon="fluent:open-24-filled" class="text-xl" />
+                                          <span class="absolute left-1/2 transform -translate-x-1/2 z-50 whitespace-nowrap top-full mt-2 px-2 bg-gray-200 text-gray-600 text-2s py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                              Order Status
+                                          </span>
+                                      </span>
+                                  </button>
+                              </a>
+                          </td>
                     </tr>
                     {#if expandedOrderId === order?._id}
                         <tr class="bg-white" >

@@ -229,7 +229,7 @@ function getStatusColor (status) {
         <input 
             type="text" 
             placeholder="Search by Name, Quote ID, or Solution Type" 
-            class="w-full h-10 border border-gray-400 focus:ring-0 focus:border-primary-500 rounded px-4 py-2 pl-10 text-sm outline-none transition-all duration-200" 
+            class="w-full h-10 border border-gray-400 focus:ring-0 focus:border-primary-500 rounded-md px-4 py-2 pl-10 text-sm outline-none transition-all duration-200" 
             value={filters.searchTerm} 
             on:input={handleSearch}/>
         {#if filters.searchTerm}
@@ -255,7 +255,9 @@ function getStatusColor (status) {
         </div>
     </div>
     <div class="pt-2">
-        <a href="/quotes" class="whitespace-nowrap justify-start items-center py-2.5 px-4 rounded-md text-white bg-primary-500 hover:bg-primary-600 transition-all duration-300">Create Quote</a>
+        <a href="/quotes" class="whitespace-nowrap justify-start items-center py-2.5 px-4 rounded-md text-white bg-primary-500 hover:bg-primary-600 transition-all duration-300">
+           + Create Quote
+        </a>
     </div>
 </div>
   <div class="overflow-x-auto bg-white shadow rounded overflow-hidden">
@@ -301,8 +303,8 @@ function getStatusColor (status) {
                             <!-- <span class={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1 ${getTransactionStatusClass(quote.status )}`}>
                               <Icon icon={getTransactionStatusIcon(quote.status )} width="16" height="16" />
                           </span> -->
-                              <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full {getStatusColor(quote.status)}">
-                                <Icon icon={getStatusIcon(quote.status )} width="16" height="16" />
+                              <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold border border-yellow-700 rounded-full {getStatusColor(quote.status)}">
+                                <Icon icon={getStatusIcon(quote.status )} class="text-lg"/>
                                   {quote?.status || 'N/A'}
                               </span>
                           </td>
