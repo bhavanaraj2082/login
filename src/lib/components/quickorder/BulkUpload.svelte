@@ -497,6 +497,10 @@
           console.error(`Error: Missing manufacturer for ${product.productNumber}`);
           return; // Skip this product
         }
+        if (!product.quantity) {
+          console.error(`Error: Missing manufacturer for ${product.quantity}`);
+          return; // Skip this product
+        }
         
         if (!product.stockId) {
           console.error(`Error: Missing stockId for ${product.productNumber}`);
@@ -521,6 +525,8 @@
 
         productsToAdd.push(newProduct);
         console.log(`Prepared product ${newProduct.partNumber} for cart addition`);
+        console.log(`Prepared product ${newProduct.partNumber.length} for cart additio`);
+        
       } else {
         // Log detailed error about why validation failed
         console.error(`Product ${product.productNumber || product.productNumber} did not pass validation:`);
@@ -707,9 +713,9 @@
     );
 
     cartloading = false;
-    setTimeout(() => {
-      window.location.href = "/cart";
-    }, 2000);
+    // setTimeout(() => {
+    //   window.location.href = "/cart";
+    // }, 2000);
   } catch (err) {
     cartloading = false;
     console.error("Error saving to localStorage:", err);
@@ -1224,9 +1230,9 @@ Example file content:
               toast.success(
                 `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`,
               );
-              setTimeout(() => {
-                window.location.href = "/cart";
-              }, 2000);
+              // setTimeout(() => {
+              //   window.location.href = "/cart";
+              // }, 2000);
             } else {
               throw new Error(resultData[1] || "Failed to add items to cart");
             }

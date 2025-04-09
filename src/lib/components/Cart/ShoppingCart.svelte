@@ -493,7 +493,7 @@
 									on:click={() => imagemodal(item.productDetails.imageSrc)} /> -->
 
 									<img 
-									src="{PUBLIC_IMAGE_URL}/{item.productDetails.image}"
+									src="{PUBLIC_IMAGE_URL}/{item.productDetails?.image}"
 									onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
 									class="cursor-pointer w-24 h-24 objec-cover bg-red-200" 
 									alt={item.productDetails.productName}
