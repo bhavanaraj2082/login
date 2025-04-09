@@ -8,7 +8,7 @@
   export let togglePopup
   export let cartId
 
-  $: month = recurrence?.recurring ? (recurrence?.recurring !== 1 && recurrence?.recurring !== 3 && recurrence?.recurring !== 6 && recurrence?.recurring !== 12 ? "Custom" : String(recurrence?.recurring)) : undefined
+  $: month = recurrence?.recurring ? (recurrence?.recurring !== 1 && recurrence?.recurring !== 3 && recurrence?.recurring !== 6 && recurrence?.recurring !== 12 ? "Custom" : String(recurrence?.recurring)) : "1"
   let custom =  String(recurrence?.recurring)
   let popup
   let error = ""

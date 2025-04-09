@@ -448,14 +448,14 @@
 					
 							<h3 class=" lg:hidden font-medium text-xs sm:text-sm">Product</h3>
 							<div class="flex items-center w-full md:w-6/12 md:pr-2">
-				<img src="{PUBLIC_IMAGE_URL}/{item.productDetails.image}" onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"  alt={item.productDetails.productName} class="w-20 h-20 shrink-0 object-cover rounded-md" />
+				<img src="{PUBLIC_IMAGE_URL}/{item?.productDetails?.image}" onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"  alt={item?.productDetails?.productName} class="w-20 h-20 shrink-0 object-cover rounded-md" />
 								<div class="ml-2">
-									<p class="text-sm text-black font-semibold">{item.productDetails.productNumber}</p>
-									<p class=" text-gray-800 text-xs lg:text-3s font-medium">{item.productDetails.productName}</p>
-									<p class=" text-gray-600 text-xs font-semibold">{item.pricing.break}</p>
-									<p class=" {item.quantity > item.stockDetails.stock ? " text-red-500" :" text-green-500"} text-xs font-semibold">
-										{item.quantity > item.stockDetails.stock ? item.quantity - item.stockDetails.stock + " Back Order" : item.stockDetails.stock + " In Stock"}
-										<span class="{item.quantity > item.stockDetails.stock ? "" : " hidden"} text-green-500 ml-1">{item.stockDetails.stock + " In Stock"}</span>
+									<p class="text-sm text-black font-semibold">{item?.productDetails?.productNumber}</p>
+									<p class=" text-gray-800 text-xs lg:text-3s font-medium">{item?.productDetails?.productName}</p>
+									<p class=" text-gray-600 text-xs font-semibold">{item?.pricing?.break}</p>
+									<p class=" {item.quantity > item?.stockDetails?.stock ? " text-red-500" :" text-green-500"} text-xs font-semibold">
+										{item.quantity > item?.stockDetails?.stock ? item.quantity - item?.stockDetails?.stock + " Back Order" : item?.stockDetails?.stock + " In Stock"}
+										<span class="{item.quantity > item?.stockDetails?.stock ? "" : " hidden"} text-green-500 ml-1">{item?.stockDetails?.stock + " In Stock"}</span>
 									</p>
 								</div>
 							</div>
@@ -465,15 +465,15 @@
 									<h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Price</h3>
 									<div class="{item.isCart || item.isQuote ? " text-green-500" : ""} text-xs gap-1 w-full font-semibold">
 										<div class=" flex gap-2 sm:block">
-									        {$currencyState === "inr" ? "₹" + (item.currentPrice.INR * (1 + (18 / 100))).toLocaleString("en-IN"): "$"+ (item.currentPrice.USD * (1 + (18 / 100))).toLocaleString("en-IN")} with GST
+									        {$currencyState === "inr" ? "₹" + (item?.currentPrice?.INR * (1 + (18 / 100))).toLocaleString("en-IN"): "$"+ (item?.currentPrice?.USD * (1 + (18 / 100))).toLocaleString("en-IN")} with GST
 										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} line-through text-slate-300">
-										    {$currencyState === "inr" ? "₹" + (item.normalPrice.INR * (1 + (18 / 100))).toLocaleString("en-IN"): "$"+ (item.normalPrice.USD * (1 + (18 / 100))).toLocaleString("en-IN")} with GST
+										    {$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR * (1 + (18 / 100))).toLocaleString("en-IN"): "$"+ (item?.normalPrice?.USD * (1 + (18 / 100))).toLocaleString("en-IN")} with GST
 										    </p>
 									    </div>
 									<div class=" text-2s text-gray-400 flex gap-2 sm:block">
-										{$currencyState === "inr" ? "₹" + item.currentPrice.INR.toLocaleString("en-IN"): "$"+ item.currentPrice.USD.toLocaleString("en-IN")} without GST
+										{$currencyState === "inr" ? "₹" + item?.currentPrice?.INR.toLocaleString("en-IN"): "$"+ item?.currentPrice?.USD.toLocaleString("en-IN")} without GST
 										<p class=" {item.isCart || item.isQuote ? "" : "hidden"} line-through text-slate-300">
-										{$currencyState === "inr" ? "₹" + item.normalPrice.INR.toLocaleString("en-IN"): "$"+ item.normalPrice.USD.toLocaleString("en-IN")} without GST
+										{$currencyState === "inr" ? "₹" + item?.normalPrice?.INR.toLocaleString("en-IN"): "$"+ item.normalPrice?.USD.toLocaleString("en-IN")} without GST
 										</p>
 									</div>
 									</div>
@@ -506,15 +506,15 @@
 							        <div class=" w-full flex justify-start items-center">
 									<div class=" {item.isCart || item.isQuote ? " text-green-500" : ""} text-xs w-full font-semibold">
 										<div class=" flex gap-2 sm:block">
-											{$currencyState === "inr" ? "₹" + (item.currentPrice.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN"): "$"+ (item.currentPrice.USD * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST
+											{$currencyState === "inr" ? "₹" + (item?.currentPrice?.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN"): "$"+ (item?.currentPrice?.USD * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST
 										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} line-through text-slate-300">
-										    {$currencyState === "inr" ? "₹" + (item.normalPrice.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN"): "$"+ (item.normalPrice.USD * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST
+										    {$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN"): "$"+ (item?.normalPrice?.USD * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST
 										    </p>
 										</div>
 										<div class="  text-gray-400 text-2s flex gap-2 sm:block">
-											{$currencyState === "inr" ? "₹" + (item.currentPrice.INR * item.quantity).toLocaleString("en-IN"): "$"+ (item.currentPrice.USD * item.quantity).toLocaleString("en-IN")} without GST
+											{$currencyState === "inr" ? "₹" + (item?.currentPrice?.INR * item.quantity).toLocaleString("en-IN"): "$"+ (item?.currentPrice?.USD * item.quantity).toLocaleString("en-IN")} without GST
 											<p class=" {item.isCart || item.isQuote ? "" : "hidden"} line-through text-slate-300">
-											{$currencyState === "inr" ? "₹" + (item.normalPrice.INR * item.quantity).toLocaleString("en-IN"): "$"+ (item.normalPrice.USD * item.quantity).toLocaleString("en-IN")} without GST
+											{$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR * item.quantity).toLocaleString("en-IN"): "$"+ (item?.normalPrice?.USD * item.quantity).toLocaleString("en-IN")} without GST
 											</p>
 									    </div>
 										</div>
