@@ -344,20 +344,11 @@ export const actions = {
 
         const cartItem = {
           productId: item.id,
-          productName: item.productName,
-
           manufacturerId: item.manufacturerId || '',
           distributorId: item.distributerId || '',
           stockId: item.stockId || '',
           quantity: item.quantity || '',
           backOrder: item.backOrder,
-          offerPrice: {
-            usd: item.usdPrice,
-            inr: item.inrPrice * 75
-          },
-          isQuote: false,
-          isBom: false,
-          isOffered: false
         };
 
         // console.log('Prepared Cart Item:', cartItem);

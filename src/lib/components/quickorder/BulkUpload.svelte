@@ -394,33 +394,115 @@
     }
   }
 
+  // function prepareValidatedProductsForCart() {
+  //   const productsToAdd = [];
+  //   if (!validatedProducts || validatedProducts.length === 0) {
+  //     toast.error("No valid items to add to cart");
+  //     return productsToAdd;
+  //   }
+  //   const validProducts = validatedProducts.filter(
+  //     (product) => product.isValid === true,
+  //   );
+
+  //   validProducts.forEach((product) => {
+  //     if (
+  //       product.stockMessage ===
+  //         "Stock is sufficient for all uploaded quantities" ||
+  //       "SKU is valid" ||
+  //       (product.productNumber &&
+  //         product.productName &&
+  //         // product.pricing &&
+  //         // product.pricing[0] &&
+  //         // product.pricing[0].break &&
+  //         product.stock > 0)
+  //     ) {
+  //       console.log(`Product ${product.productName} passed validation check`);
+
+  //       // const sizePriceInfo = product.pricing[0];
+  //       // const size = sizePriceInfo.break;
+  //       // const price = sizePriceInfo.price;
+  //       const rowQuantity = parseInt(product.quantity, 10) || 0;
+  //       const productStock = parseInt(product.stock, 10) || 0;
+  //       const backOrder = Math.max(rowQuantity - productStock, 0);
+
+  //       const newProduct = {
+  //         id: product.productId,
+  //         manufacturerId: product.manufacturer,
+  //         distributerId: product.distributer ? product.distributer : null,
+  //         stockId: product.stockId,
+  //         productName: product.productName,
+  //         partNumber: product.productNumber,
+  //         // priceSize: {
+  //         //   price: price,
+  //         //   size: size,
+  //         // },
+  //         quantity: product.quantity || 1,
+  //         backOrder: backOrder,
+  //         stock: product.stock,
+  //       };
+
+  //       productsToAdd.push(newProduct);
+  //       console.log(
+  //         `Prepared product ${newProduct.productName} for cart addition`,
+  //       );
+  //     } else {
+  //       console.log(`Product ${product.productName} did not pass validation.`);
+  //     }
+  //   });
+
+  //   console.log(`Prepared ${productsToAdd.length} products for cart`);
+  //   return productsToAdd;
+  // }
+  
   function prepareValidatedProductsForCart() {
-    const productsToAdd = [];
-    if (!validatedProducts || validatedProducts.length === 0) {
-      toast.error("No valid items to add to cart");
-      return productsToAdd;
-    }
-    const validProducts = validatedProducts.filter(
-      (product) => product.isValid === true,
-    );
-
-    validProducts.forEach((product) => {
+  const productsToAdd = [];
+  
+  // Check if validatedProducts exists and has items
+  if (!validatedProducts || validatedProducts.length === 0) {
+    console.error("Error: No validated products available");
+    toast.error("No valid items to add to cart");
+    return productsToAdd;
+  }
+  
+  // Filter valid products
+  const validProducts = validatedProducts.filter(product => product.isValid === true);
+  
+  if (validProducts.length === 0) {
+    console.error("Error: No valid products found after filtering");
+    toast.error("No valid products found after validation");
+    return productsToAdd;
+  }
+  
+  validProducts.forEach((product) => {
+    try {
+      // Fix the conditional logic - previous version had a logic error
       if (
-        product.stockMessage ===
-          "Stock is sufficient for all uploaded quantities" ||
-        "SKU is valid" ||
-        (product.productNumber &&
-          product.productName &&
-          // product.pricing &&
-          // product.pricing[0] &&
-          // product.pricing[0].break &&
-          product.stock > 0)
+        (product.message === "Stock is sufficient for all uploaded quantities" || 
+         product.message === "SKU is valid") && 
+        product.productNumber 
       ) {
-        console.log(`Product ${product.productName} passed validation check`);
-
-        // const sizePriceInfo = product.pricing[0];
-        // const size = sizePriceInfo.break;
-        // const price = sizePriceInfo.price;
+        console.log(`Product ${product.productNumber} passed validation check`);
+        
+        // Check required fields and log errors if missing
+        if (!product.productId) {
+          console.error(`Error: Missing productId for ${product.productNumber}`);
+          return; // Skip this product
+        }
+        if (!product.distributer) {
+          console.error(`Error: Missing distributer for ${product.productNumber}`);
+          return; // Skip this product
+        }
+        
+        if (!product.manufacturer) {
+          console.error(`Error: Missing manufacturer for ${product.productNumber}`);
+          return; // Skip this product
+        }
+        
+        if (!product.stockId) {
+          console.error(`Error: Missing stockId for ${product.productNumber}`);
+          return; // Skip this product
+        }
+        
         const rowQuantity = parseInt(product.quantity, 10) || 0;
         const productStock = parseInt(product.stock, 10) || 0;
         const backOrder = Math.max(rowQuantity - productStock, 0);
@@ -431,31 +513,36 @@
           distributerId: product.distributer ? product.distributer : null,
           stockId: product.stockId,
           productName: product.productName,
-          image: product.image,
           partNumber: product.productNumber,
-          description: product.prodDesc,
-          // priceSize: {
-          //   price: price,
-          //   size: size,
-          // },
           quantity: product.quantity || 1,
           backOrder: backOrder,
-          stock: product.stock,
+          stock: product.stock
         };
 
         productsToAdd.push(newProduct);
-        console.log(
-          `Prepared product ${newProduct.productName} for cart addition`,
-        );
+        console.log(`Prepared product ${newProduct.partNumber} for cart addition`);
       } else {
-        console.log(`Product ${product.productName} did not pass validation.`);
+        // Log detailed error about why validation failed
+        console.error(`Product ${product.productNumber || product.productNumber} did not pass validation:`);
+        console.error(`- Stock message: ${product.message || 'Missing'}`);
+        console.error(`- Product number exists: ${!!product.productNumber}`);
+        console.error(`- Product name exists: ${!!product.productNumber}`);
+        console.error(`- Stock value: ${product.stock}`);
       }
-    });
+    } catch (err) {
+      console.error(`Error processing product ${product.productNumber || product.productNumber}:`, err);
+    }
+  });
 
-    console.log(`Prepared ${productsToAdd.length} products for cart`);
-    return productsToAdd;
+  console.log(`Prepared ${productsToAdd.length} products for cart`);
+  
+  if (productsToAdd.length === 0) {
+    console.error("Error: No products prepared for cart after all checks");
+    toast.error("No valid items could be added to cart");
   }
-
+  
+  return productsToAdd;
+}
   function attemptAddToCart() {
     if (!isValidated || duplicateEntries.length > 0) {
       // validateAndSubmitData();
@@ -504,61 +591,131 @@
       }
     }
   }
+  // function handleLocalStorage() {
+  //   try {
+  //     cartloading = true;
+  //     const productsToAdd = prepareValidatedProductsForCart();
+  //     const simplifiedCartItems = productsToAdd.map((item) => ({
+  //       productId: item.id,
+  //       productName:item.productName,
+  //       manufacturerId: item.manufacturerId,
+  //       stockId: item.stockId,
+  //       distributorId: item.distributerId,
+  //       quantity: item.quantity || 1,
+  //       backOrder: item.backOrder,
+  //     }));
+
+  //     if (productsToAdd.length === 0) {
+  //       cartloading = false;
+  //       toast.error("No valid items to add to cart");
+  //       return;
+  //     }
+
+  //     const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+  //     const updatedCart = [...existingCart];
+  //     simplifiedCartItems.forEach((newItem) => {
+  //       const existingItemIndex = updatedCart.findIndex(
+  //         (cartItem) =>
+  //           cartItem.productId === newItem.productId &&
+  //           cartItem.stockId === newItem.stockId &&
+  //           cartItem.manufacturerId === newItem.manufacturerId,
+  //       );
+
+  //       if (existingItemIndex !== -1) {
+  //         updatedCart[existingItemIndex].quantity += newItem.quantity;
+  //         updatedCart[existingItemIndex].backOrder += newItem.backOrder;
+  //       } else {
+  //         updatedCart.push(newItem);
+  //       }
+  //     });
+
+  //     localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+  //     const productsAddedCount = productsToAdd.length;
+  //     toast.success(
+  //       `${productsAddedCount} valid ${productsAddedCount === 1 ? "item" : "items"} saved to cart.`,
+  //     );
+
+  //     cartloading = false;
+  //     setTimeout(() => {
+  //       window.location.href = "/cart";
+  //     }, 2000);
+  //   } catch (err) {
+  //     cartloading = false;
+  //     console.error("Error saving to localStorage:", err);
+  //     toast.error("Failed to save items to cart");
+  //   }
+  // }
   function handleLocalStorage() {
-    try {
-      cartloading = true;
-      const productsToAdd = prepareValidatedProductsForCart();
-      const simplifiedCartItems = productsToAdd.map((item) => ({
+  try {
+    cartloading = true;
+    const productsToAdd = prepareValidatedProductsForCart();
+    
+    if (productsToAdd.length === 0) {
+      cartloading = false;
+      toast.error("No valid items to add to cart");
+      return;
+    }
+    
+    const simplifiedCartItems = productsToAdd.map((item) => {
+      // Verify all required fields exist before mapping
+      if (!item.id || !item.manufacturerId || !item.stockId) {
+        console.error("Error: Missing required fields for cart item:", item);
+        return null;
+      }
+      
+      return {
         productId: item.id,
-        productName:item.productName,
         manufacturerId: item.manufacturerId,
         stockId: item.stockId,
         distributorId: item.distributerId,
         quantity: item.quantity || 1,
         backOrder: item.backOrder,
-      }));
+      };
+    }).filter(item => item !== null); // Remove null items
+    
+    if (simplifiedCartItems.length === 0) {
+      cartloading = false;
+      toast.error("No valid items could be processed for cart");
+      return;
+    }
 
-      if (productsToAdd.length === 0) {
-        cartloading = false;
-        toast.error("No valid items to add to cart");
-        return;
-      }
-
-      const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
-      const updatedCart = [...existingCart];
-      simplifiedCartItems.forEach((newItem) => {
-        const existingItemIndex = updatedCart.findIndex(
-          (cartItem) =>
-            cartItem.productId === newItem.productId &&
-            cartItem.stockId === newItem.stockId &&
-            cartItem.manufacturerId === newItem.manufacturerId,
-        );
-
-        if (existingItemIndex !== -1) {
-          updatedCart[existingItemIndex].quantity += newItem.quantity;
-          updatedCart[existingItemIndex].backOrder += newItem.backOrder;
-        } else {
-          updatedCart.push(newItem);
-        }
-      });
-
-      localStorage.setItem("cart", JSON.stringify(updatedCart));
-
-      const productsAddedCount = productsToAdd.length;
-      toast.success(
-        `${productsAddedCount} valid ${productsAddedCount === 1 ? "item" : "items"} saved to cart.`,
+    const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+    const updatedCart = [...existingCart];
+    
+    simplifiedCartItems.forEach((newItem) => {
+      const existingItemIndex = updatedCart.findIndex(
+        (cartItem) =>
+          cartItem.productId === newItem.productId &&
+          cartItem.stockId === newItem.stockId &&
+          cartItem.manufacturerId === newItem.manufacturerId,
       );
 
-      cartloading = false;
-      setTimeout(() => {
-        window.location.href = "/cart";
-      }, 2000);
-    } catch (err) {
-      cartloading = false;
-      console.error("Error saving to localStorage:", err);
-      toast.error("Failed to save items to cart");
-    }
+      if (existingItemIndex !== -1) {
+        updatedCart[existingItemIndex].quantity += newItem.quantity;
+        updatedCart[existingItemIndex].backOrder += newItem.backOrder;
+      } else {
+        updatedCart.push(newItem);
+      }
+    });
+
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+
+    const productsAddedCount = simplifiedCartItems.length;
+    toast.success(
+      `${productsAddedCount} valid ${productsAddedCount === 1 ? "item" : "items"} saved to cart.`,
+    );
+
+    cartloading = false;
+    setTimeout(() => {
+      window.location.href = "/cart";
+    }, 2000);
+  } catch (err) {
+    cartloading = false;
+    console.error("Error saving to localStorage:", err);
+    toast.error("Failed to save items to cart: " + err.message);
   }
+}
   function mapInvalidProductsToLines() {}
 
   let fileInput;
@@ -566,20 +723,6 @@
   function triggerUpload() {
     fileInput.click();
   }
-  // function handleDrop(event) {
-  //   event.preventDefault();
-  //   if (dropzone) {
-  //     dropzone.classList.remove("bg-primary-100", "text-primary-600");
-  //   }
-
-  //   const file = event.dataTransfer.files[0];
-  //   if (file) {
-  //     const mockEvent = {
-  //       dataTransfer: event.dataTransfer,
-  //     };
-  //     handleFileInputChange(mockEvent);
-  //   }
-  // }
   function handleDrop(event) {
     event.preventDefault();
     if (dropzone) {
@@ -802,7 +945,7 @@ Example file content:
 345678-25G,3"
           ></textarea>
 
-          {#if isValidated && rawFileData.trim()}
+          <!-- {#if isValidated && rawFileData.trim()}
             <div
               class="absolute mt-2 top-0 left-0 w-full h-full pointer-events-none"
               bind:this={overlayElement}
@@ -846,7 +989,59 @@ Example file content:
                 {/if}
               {/each}
             </div>
+          {/if} -->
+          {#if isValidated && rawFileData.trim()}
+  <div
+    class="absolute mt-2 top-0 left-0 w-full h-full pointer-events-none"
+    bind:this={overlayElement}
+    style="transform: translateY({-scrollTop}px);"
+  >
+    {#each rawFileData.trim().split("\n") as line, lineIndex}
+      {@const productInfo = line.split(',')[0].trim()}
+      {@const validationMessage = validationMessages.find((msg) => msg.productNumber === productInfo)}
+      
+      {#if lineIndex * lineHeight >= scrollTop - lineHeight * 2 && lineIndex * lineHeight <= scrollTop + viewportHeight}
+        <div
+          class="flex items-center pointer-events-auto"
+          style="position: absolute; top: {3 + lineIndex * lineHeight}px; right: 10px;"
+        >
+          {#if validationMessage}
+            {#if validationMessage.isValid === true}
+              <div
+                class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
+              >
+                <span class="text-xs mr-1">Valid</span>
+                <Icon icon="mdi:check-circle" class="text-base" />
+              </div>
+            {:else}
+              <div
+                class="flex items-center mt-2 text-red-500 bg-white bg-opacity-75 rounded px-1 mr-3"
+              >
+                <span class="text-xs mr-1">{validationMessage.message || "Invalid product"}</span>
+                <button
+                  type="button"
+                  class="text-red-500 hover:text-red-700 pointer-events-auto"
+                  title="Remove invalid product"
+                  on:click={() => removeInvalidProduct(lineIndex)}
+                >
+                  <Icon icon="mdi:close-circle" class="text-base" />
+                </button>
+              </div>
+            {/if}
+ 
+          {:else if isValidated}
+            <div
+              class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
+            >
+              <span class="text-xs mr-1">Valid</span>
+              <Icon icon="mdi:check-circle" class="text-base" />
+            </div>
           {/if}
+        </div>
+      {/if}
+    {/each}
+  </div>
+{/if}
         </div>
       </div>
     </div>
@@ -885,9 +1080,7 @@ Example file content:
             <p class="text-sm font-medium text-center px-2">
               Upload or drag and drop your CSV or XLS file to upload
             </p>
-            <!-- {#if fileError}
-            <p class="text-red-500 text-sm mt-1">{fileError}</p>
-          {/if} -->
+
           </div>
 
           <input
