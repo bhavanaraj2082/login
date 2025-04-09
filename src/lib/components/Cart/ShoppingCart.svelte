@@ -85,6 +85,16 @@
 			let cartData = data?.cart[0]?.cartItems || [];
 			cart.set(cartData);
 		    calculateTotalPrice($cart);
+			if(isLoggedIn && filteredGuestCart.length && !cartId.length){
+	    	const formdata = new FormData()
+	    	formdata.append("guestCart",JSON.stringify(filteredGuestCart))
+	    	sendMessage("?/newcart",formdata,(result)=>{
+	    		console.log(result);
+	    		localStorage.removeItem("cart")
+				filteredGuestCart = []
+	    		invalidate("data:cart")
+	    	})
+	    }
 		}
     });
 	let showModal = false;
@@ -429,17 +439,17 @@
 	<div class=" w-11/12 mx-auto flex flex-col xl:flex-row justify-between gap-4">
 		{#if loading}
 			<div
-				class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded shadow-md"
+				class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded-md shadow-md"
 			>
 				<p class=" font-medium text-lg md:text-xl xl:text-2xl">Loading...</p>
 			</div>
 		{:else if !$cart.length}
-			<div class="w-full flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white py-5 rounded shadow-sm">
+			<div class="w-full flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white py-5 rounded-md shadow-sm">
 				<Icon icon="ic:outline-shopping-cart" class="text-5xl text-primary-400 md:text-6xl" />
 				<p class=" font-bold text-lg md:text-xl">Cart is Empty</p>
 			</div>
 		{:else}
-			<div bind:this={items} class="w-full lg:w-4/4 xl:w-3/4 bg-white p-3 sm:px-4 sm:py-3 rounded-lg shadow-sm h-fit">
+			<div bind:this={items} class="w-full lg:w-4/4 xl:w-3/4 bg-white p-3 sm:px-4 sm:py-3 rounded-lg shadow h-fit">
 				<div class=" w-full sticky top-0 z-10 bg-white flex items-center justify-between mb-4 sm:space-y-1">
 					<div>
 						<h2 class=" text-xs sm:text-4s font-semibold">
@@ -452,22 +462,22 @@
 						<button
 					        type="button"
 					        on:click={()=>recureModal = true}
-					        class="{isLoggedIn ? "" : "hidden"} text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-medium">
-							<Icon icon="iconoir:calendar-rotate-solid" class=" text-lg sm:text-xl rounded text-white"/>
+					        class="{isLoggedIn ? "" : "hidden"} text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded-md text-white bg-primary-500 hover:bg-primary-600 font-medium">
+							<Icon icon="iconoir:calendar-rotate-solid" class=" text-lg sm:text-xl rounded-md text-white"/>
 					        <span class="hidden sm:block">{recurrence?.recurring ? "Edit" : "Recurrence"}</span>
 						</button>
 						<button
 					        type="button"
 					        on:click={downloadExcel}
-					        class=" text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-medium">
-							<Icon icon="mdi:file-download" class="text-lg sm:text-xl rounded text-white"/>
+					        class=" text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded-md text-white bg-primary-500 hover:bg-primary-600 font-medium">
+							<Icon icon="mdi:file-download" class="text-lg sm:text-xl rounded-md text-white"/>
 					        <span class="hidden sm:block">Download</span>
 						</button>
 				        <button
 					        type="button"
 					        on:click={emptyCart}
-					        class=" text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded text-white bg-primary-500 hover:bg-primary-600 font-medium">
-							<Icon icon="material-symbols:delete" class="text-lg sm:text-xl rounded text-white"/>
+					        class=" text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded-md text-white bg-primary-500 hover:bg-primary-600 font-medium">
+							<Icon icon="mdi:delete-forever" class="text-lg sm:text-xl rounded-md text-white"/>
 							<span class="hidden sm:block">Delete All</span>
 						</button>
 					</div>
@@ -527,7 +537,7 @@
 											<div class="flex justify-end items-center mb-2">
 												<button
 													on:click={closePopup}
-													class="rounded hover:bg-slate-200 duration-200"
+													class="rounded-md hover:bg-slate-200 duration-200"
 												>
 													<Icon icon="si:close-duotone" class="text-3xl text-red-600" />
 												</button>
@@ -541,26 +551,26 @@
 								{/if}
 								</div>
 								<div class="ml-2">
-									<a href="/products/details/{item.productDetails.productNumber}" class="text-xs hover:text-primary-500 hover:underline text-black font-semibold">{item.productDetails.productNumber}</a>
-									<div class="relative cursor-pointer text-gray-800 group text-xs">{item.productDetails.productName.length >40 ? item.productDetails.productName.substring(0,40)+"..." : item.productDetails.productName}
-                                       <p class=" absolute bg-white hidden border p-1.5 rounded shadow-md {item.productDetails.productName.length >40 ? "group-hover:block" :""}  md:w-max top-0">{item.productDetails.productName}</p>
+									<a href="/products/details/{item?.productDetails?.productNumber}" class="text-xs hover:text-primary-500 hover:underline text-black font-semibold">{item?.productDetails?.productNumber}</a>
+									<div class="relative cursor-pointer text-gray-800 group text-xs">{item?.productDetails?.productName.length >40 ? item?.productDetails?.productName.substring(0,40)+"..." : item?.productDetails?.productName}
+                                       <p class=" absolute bg-white hidden border p-1.5 rounded-md shadow-md {item?.productDetails?.productName.length >40 ? "group-hover:block" :""}  md:w-max top-0">{item?.productDetails?.productName}</p>
 									</div>
-									<p class=" text-gray-800 text-2s font-semibold">{item.pricing.break}</p>
-									<p class=" {item.quantity > item.stockDetails.stock ? " text-red-500" :" text-green-500"} text-2s ext-red-600 font-semibold">
-										{item.quantity > item.stockDetails.stock ? item.quantity - item.stockDetails.stock + " Back Order" : item.stockDetails.stock + " In Stock"}
-										<span class="{item?.quantity > item.stockDetails.stock ? "" : " hidden"} text-green-500 ml-1">{item.stockDetails.stock + " In Stock"}</span>
+									<p class=" text-gray-800 text-2s font-semibold">{item?.pricing?.break}</p>
+									<p class=" {item?.quantity > item?.stockDetails?.stock ? " text-red-500" :" text-green-500"} text-2s ext-red-600 font-semibold">
+										{item?.quantity > item?.stockDetails?.stock ? item?.quantity - item?.stockDetails?.stock + " Back Order" : item?.stockDetails?.stock + " In Stock"}
+										<span class="{item?.quantity > item?.stockDetails?.stock ? "" : " hidden"} text-green-500 ml-1">{item?.stockDetails?.stock + " In Stock"}</span>
 									</p>
-									<p class=" text-[10.5px] font-semibold">Order Multiple {item.stockDetails.orderMultiple}</p>
+									<p class=" text-[10.5px] font-semibold">Order Multiple {item?.stockDetails?.orderMultiple}</p>
 								</div>
 							</div>
                             <div class=" lg:w-6/12 sm:flex justify-between items-center">
 							    
 								 <div class=" lg:w-2/6">
 									<h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Price</h3>
-									<div class="{item.isCart || item.isQuote ? " text-green-500" : ""} text-xs flex lg:flex-col lg:gap-0 gap-1 w-full font-semibold text-content">
-										{$currencyState === "inr" ? "₹" + item.currentPrice.INR.toLocaleString("en-IN"): "$"+ item.currentPrice.USD.toLocaleString("en-IN")}
+									<div class="{item?.isCart || item?.isQuote ? " text-green-500" : ""} text-xs flex lg:flex-col lg:gap-0 gap-1 w-full font-semibold text-content">
+										{$currencyState === "inr" ? "₹" + item?.currentPrice?.INR.toLocaleString("en-IN"): "$"+ item?.currentPrice?.USD.toLocaleString("en-IN")}
 										<p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">
-										{$currencyState === "inr" ? "₹" + item.normalPrice.INR.toLocaleString("en-IN"): "$"+ item.normalPrice.USD.toLocaleString("en-IN")}
+										{$currencyState === "inr" ? "₹" + item?.normalPrice?.INR.toLocaleString("en-IN"): "$"+ item?.normalPrice?.USD.toLocaleString("en-IN")}
 										</p>
 									</div>
 								 </div>
@@ -569,20 +579,20 @@
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Quantity</h3>
 							        <div class="flex items-center md:w-2/12">
 										<input type="number" bind:value={item.quantity}
-										on:input={e=>handleQty(parseInt(e.target.value),item.stockDetails,item._id,index)}
-										class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
-							        	<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded">
+										on:input={e=>handleQty(parseInt(e.target.value),item?.stockDetails,item._id,index)}
+										class="{tog === index ? "" : "hidden"} border border-gray-200 rounded-md outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
+							        	<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded-md">
 							        		<button disabled={item.isCart || item.isQuote}
-							        			on:click={() => decrementQuantity(item.quantity,item.stockDetails,item._id,index)}
-							        			class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
+							        			on:click={() => decrementQuantity(item.quantity,item?.stockDetails,item._id,index)}
+							        			class="p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							        			><Icon icon="rivet-icons:minus" class="text-xs" /></button
 							        		>
 							        		<button on:click={()=>{tog = index}} class="w-fit px-3 py-0.5 text-xs font-medium outline-none text-center">
 							        			{item.quantity === null ? "" : item.quantity}
 							        		</button>
 							        		<button disabled={item.isCart || item.isQuote}
-							        			on:click={() => incrementQuantity(item.quantity,item.stockDetails,item._id,index)}
-							        			class=" border-l-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
+							        			on:click={() => incrementQuantity(item.quantity,item?.stockDetails,item._id,index)}
+							        			class="p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
 												<Icon icon="rivet-icons:plus" class="text-xs" />
 											</button>
 							        	</div>
@@ -592,19 +602,19 @@
 								<div class=" lg:w-2/6">
 							        <h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Total</h3>
 							        <div class=" w-full flex justify-between items-center">
-							        	<div class="{item.isCart || item.isQuote ? " text-green-500" : ""} text-xs flex gap-1 lg:flex-col lg:gap-0 font-semibold">
+							        	<div class="{item?.isCart || item?.isQuote ? " text-green-500" : ""} text-xs flex gap-1 lg:flex-col lg:gap-0 font-semibold">
 											{#if $authedUser?.id}
-											{$currencyState === "inr" ? "₹" + item.itemTotalPrice.totalINR.toLocaleString("en-IN"): "$"+ item.itemTotalPrice.totalUSD.toLocaleString("en-IN")}
+											{$currencyState === "inr" ? "₹" + item?.itemTotalPrice?.totalINR.toLocaleString("en-IN"): "$"+ item?.itemTotalPrice?.totalUSD.toLocaleString("en-IN")}
 											{:else}
-											{$currencyState === "inr" ? "₹" + (item.normalPrice.INR*item.quantity).toLocaleString("en-IN"): "$"+ (item.normalPrice.USD*item.quantity).toLocaleString("en-IN")}
+											{$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR*item.quantity).toLocaleString("en-IN"): "$"+ (item?.normalPrice?.USD*item.quantity).toLocaleString("en-IN")}
 											{/if}
 										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">
-												{$currencyState === "inr" ? "₹" + (item.normalPrice.INR*item.quantity).toLocaleString("en-IN"): "$"+ (item.normalPrice.USD*item.quantity).toLocaleString("en-IN")}
+												{$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR*item.quantity).toLocaleString("en-IN"): "$"+ (item?.normalPrice?.USD*item.quantity).toLocaleString("en-IN")}
 											</p>
 									    </div>
 							        	<button
 							        		type="button"
-							        		on:click={() => removeItem(item.productDetails.productNumber,item._id,index)}
+							        		on:click={() => removeItem(item?.productDetails?.productNumber,item._id,index)}
 							        		class=" text-lg sm:hidden text-primary-600"
 							        	>
 							        		<Icon icon="mdi:delete-forever" class=" text-xl" />
@@ -612,7 +622,7 @@
 							        </div>
 								</div>
 								<button
-							        type="button" on:click={() => removeItem(item.productDetails.productNumber,item._id,index)}
+							        type="button" on:click={() => removeItem(item?.productDetails?.productNumber,item._id,index)}
 							        class=" text-lg hidden sm:block text-primary-600">
 							        <Icon icon="mdi:delete-forever" class=" text-2xl" />
 							    </button>
@@ -625,7 +635,7 @@
 		{/if}
 
 		
-		 <div bind:this={checkout} class="w-full sticky top-0 sm:w-2/4 md:w-2/5 lg:w-2/6 xl:w-1/4 self-end xl:self-start bg-white p-3 rounded-lg shadow-sm">
+		 <div bind:this={checkout} class="w-full sticky top-0 sm:w-2/4 md:w-2/5 lg:w-2/6 xl:w-1/4 self-end xl:self-start bg-white p-3 rounded-lg shadow">
 			<div class=" space-y-2">
 				<h2 class=" text-sm lg:text-lg font-bold">Your Order</h2>
 				<div class="space-y-2">
@@ -652,14 +662,14 @@
 					{#if isLoggedIn}
 						<button disabled={checkoutDisabled}
 							on:click={()=>goto('/checkout')}
-							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white hover:bg-primary-600 py-2 rounded font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed">
+							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white hover:bg-primary-600 py-2 rounded-md font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed">
 							Checkout
 				        </button>
 					{:else}
 					<button
 							type="button"
 							on:click={()=>goto('/signin')}
-							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold"
+							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded-md font-semibold"
 						>
 							SignIn to Proceed
 						</button>
@@ -679,14 +689,14 @@
 
 </div>
 
-{#if isLoggedIn  && filteredGuestCart.length}
+{#if isLoggedIn  && filteredGuestCart.length && cartId.length}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
 		on:click={handleClick}
 		class="fixed {addToCartModal ? 'hidden' : ''} inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
 	>
-		<div bind:this={container} class="bg-white relative p-6 rounded shadow-lg w-11/12 sm:w-3/5 md:w-2/5 2xl:w-2/6 space-y-2">
+		<div bind:this={container} class="bg-white relative p-6 rounded-md shadow-lg w-11/12 sm:w-3/5 md:w-2/5 2xl:w-2/6 space-y-2">
             <button on:click={()=>{
 				addToCartModal = !addToCartModal
 				browser ? localStorage.clear() : ""
@@ -711,14 +721,14 @@
 					<button
 						type="submit"
 						formaction="?/existingcart"
-						class=" py-2 bg-primary-600 w-full rounded text-white font-medium text-sm"
+						class=" py-2 bg-primary-600 w-full rounded-md text-white font-medium text-sm"
 						>Existing Cart</button
 					>
 				{/if}
 				<button
 					type="submit"
 					formaction="?/newcart"
-					class=" py-2 bg-primary-600 w-full rounded text-white font-medium text-sm"
+					class=" py-2 bg-primary-600 w-full rounded-md text-white font-medium text-sm"
 					>New Cart</button
 				>
 			</form>
@@ -735,12 +745,12 @@
 			<p class="text-sm mb-4">You need to log in to continue. Click the button below to log in.</p>
 			<div class="flex gap-4 justify-between">
 				<button
-					class=" text-gray-500 border bottom-2 py-2 px-4 rounded hover:bg-gray-300"
+					class=" text-gray-500 border bottom-2 py-2 px-4 rounded-md hover:bg-gray-300"
 					on:click={toggleModal}
 				>
 					Cancel
 				</button>
-				<a href="/signin" on:click={setRedirectUrl} class="bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-700">
+				<a href="/signin" on:click={setRedirectUrl} class="bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-700">
 					SignIn
 				</a>
 				<!-- <a href="/login" on:click={setRedirectUrl} class="bg-primary-500 text-white py-2 px-4 rounded hover:bg-primary-700">

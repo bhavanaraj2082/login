@@ -178,6 +178,7 @@ function handleMouseLeave() {
         }
         quantity = Math.abs(quantity)
         if(quantity >10000000) quantity = 10000000
+        if(quantity === 0) quantity = 1
          clearTimeout(timeout)
          timeout = setTimeout(()=>{
             products = products.map(product => {
