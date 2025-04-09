@@ -496,12 +496,12 @@
 									src="{PUBLIC_IMAGE_URL}/{item.productDetails?.image}"
 									onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
 									class="cursor-pointer w-24 h-24 objec-cover bg-red-200" 
-									alt={item.productDetails.productName}
-									on:click={() => imagemodal(item.productDetails.image)}
-									on:mouseenter={() => handleMouseEnter(item.productDetails.image , index)}
+									alt={item.productDetails?.productName}
+									on:click={() => imagemodal(item.productDetails?.image)}
+									on:mouseenter={() => handleMouseEnter(item.productDetails?.image , index)}
 									on:mouseleave={handleMouseLeave}
 								  />
-								   {#if hoveredItem && hoveredItem.image === item.productDetails.image && hoveredItem.index === index}
+								   {#if hoveredItem && hoveredItem.image === item.productDetails?.image && hoveredItem.index === index}
 									<div
 									  class="absolute bottom-3/4 left-1/2 transform -translate-x-1/2 mb-2 z-50 whitespace-nowrap text-xs text-description font-medium py-1 px-4 rounded-md shadow-lg border leading-snug bg-black text-white"
 									>
@@ -541,9 +541,9 @@
 								{/if}
 								</div>
 								<div class="ml-2">
-									<a href="/products/details/{item.productDetails.productNumber}" class="text-xs hover:text-primary-500 hover:underline text-black font-semibold">{item.productDetails.productNumber}</a>
-									<div class="relative cursor-pointer text-gray-800 group text-xs">{item.productDetails.productName.length >40 ? item.productDetails.productName.substring(0,40)+"..." : item.productDetails.productName}
-                                       <p class=" absolute bg-white hidden border p-1.5 rounded shadow-md {item.productDetails.productName.length >40 ? "group-hover:block" :""}  md:w-max top-0">{item.productDetails.productName}</p>
+									<a href="/products/details/{item.productDetails?.productNumber}" class="text-xs hover:text-primary-500 hover:underline text-black font-semibold">{item.productDetails.productNumber}</a>
+									<div class="relative cursor-pointer text-gray-800 group text-xs">{item.productDetails?.productName.length >40 ? item.productDetails?.productName.substring(0,40)+"..." : item.productDetails?.productName}
+                                       <p class=" absolute bg-white hidden border p-1.5 rounded shadow-md {item.productDetails?.productName.length >40 ? "group-hover:block" :""}  md:w-max top-0">{item.productDetails?.productName}</p>
 									</div>
 									<p class=" text-gray-800 text-2s font-semibold">{item.pricing.break}</p>
 									<p class=" {item.quantity > item.stockDetails.stock ? " text-red-500" :" text-green-500"} text-2s ext-red-600 font-semibold">
