@@ -1,25 +1,19 @@
 <script>
-	import { onMount } from "svelte";
-	import { toast, Toaster } from "svelte-sonner";
-	import { enhance } from "$app/forms";
-
 	import Icon from "@iconify/svelte";
+	import { onMount, onDestroy } from "svelte";
+	import { enhance } from "$app/forms";
+	import { toast, Toaster } from "svelte-sonner";
+	let showSubmitPopup = false;
+
 	export let data;
 	let isLoadingPhone = false;
-	let isEmailVerified = false;
+	let searchTerm = "";
 	let loadingotp = false;
 	let loadingPhone = false;
-	let isLoading = false;
-	let showSuccesDiv = false;
-	let showFailureDiv = false;
-	let ProfileEmailVerified;
-	let submitting = false;
-	let form;
-	let errors = {};
 	// console.log(data,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+	let country = "";
 	let authedUserEmailVerified = data?.profile?.isEmailVerified;
-	console.log("authedUserEmailVerified", authedUserEmailVerified);
-
+	let authedUserPhoneVerified = data?.profile?.isPhoneVerified;
 	// console.log("authedUserEmailVerified",authedUserEmailVerified);
 
 	let verificationMessage = "";
@@ -30,72 +24,235 @@
 	let isOtpVerified = false;
 	let isOtpPhoneVerified = false;
 	let form3;
+
+	let ProfileEmailVerified = data.isEmailVerified;
+	let ProfilePhoneVerified = data.isPhoneVerified;
+	let TokenEmailVerified = "";
+	let captchaVerified = false;
+	let form2;
 	let phone = "";
 	let email = "";
-	let isDataAvailable = false;
-	let isEditable = false;
-	let country = "";
 	let name = "";
+	let company = "";
+
 	let message = "";
 	let subject = "";
-	let formValid = true;
-	let formSubmitted = false;
-	let showErrors = false;
+	let emailidstatus = "";
+	let isDataAvailable = false;
+	let errors = {};
+	let recaptchaResponse = "";
 	let successMessage = "";
+	let isChecked = false;
+	let isEditable = false;
 	let errorMessage = "";
-	function resetForm() {
-		phone = "";
-		email = "";
-		country = "";
-		name = "";
-		message = "";
-		subject = "";
-		successMessage = "";
-		errorMessage = "";
-	}
-	onMount(() => {
-		if (data && data.profile) {
-			name =
-				`${data.profile.firstName || ""} ${data.profile.lastName || ""}`.trim();
-			email = data.profile.email || "";
-			phone = data.profile.cellPhone || data.profile.primaryPhone;
+	let rotationClass = "";
+	let showCaptchaPopup = false;
+	let mathQuestion = "";
+	let mathAnswer = 0;
+	let userAnswer = "";
+	let mathError = "";
+	let OtpSent = false;
+	let captchaToken = "";
+	let form;
+	let showFailureDiv = false;
+	let showSuccesDiv = false;
+	let submitting = false;
+	let actionMessage = { message: "", success: false };
+	function setActionMessage(message, isSuccess) {
+		actionMessage = {
+			message: message,
+			success: isSuccess,
+		};
 
-			const profileCountry = data.profile.country?.trim();
-			if (profileCountry) {
-				const foundCountry = countries.find(
-					(c) =>
-						c.name.toLowerCase() === profileCountry.toLowerCase(),
-				);
-				if (foundCountry) {
-					country = foundCountry.name;
-				}
-			}
-
-			isDataAvailable = true;
+		if (message) {
+			showSubmitPopup = true;
 		} else {
-			name = "";
-			email = data?.email || "";
-			phone = "";
+			setTimeout(() => {
+				showSubmitPopup = false;
+			});
+		}
+	}
+	function showMessage(message1, keywordError) {
+		successMessage = message1;
+		errorMessage = keywordError;
+		if (keywordError === "success") {
+			setTimeout(() => {
+				resetForm();
+			}, 2000);
+		}
+	}
 
-			country = "";
-			isDataAvailable = false;
+	const validateField = (fieldName) => {
+		if (!fieldName || fieldName === "name") {
+			if (!name || !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(name)) {
+				errors.name = "User Name is required";
+			} else {
+				delete errors.name;
+			}
+		}
+		if (!fieldName || fieldName === "country") {
+    if (!country || country === "") {
+        errors.country = "Please select a country";
+    } else {
+        delete errors.country;
+    }
+}
+		if (!fieldName || fieldName === "email") {
+			if (
+				!email ||
+				!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+					email,
+				) ||
+				email.split("@")[1].includes("gamil")
+			) {
+				errors.email = "Please enter a valid email address ";
+			} else {
+				delete errors.email;
+			}
+		}
 
-			if (data?.email) {
-				email = data.email;
-				const reloadFlag = sessionStorage.getItem("emailReloaded");
-				if (!reloadFlag) {
-					sessionStorage.setItem("emailReloaded", "true");
-					location.reload(); // This will reload the page only once to prevent infinite reload
+		if (!fieldName || fieldName === "phone") {
+			if (!country) {
+        errors.phone = "Please select the country before entering the phone number";
+        return;
+    }
+
+			if (!phone || phone === "") {
+				errors.phone = "Required for the selected country";
+			} else {
+				const countryDetails = getCountryByCode(country);
+				if (!countryDetails) {
+					errors.phone = "Invalid Number for the selected country";
+					errors.country = "Invalid country selected";
 				} else {
-					sessionStorage.removeItem("emailReloaded");
+					const phonePattern = getPhonePattern(country);
+					if (!phonePattern) {
+						errors.phone =
+							"Phone number pattern for country not found";
+					} else {
+						const phoneRegex = new RegExp(phonePattern);
+						if (!phoneRegex.test(phone)) {
+							const countryName = countryDetails.name || country || "selected country";
+							errors.phone = `Please enter a valid phone number for ${countryName}.`;
+						} else {
+							delete errors.phone;
+						}
+					}
 				}
 			}
 		}
 
-		isEditable = false;
-		document.addEventListener('click', handleClickOutside);
-		return () => document.removeEventListener('click', handleClickOutside);
-	});
+		if (!fieldName || fieldName === "message") {
+			if (
+				!message ||
+				message.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(message) ||
+				/<[^>]*>/.test(message)
+			) {
+				errors.message = "Message is required";
+			} else {
+				delete errors.message;
+			}
+		}
+
+		if (!fieldName || fieldName === "subject") {
+			if (
+				!subject ||
+				subject.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(subject) ||
+				/<[^>]*>/.test(subject)
+			) {
+				errors.subject = "Subject is required";
+			} else {
+				delete errors.subject;
+			}
+		}
+
+		// if (fieldName === "company") {
+    	//   if (company && company.trim() !== "") {
+    	//     if (
+    	//       !/^[A-Za-z0-9&@!#$%^&*\(\)_+\-=\[\]\{\};:,.?\/\\|<>~`"'\s]+$/.test(company)
+    	//     ) {
+    	//       errors.company = "Company name can only contain letters, numbers, and certain special characters.";
+    	//     } else if (company.length < 3) {
+    	//       errors.company = "Company name must be at least 3 characters long.";
+    	//     } else if (company.length > 100) {
+    	//       errors.company = "Company name should not exceed 100 characters.";
+    	//     } else {
+    	//       delete errors.company;
+    	//     }
+
+    	//     if (errors.company) {
+    	//       setTimeout(() => {
+    	//         delete errors.company;
+    	//       }, 2000);
+    	//     }
+    	//   } else {
+    	//     delete errors.company; 
+    	//   }
+    	// }
+
+		if (!fieldName || fieldName === "company") {
+			if (
+				!company ||
+				company.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) ||
+				/<[^>]*>/.test(company)
+			) {
+				errors.company = "company is required";
+			} else {
+				delete errors.company;
+			}
+		}
+
+		if (!fieldName || fieldName === "captcha") {
+			if (!isChecked) {
+				errors.captcha = "Please complete the captcha";
+			} else {
+				delete errors.captcha;
+			}
+		}
+
+		if (Object.keys(errors).length > 0) {
+			isChecked = false;
+		}
+	};
+
+	let loading = false;
+	function submitFormAutomatically() {
+		loading = false;
+		if (form) {
+			const formData = new FormData(form);
+
+			fetch(form.action, {
+				method: form.method,
+				body: formData,
+			})
+				.then((response) => response.json())
+				.then((data) => {
+					// console.log("respose Status",data.status);
+					window.scrollTo({ top: 0, behavior: "smooth" });
+					if (data.status === 200) {
+						showSuccesDiv = true;
+						window.scrollTo({ top: 0, behavior: "smooth" });
+					} else {
+						showFailureDiv = true;
+						window.scrollTo({ top: 0, behavior: "smooth" });
+					}
+				});
+		}
+	}
+	function handleClickOutside(event) {
+		if (!event.target.closest(".dropdown-container")) {
+			showDropdown = false;
+		}
+	}
+	function handleKeyDown(event) {
+    if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
+        selectCountry(filteredCountries[0]);
+        event.preventDefault();
+    }
+}
 	const countries = [
 		{ name: "Afghanistan", code: "+93" },
 		{ name: "Albania", code: "+355" },
@@ -508,101 +665,99 @@
 		Haiti: /^\d{8}$/,
 		Tonga: /^\d{7}$/,
 	};
-	function handleSubmit(event) {
-		if (
-			phone.length === 0 ||
-			email.length === 0 ||
-			country.length === 0 ||
-			name.length === 0 ||
-			message.length === 0 ||
-			subject.length === 0
-		) {
-			console.log("Validation failed: Missing required fields");
-			event.preventDefault();
-			formValid = false;
-			showErrors = true;
-		} else {
-			formValid = true;
-			formSubmitted = true;
-			showErrors = false;
+
+	const handleSubmit = async ({ cancel, event }) => {
+		event.preventDefault();
+		validateField("name");
+		validateField("email");
+		validateField("phone");
+		validateField("message");
+		validateField("subject");
+		validateField("captcha");
+		validateField("country");
+
+		// formData.append(email, 'emailid');
+
+		const isValid = formValid();
+		console.log("Form valid result from handleSubmit:", isValid);
+		if (!isValid) {
+			isChecked = false;
+			cancel();
+			return;
 		}
-		if (!formValid) {
-			event.preventDefault();
-		}
-	}
 
-	// 	function handleSubmit(event) {
-	//     const isEmailVerified = ProfileEmailVerified; // Assuming this is the first email verification check
-	//     const isAuthedUserEmailVerified = authedUserEmailVerified; // The second email verification check
-	//     console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification status");
-
-	//     // Check if any required fields are empty
-	//     if (
-	//         phone.length === 0 ||
-	//         email.length === 0 ||
-	//         country.length === 0 ||
-	//         name.length === 0 ||
-	//         message.length === 0 ||
-	//         subject.length === 0
-	//     ) {
-	//         console.log("Validation failed: Missing required fields");
-	//         event.preventDefault(); // Prevent form submission
-	//         formValid = false;
-	//         showErrors = true;
-	//         return;
-	//     }
-
-	//     // Check if email is verified
-	//     if (!(isEmailVerified || isAuthedUserEmailVerified)) {
-	//         console.log("Email is not verified");
-	//         toast.error("Please verify your email to proceed");
-	//         event.preventDefault(); // Prevent form submission
-	//         formValid = false;
-	//         showErrors = true;
-	//         return;
-	//     }
-
-	//     // If all validations pass
-	//     formValid = true;
-	//     formSubmitted = true;
-	//     showSuccesDiv = true;
-	//     showErrors = false;
-	// }
-
-	function showMessage(message1, keywordError) {
-		successMessage = message1;
-		errorMessage = keywordError;
-		if (keywordError === "success") {
-			setTimeout(() => {
-				resetForm();
-			}, 2000);
-		}
-	}
-
-	// $: desh = country;
-	// $: {
-	// console.log("desh:", desh);
-	// }
-
-	function validatePhoneNumber(country, phone) {
-		const pattern = phoneNumberPatterns[country];
-		if (!pattern) {
-			throw new Error(
-				`No validation pattern found for country: ${country}`,
-			);
-		}
-		return pattern.test(phone);
-	}
-	const handleResendOtpemail = () => {
-		if (!loadingotp) {
-			form3.requestSubmit();
-		}
+		showPopup();
+		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
-	let searchTerm = "";
-	let showDropdown = false;
-	let filteredCountries = countries;
 
-	function filterCountries() {
+	function selectCountry(selectedCountry) {
+		country = selectedCountry.name;
+		// filteredCountries = countries;
+		searchTerm = `${selectedCountry.name} `;
+		showDropdown = false;
+		validateField("country");
+		validateField("phone");
+
+		validatePhoneNumber(country, phone);
+		const countryInput = document.querySelector('input[name="country"]');
+		if (countryInput) {
+			countryInput.value = selectedCountry.name;
+		}
+        if (!phone || phone === "") {
+               errors.phone = "Required for the selected country.";
+        }
+        else {
+        delete errors.phone; // Remove any errors if conditions are satisfied
+    }
+		// console.log('Selected Country:', country);
+	}
+	function toggleDropdown() {
+		showDropdown = !showDropdown;
+	}
+
+	function handleInputChange(event) {
+		// Get the current input value
+		searchTerm = event.target.value;
+
+		// Track if user is deleting text
+		const isDeleting =
+			event.inputType === "deleteContentBackward" ||
+			event.inputType === "deleteContentForward";
+
+		if (searchTerm.length > 0 && !isDeleting) {
+			// Filter countries
+			filterCountriesWithoutAutoSelect();
+
+			// Show dropdown with filtered results
+			showDropdown = filteredCountries.length > 0;
+
+			// Check for country code matches specifically
+			const codeSearch = searchTerm.replace("+", "").trim();
+			if (codeSearch.length > 0) {
+				const exactCodeMatches = filteredCountries.filter(
+					(country) => country.code.replace("+", "") === codeSearch,
+				);
+
+				if (exactCodeMatches.length === 1) {
+					selectCountry(exactCodeMatches[0]);
+					return;
+				}
+			}
+
+			const countriesStartingWith = filteredCountries.filter((country) =>
+				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+			);
+
+			if (countriesStartingWith.length === 1) {
+				selectCountry(countriesStartingWith[0]);
+			}
+		} else {
+			filterCountriesWithoutAutoSelect();
+			showDropdown = filteredCountries.length > 0;
+		}
+	}
+
+	function filterCountriesWithoutAutoSelect() {
 		filteredCountries = countries.filter(
 			(country) =>
 				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -610,144 +765,331 @@
 					.replace("+", "")
 					.includes(searchTerm.replace("+", "").toLowerCase()),
 		);
-		if (
-			filteredCountries.length === 1 &&
-			(filteredCountries[0].name.toLowerCase() ===
-				searchTerm.toLowerCase() ||
-				filteredCountries[0].code.replace("+", "").toLowerCase() ===
-					searchTerm.replace("+", "").toLowerCase())
-		) {
-			selectCountry(filteredCountries[0]);
+	}
+
+	let filteredCountries = countries;
+	let showDropdown = false;
+	function getCountryByCode(name) {
+		const country = countries.find((c) => c.name === name);
+
+		return country ? country.name : null;
+	}
+	function getPhonePattern(countryCode) {
+		const countryName = getCountryByCode(countryCode);
+		if (!countryName) return "^[0-9]+$";
+		const regex = phoneNumberPatterns[countryName];
+		return regex || "^[0-9]+$";
+	}
+
+	function validatePhoneNumber(countryCode, phone) {
+		if (!phone || !countryCode === "") {
+			// errors.contactNumber = `*Required`;
+			return false;
+		}
+
+		const country = getCountryByCode(countryCode);
+
+		// console.log('Validating phone number for country:', country);
+
+		if (!country) {
+			errors.phone = "Select your country before entering number";
+			errors.country = "Invalid country selected";
+			return false;
+		}
+
+		const phonePattern = getPhonePattern(countryCode);
+		if (!phonePattern) {
+			errors.phone = "Phone number pattern for country not found";
+			return false;
+		}
+
+		const phoneRegex = new RegExp(phonePattern);
+
+		if (!phoneRegex.test(phone)) {
+			errors.phone = `Please enter a valid phone number for ${country}.`;
+			return false;
 		} else {
-			showDropdown = filteredCountries.length > 0;
+			errors.phone = "";
+			return true;
 		}
 	}
-	function selectCountry(selectedCountry) {
-		country = selectedCountry.name;
-		searchTerm = `${selectedCountry.name} `;
-		showDropdown = false;
-		validatePhoneNumber(country, phone);
-		delete errors.country;
-	}
+	function generateMathQuestion() {
+		const num1 = Math.floor(Math.random() * 10) + 1;
+		const num2 = Math.floor(Math.random() * 10) + 1;
+		const operations = ["+", "-", "*"];
+		const randomOperation =
+			operations[Math.floor(Math.random() * operations.length)];
 
-	// function handleInputChange(event) {
-	// 	searchTerm = event.target.value;
-	// 	filterCountries();
-	// }
-function handleInputChange(event) {
-  // Get the current input value
-  searchTerm = event.target.value;
-  
-  // Track if user is deleting text
-  const isDeleting = event.inputType === 'deleteContentBackward' || 
-                     event.inputType === 'deleteContentForward';
-  
-  if (searchTerm.length > 0 && !isDeleting) {
-    // Filter countries
-    filterCountriesWithoutAutoSelect();
-    
-    // Show dropdown with filtered results
-    showDropdown = filteredCountries.length > 0;
-    
-    // Check for country code matches specifically
-    const codeSearch = searchTerm.replace('+', '').trim();
-    if (codeSearch.length > 0) {
-      const exactCodeMatches = filteredCountries.filter(
-        (country) => country.code.replace('+', '') === codeSearch
-      );
-
-      if (exactCodeMatches.length === 1) {
-        selectCountry(exactCodeMatches[0]);
-        return;
-      }
-    }
-
-    const countriesStartingWith = filteredCountries.filter(
-      (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-    );
-    
-    if (countriesStartingWith.length === 1) {
-      selectCountry(countriesStartingWith[0]);
-    }
-  } else {
-    filterCountriesWithoutAutoSelect();
-    showDropdown = filteredCountries.length > 0;
-  }
-}
-function filterCountriesWithoutAutoSelect() {
-  filteredCountries = countries.filter(
-    (country) =>
-      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
-  );
-}
-
-	function toggleDropdown() {
-		showDropdown = !showDropdown;
-	}
-
-	function handleClickOutside(event) {
-		if (!event.target.closest('.dropdown-container')) {
-			showDropdown = false;
+		if (randomOperation === "-") {
+			const larger = Math.max(num1, num2);
+			const smaller = Math.min(num1, num2);
+			mathQuestion = `What is ${larger} - ${smaller}?`;
+			mathAnswer = larger - smaller;
+		} else if (randomOperation === "+") {
+			mathQuestion = `What is ${num1} + ${num2}?`;
+			mathAnswer = num1 + num2;
+		} else if (randomOperation === "*") {
+			mathQuestion = `What is ${num1} * ${num2}?`;
+			mathAnswer = num1 * num2;
 		}
 	}
 
+	let submittingForm = false;
+	let isLoadingemail = false;
+	let progress = 0;
+	let errorMessagecap = "";
+	let inputReadOnly = false;
+
+	function validateMathCaptcha(e) {
+		const userResponse = parseInt(userAnswer.trim());
+		if (userResponse === mathAnswer) {
+			submittingForm = true;
+			if (submittingForm) {
+				const interval = setInterval(() => {
+					progress += 5;
+					if ((progress = 96)) {
+						clearInterval(interval);
+					}
+				}, 500);
+			}
+			errorMessagecap = "";
+			successMessage = "Captcha verified Successfully!!!";
+			isChecked = true;
+			captchaVerified = true;
+			loading = true;
+			inputReadOnly = true;
+
+			const tokenPayload = {
+				question: mathQuestion,
+				answer: mathAnswer,
+			};
+			captchaToken = btoa(JSON.stringify(tokenPayload));
+
+			setTimeout(() => {
+				submitFormAutomatically();
+			}, 50);
+		} else {
+			successMessage = "";
+			errorMessagecap = "Incorrect answer, try again.";
+			isChecked = false;
+
+			setTimeout(() => {
+				generateMathQuestion();
+				userAnswer = "";
+				errorMessagecap = "";
+				// setActionMessage('Something went wrong while processing your message', false);
+			}, 4000);
+		}
+	}
+
+	function clearForm() {
+		if (data && data.authedUser && data.profile) {
+			message = "";
+			subject = "";
+			isChecked = false;
+			captchaToken = "";
+			errors = {};
+		} else {
+			name = "";
+			email = "";
+			phone = "";
+			message = "";
+			subject = "";
+			isChecked = false;
+			captchaToken = "";
+			errors = {};
+		}
+	}
+
+	function handleBlur() {
+		validateField("email");
+
+		if (email && email.trim() !== "" && !errors.email) {
+			form2.requestSubmit();
+		}
+	}
+
+	function refreshMathQuestion() {
+		rotationClass = "rotate-[360deg]";
+
+		setTimeout(() => {
+			generateMathQuestion();
+			rotationClass = "";
+		}, 1000);
+	}
+
+	function onInputChange() {
+		if (userAnswer.trim()) {
+			validateMathCaptcha();
+		} else {
+			errorMessagecap = "";
+		}
+	}
+
+	function closeCaptchaPopup() {
+		showCaptchaPopup = false;
+
+		userAnswer = "";
+
+		if (successMessage) {
+			isChecked = true;
+		} else {
+			isChecked = false;
+		}
+	}
+
+	function formValid() {
+		validateField("name");
+		validateField("email");
+		validateField("phone");
+		validateField("message");
+		validateField("subject");
+		validateField("country");
+		validateField("company");
+
+		const isEmailVerified = ProfileEmailVerified;
+		const isOtpPhoneVerified = ProfilePhoneVerified;
+		const isUserEmailVerified = authedUserEmailVerified === true;
+		const isUserPhoneVerified = authedUserPhoneVerified === true;
+
+		// console.log('ProfileEmailVerified:', isEmailVerified);
+		// console.log('authedUserEmailVerified:', authedUserEmailVerified);
+		// console.log('ProfilePhoneVerified:', isOtpPhoneVerified);
+		// console.log('authedUserPhoneVerified:', authedUserPhoneVerified);
+
+		const hasErrors = Object.keys(errors).length > 0;
+
+		const isValid =
+			!hasErrors &&
+			(isEmailVerified ||
+				isUserEmailVerified ||
+				isOtpPhoneVerified ||
+				isUserPhoneVerified);
+
+		// console.log(isValid, "*******************");
+		return isValid;
+	}
+
+	function showPopup() {
+		if (isChecked) {
+			showCaptchaPopup = true;
+			generateMathQuestion();
+		}
+	}
+
+	let isEmailVerified = false;
+
+	let isLoading = false;
+	onMount(() => {
+		isChecked = false;
+
+		if (data && data.authedUser && data.profile) {
+			//  name = data.authedUser.username || '';
+			name =
+				`${data.profile.firstName || ""} ${data.profile.lastName || ""}`.trim();
+			email = data.profile.email || "";
+			phone = data.profile.cellPhone || "";
+			country = data.profile.country || "";
+			company = data.profile.companyName || "";
+
+			isDataAvailable = true;
+		} else {
+			name = "";
+			email = data.email || "";
+			phone = "";
+			country = "";
+			company = "";
+
+			isDataAvailable = false;
+			if (data?.email) {
+				email = data.email;
+				const reloadFlag = sessionStorage.getItem("emailReloaded");
+				if (!reloadFlag) {
+					sessionStorage.setItem("emailReloaded", "true");
+					location.reload();
+				} else {
+					sessionStorage.removeItem("emailReloaded");
+				}
+			}
+		}
+		isEditable = false;
+		document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+
+		setTimeout(() => {
+			isChecked = false;
+		}, 1500);
+		generateMathQuestion();
+	});
+	let isEmailModified = false;
+
+
+	let timeLeft = 60;
+	let timerInterval;
+	const startTimer = () => {
+		clearInterval(timerInterval);
+		timeLeft = 60;
+
+		timerInterval = setInterval(() => {
+			if (timeLeft > 0) {
+				timeLeft -= 1;
+			} else {
+				clearInterval(timerInterval);
+			}
+		}, 1000);
+	};
+
+	onDestroy(() => {
+		if (timerInterval) clearInterval(timerInterval);
+	});
+
+	const handleResendOtpemail = () => {
+		if (!loadingotp) {
+			form3.requestSubmit();
+		}
+	};
+	$: if (country) {
+    validateField("phone");
+}
 </script>
 
 {#if showSuccesDiv}
-
-<div
-class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
->
-<div
-	class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
->
-	<h3 class="md:text-xl text-lg font-semibold text-green-600 mb-4">
-		Contact Us Form Submission
-	</h3>
-	<p class="md:text-md text-xs text-gray-700 mt-4 mb-6">
-		Thank you for reaching out! We have received your message and
-		will get back to you as soon as possible.
-
-	</p>
-	<div class="w-10/12 mx-auto my-6 border-t-1 border-green-300"></div>
-	<div class="flex items-center justify-center">
-		<a
-			href="/"
-			class="bg-white text-primary-500 border-1 border-primary-500 px-4 py-2 rounded-md font-medium hover:bg-primary-500 hover:text-white transition-all duration-300 flex justify-center items-center"
-		>
-			<Icon icon="mdi:home" class="text-xl mr-2" />Back to Home
-		</a>
-	</div>
-</div>
-</div>
-{:else if showFailureDiv}
-	<div
-		class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
-	>
-		<div
-			class="w-10/12 md:w-8/12 bg-gradient-to-r from-red-100 via-red-50 to-red-100 p-8 rounded-lg shadow-lg text-center"
-		>
-			<p class="sm:text-md text-sm text-gray-700 mb-6">
-			There was an issue with submitting the form. Please try again after a while.
+	<div class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4">
+		<div class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg">
+			<h3 class="md:text-xl text-lg font-semibold text-green-600 mb-4">
+				Contact Us Form Submission
+			</h3>
+			<p class="md:text-md text-xs text-gray-700 mt-4 mb-6">
+				Thank you for reaching out! We have received your message and
+				will get back to you as soon as possible.
 			</p>
-
-			<div class="w-10/12 mx-auto my-6 border-t-2 border-red-300"></div>
-			<div>
-				<a
-					href="/feedback"
-					class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
-				>
-				Report Issue
+			<div class="w-10/12 mx-auto my-6 border-t-1 border-green-300"></div>
+			<div class="flex items-center justify-center">
+				<a href="/"
+					class="bg-white text-primary-500 border-1 border-primary-500 px-4 py-2 rounded-md font-medium hover:bg-primary-500 hover:text-white transition-all duration-300 flex justify-center items-center">
+					<Icon icon="mdi:home" class="text-xl mr-2" />Back to Home
 				</a>
 			</div>
 		</div>
 	</div>
-
-	{:else}
-	<section
-		class="mt-6 mb-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto sm:p-0  font-roboto bg-white"
-	>
+{:else if showFailureDiv}
+	<div class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs">
+		<div class="w-10/12 md:w-8/12 bg-gradient-to-r from-red-100 via-red-50 to-red-100 p-8 rounded-lg shadow-lg text-center">
+			<p class="sm:text-md text-sm text-gray-700 mb-6">
+				There was an issue with submitting the form. Please try again
+				after a while.
+			</p>
+			<div class="w-10/12 mx-auto my-6 border-t-2 border-red-300"></div>
+			<div>
+				<a href="/feedback"
+				class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition">
+					Report Issue
+				</a>
+			</div>
+		</div>
+	</div>
+{:else}
+	<section class="mt-6 mb-10 w-11/12 max-w-7xl flex flex-wrap justify-center mx-auto sm:p-0 font-roboto bg-white">
 		<div class="w-full shadow rounded-lg">
 			<h1 class="sm:text-2xl text-md font-bold bg-primary-400 text-white py-4 pl-4 rounded-t-lg">
 				Get in Touch with Us
@@ -755,13 +1097,11 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 			<form
 				method="POST"
 				action="?/contactus"
-				class="space-y-4 p-3"
+				class="space-y-4"
 				bind:this={form}
 				use:enhance={(event) => {
-						
-					// Check email verification first
-					const isEmailVerified = ProfileEmailVerified; // Assuming this is the first email verification check
-					const isAuthedUserEmailVerified = authedUserEmailVerified; // The second email verification check
+					const isEmailVerified = ProfileEmailVerified; 
+					const isAuthedUserEmailVerified = authedUserEmailVerified; 
 					console.log(
 						isEmailVerified,
 						isAuthedUserEmailVerified,
@@ -771,13 +1111,12 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 						console.log("Email is not verified");
 						toast.error("Please verify your email to proceed");
 						event.preventDefault();
-						// Return a function that does nothing to prevent form submission
+
 						return () => {};
 					}
 					submitting = true;
-					// If email is verified, proceed with form submission handling
+
 					return async ({ result }) => {
-					
 						let message1 = "";
 						let keywordError = "";
 						console.log(result);
@@ -801,520 +1140,841 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 
 						showMessage(message1, keywordError);
 					};
-				}}
-			>
-			<input
-										type="hidden"
-										name="country"
-										id="country"
-										bind:value={country}
-									/>
-				<section class="flex flex-col md:flex-row p-2">
-					<div class="md:w-2/5 p-0 mt-0 ">
-						<div class="flex items-start sm:mt-6 mt-3 sm:mb-6 mb-3 sm:ml-4 ml-0">
-							<Icon icon="mdi:phone" class="text-heading sm:w-5 w-4 h-5 mr-2" />
+				}}>
+				<div class="flex flex-col md:flex-row p-4">
+					<div class="md:w-2/5 p-2">
+						<div
+							class="flex items-start sm:mt-6 mt-3 sm:mb-6 mb-3 sm:ml-4 ml-0"
+						>
+							<Icon
+								icon="mdi:phone"
+								class="text-heading sm:w-5 w-4 h-5 mr-2"
+							/>
 							<div>
-								<p class="sm
-							:text-lg text-sm text-heading mb-2 font-semibold">Phone number</p>
-							<div class="sm:text-sm text-xs hover:text-primary-500 cursor-pointer"><a href= 'tel:7829922222'>
-								7829922222
-							</a></div>
+								<p
+									class="sm:text-lg text-sm text-heading mb-2 font-semibold"
+								>
+									Phone number
+								</p>
+								<div
+									class="sm:text-sm text-xs hover:text-primary-500 cursor-pointer"
+								>
+									<a href="tel:7829922222"> 7829922222 </a>
+								</div>
 							</div>
 						</div>
 						<hr class="my-2" />
-						<div class="flex items-start sm:mt-6 mt-3 sm:mb-6 mb-3 sm:ml-4 ml-0">
-							<Icon icon="material-symbols:mail-rounded" class="text-heading sm:w-5 w-4 h-5 mr-2" />
+						<div
+							class="flex items-start sm:mt-6 mt-3 sm:mb-6 mb-3 sm:ml-4 ml-0"
+						>
+							<Icon
+								icon="material-symbols:mail-rounded"
+								class="text-heading sm:w-5 w-4 h-5 mr-2"
+							/>
 							<div>
-								<p class="sm
-							:text-lg text-sm text-heading mb-2 font-semibold">Email</p>
-					    <div class="sm:text-sm text-xs hover:text-primary-500 cursor-pointer"><a href="mailto:sales@partskeys.com">chemikart@gmail.com</a></div>
+								<p
+									class="sm:text-lg text-sm text-heading mb-2 font-semibold"
+								>
+									Email
+								</p>
+								<div
+									class="sm:text-sm text-xs hover:text-primary-500 cursor-pointer"
+								>
+									<a href="mailto:sales@partskeys.com"
+										>chemikart@gmail.com</a
+									>
+								</div>
 							</div>
 						</div>
 						<hr class="my-2" />
-						<div class="flex items-start sm:mt-6 mt-3 sm:mb-6 mb-3 sm:ml-4 ml-0">
-							<Icon icon="ic:sharp-location-on" class="text-heading sm:w-5 w-4 h-5 mr-2 shrink-0" />
+						<div
+							class="flex items-start sm:mt-6 mt-3 sm:mb-6 mb-3 sm:ml-4 ml-0"
+						>
+							<Icon
+								icon="ic:sharp-location-on"
+								class="text-heading sm:w-5 w-4 h-5 mr-2 shrink-0"
+							/>
 							<div>
-								<p class="sm
-							:text-lg text-sm text-heading mb-2 font-semibold">Location</p>							
-							<a href="https://www.google.com/maps?q=No.+206,+Vinni+Arcade+100+Feet+Ring+Road,+Kathriguppe+Main+Rd,+Bengaluru,+Karnataka+560085" target="_blank" class="sm:text-sm text-xs hover:text-primary-500 cursor-pointer">
-								No. 206, Vinni Arcade 100 Feet Ring Road, Kathriguppe Main Rd, Bengaluru, Karnataka 560085
-							  </a>							  
+								<p
+									class="sm:text-lg text-sm text-heading mb-2 font-semibold"
+								>
+									Location
+								</p>
+								<a
+									href="https://www.google.com/maps?q=No.+206,+Vinni+Arcade+100+Feet+Ring+Road,+Kathriguppe+Main+Rd,+Bengaluru,+Karnataka+560085"
+									target="_blank"
+									class="sm:text-sm text-xs hover:text-primary-500 cursor-pointer"
+								>
+									No. 206, Vinni Arcade 100 Feet Ring Road,
+									Kathriguppe Main Rd, Bengaluru, Karnataka
+									560085
+								</a>
 							</div>
 						</div>
 					</div>
-					<div class="md:w-3/5 md:mr-2 md:ml-10 mr-0 px-4">
-						<div class="p-0 sm:p-0 md:p-0">
-							<div class="mt-3">
-								<p class="sm:text-lg text-md text-heading font-bold">Send a Message</p>
-								<p class="sm:text-sm text-xs text-heading mt-3 mb-3">We’d love to hear from you! Send us a message, and let’s stay connected.</p>
-							</div>
-							<div class="flex flex-col md:flex-row md:space-x-4">
-								<div class="flex-1 mb-4">
-									<input type="text" name="name" id="name" bind:value={name} class="flex w-full border-1 sm:text-sm text-xs border-gray-200 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="User Name" />
-									{#if showErrors && name.length === 0}
-										<span class="text-red-500 sm:text-xs text-2s font-medium"
-											>Name is required</span
-										>
-									{/if}
-									{#if name.length > 0 && !/^[A-Za-z\s]+$/.test(name)}
-										<span class="text-red-500 sm:text-xs text-2s font-medium"
-											>Name cannot contain numbers or
-											special characters</span
-										>
-									{/if}
-								</div>
-							</div>
-							<div class="flex flex-col md:flex-row md:space-x-4">
-								<div class="flex-1 mb-4">
+					<div class="md:w-3/5 p-2">
+						<div class="p-2 sm:p-6">
+							<p
+								class="sm:text-lg text-md text-heading font-bold"
+							>
+								Send a Message
+							</p>
+							<p
+								class="sm:text-sm text-xs text-heading mt-3 mb-3"
+							>
+								We'd love to hear from you! Send us a message,
+								and let's stay connected.
+							</p>
+
+							<div>
+								<div class="mb-4">
 									<input
-										type="hidden"
-										name="email"
-										id="email"
-										bind:value={email}
+									  type="text"
+									  name="name"
+									  id="name"
+									  bind:value={name}
+									  class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+									  placeholder="User Name"
+									  on:input={() => {
+										const trimmedName = name.trim();
+										name = trimmedName;
+										validateField("name");
+										errors.name = !name
+										  ? "*Required"
+										  : !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(name)
+										  ? "Please enter a valid name"
+										  : "";
+									  }}
 									/>
-									<form
-										action="?/verifyemail"
-										bind:this={form3}
-										method="POST"
-										use:enhance={({}) => {
-											return async ({ result }) => {
-												isLoading = false;
-												console.log("result", result);
-												if (
-													result.data?.status === 200
-												) {
-													ProfileEmailVerified =
-														result.data
-															.isEmailVerified;
-													if (
-														authedUserEmailVerified ===
-														true
-													) {
-														ProfileEmailVerified = true;
-													}
-
-													verificationMessage =
-														result.data.message;
-
-													if (
-														verificationMessage.includes(
-															"Verification email sent successfully. Please check your inbox.",
-														)
-													) {
-														displayMessage =
-															"Please check your inbox.";
-														emailSent = true;
-														enteredOtp = "";
-														isOtpVerified = false;
-													} else {
-														displayMessage =
-															verificationMessage;
-														emailSent = false;
-														isOtpVerified = false;
-													}
-
-													toast.success(
-														verificationMessage,
-													);
-												} else {
-													toast.error(
-														result.data.message,
-													);
-													ProfileEmailVerified =
-														result.data
-															.isEmailVerified;
-													emailSent = false;
-												}
-											};
-										}}
-										class="flex w-full items-center"
-										on:submit={() => {
-											isLoading = true;
-										}}
-									>
-										<div class="relative w-full">
-											<input
-												type="text"
-												name="email"
-												id="email"
-												bind:value={email}
-												class="flex w-full border-1 border-gray-200 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
-												placeholder="Email"
-												on:input={() => {
-													email = email.trim();
-
-													ProfileEmailVerified = false;
-													emailSent = false;
-													authedUserEmailVerified = false;
-												}}
-											/>
-											{#if showErrors && email.length === 0}
-												<span
-													class="text-red-500 sm:text-xs text-2s font-medium"
-													>Email is required</span
-												>
-											{/if}
-											{#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
-												<span
-													class="text-red-500 sm:text-xs text-2s font-medium"
-													>Please enter a valid email
-													address.</span
-												>
-											{/if}
-											{#if isLoading}
-												<span
-													class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
-												>
-													<Icon
-														icon="line-md:loading-alt-loop"
-														class="w-4 h-4 mr-1"
-													/>
-													Verifying...
-												</span>
-											{:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
-												<button
-													type="submit"
-													class="absolute right-2 top-1/2 mt- transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
-													disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-														email,
-													) ||
-														email
-															.split("@")[1]
-															.includes("gamil")}
-												>
-													Verify
-												</button>
-											{:else if emailSent}
-												<span
-													class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-												>
-													{#if isOtpVerified}
-														Verified
-														<Icon
-															icon="material-symbols:verified-rounded"
-															class="w-4 h-4 mt-2 ml-1"
-														/>
-													{:else}
-														<Icon
-															icon="fluent:mail-all-read-16-filled"
-															class="w-4  h-4 mr-1"
-														/>
-														Check your inbox
-													{/if}
-												</span>
-											{:else}
-												<span
-													class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-												>
-													Verified
-													<Icon
-														icon="material-symbols:verified-rounded"
-														class="w-4 h-4 ml-1"
-													/>
-												</span>
-											{/if}
-										</div>
-									</form>
-									{#if emailSent && isOtpVerified === false}
-										<br />
-
+									{#if errors?.name}
+									  <span class="text-red-500 text-xs">
+										{errors.name}
+									  </span>
+									{/if}
+								  </div>
+								<input
+									type="hidden"
+									name="email"
+									id="email"
+									bind:value={email}/>
+								<div class="flex-1 mb-4">
+									<div class="flex-1 mb-4">
 										<form
-											action="?/verifyOtpEmail"
+											action="?/verifyemail"
+											bind:this={form3}
 											method="POST"
-											use:enhance={() => {
+											use:enhance={({}) => {
 												return async ({ result }) => {
-													loadingotp = false; // Hide loading spinner when the request is complete
-													if (result.status === 200) {
+													isLoading = false;
+													console.log(
+														"result",
+														result,
+													);
+													if (
+														result.data?.status ===
+														200
+													) {
+														ProfileEmailVerified =
+															result.data
+																.isEmailVerified;
 														if (
-															result.data
-																.status === 200
+															authedUserEmailVerified ===
+															true
 														) {
-															const verifiedMessage =
-																result.data
-																	.message;
-															toast.success(
-																verifiedMessage,
-															);
-															isOtpVerified =
-																result.data
-																	.isEmailVerified;
-															enteredOtpemail =
-																"";
 															ProfileEmailVerified = true;
-															console.log(
-																isOtpVerified,
-																"isOtpVerified",
-															);
-														} else {
-															const errorMessage =
-																result.data
-																	.message ||
-																"An unknown error occurred!";
-															toast.error(
-																errorMessage,
-															);
 														}
-													} else {
-														const errorMessage =
-															result.data
-																.message ||
-															"Request failed. Please try again.";
-														toast.error(
-															errorMessage,
+
+														verificationMessage =
+															result.data.message;
+
+														if (
+															verificationMessage.includes(
+																"Verification email sent successfully. Please check your inbox.",
+															)
+														) {
+															displayMessage =
+																"Please check your inbox.";
+															emailSent = true;
+															enteredOtp = "";
+															isOtpVerified = false;
+														} else {
+															displayMessage =
+																verificationMessage;
+															emailSent = false;
+															isOtpVerified = false;
+														}
+
+														toast.success(
+															verificationMessage,
 														);
+													} else {
+														toast.error(
+															result.data.message,
+														);
+														ProfileEmailVerified =
+															result.data
+																.isEmailVerified;
+														emailSent = false;
 													}
 												};
 											}}
+											class="flex w-full items-center"
 											on:submit={() => {
-												loadingotp = true; // Show loading message when form is submitted
+												isLoading = true;
 											}}
 										>
 											<div class="relative w-full">
 												<input
-													type="hidden"
+													type="text"
 													name="email"
 													id="email"
 													bind:value={email}
-												/>
-												<input
-													type="text"
-													name="enteredOtp"
-													bind:value={enteredOtpemail}
-													placeholder="Enter 6-digit OTP"
-													class="flex w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+													class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+													placeholder="Email"
 													on:input={() => {
-														enteredOtpemail =
-															enteredOtpemail.trim();
+														email = email.trim();
+														validateField("email");
+														errors.email = !email
+															? "*Required"
+															: !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+																		email,
+																  ) ||
+																  email
+																		.split(
+																			"@",
+																		)[1]
+																		.includes(
+																			"gamil",
+																		)
+																? "Please enter a valid email address"
+																: "";
+														ProfileEmailVerified = false;
+														emailSent = false;
+														authedUserEmailVerified = false;
 													}}
 												/>
-												<button
-													type="submit"
-													class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded hover:underline"
-													disabled={loadingotp}
+												{#if isLoading}
+													<span
+														class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
+													>
+														<Icon
+															icon="line-md:loading-alt-loop"
+															class="w-4 h-4 mr-1"
+														/>
+														Verifying...
+													</span>
+												{:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
+													<button
+														type="submit"
+														class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
+														disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+															email,
+														) ||
+															email
+																.split("@")[1]
+																.includes(
+																	"gamil",
+																)}
+													>
+														Verify
+													</button>
+												{:else if emailSent}
+													<span
+														class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+													>
+														{#if isOtpVerified}
+															Verified
+															<Icon
+																icon="material-symbols:verified-rounded"
+																class="w-4 h-4 mt-2 ml-1"
+															/>
+														{:else}
+															<Icon
+																icon="fluent:mail-all-read-16-filled"
+																class="w-4  h-4 mr-1"
+															/>
+															Check your inbox
+														{/if}
+													</span>
+												{:else}
+													<span
+														class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+													>
+														Verified
+														<Icon
+															icon="material-symbols:verified-rounded"
+															class="w-4 h-4 ml-1"
+														/>
+													</span>
+												{/if}
+											</div>
+										</form>
+										{#if emailSent && isOtpVerified === false}
+											<form
+												action="?/verifyOtpEmail"
+												method="POST"
+												use:enhance={() => {
+													return async ({
+														result,
+													}) => {
+														loadingotp = false; 
+														if (
+															result.status ===
+															200
+														) {
+															if (
+																result.data
+																	.status ===
+																200
+															) {
+																const verifiedMessage =
+																	result.data
+																		.message;
+																toast.success(
+																	verifiedMessage,
+																);
+																isOtpVerified =
+																	result.data
+																		.isEmailVerified;
+																enteredOtpemail =
+																	"";
+																ProfileEmailVerified = true;
+																console.log(
+																	isOtpVerified,
+																	"isOtpVerified",
+																);
+															} else {
+																const errorMessage =
+																	result.data
+																		.message ||
+																	"An unknown error occurred!";
+																toast.error(
+																	errorMessage,
+																);
+															}
+														} else {
+															const errorMessage =
+																result.data
+																	.message ||
+																"Request failed. Please try again.";
+															toast.error(
+																errorMessage,
+															);
+														}
+													};
+												}}
+												on:submit={() => {
+													loadingotp = true; 
+												}}
+											>
+												<div
+													class="relative w-full mb-2"
 												>
-													<!-- {loadingotp ? 'Verifying...' : 'Verify'} -->
-													{#if loadingotp}
+													<input
+														type="hidden"
+														name="email"
+														id="email"
+														bind:value={email}
+													/>
+													<input
+														type="text"
+														name="enteredOtp"
+														bind:value={
+															enteredOtpemail
+														}
+														placeholder="Enter 6-digit OTP"
+														class="w-full placeholder:text-xs mt-4 text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+														on:input={() => {
+															enteredOtpemail =
+																enteredOtpemail.trim();
+															enteredOtpemail =
+																enteredOtpemail
+																	.replace(
+																		/\D/g,
+																		"",
+																	)
+																	.slice(
+																		0,
+																		6,
+																	);
+														}}
+													/>
+													<button
+														type="submit"
+														class="absolute top-1/2 right-3 mt-2 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded-md hover:text-primary-800 hover:underline disabled:opacity-50"
+														disabled={loadingotp}
+													>
+														{#if loadingotp}
+															<span
+																class="flex items-center"
+															>
+																<Icon
+																	icon="line-md:loading-alt-loop"
+																	class="w-4 h-4 mr-1 animate-spin"
+																/>
+																Verifying...
+															</span>
+														{:else}
+															Verify
+														{/if}
+													</button>
+												</div>
+												<div
+													class="flex justify-end text-xs"
+												>
+													<span>
+														Didn't receive the code?</span
+													>
+													<button
+														type="button"
+														on:click={handleResendOtpemail}
+														disabled={loadingotp}
+														class="text-primary-400 hover:text-primary-500 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+													>
+														Get a new code
+													</button>
+												</div>
+											</form>
+										{/if}
+										{#if errors?.email}
+											<span class="text-red-500 text-xs"
+												>{errors.email}</span
+											>
+										{/if}
+
+										{#if emailSent && isOtpVerified === false}
+											<!-- OTP verification form -->
+										{/if}
+									</div>
+								</div>
+
+								<div
+									class="grid grid-cols-1 md:grid-cols-2 my-4 gap-6"
+								>
+									<div>
+										<div class="relative">
+											<input
+												type="text"
+												name="country"
+												bind:value={country}
+												placeholder="Search country"
+												on:input={handleInputChange}
+												on:click={toggleDropdown}
+												on:keydown={handleKeyDown}
+												on:input={() => {
+													validateField("country");
+													
+													  
+												}}
+												class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+											/>
+
+											{#if showDropdown}
+												<div
+													class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
+												>
+													<ul
+														class="max-h-60 overflow-y-auto text-sm"
+													>
+														{#each filteredCountries as country (country.name)}
+															<!-- svelte-ignore a11y-click-events-have-key-events -->
+															<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+															<li
+																on:click={() =>
+																	selectCountry(
+																		country,
+																	)}
+																class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+															>
+																{country.name}
+																({country.code})
+															</li>
+														{/each}
+														{#if filteredCountries.length === 0}
+															<div
+																class="flex items-center px-4 py-3"
+															>
+																<Icon
+																	icon="tabler:info-square-rounded-filled"
+																	class="text-red-500 text-base mr-2"
+																/>
+																<li
+																	class="text-gray-800 text-xs"
+																>
+																	No matching
+																	countries
+																	found!
+																</li>
+															</div>
+														{/if}
+													</ul>
+												</div>
+											{/if}
+											{#if errors?.country}
+												<p
+													class="text-red-500 text-xs mt-1"
+												>
+													{errors.country}
+												</p>
+											{/if}
+										</div>
+									</div>
+
+									<div>
+										<input
+											type="tel"
+											name="phone"
+											placeholder="Enter Contact Number"
+											class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+											bind:value={phone}
+											title="Please enter a valid phone number"
+											on:input={() => {
+												phone = phone
+													.replace(/[^+\d]/g, "");
+												validateField("phone");
+												validatePhoneNumber(
+													country,
+													phone,
+												);
+											}}
+										/>
+										{#if errors?.phone}
+											<p class="text-red-500 text-xs mt-1">
+												{errors.phone}
+											</p>
+										{/if}
+									</div>
+								</div>
+								<div class="pb-4">
+									<input
+									  type="text"
+									  name="company"
+									  placeholder="Enter Company Name"
+									  class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+									  bind:value={company}
+									  title="Please enter a valid company name"
+									  on:input={() => {
+										// const trimmedName = company.trim();
+										// company = trimmedName;
+										validateField("company");
+										
+									  }}
+									  />
+									  {#if errors?.company}
+									  <span class="text-red-500 text-xs">{errors.company}</span>
+								  {/if}
+								</div>
+								<!-- Subject field -->
+								<div class="flex flex-col md:flex-row md:space-x-4">
+									<div class="flex-1 mb-4">
+										<input
+											type="text"
+											name="subject"
+											id="subject"
+											bind:value={subject}
+											class="w-full text-sm placeholder:text-xs px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+											placeholder="Subject"
+											on:input={() => {
+												validateField("subject");
+												errors.subject =
+													!subject ||
+													subject.trim() === ""
+														? "*Required"
+														: !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(
+																	subject,
+															  ) ||
+															  /<[^>]*>/.test(
+																	subject,
+															  )
+															? 'No special characters allowed except &-.,!@():;"'
+															: "";
+											}}
+										/>
+										{#if errors?.subject}
+											<span class="text-red-500 text-xs"
+												>{errors.subject}</span
+											>
+										{/if}
+									</div>
+								</div>
+
+								<!-- Message field -->
+								<div class="">
+									<div class="">
+										<textarea
+											name="message"
+											id="message"
+											bind:value={message}
+											class="w-full text-sm h-24 placeholder:text-xs px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+											placeholder="Message"
+											on:input={() => {
+												validateField("message");
+												errors.message =
+													!message ||
+													message.trim() === ""
+														? "*Required"
+														: !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(
+																	message,
+															  ) ||
+															  /<[^>]*>/.test(
+																	message,
+															  )
+															? 'No special characters allowed except &-.,!@():;"'
+															: "";
+											}}
+										></textarea>
+										{#if errors?.message}
+											<span class="text-red-500 text-xs"
+												>{errors.message}</span
+											>
+										{/if}
+									</div>
+								</div>
+
+								<!-- Captcha and Submit button -->
+								<div class="flex flex-col lg:flex-row mb-2">
+									<div class="flex-1 mb-4">
+										<label
+											for="recaptcha"
+											class="block text-sm font-medium text-gray-700"
+										>
+										</label>
+										<input
+											type="hidden"
+											name="token"
+											value={captchaToken}
+										/>
+										<div id="g-recaptcha-response">
+											<label
+												class="flex mt-5 md:mt-6 items-center justify-end space-x-2 mb-4 cursor-pointer"
+											>
+												<input
+													type="checkbox"
+													name="captcha"
+													value="captcha"
+													class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded-md cursor-pointer hover:border-primary-500 transition-colors duration-300"
+													bind:checked={isChecked}
+													on:click={(event) => {
+														event.preventDefault();
+														if (formValid()) {
+															isChecked = true;
+															showPopup();
+														} else {
+															if (
+																Object.keys(
+																	errors,
+																).length > 0
+															) {
+																toast.error(
+																	"Please fill all the required fields.",
+																);
+																return;
+															}
+															if (
+																!(
+																	ProfileEmailVerified ||
+																	authedUserEmailVerified ===
+																		true
+																)
+															) {
+																{
+																	toast.error(
+																		"Please verify your email to proceed",
+																	);
+																	return;
+																}
+															}
+
+															isChecked = false;
+														}
+													}}
+												/>
+												<span
+													class="text-gray-700 font-medium text-sm"
+													>Please verify you are human</span
+												>
+											</label>
+
+											<div
+												class="mt-4 rounded flex items-center justify-end"
+											>
+												<button
+													class="px-6 py-3 rounded-md bg-primary-400 text-white font-medium shadow-md hover:shadow-xl transform transition hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-300"
+													on:click={(event) => {
+														event.preventDefault();
+
+														if (!formValid()) {
+															if (
+																Object.keys(
+																	errors,
+																).length > 0
+															) {
+																toast.error(
+																	"Please fill all the required fields.",
+																);
+																return;
+															}
+
+															if (
+																!(
+																	ProfileEmailVerified ||
+																	authedUserEmailVerified ===
+																		true
+																)
+															) {
+																toast.error(
+																	"Please verify your email to proceed",
+																);
+																return;
+															}
+														}
+
+														if (!isChecked) {
+															toast.error(
+																"Please complete the CAPTCHA to proceed with the submission.",
+															);
+															return;
+														}
+
+														handleSubmit({ event });
+													}}
+													on:keydown={(event) => {
+														if (
+															event.key ===
+															"Enter"
+														) {
+															event.preventDefault();
+														}
+													}}
+												>
+													{#if submitting}
 														<span
-															class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 flex items-center"
+															class="flex items-center justify-center"
 														>
 															<Icon
 																icon="line-md:loading-alt-loop"
-																class="w-4 h-4 mr-1 animate-spin"
+																class="w-4 h-4 mr-2 animate-spin"
 															/>
-															Verifying...
+															Submitting...
 														</span>
 													{:else}
-														Verify
+														Submit Request
 													{/if}
 												</button>
 											</div>
-											<div
-												class="flex justify-end text-sm"
-											>
-												<button
-													type="button"
-													on:click={handleResendOtpemail}
-													disabled={loadingotp}
-													class="text-sm text-primary-600 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-												>
-													Get a new code
-												</button>
-											</div>
-										</form>
-									{/if}
-								</div>
-							</div>
-							<!-- <div class="flex flex-col md:flex-row md:space-x-4">
-								<div class="flex-1 mb-4">
-									<select
-										name="country"
-										id="country"
-										bind:value={country}
-										class="block w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
-									>
-										<option value="" disabled selected
-											>Select a country</option
-										>
-										{#each countries as { code, name }}
-											<option value={name}
-												>{name}({code})</option
-											>
-										{/each}
-									</select>
-									{#if showErrors && country.length === 0}
-										<span class="text-red-500 sm:text-xs text-2s font-medium"
-											>country is required</span
-										>
-									{/if}
-								</div>
-								<div class="flex-1 mb-4">
-									<input
-										type="tel"
-										name="phone"
-										id="phone"
-										bind:value={phone}
-										class="block w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
-										placeholder="Phone"
-									/>
-									{#if showErrors && phone.length === 0}
-										<span class="text-red-500 sm:text-xs text-2s font-medium"
-											>Phone number is required</span
-										>
-									{/if}
-									{#if phone.length > 0 && !validatePhoneNumber(country, phone)}
-										<span class="text-red-500 sm:text-xs text-2s font-medium"
-											>Please enter a valid phone number
-											for {country}</span
-										>
-									{/if}
-								</div>
-							</div> -->
-							<div class="flex flex-col md:flex-row md:space-x-4">
-								<!-- <div class="flex-1 mb-4">
-									<select name="country" id="country" bind:value={country} class="block w-full sm:text-sm text-xs border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400">
-										<option value="" disabled selected>Select a country</option>
-										{#each countries as { code, name }}
-										  <option value={name}>{name}({code})</option>
-										{/each}
-									  </select>
-									{#if showErrors && country.length === 0}
-										<span class="text-red-500 sm:text-xs text-2s font-medium">country is required</span>
-									{/if}
-								</div> -->
-								<div class="flex-1 mb-4 relative w-full">
-									<!-- <label class="block text-gray-700 font-semibold text-sm my-2">*Country</label> -->
 
-									<!-- Input Field for Country Search -->
-									<div class="relative">
-										<input
-											type="text"
-											bind:value={country}
-											placeholder="Country"
-											on:input={handleInputChange}
-											on:click={toggleDropdown}
-											class="block w-full sm:text-sm text-xs border-1 border-gray-200 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
-											required
-										/>
-										<Icon
-											icon={showDropdown
-												? "ep:arrow-up-bold"
-												: "ep:arrow-down-bold"}
-											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
-											on:click={toggleDropdown}
-										/>
+											{#if errorMessage}
+												<p class="text-red-500 text-sm mt-2">
+													{errorMessage}
+												</p>
+											{/if}
+										</div>
 									</div>
 
-									<!-- Dropdown Suggestions -->
-									{#if showDropdown}
+									{#if showCaptchaPopup}
+									<!-- svelte-ignore a11y-click-events-have-key-events -->
+									<!-- svelte-ignore a11y-no-static-element-interactions -->
+									<div
+										class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
+										on:click={closeCaptchaPopup}
+									>
+										<!-- svelte-ignore a11y-click-events-have-key-events -->
+										<!-- svelte-ignore a11y-no-static-element-interactions -->
 										<div
-											class="absolute w-full bg-white border-1 border-gray-300 rounded-md shadow-lg z-10 mt-1"
+											class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100"
+											on:click|stopPropagation
 										>
-											<ul
-												class="max-h-60 overflow-y-auto text-sm"
-											>
-												{#each filteredCountries as country (country.name)}
-													<!-- svelte-ignore a11y-click-events-have-key-events -->
-													<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-													<li
-														on:click={() =>
-															selectCountry(
-																country
-															)}
-														class="px-4 py-2 cursor-pointer hover:bg-gray-100"
-													>
-														{country.name} ({country.code})
-													</li>
-												{/each}
-												{#if filteredCountries.length === 1}
-													<div
-														class="px-4 py-2 text-gray-600 text-xs"
-													>
-														No matching countries
-														found!
-													</div>
+											<h2 class="text-xl font-bold mb-6 text-gray-800 text-center">
+												Verify You're Human
+											</h2>
+								
+											<div class="bg-gray-50 p-4 rounded-lg mb-6">
+												<p class="flex items-center justify-between text-gray-700 font-medium">
+													<span class="text-lg">{mathQuestion}</span>
+													<button
+													class="ml-4 text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-all duration-300 {submittingForm ? 'opacity-50 cursor-not-allowed' : ''}"
+													on:click={submittingForm ? null : refreshMathQuestion}
+													disabled={submittingForm}
+												>
+													<Icon
+														icon="ic:round-refresh"
+														class={`w-5 h-5 text-primary-600 ${submittingForm ? '' : 'cursor-pointer hover:scale-110'} transition transform ${rotationClass}`}
+													/>
+												</button>
+												</p>
+											</div>
+											
+											<div class="mb-6">
+												<input
+													type="text"
+													bind:value={userAnswer}
+													placeholder="Your Answer"
+													class="border border-gray-300 rounded-lg w-full p-3 text-gray-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all"
+													on:input={onInputChange}
+													readonly={inputReadOnly}
+												/>
+								
+												{#if errorMessagecap}
+													<p class="text-red-500 text-sm mt-2 flex items-center">
+														<Icon icon="mdi:alert-circle" class="w-4 h-4 mr-1" />
+														{errorMessagecap}
+													</p>
 												{/if}
-											</ul>
+												
+												{#if successMessage}
+													<p class="text-green-500 text-sm mt-2 flex items-center">
+														<Icon icon="mdi:check-circle" class="w-4 h-4 mr-1" />
+														{successMessage}
+													</p>
+												{/if}
+											</div>
+											
+											{#if submittingForm}
+												<div class="w-full mb-4">
+													<p class="text-sm mb-2 flex items-center text-gray-600">
+														<Icon icon="mdi:loading" class="w-4 h-4 mr-2 animate-spin" />
+														Submitting form
+													</p>
+													<div class="relative">
+														<div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+															<!-- Bind the width of the progress bar to the progress variable -->
+															<div
+																class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
+																style="width: {progress}%;"
+															></div>
+														</div>
+													</div>
+												</div>
+											{/if}
+											
+											<button
+												class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base"
+												on:click={() => {
+													onInputChange();
+													if (!errorMessagecap && userAnswer) {
+														submittingForm = true;
+								
+														setTimeout(() => {
+															submittingForm = false;
+															successMessage = 'Verification successful!';
+														}, 2000);
+													} else {
+														errorMessagecap = '*Please answer the question correctly';
+													}
+												}}
+											>
+												Verify Now
+											</button>
 										</div>
-									{/if}
-
-									<!-- Validation Message -->
-									{#if showErrors && country.length === 0}
-										<span
-											class="text-red-500 sm:text-xs text-2s font-medium "
-											>Country is required</span
-										>
-									{/if}
-								</div>
-								<div class="flex-1 mb-4">
-									<input
-										type="tel"
-										name="phone"
-										id="phone"
-										bind:value={phone}
-										class="block w-full sm:text-sm text-xs border-1 border-gray-200 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
-										placeholder="Phone"
-									/>
-									{#if showErrors && phone.length === 0}
-										<span
-											class="text-red-500 sm:text-xs text-2s font-medium "
-											>Phone number is required</span
-										>
-									{/if}
-									{#if phone?.length > 0 && !validatePhoneNumber(country, phone)}
-										<span
-											class="text-red-500 sm:text-xs text-2s font-medium "
-											>Please enter a valid phone number
-											for {country}</span
-										>
-									{/if}
-								</div>
-							</div>
-
-							<div class="flex flex-col md:flex-row md:space-x-4">
-								<div class="flex-1 mb-4">
-									<input
-										type="text"
-										name="subject"
-										id="subject"
-										bind:value={subject}
-										class="block w-full sm:text-sm text-xs border-1 border-gray-200 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
-										placeholder="Subject"
-									/>
-									{#if showErrors && subject.length === 0}
-										<span class="text-red-500 sm:text-xs text-2s font-medium"
-											>Subject is required</span
-										>
-									{/if}
-								</div>
-							</div>
-							<div class="flex-1 mb-4">
-								<textarea name="message" id="message" bind:value={message} class="w-full sm:text-sm text-xs p-2 border-1 border-gray-200 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400 h-32" placeholder="Message"></textarea>
-								{#if showErrors && message.length === 0}
-									<span class="text-red-500 sm:text-xs text-2s font-medium"
-										>Message is required</span
-									>
+									</div>
 								{/if}
-							</div>
-							<input type="hidden" name="status" value="unread" />
-							<div class="mt-2 mb-3 flex items-center justify-end gap-x-6">
-								<button
-									type="submit"
-									on:click={handleSubmit}
-									class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-400 text-white sm:text-md text-xs rounded-md transition-all duration-300 hover:bg-primary-500 sm:w-auto font-semibold"
-									>
-									{#if submitting}
-									Sending...
-								  {:else}
-									Send Message
-								  {/if}
-									</button
-								>
+								</div>
 							</div>
 						</div>
 					</div>
-				</section>
+				</div>
 			</form>
 		</div>
-		<Toaster position="bottom-right" richColors />
 	</section>
 {/if}
+<Toaster position="bottom-right" richColors />

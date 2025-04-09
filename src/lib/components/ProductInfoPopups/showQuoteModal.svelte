@@ -32,8 +32,8 @@
     form5.requestSubmit();
   };
 
-  function handleInput() {
-    enteredOtp = enteredOtp.trim();
+  function handleInput(e) {
+    enteredOtp = e.target.value.replace(/[^0-9]/g, "").trim();
   }
 
   function validateForm() {
@@ -130,7 +130,7 @@
           {#if productName}
             {productQuote.productName}
           {:else}
-            <!-- {selectedProduct.name || "--"} -->
+            {selectedProduct.name || "--"}
           {/if}
         </p>
       </div>
@@ -477,7 +477,7 @@
       <div class="flex justify-between items-center mt-4">
         <button
           on:click={toggleQuoteModal}
-          class="bg-teal-500 hover:bg-teal-600 text-white font-medium py-1.5 px-4 rounded"
+          class="bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium py-1.5 px-4 rounded"
         >
           ✖ Close
         </button>
@@ -485,12 +485,15 @@
           type="submit"
           class="bg-primary-500 hover:bg-primary-600 text-white font-medium rounded py-1.5 px-4"
         >
-        {#if isSubmitting}
-        <Icon icon="line-md:loading-alt-loop" class="w-5 h-5 mr-2 animate-spin inline" />
-        Submitting..
-      {:else}
-        Submit
-      {/if}
+          {#if isSubmitting}
+            <Icon
+              icon="line-md:loading-alt-loop"
+              class="w-5 h-5 mr-2 animate-spin inline"
+            />
+            Submitting..
+          {:else}
+            Submit
+          {/if}
         </button>
       </div>
     </form>

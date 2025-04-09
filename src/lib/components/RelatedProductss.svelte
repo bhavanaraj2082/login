@@ -4,6 +4,7 @@
   import { toast, Toaster } from "svelte-sonner";
   import { invalidate } from "$app/navigation";
   import Icon from "@iconify/svelte";
+  import { goto } from '$app/navigation';
   import { currencyState, cartTotalComps } from "$lib/stores/mainStores.js";
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
   import { authedUser } from "$lib/stores/mainStores.js";
@@ -18,50 +19,24 @@
   import { enhance } from "$app/forms";
   $: displayPrice =
     $currencyState === "usd"
-      ? selectedProduct.priceUSD
-      : selectedProduct.priceINR;
+      ? selectedProduct.USD
+      : selectedProduct.INR;
   $: currencySymbol = $currencyState === "usd" ? "$" : "₹";
 
-  const productsData = relatedProducts;
+  // const productsData = relatedProducts;
   let isLoggedIn = $authedUser?.id ? true : false;
   let showCartPopup = false;
-  let RelatedProductData = productsData.map((product) => {
-    return {
-      productId: product._id,
-      prodDesc: product.prodDesc,
-      productName: product.productName,
-      priceSize:
-        Array.isArray(product.stockPriceSize) &&
-        product.stockPriceSize.length > 0
-          ? product.stockPriceSize.map((size) => ({
-              size: size.break || "N/A",
-              priceINR: size.inr || 0,
-              priceUSD: size.usd || 0,
-              offer: size.offer || "0",
-            }))
-          : [],
-      image: product.image,
-      manufacturer: product.manufacturerInfo[0]?.name,
-      manufacturerId: product.manufacturerInfo[0]?._id,
-      distributorId: product.stockInfo?.[0]?.distributor || "",
-      stockInfo: Array.isArray(product.stockInfo) ? product.stockInfo : [],
-      stockId:
-        Array.isArray(product.stockInfo) && product.stockInfo.length > 0
-          ? product.stockInfo.map((stock) => stock._id)
-          : [],
-      stock: product.stockQuantity,
-      category: product.categoryInfo[0]?.urlName,
-      subCategory: product.subCategoryInfo[0]?.urlName,
-      subsubCategory: product.subsubCategoryInfo[0]?.urlName,
-      productUrl: product.productUrl,
-      productNumber: product.productNumber,
-      variants: Array.isArray(product.variants) ? product.variants : [],
-    };
-  });
-
+  let RelatedProductData = relatedProducts;
+  // console.log("final RelatedProductData",RelatedProductData);
+  
   let currentIndex = 0;
   let logosPerSlide = 4;
   let totalSlides = Math.ceil(RelatedProductData.length / logosPerSlide);
+
+  function handleViewCartClick() {
+    showCartPopup = false;
+    goto('/cart');
+  }
 
   function prevSlide() {
     if (currentIndex > 0) {
@@ -309,7 +284,7 @@
   <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
 </form>
 <div class="max-w-7xl mx-auto my-10 md:w-11/12">
-  <h3 class="text-xl font-bold text-heading p-1 mx-auto">Related Products</h3>
+  <h3 class="text-xl font-bold text-heading p-1 mx-auto uppercase">Related Products</h3>
 
   <div class="relative mt-1">
     <div class="flex items-center">
@@ -345,7 +320,7 @@
                   >
                     <img
                       src="{PUBLIC_IMAGE_URL}/{product?.image}"
-                      onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+                      onerror="this.src='/fallback.jpg'"
                       alt="Img"
                       class="w-20 h-20 object-contain rounded-sm"
                     /></a
@@ -456,7 +431,7 @@
       <div class="flex flex-row sm:flex-row gap-4 mb-3">
         <img
           src="{PUBLIC_IMAGE_URL}/{selectedProduct?.image}"
-          onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+          onerror="this.src='/fallback.jpg'"
           alt="ProductImage"
           class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border mx-auto sm:mx-0"
         />
@@ -505,7 +480,7 @@
                   Price:
                   <span class="font-semibold text-md">
                     {#if $currencyState === "inr"}
-                      ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
+                      ₹ {(Number(selectedPrice?.INR) || 0).toLocaleString(
                         "en-IN",
                         {
                           minimumFractionDigits: 2,
@@ -513,7 +488,7 @@
                         }
                       )}
                     {:else if $currencyState === "usd"}
-                      $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
+                      $ {(Number(selectedPrice?.USD) || 0).toLocaleString(
                         "en-US",
                         {
                           minimumFractionDigits: 2,
@@ -546,7 +521,7 @@
           <div class="mt-4">
             <h1 class="font-semibold">Select Size</h1>
             <div class="flex gap-3 mt-3 flex-wrap mb-4">
-              {#each selectedProduct.priceSize as { size }, index}
+              {#each selectedProduct.priceSize as { break: size }, index}
                 <button
                   class="focus:bg-primary-400 hover:scale-105 focus:text-white border px-3 py-1 rounded-full {selectedPriceIndex ===
                   index
@@ -567,7 +542,7 @@
                   Price:
                   <span class="font-semibold text-md">
                     {#if $currencyState === "usd"}
-                      $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
+                      $ {(Number(selectedPrice?.USD) || 0).toLocaleString(
                         "en-US",
                         {
                           minimumFractionDigits: 2,
@@ -575,7 +550,7 @@
                         }
                       )}
                     {:else}
-                      ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
+                      ₹ {(Number(selectedPrice?.INR) || 0).toLocaleString(
                         "en-IN",
                         {
                           minimumFractionDigits: 2,
@@ -707,7 +682,7 @@
         <button on:click={cartTogglePopup} class="text-primary-400 font-bold">
           <Icon
             icon="mdi:close"
-            class="text-2xl font-bold hover:bg-primary-400 hover:text-white hover:rounded-md hover:p-px"
+            class="text-2xl font-bold hover:bg-red-100 text-red-600 border rounded hover:p-px"
           />
         </button>
       </div>
@@ -715,7 +690,7 @@
         <div class="flex items-center mb-6 justify-around w-full">
           <img
             src="{PUBLIC_IMAGE_URL}/{selectedProduct?.image}"
-            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+            onerror="this.src='/fallback.jpg'"
             alt="Img"
             class="w-24 h-24 object-contain p-1 mt-2 border rounded"
           />
@@ -743,7 +718,7 @@
               <p class="text-base font-semibold text-gray-800">
                 {#if $currencyState === "usd"}
                   $ {(
-                    Number(selectedPrice?.priceUSD || 0) *
+                    Number(selectedPrice?.USD || 0) *
                     Number(popupQuantity || 1) *
                     1.18
                   ).toLocaleString("en-US", {
@@ -752,7 +727,7 @@
                   })}
                 {:else}
                   ₹ {(
-                    Number(selectedPrice?.priceINR || 0) *
+                    Number(selectedPrice?.INR || 0) *
                     Number(popupQuantity || 1) *
                     1.18
                   ).toLocaleString("en-IN", {
@@ -770,7 +745,7 @@
             <div class="flex flex-col items-center gap-1 mt-1">
               <p class="text-sm font-bold text-gray-500">
                 {#if $currencyState === "usd"}
-                  $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
+                  $ {(Number(selectedPrice?.USD || 0) * Number(popupQuantity || 1)).toLocaleString(
                     "en-US",
                     {
                       minimumFractionDigits: 2,
@@ -778,7 +753,7 @@
                     }
                   )}
                 {:else}
-                  ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
+                  ₹ {(Number(selectedPrice?.INR || 0) * Number(popupQuantity || 1)).toLocaleString(
                     "en-IN",
                     {
                       minimumFractionDigits: 2,
@@ -801,7 +776,7 @@
         </button>
         <button
           class="text-primary-400 px-3 py-1.5 rounded font-normal flex gap-2 border-1 border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
-          on:click={() => (window.location.href = "/cart")}
+          on:click={handleViewCartClick}
         >
           View Cart
           <Icon icon="ic:round-shopping-cart" class="text-2xl inline mr-1" />

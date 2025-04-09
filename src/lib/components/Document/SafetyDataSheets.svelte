@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { goto } from "$app/navigation";
   import Icon from "@iconify/svelte";
+  import { toast, Toaster } from "svelte-sonner";
   let showNav = false;
   let showErrors = false;
   let showProductDetails = false;
@@ -45,7 +46,7 @@
     document.body.appendChild(link);
     link.click(); 
   } else {
-    alert("Invalid datasheet URL");
+    toast.error("Invalid datasheet URL");
   }
 }
   function toggleProductDetails() {
@@ -192,28 +193,28 @@
   <div class="w-full inline-flex rounded mb-8">
     <nav
       aria-label="Tabs"
-      class="w-full flex space-x-0 overflow-x-auto rounded-t hide"
-    >
-      {#each tabs as tab}
-        <div class="inline-block w-full">
-          <button
-            on:click={() => (activeTab = tab.name)}
-            class="w-full py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300
-              {activeTab === tab.name
-              ? 'bg-gray-50 text-primary-500 font-bold'
-              : 'bg-primary-100 text-black'}
-              hover:bg-gray-50 hover:text-primary-500 whitespace-nowrap"
-          >
-            {tab.name}
-          </button>
-          <div
-            class="h-0.5 bg-primary-300
-            {activeTab === tab.name
-              ? 'w-full'
-              : 'w-0'} transition-all duration-300 ease-in-out"
-          ></div>
-        </div>
-      {/each}
+      class="w-full flex space-x-3 rounded-t overflow-hidden pb-1 lg:overflow-x-hidden overflow-x-scroll scroll"      
+      >
+    {#each tabs as tab}
+    <div class="inline-block w-full">
+      <button
+        on:click={() => (activeTab = tab.name)}
+        class="w-full py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300
+          {activeTab === tab.name
+          ? 'bg-primary-100 text-primary-500 font-semibold'
+          : 'bg-primary-200 text-black'}
+          hover:bg-primary-400 hover:text-white whitespace-nowrap"
+      >
+        {tab.name}
+      </button>
+      <div
+        class="h-0.5 bg-primary-500
+        {activeTab === tab.name
+          ? 'w-full'
+          : 'w-0'} transition-all duration-300 ease-in-out"
+      ></div>
+    </div>
+  {/each}
     </nav>
   </div>
 
@@ -732,9 +733,10 @@
                 </ul>
               </div>
               <p class="mt-3">
-                Having trouble? Feel free to contact <strong
-                  >Technical Service</strong
-                > for assistance.
+                Having trouble? Feel free to 
+                <span class="text-primary-500 font-semibold hover:underline">
+                  <a href="/contact-us">Contact Us </a>
+                </span>
               </p>
             </div>
           {/if}
@@ -813,9 +815,10 @@
                   </ul>
                 </div>
                 <p class="mt-3">
-                  Having trouble? Feel free to contact <strong
-                    >Technical Service</strong
-                  > for assistance.
+                  Having trouble? Feel free to 
+                  <span class="text-primary-500 font-semibold hover:underline">
+                    <a href="/contact-us">Contact Us </a>
+                  </span>
                 </p>
               </div>
             {/if}
@@ -848,11 +851,13 @@
                   Lot and Batch Numbers can be found on a product's label
                   following the words 'Lot' or 'Batch'.
                 </p>
-                <h4 class="font-bold mt-2">Mallipore Products</h4>
+                <h4 class="font-bold mt-2">Chemikart Products</h4>
                 <h2>
-                  For assistance obtaining the Lot or batch number for Millipore
-                  products, please contact
-                  <span class="font-bold">customer support</span>.
+                  For assistance obtaining the Lot or batch number for Chemikart Products, please contact
+                  <span class="text-primary-500 font-semibold hover:underline">
+                    <a href="/contact-us">Contact Us </a>
+                  
+                  </span>
                 </h2>
               </div>
             {/if}
@@ -953,9 +958,10 @@
                   </ul>
                 </div>
                 <p class="mt-3">
-                  Having trouble? Feel free to contact <strong
-                    >Technical Service</strong
-                  > for assistance.
+                  Having trouble? Feel free to 
+                  <span class="text-primary-500 font-semibold hover:underline">
+                    <a href="/contact-us">Contact Us </a>
+                  </span>
                 </p>
               </div>
             {/if}
@@ -1111,9 +1117,10 @@
                   </ul>
                 </div>
                 <p class="mt-3">
-                  Having trouble? Feel free to contact <strong
-                    >Technical Service</strong
-                  > for assistance.
+                  Having trouble? Feel free to 
+                  <span class="text-primary-500 font-semibold hover:underline">
+                    <a href="/contact-us">Contact Us </a>
+                  </span>
                 </p>
               </div>
             {/if}
@@ -1153,7 +1160,7 @@
                     >062K1064</code
                   >.
                 </p>
-                <h4 class="font-bold mt-2">Aldrich Products</h4>
+                <h4 class="font-bold mt-2">Chemikart Products</h4>
                 <ul class="list-disc ml-5">
                   <li>
                     For a lot number such as <code>TO09019TO</code>, enter it as
@@ -1200,3 +1207,4 @@
     </div>
   </div>
 </div>
+<Toaster position="bottom-right" richColors />

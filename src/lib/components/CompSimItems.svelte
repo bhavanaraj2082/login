@@ -1,72 +1,132 @@
 <script>
   import {PUBLIC_IMAGE_URL} from "$env/static/public"
   import { onMount } from "svelte";
-  import { browser } from "$app/environment";
-  import Icon from "@iconify/svelte";
-  import { invalidate } from "$app/navigation";
   import { toast, Toaster } from "svelte-sonner";
-  import { currencyState } from "$lib/stores/mainStores.js";
+  import { goto } from '$app/navigation';
+  import { invalidate } from "$app/navigation";
+  import Icon from "@iconify/svelte";
+  import { currencyState, cartTotalComps } from "$lib/stores/mainStores.js";
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
   import { authedUser } from "$lib/stores/mainStores.js";
   import { sendMessage } from "$lib/utils.js";
   import ShowQuoteModal from "$lib/components/ProductInfoPopups/showQuoteModal.svelte";
   export let compareSimilarity;
   export let profile;
-  // console.log(compareSimilarity,"compare");
   let showQuoteModal = false;
   let productQuote = null;
   let form5;
-
+  // console.log("compareSimilarity",compareSimilarity);
+  import { enhance } from "$app/forms";
   $: displayPrice =
     $currencyState === "usd"
-      ? selectedProduct.priceUSD
-      : selectedProduct.priceINR;
+      ? selectedProduct.USD
+      : selectedProduct.INR;
   $: currencySymbol = $currencyState === "usd" ? "$" : "₹";
-  const productsData = compareSimilarity;
+  let showDifference = false;
+  function toggleDifference(event) {
+    showDifference = event.target.checked;
+  }
+  let specificKeys = [
+    "material",
+    "Agency",
+    "matrix active group",
+    "technique(s)",
+    "application(s)",
+    "Plug Shape",
+    "Noise Reduction Rating (NRR)",
+    "Disposable",
+    "Size",
+    "Dielectric",
+    "application(s)",
+    "technique(s)",
+    "matrix active group",
+    "packaging",
+    "product line",
+    "material",
+    "Agency",
+    "packaging",
+    "parameter",
+    "fitting",
+    "compatability"
+  ];
+  function truncateByLength(text, maxLength) {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + "...";
+    }
+    return text;
+  }
+  function isUnique(value, key) {
+    if (value === "-" || value === undefined) {
+      return false;
+    }
+    const values = CompareSimilarityData.map(
+      (product) => product.properties[key]
+    ).filter((val) => val !== "-");
+    return values.filter((v) => v === value).length === 1;
+  }
+
+  function handleViewCartClick() {
+    showCartPopup = false;
+    goto('/cart');
+  }
+
+  // const productsData = compareSimilarity;
   let isLoggedIn = $authedUser?.id ? true : false;
-  let CompareSimilarityData = productsData.map((product) => ({
-    productId: product._id,
-    prodDesc: product.prodDesc,
-    productName: product.productName,
-    image: product.image,
-    manufacturer: product.manufacturerInfo?.[0]?.name || "Unknown",
-    stock: product.stockQuantity,
-    category: product.categoryInfo?.[0]?.urlName || "Uncategorized",
-    subCategory: product.subCategoryInfo?.[0]?.urlName || "Uncategorized",
-    subsubCategory: product.subsubCategoryInfo?.[0]?.urlName || "Uncategorized",
-    productUrl: product.productUrl,
-    manufacturerId: product.manufacturerInfo[0]?._id,
-    distributorId: product.stockInfo?.[0]?.distributor || "",
-    stockInfo: Array.isArray(product.stockInfo) ? product.stockInfo : [],
-    stockId:
-      Array.isArray(product.stockInfo) && product.stockInfo.length > 0
-        ? product.stockInfo.map((stock) => stock._id)
-        : [],
-    productNumber: product.productNumber,
-    properties: product.properties || {},
-    priceSize:
-      Array.isArray(product.stockPriceSize) && product.stockPriceSize.length > 0
-        ? product.stockPriceSize.map((size) => ({
-            size: size.break || "N/A",
-            priceINR: size.inr || 0,
-            priceUSD: size.usd || 0,
-            offer: size.offer || "0",
-          }))
-        : [],
-    variants: Array.isArray(product.variants) ? product.variants : [],
-  }));
-  // console.log(CompareSimilarityData, "CompareSimilarityData*****");
   let showCartPopup = false;
+  // let RelatedProductData = productsData.map((product) => {
+  //   return {
+  //     productId: product._id,
+  //     prodDesc: product.prodDesc,
+  //     productName: product.productName,
+  //     priceSize:
+  //       Array.isArray(product.stockPriceSize) &&
+  //       product.stockPriceSize.length > 0
+  //         ? product.stockPriceSize.map((size) => ({
+  //             size: size.break || "N/A",
+  //             priceINR: size.inr || 0,
+  //             priceUSD: size.usd || 0,
+  //             offer: size.offer || "0",
+  //           }))
+  //         : [],
+  //     image: product.image,
+  //     manufacturer: product.manufacturerInfo[0]?.name,
+  //     manufacturerId: product.manufacturerInfo[0]?._id,
+  //     distributorId: product.stockInfo?.[0]?.distributor || "",
+  //     stockInfo: Array.isArray(product.stockInfo) ? product.stockInfo : [],
+  //     stockId:
+  //       Array.isArray(product.stockInfo) && product.stockInfo.length > 0
+  //         ? product.stockInfo.map((stock) => stock._id)
+  //         : [],
+  //     stock: product.stockQuantity,
+  //     category: product.categoryInfo[0]?.urlName,
+  //     subCategory: product.subCategoryInfo[0]?.urlName,
+  //     subsubCategory: product.subsubCategoryInfo[0]?.urlName,
+  //     productUrl: product.productUrl,
+  //     productNumber: product.productNumber,
+  //     variants: Array.isArray(product.variants) ? product.variants : [],
+  //   };
+  // });
+
+  let CompareSimilarityData = compareSimilarity;
+  // console.log("final RelatedProductData",RelatedProductData);
+  
   let currentIndex = 0;
   let logosPerSlide = 4;
   let totalSlides = Math.ceil(CompareSimilarityData.length / logosPerSlide);
 
   function prevSlide() {
-    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+    if (currentIndex > 0) {
+      currentIndex = (currentIndex - 1) % totalSlides;
+    }
   }
 
   function nextSlide() {
-    currentIndex = (currentIndex + 1) % totalSlides;
+    if (currentIndex < totalSlides - 1) {
+      currentIndex = (currentIndex + 1) % totalSlides;
+    }
+  }
+  function cartTogglePopup() {
+    showCartPopup = !showCartPopup;
   }
 
   function updateLogosPerSlide() {
@@ -96,22 +156,21 @@
   let selectedProduct = {};
   let selectedPrice;
   let selectedStockId;
+  let selectedVariants;
   let selectedPriceIndex = 0;
   let showModal = false;
-  let selectedVariants;
-  // let showCartMessage = false;
 
   function openModal(product) {
+    // console.log("Product Data in openModal:", product);
     selectedProduct = {
-      description: product.description,
-      id: product.id,
+      productId: product.productId || product._id,
       brand: product.brand,
-      name: product.name,
-      image: product.image,
-      name: product.name,
+      description: product.description,
+      name: product.productName || product.name,
+      image: product.image || product.image,
       partNumber: product.partNumber,
       priceSize: product.priceSize,
-      quantity: product.quantity || 1,
+      // quantity: product.quantity || 1,
       stock: product.stock,
       category: product.category,
       subCategory: product.subCategory,
@@ -120,50 +179,23 @@
       distributorId:
         product.distributorId || product.stockInfo?.[0]?.distributor || "",
       stockId: Array.isArray(product.stockId) ? product.stockId : [],
-      productId: product.productId || product._id,
       variants: Array.isArray(product.variants) ? product.variants : [],
     };
+
     selectedPriceIndex = 0;
     selectedPrice = selectedProduct.priceSize[selectedPriceIndex];
     selectedStockId = selectedProduct.stockId[selectedPriceIndex] || "NA";
     selectedVariants = selectedProduct.variants[selectedPriceIndex] || "NA";
     popupQuantity = 1;
     showModal = true;
-    // showCartMessage = false;
 
     // console.log("Selected Product Data after openModal:", selectedProduct);
     // console.log("Selected Price:", selectedPrice);
     // console.log("Selected Stock ID:", selectedStockId);
-    // console.log("selected Vaiants", selectedVariants);
   }
 
   function closeModal() {
     showModal = false;
-  }
-
-  // function selectPrice(index, size) {
-  //   const filtered = selectedProduct.priceSize.find(
-  //     (price) => price.size === size
-  //   );
-  //   selectedPrice = filtered;
-  //   selectedPriceIndex = index;
-  // }
-
-  // function selectPrice(index, size) {
-  //   selectedPrice = selectedProduct.priceSize[index];
-  //   selectedPriceIndex = index;
-  //   selectedStockId = selectedProduct.stockId[index] || "NA";
-
-  //   // console.log("Selected Price:", selectedPrice);
-  //   // console.log("Updated Stock ID:", selectedStockId);
-  // }
-  function selectPrice(index, size) {
-    selectedPrice = {
-      ...selectedProduct.priceSize[index],
-      index: index,
-    };
-    selectedPriceIndex = index;
-    selectedStockId = selectedProduct.stockId[index] || "NA";
   }
 
   let popupQuantity = 1;
@@ -174,6 +206,7 @@
       selectedProduct.quantity = popupQuantity;
     }
   }
+
   function incrementPopupQuantity() {
     if (popupQuantity < 999) {
       popupQuantity++;
@@ -181,28 +214,35 @@
     }
   }
 
+  function selectPrice(index, size) {
+    selectedPrice = {
+      ...selectedProduct.priceSize[index],
+      index: index,
+    };
+    selectedPriceIndex = index;
+    selectedStockId = selectedProduct.stockId[index] || "NA";
+  }
+
   function handlePopupInput(event) {
-    let value = event.target.value;
+    const value = parseInt(event.target.value, 10);
 
-    // Remove non-numeric characters
-    value = value.replace(/\D/g, "");
-
-    // Convert to integer
-    value = parseInt(value, 10);
-
-    // Ensure value is within limits
-    if (isNaN(value) || value < 1) {
-      popupQuantity = null;
-    } else if (value > 999) {
-      popupQuantity = 999;
-    } else {
-      popupQuantity = value;
+    // Allow empty value during typing
+    if (event.target.value === "") {
+      popupQuantity = "";
+      return;
     }
 
-    // Update input field value to prevent invalid entries
-    event.target.value = popupQuantity;
-
-    selectedProduct.quantity = popupQuantity;
+    if (isNaN(value)) {
+      popupQuantity = 1;
+    } else {
+      if (value < 1) {
+        popupQuantity = 1;
+      } else if (value > 999) {
+        popupQuantity = 999;
+      } else {
+        popupQuantity = value;
+      }
+    }
   }
 
   const guestCartFetch = () => {
@@ -212,10 +252,6 @@
       cart.set(result.cart);
     });
   };
-
-  function cartTogglePopup() {
-    showCartPopup = !showCartPopup;
-  }
 
   export function addToCart(product, index) {
     // console.log("Product Data:", product);
@@ -249,20 +285,20 @@
 
     if (!isLoggedIn) {
       addItemToCart(cartItem);
+      submitAlternateForm();
       closeModal();
       // toast.success("Product added to cart");
       // setTimeout(() => {
       //   closeModal();
       // }, 1000);
       guestCartFetch();
-
       return;
     }
 
     const formdata = new FormData();
     formdata.append("items", JSON.stringify(cartItem));
-
     sendMessage("?/addtocart", formdata, async (result) => {
+      submitForm();
       // toast.success(result.message);
       closeModal();
       // setTimeout(() => {
@@ -271,34 +307,36 @@
       invalidate("/");
     });
 
-    console.log("Final Cart Item Sent:", cartItem);
+    // console.log("Final Cart Item Sent:", cartItem);
   }
+  let form2;
+  async function submitForm() {
+    form2.requestSubmit();
+  }
+  async function submitAlternateForm() {
+    // submitGuestForm.requestSubmit();
+    const storedTotalComps = JSON.parse(localStorage.getItem("cart"));
+    localStorage.setItem("totalCompsChemi", storedTotalComps.length);
+    syncLocalStorageToStore();
+  }
+  function syncLocalStorageToStore() {
+    // Check if we are in the browser
+    if (typeof window !== "undefined") {
+      const storedTotalComps = localStorage.getItem("totalCompsChemi");
+      if (storedTotalComps) {
+        cartTotalComps.set(Number(storedTotalComps));
+      }
+    }
+  }
+  function handleDataCart() {
+    return async ({ result }) => {
+      // console.log("result from page server for carat data",result);
 
-  let specificKeys = [
-    "material",
-    "Agency",
-    "matrix active group",
-    "technique(s)",
-    "application(s)",
-  ];
-  let showDifference = false;
-  function toggleDifference(event) {
-    showDifference = event.target.checked;
-  }
-  function truncateByLength(text, maxLength) {
-    if (text.length > maxLength) {
-      return text.substring(0, maxLength) + "...";
-    }
-    return text;
-  }
-  function isUnique(value, key) {
-    if (value === "-" || value === undefined) {
-      return false;
-    }
-    const values = CompareSimilarityData.map(
-      (product) => product.properties[key]
-    ).filter((val) => val !== "-");
-    return values.filter((v) => v === value).length === 1;
+      const totalComps = result?.data?.cartData?.cartItems.length;
+      // console.log("totalComps",totalComps);
+      localStorage.setItem("totalCompsChemi", totalComps);
+      syncLocalStorageToStore();
+    };
   }
 
   function toggleQuoteModal(selectedProduct) {
@@ -311,8 +349,25 @@
     closeModal();
     location.href = `/products/${selectedProduct.category}/${selectedProduct.subCategory}/${selectedProduct.partNumber}#productVariants`;
   }
+
+  function isSameAsFirst(value, key) {
+    if (CompareSimilarityData.length === 0 ) {
+    return false; 
+  }
+
+  const firstValue = CompareSimilarityData[0].properties[key];
+  return value === firstValue;
+}
 </script>
 
+<form
+  method="POST"
+  action="/?/getCartValue"
+  bind:this={form2}
+  use:enhance={handleDataCart}
+>
+  <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
+</form>
 <div class="max-w-7xl mx-auto my-10">
   <div class="flex justify-between items-center mb-4 md:w-11/12 mx-auto">
     <h3 class="text-xl font-bold text-heading p-1">Compare Similar Items</h3>
@@ -361,7 +416,7 @@
                   >
                     <img
                       src="{PUBLIC_IMAGE_URL}/{product?.image}"
-                      onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+                      onerror="this.src='/fallback.jpg'"
                       alt="Img"
                       class="w-20 h-20 object-contain rounded-sm"
                     /></a
@@ -405,42 +460,36 @@
                         stockId: product.stockId,
                         variants: product.variants,
                       })}
-                    class="w-10/12 max-w-xs text-primary-500 py-1.5 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition px-1.5 mb-4"
+                    class="w-10/12 max-w-xs text-primary-500 py-1.5 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition px-1.5 mb-3"
                   >
                     View Price & Availability
                   </button>
                 </div>
 
+              <!-- details div -->
                 <div class="px-3 mb-3">
                   <h3 class="text-gray-700">
-                    {#each specificKeys as key}
-                      <div
-                        class="grid grid-cols-2 gap-4 mb-2 mt-2 rounded-sm p-2 {showDifference &&
-                        isUnique(product.properties[key], key)
-                          ? 'bg-primary-100 border border-gray-200'
-                          : 'bg-white'}"
-                      >
-                        <span class="text-left text-xs font-semibold"
-                          >{key}:</span
-                        >
-                        <span
-                          class="text-gray-500 text-right text-xs font-normal"
-                        >
-                          {#if product.properties && product.properties[key]}
+                    {#each Object.keys(product.properties) as key}
+                      <hr class="border-t border-gray-300" />
+                      <div class="py-2 {showDifference && !isSameAsFirst(product.properties[key], key) && product.properties[key] && product.properties[key] !== '__' ? 'bg-primary-100 ' : 'bg-white'} min-h-[60px] max-h-[60px] overflow-hidden">
+                        <div class="text-left text-xs font-semibold">{key}:</div>
+                        <div class="text-gray-500 text-xs pt-1 font-normal">
+                          {#if product.properties[key]}
                             {#if typeof product.properties[key] === "object"}
                               {JSON.stringify(product.properties[key])}
                             {:else}
-                              {truncateByLength(product.properties[key], 10)}
+                              {product.properties[key]}
                             {/if}
                           {:else}
                             -
                           {/if}
-                        </span>
+                        </div>
                       </div>
-                      <hr class="border-t border-gray-300" />
                     {/each}
                   </h3>
                 </div>
+                
+
               </div>
             </div>
           {/each}
@@ -456,7 +505,7 @@
     </div>
   </div>
 </div>
-<!-- svelte-ignore a11y-click-events-have-key-events -->
+
 {#if showModal}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -484,7 +533,7 @@
       <div class="flex flex-row sm:flex-row gap-4 mb-3">
         <img
           src="{PUBLIC_IMAGE_URL}/{selectedProduct?.image}"
-          onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+          onerror="this.src='/fallback.jpg'"
           alt="ProductImage"
           class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border mx-auto sm:mx-0"
         />
@@ -493,7 +542,8 @@
             {selectedProduct.brand || "--"}
           </p>
           <p class="text-base font-semibold text-primary-500 text-left">
-            <a href={selectedProduct.partNumber}
+            <a
+              href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
               >{selectedProduct.partNumber || "--"}</a
             >
           </p>
@@ -529,9 +579,10 @@
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start"
               >
                 <p class="text-sm sm:text-lg ml-2">
-                  Price: <span class="font-semibold text-md">
+                  Price:
+                  <span class="font-semibold text-md">
                     {#if $currencyState === "inr"}
-                      ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
+                      ₹ {(Number(selectedPrice?.INR) || 0).toLocaleString(
                         "en-IN",
                         {
                           minimumFractionDigits: 2,
@@ -539,7 +590,7 @@
                         }
                       )}
                     {:else if $currencyState === "usd"}
-                      $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
+                      $ {(Number(selectedPrice?.USD) || 0).toLocaleString(
                         "en-US",
                         {
                           minimumFractionDigits: 2,
@@ -557,7 +608,9 @@
             <p class="text-gray-700 text-sm">
               The price for this product is unavailable. Please request a quote
             </p>
-            <!-- <a href={selectedProduct.partNumber}> -->
+            <!-- <a
+              href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
+            > -->
             <button
               on:click={() => toggleQuoteModal(selectedProduct)}
               class="bg-primary-500 py-2 px-4 hover:bg-primary-600 rounded text-sm text-white mt-2"
@@ -570,7 +623,7 @@
           <div class="mt-4">
             <h1 class="font-semibold">Select Size</h1>
             <div class="flex gap-3 mt-3 flex-wrap mb-4">
-              {#each selectedProduct.priceSize as { size }, index}
+              {#each selectedProduct.priceSize as { break: size }, index}
                 <button
                   class="focus:bg-primary-400 hover:scale-105 focus:text-white border px-3 py-1 rounded-full {selectedPriceIndex ===
                   index
@@ -588,9 +641,10 @@
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start mb-4"
               >
                 <p class="text-sm sm:text-lg ml-2">
-                  Price: <span class="font-semibold text-md">
+                  Price:
+                  <span class="font-semibold text-md">
                     {#if $currencyState === "usd"}
-                      $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
+                      $ {(Number(selectedPrice?.USD) || 0).toLocaleString(
                         "en-US",
                         {
                           minimumFractionDigits: 2,
@@ -598,7 +652,7 @@
                         }
                       )}
                     {:else}
-                      ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
+                      ₹ {(Number(selectedPrice?.INR) || 0).toLocaleString(
                         "en-IN",
                         {
                           minimumFractionDigits: 2,
@@ -630,6 +684,7 @@
                     on:input={handlePopupInput}
                     class="w-16 sm:w-20 h-9 text-center border-none focus:outline-none focus:ring-0"
                   /> -->
+
                   <input
                     type="text"
                     min="1"
@@ -637,7 +692,6 @@
                     bind:value={popupQuantity}
                     class="w-12 h-6 p-0 text-center border-0 focus:border-0 focus:outline-none focus:ring-0 rounded-md"
                     on:focus={(e) => {
-                      // Select all text on focus with a small delay to ensure it works across browsers
                       setTimeout(() => {
                         e.target.select();
                       }, 10);
@@ -680,25 +734,11 @@
                     +
                   </button>
                 </div>
-                <!-- <button
-                  type="button"
-                  class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-500 hover:text-white transition {popupQuantity <
-                  1
-                    ? 'cursor-not-allowed hover:opacity-65'
-                    : ''}"
-                  disabled={popupQuantity < 1}
-                  on:click={() => {
-                    addToCart(selectedProduct, selectedPriceIndex);
-                    cartTogglePopup();
-                  }}
-                >
-                  Add to Cart
-                </button> -->
                 <button
                   type="button"
                   class="text-sm font-semibold py-2 px-4 w-full sm:w-1/2 md:w-1/2 lg:w-1/3 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-500 hover:text-white transition {popupQuantity <
                   1
-                    ? 'cursor-not-allowed hover:opacity-65'
+                    ? ' hover:opacity-65'
                     : ''}"
                   disabled={popupQuantity < 1}
                   on:click={() => {
@@ -719,7 +759,6 @@
     </div>
   </div>
 {/if}
-
 {#if showCartPopup}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -745,7 +784,7 @@
         <button on:click={cartTogglePopup} class="text-primary-400 font-bold">
           <Icon
             icon="mdi:close"
-            class="text-2xl font-bold hover:bg-primary-400 hover:text-white hover:rounded-md hover:p-px"
+            class="text-2xl font-bold hover:bg-red-100 text-red-600 border rounded hover:p-px"
           />
         </button>
       </div>
@@ -753,7 +792,7 @@
         <div class="flex items-center mb-6 justify-around w-full">
           <img
             src="{PUBLIC_IMAGE_URL}/{selectedProduct?.image}"
-            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+            onerror="this.src='/fallback.jpg'"
             alt="Img"
             class="w-24 h-24 object-contain p-1 mt-2 border rounded"
           />
@@ -781,8 +820,8 @@
               <p class="text-base font-semibold text-gray-800">
                 {#if $currencyState === "usd"}
                   $ {(
-                    (Number(selectedPrice?.priceUSD) || 0) *
-                    (Number(popupQuantity) || 0) *
+                    Number(selectedPrice?.USD || 0) *
+                    Number(popupQuantity || 1) *
                     1.18
                   ).toLocaleString("en-US", {
                     minimumFractionDigits: 2,
@@ -790,8 +829,8 @@
                   })}
                 {:else}
                   ₹ {(
-                    (Number(selectedPrice?.priceINR) || 0) *
-                    (Number(popupQuantity) || 0) *
+                    Number(selectedPrice?.INR || 0) *
+                    Number(popupQuantity || 1) *
                     1.18
                   ).toLocaleString("en-IN", {
                     minimumFractionDigits: 2,
@@ -808,7 +847,7 @@
             <div class="flex flex-col items-center gap-1 mt-1">
               <p class="text-sm font-bold text-gray-500">
                 {#if $currencyState === "usd"}
-                  $ {(Number(selectedPrice?.priceUSD) || 0).toLocaleString(
+                  $ {(Number(selectedPrice?.USD || 0) * Number(popupQuantity || 1)).toLocaleString(
                     "en-US",
                     {
                       minimumFractionDigits: 2,
@@ -816,7 +855,7 @@
                     }
                   )}
                 {:else}
-                  ₹ {(Number(selectedPrice?.priceINR) || 0).toLocaleString(
+                  ₹ {(Number(selectedPrice?.INR || 0) * Number(popupQuantity || 1)).toLocaleString(
                     "en-IN",
                     {
                       minimumFractionDigits: 2,
@@ -839,7 +878,7 @@
         </button>
         <button
           class="text-primary-400 px-3 py-1.5 rounded font-normal flex gap-2 border-1 border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
-          on:click={() => (window.location.href = "/cart")}
+          on:click={handleViewCartClick}
         >
           View Cart
           <Icon icon="ic:round-shopping-cart" class="text-2xl inline mr-1" />

@@ -40,7 +40,7 @@ export default {
 				shimmer : 'shimmer 2s ease-in-out infinite',
         		'progress-pulse': 'progress-pulse 1.5s ease-in-out infinite',
 				loadingbar: 'loadingbar 1s ease-out infinite',
-				'spin-slow': 'spin 3s linear infinite',
+				'spin-slow': 'spin 5s linear infinite',
 				'slow-bounce': 'bounce 3s infinite',
 				'pulse-delay': 'pulse-delay 2.5s ease-in-out infinite',
 				'float': 'float 6s ease-in-out infinite',

@@ -87,7 +87,7 @@ export const actions = {
 							attributes: { email, username: `${email.split('@')[0]}` }
 						});
 						user = luciaUser;
-						await new Profile({ userId: luciaUser.userId, email, sitePreferences: {
+						await new Profile({ userId: luciaUser.userId, email, needsPasswordSetup: true, sitePreferences: {
 							productEntryType : "Manual Entry",
 							noOfQuickOrderFields: 3,
 							noOfOrdersPerPage: 3,
@@ -153,6 +153,12 @@ export const actions = {
 						const existingKey = await auth.getKey('email', email);
 						await auth.updateKeyPassword('email', email, 'Password123');
 						user = await auth.getUser(existingKey.userId);
+						console.log(user,"**********");
+						await Profile.findOneAndUpdate(
+							{ email: email },
+							{ needsPasswordSetup: true },
+							{ new: true, upsert: false }
+						);
 					} catch (err) {
 						console.error('Error handling invalid password case:', err);
 						return fail(500, { errorMsg: 'Failed to update password. Please try again later.' });

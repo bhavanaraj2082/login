@@ -7,8 +7,8 @@
 <section class="w-11/12 mx-auto pb-4 max-w-7xl">
     <div class="flex flex-wrap w-full justify-between py-6">
         <div class="sm:w-3/6 w-full pb-4">
-            <h1 class="text-xl font-bold">Most Popular Products</h1>
-            <p class="text-xs md:text-sm">
+            <h1 class="text-xl font-bold mb-2">Most Popular Products</h1>
+            <p class="text-xs md:text-sm text-justify">
                 Choose Chemikart for your chemical needs and experience the
                 difference that quality and service can make in your scientific
                 endeavors.

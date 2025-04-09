@@ -20,6 +20,11 @@ const contactUSSchema = new Schema(
       required: false,
       trim: true,
     },
+    company: {
+      type: String,
+      required: false,
+      trim: true,
+    },
     subject: {
       type: String,
       required: false,
@@ -38,8 +43,7 @@ const contactUSSchema = new Schema(
     },
     status: {
       type: String,
-      required: false,
-      trim: true,
+      default: "unread"  
     },
   },
   {

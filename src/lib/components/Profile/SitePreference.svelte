@@ -59,7 +59,7 @@ const handleSubmit =()=>{
 }
 </script>
 
-<div class="shadow  rounded p-5 bg-white">
+<div class="shadow  rounded-md p-5 bg-white">
     <h1 class=" text-xl font-bold"> Manage Your Site Preferences</h1>
     {#if !toggleEdit}
        <div>
@@ -86,17 +86,17 @@ const handleSubmit =()=>{
             <div class=" w-full">
                 <label class=" text-xs md:text-sm font-medium" for="lastname">Product Entry Preference</label><br>
                 <select bind:value={productEntry}
-                class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded p-2 text-sm focus:border-primary-500">
+                class=" outline-none w-full border-1 focus:ring-0 mt-2 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500">
                     <option class=" hover:bg-primary-200" value="Manual Entry">Manual Entry</option>
                     <!-- <option class=" hover:bg-primary-200" value="Bulk Upload">Bulk Upload</option> -->
                 </select>
             </div>
             <div class=" sm:w-full">
-            <p class=" text-xs md:text-sm font-medium">Default number of entry fields on Quick Order</p>
-            <div class="w-fit flex items-center border-1 border-gray-300 rounded">
-                <button type="button" on:click={() => decrement('quickorder')} class=" border-r-1 p-2.5 border-gray-300 text-primary-500"><Icon icon="rivet-icons:minus" class="text-sm"/></button>
+            <p class=" text-xs md:text-sm font-medium mb-3">Default number of entry fields on Quick Order</p>
+            <div class="w-fit flex items-center border border-gray-300 rounded-md p-0.5 shadow">
+                <button type="button" on:click={() => decrement('quickorder')} class="p-2.5 border-gray-300 text-primary-500"><Icon icon="rivet-icons:minus" class="text-sm"/></button>
                 <p class="w-20 sm:w-40 mx-3 text-sm font-medium outline-none text-center">{quickOrder}</p>
-                <button type="button" on:click={() => increment('quickorder')} class=" border-l-1 border-gray-300 p-2.5 text-primary-500"><Icon icon="rivet-icons:plus" class="text-sm"/></button>
+                <button type="button" on:click={() => increment('quickorder')} class="border-gray-300 p-2.5 text-primary-500"><Icon icon="rivet-icons:plus" class="text-sm"/></button>
             </div>
             </div>
             <!-- <div class=" sm:w-full">
@@ -116,8 +116,8 @@ const handleSubmit =()=>{
                 </div>
             </div> -->
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
-                <button type="button" on:click={()=>toggleEdit = false} class=" w-full rounded py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
-                <button type="submit" class=" w-full rounded py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Save</button>
+                <button type="button" on:click={()=>toggleEdit = false} class=" w-full rounded-md py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
+                <button type="submit" class=" w-full rounded-md py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Save</button>
             </div>
         </form>
       </div>

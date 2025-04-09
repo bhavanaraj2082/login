@@ -21,14 +21,13 @@
 <div class="w-11/12 mx-auto">
   <div class="flex flex-col md:flex-row">
     <div class="w-full md:w-1/4 h-fit p-4 border border-gray-300 rounded-lg shadow-sm">
-        <h1 class="text-xl font-semibold mb-4">Product Safety</h1>
+        <h1 class="sm:text-base text-sm font-medium mb-4 text-heading">Product Safety</h1>
         {#each topics as topic, i}
           <button
-            class="py-2 px-4 w-full font-medium text-left cursor-pointer mb-2 transition duration-200 ease-in-out"
+            class="py-2 px-4 text-xs w-full font-medium text-left cursor-pointer mb-2 transition duration-200 ease-in-out"
             class:text-primary-500={selectedTopic === topic.id}
             class:font-semibold={selectedTopic === topic.id}
-            on:click={() => selectTopic(topic.id)}
-          >
+            on:click={() => selectTopic(topic.id)}>
             {topic.name}
           </button>
           {#if i !== topics.length - 1}

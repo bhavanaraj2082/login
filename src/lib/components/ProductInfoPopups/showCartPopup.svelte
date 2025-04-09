@@ -1,11 +1,18 @@
 <script>
   import Icon from "@iconify/svelte";
+  import { goto } from '$app/navigation';
   import { currencyState } from "$lib/stores/mainStores.js";
-  import {PUBLIC_IMAGE_URL} from "$env/static/public"
+  import { PUBLIC_IMAGE_URL } from "$env/static/public";
   export let data;
   export let cartTogglePopup;
   export let addedQuantity;
   export let index;
+  export let showCartPopup;
+  
+  function handleViewCartClick() {
+    showCartPopup = false;
+    goto('/cart');
+  }
 </script>
 
 {#each data.records as product}
@@ -39,7 +46,7 @@
             src="{PUBLIC_IMAGE_URL}/{product?.imageSrc}"
             alt="Img"
             class="w-24 h-24 object-contain p-1 mt-2 border rounded"
-            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+            onerror="this.src='/fallback.jpg'"
           />
           <div class="text-sm m-4">
             <p class="font-semibold text-primary-500">
@@ -62,13 +69,13 @@
                 {#if $currencyState === "usd"}
                   $ {(
                     (Number(product?.priceSize[index]?.USD) || 0) *
-                    0.18 *
-                    (addedQuantity || 0)
+                    1.18 *
+                    Number(addedQuantity || 0)
                   ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 {:else}
                   ₹ {(
                     (Number(product?.priceSize[index]?.INR) || 0) *
-                    0.18 *
+                    1.18 *
                     (addedQuantity || 0)
                   ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 {/if}
@@ -110,14 +117,12 @@
         >
           Continue Shopping
         </button>
-        <a href="/cart">
-          <button
+          <button on:click={handleViewCartClick}
             class="text-primary-400 px-3 py-1.5 rounded-md font-normal flex gap-2 border-1 border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
           >
             View Cart
             <Icon icon="ic:round-shopping-cart" class="text-2xl inline mr-1" />
           </button>
-        </a>
       </div>
     </div>
   </div>

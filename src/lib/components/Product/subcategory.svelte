@@ -5,13 +5,17 @@
 
   let searchTerm = "";
 
-  $: filteredSubcategories = subcategories.filter(
+  $: originalCategories = subcategories
+  .filter((subcategory) => subcategory.productCount > 0)
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+  $: filteredSubcategories = originalCategories.filter(
     (subcategory) =>
       subcategory.productCount > 0 &&
       subcategory.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  $: console.log("filteredSubcategories :", filteredSubcategories);
+  // $: console.log("filteredSubcategories :", filteredSubcategories);
 
   function clearSearch() {
     searchTerm = "";

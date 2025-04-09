@@ -12,7 +12,7 @@
 	});
 
 	const user = $authedUser?.email;
-	let email = '';
+	let email = user;
 	let orderNumber = '';
 	let error = {};
 	let showErrorPopup = false;
@@ -36,8 +36,7 @@
 		}
 		return async ({ result }) => {
 			if (result.type === 'success' && result.data.success) {
-
-				let email = result?.data?.order?.profileId?.email || '';
+				let email = result?.data?.order?.userEmail || '';
 				let url = `/order-status/${result.data?.order?.orderid}`;
 				if (email) {
 					url += `?email=${encodeURIComponent(email)}`;

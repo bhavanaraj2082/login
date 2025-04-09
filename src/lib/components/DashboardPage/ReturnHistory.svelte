@@ -253,7 +253,7 @@
               <input
                 type="text"
                 placeholder="Search by Return Order ID, Invoice Number, or Order Number"
-                class="w-full h-10 border rounded px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-0 focus:border-primary-500"
+                class="w-full h-10 border rounded-md px-4 py-2 pl-10 text-sm focus:outline-none focus:ring-0 focus:border-primary-500"
                 bind:value={filters.searchTerm}
                 on:input={handleSearch}/>
                 {#if filters.searchTerm}
@@ -296,7 +296,7 @@
           <div class="flex flex-col sm:flex-row w-full lg:w-1/4">
             <div class="flex-1 sm:max-w-[200px]">
               <select
-                class="w-full h-10 border rounded px-3 py-2 text-sm appearance-none bg-white focus:outline-none focus:ring-0 focus:border-primary-500"
+                class="w-full h-10 border rounded-md px-3 py-2.5 text-xs appearance-none bg-white focus:outline-none focus:ring-0 focus:border-primary-500"
                 bind:value={filters.status}
                 on:change={filterReturns}>
                 <option value="">All Status</option>
@@ -307,7 +307,7 @@
             </div>
             <div class="flex-1 md:ml-2 md:mt-0 mt-2">
               <button
-                class="w-full h-10 border bg-white border-primary-500 rounded flex items-center justify-center px-4 text-sm hover:bg-primary-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                class="w-full h-10 border bg-white border-primary-500 rounded-md flex items-center justify-center px-4 text-sm hover:bg-primary-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 on:click={clearFilters}
                 disabled={!isAnyFilterActive}>
                 <Icon icon="hugeicons:filter-remove" class="mr-2" width="20" height="20"/>
@@ -318,13 +318,13 @@
         </div>
       </div>
       {#if filteredReturns.length === 0}
-      <div class="p-8 my-2 border border-yellow-500 rounded flex justify-center bg-white items-center">
+      <div class="p-8 my-2 border border-yellow-500 rounded-md flex justify-center bg-white items-center">
           <p class="text-yellow-800">No returns match your current filters. Try adjusting your search criteria.</p>
       </div>
       {:else}
           <div class="py-1">
               {#each paginatedReturns as item (item._id)}
-                  <div class="bg-white rounded shadow-sm border border-gray-200 overflow-hidden">
+                  <div class="bg-white rounded-md shadow border border-gray-200 overflow-hidden">
                       <!-- svelte-ignore a11y-click-events-have-key-events -->
                       <!-- svelte-ignore a11y-no-static-element-interactions -->
                       <div class="p-4 cursor-pointer hover:bg-gray-50" 
@@ -392,11 +392,11 @@
                                           <h5 class="text-sm font-medium text-gray-500 mb-2">Estimation Date</h5>
                                           <p class="text-sm">{formatDate(getStatusObject(item).estimation)}</p>
                                       </div>
-                                      <div class="bg-gray-50 p-4 rounded">
+                                      <div class="bg-gray-50 p-4 rounded-md">
                                           <h5 class="text-sm font-medium text-gray-500 mb-2">Picked Date</h5>
                                           <p class="text-sm">{formatDate(getStatusObject(item).picked) || 'N/A'}</p>
                                       </div>
-                                      <div class="bg-gray-50 p-4 rounded">
+                                      <div class="bg-gray-50 p-4 rounded-md">
                                           <h5 class="text-sm font-medium text-gray-500 mb-2">Current Status</h5>
                                           <p class="text-sm">{getStatusObject(item).status || 'N/A'}</p>
                                       </div>
@@ -404,7 +404,7 @@
                                   <form method="POST" action="?/cancelreturn" class="flex justify-end" use:enhance={handleCancelReturn}>
                                       <input type="hidden" name="id" value={item._id}>
                                       <button type="submit"
-                                              class="px-4 py-2 border border-primary-500 text-primary-500 rounded hover:bg-primary-500 hover:text-white transition-colors">
+                                              class="px-4 py-2 border border-primary-500 text-primary-500 rounded-md hover:bg-primary-500 hover:text-white transition-colors">
                                           Cancel Return
                                       </button>
                                   </form>

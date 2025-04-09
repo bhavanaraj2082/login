@@ -43,34 +43,70 @@
   const phoneRegex = /^[6-9]\d{9}$/;
 
   function validateUsername() {
+    let newErrors = { ...errors }; // Create a new object for reactivity
+
     if (!username) {
-      errors.username = "*Required";
+      newErrors.username = "*Required";
     } else if (username.length < 3) {
-      errors.username = "Please enter at least 3 characters";
+      newErrors.username = "Please enter at least 3 characters";
     } else if (/^[^a-zA-Z]/.test(username)) {
-      errors.username = "Username must start with a letter";
+      newErrors.username = "Username must start with a letter";
     } else if (/[^a-zA-Z0-9_]/.test(username)) {
-      errors.username =
+      newErrors.username =
         "Username can include only letters, numbers, and underscore ( _ )";
     } else if (/^[0-9]+$/.test(username)) {
-      errors.username = "Username cannot contain only numbers";
+      newErrors.username = "Username cannot contain only numbers";
     } else if (/^[_]+$/.test(username)) {
-      errors.username = "Username cannot contain only underscores ( _ )";
+      newErrors.username = "Username cannot contain only underscores ( _ )";
     } else if (!/^(?=(.*[a-zA-Z]){3,})[a-zA-Z0-9_]+$/.test(username.trim())) {
-      errors.username = "Username must contain at least 3 letters";
+      newErrors.username = "Username must contain at least 3 letters";
     } else {
-      delete errors.username;
+      delete newErrors.username;
     }
+
+    errors = newErrors; // Reassign errors to trigger reactivity
   }
 
   function validateEmail() {
+    let newErrors = { ...errors }; // Create a new object for reactivity
+
     if (!email) {
-      errors.email = "*Required";
+      newErrors.email = "*Required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = "Please enter a valid email.";
+      newErrors.email = "Please enter a valid email.";
     } else {
-      delete errors.email;
+      delete newErrors.email;
     }
+
+    errors = newErrors; // Reassign errors to trigger reactivity
+  }
+
+  function validateFirstName() {
+    let newErrors = { ...errors }; // Ensure reactivity
+
+    if (!firstName) {
+      newErrors.firstName = "*Required";
+    } else if (!/^[a-zA-Z\s]+$/.test(firstName)) {
+      newErrors.firstName = "First name can only contain letters and spaces";
+    } else {
+      delete newErrors.firstName;
+    }
+
+    errors = newErrors; // Update errors object to trigger reactivity
+  }
+
+  function validateLastName() {
+    let newErrors = { ...errors }; // Ensure reactivity
+
+    if (!lastName) {
+      newErrors.lastName = "*Required";
+    } else if (!/^[a-zA-Z\s]+$/.test(lastName)) {
+      newErrors.lastName = "Last name can only contain letters and spaces";
+    } else {
+      delete newErrors.lastName;
+    }
+
+    errors = newErrors; // Update errors object to trigger reactivity
   }
 
   function validatePhone() {
@@ -88,63 +124,37 @@
     }
   }
 
-  // function validatePassword() {
-  //   if (!password) {
-  //     errors.password = "*Required";
-  //   } else if (
-  //     !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-  //       password
-  //     )
-  //   ) {
-  //     errors.password =
-  //       "Ensure your password matches the format outlined below.";
-  //   } else {
-  //     delete errors.password;
-  //   }
-  // }
-  let errors = { password: "" };
-
-  if (!password) {
-    error.password = "*Required";
-  } else if (
-    !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-      password
-    )
-  ) {
-    error.password = "Ensure your password matches the format outlined below.";
-  } else {
-    delete error.password;
-  }
-
+  let errors = {};
   let passwordStrength = 0;
 
   function validatePassword() {
     typing = password.length > 0;
-    errors.password = "";
 
-    if (password.length < 8) {
-      errors.password = "Password must be at least 8 characters long.";
-    }
-    // Check if the password contains the word 'password'
-    else if (password.includes("password")) {
-      errors.password = "Password cannot contain common or guessable text.";
-    }
+    let newErrors = { ...errors };
 
     if (!password) {
-      errors.password = "*Required";
+      newErrors.password = "*Required";
       passwordStrength = 0;
+    } else if (password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long.";
+    }
+    // Check if the password contains the word 'password'
+    else if (password.toLowerCase().includes("password")) {
+      newErrors.password = "Password cannot contain common or guessable text.";
     } else if (
       !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
         password
       )
     ) {
-      errors.password =
+      newErrors.password =
         "Ensure your password matches the format outlined below.";
       passwordStrength = 50;
     } else {
-      delete errors.password;
+      delete newErrors.password;
       passwordStrength = calculateStrength(password);
     }
+
+    errors = newErrors; // Reassign to trigger reactivity
   }
 
   function calculateStrength(password) {
@@ -159,13 +169,15 @@
   $: calculateStrength(password);
 
   function validateConfirmPassword() {
+    let newErrors = { ...errors };
     if (!passwordConfirm) {
-      errors.passwordConfirm = "*Required";
+      newErrors.passwordConfirm = "*Required";
     } else if (passwordConfirm !== password) {
-      errors.passwordConfirm = "Passwords do not match";
+      newErrors.passwordConfirm = "Passwords do not match";
     } else {
-      delete errors.passwordConfirm;
+      delete newErrors.passwordConfirm;
     }
+    errors = newErrors; // Reassign to trigger reactivity
   }
 
   const handleResendemailOtp = () => {
@@ -1012,29 +1024,31 @@
   }
 
   function validatePhoneNumber(countryName, phone) {
+    let newErrors = { ...errors };
+
     if (!phone) {
-      errors.phone = "*Required";
-      return;
+      newErrors.phone = "*Required";
+    } else if (!countryName) {
+      newErrors.phone = "Select a country before entering your phone number";
     } else {
-      errors.phone = "";
-    }
+      const matchedCountry = countries.find((c) => c.name === countryName);
 
-    if (!countryName) {
-      errors.phone = "Select a country before entering your phone number";
-      return;
-    } else {
-      errors.phone = "";
-    }
+      if (!matchedCountry) {
+        newErrors.phone = "Invalid country selected to validate phone";
+        newErrors.country = "Invalid country selected";
+      } else {
+        const phonePattern = getPhonePattern(matchedCountry.code);
+        const phoneRegex = new RegExp(phonePattern);
 
-    const countryCode = countries.find((c) => c.name === countryName)?.code;
-    const phonePattern = getPhonePattern(countryCode);
-    const phoneRegex = new RegExp(phonePattern);
-
-    if (!phoneRegex.test(phone)) {
-      errors.phone = `Please enter a valid phone number for ${countryName}.`;
-    } else {
-      errors.phone = "";
+        if (!phoneRegex.test(phone)) {
+          newErrors.phone = `Please enter a valid phone number for ${countryName}.`;
+        } else {
+          delete newErrors.phone;
+          delete newErrors.country;
+        }
+      }
     }
+    errors = newErrors;
   }
 
   const countriesLength = countries.length;
@@ -1054,9 +1068,10 @@
   }
   let filteredCountries = countries;
   let showDropdown = false;
+
   function selectCountry(selectedCountry) {
     country = selectedCountry.name;
-    searchTerm = `${selectedCountry.name} `;
+    searchTerm = selectedCountry.name;
     showDropdown = false;
     validateCountry();
     validatePhoneNumber(country, phone);
@@ -1076,51 +1091,57 @@
     showDropdown = filteredCountries.length > 0 && searchTerm !== "";
   }
 
-  // function handleInputChange(event) {
-  //   searchTerm = event.target.value;
-  //   filterCountries();
-  // }
-  function handleInputChange(event) {
-    // Get the current input value
-    searchTerm = event.target.value;
+  function handleInputChange(event, fromValidation = false) {
+    searchTerm = event.target.value.trim();
 
-    // Track if user is deleting text
     const isDeleting =
       event.inputType === "deleteContentBackward" ||
       event.inputType === "deleteContentForward";
 
-    if (searchTerm.length > 0 && !isDeleting) {
-      // Filter countries
-      filterCountriesWithoutAutoSelect();
+    filterCountriesWithoutAutoSelect();
 
-      // Show dropdown with filtered results
-      showDropdown = filteredCountries.length > 0;
+    const codeSearch = searchTerm.replace("+", "").trim();
+    showDropdown = !fromValidation;
 
-      // Check for country code matches specifically
-      const codeSearch = searchTerm.replace("+", "").trim();
-      if (codeSearch.length > 0) {
-        const exactCodeMatches = filteredCountries.filter(
-          (country) => country.code.replace("+", "") === codeSearch
-        );
+    if (searchTerm.length === 0) {
+      errors.country = "Invalid country selected";
+      errors.phone = "Invalid country selected to validate phone";
+      return;
+    }
 
-        if (exactCodeMatches.length === 1) {
-          selectCountry(exactCodeMatches[0]);
-          return;
-        }
+    if (!isDeleting) {
+      const exactCodeMatches = filteredCountries.filter(
+        (country) => country.code.replace("+", "") === codeSearch
+      );
+
+      if (exactCodeMatches.length === 1) {
+        selectCountry(exactCodeMatches[0]);
+        return;
       }
 
-      const countriesStartingWith = filteredCountries.filter((country) =>
+      const nameMatches = filteredCountries.filter((country) =>
         country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
       );
 
-      if (countriesStartingWith.length === 1) {
-        selectCountry(countriesStartingWith[0]);
+      if (nameMatches.length === 1) {
+        selectCountry(nameMatches[0]);
+        return;
       }
+    }
+
+    const countryExists = countries.some((c) =>
+      c.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+    );
+
+    if (!countryExists) {
+      errors.country = "Invalid country selected";
+      errors.phone = "Invalid country selected to validate phone";
     } else {
-      filterCountriesWithoutAutoSelect();
-      showDropdown = filteredCountries.length > 0;
+      delete errors.country;
+      delete errors.phone;
     }
   }
+
   function filterCountriesWithoutAutoSelect() {
     filteredCountries = countries.filter(
       (country) =>
@@ -1129,6 +1150,39 @@
           .replace("+", "")
           .includes(searchTerm.replace("+", "").toLowerCase())
     );
+  }
+
+  function handleKeyDowncountry(event) {
+    const exactCountryMatch = countries.some((c) => c.name === country);
+
+    if (
+      exactCountryMatch &&
+      !(
+        event.key === "Backspace" ||
+        event.key === "Delete" ||
+        event.key === "ArrowLeft" ||
+        event.key === "ArrowRight" ||
+        event.key === "Home" ||
+        event.key === "End" ||
+        event.key === "Tab" ||
+        event.key === "Escape" ||
+        event.ctrlKey
+      )
+    ) {
+      event.preventDefault();
+      return false;
+    }
+
+    if (
+      event.key === "Enter" &&
+      searchTerm.length >= 3 &&
+      filteredCountries.length > 0
+    ) {
+      selectCountry(filteredCountries[0]);
+      event.preventDefault();
+    } else if (event.key === "Escape") {
+      showDropdown = false;
+    }
   }
 
   function filterCountries() {
@@ -1151,25 +1205,6 @@
     }
   }
 
-  // function validateGstNumber() {
-  //   // if (!gstNumber) {
-  //   //   errors.gstNumber = '*Required';
-  //   // } else if (!/^[0-9]{2}[A-Z0-9]+$/.test(gstNumber)) {
-  //   //   errors.gstNumber = 'Please provide a valid GST Number.';
-  //   // } else {
-  //   //   delete errors.gstNumber;
-  //   // }
-
-  //   if (gstNumber) {
-  //     if (!/^[0-9]{2}[A-Z0-9]+$/.test(gstNumber)) {
-  //       errors.gstNumber = "Please provide a valid GST Number.";
-  //     } else {
-  //       delete errors.gstNumber;
-  //     }
-  //   } else {
-  //     delete errors.gstNumber;
-  //   }
-  // }
   function validateGstNumber() {
     if (companyName && !gstNumber) {
       errors.gstNumber =
@@ -1201,144 +1236,12 @@
     }
   }
 
-  // function validateForm() {
-  //   errors = {};
-  //   if (!username) {
-  //     errors.username = "*Required";
-  //   } else if (username.length < 3) {
-  //     errors.username = "Please enter at least 3 characters";
-  //   } else if (/^[^a-zA-Z]/.test(username)) {
-  //     errors.username = "Username must start with a letter";
-  //   } else if (/[^a-zA-Z0-9_]/.test(username)) {
-  //     errors.username =
-  //       "Username can include only letters, numbers, and underscore ( _ )";
-  //   } else if (/^[0-9]+$/.test(username)) {
-  //     errors.username = "Username cannot contain only numbers";
-  //   } else if (/^[_]+$/.test(username)) {
-  //     errors.username = "Username cannot contain only underscores ( _ )";
-  //   } else if (!/^(?=(.*[a-zA-Z]){3,})[a-zA-Z0-9_]+$/.test(username.trim())) {
-  //     errors.username = "Username must contain at least 3 letters";
-  //   } else {
-  //     delete errors.username;
-  //   }
-
-  //   if (!email) {
-  //     errors.email = "*Required";
-  //   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-  //     errors.email = "Please enter a valid email.";
-  //   } else {
-  //     delete errors.email;
-  //   }
-
-  //   if (!phone) {
-  //     errors.phone = "*Required";
-  //   } else {
-  //     const phonePattern = getPhonePattern(country);
-  //     const phoneRegex = new RegExp(phonePattern);
-
-  //     if (!phoneRegex.test(phone)) {
-  //       errors.phone = `Please enter a valid phone number for ${country}.`;
-  //     } else {
-  //       delete errors.phone;
-  //     }
-  //   }
-
-  //   if (!country) {
-  //     errors.phone =
-  //       "Please select the country before entering the phone number";
-  //   } else {
-  //     delete errors.phone;
-  //   }
-
-  //   if (!country) {
-  //     errors.country = "*Required";
-  //   } else {
-  //     delete errors.country;
-  //   }
-
-  //   if (!password) {
-  //     errors.password = "*Required";
-  //   } else if (
-  //     !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-  //       password
-  //     )
-  //   ) {
-  //     errors.password =
-  //       "Ensure your password matches the format outlined below.";
-  //   } else {
-  //     delete errors.password;
-  //   }
-
-  //   if (!passwordConfirm) {
-  //     errors.passwordConfirm = "*Required";
-  //   } else if (passwordConfirm !== password) {
-  //     errors.passwordConfirm = "Passwords do not match";
-  //   } else {
-  //     delete errors.passwordConfirm;
-  //   }
-
-  //   if (!termsAccepted) {
-  //     errors.termsAndConditions =
-  //       "You need to agree to the Terms of Service and Privacy Policy to proceed";
-  //   }
-
-  //   if (gstNumber) {
-  //     if (!/^[0-9]{2}[A-Z0-9]+$/.test(gstNumber)) {
-  //       errors.gstNumber = "Please provide a valid GST Number.";
-  //     } else {
-  //       delete errors.gstNumber;
-  //     }
-  //   } else {
-  //     delete errors.gstNumber;
-  //   }
-
-  //   if (tanNumber) {
-  //     if (!/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(tanNumber)) {
-  //       errors.tanNumber = "Please provide a valid TAN Number";
-  //     } else {
-  //       delete errors.tanNumber;
-  //     }
-  //   } else {
-  //     delete errors.tanNumber;
-  //   }
-
-  //   if (!(isOtpVerified === true)) {
-  //     // toast.error('Please verify your email or phone number to proceed');
-  //     toast.error("Please verify your email to proceed");
-  //   }
-
-  //   console.log(isOtpVerified, "isOtpVerified");
-  //   console.log("Error object:", errors);
-  //   errorCount = Object.keys(errors).length;
-  //   console.log("Number of errors:", errorCount);
-
-  //   return (
-  //     Object.keys(errors).length === 0 && isOtpVerified === true
-  //     // (isOtpVerified === true || isEmailVerified || isOtpPhoneVerified || ProfilePhoneVerified)
-  //   );
-  // }
-
   function validateForm() {
     errors = {};
     if (companyName && !/^[a-zA-Z\s]+$/.test(companyName)) {
       errors.companyName = "Company name can only contain letters and spaces";
     } else {
       delete errors.companyName;
-    }
-
-    if (!lastName) {
-      errors.lastName = "*Required";
-    } else if (!/^[a-zA-Z\s]+$/.test(lastName)) {
-      errors.lastName = "Last name can only contain letters.";
-    } else {
-      delete errors.lastName;
-    }
-    if (!firstName) {
-      errors.firstName = "*Required";
-    } else if (!/^[a-zA-Z\s]+$/.test(firstName)) {
-      errors.firstName = "First name can only contain letters.";
-    } else {
-      delete errors.firstName;
     }
 
     if (companyType && !/^[a-zA-Z\s]+$/.test(companyType)) {
@@ -1364,72 +1267,40 @@
       delete errors.tanNumber;
     }
 
-    if (!username) {
-      errors.username = "*Required";
-    } else if (username.length < 3) {
-      errors.username = "Please enter at least 3 characters";
-    } else if (/^[^a-zA-Z]/.test(username)) {
-      errors.username = "Username must start with a letter";
-    } else if (/[^a-zA-Z0-9_]/.test(username)) {
-      errors.username =
-        "Username can include only letters, numbers, and underscore ( _ )";
-    } else if (/^[0-9]+$/.test(username)) {
-      errors.username = "Username cannot contain only numbers";
-    } else if (/^[_]+$/.test(username)) {
-      errors.username = "Username cannot contain only underscores ( _ )";
-    } else if (!/^(?=(.*[a-zA-Z]){3,})[a-zA-Z0-9_]+$/.test(username.trim())) {
-      errors.username = "Username must contain at least 3 letters";
-    } else {
-      delete errors.username;
-    }
-
-    if (!email) {
-      errors.email = "*Required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = "Please enter a valid email.";
-    } else {
-      delete errors.email;
-    }
-
-    if (!phone) {
-      errors.phone = "*Required";
-    } else {
-      const phonePattern = getPhonePattern(country);
-      const phoneRegex = new RegExp(phonePattern);
-
-      if (!phoneRegex.test(phone)) {
-        errors.phone = `Please enter a valid phone number for ${country}.`;
-      } else {
-        delete errors.phone;
-      }
-    }
-
     if (!country) {
       errors.country = "*Required";
     } else {
       delete errors.country;
+
+      const countryInput = document.querySelector('input[name="country"]');
+      if (countryInput) {
+        const previousDropdownState = showDropdown;
+        showDropdown = false;
+        handleInputChange(
+          { target: countryInput, inputType: "insertText" },
+          true
+        );
+        showDropdown = previousDropdownState;
+      }
+
+      const countryExists = countries.some((c) => c.name === country);
+      if (!countryExists) {
+        errors.country = "Invalid country selected";
+        errors.phone = "Invalid country selected to validate phone";
+      } else {
+        delete errors.country;
+        delete errors.phone;
+        validatePhoneNumber(country, phone);
+      }
     }
 
-    if (!password) {
-      errors.password = "*Required";
-    } else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-        password
-      )
-    ) {
-      errors.password =
-        "Ensure your password matches the format outlined below.";
-    } else {
-      delete errors.password;
-    }
-
-    if (!passwordConfirm) {
-      errors.passwordConfirm = "*Required";
-    } else if (passwordConfirm !== password) {
-      errors.passwordConfirm = "Passwords do not match";
-    } else {
-      delete errors.passwordConfirm;
-    }
+    validateUsername();
+    validateEmail();
+    validateFirstName();
+    validateLastName();
+    validatePhoneNumber(country, phone);
+    validatePassword();
+    validateConfirmPassword();
 
     const checkbox = document.querySelector('input[type="checkbox"]');
     if (!checkbox) {
@@ -1445,7 +1316,7 @@
       toast.error("Please verify your email to proceed");
     }
 
-    console.log(isOtpVerified, "isOtpVerified");
+    // console.log(isOtpVerified, "isOtpVerified");
     console.log("Error object:", errors);
     errorCount = Object.keys(errors).length;
     console.log("Number of errors:", errorCount);
@@ -1455,7 +1326,6 @@
 
   const handleCheckboxChange = (event) => {
     isTermsAccepted = event.target.checked;
-    //   console.log("isTermsAccepted",isTermsAccepted)
     if (isTermsAccepted) {
       delete errors.termsAndConditions;
     } else {
@@ -1849,13 +1719,7 @@
             name="firstName"
             bind:value={firstName}
             placeholder="First Name"
-            on:input={() => {
-              errors.firstName = !firstName
-                ? "*Required"
-                : !/^[a-zA-Z\s]+$/.test(firstName)
-                  ? "First name can only contain letters and spaces"
-                  : "";
-            }}
+            on:input={validateFirstName}
           />
           <p class=" text-red-500 text-left text-xs">
             {errors?.firstName || ""}
@@ -1871,13 +1735,7 @@
             name="lastName"
             bind:value={lastName}
             placeholder="Last Name"
-            on:input={() => {
-              errors.lastName = !lastName
-                ? "*Required"
-                : !/^[a-zA-Z\s]+$/.test(lastName)
-                  ? "Lastname can only contain letters and spaces"
-                  : "";
-            }}
+            on:input={validateLastName}
           />
           <p class=" text-red-500 text-left text-xs">
             {errors?.lastName || ""}
@@ -1897,6 +1755,7 @@
               placeholder="Search Country"
               on:input={handleInputChange}
               on:click={toggleDropdown}
+              on:keydown={handleKeyDowncountry}
               class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
                     focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400
                     placeholder:text-sm h-10"
@@ -1973,6 +1832,7 @@
           type="tel"
           id="phone"
           name="phone"
+          oninput="this.value = this.value.replace(/[^0-9]/g, '')"
           bind:value={phone}
           on:input={() => validatePhoneNumber(country, phone)}
           placeholder="Enter your phone number"
@@ -2191,7 +2051,7 @@
             name="confirmpassword"
             type="password"
             bind:value={passwordConfirm}
-            on:input={() => validateConfirmPassword()}
+            on:input={validateConfirmPassword}
             placeholder="Confirm your password"
             class="mt-1 block w-full p-2 pr-10 border text-sm border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10"
           />

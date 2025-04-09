@@ -4,20 +4,16 @@
 <div class="w-full mx-auto">
   <div class="flex flex-col md:flex-row">
     <div class="w-full p-5">
-      <p class="sm:text-xl text-md font-semibold mb-6">Understanding Product Labels</p>
-
+      <p class="sm:text-xl text-md font-semibold mb-6 text-heading">Understanding Product Labels</p>
       <p class="sm:text-sm text-xs mb-4 font-medium text-heading">
         GHS Compliant Product Label
       </p>
-
       <p class="sm:text-sm text-xs text-justify mb-4">
         Our product labels are designed to provide complete, up-to-date
         information on our products. Information available when and where you
         need it most.
       </p>
-
       <p class="sm:text-sm text-xs">On our labels, you can find:</p>
-
       <ul class="list-disc pl-6 mb-4  text-justify sm:text-sm text-xs">
         <li>Complete product name and description</li>
         <li>Health and safety hazard information</li>

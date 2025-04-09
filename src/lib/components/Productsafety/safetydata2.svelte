@@ -4,7 +4,7 @@
 <div class="w-full mx-auto">
   <div class="flex flex-col md:flex-row">
     <div class="w-full p-5">
-      <h1 class="text-xl font-semibold mb-6">Globally Harmonized System (GHS)</h1>
+      <h1 class="text-xl font-semibold mb-6 text-heading">Globally Harmonized System (GHS)</h1>
 
       <p class="sm:text-sm text-xs text-justify mb-4">
         The 

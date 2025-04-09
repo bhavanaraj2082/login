@@ -1,7 +1,23 @@
 <script>
   import Icon from "@iconify/svelte";
   export let remainingProducts;
+  import {PUBLIC_IMAGE_URL} from "$env/static/public"
   // console.log("remainingProducts",remainingProducts);
+  export let currencyType;
+
+  function priceShowing(price, currency) {
+    if (price === undefined || price === null || price === 0) {
+        return '--';
+    }
+    const formattedPrice = price.toFixed(3);
+    if (currency === "inr") {
+        return `₹ ${formattedPrice}`;
+    }
+    if (currency === "usd") {
+        return `$ ${formattedPrice}`;
+    }
+    return formattedPrice; 
+}
 </script>
 
 <div class="col-span-2 mt-6"> 
@@ -20,7 +36,11 @@
           class="flex justify-between items-center px-4 py-2 rounded-md shadow"
         >
           <div class="flex gap-3 items-center w-[35%]">
-            <img src={product.imgSrc} alt="img" class="w-16 rounded-lg" />
+              <!-- svelte-ignore a11y-missing-attribute -->
+              <img  
+              src="{PUBLIC_IMAGE_URL}/{product?.image}"
+              onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
+              class="w-16 rounded-lg" />
             <div class="flex flex-col">
               <p class="text-gray-600 text-sm font-semibold">
                 {product.productName || "--"}
@@ -31,7 +51,7 @@
                 >
               </p>
               <p class="font-medium text-sm text-gray-700">
-                &#8377; <span>{product.unitPrice || "--"}</span>
+                {priceShowing(product.unitPrice , currencyType)}
               </p>
             </div>
           </div>

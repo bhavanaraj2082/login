@@ -563,7 +563,7 @@ onMount(() => {
 			$Cusdetails.Email = data.profile.email || "";
 			$Cusdetails.Number = data.profile.cellPhone || data.profile.primaryPhone || "";
 			$Cusdetails.userId = data.profile.userId || "" ;
-			$Cusdetails.Organisation = data.profile.companyName || "N/a";
+			$Cusdetails.Organisation = data.profile.companyName || "";
 
 			// Country logic
 			const profileCountry = data.profile.country?.trim();
@@ -706,6 +706,13 @@ function filterCountriesWithoutAutoSelect() {
 	// }
 	// return pattern.test(phone);
 	// }
+
+	function handleKeyDown(event) {
+    if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
+        selectCountry(filteredCountries[0]);
+        event.preventDefault();
+    }
+}
 </script>
 <div class="pb-10 bg-white  flex justify-between">
 	<span class="flex items-center gap-2">
@@ -735,6 +742,7 @@ function filterCountriesWithoutAutoSelect() {
 	<span class="flex items-center gap-2">
 		<Icon icon="material-symbols:add-notes-outline-rounded" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300"  style="stroke-width: 2;" />
 	<h1 class="font-bold text-black text-opacity-25 sm:text-2xl text-sm">Step 4: Additional notes</h1>
+</span>
 	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog3()}>Edit</button>
 </div>
 <hr /><hr />
@@ -835,6 +843,7 @@ function filterCountriesWithoutAutoSelect() {
         placeholder="Select your Country"
         on:input={handleInputChange}
         on:click={toggleDropdown}
+		on:keydown={handleKeyDown}
         class="block w-full sm:text-sm text-xs rounded p-1.5 pr-8 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
         required
     />

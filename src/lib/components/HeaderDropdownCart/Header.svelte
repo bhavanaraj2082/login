@@ -300,7 +300,15 @@ async function submitForm() {
 	}
 	const handleSubmitBtn = () => {
 		if (searchQuery !== '') {
-			goto('/search?query=' + searchQuery);
+			const cleanedSearchQuery = searchQuery.replace(/[^\w\s\-]/g, '');
+			const searchQueryUpperCase = cleanedSearchQuery.toUpperCase();
+			if (searchQueryUpperCase.trim() !== '') {
+				let url = `/search?query=${searchQueryUpperCase}`;
+				if ($authedUser && $authedUser?.id) {
+				url += `&userId=${$authedUser.id}`;
+			}
+			goto(url);
+		}
 			searchQuery = '';
 		}
 	};
@@ -364,7 +372,7 @@ async function submitForm() {
 >
 	<input type="hidden" name="guestCart" value={JSON.stringify($guestCart)} />
 </form> -->
-<nav class="bg-primary-400 font-workSans">
+<nav class="bg-primary-400 font-workSans px-0.5">
 	<Toaster position="bottom-right" richColors />
 	{#if isOpen}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -604,7 +612,7 @@ async function submitForm() {
 						bind:value={searchQuery}
 						name="query"
 						on:input={handleInput}
-						class=" border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 w-full px-3 py-2 md:py-3 text-sm placeholder:text-xs truncate pr-12 sm:pr-10"/>
+						class=" border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 w-full px-3 py-2 md:py-3 text-sm placeholder:text-xs truncate pr-12 sm:pr-10"/>
 					{#if isLoading}
 						<div class="absolute right-3 top-1/2 transform -translate-y-1/2">
 							<Icon icon="ei:spinner" class="w-8 h-8 animate-spin text-primary-600 opacity-75 text-5xl"/>
@@ -654,7 +662,7 @@ async function submitForm() {
 						class="mr-2 flex flex-row justify-center cursor-pointer z-10 gap-2 m-1">
 						<p class="w-7 h-7 flex items-center justify-center bg-white text-primary-400 rounded-full font-semibold text-lg">{getInitial(userName)}
 					</p>
-						<h2 class="text-sm text-white mt-1 capitalize">{userName}</h2>
+						<h2 class="text-sm text-white mt-1 capitalize">{$authedUser.firstname || userName}</h2>
 						<button on:click={handleProfile}>
 							<Icon
 								icon={showUserOptions ? 'ion:chevron-up' : 'ion:chevron-down'}
@@ -803,7 +811,7 @@ async function submitForm() {
 				{/each}
 				<!-- <a href="/quotes"> -->
 					<div class="group" role="menu"><div class="py-0 pr-2 pl-3 text-gray-600">
-					<button on:click={() => goto('/quotes')} class="flex items-center hover:bg-gray-200/25 p-2 cursor-pointer rounded-t-md text-nowrap sm:text-sm text-xs lg:text-base font-medium text-left w-full text-white">
+					<button on:click={() => goto('/quotes')} class="flex items-center hover:bg-gray-200/25 p-2 cursor-pointer hover:scale-105 rounded-t-md text-nowrap sm:text-sm text-xs lg:text-base font-medium text-left w-full text-white">
 						<span class="text-white font-medium sm:text-sm text-xs lg:text-base">
 							Quotes
 						</span>
@@ -832,19 +840,19 @@ async function submitForm() {
 				</a> -->
 				
 				<div class="relative flex items-center justify-center lg:space-x-2 lg:pr-4">
-							<div class="relative flex items-center justify-between bg-primary-400 border-2 border-white w-28 lg:w-32 h-7 bottom-0.5 rounded-md cursor-pointer">
+							<div class="relative flex items-center justify-between bg-primary-400 border-2 border-white w-16 lg:w-32 h-7 bottom-0.5 rounded-md cursor-pointer">
 								<div class="absolute flex items-center justify-between w-full h-full transition-all duration-300 ease-in-out">
 									<button 
 										class="w-1/2 h-full flex items-center justify-center bg-white text-gray-400 z-10 text-xs"
-										on:click={setINR} 
-									>
-										₹ <span class="text-2s ml-1 font-medium">INR</span>
+										on:click={setINR} >
+										<span class="text-2s lg:text-xs">₹</span>
+										<span class="text-2s ml-1 font-medium hidden lg:inline">INR</span>
 									</button>
 									<button 
 										class="w-1/2 h-full flex items-center justify-center bg-white text-gray-400 z-10 text-xs"
-										on:click={setUSD} 
-									>
-										$ <span class="text-2s ml-1 font-medium">USD</span>
+										on:click={setUSD} >
+										<span class="text-2s lg:text-xs">$</span>
+										<span class="text-2s ml-1 font-medium hidden lg:inline">USD</span>
 									</button>
 							</div>
 							
@@ -854,7 +862,7 @@ async function submitForm() {
 								class="absolute w-1/2 h-full rounded bg-primary-500 transition-all duration-300 ease-in-out flex items-center justify-center"
 								style="top: 50%; left: {$currencyState === 'inr' ? '25%' : '75%'}; transform: translate(-50%, -50%); z-index: 10;"
 							on:click={toggleCurrency}>
-								<button class="text-white text-2s font-medium">{$currencyState === 'inr' ? '₹ INR' : '$ USD'}
+								<button class="text-white lg:text-2s text-1s font-medium whitespace-nowrap">{$currencyState === 'inr' ? '₹ INR' : '$ USD'}
 								</button>
 							</div>
 						</div>

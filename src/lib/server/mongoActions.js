@@ -37,7 +37,7 @@ import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import Return from '$lib/server/models/Return.js';
 import Counter from '$lib/server/models/Counter.js';
 import { sendEmail } from '$lib/server/utils/sendEmail.js';
-
+import PartRequest from '$lib/server/models/PartRequest.js';
 async function conversionRates() {
 	const rates = await Curconversion.find().exec();
 	const currentRates = {};
@@ -697,6 +697,7 @@ export const signUp = async (body, cookies) => {
 			email: userData.email,
 			isEmailVerified: userData.isEmailVerified,
 			country: 'N/A',
+			needsPasswordSetup: true,
 			sitePreferences: {
 				productEntryType : "Manual Entry",
 				noOfQuickOrderFields: 3,
@@ -831,56 +832,66 @@ const sendVerificationEmailSignup = async (email, verificationUrl) => {
 
 const sendVerificationEmailform = async (email, verificationUrl) => {
 	const transporter = nodemailer.createTransport({
-		service: 'partskeys',
-		host: MAIL_HOST,
-		port: 587,
-		secure: false,
-		auth: {
-			user: SENDER_EMAIL,
-			pass: SENDER_PASSWORD
-		}
+	  service: "partskeys",
+	  host: MAIL_HOST,
+	  port: 587,
+	  secure: false,
+	  auth: {
+		user: SENDER_EMAIL,
+		pass: SENDER_PASSWORD,
+	  },
 	});
-
+  
 	const mailOptions = {
-		from: SENDER_EMAIL,
-		to: email,
-		subject: 'Email Verification for Your Account',
-		html: `
-		<html>
-			<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-				<div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-					<h2 style="color: #333333; text-align: center; font-size: 24px;">Verify Your Email Address</h2>
-					<p style="font-size: 16px; color: #555555; line-height: 1.5; text-align: center;">
-						Hi there,<br/><br/>
-						Welcome to ${PUBLIC_WEBSITE_NAME}! Please verify your email address by using the OTP below.
-					</p>
-					<div style="text-align: center; margin: 20px 0;">
-						<span style="display: inline-block; font-size: 20px; font-weight: bold; color: #333333; padding: 10px 20px; background-color: #f0f0f0; border-radius: 4px;">
-							${verificationUrl}
-						</span>
-					</div>
-					<p style="font-size: 14px; color: #777777; text-align: center; margin-top: 30px;">
-						If you didn't sign up for this account, you can ignore this email.
-					</p>
-					<p style="font-size: 14px; color: #777777; text-align: center;">
-						Thanks,<br/>
-						The ${PUBLIC_WEBSITE_NAME} Team
-					</p>
-				</div>
-			</body>
-		</html>
-		`
+	  from: SENDER_EMAIL,
+	  to: email,
+	  subject: "Email Verification for Your Account",
+	  html: `
+<html>
+  <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f2f2f2;">
+	  <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" style="background-color: #f2f2f2; padding: 20px;">
+		  <tr>
+			  <td align="center">
+				  <table width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 5px; overflow: hidden;">
+					  <tr>
+						  <td style="background-color: #fe5939; padding: 20px; text-align: center;">
+							  <p style="display: block; margin: auto;color: white;font-size: 25px;font-weight: bold;">${PUBLIC_WEBSITE_NAME}</p>
+						  </td>
+					  </tr>
+					  <tr>
+						  <td style="padding: 30px; text-align: center;">
+							  <h2 style="font-size: 22px; color: #333333; margin-bottom: 10px;">Verify your email address</h2>
+							  <p style="font-size: 16px; color: #555555; line-height: 1.5; margin-bottom: 20px;">
+								  Thank you for connecting with ${PUBLIC_WEBSITE_NAME}. To verify the email address you provided, we have sent you a verification code. Please enter the code when prompted to proceed. If you did not request this verification, you may safely ignore this message.
+							  </p>
+							  <h4 style="font-size: 16px; color: #333333; font-weight: bold; margin-bottom: 5px;">Verification code</h4>
+							  <p style="font-size: 32px; color: #333333; font-weight: bold; margin: 0;">${verificationUrl}</p>
+							  <p style="font-size: 14px; color: #777777; margin-top: 10px;">(This code is valid for 5 minutes)</p>
+						  </td>
+					  </tr>
+					  <tr>
+						  <td style="background-color: #f8f8f8; padding: 20px; text-align: center; font-size: 14px; color: #555555;">
+							  ${PUBLIC_WEBSITE_NAME} will never email you and ask you to disclose your password, credit card, or banking account number.<br>
+							  Visit our website: <a href="${APP_URL}" style="color: #0281ff; text-decoration: none; font-weight: normal;">${APP_URL}</a>
+						  </td>
+					  </tr>
+				  </table>
+			  </td>
+		  </tr>
+	  </table>
+  </body>
+</html> `,
 	};
-
+  
 	try {
-		const result = await transporter.sendMail(mailOptions);
-		console.log('Verification email sent: ', result);
-		return true;
+	  const result = await transporter.sendMail(mailOptions);
+	  console.log("Verification email sent: ", result);
+	  return true;
 	} catch (error) {
-		console.error('Error sending verification email:', error);
-		return false;
+	  console.error("Error sending verification email:", error);
+	  return false;
 	}
-};
+  };
 
 export const sendemailOtp = async (email) => {
 	const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -1568,7 +1579,11 @@ export const ResetPassword = async (body) => {
 
 			// Reset password using the email
 			await auth.updateKeyPassword('email', email, newPassword);
-			
+			await Profile.findOneAndUpdate(
+				{ email: email },
+				{ needsPasswordSetup: false },
+				{ new: true, upsert: false }
+			);
 			// Invalidate session and delete token record
 			await auth.invalidateSession(email);
 			await TokenVerification.deleteOne({ token });
@@ -1579,6 +1594,11 @@ export const ResetPassword = async (body) => {
 		// Case 2: If no token but userEmail is provided, reset password directly
 		if (email) {
 			await auth.updateKeyPassword('email', email, newPassword);
+			await Profile.findOneAndUpdate(
+				{ email: email },
+				{ needsPasswordSetup: false },
+				{ new: true, upsert: false }
+			);
 			// Invalidate user session
 			await auth.invalidateSession(email);
 
@@ -2329,8 +2349,10 @@ export const addAllToCart = async (items, userId, userEmail) => {
 
 //Myfavouries actions ends
 
-
 export const quicksearch = async ({ query }) => {
+console.log(query,"query");
+
+  
 	try {
 	  const baseProducts = await Product.find({
 		productNumber: { $regex: query, $options: 'i' }
@@ -2339,7 +2361,9 @@ export const quicksearch = async ({ query }) => {
 		.limit(20)
 		.lean()
 		.exec();
+  
 	  const enrichedProducts = [];
+  
 	  for (const baseProduct of baseProducts) {
 		const stockEntries = await Stock.find({ 
 		  productNumber: baseProduct.productNumber 
@@ -2364,44 +2388,42 @@ export const quicksearch = async ({ query }) => {
 		  });
 		  continue;
 		}
+  
 		for (const entry of stockEntries) {
-
-		  
 		  let processedPricing = [];
 		  let priceoneValue = "";
-		  
+  
 		  if (entry.pricing) {
 			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
 			const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
-		
+  
 			if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
-				processedPricing = originalPricing.map(price => {
-					const inrValue = price.INR;
-					const usdValue = inrValue / currency.rate; 
-					return {
-						...price,
-						USD: usdValue.toFixed(2) 
-					};
-				});
-		
-				priceoneValue = originalPricing[0]?.INR || "";
-		
+			  processedPricing = originalPricing.map(price => {
+				const inrValue = price.INR;
+				const usdValue = inrValue / currency.rate;
+				return {
+				  ...price,
+				  USD: usdValue.toFixed(2)
+				};
+			  });
+  
+			  priceoneValue = originalPricing[0]?.INR || "";
+  
 			} else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
-				processedPricing = originalPricing.map(price => {
-					const usdValue = price.USD;
-					const inrValue = usdValue * currency.rate; 
-					return {
-						...price,
-						INR: inrValue.toFixed(2) 
-					};
-				});
-		
-				priceoneValue = originalPricing[0]?.USD || "";
+			  processedPricing = originalPricing.map(price => {
+				const usdValue = price.USD;
+				const inrValue = usdValue * currency.rate;
+				return {
+				  ...price,
+				  INR: inrValue.toFixed(2)
+				};
+			  });
+  
+			  priceoneValue = originalPricing[0]?.USD || "";
 			} else {
-				processedPricing = originalPricing;
+			  processedPricing = originalPricing;
 			}
-		}
-		
+		  }
   
 		  const productEntry = {
 			id: baseProduct._id.toString(),
@@ -2413,28 +2435,23 @@ export const quicksearch = async ({ query }) => {
 			manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
 			distributer: entry.distributor ? entry.distributor.toString() : null,
 			stock: entry.stock || 0,
-			priceone: priceoneValue, 
+			priceone: priceoneValue,
 			pricing: processedPricing
 		  };
-		  
-		  console.log('Final product entry structure:', JSON.stringify({
-			id: productEntry.id,
-			productName: productEntry.productName,
-			priceone: productEntry.priceone,
-			pricing: productEntry.pricing
-		  }, null, 2));
-		  
+  
+		  console.log("Final Product Entry:", JSON.stringify(productEntry, null, 2));
+  
 		  enrichedProducts.push(productEntry);
 		}
 	  }
   
 	  return enrichedProducts;
 	} catch (error) {
-	  throw new Error('An error occurred while processing the quicksearch.');
+	  console.error("Error in quicksearch:", error);
+	  throw new Error("An error occurred while processing the quicksearch.");
 	}
   };
-
-
+  
 
 
 // export const uploadFile = async ({ query }) => {
@@ -2454,18 +2471,73 @@ export const quicksearch = async ({ query }) => {
 // 	const results = [];
 
 // 	for (const [productNumberAndSize, quantity] of validQueries) {
-// 		const parts = productNumberAndSize.split('-');
-// 		const productNumber = parts.slice(0, parts.length - 1).join('-');
-// 		const size = parts[parts.length - 1];
-// 		const product = await Product.findOne({ 
-// 			productNumber: new RegExp('^' + productNumber.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '$', 'i') 
+// 		let inputStr = productNumberAndSize.trim();
+// 		let productNumber, size;
+// 		const spaceHyphenPattern = /^(.*?)\s+-\s+(.+)$/;
+// 		const spaceHyphenMatch = inputStr.match(spaceHyphenPattern);
+// 		const complexSizePattern = /^([A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)*)-(\d+(?:-[A-Za-z]+)(?:-\d+)?)$/;
+// 		const complexSizeMatch = inputStr.match(complexSizePattern);
+// 		const measurementPattern = /^(.*?)-(\d+[-]?[A-Za-z]+)$/;
+// 		const measurementMatch = inputStr.match(measurementPattern);
+
+// 		// Updated pattern to handle both "each" and "case" with more flexibility
+// 		const quantityPatterns = [
+// 			/^(.*?)[-\s]+(each\s*(?:of)?\s*[-\s]*\d+|each[-\s]*of[-\s]*\d+|\d+\s*(?:each|pcs|units|items))$/i,
+// 			/^(.*?)[-\s]+(case\s*(?:of)?\s*[-\s]*\d+|case[-\s]*of[-\s]*\d+|\d+\s*(?:case|pcs|units|items))$/i,
+// 			/^(.*?)[-\s]+(pack\s*(?:of)?\s*[-\s]*\d+|pack[-\s]*of[-\s]*\d+|\d+\s*(?:pack|pcs|units|items))$/i
+
+// 		];
+
+// 		let eachMatch = null;
+// 		for (const pattern of quantityPatterns) {
+// 			const match = inputStr.match(pattern);
+// 			if (match) {
+// 				eachMatch = match;
+// 				break;
+// 			}
+// 		}
+
+// 		if (spaceHyphenMatch) {
+// 			productNumber = spaceHyphenMatch[1].trim();
+// 			size = spaceHyphenMatch[2].trim();
+// 		} else if (complexSizeMatch) {
+// 			productNumber = complexSizeMatch[1].trim();
+// 			size = complexSizeMatch[2].trim();
+// 		} else if (measurementMatch) {
+// 			productNumber = measurementMatch[1].trim();
+// 			size = measurementMatch[2].trim();
+// 		} else if (eachMatch) {
+// 			productNumber = eachMatch[1].trim();
+// 			size = eachMatch[2].trim();
+// 		} else {
+// 			const parts = inputStr.split('-');
+// 			if (parts.length >= 2) {
+// 				productNumber = parts.slice(0, parts.length - 1).join('-');
+// 				size = parts[parts.length - 1];
+// 			} else {
+// 				productNumber = inputStr;
+// 				size = "";
+// 			}
+// 		}
+
+// 		const sizeWithQuantityPattern = /^(.*?)(\d+)$/;
+// 		const sizeWithQuantityMatch = size.match(sizeWithQuantityPattern);
+
+// 		if (sizeWithQuantityMatch && !quantity) {
+// 			size = sizeWithQuantityMatch[1].trim();
+// 		}
+
+// 		console.log(`Parsed: Product Number = "${productNumber}", Size = "${size}"`);
+
+// 		const product = await Product.findOne({
+// 			productNumber: new RegExp('^' + productNumber.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '$', 'i')
 // 		}).exec();
 
 // 		if (product) {
-// 			const stockInfo = await Stock.find({ 
-// 				productNumber: product.productNumber 
+// 			const stockInfo = await Stock.find({
+// 				productNumber: product.productNumber
 // 			}).select('id stock pricing distributor manufacturer');
-			
+
 // 			console.log(stockInfo, "asadsdsfsdfxdrdr********************8");
 
 // 			let convertedPricing = [];
@@ -2492,11 +2564,57 @@ export const quicksearch = async ({ query }) => {
 // 				});
 // 				continue;
 // 			}
-// 			const normalizedUserSize = size.replace(/\s+/g, '').toLowerCase();
-// 			const validSizePrice = convertedPricing.find(item => {
-// 				const normalizedItemSize = (item.break || '').replace(/\s+/g, '').toLowerCase();
+// 			const normalizedUserSize = size
+// 				.toLowerCase()
+// 				.replace(/\s+/g, '')
+// 				.replace(/[-_]/g, '')
+// 				.replace(/of/g, '')
+// 				.replace(/each/g, 'each')
+// 				.replace(/ea/g, 'each')
+// 				.replace(/pack/g, 'pack')
+// 				.replace(/pa/g, 'pack')
+// 				.replace(/case/g, 'case')
+// 				.replace(/ca/g, 'case');
+
+// 			let validSizePrice = convertedPricing.find(item => {
+// 				const normalizedItemSize = (item.break || '')
+// 					.toLowerCase()
+// 					.replace(/\s+/g, '')
+// 					.replace(/[-_]/g, '')
+// 					.replace(/of/g, '')
+// 					.replace(/each/g, 'each')
+// 					.replace(/ea/g, 'each')
+// 					.replace(/pack/g, 'pack')
+// 					.replace(/pa/g, 'pack')
+// 					.replace(/case/g, 'case')
+// 					.replace(/ca/g, 'case');
+
 // 				return normalizedItemSize === normalizedUserSize;
 // 			});
+
+// 			if (!validSizePrice && normalizedUserSize) {
+// 				console.log(`No exact size match for ${size}, trying partial match...`);
+// 				const partialMatch = convertedPricing.find(item => {
+// 					const normalizedItemSize = (item.break || '')
+// 						.toLowerCase()
+// 						.replace(/\s+/g, '')
+// 						.replace(/[-_]/g, '')
+// 						.replace(/of/g, '')
+// 						.replace(/each/g, 'each')
+// 						.replace(/ea/g, 'each')
+// 						.replace(/pack/g, 'pack')
+// 						.replace(/pa/g, 'pack')
+// 						.replace(/case/g, 'case')
+// 						.replace(/ca/g, 'case');
+// 					return normalizedItemSize.includes(normalizedUserSize) ||
+// 						normalizedUserSize.includes(normalizedItemSize);
+// 				});
+
+// 				if (partialMatch) {
+// 					console.log(`Found partial match: ${partialMatch.break}`);
+// 					validSizePrice = partialMatch;
+// 				}
+// 			}
 
 // 			if (!validSizePrice) {
 // 				console.log(`Size ${size} is invalid or not available for product ${productNumber}`);
@@ -2512,10 +2630,10 @@ export const quicksearch = async ({ query }) => {
 // 			let availableStock = Number(stockInfo[0]?.stock) || 0;
 // 			results.push({
 // 				id: product._id.toString(),
-// 				image: product.imageSrc || "No image available",
+// 				image: product.image || "No image available",
 // 				description: product.prodDesc || "No description available",
 // 				productName: product.productName || "No product name available",
-// 				productNumber: product.productNumber, 
+// 				productNumber: product.productNumber,
 // 				quantity: parseInt(quantity),
 // 				stockId: stockInfo[0]?.id.toString() || null,
 // 				stock: availableStock,
@@ -2524,7 +2642,7 @@ export const quicksearch = async ({ query }) => {
 // 				isValid: true,
 // 				message: "Product number and size are valid",
 // 				pricing: [{
-// 					break: validSizePrice.break, // Keep the original case for display
+// 					break: validSizePrice.break,
 // 					price: validSizePrice.INR || "N/A",
 // 				}],
 // 			});
@@ -2542,213 +2660,103 @@ export const quicksearch = async ({ query }) => {
 // 	return results;
 // };
 export const uploadFile = async ({ query }) => {
-	const validQueries = query.filter(([productNumberAndSize, quantity]) =>
-		productNumberAndSize?.trim() && String(quantity)?.trim()
+	const validQueries = query.filter(([sku, quantity]) =>
+	  sku?.trim() && String(quantity)?.trim()
 	);
-	console.log(validQueries, "validone");
-
+	
 	if (validQueries.length === 0) {
-		return validQueries.map(() => ({
-			productNumber: "Unknown",
+	  return [];
+	}
+	const skuMap = new Map();
+	const normalizedSkus = [];
+	
+	for (const [sku, quantity] of validQueries) {
+	  const cleanSku = sku.trim().replace(/[-\s]/g, '').toLowerCase();
+	  skuMap.set(cleanSku, { original: sku.trim(), quantity: parseInt(quantity) });
+	  normalizedSkus.push(cleanSku);
+	}
+  const stockItems = await Stock.aggregate([
+	  {
+		$addFields: {
+		  normalizedSku: {
+			$toLower: {
+			  $replaceAll: {
+				input: "$sku",
+				find: "-",
+				replacement: ""
+			  }
+			}
+		  }
+		}
+	  },
+	  {
+		$match: {
+		  normalizedSku: { $in: normalizedSkus }
+		}
+	  },
+	  {
+		$project: {
+		  _id: 1,
+		  productid: 1,
+		  stock: 1,
+		  pricing: 1,
+		  distributor: 1,
+		  manufacturer: 1,
+		  productName:1,
+		  productNumber: 1,
+		  sku: 1,
+		  normalizedSku: 1
+		}
+	  }
+	]).exec();
+	
+	const stockItemsByNormalizedSku = stockItems.reduce((acc, item) => {
+	  if (!acc[item.normalizedSku]) {
+		acc[item.normalizedSku] = [];
+	  }
+	  acc[item.normalizedSku].push(item);
+	  return acc;
+	}, {});
+	const results = await Promise.all(
+	  normalizedSkus.map(async (normalizedSku) => {
+		const { original, quantity } = skuMap.get(normalizedSku);
+		const matchedItems = stockItemsByNormalizedSku[normalizedSku];
+  
+		if (!matchedItems || matchedItems.length === 0) {
+		  return {
+			productNumber: original,
+			quantity,
 			isValid: false,
-			message: "Product number is invalid",
-		}));
-	}
-
-	const results = [];
-
-	for (const [productNumberAndSize, quantity] of validQueries) {
-		let inputStr = productNumberAndSize.trim();
-		let productNumber, size;
-		const spaceHyphenPattern = /^(.*?)\s+-\s+(.+)$/;
-		const spaceHyphenMatch = inputStr.match(spaceHyphenPattern);
-		const complexSizePattern = /^([A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)*)-(\d+(?:-[A-Za-z]+)(?:-\d+)?)$/;
-		const complexSizeMatch = inputStr.match(complexSizePattern);
-		const measurementPattern = /^(.*?)-(\d+[-]?[A-Za-z]+)$/;
-		const measurementMatch = inputStr.match(measurementPattern);
-
-		// Updated pattern to handle both "each" and "case" with more flexibility
-		const quantityPatterns = [
-			/^(.*?)[-\s]+(each\s*(?:of)?\s*[-\s]*\d+|each[-\s]*of[-\s]*\d+|\d+\s*(?:each|pcs|units|items))$/i,
-			/^(.*?)[-\s]+(case\s*(?:of)?\s*[-\s]*\d+|case[-\s]*of[-\s]*\d+|\d+\s*(?:case|pcs|units|items))$/i,
-			/^(.*?)[-\s]+(pack\s*(?:of)?\s*[-\s]*\d+|pack[-\s]*of[-\s]*\d+|\d+\s*(?:pack|pcs|units|items))$/i
-
-		];
-
-		let eachMatch = null;
-		for (const pattern of quantityPatterns) {
-			const match = inputStr.match(pattern);
-			if (match) {
-				eachMatch = match;
-				break;
-			}
+			message: "Stock information is missing",
+		  };
 		}
-
-		if (spaceHyphenMatch) {
-			productNumber = spaceHyphenMatch[1].trim();
-			size = spaceHyphenMatch[2].trim();
-		} else if (complexSizeMatch) {
-			productNumber = complexSizeMatch[1].trim();
-			size = complexSizeMatch[2].trim();
-		} else if (measurementMatch) {
-			productNumber = measurementMatch[1].trim();
-			size = measurementMatch[2].trim();
-		} else if (eachMatch) {
-			productNumber = eachMatch[1].trim();
-			size = eachMatch[2].trim();
-		} else {
-			const parts = inputStr.split('-');
-			if (parts.length >= 2) {
-				productNumber = parts.slice(0, parts.length - 1).join('-');
-				size = parts[parts.length - 1];
-			} else {
-				productNumber = inputStr;
-				size = "";
-			}
-		}
-
-		const sizeWithQuantityPattern = /^(.*?)(\d+)$/;
-		const sizeWithQuantityMatch = size.match(sizeWithQuantityPattern);
-
-		if (sizeWithQuantityMatch && !quantity) {
-			size = sizeWithQuantityMatch[1].trim();
-		}
-
-		console.log(`Parsed: Product Number = "${productNumber}", Size = "${size}"`);
-
-		const product = await Product.findOne({
-			productNumber: new RegExp('^' + productNumber.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '$', 'i')
-		}).exec();
-
-		if (product) {
-			const stockInfo = await Stock.find({
-				productNumber: product.productNumber
-			}).select('id stock pricing distributor manufacturer');
-
-			console.log(stockInfo, "asadsdsfsdfxdrdr********************8");
-
-			let convertedPricing = [];
-			for (let stock of stockInfo) {
-				const { pricing = [], distributor, manufacturer } = stock || [];
-
-				if (pricing && pricing[0] && pricing[0].INR) {
-					convertedPricing = convertedPricing.concat(pricing);
-				} else {
-					const converted = await convertToINR([pricing] || []);
-					convertedPricing = convertedPricing.concat(converted);
-				}
-
-				console.log('Distributor:', distributor);
-				console.log('Manufacturer:', manufacturer);
-			}
-
-			if (stockInfo.length === 0) {
-				results.push({
-					productNumber,
-					quantity: parseInt(quantity),
-					isValid: false,
-					message: "Stock information missing",
-				});
-				continue;
-			}
-			const normalizedUserSize = size
-				.toLowerCase()
-				.replace(/\s+/g, '')
-				.replace(/[-_]/g, '')
-				.replace(/of/g, '')
-				.replace(/each/g, 'each')
-				.replace(/ea/g, 'each')
-				.replace(/pack/g, 'pack')
-				.replace(/pa/g, 'pack')
-				.replace(/case/g, 'case')
-				.replace(/ca/g, 'case');
-
-			let validSizePrice = convertedPricing.find(item => {
-				const normalizedItemSize = (item.break || '')
-					.toLowerCase()
-					.replace(/\s+/g, '')
-					.replace(/[-_]/g, '')
-					.replace(/of/g, '')
-					.replace(/each/g, 'each')
-					.replace(/ea/g, 'each')
-					.replace(/pack/g, 'pack')
-					.replace(/pa/g, 'pack')
-					.replace(/case/g, 'case')
-					.replace(/ca/g, 'case');
-
-				return normalizedItemSize === normalizedUserSize;
-			});
-
-			if (!validSizePrice && normalizedUserSize) {
-				console.log(`No exact size match for ${size}, trying partial match...`);
-				const partialMatch = convertedPricing.find(item => {
-					const normalizedItemSize = (item.break || '')
-						.toLowerCase()
-						.replace(/\s+/g, '')
-						.replace(/[-_]/g, '')
-						.replace(/of/g, '')
-						.replace(/each/g, 'each')
-						.replace(/ea/g, 'each')
-						.replace(/pack/g, 'pack')
-						.replace(/pa/g, 'pack')
-						.replace(/case/g, 'case')
-						.replace(/ca/g, 'case');
-					return normalizedItemSize.includes(normalizedUserSize) ||
-						normalizedUserSize.includes(normalizedItemSize);
-				});
-
-				if (partialMatch) {
-					console.log(`Found partial match: ${partialMatch.break}`);
-					validSizePrice = partialMatch;
-				}
-			}
-
-			if (!validSizePrice) {
-				console.log(`Size ${size} is invalid or not available for product ${productNumber}`);
-				results.push({
-					productNumber,
-					quantity: parseInt(quantity),
-					isValid: false,
-					message: `Size ${size} is invalid or not available for product ${productNumber}`,
-				});
-				continue;
-			}
-
-			let availableStock = Number(stockInfo[0]?.stock) || 0;
-			results.push({
-				id: product._id.toString(),
-				image: product.image || "No image available",
-				description: product.prodDesc || "No description available",
-				productName: product.productName || "No product name available",
-				productNumber: product.productNumber,
-				quantity: parseInt(quantity),
-				stockId: stockInfo[0]?.id.toString() || null,
-				stock: availableStock,
-				manufacturer: stockInfo[0]?.manufacturer?.toString() || null,
-				distributer: stockInfo[0]?.distributor?.toString() || null,
-				isValid: true,
-				message: "Product number and size are valid",
-				pricing: [{
-					break: validSizePrice.break,
-					price: validSizePrice.INR || "N/A",
-				}],
-			});
-		} else {
-			results.push({
-				productNumber: productNumberAndSize,
-				quantity: parseInt(quantity),
-				isValid: false,
-				message: "Product number is invalid",
-			});
-		}
-	}
-	console.log(results, "results");
-
+  
+		const matchedStock = matchedItems[0];
+		let availableStock = Number(matchedStock?.stock) || 0;
+		
+		return {
+		  id: matchedStock._id.toString(),
+		  productId: matchedStock.productid.toString(),
+		  productNumber: matchedStock.productNumber,
+		  productName:matchedStock.productName,
+		  sku: matchedStock.sku,
+		  stockId: matchedStock._id.toString(),
+		  stock: availableStock,
+		  manufacturer: matchedStock.manufacturer?.toString() || null,
+		  distributer: matchedStock.distributor?.toString() || null,
+		  isValid: true,
+		  message: "SKU is valid",
+		};
+	  })
+	);
+	console.log(results,"result");
+  
 	return results;
-};
-
+  };
 export const CreateProductQuote = async (formattedData) => {
-	const newQuote = new Quotes(formattedData);
+	console.log("formattedData",formattedData);
+	
+	const newQuote = new PartRequest(formattedData);
 	await newQuote.save();
 	return { status: 200 };
 };

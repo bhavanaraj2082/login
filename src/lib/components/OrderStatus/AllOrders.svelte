@@ -2,7 +2,23 @@
   import Icon from "@iconify/svelte";
   export let orderedproduct;
   export let orderStatus;
+  import {PUBLIC_IMAGE_URL} from "$env/static/public"
   // console.log("orderProduct====>", orderedproduct);
+  export let currencyType;
+
+  function priceShowing(price, currency) {
+    if (price === undefined || price === null || price === 0) {
+        return '--';
+    }
+    const formattedPrice = price.toFixed(3);
+    if (currency === "inr") {
+        return `₹ ${formattedPrice}`;
+    }
+    if (currency === "usd") {
+        return `$ ${formattedPrice}`;
+    }
+    return formattedPrice; 
+}
 </script>
 
 <div class="col-span-2 mt-2">
@@ -18,7 +34,11 @@
           <div
             class="flex gap-3 items-center col-span-3 sm:col-span-2 mb-2 sm:mb-0"
           >
-            <img src={product.imgSrc} alt="img" class="w-16 rounded-lg" />
+            <!-- svelte-ignore a11y-missing-attribute -->
+            <img  
+            src="{PUBLIC_IMAGE_URL}/{product?.image}"
+            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
+            class="w-16 rounded-lg" />
             <div class="flex flex-col">
               <p class="text-gray-600 text-sm font-semibold">
                 {product.productName || "--"}
@@ -29,7 +49,7 @@
                 >
               </p>
               <p class="font-medium text-sm text-gray-700">
-                &#8377; <span>{product.unitPrice.toFixed(3) || "--"}</span>
+                {priceShowing(product.unitPrice, currencyType)}
               </p>
             </div>
           </div>
@@ -39,7 +59,7 @@
           >
             <p class="font-medium text-sm text-gray-600">Ext.price</p>
             <p class="font-medium text-sm text-gray-700">
-              &#8377; <span>{product.extendedPrice.toFixed(3) || "--"}</span>
+              {priceShowing(product.extendedPrice, currencyType)}
             </p>
           </div>
 

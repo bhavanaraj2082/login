@@ -730,9 +730,9 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
          <input type="hidden" name="status" value="unread" />
     </div>
 
-    {#if showErrors}
+    <!-- {#if showErrors}
     <div class="font-normal text-xs text-red-500">Please fill in all required fields.</div>
-  {/if}
+  {/if} -->
   {#if successMessage}
     <div class="mt-4 text-green-500">{successMessage}</div>
   {/if}

@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
-import { uploadFile, quicksearch, quickcheck,addToCartquick, CreateProductQuote } from '$lib/server/mongoActions';
+import { uploadFile, quicksearch, quickcheck, addToCart, CreateProductQuote } from '$lib/server/mongoActions';
 import { error, fail } from '@sveltejs/kit';
 import { nanoid } from 'nanoid';
 import Profile from '$lib/server/models/Profile.js';
@@ -10,7 +10,82 @@ import { APP_URL } from '$env/static/private';
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import sendemail from '$lib/data/sendemail.json';
 import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
-
+function parseProductQuery(query) {
+  let inputStr = query.trim();
+  let productNumber, size;
+  
+  // Various patterns for different types of product number and size combinations
+  const spaceHyphenPattern = /^(.*?)\s+-\s+(.+)$/;
+  const spaceHyphenMatch = inputStr.match(spaceHyphenPattern);
+  
+  const complexSizePattern = /^([A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)*)-(\d+(?:-[A-Za-z\u00B0-\u9FFF]+)(?:-\d+)?)$/;
+  const complexSizeMatch = inputStr.match(complexSizePattern);
+  
+  // Pattern for measurements including Unicode characters like μL, μg
+  const measurementPattern = /^(.*?)-(\d+[-]?[A-Za-z\u00B0-\u9FFF]+)$/;
+  const measurementMatch = inputStr.match(measurementPattern);
+  
+  // Specific pattern for micro units
+  const unicodeUnitPattern = /^(.*?)-(\d+[-]?[μ][A-Za-z]+)$/;
+  const unicodeUnitMatch = inputStr.match(unicodeUnitPattern);
+  
+  // Patterns for quantity descriptions (each, case, pack)
+  const quantityPatterns = [
+    /^(.*?)[-\s]+(each\s*(?:of)?\s*[-\s]*\d+|each[-\s]*of[-\s]*\d+|\d+\s*(?:each|pcs|units|items))$/i,
+    /^(.*?)[-\s]+(case\s*(?:of)?\s*[-\s]*\d+|case[-\s]*of[-\s]*\d+|\d+\s*(?:case|pcs|units|items))$/i,
+    /^(.*?)[-\s]+(pack\s*(?:of)?\s*[-\s]*\d+|pack[-\s]*of[-\s]*\d+|\d+\s*(?:pack|pcs|units|items))$/i
+  ];
+  
+  let eachMatch = null;
+  for (const pattern of quantityPatterns) {
+    const match = inputStr.match(pattern);
+    if (match) {
+      eachMatch = match;
+      break;
+    }
+  }
+  
+  // Apply patterns in order to determine product number and size
+  if (unicodeUnitMatch) {
+    productNumber = unicodeUnitMatch[1].trim();
+    size = unicodeUnitMatch[2].trim();
+  } else if (spaceHyphenMatch) {
+    productNumber = spaceHyphenMatch[1].trim();
+    size = spaceHyphenMatch[2].trim();
+  } else if (complexSizeMatch) {
+    productNumber = complexSizeMatch[1].trim();
+    size = complexSizeMatch[2].trim();
+  } else if (measurementMatch) {
+    productNumber = measurementMatch[1].trim();
+    size = measurementMatch[2].trim();
+  } else if (eachMatch) {
+    productNumber = eachMatch[1].trim();
+    size = eachMatch[2].trim();
+  } else {
+    // Default fallback: split by hyphen
+    const parts = inputStr.split('-');
+    if (parts.length >= 2) {
+      productNumber = parts.slice(0, parts.length - 1).join('-');
+      size = parts[parts.length - 1];
+    } else {
+      productNumber = inputStr;
+      size = "";
+    }
+  }
+  
+  // Final cleanup for size with quantity
+  const sizeWithQuantityPattern = /^(.*?)(\d+)$/;
+  const sizeWithQuantityMatch = size.match(sizeWithQuantityPattern);
+  
+  if (sizeWithQuantityMatch) {
+    size = sizeWithQuantityMatch[1].trim();
+  }
+  
+  return {
+    productNumber,
+    size
+  };
+}
 export const actions = {
   quickcheck: async ({ request }) => {
     try {
@@ -37,82 +112,150 @@ export const actions = {
     }
   },
 
-quicksearch: async ({ request }) => {
-  const data = Object.fromEntries(await request.formData());
-  const { quickSearch } = data;
+  // quicksearch: async ({ request }) => {
+  //   const data = Object.fromEntries(await request.formData());
+  //   const { quickSearch } = data;
 
-  if (quickSearch && quickSearch.length >= 0) {
-    try {
-      const results = await quicksearch({ query: quickSearch });
-      console.log('Raw results:', JSON.stringify(results, null, 2));
+  //   if (quickSearch && quickSearch.length >= 0) {
+  //     try {
+  //       const results = await quicksearch({ query: quickSearch });
+  //       const processedResults = results.map(product => {
+  //         let processedPricing = [];
+  //         if (product.pricing && Array.isArray(product.pricing)) {
+  //           processedPricing = product.pricing.map(item => {
+  //             const processedItem = { ...item };
 
-      const processedResults = results.map(product => {
-        // Log the raw pricing data for debugging
-        console.log('Product pricing before processing:', JSON.stringify(product.pricing, null, 2));
+  //             if (item.INR) {
+  //               processedItem.inr = item.INR;
+  //             }
+  //             if (item.usd) {
+  //               processedItem.usd = item.usd;
+  //             } else if (item.USD) {
+  //               processedItem.usd = item.USD;
+  //             }
+
+  //             return {
+  //               break: item.break || 'N/A',
+  //               usd: item.usd || item.USD || 'N/A',
+  //               inr: item.inr || item.INR || 'N/A',
+  //               offer: item.offer || '0'
+  //             };
+  //           });
+  //         }
+
+
+  //         return {
+  //           id: product.id,
+  //           image: product.image,
+  //           description: product.description,
+  //           productName: product.productName,
+  //           productNumber: product.productNumber,
+  //           stockId: product.stockId,
+  //           manufacturer: product.manufacturer,
+  //           distributer: product.distributer,
+  //           stock: product.stock || 0,
+  //           pricing: processedPricing,
+  //           priceone: product.priceone || (processedPricing[0]?.inr || processedPricing[0]?.INR || ''),
+  //         };
+  //       });
+
+  //       //  console.log(processedResults,"processedResults");
+  //       //  console.log(processedResults.length,"length");
+
+
+
+  //       return processedResults;
+  //     } catch (error) {
+  //       console.error('Error in quicksearch action:', error);
+  //       return { error: 'An error occurred while fetching search results.' };
+  //     }
+  //   } else {
+  //     console.log('Search query is invalid:', quickSearch);
+  //     return { error: 'Search query must be at least 2 characters.' };
+  //   }
+  // },
+ 
+  quicksearch: async ({ request }) => {
+    const data = Object.fromEntries(await request.formData());
+    const { quickSearch } = data;
+  
+    if (quickSearch && quickSearch.length >= 0) {
+      try {
+        // Parse the product number and size from the search query
+        const parsedQuery = parseProductQuery(quickSearch);
+        console.log("Original Query:", quickSearch);
+        console.log("Parsed Product Number:", parsedQuery.productNumber);
+        console.log("Parsed Size:", parsedQuery.size);
         
-        let processedPricing = [];
-        if (product.pricing && Array.isArray(product.pricing)) {
-          processedPricing = product.pricing.map(item => {
-            // Create an object with all original properties
-            const processedItem = { ...item };
-            
-            // Check for different price formats
-            if (item.INR) {
-              processedItem.inr = item.INR;
-            }
-            
-            // Preserve the original currency if it exists
-            if (item.usd) {
-              processedItem.usd = item.usd;
-            } else if (item.USD) {
-              processedItem.usd = item.USD;
-            }
-            
-            return {
-              break: item.break || 'N/A',
-              usd: item.usd || item.USD || 'N/A',
-              inr: item.inr || item.INR || 'N/A', 
-              offer: item.offer || '0'
-            };
-          });
+        // Call the original quicksearch function with the parsed product number
+        const results = await quicksearch({ query: parsedQuery.productNumber });
+        
+        const processedResults = results.map(product => {
+          let processedPricing = [];
+          if (product.pricing && Array.isArray(product.pricing)) {
+            processedPricing = product.pricing.map(item => {
+              const processedItem = { ...item };
+  
+              if (item.INR) {
+                processedItem.inr = item.INR;
+              }
+              if (item.usd) {
+                processedItem.usd = item.usd;
+              } else if (item.USD) {
+                processedItem.usd = item.USD;
+              }
+  
+              return {
+                break: item.break || 'N/A',
+                usd: item.usd || item.USD || 'N/A',
+                inr: item.inr || item.INR || 'N/A',
+                offer: item.offer || '0'
+              };
+            });
+          }
+  
+          // Calculate relevance if size is provided
+          let relevance = 1;
+          if (parsedQuery.size && product.size) {
+            const productSizeLower = product.size.toLowerCase();
+            const parsedSizeLower = parsedQuery.size.toLowerCase();
+            relevance = productSizeLower.includes(parsedSizeLower) ? 2 : 0.5;
+          }
+  
+          return {
+            id: product.id,
+            image: product.image,
+            description: product.description,
+            productName: product.productName,
+            productNumber: product.productNumber,
+            stockId: product.stockId,
+            manufacturer: product.manufacturer,
+            distributer: product.distributer,
+            stock: product.stock || 0,
+            pricing: processedPricing,
+            priceone: product.priceone || (processedPricing[0]?.inr || processedPricing[0]?.INR || ''),
+            size: product.size || null,
+            parsedSize: parsedQuery.size,
+            relevance: relevance
+          };
+        });
+  
+        // Sort by relevance if a size was specified
+        if (parsedQuery.size) {
+          processedResults.sort((a, b) => b.relevance - a.relevance);
         }
-        
-        // Log the processed pricing for debugging
-        console.log('Product pricing after processing:', JSON.stringify(processedPricing, null, 2));
-        
-        return {
-          id: product.id,
-          image: product.image,
-          description: product.description,
-          productName: product.productName,
-          productNumber: product.productNumber,
-          stockId: product.stockId,
-          manufacturer: product.manufacturer,
-          distributer: product.distributer,
-          stock: product.stock || 0,
-          pricing: processedPricing,
-          priceone: product.priceone || (processedPricing[0]?.inr || processedPricing[0]?.INR || ''),
-        };
-      });
-
-      console.log('Processed results:', JSON.stringify(processedResults.map(p => ({
-        id: p.id,
-        productName: p.productName,
-        priceone: p.priceone,
-        pricing: p.pricing
-      })), null, 2));
-
-      return processedResults;
-    } catch (error) {
-      console.error('Error in quicksearch action:', error);
-      return { error: 'An error occurred while fetching search results.' };
+  
+        return processedResults;
+      } catch (error) {
+        console.error('Error in quicksearch action:', error);
+        return { error: 'An error occurred while fetching search results.' };
+      }
+    } else {
+      console.log('Search query is invalid:', quickSearch);
+      return { error: 'Search query must be at least 2 characters.' };
     }
-  } else {
-    console.log('Search query is invalid:', quickSearch);
-    return { error: 'Search query must be at least 2 characters.' };
-  }
-},
-
+  },
+  
   uploadFile: async ({ request }) => {
     try {
       const data = await request.formData();
@@ -174,59 +317,50 @@ quicksearch: async ({ request }) => {
       };
     }
   },
-  
+
   addToCart: async ({ request, locals }) => {
     try {
       console.log('Received request:', request);
       const formData = await request.formData();
       console.log('Form Data:', formData);
-      
-      const cartItems = JSON.parse(formData.get('cartItems')) || JSON.parse(formData.get('manualEntries')) ;
+
+      const cartItems = JSON.parse(formData.get('cartItems')) || JSON.parse(formData.get('manualEntries'));
       console.log('Parsed Cart Items:', cartItems);
-      
+
       if (!locals.user) {
         console.error('User not authenticated');
         return fail(401, { message: 'User not authenticated' });
       }
-  console.log("user Details",locals.user);
-  
+      console.log("user Details", locals.user);
+
       const userId = locals.user.userId;
       const userEmail = locals.user.email;
       console.log('User ID:', userId, 'User Email:', userEmail);
-  
+
       // Process each cart item
       for (const item of cartItems) {
         // console.log('Processing item:', item);
         // const backorder =Math.max(item.quantity-item.stock)
-        
-        const cartItem = {
-          productId:  item.id,
-          productName: item.productName,
 
+        const cartItem = {
+          productId: item.id,
           manufacturerId: item.manufacturerId || '',
-          distributorId : item.distributerId || '',
-          stockId :item.stockId|| '',
+          distributorId: item.distributerId || '',
+          stockId: item.stockId || '',
           quantity: item.quantity || '',
           backOrder: item.backOrder,
-          offerPrice: {
-            usd: item.usdPrice,
-            inr: item.inrPrice * 75 
-          },
-          isQuote: false,
-          isBom: false,
-          isOffered: false
         };
-  
+
         // console.log('Prepared Cart Item:', cartItem);
-        const result = await addToCartquick(cartItem, userId, userEmail);
+        const result = await addToCart(cartItem, userId, userEmail);
         // console.log('Add to Cart Result:', result);
-  
+
         if (!result.success) {
           console.error('Failed to add item to cart:', result.message);
           return fail(400, { message: result.message });
         }
       }
-  
+
       console.log(`${cartItems.length} item(s) added to cart successfully`);
       return {
         success: true,
@@ -237,229 +371,209 @@ quicksearch: async ({ request }) => {
       return fail(500, { message: 'Failed to add items to cart' });
     }
   },
-createQuote: async ({ request }) => {
-  try {
-    const data = Object.fromEntries(await request.formData());
-    console.log("quote data in server js", data);
-    async function getClientIP() {
-      const response = await fetch('https://api.ipify.org?format=json');
-      const data = await response.json();
-      return data.ip;
+  createQuote: async ({ request }) => {
+    try {
+      const data = Object.fromEntries(await request.formData());
+      console.log("quote data in server js", data);
+      async function getClientIP() {
+        const response = await fetch('https://api.ipify.org?format=json');
+        const data = await response.json();
+        return data.ip;
+      }
+      const ipAddress = await getClientIP();
+
+
+      const record = await CreateProductQuote(data);
+
+      const targetEmailContent = sendemail.emailTemplatequote
+        .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
+        .replaceAll('{{APP_URL}}', APP_URL)
+        .replaceAll('{{productName}}', data.productName || '')
+        .replaceAll('{{productNumber}}', data.productNumber || '')
+        .replaceAll('{{units}}', data.units || '')
+        .replaceAll('{{Firstname}}', data.Firstname || '')
+        .replaceAll('{{Lastname}}', data.lastname || '')
+        .replaceAll('{{organisation}}', data.organisation || '')
+        .replaceAll('{{email}}', data.email || '')
+        .replaceAll('{{phone}}', data.phone || '')
+        .replaceAll('{{futherdetails}}', data.futherdetails || '')
+        .replaceAll('{{ipAddress}}', ipAddress || '');  // Include the IP address
+
+      try {
+        await sendNotificationEmail(
+          `New Quote Created – ${PUBLIC_WEBSITE_NAME}`,
+          targetEmailContent
+        );
+      } catch (error) {
+        console.error('Error sending notification email to the team:', error);
+      }
+
+      // Send confirmation email to the user (customer)
+      const userEmailContent = sendemail.emailTemplatequoteuser
+        .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
+        .replaceAll('{{APP_URL}}', APP_URL)
+        .replaceAll('{{productName}}', data.productName || '')
+        .replaceAll('{{productNumber}}', data.productNumber || '')
+        .replaceAll('{{units}}', data.units || '')
+        .replaceAll('{{Firstname}}', data.Firstname || '')
+        .replaceAll('{{Lastname}}', data.lastname|| '')
+        .replaceAll('{{organisation}}', data.organisation || '')
+        .replaceAll('{{email}}', data.email || '')
+        .replaceAll('{{phone}}', data.phone || '')
+        .replaceAll('{{futherdetails}}', data.futherdetails || '');
+
+      try {
+        await sendEmailToUser(
+          `Your Quote Confirmation – ${PUBLIC_WEBSITE_NAME}`,
+          userEmailContent,
+          data.email
+        );
+      } catch (error) {
+        console.error('Error sending confirmation email to the user:', error);
+      }
+
+      return record;
+
+    } catch (error) {
+      console.error("Error creating quote:", error);
     }
-    const ipAddress = await getClientIP();
-    const components = {
-      productName: data.productName,
-      productNumber: data.productNumber,
-    };
+  },
 
-    const formattedData = {
-      Configure_custom_solution: {
-        components: components,
-        units: data.units,
-      },
-      Additional_notes: data.futherdetails,
-      status: data.status,
-      Customer_details: {
-        Firstname: data.Firstname,
-        Lastname: data.lastname,
-        organisation: data.organisation,
-        email: data.email,
-        number: data.phone,
-      },
-      ipAddress: ipAddress, // Add the IP address to the formatted data
-    };
+  verifyemail: async ({ request }) => {
+    const rawData = Object.fromEntries(await request.formData());
 
-    const record = await CreateProductQuote(formattedData);
 
-    const targetEmailContent = sendemail.emailTemplatequote
-      .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
-      .replaceAll('{{APP_URL}}', APP_URL)
-      .replaceAll('{{productName}}', formattedData.Configure_custom_solution.components.productName || '')
-      .replaceAll('{{productNumber}}', formattedData.Configure_custom_solution.components.productNumber || '')
-      .replaceAll('{{units}}', formattedData.Configure_custom_solution.units || '')
-      .replaceAll('{{Firstname}}', formattedData.Customer_details.Firstname || '')
-      .replaceAll('{{Lastname}}', formattedData.Customer_details.Lastname || '')
-      .replaceAll('{{organisation}}', formattedData.Customer_details.organisation || '')
-      .replaceAll('{{email}}', formattedData.Customer_details.email || '')
-      .replaceAll('{{phone}}', formattedData.Customer_details.number || '')
-      .replaceAll('{{futherdetails}}', formattedData.Additional_notes || '')
-      .replaceAll('{{ipAddress}}', formattedData.ipAddress || '');  // Include the IP address
+    const email = rawData.email;
+
+
+
+    if (!email) {
+      return {
+        status: 500,
+        message: 'Please provide a valid email address',
+        success: false,
+        isEmailVerified: false
+      };
+    }
 
     try {
-      await sendNotificationEmail(
-        `New Quote Created – ${PUBLIC_WEBSITE_NAME}`,
-        targetEmailContent
-      );
-    } catch (error) {
-      console.error('Error sending notification email to the team:', error);
-    }
+      const tokenVerificationRecord = await TokenVerification.findOne({ email });
 
-    // Send confirmation email to the user (customer)
-    const userEmailContent = sendemail.emailTemplatequoteuser
-      .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
-      .replaceAll('{{APP_URL}}', APP_URL)
-      .replaceAll('{{productName}}', formattedData.Configure_custom_solution.components.productName || '')
-      .replaceAll('{{productNumber}}', formattedData.Configure_custom_solution.components.productNumber || '')
-      .replaceAll('{{units}}', formattedData.Configure_custom_solution.units || '')
-      .replaceAll('{{Firstname}}', formattedData.Customer_details.Firstname || '')
-      .replaceAll('{{Lastname}}', formattedData.Customer_details.Lastname || '')
-      .replaceAll('{{organisation}}', formattedData.Customer_details.organisation || '')
-      .replaceAll('{{email}}', formattedData.Customer_details.email || '')
-      .replaceAll('{{phone}}', formattedData.Customer_details.number || '')
-      .replaceAll('{{futherdetails}}', formattedData.Additional_notes || '');
+      if (tokenVerificationRecord && tokenVerificationRecord.isEmailVerified) {
 
-    try {
-      await sendEmailToUser(
-        `Your Quote Confirmation – ${PUBLIC_WEBSITE_NAME}`,
-        userEmailContent,
-        formattedData.Customer_details.email
-      );
-    } catch (error) {
-      console.error('Error sending confirmation email to the user:', error);
-    }
-
-    return record;
-
-  } catch (error) {
-    console.error("Error creating quote:", error);
-  }
-},
-
-verifyemail: async ({ request }) => {
-  const rawData = Object.fromEntries(await request.formData());
+        return {
+          status: 200,
+          message: 'Email is already verified',
+          success: true,
+          isEmailVerified: true
+        };
+      }
+      const user = await Profile.findOne({ email });
 
 
-  const email = rawData.email;
+      if (!user) {
+        const result = await sendemailOtp(email);
+        if (result) {
+          return {
+            status: 200,
+            message: 'Verification email sent successfully. Please check your inbox.',
+            success: true,
+            isEmailVerified: false
+          };
+        } else {
+          throw new Error('Email sending failed');
+        }
+      }
 
+      if (!user.isEmailVerified) {
+        const result = await sendemailOtp(email);
+        if (result) {
+          return {
+            status: 200,
+            message: 'Verification email sent successfully. Please check your inbox.',
+            success: true,
+            isEmailVerified: false
+          };
+        } else {
 
-
-  if (!email) {
-    return {
-      status: 500,
-      message: 'Please provide a valid email address',
-      success: false,
-      isEmailVerified: false
-    };
-  }
-
-  try {
-    const tokenVerificationRecord = await TokenVerification.findOne({ email });
-
-    if (tokenVerificationRecord && tokenVerificationRecord.isEmailVerified) {
-
+          throw new Error('Email sending failed');
+        }
+      }
       return {
         status: 200,
-        message: 'Email is already verified',
+        message: 'User already exists and email is verified.',
         success: true,
         isEmailVerified: true
       };
+    } catch (error) {
+      // console.error('Error during email verification:', error);
+      return {
+        status: 500,
+        message: 'Verification mail could not be sent. Double-Check your email again',
+        success: false,
+        isEmailVerified: false
+      };
     }
-    const user = await Profile.findOne({ email });
+  },
 
+  verifyOtpEmail: async ({ request }) => {
+    const body = Object.fromEntries(await request.formData());
+    console.log('verifyOtp body', body);
 
-    if (!user) {
-      const result = await sendemailOtp(email);
-      if (result) {
+    const { email, enteredOtp } = body;
+
+    try {
+      if (!email) {
+
         return {
-          status: 200,
-          message: 'Verification email sent successfully. Please check your inbox.',
-          success: true,
+          status: 500,
+          message: 'Please provide email  verify.',
+          success: false,
+          isEmailVerified: false
+        };
+      }
+      if (!enteredOtp) {
+
+        return {
+          status: 500,
+          message: 'Please provide OTP to verify.',
+          success: false,
+          isEmailVerified: false
+        };
+      }
+
+      //   console.log(`Verifying OTP for email: ${email}`);
+      const verificationResult = await verifyemailOtp(email, enteredOtp);
+
+      //   console.log(verificationResult, "verificationResult");
+
+      if (!verificationResult.success) {
+        // console.log("OTP verification failed:", verificationResult.message);
+        return {
+          status: 500,
+          message: verificationResult.message,
+          success: false,
           isEmailVerified: false
         };
       } else {
-        throw new Error('Email sending failed');
-      }
-    }
-
-    if (!user.isEmailVerified) {
-      const result = await sendemailOtp(email);
-      if (result) {
+        // console.log("OTP verification successful:", verificationResult.message);
         return {
           status: 200,
-          message: 'Verification email sent successfully. Please check your inbox.',
+          message: verificationResult.message,
           success: true,
-          isEmailVerified: false
+          isEmailVerified: true
         };
-      } else {
-
-        throw new Error('Email sending failed');
       }
-    }
-    return {
-      status: 200,
-      message: 'User already exists and email is verified.',
-      success: true,
-      isEmailVerified: true
-    };
-  } catch (error) {
-    // console.error('Error during email verification:', error);
-    return {
-      status: 500,
-      message: 'Verification mail could not be sent. Double-Check your email again',
-      success: false,
-      isEmailVerified: false
-    };
-  }
-},
-
-verifyOtpEmail: async ({ request }) => {
-  const body = Object.fromEntries(await request.formData());
-  console.log('verifyOtp body', body);
-
-  const { email, enteredOtp } = body;
-
-  try {
-    if (!email ) {
-
+    } catch (error) {
+      //   console.error("Error in verifyOtp handler:", error);
       return {
         status: 500,
-        message: 'Please provide email  verify.',
+        message: 'An unexpected error occurred while verifying the OTP. Please try again later.',
         success: false,
         isEmailVerified: false
       };
     }
-    if (!enteredOtp ) {   
-
-      return {
-        status: 500,
-        message: 'Please provide OTP to verify.',
-        success: false,
-        isEmailVerified: false
-      };
-    }
-
-    //   console.log(`Verifying OTP for email: ${email}`);
-    const verificationResult = await verifyemailOtp(email, enteredOtp);
-
-    //   console.log(verificationResult, "verificationResult");
-
-    if (!verificationResult.success) {
-      // console.log("OTP verification failed:", verificationResult.message);
-      return {
-        status: 500,
-        message: verificationResult.message,
-        success: false,
-        isEmailVerified: false
-      };
-    } else {
-      // console.log("OTP verification successful:", verificationResult.message);
-      return {
-        status: 200,
-        message: verificationResult.message,
-        success: true,
-        isEmailVerified: true
-      };
-    }
-  } catch (error) {
-    //   console.error("Error in verifyOtp handler:", error);
-    return {
-      status: 500,
-      message: 'An unexpected error occurred while verifying the OTP. Please try again later.',
-      success: false,
-      isEmailVerified: false
-    };
-  }
-},
+  },
 
 
 };
@@ -470,16 +584,16 @@ verifyOtpEmail: async ({ request }) => {
 
 
 export const load = async ({ locals }) => {
-	if (!locals?.user) {
-		return null;
-	}
-	const authedUser = { id: locals.user.userId };
-	const userProfile = await Profile.findOne({ userId: authedUser.id });
+  if (!locals?.user) {
+    return null;
+  }
+  const authedUser = { id: locals.user.userId };
+  const userProfile = await Profile.findOne({ userId: authedUser.id });
   // console.log(userProfile,"userProile");
-  
 
-	if (!userProfile) {
-		return null;
-	}
-	return JSON.parse(JSON.stringify({ profile: userProfile }));
+
+  if (!userProfile) {
+    return null;
+  }
+  return JSON.parse(JSON.stringify({ profile: userProfile }));
 };

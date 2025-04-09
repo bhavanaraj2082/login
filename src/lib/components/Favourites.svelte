@@ -442,13 +442,13 @@ onMount(() => {
             <input 
                 type="text" 
                 placeholder="Search by Name, Prouduct Number, or Manufacturer" 
-                class="w-full h-10 border border-gray-400 focus:ring-0 focus:border-primary-500 rounded px-4 py-2 pl-10 text-sm outline-none transition-all duration-200" 
+                class="w-full h-10 border border-gray-400 focus:ring-0 focus:border-primary-500 rounded-md px-4 py-2 pl-10 text-sm outline-none transition-all duration-200" 
                 value={filters.searchTerm} 
                 on:input={handleSearch}/>
             {#if filters.searchTerm}
                 <button 
                     type="button" 
-                    class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded" 
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded-md" 
                     style="color: #cb1919" 
                     on:click={clearSearch}>
                     <Icon icon="oui:cross" width="16" height="16" class="font-bold" />
@@ -486,7 +486,7 @@ onMount(() => {
                         })))} />
                 <button 
                     type="submit"
-                    class="flex w-full bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 px-5 py-2.5 rounded whitespace-nowrap">
+                    class="flex w-full bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 px-5 py-2.5 rounded-md whitespace-nowrap">
                     <Icon icon="heroicons-solid:shopping-cart" width="20" />
                     <span class=" md:text-sm font-medium text-xs">Add All to Cart</span>
                 </button>
@@ -497,7 +497,7 @@ onMount(() => {
                 use:enhance={handleClearAll}>
                 <button 
                     type="submit" 
-                    class="flex w-full bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2.5 rounded whitespace-nowrap">
+                    class="flex w-full bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2.5 rounded-md whitespace-nowrap">
                     <Icon icon="mdi:delete-forever" width="20" />
                     <span class=" font-medium md:text-sm text-xs">Remove All</span>
                 </button>
@@ -506,17 +506,17 @@ onMount(() => {
     </div>
     <div class="space-y-2">
         {#if !paginatedFavorites.length}
-            <div class="w-full md:w-full border rounded border-primary-400 bg-white items-center px-4 py-8 md:col-span-2">
+            <div class="w-full md:w-full border rounded-md border-primary-400 bg-white items-center px-4 py-8 md:col-span-2">
                 <p class="text-center text-gray-500">No related items found</p>
             </div>
 		{:else}
             {#each paginatedFavorites as item,index}
-                <div class="flex flex-col md:flex-row items-center justify-between p-6 border bg-white border-gray-200 rounded w-full shadow">
+                <div class="flex flex-col md:flex-row items-center justify-between p-6 border bg-white border-gray-200 rounded-md w-full shadow">
                 <img 
                     src="{PUBLIC_IMAGE_URL}/{item.image}"
                   onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
                     alt={item.name} 
-                    class=" w-32 h-32 object-cover rounded-md mb-3 md:mb-0 md:mr-4"/>
+                    class=" w-32 h-32 object-cover rounded-md-md mb-3 md:mb-0 md:mr-4"/>
                 
                 <div class="flex-1 text-center md:text-left space-y-0.5">
                     <h2 class="text-sm font-bold text-gray-800">
@@ -549,7 +549,7 @@ onMount(() => {
                         </p>
                     {/if}
                 </div>
-                <div class="flex pl-2 justify-start md:w-1/4 sm:items-center m-1 p-2 rounded sm:justify-center">
+                <div class="flex pl-2 justify-start md:w-1/4 sm:items-center m-1 p-2 rounded-md sm:justify-center">
                     <div class="flex flex-col items-start">
                         <p class="font-semibold" 
                            class:text-green-600={item.stockInfo.stock > 0} 
@@ -581,7 +581,7 @@ onMount(() => {
                     })} />
                         <button 
                             type="submit" 
-                            class="flex bg-primary-500 items-center text-white hover:scale-95 transition-all duration-300 border-primary-500 px-2.5 py-2 rounded"
+                            class="flex bg-primary-500 items-center text-white hover:scale-95 transition-all duration-300 border-primary-500 px-2.5 py-2 rounded-md"
                             disabled={item.stockInfo.stock <= 0}>
                             <Icon 
                             icon="heroicons-solid:shopping-cart" 
@@ -599,7 +599,7 @@ onMount(() => {
                             <input type="hidden" name="itemId" value={item.id} />
                             <button 
                                 type="submit" 
-                                class="flex bg-red-600 items-center text-white hover:scale-95 transition-all duration-300 border-red-600 px-2.5 py-2 rounded">
+                                class="flex bg-red-600 items-center text-white hover:scale-95 transition-all duration-300 border-red-600 px-2.5 py-2 rounded-md">
                                 <Icon icon="mdi:delete-forever" class="text-xl" aria-label="Remove Icon" />
                                 <span class="hidden text-xs font-medium md:inline">Remove</span>
                             </button>
@@ -608,19 +608,18 @@ onMount(() => {
                     <div class="flex items-center">
                     <input type="number" bind:value={item.quantity}
                     
-                    class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">   
+                    class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">   
                     <div class=" {tog === index ? "hidden" : ""} flex items-center justify-center md:justify-start space-x-4">
                         <button 
                             on:click={() => decreaseQuantity(item)} 
-                            class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+                            class="px-2 py-1 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
                             disabled={item.quantity <= item.stockInfo.orderMultiple}>
                             -
                         </button>
                         <button class="text-sm font-medium">{item.quantity}</button>
                         <button 
                             on:click={() => increaseQuantity(item)} 
-                            class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
-                        >
+                            class="px-2 py-1 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50">
                             +
                         </button>
                     </div>

@@ -61,7 +61,7 @@
   id="productVariants"
   class="md:w-11/12 max-w-7xl bg-white mx-auto shadow-sm border border-gray-200 rounded-md m-10"
 >
-  <h1 class="w-full text-left text-xl text-heading font-bold p-3">Products</h1>
+  <h1 class="w-full text-left text-xl text-heading font-bold p-3 uppercase">Products</h1>
 
   <div class="bg-white shadow-md rounded-lg overflow-hidden">
     <div class="overflow-x-auto">
@@ -88,14 +88,7 @@
             <tr
               class="bg-white border-b hover:bg-gray-50 cursor-pointer"
               on:click={() => {
-                if (
-                  minPriceINR !== "--" &&
-                  maxPriceINR !== "--" &&
-                  minPriceUSD !== "--" &&
-                  maxPriceUSD !== "--"
-                ) {
                   window.location.href = variant.productNumber;
-                }
               }}
             >
               <td class="py-4 px-6">
@@ -104,7 +97,7 @@
                     src="{PUBLIC_IMAGE_URL}/{variant?.imageSrc}"
                     alt={variant.productNumber}
                     class="w-20 h-20 object-contain"
-                    onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+                    onerror="this.src='/fallback.jpg'"
                   />
                 </a>
               </td>

@@ -15,9 +15,11 @@
   import LikedPopup from "./LikedPopup.svelte";
   import { toast, Toaster } from "svelte-sonner";
   import AboutTheItem from "./AboutTheItem.svelte";
+	import { isFavoriteStore } from "$lib/stores/favorites.js";
+
   export let data;
   export let isauthedUser;
-  export let isFavorite;
+  // export let isFavorite;
   export let profile;
   let form;
   let showImagePopup = false;
@@ -28,7 +30,7 @@
   let form5;
   let showPopup = false;
   let showCartPopup = false;
-  $: isLiked = isFavorite;
+  $: isLiked = $isFavoriteStore;
   let authedEmail = isauthedUser.email;
   let showLikedPopup = false;
   let orderMultiple = null;
@@ -47,15 +49,6 @@
     showQuoteModal = !showQuoteModal;
     productQuote = selectedProduct;
   }
-
-  // $: {
-  //   if (data.records.length > 0 && quantity === 1) {
-  //     orderMultiple = data.records[0].orderMultiple;
-  //     quantity = orderMultiple;
-  //   } else if (data.records.length === 0) {
-  //     quantity = null;
-  //   }
-  // }
 
   $: {
     if (
@@ -140,19 +133,8 @@
   }
 
   function toggleLike() {
-    isFavorite = !isFavorite;
+    isFavoriteStore.update(n => !n);  
   }
-
-  // const updateQuantity = (event) => {
-  //   let value = parseInt(event.target.value);
-  //   if (isNaN(value) || value < 1) {
-  //     quantity = null;
-  //   } else if (value > 999) {
-  //     quantity = 999;
-  //   } else {
-  //     quantity = value;
-  //   }
-  // };
 
   $: {
     if (data.records.length > 0) {
@@ -291,7 +273,7 @@
 </form>
 {#each data.records as product}
   <div
-    class="md:w-11/12 max-w-7xl md:flex lg:flex mx-auto bg-white shadow rounded w-full p-6 space-x-4"
+    class="md:w-11/12 max-w-7xl md:flex lg:flex mx-auto bg-white shadow rounded w-full p-6 mb-6 space-x-4"
   >
     <div
       class="flex space-x-4 justify-between flex-col lg:flex-row md:w-full
@@ -311,7 +293,7 @@
               src="{PUBLIC_IMAGE_URL}/{product?.imageSrc}"
               alt="Product Image"
               class="w-56 h-56 object-contain"
-              onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+              onerror="this.src='/fallback.jpg'"
             />
             <div
               class="absolute bottom-full left-1/2 transform -translate-x-1/2 w-max px-3 py-1 bg-gray-600 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap"

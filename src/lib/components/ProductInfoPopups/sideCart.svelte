@@ -62,7 +62,7 @@
             <p class="text-heading font-semibold">
               {product?.productNumber} - {product?.priceSize[index]?.break}
             </p>
-            <button
+            <!-- <button
               on:click={toggleTooltip}
               class="text-primary-400 ml-2 pointer-events-none"
             >
@@ -70,7 +70,7 @@
                 icon="akar-icons:info-fill"
                 class="text-base font-semibold"
               />
-            </button>
+            </button> -->
           </div>
           <span class="text-lg font-bold mt-4">
             {#if $currencyState === "usd"}
@@ -298,5 +298,5 @@
   </div>
 {/each}
 {#if showCartPopup}
-  <ShowCartPopup {data} {cartTogglePopup} {addedQuantity} {index} />
+  <ShowCartPopup {data} {cartTogglePopup} {addedQuantity} {index} {showCartPopup} />
 {/if}

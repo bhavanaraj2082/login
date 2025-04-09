@@ -5,7 +5,15 @@
 	import { toast, Toaster } from "svelte-sonner";
 	let selectedNames = [];
 	let reason = [];
+	let carrn=false;
 	let submitting = false;
+	let inputReadOnly = false;
+	let progress = 0;
+	let form;
+	let isCheckedcap = false;
+	let errorMessagecap = "";
+	let submittingForm = false;
+	let loading = false;
 	$: reason = [...selectedNames];
 	export let data;
 	let authedUserEmailVerified = data?.profile?.isEmailVerified;
@@ -14,6 +22,13 @@
 	// console.log("authedUserEmailVerified",authedUserEmailVerified);
 
 	let verificationMessage = "";
+	let captchaVerified = false;
+	let captchaToken = "";
+	let rotationClass = "";
+	let showCaptchaPopup = false;
+	let mathQuestion = "";
+	let mathAnswer = 0;
+	let userAnswer = "";
 	let emailSent = false;
 	let displayMessage = "";
 	let enteredOtp = "";
@@ -443,11 +458,11 @@
 	let isEditable = false;
 	onMount(() => {
 		if (data && data.profile) {
-			fname=data.profile.firstName || "";
-lname=data.profile.lastName || "";
+			fname = data.profile.firstName || "";
+			lname = data.profile.lastName || "";
 			email = data.profile.email || "";
 			number = data.profile.cellPhone || data.profile.primaryPhone;
-			company=data.profile.companyName || "";
+			company = data.profile.companyName || "";
 
 			const profileCountry = data.profile.country?.trim();
 			if (profileCountry) {
@@ -482,10 +497,10 @@ lname=data.profile.lastName || "";
 		}
 
 		isEditable = false;
-		document.addEventListener('click', handleClickOutside);
-		return () => document.removeEventListener('click', handleClickOutside);
+		document.addEventListener("click", handleClickOutside);
+		return () => document.removeEventListener("click", handleClickOutside);
 	});
-	let isChecked = false;
+	let isChecked = true;
 	let phone = "";
 	let name = "";
 	let message = "";
@@ -520,15 +535,44 @@ lname=data.profile.lastName || "";
 		role = "";
 		selectedNames = [];
 	}
+	function handleKeyDown(event) {
+    if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
+        selectlocation(filteredCountries[0]);
+        event.preventDefault();
+    }
+}
 	function handleSubmit(event) {
+// 		const isFnameValid = fname.length > 0 && /^[A-Za-z\s]+$/.test(fname);
+//   const isLnameValid = lname.length > 0 && /^[A-Za-z\s]+$/.test(lname);
 		if (
 			number.length === 0 ||
 			email.length === 0 ||
-			fname.length === 0 ||
-			company.length === 0 ||
+
+			fname.length === 0 || 
+			fname.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(fname) ||
+				/<[^>]*>/.test(fname) ||
+
+				lname.length === 0 || 
+			lname.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(lname) ||
+				/<[^>]*>/.test(lname) ||
+			
+			company.length === 0 || 
+			company.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) ||
+				/<[^>]*>/.test(company) ||
+
 			details.length === 0 ||
-			role.length === 0 ||
-			lname.length === 0 ||
+			details.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) ||
+				/<[^>]*>/.test(details) ||
+			
+			role.length === 0 || 
+			role.trim() === "" ||
+				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(role) ||
+				/<[^>]*>/.test(role) ||
+
 			reason.length === 0 ||
 			!isChecked
 		) {
@@ -545,6 +589,128 @@ lname=data.profile.lastName || "";
 			event.preventDefault();
 		}
 	}
+	function showPopup() {
+		if (isCheckedcap) {
+			showCaptchaPopup = true;
+			generateMathQuestion();
+		}
+	}
+	function generateMathQuestion() {
+		const num1 = Math.floor(Math.random() * 10) + 1;
+		const num2 = Math.floor(Math.random() * 10) + 1;
+		const operations = ["+", "-", "*"];
+		const randomOperation =
+			operations[Math.floor(Math.random() * operations.length)];
+
+		if (randomOperation === "-") {
+			const larger = Math.max(num1, num2);
+			const smaller = Math.min(num1, num2);
+			mathQuestion = `What is ${larger} - ${smaller}?`;
+			mathAnswer = larger - smaller;
+		} else if (randomOperation === "+") {
+			mathQuestion = `What is ${num1} + ${num2}?`;
+			mathAnswer = num1 + num2;
+		} else if (randomOperation === "*") {
+			mathQuestion = `What is ${num1} * ${num2}?`;
+			mathAnswer = num1 * num2;
+		}
+	}
+	function validateMathCaptcha(e) {
+		const userResponse = parseInt(userAnswer.trim());
+		if (userResponse === mathAnswer) {
+			submittingForm = true;
+			if (submittingForm) {
+				const interval = setInterval(() => {
+					progress += 5;
+					if ((progress = 96)) {
+						clearInterval(interval);
+					}
+				}, 500);
+			}
+			errorMessagecap = "";
+			successMessage = "Captcha verified Successfully!!!";
+			isCheckedcap = true;
+			captchaVerified = true;
+			loading = true;
+			inputReadOnly = true;
+
+			const tokenPayload = {
+				question: mathQuestion,
+				answer: mathAnswer,
+			};
+			captchaToken = btoa(JSON.stringify(tokenPayload));
+
+			setTimeout(() => {
+				submitFormAutomatically();
+			}, 50);
+		} else {
+			successMessage = "";
+			errorMessagecap = "Incorrect answer, try again.";
+			isCheckedcap = false;
+
+			setTimeout(() => {
+				generateMathQuestion();
+				userAnswer = "";
+				errorMessagecap = "";
+				// setActionMessage('Something went wrong while processing your message', false);
+			}, 4000);
+		}
+	}
+	function submitFormAutomatically() {
+		loading = false;
+		if (form) {
+			const formData = new FormData(form);
+
+			fetch(form.action, {
+				method: form.method,
+				body: formData,
+			})
+				.then((response) => response.json())
+				.then((data) => {
+					// console.log("respose Status",data.status);
+					window.scrollTo({ top: 0, behavior: "smooth" });
+					if (data.status === 200) {
+						showSuccesDiv = true;
+						window.scrollTo({ top: 0, behavior: "smooth" });
+					} else {
+						showFailureDiv = true;
+						window.scrollTo({ top: 0, behavior: "smooth" });
+					}
+				});
+		}
+	}
+	function refreshMathQuestion() {
+		rotationClass = "rotate-[360deg]";
+
+		setTimeout(() => {
+			generateMathQuestion();
+			rotationClass = "";
+		}, 1000);
+	}
+function carrnchange() {
+	carrn=true;
+}
+$: disabled = location.length === 0;
+	function onInputChange() {
+		if (userAnswer.trim()) {
+			validateMathCaptcha();
+		} else {
+			errorMessagecap = "";
+		}
+	}
+
+	function closeCaptchaPopup() {
+		showCaptchaPopup = false;
+
+		userAnswer = "";
+
+		if (successMessage) {
+			isChecked = true;
+		} else {
+			isChecked = false;
+		}
+	}
+
 	function showMessage(message1, keywordError) {
 		successMessage = message1;
 		errorMessage = keywordError;
@@ -576,13 +742,15 @@ lname=data.profile.lastName || "";
 		}
 	};
 	let searchTerm = "";
-    let showDropdown = false;
-    let filteredCountries = [];
+	let showDropdown = false;
+	let filteredCountries = [];
 
 	function filterCountries() {
 		filteredCountries = countries.filter(
 			(location) =>
-				location.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				location.name
+					.toLowerCase()
+					.includes(searchTerm.toLowerCase()) ||
 				location.code
 					.replace("+", "")
 					.includes(searchTerm.replace("+", "").toLowerCase()),
@@ -596,7 +764,7 @@ lname=data.profile.lastName || "";
 		) {
 			selectlocation(filteredCountries[0]);
 		} else {
-			showDropdown = filteredCountries.length > 0; 
+			showDropdown = filteredCountries.length > 0;
 		}
 	}
 	function selectlocation(selectedlocation) {
@@ -607,89 +775,100 @@ lname=data.profile.lastName || "";
 		delete errors.location;
 	}
 
-    // function handleInputChange(event) {
-    //     searchTerm = event.target.value;
-    //     filterCountries();
-    // }
+	// function handleInputChange(event) {
+	//     searchTerm = event.target.value;
+	//     filterCountries();
+	// }
 
 	function filterCountriesWithoutAutoSelect() {
-    filteredCountries = countries.filter(
-      (country) =>
-        country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
-    );
-  }
+		filteredCountries = countries.filter(
+			(country) =>
+				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				country.code
+					.replace("+", "")
+					.includes(searchTerm.replace("+", "").toLowerCase()),
+		);
+	}
 
-  function handleInputChange(event) {
-    searchTerm = event.target.value;
-    const isDeleting =
-      event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward';
+	function handleInputChange(event) {
+		searchTerm = event.target.value;
+		const isDeleting =
+			event.inputType === "deleteContentBackward" ||
+			event.inputType === "deleteContentForward";
 
-    if (searchTerm.length > 0 && !isDeleting) {
-      filterCountriesWithoutAutoSelect();
-      showDropdown = filteredCountries.length > 0;
-      const codeSearch = searchTerm.replace('+', '').trim();
-      if (codeSearch.length > 0) {
-        const exactCodeMatches = filteredCountries.filter(
-          (country) => country.code.replace('+', '') === codeSearch
-        );
+		if (searchTerm.length > 0 && !isDeleting) {
+			filterCountriesWithoutAutoSelect();
+			showDropdown = filteredCountries.length > 0;
+			const codeSearch = searchTerm.replace("+", "").trim();
+			if (codeSearch.length > 0) {
+				const exactCodeMatches = filteredCountries.filter(
+					(country) => country.code.replace("+", "") === codeSearch,
+				);
 
-        if (exactCodeMatches.length === 1) {
-			selectlocation(exactCodeMatches[0]);
-          return;
-        }
-      }
-      const countriesStartingWith = filteredCountries.filter((country) =>
-        country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-      );
+				if (exactCodeMatches.length === 1) {
+					selectlocation(exactCodeMatches[0]);
+					return;
+				}
+			}
+			const countriesStartingWith = filteredCountries.filter((country) =>
+				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+			);
 
-      if (countriesStartingWith.length === 1) {
-        selectlocation(countriesStartingWith[0]);
-      }
-    } else {
-      filterCountriesWithoutAutoSelect();
-      showDropdown = filteredCountries.length > 0;
-    }
-  }
-
-    function toggleDropdown() {
-        showDropdown = !showDropdown;
-    }
-
-	function handleClickOutside(event) {
-		if (!event.target.closest('.dropdown-container')) {
-			showDropdown = false;
+			if (countriesStartingWith.length === 1) {
+				selectlocation(countriesStartingWith[0]);
+			}
+		} else {
+			filterCountriesWithoutAutoSelect();
+			showDropdown = filteredCountries.length > 0;
 		}
 	}
 
+	function toggleDropdown() {
+		showDropdown = !showDropdown;
+	}
+
+	function handleClickOutside(event) {
+		if (!event.target.closest(".dropdown-container")) {
+			showDropdown = false;
+		}
+	}
+	 function handleFocus() {
+		showErrors = false; // Hide error on focus (if you want to show it only after the user types)
+  }
 </script>
+<style>
+	/* Custom cursor when the input is disabled */
+	input:disabled {
+	  cursor: not-allowed;  /* Shows the 'not-allowed' cursor */
+	}
+  </style>
 
 {#if showSuccesDiv}
-<div
-class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
->
-<div
-	class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
->
-	<h3 class="md:text-xl text-lg font-semibold text-green-600 mb-4">
-		Chemikart Solution Submission
-	</h3>
-	<p class="md:text-md text-xs text-gray-700 mt-4 mb-6">
-		Thank you for reaching out! We have received your inquiry and
-		will get back to you with a customized solution shortly.
-	</p>
-	<div class="w-10/12 mx-auto my-6 border-t-1 border-green-300"></div>
-	<div class="flex items-center justify-center">
-		<a
-			href="/"
-			class="bg-white text-primary-500 border-1 border-primary-500 px-4 py-2 rounded-md font-medium hover:bg-primary-500 hover:text-white transition-all duration-300 flex justify-center items-center"
+	<div
+		class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
+	>
+		<div
+			class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
 		>
-			<Icon icon="mdi:home" class="text-xl mr-2" />Back to Home
-		</a>
+			<h3 class="md:text-xl text-lg font-semibold text-green-600 mb-4">
+				Chemikart Solution Submission
+			</h3>
+			<p class="md:text-md text-xs text-gray-700 mt-4 mb-6">
+				Thank you for reaching out! We have received your inquiry and
+				will get back to you with a customized solution shortly.
+			</p>
+			<div class="w-10/12 mx-auto my-6 border-t-1 border-green-300"></div>
+			<div class="flex items-center justify-center">
+				<a
+					href="/"
+					class="bg-white text-primary-500 border-1 border-primary-500 px-4 py-2 rounded-md font-medium hover:bg-primary-500 hover:text-white transition-all duration-300 flex justify-center items-center"
+				>
+					<Icon icon="mdi:home" class="text-xl mr-2" />Back to Home
+				</a>
+			</div>
+		</div>
 	</div>
-</div>
-</div>
-	{:else if showFailureDiv}
+{:else if showFailureDiv}
 	<div
 		class="pb-20 pt-20 h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl mb-10 sm:text-sm text-xs"
 	>
@@ -697,7 +876,8 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 			class="w-10/12 md:w-8/12 bg-gradient-to-r from-red-100 via-red-50 to-red-100 p-8 rounded-lg shadow-lg text-center"
 		>
 			<p class="sm:text-md text-sm text-gray-700 mb-6">
-			There was an issue with submitting the form. Please try again after a while.
+				There was an issue with submitting the form. Please try again
+				after a while.
 			</p>
 
 			<div class="w-10/12 mx-auto my-6 border-t-2 border-red-300"></div>
@@ -706,24 +886,28 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 					href="/feedback"
 					class="sm:text-sm text-xs bg-white text-primary-500 border border-primary-500 px-4 py-2 rounded-md hover:bg-primary-500 hover:text-white transition"
 				>
-				Report Issue
+					Report Issue
 				</a>
 			</div>
 		</div>
 	</div>
 {:else}
 	<section class="md:w-11/12 mx-auto max-w-7xl bg-gray-50 sm:pb-0 px-2 pb-10">
-		<section >
+		<section>
 			<div class="font-bold text-xl md:text-2xl pb-4">
 				Chemikart Solutions
 			</div>
-			<p class="sm:text-sm text-xs leading-6 text-content mx-auto text-justify-center">
+			<p
+				class="sm:text-sm text-xs leading-6 text-content mx-auto text-justify-center"
+			>
 				We offer a full range of e-Commerce tools designed to enable
 				greater spend control for your procurement staff, providing your
 				researchers with ease of access to the products they've come to
 				rely on.
 			</p>
-			<p class="sm:text-sm text-xs leading-6 text-content mx-auto text-justify-center mt-2">
+			<p
+				class="sm:text-sm text-xs leading-6 text-content mx-auto text-justify-center mt-2"
+			>
 				We have three solutions available to help you save time and cost
 				in procurement management. Read further for more details of each
 				solution, or fill out our contact form and our team will reach
@@ -748,7 +932,9 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 									>
 										The One-to-One Solution: E-Procurement
 									</h2>
-									<p class="sm:text-sm text-xs text-content mt-4">
+									<p
+										class="sm:text-sm text-xs text-content mt-4"
+									>
 										e-Procurement provides seamless
 										system-to-system connectivity of your
 										existing spend management system.
@@ -768,7 +954,9 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 									>
 										The Customized Solution: Pipeline®
 									</h2>
-									<p class="sm:text-sm text-xs text-content mt-4">
+									<p
+										class="sm:text-sm text-xs text-content mt-4"
+									>
 										This customized service balances your
 										organization's business needs with the
 										product requirements of your
@@ -789,7 +977,9 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 									>
 										The Simple Solution: Chemikart E-Shop
 									</h2>
-									<p class="sm:text-sm text-xs text-content mt-4">
+									<p
+										class="sm:text-sm text-xs text-content mt-4"
+									>
 										Your procurement staff can access our
 										products simply, easily, and securely
 										through chemikart.com.
@@ -1017,11 +1207,14 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 			>
 				Contact Our Team
 			</h2>
+			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			<form
 				method="POST"
 				action="?/contactus"
+				bind:this={form}
 				class="w-full md:mt-3 mt-0 max-w-3xl sm:ml-3 ml-0"
 				use:enhance={(event) => {
+					
 					const isEmailVerified = ProfileEmailVerified; // Assuming this is the first email verification check
 					const isAuthedUserEmailVerified = authedUserEmailVerified; // The second email verification check
 					console.log(
@@ -1036,7 +1229,8 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 						// Return a function that does nothing to prevent form submission
 						return () => {};
 					}
-					submitting= true;
+					
+					submitting = true;
 					return async ({ result }) => {
 						let message1 = "";
 						let keywordError = "";
@@ -1048,7 +1242,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 							showSuccesDiv = true;
 							console.log(message1);
 							// setTimeout(() => {
-							// 	window.location.reload(); 							
+							// 	window.location.reload();
 							// }, 3000);
 						} else if (keywordError === "error") {
 							message1 = result.data.data.error;
@@ -1063,9 +1257,14 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 						}, 100);
 					};
 				}}
+				  on:keydown={(event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                    }
+                }}
 			>
 				<!-- <div class="message-container mt-3">
-        {#if errorMessage === "success"}
+        {#if errorMessage === "success"}locatio
             <div class="text-center bg-green-100 text-green-700 py-2 mb-4 rounded-md">
                 {successMessage}
             </div>
@@ -1084,8 +1283,6 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 				</div>
 				<div>
 					<label class="flex items-center space-x-2 text-lg">
-						<!-- type="checkbox"
-                    class="form-checkbox rounded text-primary-600 mr-2 focus:outline-none focus:ring-0" -->
 						<input
 							type="checkbox"
 							bind:group={selectedNames}
@@ -1145,6 +1342,29 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 						>
 					</label>
 				</div>
+				<div>
+					<label class=" items-center space-x-2 hidden">
+						<input
+							type="checkbox"
+							name="query"
+							bind:value={reason}
+							bind:checked={isChecked}
+							class="w-4 h-4 ml-1 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0"
+						/>
+						<span class=" text-xs">
+							I confirm that I have selected the correct queries</span
+						>
+					</label>
+					{#if showErrors && reason.length === 0}
+						<span
+							class="text-red-500 sm:text-xs text-2s font-medium"
+						>
+							Please select one of the above reasons</span
+						>
+					{/if}
+
+					<input type="hidden" name="status" value="unread" />
+				</div>
 				<div
 					class="w-full mt-3 max-w-full sm:max-w-lg md:max-w-3xl overflow-hidden"
 				>
@@ -1155,20 +1375,27 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								name="fname"
 								id="fname"
 								bind:value={fname}
-								class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="First Name*"
 							/>
-							{#if showErrors && fname.length === 0}
-								<span class="text-red-500 sm:text-xs text-2s font-medium"
+							<!-- {#if showErrors && fname.length === 0}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
 									>First Name is required</span
 								>
-							{/if}
-							{#if fname.length > 0 && !/^[A-Za-z\s]+$/.test(fname)}
-								<span class="text-red-500 sm:text-xs text-2s font-medium"
+							{/if} -->
+							{#if showErrors && (!fname || fname.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(fname) || /<[^>]*>/.test(fname))}
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+								First Name is required.
+							</span>
+						  {/if}
+							<!-- {#if fname.length > 0 && !/^[A-Za-z\s]+$/.test(fname)}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
 									>First Name cannot contain numbers or
 									special characters</span
 								>
-							{/if}
+							{/if} -->
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
@@ -1176,94 +1403,165 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								name="lname"
 								id="lname"
 								bind:value={lname}
-								class="flex w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="flex w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Last Name*"
 							/>
-							{#if showErrors && lname.length === 0}
-								<span class="text-red-500 sm:text-xs text-2s font-medium"
+							<!-- {#if showErrors && lname.length === 0}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
 									>Last Name is required</span
 								>
 							{/if}
 							{#if lname.length > 0 && !/^[A-Za-z\s]+$/.test(lname)}
-								<span class="text-red-500 sm:text-xs text-2s font-medium"
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
 									>Last Name cannot contain numbers or special
 									characters</span
 								>
-							{/if}
+							{/if} -->
+							{#if showErrors && (!lname || lname.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(lname) || /<[^>]*>/.test(lname))}
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+								Last Name is required.
+							</span>
+						  {/if}
 						</div>
 					</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 					<div class="flex flex-col md:flex-row md:space-x-4">
+					
+				
+
+
+
 						<div class="flex-1 mb-4 relative w-full">
 							<div class="relative">
-							<input
-								type="text"
-								id="location" 
-								name="location"
-								bind:value={location}
-								placeholder="Location"
-								on:input={handleInputChange}
-								on:click={toggleDropdown}
-								class="w-full sm:text-sm text-xs px-2 py-2 placeholder-gray-400 rounded  border-1 border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
-								required
-							/>
-						
-							<Icon
-								icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
-								class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-								on:click={toggleDropdown}
-							/>
+								<input
+									type="text"
+									id="location"
+									name="location"
+									bind:value={location}
+									placeholder="Location*"
+									on:input={handleInputChange}
+									on:click={toggleDropdown}
+									on:keydown={handleKeyDown}
+									class="w-full sm:text-sm text-xs px-2 py-2 placeholder-gray-400 rounded-md border-1 border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
+									required
+								/>
+
+								<Icon
+									icon={showDropdown
+										? "ep:arrow-up-bold"
+										: "ep:arrow-down-bold"}
+									class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+									on:click={toggleDropdown}
+								/>
 							</div>
-						
 							<!-- Dropdown Suggestions -->
 							{#if showDropdown}
-								<div class="absolute w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 mt-1">
-									<ul class="max-h-60 overflow-y-auto sm:text-sm text-xs">
+								<div
+									class="absolute w-full bg-white border border-gray-300 rounded-md-md shadow-lg z-10 mt-1"
+								>
+									<ul
+										class="max-h-60 overflow-y-auto sm:text-sm text-xs"
+									>
 										{#each filteredCountries as location (location.name)}
 											<!-- svelte-ignore a11y-click-events-have-key-events -->
 											<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 											<li
-												on:click={() => selectlocation(location)}
+												on:click={() =>
+													selectlocation(location)}
 												class="px-4 py-2 cursor-pointer hover:bg-gray-100"
 											>
 												{location.name} ({location.code})
 											</li>
 										{/each}
 										{#if filteredCountries.length === 1}
-											<div class="px-4 py-2 text-gray-600 text-xs">No matching countries found!</div>
+											<div
+												class="px-4 py-2 text-gray-600 text-xs"
+											>
+												No matching countries found!
+											</div>
 										{/if}
 									</ul>
 								</div>
 							{/if}
-						
+
 							<!-- Validation Message -->
 							{#if showErrors && location.length === 0}
-								<span class="text-red-500 sm:text-xs text-2s font-medium">location is required</span>
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+									>Location is required</span
+								>
 							{/if}
 						</div>
+
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
 								type="tel"
 								name="number"
 								id="number"
 								bind:value={number}
-								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								on:hover={handleFocus}
+								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Phone Number*"
+								{disabled}
+								required
 							/>
+							<!-- {#if location.length === 0 && !showErrors}
+								<span class="text-red-500 sm:text-xs text-2s font-medium">
+									Select your country before entering your number
+								</span>
+							{/if} -->
 							{#if showErrors && number.length === 0}
-								<span class="text-red-500 sm:text-xs text-2s font-medium"
-									>Number is required</span
-								>
+								<span class="text-red-500 sm:text-xs text-2s font-medium">
+									Number is required
+								</span>
 							{/if}
-							<!-- {#if number.length > 0 && !/^\+?[0-9]{10}$/.test(number)}
-                                    <span class="text-red-500 sm:text-xs text-2s font-medium">Please enter a valid number number.</span>
-                                {/if} -->
 							{#if number?.length > 0 && !validatePhoneNumber(location, number)}
-								<span class="text-red-500 sm:text-xs text-2s font-medium"
-									>Please enter a valid phone number for {location}</span
-								>
+								<span class="text-red-500 sm:text-xs text-2s font-medium">
+									Please enter a valid phone number for {location}
+								</span>
 							{/if}
 						</div>
+						
 					</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
@@ -1271,14 +1569,14 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								name="company"
 								id="company"
 								bind:value={company}
-								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Company Name*"
 							/>
-							{#if showErrors && company.length === 0}
-								<span class="text-red-500 sm:text-xs text-2s font-medium"
-									>Company Name is required</span
-								>
-							{/if}
+							{#if showErrors && (!company || company.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) || /<[^>]*>/.test(company))}
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+							  Company Name is required.
+							</span>
+						  {/if}
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
@@ -1286,19 +1584,25 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 								name="role"
 								id="role"
 								bind:value={role}
-								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Role*"
 							/>
-							{#if showErrors && role.length === 0}
-								<span class="text-red-500 sm:text-xs text-2s font-medium"
+							<!-- {#if showErrors && role.length === 0}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
 									>Role is required</span
 								>
-							{/if}
+							{/if} -->
+							{#if showErrors && (!role || role.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(role) || /<[^>]*>/.test(role))}
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+								Role is required.
+							</span>
+						  {/if}
 						</div>
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
-							<!-- <input type="text" name="email" id="email" bind:value={email} class="block w-full border-1 border-gray-300 text-sm p-2 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email Address*" /> -->
+							<!-- <input type="text" name="email" id="email" bind:value={email} class="block w-full border-1 border-gray-300 text-sm p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email Address*" /> -->
 							<input
 								type="hidden"
 								name="email"
@@ -1362,8 +1666,8 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 										name="email"
 										id="email"
 										bind:value={email}
-										class="flex w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
-										placeholder="Email"
+										class="flex w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										placeholder="Email*"
 										on:input={() => {
 											email = email.trim();
 
@@ -1373,12 +1677,14 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 										}}
 									/>
 									{#if showErrors && email.length === 0}
-										<span class="text-red-500 sm:text-xs text-2s font-medium"
+										<span
+											class="text-red-500 sm:text-xs text-2s font-medium"
 											>Email is required</span
 										>
 									{/if}
 									{#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
-										<span class="text-red-500 sm:text-xs text-2s font-medium"
+										<span
+											class="text-red-500 sm:text-xs text-2s font-medium"
 											>Please enter a valid email address.</span
 										>
 									{/if}
@@ -1412,7 +1718,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 											{#if isOtpVerified}
 												Verified
 												<Icon
-													icon="material-symbols:verified-rounded"
+													icon="material-symbols:verified-rounded-md"
 													class="w-4 h-4 mt-2 ml-1"
 												/>
 											{:else}
@@ -1429,7 +1735,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 										>
 											Verified
 											<Icon
-												icon="material-symbols:verified-rounded"
+												icon="material-symbols:verified-rounded-md"
 												class="w-4 h-4 ml-1"
 											/>
 										</span>
@@ -1444,7 +1750,7 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 									method="POST"
 									use:enhance={() => {
 										return async ({ result }) => {
-											loadingotp = false; // Hide loading spinner when the request is complete
+											loadingotp = false; 
 											if (result.status === 200) {
 												if (
 													result.data.status === 200
@@ -1493,15 +1799,26 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 											name="enteredOtp"
 											bind:value={enteredOtpemail}
 											placeholder="Enter 6-digit OTP"
-											class="flex w-full border-1 border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
-											on:input={() => {
-												enteredOtpemail =
-													enteredOtpemail.trim();
+											class="flex w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+											
+												on:input={() => {
+															enteredOtpemail =
+																enteredOtpemail.trim();
+															enteredOtpemail =
+																enteredOtpemail
+																	.replace(
+																		/\D/g,
+																		"",
+																	)
+																	.slice(
+																		0,
+																		6,
+																	);
 											}}
 										/>
 										<button
 											type="submit"
-											class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded hover:underline"
+											class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded-md hover:underline"
 											disabled={loadingotp}
 										>
 											<!-- {loadingotp ? 'Verifying...' : 'Verify'} -->
@@ -1545,56 +1862,216 @@ class="mb-4 w-full flex items-center justify-center mx-auto max-w-7xl p-4"
 							name="details"
 							id="details"
 							bind:value={details}
-							class="w-full sm:text-sm text-xs p-2 border-1 border-gray-300 rounded focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 mb-4 h-32"
+							class="w-full sm:text-sm text-xs p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 h-32"
 							placeholder="Additional Details*"
 						></textarea>
-						{#if showErrors && details.length === 0}
-							<span class="text-red-500 sm:text-xs text-2s font-medium"
-								>Additional Details are required</span
+						<!-- {#if showErrors && details.length === 0}
+							<span
+								class="text-red-500 sm:text-xs text-2s font-medium"
 							>
-						{/if}
+								Additional Details are required</span
+							>
+						{/if} -->
+						{#if showErrors && (!details || details.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) || /<[^>]*>/.test(details))}
+							<span class="text-red-500 sm:text-xs text-2s font-medium">
+								Additional Details are required.
+							</span>
+						  {/if}
 					</div>
-					<div>
-						<label class="flex items-center space-x-2">
+					<span class="flex-1 w-1/3 mb-4">
+						<label for="recaptcha" class="block text-sm font-medium text-gray-700">
+						</label>
+						<input type="hidden" name="token" value={captchaToken} />
+					<div id="g-recaptcha-response">
+						<label
+							class="flex mt-5 md:mt-6 items-center justify-end space-x-2 mb-4 cursor-pointer"
+						>
 							<input
 								type="checkbox"
-								name="query"
-								bind:value={reason}
-								bind:checked={isChecked}
-								class="w-4 h-4 mb-5 ml-1 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0"
-							/>
+								name="captcha"
+								value="captcha"
+								class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded cursor-pointer hover:border-primary-500 transition-colors duration-300"
+								bind:checked={isCheckedcap}
+								on:click={(event) => {
+									
+									event.preventDefault();
+									handleSubmit(event);
 
-							<span class="mb-5 text-xs"
-								>I confirm that I have selected the correct
-								queries</span
+									// Check if form is valid (all required fields filled)
+									if (!formValid) {
+										if (Object.keys(errors).length > 0) {
+											toast.error(
+												"Please fill all the required fields.",
+											);
+											isCheckedcap = false;
+											return;
+										}
+										return;
+									}
+
+									if (
+										!(
+											ProfileEmailVerified ||
+											authedUserEmailVerified === true
+										)
+									) {
+										toast.error(
+											"Please verify your email to proceed",
+										);
+										isCheckedcap = false;
+										return;
+									}
+
+									isCheckedcap = true;
+									showPopup();
+								}}
+								  on:keydown={(event) => {
+									if (event.key === 'Enter') {
+										event.preventDefault();
+									}
+								}}
+							/>
+							<span class="text-gray-600 font-medium text-sm"
+								>Please verify you are human</span
 							>
 						</label>
-						{#if showErrors && reason.length === 0}
-							<span class="text-red-500 sm:text-xs text-2s font-medium"
-								>Please select one of the above reasons</span
+						<div
+							class="mt-0 flex items-center justify-end mr-10 gap-x-6"
+						>
+							<!-- <button type="submit"
+  							on:click={handleSubmit}
+  							class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold">
+  							{#if submitting}
+  							  Sending...
+  							{:else}
+  							  Send Message
+  							{/if}
+						</button> -->
+							<button
+								type="submit"
+								on:click={(event) => {
+									handleSubmit(event);
+									if (!isCheckedcap) {
+										toast.error(
+											"Please complete the CAPTCHA to proceed with the submission.",
+										);
+										event.preventDefault();
+										return;
+									}
+								}}
+								  on:keydown={(event) => {
+									if (event.key === 'Enter') {
+										event.preventDefault();
+									}
+								}}
+								class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
 							>
-						{/if}
-						{#if showErrors && !isChecked}
-							<span class="text-red-500 sm:text-xs text-2s font-medium"
-								>confirm the above statement</span
+								{#if submitting}
+									Sending...
+								{:else}
+									Send Message
+								{/if}
+							</button>
+						</div>
+					</div>
+					</span>
+					{#if showCaptchaPopup}
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
+					<div
+						class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
+						on:click={closeCaptchaPopup}
+					>
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<!-- svelte-ignore a11y-no-static-element-interactions -->
+						<div
+							class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100"
+							on:click|stopPropagation
+						>
+							<h2 class="text-xl font-bold mb-6 text-gray-800 text-center">
+								Verify You're Human
+							</h2>
+				
+							<div class="bg-gray-50 p-4 rounded-lg mb-6">
+								<p class="flex items-center justify-between text-gray-700 font-medium">
+									<span class="text-lg">{mathQuestion}</span>
+									<button
+									class="ml-4 text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-all duration-300 {submittingForm ? 'opacity-50 cursor-not-allowed' : ''}"
+									on:click={submittingForm ? null : refreshMathQuestion}
+									disabled={submittingForm}
+								>
+									<Icon
+										icon="ic:round-refresh"
+										class={`w-5 h-5 text-primary-600 ${submittingForm ? '' : 'cursor-pointer hover:scale-110'} transition transform ${rotationClass}`}
+									/>
+								</button>
+								</p>
+							</div>
+							
+							<div class="mb-6">
+								<input
+									type="text"
+									bind:value={userAnswer}
+									placeholder="Your Answer"
+									class="border border-gray-300 rounded-lg w-full p-3 text-gray-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all"
+									on:input={onInputChange}
+									readonly={inputReadOnly}
+								/>
+				
+								{#if errorMessagecap}
+									<p class="text-red-500 text-sm mt-2 flex items-center">
+										<Icon icon="mdi:alert-circle" class="w-4 h-4 mr-1" />
+										{errorMessagecap}
+									</p>
+								{/if}
+								
+								{#if successMessage}
+									<p class="text-green-500 text-sm mt-2 flex items-center">
+										<Icon icon="mdi:check-circle" class="w-4 h-4 mr-1" />
+										{successMessage}
+									</p>
+								{/if}
+							</div>
+							
+							{#if submittingForm}
+								<div class="w-full mb-4">
+									<p class="text-sm mb-2 flex items-center text-gray-600">
+										<Icon icon="mdi:loading" class="w-4 h-4 mr-2 animate-spin" />
+										Submitting form
+									</p>
+									<div class="relative">
+										<div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+											<!-- Bind the width of the progress bar to the progress variable -->
+											<div
+												class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
+												style="width: {progress}%;"
+											></div>
+										</div>
+									</div>
+								</div>
+							{/if}
+							
+							<button
+								class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base"
+								on:click={() => {
+									onInputChange();
+									if (!errorMessagecap && userAnswer) {
+										submittingForm = true;
+				
+										setTimeout(() => {
+											submittingForm = false;
+											successMessage = 'Verification successful!';
+										}, 2000);
+									} else {
+										errorMessagecap = '*Please answer the question correctly';
+									}
+								}}
 							>
-						{/if}
-						<input type="hidden" name="status" value="unread" />
+								Verify Now
+							</button>
+						</div>
 					</div>
-					<div class="mt-0 flex items-center justify-end gap-x-6">
-						<button
-  type="submit"
-  on:click={handleSubmit}
-  class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
-  >
-  {#if submitting}
-    Sending...
-  {:else}
-    Send Message
-  {/if}
-</button>
-
-					</div>
+				{/if}
 				</div>
 			</form>
 			<Toaster position="bottom-right" richColors />
