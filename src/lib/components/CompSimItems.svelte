@@ -470,21 +470,23 @@
                 <div class="px-3 mb-3">
                   <h3 class="text-gray-700">
                     {#each Object.keys(product.properties) as key}
-                      <hr class="border-t border-gray-300" />
-                      <div class="py-2 {showDifference && !isSameAsFirst(product.properties[key], key) && product.properties[key] && product.properties[key] !== '__' ? 'bg-primary-100 ' : 'bg-white'} min-h-[60px] max-h-[60px] overflow-hidden">
-                        <div class="text-left text-xs font-semibold">{key}:</div>
-                        <div class="text-gray-500 text-xs pt-1 font-normal">
-                          {#if product.properties[key]}
-                            {#if typeof product.properties[key] === "object"}
-                              {JSON.stringify(product.properties[key])}
-                            {:else}
-                              {product.properties[key]}
-                            {/if}
+                    {#if key !== 'Languages'}
+                    <hr class="border-t border-gray-300" />
+                    <div class="py-2 {showDifference && !isSameAsFirst(product.properties[key], key) && product.properties[key] && product.properties[key] !== '__' ? 'bg-primary-100 ' : 'bg-white'} min-h-[60px] max-h-[60px] overflow-hidden">
+                      <div class="text-left text-xs font-semibold">{key}:</div>
+                      <div class="text-gray-500 text-xs pt-1 font-normal">
+                        {#if product.properties[key]}
+                          {#if typeof product.properties[key] === "object"}
+                            {JSON.stringify(product.properties[key])}
                           {:else}
-                            -
+                            {product.properties[key]}
                           {/if}
-                        </div>
+                        {:else}
+                          -
+                        {/if}
                       </div>
+                    </div>
+                    {/if}
                     {/each}
                   </h3>
                 </div>
