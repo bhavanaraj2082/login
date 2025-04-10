@@ -20,8 +20,6 @@
 	let form;
 	let form2;
 	let isLoggedIn = $authedUser?.id ? true : false;
-	$: a = browser ? JSON.parse(localStorage.getItem("cart")) :[]
-	$: guestCart.set(a)
 	function formatPriceToNumber(priceString) {
 		if (!priceString) return 0;
 		const formattedPrice = String(priceString)
