@@ -4,18 +4,14 @@
 	import { enhance } from "$app/forms";
 	import { toast, Toaster } from "svelte-sonner";
 	let showSubmitPopup = false;
-
 	export let data;
 	let isLoadingPhone = false;
 	let searchTerm = "";
 	let loadingotp = false;
 	let loadingPhone = false;
-	// console.log(data,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 	let country = "";
 	let authedUserEmailVerified = data?.profile?.isEmailVerified;
 	let authedUserPhoneVerified = data?.profile?.isPhoneVerified;
-	// console.log("authedUserEmailVerified",authedUserEmailVerified);
-
 	let verificationMessage = "";
 	let emailSent = false;
 	let displayMessage = "";
@@ -83,13 +79,17 @@
 	}
 
 	const validateField = (fieldName) => {
-		if (!fieldName || fieldName === "name") {
-			if (!name || !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(name)) {
-				errors.name = "User Name is required";
-			} else {
-				delete errors.name;
-			}
-		}
+	if (!fieldName || fieldName === "name") {
+	if (!name) {
+		errors.name = "User Name is required";
+	} else if (!/^[A-Za-z\s]+$/.test(name)) {
+		errors.name = "User Name should contain only letters and spaces";
+	} else {
+		delete errors.name;
+	}
+}
+
+
 		if (!fieldName || fieldName === "country") {
     if (!country || country === "") {
         errors.country = "Please select a country";
@@ -168,42 +168,28 @@
 			}
 		}
 
-		// if (fieldName === "company") {
-    	//   if (company && company.trim() !== "") {
-    	//     if (
-    	//       !/^[A-Za-z0-9&@!#$%^&*\(\)_+\-=\[\]\{\};:,.?\/\\|<>~`"'\s]+$/.test(company)
-    	//     ) {
-    	//       errors.company = "Company name can only contain letters, numbers, and certain special characters.";
-    	//     } else if (company.length < 3) {
-    	//       errors.company = "Company name must be at least 3 characters long.";
-    	//     } else if (company.length > 100) {
-    	//       errors.company = "Company name should not exceed 100 characters.";
-    	//     } else {
-    	//       delete errors.company;
-    	//     }
-
-    	//     if (errors.company) {
-    	//       setTimeout(() => {
-    	//         delete errors.company;
-    	//       }, 2000);
-    	//     }
-    	//   } else {
-    	//     delete errors.company; 
-    	//   }
-    	// }
-
 		if (!fieldName || fieldName === "company") {
-			if (
-				!company ||
-				company.trim() === "" ||
-				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) ||
-				/<[^>]*>/.test(company)
-			) {
-				errors.company = "company is required";
-			} else {
-				delete errors.company;
-			}
-		}
+	const trimmedCompany = company ? company.trim() : "";
+	let newErrors = { ...errors };
+
+	if (!trimmedCompany) {
+		newErrors.company = "Company name is required";
+	} else if (trimmedCompany.length < 3) {
+		newErrors.company = "Company name must be at least 3 characters";
+	} else if (
+		!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(trimmedCompany) ||
+		/<[^>]*>/.test(trimmedCompany)
+	) {
+		newErrors.company = "Please enter a valid company name";
+	} else {
+		delete newErrors.company;
+	}
+
+	errors = newErrors; 
+}
+
+
+
 
 		if (!fieldName || fieldName === "captcha") {
 			if (!isChecked) {
@@ -230,7 +216,6 @@
 			})
 				.then((response) => response.json())
 				.then((data) => {
-					// console.log("respose Status",data.status);
 					window.scrollTo({ top: 0, behavior: "smooth" });
 					if (data.status === 200) {
 						showSuccesDiv = true;
@@ -675,9 +660,6 @@
 		validateField("subject");
 		validateField("captcha");
 		validateField("country");
-
-		// formData.append(email, 'emailid');
-
 		const isValid = formValid();
 		console.log("Form valid result from handleSubmit:", isValid);
 		if (!isValid) {
@@ -692,7 +674,6 @@
 
 	function selectCountry(selectedCountry) {
 		country = selectedCountry.name;
-		// filteredCountries = countries;
 		searchTerm = `${selectedCountry.name} `;
 		showDropdown = false;
 		validateField("country");
@@ -707,31 +688,22 @@
                errors.phone = "Required for the selected country.";
         }
         else {
-        delete errors.phone; // Remove any errors if conditions are satisfied
+        delete errors.phone; 
     }
-		// console.log('Selected Country:', country);
 	}
 	function toggleDropdown() {
 		showDropdown = !showDropdown;
 	}
 
 	function handleInputChange(event) {
-		// Get the current input value
 		searchTerm = event.target.value;
-
-		// Track if user is deleting text
 		const isDeleting =
 			event.inputType === "deleteContentBackward" ||
 			event.inputType === "deleteContentForward";
 
 		if (searchTerm.length > 0 && !isDeleting) {
-			// Filter countries
 			filterCountriesWithoutAutoSelect();
-
-			// Show dropdown with filtered results
-			showDropdown = filteredCountries.length > 0;
-
-			// Check for country code matches specifically
+		showDropdown = filteredCountries.length > 0;
 			const codeSearch = searchTerm.replace("+", "").trim();
 			if (codeSearch.length > 0) {
 				const exactCodeMatches = filteredCountries.filter(
@@ -783,14 +755,10 @@
 
 	function validatePhoneNumber(countryCode, phone) {
 		if (!phone || !countryCode === "") {
-			// errors.contactNumber = `*Required`;
 			return false;
 		}
 
 		const country = getCountryByCode(countryCode);
-
-		// console.log('Validating phone number for country:', country);
-
 		if (!country) {
 			errors.phone = "Select your country before entering number";
 			errors.country = "Invalid country selected";
@@ -877,7 +845,6 @@
 				generateMathQuestion();
 				userAnswer = "";
 				errorMessagecap = "";
-				// setActionMessage('Something went wrong while processing your message', false);
 			}, 4000);
 		}
 	}
@@ -951,12 +918,6 @@
 		const isOtpPhoneVerified = ProfilePhoneVerified;
 		const isUserEmailVerified = authedUserEmailVerified === true;
 		const isUserPhoneVerified = authedUserPhoneVerified === true;
-
-		// console.log('ProfileEmailVerified:', isEmailVerified);
-		// console.log('authedUserEmailVerified:', authedUserEmailVerified);
-		// console.log('ProfilePhoneVerified:', isOtpPhoneVerified);
-		// console.log('authedUserPhoneVerified:', authedUserPhoneVerified);
-
 		const hasErrors = Object.keys(errors).length > 0;
 
 		const isValid =
@@ -965,8 +926,6 @@
 				isUserEmailVerified ||
 				isOtpPhoneVerified ||
 				isUserPhoneVerified);
-
-		// console.log(isValid, "*******************");
 		return isValid;
 	}
 
@@ -978,13 +937,11 @@
 	}
 
 	let isEmailVerified = false;
-
 	let isLoading = false;
 	onMount(() => {
 		isChecked = false;
 
 		if (data && data.authedUser && data.profile) {
-			//  name = data.authedUser.username || '';
 			name =
 				`${data.profile.firstName || ""} ${data.profile.lastName || ""}`.trim();
 			email = data.profile.email || "";
@@ -1127,9 +1084,6 @@
 							submitting = false;
 							showSuccesDiv = true;
 							console.log(message1);
-							// setTimeout(() => {
-							// 	location.reload();
-							// }, 3000);
 						} else if (keywordError === "error") {
 							message1 = result.data.data.error;
 							submitting = false;
@@ -1229,28 +1183,23 @@
 							<div>
 								<div class="mb-4">
 									<input
-									  type="text"
-									  name="name"
-									  id="name"
-									  bind:value={name}
-									  class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-									  placeholder="User Name"
-									  on:input={() => {
-										const trimmedName = name.trim();
-										name = trimmedName;
-										validateField("name");
-										errors.name = !name
-										  ? "*Required"
-										  : !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(name)
-										  ? "Please enter a valid name"
-										  : "";
-									  }}
-									/>
-									{#if errors?.name}
-									  <span class="text-red-500 text-xs">
-										{errors.name}
-									  </span>
-									{/if}
+  type="text"
+  name="name"
+  id="name"
+  bind:value={name}
+  class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+  placeholder="User Name"
+  on:input={() => {
+    name = name.trimStart(); 
+    validateField("name");
+  }}
+/>
+{#if errors?.name}
+  <span class="text-red-500 text-xs">
+    {errors.name}
+  </span>
+{/if}
+
 								  </div>
 								<input
 									type="hidden"
@@ -1335,7 +1284,7 @@
 														email = email.trim();
 														validateField("email");
 														errors.email = !email
-															? "*Required"
+															? "Please enter a valid email address"
 															: !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
 																		email,
 																  ) ||
@@ -1543,7 +1492,7 @@
 										{/if}
 
 										{#if emailSent && isOtpVerified === false}
-											<!-- OTP verification form -->
+										<!-- fdghj -->
 										{/if}
 									</div>
 								</div>
@@ -1563,6 +1512,8 @@
 												on:keydown={handleKeyDown}
 												on:input={() => {
 													validateField("country");
+													const trimmedCountry = country.trim();
+													country = trimmedCountry;
 													
 													  
 												}}
@@ -1647,24 +1598,22 @@
 								</div>
 								<div class="pb-4">
 									<input
-									  type="text"
-									  name="company"
-									  placeholder="Enter Company Name"
-									  class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-									  bind:value={company}
-									  title="Please enter a valid company name"
-									  on:input={() => {
-										// const trimmedName = company.trim();
-										// company = trimmedName;
-										validateField("company");
-										
-									  }}
-									  />
-									  {#if errors?.company}
-									  <span class="text-red-500 text-xs">{errors.company}</span>
+									type="text"
+									name="company"
+									placeholder="Enter Company Name"
+									class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+									bind:value={company}
+									title="Please enter a valid company name"
+									on:input={() => {
+									  company = company.trimStart(); // optional: keep user input natural
+									  validateField("company"); // will set the right error message
+									}}
+								  />
+								  {#if errors?.company}
+									<span class="text-red-500 text-xs">{errors.company}</span>
 								  {/if}
+								  
 								</div>
-								<!-- Subject field -->
 								<div class="flex flex-col md:flex-row md:space-x-4">
 									<div class="flex-1 mb-4">
 										<input
@@ -1675,11 +1624,12 @@
 											class="w-full text-sm placeholder:text-xs px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											placeholder="Subject"
 											on:input={() => {
+												const trimmedSubject = subject.trim();
+												subject = trimmedSubject;
 												validateField("subject");
 												errors.subject =
-													!subject ||
-													subject.trim() === ""
-														? "*Required"
+													!subject
+														? "Subject is required"
 														: !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(
 																	subject,
 															  ) ||
@@ -1688,6 +1638,8 @@
 															  )
 															? 'No special characters allowed except &-.,!@():;"'
 															: "";
+
+
 											}}
 										/>
 										{#if errors?.subject}
@@ -1698,7 +1650,6 @@
 									</div>
 								</div>
 
-								<!-- Message field -->
 								<div class="">
 									<div class="">
 										<textarea
@@ -1708,11 +1659,13 @@
 											class="w-full text-sm h-24 placeholder:text-xs px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											placeholder="Message"
 											on:input={() => {
+												const trimmedMessage = message.trim();
+												message = trimmedMessage;
 												validateField("message");
 												errors.message =
 													!message ||
 													message.trim() === ""
-														? "*Required"
+														? "Message is required"
 														: !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(
 																	message,
 															  ) ||
@@ -1731,7 +1684,6 @@
 									</div>
 								</div>
 
-								<!-- Captcha and Submit button -->
 								<div class="flex flex-col lg:flex-row mb-2">
 									<div class="flex-1 mb-4">
 										<label
@@ -1766,7 +1718,7 @@
 																).length > 0
 															) {
 																toast.error(
-																	"Please fill all the required fields.",
+																	"Please fill all the required fields .",
 																);
 																return;
 															}
@@ -1937,7 +1889,6 @@
 													</p>
 													<div class="relative">
 														<div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-															<!-- Bind the width of the progress bar to the progress variable -->
 															<div
 																class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
 																style="width: {progress}%;"

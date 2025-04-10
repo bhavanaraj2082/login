@@ -18,9 +18,6 @@
 	export let data;
 	let authedUserEmailVerified = data?.profile?.isEmailVerified;
 	console.log("authedUserEmailVerified", authedUserEmailVerified);
-
-	// console.log("authedUserEmailVerified",authedUserEmailVerified);
-
 	let verificationMessage = "";
 	let captchaVerified = false;
 	let captchaToken = "";
@@ -489,13 +486,12 @@
 				const reloadFlag = sessionStorage.getItem("emailReloaded");
 				if (!reloadFlag) {
 					sessionStorage.setItem("emailReloaded", "true");
-					location.reload(); // This will reload the page only once to prevent infinite reload
+					location.reload(); 
 				} else {
 					sessionStorage.removeItem("emailReloaded");
 				}
 			}
 		}
-
 		isEditable = false;
 		document.addEventListener("click", handleClickOutside);
 		return () => document.removeEventListener("click", handleClickOutside);
@@ -542,26 +538,25 @@
     }
 }
 	function handleSubmit(event) {
-// 		const isFnameValid = fname.length > 0 && /^[A-Za-z\s]+$/.test(fname);
-//   const isLnameValid = lname.length > 0 && /^[A-Za-z\s]+$/.test(lname);
 		if (
 			number.length === 0 ||
 			email.length === 0 ||
 
 			fname.length === 0 || 
-			fname.trim() === "" ||
-				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(fname) ||
-				/<[^>]*>/.test(fname) ||
+        fname.trim() === "" ||
+        !/^[A-Za-z\s]+$/.test(fname) || 
+        /<[^>]*>/.test(fname) || 
 
 				lname.length === 0 || 
-			lname.trim() === "" ||
-				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(lname) ||
-				/<[^>]*>/.test(lname) ||
+        lname.trim() === "" ||
+        !/^[A-Za-z\s]+$/.test(lname) || 
+        /<[^>]*>/.test(lname) || 
 			
-			company.length === 0 || 
-			company.trim() === "" ||
-				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) ||
-				/<[^>]*>/.test(company) ||
+		company.length === 0 || 
+		company.trim() === "" ||
+		company.trim().length < 3 || // ✅ Minimum 3 characters validation
+		!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) ||
+		/<[^>]*>/.test(company) ||
 
 			details.length === 0 ||
 			details.trim() === "" ||
@@ -652,7 +647,6 @@
 				generateMathQuestion();
 				userAnswer = "";
 				errorMessagecap = "";
-				// setActionMessage('Something went wrong while processing your message', false);
 			}, 4000);
 		}
 	}
@@ -667,7 +661,6 @@
 			})
 				.then((response) => response.json())
 				.then((data) => {
-					// console.log("respose Status",data.status);
 					window.scrollTo({ top: 0, behavior: "smooth" });
 					if (data.status === 200) {
 						showSuccesDiv = true;
@@ -774,12 +767,6 @@ $: disabled = location.length === 0;
 		validatePhoneNumber(location, number);
 		delete errors.location;
 	}
-
-	// function handleInputChange(event) {
-	//     searchTerm = event.target.value;
-	//     filterCountries();
-	// }
-
 	function filterCountriesWithoutAutoSelect() {
 		filteredCountries = countries.filter(
 			(country) =>
@@ -833,13 +820,12 @@ $: disabled = location.length === 0;
 		}
 	}
 	 function handleFocus() {
-		showErrors = false; // Hide error on focus (if you want to show it only after the user types)
+		showErrors = false; 
   }
 </script>
 <style>
-	/* Custom cursor when the input is disabled */
 	input:disabled {
-	  cursor: not-allowed;  /* Shows the 'not-allowed' cursor */
+	  cursor: not-allowed;  
 	}
   </style>
 
@@ -1215,8 +1201,8 @@ $: disabled = location.length === 0;
 				class="w-full md:mt-3 mt-0 max-w-3xl sm:ml-3 ml-0"
 				use:enhance={(event) => {
 					
-					const isEmailVerified = ProfileEmailVerified; // Assuming this is the first email verification check
-					const isAuthedUserEmailVerified = authedUserEmailVerified; // The second email verification check
+					const isEmailVerified = ProfileEmailVerified; 
+					const isAuthedUserEmailVerified = authedUserEmailVerified; 
 					console.log(
 						isEmailVerified,
 						isAuthedUserEmailVerified,
@@ -1226,7 +1212,6 @@ $: disabled = location.length === 0;
 						console.log("Email is not verified");
 						toast.error("Please verify your email to proceed");
 						event.preventDefault();
-						// Return a function that does nothing to prevent form submission
 						return () => {};
 					}
 					
@@ -1241,9 +1226,6 @@ $: disabled = location.length === 0;
 							submitting = false;
 							showSuccesDiv = true;
 							console.log(message1);
-							// setTimeout(() => {
-							// 	window.location.reload();
-							// }, 3000);
 						} else if (keywordError === "error") {
 							message1 = result.data.data.error;
 							submitting = false;
@@ -1263,17 +1245,6 @@ $: disabled = location.length === 0;
                     }
                 }}
 			>
-				<!-- <div class="message-container mt-3">
-        {#if errorMessage === "success"}locatio
-            <div class="text-center bg-green-100 text-green-700 py-2 mb-4 rounded-md">
-                {successMessage}
-            </div>
-            {:else if errorMessage === 'error'}
-                <div class="text-center bg-red-100 text-red-700 py-2 mb-4 rounded-md">
-                    {successMessage}
-                </div>
-            {/if}
-    </div> -->
 				<div>
 					<p
 						class="mb-5 mt-6 text-bold font-semibold sm:text-base text-sm text-heading"
@@ -1371,81 +1342,71 @@ $: disabled = location.length === 0;
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
-								type="text"
-								name="fname"
-								id="fname"
-								bind:value={fname}
-								class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
-								placeholder="First Name*"
-							/>
-							<!-- {#if showErrors && fname.length === 0}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-									>First Name is required</span
-								>
-							{/if} -->
-							{#if showErrors && (!fname || fname.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(fname) || /<[^>]*>/.test(fname))}
+  type="text"
+  name="fname"
+  id="fname"
+  bind:value={fname}
+  class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+  placeholder="First Name*"
+  on:input={() => {
+    fname = fname.trimStart(); // Update value reactively
+
+    if (!fname) {
+      errors = { ...errors, name: "" };
+    } else if (!/^[A-Za-z\s]+$/.test(fname)) {
+      errors = { ...errors, name: "First Name should contain only letters and spaces" };
+    } else {
+      const { name, ...rest } = errors;
+      errors = rest; // Remove error when valid
+    }
+  }}
+/>
+{#if errors?.name}
+  <span class="text-red-500 text-xs">
+    {errors.name}
+  </span>
+{/if}
+{#if showErrors && !fname}
 							<span class="text-red-500 sm:text-xs text-2s font-medium">
-								First Name is required.
+							  First Name is required.
 							</span>
-						  {/if}
-							<!-- {#if fname.length > 0 && !/^[A-Za-z\s]+$/.test(fname)}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-									>First Name cannot contain numbers or
-									special characters</span
-								>
-							{/if} -->
+							{/if}
+
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
-								type="text"
-								name="lname"
-								id="lname"
-								bind:value={lname}
-								class="flex w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
-								placeholder="Last Name*"
-							/>
-							<!-- {#if showErrors && lname.length === 0}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-									>Last Name is required</span
-								>
-							{/if}
-							{#if lname.length > 0 && !/^[A-Za-z\s]+$/.test(lname)}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-									>Last Name cannot contain numbers or special
-									characters</span
-								>
-							{/if} -->
-							{#if showErrors && (!lname || lname.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(lname) || /<[^>]*>/.test(lname))}
+  type="text"
+  name="lname"
+  id="lname"
+  bind:value={lname}
+  class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+  placeholder="Last Name*"
+  on:input={() => {
+    lname = lname.trimStart(); // Update value reactively
+
+    if (!lname) {
+      errors = { ...errors, lname: "" };
+    } else if (!/^[A-Za-z\s]+$/.test(lname)) {
+      errors = { ...errors, lname: "Last Name should contain only letters and spaces" };
+    } else {
+      const { lname, ...rest } = errors;
+      errors = rest; // Remove error when valid
+    }
+  }}
+/>
+{#if errors?.lname}
+  <span class="text-red-500 text-xs">
+    {errors.lname}
+  </span>
+{/if}
+{#if showErrors && !lname}
 							<span class="text-red-500 sm:text-xs text-2s font-medium">
-								Last Name is required.
+							  Last Name is required.
 							</span>
-						  {/if}
+							{/if}
 						</div>
 					</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 					<div class="flex flex-col md:flex-row md:space-x-4">
-					
-				
-
-
-
 						<div class="flex-1 mb-4 relative w-full">
 							<div class="relative">
 								<input
@@ -1457,10 +1418,14 @@ $: disabled = location.length === 0;
 									on:input={handleInputChange}
 									on:click={toggleDropdown}
 									on:keydown={handleKeyDown}
+									on:input={ ()=> {
+										const trimmedLocation= location.trim();
+										location = trimmedLocation;
+									}
+									}
 									class="w-full sm:text-sm text-xs px-2 py-2 placeholder-gray-400 rounded-md border-1 border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
 									required
 								/>
-
 								<Icon
 									icon={showDropdown
 										? "ep:arrow-up-bold"
@@ -1469,7 +1434,6 @@ $: disabled = location.length === 0;
 									on:click={toggleDropdown}
 								/>
 							</div>
-							<!-- Dropdown Suggestions -->
 							{#if showDropdown}
 								<div
 									class="absolute w-full bg-white border border-gray-300 rounded-md-md shadow-lg z-10 mt-1"
@@ -1498,8 +1462,6 @@ $: disabled = location.length === 0;
 									</ul>
 								</div>
 							{/if}
-
-							<!-- Validation Message -->
 							{#if showErrors && location.length === 0}
 								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
@@ -1507,7 +1469,6 @@ $: disabled = location.length === 0;
 								>
 							{/if}
 						</div>
-
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
 								type="tel"
@@ -1517,14 +1478,14 @@ $: disabled = location.length === 0;
 								on:hover={handleFocus}
 								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Phone Number*"
+								on:input={ ()=> {
+									const trimmedNumber= number.trim();
+									number = trimmedNumber;
+								}
+								}
 								{disabled}
 								required
 							/>
-							<!-- {#if location.length === 0 && !showErrors}
-								<span class="text-red-500 sm:text-xs text-2s font-medium">
-									Select your country before entering your number
-								</span>
-							{/if} -->
 							{#if showErrors && number.length === 0}
 								<span class="text-red-500 sm:text-xs text-2s font-medium">
 									Number is required
@@ -1536,47 +1497,40 @@ $: disabled = location.length === 0;
 								</span>
 							{/if}
 						</div>
-						
 					</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
-							<input
-								type="text"
-								name="company"
-								id="company"
-								bind:value={company}
-								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
-								placeholder="Company Name*"
-							/>
-							{#if showErrors && (!company || company.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) || /<[^>]*>/.test(company))}
-							<span class="text-red-500 sm:text-xs text-2s font-medium">
-							  Company Name is required.
-							</span>
-						  {/if}
+							
+						  <input
+  type="text"
+  name="company"
+  id="company"
+  bind:value={company}
+  class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+  placeholder="Company Name*"
+  on:input={() => {
+    company = company.trimStart(); // Avoid leading spaces
+
+    if (!company || company.trim() === "") {
+      errors = { ...errors, company: "Company Name is required" };
+    } else if (company.trim().length < 3) {
+      errors = { ...errors, company: "Company Name must be at least 3 characters" };
+    } else if (!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(company)) {
+      errors = { ...errors, company: "Invalid characters in Company Name" };
+    } else if (/<[^>]*>/.test(company)) {
+      errors = { ...errors, company: "Company Name should not contain HTML tags" };
+    } else {
+      const { company, ...rest } = errors;
+      errors = rest; // Clear error if valid
+    }
+  }}
+/>
+{#if errors?.company}
+  <span class="text-red-500 text-xs">
+    {errors.company}
+  </span>
+{/if}
+
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
@@ -1586,13 +1540,12 @@ $: disabled = location.length === 0;
 								bind:value={role}
 								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
 								placeholder="Role*"
+								on:input={ ()=> {
+									const trimmedRole= role.trim();
+									role = trimmedRole;
+								}
+								}
 							/>
-							<!-- {#if showErrors && role.length === 0}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-									>Role is required</span
-								>
-							{/if} -->
 							{#if showErrors && (!role || role.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(role) || /<[^>]*>/.test(role))}
 							<span class="text-red-500 sm:text-xs text-2s font-medium">
 								Role is required.
@@ -1602,7 +1555,6 @@ $: disabled = location.length === 0;
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
-							<!-- <input type="text" name="email" id="email" bind:value={email} class="block w-full border-1 border-gray-300 text-sm p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email Address*" /> -->
 							<input
 								type="hidden"
 								name="email"
@@ -1784,7 +1736,7 @@ $: disabled = location.length === 0;
 										};
 									}}
 									on:submit={() => {
-										loadingotp = true; // Show loading message when form is submitted
+										loadingotp = true; 
 									}}
 								>
 									<div class="relative w-full">
@@ -1821,7 +1773,6 @@ $: disabled = location.length === 0;
 											class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded-md hover:underline"
 											disabled={loadingotp}
 										>
-											<!-- {loadingotp ? 'Verifying...' : 'Verify'} -->
 											{#if loadingotp}
 												<span
 													class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 flex items-center"
@@ -1849,12 +1800,6 @@ $: disabled = location.length === 0;
 									</div>
 								</form>
 							{/if}
-							<!-- {#if showErrors && email.length === 0}
-                                    <span class="text-red-500 sm:text-xs text-2s font-medium">Email is required</span>
-                                {/if}
-                                {#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
-                                    <span class="text-red-500 sm:text-xs text-2s font-medium">Please enter a valid email address.</span>
-                                {/if} -->
 						</div>
 					</div>
 					<div class="flex-1 mb-4 sm:w-full">
@@ -1864,14 +1809,12 @@ $: disabled = location.length === 0;
 							bind:value={details}
 							class="w-full sm:text-sm text-xs p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 h-32"
 							placeholder="Additional Details*"
+							on:input={ ()=> {
+								const trimmedDetails= details.trim();
+								details = trimmedDetails;
+							}
+							}
 						></textarea>
-						<!-- {#if showErrors && details.length === 0}
-							<span
-								class="text-red-500 sm:text-xs text-2s font-medium"
-							>
-								Additional Details are required</span
-							>
-						{/if} -->
 						{#if showErrors && (!details || details.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) || /<[^>]*>/.test(details))}
 							<span class="text-red-500 sm:text-xs text-2s font-medium">
 								Additional Details are required.
@@ -1893,11 +1836,8 @@ $: disabled = location.length === 0;
 								class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded cursor-pointer hover:border-primary-500 transition-colors duration-300"
 								bind:checked={isCheckedcap}
 								on:click={(event) => {
-									
 									event.preventDefault();
 									handleSubmit(event);
-
-									// Check if form is valid (all required fields filled)
 									if (!formValid) {
 										if (Object.keys(errors).length > 0) {
 											toast.error(
@@ -1938,15 +1878,6 @@ $: disabled = location.length === 0;
 						<div
 							class="mt-0 flex items-center justify-end mr-10 gap-x-6"
 						>
-							<!-- <button type="submit"
-  							on:click={handleSubmit}
-  							class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold">
-  							{#if submitting}
-  							  Sending...
-  							{:else}
-  							  Send Message
-  							{/if}
-						</button> -->
 							<button
 								type="submit"
 								on:click={(event) => {
@@ -2041,7 +1972,6 @@ $: disabled = location.length === 0;
 									</p>
 									<div class="relative">
 										<div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-											<!-- Bind the width of the progress bar to the progress variable -->
 											<div
 												class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
 												style="width: {progress}%;"
@@ -2050,7 +1980,6 @@ $: disabled = location.length === 0;
 									</div>
 								</div>
 							{/if}
-							
 							<button
 								class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base"
 								on:click={() => {
