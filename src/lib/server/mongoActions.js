@@ -2772,29 +2772,59 @@ export const saveMailId = async (body) => {
 	return { status: 200 };
 };
 
-export const addToCart = async(item,userId,userEmail)=>{
-	const search = await Cart.findOne({userId,userEmail,isActiveCart:true}).lean()
-	// const id = await Stock.findOne({productid:item.productId,manufacturer:item.manufacturerId},{distributor:1})
-    // item.distributorId = id.distributor
-	let cart
-	if(search === null){
-		cart = await Cart.create({cartId:nanoid(8),cartName:"mycart",cartItems:item,userId,userEmail,isActiveCart:true})
-		return {success:true,message:"Product is added to cart2"}
-	}else{
-		const findItem = search.cartItems.find(x=>x.stockId.toString() === item.stockId)
-	   console.log(item,"sdffffffffff",findItem);
-		if(findItem === undefined){
-		cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$push:{cartItems:item}},{new:true})
-		return {success:true,message:"Product is added to cart"}
-		}else{
-		 findItem.quantity = item.quantity
-		 findItem.backOrder = item.backOrder
-		cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$set:{cartItems:search.cartItems}},{new:true})
-		return {success:true,message:"Product quantity is updated in cart"}
-		}
+export const addToCart = async (item, userId, userEmail) => {
+	console.log(item);
+	const a = Date.now()
+	const cart = await Cart.findOne({
+	  userId,
+	  userEmail,
+	  isActiveCart: true,
+	  cartItems: { $elemMatch: { stockId: item.stockId } }
+	});
+  
+	if (!cart) {
+	  const existingCart = await Cart.findOne({ userId, userEmail, isActiveCart: true });
+  
+	  if (!existingCart) {
+		await Cart.create({
+		  cartId: nanoid(8),
+		  cartName: "mycart",
+		  cartItems: [item],
+		  userId,
+		  userEmail,
+		  isActiveCart: true
+		});
+		return { success: true, message: "Product is added to new cart" };
+	  } else {
+		await Cart.findOneAndUpdate(
+		  { userId, userEmail, isActiveCart: true },
+		  { $push: { cartItems: item } },
+		  { new: true }
+		);
+		return { success: true, message: "Product is added to cart" };
+	  }
+	} else {
+	  await Cart.findOneAndUpdate(
+		{
+		  userId,
+		  userEmail,
+		  isActiveCart: true,
+		  "cartItems.stockId": item.stockId
+		},
+		{
+		  $set: {
+			"cartItems.$.quantity": item.quantity,
+			"cartItems.$.backOrder": item.backOrder
+		  }
+		},
+		{ new: true }
+	  );
+	  const b = Date.now()
+	  console.log(b-a,"millisecond");
+	  return { success: true, message: "Product quantity is updated in cart" };
 	}
-} 
-
+  };
+  
 export const updateItemQty = async(body,userId)=>{
 	const {quantity,_id,cartId,stock} = body
 	const backOrder = quantity > stock ? quantity - stock : 0;
@@ -2828,37 +2858,108 @@ export const deleteOneFromCart = async (body, userId) => {
 	return {success:true, message: `${productNumber} is removed from Cart` };
 };
 
-export const getGuestCart = async(body)=>{
-	const arr = []
-	for(let {productId,manufacturerId,distributorId,quantity} of body){
-	const productDetails = await Product.findOne({_id:productId},{imageSrc:1,productName:1,productNumber:1,_id:0})
-	const stockDetails = await Stock.findOne({productid:productId,distributor:distributorId},{_id:0,stock:1,orderMultiple:1,pricing:1})
-	const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
-	console.log(stockDetails);
-	let pricing = stockDetails?.pricing
-	if(pricing.INR !== undefined && pricing.INR !== null){
-		pricing.USD = pricing.INR/currency.rate
-	  }else{
-	   pricing.INR = pricing.USD * currency.rate;
-	  }
-	 let totalINR = pricing.INR * quantity;
-	 let totalUSD = pricing.USD * quantity;
+// export const getGuestCart = async(body)=>{
+// 	const arr = []
+// 	for(let {productId,manufacturerId,distributorId,quantity} of body){
+// 	const productDetails = await Product.findOne({_id:productId},{imageSrc:1,productName:1,productNumber:1,_id:0})
+// 	const stockDetails = await Stock.findOne({productid:productId,distributor:distributorId},{_id:0,stock:1,orderMultiple:1,pricing:1})
+// 	const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+// 	console.log(stockDetails);
+// 	let pricing = stockDetails?.pricing
+// 	if(pricing.INR !== undefined && pricing.INR !== null){
+// 		pricing.USD = pricing.INR/currency.rate
+// 	  }else{
+// 	   pricing.INR = pricing.USD * currency.rate;
+// 	  }
+// 	 let totalINR = pricing.INR * quantity;
+// 	 let totalUSD = pricing.USD * quantity;
 
-	  let result ={
+// 	  let result ={
+// 		productDetails,
+// 		stockDetails,
+// 		manufacturerId,
+// 		quantity,
+// 		currentPrice:{INR:pricing.INR,USD:pricing.USD},
+// 		normalPrice:{INR:pricing.INR,USD:pricing.USD},
+// 		pricing,
+// 		itemTotalPrice:{totalINR,totalUSD}
+// 	  }
+//       arr.push(result)
+// 	}
+// 	///console.log(arr);
+// 	return {cart:JSON.parse(JSON.stringify(arr))}
+// }
+export const getGuestCart = async (body) => {
+	try {
+	const productIds = body.map(item => item.productId);
+	//const distributorIds = body.map(item => item.distributorId);
+	const stockIds = body.map(item => item.stockId);
+  
+	// Fetch conversion rate once
+	const currencyPromise = Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+  
+	// Fetch all product details in a single query
+	const productMapPromise = Product.find(
+	  { _id: { $in: productIds } },
+	  { imageSrc: 1, productName: 1, productNumber: 1 }
+	).then(products =>
+	  products.reduce((acc, p) => {
+		acc[p._id] = p;
+		return acc;
+	  }, {})
+	);
+  
+	// Fetch all stock details in a single query
+	const stockMapPromise = Stock.find(
+	  { _id: { $in: stockIds } },
+	  { productid: 1, distributor: 1, stock: 1, orderMultiple: 1, pricing: 1 }
+	).then(stocks =>
+	  stocks.reduce((acc, s) => {
+		acc[s._id] = s;
+		return acc;
+	  }, {})
+	);
+  
+	// Wait for all async data to be ready
+	const [currency, productMap, stockMap] = await Promise.all([
+	  currencyPromise,
+	  productMapPromise,
+	  stockMapPromise
+	]);
+	// Now process the cart
+	const cart = body.map(({ productId, manufacturerId, stockId, quantity }) => {
+	  const productDetails = productMap[productId];
+	  const stockDetails = stockMap[`${stockId}`];
+      console.log(stockDetails);
+	  let pricing = stockDetails?.pricing || {};
+  
+	  if (pricing.INR !== undefined && pricing.INR !== null) {
+		pricing.USD = pricing.INR / currency.rate;
+	  } else if (pricing.USD !== undefined && pricing.USD !== null) {
+		pricing.INR = pricing.USD * currency.rate;
+	  }
+	  const totalINR = pricing.INR * quantity;
+	  const totalUSD = pricing.USD * quantity;
+  
+	  return {
 		productDetails,
 		stockDetails,
 		manufacturerId,
 		quantity,
-		currentPrice:{INR:pricing.INR,USD:pricing.USD},
-		normalPrice:{INR:pricing.INR,USD:pricing.USD},
+		currentPrice: { INR: pricing.INR, USD: pricing.USD },
+		normalPrice: { INR: pricing.INR, USD: pricing.USD },
 		pricing,
-		itemTotalPrice:{totalINR,totalUSD}
-	  }
-      arr.push(result)
+		itemTotalPrice: { totalINR, totalUSD }
+	  };
+	});
+   //  console.log(cart);
+	return { cart: JSON.parse(JSON.stringify(cart)) };
+  
+	} catch (error) {
+		console.log(error);
 	}
-	///console.log(arr);
-	return {cart:JSON.parse(JSON.stringify(arr))}
-}
+	};
+  
 
 export const addItemsToExistingCart = async(body,cartId)=>{
 	const updatedCart = await Cart.findOneAndUpdate(
@@ -3300,4 +3401,32 @@ export const getMyFavorites = async(userId) => {
 	const myFav = await MyFavourites.findOne({userId},{favorite:1,_id:0}).lean()
 	let favorite = JSON.parse(JSON.stringify(myFav.favorite.map(x=>x.stockId)))
 	return {favorite}
+}
+
+export const bulkUploadToCart = async(items,userId,email) =>{
+	const bulk = await Cart.findOneAndUpdate(
+		{userId,isActiveCart:true},
+		{
+		  $push: {
+			cartItems: { $each: items }
+		  }
+		},
+		{ new: true }
+	  );
+
+    if(bulk === null){
+		await Cart.create({
+			cartId: nanoid(8),
+			cartName: "mycart",
+			cartItems: items,
+			userId,
+			userEmail,
+			isActiveCart: true
+		  });
+		  return { success: true, message: "Product is added to new cart" };
+	  
+	}else{
+		return { success: true, message: "Product is added to new cart" };
+	}
+	  
 }

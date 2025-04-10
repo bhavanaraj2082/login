@@ -1,4 +1,5 @@
 <script>
+	import { browser } from '$app/environment';
 	import { myFavorites } from '$lib/stores/favorites.js';
 	import { sendMessage } from '$lib/utils.js';
 	import { authedUser,currencyState,cartTotalComps } from '$lib/stores/mainStores.js';
@@ -52,13 +53,13 @@
 	let isLiked = false;
 	const heartOutline = 'mdi:heart-outline';
 	const heartFilled = 'mdi:heart';
-	// $authedUser.email="rukhiyasameen@gmail.com"
-	// $authedUser.username="Sameena"
 	let userEmail = $authedUser?.email;
 	let userName = $authedUser?.username;
 	let form2;
 	let submitGuestForm;
 	$: showUserOptions = false;
+	$: a = browser ? JSON.parse(localStorage.getItem("cart")) :[]
+	$: guestCart.set(a)
   let dropdown; 
   function handleProfile(event) {
         event.stopPropagation(); 

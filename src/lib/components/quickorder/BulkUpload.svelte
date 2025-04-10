@@ -1,4 +1,6 @@
 <script>
+	import { goto } from '$app/navigation';
+	import { cart,guestCart } from '$lib/stores/cart.js';
   import Icon from "@iconify/svelte";
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
@@ -7,7 +9,9 @@
   import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
   export let data;
   import { fade } from "svelte/transition";
+  $:console.log($cart);
   let validationMessages = [];
+	let isLoggedIn = $authedUser?.id ? true : false
   let duplicateEntries = [];
   let rawFileData = "";
   let fileError = "";
@@ -512,7 +516,7 @@
         const backOrder = Math.max(rowQuantity - productStock, 0);
 
         const newProduct = {
-          id: product.productId,
+          productId: product.productId,
           manufacturerId: product.manufacturer,
           distributerId: product.distributer ? product.distributer : null,
           stockId: product.stockId,
@@ -524,6 +528,8 @@
         };
 
         productsToAdd.push(newProduct);
+        localStorage.setItem("cart",JSON.stringify(productsToAdd))
+        //guestCart.set(productsToAdd)
         console.log(`Prepared product ${newProduct.partNumber} for cart addition`);
         console.log(`Prepared product ${newProduct.partNumber.length} for cart additio`);
         
@@ -546,7 +552,7 @@
     console.error("Error: No products prepared for cart after all checks");
     toast.error("No valid items could be added to cart");
   }
-  
+  if(!isLoggedIn) goto("/cart")
   return productsToAdd;
 }
   function attemptAddToCart() {
@@ -665,13 +671,13 @@
     
     const simplifiedCartItems = productsToAdd.map((item) => {
       // Verify all required fields exist before mapping
-      if (!item.id || !item.manufacturerId || !item.stockId) {
+      if (!item.productId || !item.manufacturerId || !item.stockId) {
         console.error("Error: Missing required fields for cart item:", item);
         return null;
       }
       
       return {
-        productId: item.id,
+        productId: item.productId,
         manufacturerId: item.manufacturerId,
         stockId: item.stockId,
         distributorId: item.distributerId,
@@ -1209,16 +1215,27 @@ Example file content:
       use:enhance={({ formData, cancel }) => {
         cartloading = true;
 
-        const productsToAdd = prepareValidatedProductsForCart();
+        let productsToAdd = prepareValidatedProductsForCart();
 
         if (productsToAdd.length === 0) {
           cartloading = false;
           toast.error("No valid items to add to cart");
           return cancel();
         }
-
+        productsToAdd = productsToAdd.filter(y=>{
+          const search = $cart.find(x=>x.stockId === y.stockId)
+          if(search === undefined) return y
+        })
+        console.log(productsToAdd,"form");
+        if(!isLoggedIn){
+          localStorage.setItem("cart",JSON.stringify(productsToAdd))
+          guestCart.set(productsToAdd)
+          console.log('is kmdk  ej k');
+          goto("/cart")
+          cancel()
+        }
         formData.set("cartItems", JSON.stringify(productsToAdd));
-
+        //cancel()
         return async ({ result }) => {
           cartloading = false;
 
@@ -1230,6 +1247,7 @@ Example file content:
               toast.success(
                 `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`,
               );
+              goto("/cart")
               // setTimeout(() => {
               //   window.location.href = "/cart";
               // }, 2000);
@@ -1244,9 +1262,8 @@ Example file content:
       }}
     >
       <button
-        type="button"
+        type="submit"
         class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center gap-2"
-        on:click={attemptAddToCart}
         disabled={cartloading ||
           (isValidated &&
             validatedProducts.length > 0 &&

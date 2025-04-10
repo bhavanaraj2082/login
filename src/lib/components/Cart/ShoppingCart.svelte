@@ -14,7 +14,7 @@
 	import { PUBLIC_IMAGE_URL } from "$env/static/public"
 
 	export let data
-	let loading = false;
+	let loading = true;
 	let isLoggedIn = $authedUser?.id ? true : false
 	let filteredGuestCart = ''
 	let container
@@ -34,8 +34,9 @@
 	$: cartId = data?.cart[0]?.cartId || '';
 	$: cartName = data?.cart[0]?.cartName || '';
 	$: recurrence = data?.cart[0]?.recurrence || '';
-    //console.log(data,"forntend");
-
+    console.log($guestCart,"forntend");
+	$: a = browser ? JSON.parse(localStorage.getItem("cart")) :[]
+	$: guestCart.set(a)
 	const calculateTotalPrice = (cart)=>{
        priceINR = cart.reduce((sum,crt)=> sum + crt.currentPrice.INR*crt.quantity,0)
        priceUSD = cart.reduce((sum,crt)=> sum + crt.currentPrice.USD*crt.quantity,0)
@@ -45,8 +46,9 @@
 		const formdata = new FormData();
 		formdata.append('guestCart', JSON.stringify($guestCart));
 		sendMessage('?/guestCart', formdata, async (result) => {
-		    //console.log("guest cart in coponent",result);
+		    console.log("guest cart in coponent",result);
 			cart.set(result.cart);
+			loading = false
 			calculateTotalPrice($cart);
 		});
 	};
@@ -84,6 +86,7 @@
 		} else {
 			let cartData = data?.cart[0]?.cartItems || [];
 			cart.set(cartData);
+			loading = false
 		    calculateTotalPrice($cart);
 			if(isLoggedIn && filteredGuestCart.length && !cartId.length){
 	    	const formdata = new FormData()
@@ -441,7 +444,7 @@
 			<div
 				class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded-md shadow-md"
 			>
-				<p class=" font-medium text-lg md:text-xl xl:text-2xl">Loading...</p>
+				<p class=" font-medium text-lg md:text-xl xl:text-2xl"> <Icon icon="line-md:loading-loop" class="text-4xl text-primary-500"/></p>
 			</div>
 		{:else if !$cart.length}
 			<div class="w-full flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white py-5 rounded-md shadow-sm">
@@ -568,9 +571,9 @@
 								 <div class=" lg:w-2/6">
 									<h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Price</h3>
 									<div class="{item?.isCart || item?.isQuote ? " text-green-500" : ""} text-xs flex lg:flex-col lg:gap-0 gap-1 w-full font-semibold text-content">
-										{$currencyState === "inr" ? "₹" + item?.currentPrice?.INR.toLocaleString("en-IN"): "$"+ item?.currentPrice?.USD.toLocaleString("en-IN")}
+										{$currencyState === "inr" ? "₹" + item?.currentPrice?.INR?.toLocaleString("en-IN"): "$"+ item?.currentPrice?.USD?.toLocaleString("en-IN")}
 										<p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">
-										{$currencyState === "inr" ? "₹" + item?.normalPrice?.INR.toLocaleString("en-IN"): "$"+ item?.normalPrice?.USD.toLocaleString("en-IN")}
+										{$currencyState === "inr" ? "₹" + item?.normalPrice?.INR?.toLocaleString("en-IN"): "$"+ item?.normalPrice?.USD?.toLocaleString("en-IN")}
 										</p>
 									</div>
 								 </div>
@@ -604,12 +607,12 @@
 							        <div class=" w-full flex justify-between items-center">
 							        	<div class="{item?.isCart || item?.isQuote ? " text-green-500" : ""} text-xs flex gap-1 lg:flex-col lg:gap-0 font-semibold">
 											{#if $authedUser?.id}
-											{$currencyState === "inr" ? "₹" + item?.itemTotalPrice?.totalINR.toLocaleString("en-IN"): "$"+ item?.itemTotalPrice?.totalUSD.toLocaleString("en-IN")}
+											{$currencyState === "inr" ? "₹" + item?.itemTotalPrice?.totalINR?.toLocaleString("en-IN"): "$"+ item?.itemTotalPrice?.totalUSD?.toLocaleString("en-IN")}
 											{:else}
-											{$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR*item.quantity).toLocaleString("en-IN"): "$"+ (item?.normalPrice?.USD*item.quantity).toLocaleString("en-IN")}
+											{$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR*item.quantity)?.toLocaleString("en-IN"): "$"+ (item?.normalPrice?.USD*item.quantity)?.toLocaleString("en-IN")}
 											{/if}
 										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} text-xs line-through text-slate-300">
-												{$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR*item.quantity).toLocaleString("en-IN"): "$"+ (item?.normalPrice?.USD*item.quantity).toLocaleString("en-IN")}
+												{$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR*item.quantity)?.toLocaleString("en-IN"): "$"+ (item?.normalPrice?.USD*item.quantity)?.toLocaleString("en-IN")}
 											</p>
 									    </div>
 							        	<button
