@@ -1,4 +1,5 @@
 <script>
+	import { browser } from '$app/environment';
 	import { sendMessage } from "$lib/utils.js";
 	import { cart, guestCart, removeFromCart } from "$lib/stores/cart.js";
 	import { goto, invalidate } from "$app/navigation";
@@ -19,7 +20,6 @@
 	let form;
 	let form2;
 	let isLoggedIn = $authedUser?.id ? true : false;
-
 	function formatPriceToNumber(priceString) {
 		if (!priceString) return 0;
 		const formattedPrice = String(priceString)

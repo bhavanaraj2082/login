@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
-import { uploadFile, quicksearch, quickcheck, addToCart, CreateProductQuote } from '$lib/server/mongoActions';
+import { uploadFile, quicksearch, quickcheck, addToCart, CreateProductQuote,bulkUploadToCart } from '$lib/server/mongoActions';
 import { error, fail } from '@sveltejs/kit';
 import { nanoid } from 'nanoid';
 import Profile from '$lib/server/models/Profile.js';
@@ -10,6 +10,7 @@ import { APP_URL } from '$env/static/private';
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import sendemail from '$lib/data/sendemail.json';
 import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
+import {getCart} from '$lib/server/mongoLoads.js'
 function parseProductQuery(query) {
   let inputStr = query.trim();
   let productNumber, size;
@@ -86,6 +87,7 @@ function parseProductQuery(query) {
     size
   };
 }
+
 export const actions = {
   quickcheck: async ({ request }) => {
     try {
@@ -336,30 +338,30 @@ export const actions = {
       const userId = locals.user.userId;
       const userEmail = locals.user.email;
       console.log('User ID:', userId, 'User Email:', userEmail);
-
+       const daaa = await bulkUploadToCart(cartItems, userId, userEmail)
       // Process each cart item
-      for (const item of cartItems) {
-        // console.log('Processing item:', item);
-        // const backorder =Math.max(item.quantity-item.stock)
+      // for (const item of cartItems) {
+      //   // console.log('Processing item:', item);
+      //   // const backorder =Math.max(item.quantity-item.stock)
 
-        const cartItem = {
-          productId: item.id,
-          manufacturerId: item.manufacturerId || '',
-          distributorId: item.distributerId || '',
-          stockId: item.stockId || '',
-          quantity: item.quantity || '',
-          backOrder: item.backOrder,
-        };
+      //   const cartItem = {
+      //     productId: item.id,
+      //     manufacturerId: item.manufacturerId || '',
+      //     distributorId: item.distributerId || '',
+      //     stockId: item.stockId || '',
+      //     quantity: item.quantity || '',
+      //     backOrder: item.backOrder,
+      //   };
 
-        // console.log('Prepared Cart Item:', cartItem);
-        const result = await addToCart(cartItem, userId, userEmail);
-        // console.log('Add to Cart Result:', result);
+      //   // console.log('Prepared Cart Item:', cartItem);
+      //   const result = await addToCart(cartItem, userId, userEmail);
+      //   // console.log('Add to Cart Result:', result);
 
-        if (!result.success) {
-          console.error('Failed to add item to cart:', result.message);
-          return fail(400, { message: result.message });
-        }
-      }
+      //   if (!result.success) {
+      //     console.error('Failed to add item to cart:', result.message);
+      //     return fail(400, { message: result.message });
+      //   }
+      // }
 
       console.log(`${cartItems.length} item(s) added to cart successfully`);
       return {
@@ -589,11 +591,12 @@ export const load = async ({ locals }) => {
   }
   const authedUser = { id: locals.user.userId };
   const userProfile = await Profile.findOne({ userId: authedUser.id });
-  // console.log(userProfile,"userProile");
+  const cart = await getCart(authedUser.id)
+  console.log(authedUser,"userProile");
 
 
   if (!userProfile) {
     return null;
   }
-  return JSON.parse(JSON.stringify({ profile: userProfile }));
+  return JSON.parse(JSON.stringify({ profile: userProfile,cart }));
 };

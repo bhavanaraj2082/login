@@ -1,7 +1,12 @@
 <script>
+	import { sendMessage } from '$lib/utils.js';
+	import { authedUser } from '$lib/stores/mainStores.js';
+	import { cart,guestCart } from '$lib/stores/cart.js';
   import Manualupload from "$lib/components/quickorder/Manualupload.svelte";
   export let data;
-  // console.log(data,"data");
+  console.log(data,"data");
+  let isLoggedIn = $authedUser?.id ? true : false
+
 
   import SEO from "$lib/components/SEO.svelte";
   import {
@@ -9,6 +14,7 @@
     PUBLIC_COMPBUY_IMAGE_PATH,
     PUBLIC_WEBSITE_NAME,
   } from "$env/static/public";
+    import { onMount } from 'svelte';
 
   let metadata = {
     title: `Quick Order | ${PUBLIC_WEBSITE_NAME}` || "Default Product Title",
@@ -31,6 +37,29 @@
       },
     },
   };
+  const guestCartFetch = () => {
+		const formdata = new FormData();
+		formdata.append('guestCart', JSON.stringify($guestCart));
+		sendMessage('/cart?/guestCart', formdata, async (result) => {
+		    console.log("guest cart in coponent",result);
+			cart.set(result.cart);
+			//calculateTotalPrice($cart);
+		});
+	};
+  onMount(() => {
+
+		if (!isLoggedIn) {
+			if ($guestCart.length) {
+				guestCartFetch();
+			} else {
+				cart.set([]);
+			}
+		} else {
+			let cartData = data?.cart?.cart[0]?.cartItems || [];
+			cart.set(cartData);
+		//  calculateTotalPrice($cart);
+		}
+    });
 </script>
 
 <SEO {metadata} />
