@@ -446,7 +446,7 @@
 									class="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-stone-300 rounded-md overflow-hidden"
 								>
 									<img
-										src="{PUBLIC_IMAGE_URL}/{item.productDetails.image}"
+										src="{PUBLIC_IMAGE_URL}/{item?.productDetails?.image}"
 										onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
 										alt="img"
 										class="w-full h-full object-cover"
@@ -455,15 +455,15 @@
 								<div class="flex-1">
 									<button on:click={()=>{
 										cartOpen = false
-										goto(`/products/details/${item.productDetails.productNumber}`)
+										goto(`/products/details/${item?.productDetails?.productNumber}`)
 									}} class="hover:text-primary-500 hover:underline font-semibold text-sm">
-										{item.productDetails.productNumber}
+										{item?.productDetails?.productNumber}
 									</button>
 									<p class="font-medium text-xs text-gray-800">
-										{item.productDetails.productName}
+										{item?.productDetails?.productName}
 									</p>
 									<p class="text-xs text-gray-500">
-										{item.pricing.break}
+										{item?.pricing?.break}
 									</p>
 								</div>
 								<button
@@ -471,7 +471,7 @@
 									class="text-primary-400"
 									on:click={() =>
 										removeItem(
-											item.productDetails.productNumber,
+											item?.productDetails?.productNumber,
 											item._id,
 											index,
 										)}
@@ -487,11 +487,11 @@
 								<p class="text-sm font-semibold text-gray-600">
 									{$currencyState === "inr"
 										? "₹" +
-											item?.pricing.INR.toLocaleString(
+											item?.pricing?.INR.toLocaleString(
 												"en-IN",
 											)
 										: "$" +
-											item?.pricing.USD.toLocaleString(
+											item?.pricing?.USD.toLocaleString(
 												"en-IN",
 											)}
 								</p>
@@ -502,7 +502,7 @@
 										on:input={(e) =>
 											handleQty(
 												parseInt(e.target.value),
-												item.stockDetails,
+												item?.stockDetails,
 												item._id,
 												index,
 											)}
@@ -522,7 +522,7 @@
 												item.isQuote}
 											on:click={() =>
 												decrementQuantity(
-													item.stockDetails,
+													item?.stockDetails,
 													item._id,
 													index,
 												)}
@@ -562,11 +562,11 @@
 									{$currencyState === "inr"
 										? "₹" +
 											(
-												item.pricing.INR * item.quantity
+												item?.pricing?.INR * item.quantity
 											).toLocaleString("en-IN")
 										: "$" +
 											(
-												item.pricing.USD * item.quantity
+												item?.pricing?.USD * item.quantity
 											).toLocaleString("en-IN")}
 								</p>
 							</div>

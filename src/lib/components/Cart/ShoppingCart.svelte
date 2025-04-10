@@ -551,7 +551,7 @@
 								{/if}
 								</div>
 								<div class="ml-2">
-									<a href="/products/details/{item.productDetails?.productNumber}" class="text-xs hover:text-primary-500 hover:underline text-black font-semibold">{item.productDetails.productNumber}</a>
+									<a href="/products/details/{item.productDetails?.productNumber}" class="text-xs hover:text-primary-500 hover:underline text-black font-semibold">{item?.productDetails?.productNumber}</a>
 									<div class="relative cursor-pointer text-gray-800 group text-xs">{item.productDetails?.productName.length >40 ? item.productDetails?.productName.substring(0,40)+"..." : item.productDetails?.productName}
                                        <p class=" absolute bg-white hidden border p-1.5 rounded shadow-md {item.productDetails?.productName.length >40 ? "group-hover:block" :""}  md:w-max top-0">{item.productDetails?.productName}</p>
 									</div>
