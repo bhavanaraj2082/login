@@ -489,15 +489,30 @@ function validateLastName(event) {
         errorMessage2 = '';
     }
 }
+
 function validatecompany(event) {
-    const input = event.target.value;
-    const regex = /^[a-zA-Z0-9\s]*$/; 
-    if (!regex.test(input)) {
-        errorMessage5 = 'Company Name cannot contain special characters';
-    } else {
-        errorMessage5 = '';
-    }
+	const input = event.target.value.trim();
+	const regex = /^[a-zA-Z0-9\s&\-.,!@():;"']+$/;
+
+	if (!input) {
+		errorMessage5 = 'Company Name is required';
+		return false;
+	} else if (input.length < 3) {
+		errorMessage5 = 'Company Name must be at least 3 characters';
+		return false;
+	} else if (!regex.test(input)) {
+		errorMessage5 = 'Invalid characters in Company Name';
+		return false;
+	} else if (/<[^>]*>/.test(input)) {
+		errorMessage5 = 'Company Name should not contain HTML tags';
+		return false;
+	} else {
+		errorMessage5 = '';
+		return true;
+	}
 }
+
+
 function validateEmail(event) {
     const input = event.target.value;
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -519,24 +534,35 @@ function validatePhNo(country, number) {
 }
 
 
-
 const validateAll = (country, number) => {
-if (!isFormData) {
-    errorMessage = 'Please fill all the required fields'; 
-	setTimeout(() => {
-	errorMessage = '';
-}, 5000);
-    return false; 
-} else {
-    errorMessage = ''; 
-}
-validateFirstName({ target: { value: $Cusdetails.FirstName } });
-validateLastName({ target: { value: $Cusdetails.LastName } });
-validateEmail({ target: { value: $Cusdetails.Email } });
-validatecompany({ target: { value: $Cusdetails.Organisation } });
+	// Check if form has required data
+	if (!isFormData) {
+		errorMessage = 'Please fill all the required fields';
+		setTimeout(() => {
+			errorMessage = '';
+		}, 5000);
+		return false;
+	} else {
+		errorMessage = '';
+	}
 
-return !errorMessage1 && !errorMessage2 && !errorMessage3 && !errorMessage4;
+	// Trigger validations for each field
+	validateFirstName({ target: { value: $Cusdetails.FirstName } });
+	validateLastName({ target: { value: $Cusdetails.LastName } });
+	validateEmail({ target: { value: $Cusdetails.Email } });
+	validatecompany({ target: { value: $Cusdetails.Organisation } });
+
+	// Return true only if all error messages are empty
+	return (
+		!errorMessage1 && 
+		!errorMessage2 && 
+		!errorMessage3 && 
+		!errorMessage4 && 
+		!errorMessage5
+	);
 };
+
+
 const cust = () => {
 	if (!validateAll($Cusdetails.Country, $Cusdetails.Number)) {
 	return;
@@ -698,6 +724,7 @@ function filterCountriesWithoutAutoSelect() {
 			showDropdown = false;
 		}
 	}
+	let errors = {};
 
 	// function validatePhoneNumber(country, phone) {
 	// const pattern = phoneNumberPatterns[country];
@@ -786,7 +813,11 @@ function filterCountriesWithoutAutoSelect() {
 			bind:value={$Cusdetails.FirstName}
 			name="Firstname"
 			id="firstname"
-            on:input={validateFirstName}
+			on:input={() => {
+				validateFirstName
+				const trimmedName = $Cusdetails.FirstName.trim();
+						  $Cusdetails.FirstName= trimmedName;
+				}}
 			required
 		/>
         {#if errorMessage && !$Cusdetails.FirstName}
@@ -809,7 +840,11 @@ function filterCountriesWithoutAutoSelect() {
 					id="lastname"
 					bind:value={$Cusdetails.LastName}
 					required
-                    on:input={validateLastName}
+					on:input={() => {
+						validateLastName
+						const trimmedLName = $Cusdetails.LastName.trim();
+								  $Cusdetails.LastName= trimmedLName;
+						}}
 				/>
                 {#if errorMessage && !$Cusdetails.LastName}
                 <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
@@ -888,8 +923,12 @@ function filterCountriesWithoutAutoSelect() {
 			id="phone"
 			bind:value={$Cusdetails.Number}
 			placeholder=""
-			required
-            on:input={() => validatePhNo($Cusdetails.Country, $Cusdetails.Number)}	
+			required			
+			on:input={() => {
+				validatePhNo($Cusdetails.Country, $Cusdetails.Number)
+				const trimmedNum = $Cusdetails.Number.trim();
+						  $Cusdetails.Number= trimmedNum;
+				}}
             />
 			{#if errorMessage && !$Cusdetails.Number}
 			<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
@@ -1134,23 +1173,45 @@ function filterCountriesWithoutAutoSelect() {
 	<div class="mt-2 mb-2">
 		<label for="" class="sm:text-sm text-xs">Company name <span class="text-primary-500"> *</span></label>
 		<br />
-		<input
-			type="text"
-			name="organisation"
-			id=""
-			bind:value={$Cusdetails.Organisation}
-			on:input={validatecompany}
-			
-			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-		/>
-        {#if errorMessage && !$Cusdetails.Organisation}
-                <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
-                    Company name is required</div>
-                {/if}
-				{#if errorMessage5}
-				<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1 md:hidden block">
-					{errorMessage5}</div>
-				{/if}
+		
+
+  <input
+  type="text"
+  name="organisation"
+  id="organisation"
+  bind:value={$Cusdetails.Organisation}
+  class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+  on:input={() => {
+    $Cusdetails.Organisation = $Cusdetails.Organisation.trimStart(); // Avoid leading spaces
+
+    const org = $Cusdetails.Organisation.trim();
+
+    if (!org) {
+      errors = { ...errors, organisation: "Company Name is required" };
+    } else if (org.length < 3) {
+      errors = { ...errors, organisation: "Company Name must be at least 3 characters" };
+    } else if (!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(org)) {
+      errors = { ...errors, organisation: "Invalid characters in Company Name" };
+    } else if (/<[^>]*>/.test(org)) {
+      errors = { ...errors, organisation: "Company Name should not contain HTML tags" };
+    } else {
+      const { organisation, ...rest } = errors;
+      errors = rest; // Clear error if valid
+    }
+  }}
+/>
+
+{#if errors?.organisation}
+  <span class="text-red-500 text-xs">
+    {errors.organisation}
+  </span>
+{/if}
+
+{#if errorMessage && !$Cusdetails.organisation}
+<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">   
+	Company Name is required</div>
+{/if}
+	
 	</div>
 	<!-- <div class="mt-2 mb-2">
 		<label for="" class="sm:text-sm text-xs">Invoice number</label>

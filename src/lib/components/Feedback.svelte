@@ -412,10 +412,13 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
             name="name"
             id="name"
             bind:value={formData.name}
-            on:input={() => showNameError = false} 
+on:input={() => {
+  showNameError = false;
+  const trimmedName = formData.name.trim();
+            formData.name= trimmedName;
+  }}
             class="block w-full rounded-md focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
           />
-          <!-- {#if formData.name.length > 0 && !/^[a-zA-Z]+$/.test(formData.name)} -->
           {#if formData.name.length > 0 && !/^[A-Za-z\s]+$/.test(formData.name)}  
           <span class="text-red-500 text-xs font-normal">Please enter a valid user name.</span>
          {/if}{#if showNameError}
@@ -682,7 +685,11 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
             name="feedback"
             id="feedback"
             bind:value={formData.feedback}
-            on:input={() => showFeedbackError = false} 
+            on:input={() => {
+              showFeedbackError = false;
+              const trimmedFeedback = formData.feedback.trim();
+                        formData.feedback= trimmedFeedback;
+              }}
             rows="3"
             class="block w-full rounded-md bg-white px-3 py-1.5 text-sm text-gray-900 focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500"
           ></textarea>
