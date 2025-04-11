@@ -169,6 +169,10 @@
 					type="email"
 					name="email"
 					bind:value={email}
+					on:input={(e) => {
+						e.target.value = e.target.value.replace(/^\s+/, '');
+						email = e.target.value;
+											}}
 					class="w-full p-1.5 border-1 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"/>
 			</div>
 			<div class="flex flex-col w-full md:w-1/3 mt-4 sm:mt-0">
@@ -177,6 +181,10 @@
 					type="text"
 					name="invoiceNumber"
 					bind:value={invoiceNumber}
+					on:input={(e) => {
+						e.target.value = e.target.value.replace(/^\s+/, '');
+						invoiceNumber = e.target.value;
+											}}
 					class="w-full p-1.5 border-1 border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"/>
 			</div>
 			<div class="flex flex-col w-full sm:w-auto mt-6">

@@ -991,6 +991,12 @@
 							bind:value={assistanceMessage}
 							required
 							on:input={() => validateField("assistanceMessage")}
+							on:input={(e) => {
+              
+								e.target.value = e.target.value.replace(/^\s+/, '');
+								assistanceMessage = e.target.value;
+										
+								  validateField("assistanceMessage")}}
 							rows="4"
 							class="mt-1 block w-3/4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"
 						></textarea>
@@ -1013,6 +1019,12 @@
 								type="text"
 								placeholder="First Name"
 								bind:value={firstName}
+								on:input={(e) => {
+              
+									e.target.value = e.target.value.replace(/^\s+/, '');
+									firstName = e.target.value;
+											
+									  validateField("firstName")}}
 								class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 								required
 								on:input={() => validateField("firstName")}
@@ -1031,6 +1043,12 @@
 								type="text"
 								placeholder="Last Name"
 								bind:value={lastName}
+								on:input={(e) => {
+              
+									e.target.value = e.target.value.replace(/^\s+/, '');
+									lastName = e.target.value;
+											
+									  validateField("lastName")}}
 								class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 								required
 								on:input={() => validateField("lastName")}
@@ -1052,6 +1070,12 @@
 								class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 								required
 								on:input={() => validateField("email")}
+								on:input={(e) => {
+              
+									e.target.value = e.target.value.replace(/^\s+/, '');
+									email = e.target.value;
+											
+									  validateField("email")}}
 							/>
 							{#if errors.email}
 								<p class="text-red-500 text-xs mt-1">
@@ -1087,6 +1111,12 @@
 								class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 								required
 								on:input={() => validateField("companyName")}
+								on:input={(e) => {
+              
+									e.target.value = e.target.value.replace(/^\s+/, '');
+									companyName = e.target.value;
+											
+									  validateField("companyName")}}
 							/>
 							{#if errors.companyName}
 								<p class="text-red-500 text-xs mt-1">
@@ -1104,6 +1134,12 @@
 									placeholder="Search Country"
 									on:input={handleInputChange}
 									on:click={toggleDropdown}
+									on:input={(e) => {
+              
+                
+										country = country.trim();
+												
+										  validateField("country")}}
 									autocomplete="off"
 									class="flex-1 outline-none w-full border border-gray-300 rounded focus:ring-0 focus:border-primary-400 p-2 text-sm"
 									required

@@ -74,6 +74,10 @@
 							id="email"
 							name="email"
 							bind:value={email}
+							on:input={(e) => {
+								e.target.value = e.target.value.replace(/^\s+/, '');
+								email = e.target.value;
+													}}
 							class="mt-1 p-2 border-1 border-gray-200 rounded-md w-full focus:ring-0 focus:outline-none focus:border-primary-500"/>
 					</div>
 					<div class="flex-1">
@@ -88,6 +92,10 @@
 							id="orderNumber"
 							name="orderNumber"
 							bind:value={orderNumber}
+							on:input={(e) => {
+								e.target.value = e.target.value.replace(/^\s+/, '');
+								orderNumber = e.target.value;
+													}}
 							class="mt-1 p-2 border-1 border-gray-200 rounded-md w-full focus:outline-none focus:ring-0 focus:border-primary-500"/>
 					</div>
 				</div>

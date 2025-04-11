@@ -563,7 +563,7 @@
         }
 
         if (!fieldName || fieldName === "city") {
-            if (!city || !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(city)) {
+            if (!city || !/^[A-Za-z0-9@!#$%^&*.,:;'"(_)+-\s]+$/.test(city)) {
                 errors.city = "City Name is required";
             } else {
                 delete errors.city;
@@ -1229,7 +1229,9 @@ function handleKeyDown(event) {
                             maxlength="50"
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="First Name"
-                            on:input={() => {
+                            on:input={(e) => {
+                                e.target.value = e.target.value.replace(/^\s+/, '');
+                                firstname = e.target.value;
                                 validateField("firstname");
                                 errors.firstname = !firstname
                                     ? "*Required"
@@ -1258,7 +1260,9 @@ function handleKeyDown(event) {
                             maxlength="50"
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Last Name"
-                            on:input={() => {
+                            on:input={(e) => {
+                                 e.target.value = e.target.value.replace(/^\s+/, '');
+                                 lastname = e.target.value;
                                 validateField("lastname");
                                 errors.lastname = !lastname
                                     ? "*Required"
@@ -1291,7 +1295,9 @@ function handleKeyDown(event) {
                             maxlength="50"
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Company Name"
-                            on:input={() => {
+                            on:input={(e) => {
+                                 e.target.value = e.target.value.replace(/^\s+/, '');
+                                 company = e.target.value;
                                 validateField("company");
                                 errors.company = !company
                                     ? "*Required"
@@ -1322,11 +1328,13 @@ function handleKeyDown(event) {
                             maxlength="50"
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Street Name"
-                            on:input={() => {
+                            on:input={(e) => {
+                                 e.target.value = e.target.value.replace(/^\s+/, '');
+                                 street = e.target.value;
                                 validateField("street");
                                 errors.street = !street
                                     ? "*Required"
-                                    : !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(
+                                    : !/^[A-Za-z0-9@!#$%^&*(_).,:;'"+-\s]+$/.test(
                                             street,
                                         )
                                       ? "Please enter a valid street name"
@@ -1414,7 +1422,9 @@ function handleKeyDown(event) {
                                         maxlength="50"
                                         class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                                         placeholder="Email"
-                                        on:input={() => {
+                                        on:input={(e) => {
+                                             e.target.value = e.target.value.replace(/^\s+/, '');
+                                             email = e.target.value;
                                             email = email.trim();
                                             validateField("email");
                                             errors.email = !email
@@ -1609,7 +1619,9 @@ function handleKeyDown(event) {
                             maxlength="50"
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="City"
-                            on:input={() => {
+                            on:input={(e) => {
+                                 e.target.value = e.target.value.replace(/^\s+/, '');
+                                 city = e.target.value;
                                 validateField("city");
                                 errors.city = !city
                                     ? "*Required"
@@ -1643,6 +1655,7 @@ function handleKeyDown(event) {
                                 on:click={toggleDropdown}
                                 on:keydown={handleKeyDown}
                                 on:input={() => {
+                                    country= country.trim();
                                     validateField("country");
                                     
                                       
@@ -1736,7 +1749,9 @@ function handleKeyDown(event) {
                             rows="4"
                             bind:value={description}
                             maxlength="200"
-                            on:input={() => {
+                            on:input={(e) => {
+                                 e.target.value = e.target.value.replace(/^\s+/, '');
+                                 description = e.target.value;
                                 validateField("description");
                                 errors.description = !description
                                     ? "*Required"
@@ -1773,7 +1788,13 @@ function handleKeyDown(event) {
                             bind:value={url}
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             title="Please enter a valid URL"
-                            on:input={() => validateField("url")}
+                            on:input={(e) => {
+                                e.target.value = e.target.value.replace(/^\s+/, '');
+                                url = e.target.value;
+                               validateField("url");
+                               
+                                
+                           }}
                         />
                         {#if errors.url}
                             <p class="text-red-500 text-xs mt-1">

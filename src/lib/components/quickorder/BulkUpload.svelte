@@ -1003,10 +1003,11 @@ Example file content:
               {/each}
             </div>
           {/if} -->
-          {#if isValidated && rawFileData.trim()}
+          {#if isValidated && rawFileData.trim() }
   <div
     class="absolute mt-2 top-0 left-0 w-full h-full pointer-events-none"
     bind:this={overlayElement}
+   
     style="transform: translateY({-scrollTop}px);"
   >
     {#each rawFileData.trim().split("\n") as line, lineIndex}
@@ -1017,11 +1018,13 @@ Example file content:
         <div
           class="flex items-center pointer-events-auto"
           style="position: absolute; top: {3 + lineIndex * lineHeight}px; right: 10px;"
+          bind:this={scrollContainer}
         >
           {#if validationMessage}
             {#if validationMessage.isValid === true}
               <div
                 class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
+                bind:this={scrollContainer}
               >
                 <span class="text-xs mr-1">Valid</span>
                 <Icon icon="mdi:check-circle" class="text-base" />
@@ -1029,6 +1032,7 @@ Example file content:
             {:else}
               <div
                 class="flex items-center mt-2 text-red-500 bg-white bg-opacity-75 rounded px-1 mr-3"
+                bind:this={scrollContainer}
               >
                 <span class="text-xs mr-1">{validationMessage.message || "Invalid product"}</span>
                 <button
@@ -1045,6 +1049,7 @@ Example file content:
           {:else if isValidated}
             <div
               class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
+              bind:this={scrollContainer}
             >
               <span class="text-xs mr-1">Valid</span>
               <Icon icon="mdi:check-circle" class="text-base" />
