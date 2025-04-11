@@ -37,6 +37,7 @@
     //$:console.log($cart,"forntend");
 	$: a = browser ? JSON.parse(localStorage.getItem("cart")) :[]
 	$: guestCart.set(a)
+
 	const calculateTotalPrice = (cart)=>{
        priceINR = cart.reduce((sum,crt)=> sum + crt.currentPrice.INR*crt.quantity,0)
        priceUSD = cart.reduce((sum,crt)=> sum + crt.currentPrice.USD*crt.quantity,0)
@@ -527,10 +528,8 @@
 									</div>
 									</div>
 								  {/if}
-									{#if showimage}
-									<!-- svelte-ignore a11y-click-events-have-key-events -->
-									<!-- svelte-ignore a11y-no-static-element-interactions -->
-									<div
+									<!-- {#if showimage}
+										<div
 										on:click={(e) => {
 											if (e.target === e.currentTarget) {
 												showimage = false;
@@ -546,13 +545,12 @@
 													<Icon icon="si:close-duotone" class="text-3xl text-red-600" />
 												</button>
 											</div>
-											<!-- svelte-ignore a11y-img-redundant-alt -->
-											<img src="{PUBLIC_IMAGE_URL}/{selectedImage}" 
+										   <img src="{PUBLIC_IMAGE_URL}/{selectedImage}" 
 											onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
 											alt="image" class="" />
 										</div>
 									</div>
-								{/if}
+								    {/if} -->
 								</div>
 								<div class="ml-2">
 									<a href="/products/details/{item.productDetails?.productNumber}" class="text-xs hover:text-primary-500 hover:underline text-black font-semibold">{item?.productDetails?.productNumber}</a>
@@ -765,12 +763,15 @@
 	</div>
 
 {/if}
-<!-- {#if showimage}
 
+{#if showimage}
+
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div on:click={(e) => {
 	if (e.target === e.currentTarget) {
 	showimage = false;}
-	}} class="fixed inset-0 shadow-xl bg-opacity-75 flex items-center justify-center z-50">
+	}} class="fixed inset-0 bg-black shadow-xl bg-opacity-75 flex items-center justify-center z-50">
 	<div class="bg-white rounded-lg shadow-lg p-6 mx-4 w-full md:w-1/2 lg:w-1/3">
 	<div class="flex justify-end items-center mb-2">
 		<button
@@ -778,7 +779,7 @@
 		on:click={closePopup}>
 		<Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
 	  </button>
+   </div>
+<img src="{PUBLIC_IMAGE_URL}/{selectedImage}" onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"  alt="" class=" w-72 h-72 md:w-96 md:h-96 mx-auto bject-cover " /></div>
 </div>
-<img src={selectedImage} alt="image" class="" /></div>
-</div>
-{/if} -->
+{/if}
