@@ -532,6 +532,7 @@ export async function login(body, cookies) {
 export const signUp = async (body, cookies) => {
 	// console.log(body, "bodysignUp");
 	const existingUser = await auth.getKey("email", body.email).catch(() => null);
+	const existingUsernameKey = await auth.getKey('username', body.username).catch(() => null);
 	// const existingPhoneKey = await auth
 	//   .getKey("phone", body.phone)
 	//   .catch(() => null);
@@ -540,6 +541,13 @@ export const signUp = async (body, cookies) => {
 	  return {
 		success: false,
 		message: "This email already exists. Please login or try with another.",
+	  };
+	}
+
+	if (existingUsernameKey) {
+	  return {
+		success: false,
+		message: "This username already exists. Please login or try with another.",
 	  };
 	}
   
@@ -571,6 +579,15 @@ export const signUp = async (body, cookies) => {
 	// 	password: "Password123",
 	//   });
 	// }
+
+	if (!existingUsernameKey) {
+	  await auth.createKey({
+		userId: luciaUser.userId,
+		providerId: "username",
+		providerUserId: body.username,
+		password: body.password,
+	  });
+	}
 	console.log(luciaUser, "luciaUser");
   
 	const newProfile = new Profile({

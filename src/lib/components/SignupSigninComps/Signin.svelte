@@ -11,6 +11,7 @@
 
   let isOtpLogin = false;
   let email = "";
+  let emailOrUsername = "";
   let password = "";
   let validErrorpass = "";
   let otpStatus = "";
@@ -32,15 +33,38 @@
     }
   }
 
+  function validateEmailOrUsername() {
+    const value = emailOrUsername.trim();
+    let newErrors = { ...errors };
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValidUsername =
+      /^[a-zA-Z][a-zA-Z0-9_]{2,}$/.test(value) &&
+      /[a-zA-Z]/.test(value) &&
+      !/^[0-9]+$/.test(value) &&
+      !/^[_]+$/.test(value);
+
+    if (!value) {
+      newErrors.emailOrUsername = "*Required";
+    } else if (!emailRegex.test(value) && !isValidUsername) {
+      newErrors.emailOrUsername = "Enter a valid email or username";
+    } else {
+      delete newErrors.emailOrUsername;
+    }
+
+    errors = newErrors;
+  }
+
   const handleFormSubmit = ({ cancel }) => {
     return async ({ result, update }) => {
-      console.log(result);
+      console.log("form result:", result);
 
       if (result.type === "redirect") {
+        console.log("Redirecting to:", result.location);
         await goto(result.location);
-        await update();
-        location.reload();
+        return;
       }
+
       await applyAction(result);
 
       if (result.type === "failure") {
@@ -353,7 +377,7 @@
               use:enhance={handleFormSubmit}
               class="space-y-4"
             >
-              <div class="space-y-1">
+              <!-- <div class="space-y-1">
                 <label
                   for="email"
                   class="block text-sm font-medium text-gray-700"
@@ -377,6 +401,36 @@
                 </div>
                 {#if errors.email}
                   <p class="text-red-500 text-xs mt-1">{errors.email}</p>
+                {/if}
+              </div> -->
+
+              <div class="space-y-1">
+                <label
+                  for="emailOrUsername"
+                  class="block text-sm font-medium text-gray-700"
+                >
+                  Email or Username
+                </label>
+                <div class="relative">
+                  <div
+                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+                  >
+                    <Icon icon="heroicons:envelope" class="text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    name="emailOrUsername"
+                    id="emailOrUsername"
+                    bind:value={emailOrUsername}
+                    on:input={validateEmailOrUsername}
+                    placeholder="Enter your email or username"
+                    class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                  />
+                </div>
+                {#if errors.emailOrUsername}
+                  <p class="text-red-500 text-xs mt-1">
+                    {errors.emailOrUsername}
+                  </p>
                 {/if}
               </div>
               <div class="space-y-1">

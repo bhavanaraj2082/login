@@ -205,10 +205,10 @@
                 <Icon icon="tdesign:verified-filled" class=" text-xl ml-2 {isEmailVerified ? "text-green-500":"text-gray-400"}"/>
                 </div>
                 {#if needsPasswordSetup}
-                <div class="w-full flex items-center bg-red-50 border border-red-200 rounded-lg p-2">
-                    <p class="text-sm text-red-600">
+                <div class="w-full flex items-center bg-primary-50 border border-primary-200 rounded-lg p-2">
+                    <p class="text-xs text-primary-600">
                         We noticed you haven’t set up a password yet. To keep your account safe, please create one now. 
-                        <a href="/reset-password" class="text-red-600 text-xs font-semibold hover:underline hover:text-red-700">Click here to setup your password</a>
+                        <a href="/reset-password" class="text-primary-600 text-xs font-medium hover:underline hover:text-primary-500">Click here to setup your password</a>
                     </p>
                 </div>
                 {:else}
