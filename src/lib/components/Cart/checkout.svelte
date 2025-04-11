@@ -195,12 +195,12 @@
 				readyToShip: cart.quantity - backOrder,
 				distributorId: cart.distributorId,
 				manufacturerId: cart.manufacturerId,
-				stockId: cart.stockId,
+				stockId: cart?.stockId,
 				unitPrice: price,
 				productName:cart.productDetails?.productName,
-				productNumber:cart.productDetails.productNumber,
-				manufacturerName:cart.mfrDetails.name,
-				returnPolicy:cart.productDetails.returnPolicy
+				productNumber:cart.productDetails?.productNumber,
+				manufacturerName:cart?.mfrDetails?.name,
+				returnPolicy:cart?.productDetails?.returnPolicy
 				//distributorAlias:cart.distributorDetails.aliasname
 			});
 		});
