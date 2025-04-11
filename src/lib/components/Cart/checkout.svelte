@@ -60,8 +60,8 @@
     console.log($cart);
 
     const data = $cart.map((item) => [
-        item.productDetails?.productName,
-        item.mfrDetails?.name,
+        item?.productDetails?.productName,
+        item?.mfrDetails?.name,
         item.quantity,
         item.quantity - item?.stockDetails?.stock < 0 ? 0 : item.quantity - item?.stockDetails?.stock,
         $currencyState === "inr" ? "₹ "+item.currentPrice?.INR.toLocaleString("en-IN") : "$ "+item?.currentPrice?.USD.toLocaleString("en-IN"),
