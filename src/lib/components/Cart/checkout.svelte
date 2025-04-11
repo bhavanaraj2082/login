@@ -60,17 +60,17 @@
     console.log($cart);
 
     const data = $cart.map((item) => [
-        item.productDetails.productName,
-        item.mfrDetails.name,
+        item.productDetails?.productName,
+        item.mfrDetails?.name,
         item.quantity,
-        item.quantity - item.stockDetails.stock < 0 ? 0 : item.quantity - item.stockDetails.stock,
-        $currencyState === "inr" ? "₹ "+item.currentPrice.INR.toLocaleString("en-IN") : "$ "+item.currentPrice.USD.toLocaleString("en-IN"),
-        $currencyState === "inr" ? "₹ "+(item.pricing.INR * item.quantity).toLocaleString("en-IN") : "$ "+ (item.pricing.USD * item.quantity).toLocaleString("en-IN"),
+        item.quantity - item?.stockDetails?.stock < 0 ? 0 : item.quantity - item?.stockDetails?.stock,
+        $currencyState === "inr" ? "₹ "+item.currentPrice?.INR.toLocaleString("en-IN") : "$ "+item?.currentPrice?.USD.toLocaleString("en-IN"),
+        $currencyState === "inr" ? "₹ "+(item?.pricing?.INR * item.quantity).toLocaleString("en-IN") : "$ "+ (item?.pricing?.USD * item.quantity).toLocaleString("en-IN"),
 	]);
 
     // Calculate total price (sum of the last column - 'Extended Price')
     const totalPrice = $cart.reduce((total, item) => {
-        return total + ($currencyState === "inr" ? (item.pricing.INR * item.quantity) : (item.pricing.USD * item.quantity));
+        return total + ($currencyState === "inr" ? (item?.pricing?.INR * item.quantity) : (item?.pricing?.USD * item.quantity));
     }, 0);
 
     // Add a new row for the total price at the bottom
@@ -197,7 +197,7 @@
 				manufacturerId: cart.manufacturerId,
 				stockId: cart.stockId,
 				unitPrice: price,
-				productName:cart.productDetails.productName,
+				productName:cart.productDetails?.productName,
 				productNumber:cart.productDetails.productNumber,
 				manufacturerName:cart.mfrDetails.name,
 				returnPolicy:cart.productDetails.returnPolicy
