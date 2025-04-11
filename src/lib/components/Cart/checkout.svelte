@@ -60,8 +60,8 @@
     console.log($cart);
 
     const data = $cart.map((item) => [
-        item.productDetails?.productName,
-        item.mfrDetails?.name,
+        item?.productDetails?.productName,
+        item?.mfrDetails?.name,
         item.quantity,
         item.quantity - item?.stockDetails?.stock < 0 ? 0 : item.quantity - item?.stockDetails?.stock,
         $currencyState === "inr" ? "₹ "+item.currentPrice?.INR.toLocaleString("en-IN") : "$ "+item?.currentPrice?.USD.toLocaleString("en-IN"),
@@ -195,12 +195,12 @@
 				readyToShip: cart.quantity - backOrder,
 				distributorId: cart.distributorId,
 				manufacturerId: cart.manufacturerId,
-				stockId: cart.stockId,
+				stockId: cart?.stockId,
 				unitPrice: price,
 				productName:cart.productDetails?.productName,
-				productNumber:cart.productDetails.productNumber,
-				manufacturerName:cart.mfrDetails.name,
-				returnPolicy:cart.productDetails.returnPolicy
+				productNumber:cart.productDetails?.productNumber,
+				manufacturerName:cart?.mfrDetails?.name,
+				returnPolicy:cart?.productDetails?.returnPolicy
 				//distributorAlias:cart.distributorDetails.aliasname
 			});
 		});
