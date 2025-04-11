@@ -131,9 +131,10 @@
     if (price === undefined || price === null || price === 0) {
         return '--';
     }
-    const formattedPrice = price.toFixed(3);
+    const formattedPrice = Number(price.toFixed(2));
     if (currency === "inr") {
-        return `₹ ${formattedPrice}`;
+         let showingPrice = formattedPrice.toLocaleString("en-IN");
+        return `₹ ${showingPrice}`;
     }
     if (currency === "usd") {
         return `$ ${formattedPrice}`;
