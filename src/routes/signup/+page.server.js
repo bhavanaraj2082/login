@@ -12,7 +12,7 @@ export const actions = {
     } catch (error) {
       return {
         success:false,
-        message:"Username or email already exists. Please use a different username or email" 
+        message:"Something went wrong while processing your request. Please try again later" 
       };
     }
   },
