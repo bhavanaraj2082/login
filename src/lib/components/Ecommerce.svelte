@@ -1525,6 +1525,11 @@ $: disabled = location.length === 0;
     }
   }}
 />
+{#if showErrors && company.length === 0}
+								<span class="text-red-500 sm:text-xs text-2s font-medium">
+									Company is required
+								</span>
+							{/if}
 {#if errors?.company}
   <span class="text-red-500 text-xs">
     {errors.company}

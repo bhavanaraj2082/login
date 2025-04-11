@@ -233,12 +233,24 @@ onMount(() => {
 		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={tog3()}>Edit</button>
 	  </div>
 	  <hr /><hr />
-	  <div class="py-10 bg-white  flex justify-between">
+	  <!-- <div class="py-10 bg-white  flex justify-between">
         <span class="flex items-center gap-2">
             <Icon icon="ph:user-list-bold" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300" />
 		  <h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 			  Step 5: Customer details
 		  </h1>
+		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={tog4()}>Edit</button>
+	  </div> -->
+
+
+
+      <div class="py-10 bg-white  flex justify-between">
+        <span class="flex items-center gap-2">
+            <Icon icon="ph:user-list-bold" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300 "  />
+		  <h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
+            Step 5: Customer details
+		  </h1>
+        </span>
 		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={tog4()}>Edit</button>
 	  </div>
 	  <hr /><hr />
@@ -256,7 +268,12 @@ onMount(() => {
 				  <br>
 				  <input type="text" name="Address" bind:value={$Delivery.Address1} id="" 
 				  class="block rounded  md:w-3/4 w-full lg:w-1/2 p-1  sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-				              on:input={validateAdd1}
+				             
+                              on:input={() => {
+                                validateAdd1
+                                const trimmedAdd1 = $Delivery.Address1.trim();
+                                          $Delivery.Address1= trimmedAdd1;
+                                }}
 		/>
         {#if errorMessages.address1}
 		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
@@ -273,7 +290,11 @@ onMount(() => {
 				  <br>
 				  <input type="text" name="Address2" bind:value={$Delivery.Address2} id="" 
 				  class="block rounded md:w-3/4 w-full lg:w-1/2 p-1  sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-				              on:input={validateAdd2}
+                  on:input={() => {
+                    validateAdd2
+                    const trimmedAdd2 = $Delivery.Address2.trim();
+                              $Delivery.Address2= trimmedAdd2;
+                    }}
 		/>
         {#if errorMessages.address2}
 		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
@@ -290,7 +311,12 @@ onMount(() => {
 				<br>
 				<input type="text" name="City" id="" 
 				class="block rounded  md:w-3/4 w-full lg:w-1/2 p-1  sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-				bind:value={$Delivery.City} />
+				bind:value={$Delivery.City}
+                on:input={() => {
+                    
+                    const trimmedCity = $Delivery.City.trim();
+                              $Delivery.City= trimmedCity;
+                    }} />
                 {#if errorMessage && !$Delivery.City}
                 <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
                     City is required</div>
@@ -328,7 +354,11 @@ onMount(() => {
 				  <input type="text" name="postcode" id="text1" 
 				  class="block rounded  md:w-3/4 w-full lg:w-1/2 p-1  sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
 				  bind:value={$Delivery.Post} 
-				  on:input={(event) => validatePostalcode(event, $Cusdetails.Country)} 
+                  on:input={(event) => {
+                    validatePostalcode(event, $Cusdetails.Country)
+                    const trimmedPost = $Delivery.Post.trim();
+                              $Delivery.Post= trimmedPost;
+                    }}
                   />
                   {#if errorMessages.postalCode}
                   <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
@@ -343,7 +373,12 @@ onMount(() => {
 				<label for="" class="text-sm ">GST</label><br>
 				<input type="text" 
 				class="block rounded  md:w-3/4 w-full lg:w-1/2 p-1  sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-				name="County" id="" bind:value={$Delivery.County} on:input={validateGST}
+				name="County" id="" bind:value={$Delivery.County} 
+                on:input={() => {
+                    validateGST
+                    const trimmedGST = $Delivery.County.trim();
+                              $Delivery.County= trimmedGST;
+                    }}
                 />
                 {#if errorMessages.gst}
                 <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
