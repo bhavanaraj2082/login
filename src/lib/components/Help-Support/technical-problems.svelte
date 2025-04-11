@@ -976,6 +976,12 @@ function filterCountriesWithoutAutoSelect() {
             name="assistance"
             bind:value={assistance}
             on:input={() => validateField("assistance")}
+            on:input={(e) => {
+              
+              e.target.value = e.target.value.replace(/^\s+/, '');
+              assistance = e.target.value;
+                      
+                validateField("assistance")}}
             class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm"
             required
           ></textarea>
@@ -1105,6 +1111,12 @@ function filterCountriesWithoutAutoSelect() {
               class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
               required
               on:input={() => validateField("firstName")}
+              on:input={(e) => {
+              
+                e.target.value = e.target.value.replace(/^\s+/, '');
+                firstName = e.target.value;
+                        
+                  validateField("firstName")}}
             />
             {#if errors.firstName}
               <p class="text-red-500 text-xs mt-1">{errors.firstName}</p>
@@ -1121,6 +1133,12 @@ function filterCountriesWithoutAutoSelect() {
               class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
               required
               on:input={() => validateField("lastName")}
+              on:input={(e) => {
+              
+                e.target.value = e.target.value.replace(/^\s+/, '');
+                lastName = e.target.value;
+                        
+                  validateField("lastName")}}
             />
             {#if errors.lastName}
               <p class="text-red-500 text-xs mt-1">{errors.lastName}</p>
@@ -1137,6 +1155,12 @@ function filterCountriesWithoutAutoSelect() {
               class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
               required
               on:input={() => validateField("email")}
+              on:input={(e) => {
+              
+                e.target.value = e.target.value.replace(/^\s+/, '');
+                email = e.target.value;
+                        
+                  validateField("email")}}
             />
             {#if errors.email}
               <p class="text-red-500 text-xs mt-1">{errors.email}</p>
@@ -1152,6 +1176,12 @@ function filterCountriesWithoutAutoSelect() {
               class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
               required
               on:input={() => validateField("companyName")}
+              on:input={(e) => {
+              
+                e.target.value = e.target.value.replace(/^\s+/, '');
+                companyName = e.target.value;
+                        
+                  validateField("companyName")}}
             />
             {#if errors.companyName}
               <p class="text-red-500 text-xs mt-1">{errors.companyName}</p>
@@ -1167,6 +1197,12 @@ function filterCountriesWithoutAutoSelect() {
                 placeholder="Search Country"
                 on:input={handleInputChange}
                 on:click={toggleDropdown}
+                on:input={(e) => {
+              
+                
+                  country = country.trim();
+                          
+                    validateField("country")}}
                 autocomplete="off"
                 class="flex-1 outline-none w-full border border-gray-300 rounded focus:ring-0 focus:border-primary-400 p-2 text-sm"
                 required

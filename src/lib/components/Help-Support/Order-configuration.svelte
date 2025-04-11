@@ -746,18 +746,15 @@
 
 						// thankYouMessageVisible = true;
 						showSuccesDiv = true;
-					
 					} else if (status === 2) {
 						form = result.data;
 						await update();
 
 						showFailureDiv = true;
-					
 					} else {
 						form = result.data;
 						await update();
 						showSuccesDiv = true;
-					
 					}
 				}
 			};
@@ -786,9 +783,9 @@
 	<div
 		class="h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl"
 	>
-	<div
-	class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
->
+		<div
+			class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
+		>
 			<h3 class="text-2xl font-semibold text-green-600 mb-4">
 				Customer Support Form Submission
 			</h3>
@@ -883,6 +880,7 @@
 									class="w-full border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm rounded-md"
 									required
 									on:input={() => {
+										poNumber = poNumber.trim();
 										poVerified = false;
 										validateField("poNumber");
 									}}
@@ -936,6 +934,10 @@
 								type="text"
 								placeholder="Item Number"
 								bind:value={product.itemNumber}
+								on:input={() => {
+									product.itemNumber =
+										product.itemNumber.trim();
+								}}
 								class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
 								required
 							/>
@@ -980,6 +982,15 @@
 								class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 								required
 								on:input={() => validateField("firstName")}
+								on:input={(e) => {
+									e.target.value = e.target.value.replace(
+										/^\s+/,
+										"",
+									);
+									firstName = e.target.value;
+
+									validateField("firstName");
+								}}
 							/>
 							{#if errors.firstName}
 								<p class="text-red-500 text-xs mt-1">
@@ -998,6 +1009,15 @@
 								class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 								required
 								on:input={() => validateField("lastName")}
+								on:input={(e) => {
+									e.target.value = e.target.value.replace(
+										/^\s+/,
+										"",
+									);
+									lastName = e.target.value;
+
+									validateField("lastName");
+								}}
 							/>
 							{#if errors.lastName}
 								<p class="text-red-500 text-xs mt-1">
@@ -1016,6 +1036,15 @@
 								class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 								required
 								on:input={() => validateField("email")}
+								on:input={(e) => {
+									e.target.value = e.target.value.replace(
+										/^\s+/,
+										"",
+									);
+									email = e.target.value;
+
+									validateField("email");
+								}}
 							/>
 							{#if errors.email}
 								<p class="text-red-500 text-xs mt-1">
@@ -1051,6 +1080,15 @@
 								class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 								required
 								on:input={() => validateField("companyName")}
+								on:input={(e) => {
+									e.target.value = e.target.value.replace(
+										/^\s+/,
+										"",
+									);
+									companyName = e.target.value;
+
+									validateField("companyName");
+								}}
 							/>
 							{#if errors.companyName}
 								<p class="text-red-500 text-xs mt-1">
@@ -1068,6 +1106,11 @@
 									placeholder="Search Country"
 									on:input={handleInputChange}
 									on:click={toggleDropdown}
+									on:input={(e) => {
+										country = country.trim();
+
+										validateField("country");
+									}}
 									autocomplete="off"
 									class="flex-1 outline-none w-full border border-gray-300 rounded focus:ring-0 focus:border-primary-400 p-2 text-sm"
 									required

@@ -1920,13 +1920,20 @@ const enhanceForm = (index) => {
               bind:value={units}
               class="w-full px-4 py-2 border border-gray-300 hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 rounded mt-1"
               placeholder="Units Required"
-              on:input={() => {
-                if (!units || units < 1 || units > 999) {
-                  formErrors.units = "Units must be between 1 and 999.";
+              on:input={(e) => {
+                let input = e.target.value.replace(/^\s+/, ''); 
+                input = input.replace(/[^\d]/g, ''); 
+
+                e.target.value = input;
+                units = input;
+
+                if (!units || +units < 1 || +units > 999) {
+                  formErrors.units = "Units must be a number between 1 and 999.";
                 } else {
                   formErrors.units = "";
                 }
               }}
+              
             />
             {#if formErrors.units}
               <p class="text-red-500 text-xs">{formErrors.units}</p>
@@ -1944,6 +1951,7 @@ const enhanceForm = (index) => {
               class="w-full px-4 py-2 borderhover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
               placeholder="First Name"
               on:input={() => {
+                firstName=firstName.trim();
                 if (!firstName.trim()) {
                   formErrors.firstName = "First name is required.";
                 } else if (!/^[A-Za-z\s]+$/.test(firstName)) {
@@ -1970,6 +1978,7 @@ const enhanceForm = (index) => {
               class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
               placeholder="Last Name"
               on:input={() => {
+                lastName = lastName.trim();
                 if (!lastName.trim()) {
                   formErrors.lastName = "Last name is required.";
                 } else if (!/^[A-Za-z\s]+$/.test(lastName)) {
@@ -1997,6 +2006,7 @@ const enhanceForm = (index) => {
               class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
               placeholder="Organisation Name"
               on:input={() => {
+                organisation=organisation.trim();
                 if (!organisation.trim()) {
                   formErrors.organisation = "Organisation name is required.";
                 } else if (!/^[A-Za-z0-9\s]+$/.test(organisation)) {
@@ -2022,6 +2032,7 @@ const enhanceForm = (index) => {
               class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
               placeholder="Phone Number"
               on:input={() => {
+                phone=phone.trim();
                 if (!phone.trim()) {
                   formErrors.phone = "Phone number is required.";
                 } else if (!/^\+?[0-9\s-]{7,15}$/.test(phone)) {
@@ -2090,7 +2101,11 @@ const enhanceForm = (index) => {
                   bind:value={email}
                   class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
                   placeholder="Your email"
-                  on:input={() => {
+                 
+                  on:input={(e) => {
+                       e.target.value = e.target.value.replace(/^\s+/, '');
+                       email = e.target.value;
+                    email=email.trim();
                     if (!email.trim()) {
                       formErrors.email = "Email is required.";
                     } else if (
@@ -2210,8 +2225,13 @@ const enhanceForm = (index) => {
                     placeholder="Enter 6-digit OTP"
                     class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
                     on:input={() => {
-                      enteredOtpemail = enteredOtpemail.trim();
-                    }}
+                      enteredOtpemail =
+                          enteredOtpemail.trim();
+                      enteredOtpemail =
+                          enteredOtpemail
+                              .replace(/\D/g, "")
+                              .slice(0, 6);
+                  }}
                   />
                   <button
                     type="submit"
@@ -2261,8 +2281,9 @@ const enhanceForm = (index) => {
               name="futherdetails"
               bind:value={futherdetails}
               on:input={() => {
-                formErrors.futherdetails = "";
 
+                formErrors.futherdetails = "";
+futherdetails=futherdetails.trim();
                 if (!futherdetails.trim()) {
                   formErrors.futherdetails = "Further details are required.";
                 } else if (!/^[A-Za-z0-9\s\.,\/\";-]+$/.test(futherdetails)) {
