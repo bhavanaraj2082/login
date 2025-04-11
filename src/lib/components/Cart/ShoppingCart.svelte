@@ -34,7 +34,7 @@
 	$: cartId = data?.cart[0]?.cartId || '';
 	$: cartName = data?.cart[0]?.cartName || '';
 	$: recurrence = data?.cart[0]?.recurrence || '';
-    console.log($guestCart,"forntend");
+    //$:console.log($cart,"forntend");
 	$: a = browser ? JSON.parse(localStorage.getItem("cart")) :[]
 	$: guestCart.set(a)
 	const calculateTotalPrice = (cart)=>{
@@ -81,6 +81,7 @@
 			if ($guestCart.length) {
 				guestCartFetch();
 			} else {
+			loading = false
 				cart.set([]);
 			}
 		} else {

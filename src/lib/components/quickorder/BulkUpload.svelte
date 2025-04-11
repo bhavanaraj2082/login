@@ -528,8 +528,6 @@
         };
 
         productsToAdd.push(newProduct);
-        localStorage.setItem("cart",JSON.stringify(productsToAdd))
-        //guestCart.set(productsToAdd)
         console.log(`Prepared product ${newProduct.partNumber} for cart addition`);
         console.log(`Prepared product ${newProduct.partNumber.length} for cart additio`);
         
@@ -552,7 +550,10 @@
     console.error("Error: No products prepared for cart after all checks");
     toast.error("No valid items could be added to cart");
   }
-  if(!isLoggedIn) goto("/cart")
+  if(!isLoggedIn){
+    localStorage.setItem("cart",JSON.stringify(productsToAdd))
+    goto("/cart")
+  } 
   return productsToAdd;
 }
   function attemptAddToCart() {
