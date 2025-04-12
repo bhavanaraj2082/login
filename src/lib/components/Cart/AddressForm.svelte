@@ -868,8 +868,8 @@ $:console.log(location,"location");
 			    <p class="text-red-500 text-xs mt-1">{errors.postalCode}</p>
 		    {/if}
 
-			    <div class=" flex items-center mt-4 mb-2">
-				<input type="checkbox" name="isDefault" class="focus:ring-0 text-primary-400" 
+			    <!--<div class=" flex items-center mt-4 mb-2">
+				 <input type="checkbox" name="isDefault" class="focus:ring-0 text-primary-400" 
                    on:change={(e) => {
                        if (!e.target.checked) {
                            e.preventDefault(); 
@@ -883,7 +883,7 @@ $:console.log(location,"location");
                     }}
                     checked={formdata.isDefault} value={formdata.isDefault}/>
 				<label class="w-full text-xs md:text-sm font-medium ml-2" for="isDefault">Set this address as default</label>
-			    </div>
+			    </div> -->
                 <div class="my-2 flex flex-row gap-2">
                 <button on:click={handlePopupAddress} type="button"
                 class="px-4 py-2 bg-gray-200 text-description rounded hover:bg-gray-300 focus:outline-none focus:ring-0 w-1/2">

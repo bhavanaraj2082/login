@@ -12,6 +12,7 @@
 
 	let cartId;
 	let cartOpen = false;
+	export let loading
 	let cartItems = [];
 	let subtotal = 0;
 	let priceINR = 0;
@@ -426,7 +427,13 @@
 				</button>
 			</div>
 			<div class="px-2 py-2 overflow-y-auto scroll flex-1">
-				{#if !$cart.length}
+				{#if loading}
+				<div
+				class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded-md shadow-md"
+			>
+				<p class=" font-medium text-lg md:text-xl xl:text-2xl"> <Icon icon="line-md:loading-loop" class="text-4xl text-primary-500"/></p>
+			</div>
+				{:else if !$cart.length}
 					<div
 						class="w-full h-full flex flex-col gap-2 items-center justify-center"
 					>

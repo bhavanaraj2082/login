@@ -391,7 +391,7 @@ export const checkoutOrder = async (order) => {
 		await Cart.findOneAndUpdate({userId:order.userId,isActiveCart:true},{isActiveCart:false})
 		
 		if (newOrder._id) {
-			return { success: true, message: 'Successfully Ordered',orderId:newOrder.orderid };
+			return { success: true, message: 'Successfully Ordered',orderId:newOrder.orderid,email:newOrder.userEmail };
 		} else {
 			return {
 				success: false,
