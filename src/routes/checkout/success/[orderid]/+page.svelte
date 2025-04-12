@@ -22,7 +22,7 @@
         </div>
         <button 
           class="bg-primary-500 hover:bg-primary-600 text-white font-medium rounded px-4 py-2 mt-4 max-w-sm transition ease-in-out duration-300" 
-          on:click={() => goto(`/order-status/${$page.params.orderid}`)}
+          on:click={() => goto(`/order-status/${$page.params.orderid}?email=${$page.url.searchParams.get("email")}`)}
           in:fly={{ y: 10, duration: 600 }}>
           View Order Status
         </button>

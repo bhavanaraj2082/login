@@ -250,7 +250,7 @@
 			if(result.data.success){
 				localStorage.removeItem("totalCompsChemi")
 				cartTotalComps.set(0)
-				goto(`checkout/success/${result.data.orderId}`)
+				goto(`checkout/success/${result.data.orderId}?email=${result.data.email}`)
 			}else{
 				goto('checkout/failure')
 			}

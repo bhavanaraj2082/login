@@ -429,7 +429,7 @@
 
 
 <div on:scroll={handleScroll} class=" relative hide mx-auto bg-gray-50 mb-5">
-	<button class="{isHide ? "hidden" : ""} fixed xl:hidden {scrollto ? "top-48 sm:top-28 " : "top-24 sm:top-36"}   right-2 z-20 rounded border shrink-0 p-1.5 bg-primary-100 hover:text-white hover:bg-primary-600" 
+	<!-- <button class="{isHide ? "hidden" : ""} fixed xl:hidden {scrollto ? "top-48 sm:top-28 " : "top-24 sm:top-36"}   right-2 z-20 rounded border shrink-0 p-1.5 bg-primary-100 hover:text-white hover:bg-primary-600" 
 	on:click={()=>{
 	   scrollto = !scrollto
 	   if(scrollto){
@@ -440,7 +440,7 @@
 	   }
 	}}>
 		<Icon icon={scrollto ? "zondicons:cheveron-up" :"zondicons:cheveron-down"} class='text-2xl'/>
-	</button>
+	</button> -->
 	<div class=" w-11/12 mx-auto flex flex-col xl:flex-row justify-between gap-4">
 		{#if loading}
 			<div
@@ -485,6 +485,18 @@
 							<Icon icon="mdi:delete-forever" class="text-lg sm:text-xl rounded-md text-white"/>
 							<span class="hidden sm:block">Delete All</span>
 						</button>
+						<button class="{isHide ? "hidden" : ""} right-2 z-20 rounded border shrink-0 p-1.5 bg-primary-100 hover:text-white hover:bg-primary-600" 
+	on:click={()=>{
+	   scrollto = !scrollto
+	   if(scrollto){
+		checkout.scrollIntoView({ behavior: 'smooth' })
+	   }else{
+		items.scrollIntoView({ behavior: 'smooth' })
+		window.scrollTo({top:0,behavior:"smooth"})
+	   }
+	}}>
+		<Icon icon={scrollto ? "zondicons:cheveron-up" :"zondicons:cheveron-down"} class='text-2xl'/>
+	</button>
 					</div>
 				</div>
 				
@@ -636,7 +648,6 @@
 		
 		{/if}
 
-		
 		 <div bind:this={checkout} class="w-full sticky top-0 sm:w-2/4 md:w-2/5 lg:w-2/6 xl:w-1/4 self-end xl:self-start bg-white p-3 rounded-lg shadow">
 			<div class=" space-y-2">
 				<h2 class=" text-sm lg:text-lg font-bold">Your Order</h2>
@@ -688,6 +699,7 @@
 		</div>
 	 
 	</div>
+	<div class="" bind:this={checkout}></div>
 
 </div>
 
