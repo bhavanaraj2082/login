@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+  
 	import { cart,guestCart } from '$lib/stores/cart.js';
   import Icon from "@iconify/svelte";
   import { enhance } from "$app/forms";
@@ -283,10 +284,12 @@
       reader.readAsText(file);
     }
   }
+
   function submitFileData() {
     if (!rawFileData.trim()) {
       toast.error("Please enter product data before submitting");
-      return;
+      cartloading = false;
+      cancel();
     }
     const updatedFile = new File(
       [rawFileData],
@@ -886,6 +889,7 @@
           toast.warning(
             "Some products are invalid. Please review before adding to cart.",
           );
+          cartloading = false;
         } else if (validatedProducts.length > 0) {
           setTimeout(() => {
             if (data?.authedUser && data?.authedUser?.id) {
@@ -949,7 +953,6 @@
             bind:value={rawFileData}
             on:input={handleTextChange}
             on:scroll={handleScroll}
-            readonly
             class="w-full h-72 p-3 font-mono border-primary-200 focus:ring-0 focus:border-primary-400"
             bind:this={textareaElement}
             placeholder="Upload a file containing product data...
@@ -1221,7 +1224,11 @@ Example file content:
       action="?/addToCart"
       use:enhance={({ formData, cancel }) => {
         cartloading = true;
-
+  if (!isValidated || duplicateEntries.length > 0) {
+      // validateAndSubmitData();
+      submitFileData();
+      return false;
+    }
         let productsToAdd = prepareValidatedProductsForCart();
 
         if (productsToAdd.length === 0) {
