@@ -949,6 +949,7 @@
             bind:value={rawFileData}
             on:input={handleTextChange}
             on:scroll={handleScroll}
+            readonly
             class="w-full h-72 p-3 font-mono border-primary-200 focus:ring-0 focus:border-primary-400"
             bind:this={textareaElement}
             placeholder="Upload a file containing product data...
