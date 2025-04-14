@@ -24,7 +24,7 @@
 	}
 </script>
 
-<section class="w-11/12 flex flex-col mx-auto mb-3 max-w-7xl">
+<section class="w-11/12 flex flex-col mx-auto mb-3 max-w-7xl px-2">
   <h1 class="sm:hidden block sm:px-0 mb-2 sm:mb-0 font-bold sm:text-2xl text-lg text-heading">
     Applications
   </h1>

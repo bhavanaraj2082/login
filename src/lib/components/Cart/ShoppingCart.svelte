@@ -441,15 +441,14 @@
 	}}>
 		<Icon icon={scrollto ? "zondicons:cheveron-up" :"zondicons:cheveron-down"} class='text-2xl'/>
 	</button> -->
-	<div class=" w-11/12 mx-auto flex flex-col xl:flex-row justify-between gap-4">
+	<div class=" w-11/12 mx-auto flex flex-col xl:flex-row justify-between gap-4 max-w-7xl">
 		{#if loading}
 			<div
-				class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded-md shadow-md"
-			>
+				class="w-full h-72 flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white p-4 rounded-md shadow-md">
 				<p class=" font-medium text-lg md:text-xl xl:text-2xl"> <Icon icon="line-md:loading-loop" class="text-4xl text-primary-500"/></p>
 			</div>
 		{:else if !$cart.length}
-			<div class="w-full flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white py-5 rounded-md shadow-sm">
+			<div class="w-full flex flex-col gap-2 items-center justify-center lg:w-4/4 xl:w-3/4 bg-white py-5 rounded-md shadow">
 				<Icon icon="ic:outline-shopping-cart" class="text-5xl text-primary-400 md:text-6xl" />
 				<p class=" font-bold text-lg md:text-xl">Cart is Empty</p>
 			</div>
@@ -485,18 +484,18 @@
 							<Icon icon="mdi:delete-forever" class="text-lg sm:text-xl rounded-md text-white"/>
 							<span class="hidden sm:block">Delete All</span>
 						</button>
-						<button class="{isHide ? "hidden" : ""} right-2 z-20 rounded border shrink-0 p-1.5 bg-primary-100 hover:text-white hover:bg-primary-600" 
-	on:click={()=>{
-	   scrollto = !scrollto
-	   if(scrollto){
-		checkout.scrollIntoView({ behavior: 'smooth' })
-	   }else{
-		items.scrollIntoView({ behavior: 'smooth' })
-		window.scrollTo({top:0,behavior:"smooth"})
-	   }
-	}}>
-		<Icon icon={scrollto ? "zondicons:cheveron-up" :"zondicons:cheveron-down"} class='text-2xl'/>
-	</button>
+						<button class="{isHide || $cart.length <= 10 ? "hidden" : ""} right-2 z-20 rounded-md shrink-0 sm:p-1.5 p-1 bg-primary-200 hover:text-white hover:bg-primary-600" 
+							on:click={()=>{
+							   scrollto = !scrollto
+							   if(scrollto){
+								checkout.scrollIntoView({ behavior: 'smooth' })
+							   }else{
+								items.scrollIntoView({ behavior: 'smooth' })
+								window.scrollTo({top:0,behavior:"smooth"})
+							   }
+							}}>
+								<Icon icon={scrollto ? "zondicons:cheveron-up" :"zondicons:cheveron-down"} class='text-2xl'/>
+						</button>
 					</div>
 				</div>
 				
