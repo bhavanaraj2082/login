@@ -9,6 +9,7 @@
   import { isFavoriteStore } from "$lib/stores/favorites.js";
   import { tick } from "svelte";
   export let data;
+  import { page } from '$app/stores';
   // console.log("Data  ==>(:", data);
 
   $: tick().then(() => {
@@ -26,25 +27,35 @@
   return filteredSlices.join(', ');
 }   
 
+  let url = $page.url.pathname; 
+  let urlArray = url.split('/');
+
   let productData = data?.productData?.records[0];
-  let categoryUrl = data?.relatedProducts?.category;
-  let subCategoryUrl = data?.relatedProducts?.subCategory;
+  
+  let relatedProductsNames = data.relatedProducts?.map((item) => {
+  return `Buy ${productData?.manufacturer?.name} ${item.productName} ${item.productNumber}.`;
+  }).join(' ');
+
+  // console.log("relatedProductsNames", relatedProductsNames);
+
+  let categoryUrl = urlArray[(urlArray.length)-3];
+  let subCategoryUrl = urlArray[(urlArray.length)-2];
   let sliceNum = data?.productData?.records[0]?.productNumber;
   const slicedNumber = generateProgressiveStrings(sliceNum);
   
   let metadata = {
     title:
       `${productData?.productName} | ${productData?.manufacturer?.name} | ${PUBLIC_WEBSITE_NAME} ` ||
-      "Default Product Title",
+      `${PUBLIC_WEBSITE_NAME}`,
     description:
       `Order ${productData?.manufacturer?.name} manufacturers ${productData?.productName} partnumber online at ${PUBLIC_WEBSITE_NAME}.` ||
       "Default product description",
     keywords:
-      `${slicedNumber},${productData?.manufacturer?.name}, ${productData?.productName},${productData?.description}` ||
+      `${slicedNumber},${productData?.manufacturer?.name}, ${productData?.productName},${productData?.description},${relatedProductsNames}` ||
       "default, product, keywords",
     urlPath:
       `${PUBLIC_WEBSITE_URL}/products/${categoryUrl}/${subCategoryUrl}/${productData?.productNumber}` ||
-      "Default URl",
+      `${PUBLIC_WEBSITE_URL}`,
     image: productData?.imageSrc,
     // ? `${PUBLIC_COMPBUY_IMAGE_PATH}/part/${data.componentData.image}`
     // 	: '/partskeys.jpeg',
@@ -53,13 +64,13 @@
       "@type": "Product",
       name:
         `${productData?.productName} | ${productData?.manufacturer?.name} | ${PUBLIC_WEBSITE_NAME} ` ||
-        "Default Product Name",
+        `${PUBLIC_WEBSITE_NAME}`,
       description:
         `Order ${productData?.manufacturer?.name} manufacturers ${productData?.productName} partnumber online at ${PUBLIC_WEBSITE_NAME}.` ||
         "Default product description",
       url:
         `${PUBLIC_WEBSITE_URL}/products/${categoryUrl}/${subCategoryUrl}/${productData?.productNumber}` ||
-        "Default URl",
+        `${PUBLIC_WEBSITE_URL}`,
       brand: {
         "@type": "Brand",
         name: `${PUBLIC_WEBSITE_NAME}`,

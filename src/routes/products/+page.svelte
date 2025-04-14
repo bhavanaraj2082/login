@@ -19,13 +19,13 @@
 
   let metadata = {
     title:
-      `Chemical Products | Product Categories | ${PUBLIC_WEBSITE_NAME} ` ||
-      "Default Product Title",
+      `Chemical Products | Product Categories | ${PUBLIC_WEBSITE_NAME}` ||
+      `${PUBLIC_WEBSITE_NAME}`,
     description:
       `Check Chemical Products , price, from our trusted manufactures.Order now and get for discounted price.` ||
       "Default product description",
     keywords: `${key}` || "default, product, keywords",
-    urlPath: `${PUBLIC_WEBSITE_URL}/products` || "Default URl",
+    urlPath: `${PUBLIC_WEBSITE_URL}/products` || `${PUBLIC_WEBSITE_URL}`,
     schema: {
       "@context": "https://schema.org",
       "@type": "Product",
