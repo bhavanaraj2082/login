@@ -22,7 +22,7 @@
   
 </script>
 
-<section class="w-full lg:w-11/12 mx-auto mb-3  max-w-7xl">
+<section class="w-full lg:w-11/12 mx-auto mb-3  max-w-7xl px-2">
   <h1 class="sm:hidden block px-2.5  mb-2 sm:mb-0 font-bold text-xl text-heading">
     {categoryData.name}
   </h1>

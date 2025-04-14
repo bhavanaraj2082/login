@@ -285,7 +285,7 @@
 	/>
 {/if}
 
-<section class=" mx-auto mb-4 w-11/12 sm:flex gap-4 sm:items-start space-y-4 sm:space-y-0">
+<section class=" mx-auto mb-4 w-11/12 sm:flex gap-4 sm:items-start space-y-4 sm:space-y-0 max-w-7xl">
 	<div class="p-3 lg:p-4 sm:w-1/2 md:w-3/5 lg:w-3/4 bg-white shadow-sm rounded">
 		<!-- <h3 class="text-md font-semibold text-gray-600">Address Selection</h3> -->
 		 <div class=" flex flex-col md:flex-row gap-4 mb-1">
@@ -404,7 +404,7 @@
 
 </section>
 
-<div class="mx-auto w-11/12 mb-5">
+<div class="mx-auto w-11/12 mb-5 max-w-7xl">
 	<div class=" w-full space-y-4">
 		{#if loading}
 			<div
