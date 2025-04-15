@@ -1192,8 +1192,13 @@ export async function DifferentProds(productId) {
       const stock = await Stock.findOne({ productid: variant._id }).lean(); // Fetch stock by productid
 
       let variantPricing = [];
-      let variantStockId = [];
+      let variantstockQuantity = stock?.stock || 0;
+      let variantorderMultiple = stock.orderMultiple || 1;
+      let variantorderedQty = stock.orderedQty || 0;
+      let variantavailableStock = variantstockQuantity - variantorderedQty;
+      let variantStockId = stock?._id ? stock._id.toString() : "";
       let variantdistributorId = stock?.distributor ? stock.distributor.toString() : "";
+      let variantmanufacturerId = stock?.manufacturer ? stock.manufacturer.toString() : "";
 
       if (stock?.pricing) {
         const { break: breakPoint, offer, ...variantCurrencies } = stock.pricing;
@@ -1240,6 +1245,9 @@ export async function DifferentProds(productId) {
         pricing: variantPricing,
         stockId: variantStockId,
         distributorId: variantdistributorId,
+        manufacturerId: variantmanufacturerId,
+        stock:variantavailableStock,
+        orderMultiple:variantorderMultiple,
       };
     })
   );
@@ -1279,6 +1287,9 @@ export async function DifferentProds(productId) {
       pricing: variant?.pricing,
       stockId: variant?.stockId,
       distributorId: variant?.distributorId,
+      manufacturerId: variant?.manufacturerId,
+      stock:variant?.stock,
+      orderMultiple:variant?.orderMultiple,
     })),
   };
 
