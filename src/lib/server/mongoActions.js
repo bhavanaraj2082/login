@@ -3420,7 +3420,7 @@ export const getMyFavorites = async(userId) => {
 	return {favorite}
 }
 
-export const bulkUploadToCart = async(items,userId,email) =>{
+export const bulkUploadToCart = async(items,userId,userEmail) =>{
 	const bulk = await Cart.findOneAndUpdate(
 		{userId,isActiveCart:true},
 		{

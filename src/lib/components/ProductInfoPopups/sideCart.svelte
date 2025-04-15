@@ -9,7 +9,7 @@
   export let quantity;
   export let addedQuantity;
   export let index;
-  export let toggleTooltip;
+  // export let toggleTooltip;
   export let togglePopup;
   export let showPopup;
   export let decreaseQuantity;
