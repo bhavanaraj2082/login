@@ -12,8 +12,6 @@
 	export let tog3;
 	export let tog4;
 	let number = "";
-
-
 	let authedUserEmailVerified = data?.profile?.isEmailVerified || "";
 	console.log("authedUserEmailVerified", authedUserEmailVerified);
 	const handleResendOtpemail = () => {
@@ -29,10 +27,6 @@
 	let ProfileEmailVerified = false;
 	let isDataAvailable = false;
 	let isEditable = false;
-	// console.log(data,"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-
-	// console.log("authedUserEmailVerified",authedUserEmailVerified);
-
 	let verificationMessage = "";
 	let emailSent = false;
 	let displayMessage = "";
@@ -41,7 +35,6 @@
 	let isOtpVerified = false;
 	let isOtpPhoneVerified = false;
 	let form3;
-	// let errors={};
 	let country;
 	let errorMessage = '';
 	$: isFormData =
@@ -51,10 +44,8 @@
 		$Cusdetails.Country &&
 		$Cusdetails.Email &&
 		$Cusdetails.Number;
-
 	$Cusdetails.userId = data?.profile?.userId || "";
-	console.log("$Cusdetails.userId",$Cusdetails.userId);
-	
+	// console.log("$Cusdetails.userId",$Cusdetails.userId);
 	const titles = ['Dr', 'Miss', 'Mr', 'Ms', 'Mrs', 'Prof'];
     const countries = [
 		{ name: 'Afghanistan', code: '+93' },
@@ -469,9 +460,7 @@
 		Tonga: /^\d{7}$/
 	};
     let errorMessage1, errorMessage2,errorMessage3,errorMessage4,errorMessage7,errorMessage5;	
-	
-    //VALIDATIONS
-    function validateFirstName(event) {
+	    function validateFirstName(event) {
     const input = event.target.value;
     const regex = /^[A-Za-z\s]*$/; 
     if (!regex.test(input)) {
@@ -489,7 +478,6 @@ function validateLastName(event) {
         errorMessage2 = '';
     }
 }
-
 function validatecompany(event) {
 	const input = event.target.value.trim();
 	const regex = /^[a-zA-Z0-9\s&\-.,!@():;"']+$/;
@@ -511,8 +499,6 @@ function validatecompany(event) {
 		return true;
 	}
 }
-
-
 function validateEmail(event) {
     const input = event.target.value;
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -523,36 +509,33 @@ function validateEmail(event) {
     }
 }
 function validatePhNo(country, number) {
-    const pattern = phoneNumberPatterns[country];
-    if (!pattern) {
-        errorMessage4 = 'No validation pattern found for this country';
-    } else if (!pattern.test(number)) { 
-        errorMessage4 = `Please enter a valid phone number for ${country}`;
+    if (!country) {
+        errorMessage4 = 'Please select your country before entering Number';
     } else {
-        errorMessage4 = ''; 
+        const pattern = phoneNumberPatterns[country];
+        if (!pattern) {
+            errorMessage4 = 'No validation pattern found for this country';
+        } else if (!pattern.test(number)) {
+            errorMessage4 = `Please enter a valid phone number for ${country}`;
+        } else {
+            errorMessage4 = '';
+        }
     }
 }
-
-
 const validateAll = (country, number) => {
-	// Check if form has required data
 	if (!isFormData) {
 		errorMessage = 'Please fill all the required fields';
-		setTimeout(() => {
-			errorMessage = '';
-		}, 5000);
+		// setTimeout(() => {
+		// 	errorMessage = '';
+		// }, 5000);
 		return false;
 	} else {
 		errorMessage = '';
 	}
-
-	// Trigger validations for each field
 	validateFirstName({ target: { value: $Cusdetails.FirstName } });
 	validateLastName({ target: { value: $Cusdetails.LastName } });
 	validateEmail({ target: { value: $Cusdetails.Email } });
 	validatecompany({ target: { value: $Cusdetails.Organisation } });
-
-	// Return true only if all error messages are empty
 	return (
 		!errorMessage1 && 
 		!errorMessage2 && 
@@ -561,9 +544,13 @@ const validateAll = (country, number) => {
 		!errorMessage5
 	);
 };
-
-
 const cust = () => {
+	// console.log("$Cusdetails.Country",$Cusdetails.Country);
+	// console.log("$Cusdetails.FirstName",$Cusdetails.FirstName);
+	// console.log("$Cusdetails.LastName",$Cusdetails.LastName);
+	// console.log("$Cusdetails.Organisation",$Cusdetails.Organisation);
+	// console.log("$Cusdetails.Email",$Cusdetails.Email);
+	// console.log("$Cusdetails.Number",$Cusdetails.Number);
 	if (!validateAll($Cusdetails.Country, $Cusdetails.Number)) {
 	return;
 }
@@ -576,53 +563,41 @@ if (validateEmail && !(authedUserEmailVerified || ProfileEmailVerified)) {
 }
 tog4();
 };
-
 onMount(() => {
-	const storedEmailVerified = localStorage.getItem("ProfileEmailVerified");
+    const storedEmailVerified = localStorage.getItem("ProfileEmailVerified");
     if (storedEmailVerified === "true") {
         ProfileEmailVerified = true;
     }
-		if (data && data.profile) {
-			// Updating Cusdetails store values
-			$Cusdetails.FirstName = `${data.profile.firstName || "" }`.trim();
-			$Cusdetails.LastName = `${data.profile.lastName || ""}`.trim();
-			$Cusdetails.Email = data.profile.email || "";
-			$Cusdetails.Number = data.profile.cellPhone || data.profile.primaryPhone || "";
-			$Cusdetails.userId = data.profile.userId || "" ;
-			$Cusdetails.Organisation = data.profile.companyName || "";
 
-			// Country logic
-			const profileCountry = data.profile.country?.trim();
-			if (profileCountry) {
-				const foundCountry = countries.find(
-					(c) =>
-						c.name.toLowerCase() === profileCountry.toLowerCase(),
-				);
-				if (foundCountry) {
-					$Cusdetails.Country = foundCountry.name;
-					// $Cusdetails.Country = country; // Assigning the country to the store
-				}
-			}
+    // Check if user details are already filled
+    if ($Cusdetails.FirstName && $Cusdetails.LastName && $Cusdetails.Email) {
+        // User details are already filled, no need to fetch again
+        isDataAvailable = true;
+    } else if (data && data.profile) {
+        // Fetch user details from data
+        $Cusdetails.FirstName = `${data.profile.firstName || ""}`.trim();
+        $Cusdetails.LastName = `${data.profile.lastName || ""}`.trim();
+        $Cusdetails.Email = data.profile.email || "";
+        $Cusdetails.Number = data.profile.cellPhone || data.profile.primaryPhone || "";
+        $Cusdetails.userId = data.profile.userId || "";
+        $Cusdetails.Organisation = data.profile.companyName || "";
+        const profileCountry = data.profile.country?.trim();
+        if (profileCountry) {
+            const foundCountry = countries.find(
+                (c) => c.name.toLowerCase() === profileCountry.toLowerCase(),
+            );
+            if (foundCountry) {
+                $Cusdetails.Country = foundCountry.name;
+            }
+        }
 
-			isDataAvailable = true;
-		} 
+        isDataAvailable = true;
+    }
 
-
-		// else {
-		// 	// If no profile data is available, reset store values
-		// 	$Cusdetails.FirstName = "";
-		// 	$Cusdetails.LastName = "";
-		// 	$Cusdetails.Email = data?.email || "";
-		// 	$Cusdetails.Number = "";
-		// 	$Cusdetails.userId = "";
-		// 	country = "";
-		// 	isDataAvailable = false;
-		// }
-
-		isEditable = false;
-		document.addEventListener('click', handleClickOutside);
-		return () => document.removeEventListener('click', handleClickOutside);
-	});
+    isEditable = false;
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+});
 	$: if (ProfileEmailVerified) {
     localStorage.setItem("ProfileEmailVerified", "true");
 }
@@ -660,29 +635,14 @@ let searchTerm = "";
 		// delete errors.$Cusdetails.Country;
 		validatePhNo($Cusdetails.Country, $Cusdetails.Number);
 	}
-
-// 	function handleInputChange(event) {
-//     searchTerm = event.target.value;
-//     filterCountries();
-// }
-
 function handleInputChange(event) {
-  // Get the current input value
   searchTerm = event.target.value;
-  
-  // Track if user is deleting text
-  const isDeleting = event.inputType === 'deleteContentBackward' || 
+    const isDeleting = event.inputType === 'deleteContentBackward' || 
                      event.inputType === 'deleteContentForward';
-  
   if (searchTerm.length > 0 && !isDeleting) {
-    // Filter countries
     filterCountriesWithoutAutoSelect();
-    
-    // Show dropdown with filtered results
-    showDropdown = filteredCountries.length > 0;
-    
-    // Check for country code matches specifically
-    const codeSearch = searchTerm.replace('+', '').trim();
+        showDropdown = filteredCountries.length > 0;
+        const codeSearch = searchTerm.replace('+', '').trim();
     if (codeSearch.length > 0) {
       const exactCodeMatches = filteredCountries.filter(
         (country) => country.code.replace('+', '') === codeSearch
@@ -713,8 +673,6 @@ function filterCountriesWithoutAutoSelect() {
       country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
   );
 }
-
-
     function toggleDropdown() {
         showDropdown = !showDropdown;
     }
@@ -725,15 +683,6 @@ function filterCountriesWithoutAutoSelect() {
 		}
 	}
 	let errors = {};
-
-	// function validatePhoneNumber(country, phone) {
-	// const pattern = phoneNumberPatterns[country];
-	// if (!pattern) {
-	// throw new Error(`No validation pattern found for country: ${country}`);
-	// }
-	// return pattern.test(phone);
-	// }
-
 	function handleKeyDown(event) {
     if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
         selectCountry(filteredCountries[0]);
@@ -935,18 +884,12 @@ function filterCountriesWithoutAutoSelect() {
 				Phone number is required</div>
 			{/if}
 		{#if $Cusdetails.Number && errorMessage4}
-		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
-			Please enter a valid phone number for {$Cusdetails.Country}</div>
-		{/if}
+<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
+    {errorMessage4}
+</div>
+{/if}
 	</div>
 	<div class="flex-1 mb-4 mt-2">
-		<!-- <input type="text" name="email" id="email" bind:value={email} class="block w-full border border-gray-300 p-2 rounded focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400" placeholder="Email" />
-        {#if showErrors && email.length === 0}
-            <span class="text-red-400 text-xs">Email is required</span>
-        {/if}
-        {#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
-            <span class="text-red-400 text-xs">Please enter a valid email address.</span>
-        {/if} -->
 		<label for="" class="sm:text-sm text-xs">Email <span class="text-primary-500"> *</span></label>
 		<input
 			type="hidden"
@@ -1173,8 +1116,6 @@ function filterCountriesWithoutAutoSelect() {
 	<div class="mt-2 mb-2">
 		<label for="" class="sm:text-sm text-xs">Company name <span class="text-primary-500"> *</span></label>
 		<br />
-		
-
   <input
   type="text"
   name="organisation"
@@ -1196,7 +1137,7 @@ function filterCountriesWithoutAutoSelect() {
       errors = { ...errors, organisation: "Company Name should not contain HTML tags" };
     } else {
       const { organisation, ...rest } = errors;
-      errors = rest; // Clear error if valid
+      errors = rest; 
     }
   }}
 />
@@ -1207,27 +1148,11 @@ function filterCountriesWithoutAutoSelect() {
   </span>
 {/if}
 
-{#if errorMessage && !$Cusdetails.organisation}
+{#if errorMessage && !$Cusdetails.Organisation}
 <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">   
 	Company Name is required</div>
 {/if}
-	
 	</div>
-	<!-- <div class="mt-2 mb-2">
-		<label for="" class="sm:text-sm text-xs">Invoice number</label>
-		<br />
-		<input
-			type="text"
-			name="lgcnumber"
-			id=""
-			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-			bind:value={$Cusdetails.LGC}
-		/>
-	</div> -->
-    <!-- {#if errorMessage}
-		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
-			{errorMessage}</div>
-		{/if} -->
 	<div class="flex space-x-4">
 		<button
 			type="button"

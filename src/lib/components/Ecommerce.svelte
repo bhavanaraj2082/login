@@ -5,6 +5,7 @@
 	import { toast, Toaster } from "svelte-sonner";
 	let selectedNames = [];
 	let reason = [];
+	let hovered = false;
 	let carrn=false;
 	let submitting = false;
 	let inputReadOnly = false;
@@ -539,7 +540,7 @@
 }
 	function handleSubmit(event) {
 		if (
-			number.length === 0 ||
+			number?.length === 0 ||
 			email.length === 0 ||
 
 			fname.length === 0 || 
@@ -1424,7 +1425,7 @@ $: disabled = location.length === 0;
 									}
 									}
 									class="w-full sm:text-sm text-xs px-2 py-2 placeholder-gray-400 rounded-md border-1 border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
-									required
+									
 								/>
 								<Icon
 									icon={showDropdown
@@ -1470,32 +1471,38 @@ $: disabled = location.length === 0;
 							{/if}
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
-							<input
-								type="tel"
-								name="number"
-								id="number"
-								bind:value={number}
-								on:hover={handleFocus}
-								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
-								placeholder="Phone Number*"
-								on:input={ ()=> {
-									const trimmedNumber= number.trim();
-									number = trimmedNumber;
-								}
-								}
-								{disabled}
-								required
-							/>
-							{#if showErrors && number.length === 0}
-								<span class="text-red-500 sm:text-xs text-2s font-medium">
-									Number is required
-								</span>
-							{/if}
-							{#if number?.length > 0 && !validatePhoneNumber(location, number)}
-								<span class="text-red-500 sm:text-xs text-2s font-medium">
-									Please enter a valid phone number for {location}
-								</span>
-							{/if}
+<input
+	type="tel"
+	name="number"
+	id="number"
+	bind:value={number}
+	class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+	placeholder="Phone Number*"
+	disabled={!location}
+
+	on:mouseenter={() => hovered = true}
+	on:mouseleave={() => hovered = false}
+	on:input={() => {
+		number = number.trim();
+	}}
+/>
+
+
+{#if showErrors && number?.length === 0}
+	<span class="text-red-500 sm:text-xs text-2s font-medium">
+		Number is required
+	</span>
+{:else if !location && hovered}
+	<span class="text-red-500 sm:text-xs text-2s font-medium">
+		Please select your country before entering Number
+	</span>
+{:else if number?.length > 0 && !validatePhoneNumber(location, number)}
+	<span class="text-red-500 sm:text-xs text-2s font-medium">
+		Please enter a valid phone number for {location}
+	</span>
+{/if}
+
+
 						</div>
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
