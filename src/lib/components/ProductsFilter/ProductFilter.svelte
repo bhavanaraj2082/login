@@ -288,7 +288,7 @@ function handleMouseLeave() {
         manufacturerId:product.manufacturerDetails._id,
         distributorId:product.distributorId,
         stockId:product.stockId,
-        quantity:product.quantity,
+        quantity:product.quantity ? product.quantity: 1,
         backOrder
     }))
     sendMessage("?/addtocart",formdata,async(result)=>{
@@ -471,7 +471,7 @@ function handleMouseLeave() {
 <section class=" space-y-3 lg:flex items-start gap-4">
     <!-- filters -->
     <div class=" w-full h-fit sticky top-0 z-20 lg:w-1/4">
-        <div class=" p-2 sm:p-4 bg-white shadow rounded space-y-2 mt-3">
+        <div class=" p-2 sm:p-4 bg-white shadow rounded-md space-y-2 mt-3">
             
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -486,7 +486,7 @@ function handleMouseLeave() {
                 selectedSort = ""
                 selectedManufacturer = null
                 goto(`/products/${categoryName}/${subCategoryName}`)
-                }} class="{Object.entries(selectedValues).length > 0 || selectedManufacturer !== null || selectedSort.length ? "" : "hidden"} lg:hidden bg-primary-500 text-xs px-2 py-1 rounded text-white font-normal">Clear All</button>
+                }} class="{Object.entries(selectedValues).length > 0 || selectedManufacturer !== null || selectedSort.length ? "" : "hidden"} lg:hidden bg-primary-500 text-xs px-2 py-1 rounded-md text-white font-normal">Clear All</button>
               </div>
                <Icon icon={toggleFilter ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-3xl p-0.5 rounded-full hover:bg-gray-100 lg:hidden"/>
             </div>
@@ -498,18 +498,18 @@ function handleMouseLeave() {
                 selectedSort = ""
                 selectedManufacturer = null
                 goto(`/products/${categoryName}/${subCategoryName}`)
-                }} class="{Object.entries(selectedValues).length > 0 || selectedManufacturer !== null || selectedSort.length ? "" : "hidden"} bg-primary-500 text-[11px] px-2 py-1 rounded text-white font-normal">Clear All</button>
+                }} class="{Object.entries(selectedValues).length > 0 || selectedManufacturer !== null || selectedSort.length ? "" : "hidden"} bg-primary-500 text-[11px] px-2 py-1 rounded-md text-white font-normal">Clear All</button>
             </div>
             <div class=" max-h-[80vh] overflow-y-auto scroll space-y-2 {toggleFilter ? "block":" hidden lg:block"}">
             <div class="relative pr-1">
-                <input type="text" placeholder="Search..." bind:value={search} on:input={e=>handleSearch(e.target.value)} class=" w-full text-xs font-medium rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500"/>
+                <input type="text" placeholder="Search..." bind:value={search} on:input={e=>handleSearch(e.target.value)} class=" w-full text-xs font-medium rounded-md border-1 border-gray-300 focus:ring-0 focus:border-primary-500"/>
                 {#if searchLoading}
                     <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
                 {/if}
              </div>
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <!-- svelte-ignore a11y-no-static-element-interactions -->
-             <div on:click={()=>showMfrDropdown = !showMfrDropdown} class="mr-1 cursor-pointer font-semibold text-xs flex items-center justify-between p-1 rounded border-1 border-gray-300 ">
+             <div on:click={()=>showMfrDropdown = !showMfrDropdown} class="mr-1 cursor-pointer font-semibold text-xs flex items-center justify-between p-1 rounded-md border-1 border-gray-300 ">
               <span class="ml-2">Manufacturer</span>
               <Icon icon={showMfrDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
              </div>
@@ -517,11 +517,11 @@ function handleMouseLeave() {
                <input type="text" bind:value={selectedManufacturer}
                       placeholder="Search manufacturers..." 
                       on:input={e => handleManufacturer(e.target.value)} 
-                      class="w-full text-xs rounded border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
+                      class="w-full text-xs rounded-md border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
                       {#if loading}
                         <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
                       {/if}
-               <div class="space-y-2.5 py-2.5 border-1 rounded px-2 overflow-y-auto my-1 scroll">
+               <div class="space-y-2.5 py-2.5 border-1 rounded-md px-2 overflow-y-auto my-1 scroll">
                    {#if !searchManufacture.length}
                        <p class="text-sm text-center">No manufacturer found</p>
                    {:else}
@@ -543,11 +543,11 @@ function handleMouseLeave() {
              
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <!-- svelte-ignore a11y-no-static-element-interactions -->
-             <div on:click={()=>showSortByDropdown = !showSortByDropdown} class="mr-1 cursor-pointer font-semibold text-xs flex items-center justify-between p-1 rounded border-1 border-gray-300 ">
+             <div on:click={()=>showSortByDropdown = !showSortByDropdown} class="mr-1 cursor-pointer font-semibold text-xs flex items-center justify-between p-1 rounded-md border-1 border-gray-300 ">
                 <span class="ml-2">Sort By</span>
                 <Icon icon={showSortByDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
              </div>
-             <div class="p-3 mr-1 border-1 rounded {showSortByDropdown ? "block" : "hidden"}">
+             <div class="p-3 mr-1 border-1 rounded-md {showSortByDropdown ? "block" : "hidden"}">
                 <div class=" space-y-2.5 py-2.5 h-auto">
                     <label for="asc" class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
                         <input type="checkbox" id='asc' on:change={(e)=>handlePrice(e.target.checked,"asc")} checked={selectedSort === "asc"} class=" cursor-pointer outline-none rounded text-primary-500 focus:ring-0">
@@ -562,7 +562,7 @@ function handleMouseLeave() {
              {#if Object.entries(specifications).length > 0}
              <div class="mr-1 flex flex-col space-y-2">
                 {#each Object.entries(specifications).slice(0, showAllForIndex ? Object.entries(specifications).length : maxItems) as [key,values],index }
-                <button on:click={()=>handleFilters(index)} class="cursor-pointer w-full font-semibold text-xs flex items-center justify-between p-1 rounded border-1 border-gray-200 ">
+                <button on:click={()=>handleFilters(index)} class="cursor-pointer w-full font-semibold text-xs flex items-center justify-between p-1 rounded-md border-1 border-gray-200 ">
                     <div class="ml-2 flex items-center gap-1.5">{key}
                       {#if selectedValues[key] && selectedValues[key].length > 0}
                         <Icon icon="icomoon-free:checkbox-checked" class="text-sm text-primary-600"/>
@@ -570,7 +570,7 @@ function handleMouseLeave() {
                      </div>
                     <Icon icon={arr === index ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
                 </button>
-                <div class="p-3 border-1 rounded { arr === index ? "block" : "hidden"}">
+                <div class="p-3 border-1 rounded-md { arr === index ? "block" : "hidden"}">
                     {#each values.sort((a, b) => a.localeCompare(b)) as value }
                        <div class=" py-1 h-auto">
                           <label for={value.replaceAll(" ","-")} class=" cursor-pointer flex items-center gap-2 text-xs font-medium">
@@ -585,13 +585,15 @@ function handleMouseLeave() {
                    
                  </div>
                 {/each}
-                <button on:click={() => handleShowMore()} class="text-xs self-end text-primary-600 hover:text-primary-400 mt-3">
-                  {showAllForIndex ? '- Show Less' : '+ Show More'}
-                </button>
+                
              </div>
+             
              {/if}
+            
             </div>
-           
+            <button on:click={() => handleShowMore()} class="text-xs w-full text-end text-primary-600 hover:text-primary-400 mt-3">
+              {showAllForIndex ? '- Show Less' : '+ Show More'}
+            </button>
         </div>
     </div>
     <!-- products -->
@@ -602,7 +604,7 @@ function handleMouseLeave() {
         </div>
         {:else}
        {#each paginatedProducts as product,index}
-        <div class=" relative bg-white shadow p-2 sm:p-4 md:px-8 space-y-2 rounded">
+        <div class=" relative bg-white shadow p-2 sm:p-4 md:px-8 space-y-2 rounded-md">
             <button on:click={()=>handleFavorites(product)} class="{$authedUser?.id && Object.keys(product.pricing).length > 0 ? "" : "hidden"} absolute top-6 right-6">
                 <Icon icon={$myFavorites.find(x=> x === product.stockId) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
             </button>
@@ -649,7 +651,7 @@ function handleMouseLeave() {
 							<div class="flex justify-end items-center mb-2">
 								<button
 									on:click={closePopup}
-									class="rounded hover:bg-slate-200 duration-200"
+									class="rounded-md hover:bg-slate-200 duration-200"
 								>
 									<Icon icon="si:close-duotone" class="text-3xl text-red-600" />
 								</button>
@@ -675,8 +677,8 @@ function handleMouseLeave() {
                             <div class="flex items-center">
                                 <input type="number" bind:value={product.quantity}
 					            on:input={e=>handleQty(product._id,parseInt(e.target.value))}
-					            class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
-					        <div class=" {tog === index ? "hidden" : ""} flex items-center border-1 border-primary-300 rounded">
+					            class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
+					        <div class=" {tog === index ? "hidden" : ""} flex items-center border-1 border-primary-300 rounded-md">
 						    <button
 							on:click={() => decrementQuantity(product._id)}
 							class=" p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
@@ -694,14 +696,14 @@ function handleMouseLeave() {
 					        </div>
                             </div>
                         </div>
-                        <button type="button" on:click={()=>addToCart(product)} class="text-xs flex items-center gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded transition ease-in-out duration-300">
+                        <button type="button" on:click={()=>addToCart(product)} class="text-xs flex items-center gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300">
                             <Icon icon="mdi:cart" class="text-xl" />
                             Add to Cart
                         </button>
                     </div>
                     {:else if  product?.variants && product?.variants?.length > 0}
                     <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`}>
-                        <button class="bg-primary-500 py-2 px-3 hover:bg-primary-500 rounded text-sm text-white mt-2">
+                        <button class="bg-primary-500 py-2 px-3 hover:bg-primary-500 rounded-md text-sm text-white mt-2">
                           View variants
                         </button>
                       </a>                      
@@ -712,7 +714,7 @@ function handleMouseLeave() {
                         </p>
                         <button
                           on:click={() => toggleQuoteModal(product)}
-                          class="bg-primary-500 py-2 px-3 hover:bg-primary-500 rounded text-sm text-white mt-2"
+                          class="bg-primary-500 py-2 px-3 hover:bg-primary-500 rounded-md text-sm text-white mt-2"
                         >
                           Request Quote
                         </button>
@@ -727,8 +729,8 @@ function handleMouseLeave() {
                     <div class="flex items-center">
                         <input type="number" bind:value={product.quantity}
 					on:input={e=>handleQty(product._id,parseInt(e.target.value))}
-					class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
-					<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded">
+					class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
+					<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded-md">
 						<button
 							on:click={() => decrementQuantity(product._id)}
 							class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
@@ -747,7 +749,7 @@ function handleMouseLeave() {
 					</div>
                     </div>
                 </div>
-                <button type="button" on:click={()=>addToCart(product)} class=" text-xs sm:text-sm px-3 py-1 flex items-center gap-1 sm:p-1.5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded ">
+                <button type="button" on:click={()=>addToCart(product)} class=" text-xs sm:text-sm px-3 py-1 flex items-center gap-1 sm:p-1.5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md ">
                     <Icon icon="mdi:cart" class="text-xl" />
                     <span class="hidden xs:block">Add to Cart</span>
                 </button>
@@ -763,13 +765,13 @@ function handleMouseLeave() {
         on:click={() => goToPage(1)} 
         disabled={currentPage == 1}
       >
-      <Icon icon="charm:chevrons-left" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded disabled:text-gray-300" />
+      <Icon icon="charm:chevrons-left" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded-md disabled:text-gray-300" />
       </button>
         <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
           on:click={() => goToPage(currentPage - 1)} 
           disabled={currentPage == 1}
         >
-        <Icon icon="ic:round-chevron-left" class="p-1 sm:p-2 text-2xl sm:text-4xl rounded disabled:text-gray-300" />
+        <Icon icon="ic:round-chevron-left" class="p-1 sm:p-2 text-2xl sm:text-4xl rounded-md disabled:text-gray-300" />
         </button>
       
         {#each getPageNumbers(currentPage,totalPages) as page}
@@ -785,13 +787,13 @@ function handleMouseLeave() {
           on:click={() => goToPage(currentPage + 1)}
           disabled={currentPage == totalPages}
         >
-        <Icon icon="charm:chevron-right" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded disabled:text-gray-300" />
+        <Icon icon="charm:chevron-right" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded-md disabled:text-gray-300" />
         </button>
         <button class=" border shadow-md bg-white border-gray-300 rounded-md text-gray-400 hover:bg-gray-100 disabled:border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
           on:click={() => goToPage(totalPages)}
           disabled={currentPage == totalPages}
         >
-        <Icon icon="charm:chevrons-right" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded disabled:text-gray-300" />
+        <Icon icon="charm:chevrons-right" class="p-1 sm:p-2.5 text-2xl sm:text-4xl rounded-md disabled:text-gray-300" />
         </button>
       </div>
     </div>
