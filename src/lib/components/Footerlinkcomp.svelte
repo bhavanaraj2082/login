@@ -4,7 +4,7 @@
   
   <section class="bg-primary-50">
     <div class="md:w-11/12 max-w-7xl mx-auto">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 px-8 gap-1 pt-4 pb-5">
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 px-8 gap-1 pt-4 pb-5">
         {#each footerData as item}
           <div class="text-left text-nowrap">
             <a
