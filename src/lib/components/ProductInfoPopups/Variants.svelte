@@ -97,6 +97,9 @@
 
       if (!isLoggedIn) {
         addItemToCart(cartItem);
+        const updatedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+        localStorage.setItem("totalCompsChemi", updatedCart.length);
+        syncLocalStorageToStore();
         isSuccess = true;
       } else {
         pendingRequests++;
