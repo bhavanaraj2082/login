@@ -6,82 +6,163 @@
   import { addItemToCart } from "$lib/stores/cart.js";
   import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
   import { sendMessage } from "$lib/utils.js";
+  import { enhance } from "$app/forms";
+  import { invalidate } from "$app/navigation";
+  import { writable } from "svelte/store";
+  import { onMount } from "svelte";
+  import { toast, Toaster } from "svelte-sonner";
 
   export let record;
   export let productName;
-  let quantity = 1;
   let isLoggedIn = $authedUser?.id ? true : false;
   let showQuoteModal = false;
   let productQuote = null;
   let form5;
+  let form;
   const allVariants = record.variants;
-  // console.log(allVariants,"allVariants");
+  // console.log(allVariants, "allVariants");
 
   let selectedProductId = null;
   function togglePricing(productId) {
     selectedProductId = selectedProductId === productId ? null : productId;
   }
 
-  function increaseQuantity() {
-    if (quantity < 999) quantity++;
+  const pricingQuantities = writable({});
+
+  onMount(() => {
+    allVariants.forEach((variant) => {
+      pricingQuantities.update((quantities) => {
+        if (!quantities[variant._id]) {
+          quantities[variant._id] = variant.pricing.map(() => "");
+        }
+        return quantities;
+      });
+    });
+  });
+
+  function validateRowQuantity(event, variantId, index) {
+    let val = event.target.value.replace(/[^0-9]/g, "");
+    if (val.startsWith("0")) val = val.slice(1);
+    pricingQuantities.update((q) => {
+      q[variantId][index] = val ? Math.min(parseInt(val), 999) : "";
+      return q;
+    });
   }
 
-  function decreaseQuantity() {
-    if (quantity > 1) quantity--;
+  function increaseRowQuantity(variantId, index) {
+    pricingQuantities.update((q) => {
+      const current = parseInt(q[variantId][index] || "0", 10);
+      if (current < 999) q[variantId][index] = current + 1;
+      return q;
+    });
   }
 
-  function validateQuantity(event) {
-    let inputValue = event.target.value.replace(/[^0-9]/g, "");
+  function decreaseRowQuantity(variantId, index) {
+    pricingQuantities.update((q) => {
+      const current = parseInt(q[variantId][index] || "1", 10);
+      q[variantId][index] = current > 1 ? current - 1 : 1;
+      return q;
+    });
+  }
 
-    if (inputValue === "") {
-      quantity = "";
+  function addToCart(variant, quantityArray) {
+    const selectedQuantities = quantityArray
+      .map((qty, i) => ({
+        priceItem: variant.pricing[i],
+        quantity: parseInt(qty || "0", 10),
+        index: i,
+      }))
+      .filter((item) => item.quantity > 0);
+
+    if (selectedQuantities.length === 0) {
+      toast.error("Please enter quantity for at least one size");
       return;
     }
 
-    if (inputValue.startsWith("0") && inputValue.length > 1) {
-      inputValue = inputValue.slice(1);
-    }
+    let isSuccess = false;
+    let isError = false;
+    let pendingRequests = 0;
 
-    let parsedValue = parseInt(inputValue, 10);
-    quantity = parsedValue > 999 ? 999 : parsedValue;
-  }
+    selectedQuantities.forEach((item) => {
+      const backOrder =
+        item.quantity > variant.stock ? item.quantity - variant.stock : 0;
+      const cartItem = {
+        productId: variant.productId || variant._id,
+        manufacturerId: variant.manufacturerId || "",
+        distributorId: variant.distributorId || "",
+        stockId: item.priceItem.stockId || "NA",
+        quantity: item.quantity,
+        backOrder,
+      };
 
-  function onBlurQuantity(event) {
-    let inputValue = parseInt(event.target.value, 10);
-    if (!inputValue || inputValue < 1) {
-      quantity = 1;
-    }
-  }
+      if (!isLoggedIn) {
+        addItemToCart(cartItem);
+        isSuccess = true;
+      } else {
+        pendingRequests++;
+        const formData = new FormData();
+        formData.append("items", JSON.stringify(cartItem));
 
-  function addToCart(variant) {
-    const selectedStockId = variant.stockId || "NA";
-    const backOrder = quantity > variant.stock ? quantity - variant.stock : 0;
+        sendMessage("?/addtocart", formData, async (result) => {
+          pendingRequests--;
+          if (result.success) {
+            isSuccess = true;
+            await submitForm();
+            invalidate("/");
+          } else {
+            isError = true;
+          }
 
-    const cartItem = {
-      productId: variant.productId || variant._id,
-      manufacturerId: variant.manufacturerId || "",
-      distributorId: variant.distributorId || "",
-      stockId: selectedStockId,
-      quantity: quantity,
-      backOrder,
-    };
-
-    if (!isLoggedIn) {
-      addItemToCart(cartItem);
-      quantity = 1;
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("items", JSON.stringify(cartItem));
-
-    sendMessage("?/addtocart", formData, async (result) => {
-      if (result.success) {
-        quantity = 1;
-        await submitForm();
-        invalidate("/");
+          // Only show toast once all async calls are done
+          if (pendingRequests === 0) {
+            if (isSuccess && !isError) {
+              toast.success(
+                selectedQuantities.length === 1
+                  ? "Product added to cart"
+                  : "Products added to cart"
+              );
+            } else {
+              toast.error("Error while adding products to cart");
+            }
+          }
+        });
       }
     });
+
+    // For guest users (no async), show toast directly
+    if (!isLoggedIn) {
+      toast.success(
+        selectedQuantities.length === 1
+          ? "Product added to cart"
+          : "Products added to cart"
+      );
+    }
+
+    // 🔄 Reset input quantities
+    pricingQuantities.update((q) => {
+      q[variant._id] = variant.pricing.map(() => "");
+      return q;
+    });
+  }
+
+  function handleData() {
+    return async ({ result }) => {
+      const totalComps = result?.data?.cartData?.cartItems.length;
+      localStorage.setItem("totalCompsChemi", totalComps);
+      syncLocalStorageToStore();
+    };
+  }
+
+  function syncLocalStorageToStore() {
+    const storedTotalComps = localStorage.getItem("totalCompsChemi");
+
+    if (storedTotalComps) {
+      cartTotalComps.set(Number(storedTotalComps));
+    }
+  }
+
+  async function submitForm() {
+    form.requestSubmit();
   }
 
   function getMinMaxPrices(pricing) {
@@ -132,6 +213,15 @@
   }
 </script>
 
+<form
+  method="POST"
+  action="/?/getCartValue"
+  bind:this={form}
+  use:enhance={handleData}
+>
+  <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
+</form>
+
 <div
   id="productVariants"
   class="md:w-11/12 max-w-7xl bg-white mx-auto shadow-sm border border-gray-200 rounded-md m-10"
@@ -153,7 +243,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each allVariants as variant}
+          {#each allVariants as variant (variant._id)}
             {@const { minPriceINR, maxPriceINR, minPriceUSD, maxPriceUSD } =
               getMinMaxPrices(variant.pricing)}
             <tr
@@ -161,7 +251,7 @@
                 ? "bg-white cursor-pointer"
                 : "bg-white border-b hover:bg-gray-50 cursor-pointer"}
               on:click={() => {
-                // window.location.href = variant.productNumber;
+                // Optional: handle row click
               }}
             >
               <td class="py-1 px-6">
@@ -183,57 +273,51 @@
               </td>
               <td class="py-1 px-6">{variant.manufacturerName}</td>
               <td class="py-1 px-6">
-                <span>
-                  {#if $currencyState === "usd"}
-                    {#if minPriceUSD === maxPriceUSD && minPriceUSD !== "--"}
-                      <span class="font-semibold text-black">
-                        $ {(Number(minPriceUSD) || 0).toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </span>
-                    {:else if minPriceUSD === "--" && maxPriceUSD === "--"}
-                      <span class="font-bold text-black px-8"> -- </span>
-                    {:else}
-                      <span class="font-semibold text-black">
-                        $ {(Number(minPriceUSD) || 0).toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })} - $ {(Number(maxPriceUSD) || 0).toLocaleString(
-                          "en-US",
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }
-                        )}
-                      </span>
-                    {/if}
-                  {:else if minPriceINR === maxPriceINR && minPriceINR !== "--"}
+                {#if $currencyState === "usd"}
+                  {#if minPriceUSD === maxPriceUSD && minPriceUSD !== "--"}
                     <span class="font-semibold text-black">
-                      ₹ {(Number(minPriceINR) || 0).toLocaleString("en-IN", {
+                      $ {(Number(minPriceUSD) || 0).toLocaleString("en-US", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
                     </span>
-                  {:else if minPriceINR === "--" && maxPriceINR === "--"}
+                  {:else if minPriceUSD === "--" && maxPriceUSD === "--"}
                     <span class="font-bold text-black px-8"> -- </span>
                   {:else}
                     <span class="font-semibold text-black">
-                      ₹ {(Number(minPriceINR) || 0).toLocaleString("en-IN", {
+                      $ {(Number(minPriceUSD) || 0).toLocaleString("en-US", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      })} - ₹ {(Number(maxPriceINR) || 0).toLocaleString(
-                        "en-IN",
-                        {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }
-                      )}
+                      })}
+                      - $ {(Number(maxPriceUSD) || 0).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </span>
                   {/if}
-                </span>
+                {:else if minPriceINR === maxPriceINR && minPriceINR !== "--"}
+                  <span class="font-semibold text-black">
+                    ₹ {(Number(minPriceINR) || 0).toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                {:else if minPriceINR === "--" && maxPriceINR === "--"}
+                  <span class="font-bold text-black px-8"> -- </span>
+                {:else}
+                  <span class="font-semibold text-black">
+                    ₹ {(Number(minPriceINR) || 0).toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                    - ₹ {(Number(maxPriceINR) || 0).toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                {/if}
               </td>
-              <!-- {/if} -->
+
               <td class="py-4 px-6 text-center sm:py-3 sm:px-4">
                 {#if minPriceINR === "--" && maxPriceINR === "--"}
                   <div class="relative group inline-block">
@@ -249,20 +333,11 @@
                       This product's price is unavailable, click to request a
                       quote
                       <div
-                        class="absolute left-1/2 top-full -translate-x-1/2 w-3 h-3
-                      border-l-[8px] border-l-transparent
-                      border-r-[8px] border-r-transparent
-                      border-t-[8px] border-t-white"
+                        class="absolute left-1/2 top-full -translate-x-1/2 w-3 h-3 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white"
                       ></div>
                     </div>
                   </div>
                 {:else}
-                  <!-- <a
-                    href={variant.productNumber}
-                    class="bg-primary-500 text-white py-2 px-3 rounded hover:bg-primary-600 text-sm block sm:inline-block"
-                  >
-                    View Product
-                  </a> -->
                   <button
                     on:click={() => togglePricing(variant._id)}
                     class="text-primary-500 hover:text-primary-600 font-medium inline"
@@ -270,45 +345,53 @@
                     {selectedProductId === variant._id
                       ? "Hide Pricing"
                       : "View Pricing"}
-                    {#if selectedProductId === variant._id}
-                      <Icon
-                        class="inline text-xl"
-                        icon="material-symbols:keyboard-arrow-up-rounded"
-                      />
-                    {:else}
-                      <Icon
-                        class="inline text-xl"
-                        icon="material-symbols:keyboard-arrow-down-rounded"
-                      />
-                    {/if}
+                    <Icon
+                      class="inline text-xl"
+                      icon={selectedProductId === variant._id
+                        ? "material-symbols:keyboard-arrow-up-rounded"
+                        : "material-symbols:keyboard-arrow-down-rounded"}
+                    />
                   </button>
                 {/if}
               </td>
             </tr>
             {#if selectedProductId === variant._id}
-              {#each variant.pricing as priceItem}
-                <tr class="bg-blue-50 border-b">
-                  <th class="py-3 px-6 text-gray-800 text-sm font-semibold"
-                    >Pack Size</th
-                  >
-                  <th class="py-3 px-6 text-gray-800 text-sm font-semibold"
-                    >SKU</th
-                  >
-                  <th class="py-3 px-6 text-gray-800 text-sm font-semibold"
-                    >Availability</th
-                  >
-                  <th class="py-3 px-6 text-gray-800 text-sm font-semibold"
-                    >Price</th
-                  >
-                  <th class="py-3 px-6 text-gray-800 text-sm font-semibold"
-                    >Quantity</th
-                  >
-                </tr>
+              <tr class="bg-blue-50 border-b">
+                <th class="py-3 px-6 text-gray-800 text-sm font-semibold"
+                  >Pack Size</th
+                >
+                <th class="py-3 px-6 text-gray-800 text-sm font-semibold"
+                  >SKU</th
+                >
+                <th class="py-3 px-6 text-gray-800 text-sm font-semibold"
+                  >Price</th
+                >
+                <th class="py-3 px-6 text-gray-800 text-sm font-semibold"
+                  >Availability</th
+                >
+                <th class="py-3 px-6 text-gray-800 text-sm font-semibold"
+                  >Quantity</th
+                >
+              </tr>
+              {#each variant.pricing as priceItem, i}
                 <tr class="bg-blue-50">
                   <td class="py-1 px-6 font-medium">{priceItem.break}</td>
                   <td class="py-1 px-6 font-medium"
                     >{variant.productNumber}-{priceItem.break}</td
                   >
+                  <td class="py-1 px-6 font-medium">
+                    {#if $currencyState === "usd"}
+                      $ {(Number(priceItem.USD) || 0).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    {:else}
+                      ₹ {(Number(priceItem.INR) || 0).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    {/if}
+                  </td>
                   <td class="py-1 px-6 font-medium">
                     {#if variant.stock > 0}
                       In stock
@@ -324,62 +407,51 @@
                       Out of stock
                     {/if}
                   </td>
-                  <td class="py-1 px-6 font-medium">
-                    {#if $currencyState === "usd"}
-                      $ {(Number(priceItem.USD) || 0).toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    {:else}
-                      ₹ {(Number(priceItem.INR) || 0).toLocaleString("en-IN", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    {/if}
-                  </td>
                   <td class="py-3 px-6 font-medium">
                     <div
                       class="flex items-center border border-gray-300 justify-between w-full space-x-1 rounded-md"
                     >
                       <button
-                        on:click={decreaseQuantity}
+                        on:click={() => decreaseRowQuantity(variant._id, i)}
                         class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
                       >
-                        <Icon icon="ic:round-minus" class="text-2xl" />
+                        <Icon icon="ic:round-minus" class="text-lg" />
                       </button>
 
                       <input
                         type="text"
-                        bind:value={quantity}
-                        min="1"
-                        max="999"
-                        maxlength="3"
-                        on:input={validateQuantity}
-                        on:blur={onBlurQuantity}
-                        class="w-4 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
-                        aria-label="Quantity"
+                        bind:value={$pricingQuantities[variant._id][i]}
+                        on:input={(e) => validateRowQuantity(e, variant._id, i)}
+                        class="w-10 h-6 p-0 text-center border-none outline-none focus:outline-none focus:ring-0 focus:border-transparent bg-transparent"
                       />
 
                       <button
-                        on:click={increaseQuantity}
-                        class="w-full text-lg text-primary-400 font-bold h-8 flex items-center justify-center"
+                        on:click={() => increaseRowQuantity(variant._id, i)}
+                        class="w-full text-lg text-primary-400 font-medium h-8 flex items-center justify-center"
                       >
-                        <Icon icon="ic:round-plus" class="text-2xl" />
+                        <Icon icon="ic:round-plus" class="text-lg" />
                       </button>
                     </div>
                   </td>
                 </tr>
               {/each}
+              <!-- Add to Cart Button, moved outside the loop -->
               <tr class="bg-blue-50 border-b cursor-pointer">
                 <td colspan="5" class="py-2 px-6">
                   <div class="flex justify-end">
                     <button
-                      on:click={() => addToCart(variant)}
-                      class="text-white border flex justify-center items-center border-primary-400 rounded-md py-1.5 font-medium px-2 hover:bg-primary-400 bg-primary-400 hover:text-white {quantity <
-                      1
-                        ? 'cursor-not-allowed hover:opacity-65'
-                        : ''}"
-                      disabled={quantity < 1}
+                      on:click={() =>
+                        addToCart(variant, $pricingQuantities[variant._id])}
+                      class={`text-white border flex justify-center items-center rounded-md py-1.5 font-medium px-2 
+    ${
+      $pricingQuantities[variant._id]?.some((q) => parseInt(q || "0") > 0)
+        ? " bg-primary-400 text-white cursor-pointer"
+        : "bg-primary-400 hover:bg-primary-300 text-white cursor-not-allowed"
+    }
+  `}
+                      disabled={!$pricingQuantities[variant._id]?.some(
+                        (q) => parseInt(q || "0") > 0
+                      )}
                     >
                       <Icon
                         icon="ic:round-shopping-cart"
@@ -400,3 +472,4 @@
 {#if showQuoteModal}
   <ShowQuoteModal {productName} {toggleQuoteModal} {form5} {productQuote} />
 {/if}
+<Toaster position="bottom-right" richColors />
