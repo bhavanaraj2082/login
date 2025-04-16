@@ -123,7 +123,6 @@ const handleFileUpload = (event) => {
 		export let tog1;
 		export let tog2;
 		const solvent = [
-			"Select a solvent",
 			"Acetone",
 			"Acetonitrile",
 			"Benzene",
@@ -520,7 +519,7 @@ else if (selectedSolvent === "Yes") {
 				<button
 					type="button"
 					on:click={decrement}
-					disabled={count === 0}
+					disabled={count <=1}
 					class="p-1"
 				>
 					<Icon icon="ion:minus" class="text-primary-500 text-lg" />
@@ -555,12 +554,12 @@ else if (selectedSolvent === "Yes") {
 						e.target.value = numericValue;
 						
 						if (numericValue === "") {
-						  $formData.units = 0;
+						  $formData.units = 1;
 						  updateUnits();
 						  return;
 						}
 						
-						const trimmedValue = numericValue.replace(/^0+/, "") || "0";
+						const trimmedValue = numericValue.replace(/^0+/, "") || "1";
 						const parsedValue = parseInt(trimmedValue, 10);
 						
 						if (parsedValue >= 1 && parsedValue <= 999) {
