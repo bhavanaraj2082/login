@@ -156,10 +156,7 @@ if (input.trim() !== '') {
 
 function validateAll() {
     if (!$Delivery.Address1 || !$Delivery.Address2 || !$Delivery.City || !$Delivery.Country || !$Delivery.Post) {
-        errorMessage = "Please fill all the required fields";
-        setTimeout(() => {
-	    errorMessage = '';
-        }, 5000);
+        errorMessage = "Please fill all the required fields"; 
         return false; 
     }
     errorMessages = {

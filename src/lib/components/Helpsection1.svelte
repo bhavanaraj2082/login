@@ -41,16 +41,18 @@
 <div  class="block md:hidden">
 {#if showCrcl}
 <!-- <div  class="block md:hidden"> -->
-  <div class="relative">
-      <button
-        class="font-semibold absolute rounded rounded-b-none flex flex-col items-center px-3 pt-2 pb-1 gap-2 transition-opacity duration-300 transform bottom-12 right-5 z-30
-        "
-        on:click={toggleHelp}>
-        <div class="fixed w-8 h-8 bg-primary-500 text-white rounded flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
-          <Icon icon="ic:outline-chat" class="text-bold text-xl" />
-      </div>
-      </button>
-  </div>
+  <div class="relative w-full  flex items-center justify-center">
+    <button
+        class="font-semibold rounded-full flex flex-col items-center py-2 gap-3 transition-opacity duration-300 w-full max-w-4xl z-30"
+        on:click={toggleHelp}
+    >
+        <!-- Inner div with larger content -->
+        <div class="w-full h-16 bg-primary-400 text-white rounded-full flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
+            <p class="text-lg sm:text-xl md:text-2xl">Help section</p>
+        </div>
+    </button>
+</div>
+
 <!-- </div> -->
 {/if}
 {#if isHelpVisible}
