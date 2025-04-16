@@ -647,6 +647,7 @@ export const loadProductsubcategory = async (
 
     let matchCondition = {
         subCategory: subcategory._id,
+        isvariant:false
       // inStock: { $exists: true, $gt: 0 },
     };
 
@@ -733,7 +734,7 @@ export const loadProductsubcategory = async (
           // Check if pricing is an empty object
           isEmptyPricing: {
             $cond: {
-              if: {
+              if:                                                                                                                                                  {
                 $eq: [
                   { $size: { $objectToArray: { $ifNull: ["$stockDetails.pricing", {}] } } }, 0
                 ], // If pricing is an empty object
