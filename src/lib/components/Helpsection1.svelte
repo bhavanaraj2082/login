@@ -47,8 +47,9 @@
         on:click={toggleHelp}
     >
         <!-- Inner div with larger content -->
-        <div class="w-full h-16 bg-primary-400 text-white rounded-full flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
+        <div class="w-72 max-w-xs h-10 bg-primary-400 text-white rounded-lg flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
             <p class="text-lg sm:text-xl md:text-2xl">Help section</p>
+            <Icon icon="material-symbols:chat-outline-rounded" class="text-bold text-2xl ml-2 mt-1" />
         </div>
     </button>
 </div>

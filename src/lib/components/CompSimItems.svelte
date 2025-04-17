@@ -472,7 +472,7 @@
                     {#each Object.keys(product.properties) as key}
                     {#if key !== 'Languages'}
                     <hr class="border-t border-gray-300" />
-                    <div class="py-2 {showDifference && !isSameAsFirst(product.properties[key], key) && product.properties[key] && product.properties[key] !== '__' ? 'bg-primary-100 ' : 'bg-white'} min-h-[60px] max-h-[60px] overflow-hidden">
+                    <div class="py-2 {showDifference && !isSameAsFirst(product.properties[key], key) && product.properties[key] && product.properties[key] !== '__' ? 'bg-blue-50 ' : 'bg-white'} min-h-[60px] max-h-[60px] overflow-hidden">
                       <div class="text-left text-xs font-semibold">{key}:</div>
                       <div class="text-gray-500 text-xs pt-1 font-normal">
                         {#if product.properties[key]}

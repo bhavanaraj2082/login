@@ -1500,8 +1500,13 @@ export async function CompareSimilarityData(productId) {
       return { error: "Product not found" };
     }
 
+    // Check if the parent product has properties
+    if (!product.properties || Object.keys(product.properties).length === 0) {
+      return { error: "Parent product has no properties" };
+    }
+
     // Extract the keys from the parent product's properties
-    const parentPropertyKeys = product.properties ? Object.keys(product.properties) : [];
+    const parentPropertyKeys = Object.keys(product.properties);
 
     // Fetch the next 3 products based on the productNumber
     const nextProducts = await Product.find({
@@ -1608,9 +1613,6 @@ export async function CompareSimilarityData(productId) {
     return { error: "An error occurred while fetching the next products" };
   }
 }
-
-
-
 
 export const getCart = async(userId,cartId)=>{
    //if(!userId) return { cart:[]}
