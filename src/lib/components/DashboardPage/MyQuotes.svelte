@@ -6,7 +6,7 @@ import Calender from '$lib/components/Calender.svelte';
   
  export let data;
   let quotes = data?.quotes || [];
-  console.log("QUOTEs in FE=>>>", quotes)
+//   console.log("QUOTEs in FE=>>>", quotes)
 
   let selectedQuote = null;
 
@@ -196,22 +196,22 @@ onMount(() => {
 
 function getStatusColor (status) {
         switch(status?.toLowerCase()) {
-            case 'processed':
-                return 'bg-green-100 text-green-800 border-green-200';
-            case 'failure':
-                return 'bg-red-100 text-red-800 border-red-200';
+            case 'responded':
+                return 'bg-green-100 text-green-800 border border-green-200';
+            case 'spam':
+                return 'bg-red-100 text-red-800 border border-red-200';
             case 'unread':
-                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
             default:
-                return 'bg-gray-100 text-gray-800 border-gray-200';
+                return 'bg-gray-100 text-gray-800 border border-gray-200';
         }
     };
 
     function getStatusIcon (status) {
         switch(status?.toLowerCase()) {
-            case 'processed':
+            case 'responded':
                 return 'ri:checkbox-circle-line';
-            case 'failure':
+            case 'spam':
                 return 'ri:close-circle-line';
             case 'unread':
                 return 'ri:time-line';
@@ -235,9 +235,9 @@ function getStatusColor (status) {
         {#if filters.searchTerm}
             <button 
                 type="button" 
-                class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded text-red-600" 
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded bg-red-50 hover:bg-red-100  " 
                 on:click={clearSearch}>
-                <Icon icon="oui:cross" width="16" height="16" class="font-bold" />
+                <Icon icon="oui:cross" class="text-xl p-0.5 font-bold  text-red-500" />
             </button>
         {/if}
     </div>
@@ -303,8 +303,8 @@ function getStatusColor (status) {
                             <!-- <span class={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1 ${getTransactionStatusClass(quote.status )}`}>
                               <Icon icon={getTransactionStatusIcon(quote.status )} width="16" height="16" />
                           </span> -->
-                              <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold border border-yellow-700 rounded-full {getStatusColor(quote.status)}">
-                                <Icon icon={getStatusIcon(quote.status )} class="text-lg"/>
+                              <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold  rounded-full {getStatusColor(quote.status)}">
+                                <Icon icon={getStatusIcon(quote.status )} class="text-lg mr-0.5"/>
                                   {quote?.status || 'N/A'}
                               </span>
                           </td>
@@ -399,7 +399,7 @@ function getStatusColor (status) {
                       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                           <div class="bg-gray-50 p-4 rounded-lg">
                               <p class="text-sm font-semibold text-heading">Contact Details</p>
-                              <p class="mt-2 text-sm text-gray-900">{selectedQuote.Customer_details?.Title || 'N/A'} {selectedQuote.Customer_details?.Firstname || 'N/A'} {selectedQuote.Customer_details?.Lastname || 'N/A'}</p>
+                              <p class="mt-2 text-sm text-gray-900">{selectedQuote.Customer_details?.Title || ''} {selectedQuote.Customer_details?.Firstname || 'N/A'} {selectedQuote.Customer_details?.Lastname || 'N/A'}</p>
                               <p class="mt-1 text-sm text-gray-600">{selectedQuote.Customer_details?.email || 'N/A'}</p>
                               <p class="mt-1 text-sm text-gray-600">{selectedQuote.Customer_details?.number || 'N/A'}</p>
                           </div>
@@ -412,7 +412,7 @@ function getStatusColor (status) {
                               <p class="text-sm font-semibold text-heading">Delivery Address</p>
                               <p class="mt-2 text-sm text-gray-900">{selectedQuote?.Delivery_information?.Address1 || 'N/A'}</p>
                               <p class="mt-1 text-sm text-gray-600">
-                                  {selectedQuote.Delivery_information?.City}, {selectedQuote?.Delivery_information?.County || 'N/A'}
+                                  {selectedQuote.Delivery_information?.City}, {selectedQuote?.Delivery_information?.Country1 || 'N/A'}
                               </p>
                               <p class="text-sm text-gray-600">{selectedQuote.Delivery_information?.Post || 'N/A'}</p>
                           </div>

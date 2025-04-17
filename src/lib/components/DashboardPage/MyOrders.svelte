@@ -6,7 +6,7 @@
 //  import ReportsTab from '$lib/components/AccountPage/Tabs/Reports.svelte';
     
     export let data;
-    console.log("myorders=>",data)
+    // console.log("myorders=>",data)
     let activeTab = 'orders';
     
 //  const tabs = ['Orders', 'Invoices', 'Products', 'Reports'];
