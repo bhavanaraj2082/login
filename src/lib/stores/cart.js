@@ -23,22 +23,22 @@ export function addItemToCart(item) {
 		if (Array.isArray(item)) {
 			if (!items.length) return item;
 
-			const inCart = item.filter((item1) => items.some((item2) => item2.productId === item1.productId));
+			const inCart = item.filter((item1) => items.some((item2) => item2.productId === item1.productId && item2.stockId === item1.stockId));
 			//console.log('add to cart',inCart);
 			if (inCart.length) {
 				inCart.forEach((obj) => {
-					const search = items.find((item) => item.productId === obj.productId);
+					const search = items.find((item) => item.productId === obj.productId && item.stockId === obj.stockId);
 					if (search !== undefined) Object.assign(search, obj);
 				});
 			}
-			const notInCart = item.filter((item1) => !items.some((item2) => item2.productId === item1.productId));
+			const notInCart = item.filter((item1) => !items.some((item2) => item2.productId === item1.productId && item2.stockId === item1.stockId));
 			notInCart.forEach((obj) => {
 				items.push(obj);
 			});
 			return items;
 		} else {
 			if (!items.length) return [item];
-			const search = items.find((itm) => itm.productId === item.productId);
+			const search = items.find((itm) => itm.productId === item.productId && itm.stockId === item.stockId);
 			if (search === undefined) {
 				items.push(item);
 			} else {
