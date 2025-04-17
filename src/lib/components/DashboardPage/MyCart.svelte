@@ -631,7 +631,7 @@ function formatDate(dateString) {
 			const fromDate = new Date(value);
 			const toDate = new Date(filters.dateTo);
 			if (fromDate > toDate) {
-				toast.error('From date cannot be later than To date');
+				// toast.error('From date cannot be later than To date');
 				return;
 			}
 		}

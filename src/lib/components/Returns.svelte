@@ -7,7 +7,7 @@
 	import { toast, Toaster } from 'svelte-sonner';
 
 	const user = $authedUser?.email;
-	let email = '';
+	let email = user;
 	let invoiceNumber = '';
 	let error = {};
 	let formError = '';
@@ -167,6 +167,7 @@
 				<label for="email" class="mb-1 text-sm font-medium text-gray-700">Email</label>
 				<input
 					type="email"
+					id="email"
 					name="email"
 					bind:value={email}
 					on:input={(e) => {

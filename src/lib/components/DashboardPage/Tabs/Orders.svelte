@@ -1,21 +1,21 @@
 <script>
-    import { onMount } from 'svelte';
     import Icon from '@iconify/svelte';
-    import * as XLSX from 'xlsx';
-    import { slide,fade } from 'svelte/transition';
+    import { slide, fade } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
     import { writable } from 'svelte/store';
+    import ExcelJS from 'exceljs';
+    import  pkg  from 'file-saver';
     import Calender from '$lib/components/Calender.svelte';
-	import { toast, Toaster } from 'svelte-sonner';
+    import { toast, Toaster } from 'svelte-sonner';
     
     export let data;
-    // console.log("data=>",data)
+    // console.log("ordersdata=>", data);
     let initialOrders = [];
     let orders = [];
     let expandedOrderId = null;
     let isInfoPopupOpen = false;
     let userOrderType = null;
-    let userEmail = data.authedUser.email
+    let userEmail = data.authedUser.email;
     let calendarComponent;
     let isLoading = false;
     
@@ -26,14 +26,15 @@
         firstTimeOnly: false,
         dateRange: 'custom'
     };
+    
     let order = initialOrders.map((item) => ({
-		...item,
-		productList: item.productList || []
-	}));
+        ...item,
+        productList: item.productList || []
+    }));
 
     $: isAnyFilterActive = filters.dateRange !== '' || 
-    filters.status !== '' || 
-    filters.searchTerm !== '';
+       filters.status !== '' || 
+       filters.searchTerm !== '';
     
     $: {
         if (data?.orders) {
@@ -63,7 +64,14 @@
 
     const getEarliestOrderDate = (orders) => {
         if (!orders || orders.length === 0) return null;
-        return new Date(Math.min(...orders.map(order => new Date(order.createdAt))));
+        
+        const earliestDate = orders.reduce((earliest, order) => {
+            const orderDate = new Date(order.createdAt);
+            return orderDate < earliest ? orderDate : earliest;
+        }, new Date(orders[0].createdAt));
+
+        earliestDate.setHours(0, 0, 0, 0);
+        return earliestDate;
     };
 
     const handleDateChange = (event) => {
@@ -93,28 +101,29 @@
     $: pageNumbers = getPageRange($currentPage, totalItems);
     $: totalPages = Math.ceil(totalItems / $itemsPerPage);
     $: paginatedOrders = getPaginatedData($currentPage, $itemsPerPage, orders).map(order => ({
-    ...order,
-    orderid: order.orderid || 'N/A',
-    purchaseorder: order.purchaseorder || 'N/A',
-    status: getOrderStatus(order),
-    currency: order.currency || 'INR',
-    totalprice: order.totalprice || 0,
-    subtotalprice: order.subtotalprice || 0,
-    shippingprice: order.shippingprice || 0,
-    transactionid: order.transactionid || 'N/A',
-    Invoice: order.invoice || 'N/A',
-    orderType: order.orderType || 'personal',
-    orderdetails: (order.orderdetails || []).map(item => ({
-        customerReference: item.customerReference || '--',
-        productName: item.productName || 'N/A',
-        orderQty: item.orderQty || 0,
-        readyToShip: item.readyToShip || 0,
-        backOrder: item.backOrder || 0,
-        unitPrice: item.unitPrice || 0,
-        extendedPrice: item.extendedPrice || 0,
-        currency: item.currency || order.currency || 'INR'
-    }))
-}));;
+        ...order,
+        orderid: order.orderid || 'N/A',
+        purchaseorder: order.purchaseorder || 'N/A',
+        status: getOrderStatus(order),
+        currency: order.currency || 'INR',
+        totalprice: order.totalprice || 0,
+        subtotalprice: order.subtotalprice || 0,
+        shippingprice: order.shippingprice || 0,
+        transactionid: order.transactionid || 'N/A',
+        Invoice: order.invoice || 'N/A',
+        orderType: order.orderType || 'personal',
+        orderdetails: (order.orderdetails || []).map(item => ({
+            customerReference: item.customerReference || '--',
+            productName: item.productName || item.manufacturerProductName || 'N/A',
+            orderQty: item.orderQty || 0,
+            readyToShip: item.readyToShip || 0,
+            backOrder: item.backOrder || 0,
+            unitPrice: item.unitPrice || 0,
+            extendedPrice: item.extendedPrice || 0,
+            leadtime: item.leadtime || '--',
+            currency: item.currency || order.currency || 'INR'
+        }))
+    }));
 
     function getPageRange(current, total) {
         const range = [];
@@ -179,29 +188,41 @@
     }
 
     const formatAddress = (addressData) => {
-         if (typeof addressData === 'string') {
+        if (typeof addressData === 'string') {
             const parts = addressData.split(',').map(part => part.trim());
-            return [
-                parts[0] || '',
-                parts[1] || '',
-                parts.slice(2).join(', ') || ''
-            ];
-        } else if (addressData && typeof addressData === 'object') {
-            const addressLine1 = addressData.address || '';
-            const addressLine2 = `${addressData.city || ''}, ${addressData.state || ''}`.trim();
-            const addressLine3 = `${addressData.country || ''}, ${addressData.postalcode || ''}`.trim();
+            if (parts.length >= 3) {
+                return [
+                    parts[0] || '',
+                    parts[1] || '',
+                    parts.slice(2).join(', ') || ''
+                ].filter(Boolean); 
+            }
+            return parts.filter(Boolean); 
+        } 
+        else if (addressData && typeof addressData === 'object') {
+            const addressLine1 = addressData.organizationName ? 
+                `${addressData.attentionTo || ''}, ${addressData.organizationName || ''}`.trim() :
+                addressData.address || '';
+                
+            const addressLine2 = addressData.street ? 
+                `${addressData.department || ''}, ${addressData.building || ''}, ${addressData.street || ''}`.trim() :
+                `${addressData.city || ''}, ${addressData.state || ''}`.trim();
+                
+            const addressLine3 = addressData.location ?
+                `${addressData.city || ''}, ${addressData.state || ''}, ${addressData.location || ''}, ${addressData.postalCode || ''}`.trim() :
+                `${addressData.country || ''}, ${addressData.postalcode || ''}`.trim();
+                
             return [
                 addressLine1,
                 addressLine2,
                 addressLine3
-            ].map(line => line.trim()).filter(line => line.length > 0); 
+            ].map(line => line.trim()).filter(line => line.length > 0);
         }
         return ['N/A'];
     };
 
-
     const getOrderStatus = (order) => {
-    return order?.status || 'pending'; 
+        return order?.status || 'pending'; 
     };
 
     const formatDate = (dateString) => {
@@ -218,9 +239,14 @@
     };
 
     const isDateInRange = (date, fromDate, toDate) => {
+        if (!date) return false;
+        
         const checkDate = new Date(date);
+        if (isNaN(checkDate.getTime())) return false;
+        
         const start = fromDate ? new Date(fromDate) : null;
         const end = toDate ? new Date(toDate) : null;
+        
         if (start) start.setHours(0, 0, 0, 0);
         if (end) end.setHours(23, 59, 59, 999);
         checkDate.setHours(0, 0, 0, 0);
@@ -247,83 +273,73 @@
     };
     
     const filterOrders = () => {
-    let filteredOrders = [...initialOrders];
+        let filteredOrders = [...initialOrders];
 
-    if (filters.orderType) {
-        filteredOrders = filteredOrders.filter(order => 
-            order.orderType === filters.orderType
-        );
-    }
-    
-    if (filters.searchTerm && filters.searchTerm.trim() !== '') {
-        const searchTermLower = filters.searchTerm.toLowerCase().trim();
-        filteredOrders = filteredOrders.filter(order => {
-            const orderIdMatch = order.orderid?.toString().toLowerCase().includes(searchTermLower);
-            const purchaseOrderMatch = order.purchaseorder?.toString().toLowerCase().includes(searchTermLower);
-            const transactionIdMatch = order.transactionid?.toString().toLowerCase().includes(searchTermLower);
-            
-            return orderIdMatch || purchaseOrderMatch || transactionIdMatch;
-        });
-    }
-    
-    if (filters.dateFrom || filters.dateTo) {
-        filteredOrders = filteredOrders.filter(order => 
-            isDateInRange(order.createdAt, filters.dateFrom, filters.dateTo)
-        );
-    }
-    
-    if (filters.status) {
-        filteredOrders = filteredOrders.filter(order => 
-            order.status?.toLowerCase() === filters.status.toLowerCase()
-        );
-    }
+        if (filters.orderType) {
+            filteredOrders = filteredOrders.filter(order => 
+                order.orderType === filters.orderType
+            );
+        }
+        
+        if (filters.searchTerm && filters.searchTerm.trim() !== '') {
+            const searchTermLower = filters.searchTerm.toLowerCase().trim();
+            filteredOrders = filteredOrders.filter(order => {
+                const orderIdMatch = order.orderid?.toString().toLowerCase().includes(searchTermLower);
+                const purchaseOrderMatch = order.purchaseorder?.toString().toLowerCase().includes(searchTermLower);
+                const transactionIdMatch = order.transactionid?.toString().toLowerCase().includes(searchTermLower);
+                const invoiceMatch = order.invoice?.toString().toLowerCase().includes(searchTermLower);
+                
+                return orderIdMatch || purchaseOrderMatch || transactionIdMatch || invoiceMatch;
+            });
+        }
+        
+        if (filters.dateFrom || filters.dateTo) {
+            filteredOrders = filteredOrders.filter(order => 
+                isDateInRange(order.createdAt, filters.dateFrom, filters.dateTo)
+            );
+        }
+        
+        if (filters.status) {
+            filteredOrders = filteredOrders.filter(order => 
+                order.status?.toLowerCase() === filters.status.toLowerCase()
+            );
+        }
 
-    orders = filteredOrders;
-    currentPage.set(1);
-};
-
-const updateFilters = (key, value) => {
-    filters[key] = value;
-    filterOrders();
-};
-const handleSearch = (event) => {
-    filters.searchTerm = event.target.value;
-    filterOrders();
-};
-// const handlePageChange = (event) => {
-//     currentPage = event.detail.page;
-// };
-// const applyFilters = () => {
-//     filterOrders();
-// };
-
-const toggleOrderDetails = (orderId) => {
-    expandedOrderId = expandedOrderId === orderId ? null : orderId;
-};
-const clearFilters = () => {
-    filters = {
-        dateRange: '',
-        status: '',
-        searchTerm: '', 
-        orderType: filters.orderType 
+        orders = filteredOrders;
+        currentPage.set(1);
     };
-    filterOrders();
-};
 
-function clearSearch() {
-		filters = {
-			searchTerm: ''
-		};
+    const updateFilters = (key, value) => {
+        filters[key] = value;
         filterOrders();
-	}
- 
-onMount(() => {
-    filterOrders();
-});
-function openInfoPopup() { isInfoPopupOpen = true;}
-function closeInfoPopup() { isInfoPopupOpen = false;}
+    };
+    
+    const handleSearch = (event) => {
+        filters.searchTerm = event.target.value;
+        filterOrders();
+    };
 
-const getTransactionStatusClass = (status) => {
+    const toggleOrderDetails = (orderId) => {
+        expandedOrderId = expandedOrderId === orderId ? null : orderId;
+    };
+    
+
+    function clearSearch() {
+        filters.searchTerm = '';
+        filterOrders();
+    }
+
+    function clearStatus() {
+        filters.status = '';
+        updateFilters('status', '');
+    }
+
+ 
+    
+    function openInfoPopup() { isInfoPopupOpen = true; }
+    function closeInfoPopup() { isInfoPopupOpen = false; }
+
+    const getTransactionStatusClass = (status) => {
         switch(status?.toLowerCase()) {
             case 'success':
                 return 'bg-green-100 text-green-800 border-green-200';
@@ -349,113 +365,115 @@ const getTransactionStatusClass = (status) => {
         }
     };
 
-function downloadAsExcel(order) {
-    if (!order || Object.keys(order).length === 0) {
-        toast.error("No order data to export.");
-        return;
-    }
-
-    try {
-        const workbook = XLSX.utils.book_new();
-
-        // Helper to add styled headers
-        const createStyledHeader = (title) => ({
-            v: title,
-            t: 's',
-            s: {
-                font: {
-                    bold: true,
-                    color: { rgb: "FFFFFF" }
-                },
-                fill: {
-                    fgColor: { rgb: "4A90E2" }
-                },
-                alignment: { horizontal: "center" }
-            }
-        });
-
-        const excelData = [
-            [createStyledHeader("Order Summary")],
-            [],
-            ["Order ID", order.orderid || 'N/A'],
-            ["Order Date", new Date(order.createdAt).toLocaleDateString()],
-            ["Order Type", order.orderType || 'N/A'],
-            ["Status", order.status || 'N/A'],
-            [],
-            [createStyledHeader("Financial Summary")],
-            [],
-            ["Subtotal", formatCurrency(order.subtotalprice || 0, order.currency)],
-            ["Shipping", formatCurrency(order.shippingprice || 0, order.currency)],
-            ["Total", formatCurrency(order.totalprice || 0, order.currency)],
-            [],
-            [createStyledHeader("Transaction Details")],
-            [],
-            ["Transaction ID", order.transactionid || '-'],
-            ["Invoice Number", order.invoice || '-'],
-            ["Payment Status", order.transdetails?.status || '-'],
-            ["Payment Mode", order.transdetails?.mode || order.transdetails?.payment_source || '-'],
-            [],
-            [createStyledHeader("Order Items")],
-            [],
-            ["Product Name", "Order Qty", "Ready to Ship", "Back Order", "Customer Ref", "Unit Price", "Extended Price"]
-        ];
-
-        if (order.orderdetails && order.orderdetails.length > 0) {
-            order.orderdetails.forEach(item => {
-                excelData.push([
-                    item.manufacturerProductName || 'N/A',
-                    item.orderQty || 0,
-                    item.readyToShip || 0,
-                    item.backOrder || 0,
-                    // item.customerReference || '--',
-                    formatCurrency(item.unitPrice || 0, order.currency),
-                    formatCurrency(item.extendedPrice || 0, order.currency)
-                ]);
-            });
+    async function downloadAsExcel(order) {
+        if (!order || Object.keys(order).length === 0) {
+            toast.error("No order data to export.");
+            return;
         }
 
-        excelData.push(
-            [],
-            [createStyledHeader("Shipping Details")],
-            []
-        );
+        try {
+            const wb = new ExcelJS.Workbook();
+            const ws = wb.addWorksheet("Order Details");
 
-        const shippingAddress = formatAddress(order.shippingAddress || order.shipmentAddress);
-        const billingAddress = formatAddress(order.billingAddress);
+            const headerStyle = {
+                font: { bold: true, color: { argb: '000000' } },
+                fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DFDFDF' } },
+                alignment: { horizontal: 'center' },
+                border: {
+                    top: { style: 'thin' },
+                    left: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    right: { style: 'thin' }
+                }
+            };
 
-        excelData.push(
-            ["Shipping Address"],
-            ...shippingAddress.map(line => [line]),
-            [],
-            ["Billing Address"],
-            ...billingAddress.map(line => [line])
-        );
+            const addHeaderRow = (title) => {
+                const row = ws.addRow([title]);
+                row.eachCell(cell => {
+                    cell.style = headerStyle;
+                });
+            };
 
-        const worksheet = XLSX.utils.aoa_to_sheet(excelData);
+            const addKeyValue = (key, value) => ws.addRow([key, value || '--']);
 
-        worksheet['!cols'] = [
-            { wch: 20 },  
-            { wch: 30 },
-            { wch: 15 },
-            { wch: 15 },
-            { wch: 15 },
-            { wch: 15 },
-            { wch: 15 },
-            { wch: 15 }
-        ];
+            addHeaderRow("Order Summary");
+            ws.addRow([]);
+            addKeyValue("Order ID", order.orderid);
+            addKeyValue("Order Date", formatDate(order.createdAt));
+            addKeyValue("Invoice Number", order.invoice);
+            addKeyValue("Status", order.status);
+            ws.addRow([]);
 
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Order Details");
+            addHeaderRow("Financial Summary");
+            ws.addRow([]);
+            addKeyValue("Subtotal", formatCurrency(order.subtotalprice, order.currency));
+            addKeyValue("Shipping", formatCurrency(order.shippingprice, order.currency));
+            addKeyValue("Total", formatCurrency(order.totalprice, order.currency));
+            ws.addRow([]);
 
-        const filename = `Order_${order.orderid || order.transactionid || "Details"}.xlsx`;
-        XLSX.writeFile(workbook, filename);
+            if (order.transactionid || order.transdetails) {
+                addHeaderRow("Transaction Details");
+                ws.addRow([]);
+                addKeyValue("Transaction ID", order.transactionid);
+                addKeyValue("Payment Status", order.transdetails?.status);
+                addKeyValue("Payment Mode", order.transdetails?.mode || order.transdetails?.payment_source);
+                ws.addRow([]);
+            }
 
-    } catch (error) {
-        console.error('Error downloading Excel:', error);
-        toast.error('Failed to download Excel file');
+            addHeaderRow("Order Items");
+            ws.addRow([]);
+            const itemHeaderRow = ws.addRow([
+                "Product Name", "Order Qty", "Ready to Ship", "Back Order",
+                "Customer Ref", "Unit Price", "Extended Price"
+            ]);
+            itemHeaderRow.eachCell(cell => cell.style = headerStyle);
+
+            if (order.orderdetails?.length > 0) {
+                order.orderdetails.forEach(item => {
+                    ws.addRow([
+                        item.productName || '--',
+                        item.orderQty || 0,
+                        item.readyToShip || 0,
+                        item.backOrder || 0,
+                        item.customerReference || '--',
+                        formatCurrency(item.unitPrice || 0, order.currency),
+                        formatCurrency(item.extendedPrice || 0, order.currency)
+                    ]);
+                });
+            }
+
+            ws.addRow([]);
+            addHeaderRow("Address Details");
+            ws.addRow([]);
+
+            const shippingAddress = formatAddress(order.shippingaddress);
+            const billingAddress = formatAddress(order.billingaddress);
+
+            ws.addRow(["Shipping Address:"]);
+            shippingAddress.forEach(line => ws.addRow(["  " + line]));
+            ws.addRow([]);
+            ws.addRow(["Billing Address:"]);
+            billingAddress.forEach(line => ws.addRow(["  " + line]));
+
+            ws.columns = [
+                { width: 25 },
+                { width: 30 },
+                { width: 15 },
+                { width: 15 },
+                { width: 20 },
+                { width: 15 },
+                { width: 15 }
+            ];
+
+            const buffer = await wb.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            const filename = `Order_${order.orderid || order.invoice || "Details"}.xlsx`;
+            pkg(blob, filename);
+        } catch (error) {
+            console.error("Error downloading Excel:", error);
+            toast.error("Failed to download Excel file");
+        }
     }
-}
-
-
 </script>
 
 <div class="my-6">
@@ -466,73 +484,76 @@ function downloadAsExcel(order) {
                     <Icon icon="ri:search-line" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="20" height="20"/>
                     <input
                         type="text"
-                        placeholder="Search by Order Number"
+                        placeholder="Search by Order Number or Invoice"
                         class="w-full border rounded-md px-4 py-3 pl-10 focus:ring-0 focus:border-primary-500 text-xs transition-all outline-none duration-200"
                         value={filters.searchTerm}
                         on:input={handleSearch}/>
                         {#if filters.searchTerm}
-                        <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded-md" style="color: #cb1919" on:click={clearSearch}>
-                            <Icon icon="oui:cross" width="16" height="16" class="font-bold" />
+                        <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded bg-red-50 hover:bg-red-100" on:click={clearSearch}>
+                            <Icon icon="oui:cross" class="text-xl p-0.5 font-bold  text-red-500" />
                         </button>
                     {/if}  
                 </div>
             </div>
-            <!-- <div class="flex flex-col sm:flex-row lg:flex-row w-full lg:w-2/5 my-2 md:my-2 lg:my-0 lg:ml-2"> -->
             <div class="flex flex-col sm:flex-row lg:flex-row w-full lg:w-2/5 my-2 md:my-2 lg:my-0 lg:ml-2">
                 <div class="relative w-full md:max-w-80">
                     <Calender
-                bind:this={calendarComponent}
-                minDate={getEarliestOrderDate(initialOrders)}
-                on:dateChange={handleDateChange}
-                on:filterChange={handleFilterChange}
-                initialFilters={{
-                    firstTimeOnly: false,
-                    dateRange: 'custom'
-                }} />
+                    bind:this={calendarComponent}
+                    minDate={getEarliestOrderDate(initialOrders)}
+                    on:dateChange={handleDateChange}
+                    on:filterChange={handleFilterChange}
+                    initialFilters={{
+                        firstTimeOnly: false,
+                        dateRange: 'custom'
+                    }} />
                 </div> 
-                <div class="flex-1 sm:max-w-[400px] mt-2 md:mt-0 md:ml-2">
-                    <select class="border w-full h-10 text-xs rounded-md focus:ring-0 focus:border-primary-500 transition-all outline-none duration-200 pb-2"
-                            bind:value={filters.status}
-                            on:change={() => updateFilters('status', filters.status)}>
+                <div class="relative flex-1 sm:max-w-[400px] mt-2 md:mt-0 md:ml-2">
+                    <select 
+                        class="border w-full h-10 text-xs rounded-md focus:ring-0 focus:border-primary-500 transition-all outline-none duration-200 pr-10" 
+                        bind:value={filters.status}
+                        on:change={() => updateFilters('status', filters.status)}>
                         <option value="">All Status</option>
                         <option value="pending">Pending</option>
                         <option value="cancelled">Cancelled</option>
                         <option value="shipped">Shipped</option>
                         <option value="received">Received</option>
                     </select>
+                    {#if filters.status}
+                        <button 
+                            type="button" 
+                            class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded bg-red-50 hover:bg-red-100  " 
+                            on:click={clearStatus}>
+                            <Icon icon="oui:cross" class="text-xl p-0.5 font-bold  text-red-500" />
+                        </button>
+                    {/if}
                 </div>
-            </div>
-            <div class="flex flex-col sm:flex-row w-full lg:w-1/4 flex-1 lg:ml-2 md:mt-0 mt-2">
-                <!-- <button class="bg-primary-500 w-full h-10 text-white px-4 py-2 rounded hover:bg-primary-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap" on:click={applyFilters}
-                    disabled={!isAnyFilterActive}>
-                    Apply Filters
-                </button> -->
-                <button class="border border-primary-500 flex items-center justify-center  md:mt-0 mt-2  w-1/2 h-10 px-2 py-2 rounded-md hover:bg-primary-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed" on:click={clearFilters} disabled={!isAnyFilterActive}>
-                    <Icon icon="hugeicons:filter-remove" class="mr-2 hover:text-white" width="20" height="20" />
-                    <span class="text-sm">Clear</span>
-                </button>
             </div>
         </div>
     </div>
-    <div class="overflow-x-auto rounded-md shadow hide">
+    <div class="hidden lg:block rounded-md shadow hide">
         <table class="w-full border-collapse border border-gray-100">
             <thead class="bg-gradient-to-r from-primary-500 to-primary-600 text-white uppercase text-xs tracking-wider">
                 <tr>
-                    <th class="px-4 py-2 text-sm font-medium">DATE</th>
+                    <th class="px-4 py-2 text-sm font-medium rounded-tl">DATE</th>
                     <th class="px-4 py-2 text-sm font-medium">ORDER NUMBER</th>
-                    {#if order.some(order => order?.purchaseorder)}
-                    <th class="px-4 py-2 text-sm font-medium">PURCHASE ORDER NUMBER</th>
-                  {/if}
+                        {#if order.some(order => order?.purchaseorder)}
+                            <th class="px-4 py-2 text-sm font-medium">PURCHASE ORDER NUMBER</th>
+                        {/if}
                     <th class="px-4 py-2 text-sm font-medium">TOTAL</th>
                     <th class="px-4 py-2 text-sm font-medium">STATUS</th>
-                    <th class="px-4 py-2 text-sm font-medium">ACTIONS</th>
+                    <th class="px-4 py-2 text-sm font-medium rounded-tr">ACTIONS</th>
                 </tr>
             </thead>
             <tbody>
             {#if !paginatedOrders.length}
                 <tr>
-                    <td colspan="6" class="border px-4 py-8 text-center text-gray-500">
-                        Search related Order is not found
+                    <td colspan="6" class="text-center text-red-500">
+                        <div class="flex items-center justify-center p-4 bg-white">
+                            <span class="bg-primary-50 rounded-full items-center">
+                              <Icon icon="mdi:box-alert-outline" class="text-primary-500 md:text-xl text-sm m-2 "/>
+                            </span>
+                            <p class="md:text-content font-light ml-1 text-xs">Order is not found</p>
+                        </div>
                     </td>
                 </tr>
 			{:else}
@@ -634,7 +655,6 @@ function downloadAsExcel(order) {
                                         <div class="flex justify-between items-center">
                                             <h4 class="font-bold text-heading mb-2">Order Items</h4>
                                           </div>
-                                        <!-- <h4 class="font-bold text-heading mb-2">Order Items</h4> -->
                                         <div class="overflow-x-auto rounded-t-md">
                                             <table class="w-full sm:text-sm text-xs ">
                                                 <thead class="rounded-md ">
@@ -644,7 +664,7 @@ function downloadAsExcel(order) {
                                                         <!-- <th class="border px-2 py-1 text-center">Available</th> -->
                                                         <th class="border px-2 py-1 text-center">Ready</th>
                                                         <th class="border px-2 py-1 text-center whitespace-nowrap">Back Order</th>
-                                                        <th class="border px-2 py-1 text-center whitespace-nowrap">Lead Time</th>
+                                                        <!-- <th class="border px-2 py-1 text-center whitespace-nowrap">Lead Time</th> -->
                                                         <!-- <th class="border px-2 py-1 text-center">Customer Ref</th> -->
                                                         <th class="border px-2 py-1 text-right whitespace-nowrap">Unit Price</th>
                                                         <th class="border px-2 py-1 text-right">Total</th>
@@ -658,7 +678,7 @@ function downloadAsExcel(order) {
                                                             <!-- <td class="border px-2 py-1 text-center">{item?.availableStock}</td> -->
                                                             <td class="border px-2 py-1 text-center">{item?.readyToShip || 0 }</td>
                                                             <td class="border px-2 py-1 text-center">{item?.backOrder || 0 }</td>
-                                                            <td class="border px-2 py-1 text-center">{item?.leadtime || '--' }</td>
+                                                            <!-- <td class="border px-2 py-1 text-center">{item?.leadtime || '--' }</td> -->
                                                             <!-- <td class="border px-2 py-1 text-center">{item?.customerReference || '--'}</td> -->
                                                             <td class="border px-2 py-1 text-right">{formatCurrency(item?.unitPrice || 0, item?.currency || 'INR')}</td>
                                                             <td class="border px-2 py-1 text-right">{formatCurrency(item?.extendedPrice || 0, item?.currency || 'INR')}</td>
@@ -669,7 +689,7 @@ function downloadAsExcel(order) {
                                         </div>
                                     </div>
                                     <div class="bg-white rounded-md shadow p-4">
-                                        <h3 class="font-bold mb-2 text-heading">Shipping Details</h3>
+                                        <h3 class="font-bold mb-2 text-heading">Address Details</h3>
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                             <div>
                                                 <h4 class="text-sm font-medium text-gray-500 mb-2">Shipping Address</h4>
@@ -753,6 +773,189 @@ function downloadAsExcel(order) {
             </tbody>
         </table>
     </div>
+    <div class="lg:hidden space-y-4">
+        {#if !paginatedOrders.length}
+            <div class="flex items-center justify-center shadow rounded-md py-4 bg-white">
+                <span class="bg-primary-50 rounded-full items-center">
+                  <Icon icon="mdi:box-alert-outline" class="text-primary-500 md:text-xl text-sm m-2 "/>
+                </span>
+                <p class="md:text-content font-light ml-1 text-xs">Order is not found</p>
+            </div>
+        {:else}
+            {#each paginatedOrders as order}
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                <div class="bg-white rounded-lg shadow p-4 space-y-2" on:click={() => toggleOrderDetails(order?._id)}>
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm font-semibold">{formatDate(order?.createdAt) || 'N/A'}</div>
+                        <div class={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1 ${
+                            order?.status === 'pending' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                            order?.status === 'cancelled' ? 'bg-red-100 text-red-800 border border-red-200' :
+                            order?.status === 'pending cancellation' ? 'bg-red-100 text-red-600 border border-red-100' :
+                            order?.status === 'shipped' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
+                            order?.status === 'received' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                            'bg-gray-100 text-gray-800 border border-gray-200'
+                        }`}>
+                            <Icon icon={order?.status === 'pending' ? 'ri:time-line' :
+                                order?.status === 'cancelled' ? 'ri:close-circle-line' :
+                                order?.status === 'pending cancellation' ? 'fluent:calendar-cancel-20-regular' :
+                                order?.status === 'shipped' ? 'la:shipping-fast' :
+                                order?.status === 'received' ? 'ri:checkbox-circle-line' :
+                                'ri:question-line'
+                            } width="16" height="16" />
+                            {order?.status.charAt(0).toUpperCase() + order?.status.slice(1)}
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-600">Order ID: <span class="font-medium">{order?.orderid || 'N/A'}</span></div>
+                    <div class="text-xs text-gray-600">Total: <span class="font-medium">{formatCurrency(order?.totalprice || 0, order?.currency || 'INR')}</span></div>
+                    <div class="flex gap-2 pt-2 sm:max-w-sm">
+                        <button 
+                            type="button"
+                            disabled={isLoading}
+                            class="flex-1 text-primary-500 border border-primary-500 rounded-md py-1 text-xs flex items-center justify-center gap-1 hover:bg-primary-600 hover:text-white transition-all"
+                            on:click|stopPropagation={() => toggleOrderDetails(order?._id)}>
+                            <Icon icon={isLoading ? 'mdi:loading' : (expandedOrderId === order?._id ? 'mdi:chevron-up' : 'mdi:chevron-down')} class={`text-base ${isLoading ? 'animate-spin' : ''}`} />
+                            {expandedOrderId === order?._id ? 'Hide Details' : 'Show Details'}
+                        </button>
+                        <a href={`/order-status/${order?.orderid}?email=${userEmail}`} class="flex-1">
+                            <button class="w-full text-primary-500 border border-primary-500 rounded-md py-1 text-xs flex items-center justify-center gap-1 hover:bg-primary-600 hover:text-white transition-all">
+                                <Icon icon="fluent:open-24-filled" class="text-base" />
+                                Order Status
+                            </button>
+                        </a>
+                    </div>
+    
+                    {#if expandedOrderId === order?._id}
+                        <div transition:slide={{ duration: 300, easing: quintOut }} class="pt-4 space-y-4">
+                            <div class="bg-white p-4 rounded-md shadow border">
+                                <h4 class="text-heading font-bold mb-2 text-sm">Order Summary</h4>
+                                <div class="grid grid-cols-2 gap-3 text-xs">
+                                    <div>
+                                        <p class="text-heading font-semibold">Subtotal</p>
+                                        <p>{formatCurrency(order?.subtotalprice, order?.currency)}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-heading font-semibold">Shipping</p>
+                                        <p>{formatCurrency(order?.shippingprice || 0, order?.currency || 'INR' )}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-heading font-semibold">Total</p>
+                                        <p>{formatCurrency(order?.totalprice || 0 , order?.currency || 0)}</p>
+                                    </div>
+                                    {#if order?.transactionid && order?.transdetails}
+                                        <div>
+                                            <p class="text-heading font-semibold">Transaction ID</p>
+                                            <p class="break-words">{order?.transactionid || '--'}</p>
+                                        </div>
+                                    {/if}
+                                    <div class="col-span-2">
+                                        <p class="text-heading font-semibold">Invoice Number</p>
+                                        <p class="text-xs break-words">{order?.invoice || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-md shadow border">
+                                <h4 class="font-bold text-heading mb-3 text-sm">Order Items</h4>
+                                {#each order?.orderdetails || [] as item}
+                                    <div class="border rounded mb-2 p-2">
+                                        <div class="font-medium text-xs">{item?.productName || 'N/A'}</div>
+                                        <div class="grid grid-cols-2 gap-2 text-xs mt-1">
+                                            <div>
+                                                <span class="text-gray-500">Qty:</span> {item?.orderQty || 0}
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-500">Ready:</span> {item?.readyToShip || 0}
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-500">Back Order:</span> {item?.backOrder || 0}
+                                            </div>
+                                            <div>
+                                                <span class="text-gray-500">Unit Price:</span> {formatCurrency(item?.unitPrice || 0, item?.currency || 'INR')}
+                                            </div>
+                                            <div class="col-span-2 text-right font-medium">
+                                                Total: {formatCurrency(item?.extendedPrice || 0, item?.currency || 'INR')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {/each}
+                            </div>
+                            <div class="bg-white rounded-md shadow border p-4">
+                                <h3 class="font-bold mb-3 text-heading text-sm">Address Details</h3>
+                                <div class="flex justify-between">
+                                    <div>
+                                        <h4 class="text-xs font-medium text-gray-500 mb-1">Shipping Address</h4>
+                                        <div class="text-xs">
+                                            {#each formatAddress(order?.shippingaddress || order?.shipmentAddress) as line}
+                                                <p class="mb-1">{line}</p>
+                                            {/each}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-xs font-medium text-gray-500 mb-1">Billing Address</h4>
+                                        <div class="text-xs">
+                                            {#each formatAddress(order?.billingaddress) as line}
+                                                <p class="mb-1">{line}</p>
+                                            {/each}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {#if order?.transactionid && order?.transdetails}
+                                <div class="bg-white p-4 rounded-md shadow border">
+                                    <h4 class="text-heading font-bold mb-3 text-sm">Transaction Details</h4>
+                                    <div class="mb-3">
+                                        <span class={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center gap-1 ${getTransactionStatusClass(order.transdetails.status)}`}>
+                                            <Icon icon={getTransactionStatusIcon(order.transdetails.status)} width="16" height="16" />
+                                            {order.transdetails.status.charAt(0).toUpperCase() + order.transdetails.status.slice(1)}
+                                        </span>
+                                        {#if order.transdetails.error_Message}
+                                            <p class="text-xs text-red-600 mt-2">{order.transdetails.error_Message}</p>
+                                        {/if}
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <div>
+                                            <p class="text-gray-600">Payment ID</p>
+                                            <p class="font-medium break-words">{order.transdetails.mihpayid || 'N/A'}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-600">Bank Reference</p>
+                                            <p class="font-medium break-words">{order.transdetails.bank_ref_num || 'N/A'}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-600">Payment Mode</p>
+                                            <p class="font-medium">{order.transdetails.mode || order.transdetails.payment_source || 'N/A'}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-600">Amount</p>
+                                            <p class="font-medium">{formatCurrency(order.transdetails.amount, order.currency)}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-600">Transaction Date</p>
+                                            <p class="font-medium">{order.transdetails.addedon || 'N/A'}</p>
+                                        </div>
+                                        {#if order.transdetails.status === 'success'}
+                                            <div>
+                                                <p class="text-gray-600">Net Amount Debited</p>
+                                                <p class="font-medium">{formatCurrency(order.transdetails.net_amount_debit, order.currency)}</p>
+                                            </div>
+                                        {/if}
+                                    </div>
+                                </div>
+                            {/if}
+                            <div class="text-right pt-2">
+                                <button 
+                                    on:click|stopPropagation={() => downloadAsExcel(order)} 
+                                    class="bg-white text-heading px-3 py-1 border rounded-md shadow text-xs hover:text-white hover:bg-green-700 transition-all inline-flex items-center gap-1">
+                                    <Icon icon="mdi:file-excel" width="16" height="16" />
+                                    Download as Excel
+                                </button>
+                            </div>
+                        </div>
+                    {/if}
+                </div>
+            {/each}
+        {/if}
+    </div>
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     {#if totalPages > 1}
     <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-around border bg-white shadow-sm px-4 py-4 rounded-b-md md:mt-1 m-1 md:m-0"
@@ -807,5 +1010,5 @@ function downloadAsExcel(order) {
         </div>
        </div> 
      {/if}  
-       <Toaster position="bottom-right" richColors />
+    <Toaster position="bottom-right" richColors />
 </div>
