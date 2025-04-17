@@ -7,12 +7,13 @@
   import { cartState } from "$lib/stores/cartStores.js";
   import Bulkupload from "./Bulkupload.svelte";
   import { toast } from "svelte-sonner";
+  import {addItemToCart} from "$lib/stores/cart.js"
   import { PUBLIC_IMAGE_URL } from "$env/static/public";
   let uploadedRows = [];
   let showSavedCarts = false;
   // console.log(currencyState, "currencyState");
   export let data;
-  console.log(data, "i am data");
+  // console.log(data, "i am data");
 
   let cartPopupItems;
   let checking = false;
@@ -151,7 +152,7 @@
     }
   }
   function filterProducts(query, index) {
-    console.log(index, "roo");
+    // console.log(index, "roo");
 
     if (!Array.isArray(products) || !query) {
       return [];
@@ -849,7 +850,12 @@ const enhanceForm = (index) => {
       toast.success(`Product added to the cart`);
     }
 
+    // localStorage.setItem("cart", JSON.stringify(currentCart));
     localStorage.setItem("cart", JSON.stringify(currentCart));
+    localStorage.setItem("totalCompsChemi", currentCart.length);
+    // toast.success(`Product added to the cart`);
+syncLocalStorageToStore();
+addItemToCart(currentCart)
     cartRowIndexToBeCleared = currentIndex;
     showCartPopupdetails(cartItem);
 
@@ -926,7 +932,7 @@ const enhanceForm = (index) => {
           productName: validProduct.productName,
           productNumber: validProduct.productNumber,
           manufacturerId: validProduct.manufacturer,
-          distributerId: validProduct.distributer,
+          distributorId: validProduct.distributer,
           stockId: validProduct.stockId,
           stock: validProduct.stock,
           productId: validProduct.id,
@@ -1030,17 +1036,21 @@ const enhanceForm = (index) => {
           cartItem.manufacturerId === item.manufacturerId,
       );
 
-      if (existingItemIndex > -1) {
-        // Add the new quantity to the existing quantity
-        currentCart[existingItemIndex].quantity += item.quantity;
-        currentCart[existingItemIndex].backOrder += item.backOrder;
-      } else {
+      // if (existingItemIndex > -1) {
+      //   // Add the new quantity to the existing quantity
+      //   currentCart[existingItemIndex].quantity += item.quantity;
+      //   currentCart[existingItemIndex].backOrder += item.backOrder;
+      // } else {
         currentCart.push(simplifiedItem);
-      }
+      // }
     }
 
+    
     localStorage.setItem("cart", JSON.stringify(currentCart));
+    localStorage.setItem("totalCompsChemi", currentCart.length);
     toast.success(`Product added to the cart`);
+syncLocalStorageToStore();
+addItemToCart(currentCart)
 
     if (typeof showCartPopup === "function") {
       showCartPopup(cartItems);
@@ -1058,10 +1068,10 @@ const enhanceForm = (index) => {
   function handleManualEntriesSubmit() {
     cartloading = true;
     const cartItems = prepareManualEntriesToCart();
-    if (cartItems.length === 0) {
-      cartloading = false;
-      return;
-    }
+    // if (cartItems.length === 0) {
+    //   cartloading = false;
+    //   return;
+    // }
     if (manualEntriesForm) {
       const input = manualEntriesForm.querySelector('input[name="cartItems"]');
       input.value = JSON.stringify(cartItems);
@@ -1229,7 +1239,7 @@ const enhanceForm = (index) => {
                       <!-- svelte-ignore a11y-click-events-have-key-events -->
                       <!-- svelte-ignore a11y-no-static-element-interactions -->
                       <div
-                        class="p-4 border-b border-gray-300 last:border-b-0 hover:bg-primary-100 cursor-pointer"
+                        class="p-4 border-b border-gray-300 last:border-b-0 hover:bg-primary-100 cursor-pointer text-sm"
                         on:click={() => {
                           if (
                             result.pricing?.length > 0 &&

@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
-import { uploadFile, quicksearch, quickcheck, addToCart, CreateProductQuote,bulkUploadToCart } from '$lib/server/mongoActions';
+import { uploadFile, quicksearch, quickcheck, addToCart, CreateProductQuote, bulkUploadToCart } from '$lib/server/mongoActions';
 import { error, fail } from '@sveltejs/kit';
 import { nanoid } from 'nanoid';
 import Profile from '$lib/server/models/Profile.js';
@@ -10,33 +10,33 @@ import { APP_URL } from '$env/static/private';
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import sendemail from '$lib/data/sendemail.json';
 import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
-import {getCart} from '$lib/server/mongoLoads.js'
+import { getCart } from '$lib/server/mongoLoads.js'
 function parseProductQuery(query) {
   let inputStr = query.trim();
   let productNumber, size;
-  
+
   // Various patterns for different types of product number and size combinations
   const spaceHyphenPattern = /^(.*?)\s+-\s+(.+)$/;
   const spaceHyphenMatch = inputStr.match(spaceHyphenPattern);
-  
+
   const complexSizePattern = /^([A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)*)-(\d+(?:-[A-Za-z\u00B0-\u9FFF]+)(?:-\d+)?)$/;
   const complexSizeMatch = inputStr.match(complexSizePattern);
-  
+
   // Pattern for measurements including Unicode characters like μL, μg
   const measurementPattern = /^(.*?)-(\d+[-]?[A-Za-z\u00B0-\u9FFF]+)$/;
   const measurementMatch = inputStr.match(measurementPattern);
-  
+
   // Specific pattern for micro units
   const unicodeUnitPattern = /^(.*?)-(\d+[-]?[μ][A-Za-z]+)$/;
   const unicodeUnitMatch = inputStr.match(unicodeUnitPattern);
-  
+
   // Patterns for quantity descriptions (each, case, pack)
   const quantityPatterns = [
     /^(.*?)[-\s]+(each\s*(?:of)?\s*[-\s]*\d+|each[-\s]*of[-\s]*\d+|\d+\s*(?:each|pcs|units|items))$/i,
     /^(.*?)[-\s]+(case\s*(?:of)?\s*[-\s]*\d+|case[-\s]*of[-\s]*\d+|\d+\s*(?:case|pcs|units|items))$/i,
     /^(.*?)[-\s]+(pack\s*(?:of)?\s*[-\s]*\d+|pack[-\s]*of[-\s]*\d+|\d+\s*(?:pack|pcs|units|items))$/i
   ];
-  
+
   let eachMatch = null;
   for (const pattern of quantityPatterns) {
     const match = inputStr.match(pattern);
@@ -45,7 +45,7 @@ function parseProductQuery(query) {
       break;
     }
   }
-  
+
   // Apply patterns in order to determine product number and size
   if (unicodeUnitMatch) {
     productNumber = unicodeUnitMatch[1].trim();
@@ -73,15 +73,15 @@ function parseProductQuery(query) {
       size = "";
     }
   }
-  
+
   // Final cleanup for size with quantity
   const sizeWithQuantityPattern = /^(.*?)(\d+)$/;
   const sizeWithQuantityMatch = size.match(sizeWithQuantityPattern);
-  
+
   if (sizeWithQuantityMatch) {
     size = sizeWithQuantityMatch[1].trim();
   }
-  
+
   return {
     productNumber,
     size
@@ -114,90 +114,25 @@ export const actions = {
     }
   },
 
-  // quicksearch: async ({ request }) => {
-  //   const data = Object.fromEntries(await request.formData());
-  //   const { quickSearch } = data;
 
-  //   if (quickSearch && quickSearch.length >= 0) {
-  //     try {
-  //       const results = await quicksearch({ query: quickSearch });
-  //       const processedResults = results.map(product => {
-  //         let processedPricing = [];
-  //         if (product.pricing && Array.isArray(product.pricing)) {
-  //           processedPricing = product.pricing.map(item => {
-  //             const processedItem = { ...item };
-
-  //             if (item.INR) {
-  //               processedItem.inr = item.INR;
-  //             }
-  //             if (item.usd) {
-  //               processedItem.usd = item.usd;
-  //             } else if (item.USD) {
-  //               processedItem.usd = item.USD;
-  //             }
-
-  //             return {
-  //               break: item.break || 'N/A',
-  //               usd: item.usd || item.USD || 'N/A',
-  //               inr: item.inr || item.INR || 'N/A',
-  //               offer: item.offer || '0'
-  //             };
-  //           });
-  //         }
-
-
-  //         return {
-  //           id: product.id,
-  //           image: product.image,
-  //           description: product.description,
-  //           productName: product.productName,
-  //           productNumber: product.productNumber,
-  //           stockId: product.stockId,
-  //           manufacturer: product.manufacturer,
-  //           distributer: product.distributer,
-  //           stock: product.stock || 0,
-  //           pricing: processedPricing,
-  //           priceone: product.priceone || (processedPricing[0]?.inr || processedPricing[0]?.INR || ''),
-  //         };
-  //       });
-
-  //       //  console.log(processedResults,"processedResults");
-  //       //  console.log(processedResults.length,"length");
-
-
-
-  //       return processedResults;
-  //     } catch (error) {
-  //       console.error('Error in quicksearch action:', error);
-  //       return { error: 'An error occurred while fetching search results.' };
-  //     }
-  //   } else {
-  //     console.log('Search query is invalid:', quickSearch);
-  //     return { error: 'Search query must be at least 2 characters.' };
-  //   }
-  // },
- 
   quicksearch: async ({ request }) => {
     const data = Object.fromEntries(await request.formData());
     const { quickSearch } = data;
-  
+
     if (quickSearch && quickSearch.length >= 0) {
       try {
-        // Parse the product number and size from the search query
         const parsedQuery = parseProductQuery(quickSearch);
         console.log("Original Query:", quickSearch);
         console.log("Parsed Product Number:", parsedQuery.productNumber);
         console.log("Parsed Size:", parsedQuery.size);
-        
-        // Call the original quicksearch function with the parsed product number
         const results = await quicksearch({ query: parsedQuery.productNumber });
-        
+
         const processedResults = results.map(product => {
           let processedPricing = [];
           if (product.pricing && Array.isArray(product.pricing)) {
             processedPricing = product.pricing.map(item => {
               const processedItem = { ...item };
-  
+
               if (item.INR) {
                 processedItem.inr = item.INR;
               }
@@ -206,7 +141,7 @@ export const actions = {
               } else if (item.USD) {
                 processedItem.usd = item.USD;
               }
-  
+
               return {
                 break: item.break || 'N/A',
                 usd: item.usd || item.USD || 'N/A',
@@ -215,15 +150,14 @@ export const actions = {
               };
             });
           }
-  
-          // Calculate relevance if size is provided
+
           let relevance = 1;
           if (parsedQuery.size && product.size) {
             const productSizeLower = product.size.toLowerCase();
             const parsedSizeLower = parsedQuery.size.toLowerCase();
             relevance = productSizeLower.includes(parsedSizeLower) ? 2 : 0.5;
           }
-  
+
           return {
             id: product.id,
             image: product.image,
@@ -241,12 +175,10 @@ export const actions = {
             relevance: relevance
           };
         });
-  
-        // Sort by relevance if a size was specified
         if (parsedQuery.size) {
           processedResults.sort((a, b) => b.relevance - a.relevance);
         }
-  
+
         return processedResults;
       } catch (error) {
         console.error('Error in quicksearch action:', error);
@@ -257,11 +189,11 @@ export const actions = {
       return { error: 'Search query must be at least 2 characters.' };
     }
   },
-  
+
   uploadFile: async ({ request }) => {
     try {
       const data = await request.formData();
-      console.log(data, "upload file");
+
 
       const file = data.get('file');
       if (!file || file.size === 0) {
@@ -322,23 +254,18 @@ export const actions = {
 
   addToCart: async ({ request, locals }) => {
     try {
-      console.log('Received request:', request);
       const formData = await request.formData();
-      console.log('Form Data:', formData);
 
       const cartItems = JSON.parse(formData.get('cartItems')) || JSON.parse(formData.get('manualEntries'));
-      console.log('Parsed Cart Items:', cartItems);
 
       if (!locals.user) {
         console.error('User not authenticated');
         return fail(401, { message: 'User not authenticated' });
       }
-      console.log("user Details", locals.user);
 
       const userId = locals.user.userId;
       const userEmail = locals.user.email;
-      console.log('User ID:', userId, 'User Email:', userEmail);
-       const daaa = await bulkUploadToCart(cartItems, userId, userEmail)
+      const daaa = await bulkUploadToCart(cartItems, userId, userEmail)
       // Process each cart item
       // for (const item of cartItems) {
       //   // console.log('Processing item:', item);
@@ -362,21 +289,17 @@ export const actions = {
       //     return fail(400, { message: result.message });
       //   }
       // }
-
-      console.log(`${cartItems.length} item(s) added to cart successfully`);
       return {
         success: true,
         message: `${cartItems.length} item(s) added to cart successfully`
       };
     } catch (err) {
-      console.error('Error adding to cart:', err);
       return fail(500, { message: 'Failed to add items to cart' });
     }
   },
   createQuote: async ({ request }) => {
     try {
       const data = Object.fromEntries(await request.formData());
-      console.log("quote data in server js", data);
       async function getClientIP() {
         const response = await fetch('https://api.ipify.org?format=json');
         const data = await response.json();
@@ -410,7 +333,6 @@ export const actions = {
         console.error('Error sending notification email to the team:', error);
       }
 
-      // Send confirmation email to the user (customer)
       const userEmailContent = sendemail.emailTemplatequoteuser
         .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
         .replaceAll('{{APP_URL}}', APP_URL)
@@ -418,7 +340,7 @@ export const actions = {
         .replaceAll('{{productNumber}}', data.productNumber || '')
         .replaceAll('{{units}}', data.units || '')
         .replaceAll('{{Firstname}}', data.Firstname || '')
-        .replaceAll('{{Lastname}}', data.lastname|| '')
+        .replaceAll('{{Lastname}}', data.lastname || '')
         .replaceAll('{{organisation}}', data.organisation || '')
         .replaceAll('{{email}}', data.email || '')
         .replaceAll('{{phone}}', data.phone || '')
@@ -543,14 +465,10 @@ export const actions = {
           isEmailVerified: false
         };
       }
-
-      //   console.log(`Verifying OTP for email: ${email}`);
       const verificationResult = await verifyemailOtp(email, enteredOtp);
 
-      //   console.log(verificationResult, "verificationResult");
 
       if (!verificationResult.success) {
-        // console.log("OTP verification failed:", verificationResult.message);
         return {
           status: 500,
           message: verificationResult.message,
@@ -592,11 +510,11 @@ export const load = async ({ locals }) => {
   const authedUser = { id: locals.user.userId };
   const userProfile = await Profile.findOne({ userId: authedUser.id });
   const cart = await getCart(authedUser.id)
-  console.log(authedUser,"userProile");
+  console.log(authedUser, "userProile");
 
 
   if (!userProfile) {
     return null;
   }
-  return JSON.parse(JSON.stringify({ profile: userProfile,cart }));
+  return JSON.parse(JSON.stringify({ profile: userProfile, cart }));
 };

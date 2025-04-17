@@ -555,13 +555,16 @@
   }
   if(!isLoggedIn){
     localStorage.setItem("cart",JSON.stringify(productsToAdd))
-    goto("/cart")
+    // goto("/cart")
+     setTimeout(() => {
+      window.location.href = "/cart";
+    }, 2000);
   } 
   return productsToAdd;
 }
   function attemptAddToCart() {
     if (!isValidated || duplicateEntries.length > 0) {
-      // validateAndSubmitData();
+
       submitFileData();
       return;
     }
@@ -607,61 +610,7 @@
       }
     }
   }
-  // function handleLocalStorage() {
-  //   try {
-  //     cartloading = true;
-  //     const productsToAdd = prepareValidatedProductsForCart();
-  //     const simplifiedCartItems = productsToAdd.map((item) => ({
-  //       productId: item.id,
-  //       productName:item.productName,
-  //       manufacturerId: item.manufacturerId,
-  //       stockId: item.stockId,
-  //       distributorId: item.distributerId,
-  //       quantity: item.quantity || 1,
-  //       backOrder: item.backOrder,
-  //     }));
 
-  //     if (productsToAdd.length === 0) {
-  //       cartloading = false;
-  //       toast.error("No valid items to add to cart");
-  //       return;
-  //     }
-
-  //     const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
-  //     const updatedCart = [...existingCart];
-  //     simplifiedCartItems.forEach((newItem) => {
-  //       const existingItemIndex = updatedCart.findIndex(
-  //         (cartItem) =>
-  //           cartItem.productId === newItem.productId &&
-  //           cartItem.stockId === newItem.stockId &&
-  //           cartItem.manufacturerId === newItem.manufacturerId,
-  //       );
-
-  //       if (existingItemIndex !== -1) {
-  //         updatedCart[existingItemIndex].quantity += newItem.quantity;
-  //         updatedCart[existingItemIndex].backOrder += newItem.backOrder;
-  //       } else {
-  //         updatedCart.push(newItem);
-  //       }
-  //     });
-
-  //     localStorage.setItem("cart", JSON.stringify(updatedCart));
-
-  //     const productsAddedCount = productsToAdd.length;
-  //     toast.success(
-  //       `${productsAddedCount} valid ${productsAddedCount === 1 ? "item" : "items"} saved to cart.`,
-  //     );
-
-  //     cartloading = false;
-  //     setTimeout(() => {
-  //       window.location.href = "/cart";
-  //     }, 2000);
-  //   } catch (err) {
-  //     cartloading = false;
-  //     console.error("Error saving to localStorage:", err);
-  //     toast.error("Failed to save items to cart");
-  //   }
-  // }
   function handleLocalStorage() {
   try {
     cartloading = true;
@@ -674,7 +623,6 @@
     }
     
     const simplifiedCartItems = productsToAdd.map((item) => {
-      // Verify all required fields exist before mapping
       if (!item.productId || !item.manufacturerId || !item.stockId) {
         console.error("Error: Missing required fields for cart item:", item);
         return null;
@@ -715,7 +663,7 @@
       }
     });
 
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    // localStorage.setItem("cart", JSON.stringify(updatedCart));
 
     const productsAddedCount = simplifiedCartItems.length;
     toast.success(
@@ -1245,7 +1193,10 @@ Example file content:
           localStorage.setItem("cart",JSON.stringify(productsToAdd))
           guestCart.set(productsToAdd)
           console.log('is kmdk  ej k');
-          goto("/cart")
+          // goto("/cart")
+           setTimeout(() => {
+      window.location.href = "/cart";
+    }, 2000);
           cancel()
         }
         formData.set("cartItems", JSON.stringify(productsToAdd));
@@ -1261,10 +1212,10 @@ Example file content:
               toast.success(
                 `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`,
               );
-              goto("/cart")
-              // setTimeout(() => {
-              //   window.location.href = "/cart";
-              // }, 2000);
+              // goto("/cart")
+              setTimeout(() => {
+                window.location.href = "/cart";
+              }, 2000);
             } else {
               throw new Error(resultData[1] || "Failed to add items to cart");
             }

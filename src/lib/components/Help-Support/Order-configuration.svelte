@@ -109,8 +109,9 @@
 				delete errors.accountNumber;
 			}
 		}
+
 		if (!fieldName || fieldName === "companyName") {
-			if (!companyName || !/^[a-zA-Z0-9@*()#$]+$/.test(companyName)) {
+			if (!companyName || !/^[A-Za-z0-9@.,\s&-]+$/.test(companyName)) {
 				errors.companyName = "Please enter a valid Company name ";
 			} else {
 				delete errors.companyName;
@@ -988,11 +989,15 @@
 										"",
 									);
 									firstName = e.target.value;
-
 									validateField("firstName");
+									errors.firstName = !firstName
+										? "*Required"
+										: !/^[A-Za-z\s]+$/.test(firstName)
+											? "Please enter a valid last name"
+											: "";
 								}}
 							/>
-							{#if errors.firstName}
+							{#if errors?.firstName}
 								<p class="text-red-500 text-xs mt-1">
 									{errors.firstName}
 								</p>
@@ -1015,11 +1020,15 @@
 										"",
 									);
 									lastName = e.target.value;
-
 									validateField("lastName");
+									errors.lastname = !lastName
+										? "*Required"
+										: !/^[A-Za-z]+$/.test(lastName)
+											? "Please enter a valid last name"
+											: "";
 								}}
 							/>
-							{#if errors.lastName}
+							{#if errors?.lastName}
 								<p class="text-red-500 text-xs mt-1">
 									{errors.lastName}
 								</p>
@@ -1042,11 +1051,21 @@
 										"",
 									);
 									email = e.target.value;
-
+									email = email.trim();
 									validateField("email");
+									errors.email = !email
+										? "*Required"
+										: !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+													email,
+											  ) ||
+											  email
+													.split("@")[1]
+													.includes("gamil")
+											? "Please enter a valid email address"
+											: "";
 								}}
 							/>
-							{#if errors.email}
+							{#if errors?.email}
 								<p class="text-red-500 text-xs mt-1">
 									{errors.email}
 								</p>
@@ -1079,18 +1098,22 @@
 								bind:value={companyName}
 								class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 								required
-								on:input={() => validateField("companyName")}
-								on:input={(e) => {
-									e.target.value = e.target.value.replace(
-										/^\s+/,
-										"",
-									);
-									companyName = e.target.value;
 
-									validateField("companyName");
-								}}
+
+								                            on:input={(e) => {
+																e.target.value = e.target.value.replace(/^\s+/, '');
+																companyName = e.target.value;
+															   validateField("companyName");
+															   errors.company = !companyName
+																   ? "*Required"
+																   : !/^[A-Za-z0-9@.,!#$%^&*(_)+-\s]+$/.test(
+																	companyName,
+																	   )
+																	 ? "Please enter a valid company name"
+																	 : "";
+														   }}
 							/>
-							{#if errors.companyName}
+							{#if errors?.companyName}
 								<p class="text-red-500 text-xs mt-1">
 									{errors.companyName}
 								</p>
