@@ -9,7 +9,7 @@
   const productDetails = products.map((product) => ({
     id: product._id,
     productName: product.productName,
-    imageSrc: product.imageSrc,
+    image : product.image
   }));
 
   const shipmentdetails = shipments.map((shipment, index) => ({
@@ -26,7 +26,7 @@
         return {
           ...detail,
           productName: product.productName,
-          imgSrc: product.imageSrc,
+          image : product.image
         };
       }
       return detail;
@@ -45,7 +45,7 @@
     }
     return date.toLocaleDateString("en-US", options);
   }
-  // console.log("shipmenet ---->",shipmentdetails);
+  console.log("shipmenettt ---->",shipmentdetails);
 
   function priceShowing(price, currency) {
     if (price === undefined || price === null || price === 0) {
@@ -82,9 +82,9 @@
       {#each shipment.shipDetails as item}
         <div class="rounded-lg mb-5 bg-white">
           <div
-            class="flex justify-between items-center px-4 py-2 bg-white rounded-md shadow"
+            class="grid grid-cols-1 sm:grid-cols-4 gap-4 justify-between items-center px-4 py-2 rounded-md shadow"
           >
-            <div class="flex gap-3">
+            <div class="flex gap-3 col-span-3 sm:col-span-2">
               <div>
                   <!-- svelte-ignore a11y-missing-attribute -->
             <img  
@@ -92,7 +92,7 @@
             onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
             class="w-16 rounded-lg" />
               </div>
-              <div class="flex flex-col">
+              <div class="flex flex-col justify-center">
                 <p class="text-gray-600 text-sm font-semibold">
                   {item.productName || "--"}
                 </p>
@@ -100,11 +100,16 @@
                   Qty : <span class="text-gray-700">{item.quantity || "-"}</span
                   >
                 </p>
-                <p class="font-medium text-sm text-gray-700">
-                  {priceShowing(item.price, currencyType)}
-                </p>
               </div>
             </div>
+
+            <div>
+              <p class="font-medium text-sm text-gray-600">unit price</p>
+              <p class="font-medium text-sm text-gray-700">
+                {priceShowing(item.price, currencyType)}
+              </p>
+            </div>
+
             <div class="flex flex-col">
               <div class="flex gap-2 justify-end">
                 {#if shipment.status === "Delivered"}
@@ -118,7 +123,7 @@
                       Delivered
                     </h3>
                   </div>
-                {:else if shipment.status === "Shipped"}
+                {:else if shipment.status === "Dispatched from Bengaluru"}
                   <div class="flex gap-2">
                     <Icon
                       icon="iconoir:delivery-truck"
@@ -126,7 +131,7 @@
                     />
                     <h3 class="font-semibold text-sm text-gray-500">Shipped</h3>
                   </div>
-                {:else if shipment.status === "Pending"}
+                {:else if ( shipment.status === "Order Loaded") || (shipment.status === "Picked up from warehouse")}
                   <div class="flex gap-2">
                     <Icon
                       icon="mingcute:time-duration-line"

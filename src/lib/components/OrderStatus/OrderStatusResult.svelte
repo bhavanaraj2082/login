@@ -23,13 +23,13 @@
     id: product._id,
     productName: product.productName,
     // prodDesc: product.prodDesc,
-    imgSrc: product.imageSrc,
+    image : product.image
   }));
 
   const shippedDetails = shipedProducts
     .filter(
       (shipment) =>
-        shipment.status === "Shipped" || shipment.status === "Delivered"
+        shipment.status === "Dispatched from Bengaluru" || shipment.status === "Delivered"
     )
     .map((shipment) => {
       return shipment.shipDetails.map((detail) => {
@@ -49,6 +49,12 @@
     })
     .flat();
 
+    let showCancelButton = true;
+
+    if(shippedDetails?.length >= 1){
+      showCancelButton = false
+    }
+
   const orderedproduct = orderDetails.map((order) => {
     const product = productDetails.find(
       (product) => product.id === order.productId
@@ -58,7 +64,7 @@
       ...(product && {
         productName: product.productName,
         // prodDesc: product.prodDesc,
-        imgSrc: product.imgSrc,
+        image : product.image
       }),
     };
   });
@@ -77,7 +83,7 @@
 
       if (remainingQty > 0) {
         return {
-          imgSrc: product.imgSrc,
+          image : product.image,
           productName: product.productName,
           unitPrice: product.unitPrice,
           productId: product.productId,
@@ -87,6 +93,8 @@
       return null;
     })
     .filter((item) => item !== null);
+
+    console.log("--------------remainingProducts",remainingProducts);
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -153,8 +161,8 @@
         >
           Items Order and Order Details
         </h2>
-        {#if user === email}
-          {#if orderStatus == "pending"}
+        {#if (user === email) && (showCancelButton === true) }
+          {#if orderStatus === "pending"}
             <div>
               <button
                 on:click={showCancelConfirmation}
@@ -163,7 +171,7 @@
               </button>
             </div>
           {/if}
-          {#if orderStatus == "pending cancellation"}
+          {#if orderStatus === "pending cancellation"}
             <div class="my-2">
               <p class="text-red-500 text-sm md:text-lg font-semibold">
                 Order Cancel Request Submited!
@@ -183,7 +191,7 @@
             <div class="flex justify-end mt-4">
               <button
                 on:click={hideCancelPopup}
-                class="mr-2 bg-gray-300 text-white rounded px-4 py-2" >
+                class="mr-2 bg-gray-200 text-gray-800 hover:bg-gray-300 rounded px-4 py-2" >
                 Close
               </button>
               <div>
@@ -198,7 +206,7 @@
                     value="pending cancellation"/>
                   <button
                     type="submit"
-                    class="bg-red-500 text-white rounded px-4 py-2" >
+                    class="bg-red-500 text-white hover:bg-red-600 rounded px-4 py-2" >
                     Yes, cancel
                   </button>
                 </form>
