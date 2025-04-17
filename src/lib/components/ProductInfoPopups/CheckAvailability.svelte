@@ -99,7 +99,11 @@
             aria-label="Quantity"
             max="999"
           />
-          <input type="hidden" name="ProductId" value={product.productNumber} />
+          <input
+            type="hidden"
+            name="stockId"
+            value={product?.priceSize[index]?.pricingStockId}
+          />
           <button
             on:click={increaseQuantity}
             class="w-8 h-8 text-primary-400 flex items-center justify-center"
@@ -123,7 +127,11 @@
           }}
         >
           <input type="hidden" name="quantity" value={$quantity} />
-          <input type="hidden" name="ProductId" value={product.productNumber} />
+          <input
+            type="hidden"
+            name="stockId"
+            value={product?.priceSize[index]?.pricingStockId}
+          />
           <button
             type="submit"
             class="bg-primary-400 text-white p-2 rounded flex items-center space-x-1 {$quantity <

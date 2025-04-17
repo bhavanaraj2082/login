@@ -1118,7 +1118,6 @@ export async function DifferentProds(productId) {
     throw new Error("Product not found");
   }
 
-  const partNumber = product.productNumber;
   const productid = product._id; 
 
   let stockQuantity = 0;
@@ -1130,15 +1129,18 @@ export async function DifferentProds(productId) {
   let stock = 0;
   let distributorId = "";
   let sku = [];
+  let pricingStockId = "";
 
   if (productid) {
-    const stockRecords = await Stock.find({ productid }).exec(); 
+    const stockRecords = await Stock.find({ productid }).exec();
+
     if (stockRecords.length > 0) {
       for (const stockRecord of stockRecords) {
         if (typeof stockRecord.stock !== "undefined") {
           stockQuantity = stockRecord.stock;
           orderMultiple = stockRecord.orderMultiple;
           orderedQty = stockRecord.orderedQty;
+          pricingStockId = stockRecord._id.toString();
           availableStock = stockQuantity - orderedQty;
           if (stockRecord.sku) {
             sku.push(stockRecord.sku);
@@ -1151,6 +1153,8 @@ export async function DifferentProds(productId) {
             offer: offer || undefined,
             USD: 0,
             INR: 0,
+            stockQuantity: availableStock,
+            pricingStockId: pricingStockId,
           };
 
           if (currencies.INR && !currencies.USD) {

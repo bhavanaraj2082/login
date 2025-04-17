@@ -98,7 +98,7 @@
         <span class="flex justify-between items-center">
           <!-- <p class="text-heading font-semibold md:text-sm text-xs whitespace-nowrap">Availability :</p> -->
           <p class="md:text-sm text-xs whitespace-nowrap font-medium">
-            {#if product?.stockQuantity > 0}
+            {#if product?.priceSize[index]?.stockQuantity > 0}
               In Stock <Icon
                 icon="ix:success-filled"
                 class="text-base text-green-500 inline font-bold"
@@ -298,5 +298,11 @@
   </div>
 {/each}
 {#if showCartPopup}
-  <ShowCartPopup {data} {cartTogglePopup} {addedQuantity} {index} {showCartPopup} />
+  <ShowCartPopup
+    {data}
+    {cartTogglePopup}
+    {addedQuantity}
+    {index}
+    {showCartPopup}
+  />
 {/if}

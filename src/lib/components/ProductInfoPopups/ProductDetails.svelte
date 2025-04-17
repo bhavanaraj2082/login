@@ -15,7 +15,7 @@
   import LikedPopup from "./LikedPopup.svelte";
   import { toast, Toaster } from "svelte-sonner";
   import AboutTheItem from "./AboutTheItem.svelte";
-	import { isFavoriteStore } from "$lib/stores/favorites.js";
+  import { isFavoriteStore } from "$lib/stores/favorites.js";
 
   export let data;
   export let isauthedUser;
@@ -133,7 +133,7 @@
   }
 
   function toggleLike() {
-    isFavoriteStore.update(n => !n);  
+    isFavoriteStore.update((n) => !n);
   }
 
   $: {
@@ -399,11 +399,6 @@
                   name="quantity"
                   value={product?.orderMultiple || 1}
                 />
-                <input
-                  type="hidden"
-                  name="stock"
-                  value={product?.stockQuantity}
-                />
                 {#if authedEmail}
                   <button class="mt-0.5" type="submit" on:click={toggleLike}>
                     <Icon
@@ -515,81 +510,108 @@
             <h4 class="bg-white text-heading font-bold text-left uppercase">
               Select a Size
             </h4>
-            <div
-              class="grid grid-cols-[1fr_2fr_1fr_1fr] gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm sm:font-semibold font-medium text-gray-700 text-left border-b border-gray-300"
+            <table
+              class="w-full mt-2 text-xs sm:text-sm font-medium text-left text-gray-700 border-separate border-spacing-y-2"
             >
-              <div class="px-1 pl-0 py-2 whitespace-nowrap">Pack Size</div>
-              <div class="px-1 py-2">SKU</div>
-              <div class="px-1 py-2">Availability</div>
-              <div class="py-2 px-1">Price</div>
-            </div>
-            {#each product?.priceSize as priceItem, i}
-              <div class="w-full mt-2">
-                <button
-                  type="button"
-                  class={`w-full grid grid-cols-[1fr_2fr_1fr_1fr] gap-2 md:gap-4 lg:gap-6 text-xs sm:text-sm text-gray-600 cursor-pointer transition-transform border border-gray-100 rounded-sm ${index === i ? "border md:border-l-6 lg:border bg-primary-100 border-gray-200" : "border-none"}`}
-                  on:click={() => handleThumbnailClick(i, product)}
-                >
-                  <div class="px-1 py-2 pl-1 text-left">
-                    {priceItem?.break}
-                  </div>
-
-                  <div class="px-1 py-2 text-left relative">
-                    {#if copyToastIndex === i}
-                      <div
-                        class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-500 text-white py-1 px-2 rounded text-xs"
-                      >
-                        Copied!
-                      </div>
-                    {/if}
-
-                    {#if product?.sku[i]}
-                      <!-- svelte-ignore a11y-click-events-have-key-events -->
-                      <!-- svelte-ignore a11y-no-static-element-interactions -->
-                      <span
-                        on:click={() => {
-                          handleThumbnailClick(i, product);
-                          copyProductNumber(product.sku[i], i);
-                        }}
-                        class="hover:bg-blue-200 p-0.5 cursor-pointer rounded-sm block sm:inline break-all"
-                      >
-                        {product.sku[i]}
-                      </span>
-                    {/if}
-                  </div>
-                  <div class="px-1 py-2 text-left">
-                    {#if product?.stockQuantity > 0}
-                      In Stock
-                      <Icon
-                        icon="ix:success-filled"
-                        class="text-base text-green-500 inline font-bold mb-1"
-                      />
-                    {:else}
-                      <Icon
-                        icon="ix:error-filled"
-                        class="text-base text-red-500 font-bold inline mb-1"
-                      />
-                      Out of stock
-                    {/if}
-                  </div>
-                  <div
-                    class="px-1.5 py-2 text-left whitespace-nowrap overflow-hidden"
+              <thead>
+                <tr class="text-sm sm:font-semibold">
+                  <th
+                    class="px-1 pl-0 py-2 whitespace-nowrap border-b border-gray-300"
+                    >Pack Size</th
                   >
-                    {#if $currencyState === "usd"}
-                      $ {(Number(priceItem.USD) || 0).toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    {:else}
-                      ₹ {(Number(priceItem.INR) || 0).toLocaleString("en-IN", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    {/if}
-                  </div>
-                </button>
-              </div>
-            {/each}
+                  <th class="px-1 py-2 border-b border-gray-300">SKU</th>
+                  <th class="px-1 py-2 border-b border-gray-300"
+                    >Availability</th
+                  >
+                  <th class="py-2 px-1 border-b border-gray-300">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each product?.priceSize as priceItem, i}
+                  <tr
+                    class={`rounded border border-gray-100 transition-transform cursor-pointer ${
+                      index === i
+                        ? "border md:border-l-6 lg:border bg-primary-100 border-gray-200"
+                        : "border-none"
+                    }`}
+                    on:click={() => handleThumbnailClick(i, product)}
+                  >
+                    <!-- Pack Size -->
+                    <td
+                      class="px-1 py-2 pl-1 text-gray-600 font-normal text-left rounded-l-sm"
+                    >
+                      {priceItem?.break}
+                    </td>
+
+                    <!-- SKU with copy toast -->
+                    <td
+                      class="px-1 py-2 text-left text-gray-600 font-normal relative"
+                    >
+                      {#if copyToastIndex === i}
+                        <div
+                          class="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-500 text-white py-1 px-2 rounded text-xs"
+                        >
+                          Copied!
+                        </div>
+                      {/if}
+                      <!-- svelte-ignore a11y-no-static-element-interactions -->
+                      {#if product?.sku[i]}
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <span
+                          on:click={() => {
+                            handleThumbnailClick(i, product);
+                            copyProductNumber(product.sku[i], i);
+                          }}
+                          class="hover:bg-blue-200 p-0.5 cursor-pointer rounded-sm block sm:inline break-all"
+                        >
+                          {product.sku[i]}
+                        </span>
+                      {/if}
+                    </td>
+
+                    <!-- Availability -->
+                    <td class="px-1 py-2 text-left text-gray-600 font-normal">
+                      {#if priceItem?.stockQuantity > 0}
+                        <Icon
+                          icon="ix:success-filled"
+                          class="text-base text-green-500 inline font-bold mb-1"
+                        />
+                        In Stock
+                      {:else}
+                        <Icon
+                          icon="ix:error-filled"
+                          class="text-base text-red-500 font-bold inline mb-1"
+                        />
+                        Out of stock
+                      {/if}
+                    </td>
+
+                    <!-- Price -->
+                    <td
+                      class="px-1.5 py-2 text-left text-gray-600 font-normal whitespace-nowrap overflow-hidden rounded-r-sm"
+                    >
+                      {#if $currencyState === "usd"}
+                        $ {(Number(priceItem.USD) || 0).toLocaleString(
+                          "en-US",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        )}
+                      {:else}
+                        ₹ {(Number(priceItem.INR) || 0).toLocaleString(
+                          "en-IN",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        )}
+                      {/if}
+                    </td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
           </div>
         {/if}
         <div class="max-[640px]:block hidden">
