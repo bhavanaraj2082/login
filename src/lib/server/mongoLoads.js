@@ -647,7 +647,6 @@ export const loadProductsubcategory = async (
 
     let matchCondition = {
         subCategory: subcategory._id,
-        isvariant:false
       // inStock: { $exists: true, $gt: 0 },
     };
 
