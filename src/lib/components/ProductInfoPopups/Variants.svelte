@@ -97,7 +97,8 @@
 
       if (!isLoggedIn) {
         addItemToCart(cartItem);
-        const updatedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+        const cartData = localStorage.getItem("cart");
+        const updatedCart = cartData ? JSON.parse(cartData) : [];
         localStorage.setItem("totalCompsChemi", updatedCart.length);
         syncLocalStorageToStore();
         isSuccess = true;
