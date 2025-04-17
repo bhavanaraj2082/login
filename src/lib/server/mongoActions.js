@@ -151,29 +151,10 @@ export const CancelOrder = async (body) => {
 	}
 };
 
-// export async function checkavailabilityproduct(data) {
-// 	// console.log(data);
-// 	const stockRecord = await Stock.findOne({ productNumber: data.ProductId }).exec();
-// 	// console.log('stockRecord:', stockRecord);
-// 	const stockQuantity = stockRecord.stock;
-// 	// console.log(stockQuantity,"stockQuantity");
-
-// 	if (!stockRecord) {
-// 		return { message: 'Out of stock', type: 'error' };
-// 	}
-
-// 	if (stockQuantity > 0) {
-// 		return { message: `${stockQuantity} Quantity is Available to ship.`, type: 'success' };
-// 	} else {
-// 		return { message: `Out of Stock`, type: 'error' };
-// 	}
-// }
-
-
 export async function checkavailabilityproduct(data) {
-	const { ProductId, quantity } = data;
+	const { stockId, quantity } = data;
 
-	if (!ProductId || !quantity) {
+	if (!stockId || !quantity) {
 		return {
 			type: 'error',
 			message: 'Product and Quantity are required'
@@ -182,9 +163,9 @@ export async function checkavailabilityproduct(data) {
 	const requestedQuantity = parseInt(quantity, 10);
 
 	try {
-		const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
+		const stockRecord = await Stock.findOne({ _id: stockId }).exec();		
 		if (!stockRecord) {
-			console.log(`No stock record found for ProductId: ${ProductId}`);
+			console.log(`No stock record found for stockId: ${stockId}`);
 			return {
 				message: 'Out of stock',
 				stock: 'Unavailable',
@@ -192,8 +173,8 @@ export async function checkavailabilityproduct(data) {
 			};
 		}
 
-		const totalStock = stockRecord.stock ?? 0;
-		const orderedQty = stockRecord.orderedQty ?? 0;
+		const totalStock = stockRecord.stock || 0;
+		const orderedQty = stockRecord.orderedQty || 0;
 		const availableStock = totalStock - orderedQty;
 		if (availableStock <= 0) {
 			return {
