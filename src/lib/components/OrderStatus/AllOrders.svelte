@@ -1,9 +1,8 @@
 <script>
   import Icon from "@iconify/svelte";
   export let orderedproduct;
-  export let orderStatus;
+  // export let orderStatus;
   import {PUBLIC_IMAGE_URL} from "$env/static/public"
-  // console.log("orderProduct====>", orderedproduct);
   export let currencyType;
 
   function priceShowing(price, currency) {
@@ -49,10 +48,17 @@
                   >{product.orderQty || "--"}</span
                 >
               </p>
-              <p class="font-medium text-sm text-gray-700">
+             
+            </div>
+          </div>
+
+          <div
+          class="flex flex-col justify-between items-start ml-3 sm:ml-0 sm:items-center"
+          >
+            <p class="font-medium text-sm text-gray-600">unit price</p>
+             <p class="font-medium text-sm text-gray-700">
                 {priceShowing(product.unitPrice, currencyType)}
               </p>
-            </div>
           </div>
 
           <div
@@ -64,7 +70,7 @@
             </p>
           </div>
 
-          <div class="flex gap-2 justify-end items-center">
+          <!-- <div class="flex gap-2 justify-end items-center">
             {#if orderStatus == "pending" || orderStatus == "pending cancellation"}
               <div class="flex gap-2">
                 <Icon
@@ -98,7 +104,7 @@
                 <h3 class="font-semibold text-sm text-gray-500">Cancelled</h3>
               </div>
             {/if}
-          </div>
+          </div> -->
         </div>
       </div>
     {/each}

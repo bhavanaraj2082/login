@@ -28,15 +28,15 @@
     </div>
   {/if}
   <div class="mb-5">
+    {#each remainingProducts as product}
     <div class="mb-3">
       <h1 class="text-base text-gray-600 font-semibold">Pending Products</h1>
     </div>
-    {#each remainingProducts as product}
       <div class="rounded-lg mb-5 bg-white">
         <div
           class="flex justify-between items-center px-4 py-2 rounded-md shadow"
         >
-          <div class="flex gap-3 items-center w-[35%]">
+          <div class="flex gap-3 items-center w-[50%]">
               <!-- svelte-ignore a11y-missing-attribute -->
               <img  
               src="{PUBLIC_IMAGE_URL}/{product?.image}"
@@ -51,11 +51,16 @@
                   >{product.remainingQuantity || "--"}</span
                 >
               </p>
-              <p class="font-medium text-sm text-gray-700">
-                {priceShowing(product.unitPrice , currencyType)}
-              </p>
             </div>
           </div>
+
+          <div>
+            <p class="font-medium text-sm text-gray-600">unit price</p>
+            <p class="font-medium text-sm text-gray-700">
+              {priceShowing(product.unitPrice , currencyType)}
+            </p>
+          </div>
+
           <div class="flex gap-2 justify-end">
             <div class="flex gap-2">
               <div></div>
