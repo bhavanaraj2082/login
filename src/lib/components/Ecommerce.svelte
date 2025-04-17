@@ -6,7 +6,7 @@
 	let selectedNames = [];
 	let reason = [];
 	let hovered = false;
-	let carrn=false;
+	let carrn = false;
 	let submitting = false;
 	let inputReadOnly = false;
 	let progress = 0;
@@ -487,7 +487,7 @@
 				const reloadFlag = sessionStorage.getItem("emailReloaded");
 				if (!reloadFlag) {
 					sessionStorage.setItem("emailReloaded", "true");
-					location.reload(); 
+					location.reload();
 				} else {
 					sessionStorage.removeItem("emailReloaded");
 				}
@@ -533,42 +533,40 @@
 		selectedNames = [];
 	}
 	function handleKeyDown(event) {
-    if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
-        selectlocation(filteredCountries[0]);
-        event.preventDefault();
-    }
-}
+		if (
+			event.key === "Enter" &&
+			searchTerm.length >= 3 &&
+			filteredCountries.length > 0
+		) {
+			selectlocation(filteredCountries[0]);
+			event.preventDefault();
+		}
+	}
 	function handleSubmit(event) {
 		if (
 			number?.length === 0 ||
 			email.length === 0 ||
-
-			fname.length === 0 || 
-        fname.trim() === "" ||
-        !/^[A-Za-z\s]+$/.test(fname) || 
-        /<[^>]*>/.test(fname) || 
-
-				lname.length === 0 || 
-        lname.trim() === "" ||
-        !/^[A-Za-z\s]+$/.test(lname) || 
-        /<[^>]*>/.test(lname) || 
-			
-		company.length === 0 || 
-		company.trim() === "" ||
-		company.trim().length < 3 || // ✅ Minimum 3 characters validation
-		!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) ||
-		/<[^>]*>/.test(company) ||
-
+			fname.length === 0 ||
+			fname.trim() === "" ||
+			!/^[A-Za-z\s]+$/.test(fname) ||
+			/<[^>]*>/.test(fname) ||
+			lname.length === 0 ||
+			lname.trim() === "" ||
+			!/^[A-Za-z\s]+$/.test(lname) ||
+			/<[^>]*>/.test(lname) ||
+			company.length === 0 ||
+			company.trim() === "" ||
+			company.trim().length < 3 || // ✅ Minimum 3 characters validation
+			!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) ||
+			/<[^>]*>/.test(company) ||
 			details.length === 0 ||
 			details.trim() === "" ||
-				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) ||
-				/<[^>]*>/.test(details) ||
-			
-			role.length === 0 || 
+			!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) ||
+			/<[^>]*>/.test(details) ||
+			role.length === 0 ||
 			role.trim() === "" ||
-				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(role) ||
-				/<[^>]*>/.test(role) ||
-
+			!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(role) ||
+			/<[^>]*>/.test(role) ||
 			reason.length === 0 ||
 			!isChecked
 		) {
@@ -673,26 +671,55 @@
 				});
 		}
 	}
-	function refreshMathQuestion() {
+	// function refreshMathQuestion() {
+	// 	rotationClass = "rotate-[360deg]";
+
+	// 	setTimeout(() => {
+	// 		generateMathQuestion();
+	// 		rotationClass = "";
+	// 	}, 1000);
+	// }
+	function refreshMathQuestion(event) {
+		if (event) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+
 		rotationClass = "rotate-[360deg]";
 
 		setTimeout(() => {
 			generateMathQuestion();
 			rotationClass = "";
+			userAnswer = ""; // Clear the previous answer when refreshing
+			errorMessagecap = ""; // Clear any error messages
+			successMessage = ""; // Clear any success messages
 		}, 1000);
 	}
-function carrnchange() {
-	carrn=true;
-}
-$: disabled = location.length === 0;
+	function carrnchange() {
+		carrn = true;
+	}
+	$: disabled = location.length === 0;
+	// function onInputChange() {
+	// 	if (userAnswer.trim()) {
+	// 		validateMathCaptcha();
+	// 	} else {
+	// 		errorMessagecap = "";
+	// 	}
+	// }
+
 	function onInputChange() {
-		if (userAnswer.trim()) {
-			validateMathCaptcha();
-		} else {
+		// Just clear the error message when typing, don't validate yet
+		if (errorMessagecap && userAnswer.trim()) {
 			errorMessagecap = "";
 		}
 	}
-
+	function verifyCaptcha() {
+		if (userAnswer.trim()) {
+			validateMathCaptcha();
+		} else {
+			errorMessagecap = "Please answer the question";
+		}
+	}
 	function closeCaptchaPopup() {
 		showCaptchaPopup = false;
 
@@ -820,15 +847,10 @@ $: disabled = location.length === 0;
 			showDropdown = false;
 		}
 	}
-	 function handleFocus() {
-		showErrors = false; 
-  }
-</script>
-<style>
-	input:disabled {
-	  cursor: not-allowed;  
+	function handleFocus() {
+		showErrors = false;
 	}
-  </style>
+</script>
 
 {#if showSuccesDiv}
 	<div
@@ -1201,9 +1223,8 @@ $: disabled = location.length === 0;
 				bind:this={form}
 				class="w-full md:mt-3 mt-0 max-w-3xl sm:ml-3 ml-0"
 				use:enhance={(event) => {
-					
-					const isEmailVerified = ProfileEmailVerified; 
-					const isAuthedUserEmailVerified = authedUserEmailVerified; 
+					const isEmailVerified = ProfileEmailVerified;
+					const isAuthedUserEmailVerified = authedUserEmailVerified;
 					console.log(
 						isEmailVerified,
 						isAuthedUserEmailVerified,
@@ -1215,7 +1236,7 @@ $: disabled = location.length === 0;
 						event.preventDefault();
 						return () => {};
 					}
-					
+
 					submitting = true;
 					return async ({ result }) => {
 						let message1 = "";
@@ -1240,11 +1261,11 @@ $: disabled = location.length === 0;
 						}, 100);
 					};
 				}}
-				  on:keydown={(event) => {
-                    if (event.key === 'Enter') {
-                        event.preventDefault();
-                    }
-                }}
+				on:keydown={(event) => {
+					if (event.key === "Enter") {
+						event.preventDefault();
+					}
+				}}
 			>
 				<div>
 					<p
@@ -1343,67 +1364,76 @@ $: disabled = location.length === 0;
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
-  type="text"
-  name="fname"
-  id="fname"
-  bind:value={fname}
-  class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
-  placeholder="First Name*"
-  on:input={() => {
-    fname = fname.trimStart(); // Update value reactively
+								type="text"
+								name="fname"
+								id="fname"
+								bind:value={fname}
+								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+								placeholder="First Name*"
+								on:input={() => {
+									fname = fname.trimStart(); // Update value reactively
 
-    if (!fname) {
-      errors = { ...errors, name: "" };
-    } else if (!/^[A-Za-z\s]+$/.test(fname)) {
-      errors = { ...errors, name: "First Name should contain only letters and spaces" };
-    } else {
-      const { name, ...rest } = errors;
-      errors = rest; // Remove error when valid
-    }
-  }}
-/>
-{#if errors?.name}
-  <span class="text-red-500 text-xs">
-    {errors.name}
-  </span>
-{/if}
-{#if showErrors && !fname}
-							<span class="text-red-500 sm:text-xs text-2s font-medium">
-							  First Name is required.
-							</span>
+									if (!fname) {
+										errors = { ...errors, name: "" };
+									} else if (!/^[A-Za-z\s]+$/.test(fname)) {
+										errors = {
+											...errors,
+											name: "First Name should contain only letters and spaces",
+										};
+									} else {
+										const { name, ...rest } = errors;
+										errors = rest; // Remove error when valid
+									}
+								}}
+							/>
+							{#if errors?.name}
+								<span class="text-red-500 text-xs">
+									{errors.name}
+								</span>
 							{/if}
-
+							{#if showErrors && !fname}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									First Name is required.
+								</span>
+							{/if}
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
-  type="text"
-  name="lname"
-  id="lname"
-  bind:value={lname}
-  class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
-  placeholder="Last Name*"
-  on:input={() => {
-    lname = lname.trimStart(); // Update value reactively
+								type="text"
+								name="lname"
+								id="lname"
+								bind:value={lname}
+								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+								placeholder="Last Name*"
+								on:input={() => {
+									lname = lname.trimStart(); // Update value reactively
 
-    if (!lname) {
-      errors = { ...errors, lname: "" };
-    } else if (!/^[A-Za-z\s]+$/.test(lname)) {
-      errors = { ...errors, lname: "Last Name should contain only letters and spaces" };
-    } else {
-      const { lname, ...rest } = errors;
-      errors = rest; // Remove error when valid
-    }
-  }}
-/>
-{#if errors?.lname}
-  <span class="text-red-500 text-xs">
-    {errors.lname}
-  </span>
-{/if}
-{#if showErrors && !lname}
-							<span class="text-red-500 sm:text-xs text-2s font-medium">
-							  Last Name is required.
-							</span>
+									if (!lname) {
+										errors = { ...errors, lname: "" };
+									} else if (!/^[A-Za-z\s]+$/.test(lname)) {
+										errors = {
+											...errors,
+											lname: "Last Name should contain only letters and spaces",
+										};
+									} else {
+										const { lname, ...rest } = errors;
+										errors = rest; // Remove error when valid
+									}
+								}}
+							/>
+							{#if errors?.lname}
+								<span class="text-red-500 text-xs">
+									{errors.lname}
+								</span>
+							{/if}
+							{#if showErrors && !lname}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Last Name is required.
+								</span>
 							{/if}
 						</div>
 					</div>
@@ -1419,13 +1449,11 @@ $: disabled = location.length === 0;
 									on:input={handleInputChange}
 									on:click={toggleDropdown}
 									on:keydown={handleKeyDown}
-									on:input={ ()=> {
-										const trimmedLocation= location.trim();
+									on:input={() => {
+										const trimmedLocation = location.trim();
 										location = trimmedLocation;
-									}
-									}
-									class="w-full sm:text-sm text-xs px-2 py-2 placeholder-gray-400 rounded-md border-1 border-gray-300 focus:outline-none focus:ring-0 focus:border-primary-500"
-									
+									}}
+									class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 								/>
 								<Icon
 									icon={showDropdown
@@ -1471,78 +1499,100 @@ $: disabled = location.length === 0;
 							{/if}
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
-<input
-	type="tel"
-	name="number"
-	id="number"
-	bind:value={number}
-	class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
-	placeholder="Phone Number*"
-	disabled={!location}
+							<input
+								type="tel"
+								name="number"
+								id="number"
+								bind:value={number}
+								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+								placeholder="Phone Number*"
+								disabled={!location}
+								on:mouseenter={() => (hovered = true)}
+								on:mouseleave={() => (hovered = false)}
+								on:input={() => {
+									number = number.trim();
+								}}
+							/>
 
-	on:mouseenter={() => hovered = true}
-	on:mouseleave={() => hovered = false}
-	on:input={() => {
-		number = number.trim();
-	}}
-/>
-
-
-{#if showErrors && number?.length === 0}
-	<span class="text-red-500 sm:text-xs text-2s font-medium">
-		Number is required
-	</span>
-{:else if !location && hovered}
-	<span class="text-red-500 sm:text-xs text-2s font-medium">
-		Please select your country before entering Number
-	</span>
-{:else if number?.length > 0 && !validatePhoneNumber(location, number)}
-	<span class="text-red-500 sm:text-xs text-2s font-medium">
-		Please enter a valid phone number for {location}
-	</span>
-{/if}
-
-
+							{#if showErrors && number?.length === 0}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Number is required
+								</span>
+							{:else if !location && hovered}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Please select your country before entering
+									Number
+								</span>
+							{:else if number?.length > 0 && !validatePhoneNumber(location, number)}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Please enter a valid phone number for {location}
+								</span>
+							{/if}
 						</div>
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
-							
-						  <input
-  type="text"
-  name="company"
-  id="company"
-  bind:value={company}
-  class="flex sm:text-sm text-xs w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
-  placeholder="Company Name*"
-  on:input={() => {
-    company = company.trimStart(); // Avoid leading spaces
+							<input
+								type="text"
+								name="company"
+								id="company"
+								bind:value={company}
+								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+								placeholder="Company Name*"
+								on:input={() => {
+									company = company.trimStart(); // Avoid leading spaces
 
-    if (!company || company.trim() === "") {
-      errors = { ...errors, company: "Company Name is required" };
-    } else if (company.trim().length < 3) {
-      errors = { ...errors, company: "Company Name must be at least 3 characters" };
-    } else if (!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(company)) {
-      errors = { ...errors, company: "Invalid characters in Company Name" };
-    } else if (/<[^>]*>/.test(company)) {
-      errors = { ...errors, company: "Company Name should not contain HTML tags" };
-    } else {
-      const { company, ...rest } = errors;
-      errors = rest; // Clear error if valid
-    }
-  }}
-/>
-{#if showErrors && company.length === 0}
-								<span class="text-red-500 sm:text-xs text-2s font-medium">
+									if (!company || company.trim() === "") {
+										errors = {
+											...errors,
+											company: "Company Name is required",
+										};
+									} else if (company.trim().length < 3) {
+										errors = {
+											...errors,
+											company:
+												"Company Name must be at least 3 characters",
+										};
+									} else if (
+										!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(
+											company,
+										)
+									) {
+										errors = {
+											...errors,
+											company:
+												"Invalid characters in Company Name",
+										};
+									} else if (/<[^>]*>/.test(company)) {
+										errors = {
+											...errors,
+											company:
+												"Company Name should not contain HTML tags",
+										};
+									} else {
+										const { company, ...rest } = errors;
+										errors = rest; // Clear error if valid
+									}
+								}}
+							/>
+							{#if showErrors && company.length === 0}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
 									Company is required
 								</span>
 							{/if}
-{#if errors?.company}
-  <span class="text-red-500 text-xs">
-    {errors.company}
-  </span>
-{/if}
-
+							{#if errors?.company}
+								<span class="text-red-500 text-xs">
+									{errors.company}
+								</span>
+							{/if}
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
@@ -1550,19 +1600,20 @@ $: disabled = location.length === 0;
 								name="role"
 								id="role"
 								bind:value={role}
-								class="block w-full border-1 border-gray-300 sm:text-sm text-xs p-2 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400"
+								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 								placeholder="Role*"
-								on:input={ ()=> {
-									const trimmedRole= role.trim();
+								on:input={() => {
+									const trimmedRole = role.trim();
 									role = trimmedRole;
-								}
-								}
+								}}
 							/>
 							{#if showErrors && (!role || role.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(role) || /<[^>]*>/.test(role))}
-							<span class="text-red-500 sm:text-xs text-2s font-medium">
-								Role is required.
-							</span>
-						  {/if}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Role is required.
+								</span>
+							{/if}
 						</div>
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
@@ -1630,7 +1681,7 @@ $: disabled = location.length === 0;
 										name="email"
 										id="email"
 										bind:value={email}
-										class="flex w-full sm:text-sm text-xs border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
+										class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 										placeholder="Email*"
 										on:input={() => {
 											email = email.trim();
@@ -1714,7 +1765,7 @@ $: disabled = location.length === 0;
 									method="POST"
 									use:enhance={() => {
 										return async ({ result }) => {
-											loadingotp = false; 
+											loadingotp = false;
 											if (result.status === 200) {
 												if (
 													result.data.status === 200
@@ -1748,7 +1799,7 @@ $: disabled = location.length === 0;
 										};
 									}}
 									on:submit={() => {
-										loadingotp = true; 
+										loadingotp = true;
 									}}
 								>
 									<div class="relative w-full">
@@ -1763,21 +1814,14 @@ $: disabled = location.length === 0;
 											name="enteredOtp"
 											bind:value={enteredOtpemail}
 											placeholder="Enter 6-digit OTP"
-											class="flex w-full border-1 border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
-											
-												on:input={() => {
-															enteredOtpemail =
-																enteredOtpemail.trim();
-															enteredOtpemail =
-																enteredOtpemail
-																	.replace(
-																		/\D/g,
-																		"",
-																	)
-																	.slice(
-																		0,
-																		6,
-																	);
+											class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+											on:input={() => {
+												enteredOtpemail =
+													enteredOtpemail.trim();
+												enteredOtpemail =
+													enteredOtpemail
+														.replace(/\D/g, "")
+														.slice(0, 6);
 											}}
 										/>
 										<button
@@ -1819,180 +1863,217 @@ $: disabled = location.length === 0;
 							name="details"
 							id="details"
 							bind:value={details}
-							class="w-full sm:text-sm text-xs p-2 border-1 border-gray-300 rounded-md focus:outline-none focus:border-primary-400 focus:shadow-none focus:ring-0 placeholder-gray-400 h-32"
+							class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300 h-32"
 							placeholder="Additional Details*"
-							on:input={ ()=> {
-								const trimmedDetails= details.trim();
+							on:input={() => {
+								const trimmedDetails = details.trim();
 								details = trimmedDetails;
-							}
-							}
+							}}
 						></textarea>
 						{#if showErrors && (!details || details.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) || /<[^>]*>/.test(details))}
-							<span class="text-red-500 sm:text-xs text-2s font-medium">
+							<span
+								class="text-red-500 sm:text-xs text-2s font-medium"
+							>
 								Additional Details are required.
 							</span>
-						  {/if}
+						{/if}
 					</div>
 					<span class="flex-1 w-1/3 mb-4">
-						<label for="recaptcha" class="block text-sm font-medium text-gray-700">
-						</label>
-						<input type="hidden" name="token" value={captchaToken} />
-					<div id="g-recaptcha-response">
 						<label
-							class="flex mt-5 md:mt-6 items-center justify-end space-x-2 mb-4 cursor-pointer"
+							for="recaptcha"
+							class="block text-sm font-medium text-gray-700"
 						>
-							<input
-								type="checkbox"
-								name="captcha"
-								value="captcha"
-								class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded cursor-pointer hover:border-primary-500 transition-colors duration-300"
-								bind:checked={isCheckedcap}
-								on:click={(event) => {
-									event.preventDefault();
-									handleSubmit(event);
-									if (!formValid) {
-										if (Object.keys(errors).length > 0) {
+						</label>
+						<input
+							type="hidden"
+							name="token"
+							value={captchaToken}
+						/>
+						<div id="g-recaptcha-response">
+							<label
+								class="flex mt-5 md:mt-6 items-center justify-end space-x-2 mb-4 cursor-pointer"
+							>
+								<input
+									type="checkbox"
+									name="captcha"
+									value="captcha"
+									class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded cursor-pointer hover:border-primary-500 transition-colors duration-300"
+									bind:checked={isCheckedcap}
+									on:click={(event) => {
+										event.preventDefault();
+										handleSubmit(event);
+										if (!formValid) {
+											if (
+												Object.keys(errors).length > 0
+											) {
+												toast.error(
+													"Please fill all the required fields.",
+												);
+												isCheckedcap = false;
+												return;
+											}
+											return;
+										}
+
+										if (
+											!(
+												ProfileEmailVerified ||
+												authedUserEmailVerified === true
+											)
+										) {
 											toast.error(
-												"Please fill all the required fields.",
+												"Please verify your email to proceed",
 											);
 											isCheckedcap = false;
 											return;
 										}
-										return;
-									}
 
-									if (
-										!(
-											ProfileEmailVerified ||
-											authedUserEmailVerified === true
-										)
-									) {
-										toast.error(
-											"Please verify your email to proceed",
-										);
-										isCheckedcap = false;
-										return;
-									}
-
-									isCheckedcap = true;
-									showPopup();
-								}}
-								  on:keydown={(event) => {
-									if (event.key === 'Enter') {
-										event.preventDefault();
-									}
-								}}
-							/>
-							<span class="text-gray-600 font-medium text-sm"
-								>Please verify you are human</span
+										isCheckedcap = true;
+										showPopup();
+									}}
+									on:keydown={(event) => {
+										if (event.key === "Enter") {
+											event.preventDefault();
+										}
+									}}
+								/>
+								<span class="text-gray-600 font-medium text-sm"
+									>Please verify you are human</span
+								>
+							</label>
+							<div
+								class="mt-0 flex items-center justify-end mr-10 gap-x-6"
 							>
-						</label>
-						<div
-							class="mt-0 flex items-center justify-end mr-10 gap-x-6"
-						>
-							<button
-								type="submit"
-								on:click={(event) => {
-									handleSubmit(event);
-									if (!isCheckedcap) {
-										toast.error(
-											"Please complete the CAPTCHA to proceed with the submission.",
-										);
-										event.preventDefault();
-										return;
-									}
-								}}
-								  on:keydown={(event) => {
-									if (event.key === 'Enter') {
-										event.preventDefault();
-									}
-								}}
-								class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
-							>
-								{#if submitting}
-									Sending...
-								{:else}
-									Send Message
-								{/if}
-							</button>
+								<button
+									type="submit"
+									on:click={(event) => {
+										handleSubmit(event);
+										if (!isCheckedcap) {
+											toast.error(
+												"Please complete the CAPTCHA to proceed with the submission.",
+											);
+											event.preventDefault();
+											return;
+										}
+									}}
+									on:keydown={(event) => {
+										if (event.key === "Enter") {
+											event.preventDefault();
+										}
+									}}
+									class="sm:px-5 px-2 sm:py-2 py-1 bg-primary-500 text-white sm:text-md text-sm rounded-md transition duration-300 hover:bg-primary-600 sm:w-auto font-semibold"
+								>
+									{#if submitting}
+										Sending...
+									{:else}
+										Send Message
+									{/if}
+								</button>
+							</div>
 						</div>
-					</div>
 					</span>
 					{#if showCaptchaPopup}
-					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<!-- svelte-ignore a11y-no-static-element-interactions -->
-					<div
-						class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
-						on:click={closeCaptchaPopup}
-					>
 						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<!-- svelte-ignore a11y-no-static-element-interactions -->
 						<div
-							class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100"
-							on:click|stopPropagation
+							class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
+							on:click={closeCaptchaPopup}
 						>
-							<h2 class="text-xl font-bold mb-6 text-gray-800 text-center">
-								Verify You're Human
-							</h2>
-				
-							<div class="bg-gray-50 p-4 rounded-lg mb-6">
-								<p class="flex items-center justify-between text-gray-700 font-medium">
-									<span class="text-lg">{mathQuestion}</span>
-									<button
-									class="ml-4 text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-all duration-300 {submittingForm ? 'opacity-50 cursor-not-allowed' : ''}"
-									on:click={submittingForm ? null : refreshMathQuestion}
-									disabled={submittingForm}
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<!-- svelte-ignore a11y-no-static-element-interactions -->
+							<div
+								class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100"
+								on:click|stopPropagation
+							>
+								<h2
+									class="text-xl font-bold mb-6 text-gray-800 text-center"
 								>
-									<Icon
-										icon="ic:round-refresh"
-										class={`w-5 h-5 text-primary-600 ${submittingForm ? '' : 'cursor-pointer hover:scale-110'} transition transform ${rotationClass}`}
+									Verify You're Human
+								</h2>
+
+								<div class="bg-gray-50 p-4 rounded-lg mb-6">
+									<p
+										class="flex items-center justify-between text-gray-700 font-medium"
+									>
+										<span class="text-lg"
+											>{mathQuestion}</span
+										>
+										<button
+											class="ml-4 text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-all duration-300 {submittingForm
+												? 'opacity-50 cursor-not-allowed'
+												: ''}"
+											on:click={submittingForm
+												? null
+												: (e) => refreshMathQuestion(e)}
+											disabled={submittingForm}
+										>
+											<Icon
+												icon="ic:round-refresh"
+												class={`w-5 h-5 text-primary-600 ${submittingForm ? "" : "cursor-pointer hover:scale-110"} transition transform ${rotationClass}`}
+											/>
+										</button>
+									</p>
+								</div>
+
+								<div class="mb-6">
+									<input
+										type="text"
+										bind:value={userAnswer}
+										placeholder="Your Answer"
+										class="border border-gray-300 rounded-lg w-full p-3 text-gray-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all"
+										on:input={onInputChange}
+										readonly={inputReadOnly}
 									/>
-								</button>
-								</p>
-							</div>
-							
-							<div class="mb-6">
-								<input
-									type="text"
-									bind:value={userAnswer}
-									placeholder="Your Answer"
-									class="border border-gray-300 rounded-lg w-full p-3 text-gray-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all"
-									on:input={onInputChange}
-									readonly={inputReadOnly}
-								/>
-				
-								{#if errorMessagecap}
-									<p class="text-red-500 text-sm mt-2 flex items-center">
-										<Icon icon="mdi:alert-circle" class="w-4 h-4 mr-1" />
-										{errorMessagecap}
-									</p>
-								{/if}
-								
-								{#if successMessage}
-									<p class="text-green-500 text-sm mt-2 flex items-center">
-										<Icon icon="mdi:check-circle" class="w-4 h-4 mr-1" />
-										{successMessage}
-									</p>
-								{/if}
-							</div>
-							
-							{#if submittingForm}
-								<div class="w-full mb-4">
-									<p class="text-sm mb-2 flex items-center text-gray-600">
-										<Icon icon="mdi:loading" class="w-4 h-4 mr-2 animate-spin" />
-										Submitting form
-									</p>
-									<div class="relative">
-										<div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+
+									{#if errorMessagecap}
+										<p
+											class="text-red-500 text-sm mt-2 flex items-center"
+										>
+											<Icon
+												icon="mdi:alert-circle"
+												class="w-4 h-4 mr-1"
+											/>
+											{errorMessagecap}
+										</p>
+									{/if}
+
+									{#if successMessage}
+										<p
+											class="text-green-500 text-sm mt-2 flex items-center"
+										>
+											<Icon
+												icon="mdi:check-circle"
+												class="w-4 h-4 mr-1"
+											/>
+											{successMessage}
+										</p>
+									{/if}
+								</div>
+
+								{#if submittingForm}
+									<div class="w-full mb-4">
+										<p
+											class="text-sm mb-2 flex items-center text-primary-600"
+										>
+											<Icon
+												icon="mdi:loading"
+												class="w-4 h-4 mr-2 animate-spin"
+											/>
+											Submitting form
+										</p>
+										<div class="relative">
 											<div
-												class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
-												style="width: {progress}%;"
-											></div>
+												class="w-full h-2 bg-gray-200 rounded-full overflow-hidden"
+											>
+												<div
+													class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
+													style="width: {progress}%;"
+												></div>
+											</div>
 										</div>
 									</div>
-								</div>
-							{/if}
-							<button
+								{/if}
+								<!-- <button
 								class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base"
 								on:click={() => {
 									onInputChange();
@@ -2009,13 +2090,36 @@ $: disabled = location.length === 0;
 								}}
 							>
 								Verify Now
-							</button>
+							</button> -->
+								<button
+									class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base {submittingForm
+										? 'opacity-50 cursor-not-allowed'
+										: ''}"
+									on:click={(e) => {
+										if (!submittingForm) {
+											e.preventDefault();
+											e.stopPropagation();
+											verifyCaptcha();
+										}
+									}}
+									disabled={submittingForm}
+								>
+									{submittingForm
+										? "Verifying..."
+										: "Verify Now"}
+								</button>
+							</div>
 						</div>
-					</div>
-				{/if}
+					{/if}
 				</div>
 			</form>
 			<Toaster position="bottom-right" richColors />
 		</section>
 	</section>
 {/if}
+
+<style>
+	input:disabled {
+		cursor: not-allowed;
+	}
+</style>

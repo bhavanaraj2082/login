@@ -364,7 +364,7 @@
                         stockId: product.stockId,
                         variants: product.variants,
                       })}
-                    class="w-10/12 max-w-xs text-primary-500 py-1.5 rounded border border-primary-500 hover:bg-primary-500 hover:text-white transition px-1.5 mb-4"
+                    class="w-10/12 max-w-xs text-primary-500 py-1.5 rounded-md border border-primary-500 hover:bg-primary-500 hover:text-white transition-all duration-300 px-1.5 mb-4"
                   >
                     View Price & Availability
                   </button>
@@ -408,19 +408,19 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
+    class="fixed inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50"
     on:click={() => (showModal = false)}
   >
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="bg-white p-6 rounded-lg w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-5/12 relative"
+      class="bg-white p-8 rounded-lg w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-5/12 relative"
       on:click|stopPropagation
     >
-      <div class="mt-2 absolute right-6 top-1">
+      <div class="mt-6 absolute right-6 top-1">
         <button
           on:click={closeModal}
-          class="hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
+          class="hover:bg-red-100 text-white rounded-md font-bold transition-colors duration-300"
         >
           <Icon
             icon="mdi:close"
@@ -445,10 +445,10 @@
               >{selectedProduct.partNumber || "--"}</a
             >
           </p>
-          <h2 class="text-lg font-medium text-left">
+          <h2 class="sm:text-md text-sm font-medium text-left">
             {selectedProduct.name || "--"}
           </h2>
-          <p class="text-sm text-left">
+          <p class="text-xs text-left mt-3">
             {selectedProduct.description || "--"}
           </p>
         </div>
@@ -465,7 +465,7 @@
 
             <button
               on:click={viewProduct}
-              class="bg-primary-500 py-2 px-4 hover:bg-primary-600 text-sm rounded text-white mt-2"
+              class="bg-primary-500 py-2 px-4 hover:bg-primary-600 text-sm rounded-md text-white mt-6"
             >
               View Products
             </button>
@@ -562,13 +562,13 @@
                 </p>
               </div>
 
-              <form class="flex items-center gap-3">
+              <form class="flex  items-center gap-3">
                 <div
                   class="border border-gray-300 rounded-md flex gap-2 justify-between items-center hover:shadow-lg hover:shadow-orange-100 w-full sm:w-36"
                 >
                   <button
                     type="button"
-                    class="pl-3 text-xl text-primary-500 hover:scale-110"
+                    class="pl-3 text-xl text-primary-500   m-1 hover:scale-110"
                     on:click={decrementPopupQuantity}
                   >
                     -
@@ -661,7 +661,7 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity !m-0"
     on:click={() => {
       closeModal();
       showCartPopup = false;
@@ -682,7 +682,7 @@
         <button on:click={cartTogglePopup} class="text-primary-400 font-bold">
           <Icon
             icon="mdi:close"
-            class="text-2xl font-bold hover:bg-red-100 text-red-600 border rounded hover:p-px"
+            class="text-2xl font-bold hover:bg-red-100 text-red-600 border rounded-md hover:p-px"
           />
         </button>
       </div>

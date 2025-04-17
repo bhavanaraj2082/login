@@ -512,19 +512,19 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
+    class="fixed inset-0 bg-gray-800 bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50"
     on:click={() => (showModal = false)}
   >
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="bg-white p-6 rounded-lg w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-5/12 relative"
+      class="bg-white p-8 rounded-lg w-full sm:w-3/4 md:w-2/3 lg:w-1/2 xl:w-5/12 relative"
       on:click|stopPropagation
     >
       <div class="mt-2 absolute right-6 top-1">
         <button
           on:click={closeModal}
-          class="hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
+          class="hover:bg-red-100 text-white rounded mt-8 font-bold transition-colors duration-300"
         >
           <Icon
             icon="mdi:close"
@@ -549,7 +549,7 @@
               >{selectedProduct.partNumber || "--"}</a
             >
           </p>
-          <h2 class="text-lg font-medium text-left">
+          <h2 class="text-md font-medium text-left">
             {selectedProduct.name || "--"}
           </h2>
           <p class="text-sm text-left">
@@ -627,7 +627,7 @@
             <div class="flex gap-3 mt-3 flex-wrap mb-4">
               {#each selectedProduct.priceSize as { break: size }, index}
                 <button
-                  class="focus:bg-primary-400 hover:scale-105 focus:text-white border px-3 py-1 rounded-full {selectedPriceIndex ===
+                  class="focus:bg-primary-400 hover:scale-105 focus:text-white border px-3 py-1 rounded-full ease-in-out duration-300 {selectedPriceIndex ===
                   index
                     ? ' bg-primary-400 text-white'
                     : ''}"
@@ -672,7 +672,7 @@
                 >
                   <button
                     type="button"
-                    class="pl-3 text-xl text-primary-500 hover:scale-110"
+                    class="pl-3 text-xl m-1 text-primary-500 hover:scale-110"
                     on:click={decrementPopupQuantity}
                   >
                     -
@@ -692,7 +692,7 @@
                     min="1"
                     maxlength="3"
                     bind:value={popupQuantity}
-                    class="w-12 h-6 p-0 text-center border-0 focus:border-0 focus:outline-none focus:ring-0 rounded-md"
+                    class="w-12 h-6 p-0 m-1 text-center border-0 focus:border-0 focus:outline-none focus:ring-0 rounded-md"
                     on:focus={(e) => {
                       setTimeout(() => {
                         e.target.select();
@@ -730,7 +730,7 @@
                   />
                   <button
                     type="button"
-                    class="pr-3 text-xl text-primary-500 hover:scale-110"
+                    class="pr-3 text-xl m-1 text-primary-500 hover:scale-110"
                     on:click={incrementPopupQuantity}
                   >
                     +

@@ -148,12 +148,12 @@
 			errorMessagecap = 'Incorrect answer, try again.';
 			isChecked = false;
 
-			setTimeout(() => {
-				generateMathQuestion();
-				userAnswer = '';
-				errorMessagecap = '';
-				// setActionMessage('Something went wrong while processing your message', false);
-			}, 4000);
+			// setTimeout(() => {
+			// 	generateMathQuestion();
+			// 	userAnswer = '';
+			// 	errorMessagecap = '';
+			// 	// setActionMessage('Something went wrong while processing your message', false);
+			// }, 4000);
 		}
 	}
     function handleClickOutside(event) {
@@ -161,15 +161,30 @@
             showDropdown = false;
         }
     }
-    function refreshMathQuestion() {
-		rotationClass = 'rotate-[360deg]';
+    // function refreshMathQuestion() {
+	// 	rotationClass = 'rotate-[360deg]';
 
-		setTimeout(() => {
-			generateMathQuestion();
-			rotationClass = '';
-		}, 1000);
-	}
+	// 	setTimeout(() => {
+	// 		generateMathQuestion();
+	// 		rotationClass = '';
+	// 	}, 1000);
+	// }
+	function refreshMathQuestion(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  
+  rotationClass = "rotate-[360deg]";
 
+  setTimeout(() => {
+    generateMathQuestion();
+    rotationClass = "";
+    userAnswer = ""; // Clear the previous answer when refreshing
+    errorMessagecap = ""; // Clear any error messages
+    successMessage = ""; // Clear any success messages
+  }, 1000);
+}
 	function showPopup() {
 		if (isChecked) {
 			showCaptchaPopup = true;
@@ -415,13 +430,25 @@
         { name: "Zambia", code: "+260" },
         { name: "Zimbabwe", code: "+263" },
     ];
-	function onInputChange() {
-		if (userAnswer.trim()) {
-			validateMathCaptcha();
-		} else {
-			errorMessagecap = '';
-		}
-	}
+	// function onInputChange() {
+	// 	if (userAnswer.trim()) {
+	// 		validateMathCaptcha();
+	// 	} else {
+	// 		errorMessagecap = '';
+	// 	}
+	// }
+    function onInputChange() {
+  if (errorMessagecap && userAnswer.trim()) {
+    errorMessagecap = "";
+  }
+}
+function verifyCaptcha() {
+  if (userAnswer.trim()) {
+    validateMathCaptcha();
+  } else {
+    errorMessagecap = "Please answer the question";
+  }
+}
 
 	function closeCaptchaPopup() {
 		showCaptchaPopup = false;
@@ -895,7 +922,7 @@
 		searchTerm = selectedCountry.name;
 		showDropdown = false;
 		validateField('country');
-		validatePhoneNumber(country, contactNumber);
+		validatePhoneNumber(country, phone);
         validateField("phone");
 
 		delete errors.country;
@@ -1923,9 +1950,9 @@ function handleKeyDown(event) {
                                 <span class="text-lg">{mathQuestion}</span>
                                 <button
                                 class="ml-4 text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-all duration-300 {submittingForm ? 'opacity-50 cursor-not-allowed' : ''}"
-                                on:click={submittingForm ? null : refreshMathQuestion}
+                                on:click={submittingForm ? null : (e) => refreshMathQuestion(e)}
                                 disabled={submittingForm}
-                            >
+                                >
                                 <Icon
                                     icon="ic:round-refresh"
                                     class={`w-5 h-5 text-primary-600 ${submittingForm ? '' : 'cursor-pointer hover:scale-110'} transition transform ${rotationClass}`}
@@ -1961,7 +1988,7 @@ function handleKeyDown(event) {
                         
                         {#if submittingForm}
                             <div class="w-full mb-4">
-                                <p class="text-sm mb-2 flex items-center text-gray-600">
+                                <p class="text-sm mb-2 flex items-center text-primary-600">
                                     <Icon icon="mdi:loading" class="w-4 h-4 mr-2 animate-spin" />
                                     Submitting form
                                 </p>
@@ -1976,8 +2003,20 @@ function handleKeyDown(event) {
                                 </div>
                             </div>
                         {/if}
-                        
                         <button
+  class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base {submittingForm ? 'opacity-50 cursor-not-allowed' : ''}"
+  on:click={(e) => {
+    if (!submittingForm) {
+      e.preventDefault();
+      e.stopPropagation();
+      verifyCaptcha();
+    }
+  }}
+  disabled={submittingForm}
+>
+  {submittingForm ? 'Verifying...' : 'Verify Now'}
+</button>
+                        <!-- <button
                             class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base"
                             on:click={() => {
                                 onInputChange();
@@ -1994,7 +2033,7 @@ function handleKeyDown(event) {
                             }}
                         >
                             Verify Now
-                        </button>
+                        </button> -->
                     </div>
                 </div>
             {/if}
