@@ -2657,23 +2657,137 @@ console.log(query,"query");
 
 // 	return results;
 // };
+// export const uploadFile = async ({ query }) => {
+// 	const validQueries = query.filter(([sku, quantity]) =>
+// 	  sku?.trim() && String(quantity)?.trim()
+// 	);
+	
+// 	if (validQueries.length === 0) {
+// 	  return [];
+// 	}
+// 	const skuMap = new Map();
+// 	const normalizedSkus = [];
+	
+// 	for (const [sku, quantity] of validQueries) {
+// 	  const cleanSku = sku.trim().replace(/[-\s]/g, '').toLowerCase();
+// 	  skuMap.set(cleanSku, { original: sku.trim(), quantity: parseInt(quantity) });
+// 	  normalizedSkus.push(cleanSku);
+// 	}
+//   const stockItems = await Stock.aggregate([
+// 	  {
+// 		$addFields: {
+// 		  normalizedSku: {
+// 			$toLower: {
+// 			  $replaceAll: {
+// 				input: "$sku",
+// 				find: "-",
+// 				replacement: ""
+// 			  }
+// 			}
+// 		  }
+// 		}
+// 	  },
+// 	  {
+// 		$match: {
+// 		  normalizedSku: { $in: normalizedSkus }
+// 		}
+// 	  },
+// 	  {
+// 		$project: {
+// 		  _id: 1,
+// 		  productid: 1,
+// 		  stock: 1,
+// 		  pricing: 1,
+// 		  distributor: 1,
+// 		  manufacturer: 1,
+// 		  productName:1,
+// 		  productNumber: 1,
+// 		  sku: 1,
+// 		  normalizedSku: 1
+// 		}
+// 	  }
+// 	]).exec();
+	
+// 	const stockItemsByNormalizedSku = stockItems.reduce((acc, item) => {
+// 	  if (!acc[item.normalizedSku]) {
+// 		acc[item.normalizedSku] = [];
+// 	  }
+// 	  acc[item.normalizedSku].push(item);
+// 	  return acc;
+// 	}, {});
+// 	const results = await Promise.all(
+// 	  normalizedSkus.map(async (normalizedSku) => {
+// 		const { original, quantity } = skuMap.get(normalizedSku);
+// 		const matchedItems = stockItemsByNormalizedSku[normalizedSku];
+  
+// 		if (!matchedItems || matchedItems.length === 0) {
+// 		  return {
+// 			productNumber: original,
+// 			quantity,
+// 			isValid: false,
+// 			message: "Stock information is missing",
+// 		  };
+// 		}
+  
+// 		const matchedStock = matchedItems[0];
+// 		let availableStock = Number(matchedStock?.stock) || 0;
+		
+// 		return {
+// 		  id: matchedStock._id.toString(),
+// 		  productId: matchedStock.productid.toString(),
+// 		  productNumber: matchedStock.productNumber,
+// 		  productName:matchedStock.productName,
+// 		  sku: matchedStock.sku,
+// 		  stockId: matchedStock._id.toString(),
+// 		  stock: availableStock,
+// 		  manufacturer: matchedStock.manufacturer?.toString() || null,
+// 		  distributer: matchedStock.distributor?.toString() || null,
+// 		  isValid: true,
+// 		  message: "SKU is valid",
+// 		};
+// 	  })
+// 	);
+// 	console.log(results,"result");
+  
+// 	return results;
+//   };
 export const uploadFile = async ({ query }) => {
-	const validQueries = query.filter(([sku, quantity]) =>
-	  sku?.trim() && String(quantity)?.trim()
-	);
+	// First, handle both formats:
+	// 1. [[sku, quantity]] format
+	// 2. [[sku]] format (assign quantity = 1)
+	let validQueries = [];
+	
+	for (const item of query) {
+	  const [sku, quantity] = item;
+	  
+	  if (sku?.trim()) {
+		// If it's format 2 (only SKU, no quantity), assign quantity as 1
+		if (quantity === undefined) {
+		  validQueries.push([sku.trim(), '1']);
+		} 
+		// If it's format 1 (SKU with quantity), use the provided quantity
+		else if (String(quantity)?.trim()) {
+		  validQueries.push([sku.trim(), quantity.trim()]);
+		}
+	  }
+	}
+	
+	console.log(validQueries, "validQueries");
 	
 	if (validQueries.length === 0) {
 	  return [];
 	}
+	
 	const skuMap = new Map();
 	const normalizedSkus = [];
 	
 	for (const [sku, quantity] of validQueries) {
-	  const cleanSku = sku.trim().replace(/[-\s]/g, '').toLowerCase();
-	  skuMap.set(cleanSku, { original: sku.trim(), quantity: parseInt(quantity) });
+	  const cleanSku = sku.replace(/[-\s]/g, '').toLowerCase();
+	  skuMap.set(cleanSku, { original: sku, quantity: parseInt(quantity) });
 	  normalizedSkus.push(cleanSku);
 	}
-  const stockItems = await Stock.aggregate([
+  
+	const stockItems = await Stock.aggregate([
 	  {
 		$addFields: {
 		  normalizedSku: {
@@ -2700,7 +2814,7 @@ export const uploadFile = async ({ query }) => {
 		  pricing: 1,
 		  distributor: 1,
 		  manufacturer: 1,
-		  productName:1,
+		  productName: 1,
 		  productNumber: 1,
 		  sku: 1,
 		  normalizedSku: 1
@@ -2715,11 +2829,12 @@ export const uploadFile = async ({ query }) => {
 	  acc[item.normalizedSku].push(item);
 	  return acc;
 	}, {});
+	
 	const results = await Promise.all(
 	  normalizedSkus.map(async (normalizedSku) => {
 		const { original, quantity } = skuMap.get(normalizedSku);
 		const matchedItems = stockItemsByNormalizedSku[normalizedSku];
-  
+		
 		if (!matchedItems || matchedItems.length === 0) {
 		  return {
 			productNumber: original,
@@ -2728,7 +2843,7 @@ export const uploadFile = async ({ query }) => {
 			message: "Stock information is missing",
 		  };
 		}
-  
+		
 		const matchedStock = matchedItems[0];
 		let availableStock = Number(matchedStock?.stock) || 0;
 		
@@ -2736,8 +2851,9 @@ export const uploadFile = async ({ query }) => {
 		  id: matchedStock._id.toString(),
 		  productId: matchedStock.productid.toString(),
 		  productNumber: matchedStock.productNumber,
-		  productName:matchedStock.productName,
+		  productName: matchedStock.productName,
 		  sku: matchedStock.sku,
+		  quantity: quantity, // Use the quantity from skuMap instead of matchedStock.quantity
 		  stockId: matchedStock._id.toString(),
 		  stock: availableStock,
 		  manufacturer: matchedStock.manufacturer?.toString() || null,
@@ -2747,8 +2863,9 @@ export const uploadFile = async ({ query }) => {
 		};
 	  })
 	);
-	console.log(results,"result");
-  
+	
+	console.log(results, "result");
+	
 	return results;
   };
 export const CreateProductQuote = async (formattedData) => {
@@ -3401,30 +3518,83 @@ export const getMyFavorites = async(userId) => {
 	return {favorite}
 }
 
-export const bulkUploadToCart = async(items,userId,userEmail) =>{
-	const bulk = await Cart.findOneAndUpdate(
-		{userId,isActiveCart:true},
-		{
-		  $push: {
-			cartItems: { $each: items }
-		  }
-		},
-		{ new: true }
-	  );
+// export const bulkUploadToCart = async(items,userId,userEmail) =>{
+// 	const bulk = await Cart.findOneAndUpdate(
+// 		{userId,isActiveCart:true},
+// 		{
+// 		  $push: {
+// 			cartItems: { $each: items }
+// 		  }
+// 		},
+// 		{ new: true }
+// 	  );
 
-    if(bulk === null){
-		await Cart.create({
-			cartId: nanoid(8),
-			cartName: "mycart",
-			cartItems: items,
-			userId,
-			userEmail,
-			isActiveCart: true
-		  });
-		  return { success: true, message: "Product is added to new cart" };
+//     if(bulk === null){
+// 		await Cart.create({
+// 			cartId: nanoid(8),
+// 			cartName: "mycart",
+// 			cartItems: items,
+// 			userId,
+// 			userEmail,
+// 			isActiveCart: true
+// 		  });
+// 		  return { success: true, message: "Product is added to new cart" };
 	  
-	}else{
-		return { success: true, message: "Product is added to new cart" };
+// 	}else{
+// 		return { success: true, message: "Product is added to new cart" };
+// 	}
+	  
+// }
+
+export const bulkUploadToCart = async (items, userId, userEmail) => {
+	let cart = await Cart.findOne({ userId, isActiveCart: true });
+  
+	if (!cart) {
+
+	  const newCartData = {
+		cartId: nanoid(8),
+		cartName: "mycart",
+		cartItems: items,
+		userId,
+		userEmail,
+		isActiveCart: true,
+	  };
+  
+
+  
+	  await Cart.create(newCartData);
+  
+	  return { success: true, message: "Product is added to new cart" };
+	} else {
+	  if (!cart.cartItems) {
+		cart.cartItems = [];
+	  }
+  
+	  if (cart.cartItems.length === 0) {
+		cart.cartItems = items;
+	  } else {
+
+  
+		for (const newItem of items) {
+  
+		  const existingItem = cart.cartItems.find(
+			(item) => item.stockId.toString() === newItem.stockId.toString()
+		  );
+  
+		  if (existingItem) {
+  
+			existingItem.quantity = newItem.quantity;
+			existingItem.backOrder = newItem.backOrder;
+		  } else {
+
+			cart.cartItems.push(newItem);
+		  }
+		}
+	  }
+  
+	  await cart.save();
+
+  
+	  return { success: true, message: "Cart updated successfully" };
 	}
-	  
-}
+  };

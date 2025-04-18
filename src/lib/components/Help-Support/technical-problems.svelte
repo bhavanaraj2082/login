@@ -189,12 +189,12 @@
       }
     }
     if (!fieldName || fieldName === "companyName") {
-      if (!companyName || !/^[a-zA-Z0-9@*()#$]+$/.test(companyName)) {
-        errors.companyName = "Please enter a valid Company name ";
-      } else {
-        delete errors.companyName;
-      }
-    }
+			if (!companyName || !/^[A-Za-z0-9@.,\s&-]+$/.test(companyName)) {
+				errors.companyName = "Please enter a valid Company name ";
+			} else {
+				delete errors.companyName;
+			}
+		}
 
     if (fieldName === "technical_issue") {
       if (!selectedOption) {
@@ -205,18 +205,18 @@
     }
 
     if (!fieldName || fieldName === "assistance") {
-      if (
-        !assistance ||
-        !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(assistance) ||
-        /<script.*?>.*?<\/script>/i.test(assistance) ||
-        /<[^>]*>/i.test(assistance)
-      ) {
-        errors.assistance =
-          "Assistance is required and must not contain HTML tags or scripts.";
-      } else {
-        delete errors.assistance;
-      }
-    }
+  if (
+    !assistance ||
+    !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(assistance) ||
+    /<script.*?>.*?<\/script>/i.test(assistance) ||
+    /<[^>]*>/i.test(assistance)
+  ) {
+    errors.assistance = "Please enter valid assistance details.";
+  } else {
+    delete errors.assistance;
+  }
+}
+
     if (!fieldName || fieldName === "issue") {
       if (!issue) {
         errors.issue = "Please select any one Option ";
@@ -977,11 +977,19 @@ function filterCountriesWithoutAutoSelect() {
             bind:value={assistance}
             on:input={() => validateField("assistance")}
             on:input={(e) => {
-              
-              e.target.value = e.target.value.replace(/^\s+/, '');
+              e.target.value = e.target.value.replace(
+                /^\s+/,
+                "",
+              );
               assistance = e.target.value;
-                      
-                validateField("assistance")}}
+              validateField("assistance");
+              errors.assistance = !assistance
+                ? "*Required"
+                : !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(assistance) 
+
+                  ? "Please enter a valid assistance "
+                  : "";
+            }}
             class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm"
             required
           ></textarea>
@@ -1112,14 +1120,23 @@ function filterCountriesWithoutAutoSelect() {
               required
               on:input={() => validateField("firstName")}
               on:input={(e) => {
-              
-                e.target.value = e.target.value.replace(/^\s+/, '');
+                e.target.value = e.target.value.replace(
+                  /^\s+/,
+                  "",
+                );
                 firstName = e.target.value;
-                        
-                  validateField("firstName")}}
+                validateField("firstName");
+                errors.firstName = !firstName
+                  ? "*Required"
+                  : !/^[A-Za-z\s]+$/.test(firstName)
+                    ? "Please enter a valid last name"
+                    : "";
+              }}
             />
-            {#if errors.firstName}
-              <p class="text-red-500 text-xs mt-1">{errors.firstName}</p>
+            {#if errors?.firstName}
+              <p class="text-red-500 text-xs mt-1">
+                {errors.firstName}
+              </p>
             {/if}
           </div>
 
@@ -1134,14 +1151,23 @@ function filterCountriesWithoutAutoSelect() {
               required
               on:input={() => validateField("lastName")}
               on:input={(e) => {
-              
-                e.target.value = e.target.value.replace(/^\s+/, '');
+                e.target.value = e.target.value.replace(
+                  /^\s+/,
+                  "",
+                );
                 lastName = e.target.value;
-                        
-                  validateField("lastName")}}
+                validateField("lastName");
+                errors.lastname = !lastName
+                  ? "*Required"
+                  : !/^[A-Za-z]+$/.test(lastName)
+                    ? "Please enter a valid last name"
+                    : "";
+              }}
             />
-            {#if errors.lastName}
-              <p class="text-red-500 text-xs mt-1">{errors.lastName}</p>
+            {#if errors?.lastName}
+              <p class="text-red-500 text-xs mt-1">
+                {errors.lastName}
+              </p>
             {/if}
           </div>
 
@@ -1156,16 +1182,49 @@ function filterCountriesWithoutAutoSelect() {
               required
               on:input={() => validateField("email")}
               on:input={(e) => {
-              
-                e.target.value = e.target.value.replace(/^\s+/, '');
+                e.target.value = e.target.value.replace(
+                  /^\s+/,
+                  "",
+                );
                 email = e.target.value;
-                        
-                  validateField("email")}}
+                email = email.trim();
+                validateField("email");
+                errors.email = !email
+                  ? "*Required"
+                  : !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                        email,
+                      ) ||
+                      email
+                        .split("@")[1]
+                        .includes("gamil")
+                    ? "Please enter a valid email address"
+                    : "";
+              }}
             />
-            {#if errors.email}
-              <p class="text-red-500 text-xs mt-1">{errors.email}</p>
+            {#if errors?.email}
+              <p class="text-red-500 text-xs mt-1">
+                {errors.email}
+              </p>
             {/if}
           </div>
+
+          <!-- Company Name Input -->
+          <!-- <div class="flex flex-col">
+      <input
+        name="companyName"
+        type="text"
+        id="companyName"
+        placeholder="Company/Institution Name"
+        bind:value={companyName}
+        required
+        class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
+        on:input={() => validateField('companyName')}
+      />
+      
+      </div>
+      {#if errors.companyName}
+        <p class="text-red-500 text-xs mt-1">{errors.companyName}</p>
+      {/if} -->
 
           <div class="flex flex-col">
             <input
@@ -1175,16 +1234,25 @@ function filterCountriesWithoutAutoSelect() {
               bind:value={companyName}
               class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
               required
-              on:input={() => validateField("companyName")}
-              on:input={(e) => {
-              
-                e.target.value = e.target.value.replace(/^\s+/, '');
-                companyName = e.target.value;
-                        
-                  validateField("companyName")}}
+
+
+                                          on:input={(e) => {
+                              e.target.value = e.target.value.replace(/^\s+/, '');
+                              companyName = e.target.value;
+                               validateField("companyName");
+                               errors.company = !companyName
+                                 ? "*Required"
+                                 : !/^[A-Za-z0-9@.,!#$%^&*(_)+-\s]+$/.test(
+                                companyName,
+                                   )
+                                 ? "Please enter a valid company name"
+                                 : "";
+                             }}
             />
-            {#if errors.companyName}
-              <p class="text-red-500 text-xs mt-1">{errors.companyName}</p>
+            {#if errors?.companyName}
+              <p class="text-red-500 text-xs mt-1">
+                {errors.companyName}
+              </p>
             {/if}
           </div>
 
@@ -1198,29 +1266,33 @@ function filterCountriesWithoutAutoSelect() {
                 on:input={handleInputChange}
                 on:click={toggleDropdown}
                 on:input={(e) => {
-              
-                
                   country = country.trim();
-                          
-                    validateField("country")}}
+
+                  validateField("country");
+                }}
                 autocomplete="off"
                 class="flex-1 outline-none w-full border border-gray-300 rounded focus:ring-0 focus:border-primary-400 p-2 text-sm"
                 required
               />
               <Icon
-                icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
+                icon={showDropdown
+                  ? "ep:arrow-up-bold"
+                  : "ep:arrow-down-bold"}
                 class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
               />
               {#if showDropdown}
                 <div
                   class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
                 >
-                  <ul class="max-h-60 overflow-y-auto text-sm">
+                  <ul
+                    class="max-h-60 overflow-y-auto text-sm"
+                  >
                     {#each filteredCountries as country (country.name)}
                       <!-- svelte-ignore a11y-click-events-have-key-events -->
                       <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                       <li
-                        on:click={() => selectCountry(country)}
+                        on:click={() =>
+                          selectCountry(country)}
                         class="px-4 py-2 cursor-pointer hover:bg-gray-100"
                       >
                         {country.name} ({country.code})
@@ -1231,7 +1303,9 @@ function filterCountriesWithoutAutoSelect() {
               {/if}
             </div>
             {#if errors.country}
-              <p class="text-red-500 text-xs mt-1">{errors.country}</p>
+              <p class="text-red-500 text-xs mt-1">
+                {errors.country}
+              </p>
             {/if}
           </div>
 
@@ -1245,29 +1319,33 @@ function filterCountriesWithoutAutoSelect() {
               class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
               required
               on:input={() => {
-                phoneNumber = phoneNumber.replace(/[^+\d]/g, "").trim();
+                phoneNumber = phoneNumber
+                  .replace(/[^+\d]/g, "")
+                  .trim();
                 validateField("phoneNumber");
                 validatePhoneNumber(country, phoneNumber);
               }}
             />
             {#if errors.phoneNumber}
-              <p class="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>
+              <p class="text-red-500 text-xs mt-1">
+                {errors.phoneNumber}
+              </p>
             {/if}
           </div>
           <!-- <div class="flex flex-col">
-            <input
-              type="text"
-              name="accountNumber"
-              placeholder="Account Number"
-              bind:value={accountNumber}
-              class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
-              required
-              on:input={() => validateField("accountNumber")}
-            />
-            {#if errors.accountNumber}
-              <p class="text-red-500 text-xs mt-1">{errors.accountNumber}</p>
-            {/if}
-          </div> -->
+      <input
+      type="text"
+      name="accountNumber"
+      placeholder="Account Number"
+      bind:value={accountNumber}
+      class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
+      required
+      on:input={() => validateField('accountNumber')}
+      />
+      {#if errors.accountNumber}
+      <p class="text-red-500 text-xs mt-1">{errors.accountNumber}</p>
+      {/if}
+    </div> -->
         </div>
 
         <div class="flex justify-center md:justify-end md:ml-5 col-span-2 mt-2">
