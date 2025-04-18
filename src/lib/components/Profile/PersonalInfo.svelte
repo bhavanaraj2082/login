@@ -164,97 +164,82 @@
                 <h2 class=" font-semibold text-4s">Contact Information</h2>
                 <button on:click={()=>toggleEdit = true} class=" w-20 rounded-md py-1.5 font-medium text-xs md:text-sm text-white bg-primary-500 hover:bg-primary-600">Edit</button>
             </div>
-            <section class="w-full flex flex-col sm:flex-row flex-wrap gap-y-4 py-3">
-                {#if needsPasswordSetup}
-                    <div class="w-full flex items-center bg-primary-50 border border-primary-200 rounded-lg p-2">
-                        <p class="text-xs text-primary-600">
-                            We noticed you haven’t set up a password yet. To keep your account safe, please create one now. 
-                            <a href="/reset-password" class="text-primary-600 text-xs font-medium hover:underline hover:text-primary-500">
-                                Click here to setup your password
-                            </a>
-                        </p>
-                    </div>
-                {:else}
-                    <div class="w-full flex sm:flex-row items-center lg:w-1/3 sm:w-1/2">
-                        <h4 class="font-normal text-sm">Password:</h4>
-                        <a href="/reset-password" class="text-xs text-primary-500 font-semibold ml-2">
-                            Reset Password
-                        </a>
-                    </div>
-                {/if}
-                <div class="flex sm:flex-col text-sm md:text-4s w-full lg:w-1/3 sm:w-1/2">
-                    <h4 class="font-normal text-sm">Name:</h4>
+            <section class=" w-full flex flex-col sm:flex-row flex-wrap gap-y-4 py-3">
+                <div class="flex sm:flex-row items-center text-sm md:text-4s w-full sm:w-1/2">
+                    <h4 class="font-medium">Name :</h4>
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <!-- svelte-ignore a11y-no-static-element-interactions -->
+                    <!-- svelte-ignore a11y-missing-attribute -->
                     {#if !firstName}
+                    <a on:click={() => toggleEdit = true} class="text-primary-500 font-medium ml-2 text-sm hover:underline">
+                        Update Name
+                    </a>
+                    {:else}
+                        <p class="ml-2 text-sm">{firstName || "Update Name"} {lastName || ""}</p>
+                    {/if}
+                </div>
+                <div class="w-full flex sm:flex-row items-center sm:w-1/2">
+                    <label class="text-xs md:text-sm font-semibold" for="cellPhone">
+                        <!-- <span class="text-sm font-bold text-red-500">*</span> -->Primary Phone :
+                    </label><br>
+                    {#if !cellPhone && (firstName && lastName && email || email)}
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <!-- svelte-ignore a11y-no-static-element-interactions -->
                         <!-- svelte-ignore a11y-missing-attribute -->
-                        <a on:click={() => toggleEdit = true} class="text-primary-500 font-semibold  text-sm hover:underline">
-                            Update Name
-                        </a>
-                    {:else}
-                        <p class=" text-sm font-semibold">{firstName || "Update Name"} {lastName || ""}</p>
-                    {/if}
-                </div>
-            
-                <div class="w-full flex sm:flex-col items-centre md:ml-20      sm:w-1/2">
-                    <label class=" md:ml-10 font-medium" for="cellPhone">
-                        <h4 class="font-normal text-sm"><span class="text-red-500 font-semibold">*</span>Primary Phone:</h4>
-                    </label>
-                    
-                    {#if !cellPhone && (firstName && lastName && email || email)}
-                   
-                        <div class="text-sm text-gray-600 p-2 bg-red-50 items-end  ml-10  border border-red-300 rounded-md">
+                        <p class="text-sm text-gray-600 p-2 bg-red-50 border border-red-300 rounded-md">
                             It looks like you haven't updated your phone number yet. 
-                            <!-- svelte-ignore a11y-click-events-have-key-events -->
-                            <!-- svelte-ignore a11y-no-static-element-interactions -->
-                            <!-- svelte-ignore a11y-missing-attribute -->
                             <a on:click={() => toggleEdit = true} class="text-primary-500 font-semibold hover:underline cursor-pointer">
                                 Update Phone Number
                             </a>
-                        </div>
+                        </p>
                     {:else}
-                        <p class="text-sm ml-2 md:ml-10 font-semibold">{cellPhone || "N/A"}</p>
+                    <!-- <h4 class="font-medium">Primary Phone :</h4> -->
+                    <p class=" text-sm ml-2">{cellPhone || "N/A"}</p>
                         {#if errors?.cellPhone}
                             <span class="text-red-400 text-xs">{errors.cellPhone}</span>
                         {/if}
                     {/if}
                 </div>
-                <div class="w-full flex sm:flex-col md:ml-1    lg:w-1/3 sm:w-1/2"> 
+                <!-- <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
+                    <h4 class="font-medium">Primary Phone :</h4>
+                    <p class=" text-sm ml-2">{cellPhone || "update cellPhone"}</p>
+                </div> -->
+                <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
+                    <h4 class="font-medium">Alternative Phone :</h4>
+                    <p class=" text-sm ml-2">{alternatePhone || "--"}</p>
+                </div>
+                <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
                     <div class="flex items-center gap-2">
-                        <h4 class="font-normal text-sm">Email:</h4>
+                    <h4 class="font-medium">Email:</h4>
+                </div>
+                <p class=" text-sm ml-2">{email || "N/A"}</p>
+                <Icon icon="tdesign:verified-filled" class=" text-xl ml-2 {isEmailVerified ? "text-green-500":"text-gray-400"}"/>
+                </div>
+                {#if needsPasswordSetup}
+                <div class="w-full flex items-center bg-primary-50 border border-primary-200 rounded-lg p-2">
+                    <p class="text-xs text-primary-600">
+                        We noticed you haven’t set up a password yet. To keep your account safe, please create one now. 
+                        <a href="/reset-password" class="text-primary-600 text-xs font-medium hover:underline hover:text-primary-500">Click here to setup your password</a>
+                    </p>
+                </div>
+                {:else}
+                <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
+                    <h4 class="font-medium">Password :</h4>
+                    <a href="/reset-password" class="text-xs text-primary-500 font-semibold ml-2">Reset Password</a>
+                    <div class=" flex items-center gap-2 -mt-1.5">
                     </div>
-                    <span class="flex flex-row items-end ">
-                        <p class="text-sm font-semibold">{email || "N/A"}</p>
-                        <Icon icon="tdesign:verified-filled" class="text-xl ml-2 {isEmailVerified ? 'text-green-500' : 'text-gray-400'}" />
-                    </span>
                 </div>
-            
-                <div class="w-full flex sm:flex-col items-centre md:ml-10 lg:w-1/3 sm:w-1/2">
-                    <h4 class="font-normal md:ml-20">Alternative Phone:</h4>
-                    <p class="text-sm ml-2  md:ml-20 font-semibold">{alternatePhone || "__"}</p>
-                </div>
+                {/if}
             </section>
             <div class="mt-4">
-                <h2 class="font-semibold text-4s border-b-1 pb-2 pt-5">Business Information</h2>
+                <h2 class="font-semibold text-lg border-b-1 pb-2">Business Information</h2>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
-                    <h4 class="font-normal text-sm">Company Name:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{companyName || "__"}</p>
+                    <h4 class="font-medium">Company Name:</h4>
+                    <p class=" text-sm ml-2">{companyName || "--"}</p>
                 </div>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
-                    <h4 class=" font-normal text-sm">Company Type:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{companytype || "__"}</p>
-                </div>
-                <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
-                    <h4 class=" font-normal text-sm">Job Title:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{jobtitle || "__"}</p>
-                </div>
-                <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
-                    <h4 class=" font-normal text-sm">GST Number:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{gstNumber || "__"}</p>
-                </div>
-                <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
-                    <h4 class=" font-normal text-sm">TAN Number:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{tanNumber || "__"}</p>
+                    <h4 class=" font-medium">GST Number:</h4>
+                    <p class=" text-sm ml-2">{gstNumber || "--"}</p>
                 </div>
             </div>
         </div>
