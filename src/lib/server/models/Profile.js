@@ -58,6 +58,10 @@ const chemiDashProfileSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    jobtitle: {
+      type: String,
+      required: false,
+    },
     needsPasswordSetup: { type: Boolean, default: false },
     linkOrganization: jsonSchema,
     sitePreferences: jsonSchema,
