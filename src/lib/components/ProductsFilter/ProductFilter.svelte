@@ -175,7 +175,7 @@ function handleMouseLeave() {
     let timeout
     const handleQty = (id,quantity) =>{
         if(isNaN(quantity)){
-            return
+            quantity = 1
         }
         quantity = Math.abs(quantity)
         if(quantity >10000000) quantity = 10000000
@@ -360,7 +360,7 @@ function handleMouseLeave() {
   const handleFavorites = (product)=>{
     try {
      console.log(product);
-    addLocalToFavorites(product.stockId)
+    addLocalToFavorites(product._id)
     let formdata = new FormData()
     formdata.append("authedEmail",$authedUser.email)
     formdata.append("productId",product._id)
@@ -582,16 +582,18 @@ function handleMouseLeave() {
                            </label>
                        </div>
                     {/each}
-                   
+                    
                  </div>
                 {/each}
-                
+                <button on:click={() => handleShowMore()} class="text-xs xl:hidden w-full text-end text-primary-600 hover:text-primary-400 mt-3">
+                  {showAllForIndex ? '- Show Less' : '+ Show More'}
+                </button>
              </div>
              
              {/if}
             
             </div>
-            <button on:click={() => handleShowMore()} class="text-xs w-full text-end text-primary-600 hover:text-primary-400 mt-3">
+            <button on:click={() => handleShowMore()} class="text-xs hidden xl:block w-full text-end text-primary-600 hover:text-primary-400 mt-3">
               {showAllForIndex ? '- Show Less' : '+ Show More'}
             </button>
         </div>
@@ -606,7 +608,7 @@ function handleMouseLeave() {
        {#each paginatedProducts as product,index}
         <div class=" relative bg-white shadow p-2 sm:p-4 md:px-8 space-y-2 rounded-md">
             <button on:click={()=>handleFavorites(product)} class="{$authedUser?.id && Object.keys(product.pricing).length > 0 ? "" : "hidden"} absolute top-6 right-6">
-                <Icon icon={$myFavorites.find(x=> x === product.stockId) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
+                <Icon icon={$myFavorites.find(x=> x === product._id) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
             </button>
             <div class=" w-10/12 ">
                 <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{product?.productName  || ""}</a>

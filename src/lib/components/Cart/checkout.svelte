@@ -277,6 +277,8 @@
 	<AddressForm
 	on:onSubmit={handleDispatchEvent}
 	formdata={formData}
+	billing={userData?.billingAddress}
+	shipping={userData?.shippingAddress}
 	handlePopupAddress = {()=>isForm = false}
 	{actionName}
 	firstname={userData?.firstName} 

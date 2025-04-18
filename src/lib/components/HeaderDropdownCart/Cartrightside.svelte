@@ -21,6 +21,8 @@
 	let form;
 	let form2;
 	let isLoggedIn = $authedUser?.id ? true : false;
+	let selectedId = ''
+
 	function formatPriceToNumber(priceString) {
 		if (!priceString) return 0;
 		const formattedPrice = String(priceString)
@@ -85,11 +87,12 @@
 	const handleQty = (quantity, stock, _id, indx) => {
 		if(isNaN(quantity)){
 			calculateTotalPrice($cart)
-			return
+			quantity =1
 		}
 		quantity = Math.abs(quantity)
 		clearTimeout(timeout);
 		if (quantity > 10000000) quantity = 10000000;
+		selectedId = _id
 		timeout = setTimeout(() => {
 		if(quantity <= stock.orderMultiple ) quantity = stock.orderMultiple
 		const selectedQty = Math.ceil(quantity/ stock.orderMultiple) * stock.orderMultiple
@@ -128,6 +131,7 @@
 			sendMessage("/cart?/updateQty", formdata, async (result) => {
 				invalidate("data:cart");
 				calculateTotalPrice($cart);
+				selectedId = ''
 				tog = null;
 			});
 		}, 1400);
@@ -160,7 +164,7 @@
 				return item;
 			});
 		}
-
+		selectedId = _id
 		timeout = setTimeout(() => {
 			const formdata = new FormData();
 			formdata.append("_id", _id);
@@ -170,6 +174,7 @@
 			sendMessage("/cart?/updateQty", formdata, async (result) => {
 				// console.log(result);
 				calculateTotalPrice($cart);
+				selectedId = ''
 			});
 		}, 1000);
 	};
@@ -199,6 +204,7 @@
 					return item;
 				});
 		}
+		selectedId = _id
 		timeout = setTimeout(() => {
 			const formdata = new FormData();
 			formdata.append("_id", _id);
@@ -207,7 +213,7 @@
 			formdata.append("cartId", cartId);
 			sendMessage("/cart?/updateQty", formdata, async (result) => {
 				calculateTotalPrice($cart);
-				// console.log(result);
+				selectedId =''
 			});
 		}, 1000);
 	};
@@ -525,8 +531,7 @@
 											: ''} flex items-center border-1 rounded"
 									>
 										<button
-											disabled={item.isCart ||
-												item.isQuote}
+										disabled={item.isCart || item.isQuote || selectedId.length && item._id !== selectedId}
 											on:click={() =>
 												decrementQuantity(
 													item?.stockDetails,
@@ -540,6 +545,7 @@
 											/></button
 										>
 										<button
+										    disabled={selectedId.length && item._id !== selectedId}
 											on:click={() => {
 												tog = index;
 											}}
@@ -548,8 +554,7 @@
 											{item.quantity === null ? "" : item.quantity}
 										</button>
 										<button
-											disabled={item.isCart ||
-												item.isQuote}
+										disabled={item.isCart || item.isQuote || selectedId.length && item._id !== selectedId}
 											on:click={() =>
 												incrementQuantity(
 													item.stockDetails,

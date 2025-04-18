@@ -2258,7 +2258,7 @@ export const favaddToCart = async (cartData, userId, userEmail) => {
         //console.log(cartData,"opopopop");
         if (existingCart) {
             const itemIndex = existingCart.cartItems.findIndex(
-                item => item.productId.toString() === cartData.productId
+                item => item.stockId.toString() === cartData.stockId
             );
 
             if (itemIndex > -1) {
