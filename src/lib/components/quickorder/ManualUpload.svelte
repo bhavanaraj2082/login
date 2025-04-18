@@ -1771,6 +1771,11 @@ addItemToCart(currentCart)
                   const resultData = result.data;
 
                   if (resultData && resultData.success === true) {
+                    if ($authedUser.id) {
+                        submitForm();
+                      } else {
+                        submitAlternateForm();
+                      }
                     const cartItem = prepareCartItem();
                     cartloadingpop = false;
 
