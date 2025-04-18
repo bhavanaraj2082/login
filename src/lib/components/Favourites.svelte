@@ -14,7 +14,7 @@
     export let data;
     // console.log('favdata==>>', data)
     let form;
-    
+    let fav = writable([])
     $: isAuthenticated = !!data?.locals?.user?.email;
     
     const fetchMyFav = ()=>{
@@ -40,24 +40,18 @@
             image: item.productInfo.image || '/default-product-image.jpg',
             manufacturerName: item.manufacturerInfo?.name || 'Unknown Manufacturer',
             distributorName: item.distributorInfo?.aliasName || 'Direct Supply',
-            stockInfo: {
-                id: item.stockInfo?.stockId,
-                pricing: item.stockInfo?.pricing,
-                specification: item.stockInfo?.specification,
-                orderMultiple: item.stockInfo?.orderMultiple || 1,
-                stock: parseInt(item.stockInfo?.stock) || 0
-            },
+            stockInfo: item.stockInfo,
             manufacturerInfo: {
                 id: item.manufacturerInfo?.manufacturerId
             },
             distributorInfo: {
                 id: item.distributorInfo?.distributorId,
             },
+            specIndex:0,
             quantity: parseInt(item.quantity) || 1,
             createdAt: item.createdDate || new Date(),
         };
     }).filter(Boolean) : [];
-
     // $:console.log("favData====>",favData)
 
     let calendarComponent;
@@ -229,9 +223,10 @@ function handleKeyDown(event) {
 }
 
 $: filteredFavorites = filterFavorites(favData, filters);
-$: totalPages = Math.ceil(filteredFavorites.length / $itemsPerPage);
+$: totalPages = Math.ceil(favData.length / $itemsPerPage);
 $: pageNumbers = getPageRange($currentPage, filteredFavorites.length);
 $: paginatedFavorites = getPaginatedData(filteredFavorites, $currentPage, $itemsPerPage);
+$:fav.set(paginatedFavorites)
 
 function calculateTotalPrice(price, quantity) {
     if (!price || price === 'Price not available') return 'N/A';
@@ -479,7 +474,7 @@ onMount(() => {
                         .filter(item => item.stockInfo.stock > 0)
                         .map(item => ({
                             productId: item.id,
-                            stockId: item.stockInfo.id,
+                            stockId: item.stockInfo[item.specIndex]._id,
                             manufacturerId: item.manufacturerInfo.id,
                             distributorId: item.distributorInfo.id,
                             quantity: item.quantity
@@ -505,12 +500,12 @@ onMount(() => {
         </div>
     </div>
     <div class="space-y-2">
-        {#if !paginatedFavorites.length}
+        {#if !$fav.length}
             <div class="w-full md:w-full border rounded-md border-primary-400 bg-white items-center px-4 py-8 md:col-span-2">
                 <p class="text-center text-gray-500">No related items found</p>
             </div>
 		{:else}
-            {#each paginatedFavorites as item,index}
+            {#each $fav as item,index}
                 <div class="flex flex-col md:flex-row items-center justify-between p-6 border bg-white border-gray-200 rounded-md w-full shadow">
                 <img 
                     src="{PUBLIC_IMAGE_URL}/{item.image}"
@@ -537,52 +532,57 @@ onMount(() => {
                     <p class="text-sm font-semibold">
                         Price: <span class="text-black">
                             { $currencyState === "usd" 
-                                ? `$${item.stockInfo.pricing.USD.toLocaleString("en-IN")}` 
-                                : item.stockInfo.pricing?.INR 
-                                    ? `₹${item.stockInfo.pricing.INR.toLocaleString("en-IN")}` 
+                                ? `$${item.stockInfo[item.specIndex].pricing.USD.toLocaleString("en-IN")}` 
+                                : item.stockInfo[item.specIndex].pricing?.INR 
+                                    ? `₹${item.stockInfo[item.specIndex].pricing.INR.toLocaleString("en-IN")}` 
                                     : 'Price not available'}
                         </span>
                     </p>
-                    {#if item.stockInfo.specification}
-                        <p class="text-sm font-semibold">
-                            Specification: <span class=" font-normal">{item.stockInfo?.specification}</span>
-                        </p>
-                    {/if}
+                        <div class="text-sm font-semibold flex gap-2">
+                            Specification: 
+                            {#each item.stockInfo as spec,index }
+                            <button on:click={()=>{
+                                   let search = $fav.find(x=>x.id === item.id)
+                                   console.log(search);
+                                   search.specIndex = index
+                                   fav.set($fav)
+                            }} class=" {index === item.specIndex ? " bg-primary-300" : " bg-gray-200"} text-xs px-2 py-1 rounded">{spec.specification}</button>
+                            {/each}
+                        </div>
                 </div>
                 <div class="flex pl-2 justify-start md:w-1/4 sm:items-center m-1 p-2 rounded-md sm:justify-center">
                     <div class="flex flex-col items-start">
                         <p class="font-semibold" 
-                           class:text-green-600={item.stockInfo.stock > 0} 
-                           class:text-red-600={item.stockInfo.stock === 0}>
-                            <span class="text-gray-500 text-xs">Available Stock:</span> {item.stockInfo?.stock || 0}
+                           class:text-green-600={item.stockInfo[item.specIndex].stock > 0} 
+                           class:text-red-600={item.stockInfo[item.specIndex].stock === 0}>
+                            <span class="text-gray-500 text-xs">Available Stock:</span> {item.stockInfo[item.specIndex]?.stock || 0}
                         </p>
-                        <p class="{item.quantity > item.stockInfo.stock ? "" : "hidden"} text-xs font-semibold text-gray-500">Back Order: <span class=" text-sm text-red-500">{item.quantity > item.stockInfo.stock ? item.quantity - item.stockInfo.stock : 0}</span></p>
-                        {#if item.stockInfo.orderMultiple > 1}
+                        <p class="{item.quantity > item.stockInfo[item.specIndex].stock ? "" : "hidden"} text-xs font-semibold text-gray-500">Back Order: <span class=" text-sm text-red-500">{item.quantity > item.stockInfo[item.specIndex].stock ? item.quantity - item.stockInfo[item.specIndex].stock : 0}</span></p>
+                        {#if item.stockInfo[item.specIndex].orderMultiple > 1}
                             <p class="text-xs text-gray-500">
-                                Order Multiple: {item.stockInfo?.orderMultiple}
+                                Order Multiple: {item.stockInfo[item.specIndex]?.orderMultiple}
                             </p>
                         {/if}
                     </div>
                 </div>
                 <div class="flex flex-col md:items-end items-center mt-4 md:mt-0 space-y-4">
                     <div class="flex md:flex-col lg:flex-row gap-3 space-x-4 relative">
-                     {#if item.stockInfo.stock > 0}
-                        <form 
+                   <form 
                         method="POST" 
                         action="?/addItemToCart"
                         use:enhance={handleAddToCart}>
                         <input type="hidden" name="itemData" value={JSON.stringify({
                         productId: item.id,
-                        stockId: item.stockInfo.id,
+                        stockId: item.stockInfo[item.specIndex]._id,
                         manufacturerId: item.manufacturerInfo.id,
                         distributorId: item.distributorInfo.id,
                         quantity: item.quantity,
-                        backOrder:item.quantity > item.stockInfo.stock ? item.quantity - item.stockInfo.stock : 0
+                        backOrder:item.quantity > item.stockInfo[item.specIndex].stock ? item.quantity - item.stockInfo[item.specIndex].stock : 0
                     })} />
                         <button 
                             type="submit" 
                             class="flex bg-primary-500 items-center text-white hover:scale-95 transition-all duration-300 border-primary-500 px-2.5 py-2 rounded-md"
-                            disabled={item.stockInfo.stock <= 0}>
+                            >
                             <Icon 
                             icon="heroicons-solid:shopping-cart" 
                             class="text-xl" 
@@ -591,7 +591,6 @@ onMount(() => {
                            
                         </button>
                     </form>
-                        {/if}
                         <form 
                             method="POST" 
                             action="?/removeItem"
@@ -613,7 +612,7 @@ onMount(() => {
                         <button 
                             on:click={() => decreaseQuantity(item)} 
                             class="px-2 py-1 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
-                            disabled={item.quantity <= item.stockInfo.orderMultiple}>
+                            disabled={item.quantity <= item.stockInfo[item.specIndex].orderMultiple}>
                             -
                         </button>
                         <button class="text-sm font-medium">{item.quantity}</button>
@@ -624,11 +623,11 @@ onMount(() => {
                         </button>
                     </div>
                     </div>
-                    {#if item.stockInfo.pricing}
+                    {#if item.stockInfo[item.specIndex].pricing}
                         <p class="text-sm font-semibold text-gray-800">
                             Total: { $currencyState === "usd" 
-                                ? `$${(item.stockInfo.pricing.USD * item.quantity).toLocaleString("en-IN")}`
-                                : `₹${(item.stockInfo.pricing.INR * item.quantity).toLocaleString("en-IN")}`}
+                                ? `$${(item.stockInfo[item.specIndex].pricing.USD * item.quantity).toLocaleString("en-IN")}`
+                                : `₹${(item.stockInfo[item.specIndex].pricing.INR * item.quantity).toLocaleString("en-IN")}`}
                         </p>
                     {:else}
                         <p class="text-sm font-semibold text-gray-800">
@@ -640,7 +639,7 @@ onMount(() => {
             {/each}
         {/if}
     </div>
-    {#if totalPages > 1}
+    {#if totalPages}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
         class="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-around border bg-white shadow px-4 py-4 rounded-b-md md:mt-2 my-1 md:m-0"

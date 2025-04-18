@@ -9,7 +9,9 @@
 	export let formdata;
 	export let actionName;
   export let isShowbox ;
-
+  export let billing
+  export let shipping ;
+   console.log(billing,shipping,"opop");
 let message="At least one address must be default";
   // export let accounttype;
 	export let handlePopupAddress;
@@ -35,17 +37,58 @@ let message="At least one address must be default";
     "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
   ];
 
-  email= formdata?.email || email ,
-  phone= formdata?.phone || phone ,
-  postalCode= formdata?.postalCode || postalCode ,
-  city= formdata?.city || city ,
-  state= formdata?.state || state ,
-  organizationName= formdata?.organizationName || organizationName ,
-  attentionTo= formdata?.attentionTo || attentionTo ,
-  street= formdata?.street || street ,
-  building= formdata?.building || building ,
-  department= formdata?.department || department ,
-  // gst=formdata?.gst || gst,
+  const handleAddress = (type,checked)=>{
+    if(checked === true){
+      if(type === "billing"){
+        email= billing?.email || email ,
+        phone= billing?.phone || phone ,
+        postalCode= billing?.postalCode || postalCode ,
+        city= billing?.city || city ,
+        state= billing?.state || state ,
+        organizationName= billing?.organizationName || organizationName ,
+        attentionTo= billing?.attentionTo || attentionTo ,
+        street= billing?.street || street ,
+        building= billing?.building || building ,
+        department= billing?.department || department
+      }
+      else if(type === "shipping"){
+        email= shipping?.email || email ,
+        phone= shipping?.phone || phone ,
+        postalCode= shipping?.postalCode || postalCode ,
+        city= shipping?.city || city ,
+        state= shipping?.state || state ,
+        organizationName= shipping?.organizationName || organizationName ,
+        attentionTo= shipping?.attentionTo || attentionTo ,
+        street= shipping?.street || street ,
+        building= shipping?.building || building ,
+        department= shipping?.department || department
+      }else{
+        email= formdata?.email || email ,
+        phone= formdata?.phone || phone ,
+        postalCode= formdata?.postalCode || postalCode ,
+        city= formdata?.city || city ,
+        state= formdata?.state || state ,
+        organizationName= formdata?.organizationName || organizationName ,
+        attentionTo= formdata?.attentionTo || attentionTo ,
+        street= formdata?.street || street ,
+        building= formdata?.building || building ,
+        department= formdata?.department || department
+      }
+    }else{
+      email= formdata?.email || email ,
+        phone= formdata?.phone || phone ,
+        postalCode= formdata?.postalCode || postalCode ,
+        city= formdata?.city || city ,
+        state= formdata?.state || state ,
+        organizationName= formdata?.organizationName || organizationName ,
+        attentionTo= formdata?.attentionTo || attentionTo ,
+        street= formdata?.street || street ,
+        building= formdata?.building || building ,
+        department= formdata?.department || department
+    }
+  }
+  handleAddress()
+   // gst=formdata?.gst || gst,
   
   location= formdata?.location || location ;
 	let name;
@@ -702,6 +745,17 @@ $:console.log(location,"location");
 			<input type="hidden" name="actionType" value={actionName} />
 			<input type="hidden" name="addressId" value={formdata.addressId} />
 			<input type="hidden" name="addAlternate" value={formdata.addAlternate} />
+      <div class=" text-sm flex items-center gap-2 py-2.5">
+        {#if actionName === 'billingaddress'}
+        {#if shipping}
+          <input class=" focus:ring-0 outline-none text-primary-500" on:change={(e)=>handleAddress("shipping",e.target.checked)} type="checkbox"> same as shipping address
+        {/if}
+      {:else}
+      {#if billing}
+       <input class=" focus:ring-0 outline-none text-primary-500" on:change={(e)=>handleAddress("billing",e.target.checked)} type="checkbox"> same as billing address
+      {/if}
+      {/if}
+      </div>
 			<label class="w-full text-xs md:text-sm font-medium mt-1 bg-red" for="firstname">Attention To</label>
 			<input
 				class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"

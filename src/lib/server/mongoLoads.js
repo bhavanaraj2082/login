@@ -2052,11 +2052,11 @@ export async function getUserFavorites(userId) {
       {
         $lookup: {
           from: 'stocks',
-          let: { stockId: '$favorite.stockId' },
+          let: { productId: '$favorite.productId' },
           pipeline: [
             {
               $match: {
-                $expr: { $eq: ['$_id', '$$stockId'] }
+                $expr: { $eq: ['$productid', '$$productId'] }
               }
             }
           ],
@@ -2096,32 +2096,44 @@ export async function getUserFavorites(userId) {
             name: { $arrayElemAt: ['$manufacturerDetails.name', 0] },
             urlName: { $arrayElemAt: ['$manufacturerDetails.urlName', 0] }
           },
-          stockInfo: {
-            stockId: { $toString: '$favorite.stockId' },
-            pricing: { $arrayElemAt: ['$stockDetails.pricing', 0] },
-            stock: { $arrayElemAt: ['$stockDetails.stock', 0] },
-            orderMultiple: { $arrayElemAt: ['$stockDetails.orderMultiple', 0] },
-            specification: { $arrayElemAt: ['$stockDetails.specification', 0] }
-          },
+          // stockInfo: {
+          //   stockId: { $arrayElemAt: ['$stockDetails._id', 0] },
+          //   pricing: { $arrayElemAt: ['$stockDetails.pricing', 0] },
+          //   stock: { $arrayElemAt: ['$stockDetails.stock', 0] },
+          //   orderdQty: { $arrayElemAt: ['$stockDetails.orderdQty', 0] },
+          //   orderMultiple: { $arrayElemAt: ['$stockDetails.orderMultiple', 0] },
+          // },
           distributorInfo: {
             distributorId: { $toString: '$favorite.distributorId' },
             distributorName: { $arrayElemAt: ['$distributorDetails.distributorname', 0] },
             aliasName: { $arrayElemAt: ['$distributorDetails.aliasname', 0] }
           },
           quantity: { $toString: '$favorite.quantity' },
-          stock: { $toString: '$favorite.stock' }
+          stock: { $toString: '$favorite.stock' },
+          "stockDetails":1
         }
       }
     ]).exec();
-    
+    console.log(favorites,"--------");
     const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
     favorites = favorites.map(fav=>{
-      let {stockInfo,...data} = fav
-      if(stockInfo.pricing.INR !== undefined && stockInfo.pricing.INR !== null){
-        stockInfo.pricing.USD = stockInfo.pricing.INR/currency.rate
-      }else{
-       stockInfo.pricing.INR = stockInfo.pricing.USD * currency.rate;
-      }
+      let {stockDetails,...data} = fav
+      let stockInfo = stockDetails.map(x=>{
+        if(x.pricing.INR !== undefined && x.pricing.INR !== null){
+            x.pricing.USD = x.pricing.INR/currency.rate
+          }else{
+           x.pricing.INR = x.pricing.USD * currency.rate;
+          }
+          if(x.orderedQty){
+            x.stock = x.stock > x.orderedQty ? x.stock - x.orderedQty : 0
+          }
+          return x
+       })
+      // if(stockInfo.pricing.INR !== undefined && stockInfo.pricing.INR !== null){
+      //   stockInfo.pricing.USD = stockInfo.pricing.INR/currency.rate
+      // }else{
+      //  stockInfo.pricing.INR = stockInfo.pricing.USD * currency.rate;
+      // }
       return {stockInfo,...data}
     })
     

@@ -28,6 +28,7 @@
 	let isHide = false
 	let tog = null
 	let checkoutDisabled = false
+	let selectedId = ''
 
 	$: cartData = data?.cart[0]?.cartItems || [];
 	$: cart.set(cartData);
@@ -222,11 +223,11 @@
 		return recurring + " Months"
 	}
 	}
-	
 	const handleQty = (quantity,stock,_id,indx)=>{
+        selectedId = _id
 		if(isNaN(quantity)){
 			//calculateTotalPrice($cart)
-			return
+			quantity = 1
 		}
 		if (quantity > 10000000){
 			quantity = 10000000
@@ -271,12 +272,14 @@
 			invalidate("data:cart")
 			calculateTotalPrice($cart)
             tog = null
+			selectedId = ''
             checkoutDisabled = false
 		  })
 	  },1400)
 	}
 
 	const incrementQuantity = (quantity,stock,_id,indx) => {
+		selectedId = _id
 		clearTimeout(timeout)
         checkoutDisabled = true
 		if(!isLoggedIn){
@@ -310,12 +313,14 @@
 			invalidate("data:cart")
 			calculateTotalPrice($cart)
 			checkoutDisabled = false
+			selectedId = ''
 		  })
 	  },1000)
 
 	};
 
 	const decrementQuantity = (quantity,stock,_id,indx) => {
+		selectedId = _id
 		clearTimeout(timeout)
         checkoutDisabled = true
            
@@ -352,6 +357,7 @@
 			invalidate("data:cart")
 			calculateTotalPrice($cart)
 			checkoutDisabled = false
+			selectedId = ''
 		  })
 	  },1000)
 	};
@@ -595,15 +601,15 @@
 										on:input={e=>handleQty(parseInt(e.target.value),item?.stockDetails,item._id,index)}
 										class="{tog === index ? "" : "hidden"} border border-gray-200 rounded-md outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
 							        	<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded-md">
-							        		<button disabled={item.isCart || item.isQuote}
+							        		<button disabled={item.isCart || item.isQuote || selectedId.length && item._id !== selectedId}
 							        			on:click={() => decrementQuantity(item.quantity,item?.stockDetails,item._id,index)}
 							        			class="p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							        			><Icon icon="rivet-icons:minus" class="text-xs" /></button
 							        		>
-							        		<button on:click={()=>{tog = index}} class="w-fit px-3 py-0.5 text-xs font-medium outline-none text-center">
+							        		<button on:click={()=>{tog = index}} disabled={selectedId.length && item._id !== selectedId} class="w-fit px-3 py-0.5 text-xs font-medium outline-none text-center">
 							        			{item.quantity === null ? "" : item.quantity}
 							        		</button>
-							        		<button disabled={item.isCart || item.isQuote}
+							        		<button disabled={item.isCart || item.isQuote || selectedId.length && item._id !== selectedId }
 							        			on:click={() => incrementQuantity(item.quantity,item?.stockDetails,item._id,index)}
 							        			class="p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
 												<Icon icon="rivet-icons:plus" class="text-xs" />
