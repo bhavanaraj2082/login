@@ -1,7 +1,7 @@
 <script>
-	import { goto } from '$app/navigation';
-  
-	import { cart,guestCart } from '$lib/stores/cart.js';
+  import { goto } from "$app/navigation";
+
+  import { cart, guestCart } from "$lib/stores/cart.js";
   import Icon from "@iconify/svelte";
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
@@ -10,9 +10,9 @@
   import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
   export let data;
   import { fade } from "svelte/transition";
-  $:console.log($cart);
+  $: console.log($cart);
   let validationMessages = [];
-	let isLoggedIn = $authedUser?.id ? true : false
+  let isLoggedIn = $authedUser?.id ? true : false;
   let duplicateEntries = [];
   let rawFileData = "";
   let fileError = "";
@@ -81,9 +81,7 @@
     if (isValidated) {
       invalidProductLines = mapInvalidProductsToLines();
     }
-
     toast.success(`Removed duplicate entry for ${productInfo}`);
-
     if (duplicateEntries.length === 0) {
       submitFileData();
     }
@@ -122,7 +120,6 @@
   }
 
   function removeAllInvalidProducts() {
-    // Get all the invalid product numbers
     const invalidProductNumbers = validationMessages
       .filter((message) => !message.isValid)
       .map((message) => message.productNumber);
@@ -131,18 +128,10 @@
       toast.info("No invalid products to remove.");
       return;
     }
-
-    // Split the raw file data into lines
     let lines = rawFileData.split("\n");
-
-    // Keep track of the lines to remove
     const linesToRemove = [];
-
-    // Identify which lines contain invalid products
     lines.forEach((line, index) => {
       const [productInfo] = line.split(",").map((item) => item.trim());
-
-      // Check if this line contains any of the invalid product numbers
       const containsInvalidProduct = invalidProductNumbers.some(
         (invalidProduct) => productInfo.includes(invalidProduct),
       );
@@ -151,24 +140,15 @@
         linesToRemove.push(index);
       }
     });
-
-    // Remove lines in reverse order to maintain correct indices
     linesToRemove.reverse().forEach((lineIndex) => {
       lines.splice(lineIndex, 1);
     });
-
-    // Join the remaining lines back together
     rawFileData = lines.join("\n");
-
-    // Update validation messages to remove entries for removed products
     validationMessages = validationMessages.filter(
       (message) => message.isValid,
     );
 
-    // Update the mapping of invalid products to lines
     invalidProductLines = mapInvalidProductsToLines();
-
-    // Show appropriate toast message
     if (!rawFileData.trim()) {
       toast.success(
         "All invalid items removed. Please add valid product number and size to add to cart.",
@@ -177,8 +157,6 @@
     } else {
       toast.success("All invalid products removed. You can now add to cart.");
     }
-
-    // Reset validation state if there are no more validation messages
     if (validationMessages.length === 0) {
       isValidated = false;
     }
@@ -401,170 +379,110 @@
     }
   }
 
-  // function prepareValidatedProductsForCart() {
-  //   const productsToAdd = [];
-  //   if (!validatedProducts || validatedProducts.length === 0) {
-  //     toast.error("No valid items to add to cart");
-  //     return productsToAdd;
-  //   }
-  //   const validProducts = validatedProducts.filter(
-  //     (product) => product.isValid === true,
-  //   );
-
-  //   validProducts.forEach((product) => {
-  //     if (
-  //       product.stockMessage ===
-  //         "Stock is sufficient for all uploaded quantities" ||
-  //       "SKU is valid" ||
-  //       (product.productNumber &&
-  //         product.productName &&
-  //         // product.pricing &&
-  //         // product.pricing[0] &&
-  //         // product.pricing[0].break &&
-  //         product.stock > 0)
-  //     ) {
-  //       console.log(`Product ${product.productName} passed validation check`);
-
-  //       // const sizePriceInfo = product.pricing[0];
-  //       // const size = sizePriceInfo.break;
-  //       // const price = sizePriceInfo.price;
-  //       const rowQuantity = parseInt(product.quantity, 10) || 0;
-  //       const productStock = parseInt(product.stock, 10) || 0;
-  //       const backOrder = Math.max(rowQuantity - productStock, 0);
-
-  //       const newProduct = {
-  //         id: product.productId,
-  //         manufacturerId: product.manufacturer,
-  //         distributerId: product.distributer ? product.distributer : null,
-  //         stockId: product.stockId,
-  //         productName: product.productName,
-  //         partNumber: product.productNumber,
-  //         // priceSize: {
-  //         //   price: price,
-  //         //   size: size,
-  //         // },
-  //         quantity: product.quantity || 1,
-  //         backOrder: backOrder,
-  //         stock: product.stock,
-  //       };
-
-  //       productsToAdd.push(newProduct);
-  //       console.log(
-  //         `Prepared product ${newProduct.productName} for cart addition`,
-  //       );
-  //     } else {
-  //       console.log(`Product ${product.productName} did not pass validation.`);
-  //     }
-  //   });
-
-  //   console.log(`Prepared ${productsToAdd.length} products for cart`);
-  //   return productsToAdd;
-  // }
-  
   function prepareValidatedProductsForCart() {
-  const productsToAdd = [];
-  
-  // Check if validatedProducts exists and has items
-  if (!validatedProducts || validatedProducts.length === 0) {
-    console.error("Error: No validated products available");
-    toast.error("No valid items to add to cart");
-    return productsToAdd;
-  }
-  
-  // Filter valid products
-  const validProducts = validatedProducts.filter(product => product.isValid === true);
-  
-  if (validProducts.length === 0) {
-    console.error("Error: No valid products found after filtering");
-    toast.error("No valid products found after validation");
-    return productsToAdd;
-  }
-  
-  validProducts.forEach((product) => {
-    try {
-      // Fix the conditional logic - previous version had a logic error
-      if (
-        (product.message === "Stock is sufficient for all uploaded quantities" || 
-         product.message === "SKU is valid") && 
-        product.productNumber 
-      ) {
-        console.log(`Product ${product.productNumber} passed validation check`);
-        
-        // Check required fields and log errors if missing
-        if (!product.productId) {
-          console.error(`Error: Missing productId for ${product.productNumber}`);
-          return; // Skip this product
-        }
-        if (!product.distributer) {
-          console.error(`Error: Missing distributer for ${product.productNumber}`);
-          return; // Skip this product
-        }
-        
-        if (!product.manufacturer) {
-          console.error(`Error: Missing manufacturer for ${product.productNumber}`);
-          return; // Skip this product
-        }
-        if (!product.quantity) {
-          console.error(`Error: Missing manufacturer for ${product.quantity}`);
-          return; // Skip this product
-        }
-        
-        if (!product.stockId) {
-          console.error(`Error: Missing stockId for ${product.productNumber}`);
-          return; // Skip this product
-        }
-        
-        const rowQuantity = parseInt(product.quantity, 10) || 0;
-        const productStock = parseInt(product.stock, 10) || 0;
-        const backOrder = Math.max(rowQuantity - productStock, 0);
+    const productsToAdd = [];
 
-        const newProduct = {
-          productId: product.productId,
-          manufacturerId: product.manufacturer,
-          distributerId: product.distributer ? product.distributer : null,
-          stockId: product.stockId,
-          productName: product.productName,
-          partNumber: product.productNumber,
-          quantity: product.quantity || 1,
-          backOrder: backOrder,
-          stock: product.stock
-        };
-
-        productsToAdd.push(newProduct);
-        console.log(`Prepared product ${newProduct.partNumber} for cart addition`);
-        console.log(`Prepared product ${newProduct.partNumber.length} for cart additio`);
-        
-      } else {
-        // Log detailed error about why validation failed
-        console.error(`Product ${product.productNumber || product.productNumber} did not pass validation:`);
-        console.error(`- Stock message: ${product.message || 'Missing'}`);
-        console.error(`- Product number exists: ${!!product.productNumber}`);
-        console.error(`- Product name exists: ${!!product.productNumber}`);
-        console.error(`- Stock value: ${product.stock}`);
-      }
-    } catch (err) {
-      console.error(`Error processing product ${product.productNumber || product.productNumber}:`, err);
+    if (!validatedProducts || validatedProducts.length === 0) {
+      console.error("Error: No validated products available");
+      toast.error("No valid items to add to cart");
+      return productsToAdd;
     }
-  });
 
-  console.log(`Prepared ${productsToAdd.length} products for cart`);
-  
-  if (productsToAdd.length === 0) {
-    console.error("Error: No products prepared for cart after all checks");
-    toast.error("No valid items could be added to cart");
+    const validProducts = validatedProducts.filter(
+      (product) => product.isValid === true,
+    );
+
+    if (validProducts.length === 0) {
+      console.error("Error: No valid products found after filtering");
+      toast.error("No valid products found after validation");
+      return productsToAdd;
+    }
+
+    validProducts.forEach((product) => {
+      try {
+        if (
+          (product.message ===
+            "Stock is sufficient for all uploaded quantities" ||
+            product.message === "SKU is valid") &&
+          product.productNumber
+        ) {
+          if (!product.productId) {
+            console.error(
+              `Error: Missing productId for ${product.productNumber}`,
+            );
+            return;
+          }
+          if (!product.distributer) {
+            console.error(
+              `Error: Missing distributer for ${product.productNumber}`,
+            );
+            return;
+          }
+
+          if (!product.manufacturer) {
+            console.error(
+              `Error: Missing manufacturer for ${product.productNumber}`,
+            );
+            return;
+          }
+          if (!product.quantity) {
+            console.error(
+              `Error: Missing quantity for ${product.productNumber}`,
+            );
+            return;
+          }
+
+          if (!product.stockId) {
+            console.error(
+              `Error: Missing stockId for ${product.productNumber}`,
+            );
+            return;
+          }
+
+          const rowQuantity = parseInt(product.quantity, 10) || 0;
+          const productStock = parseInt(product.stock, 10) || 0;
+          const backOrder = Math.max(rowQuantity - productStock, 0);
+
+          const newProduct = {
+            productId: product.productId,
+            manufacturerId: product.manufacturer,
+            distributerId: product.distributer ? product.distributer : null,
+            stockId: product.stockId,
+            productName: product.productName,
+            partNumber: product.productNumber,
+            quantity: product.quantity || 1,
+            backOrder: backOrder,
+            stock: product.stock,
+          };
+
+          productsToAdd.push(newProduct);
+          // console.log(`Prepared product ${newProduct.partNumber} for cart addition`);
+        } else {
+          console.error(
+            `Product ${product.productNumber || "Unknown"} did not pass validation:`,
+          );
+          console.error(`- Stock message: ${product.message || "Missing"}`);
+          console.error(`- Product number exists: ${!!product.productNumber}`);
+          console.error(`- Product name exists: ${!!product.productName}`);
+          console.error(`- Stock value: ${product.stock}`);
+        }
+      } catch (err) {
+        console.error(
+          `Error processing product ${product.productNumber || "Unknown"}:`,
+          err,
+        );
+      }
+    });
+
+    if (productsToAdd.length === 0) {
+      toast.error("No valid items could be added to cart");
+    }
+
+    return productsToAdd;
   }
-  if(!isLoggedIn){
-    localStorage.setItem("cart",JSON.stringify(productsToAdd))
-    // goto("/cart")
-     setTimeout(() => {
-      window.location.href = "/cart";
-    }, 2000);
-  } 
-  return productsToAdd;
-}
+
   function attemptAddToCart() {
     if (!isValidated || duplicateEntries.length > 0) {
-
       submitFileData();
       return;
     }
@@ -587,14 +505,16 @@
       submitAlternateForm();
     }
   }
+
   async function submitAlternateForm() {
-    const storedTotalComps = JSON.parse(localStorage.getItem("cart"));
-    localStorage.setItem("totalCompsChemi", storedTotalComps.length);
+    const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+    localStorage.setItem("totalCompsChemi", storedCart.length);
     syncLocalStorageToStore();
   }
+
   function handleDataCart() {
     return async ({ result }) => {
-      console.log("result from page server for carat data", result);
+      console.log("result from page server for cart data", result);
 
       const totalComps = result?.data?.cartData?.cartItems.length;
       console.log("totalComps", totalComps);
@@ -602,6 +522,7 @@
       syncLocalStorageToStore();
     };
   }
+
   function syncLocalStorageToStore() {
     if (typeof window !== "undefined") {
       const storedTotalComps = localStorage.getItem("totalCompsChemi");
@@ -612,74 +533,80 @@
   }
 
   function handleLocalStorage() {
-  try {
-    cartloading = true;
-    const productsToAdd = prepareValidatedProductsForCart();
-    
-    if (productsToAdd.length === 0) {
-      cartloading = false;
-      toast.error("No valid items to add to cart");
-      return;
-    }
-    
-    const simplifiedCartItems = productsToAdd.map((item) => {
-      if (!item.productId || !item.manufacturerId || !item.stockId) {
-        console.error("Error: Missing required fields for cart item:", item);
-        return null;
-      }
-      
-      return {
-        productId: item.productId,
-        manufacturerId: item.manufacturerId,
-        stockId: item.stockId,
-        distributorId: item.distributerId,
-        quantity: item.quantity || 1,
-        backOrder: item.backOrder,
-      };
-    }).filter(item => item !== null); // Remove null items
-    
-    if (simplifiedCartItems.length === 0) {
-      cartloading = false;
-      toast.error("No valid items could be processed for cart");
-      return;
-    }
+    try {
+      cartloading = true;
+      const productsToAdd = prepareValidatedProductsForCart();
 
-    const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
-    const updatedCart = [...existingCart];
-    
-    simplifiedCartItems.forEach((newItem) => {
-      const existingItemIndex = updatedCart.findIndex(
-        (cartItem) =>
-          cartItem.productId === newItem.productId &&
-          cartItem.stockId === newItem.stockId &&
-          cartItem.manufacturerId === newItem.manufacturerId,
+      if (productsToAdd.length === 0) {
+        cartloading = false;
+        toast.error("No valid items to add to cart");
+        return;
+      }
+
+      const simplifiedCartItems = productsToAdd
+        .map((item) => {
+          if (!item.productId || !item.manufacturerId || !item.stockId) {
+            console.error(
+              "Error: Missing required fields for cart item:",
+              item,
+            );
+            return null;
+          }
+
+          return {
+            productId: item.productId,
+            manufacturerId: item.manufacturerId,
+            stockId: item.stockId,
+            distributerId: item.distributerId,
+            quantity: item.quantity || 1,
+            backOrder: item.backOrder,
+            productName: item.productName,
+            partNumber: item.partNumber,
+            stock: item.stock,
+          };
+        })
+        .filter((item) => item !== null);
+
+      if (simplifiedCartItems.length === 0) {
+        cartloading = false;
+        toast.error("No valid items could be processed for cart");
+        return;
+      }
+      const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const updatedCart = [...existingCart];
+      simplifiedCartItems.forEach((newItem) => {
+        const existingItemIndex = updatedCart.findIndex(
+          (cartItem) =>
+            cartItem.productId === newItem.productId &&
+            cartItem.stockId === newItem.stockId &&
+            cartItem.manufacturerId === newItem.manufacturerId,
+        );
+
+        if (existingItemIndex !== -1) {
+          updatedCart[existingItemIndex].quantity = newItem.quantity;
+          updatedCart[existingItemIndex].backOrder = newItem.backOrder;
+        } else {
+          updatedCart.push(newItem);
+        }
+      });
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      localStorage.setItem("totalCompsChemi", updatedCart.length);
+
+      const productsAddedCount = simplifiedCartItems.length;
+      toast.success(
+        `${productsAddedCount} valid ${productsAddedCount === 1 ? "item" : "items"} saved to cart.`,
       );
 
-      if (existingItemIndex !== -1) {
-        updatedCart[existingItemIndex].quantity += newItem.quantity;
-        updatedCart[existingItemIndex].backOrder += newItem.backOrder;
-      } else {
-        updatedCart.push(newItem);
-      }
-    });
-
-    // localStorage.setItem("cart", JSON.stringify(updatedCart));
-
-    const productsAddedCount = simplifiedCartItems.length;
-    toast.success(
-      `${productsAddedCount} valid ${productsAddedCount === 1 ? "item" : "items"} saved to cart.`,
-    );
-
-    cartloading = false;
-    // setTimeout(() => {
-    //   window.location.href = "/cart";
-    // }, 2000);
-  } catch (err) {
-    cartloading = false;
-    console.error("Error saving to localStorage:", err);
-    toast.error("Failed to save items to cart: " + err.message);
+      cartloading = false;
+      setTimeout(() => {
+        window.location.href = "/cart";
+      }, 2000);
+    } catch (err) {
+      cartloading = false;
+      console.error("Error saving to localStorage:", err);
+      toast.error("Failed to save items to cart: " + err.message);
+    }
   }
-}
   function mapInvalidProductsToLines() {}
 
   let fileInput;
@@ -955,63 +882,67 @@ Example file content:
               {/each}
             </div>
           {/if} -->
-          {#if isValidated && rawFileData.trim() }
-  <div
-    class="absolute mt-2 top-0 left-0 w-full h-full pointer-events-none"
-    bind:this={overlayElement}
-   
-    style="transform: translateY({-scrollTop}px);"
-  >
-    {#each rawFileData.trim().split("\n") as line, lineIndex}
-      {@const productInfo = line.split(',')[0].trim()}
-      {@const validationMessage = validationMessages.find((msg) => msg.productNumber === productInfo)}
-      
-      {#if lineIndex * lineHeight >= scrollTop - lineHeight * 2 && lineIndex * lineHeight <= scrollTop + viewportHeight}
-        <div
-          class="flex items-center pointer-events-auto"
-          style="position: absolute; top: {3 + lineIndex * lineHeight}px; right: 10px;"
-          bind:this={scrollContainer}
-        >
-          {#if validationMessage}
-            {#if validationMessage.isValid === true}
-              <div
-                class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
-                bind:this={scrollContainer}
-              >
-                <span class="text-xs mr-1">Valid</span>
-                <Icon icon="mdi:check-circle" class="text-base" />
-              </div>
-            {:else}
-              <div
-                class="flex items-center mt-2 text-red-500 bg-white bg-opacity-75 rounded px-1 mr-3"
-                bind:this={scrollContainer}
-              >
-                <span class="text-xs mr-1">{validationMessage.message || "Invalid product"}</span>
-                <button
-                  type="button"
-                  class="text-red-500 hover:text-red-700 pointer-events-auto"
-                  title="Remove invalid product"
-                  on:click={() => removeInvalidProduct(lineIndex)}
-                >
-                  <Icon icon="mdi:close-circle" class="text-base" />
-                </button>
-              </div>
-            {/if}
- 
-          {:else if isValidated}
+          {#if isValidated && rawFileData.trim()}
             <div
-              class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
-              bind:this={scrollContainer}
+              class="absolute mt-2 top-0 left-0 w-full h-full pointer-events-none"
+              bind:this={overlayElement}
+              style="transform: translateY({-scrollTop}px);"
             >
-              <span class="text-xs mr-1">Valid</span>
-              <Icon icon="mdi:check-circle" class="text-base" />
+              {#each rawFileData.trim().split("\n") as line, lineIndex}
+                {@const productInfo = line.split(",")[0].trim()}
+                {@const validationMessage = validationMessages.find(
+                  (msg) => msg.productNumber === productInfo,
+                )}
+
+                {#if lineIndex * lineHeight >= scrollTop - lineHeight * 2 && lineIndex * lineHeight <= scrollTop + viewportHeight}
+                  <div
+                    class="flex items-center pointer-events-auto"
+                    style="position: absolute; top: {3 +
+                      lineIndex * lineHeight}px; right: 10px;"
+                    bind:this={scrollContainer}
+                  >
+                    {#if validationMessage}
+                      {#if validationMessage.isValid === true}
+                        <div
+                          class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
+                          bind:this={scrollContainer}
+                        >
+                          <span class="text-xs mr-1">Valid</span>
+                          <Icon icon="mdi:check-circle" class="text-base" />
+                        </div>
+                      {:else}
+                        <div
+                          class="flex items-center mt-2 text-red-500 bg-white bg-opacity-75 rounded px-1 mr-3"
+                          bind:this={scrollContainer}
+                        >
+                          <span class="text-xs mr-1"
+                            >{validationMessage.message ||
+                              "Invalid product"}</span
+                          >
+                          <button
+                            type="button"
+                            class="text-red-500 hover:text-red-700 pointer-events-auto"
+                            title="Remove invalid product"
+                            on:click={() => removeInvalidProduct(lineIndex)}
+                          >
+                            <Icon icon="mdi:close-circle" class="text-base" />
+                          </button>
+                        </div>
+                      {/if}
+                    {:else if isValidated}
+                      <div
+                        class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
+                        bind:this={scrollContainer}
+                      >
+                        <span class="text-xs mr-1">Valid</span>
+                        <Icon icon="mdi:check-circle" class="text-base" />
+                      </div>
+                    {/if}
+                  </div>
+                {/if}
+              {/each}
             </div>
           {/if}
-        </div>
-      {/if}
-    {/each}
-  </div>
-{/if}
         </div>
       </div>
     </div>
@@ -1050,7 +981,6 @@ Example file content:
             <p class="text-sm font-medium text-center px-2">
               Upload or drag and drop your CSV or XLS file to upload
             </p>
-
           </div>
 
           <input
@@ -1172,11 +1102,11 @@ Example file content:
       action="?/addToCart"
       use:enhance={({ formData, cancel }) => {
         cartloading = true;
-  if (!isValidated || duplicateEntries.length > 0) {
-      // validateAndSubmitData();
-      submitFileData();
-      return false;
-    }
+        if (!isValidated || duplicateEntries.length > 0) {
+          // validateAndSubmitData();
+          submitFileData();
+          return false;
+        }
         let productsToAdd = prepareValidatedProductsForCart();
 
         if (productsToAdd.length === 0) {
@@ -1184,20 +1114,20 @@ Example file content:
           toast.error("No valid items to add to cart");
           return cancel();
         }
-        productsToAdd = productsToAdd.filter(y=>{
-          const search = $cart.find(x=>x.stockId === y.stockId)
-          if(search === undefined) return y
-        })
-        console.log(productsToAdd,"form");
-        if(!isLoggedIn){
-          localStorage.setItem("cart",JSON.stringify(productsToAdd))
-          guestCart.set(productsToAdd)
-          console.log('is kmdk  ej k');
+        // productsToAdd = productsToAdd.filter(y=>{
+        //   const search = $cart.find(x=>x.stockId === y.stockId)
+        //   if(search === undefined) return y
+        // })
+        console.log(productsToAdd, "form");
+        if (!isLoggedIn) {
+          localStorage.setItem("cart", JSON.stringify(productsToAdd));
+          guestCart.set(productsToAdd);
+          console.log("is kmdk  ej k");
           // goto("/cart")
-           setTimeout(() => {
-      window.location.href = "/cart";
-    }, 2000);
-          cancel()
+          setTimeout(() => {
+            window.location.href = "/cart";
+          }, 2000);
+          cancel();
         }
         formData.set("cartItems", JSON.stringify(productsToAdd));
         //cancel()
