@@ -1118,7 +1118,8 @@ export async function DifferentProds(productId) {
     throw new Error("Product not found");
   }
 
-  const productid = product._id; 
+  const productid = product._id;
+  const CAS = product.CAS;
 
   let stockQuantity = 0;
   let orderMultiple = 0;
@@ -1157,23 +1158,17 @@ export async function DifferentProds(productId) {
             pricingStockId: pricingStockId,
           };
 
-          if (currencies.INR && !currencies.USD) {
+          const currentRates = await conversionRates();
+          const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;
+          const inrRate = currentRates["USD"] || null;
+
+          if (currencies.INR && !currencies.USD && usdRate) {
             priceData.INR = currencies.INR;
-            const currentRates = await conversionRates();
-            const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;
-            if (usdRate) {
-              priceData.USD = Number(currencies.INR * usdRate).toFixed(2);
-            }
-          }
-          if (currencies.USD && !currencies.INR) {
+            priceData.USD = Number(currencies.INR * usdRate).toFixed(2);
+          } else if (currencies.USD && !currencies.INR && inrRate) {
             priceData.USD = currencies.USD;
-            const currentRates = await conversionRates();
-            const inrRate = currentRates["USD"] ? currentRates["USD"] : null;
-            if (inrRate) {
-              priceData.INR = Number(currencies.USD * inrRate).toFixed(2);
-            }
-          }
-          if (currencies.INR && currencies.USD) {
+            priceData.INR = Number(currencies.USD * inrRate).toFixed(2);
+          } else if (currencies.INR && currencies.USD) {
             priceData.USD = currencies.USD;
             priceData.INR = currencies.INR;
           }
@@ -1187,89 +1182,95 @@ export async function DifferentProds(productId) {
     }
   }
 
-  const variants = product.variants || [];
-  const variantRecord = await Promise.all(
-    variants.map(async (variantId) => {
-      const variant = await Product.findById(variantId).lean();
-      if (!variant) return {};
-  
-      const stockRecords = await Stock.find({ productid: variant._id }).lean(); // array
-  
-      let variantPricing = [];
-      let variantStockId = "";
-      let variantAvailableStock = 0;
-      let variantOrderMultiple = 1;
-      let variantDistributorId = "";
-      let variantManufacturerId = "";
-  
-      for (const stock of stockRecords) {
-        let variantStockQuantity = stock?.stock || 0;
-        let variantOrderedQty = stock?.orderedQty || 0;
-        variantAvailableStock = variantStockQuantity - variantOrderedQty;
-        variantOrderMultiple = stock.orderMultiple || 1;
-        variantStockId = stock._id?.toString() || "";
-        variantDistributorId = stock.distributor?.toString() || "";
-        variantManufacturerId = stock.manufacturer?.toString() || "";
-  
-        if (stock.pricing) {
-          const { break: breakPoint, offer, ...variantCurrencies } = stock.pricing;
-  
-          let variantPriceData = {
-            break: breakPoint,
-            offer: offer || undefined,
-            USD: 0,
-            INR: 0,
-            productid: variant._id?.toString() || "",
-            manufacturerId: variantManufacturerId,
-            distributorId: variantDistributorId,
-            stockId: variantStockId,
-          };
-  
-          if (variantCurrencies.INR && !variantCurrencies.USD) {
-            variantPriceData.INR = variantCurrencies.INR;
-            const currentRates = await conversionRates();
-            const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;
-            if (usdRate) {
+  let variantRecord = [];
+  if (CAS) {
+    const variants = await Product.find({ CAS, _id: { $ne: product._id } }).lean();
+
+    if (variants.length > 0) {
+      const variantIds = variants.map(v => v._id);
+      const stockRecords = await Stock.find({ productid: { $in: variantIds } }).lean();
+      const currentRates = await conversionRates();
+      const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;
+      const inrRate = currentRates["USD"] || null;
+
+      const stockByProductId = {};
+      stockRecords.forEach(stock => {
+        const pid = stock.productid?.toString();
+        if (!stockByProductId[pid]) stockByProductId[pid] = [];
+        stockByProductId[pid].push(stock);
+      });
+
+      variantRecord = variants.map(variant => {
+        const stocks = stockByProductId[variant._id.toString()] || [];
+
+        let variantPricing = [];
+        let variantStockId = "";
+        let variantAvailableStock = 0;
+        let variantOrderMultiple = 1;
+        let variantDistributorId = "";
+        let variantManufacturerId = "";
+
+        for (const stock of stocks) {
+          const variantStockQuantity = stock?.stock || 0;
+          const variantOrderedQty = stock?.orderedQty || 0;
+          variantAvailableStock = variantStockQuantity - variantOrderedQty;
+          variantOrderMultiple = stock.orderMultiple || 1;
+          variantStockId = stock._id?.toString() || "";
+          variantDistributorId = stock.distributor?.toString() || "";
+          variantManufacturerId = stock.manufacturer?.toString() || "";
+
+          if (stock.pricing) {
+            const { break: breakPoint, offer, ...variantCurrencies } = stock.pricing;
+
+            let variantPriceData = {
+              break: breakPoint,
+              offer: offer || undefined,
+              USD: 0,
+              INR: 0,
+              productid: variant._id?.toString() || "",
+              manufacturerId: variantManufacturerId,
+              distributorId: variantDistributorId,
+              stockId: variantStockId,
+            };
+
+            if (variantCurrencies.INR && !variantCurrencies.USD && usdRate) {
+              variantPriceData.INR = variantCurrencies.INR;
               variantPriceData.USD = Number(variantCurrencies.INR * usdRate).toFixed(2);
-            }
-          } else if (variantCurrencies.USD && !variantCurrencies.INR) {
-            variantPriceData.USD = variantCurrencies.USD;
-            const currentRates = await conversionRates();
-            const inrRate = currentRates["USD"] || null;
-            if (inrRate) {
+            } else if (variantCurrencies.USD && !variantCurrencies.INR && inrRate) {
+              variantPriceData.USD = variantCurrencies.USD;
               variantPriceData.INR = Number(variantCurrencies.USD * inrRate).toFixed(2);
+            } else if (variantCurrencies.INR && variantCurrencies.USD) {
+              variantPriceData.USD = variantCurrencies.USD;
+              variantPriceData.INR = variantCurrencies.INR;
             }
-          } else if (variantCurrencies.INR && variantCurrencies.USD) {
-            variantPriceData.USD = variantCurrencies.USD;
-            variantPriceData.INR = variantCurrencies.INR;
+
+            variantPricing.push(variantPriceData);
           }
-  
-          variantPricing.push(variantPriceData);
         }
-      }
-  
-      return {
-        _id: variant?._id?.toString() || "",
-        productName: variant?.productName || "Unknown Product",
-        prodDesc: variant?.prodDesc || "No description available",
-        description: Array.isArray(variant?.description) ? variant.description : [],
-        properties: variant?.properties || {},
-        manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
-        productNumber: variant?.productNumber || "N/A",
-        imageSrc: variant?.image || variant?.imageSrc || "",
-        pricing: variantPricing,
-        stockId: variantStockId,
-        distributorId: variantDistributorId,
-        manufacturerId: variantManufacturerId,
-        stock: variantAvailableStock,
-        orderMultiple: variantOrderMultiple,
-      };
-    })
-  );
+
+        return {
+          _id: variant._id?.toString() || "",
+          productName: variant.productName || "--",
+          prodDesc: variant.prodDesc || "--",
+          description: Array.isArray(variant.description) ? variant.description : [],
+          properties: variant.properties || {},
+          manufacturerName: variant.manufacturerName?.toString() || "--",
+          productNumber: variant.productNumber || "--",
+          imageSrc: variant.image || variant.imageSrc || "",
+          pricing: variantPricing,
+          stockId: variantStockId,
+          distributorId: variantDistributorId,
+          manufacturerId: variantManufacturerId,
+          stock: variantAvailableStock,
+          orderMultiple: variantOrderMultiple,
+        };
+      });
+    }
+  }
 
   const formattedRecord = {
     productId: product?._id?.toString() || "",
-    productName: product?.productName || "Unknown Product",
+    productName: product?.productName || "--",
     CAS: product?.CAS,
     productNumber: product?.productNumber || "N/A",
     prodDesc: product?.prodDesc,
@@ -1289,23 +1290,8 @@ export async function DifferentProds(productId) {
     stockId,
     stock,
     distributorId,
-    sku, 
-    variants: variantRecord.map((variant) => ({
-      _id: variant?._id?.toString() || "",
-      productName: variant?.productName || "Unknown Product",
-      prodDesc: variant?.prodDesc || "No description available",
-      description: variant?.description || [],
-      properties: variant?.properties || {},
-      manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
-      productNumber: variant?.productNumber || "N/A",
-      imageSrc: variant?.image || variant?.imageSrc || "",
-      pricing: variant?.pricing,
-      stockId: variant?.stockId,
-      distributorId: variant?.distributorId,
-      manufacturerId: variant?.manufacturerId,
-      stock:variant?.stock,
-      orderMultiple:variant?.orderMultiple,
-    })),
+    sku,
+    variants: variantRecord,
   };
 
   return { records: [formattedRecord] };
