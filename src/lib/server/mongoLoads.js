@@ -424,7 +424,7 @@ async function getMatchedComponents(search) {
     };
 
     let components = await Product.find(queryFilter)
-    .limit(20)
+    .limit(12)
     .populate('category','urlName')
     .populate('subCategory','urlName')
     .select('productName CAS productNumber manufacturerName')
