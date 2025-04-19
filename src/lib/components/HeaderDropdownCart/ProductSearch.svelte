@@ -363,8 +363,8 @@
 								alt={item?.productName}/>
 							<div class="overflow-hidden">
 								<p class="text-sm text-heading font-semibold text-justify whitespace-nowrap">{truncateText(item?.productName,30)}</p>
-								<p class="text-xs pt-1">{item?.productNumber}</p>
-								<p class="text-gray-500 text-sm font-medium pt-3">{item?.manufacturerName}</p>
+								<p class="text-xs pt-1">{item?.CAS || ""}</p>
+								<p class="text-gray-500 text-sm font-medium pt-3">{item?.manufacturerName || ""}</p>
 							</div>
 						</div>
 					</a>
