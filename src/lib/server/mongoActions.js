@@ -1184,11 +1184,21 @@ let cleanedQuery = body.query.replace(/[^\w]/g, "").toLowerCase();;
 	  };
 	  
 	try {
-		const result = await Product.find(queryFilter)
-			.limit(10)
-			.populate('category')
-			.populate('subCategory')
-			.exec();
+		let result = await Product.find(queryFilter)
+			.limit(20)
+			.populate('category','urlName')
+			.populate('subCategory','urlName')
+			.select('productName CAS productNumber manufacturerName')
+			.lean();
+
+		let seenCAS= new Set()
+		result = result.filter(prod => {
+			if(!prod.CAS) return true
+			if(seenCAS.has(prod.CAS)) return false
+			seenCAS.add(prod.CAS)
+			return true
+		})
+
 		return JSON.parse(JSON.stringify(result));
 	} catch (error) {
 		console.log(error);
