@@ -423,11 +423,20 @@ async function getMatchedComponents(search) {
       ],
     };
 
-    const components = await Product.find(queryFilter)
-      .limit(9)
-      .populate("category")
-      .populate("subCategory")
-      .exec();
+    let components = await Product.find(queryFilter)
+    .limit(20)
+    .populate('category','urlName')
+    .populate('subCategory','urlName')
+    .select('productName CAS productNumber manufacturerName')
+    .lean();
+
+    let seenCAS= new Set()
+		components = components.filter(prod => {
+			if(!prod.CAS) return true
+			if(seenCAS.has(prod.CAS)) return false
+			seenCAS.add(prod.CAS)
+			return true
+		})
 
     return components;
   } catch (error) {
