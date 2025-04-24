@@ -445,6 +445,7 @@ function handleMouseLeave() {
       } else{
         newUrl.searchParams.set(key, value);
       }
+      newUrl.searchParams.set("page", 1);
   })
   goto(newUrl.toString(),{
         invalidateAll:true,
@@ -670,8 +671,8 @@ function handleMouseLeave() {
                 </div>
                 <div class=" text-xs md:text-sm space-y-1 grow font-medium">
                     <p>Product Number : <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.productNumber || ""}</a></p>
-                    <p>Category : <a href={`/products/${categoryName}`} class=" font-semibold hover:text-primary-500 hover:underline">{catName || ""}</a></p>
-                    <p>Sub Category : <span class=" font-semibold ">{subCatName || ""}</span></p>
+                    <!-- <p>Category : <a href={`/products/${categoryName}`} class=" font-semibold hover:text-primary-500 hover:underline">{catName || ""}</a></p> -->
+                    <p>CAS Number : <span class=" font-semibold ">{product?.CAS || "N/A"}</span></p>
                     <p>Manufacturer : <span class=" font-semibold ">{product?.manufacturerDetails.name || ""}</span></p>
                     <!-- <p>Price : <span class=" font-semibold">{$currencyState === "inr" ? "₹" + product?.pricing.INR.toLocaleString("en-IN"): "$"+ product?.pricing.USD.toLocaleString("en-IN")}</span></p> -->
                     {#if product?.pricing && Object.keys(product.pricing).length > 0}
