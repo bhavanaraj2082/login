@@ -1858,20 +1858,31 @@ export async function getUserMycart(userId) {
     }
 
     const userCart = await Cart.findOne({ userId }).lean();
-    
-    if (!userCart || !userCart.cartItems || userCart.cartItems.length === 0) {
+
+    if (!userCart) {
       return {
         success: true,
         data: [],
-        message: 'No Cart found'
+        message: 'No cart found'
+      };
+    }
+
+    if (!userCart.cartItems || userCart.cartItems.length === 0) {
+      return {
+        success: true,
+        data: [{
+          ...userCart,
+          cartItems: []
+        }],
+        message: 'Cart is empty'
       };
     }
 
     const cart = await Cart.aggregate([
-      { 
-        $match: { 
-          userId: userId 
-        } 
+      {
+        $match: {
+          userId: userId
+        }
       },
       {
         $project: {
@@ -1887,8 +1898,11 @@ export async function getUserMycart(userId) {
           recurrence: 1
         }
       },
-      { 
-        $unwind: '$cartItems'
+      {
+        $unwind: {
+          path: '$cartItems',
+          preserveNullAndEmptyArrays: true
+        }
       },
       {
         $lookup: {
@@ -1974,10 +1988,15 @@ export async function getUserMycart(userId) {
       }
     ]).exec();
 
+    const cleanedCart = cart.map(c => ({
+      ...c,
+      cartItems: c.cartItems.filter(item => item.productInfo?.productId)
+    }));
+
     return {
       success: true,
-      data: cart || [],
-      message: cart.length > 0 ? 'Cart found' : 'No Cart found'
+      data: cleanedCart,
+      message: 'Cart found'
     };
 
   } catch (error) {

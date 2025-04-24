@@ -10,6 +10,7 @@
 	export let data;
 	// console.log("mycartdata====>",data)
 	function transformCartData(data) {
+  		// if (!data?.cart || !Array.isArray(data.cart)) return [];
   		if (!data?.cart || !Array.isArray(data.cart)) return [];
 
   		return data.cart
@@ -743,9 +744,28 @@ function formatDate(dateString) {
 	};
 
 	const handleNameChange = (event) => {
-		newCartName = event.target.value;
-		hasChanges = newCartName.trim() !== originalCartName;
-	};
+	const rawValue = event.target.value;
+
+	const invalidPattern = /[^a-zA-Z0-9 ]/g;
+	if (invalidPattern.test(rawValue)) {
+		toast.error('Only letters and numbers are allowed in cart name');
+	}
+
+	let sanitizedValue = rawValue
+		.replace(/<script.*?>.*?<\/script>/gi, '')
+		.replace(/<\/?[^>]+(>|$)/g, '')
+		.replace(/on\w+=".*?"/gi, '')
+		.replace(/javascript:/gi, '')
+		.replace(/[^a-zA-Z0-9]/g, '')
+		.trim();
+
+	if (rawValue !== sanitizedValue) {
+		toast.error('Only letters and numbers (no spaces or special characters) are allowed.');
+	}
+
+	newCartName = sanitizedValue;
+	hasChanges = newCartName !== originalCartName;
+};
 
 	const handleEditCart = () => {
 		return async ({ result }) => {
@@ -849,6 +869,25 @@ function formatDate(dateString) {
 		return result;
 	}
 
+	const handleCreateCartNameChange = (event) => {
+		const rawValue = event.target.value;
+		
+		let sanitizedValue = rawValue
+			.replace(/<script.*?>.*?<\/script>/gi, '') 
+			.replace(/<\/?[^>]+(>|$)/g, '') 
+			.replace(/on\w+=".*?"/gi, '') 
+			.replace(/javascript:/gi, ''); 
+		
+		sanitizedValue = sanitizedValue.replace(/[^a-zA-Z0-9 ]/g, '').trim(); 
+		
+		if (sanitizedValue.length === 0) {
+			sanitizedValue = ''; 
+		}
+	
+		newCartName = sanitizedValue;
+	};
+
+
 	const handleCreateCart = () => {
 		isCreatingCart = true;
 
@@ -885,7 +924,7 @@ function formatDate(dateString) {
 					<div class="flex flex-col items-center text-center">
 						<Icon icon="bx:cart-download" class="text-4xl mb-4 text-yellow-600" />
 						<p class="font-semibold text-xs md:text-xl text-yellow-600">
-							No items in cart
+							No Cart found 
 						</p>
 					</div>
 				</div>
@@ -929,7 +968,7 @@ function formatDate(dateString) {
 		<div class="grid md:grid-cols-2 lg:hidden gap-4">
 			{#if !paginatedCartItems.length}
 				<div class="w-full md:w-full border rounded-md border-yellow-400 items-center px-4 py-8 md:col-span-2">
-					<p class="text-center text-gray-500">No items found</p>
+					<p class="text-center text-gray-500">No Cart found</p>
 				</div>
 			{:else}
 				{#each paginatedCartItems as cart}
@@ -1021,7 +1060,7 @@ function formatDate(dateString) {
 					{#if !paginatedCartItems.length}
 						<tr>
 							<td colspan="5" class="border px-4 py-8 text-center text-gray-500">
-								No items found
+								No Cart found
 							</td>
 						</tr>
 					{:else}
@@ -1189,8 +1228,8 @@ function formatDate(dateString) {
           <h2 class="text-lg md:text-xl font-medium">
             {existingRecurrence ? 'Update' : 'Set'} Recurrence
           </h2>
-          <button type="button" on:click={toggleRecurrencePopup} class="text-gray-500 hover:text-gray-700 focus:outline-none">
-            <Icon icon="basil:cross-solid" class="text-xl hover:bg-gray-100 rounded p-1" />
+          <button type="button" on:click={toggleRecurrencePopup} class="text-gray-500 hover:text-gray-700 focus:outline-none hover:scale-95">
+            <Icon icon="basil:cross-solid" class="text-4xl text-red-600 hover:bg-red-100 rounded p-0.5 transition-all duration-300" />
           </button>
         </div>
         {#if existingRecurrence}
@@ -1226,7 +1265,7 @@ function formatDate(dateString) {
               min="1" 
               max="31"
               placeholder="Enter day (1-31)" 
-              class="border border-gray-300 rounded-md w-full p-2 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none"/>
+              class="border border-gray-300 rounded-md w-full p-2 outline-none focus:ring-0 focus:outline-none focus:border-primary-500"/>
             {#if dateError}
               <p class="text-red-500 text-xs mt-1">{dateError}</p>
             {/if}
@@ -1240,7 +1279,7 @@ function formatDate(dateString) {
               bind:value={month} 
               id="recurrence" 
               on:change={calculateNextDate}
-              class="border border-gray-300 rounded-md w-full p-2 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none">
+              class="border border-gray-300 rounded-md w-full p-2 outline-none focus:ring-0 focus:outline-none focus:border-primary-500">
               <option selected hidden value="">Select Interval</option>
               <option value="1">Monthly</option>
               <option value="3">Quarterly (3 months)</option>
@@ -1295,7 +1334,7 @@ function formatDate(dateString) {
             <button 
               type="button" 
               on:click={toggleRecurrencePopup} 
-              class="w-1/2 py-2 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400" >
+              class="w-1/2 py-2 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300" >
               Cancel
             </button>
             <button 
@@ -1325,9 +1364,7 @@ function formatDate(dateString) {
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 {#if $showPopup}
 	<div class="fixed inset-0 z-50 overflow-y-auto animate-fadeIn">
-		<div
-			class="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm animate-fadeIn"
-			on:click={closePopup}></div>
+		<div class="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm animate-fadeIn"on:click={closePopup}></div>
 		<div class="min-h-screen px-4 flex items-center justify-center overflow-auto">
 			<div class="relative bg-white rounded-lg shadow-2xl w-full max-w-7xl mx-auto animate-slideUp motion-reduce:animate-none">
 				<div class="flex items-center justify-between p-4 border-b bg-gray-50">
@@ -1344,6 +1381,8 @@ function formatDate(dateString) {
 									<input
 										type="text"
 										name="cartName"
+										pattern="[a-zA-Z0-9]+"
+										inputmode="text"
 										value={newCartName}
 										on:input={handleNameChange}
 										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent {!newCartName.trim()
@@ -1352,7 +1391,7 @@ function formatDate(dateString) {
 										placeholder="Enter new cart name"
 										required/>
 									{#if !newCartName.trim()}
-										<p class="text-red-500 text-xs my-1 absolute">*Cart name cannot be empty</p>
+										<p class="text-red-500 text-xs my-1 absolute whitespace-nowrap">*Cart name cannot be empty</p>
 									{/if}
 								</div>
 								<div class="flex gap-2">
@@ -1367,7 +1406,7 @@ function formatDate(dateString) {
 											<span>Save</span>
 										{/if}
 									</button>
-									<button type="button" on:click={cancelEditing} disabled={isLoading} class="px-3 py-2 border border-gray-300 rounded hover:bg-gray-100">
+									<button type="button" on:click={cancelEditing} disabled={isLoading} class="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-100">
 										Cancel
 									</button>
 								</div>
@@ -1390,9 +1429,9 @@ function formatDate(dateString) {
 						{/if}
 					</div>
 					<button
-						class="p-1 hover:bg-gray-100 rounded-md transition-colors duration-200"
+						class="p-1 hover:bg-red-100 rounded transition-colors duration-200 hover:scale-95 "
 						on:click={closePopup}>
-						<Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
+						<Icon icon="mdi:close" class="text-2xl text-red-500 hover:text-red-700"/>
 					</button>
 				</div>
 				{#if !$selectedCart.cartItems || $selectedCart.cartItems.length === 0}
@@ -1413,7 +1452,7 @@ function formatDate(dateString) {
 										<th class="p-3 text-center font-semibold text-sm w-24">Quantity</th>
 									</tr>
 								</thead>
-								<tbody class="divide-y divide-gray-200">
+								<tbody class="divide-y divide-gray-200 overflow-y-auto">
 									{#each $selectedCart.cartItems as item}
 										<tr class="hover:bg-gray-50 transition-colors duration-150">
 											<td class="p-3">
@@ -1566,7 +1605,7 @@ function formatDate(dateString) {
 		<div class="bg-white rounded-md shadow-lg p-6 w-11/12 max-w-md animate-fadeIn" on:click|stopPropagation>
 			<div class="flex justify-between items-center mb-4">
 				<h2 class="text-md sm:text-lg font-medium">Create a new cart</h2>
-				<button class="p-1 hover:bg-gray-100 rounded-md transition-colors duration-200" on:click={cancelNewCart}>
+				<button class="p-1 hover:bg-red-100 rounded-md transition-colors duration-300 hover:scale-95" on:click={cancelNewCart}>
 					<Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
 				</button>
 			</div>
@@ -1574,7 +1613,7 @@ function formatDate(dateString) {
 			<form method="POST" action="?/createcart" use:enhance={handleCreateCart} class="space-y-4">
 				<div>
 					<h4 class="text-sm font-medium mb-2">Cart name</h4>
-					<input type="text" name="cartName" bind:value={newCartName} placeholder="Enter cart name" class="w-full text-sm px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary-500 focus:ring-0"/>
+					<input type="text" name="cartName" bind:value={newCartName} on:input={handleCreateCartNameChange} placeholder="Enter cart name" class="w-full text-sm px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary-500 focus:ring-0"/>
 				</div>
 				<input type="hidden" name="cartName" value={newCartName} />
 				<input type="hidden" name="cartId" value={generateCartId()} />
