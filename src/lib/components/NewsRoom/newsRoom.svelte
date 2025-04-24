@@ -70,7 +70,7 @@
         </a>
         {/each}
     </div>
-    {#if totalPages > 0}
+    {#if totalPages > 1}
     <div class="w-fit gap-1 sm:gap-1.5 mx-auto flex mt-10 mb-5">
         <button class="border shadow bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-gray-200"
             on:click={() => { goToPage(0); setTimeout(scrollToTop, 100); }}

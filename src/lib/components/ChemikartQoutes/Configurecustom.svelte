@@ -62,46 +62,62 @@ const handleFileUpload = (event) => {
                 headerIndex[header] = index;
             });
 
-            // Validate if data is in the correct columns
-            for (let i = 0; i < Math.min(rows.length, 5); i++) { // Check first 5 rows
-                const row = rows[i];
+			const invalidRows = [];
+const validComponents = [];
 
-                // Validate "Component Name" (should be a string)
-                if (typeof row[headerIndex["Component Name"]] !== "string" || row[headerIndex["Component Name"]].trim() === "") {
-                    errorMessage10 = `Invalid Component Name at row ${i + 1}`;
-                    uploadedFiles = false;
-                    return;
-                }
+for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const rowIndex = i + 2; // +2 because Excel headers start at row 1
 
-                // Validate "CasNumber" (should be a valid CAS number format)
-                if (!isValidCasNumber(row[headerIndex["CasNumber"]])) {
-                    errorMessage10 = `Invalid CAS Number format at row ${i + 1}`;
-                    uploadedFiles = false;
-                    return;
-                }
+    const componentName = row[headerIndex["Component Name"]];
+    const casNumber = row[headerIndex["CasNumber"]];
+    const concentration = row[headerIndex["Concentration"]];
 
-                // Validate "Concentration" (should be a number)
-                if (isNaN(row[headerIndex["Concentration"]]) || row[headerIndex["Concentration"]] === "") {
-                    errorMessage10 = `Invalid Concentration value at row ${i + 1}`;
-                    uploadedFiles = false;
-                    return;
-                }
-            }
+    const isComponentNameValid = typeof componentName === "string" && componentName.trim() !== "";
+    const isCasNumberValid = isValidCasNumber(casNumber);
+    const isConcentrationValid = !isNaN(concentration) && concentration !== "";
 
-            // If validation passes, update the formData store
-            const components = rows.map(row => {
-                return headers.reduce((acc, header, index) => {
-                    acc[header] = row[index] || "";
-                    return acc;
-                }, {});
-            });
+    if (!isComponentNameValid || !isCasNumberValid || !isConcentrationValid) {
+        let reason = [];
+        if (!isComponentNameValid) reason.push("Invalid Component Name");
+        if (!isCasNumberValid) reason.push("Invalid CAS Number");
+        if (!isConcentrationValid) reason.push("Invalid Concentration");
 
-            formData.update((currentData) => ({
-                ...currentData,
-                components
-            }));
+        invalidRows.push(`Row ${rowIndex-1}: ${reason.join(", ")}`);
+        continue;
+    }
 
-            errorMessage10 = ""; // Clear error if data is correct
+    // If row is valid, map it to object
+    const component = headers.reduce((acc, header, index) => {
+        acc[header] = row[index] || "";
+        return acc;
+    }, {});
+    validComponents.push(component);
+}
+
+// Decide what to do after validation
+if (validComponents.length === 0) {
+    // Only one row or all are bad
+    errorMessage10 = invalidRows.join("; ");
+    uploadedFiles = false;
+    return;
+}
+
+// Save valid data
+formData.update((currentData) => ({
+    ...currentData,
+    components: validComponents
+}));
+
+uploadedFiles = true;
+
+// Show partial errors if any
+if (invalidRows.length > 0) {
+    errorMessage10 = `Some rows were skipped due to errors: ${invalidRows.join("; ")}`;
+} else {
+    errorMessage10 = "";
+}
+
         };
         reader.readAsArrayBuffer(uploadedFile);
     }
@@ -370,11 +386,19 @@ else if (selectedSolvent === "Yes") {
 			</div>
 		  {/if}
 		</div>
-	{#if errorMessage10}
-		<div class="text-red-500 mt-5 ml-12 text-sm font-medium">
-			{errorMessage10}
+	{#if errorMessage10 && uploadedFiles}
+		<div class="text-black mt-5 ml-12 text-sm font-semibold">
+			{errorMessage10} "No worries You can go with submission"
 		</div>
-	{/if}		<div class="bg-white">
+	{/if}	
+
+	{#if errorMessage10 && !uploadedFiles}
+		<div class="text-red-500 mt-5 ml-12 text-sm font-semibold">
+			{errorMessage10} 
+		</div>
+	{/if}	
+	
+	<div class="bg-white">
 			<h1 class="font-bold sm:text-2xl text-sm ml-3 md:ml-10 py-5">Would you like to specify a solvent?*</h1>
 		
 			<div class="mt-4 ml-3 md:ml-20">

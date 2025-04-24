@@ -22,17 +22,74 @@
     let toggleEdit = false;
     let errors
     $:console.log(errors);
-	const validateForm = ()=>{
-		errors={}
-            if(!firstName || !/^[A-Za-z\s]+$/.test(firstName)) errors.firstName="First name is required and valid"
-            if(!cellPhone || !/^\d{10}$/.test(cellPhone)) errors.cellPhone="Primary phone number is required and valid"
-            if(Object.keys(errors).length >0){
-			return false
-		}else{
-			return true
-		}
-	}
-    const handleSubmit =({cancel})=>{
+
+
+
+const validateField = (name, value) => {
+    let message = "";
+
+    switch(name) {
+        case "firstName":
+            if (!value) message = "First name is required";
+            else if (!/^[A-Za-z\s]+$/.test(value)) message = "First name must contain only letters";
+            break;
+
+        case "lastName":
+            if (value && !/^[A-Za-z\s]+$/.test(value)) message = "Last name must contain only letters";
+            break;
+
+        case "cellPhone":
+            if (!value) message = "Primary phone is required";
+            else if (!/^\d{10}$/.test(value)) message = "Primary phone must be 10 digits";
+            break;
+
+        case "alternatePhone":
+            if (value && !/^\d{10}$/.test(value)) message = "Alternate phone must be 10 digits";
+            break;
+
+        case "companyName":
+            if (value && !/^[\w\s.,&()-]+$/.test(value)) message = "Company name contains invalid characters";
+            break;
+
+        case "companytype":
+            if (value && !/^[A-Za-z\s]+$/.test(value)) message = "Company type should contain only letters";
+            break;
+
+        case "gstNumber":
+            if (value && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}[Z]{1}[A-Z0-9]{1}$/.test(value)) message = "Invalid GST number format (e.g, 12ABCDE1234F4Z5)";
+            break;
+
+        case "jobtitle":
+            if (value && !/^[A-Za-z\s]+$/.test(value)) message = "Job title should contain only letters";
+            break;
+
+        case "tanNumber":
+            if (value && !/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(value)) message = "Invalid TAN format (e.g., ABCD12345E)";
+            break;
+    }
+
+    errors = { ...errors, [name]: message };
+}
+
+
+const validateForm = () => {
+    errors = {};
+    validateField("firstName", firstName);
+    validateField("lastName", lastName);
+    validateField("cellPhone", cellPhone);
+    validateField("alternatePhone", alternatePhone);
+    validateField("companyName", companyName);
+    validateField("companytype", companytype);
+    validateField("gstNumber", gstNumber);
+    validateField("jobtitle", jobtitle);
+    validateField("tanNumber", tanNumber);
+
+    return Object.values(errors).every(error => !error);
+}
+
+
+
+const handleSubmit =({cancel})=>{
         if(!validateForm()){
             cancel()
         }
@@ -45,10 +102,10 @@
         }
     }
 }
+
 </script>
 <div class="shadow max-w-7xl rounded p-5 bg-white">
     {#if toggleEdit}
-    <!-- edit form for contact information -->
     <div class="">
         <h1 class=" text-xl font-bold"> Edit Contact Information <span class=" text-xs font-normal"> <span class=" text-sm font-bold text-red-500">*</span>Represent required fields</span></h1>
         <form class="my-3 flex flex-col sm:flex-row flex-wrap gap-y-3 px-2"
@@ -59,54 +116,56 @@
                     <label class=" text-xs md:text-sm font-medium" for="firstName">
                         <span class=" text-sm font-bold text-red-500">*</span>First Name</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500"
-                     type="text" name="firstName" bind:value={firstName} on:input={()=>{firstName=firstName.trimStart();}}/>
+                     type="text" name="firstName" bind:value={firstName} on:input={()=>{firstName=firstName.trimStart();validateField("firstName", firstName);}}/>
                      {#if errors?.firstName}
-					<span class="text-red-400 text-xs">{errors.firstName}</span>
+					<span class="text-red-600 text-xs">{errors.firstName}</span>
 				     {/if}
                 </div>
+
+
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="lastName">
                         Last Name</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                    type="text" name="lastName" bind:value={lastName} on:input={()=>{lastName=lastName.trimStart();}}/>
-                    <!-- {#if errors?.lastName}
-					<span class="text-red-400 text-xs">{errors.lastName}</span>
-				    {/if} -->
+                    type="text" name="lastName" bind:value={lastName} on:input={()=>{lastName=lastName.trimStart();validateField("lastName", lastName);}}/>
+                    {#if errors?.lastName}
+					<span class="text-red-600 text-xs">{errors.lastName}</span>
+				     {/if}
                 </div>
             </div>
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
             <div class=" w-full">
                 <label class=" text-xs md:text-sm font-medium" for="cellPhone"><span class=" text-sm font-bold text-red-500">*</span>Primary Phone</label><br>
                 <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                type="text" name="cellPhone" bind:value={cellPhone} on:input={()=>{cellPhone=cellPhone.trimStart();}}/>
+                type="text" name="cellPhone" bind:value={cellPhone} on:input={()=>{cellPhone=cellPhone.trimStart();validateField("cellPhone", cellPhone);}}/>
                 {#if errors?.cellPhone}
-				    <span class="text-red-400 text-xs">{errors.cellPhone}</span>
+				    <span class="text-red-600 text-xs">{errors.cellPhone}</span>
 			    {/if}
             </div>
             <div class=" w-full">
                 <label class=" text-xs md:text-sm font-medium" for="alternatePhone"><span class=" text-sm font-bold text-red-500"></span>Alternative Phone </label><br>
                 <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                type="text" name="alternatePhone" bind:value={alternatePhone} on:input={()=>{alternatePhone=alternatePhone.trimStart();}}/>
-                <!-- {#if errors?.cellPhone}
-				<span class="text-red-400 text-xs">{errors.cellPhone}</span>
-			    {/if} -->
+                type="text" name="alternatePhone" bind:value={alternatePhone} on:input={()=>{alternatePhone=alternatePhone.trimStart();validateField("alternatePhone", alternatePhone);}}/>
+                {#if errors?.alternatePhone}
+				    <span class="text-red-600 text-xs">{errors.alternatePhone}</span>
+			    {/if}
             </div>            
             </div>
             <div class="w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4 pb-4">
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="companyName">Company Name</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                    type="text" name="companyName" bind:value={companyName} on:input={()=>{companyName=companyName.trimStart();}}/>
+                    type="text" name="companyName" bind:value={companyName} on:input={()=>{companyName=companyName.trimStart();validateField("companyName", companyName);}}/>
                     {#if errors?.companyName}
-                        <span class="text-red-400 text-xs">{errors.companyName}</span>
+                        <span class="text-red-600 text-xs">{errors.companyName}</span>
                     {/if}
                 </div>
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="companytype">Company Type</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                    type="text" name="companytype" bind:value={companytype} on:input={()=>{companytype=companytype.trimStart();}}/>
+                    type="text" name="companytype" bind:value={companytype} on:input={()=>{companytype=companytype.trimStart();validateField("companytype", companytype);}}/>
                     {#if errors?.companytype}
-                        <span class="text-red-400 text-xs">{errors.companytype}</span>
+                        <span class="text-red-600 text-xs">{errors.companytype}</span>
                     {/if}
                 </div>
             </div>
@@ -115,17 +174,17 @@
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="gstNumber">GST Number</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                    type="text" name="gstNumber" bind:value={gstNumber} on:input={()=>{gstNumber=gstNumber.trimStart();}}/>
+                    type="text" name="gstNumber" bind:value={gstNumber} on:input={()=>{gstNumber=gstNumber.trimStart();validateField("gstNumber", gstNumber);}}/>
                     {#if errors?.gstNumber}
-                        <span class="text-red-400 text-xs">{errors.gstNumber}</span>
+                        <span class="text-red-600 text-xs">{errors.gstNumber}</span>
                     {/if}
                 </div>
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="jobtitle">Job Title</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                    type="text" name="jobtitle" bind:value={jobtitle} on:input={()=>{jobtitle=jobtitle.trimStart();}}/>
+                    type="text" name="jobtitle" bind:value={jobtitle} on:input={()=>{jobtitle=jobtitle.trimStart();validateField("jobtitle", jobtitle);}}/>
                     {#if errors?.jobtitle}
-                        <span class="text-red-400 text-xs">{errors.jobtitle}</span>
+                        <span class="text-red-600 text-xs">{errors.jobtitle}</span>
                     {/if}
                 </div>
             </div>
@@ -134,9 +193,9 @@
                 <div class=" w-1/2">
                     <label class=" text-xs md:text-sm font-medium" for="tanNumber">TAN Number</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                    type="text" name="tanNumber" bind:value={tanNumber} on:input={()=>{tanNumber=tanNumber.trimStart();}}/>
+                    type="text" name="tanNumber" bind:value={tanNumber} on:input={()=>{tanNumber=tanNumber.trimStart();validateField("tanNumber", tanNumber);}}/>
                     {#if errors?.tanNumber}
-                        <span class="text-red-400 text-xs">{errors.tanNumber}</span>
+                        <span class="text-red-600 text-xs">{errors.tanNumber}</span>
                     {/if}
                 </div>
             </div>
@@ -180,7 +239,7 @@
                 </div>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2">
                     <label class="text-xs md:text-sm font-semibold" for="cellPhone">
-                        <!-- <span class="text-sm font-bold text-red-500">*</span> -->Primary Phone :
+                        Primary Phone :
                     </label><br>
                     {#if !cellPhone && (firstName && lastName && email || email)}
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -193,17 +252,12 @@
                             </a>
                         </p>
                     {:else}
-                    <!-- <h4 class="font-medium">Primary Phone :</h4> -->
                     <p class=" text-sm ml-2">{cellPhone || "N/A"}</p>
                         {#if errors?.cellPhone}
-                            <span class="text-red-400 text-xs">{errors.cellPhone}</span>
+                            <span class="text-red-600 text-xs">{errors.cellPhone}</span>
                         {/if}
                     {/if}
                 </div>
-                <!-- <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
-                    <h4 class="font-medium">Primary Phone :</h4>
-                    <p class=" text-sm ml-2">{cellPhone || "update cellPhone"}</p>
-                </div> -->
                 <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
                     <h4 class="font-medium">Alternative Phone :</h4>
                     <p class=" text-sm ml-2">{alternatePhone || "--"}</p>
