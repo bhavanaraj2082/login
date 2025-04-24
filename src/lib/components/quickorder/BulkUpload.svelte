@@ -161,13 +161,54 @@
       isValidated = false;
     }
   }
+  // function handleTextChange(event) {
+  //   rawFileData = event.target.value;
+  //   const { duplicates } = checkForDuplicates(rawFileData);
+  //   duplicateEntries = duplicates;
+  //   isValidated = false;
+  //   invalidProductLines = [];
+  // }
+  let formatError = false;
   function handleTextChange(event) {
-    rawFileData = event.target.value;
-    const { duplicates } = checkForDuplicates(rawFileData);
-    duplicateEntries = duplicates;
-    isValidated = false;
-    invalidProductLines = [];
+  rawFileData = event.target.value;
+  const { duplicates } = checkForDuplicates(rawFileData);
+  duplicateEntries = duplicates;
+  isValidated = false;
+  invalidProductLines = [];
+  formatError = false;
+  fileError = "";
+  if (!rawFileData.trim()) {
+    return;
   }
+  const lines = rawFileData.split("\n").filter(line => line.trim());
+
+  let errorMessage = "";
+  
+  if (lines.length > 0) {
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const parts = line.split(",");
+      if (parts.length > 0 || !parts[0].trim() && parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
+        formatError = true;
+        errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number and optional quantity (e.g., 7987565-50G,1)`;
+        break;
+      }
+      // if (parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
+      //   formatError = true;
+      //   errorMessage = `Invalid quantity at line ${i + 1}. Quantity must be a number.`;
+      //   break;
+      // }
+    }
+  }
+  
+  // Display error message if format is invalid
+  if (formatError) {
+    fileError = errorMessage;
+    toast.error(errorMessage);
+  } else {
+    fileError = "";
+  }
+}
 
   function handleFileInputChange(event) {
     let file;
@@ -263,43 +304,112 @@
     }
   }
 
+  // function submitFileData() {
+  //   if (!rawFileData.trim()) {
+  //     toast.error("Please enter product data before submitting");
+  //     cartloading = false;
+  //     cancel();
+  //   }
+  //   const updatedFile = new File(
+  //     [rawFileData],
+  //     selectedFileName || "upload.csv",
+  //     {
+  //       type: "text/csv",
+  //     },
+  //   );
+
+  //   const dataTransfer = new DataTransfer();
+  //   dataTransfer.items.add(updatedFile);
+
+  //   const fileInput =
+  //     document.getElementById("bulkupload") ||
+  //     document.querySelector('input[type="file"]');
+
+  //   if (fileInput) {
+  //     fileInput.files = dataTransfer.files;
+
+  //     const form = fileInput.closest("form");
+
+  //     if (form) {
+  //       setTimeout(() => {
+  //         form.requestSubmit();
+  //       }, 100);
+  //     } else {
+  //       console.error("Form not found");
+  //     }
+  //   } else {
+  //     console.error("File input element not found");
+  //   }
+  // }
+
   function submitFileData() {
-    if (!rawFileData.trim()) {
-      toast.error("Please enter product data before submitting");
-      cartloading = false;
-      cancel();
-    }
-    const updatedFile = new File(
-      [rawFileData],
-      selectedFileName || "upload.csv",
-      {
-        type: "text/csv",
-      },
-    );
-
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(updatedFile);
-
-    const fileInput =
-      document.getElementById("bulkupload") ||
-      document.querySelector('input[type="file"]');
-
-    if (fileInput) {
-      fileInput.files = dataTransfer.files;
-
-      const form = fileInput.closest("form");
-
-      if (form) {
-        setTimeout(() => {
-          form.requestSubmit();
-        }, 100);
-      } else {
-        console.error("Form not found");
-      }
-    } else {
-      console.error("File input element not found");
-    }
+  if (!rawFileData.trim()) {
+    toast.error("Please enter product data before submitting");
+    cartloading = false;
+    cancel();
+    return;
   }
+
+  const lines = rawFileData.split("\n").filter(line => line.trim());
+  let formatError = false;
+  let errorMessage = "";
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const parts = line.split(",");
+    
+    if (parts.length >0 || !parts[0].trim() && parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
+      formatError = true;
+      errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number and optional quantity (e.g., 7987565-50G,1)`;
+      break;
+    }
+    
+    // Check if quantity is a number (if provided)
+    // if (parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
+    //   formatError = true;
+    //   errorMessage = `Invalid quantity at line ${i + 1}. Quantity must be a number.`;
+    //   break;
+    // }
+  }
+  
+  if (formatError) {
+    fileError = errorMessage;
+    toast.error(errorMessage);
+    return;
+  }
+
+  // Process and submit if format is valid
+  const updatedFile = new File(
+    [rawFileData],
+    selectedFileName || "upload.csv",
+    {
+      type: "text/csv",
+    },
+  );
+
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(updatedFile);
+
+  const fileInput =
+    document.getElementById("bulkupload") ||
+    document.querySelector('input[type="file"]');
+
+  if (fileInput) {
+    fileInput.files = dataTransfer.files;
+
+    const form = fileInput.closest("form");
+
+    if (form) {
+      setTimeout(() => {
+        form.requestSubmit();
+      }, 100);
+    } else {
+      console.error("Form not found");
+    }
+  } else {
+    console.error("File input element not found");
+  }
+}
 
   function removeAllDuplicates(event) {
     if (duplicateEntries.length === 0) return;
@@ -713,7 +823,39 @@
   enctype="multipart/form-data"
   use:enhance={() => {
     isLoading = true;
+    
+    // Validate format before processing
     const lines = rawFileData.trim().split("\n");
+    let formatError = false;
+    let errorMessage = "";
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const parts = line.includes(",") ? line.split(",") : line.split(/\s+/);
+      
+      // Check if each line has at least a product number
+      if (parts.length === 0 || !parts[0]?.trim()) {
+        formatError = true;
+        errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number and optional quantity (e.g., 7987565-50G,1)`;
+        break;
+      }
+      
+      // Check if quantity is a number (if provided)
+      if (parts.length > 1 && parts[1]?.trim() && isNaN(parts[1].trim())) {
+        formatError = true;
+        errorMessage = `Invalid quantity at line ${i + 1}. Quantity must be a number.`;
+        break;
+      }
+    }
+    
+    if (formatError) {
+      toast.error(errorMessage);
+      fileError = errorMessage;
+      isLoading = false;
+      return { cancel: true }; // Cancel form submission
+    }
+    
+    // Continue with processing if format is valid
     const processedLines = lines.map((line) => {
       const parts = line.includes(",") ? line.split(",") : line.split(/\s+/);
       const productNumberAndSize = parts[0]?.trim();
@@ -722,10 +864,10 @@
         quantity = "1";
         return `${productNumberAndSize},${quantity}`;
       }
-
+  
       return line.trim();
     });
-
+  
     rawFileData = processedLines.join("\n");
     return async ({ result }) => {
       const { duplicates } = checkForDuplicates(rawFileData);
@@ -945,6 +1087,14 @@ Example file content:
           {/if}
         </div>
       </div>
+      {#if fileError && !selectedFileName}
+      <div class="mt-2 p-2 text-sm text-red-500 bg-red-50 rounded">
+        <div class="flex items-center">
+          <Icon icon="mdi:alert-circle" class="mr-1" />
+          {fileError}
+        </div>
+      </div>
+    {/if}
     </div>
 
     <!-- </div> -->
@@ -1101,6 +1251,10 @@ Example file content:
       method="POST"
       action="?/addToCart"
       use:enhance={({ formData, cancel }) => {
+          if (formatError) {
+          toast.error("Please fix format errors before adding to cart");
+          return cancel();
+        }
         cartloading = true;
         if (!isValidated || duplicateEntries.length > 0) {
           // validateAndSubmitData();
@@ -1156,13 +1310,45 @@ Example file content:
         };
       }}
     >
-      <button
+    <button
+  type="submit"
+  on:click={() => {
+    if (formatError) {
+      toast.error("Please fix format errors before adding to cart");
+      return;
+    }
+  }}
+  disabled={
+    cartloading || 
+    fileError || 
+    formatError || 
+    (isValidated && 
+     validatedProducts.length > 0 && 
+     !validatedProducts.some((p) => p.isValid))
+  }
+  class={`lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 transition rounded-md flex items-center justify-center gap-2
+    ${cartloading || fileError || formatError || 
+      (isValidated && validatedProducts.length > 0 && !validatedProducts.some(p => p.isValid))
+      ? 'opacity-50 cursor-not-allowed bg-white'
+      : 'hover:bg-primary-500 hover:text-white'}
+  `}
+>
+  {#if cartloading}
+    <span>Adding...</span>
+  {:else}
+    <Icon icon="ic:round-shopping-cart" class="text-2xl" />
+    <span>Add to Cart</span>
+  {/if}
+</button>
+
+      <!-- <button
         type="submit"
         class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center gap-2"
-        disabled={cartloading ||
+        disabled={cartloading || 
+          fileError || 
           (isValidated &&
-            validatedProducts.length > 0 &&
-            !validatedProducts.some((p) => p.isValid))}
+           validatedProducts.length > 0 &&
+           !validatedProducts.some((p) => p.isValid))}
       >
         {#if cartloading}
           <span>Adding...</span>
@@ -1170,7 +1356,7 @@ Example file content:
           <Icon icon="ic:round-shopping-cart" class="text-2xl" />
           <span>Add to Cart</span>
         {/if}
-      </button>
+      </button> -->
     </form>
   {:else}
     <button

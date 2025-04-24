@@ -92,7 +92,9 @@ export const actions = {
   quickcheck: async ({ request }) => {
     try {
       const formData = Object.fromEntries(await request.formData());
-      const { ProductId, quantity } = formData;
+      console.log(formData,"formData");
+      
+      const { ProductId, quantity,stockId } = formData;
       if (!ProductId || !quantity) {
         return {
           type: 'error',
@@ -100,7 +102,7 @@ export const actions = {
         };
       }
 
-      const record = await quickcheck({ ProductId, quantity });
+      const record = await quickcheck({ ProductId, stockId, quantity });
       return {
         record,
       };
@@ -194,6 +196,7 @@ export const actions = {
   uploadFile: async ({ request }) => {
     try {
       const data = await request.formData();
+console.log(data,"data");
 
 
       const file = data.get('file');
