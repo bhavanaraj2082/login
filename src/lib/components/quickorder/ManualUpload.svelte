@@ -531,17 +531,37 @@
   //     row.filteredProducts = filterProducts(row.sku);
   //   });
   // }
+  // function formatPrice(price, quantity = 1) {
+  //   if (price === undefined || price === null) return "";
+
+  //   const numPrice = typeof price === "string" ? parseFloat(price) : price;
+  //   const numQuantity =
+  //     typeof quantity === "string" ? parseFloat(quantity) : quantity;
+  //   if (isNaN(numPrice) || isNaN(numQuantity)) return "";
+  //   const total = numPrice * numQuantity;
+  //   return total.toFixed(2);
+  // }
+
   function formatPrice(price, quantity = 1) {
-    if (price === undefined || price === null) return "";
+  if (price === undefined || price === null) return "";
 
-    const numPrice = typeof price === "string" ? parseFloat(price) : price;
-    const numQuantity =
-      typeof quantity === "string" ? parseFloat(quantity) : quantity;
-    if (isNaN(numPrice) || isNaN(numQuantity)) return "";
-    const total = numPrice * numQuantity;
-    return total.toFixed(2);
+  const numPrice = typeof price === "string" ? parseFloat(price) : price;
+  const numQuantity = 
+    typeof quantity === "string" ? parseFloat(quantity) : quantity;
+  
+  if (isNaN(numPrice) || isNaN(numQuantity)) return "";
+  
+  const total = numPrice * numQuantity;
+  let formattedNumber = total.toFixed(2);
+  if ($currencyState !== "usd") {
+    return total.toLocaleString('en-IN', {
+      minimumFractionDigits: 2, 
+      maximumFractionDigits: 2
+    });
   }
-
+  
+  return formattedNumber;
+}
   function hideDetails() {
     showDetailsModal = false;
     // selectProduct = null;
@@ -665,21 +685,24 @@
   }
 
 
+
 const enhanceForm = (index) => {
   const requestStartTime = Date.now();
   loadingState[index] = true;
   const loadingStartTime = Date.now();
-
   return async ({ result }) => {
     if (result && result.data) {
-      console.log("Raw result:", result); 
+      console.log("Raw result:", result);
       if (Array.isArray(result.data)) {
+        const normalizeKey = (productNumber, breakSize) => {
+          return `${productNumber}_${breakSize}`.toLowerCase().replace(/\s+/g, '');
+        };
+        
         const uniqueKeys = new Set();
-
         const newProducts = result.data.filter((product) => {
           const breakSize = product?.pricing?.[0]?.break || '';
-          const uniqueKey = `${product.productNumber}_${breakSize}`;
-          
+          const uniqueKey = normalizeKey(product.productNumber, breakSize);
+         
           if (!uniqueKeys.has(uniqueKey)) {
             uniqueKeys.add(uniqueKey);
             return true;
@@ -687,35 +710,67 @@ const enhanceForm = (index) => {
           return false;
         });
 
-        // console.log("New unique products by productNumber & break size:", newProducts);
-
+        const searchTerm = rows[index].sku.toLowerCase().trim();
+        const normalizedSearchTerm = searchTerm.replace(/\s+/g, '');
+        
+        const sortedProducts = [...newProducts].sort((a, b) => {
+          // Create full SKU strings for comparison (product number + size)
+          const aFullSKU = `${a.productNumber} - ${a.pricing?.[0]?.break || ''}`.toLowerCase().trim();
+          const bFullSKU = `${b.productNumber} - ${b.pricing?.[0]?.break || ''}`.toLowerCase().trim();
+          
+          // Normalized versions for more accurate matching
+          const aNormalizedSKU = aFullSKU.replace(/\s+/g, '');
+          const bNormalizedSKU = bFullSKU.replace(/\s+/g, '');
+          
+          // Exact match with full SKU (product number + size) gets highest priority
+          if (aNormalizedSKU === normalizedSearchTerm) return -1;
+          if (bNormalizedSKU === normalizedSearchTerm) return 1;
+          
+          // Next, check if product number matches exactly
+          const aProductNumber = a.productNumber.toLowerCase().trim().replace(/\s+/g, '');
+          const bProductNumber = b.productNumber.toLowerCase().trim().replace(/\s+/g, '');
+          
+          if (aProductNumber === normalizedSearchTerm) return -1;
+          if (bProductNumber === normalizedSearchTerm) return 1;
+          
+          // Next, check if full SKU starts with search term
+          if (aNormalizedSKU.startsWith(normalizedSearchTerm) && !bNormalizedSKU.startsWith(normalizedSearchTerm)) return -1;
+          if (bNormalizedSKU.startsWith(normalizedSearchTerm) && !aNormalizedSKU.startsWith(normalizedSearchTerm)) return 1;
+          
+          // Finally, check if product number starts with search term
+          if (aProductNumber.startsWith(normalizedSearchTerm) && !bProductNumber.startsWith(normalizedSearchTerm)) return -1;
+          if (bProductNumber.startsWith(normalizedSearchTerm) && !aProductNumber.startsWith(normalizedSearchTerm)) return 1;
+          
+          // Otherwise maintain original order
+          return 0;
+        });
+        
         rows = rows.map((row, i) => {
           if (i === index) {
             return {
               ...row,
-              filteredProducts: newProducts,
+              filteredProducts: sortedProducts,
             };
           }
           return row;
         });
-
+        
+        // Rest of the function with improved normalization for existingKeys
         const existingKeys = new Set(
           products.map((p) => {
             const breakSize = p?.pricing?.[0]?.break || '';
-            return `${p.productNumber}_${breakSize}`;
+            return normalizeKey(p.productNumber, breakSize);
           })
         );
-
+        
         const filteredNewProducts = newProducts.filter((p) => {
           const breakSize = p?.pricing?.[0]?.break || '';
-          const key = `${p.productNumber}_${breakSize}`;
+          const key = normalizeKey(p.productNumber, breakSize);
           return !existingKeys.has(key);
         });
-
+        
         console.log("Filtered new products to be added to global list:", filteredNewProducts);
-
         products = [...products, ...filteredNewProducts];
-
         if (result.data.length === 0) {
           toast.error("No Components found");
         } else {
@@ -728,19 +783,15 @@ const enhanceForm = (index) => {
         toast.error("No Components found");
       }
     }
-
     const loadingEndTime = Date.now();
     loadingState[index] = false;
-
     const loadingDuration = (loadingEndTime - loadingStartTime) / 1000;
     const processingEndTime = Date.now();
     const totalRequestDuration = (processingEndTime - requestStartTime) / 1000;
-
     console.log(`Loading duration: ${loadingDuration}s`);
     console.log(`Total request processing time: ${totalRequestDuration}s`);
   };
 };
-
   const closeCartPopDetails = (index) => {
     const cartPopup = document.getElementById("cart-popup-details");
     if (cartPopup) {
@@ -868,97 +919,206 @@ addItemToCart(currentCart)
 
   let manualEntriesForm;
 
-  function prepareManualEntriesToCart() {
-    const validRows = rows.filter((row) => {
-      return row.sku.trim() !== "" && row.selectedSize;
-    });
 
-    if (validRows.length === 0) {
-      toast.error("No valid items to add to cart");
-      cartloading = false;
-      return [];
-    }
 
-    const cartItems = validRows
-      .map((row) => {
-        const productNumber = row.sku.split(" -")[0].trim();
-        const validProduct = products.find(
-          (p) =>
-            String(p.productNumber).trim().toLowerCase() ===
-            productNumber.toLowerCase(),
-        );
 
-        if (!validProduct) {
-          toast.error(`Product ${productNumber} not found`);
-          cartloading = false;
-          return null;
-        }
+//   function prepareManualEntriesToCart() {
+//   const validRows = rows.filter((row) => {
+//     return row.sku.trim() !== "" && row.selectedSize;
+//   });
+  
+//   console.log(validRows, "validRows.................");
+  
+//   if (validRows.length === 0) {
+//     toast.error("No valid items to add to cart");
+//     cartloading = false;
+//     return [];
+//   }
+  
 
-        const sizePriceInfo = validProduct.pricing?.find(
-          (item) =>
-            item.break.trim().toLowerCase() ===
-            row.selectedSize.trim().toLowerCase(),
-        );
+  
+//   const cartItems = validRows
+//     .map((row) => {
+//       const productNumber = row.sku.split(" -")[0].trim();
+//       const validProduct = row.selectedProduct || products.find(
+//         (p) =>
+//           String(p.productNumber).trim().toLowerCase() ===
+//           productNumber.toLowerCase(),
+//       );
+      
+//       if (!validProduct) {
+//         toast.error(`Product ${productNumber} not found`);
+//         cartloading = false;
+//         return null;
+//       }
+      
+//       const normalize = (str) =>
+//         str?.trim().replace(/\s+/g, " ").toLowerCase(); // collapses any extra spaces
+      
+//       console.log(normalize, "normalize");
+      
+//       const sizePriceInfo = row.selectedProduct?.pricing || validProduct?.pricing;
+//       const selectedSizePricing = sizePriceInfo?.find(
+//         (item) => normalize(item?.break) === normalize(row?.selectedSize)
+//       );
+//       const pricingObject = {
+//         price: selectedSizePricing?.price || selectedSizePricing?.usd || sizePriceInfo?.[0]?.usd || "N/A"
+//       };
+            
+//       if (!sizePriceInfo) {
+//         toast.error(
+//           `Product ${validProduct.productNumber} cannot be added to cart because size ${row.selectedSize} is invalid`,
+//         );
+//         cartloading = false;
+//         return null;
+//       }
+      
+//       const quantity =
+//         selectedProduct &&
+//         selectedProduct.productNumber === validProduct.productNumber
+//           ? selectedProduct.quantity
+//           : row.quantity > 0
+//             ? row.quantity
+//             : 1;
+      
+//       const rowQuantity = parseInt(row.quantity, 10) || 0;
+//       const productStock = parseInt(validProduct.stock, 10) || 0;
+//       const backOrder = Math.max(rowQuantity - productStock, 0);
+      
+//       return {
+//         id: validProduct.id,
+//         image: validProduct.image,
+//         productName: validProduct.productName,
+//         productNumber: validProduct.productNumber,
+//         manufacturerId: validProduct.manufacturer,
+//         distributorId: validProduct.distributer,
+//         stockId: validProduct.stockId,
+//         stock: validProduct.stock,
+//         productId: validProduct.id,
+//         priceSize: {
+//           price: pricingObject.price,
+//           size: row.selectedSize,
+//         },
+//         usdPrice: selectedSizePricing?.usd || "N/A",
+//         inrPrice: selectedSizePricing?.inr || "N/A",
+//         size: row.selectedSize,
+//         backOrder: backOrder,
+//         quantity: quantity || row.quantity > 0 ? row.quantity : 1,
+//       };
+//     })
+//     .filter(Boolean);
+  
+//   if (cartItems.length === 0) {
+//     return [];
+//   }
+  
+//   return cartItems;
+// }
 
-        if (!sizePriceInfo) {
-          toast.error(
-            `Product ${validProduct.productNumber} cannot be added to cart because size ${row.selectedSize} is invalid`,
-          );
-          cartloading = false;
-          return null;
-        }
-
-        if (!sizePriceInfo) {
-          toast.error(
-            `Size ${row.selectedSize} not available for ${productNumber}`,
-          );
-          return null;
-        }
-
-        const quantity =
-          selectedProduct &&
-          selectedProduct.productNumber === validProduct.productNumber
-            ? selectedProduct.quantity
-            : row.quantity > 0
-              ? row.quantity
-              : 1;
-        const rowQuantity = parseInt(row.quantity, 10) || 0;
-        const productStock = parseInt(validProduct.stock, 10) || 0;
-        const backOrder = Math.max(rowQuantity - productStock, 0);
-
-        return {
-          id: validProduct.id,
-          image: validProduct.image,
-          productName: validProduct.productName,
-          productNumber: validProduct.productNumber,
-          manufacturerId: validProduct.manufacturer,
-          distributorId: validProduct.distributer,
-          stockId: validProduct.stockId,
-          stock: validProduct.stock,
-          productId: validProduct.id,
-          priceSize: {
-            price: sizePriceInfo.price,
-            size: row.selectedSize,
-          },
-          usdPrice:
-            validProduct.pricing.find((p) => p.break === row.selectedSize)
-              ?.usd || "N/A",
-          inrPrice:
-            validProduct.pricing.find((p) => p.break === row.selectedSize)
-              ?.inr || "N/A",
-          size: row.selectedSize,
-          backOrder: backOrder,
-
-          quantity: quantity || row.quantity > 0 ? row.quantity : 1,
-        };
-      })
-      .filter(Boolean);
-    if (cartItems.length === 0) {
-      return;
-    }
-
-    return cartItems;
+// adding quantity for the same id's
+function prepareManualEntriesToCart() {
+  const validRows = rows.filter((row) => {
+    return row.sku.trim() !== "" && row.selectedSize;
+  });
+  
+  console.log(validRows, "validRows.................");
+  
+  if (validRows.length === 0) {
+    toast.error("No valid items to add to cart");
+    cartloading = false;
+    return [];
   }
+  
+  const initialCartItems = validRows
+    .map((row) => {
+      const productNumber = row.sku.split(" -")[0].trim();
+      const validProduct = row.selectedProduct || products.find(
+        (p) =>
+          String(p.productNumber).trim().toLowerCase() ===
+          productNumber.toLowerCase(),
+      );
+      
+      if (!validProduct) {
+        toast.error(`Product ${productNumber} not found`);
+        cartloading = false;
+        return null;
+      }
+      
+      const normalize = (str) =>
+        str?.trim().replace(/\s+/g, " ").toLowerCase(); // collapses any extra spaces
+      
+      console.log(normalize, "normalize");
+      
+      const sizePriceInfo = row.selectedProduct?.pricing || validProduct?.pricing;
+      const selectedSizePricing = sizePriceInfo?.find(
+        (item) => normalize(item?.break) === normalize(row?.selectedSize)
+      );
+      const pricingObject = {
+        price: selectedSizePricing?.price || selectedSizePricing?.usd || sizePriceInfo?.[0]?.usd || "N/A"
+      };
+            
+      if (!sizePriceInfo) {
+        toast.error(
+          `Product ${validProduct.productNumber} cannot be added to cart because size ${row.selectedSize} is invalid`,
+        );
+        cartloading = false;
+        return null;
+      }
+      
+      const quantity =
+        selectedProduct &&
+        selectedProduct.productNumber === validProduct.productNumber
+          ? selectedProduct.quantity
+          : row.quantity > 0
+            ? row.quantity
+            : 1;
+      
+      const rowQuantity = parseInt(row.quantity, 10) || 0;
+      const productStock = parseInt(validProduct.stock, 10) || 0;
+      const backOrder = Math.max(rowQuantity - productStock, 0);
+      
+      return {
+        id: validProduct.id,
+        image: validProduct.image,
+        productName: validProduct.productName,
+        productNumber: validProduct.productNumber,
+        manufacturerId: validProduct.manufacturer,
+        distributorId: validProduct.distributer,
+        stockId: validProduct.stockId,
+        stock: validProduct.stock,
+        productId: validProduct.id,
+        priceSize: {
+          price: pricingObject.price,
+          size: row.selectedSize,
+        },
+        usdPrice: selectedSizePricing?.usd || "N/A",
+        inrPrice: selectedSizePricing?.inr || "N/A",
+        size: row.selectedSize,
+        backOrder: backOrder,
+        quantity: quantity || row.quantity > 0 ? row.quantity : 1,
+      };
+    })
+    .filter(Boolean);
+  
+  if (initialCartItems.length === 0) {
+    return [];
+  }
+  const combinedCartItems = [];
+  const itemsMap = new Map();
+  
+  initialCartItems.forEach(item => {
+    const key = `${item.id}-${item.distributorId}-${item.stockId}-${item.size}`;
+    
+    if (itemsMap.has(key)) {
+      const existingItem = itemsMap.get(key);
+      existingItem.quantity += item.quantity;
+      existingItem.backOrder = Math.max(existingItem.quantity - parseInt(existingItem.stock, 10), 0);
+    } else {
+      itemsMap.set(key, {...item});
+    }
+  });
+  return Array.from(itemsMap.values());
+}
 
   function resetRows() {
     rows = rows.map(() => ({
@@ -971,48 +1131,6 @@ addItemToCart(currentCart)
     }));
   }
 
-  // function handleLocalManualEntries() {
-  //   const cartItems = prepareManualEntriesToCart();
-  //   if (cartItems.length === 0) return;
-
-  //   let currentCart = JSON.parse(localStorage.getItem("cart")) || [];
-  //   for (const item of cartItems) {
-  //     const simplifiedItem = {
-  //       productId: item.productId,
-  //       manufacturerId: item.manufacturerId,
-  //       stockId: item.stockId,
-  //       distributorId: item.distributerId,
-  //       quantity: item.quantity,
-  //       backOrder: item.backOrder,
-  //     };
-
-  //     const existingItemIndex = currentCart.findIndex(
-  //       (cartItem) => cartItem.productId === item.productId,
-  //     );
-
-  //     if (existingItemIndex > -1) {
-  //       currentCart[existingItemIndex].quantity = item.quantity;
-  //       currentCart[existingItemIndex].backOrder = item.backOrder;
-  //     } else {
-  //       currentCart.push(simplifiedItem);
-  //     }
-  //   }
-
-  //   localStorage.setItem("cart", JSON.stringify(currentCart));
-  //   toast.success(`Product added to the cart`);
-  //   if (typeof showCartPopup === "function") {
-  //     showCartPopup(cartItems);
-  //   } else {
-  //     console.error("showCartPopup is not a function:", showCartPopup);
-  //   }
-
-  //   setTimeout(() => {
-  //     resetRows();
-  //   }, 1000);
-
-  //   showCartMessage = true;
-  //   cartloading = false;
-  // }
   function handleLocalManualEntries() {
     const cartItems = prepareManualEntriesToCart();
     if (cartItems.length === 0) return;
@@ -1072,7 +1190,12 @@ addItemToCart(currentCart)
     //   cartloading = false;
     //   return;
     // }
-    if (manualEntriesForm) {
+    if (!cartItems) {
+      console.error("Cart items are undefined - check prepareManualEntriesToCart function");
+      cartloading = false;
+      return;
+    }
+    if (manualEntriesForm && cartItems.length>0) {
       const input = manualEntriesForm.querySelector('input[name="cartItems"]');
       input.value = JSON.stringify(cartItems);
       manualEntriesForm.requestSubmit();
@@ -1465,7 +1588,7 @@ addItemToCart(currentCart)
                     {#if $currencyState === "usd"}
                       $ {row.selectedProduct.pricing[0]?.usd}
                     {:else}
-                      ₹ {row.selectedProduct.pricing[0]?.inr}
+                    ₹ {Number(row.selectedProduct.pricing[0]?.inr || 0).toLocaleString('en-IN')}
                     {/if}
                   {:else}
                     <button
@@ -1493,6 +1616,7 @@ addItemToCart(currentCart)
                         productName: row.selectedProduct.productName,
                         productNumber: row.selectedProduct.productNumber,
                         size: row.selectedSize,
+                        stockId:row.selectedProduct.stockId,
                         usdPrice: usdPrice,
                         inrPrice: inrPrice,
                         quantity: row.quantity,
@@ -1654,6 +1778,11 @@ addItemToCart(currentCart)
               value={selectedProduct.productNumber}
             />
             <input
+            type="hidden"
+            name="stockId"
+            value={selectedProduct.stockId}
+          />
+            <input
               type="hidden"
               name="quantity"
               value={selectedProduct.quantity}
@@ -1752,7 +1881,7 @@ addItemToCart(currentCart)
               </button>
             </div>
           </div>
-          <p class="mt-4 text-sm text-gray-600 flex items-center">
+          <p class="mt-4 mb-2 text-sm text-gray-600 flex items-center">
             <span class="ml-2">{stockStatus}</span>
           </p>
         </form>

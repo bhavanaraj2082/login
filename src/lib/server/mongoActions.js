@@ -1845,26 +1845,20 @@ export const getcancelreturn = async (id) => {
 // 	}
 // }
 
-
-
-
 export async function quickcheck(data) {
-	const { ProductId, quantity } = data;
-
-	if (!ProductId || !quantity) {
+	const { stockId, quantity } = data;
+	if (!stockId || !quantity) {
 		return {
 			type: 'error',
-			message: 'Product ID and Quantity are required.'
+			message: 'Product and Quantity are required'
 		};
 	}
-
 	const requestedQuantity = parseInt(quantity, 10);
 
 	try {
-		const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
-
+		const stockRecord = await Stock.findOne({ _id: stockId }).exec();		
 		if (!stockRecord) {
-			console.log(`No stock record found for ProductId: ${ProductId}`);
+			console.log(`No stock record found for stockId: ${stockId}`);
 			return {
 				message: 'Out of stock',
 				stock: 'Unavailable',
@@ -1872,29 +1866,33 @@ export async function quickcheck(data) {
 			};
 		}
 
-		const totalStock = stockRecord.stock;
+		const totalStock = stockRecord.stock || 0;
 		const orderedQty = stockRecord.orderedQty || 0;
 		const availableStock = totalStock - orderedQty;
-
-		if (availableStock > 0) {
-			if (requestedQuantity <= availableStock) {
-				return {
-					message: `${availableStock} is available to ship`,
-					stock: 'Available',
-					type: 'success'
-				};
-			} else {
-				return {
-					message: `Only ${availableStock} units available.`,
-					stock: 'Limited Availability',
-					type: 'error'
-				};
-			}
-		} else {
+		if (availableStock <= 0) {
 			return {
 				message: 'Out of Stock',
 				stock: 'Unavailable',
 				type: 'error'
+			};
+		}
+		if (requestedQuantity <= availableStock) {
+			return {
+				message: 'In Stock',
+				stock: 'Available',
+				type: 'success'
+			};
+		} else if(requestedQuantity > availableStock){
+			return {
+				message: `Only ${availableStock} units are available to ship out of the requested ${requestedQuantity}`,
+				stock: 'Available',
+				type: 'success'
+			};
+		} else {
+			return {
+				message: `Only ${availableStock} units are available, requested ${requestedQuantity}`,
+				stock: 'Limited Stock',
+				type: 'success'
 			};
 		}
 	} catch (error) {
@@ -1906,6 +1904,66 @@ export async function quickcheck(data) {
 		};
 	}
 }
+
+
+// export async function quickcheck(data) {
+// 	const { ProductId, quantity } = data;
+
+// 	if (!ProductId || !quantity) {
+// 		return {
+// 			type: 'error',
+// 			message: 'Product ID and Quantity are required.'
+// 		};
+// 	}
+
+// 	const requestedQuantity = parseInt(quantity, 10);
+
+// 	try {
+// 		const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
+
+// 		if (!stockRecord) {
+// 			console.log(`No stock record found for ProductId: ${ProductId}`);
+// 			return {
+// 				message: 'Out of stock',
+// 				stock: 'Unavailable',
+// 				type: 'error'
+// 			};
+// 		}
+
+// 		const totalStock = stockRecord.stock;
+// 		const orderedQty = stockRecord.orderedQty || 0;
+// 		const availableStock = totalStock - orderedQty;
+
+// 		if (availableStock > 0) {
+// 			if (requestedQuantity <= availableStock) {
+// 				return {
+// 					message: `${availableStock} is available to ship`,
+// 					stock: 'Available',
+// 					type: 'success'
+// 				};
+// 			} else {
+// 				return {
+// 					message: `Only ${availableStock} units available.`,
+// 					stock: 'Limited Availability',
+// 					type: 'error'
+// 				};
+// 			}
+// 		} else {
+// 			return {
+// 				message: 'Out of Stock',
+// 				stock: 'Unavailable',
+// 				type: 'error'
+// 			};
+// 		}
+// 	} catch (error) {
+// 		console.error('Error during stock check:', error);
+// 		return {
+// 			message: 'Something went wrong with the stock check.',
+// 			stock: 'Unavailable',
+// 			type: 'error'
+// 		};
+// 	}
+// }
 
 export const validateProductDetails = async (productNumber, size, quantity) => {
 	try {
@@ -2462,309 +2520,11 @@ console.log(query,"query");
   
 
 
-// export const uploadFile = async ({ query }) => {
-// 	const validQueries = query.filter(([productNumberAndSize, quantity]) =>
-// 		productNumberAndSize?.trim() && String(quantity)?.trim()
-// 	);
-// 	console.log(validQueries, "validone");
 
-// 	if (validQueries.length === 0) {
-// 		return validQueries.map(() => ({
-// 			productNumber: "Unknown",
-// 			isValid: false,
-// 			message: "Product number is invalid",
-// 		}));
-// 	}
-
-// 	const results = [];
-
-// 	for (const [productNumberAndSize, quantity] of validQueries) {
-// 		let inputStr = productNumberAndSize.trim();
-// 		let productNumber, size;
-// 		const spaceHyphenPattern = /^(.*?)\s+-\s+(.+)$/;
-// 		const spaceHyphenMatch = inputStr.match(spaceHyphenPattern);
-// 		const complexSizePattern = /^([A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)*)-(\d+(?:-[A-Za-z]+)(?:-\d+)?)$/;
-// 		const complexSizeMatch = inputStr.match(complexSizePattern);
-// 		const measurementPattern = /^(.*?)-(\d+[-]?[A-Za-z]+)$/;
-// 		const measurementMatch = inputStr.match(measurementPattern);
-
-// 		// Updated pattern to handle both "each" and "case" with more flexibility
-// 		const quantityPatterns = [
-// 			/^(.*?)[-\s]+(each\s*(?:of)?\s*[-\s]*\d+|each[-\s]*of[-\s]*\d+|\d+\s*(?:each|pcs|units|items))$/i,
-// 			/^(.*?)[-\s]+(case\s*(?:of)?\s*[-\s]*\d+|case[-\s]*of[-\s]*\d+|\d+\s*(?:case|pcs|units|items))$/i,
-// 			/^(.*?)[-\s]+(pack\s*(?:of)?\s*[-\s]*\d+|pack[-\s]*of[-\s]*\d+|\d+\s*(?:pack|pcs|units|items))$/i
-
-// 		];
-
-// 		let eachMatch = null;
-// 		for (const pattern of quantityPatterns) {
-// 			const match = inputStr.match(pattern);
-// 			if (match) {
-// 				eachMatch = match;
-// 				break;
-// 			}
-// 		}
-
-// 		if (spaceHyphenMatch) {
-// 			productNumber = spaceHyphenMatch[1].trim();
-// 			size = spaceHyphenMatch[2].trim();
-// 		} else if (complexSizeMatch) {
-// 			productNumber = complexSizeMatch[1].trim();
-// 			size = complexSizeMatch[2].trim();
-// 		} else if (measurementMatch) {
-// 			productNumber = measurementMatch[1].trim();
-// 			size = measurementMatch[2].trim();
-// 		} else if (eachMatch) {
-// 			productNumber = eachMatch[1].trim();
-// 			size = eachMatch[2].trim();
-// 		} else {
-// 			const parts = inputStr.split('-');
-// 			if (parts.length >= 2) {
-// 				productNumber = parts.slice(0, parts.length - 1).join('-');
-// 				size = parts[parts.length - 1];
-// 			} else {
-// 				productNumber = inputStr;
-// 				size = "";
-// 			}
-// 		}
-
-// 		const sizeWithQuantityPattern = /^(.*?)(\d+)$/;
-// 		const sizeWithQuantityMatch = size.match(sizeWithQuantityPattern);
-
-// 		if (sizeWithQuantityMatch && !quantity) {
-// 			size = sizeWithQuantityMatch[1].trim();
-// 		}
-
-// 		console.log(`Parsed: Product Number = "${productNumber}", Size = "${size}"`);
-
-// 		const product = await Product.findOne({
-// 			productNumber: new RegExp('^' + productNumber.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '$', 'i')
-// 		}).exec();
-
-// 		if (product) {
-// 			const stockInfo = await Stock.find({
-// 				productNumber: product.productNumber
-// 			}).select('id stock pricing distributor manufacturer');
-
-// 			console.log(stockInfo, "asadsdsfsdfxdrdr********************8");
-
-// 			let convertedPricing = [];
-// 			for (let stock of stockInfo) {
-// 				const { pricing = [], distributor, manufacturer } = stock || [];
-
-// 				if (pricing && pricing[0] && pricing[0].INR) {
-// 					convertedPricing = convertedPricing.concat(pricing);
-// 				} else {
-// 					const converted = await convertToINR([pricing] || []);
-// 					convertedPricing = convertedPricing.concat(converted);
-// 				}
-
-// 				console.log('Distributor:', distributor);
-// 				console.log('Manufacturer:', manufacturer);
-// 			}
-
-// 			if (stockInfo.length === 0) {
-// 				results.push({
-// 					productNumber,
-// 					quantity: parseInt(quantity),
-// 					isValid: false,
-// 					message: "Stock information missing",
-// 				});
-// 				continue;
-// 			}
-// 			const normalizedUserSize = size
-// 				.toLowerCase()
-// 				.replace(/\s+/g, '')
-// 				.replace(/[-_]/g, '')
-// 				.replace(/of/g, '')
-// 				.replace(/each/g, 'each')
-// 				.replace(/ea/g, 'each')
-// 				.replace(/pack/g, 'pack')
-// 				.replace(/pa/g, 'pack')
-// 				.replace(/case/g, 'case')
-// 				.replace(/ca/g, 'case');
-
-// 			let validSizePrice = convertedPricing.find(item => {
-// 				const normalizedItemSize = (item.break || '')
-// 					.toLowerCase()
-// 					.replace(/\s+/g, '')
-// 					.replace(/[-_]/g, '')
-// 					.replace(/of/g, '')
-// 					.replace(/each/g, 'each')
-// 					.replace(/ea/g, 'each')
-// 					.replace(/pack/g, 'pack')
-// 					.replace(/pa/g, 'pack')
-// 					.replace(/case/g, 'case')
-// 					.replace(/ca/g, 'case');
-
-// 				return normalizedItemSize === normalizedUserSize;
-// 			});
-
-// 			if (!validSizePrice && normalizedUserSize) {
-// 				console.log(`No exact size match for ${size}, trying partial match...`);
-// 				const partialMatch = convertedPricing.find(item => {
-// 					const normalizedItemSize = (item.break || '')
-// 						.toLowerCase()
-// 						.replace(/\s+/g, '')
-// 						.replace(/[-_]/g, '')
-// 						.replace(/of/g, '')
-// 						.replace(/each/g, 'each')
-// 						.replace(/ea/g, 'each')
-// 						.replace(/pack/g, 'pack')
-// 						.replace(/pa/g, 'pack')
-// 						.replace(/case/g, 'case')
-// 						.replace(/ca/g, 'case');
-// 					return normalizedItemSize.includes(normalizedUserSize) ||
-// 						normalizedUserSize.includes(normalizedItemSize);
-// 				});
-
-// 				if (partialMatch) {
-// 					console.log(`Found partial match: ${partialMatch.break}`);
-// 					validSizePrice = partialMatch;
-// 				}
-// 			}
-
-// 			if (!validSizePrice) {
-// 				console.log(`Size ${size} is invalid or not available for product ${productNumber}`);
-// 				results.push({
-// 					productNumber,
-// 					quantity: parseInt(quantity),
-// 					isValid: false,
-// 					message: `Size ${size} is invalid or not available for product ${productNumber}`,
-// 				});
-// 				continue;
-// 			}
-
-// 			let availableStock = Number(stockInfo[0]?.stock) || 0;
-// 			results.push({
-// 				id: product._id.toString(),
-// 				image: product.image || "No image available",
-// 				description: product.prodDesc || "No description available",
-// 				productName: product.productName || "No product name available",
-// 				productNumber: product.productNumber,
-// 				quantity: parseInt(quantity),
-// 				stockId: stockInfo[0]?.id.toString() || null,
-// 				stock: availableStock,
-// 				manufacturer: stockInfo[0]?.manufacturer?.toString() || null,
-// 				distributer: stockInfo[0]?.distributor?.toString() || null,
-// 				isValid: true,
-// 				message: "Product number and size are valid",
-// 				pricing: [{
-// 					break: validSizePrice.break,
-// 					price: validSizePrice.INR || "N/A",
-// 				}],
-// 			});
-// 		} else {
-// 			results.push({
-// 				productNumber: productNumberAndSize,
-// 				quantity: parseInt(quantity),
-// 				isValid: false,
-// 				message: "Product number is invalid",
-// 			});
-// 		}
-// 	}
-// 	console.log(results, "results");
-
-// 	return results;
-// };
-// export const uploadFile = async ({ query }) => {
-// 	const validQueries = query.filter(([sku, quantity]) =>
-// 	  sku?.trim() && String(quantity)?.trim()
-// 	);
-	
-// 	if (validQueries.length === 0) {
-// 	  return [];
-// 	}
-// 	const skuMap = new Map();
-// 	const normalizedSkus = [];
-	
-// 	for (const [sku, quantity] of validQueries) {
-// 	  const cleanSku = sku.trim().replace(/[-\s]/g, '').toLowerCase();
-// 	  skuMap.set(cleanSku, { original: sku.trim(), quantity: parseInt(quantity) });
-// 	  normalizedSkus.push(cleanSku);
-// 	}
-//   const stockItems = await Stock.aggregate([
-// 	  {
-// 		$addFields: {
-// 		  normalizedSku: {
-// 			$toLower: {
-// 			  $replaceAll: {
-// 				input: "$sku",
-// 				find: "-",
-// 				replacement: ""
-// 			  }
-// 			}
-// 		  }
-// 		}
-// 	  },
-// 	  {
-// 		$match: {
-// 		  normalizedSku: { $in: normalizedSkus }
-// 		}
-// 	  },
-// 	  {
-// 		$project: {
-// 		  _id: 1,
-// 		  productid: 1,
-// 		  stock: 1,
-// 		  pricing: 1,
-// 		  distributor: 1,
-// 		  manufacturer: 1,
-// 		  productName:1,
-// 		  productNumber: 1,
-// 		  sku: 1,
-// 		  normalizedSku: 1
-// 		}
-// 	  }
-// 	]).exec();
-	
-// 	const stockItemsByNormalizedSku = stockItems.reduce((acc, item) => {
-// 	  if (!acc[item.normalizedSku]) {
-// 		acc[item.normalizedSku] = [];
-// 	  }
-// 	  acc[item.normalizedSku].push(item);
-// 	  return acc;
-// 	}, {});
-// 	const results = await Promise.all(
-// 	  normalizedSkus.map(async (normalizedSku) => {
-// 		const { original, quantity } = skuMap.get(normalizedSku);
-// 		const matchedItems = stockItemsByNormalizedSku[normalizedSku];
-  
-// 		if (!matchedItems || matchedItems.length === 0) {
-// 		  return {
-// 			productNumber: original,
-// 			quantity,
-// 			isValid: false,
-// 			message: "Stock information is missing",
-// 		  };
-// 		}
-  
-// 		const matchedStock = matchedItems[0];
-// 		let availableStock = Number(matchedStock?.stock) || 0;
-		
-// 		return {
-// 		  id: matchedStock._id.toString(),
-// 		  productId: matchedStock.productid.toString(),
-// 		  productNumber: matchedStock.productNumber,
-// 		  productName:matchedStock.productName,
-// 		  sku: matchedStock.sku,
-// 		  stockId: matchedStock._id.toString(),
-// 		  stock: availableStock,
-// 		  manufacturer: matchedStock.manufacturer?.toString() || null,
-// 		  distributer: matchedStock.distributor?.toString() || null,
-// 		  isValid: true,
-// 		  message: "SKU is valid",
-// 		};
-// 	  })
-// 	);
-// 	console.log(results,"result");
-  
-// 	return results;
-//   };
 export const uploadFile = async ({ query }) => {
-	// First, handle both formats:
-	// 1. [[sku, quantity]] format
-	// 2. [[sku]] format (assign quantity = 1)
+	console.log(query,"query");
+	
+
 	let validQueries = [];
 	
 	for (const item of query) {
