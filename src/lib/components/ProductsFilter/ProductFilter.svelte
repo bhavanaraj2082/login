@@ -123,6 +123,7 @@ function handleMouseLeave() {
     })
  
     const handleManufacturer = (searchTerm) => {
+      if(/<\/?script\b[^>]*>/.test(searchTerm)) return
         if (!searchTerm) {
             searchManufacture = manufacturers;
             const newUrl = new URL(window.location.href)
@@ -326,6 +327,7 @@ function handleMouseLeave() {
   let searchLoading = false
   const handleSearch = (searchName) => {
     try{
+      if(/<\/?script\b[^>]*>/.test(searchName)) return
     clearTimeout(typingTimeout);
     const newUrl = new URL(window.location.href);
     typingTimeout = setTimeout( async() => {
@@ -621,6 +623,7 @@ function handleMouseLeave() {
                 <img 
                 src="{PUBLIC_IMAGE_URL}/{product?.image}"
                 onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
+                loading="lazy"
                 class="cursor-pointer w-32 h-32 sm:w-40 sm:h-40 object-contain" 
                 alt=""
                 on:click={() => imagemodal(product?.image)}
