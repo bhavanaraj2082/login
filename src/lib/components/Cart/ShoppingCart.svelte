@@ -224,7 +224,6 @@
 	}
 	}
 	const handleQty = (quantity,stock,_id,indx)=>{
-        selectedId = _id
 		if(isNaN(quantity)){
 			//calculateTotalPrice($cart)
 			quantity = 1
@@ -235,6 +234,8 @@
 		if(quantity <= stock.orderMultiple || isNaN(quantity)) quantity = stock.orderMultiple
 		clearTimeout(timeout)
         checkoutDisabled = true
+		let sec = !isLoggedIn ? 500 : 1500
+		timeout = setTimeout(()=>{
 
 		if(!isLoggedIn){
 			const selectedQty = Math.ceil(quantity/ stock.orderMultiple) * stock.orderMultiple
@@ -250,12 +251,11 @@
 			calculateTotalPrice($cart)
 			timeout = setTimeout(()=>{
 			tog = null
-	        },1500)
+	        },sec)
 		return
 			
 		}
-		
-		timeout = setTimeout(()=>{
+        selectedId = _id
 			const index = $cart.findIndex((item) =>item._id === _id);
 		if (index !== -1) {
 			cart.update(item=>{
@@ -279,7 +279,6 @@
 	}
 
 	const incrementQuantity = (quantity,stock,_id,indx) => {
-		selectedId = _id
 		clearTimeout(timeout)
         checkoutDisabled = true
 		if(!isLoggedIn){
@@ -294,7 +293,7 @@
 			calculateTotalPrice($cart)
 			return
 		}
-
+		selectedId = _id
 	    const index = $cart.findIndex((item) =>item._id === _id);
 		if (index !== -1) {
 			cart.update(item=>{
@@ -320,7 +319,6 @@
 	};
 
 	const decrementQuantity = (quantity,stock,_id,indx) => {
-		selectedId = _id
 		clearTimeout(timeout)
         checkoutDisabled = true
            
@@ -338,7 +336,7 @@
 			calculateTotalPrice($cart)
 			return
 		}
-		
+		selectedId = _id
 	    const index = $cart.findIndex((item) =>item._id === _id);
 		if (index !== -1) {
 			cart.update(item=>{

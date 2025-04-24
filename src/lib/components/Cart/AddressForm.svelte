@@ -11,8 +11,7 @@
   export let isShowbox ;
   export let billing
   export let shipping ;
-   console.log(billing,shipping,"opop");
-let message="At least one address must be default";
+  let message="At least one address must be default";
   // export let accounttype;
 	export let handlePopupAddress;
   let showErrors = false;
@@ -37,6 +36,10 @@ let message="At least one address must be default";
     "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
   ];
 
+  function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   const handleAddress = (type,checked)=>{
     if(checked === true){
       if(type === "billing"){
@@ -48,6 +51,7 @@ let message="At least one address must be default";
         organizationName= billing?.organizationName || organizationName ,
         attentionTo= billing?.attentionTo || attentionTo ,
         street= billing?.street || street ,
+        location= capitalize(billing?.location) || location ,
         building= billing?.building || building ,
         department= billing?.department || department
       }
@@ -60,6 +64,7 @@ let message="At least one address must be default";
         organizationName= shipping?.organizationName || organizationName ,
         attentionTo= shipping?.attentionTo || attentionTo ,
         street= shipping?.street || street ,
+        location= capitalize(shipping?.location) || location ,
         building= shipping?.building || building ,
         department= shipping?.department || department
       }else{
@@ -71,6 +76,7 @@ let message="At least one address must be default";
         organizationName= formdata?.organizationName || organizationName ,
         attentionTo= formdata?.attentionTo || attentionTo ,
         street= formdata?.street || street ,
+        location= formdata?.country ?capitalize(formdata?.country) : location  ,
         building= formdata?.building || building ,
         department= formdata?.department || department
       }
@@ -83,6 +89,7 @@ let message="At least one address must be default";
         organizationName= formdata?.organizationName || organizationName ,
         attentionTo= formdata?.attentionTo || attentionTo ,
         street= formdata?.street || street ,
+        location= formdata?.country ?capitalize(formdata?.country) : location ,
         building= formdata?.building || building ,
         department= formdata?.department || department
     }
@@ -94,7 +101,6 @@ let message="At least one address must be default";
 	let name;
 	let errorMessage = '';
 	actionName == 'billingaddress' ? (name = 'Billing') : (name = 'Shipping');
-	console.log(formdata, 'isdefalt');
 	const handleCheckbox = (checked, Default) => {
 		if (Default === true) {
 			if (checked !== Default) {
@@ -855,7 +861,7 @@ $:console.log(location,"location");
                         {#each filteredCountries as { name, code }}
                             <li on:click|stopPropagation={() => selectCountry({ name, code })} 
                             class="cursor-pointer px-2 py-1 hover:bg-gray-200">
-                                <option value={code}>{name} ({code})</option>
+                                <option value={name}>{name} ({code})</option>
                             </li>
                         {/each}
                         {#if filteredCountries.length === 0}

@@ -232,12 +232,10 @@
 	const handleSubmit = ({cancel})=>{
 		orderLoad = true
 		onSubmit = true
-		taxError = ''
-		// if(!gstNumber.length){
-		// 	console.log("gst Number",gstNumber);
-		// 	taxError = "GST number is required"
-		// 	cancel()
-		// } 
+		if(taxError.length){
+			orderLoad =false
+			cancel()
+		} 
 
 		if($billingAddress === "" || $shippingAddress === ""){
 			addressError = true
