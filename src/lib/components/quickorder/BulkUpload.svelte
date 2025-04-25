@@ -1382,7 +1382,7 @@ Example file content:
      !validatedProducts.some((p) => p.isValid))
   }
   class={`lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 transition rounded-md flex items-center justify-center gap-2
-    ${cartloading 
+    ${cartloading ||
       (isValidated && validatedProducts.length > 0 && !validatedProducts.some(p => p.isValid))
       ? 'opacity-50 cursor-not-allowed bg-white'
       : 'hover:bg-primary-500 hover:text-white'}
