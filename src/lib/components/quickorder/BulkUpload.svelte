@@ -177,36 +177,33 @@
   invalidProductLines = [];
   formatError = false;
   fileError = "";
+  
   if (!rawFileData.trim()) {
     return;
   }
+  
   const lines = rawFileData.split("\n").filter(line => line.trim());
-
-  let errorMessage = "";
   
-  if (lines.length > 0) {
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const parts = line.split(",");
-      if (parts.length > 0 || !parts[0].trim() && parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
-        formatError = true;
-        errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number and optional quantity (e.g., 7987565-50G,1)`;
-        break;
-      }
-      // if (parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
-      //   formatError = true;
-      //   errorMessage = `Invalid quantity at line ${i + 1}. Quantity must be a number.`;
-      //   break;
-      // }
+  // Simplified format check - just ensure each line has content
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    const parts = line.split(",");
+    
+    if (parts.length === 0 || !parts[0].trim()) {
+      formatError = true;
+      fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+      toast.error(fileError);
+      break;
     }
-  }
-  
-  // Display error message if format is invalid
-  if (formatError) {
-    fileError = errorMessage;
-    toast.error(errorMessage);
-  } else {
-    fileError = "";
+    
+    // Only check quantity if a second part exists
+    if (parts.length > 1 && parts[1].trim() && isNaN(Number(parts[1].trim()))) {
+      formatError = true;
+
+      fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+      toast.error(fileError);
+      break;
+    }
   }
 }
 
@@ -342,7 +339,75 @@
   //   }
   // }
 
-  function submitFileData() {
+//   function submitFileData() {
+//   if (!rawFileData.trim()) {
+//     toast.error("Please enter product data before submitting");
+//     cartloading = false;
+//     cancel();
+//     return;
+//   }
+
+//   const lines = rawFileData.split("\n").filter(line => line.trim());
+//   let formatError = false;
+//   let errorMessage = "";
+  
+//   for (let i = 0; i < lines.length; i++) {
+//     const line = lines[i];
+//     const parts = line.split(",");
+    
+//     if (parts.length >0 || !parts[0].trim() && parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
+//       formatError = true;
+//       errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number and optional quantity (e.g., 7987565-50G,1)`;
+//       break;
+//     }
+    
+//     // Check if quantity is a number (if provided)
+//     // if (parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
+//     //   formatError = true;
+//     //   errorMessage = `Invalid quantity at line ${i + 1}. Quantity must be a number.`;
+//     //   break;
+//     // }
+//   }
+  
+//   if (formatError) {
+//     fileError = errorMessage;
+//     toast.error(errorMessage);
+//     return;
+//   }
+
+//   // Process and submit if format is valid
+//   const updatedFile = new File(
+//     [rawFileData],
+//     selectedFileName || "upload.csv",
+//     {
+//       type: "text/csv",
+//     },
+//   );
+
+//   const dataTransfer = new DataTransfer();
+//   dataTransfer.items.add(updatedFile);
+
+//   const fileInput =
+//     document.getElementById("bulkupload") ||
+//     document.querySelector('input[type="file"]');
+
+//   if (fileInput) {
+//     fileInput.files = dataTransfer.files;
+
+//     const form = fileInput.closest("form");
+
+//     if (form) {
+//       setTimeout(() => {
+//         form.requestSubmit();
+//       }, 100);
+//     } else {
+//       console.error("Form not found");
+//     }
+//   } else {
+//     console.error("File input element not found");
+//   }
+// }
+function submitFileData() {
   if (!rawFileData.trim()) {
     toast.error("Please enter product data before submitting");
     cartloading = false;
@@ -354,22 +419,23 @@
   let formatError = false;
   let errorMessage = "";
   
+  // Simplified format check
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+    const line = lines[i].trim();
     const parts = line.split(",");
     
-    if (parts.length >0 || !parts[0].trim() && parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
+    if (parts.length === 0 || !parts[0].trim()) {
       formatError = true;
-      errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number and optional quantity (e.g., 7987565-50G,1)`;
+      errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
       break;
     }
     
-    // Check if quantity is a number (if provided)
-    // if (parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
-    //   formatError = true;
-    //   errorMessage = `Invalid quantity at line ${i + 1}. Quantity must be a number.`;
-    //   break;
-    // }
+    // Only check quantity if a second part exists
+    if (parts.length > 1 && parts[1].trim() && isNaN(Number(parts[1].trim()))) {
+      formatError = true;
+      errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+      break;
+    }
   }
   
   if (formatError) {
@@ -382,23 +448,17 @@
   const updatedFile = new File(
     [rawFileData],
     selectedFileName || "upload.csv",
-    {
-      type: "text/csv",
-    },
+    { type: "text/csv" }
   );
 
   const dataTransfer = new DataTransfer();
   dataTransfer.items.add(updatedFile);
 
-  const fileInput =
-    document.getElementById("bulkupload") ||
-    document.querySelector('input[type="file"]');
+  const fileInput = document.getElementById("bulkupload") || document.querySelector('input[type="file"]');
 
   if (fileInput) {
     fileInput.files = dataTransfer.files;
-
     const form = fileInput.closest("form");
-
     if (form) {
       setTimeout(() => {
         form.requestSubmit();
@@ -823,30 +883,26 @@
   enctype="multipart/form-data"
   use:enhance={() => {
     isLoading = true;
-    
-    // Validate format before processing
-    const lines = rawFileData.trim().split("\n");
-    let formatError = false;
-    let errorMessage = "";
-    
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const parts = line.includes(",") ? line.split(",") : line.split(/\s+/);
-      
-      // Check if each line has at least a product number
-      if (parts.length === 0 || !parts[0]?.trim()) {
-        formatError = true;
-        errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number and optional quantity (e.g., 7987565-50G,1)`;
-        break;
-      }
-      
-      // Check if quantity is a number (if provided)
-      if (parts.length > 1 && parts[1]?.trim() && isNaN(parts[1].trim())) {
-        formatError = true;
-        errorMessage = `Invalid quantity at line ${i + 1}. Quantity must be a number.`;
-        break;
-      }
-    }
+const lines = rawFileData.trim().split("\n");
+let formatError = false;
+let errorMessage = "";
+
+for (let i = 0; i < lines.length; i++) {
+  const line = lines[i].trim();
+  const parts = line.split(",");
+  
+  if (parts.length === 0 || !parts[0]?.trim()) {
+    formatError = true;
+    errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+    break;
+  }
+
+  if (parts.length > 1 && parts[1]?.trim() && isNaN(Number(parts[1].trim()))) {
+    formatError = true;
+    errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+    break;
+  }
+}
     
     if (formatError) {
       toast.error(errorMessage);
@@ -1320,14 +1376,13 @@ Example file content:
   }}
   disabled={
     cartloading || 
-    fileError || 
-    formatError || 
+    
     (isValidated && 
      validatedProducts.length > 0 && 
      !validatedProducts.some((p) => p.isValid))
   }
   class={`lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 transition rounded-md flex items-center justify-center gap-2
-    ${cartloading || fileError || formatError || 
+    ${cartloading 
       (isValidated && validatedProducts.length > 0 && !validatedProducts.some(p => p.isValid))
       ? 'opacity-50 cursor-not-allowed bg-white'
       : 'hover:bg-primary-500 hover:text-white'}
