@@ -599,7 +599,8 @@
 										on:input={e=>handleQty(parseInt(e.target.value),item?.stockDetails,item._id,index)}
 										class="{tog === index ? "" : "hidden"} border border-gray-200 rounded-md outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
 							        	<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded-md">
-							        		<button disabled={item.isCart || item.isQuote || selectedId.length && item._id !== selectedId}
+							        		{#if !item.isCart || !item.isQuote}
+											<button disabled={selectedId.length && item._id !== selectedId}
 							        			on:click={() => decrementQuantity(item.quantity,item?.stockDetails,item._id,index)}
 							        			class="p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							        			><Icon icon="rivet-icons:minus" class="text-xs" /></button
@@ -607,11 +608,24 @@
 							        		<button on:click={()=>{tog = index}} disabled={selectedId.length && item._id !== selectedId} class="w-fit px-3 py-0.5 text-xs font-medium outline-none text-center">
 							        			{item.quantity === null ? "" : item.quantity}
 							        		</button>
-							        		<button disabled={item.isCart || item.isQuote || selectedId.length && item._id !== selectedId }
+							        		<button disabled={selectedId.length && item._id !== selectedId }
 							        			on:click={() => incrementQuantity(item.quantity,item?.stockDetails,item._id,index)}
 							        			class="p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
 												<Icon icon="rivet-icons:plus" class="text-xs" />
 											</button>
+											{:else}
+											<button
+											class="p-1.5 bg-gray-200 text-white "
+											><Icon icon="rivet-icons:minus" class="text-xs" /></button
+										     >
+										     <button class="w-fit px-3 py-0.5 text-xs font-medium outline-none text-center">
+											     {item.quantity === null ? "" : item.quantity}
+										     </button>
+										     <button
+											    class="p-1.5 bg-gray-200 text-white ">
+											   <Icon icon="rivet-icons:plus" class="text-xs" />
+										      </button>
+											{/if}
 							        	</div>
 							        </div>
 							    </div>
