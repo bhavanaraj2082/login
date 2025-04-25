@@ -47,7 +47,6 @@
  let timeout
   function calculateFutureDate(intervals, date) {
     isSave = true
-    if(date.length > 2) return
     if(intervals === "Custom"){
     //  console.log(intervals);
      month = intervals

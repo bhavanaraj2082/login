@@ -220,7 +220,9 @@
 		};
 		checkout = order;
 	}
-	$: handleCheckout($cart);
+	$:if($cart|| $billingAddress || $shippingAddress){
+		handleCheckout($cart);
+	}
 
 	const handleDispatchEvent =(e)=>{
 		console.log(e.detail,"detail");
@@ -229,7 +231,12 @@
 		//}
 	}
 
-	const handleSubmit = ({cancel})=>{
+	const handleSubmit = ({formData,cancel})=>{
+		formData.append("order",JSON.stringify(checkout))
+		const data = Object.fromEntries(formData)
+		console.log(JSON.parse(data.order))
+		console.log($billingAddress,$shippingAddress);
+		cancel()
 		orderLoad = true
 		onSubmit = true
 		if(taxError.length){
@@ -381,18 +388,27 @@
 				<div class=" mt-4 grid grid-cols-2 gap-2">
 					{#if $authedUser.email}
 						<form method="POST" action="?/checkout" use:enhance={handleSubmit} class=" col-span-2">
-							<input type="hidden" name="order" value={JSON.stringify(checkout)}/>
+							<!-- <input type="hidden" name="order" value={JSON.stringify(checkout)}/> -->
 							{#if orderLoad}
 							<button type="button" class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-1.5 rounded font-semibold ">
 								<Icon icon="line-md:loading-loop" class=" text-xl"/>
 							</button>
 							{:else}
-							<button
-								type="submit" disabled={onSubmit || taxError.length}
-								class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold "
-							>
-								Proceed to Order
-							</button>
+							{#if onSubmit || taxError.length}
+							    <button
+							    type="button"
+							    class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-gray-300 text-white border border-gray-300 hover:bg-gray-400 py-2 rounded font-semibold "
+						        >
+							       Proceed to Order
+						        </button>
+							{:else}
+							    <button
+								    type="submit"
+								    class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white border border-primary-500 hover:bg-primary-600 py-2 rounded font-semibold "
+							    >
+								    Proceed to Order
+							    </button>
+							{/if}
 							{/if}
 							
 						</form>
