@@ -40,9 +40,11 @@
             onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
             class="w-16 rounded-lg" />
             <div class="flex flex-col">
+              <a href="/products/details/{product.productNumber}">
               <p class="text-gray-600 text-sm font-semibold">
                 {product.productName || "--"}
               </p>
+            </a>
               <p class="font-medium text-sm text-gray-500">
                 Qty : <span class="text-gray-700"
                   >{product.orderQty || "--"}</span

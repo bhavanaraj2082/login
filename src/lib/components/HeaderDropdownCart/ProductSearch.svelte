@@ -382,4 +382,28 @@
 			linkPrefix="/products/"
 			isSubcategory={true}/>
 	</div>
+
+	<hr class="mb-6 mt-4">
+
+	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+	  <div class="flex flex-col items-center gap-2 p-4 bg-white rounded-md shadow border">
+		<Icon icon="fluent-mdl2:contact-info" class="text-primary-500" width="24" height="24" />
+		<a href="/contact-us" class="text-primary-500 hover:underline font-medium text-center">Contact Us</a>
+	  </div>
+	
+	  <div class="flex flex-col items-center gap-2 p-4 bg-white rounded-md shadow border">
+		<Icon icon="healthicons:contact-support-outline" class="text-primary-500" width="24" height="24" />
+		<a href="/help-support" class="text-primary-500 hover:underline font-medium text-center">Customer Support</a>
+	  </div>
+	
+	  <div class="flex flex-col items-center gap-2 p-4 bg-white rounded-md shadow border">
+		<Icon icon="material-symbols-light:call-outline" class="text-primary-500" width="24" height="24" />
+		<a href="tel:7829922222" class="text-primary-500 hover:underline font-medium text-center">7829922222</a>
+	  </div>
+	
+	  <div class="flex flex-col items-center gap-2 p-4 bg-white rounded-md shadow border">
+		<Icon icon="mdi-light:email" class="text-primary-500" width="24" height="24" />
+		<a href="mailto:chemikart@gmail.com" class="text-primary-500 hover:underline font-medium text-center">chemikart@gmail.com</a>
+	  </div>
+	</div>
 </section>

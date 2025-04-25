@@ -87,6 +87,7 @@
           productName: product.productName,
           unitPrice: product.unitPrice,
           productId: product.productId,
+          productNumber :product.productNumber,
           remainingQuantity: remainingQty,
         };
       }
