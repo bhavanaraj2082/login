@@ -2415,30 +2415,160 @@ export const addAllToCart = async (items, userId, userEmail) => {
 
 //Myfavouries actions ends
 
-export const quicksearch = async ({ query }) => {
-console.log(query,"query");
+// export const quicksearch = async ({ query }) => {
+// console.log(query,"query");
 
   
+// 	try {
+// 	  const baseProducts = await Product.find({
+// 		productNumber: { $regex: query, $options: 'i' }
+// 	  })
+// 		.select('_id productName productNumber prodDesc image')
+// 		.limit(20)
+// 		.lean()
+// 		.exec();
+  
+// 	  const enrichedProducts = [];
+  
+// 	  for (const baseProduct of baseProducts) {
+// 		const stockEntries = await Stock.find({ 
+// 		  productNumber: baseProduct.productNumber 
+// 		})
+// 		  .select('_id stock pricing distributor manufacturer')
+// 		  .lean()
+// 		  .exec();
+  
+// 		if (!stockEntries || stockEntries.length === 0) {
+// 		  enrichedProducts.push({
+// 			id: baseProduct._id.toString(),
+// 			image: baseProduct.image || null,
+// 			description: baseProduct.prodDesc || null,
+// 			productName: baseProduct.productName,
+// 			productNumber: baseProduct.productNumber,
+// 			stockId: null,
+// 			manufacturer: null,
+// 			distributer: null,
+// 			stock: 0,
+// 			priceone: "",
+// 			pricing: []
+// 		  });
+// 		  continue;
+// 		}
+  
+// 		for (const entry of stockEntries) {
+// 		  let processedPricing = [];
+// 		  let priceoneValue = "";
+  
+// 		  if (entry.pricing) {
+// 			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
+// 			const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+  
+// 			if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
+// 			  processedPricing = originalPricing.map(price => {
+// 				const inrValue = price.INR;
+// 				const usdValue = inrValue / currency.rate;
+// 				return {
+// 				  ...price,
+// 				  USD: usdValue.toFixed(2)
+// 				};
+// 			  });
+  
+// 			  priceoneValue = originalPricing[0]?.INR || "";
+  
+// 			} else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
+// 			  processedPricing = originalPricing.map(price => {
+// 				const usdValue = price.USD;
+// 				const inrValue = usdValue * currency.rate;
+// 				return {
+// 				  ...price,
+// 				  INR: inrValue.toFixed(2)
+// 				};
+// 			  });
+  
+// 			  priceoneValue = originalPricing[0]?.USD || "";
+// 			} else {
+// 			  processedPricing = originalPricing;
+// 			}
+// 		  }
+  
+// 		  const productEntry = {
+// 			id: baseProduct._id.toString(),
+// 			image: baseProduct.image || null,
+// 			description: baseProduct.prodDesc || null,
+// 			productName: baseProduct.productName,
+// 			productNumber: baseProduct.productNumber,
+// 			stockId: entry._id.toString(),
+// 			manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
+// 			distributer: entry.distributor ? entry.distributor.toString() : null,
+// 			stock: entry.stock || 0,
+// 			priceone: priceoneValue,
+// 			pricing: processedPricing
+// 		  };
+  
+// 		  console.log("Final Product Entry:", JSON.stringify(productEntry, null, 2));
+  
+// 		  enrichedProducts.push(productEntry);
+// 		}
+// 	  }
+  
+// 	  return enrichedProducts;
+// 	} catch (error) {
+// 	  console.error("Error in quicksearch:", error);
+// 	  throw new Error("An error occurred while processing the quicksearch.");
+// 	}
+//   };
+
+export const quicksearch = async ({ query }) => {
+	const startTime = Date.now();
+
+	console.log(query, "query");
+   
 	try {
+	  // Find all matching products in a single query
 	  const baseProducts = await Product.find({
 		productNumber: { $regex: query, $options: 'i' }
 	  })
 		.select('_id productName productNumber prodDesc image')
-		.limit(20)
 		.lean()
 		.exec();
-  
+	  
+	  if (baseProducts.length === 0) {
+		return [];
+	  }
+	  
+	  // Extract all product numbers for batch lookup
+	  const productNumbers = baseProducts.map(product => product.productNumber);
+	  
+	  // Get all stock entries for these products in a single query
+	  const allStockEntries = await Stock.find({
+		productNumber: { $in: productNumbers }
+	  })
+		.select('_id stock pricing distributor manufacturer productNumber')
+		.lean()
+		.exec();
+	  
+	  // Create a lookup map of stock entries by productNumber
+	  const stockEntriesByProduct = {};
+	  allStockEntries.forEach(entry => {
+		if (!stockEntriesByProduct[entry.productNumber]) {
+		  stockEntriesByProduct[entry.productNumber] = [];
+		}
+		stockEntriesByProduct[entry.productNumber].push(entry);
+	  });
+	  
+	  // Get currency conversion rate once instead of for each product
+	  const currency = await Curconversion.findOne({ currency: 'USD' })
+		.sort({ createdAt: -1 })
+		.lean()
+		.exec();
+	  
 	  const enrichedProducts = [];
-  
+	  
+	  // Process each product with its stock entries
 	  for (const baseProduct of baseProducts) {
-		const stockEntries = await Stock.find({ 
-		  productNumber: baseProduct.productNumber 
-		})
-		  .select('_id stock pricing distributor manufacturer')
-		  .lean()
-		  .exec();
-  
-		if (!stockEntries || stockEntries.length === 0) {
+		const stockEntries = stockEntriesByProduct[baseProduct.productNumber] || [];
+		
+		if (stockEntries.length === 0) {
 		  enrichedProducts.push({
 			id: baseProduct._id.toString(),
 			image: baseProduct.image || null,
@@ -2454,15 +2584,15 @@ console.log(query,"query");
 		  });
 		  continue;
 		}
-  
+		
+		// Process stock entries for this product
 		for (const entry of stockEntries) {
 		  let processedPricing = [];
 		  let priceoneValue = "";
-  
+		  
 		  if (entry.pricing) {
 			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
-			const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
-  
+			
 			if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
 			  processedPricing = originalPricing.map(price => {
 				const inrValue = price.INR;
@@ -2472,9 +2602,9 @@ console.log(query,"query");
 				  USD: usdValue.toFixed(2)
 				};
 			  });
-  
+			  
 			  priceoneValue = originalPricing[0]?.INR || "";
-  
+			  
 			} else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
 			  processedPricing = originalPricing.map(price => {
 				const usdValue = price.USD;
@@ -2484,14 +2614,14 @@ console.log(query,"query");
 				  INR: inrValue.toFixed(2)
 				};
 			  });
-  
+			  
 			  priceoneValue = originalPricing[0]?.USD || "";
 			} else {
 			  processedPricing = originalPricing;
 			}
 		  }
-  
-		  const productEntry = {
+		  
+		  enrichedProducts.push({
 			id: baseProduct._id.toString(),
 			image: baseProduct.image || null,
 			description: baseProduct.prodDesc || null,
@@ -2503,14 +2633,12 @@ console.log(query,"query");
 			stock: entry.stock || 0,
 			priceone: priceoneValue,
 			pricing: processedPricing
-		  };
-  
-		  console.log("Final Product Entry:", JSON.stringify(productEntry, null, 2));
-  
-		  enrichedProducts.push(productEntry);
+		  });
 		}
 	  }
-  
+	  console.log(enrichedProducts.length,"enrichedProducts");
+	  
+	  console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
 	  return enrichedProducts;
 	} catch (error) {
 	  console.error("Error in quicksearch:", error);

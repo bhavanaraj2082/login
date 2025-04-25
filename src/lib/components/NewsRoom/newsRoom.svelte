@@ -1,6 +1,8 @@
 <script>
     import Icon from "@iconify/svelte";
     export let data;
+    import { PUBLIC_COMPBUY_IMAGE_PATH } from '$env/static/public';
+
 
     let items = [...data.newsrooms];
     let currentPage = 0;
@@ -54,7 +56,15 @@
         {#each paginatedItems as item}
         <a href={`newsroom/${item.newsLink}`} class=" hover:scale-105 transform transition-all duration-300 rounded-md p-4 shadow">
             <div>
-                <img src={item.image} alt="img" class="w-full h-40 object-cover mx-auto rounded-md" />
+            <img
+                src={
+                  item.image.includes('/')
+                    ? item.image
+                    : `${PUBLIC_COMPBUY_IMAGE_PATH}/prod/${item.image}`
+                }
+                alt="img"
+                class="w-full sm:w-40 md:w-64 lg:w-80 h-80 object-cover mx-auto"
+              />         
                 <div class="flex flex-col justify-between space-y-1 sm:space-y-3 md:space-y-5">
                     <h2 class="font-semibold sm:text-md text-sm mt-2 h-10">{item.title}</h2>
                     <p class="sm:text-sm text-xs  text-gray-600 h-14 overflow-hidden text-ellipsis">{truncateText(item.previewText, 90)}</p>

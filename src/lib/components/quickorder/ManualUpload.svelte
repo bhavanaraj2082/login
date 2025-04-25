@@ -693,25 +693,8 @@
       console.log("Raw result:", result);
       if (Array.isArray(result.data)) {
         const normalizeKey = (productNumber, breakSize) => {
-          return `${productNumber}_${breakSize}`.toLowerCase().replace(/\s+/g, '');
+          return `${productNumber}_${breakSize}`.toLowerCase().replace(/[\s-]+/g, '');
         };
-        
-        // Parse the search input to separate product number and size
-        const searchTerm = rows[index].sku.toLowerCase().trim();
-        let searchProductNumber = searchTerm;
-        let searchSize = '';
-        
-        // Try to extract product number and size from the search term
-        const parts = searchTerm.split(/[-_]/); // Split by dash or underscore
-        if (parts.length > 1) {
-          searchProductNumber = parts[0].trim();
-          searchSize = parts.slice(1).join('-').trim(); // Combine remaining parts as size
-        }
-        
-        // Normalize for comparison
-        const normalizedSearchProductNumber = searchProductNumber.replace(/\s+/g, '');
-        const normalizedSearchSize = searchSize.replace(/\s+/g, '');
-        const normalizedFullSearch = `${normalizedSearchProductNumber}_${normalizedSearchSize}`;
         
         const uniqueKeys = new Set();
         const newProducts = result.data.filter((product) => {
@@ -724,35 +707,42 @@
           }
           return false;
         });
+
+        const searchTerm = rows[index].sku.toLowerCase().trim();
+        const normalizedSearchTerm = searchTerm.replace(/[\s-]+/g, '');
         
         const sortedProducts = [...newProducts].sort((a, b) => {
-          const aProductNumber = a.productNumber.toLowerCase().trim().replace(/\s+/g, '');
-          const bProductNumber = b.productNumber.toLowerCase().trim().replace(/\s+/g, '');
+          // Create full SKU strings for comparison (product number + size)
+          const aFullSKU = `${a.productNumber} - ${a.pricing?.[0]?.break || ''}`.toLowerCase().trim();
+          const bFullSKU = `${b.productNumber} - ${b.pricing?.[0]?.break || ''}`.toLowerCase().trim();
           
-          const aBreakSize = (a.pricing?.[0]?.break || '').toLowerCase().trim().replace(/\s+/g, '');
-          const bBreakSize = (b.pricing?.[0]?.break || '').toLowerCase().trim().replace(/\s+/g, '');
+          // Normalized versions for more accurate matching
+          const aNormalizedSKU = aFullSKU.replace(/[\s-]+/g, '');
+          const bNormalizedSKU = bFullSKU.replace(/[\s-]+/g, '');
           
-          const aKey = `${aProductNumber}_${aBreakSize}`;
-          const bKey = `${bProductNumber}_${bBreakSize}`;
+          // Exact match with full SKU (product number + size) gets highest priority
+          if (aNormalizedSKU === normalizedSearchTerm) return -1;
+          if (bNormalizedSKU === normalizedSearchTerm) return 1;
           
-          // Exact match with both product number and size gets highest priority
-          if (aKey === normalizedFullSearch) return -1;
-          if (bKey === normalizedFullSearch) return 1;
+          // Next, check if product number matches exactly
+          const aProductNumber = a.productNumber.toLowerCase().trim().replace(/[\s-]+/g, '');
+          const bProductNumber = b.productNumber.toLowerCase().trim().replace(/[\s-]+/g, '');
           
-          // Next priority: exact product number match and partial size match
-          if (aProductNumber === normalizedSearchProductNumber && aBreakSize.includes(normalizedSearchSize)) return -1;
-          if (bProductNumber === normalizedSearchProductNumber && bBreakSize.includes(normalizedSearchSize)) return 1;
+          if (aProductNumber === normalizedSearchTerm) return -1;
+          if (bProductNumber === normalizedSearchTerm) return 1;
           
-          // Next priority: exact product number match
-          if (aProductNumber === normalizedSearchProductNumber) return -1;
-          if (bProductNumber === normalizedSearchProductNumber) return 1;
-          if (aProductNumber.startsWith(normalizedSearchProductNumber) && !bProductNumber.startsWith(normalizedSearchProductNumber)) return -1;
-          if (bProductNumber.startsWith(normalizedSearchProductNumber) && !aProductNumber.startsWith(normalizedSearchProductNumber)) return 1;
-
+          // Next, check if full SKU starts with search term
+          if (aNormalizedSKU.startsWith(normalizedSearchTerm) && !bNormalizedSKU.startsWith(normalizedSearchTerm)) return -1;
+          if (bNormalizedSKU.startsWith(normalizedSearchTerm) && !aNormalizedSKU.startsWith(normalizedSearchTerm)) return 1;
+          
+          // Finally, check if product number starts with search term
+          if (aProductNumber.startsWith(normalizedSearchTerm) && !bProductNumber.startsWith(normalizedSearchTerm)) return -1;
+          if (bProductNumber.startsWith(normalizedSearchTerm) && !aProductNumber.startsWith(normalizedSearchTerm)) return 1;
+          
+          // Otherwise maintain original order
           return 0;
         });
         
-        // Rest of your code remains the same...
         rows = rows.map((row, i) => {
           if (i === index) {
             return {
@@ -763,6 +753,7 @@
           return row;
         });
         
+        // Rest of the function with improved normalization for existingKeys
         const existingKeys = new Set(
           products.map((p) => {
             const breakSize = p?.pricing?.[0]?.break || '';
@@ -799,6 +790,122 @@
     console.log(`Total request processing time: ${totalRequestDuration}s`);
   };
 };
+
+//   const enhanceForm = (index) => {
+//   const requestStartTime = Date.now();
+//   loadingState[index] = true;
+//   const loadingStartTime = Date.now();
+//   return async ({ result }) => {
+//     if (result && result.data) {
+//       console.log("Raw result:", result);
+//       if (Array.isArray(result.data)) {
+//         const normalizeKey = (productNumber, breakSize) => {
+//           return `${productNumber}_${breakSize}`.toLowerCase().replace(/\s+/g, '');
+//         };
+        
+//         // Parse the search input to separate product number and size
+//         const searchTerm = rows[index].sku.toLowerCase().trim();
+//         let searchProductNumber = searchTerm;
+//         let searchSize = '';
+        
+//         // Try to extract product number and size from the search term
+//         const parts = searchTerm.split(/[-_]/); // Split by dash or underscore
+//         if (parts.length > 1) {
+//           searchProductNumber = parts[0].trim();
+//           searchSize = parts.slice(1).join('-').trim(); // Combine remaining parts as size
+//         }
+        
+//         // Normalize for comparison
+//         const normalizedSearchProductNumber = searchProductNumber.replace(/\s+/g, '');
+//         const normalizedSearchSize = searchSize.replace(/\s+/g, '');
+//         const normalizedFullSearch = `${normalizedSearchProductNumber}_${normalizedSearchSize}`;
+        
+//         const uniqueKeys = new Set();
+//         const newProducts = result.data.filter((product) => {
+//           const breakSize = product?.pricing?.[0]?.break || '';
+//           const uniqueKey = normalizeKey(product.productNumber, breakSize);
+         
+//           if (!uniqueKeys.has(uniqueKey)) {
+//             uniqueKeys.add(uniqueKey);
+//             return true;
+//           }
+//           return false;
+//         });
+        
+//         const sortedProducts = [...newProducts].sort((a, b) => {
+//           const aProductNumber = a.productNumber.toLowerCase().trim().replace(/\s+/g, '');
+//           const bProductNumber = b.productNumber.toLowerCase().trim().replace(/\s+/g, '');
+          
+//           const aBreakSize = (a.pricing?.[0]?.break || '').toLowerCase().trim().replace(/\s+/g, '');
+//           const bBreakSize = (b.pricing?.[0]?.break || '').toLowerCase().trim().replace(/\s+/g, '');
+          
+//           const aKey = `${aProductNumber}_${aBreakSize}`;
+//           const bKey = `${bProductNumber}_${bBreakSize}`;
+          
+//           // Exact match with both product number and size gets highest priority
+//           if (aKey === normalizedFullSearch) return -1;
+//           if (bKey === normalizedFullSearch) return 1;
+          
+//           // Next priority: exact product number match and partial size match
+//           if (aProductNumber === normalizedSearchProductNumber && aBreakSize.includes(normalizedSearchSize)) return -1;
+//           if (bProductNumber === normalizedSearchProductNumber && bBreakSize.includes(normalizedSearchSize)) return 1;
+          
+//           // Next priority: exact product number match
+//           if (aProductNumber === normalizedSearchProductNumber) return -1;
+//           if (bProductNumber === normalizedSearchProductNumber) return 1;
+//           if (aProductNumber.startsWith(normalizedSearchProductNumber) && !bProductNumber.startsWith(normalizedSearchProductNumber)) return -1;
+//           if (bProductNumber.startsWith(normalizedSearchProductNumber) && !aProductNumber.startsWith(normalizedSearchProductNumber)) return 1;
+
+//           return 0;
+//         });
+        
+//         // Rest of your code remains the same...
+//         rows = rows.map((row, i) => {
+//           if (i === index) {
+//             return {
+//               ...row,
+//               filteredProducts: sortedProducts,
+//             };
+//           }
+//           return row;
+//         });
+        
+//         const existingKeys = new Set(
+//           products.map((p) => {
+//             const breakSize = p?.pricing?.[0]?.break || '';
+//             return normalizeKey(p.productNumber, breakSize);
+//           })
+//         );
+        
+//         const filteredNewProducts = newProducts.filter((p) => {
+//           const breakSize = p?.pricing?.[0]?.break || '';
+//           const key = normalizeKey(p.productNumber, breakSize);
+//           return !existingKeys.has(key);
+//         });
+        
+//         console.log("Filtered new products to be added to global list:", filteredNewProducts);
+//         products = [...products, ...filteredNewProducts];
+//         if (result.data.length === 0) {
+//           toast.error("No Components found");
+//         } else {
+//           productNumbers = Array.from(
+//             new Set(result.data.map((record) => record.productNumber))
+//           );
+//         }
+//       } else {
+//         productNumbers = [];
+//         toast.error("No Components found");
+//       }
+//     }
+//     const loadingEndTime = Date.now();
+//     loadingState[index] = false;
+//     const loadingDuration = (loadingEndTime - loadingStartTime) / 1000;
+//     const processingEndTime = Date.now();
+//     const totalRequestDuration = (processingEndTime - requestStartTime) / 1000;
+//     console.log(`Loading duration: ${loadingDuration}s`);
+//     console.log(`Total request processing time: ${totalRequestDuration}s`);
+//   };
+// };
 
 // const enhanceForm = (index) => {
 //   const requestStartTime = Date.now();
