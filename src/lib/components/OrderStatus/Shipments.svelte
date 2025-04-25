@@ -93,9 +93,11 @@
             class="w-16 rounded-lg" />
               </div>
               <div class="flex flex-col justify-center">
+                <a href="/products/details/{item.productNumber}">
                 <p class="text-gray-600 text-sm font-semibold">
                   {item.productName || "--"}
                 </p>
+                </a>
                 <p class="font-medium text-sm text-gray-500">
                   Qty : <span class="text-gray-700">{item.quantity || "-"}</span
                   >
