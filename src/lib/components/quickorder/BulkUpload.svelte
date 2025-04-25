@@ -204,6 +204,15 @@
       toast.error(fileError);
       break;
     }
+       if (parts.length > 1 && parts[1].trim()) {
+      const quantity = Number(parts[1].trim());
+      if (!isNaN(quantity) && quantity > 999) {
+        formatError = true;
+        fileError = `Quantity at line ${i + 1} must not be greater than 999.`;
+        toast.error(fileError);
+        break;
+      }
+    }
   }
 }
 
@@ -902,6 +911,14 @@ for (let i = 0; i < lines.length; i++) {
     errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
     break;
   }
+  if (parts.length > 1 && parts[1]?.trim()) {
+      const quantity = Number(parts[1].trim());
+      if (!isNaN(quantity) && quantity > 999) {
+        formatError = true;
+        errorMessage = `Quantity at line ${i + 1} must not be greater than 999.`;
+        break;
+      }
+    }
 }
     
     if (formatError) {
@@ -1164,7 +1181,7 @@ Example file content:
         >
           <a
             class="flex items-center gap-2 text-sm font-medium text-primary-500"
-            href="/quick_order_template.csv"
+            href="/quick_order_template.xls"
             download
           >
             <Icon icon="pajamas:download" class="text-lg " /> Download Template

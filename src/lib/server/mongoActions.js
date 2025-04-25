@@ -2517,47 +2517,47 @@ console.log(query,"query");
 	  throw new Error("An error occurred while processing the quicksearch.");
 	}
   };
-  
+  export const uploadFile = async ({ query }) => {
+	const startTime = Date.now();
 
+	if (!query || query.length === 0) {
+	  return [];
+	}
 
-
-export const uploadFile = async ({ query }) => {
-	console.log(query,"query");
-	
-
-	let validQueries = [];
+	const skuData = [];
 	
 	for (const item of query) {
 	  const [sku, quantity] = item;
 	  
-	  if (sku?.trim()) {
-		// If it's format 2 (only SKU, no quantity), assign quantity as 1
-		if (quantity === undefined) {
-		  validQueries.push([sku.trim(), '1']);
-		} 
-		// If it's format 1 (SKU with quantity), use the provided quantity
-		else if (String(quantity)?.trim()) {
-		  validQueries.push([sku.trim(), quantity.trim()]);
-		}
-	  }
+	  if (!sku?.trim()) continue;
+	  
+	  const original = sku.trim();
+	  const normalizedSku = original.replace(/[-\s]/g, '').toLowerCase();
+	  const quantityNum = parseInt(quantity?.trim() || '1');
+	  
+	  skuData.push({
+		original,
+		normalizedSku,
+		quantity: quantityNum
+	  });
 	}
-	
-	console.log(validQueries, "validQueries");
-	
-	if (validQueries.length === 0) {
+
+	if (skuData.length === 0) {
 	  return [];
 	}
-	
-	const skuMap = new Map();
-	const normalizedSkus = [];
-	
-	for (const [sku, quantity] of validQueries) {
-	  const cleanSku = sku.replace(/[-\s]/g, '').toLowerCase();
-	  skuMap.set(cleanSku, { original: sku, quantity: parseInt(quantity) });
-	  normalizedSkus.push(cleanSku);
-	}
-  
+
+	const normalizedSkus = skuData.map(item => item.normalizedSku);
 	const stockItems = await Stock.aggregate([
+	  {
+		$match: {
+		  $expr: {
+			$in: [
+			  { $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
+			  normalizedSkus
+			]
+		  }
+		}
+	  },
 	  {
 		$addFields: {
 		  normalizedSku: {
@@ -2569,11 +2569,6 @@ export const uploadFile = async ({ query }) => {
 			  }
 			}
 		  }
-		}
-	  },
-	  {
-		$match: {
-		  normalizedSku: { $in: normalizedSkus }
 		}
 	  },
 	  {
@@ -2592,52 +2587,278 @@ export const uploadFile = async ({ query }) => {
 	  }
 	]).exec();
 	
-	const stockItemsByNormalizedSku = stockItems.reduce((acc, item) => {
-	  if (!acc[item.normalizedSku]) {
-		acc[item.normalizedSku] = [];
-	  }
-	  acc[item.normalizedSku].push(item);
-	  return acc;
-	}, {});
+	const stockItemMap = {};
+	for (const item of stockItems) {
+	  stockItemMap[item.normalizedSku] = item;
+	}
 	
-	const results = await Promise.all(
-	  normalizedSkus.map(async (normalizedSku) => {
-		const { original, quantity } = skuMap.get(normalizedSku);
-		const matchedItems = stockItemsByNormalizedSku[normalizedSku];
-		
-		if (!matchedItems || matchedItems.length === 0) {
-		  return {
-			productNumber: original,
-			quantity,
-			isValid: false,
-			message: "Stock information is missing",
-		  };
-		}
-		
-		const matchedStock = matchedItems[0];
-		let availableStock = Number(matchedStock?.stock) || 0;
-		
+	const results = skuData.map(({ normalizedSku, original, quantity }) => {
+	  const matchedStock = stockItemMap[normalizedSku];
+	  
+	  if (!matchedStock) {
 		return {
-		  id: matchedStock._id.toString(),
-		  productId: matchedStock.productid.toString(),
-		  productNumber: matchedStock.productNumber,
-		  productName: matchedStock.productName,
-		  sku: matchedStock.sku,
-		  quantity: quantity, // Use the quantity from skuMap instead of matchedStock.quantity
-		  stockId: matchedStock._id.toString(),
-		  stock: availableStock,
-		  manufacturer: matchedStock.manufacturer?.toString() || null,
-		  distributer: matchedStock.distributor?.toString() || null,
-		  isValid: true,
-		  message: "SKU is valid",
+		  productNumber: original,
+		  quantity,
+		  isValid: false,
+		  message: "Stock information is missing",
 		};
-	  })
-	);
+	  }
+	  
+	  return {
+		id: matchedStock._id.toString(),
+		productId: matchedStock.productid.toString(),
+		productNumber: matchedStock.productNumber,
+		productName: matchedStock.productName,
+		sku: matchedStock.sku,
+		quantity,
+		stockId: matchedStock._id.toString(),
+		stock: Number(matchedStock?.stock) || 0,
+		manufacturer: matchedStock.manufacturer?.toString() || null,
+		distributer: matchedStock.distributor?.toString() || null,
+		isValid: true,
+		message: "SKU is valid",
+	  };
+	});
 	
-	console.log(results, "result");
-	
+	console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
 	return results;
   };
+//   export const uploadFile = async ({ query }) => {
+// 	const startTime = Date.now();
+// 	console.log(query, "query");
+	
+// 	// Early return for empty queries
+// 	if (!query || query.length === 0) {
+// 	  return [];
+// 	}
+	
+// 	// Process valid queries and create normalized SKU map in one pass
+// 	const skuMap = new Map();
+// 	const normalizedSkus = [];
+	
+// 	for (const item of query) {
+// 	  const [sku, quantity] = item;
+	  
+// 	  if (!sku?.trim()) continue;
+	  
+// 	  const normalizedSku = sku.trim().replace(/[-\s]/g, '').toLowerCase();
+// 	  skuMap.set(normalizedSku, { 
+// 		original: sku.trim(), 
+// 		quantity: parseInt(quantity?.trim() || '1') 
+// 	  });
+// 	  normalizedSkus.push(normalizedSku);
+// 	}
+	
+// 	// Early return if no valid SKUs
+// 	if (normalizedSkus.length === 0) {
+// 	  return [];
+// 	}
+	
+// 	// Query optimization: Use lean() for faster query execution
+// 	const stockItems = await Stock.aggregate([
+// 	  {
+// 		$match: {
+// 		  $expr: {
+// 			$in: [
+// 			  { $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
+// 			  normalizedSkus
+// 			]
+// 		  }
+// 		}
+// 	  },
+// 	  {
+// 		$addFields: {
+// 		  normalizedSku: {
+// 			$toLower: {
+// 			  $replaceAll: {
+// 				input: "$sku",
+// 				find: "-",
+// 				replacement: ""
+// 			  }
+// 			}
+// 		  }
+// 		}
+// 	  },
+// 	  {
+// 		$project: {
+// 		  _id: 1,
+// 		  productid: 1,
+// 		  stock: 1,
+// 		  pricing: 1,
+// 		  distributor: 1,
+// 		  manufacturer: 1,
+// 		  productName: 1,
+// 		  productNumber: 1,
+// 		  sku: 1,
+// 		  normalizedSku: 1
+// 		}
+// 	  }
+// 	]).exec();
+	
+// 	// Create lookup map for faster processing
+// 	const stockItemsByNormalizedSku = {};
+// 	for (const item of stockItems) {
+// 	  if (!stockItemsByNormalizedSku[item.normalizedSku]) {
+// 		stockItemsByNormalizedSku[item.normalizedSku] = [];
+// 	  }
+// 	  stockItemsByNormalizedSku[item.normalizedSku].push(item);
+// 	}
+	
+// 	// Process results (avoid using Promise.all for a synchronous operation)
+// 	const results = normalizedSkus.map(normalizedSku => {
+// 	  const { original, quantity } = skuMap.get(normalizedSku);
+// 	  const matchedItems = stockItemsByNormalizedSku[normalizedSku];
+	  
+// 	  if (!matchedItems || matchedItems.length === 0) {
+// 		return {
+// 		  productNumber: original,
+// 		  quantity,
+// 		  isValid: false,
+// 		  message: "Stock information is missing",
+// 		};
+// 	  }
+	  
+// 	  const matchedStock = matchedItems[0];
+// 	  let availableStock = Number(matchedStock?.stock) || 0;
+	  
+// 	  return {
+// 		id: matchedStock._id.toString(),
+// 		productId: matchedStock.productid.toString(),
+// 		productNumber: matchedStock.productNumber,
+// 		productName: matchedStock.productName,
+// 		sku: matchedStock.sku,
+// 		quantity: quantity,
+// 		stockId: matchedStock._id.toString(),
+// 		stock: availableStock,
+// 		manufacturer: matchedStock.manufacturer?.toString() || null,
+// 		distributer: matchedStock.distributor?.toString() || null,
+// 		isValid: true,
+// 		message: "SKU is valid",
+// 	  };
+// 	});
+// 	console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
+// 	// console.log(results, "result");
+// 	return results;
+//   };
+
+
+// export const uploadFile = async ({ query }) => {
+// 	console.log(query,"query");
+	
+
+// 	let validQueries = [];
+	
+// 	for (const item of query) {
+// 	  const [sku, quantity] = item;
+	  
+// 	  if (sku?.trim()) {
+// 		// If it's format 2 (only SKU, no quantity), assign quantity as 1
+// 		if (quantity === undefined) {
+// 		  validQueries.push([sku.trim(), '1']);
+// 		} 
+// 		// If it's format 1 (SKU with quantity), use the provided quantity
+// 		else if (String(quantity)?.trim()) {
+// 		  validQueries.push([sku.trim(), quantity.trim()]);
+// 		}
+// 	  }
+// 	}
+	
+// 	console.log(validQueries, "validQueries");
+	
+// 	if (validQueries.length === 0) {
+// 	  return [];
+// 	}
+	
+// 	const skuMap = new Map();
+// 	const normalizedSkus = [];
+	
+// 	for (const [sku, quantity] of validQueries) {
+// 	  const cleanSku = sku.replace(/[-\s]/g, '').toLowerCase();
+// 	  skuMap.set(cleanSku, { original: sku, quantity: parseInt(quantity) });
+// 	  normalizedSkus.push(cleanSku);
+// 	}
+  
+// 	const stockItems = await Stock.aggregate([
+// 	  {
+// 		$addFields: {
+// 		  normalizedSku: {
+// 			$toLower: {
+// 			  $replaceAll: {
+// 				input: "$sku",
+// 				find: "-",
+// 				replacement: ""
+// 			  }
+// 			}
+// 		  }
+// 		}
+// 	  },
+// 	  {
+// 		$match: {
+// 		  normalizedSku: { $in: normalizedSkus }
+// 		}
+// 	  },
+// 	  {
+// 		$project: {
+// 		  _id: 1,
+// 		  productid: 1,
+// 		  stock: 1,
+// 		  pricing: 1,
+// 		  distributor: 1,
+// 		  manufacturer: 1,
+// 		  productName: 1,
+// 		  productNumber: 1,
+// 		  sku: 1,
+// 		  normalizedSku: 1
+// 		}
+// 	  }
+// 	]).exec();
+	
+// 	const stockItemsByNormalizedSku = stockItems.reduce((acc, item) => {
+// 	  if (!acc[item.normalizedSku]) {
+// 		acc[item.normalizedSku] = [];
+// 	  }
+// 	  acc[item.normalizedSku].push(item);
+// 	  return acc;
+// 	}, {});
+	
+// 	const results = await Promise.all(
+// 	  normalizedSkus.map(async (normalizedSku) => {
+// 		const { original, quantity } = skuMap.get(normalizedSku);
+// 		const matchedItems = stockItemsByNormalizedSku[normalizedSku];
+		
+// 		if (!matchedItems || matchedItems.length === 0) {
+// 		  return {
+// 			productNumber: original,
+// 			quantity,
+// 			isValid: false,
+// 			message: "Stock information is missing",
+// 		  };
+// 		}
+		
+// 		const matchedStock = matchedItems[0];
+// 		let availableStock = Number(matchedStock?.stock) || 0;
+		
+// 		return {
+// 		  id: matchedStock._id.toString(),
+// 		  productId: matchedStock.productid.toString(),
+// 		  productNumber: matchedStock.productNumber,
+// 		  productName: matchedStock.productName,
+// 		  sku: matchedStock.sku,
+// 		  quantity: quantity, // Use the quantity from skuMap instead of matchedStock.quantity
+// 		  stockId: matchedStock._id.toString(),
+// 		  stock: availableStock,
+// 		  manufacturer: matchedStock.manufacturer?.toString() || null,
+// 		  distributer: matchedStock.distributor?.toString() || null,
+// 		  isValid: true,
+// 		  message: "SKU is valid",
+// 		};
+// 	  })
+// 	);
+	
+// 	console.log(results, "result");
+	
+// 	return results;
+//   };
 export const CreateProductQuote = async (formattedData) => {
 	console.log("formattedData",formattedData);
 	
