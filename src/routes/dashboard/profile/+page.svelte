@@ -66,12 +66,12 @@
             {billingAddress} 
         />
 
-      {:else if activeComp === 2}
+      <!-- {:else if activeComp === 2}
         <EmailPreference 
             on:onSuccess={handleEvent} 
             {recordId} 
             {emailPreferences} 
-        />
+        /> -->
 
       <!-- {:else if activeComp === 3}
         <PaymentMethod 
@@ -92,7 +92,7 @@
             {paymentAddress}
         /> -->
 
-      {:else if activeComp === 3}
+      {:else if activeComp === 2}
         <SitePreference 
             on:onSuccess={handleEvent} 
             {recordId} 
