@@ -391,8 +391,9 @@ function submitFileData() {
   if (!rawFileData.trim()) {
     toast.error("Please enter product data before submitting");
     cartloading = false;
-    cancel();
-    return;
+    // cancel();
+    return { cancel: true };
+    
   }
 
   const lines = rawFileData.split("\n").filter(line => line.trim());
@@ -1300,7 +1301,8 @@ Example file content:
       use:enhance={({ formData, cancel }) => {
           if (formatError) {
           toast.error("Please fix format errors before adding to cart");
-          return cancel();
+          // return cancel();
+          return { cancel: true };
         }
         cartloading = true;
         if (!isValidated || duplicateEntries.length > 0) {
@@ -1313,7 +1315,8 @@ Example file content:
         if (productsToAdd.length === 0) {
           cartloading = false;
           toast.error("No valid items to add to cart");
-          return cancel();
+          // return cancel();
+          return { cancel: true };
         }
         // productsToAdd = productsToAdd.filter(y=>{
         //   const search = $cart.find(x=>x.stockId === y.stockId)
@@ -1328,7 +1331,8 @@ Example file content:
           setTimeout(() => {
             window.location.href = "/cart";
           }, 2000);
-          cancel();
+          // cancel();
+          return { cancel: true };
         }
         formData.set("cartItems", JSON.stringify(productsToAdd));
         //cancel()
