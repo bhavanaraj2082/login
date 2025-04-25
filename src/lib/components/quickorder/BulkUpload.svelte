@@ -191,6 +191,7 @@
     
     if (parts.length === 0 || !parts[0].trim()) {
       formatError = true;
+      cartloading = false;
       fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
       toast.error(fileError);
       break;
@@ -199,16 +200,29 @@
     // Only check quantity if a second part exists
     if (parts.length > 1 && parts[1].trim() && isNaN(Number(parts[1].trim()))) {
       formatError = true;
-
+      cartloading = false;
       fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
       toast.error(fileError);
       break;
+    }
+       if (parts.length > 1 && parts[1].trim()) {
+      const quantity = Number(parts[1].trim());
+      if (!isNaN(quantity) && quantity > 999) {
+        formatError = true;
+        cartloading = false;
+        fileError = `Quantity at line ${i + 1} must not be greater than 999.`;
+        toast.error(fileError);
+        break;
+      }
     }
   }
 }
 
   function handleFileInputChange(event) {
+    fileError = "";
+    formatError = false;
     let file;
+
     if (event.dataTransfer) {
       file = event.dataTransfer.files[0];
     } else {
@@ -238,6 +252,8 @@
     };
     //script file remove///
     const processFileData = (content) => {
+      fileError = "";
+      formatError = false;
       if (content.toLowerCase().includes("<script")) {
         fileError =
           "File contains potentially malicious script tags and was rejected.";
@@ -301,43 +317,7 @@
     }
   }
 
-  // function submitFileData() {
-  //   if (!rawFileData.trim()) {
-  //     toast.error("Please enter product data before submitting");
-  //     cartloading = false;
-  //     cancel();
-  //   }
-  //   const updatedFile = new File(
-  //     [rawFileData],
-  //     selectedFileName || "upload.csv",
-  //     {
-  //       type: "text/csv",
-  //     },
-  //   );
 
-  //   const dataTransfer = new DataTransfer();
-  //   dataTransfer.items.add(updatedFile);
-
-  //   const fileInput =
-  //     document.getElementById("bulkupload") ||
-  //     document.querySelector('input[type="file"]');
-
-  //   if (fileInput) {
-  //     fileInput.files = dataTransfer.files;
-
-  //     const form = fileInput.closest("form");
-
-  //     if (form) {
-  //       setTimeout(() => {
-  //         form.requestSubmit();
-  //       }, 100);
-  //     } else {
-  //       console.error("Form not found");
-  //     }
-  //   } else {
-  //     console.error("File input element not found");
-  //   }
-  // }
 
 //   function submitFileData() {
 //   if (!rawFileData.trim()) {
@@ -893,15 +873,26 @@ for (let i = 0; i < lines.length; i++) {
   
   if (parts.length === 0 || !parts[0]?.trim()) {
     formatError = true;
+    cartloading = false;
     errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
     break;
   }
 
   if (parts.length > 1 && parts[1]?.trim() && isNaN(Number(parts[1].trim()))) {
     formatError = true;
+    cartloading = false;
     errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
     break;
   }
+  if (parts.length > 1 && parts[1]?.trim()) {
+      const quantity = Number(parts[1].trim());
+      if (!isNaN(quantity) && quantity > 999) {
+        cartloading = false;
+        formatError = true;
+        errorMessage = `Quantity at line ${i + 1} must not be greater than 999.`;
+        break;
+      }
+    }
 }
     
     if (formatError) {
@@ -1164,7 +1155,7 @@ Example file content:
         >
           <a
             class="flex items-center gap-2 text-sm font-medium text-primary-500"
-            href="/quick_order_template.csv"
+            href="/quick_order_template.xls"
             download
           >
             <Icon icon="pajamas:download" class="text-lg " /> Download Template
@@ -1367,34 +1358,34 @@ Example file content:
       }}
     >
     <button
-  type="submit"
-  on:click={() => {
-    if (formatError) {
-      toast.error("Please fix format errors before adding to cart");
-      return;
+    type="submit"
+    on:click={(e) => {
+      if (formatError || fileError) {
+        e.preventDefault(); // Prevent the default submit action
+        toast.error("Please fix format errors before adding to cart");
+        return false;
+      }
+    }}
+    disabled={
+      cartloading || 
+      (isValidated && 
+       validatedProducts.length > 0 && 
+       !validatedProducts.some((p) => p.isValid))
     }
-  }}
-  disabled={
-    cartloading || 
-    
-    (isValidated && 
-     validatedProducts.length > 0 && 
-     !validatedProducts.some((p) => p.isValid))
-  }
-  class={`lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 transition rounded-md flex items-center justify-center gap-2
-    ${cartloading ||
-      (isValidated && validatedProducts.length > 0 && !validatedProducts.some(p => p.isValid))
-      ? 'opacity-50 cursor-not-allowed bg-white'
-      : 'hover:bg-primary-500 hover:text-white'}
-  `}
->
-  {#if cartloading}
-    <span>Adding...</span>
-  {:else}
-    <Icon icon="ic:round-shopping-cart" class="text-2xl" />
-    <span>Add to Cart</span>
-  {/if}
-</button>
+    class={`lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 transition rounded-md flex items-center justify-center gap-2
+      ${cartloading ||
+        (isValidated && validatedProducts.length > 0 && !validatedProducts.some(p => p.isValid))
+        ? 'opacity-50 cursor-not-allowed bg-white'
+        : 'hover:bg-primary-500 hover:text-white'}
+    `}
+  >
+    {#if cartloading && !fileError && !formatError}
+      <span>Adding...</span>
+    {:else}
+      <Icon icon="ic:round-shopping-cart" class="text-2xl" />
+      <span>Add to Cart</span>
+    {/if}
+  </button>
 
       <!-- <button
         type="submit"
@@ -1422,7 +1413,7 @@ Example file content:
           validatedProducts.length > 0 &&
           !validatedProducts.some((p) => p.isValid))}
     >
-      {#if cartloading}
+      {#if cartloading && !fileError && !formatError}
         <span>Adding...</span>
       {:else}
         <Icon icon="ic:round-shopping-cart" class="text-2xl" />
