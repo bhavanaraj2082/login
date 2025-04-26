@@ -233,10 +233,6 @@
 
 	const handleSubmit = ({formData,cancel})=>{
 		formData.append("order",JSON.stringify(checkout))
-		const data = Object.fromEntries(formData)
-		console.log(JSON.parse(data.order))
-		console.log($billingAddress,$shippingAddress);
-		cancel()
 		orderLoad = true
 		onSubmit = true
 		if(taxError.length){
