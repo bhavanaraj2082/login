@@ -732,7 +732,7 @@
 	function filterCountriesWithoutAutoSelect() {
 		filteredCountries = countries.filter(
 			(country) =>
-				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
 				country.code
 					.replace("+", "")
 					.includes(searchTerm.replace("+", "").toLowerCase()),
@@ -1653,7 +1653,7 @@ function verifyCaptcha() {
 											class="w-full text-sm placeholder:text-xs px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											placeholder="Subject"
 											on:input={() => {
-												const trimmedSubject = subject.trim();
+												const trimmedSubject = subject.trimStart();
 												subject = trimmedSubject;
 												validateField("subject");
 												errors.subject =
@@ -1688,7 +1688,7 @@ function verifyCaptcha() {
 											class="w-full text-sm h-24 placeholder:text-xs px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											placeholder="Message"
 											on:input={() => {
-												const trimmedMessage = message.trim();
+												const trimmedMessage = message.trimStart();
 												message = trimmedMessage;
 												validateField("message");
 												errors.message =

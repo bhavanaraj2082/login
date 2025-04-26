@@ -609,7 +609,7 @@ let searchTerm = "";
 	function filterCountries() {
 		filteredCountries = countries.filter(
 			(country) =>
-				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
 				country.code
 					.replace("+", "")
 					.includes(searchTerm.replace("+", "").toLowerCase()),
@@ -669,7 +669,7 @@ function handleInputChange(event) {
 function filterCountriesWithoutAutoSelect() {
   filteredCountries = countries.filter(
     (country) =>
-      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
       country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
   );
 }

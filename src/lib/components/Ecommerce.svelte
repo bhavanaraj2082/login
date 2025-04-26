@@ -771,7 +771,7 @@
 			(location) =>
 				location.name
 					.toLowerCase()
-					.includes(searchTerm.toLowerCase()) ||
+					.startsWith(searchTerm.toLowerCase()) ||
 				location.code
 					.replace("+", "")
 					.includes(searchTerm.replace("+", "").toLowerCase()),
@@ -798,7 +798,7 @@
 	function filterCountriesWithoutAutoSelect() {
 		filteredCountries = countries.filter(
 			(country) =>
-				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
 				country.code
 					.replace("+", "")
 					.includes(searchTerm.replace("+", "").toLowerCase()),
@@ -1603,7 +1603,7 @@
 								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 								placeholder="Role*"
 								on:input={() => {
-									const trimmedRole = role.trim();
+									const trimmedRole = role.trimStart();
 									role = trimmedRole;
 								}}
 							/>
@@ -1866,7 +1866,7 @@
 							class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300 h-32"
 							placeholder="Additional Details*"
 							on:input={() => {
-								const trimmedDetails = details.trim();
+								const trimmedDetails = details.trimStart();
 								details = trimmedDetails;
 							}}
 						></textarea>

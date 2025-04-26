@@ -66,27 +66,198 @@ onMount(() => {
         "Puducherry"
     ];
 
-let countries = [
-  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", 
-  "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", 
-  "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", 
-  "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Congo-Brazzaville)", 
-  "Congo (Democratic Republic of the Congo)", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", 
-  "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", 
-  "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", 
-  "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", 
-  "Israel", "Italy", "Ivory Coast", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea (North)", "Korea (South)", 
-  "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", 
-  "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", 
-  "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar (Burma)", "Namibia", "Nauru", 
-  "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", 
-  "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", 
-  "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", 
-  "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", 
-  "Somalia", "South Africa", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", 
-  "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", 
-  "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", 
-  "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+    const countries = [
+    { name: 'Afghanistan', code: '+93', postalRegex: /^\d{4}$/ },
+    { name: 'Albania', code: '+355', postalRegex: /^\d{4}$/ },
+    { name: 'Algeria', code: '+213', postalRegex: /^\d{5}$/ },
+    { name: 'Andorra', code: '+376', postalRegex: /^\d{3}$/ },
+    { name: 'Angola', code: '+244', postalRegex: /^\d{6}$/ },
+    { name: 'Antigua and Barbuda', code: '+1-268', postalRegex: /^\d{4}$/ },
+    { name: 'Argentina', code: '+54', postalRegex: /^\d{4}$/ },
+    { name: 'Armenia', code: '+374', postalRegex: /^\d{4}$/ },
+    { name: 'Australia', code: '+61', postalRegex: /^\d{4}$/ },
+    { name: 'Austria', code: '+43', postalRegex: /^\d{4}$/ },
+    { name: 'Azerbaijan', code: '+994', postalRegex: /^\d{4}$/ },
+    { name: 'Bahamas', code: '+1-242', postalRegex: /^\d{5}$/ },
+    { name: 'Bahrain', code: '+973', postalRegex: /^\d{3}$/ },
+    { name: 'Bangladesh', code: '+880', postalRegex: /^\d{4}$/ },
+    { name: 'Barbados', code: '+1-246', postalRegex: /^\d{5}$/ },
+    { name: 'Belarus', code: '+375', postalRegex: /^\d{6}$/ },
+    { name: 'Belgium', code: '+32', postalRegex: /^\d{4}$/ },
+    { name: 'Belize', code: '+501', postalRegex: /^\d{5}$/ },
+    { name: 'Benin', code: '+229', postalRegex: /^\d{2}$/ },
+    { name: 'Bhutan', code: '+975', postalRegex: /^\d{5}$/ },
+    { name: 'Bolivia', code: '+591', postalRegex: /^\d{4}$/ },
+    { name: 'Bosnia and Herzegovina', code: '+387', postalRegex: /^\d{5}$/ },
+    { name: 'Botswana', code: '+267', postalRegex: /^\d{3}$/ },
+    { name: 'Brazil', code: '+55', postalRegex: /^\d{5}-\d{3}$/ },
+    { name: 'Brunei', code: '+673', postalRegex: /^\d{4}$/ },
+    { name: 'Bulgaria', code: '+359', postalRegex: /^\d{4}$/ },
+    { name: 'Burkina Faso', code: '+226', postalRegex: /^\d{4}$/ },
+    { name: 'Burundi', code: '+257', postalRegex: /^\d{5}$/ },
+    { name: 'Cabo Verde', code: '+238', postalRegex: /^\d{4}$/ },
+    { name: 'Cambodia', code: '+855', postalRegex: /^\d{5}$/ },
+    { name: 'Cameroon', code: '+237', postalRegex: /^\d{5}$/ },
+    { name: 'Canada', code: '+1', postalRegex: /^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/ },
+    { name: 'Central African Republic', code: '+236', postalRegex: /^\d{5}$/ },
+    { name: 'Chad', code: '+235', postalRegex: /^\d{5}$/ },
+    { name: 'Chile', code: '+56', postalRegex: /^\d{7}$/ },
+    { name: 'China', code: '+86', postalRegex: /^\d{6}$/ },
+    { name: 'Colombia', code: '+57', postalRegex: /^\d{6}$/ },
+    { name: 'Comoros', code: '+269', postalRegex: /^\d{5}$/ },
+    { name: 'Congo, Republic of the', code: '+242', postalRegex: /^\d{5}$/ },
+    { name: 'Congo, Democratic Republic of the', code: '+243', postalRegex: /^\d{5}$/ },
+    { name: 'Costa Rica', code: '+506', postalRegex: /^\d{4}$/ },
+    { name: 'Croatia', code: '+385', postalRegex: /^\d{5}$/ },
+    { name: 'Cuba', code: '+53', postalRegex: /^\d{5}$/ },
+    { name: 'Cyprus', code: '+357', postalRegex: /^\d{4}$/ },
+    { name: 'Czech Republic', code: '+420', postalRegex: /^\d{5}$/ },
+    { name: 'Denmark', code: '+45', postalRegex: /^\d{4}$/ },
+    { name: 'Djibouti', code: '+253', postalRegex: /^\d{5}$/ },
+    { name: 'Dominica', code: '+1-767', postalRegex: /^\d{4}$/ },
+    { name: 'Dominican Republic', code: '+1-809', postalRegex: /^\d{5}$/ },
+    { name: 'Ecuador', code: '+593', postalRegex: /^\d{6}$/ },
+    { name: 'Egypt', code: '+20', postalRegex: /^\d{5}$/ },
+    { name: 'El Salvador', code: '+503', postalRegex: /^\d{4}$/ },
+    { name: 'Equatorial Guinea', code: '+240', postalRegex: /^\d{5}$/ },
+    { name: 'Eritrea', code: '+291', postalRegex: /^\d{4}$/ },
+    { name: 'Estonia', code: '+372', postalRegex: /^\d{5}$/ },
+    { name: 'Eswatini', code: '+268', postalRegex: /^\d{4}$/ },
+    { name: 'Ethiopia', code: '+251', postalRegex: /^\d{4}$/ },
+    { name: 'Fiji', code: '+679', postalRegex: /^\d{4}$/ },
+    { name: 'Finland', code: '+358', postalRegex: /^\d{5}$/ },
+    { name: 'France', code: '+33', postalRegex: /^\d{5}$/ },
+    { name: 'Gabon', code: '+241', postalRegex: /^\d{5}$/ },
+    { name: 'Gambia', code: '+220', postalRegex: /^\d{4}$/ },
+    { name: 'Georgia', code: '+995', postalRegex: /^\d{4}$/ },
+    { name: 'Germany', code: '+49', postalRegex: /^\d{5}$/ },
+    { name: 'Ghana', code: '+233', postalRegex: /^\d{5}$/ },
+    { name: 'Greece', code: '+30', postalRegex: /^\d{5}$/ },
+    { name: 'Grenada', code: '+1-473', postalRegex: /^\d{4}$/ },
+    { name: 'Guatemala', code: '+502', postalRegex: /^\d{5}$/ },
+    { name: 'Guinea', code: '+224', postalRegex: /^\d{4}$/ },
+    { name: 'Guinea-Bissau', code: '+245', postalRegex: /^\d{4}$/ },
+    { name: 'Guyana', code: '+592', postalRegex: /^\d{5}$/ },
+    { name: 'Haiti', code: '+509', postalRegex: /^\d{4}$/ },
+    { name: 'Honduras', code: '+504', postalRegex: /^\d{5}$/ },
+    { name: 'Hungary', code: '+36', postalRegex: /^\d{4}$/ },
+    { name: 'Iceland', code: '+354', postalRegex: /^\d{3}$/ },
+    { name: 'India', code: '+91', postalRegex: /^\d{6}$/ },
+    { name: 'Indonesia', code: '+62', postalRegex: /^\d{5}$/ },
+    { name: 'Iran', code: '+98', postalRegex: /^\d{5}$/ },
+    { name: 'Iraq', code: '+964', postalRegex: /^\d{5}$/ },
+    { name: 'Ireland', code: '+353', postalRegex: /^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/ },
+    { name: 'Israel', code: '+972', postalRegex: /^\d{5}$/ },
+    { name: 'Italy', code: '+39', postalRegex: /^\d{5}$/ },
+    { name: 'Jamaica', code: '+1-876', postalRegex: /^\d{5}$/ },
+    { name: 'Japan', code: '+81', postalRegex: /^\d{3}-\d{4}$/ },
+    { name: 'Jordan', code: '+962', postalRegex: /^\d{5}$/ },
+    { name: 'Kazakhstan', code: '+7', postalRegex: /^\d{6}$/ },
+    { name: 'Kenya', code: '+254', postalRegex: /^\d{5}$/ },
+    { name: 'Kiribati', code: '+686', postalRegex: /^\d{4}$/ },
+    { name: 'Kuwait', code: '+965', postalRegex: /^\d{5}$/ },
+    { name: 'Kyrgyzstan', code: '+996', postalRegex: /^\d{6}$/ },
+    { name: 'Laos', code: '+856', postalRegex: /^\d{5}$/ },
+    { name: 'Latvia', code: '+371', postalRegex: /^\d{4}$/ },
+    { name: 'Lebanon', code: '+961', postalRegex: /^\d{5}$/ },
+    { name: 'Lesotho', code: '+266', postalRegex: /^\d{4}$/ },
+    { name: 'Liberia', code: '+231', postalRegex: /^\d{4}$/ },
+    { name: 'Libya', code: '+218', postalRegex: /^\d{5}$/ },
+    { name: 'Liechtenstein', code: '+423', postalRegex: /^\d{4}$/ },
+    { name: 'Lithuania', code: '+370', postalRegex: /^\d{5}$/ },
+    { name: 'Luxembourg', code: '+352', postalRegex: /^\d{4}$/ },
+    { name: 'Madagascar', code: '+261', postalRegex: /^\d{5}$/ },
+    { name: 'Malawi', code: '+265', postalRegex: /^\d{5}$/ },
+    { name: 'Malaysia', code: '+60', postalRegex: /^\d{5}$/ },
+    { name: 'Maldives', code: '+960', postalRegex: /^\d{5}$/ },
+    { name: 'Mali', code: '+223', postalRegex: /^\d{5}$/ },
+    { name: 'Malta', code: '+356', postalRegex: /^\d{4}$/ },
+    { name: 'Marshall Islands', code: '+692', postalRegex: /^\d{5}$/ },
+    { name: 'Mauritania', code: '+222', postalRegex: /^\d{5}$/ },
+    { name: 'Mauritius', code: '+230', postalRegex: /^\d{5}$/ },
+    { name: 'Mexico', code: '+52', postalRegex: /^\d{5}$/ },
+    { name: 'Micronesia', code: '+691', postalRegex: /^\d{5}$/ },
+    { name: 'Moldova', code: '+373', postalRegex: /^\d{5}$/ },
+    { name: 'Monaco', code: '+377', postalRegex: /^\d{5}$/ },
+    { name: 'Mongolia', code: '+976', postalRegex: /^\d{5}$/ },
+    { name: 'Montenegro', code: '+382', postalRegex: /^\d{5}$/ },
+    { name: 'Morocco', code: '+212', postalRegex: /^\d{5}$/ },
+    { name: 'Mozambique', code: '+258', postalRegex: /^\d{5}$/ },
+    { name: 'Myanmar', code: '+95', postalRegex: /^\d{5}$/ },
+    { name: 'Namibia', code: '+264', postalRegex: /^\d{4}$/ },
+    { name: 'Nauru', code: '+674', postalRegex: /^\d{4}$/ },
+    { name: 'Nepal', code: '+977', postalRegex: /^\d{5}$/ },
+    { name: 'Netherlands', code: '+31', postalRegex: /^\d{4} ?[A-Za-z]{2}$/ },
+    { name: 'New Zealand', code: '+64', postalRegex: /^\d{4}$/ },
+    { name: 'Nicaragua', code: '+505', postalRegex: /^\d{5}$/ },
+    { name: 'Niger', code: '+227', postalRegex: /^\d{5}$/ },
+    { name: 'Nigeria', code: '+234', postalRegex: /^\d{6}$/ },
+    { name: 'North Macedonia', code: '+389', postalRegex: /^\d{4}$/ },
+    { name: 'Norway', code: '+47', postalRegex: /^\d{4}$/ },
+    { name: 'Oman', code: '+968', postalRegex: /^\d{3}$/ },
+    { name: 'Pakistan', code: '+92', postalRegex: /^\d{5}$/ },
+    { name: 'Palau', code: '+680', postalRegex: /^\d{5}$/ },
+    { name: 'Panama', code: '+507', postalRegex: /^\d{5}$/ },
+    { name: 'Papua New Guinea', code: '+675', postalRegex: /^\d{3}$/ },
+    { name: 'Paraguay', code: '+595', postalRegex: /^\d{5}$/ },
+    { name: 'Peru', code: '+51', postalRegex: /^\d{5}$/ },
+    { name: 'Philippines', code: '+63', postalRegex: /^\d{4}$/ },
+    { name: 'Poland', code: '+48', postalRegex: /^\d{2}-\d{3}$/ },
+    { name: 'Portugal', code: '+351', postalRegex: /^\d{4}-\d{3}$/ },
+    { name: 'Qatar', code: '+974', postalRegex: /^\d{5}$/ },
+    { name: 'Romania', code: '+40', postalRegex: /^\d{6}$/ },
+    { name: 'Russia', code: '+7', postalRegex: /^\d{6}$/ },
+    { name: 'Rwanda', code: '+250', postalRegex: /^\d{5}$/ },
+    { name: 'Saint Kitts and Nevis', code: '+1-869', postalRegex: /^\d{5}$/ },
+    { name: 'Saint Lucia', code: '+1-758', postalRegex: /^\d{5}$/ },
+    { name: 'Saint Vincent and the Grenadines', code: '+1-784', postalRegex: /^\d{5}$/ },
+    { name: 'Samoa', code: '+685', postalRegex: /^\d{5}$/ },
+    { name: 'San Marino', code: '+378', postalRegex: /^\d{5}$/ },
+    { name: 'Sao Tome and Principe', code: '+239', postalRegex: /^\d{5}$/ },
+    { name: 'Saudi Arabia', code: '+966', postalRegex: /^\d{5}$/ },
+    { name: 'Senegal', code: '+221', postalRegex: /^\d{5}$/ },
+    { name: 'Serbia', code: '+381', postalRegex: /^\d{5}$/ },
+    { name: 'Seychelles', code: '+248', postalRegex: /^\d{5}$/ },
+    { name: 'Sierra Leone', code: '+232', postalRegex: /^\d{5}$/ },
+    { name: 'Singapore', code: '+65', postalRegex: /^\d{6}$/ },
+    { name: 'Slovakia', code: '+421', postalRegex: /^\d{5}$/ },
+    { name: 'Slovenia', code: '+386', postalRegex: /^\d{4}$/ },
+    { name: 'Solomon Islands', code: '+677', postalRegex: /^\d{5}$/ },
+    { name: 'Somalia', code: '+252', postalRegex: /^\d{5}$/ },
+    { name: 'South Africa', code: '+27', postalRegex: /^\d{4}$/ },
+    { name: 'South Korea', code: '+82', postalRegex: /^\d{5}$/ },
+    { name: 'South Sudan', code: '+211', postalRegex: /^\d{5}$/ },
+    { name: 'Spain', code: '+34', postalRegex: /^\d{5}$/ },
+    { name: 'Sri Lanka', code: '+94', postalRegex: /^\d{5}$/ },
+    { name: 'Sudan', code: '+249', postalRegex: /^\d{5}$/ },
+    { name: 'Suriname', code: '+597', postalRegex: /^\d{5}$/ },
+    { name: 'Sweden', code: '+46', postalRegex: /^\d{5}$/ },
+    { name: 'Switzerland', code: '+41', postalRegex: /^\d{4}$/ },
+    { name: 'Syria', code: '+963', postalRegex: /^\d{5}$/ },
+    { name: 'Taiwan', code: '+886', postalRegex: /^\d{5}$/ },
+    { name: 'Tajikistan', code: '+992', postalRegex: /^\d{6}$/ },
+    { name: 'Tanzania', code: '+255', postalRegex: /^\d{5}$/ },
+    { name: 'Thailand', code: '+66', postalRegex: /^\d{5}$/ },
+    { name: 'Togo', code: '+228', postalRegex: /^\d{5}$/ },
+    { name: 'Trinidad and Tobago', code: '+1-868', postalRegex: /^\d{6}$/ },
+    { name: 'Tunisia', code: '+216', postalRegex: /^\d{5}$/ },
+    { name: 'Turkey', code: '+90', postalRegex: /^\d{5}$/ },
+    { name: 'Turkmenistan', code: '+993', postalRegex: /^\d{6}$/ },
+    { name: 'Tuvalu', code: '+688', postalRegex: /^\d{5}$/ },
+    { name: 'Uganda', code: '+256', postalRegex: /^\d{5}$/ },
+    { name: 'Ukraine', code: '+380', postalRegex: /^\d{5}$/ },
+    { name: 'United Arab Emirates', code: '+971', postalRegex: /^\d{5}$/ },
+    { name: 'United Kingdom', code: '+44', postalRegex: /^[A-Za-z]{1,2}\d[A-Za-z\d]? \d[A-Za-z]{2}$/ },
+    { name: 'United States', code: '+1', postalRegex: /^\d{5}(-\d{4})?$/ },
+    { name: 'Uruguay', code: '+598', postalRegex: /^\d{5}$/ },
+    { name: 'Uzbekistan', code: '+998', postalRegex: /^\d{6}$/ },
+    { name: 'Vanuatu', code: '+678', postalRegex: /^\d{4}$/ },
+    { name: 'Vatican City', code: '+379', postalRegex: /^\d{5}$/ },
+    { name: 'Venezuela', code: '+58', postalRegex: /^\d{5}$/ },
+    { name: 'Vietnam', code: '+84', postalRegex: /^\d{5}$/ },
+    { name: 'Yemen', code: '+967', postalRegex: /^\d{5}$/ },
+    { name: 'Zambia', code: '+260', postalRegex: /^\d{5}$/ },
+    { name: 'Zimbabwe', code: '+263', postalRegex: /^\d{5}$/ }
 ];
 
 const postalCodePatterns = {
@@ -281,6 +452,93 @@ const postalCodePatterns = {
 };
 
 
+let showDropdown = false;
+let filteredCountries = countries;
+let autoSelectedOnce = false;
+let previousSearchTerm = '';
+
+function selectCountry(selectedCountry) {
+    country = selectedCountry.name;
+    filteredCountries = countries; 
+    showDropdown = false; 
+    validateForm('location');
+    delete errors.location; 
+    autoSelectedOnce = false; 
+}
+
+function handleInput(event) {
+  const searchTerm = activeAddress.location.toLowerCase().trim();
+  const isDialCode = /^\d+$/.test(searchTerm);
+  showDropdown = true;
+  activeAddress.location=activeAddress.location.trim();
+
+
+  const isTypingForward = searchTerm.length > previousSearchTerm.length;
+  previousSearchTerm = searchTerm;
+  autoSelectedOnce = searchTerm.length < 3 ? false : autoSelectedOnce;
+
+  if (isDialCode) {
+    filteredCountries = countries.filter(c => c.code.replace('+', '') === searchTerm);
+    if (filteredCountries.length === 0) {
+      filteredCountries = countries.filter(c =>
+        c.code.replace('+', '').endsWith(searchTerm) &&
+        c.code.replace('+', '').length === searchTerm.length + 1
+      );
+    }
+  } else {
+    filteredCountries = countries.filter(c =>
+      c.name.toLowerCase().startsWith(searchTerm) ||
+      c.code.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  if (filteredCountries.length === 1 && searchTerm.length >= 2 && !autoSelectedOnce && isTypingForward) {
+    const autoSelectedCountry = filteredCountries[0];
+    setTimeout(() => {
+      activeAddress.location = autoSelectedCountry.name;
+      selectCountry(autoSelectedCountry);
+      autoSelectedOnce = true;
+      showDropdown = false; 
+    }, 200);
+  }
+
+  validateLocation();
+}
+
+function handleKeyDown(event) {
+  if (event.key === "Enter") {
+    event.preventDefault(); 
+    if (
+      activeAddress.location.length >= 3 &&
+      filteredCountries.length > 0
+    ) {
+      selectCountry(filteredCountries[0]);
+    }
+  }
+}
+
+function validateLocation() {
+  const found = countries.find(
+    c => c.name.toLowerCase().trim() === activeAddress.location.toLowerCase().trim()
+  );
+  if (!found && activeAddress.location.length !== 0) {
+    errors.location = "Please select a country from the list";
+    return false;
+  } else {
+    delete errors.location;
+    return true;
+  }
+}
+
+function toggleDropdown() {
+    showDropdown = !showDropdown; 
+}
+
+
+
+
+
+
     activeAddress = organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress
      
     if(!toggleEdit){
@@ -354,24 +612,14 @@ const pattern = postalCodePatterns[country] || /^\d{6}$/;
             break;
 
         case 'location':
-            if (!activeAddress.location) {
-                errors.location = "Location is required";
-            } else if (!/^[A-Za-z\s]+$/.test(activeAddress.location)) {
-                errors.location = "Location must contain only letters and spaces";
-            } else {
+        if (!activeAddress.location) {
+                errors.location = "Country is required";  // Country must be selected
+            } else if (!countries.some(c => c.name.toLowerCase() === value.toLowerCase())) {
+                errors.location = "Please select a country from the list";  // Check if country is in the list
+            }else {
                 delete errors.location;
             }
             break;
-
-        // case 'postalCode':
-        //     if (!activeAddress.postalCode) {
-        //         errors.postalCode = "Postal Code is required";
-        //     } else if (!/^[0-9\s]+$/.test(activeAddress.postalCode)) {
-        //         errors.postalCode = "Postal Code must contain only numbers and spaces";
-        //     } else {
-        //         delete errors.postalCode;
-        //     }
-        //     break;
         case "postalCode":
   if (!activeAddress.postalCode) {
     errors.postalCode = "Postal Code is required";
@@ -385,8 +633,6 @@ const pattern = postalCodePatterns[country] || /^\d{6}$/;
 
     }
 };
-
-
 
 const validateForm = () => {
     errors = {};
@@ -426,38 +672,24 @@ const pattern = postalCodePatterns[country] || /^\d{6}$/;
     }
 
     if (!activeAddress.location) {
-        errors.location = "Location is required";
-    } else if (!/^[A-Za-z\s]+$/.test(activeAddress.location)) {
-        errors.location = "Location must contain only letters and spaces";
-    }
-
-    // if (!activeAddress.postalCode) {
-    //     errors.postalCode = "Postal Code is required";
-    // } else if (!/^[0-9\s]+$/.test(activeAddress.postalCode)) {
-    //     errors.postalCode = "Postal Code must contain only numbers and spaces";
-    // }
+    errors.location = "Country is required"; // Country must be selected
+} else if (!countries.some(c => c.name.toLowerCase() === activeAddress.location.toLowerCase())) {
+    errors.location = "Please select a country from the list"; // Check if country is in the list
+}
 
     if (!activeAddress.postalCode) {
     errors.postalCode = "Postal Code is required";
   } else if (pattern && !pattern.test(activeAddress.postalCode)) {
     errors.postalCode = `Postal Code is invalid for ${country}`;
   }
-
-
-    
-
     return Object.keys(errors).length === 0;
 };
 
-
-
-     
 const handleSubmit = ({ cancel }) => {
     if (!validateForm()) {
-        cancel(); // prevent submission if form is invalid
+        cancel(); 
         return;
     }
-
     return async ({ result, update }) => {
         if (result.type === "success") {
             await update();
@@ -483,15 +715,58 @@ const handleSubmit = ({ cancel }) => {
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="location">
                         <span class=" text-sm font-bold text-red-500">*</span>Country</label><br>
-                    <select name="location" bind:value={activeAddress.location } on:change={() => validateField('location')}
-                    class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500">
-                        {#each countries as country}
-                            <option value={country}>{country}</option>
+                     <div class="relative z-10">
+                        <div class="flex items-center border border-gray-300 rounded my-1 overflow-hidden">
+                            <input
+                            type="text"
+                            name="location"
+                            bind:value={activeAddress.location}
+                            placeholder="Search Country"
+                            on:click={toggleDropdown}
+                            on:input={toggleDropdown}
+                            on:input={handleInput}
+                            on:keydown={handleKeyDown}
+                        class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-none"
+                            />
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5 text-gray-500 transition-transform duration-200 cursor-pointer mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        style:transform={showDropdown ? 'rotate(180deg)' : 'rotate(0deg)'}
+                        on:click={toggleDropdown}
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                      </div>
+                      {#if showDropdown}
+                      <ul class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-auto">
+                        {#each filteredCountries as { name, code }}
+                          <!-- svelte-ignore a11y-click-events-have-key-events -->
+                          <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                          <li on:click|stopPropagation={() => selectCountry({ name, code })} class="cursor-pointer px-1 py-0 sm:text-sm text-xs hover:bg-gray-200">
+                            <option value={code}>{name} ({code})</option>
+                          </li>
                         {/each}
-                    </select>
-                    {#if errors?.location}
-                     <span class="text-red-600 text-xs">{errors.location}</span>
-                     {/if}
+                        {#if filteredCountries.length === 0}
+                          <li class="px-2 py-1 text-gray-500">No results found</li>
+                        {/if}
+                      </ul>
+                    {/if}
+                    
+                          </div>
+                    
+                          {#if errors?.location}
+                            <p class="text-red-500 text-xs mt-1">{errors.location}</p>
+                          {/if}
                 </div>
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="state"><span class=" text-sm font-bold text-red-500">*</span>State</label><br>
@@ -504,7 +779,7 @@ const handleSubmit = ({ cancel }) => {
                     </select>
                     {:else}
                          <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                    type="text" name="state" bind:value={activeAddress.state } on:input={() => {validateField('state');activeAddress.state=activeAddress.state.trim();}}/>
+                    type="text" name="state" bind:value={activeAddress.state } on:input={() => {validateField('state');activeAddress.state=activeAddress.state.trimStart();}}/>
                     {/if}
                    
                     {#if errors?.state}
@@ -518,7 +793,7 @@ const handleSubmit = ({ cancel }) => {
                     <label class=" text-xs md:text-sm font-medium" for="city">
                         <span class=" text-sm font-bold text-red-500">*</span>City</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                    type="text" name="city" bind:value={activeAddress.city } on:input={() => {validateField('city');activeAddress.city=activeAddress.city.trim()}}/>
+                    type="text" name="city" bind:value={activeAddress.city } on:input={() => {validateField('city');activeAddress.city=activeAddress.city.trimStart()}}/>
                     {#if errors?.city}
                      <span class="text-red-600 text-xs">{errors.city}</span>
                      {/if}
@@ -527,7 +802,7 @@ const handleSubmit = ({ cancel }) => {
                     <label class=" text-xs md:text-sm font-medium" for="street">
                         <span class=" text-sm font-bold text-red-500">*</span>Street</label><br>
                         <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                        type="text" name="street" bind:value={activeAddress.street } on:input={() => {validateField('street');activeAddress.street=activeAddress.street.trim();}}/>
+                        type="text" name="street" bind:value={activeAddress.street } on:input={() => {validateField('street');activeAddress.street=activeAddress.street.trimStart();}}/>
                         {#if errors?.street}
                      <span class="text-red-600 text-xs">{errors.street}</span>
                      {/if}
@@ -539,37 +814,23 @@ const handleSubmit = ({ cancel }) => {
                     <label class=" text-xs md:text-sm font-medium" for="building">
                         Building/Room</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                    type="text" name="building" bind:value={activeAddress.building } on:input={() => {validateField('building');activeAddress.building=activeAddress.building.trim()}}/>
+                    type="text" name="building" bind:value={activeAddress.building } on:input={() => {validateField('building');activeAddress.building=activeAddress.building.trimStart()}}/>
                     {#if errors?.building}
                      <span class="text-red-600 text-xs">{errors.building}</span>
                      {/if}
                 </div>
-               
-                <!-- <div class=" w-full">
-                    <label class=" text-xs md:text-sm font-medium" for="postalCode">
-                        <span class=" text-sm font-bold text-red-500">*</span>Postal Code</label><br>
-                    <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                    type="text" name="postalCode" bind:value={activeAddress.postalCode } on:input={() => {validateField('activeAddress.postalCode ');activeAddress.postalCode=activeAddress.postalCode.trim();}}/>
-                    {#if errors?.postalCode}
-                     <span class="text-red-600 text-xs">{errors.postalCode}</span>
-                     {/if}
-                </div> -->
-
-
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="postalCode"><span class=" text-sm font-bold text-red-500">*</span>Postal Code</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
-                    type="text" name="postalCode" bind:value={activeAddress.postalCode } on:input={()=>{activeAddress.postalCode =activeAddress.postalCode .trimStart();validateField("postalCode");}}/>
+                    type="text" name="postalCode" bind:value={activeAddress.postalCode } on:input={()=>{activeAddress.postalCode =activeAddress.postalCode .trim();validateField("postalCode");}}/>
                     {#if errors?.postalCode}
                         <span class="text-red-600 text-xs">{errors.postalCode}</span>
                     {/if}
                 </div>
             </div>
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
-                
                 <div class=" w-full"></div>
             </div>
-           
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
                 <button type="button" on:click={()=>toggleEdit = false} class=" w-full rounded-md py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
                 <button type="submit" class=" w-full rounded-md py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Submit</button>
@@ -600,6 +861,5 @@ const handleSubmit = ({ cancel }) => {
                 <button on:click={()=>toggleEdit = true} class=" w-20 rounded-md py-2 self-end font-medium text-xs md:text-sm text-white bg-primary-400 hover:bg-primary-500">Edit</button>
             </div>
         </div>
-        {/if}
-                
+        {/if}   
     </div>
