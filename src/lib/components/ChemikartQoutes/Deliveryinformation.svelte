@@ -268,7 +268,7 @@ onMount(() => {
 				             
                               on:input={() => {
                                 validateAdd1
-                                const trimmedAdd1 = $Delivery.Address1.trim();
+                                const trimmedAdd1 = $Delivery.Address1.trimStart();
                                           $Delivery.Address1= trimmedAdd1;
                                 }}
 		/>
@@ -289,7 +289,7 @@ onMount(() => {
 				  class="block rounded md:w-3/4 w-full lg:w-1/2 p-1  sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
                   on:input={() => {
                     validateAdd2
-                    const trimmedAdd2 = $Delivery.Address2.trim();
+                    const trimmedAdd2 = $Delivery.Address2.trimStart();
                               $Delivery.Address2= trimmedAdd2;
                     }}
 		/>
@@ -311,7 +311,7 @@ onMount(() => {
 				bind:value={$Delivery.City}
                 on:input={() => {
                     
-                    const trimmedCity = $Delivery.City.trim();
+                    const trimmedCity = $Delivery.City.trimStart();
                               $Delivery.City= trimmedCity;
                     }} />
                 {#if errorMessage && !$Delivery.City}

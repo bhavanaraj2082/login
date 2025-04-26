@@ -414,7 +414,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
             bind:value={formData.name}
 on:input={() => {
   showNameError = false;
-  const trimmedName = formData.name.trim();
+  const trimmedName = formData.name.trimStart();
             formData.name= trimmedName;
   }}
             class="block w-full rounded-md focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
@@ -494,7 +494,7 @@ on:input={() => {
           placeholder="Email"
           on:input={() => {
             showEmailError = false
-              formData.email = formData.email.trim();
+              formData.email = formData.email.trimStart();
               // validateField("email");
               errors.email = !formData.email
                   ? "*Required"
@@ -631,7 +631,7 @@ on:input={() => {
              class="flex-1 outline-none w-full border-gray-300 border rounded focus:border-primary-400 focus:ring-0 p-2 text-sm"
              on:input={() => {
                  enteredOtpemail =
-                     enteredOtpemail.trim();
+                     enteredOtpemail.trimStart();
              }}
          />
          <button
@@ -687,7 +687,7 @@ on:input={() => {
             bind:value={formData.feedback}
             on:input={() => {
               showFeedbackError = false;
-              const trimmedFeedback = formData.feedback.trim();
+              const trimmedFeedback = formData.feedback.trimStart();
                         formData.feedback= trimmedFeedback;
               }}
             rows="3"
