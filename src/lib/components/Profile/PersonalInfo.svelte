@@ -24,6 +24,32 @@
     let errors
     $:console.log(errors);
 
+    import { onMount, onDestroy } from 'svelte';
+
+let containerRef;
+
+let handleClickOutside;
+
+onMount(() => {
+  handleClickOutside = (event) => {
+    if (containerRef && !containerRef.contains(event.target)) {
+      showDropdown = false;
+    }
+  };
+
+  document.addEventListener('click', handleClickOutside);
+});
+
+onDestroy(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
+
+function toggleDropdown() {
+  showDropdown = !showDropdown;
+}
+
+
+
 
     const countries = [
     { name: 'Afghanistan', code: '+93', postalRegex: /^\d{4}$/ },
@@ -454,9 +480,9 @@ function selectCountry(selectedCountry) {
     autoSelectedOnce = false; 
 }
 
-    function toggleDropdown() {
-    showDropdown = !showDropdown; 
-}
+//     function toggleDropdown() {
+//     showDropdown = !showDropdown; 
+// }
 
 let previousSearchTerm = '';
 
@@ -528,9 +554,7 @@ const validateField = (name, value) => {
 
         case "lastName":
             if (value) {
-                if (value.length < 3) {
-                    message = "Last name must be at least 3 characters";
-                } else if (value.length > 10) {
+              if (value.length > 10) {
                     message = "Last name must not exceed 10 characters";
                 } else if (!/^[A-Za-z\s]+$/.test(value)) {
                     message = "Last name must contain only letters";
@@ -690,11 +714,11 @@ const handleSubmit =({cancel})=>{
                 </div>
             </div>
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
-                <div class=" w-full">
+                <div class=" w-full" >
                     <!-- <label class="w-full text-xs md:text-sm font-medium mt-1" for="country">Country</label> -->
                     <label class=" text-xs md:text-sm font-medium" for="country">
                         <span class=" text-sm font-bold text-red-500">*</span>Country</label><br>
-                    <div class="relative z-10">
+                    <div class="relative z-10" bind:this={containerRef}>
                       <div class="flex items-center border border-gray-300 rounded my-1 overflow-hidden">
                           <input
                             type="text"
