@@ -1,6 +1,8 @@
 <script>
 	import { enhance } from "$app/forms";
 	import Icon from "@iconify/svelte";
+    import { onMount } from "svelte";
+
 	import { toast } from "svelte-sonner";
 	export let data;
 	let form;
@@ -24,6 +26,7 @@
 	let accountNumber = "";
 	let message = "";
 	let errormessage = "";
+
 	const addProduct = () => {
 		products = [...products, { itemNumber: "" }];
 	};
@@ -431,15 +434,37 @@
 			showDropdown = filteredCountries.length > 0;
 		}
 	}
+	// function filterCountriesWithoutAutoSelect() {
+	// 	filteredCountries = countries.filter(
+	// 		(country) =>
+	// 			country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+	// 			country.code
+	// 				.replace("+", "")
+	// 				.includes(searchTerm.replace("+", "").toLowerCase()),
+	// 	);
+	// }
 	function filterCountriesWithoutAutoSelect() {
-		filteredCountries = countries.filter(
-			(country) =>
-				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				country.code
-					.replace("+", "")
-					.includes(searchTerm.replace("+", "").toLowerCase()),
-		);
-	}
+
+const countriesStartingWith = countries.filter(
+    (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+);
+
+const countriesContaining = countries.filter(
+    (country) => 
+        !country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) && 
+        country.name.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+filteredCountries = [...countriesStartingWith, ...countriesContaining];
+const codeMatches = countries.filter(
+    (country) => country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
+);
+codeMatches.forEach(country => {
+    if (!filteredCountries.some(c => c.name === country.name)) {
+        filteredCountries.push(country);
+    }
+});
+}
 	let filteredCountries = countries;
 	let showDropdown = false;
 	function getCountryByCode(name) {
@@ -778,6 +803,17 @@
 	};
 	let showSuccesDiv = false;
 	let showFailureDiv = false;
+	function handleClickOutside(event) {
+        if (!event.target.closest(".dropdown-container")) {
+            showDropdown = false;
+        }
+    }
+	onMount(() => {
+  
+      
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    });
 </script>
 
 {#if showSuccesDiv}
