@@ -5,10 +5,10 @@
   import { toast } from "svelte-sonner";
   import { Toaster } from "svelte-sonner";
   export let data;
-  console.log(data,"ddataaa");
+  // console.log(data, "ddataaa");
   // console.log(data.authedUser,"authedUser");
   let token = data?.token || "";
-  console.log(token,"tpoken");
+  // console.log(token, "tpoken");
   let userEmail = data.authedUser?.id;
   // console.log(userId,"userId");
   let message = "";
@@ -29,13 +29,16 @@
     error = {};
     if (!newPassword) {
       error.password = "*Required";
+    } else if (!/^[A-Za-z\d!@#$%^&*]*$/.test(newPassword)) {
+      error.password = "Only !@#$%^&* characters are allowed";
     } else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{7,}$/.test(
         newPassword
       )
     ) {
-      error.password =
-        "Ensure your password matches the format outlined below.";
+      error.password = "Ensure your password matches the format outlined below";
+    } else {
+      delete error.password;
     }
 
     if (!confirmPassword) {
@@ -43,6 +46,8 @@
     } else if (confirmPassword !== newPassword) {
       error.passwordConfirm =
         "Current password does not match the entered password";
+    } else {
+      delete error.passwordConfirm;
     }
 
     if (Object.keys(error).length > 0) {
@@ -63,13 +68,14 @@
   }
 </script>
 
-<button 
-on:click={() => goto('/')}
-		class="absolute top-0.5 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-4 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md">
-		<div class="flex items-center space-x-2">
-			<Icon icon="mdi:home" class="text-xl"/>
-			<span class="hidden sm:inline text-sm font-medium">Back to Home</span>
-		</div>
+<button
+  on:click={() => goto("/")}
+  class="absolute top-0.5 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-4 text-primary-600 bg-white hover:bg-primary-700 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md"
+>
+  <div class="flex items-center space-x-2">
+    <Icon icon="mdi:home" class="text-xl" />
+    <span class="hidden sm:inline text-sm font-medium">Back to Home</span>
+  </div>
 </button>
 {#if token || userEmail}
   <div
@@ -91,38 +97,53 @@ on:click={() => goto('/')}
 
     <div class="px-6 py-6 bg-white">
       {#if successMessage}
-      <div class="p-6 text-gray-900 bg-green-50 border border-green-300 rounded-lg shadow-md text-center animate-fadeIn">
-        <!-- Center the icon properly -->
-        <div class="flex justify-center">
-          <Icon icon="mdi:check-circle" class="text-green-500 text-6xl drop-shadow-lg" />
+        <div
+          class="p-6 text-gray-900 bg-green-50 border border-green-300 rounded-lg shadow-md text-center animate-fadeIn"
+        >
+          <!-- Center the icon properly -->
+          <div class="flex justify-center">
+            <Icon
+              icon="mdi:check-circle"
+              class="text-green-500 text-6xl drop-shadow-lg"
+            />
+          </div>
+
+          <h2 class="text-lg font-semibold text-green-700 mt-3">
+            Your password has been reset successfully!
+          </h2>
+
+          <p class="text-sm text-gray-700 mt-2">
+            You will be redirected to the
+            <span class="font-semibold text-green-600">
+              {#if userEmail}
+                Dashboard
+              {:else}
+                Sign In Page
+              {/if}
+            </span> shortly.
+          </p>
+
+          <div
+            class="mt-4 text-sm text-gray-600 flex items-center justify-center gap-2"
+          >
+            <Icon icon="mdi:clock-outline" class="text-gray-500 w-5 h-5" />
+            <span>Redirecting in a moment...</span>
+          </div>
         </div>
-      
-        <h2 class="text-lg font-semibold text-green-700 mt-3">
-          Your password has been reset successfully!
-        </h2>
-        
-        <p class="text-sm text-gray-700 mt-2">
-          You will be redirected to the 
-          <span class="font-semibold text-green-600">
-            {#if userEmail} Dashboard {:else} Sign In Page {/if}
-          </span> shortly.
-        </p>
-      
-        <div class="mt-4 text-sm text-gray-600 flex items-center justify-center gap-2">
-          <Icon icon="mdi:clock-outline" class="text-gray-500 w-5 h-5" />
-          <span>Redirecting in a moment...</span>
-        </div>
-      </div>
-      
       {/if}
-      
+
       {#if errorMessage}
-      <div class="p-4 bg-red-50 border border-red-300 text-red-800 rounded-lg shadow-md flex items-center animate-fadeIn">
-        <div class="flex justify-center">
-          <Icon icon="mdi:alert-circle" class="text-red-500 mr-3 text-xl drop-shadow-lg" />
+        <div
+          class="p-4 bg-red-50 border border-red-300 text-red-800 rounded-lg shadow-md flex items-center animate-fadeIn"
+        >
+          <div class="flex justify-center">
+            <Icon
+              icon="mdi:alert-circle"
+              class="text-red-500 mr-3 text-xl drop-shadow-lg"
+            />
+          </div>
+          <span class="text-sm font-medium">{errorMessage}</span>
         </div>
-        <span class="text-sm font-medium">{errorMessage}</span>
-      </div>
       {/if}
 
       <form
@@ -182,13 +203,22 @@ on:click={() => goto('/')}
                   class="w-full px-4 py-2 pr-10 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-0 focus:ring-primary-500 focus:border-primary-500"
                   bind:value={newPassword}
                   on:input={() => {
-                    error.password = !newPassword
-                      ? "*Required"
-                      : !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-                            newPassword
-                          )
-                        ? "Ensure your password matches the format outlined below."
-                        : "";
+                    const allowedSpecialCharactersRegex =
+                      /^[A-Za-z\d!@#$%^&*]*$/;
+                    const formatRegex =
+                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{7,}$/;
+                    if (!newPassword) {
+                      error.password = "*Required";
+                    } else if (
+                      !allowedSpecialCharactersRegex.test(newPassword)
+                    ) {
+                      error.password = "Only !@#$%^&* characters are allowed";
+                    } else if (!formatRegex.test(newPassword)) {
+                      error.password =
+                        "Ensure your password matches the format outlined below";
+                    } else {
+                      error.password = "";
+                    }
                   }}
                 />
               {:else}
@@ -200,13 +230,22 @@ on:click={() => goto('/')}
                   class="w-full px-4 py-2 pr-10 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-0 focus:ring-primary-500 focus:border-primary-500"
                   bind:value={newPassword}
                   on:input={() => {
-                    error.password = !newPassword
-                      ? "*Required"
-                      : !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
-                            newPassword
-                          )
-                        ? "Ensure your password matches the format outlined below."
-                        : "";
+                    const allowedSpecialCharactersRegex =
+                      /^[A-Za-z\d!@#$%^&*]*$/;
+                    const formatRegex =
+                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{7,}$/;
+                    if (!newPassword) {
+                      error.password = "*Required";
+                    } else if (
+                      !allowedSpecialCharactersRegex.test(newPassword)
+                    ) {
+                      error.password = "Only !@#$%^&* characters are allowed";
+                    } else if (!formatRegex.test(newPassword)) {
+                      error.password =
+                        "Ensure your password matches the format outlined below";
+                    } else {
+                      error.password = "";
+                    }
                   }}
                 />
               {/if}
@@ -240,7 +279,7 @@ on:click={() => goto('/')}
               />
               <span
                 >Password should include uppercase, lowercase, number and
-                special character</span
+                special character with !@#$%^&*</span
               >
             </div>
           </div>
