@@ -458,7 +458,7 @@ let autoSelectedOnce = false;
 let previousSearchTerm = '';
 
 function selectCountry(selectedCountry) {
-    country = selectedCountry.name;
+   let country = selectedCountry.name;
     filteredCountries = countries; 
     showDropdown = false; 
     validateForm('location');
@@ -506,16 +506,17 @@ function handleInput(event) {
 }
 
 function handleKeyDown(event) {
-  if (event.key === "Enter") {
-    event.preventDefault(); 
-    if (
-      activeAddress.location.length >= 3 &&
-      filteredCountries.length > 0
-    ) {
-      selectCountry(filteredCountries[0]);
+  if (event.key === 'Enter') {
+    event.preventDefault(); // prevent form submission if inside a form
+    if (filteredCountries.length > 0) {
+      const autoSelectedCountry = filteredCountries[0];
+      activeAddress.location = autoSelectedCountry.name;
+      selectCountry(autoSelectedCountry);
+      showDropdown = false;
     }
   }
 }
+
 
 function validateLocation() {
   const found = countries.find(
@@ -534,7 +535,25 @@ function toggleDropdown() {
     showDropdown = !showDropdown; 
 }
 
+import {  onDestroy } from 'svelte';
 
+let containerRef;
+
+let handleClickOutside;
+
+onMount(() => {
+  handleClickOutside = (event) => {
+    if (containerRef && !containerRef.contains(event.target)) {
+      showDropdown = false;
+    }
+  };
+
+  document.addEventListener('click', handleClickOutside);
+});
+
+onDestroy(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 
 
 
@@ -715,7 +734,7 @@ const handleSubmit = ({ cancel }) => {
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="location">
                         <span class=" text-sm font-bold text-red-500">*</span>Country</label><br>
-                     <div class="relative z-10">
+                     <div class="relative z-10" bind:this={containerRef}>
                         <div class="flex items-center border border-gray-300 rounded my-1 overflow-hidden">
                             <input
                             type="text"
