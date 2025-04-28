@@ -3,6 +3,7 @@
 	import { enhance } from "$app/forms";
 	import Icon from "@iconify/svelte";
 	import { toast } from "svelte-sonner";
+
 	let formLoading = false;
 
 	let form;
@@ -517,15 +518,45 @@
 			showDropdown = filteredCountries.length > 0;
 		}
 	}
+	// function filterCountriesWithoutAutoSelect() {
+	// 	filteredCountries = countries.filter(
+	// 		(country) =>
+	// 			country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+	// 			country.code
+	// 				.replace("+", "")
+	// 				.includes(searchTerm.replace("+", "").toLowerCase()),
+	// 	);
+	// }
+
 	function filterCountriesWithoutAutoSelect() {
-		filteredCountries = countries.filter(
-			(country) =>
-				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				country.code
-					.replace("+", "")
-					.includes(searchTerm.replace("+", "").toLowerCase()),
-		);
-	}
+
+const countriesStartingWith = countries.filter(
+    (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+);
+
+const countriesContaining = countries.filter(
+    (country) => 
+        !country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) && 
+        country.name.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+filteredCountries = [...countriesStartingWith, ...countriesContaining];
+const codeMatches = countries.filter(
+    (country) => country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
+);
+codeMatches.forEach(country => {
+    if (!filteredCountries.some(c => c.name === country.name)) {
+        filteredCountries.push(country);
+    }
+});
+}
+
+	onMount(() => {
+  
+      
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    });
 
 	let filteredCountries = countries;
 	let showDropdown = false;

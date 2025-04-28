@@ -494,15 +494,37 @@
 			showDropdown = filteredCountries.length > 0;
 		}
 	}
+	// function filterCountriesWithoutAutoSelect() {
+	// 	filteredCountries = countries.filter(
+	// 		(country) =>
+	// 			country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+	// 			country.code
+	// 				.replace("+", "")
+	// 				.includes(searchTerm.replace("+", "").toLowerCase()),
+	// 	);
+	// }
 	function filterCountriesWithoutAutoSelect() {
-		filteredCountries = countries.filter(
-			(country) =>
-				country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				country.code
-					.replace("+", "")
-					.includes(searchTerm.replace("+", "").toLowerCase()),
-		);
-	}
+
+const countriesStartingWith = countries.filter(
+    (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+);
+
+const countriesContaining = countries.filter(
+    (country) => 
+        !country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) && 
+        country.name.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+filteredCountries = [...countriesStartingWith, ...countriesContaining];
+const codeMatches = countries.filter(
+    (country) => country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
+);
+codeMatches.forEach(country => {
+    if (!filteredCountries.some(c => c.name === country.name)) {
+        filteredCountries.push(country);
+    }
+});
+}
 
 	let filteredCountries = countries;
 	let showDropdown = false;
