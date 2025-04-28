@@ -609,7 +609,7 @@ function handleMouseLeave() {
         </div>
         {:else}
        {#each paginatedProducts as product,index}
-        <div class=" relative bg-white shadow p-2 sm:p-4 md:px-8 space-y-2 rounded-md">
+        <div class=" relative bg-white shadow p-2 sm:px-4 space-y-2 rounded-md">
             <button on:click={()=>handleFavorites(product)} class="{$authedUser?.id && Object.keys(product.pricing).length > 0 ? "" : "hidden"} absolute top-6 right-6">
                 <Icon icon={$myFavorites.find(x=> x === product._id) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
             </button>
@@ -625,7 +625,7 @@ function handleMouseLeave() {
                 src="{PUBLIC_IMAGE_URL}/{product?.image}"
                 onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
                 loading="lazy"
-                class="cursor-pointer w-32 h-32 sm:w-40 sm:h-40 object-contain" 
+                class="cursor-pointer w-28 h-28 sm:w-36 sm:h-36 object-contain" 
                 alt=""
                 on:click={() => imagemodal(product?.image)}
                 on:mouseenter={() => handleMouseEnter(product?.image , index)}
@@ -672,7 +672,9 @@ function handleMouseLeave() {
                 <div class=" text-xs md:text-sm space-y-1 grow font-medium">
                     <p>Product Number : <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`} class=" font-semibold hover:text-primary-500 hover:underline">{product?.productNumber || ""}</a></p>
                     <!-- <p>Category : <a href={`/products/${categoryName}`} class=" font-semibold hover:text-primary-500 hover:underline">{catName || ""}</a></p> -->
-                    <p>CAS Number : <span class=" font-semibold ">{product?.CAS || "N/A"}</span></p>
+                   {#if product?.CAS}
+                   <p>CAS Number : <span class=" font-semibold ">{product?.CAS || "N/A"}</span></p>
+                   {/if}
                     <p>Manufacturer : <span class=" font-semibold ">{product?.manufacturerDetails.name || ""}</span></p>
                     <!-- <p>Price : <span class=" font-semibold">{$currencyState === "inr" ? "₹" + product?.pricing.INR.toLocaleString("en-IN"): "$"+ product?.pricing.USD.toLocaleString("en-IN")}</span></p> -->
                     {#if product?.pricing && Object.keys(product.pricing).length > 0}
