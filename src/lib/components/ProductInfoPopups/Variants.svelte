@@ -215,6 +215,40 @@
     showQuoteModal = !showQuoteModal;
     productQuote = selectedProduct;
   }
+
+  let currentPage = 1;
+  const rowsPerPage = 8;
+
+  $: totalPages = Math.ceil(allVariants.length / rowsPerPage);
+
+  $: paginatedVariants = allVariants.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+
+  function goToPage(page) {
+    if (page >= 1 && page <= totalPages) {
+      currentPage = page;
+    }
+  }
+
+  function getPageItems() {
+    const pages = [];
+
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 3) {
+        pages.push(1, 2, 3, "...", totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, "...", currentPage, "...", totalPages);
+      }
+    }
+
+    return pages;
+  }
 </script>
 
 <form
@@ -247,7 +281,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each allVariants as variant (variant._id)}
+          {#each paginatedVariants as variant (variant._id)}
             {@const { minPriceINR, maxPriceINR, minPriceUSD, maxPriceUSD } =
               getMinMaxPrices(variant.pricing)}
             <tr
@@ -470,6 +504,49 @@
           {/each}
         </tbody>
       </table>
+    </div>
+
+    <div class="flex justify-center my-6">
+      <div
+        class="flex items-center space-x-2 px-4 py-2 rounded-full bg-primary-400 border border-primary-400 shadow-md"
+      >
+        <!-- Prev Button -->
+        <button
+          on:click={() => goToPage(currentPage - 1)}
+          class="w-9 h-9 rounded-full bg-white text-primary-500 hover:bg-primary-100 transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={currentPage === 1}
+        >
+          <Icon icon="mdi:chevron-left" class="text-2xl" />
+        </button>
+
+        <!-- Page Numbers with Ellipsis -->
+        {#each getPageItems() as page}
+          {#if page === "..."}
+            <span class="text-white font-semibold px-1">...</span>
+          {:else}
+            <button
+              on:click={() => goToPage(page)}
+              class={`w-9 h-9 rounded-full transition text-sm font-semibold flex items-center justify-center
+        ${
+          currentPage === page
+            ? "bg-white text-primary-500 ring-4 ring-primary-300"
+            : "bg-white text-primary-500 hover:bg-primary-100"
+        }`}
+            >
+              {page}
+            </button>
+          {/if}
+        {/each}
+
+        <!-- Next Button -->
+        <button
+          on:click={() => goToPage(currentPage + 1)}
+          class="w-9 h-9 rounded-full bg-white text-primary-500 hover:bg-primary-100 transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={currentPage === totalPages}
+        >
+          <Icon icon="mdi:chevron-right" class="text-2xl" />
+        </button>
+      </div>
     </div>
   </div>
 </div>
