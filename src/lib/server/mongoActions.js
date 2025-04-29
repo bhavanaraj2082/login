@@ -122,8 +122,9 @@ export const submitContactInfo = async (data) => {
 
 export const getOrderresultData = async (body) => {
 	try {
-		const records = await Order.findOne({ orderid: body.orderNumber });
-		if (records) {
+		const records = await Order.findOne({ orderid: body.orderNumber }).populate('profileId');
+
+		if (records?.profileId?.email === body.email) {
 			return {
 				success: true,
 				msg: 'Success',

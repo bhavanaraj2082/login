@@ -71,7 +71,7 @@
                         General Terms
                     {/if}
                 </h1>
-                <hr class="border-b border-gray-300 mb-2 mt-4" />
+                <hr class="border-b border-gray-300 mb-2 mt-1" />
                 <button
                     class={`sm:text-base text-sm mt-2 font-medium mb-2 w-full whitespace-nowrap text-start transition-all duration-300 ease-in-out transform hover:bg-primary-100 rounded-r hover:scale-105 p-1 ${
                         contentComponent === Terms

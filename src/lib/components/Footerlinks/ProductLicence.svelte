@@ -54,7 +54,7 @@
             {/if}
           </div>
     </div>
-        <h1 class="sm:text-2xl text-xl font-bold sm:mb-10 mb-4 text-center mt-5 sm:mt-0 ">General Terms and Conditions of Sale
+        <h1 class="sm:text-2xl text-xl font-bold sm:mb-6 mb-4 text-center mt2">General Terms and Conditions of Sale
         </h1>
         <p class="mt-2 font-semibold">Rev. April 2021</p>
         <ol class="list-decimal pl-5 mt-5 space-y-2 text-primary-400 text-sm font-medium ">

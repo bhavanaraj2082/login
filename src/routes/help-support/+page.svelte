@@ -11,7 +11,7 @@
     let metadata = {
 		title: `Help Support | ${PUBLIC_WEBSITE_NAME}` || 'Default Product Title',
 		description:
-			`We are here to help!  Use ${PUBLIC_WEBSITE_NAME} Help & Support to answer your questions around ordering, shipping, delivering and more.` ||
+			`We are here to help! Use ${PUBLIC_WEBSITE_NAME} Help and Support to answer your questions around ordering, shipping, delivering and more.` ||
 			'Default description',
 		keywords: `${PUBLIC_WEBSITE_NAME}, Help, Support, ordering, shipping, delivery, faq,chemical product Distributor, Authorized distributor Chemical Distributor, Authorized distributor, statistics, business philosophy, ratings, customers vote, Chemical Distributor, Chemical Products, chemicals, laboratory chemicals, industrial chemicals, specialty chemicals, chemical supply, buy chemicals, chemical solutions, chemical supplier, buy chemical products`,
 		urlPath: `${PUBLIC_WEBSITE_URL}/help-support` || 'Default URl',
@@ -20,7 +20,7 @@
 			'@type': 'Webpage',
 			name: `Help and Support | ${PUBLIC_WEBSITE_NAME}` || 'Default Product Title',
 			description:
-				`We are here to help!  Use ${PUBLIC_WEBSITE_NAME} Help & Support to answer your questions around ordering, shipping, delivering and more.` ||
+				`We are here to help! Use ${PUBLIC_WEBSITE_NAME} Help and Support to answer your questions around ordering, shipping, delivering and more.` ||
 				'Default product description',
 			url: `${PUBLIC_WEBSITE_URL}/help-support`,
 			brand: {

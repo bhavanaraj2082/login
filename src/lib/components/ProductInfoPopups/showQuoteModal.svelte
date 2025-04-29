@@ -479,7 +479,7 @@
           on:click={toggleQuoteModal}
           class="bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium py-1.5 px-4 rounded"
         >
-          ✖ Close
+          Close
         </button>
         <button
           type="submit"

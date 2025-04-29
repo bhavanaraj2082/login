@@ -57,11 +57,11 @@
           {/if}
         </div>
     </div>
-    <h1 class="sm:text-2xl text-xl font-bold sm:mb-10 mb-4 text-center l mt-5 sm:mt-0">Terms of Use</h1>
+    <h1 class="sm:text-2xl text-xl font-bold sm:mb-6 mb-4 text-center mt-2">Terms of Use</h1>
     <p class="leading-relaxed text-justify  sm:text-sm text-xs lg:ml-5 whitespace-normal break-words">
         {termsOfUseData.TermsOfUse.Content}
     </p>
-    <h1 class="text-xl font-semibold lg:ml-5 mt-4 text-gray-700  mb-4 ">Consent</h1>
+    <h1 class="text-xl font-semibold lg:ml-5 mt-4 text-gray-700 mb-4">Consent</h1>
     <div class="lg:ml-5 text-justify whitespace-normal break-words">
         <p class="">
             <span class="font-semibold text-justify sm:text-sm text-xs">

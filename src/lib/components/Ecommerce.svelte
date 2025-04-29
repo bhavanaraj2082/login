@@ -903,7 +903,7 @@
 {:else}
 	<section class="md:w-11/12 mx-auto max-w-7xl bg-gray-50 sm:pb-0 px-2 pb-10">
 		<section>
-			<div class="font-bold text-xl md:text-2xl pb-4">
+			<div class="font-bold text-xl text-gray-700 md:text-2xl pb-4">
 				Chemikart Solutions
 			</div>
 			<p
@@ -1021,10 +1021,10 @@
 		</section>
 		<section class="mx-1 md:mx-1">
 			<hr
-				class="self-center md:mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-3"
+				class="self-center md:mt-10 h-px w-full border border-black border-opacity-40 max-md:mt-3"
 			/>
 		</section>
-		<section class="px-4 mt-8">
+		<section class="px-4 mt-4">
 			<div class="flex gap-8 max-md:flex-col">
 				<div class="flex flex-col w-2/3 max-md:w-full">
 					<div
@@ -1117,7 +1117,7 @@
 					<a href="#contact-team"> </a>
 				</div>
 			</div>
-			<div class="flex gap-8 max-md:flex-col md:mt-12 mt-3">
+			<div class="flex gap-8 max-md:flex-col md:mt-8 mt-3">
 				<div class="flex flex-col w-2/3 max-md:w-full">
 					<h3
 						class="font-semibold font-worksans mt-8 sm:text-base text-sm text-heading"
@@ -1165,10 +1165,10 @@
 					<a href="#contact-team"> </a>
 				</div>
 			</div>
-			<div class="flex gap-8 max-md:flex-col md:mt-12 mt-3">
+			<div class="flex gap-8 max-md:flex-col md:mt-8 mt-3">
 				<div class="flex flex-col w-2/3 max-md:w-full">
 					<h3
-						class="font-semibold font-worksans mt-8 sm:text-base text-sm text-heading"
+						class="font-semibold font-worksans mt-6 sm:text-base text-sm text-heading"
 					>
 						The Simple Solution: Chemikart E-Shop
 					</h3>
@@ -1186,7 +1186,7 @@
 				</div>
 				<div class="flex flex-col w-1/3 max-md:w-full max-md:mt-0">
 					<h4
-						class="font-semibold font-worksans mt-8 sm:text-base text-sm text-heading"
+						class="font-semibold font-worksans mt-6 sm:text-base text-sm text-heading"
 					>
 						Benefits of the Chemikart e-Shop:
 					</h4>
@@ -1204,15 +1204,15 @@
 		</section>
 		<section class="mx-1 md:mx-1">
 			<hr
-				class="self-center md:mt-20 h-px w-full border border-black border-opacity-40 max-md:mt-3"
+				class="self-center md:mt-10 h-px w-full border border-black border-opacity-40 max-md:mt-3"
 			/>
 		</section>
 		<section
 			id="contact-team"
-			class="flex flex-col items-start py-6 w-full max-md:px-2 md:mt-10 scroll-smooth"
+			class="flex flex-col items-start py-3 w-full max-md:px-2 md:mt-4 scroll-smooth"
 		>
 			<h2
-				class="font-semibold font-worksans sm:text-lg text-md text-heading sm:ml-3 ml-0"
+				class="font-semibold font-worksans sm:text-lg text-md text-gray-700 sm:ml-3 ml-0"
 			>
 				Contact Our Team
 			</h2>

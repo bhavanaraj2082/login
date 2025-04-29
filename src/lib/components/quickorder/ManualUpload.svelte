@@ -2683,7 +2683,7 @@ futherdetails=futherdetails.trim();
               on:click={toggleQuoteModal}
               class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition duration-300 ease-in-out"
             >
-              ✖ Close
+              Close
             </button>
             <button
               type="submit"

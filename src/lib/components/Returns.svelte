@@ -111,7 +111,7 @@
 			<div class="w-full md:w-1/2 p-4 sm:p-6">
 				<ul class="space-y-2 sm:space-y-3 sm:pl-6">
 					{#each reasons as reason}
-						<li class="flex items-center text-gray-description text-xs sm:text-base">
+						<li class="flex items-center text-gray-description text-xs sm:text-sm">
 							<span class="bg-primary-400 w-3 h-3 mr-2 rounded-full overflow-hidden whitespace-nowrap"></span>{reason}
 						</li>
 					{/each}
@@ -126,14 +126,14 @@
 			</div>
 			<div class="flex-none w-full md:w-1/2 h-auto flex items-center justify-center mt-6 md:mt-0">
 				<img
-					class="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 object-contain"
+					class="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-72 object-contain"
 					src="/return3.webp"
 					alt="Return page visual"/>
 			</div>
 		</div>
 	</section>
 	<section class="mt-10 ">
-		<h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-700 text-left">
+		<h2 class="sm:text-2xl text-xl font-bold text-gray-700 text-left">
 			Chemikart Return Policy At A Glance
 		</h2>
 		<div class="bg-white rounded-lg shadow mt-4 flex flex-col md:flex-row items-center md:items-start p-4 sm:p-6">
@@ -144,10 +144,10 @@
 					alt="Policy illustration"/>
 			</div>
 			<div class="p-4 sm:p-6 text-gray-600 text-center md:text-left md:w-2/3">
-				<p class="text-xs sm:text-sm md:text-base leading-relaxed text-justify">
+				<p class="text-xs sm:text-md md:text-sm leading-relaxed text-justify">
 					{truncateText(returnPolicy.policy1)}
 				</p>
-				<p class="mt-2 text-xs sm:text-md md:text-base pt-4 leading-relaxed text-justify">
+				<p class="mt-2 text-xs sm:text-md md:text-sm pt-4 leading-relaxed text-justify">
 					{truncateText(returnPolicy.policy2)}
 				</p>
 			</div>
@@ -155,7 +155,7 @@
 	</section>
 	<section id="formReturn" class="bg-white rounded-lg shadow m-10 p-8 mx-auto">
 		<h2 class="md:text-xl text-lg font-bold mt-2">Request a return or resolve an order issue</h2>
-		<p class="text-description py-2 mb-4">
+		<p class="text-description text-sm py-2 mb-4">
 			Enter the email , invoice number associated with the shipment.
 		</p>
 		<form
