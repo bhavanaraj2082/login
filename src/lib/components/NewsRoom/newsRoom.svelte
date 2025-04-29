@@ -57,11 +57,11 @@
         <a href={`newsroom/${item.newsLink}`} class=" hover:scale-105 transform transition-all duration-300 rounded-md p-4 shadow">
             <div>
             <img
-                src={
-                  item.image.includes('/')
-                    ? item.image
-                    : `${PUBLIC_COMPBUY_IMAGE_PATH}/prod/${item.image}`
-                }
+                 src={
+                    item.image && item.image.includes('/')
+                      ? item.image
+                      : `${PUBLIC_COMPBUY_IMAGE_PATH}/prod/${item.image || 'default.jpg'}`
+                  }
                 alt="img"
                 class="w-full sm:w-40 md:w-64 lg:w-80 h-80 object-cover mx-auto"
               />         
