@@ -115,7 +115,7 @@
 	};
 
 	const DOTS = '...';
-	const VISIBLE_PAGES = 7;
+	const VISIBLE_PAGES = 5;
 
 	$: if (month) {
 		error = '';
@@ -1183,7 +1183,7 @@ function formatDate(dateString) {
 							class={`inline-flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-sm shadow-sm border transition-all duration-200 transform ${
 								page === $currentPage
 									? 'bg-primary-500 text-white border-primary-500 hover:bg-primary-600'
-									: 'bg-white text-primary-700 border-gray-300 hover:bg-primary-500 hover:text-white active:scale-110'
+									: 'bg-white text-gray-800 border-gray-300 hover:bg-primary-500 hover:text-white active:scale-110'
 							}`}
 							on:click={() => handlePageChange(page)}
 							disabled={page === $currentPage}
