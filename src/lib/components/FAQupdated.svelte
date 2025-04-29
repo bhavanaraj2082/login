@@ -55,7 +55,7 @@
   <div>
     <div class="pt-0 sm:p-3 w-11/12 max-w-7xl mx-auto">
       <h1
-        class="sm:text-2xl text-lg font-bold text-black mb-4 md:mb-6 lg:mb-8 sm:ml-2 md:ml-0 lg:ml-0" >
+        class="sm:text-2xl text-lg font-bold text-gray-800 mb-4 md:mb-6 sm:ml-2 md:ml-0 lg:ml-0" >
         Frequently Asked Questions
       </h1>
       <div class="sm:w-1/2 w-full lg:w-1/3 inline-flex rounded mb-2 mt-2 md:text-md text-xs">
@@ -68,7 +68,7 @@
           class="w-full sm:py-2 py-1 sm:h-12 h-8 sm:px-2  px-1 sm:text-lg text-md focus:outline-none transition duration-300
             {activeIndex === index
             ? 'bg-primary-100 text-primary-500 font-semibold'
-            : 'bg-primary-200 text-black'}
+            : 'bg-primary-200 text-gray-800'}
             hover:bg-primary-400 hover:text-white whitespace-nowrap">
           {title}
         </button>
@@ -101,7 +101,7 @@
                   <div
                     class="flex items-center justify-between p-1 ps-3 mx-auto"
                   >
-                    <h3 class="text-sm sm:text-base text-gray-700 font-semibold">
+                    <h3 class="text-sm sm:text-base text-gray-700 font-medium ">
                       {question}
                     </h3>
                     <Icon
