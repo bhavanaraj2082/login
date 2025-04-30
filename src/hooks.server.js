@@ -11,7 +11,8 @@ import { auth } from '$lib/server/lucia.js';
 import { sequence } from '@sveltejs/kit/hooks';
 
 let isConnected = false;
-const MONGODB_URI = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DATABASE}?authSource=${MONGO_DATABASE}`;
+// const MONGODB_URI = `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DATABASE}?authSource=${MONGO_DATABASE}`;
+const MONGODB_URI = "mongodb://127.0.0.1:27017/chemikart?directConnection=true&authSource=admin";
 
 export const main = async ({ event, resolve }) => {
   if (!isConnected) {

@@ -58,9 +58,8 @@
             <div>
             <img
                  src={
-                    item.image && item.image.includes('/')
-                      ? item.image
-                      : `${PUBLIC_COMPBUY_IMAGE_PATH}/prod/${item.image || 'default.jpg'}`
+                   
+                      `${PUBLIC_COMPBUY_IMAGE_PATH}/prod/${item.image }`
                   }
                 alt="img"
                 class="w-full sm:w-40 md:w-64 lg:w-80 h-80 object-cover mx-auto"
