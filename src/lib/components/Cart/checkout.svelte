@@ -234,7 +234,7 @@
 	const handleSubmit = ({formData,cancel})=>{
 		formData.append("order",JSON.stringify(checkout))
 		orderLoad = true
-		onSubmit = true
+		//onSubmit = true
 		if(taxError.length){
 			orderLoad =false
 			cancel()
