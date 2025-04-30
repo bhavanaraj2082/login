@@ -634,7 +634,7 @@ async function submitForm() {
 								<a href={`/products/${product?.category?.urlName}/${product?.subCategory?.urlName}/${product?.productNumber}`}
 									class="block w-full text-sm text-gray-900 px-4 py-2">
 									<p class="text-md ">{product?.productName}</p>
-									<p class="text-md text-gray-900 ">{product?.productNumber}   <span class="text-sm text-gray-700 italic pl-2"> - {product?.manufacturerName}</span> </p>
+									<p class="text-md text-gray-900 ">{product?.CAS || ""}  {#if product?.manufacturerName && product?.CAS} <span>-</span>{/if} {#if product?.manufacturerName}<span class="text-sm text-gray-700 italic pl-2">  {product?.manufacturerName}</span> {/if}</p>
 								</a>
 							</li>
 							<!-- <hr class=""> -->

@@ -5,7 +5,7 @@
   export let description;  
   export let url;           
 
-  const getTruncatedDescription = (description, maxWords = 10) => {
+  const getTruncatedDescription = (description, maxWords = 12) => {
     const words = description.split(' ');
     if (words.length > maxWords) {
       return words.slice(0, maxWords).join(' ') + '...';  // Add ellipsis if truncated
@@ -28,7 +28,7 @@
       <h3 class="sm:text-xl text-md font-semibold text-gray-800 group-hover:text-primary-600 transition-colors duration-500">
         {name}
       </h3>
-      <p class="mt-2 text-gray-600 text-justify sm:text-sm text-xs">
+      <p class="mt-2 text-gray-600 sm:text-sm text-xs">
         {getTruncatedDescription(description) || "No description available"}
       </p>
     </div>

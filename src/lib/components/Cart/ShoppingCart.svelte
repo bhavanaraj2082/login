@@ -224,7 +224,6 @@
 	}
 	}
 	const handleQty = (quantity,stock,_id,indx)=>{
-        selectedId = _id
 		if(isNaN(quantity)){
 			//calculateTotalPrice($cart)
 			quantity = 1
@@ -235,6 +234,8 @@
 		if(quantity <= stock.orderMultiple || isNaN(quantity)) quantity = stock.orderMultiple
 		clearTimeout(timeout)
         checkoutDisabled = true
+		let sec = !isLoggedIn ? 500 : 1500
+		timeout = setTimeout(()=>{
 
 		if(!isLoggedIn){
 			const selectedQty = Math.ceil(quantity/ stock.orderMultiple) * stock.orderMultiple
@@ -250,12 +251,11 @@
 			calculateTotalPrice($cart)
 			timeout = setTimeout(()=>{
 			tog = null
-	        },1500)
+	        },sec)
 		return
 			
 		}
-		
-		timeout = setTimeout(()=>{
+        selectedId = _id
 			const index = $cart.findIndex((item) =>item._id === _id);
 		if (index !== -1) {
 			cart.update(item=>{
@@ -279,7 +279,6 @@
 	}
 
 	const incrementQuantity = (quantity,stock,_id,indx) => {
-		selectedId = _id
 		clearTimeout(timeout)
         checkoutDisabled = true
 		if(!isLoggedIn){
@@ -294,7 +293,7 @@
 			calculateTotalPrice($cart)
 			return
 		}
-
+		selectedId = _id
 	    const index = $cart.findIndex((item) =>item._id === _id);
 		if (index !== -1) {
 			cart.update(item=>{
@@ -320,7 +319,6 @@
 	};
 
 	const decrementQuantity = (quantity,stock,_id,indx) => {
-		selectedId = _id
 		clearTimeout(timeout)
         checkoutDisabled = true
            
@@ -338,7 +336,7 @@
 			calculateTotalPrice($cart)
 			return
 		}
-		
+		selectedId = _id
 	    const index = $cart.findIndex((item) =>item._id === _id);
 		if (index !== -1) {
 			cart.update(item=>{
@@ -601,7 +599,8 @@
 										on:input={e=>handleQty(parseInt(e.target.value),item?.stockDetails,item._id,index)}
 										class="{tog === index ? "" : "hidden"} border border-gray-200 rounded-md outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
 							        	<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded-md">
-							        		<button disabled={item.isCart || item.isQuote || selectedId.length && item._id !== selectedId}
+							        		{#if !item.isCart || !item.isQuote}
+											<button disabled={selectedId.length && item._id !== selectedId}
 							        			on:click={() => decrementQuantity(item.quantity,item?.stockDetails,item._id,index)}
 							        			class="p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							        			><Icon icon="rivet-icons:minus" class="text-xs" /></button
@@ -609,11 +608,24 @@
 							        		<button on:click={()=>{tog = index}} disabled={selectedId.length && item._id !== selectedId} class="w-fit px-3 py-0.5 text-xs font-medium outline-none text-center">
 							        			{item.quantity === null ? "" : item.quantity}
 							        		</button>
-							        		<button disabled={item.isCart || item.isQuote || selectedId.length && item._id !== selectedId }
+							        		<button disabled={selectedId.length && item._id !== selectedId }
 							        			on:click={() => incrementQuantity(item.quantity,item?.stockDetails,item._id,index)}
 							        			class="p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
 												<Icon icon="rivet-icons:plus" class="text-xs" />
 											</button>
+											{:else}
+											<button
+											class="p-1.5 bg-gray-200 text-white "
+											><Icon icon="rivet-icons:minus" class="text-xs" /></button
+										     >
+										     <button class="w-fit px-3 py-0.5 text-xs font-medium outline-none text-center">
+											     {item.quantity === null ? "" : item.quantity}
+										     </button>
+										     <button
+											    class="p-1.5 bg-gray-200 text-white ">
+											   <Icon icon="rivet-icons:plus" class="text-xs" />
+										      </button>
+											{/if}
 							        	</div>
 							        </div>
 							    </div>

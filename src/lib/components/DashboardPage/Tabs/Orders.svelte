@@ -516,7 +516,7 @@
                         <option value="pending">Pending</option>
                         <option value="cancelled">Cancelled</option>
                         <option value="shipped">Shipped</option>
-                        <option value="received">Received</option>
+                        <option value="completed">Completed</option>
                     </select>
                     {#if filters.status}
                         <button 
@@ -572,14 +572,14 @@
                                     order?.status === 'cancelled' ? 'bg-red-100 text-red-800 border border-red-200' :
                                     order?.status === 'pending cancellation' ? 'bg-red-100 text-red-600 border border-red-100' :
                                     order?.status === 'shipped' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                                    order?.status === 'received' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                                    order?.status === 'completed' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
                                     'bg-gray-100 text-gray-800 border border-gray-200'
                                 }`}>
                                     <Icon icon={order?.status === 'pending' ? 'ri:time-line' :
                                         order?.status === 'cancelled' ? 'ri:close-circle-line' :
                                         order?.status === 'pending cancellation' ? 'fluent:calendar-cancel-20-regular' :
                                         order?.status === 'shipped' ? 'la:shipping-fast' :
-                                        order?.status === 'received' ? 'ri:checkbox-circle-line' :
+                                        order?.status === 'completed' ? 'ri:checkbox-circle-line' :
                                         'ri:question-line'
                                     } width="16" height="16" />
                                     {order?.status.charAt(0).toUpperCase() + order?.status.slice(1)}
@@ -793,14 +793,14 @@
                             order?.status === 'cancelled' ? 'bg-red-100 text-red-800 border border-red-200' :
                             order?.status === 'pending cancellation' ? 'bg-red-100 text-red-600 border border-red-100' :
                             order?.status === 'shipped' ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                            order?.status === 'received' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                            order?.status === 'completed' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
                             'bg-gray-100 text-gray-800 border border-gray-200'
                         }`}>
                             <Icon icon={order?.status === 'pending' ? 'ri:time-line' :
                                 order?.status === 'cancelled' ? 'ri:close-circle-line' :
                                 order?.status === 'pending cancellation' ? 'fluent:calendar-cancel-20-regular' :
                                 order?.status === 'shipped' ? 'la:shipping-fast' :
-                                order?.status === 'received' ? 'ri:checkbox-circle-line' :
+                                order?.status === 'completed' ? 'ri:checkbox-circle-line' :
                                 'ri:question-line'
                             } width="16" height="16" />
                             {order?.status.charAt(0).toUpperCase() + order?.status.slice(1)}

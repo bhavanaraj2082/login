@@ -161,16 +161,68 @@
       isValidated = false;
     }
   }
+  // function handleTextChange(event) {
+  //   rawFileData = event.target.value;
+  //   const { duplicates } = checkForDuplicates(rawFileData);
+  //   duplicateEntries = duplicates;
+  //   isValidated = false;
+  //   invalidProductLines = [];
+  // }
+  let formatError = false;
   function handleTextChange(event) {
-    rawFileData = event.target.value;
-    const { duplicates } = checkForDuplicates(rawFileData);
-    duplicateEntries = duplicates;
-    isValidated = false;
-    invalidProductLines = [];
+  rawFileData = event.target.value;
+  const { duplicates } = checkForDuplicates(rawFileData);
+  duplicateEntries = duplicates;
+  isValidated = false;
+  invalidProductLines = [];
+  formatError = false;
+  fileError = "";
+  
+  if (!rawFileData.trim()) {
+    return;
   }
+  
+  const lines = rawFileData.split("\n").filter(line => line.trim());
+  
+  // Simplified format check - just ensure each line has content
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    const parts = line.split(",");
+    
+    if (parts.length === 0 || !parts[0].trim()) {
+      formatError = true;
+      cartloading = false;
+      fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+      toast.error(fileError);
+      break;
+    }
+    
+    // Only check quantity if a second part exists
+    if (parts.length > 1 && parts[1].trim() && isNaN(Number(parts[1].trim()))) {
+      formatError = true;
+      cartloading = false;
+      fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+      toast.error(fileError);
+      break;
+    }
+       if (parts.length > 1 && parts[1].trim()) {
+      const quantity = Number(parts[1].trim());
+      if (!isNaN(quantity) && quantity > 999) {
+        formatError = true;
+        cartloading = false;
+        fileError = `Quantity at line ${i + 1} must not be greater than 999.`;
+        toast.error(fileError);
+        break;
+      }
+    }
+  }
+}
 
   function handleFileInputChange(event) {
+    fileError = "";
+    formatError = false;
     let file;
+
     if (event.dataTransfer) {
       file = event.dataTransfer.files[0];
     } else {
@@ -200,6 +252,8 @@
     };
     //script file remove///
     const processFileData = (content) => {
+      fileError = "";
+      formatError = false;
       if (content.toLowerCase().includes("<script")) {
         fileError =
           "File contains potentially malicious script tags and was rejected.";
@@ -263,43 +317,140 @@
     }
   }
 
-  function submitFileData() {
-    if (!rawFileData.trim()) {
-      toast.error("Please enter product data before submitting");
-      cartloading = false;
-      cancel();
+
+
+//   function submitFileData() {
+//   if (!rawFileData.trim()) {
+//     toast.error("Please enter product data before submitting");
+//     cartloading = false;
+//     cancel();
+//     return;
+//   }
+
+//   const lines = rawFileData.split("\n").filter(line => line.trim());
+//   let formatError = false;
+//   let errorMessage = "";
+  
+//   for (let i = 0; i < lines.length; i++) {
+//     const line = lines[i];
+//     const parts = line.split(",");
+    
+//     if (parts.length >0 || !parts[0].trim() && parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
+//       formatError = true;
+//       errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number and optional quantity (e.g., 7987565-50G,1)`;
+//       break;
+//     }
+    
+//     // Check if quantity is a number (if provided)
+//     // if (parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
+//     //   formatError = true;
+//     //   errorMessage = `Invalid quantity at line ${i + 1}. Quantity must be a number.`;
+//     //   break;
+//     // }
+//   }
+  
+//   if (formatError) {
+//     fileError = errorMessage;
+//     toast.error(errorMessage);
+//     return;
+//   }
+
+//   // Process and submit if format is valid
+//   const updatedFile = new File(
+//     [rawFileData],
+//     selectedFileName || "upload.csv",
+//     {
+//       type: "text/csv",
+//     },
+//   );
+
+//   const dataTransfer = new DataTransfer();
+//   dataTransfer.items.add(updatedFile);
+
+//   const fileInput =
+//     document.getElementById("bulkupload") ||
+//     document.querySelector('input[type="file"]');
+
+//   if (fileInput) {
+//     fileInput.files = dataTransfer.files;
+
+//     const form = fileInput.closest("form");
+
+//     if (form) {
+//       setTimeout(() => {
+//         form.requestSubmit();
+//       }, 100);
+//     } else {
+//       console.error("Form not found");
+//     }
+//   } else {
+//     console.error("File input element not found");
+//   }
+// }
+function submitFileData() {
+  if (!rawFileData.trim()) {
+    toast.error("Please enter product data before submitting");
+    cartloading = false;
+    // cancel();
+    return { cancel: true };
+    
+  }
+
+  const lines = rawFileData.split("\n").filter(line => line.trim());
+  let formatError = false;
+  let errorMessage = "";
+  
+  // Simplified format check
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    const parts = line.split(",");
+    
+    if (parts.length === 0 || !parts[0].trim()) {
+      formatError = true;
+      errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+      break;
     }
-    const updatedFile = new File(
-      [rawFileData],
-      selectedFileName || "upload.csv",
-      {
-        type: "text/csv",
-      },
-    );
-
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(updatedFile);
-
-    const fileInput =
-      document.getElementById("bulkupload") ||
-      document.querySelector('input[type="file"]');
-
-    if (fileInput) {
-      fileInput.files = dataTransfer.files;
-
-      const form = fileInput.closest("form");
-
-      if (form) {
-        setTimeout(() => {
-          form.requestSubmit();
-        }, 100);
-      } else {
-        console.error("Form not found");
-      }
-    } else {
-      console.error("File input element not found");
+    
+    // Only check quantity if a second part exists
+    if (parts.length > 1 && parts[1].trim() && isNaN(Number(parts[1].trim()))) {
+      formatError = true;
+      errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+      break;
     }
   }
+  
+  if (formatError) {
+    fileError = errorMessage;
+    toast.error(errorMessage);
+    return;
+  }
+
+  // Process and submit if format is valid
+  const updatedFile = new File(
+    [rawFileData],
+    selectedFileName || "upload.csv",
+    { type: "text/csv" }
+  );
+
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(updatedFile);
+
+  const fileInput = document.getElementById("bulkupload") || document.querySelector('input[type="file"]');
+
+  if (fileInput) {
+    fileInput.files = dataTransfer.files;
+    const form = fileInput.closest("form");
+    if (form) {
+      setTimeout(() => {
+        form.requestSubmit();
+      }, 100);
+    } else {
+      console.error("Form not found");
+    }
+  } else {
+    console.error("File input element not found");
+  }
+}
 
   function removeAllDuplicates(event) {
     if (duplicateEntries.length === 0) return;
@@ -713,7 +864,46 @@
   enctype="multipart/form-data"
   use:enhance={() => {
     isLoading = true;
-    const lines = rawFileData.trim().split("\n");
+const lines = rawFileData.trim().split("\n");
+let formatError = false;
+let errorMessage = "";
+
+for (let i = 0; i < lines.length; i++) {
+  const line = lines[i].trim();
+  const parts = line.split(",");
+  
+  if (parts.length === 0 || !parts[0]?.trim()) {
+    formatError = true;
+    cartloading = false;
+    errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+    break;
+  }
+
+  if (parts.length > 1 && parts[1]?.trim() && isNaN(Number(parts[1].trim()))) {
+    formatError = true;
+    cartloading = false;
+    errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+    break;
+  }
+  if (parts.length > 1 && parts[1]?.trim()) {
+      const quantity = Number(parts[1].trim());
+      if (!isNaN(quantity) && quantity > 999) {
+        cartloading = false;
+        formatError = true;
+        errorMessage = `Quantity at line ${i + 1} must not be greater than 999.`;
+        break;
+      }
+    }
+}
+    
+    if (formatError) {
+      toast.error(errorMessage);
+      fileError = errorMessage;
+      isLoading = false;
+      return { cancel: true }; // Cancel form submission
+    }
+    
+    // Continue with processing if format is valid
     const processedLines = lines.map((line) => {
       const parts = line.includes(",") ? line.split(",") : line.split(/\s+/);
       const productNumberAndSize = parts[0]?.trim();
@@ -722,10 +912,10 @@
         quantity = "1";
         return `${productNumberAndSize},${quantity}`;
       }
-
+  
       return line.trim();
     });
-
+  
     rawFileData = processedLines.join("\n");
     return async ({ result }) => {
       const { duplicates } = checkForDuplicates(rawFileData);
@@ -945,6 +1135,14 @@ Example file content:
           {/if}
         </div>
       </div>
+      {#if fileError && !selectedFileName}
+      <div class="mt-2 p-2 text-sm text-red-500 bg-red-50 rounded">
+        <div class="flex items-center">
+          <Icon icon="mdi:alert-circle" class="mr-1" />
+          {fileError}
+        </div>
+      </div>
+    {/if}
     </div>
 
     <!-- </div> -->
@@ -958,7 +1156,7 @@ Example file content:
         >
           <a
             class="flex items-center gap-2 text-sm font-medium text-primary-500"
-            href="/quick_order_template.csv"
+            href="/quick_order_template.xls"
             download
           >
             <Icon icon="pajamas:download" class="text-lg " /> Download Template
@@ -1101,6 +1299,11 @@ Example file content:
       method="POST"
       action="?/addToCart"
       use:enhance={({ formData, cancel }) => {
+          if (formatError) {
+          toast.error("Please fix format errors before adding to cart");
+          // return cancel();
+          return { cancel: true };
+        }
         cartloading = true;
         if (!isValidated || duplicateEntries.length > 0) {
           // validateAndSubmitData();
@@ -1112,7 +1315,8 @@ Example file content:
         if (productsToAdd.length === 0) {
           cartloading = false;
           toast.error("No valid items to add to cart");
-          return cancel();
+          // return cancel();
+          return { cancel: true };
         }
         // productsToAdd = productsToAdd.filter(y=>{
         //   const search = $cart.find(x=>x.stockId === y.stockId)
@@ -1127,7 +1331,8 @@ Example file content:
           setTimeout(() => {
             window.location.href = "/cart";
           }, 2000);
-          cancel();
+          // cancel();
+          return { cancel: true };
         }
         formData.set("cartItems", JSON.stringify(productsToAdd));
         //cancel()
@@ -1156,13 +1361,44 @@ Example file content:
         };
       }}
     >
-      <button
+    <button
+    type="submit"
+    on:click={(e) => {
+      if (formatError || fileError) {
+        e.preventDefault(); // Prevent the default submit action
+        toast.error("Please fix format errors before adding to cart");
+        return false;
+      }
+    }}
+    disabled={
+      cartloading || 
+      (isValidated && 
+       validatedProducts.length > 0 && 
+       !validatedProducts.some((p) => p.isValid))
+    }
+    class={`lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 transition rounded-md flex items-center justify-center gap-2
+      ${cartloading ||
+        (isValidated && validatedProducts.length > 0 && !validatedProducts.some(p => p.isValid))
+        ? 'opacity-50 cursor-not-allowed bg-white'
+        : 'hover:bg-primary-500 hover:text-white'}
+    `}
+  >
+    {#if cartloading && !fileError && !formatError}
+      <span>Adding...</span>
+    {:else}
+      <Icon icon="ic:round-shopping-cart" class="text-2xl" />
+      <span>Add to Cart</span>
+    {/if}
+  </button>
+
+      <!-- <button
         type="submit"
         class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center gap-2"
-        disabled={cartloading ||
+        disabled={cartloading || 
+          fileError || 
           (isValidated &&
-            validatedProducts.length > 0 &&
-            !validatedProducts.some((p) => p.isValid))}
+           validatedProducts.length > 0 &&
+           !validatedProducts.some((p) => p.isValid))}
       >
         {#if cartloading}
           <span>Adding...</span>
@@ -1170,7 +1406,7 @@ Example file content:
           <Icon icon="ic:round-shopping-cart" class="text-2xl" />
           <span>Add to Cart</span>
         {/if}
-      </button>
+      </button> -->
     </form>
   {:else}
     <button
@@ -1181,7 +1417,7 @@ Example file content:
           validatedProducts.length > 0 &&
           !validatedProducts.some((p) => p.isValid))}
     >
-      {#if cartloading}
+      {#if cartloading && !fileError && !formatError}
         <span>Adding...</span>
       {:else}
         <Icon icon="ic:round-shopping-cart" class="text-2xl" />

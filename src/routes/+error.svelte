@@ -99,9 +99,9 @@
             <div class="md:text-xl text-sm font-bold mb-6">
               <span class="text-red-500">{errorInfo.status} - Internal Server Error</span>
             </div>
-            <p class="md:text-lg text-sm text-gray-700 mb-6 text-justify">
+            <!-- <p class="md:text-lg text-sm text-gray-700 mb-6 text-justify">
               {errorInfo.message}
-            </p>
+            </p> -->
             <div class="mb-8">
               <p class="text-md text-gray-600 font-semibold">
                 In the meantime, you can:

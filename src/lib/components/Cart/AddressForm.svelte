@@ -11,8 +11,7 @@
   export let isShowbox ;
   export let billing
   export let shipping ;
-   console.log(billing,shipping,"opop");
-let message="At least one address must be default";
+  let message="At least one address must be default";
   // export let accounttype;
 	export let handlePopupAddress;
   let showErrors = false;
@@ -37,6 +36,10 @@ let message="At least one address must be default";
     "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
   ];
 
+  function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   const handleAddress = (type,checked)=>{
     if(checked === true){
       if(type === "billing"){
@@ -48,6 +51,7 @@ let message="At least one address must be default";
         organizationName= billing?.organizationName || organizationName ,
         attentionTo= billing?.attentionTo || attentionTo ,
         street= billing?.street || street ,
+        location= capitalize(billing?.location) || location ,
         building= billing?.building || building ,
         department= billing?.department || department
       }
@@ -60,6 +64,7 @@ let message="At least one address must be default";
         organizationName= shipping?.organizationName || organizationName ,
         attentionTo= shipping?.attentionTo || attentionTo ,
         street= shipping?.street || street ,
+        location= capitalize(shipping?.location) || location ,
         building= shipping?.building || building ,
         department= shipping?.department || department
       }else{
@@ -71,6 +76,7 @@ let message="At least one address must be default";
         organizationName= formdata?.organizationName || organizationName ,
         attentionTo= formdata?.attentionTo || attentionTo ,
         street= formdata?.street || street ,
+        location= formdata?.country ?capitalize(formdata?.country) : location  ,
         building= formdata?.building || building ,
         department= formdata?.department || department
       }
@@ -83,6 +89,7 @@ let message="At least one address must be default";
         organizationName= formdata?.organizationName || organizationName ,
         attentionTo= formdata?.attentionTo || attentionTo ,
         street= formdata?.street || street ,
+        location= formdata?.country ?capitalize(formdata?.country) : location ,
         building= formdata?.building || building ,
         department= formdata?.department || department
     }
@@ -94,7 +101,6 @@ let message="At least one address must be default";
 	let name;
 	let errorMessage = '';
 	actionName == 'billingaddress' ? (name = 'Billing') : (name = 'Shipping');
-	console.log(formdata, 'isdefalt');
 	const handleCheckbox = (checked, Default) => {
 		if (Default === true) {
 			if (checked !== Default) {
@@ -761,6 +767,7 @@ $:console.log(location,"location");
 				class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text"
 				name="attentionTo"
+        maxlength="50"
 				bind:value={attentionTo}/>
         <p class="{!errors?.attentionTo ? "hidden" : ""} text-red-500 text-xs">{errors?.attentionTo}</p>
 			<label class="w-full text-xs md:text-sm font-medium mt-1" for="lastname">Company Name</label>
@@ -768,6 +775,7 @@ $:console.log(location,"location");
 				class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text"
 				name="organizationName"
+        maxlength="50"
 				bind:value={organizationName}/>
         <p class="{!errors?.organizationName ? "hidden" : ""} text-red-500 text-xs">{errors?.organizationName}</p>
 				<!-- <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="email">Email</label>
@@ -801,7 +809,7 @@ $:console.log(location,"location");
 			
         <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Department</label>
         <input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-          type="text" name="department"
+          type="text" name="department" maxlength="40"
           bind:value={department}/>
           <p class="{!errors?.department ? "hidden" : ""} text-red-500 text-xs">{errors?.department}</p>
       <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Building</label>
@@ -817,7 +825,7 @@ $:console.log(location,"location");
 
         <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Street</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-				type="text" name="street"
+				type="text" name="street" maxlength="100"
 		    bind:value={street}/>
             {#if street.length > 0 && !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(street)}
 				<span class="text-red-500 text-xs block">Please enter a valid street name</span>
@@ -830,7 +838,7 @@ $:console.log(location,"location");
             <label class="w-full text-xs md:text-sm font-medium mt-1" for="country">Country</label>
             <div class="relative z-10">
             <div class="flex items-center border border-gray-300 rounded my-1 overflow-hidden">
-            <input type="text" name="location" bind:value={location} placeholder="Search Country"
+            <input type="text" name="location" bind:value={location} maxlength="30" placeholder="Search Country"
             on:input={toggleDropdown} on:click={toggleDropdown} on:input={filterCountries} on:input={delete errors.country}
             class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-none"
             required/>
@@ -855,7 +863,7 @@ $:console.log(location,"location");
                         {#each filteredCountries as { name, code }}
                             <li on:click|stopPropagation={() => selectCountry({ name, code })} 
                             class="cursor-pointer px-2 py-1 hover:bg-gray-200">
-                                <option value={code}>{name} ({code})</option>
+                                <option value={name}>{name} ({code})</option>
                             </li>
                         {/each}
                         {#if filteredCountries.length === 0}
@@ -871,7 +879,7 @@ $:console.log(location,"location");
             
             <label class="w-full text-xs md:text-sm font-medium mt-1" for="city">City</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-				type="text" name="city"
+				type="text" name="city" maxlength="30"
 			bind:value={city}/>
 			{#if city.length > 0 && !/^[a-zA-Z\s.'-]+$/.test(city)}
 				<span class="text-red-500 text-xs block">Please enter a valid city Name</span>
@@ -912,7 +920,7 @@ $:console.log(location,"location");
 
 			<label class="w-full text-xs md:text-sm font-medium mt-1" for="postalCode">Postal code</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-			type="text" name="postalCode" bind:value={postalCode}
+			type="text" name="postalCode" bind:value={postalCode} maxlength="12"
 			on:input={() => {
 				validateForm('postalCode'); 
 				validatePostalCode(location, postalCode);  // Validate postal code as user types

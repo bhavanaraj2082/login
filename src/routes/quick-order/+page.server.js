@@ -11,88 +11,169 @@ import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import sendemail from '$lib/data/sendemail.json';
 import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
 import {getCart} from '$lib/server/mongoLoads.js'
+// function parseProductQuery(query) {
+//   let inputStr = query.trim();
+//   let productNumber, size;
+  
+//   // Various patterns for different types of product number and size combinations
+//   const spaceHyphenPattern = /^(.*?)\s+-\s+(.+)$/;
+//   const spaceHyphenMatch = inputStr.match(spaceHyphenPattern);
+  
+//   const complexSizePattern = /^([A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)*)-(\d+(?:-[A-Za-z\u00B0-\u9FFF]+)(?:-\d+)?)$/;
+//   const complexSizeMatch = inputStr.match(complexSizePattern);
+  
+//   // Pattern for measurements including Unicode characters like μL, μg
+//   const measurementPattern = /^(.*?)-(\d+[-]?[A-Za-z\u00B0-\u9FFF]+)$/;
+//   const measurementMatch = inputStr.match(measurementPattern);
+  
+//   // Specific pattern for micro units
+//   const unicodeUnitPattern = /^(.*?)-(\d+[-]?[μ][A-Za-z]+)$/;
+//   const unicodeUnitMatch = inputStr.match(unicodeUnitPattern);
+  
+//   // Patterns for quantity descriptions (each, case, pack)
+//   const quantityPatterns = [
+//     /^(.*?)[-\s]+(each\s*(?:of)?\s*[-\s]*\d+|each[-\s]*of[-\s]*\d+|\d+\s*(?:each|pcs|units|items))$/i,
+//     /^(.*?)[-\s]+(case\s*(?:of)?\s*[-\s]*\d+|case[-\s]*of[-\s]*\d+|\d+\s*(?:case|pcs|units|items))$/i,
+//     /^(.*?)[-\s]+(pack\s*(?:of)?\s*[-\s]*\d+|pack[-\s]*of[-\s]*\d+|\d+\s*(?:pack|pcs|units|items))$/i
+//   ];
+  
+//   let eachMatch = null;
+//   for (const pattern of quantityPatterns) {
+//     const match = inputStr.match(pattern);
+//     if (match) {
+//       eachMatch = match;
+//       break;
+//     }
+//   }
+  
+//   // Apply patterns in order to determine product number and size
+//   if (unicodeUnitMatch) {
+//     productNumber = unicodeUnitMatch[1].trim();
+//     size = unicodeUnitMatch[2].trim();
+//   } else if (spaceHyphenMatch) {
+//     productNumber = spaceHyphenMatch[1].trim();
+//     size = spaceHyphenMatch[2].trim();
+//   } else if (complexSizeMatch) {
+//     productNumber = complexSizeMatch[1].trim();
+//     size = complexSizeMatch[2].trim();
+//   } else if (measurementMatch) {
+//     productNumber = measurementMatch[1].trim();
+//     size = measurementMatch[2].trim();
+//   } else if (eachMatch) {
+//     productNumber = eachMatch[1].trim();
+//     size = eachMatch[2].trim();
+//   } else {
+//     // Default fallback: split by hyphen
+//     const parts = inputStr.split('-');
+//     if (parts.length >= 2) {
+//       productNumber = parts.slice(0, parts.length - 1).join('-');
+//       size = parts[parts.length - 1];
+//     } else {
+//       productNumber = inputStr;
+//       size = "";
+//     }
+//   }
+  
+//   // Final cleanup for size with quantity
+//   const sizeWithQuantityPattern = /^(.*?)(\d+)$/;
+//   const sizeWithQuantityMatch = size.match(sizeWithQuantityPattern);
+  
+//   if (sizeWithQuantityMatch) {
+//     size = sizeWithQuantityMatch[1].trim();
+//   }
+  
+//   return {
+//     productNumber,
+//     size
+//   };
+// }
 function parseProductQuery(query) {
   let inputStr = query.trim();
-  let productNumber, size;
   
-  // Various patterns for different types of product number and size combinations
+  const packOfPattern = /^(.*?)[-\s]+(pack-of-\d+|case-of-\d+|each-of-\d+)$/i;
+  const packOfMatch = inputStr.match(packOfPattern);
+  
+  if (packOfMatch) {
+    return {
+      productNumber: packOfMatch[1].trim(),
+      size: packOfMatch[2].trim()
+    };
+  }
+  
+  const complexPattern = /^([A-Za-z0-9]+-[A-Za-z0-9]+-[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*)-((?:Pack|Case|Each)[-\s]+of[-\s]+\d+|\d+[-\s]*(?:pack|case|each|pcs|units|items)|[A-Za-z0-9\u00B0-\u9FFF]+(?:-[A-Za-z0-9\u00B0-\u9FFF]+)*)$/i;
+  const complexMatch = inputStr.match(complexPattern);
+  
+  if (complexMatch) {
+    return {
+      productNumber: complexMatch[1].trim(),
+      size: complexMatch[2].trim()
+    };
+  }
+  
   const spaceHyphenPattern = /^(.*?)\s+-\s+(.+)$/;
   const spaceHyphenMatch = inputStr.match(spaceHyphenPattern);
   
-  const complexSizePattern = /^([A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)*)-(\d+(?:-[A-Za-z\u00B0-\u9FFF]+)(?:-\d+)?)$/;
-  const complexSizeMatch = inputStr.match(complexSizePattern);
-  
-  // Pattern for measurements including Unicode characters like μL, μg
   const measurementPattern = /^(.*?)-(\d+[-]?[A-Za-z\u00B0-\u9FFF]+)$/;
   const measurementMatch = inputStr.match(measurementPattern);
   
-  // Specific pattern for micro units
-  const unicodeUnitPattern = /^(.*?)-(\d+[-]?[μ][A-Za-z]+)$/;
-  const unicodeUnitMatch = inputStr.match(unicodeUnitPattern);
-  
-  // Patterns for quantity descriptions (each, case, pack)
   const quantityPatterns = [
     /^(.*?)[-\s]+(each\s*(?:of)?\s*[-\s]*\d+|each[-\s]*of[-\s]*\d+|\d+\s*(?:each|pcs|units|items))$/i,
     /^(.*?)[-\s]+(case\s*(?:of)?\s*[-\s]*\d+|case[-\s]*of[-\s]*\d+|\d+\s*(?:case|pcs|units|items))$/i,
     /^(.*?)[-\s]+(pack\s*(?:of)?\s*[-\s]*\d+|pack[-\s]*of[-\s]*\d+|\d+\s*(?:pack|pcs|units|items))$/i
   ];
   
-  let eachMatch = null;
+  let quantityMatch = null;
   for (const pattern of quantityPatterns) {
     const match = inputStr.match(pattern);
     if (match) {
-      eachMatch = match;
+      quantityMatch = match;
       break;
     }
   }
-  
-  // Apply patterns in order to determine product number and size
-  if (unicodeUnitMatch) {
-    productNumber = unicodeUnitMatch[1].trim();
-    size = unicodeUnitMatch[2].trim();
-  } else if (spaceHyphenMatch) {
-    productNumber = spaceHyphenMatch[1].trim();
-    size = spaceHyphenMatch[2].trim();
-  } else if (complexSizeMatch) {
-    productNumber = complexSizeMatch[1].trim();
-    size = complexSizeMatch[2].trim();
+
+  if (spaceHyphenMatch) {
+    return {
+      productNumber: spaceHyphenMatch[1].trim(),
+      size: spaceHyphenMatch[2].trim()
+    };
   } else if (measurementMatch) {
-    productNumber = measurementMatch[1].trim();
-    size = measurementMatch[2].trim();
-  } else if (eachMatch) {
-    productNumber = eachMatch[1].trim();
-    size = eachMatch[2].trim();
+    return {
+      productNumber: measurementMatch[1].trim(),
+      size: measurementMatch[2].trim()
+    };
+  } else if (quantityMatch) {
+    return {
+      productNumber: quantityMatch[1].trim(),
+      size: quantityMatch[2].trim()
+    };
   } else {
-    // Default fallback: split by hyphen
     const parts = inputStr.split('-');
-    if (parts.length >= 2) {
-      productNumber = parts.slice(0, parts.length - 1).join('-');
-      size = parts[parts.length - 1];
-    } else {
-      productNumber = inputStr;
-      size = "";
+    const lastPart = parts[parts.length - 1].toLowerCase();
+    if (parts.length > 1 && 
+        (lastPart.includes('pack') || 
+         lastPart.includes('case') || 
+         lastPart.includes('each') ||
+         /^\d+[a-z\u00B0-\u9FFF]+$/.test(lastPart))) {
+      return {
+        productNumber: parts.slice(0, parts.length - 1).join('-'),
+        size: parts[parts.length - 1]
+      };
     }
+
+    return {
+      productNumber: inputStr,
+      size: ""
+    };
   }
-  
-  // Final cleanup for size with quantity
-  const sizeWithQuantityPattern = /^(.*?)(\d+)$/;
-  const sizeWithQuantityMatch = size.match(sizeWithQuantityPattern);
-  
-  if (sizeWithQuantityMatch) {
-    size = sizeWithQuantityMatch[1].trim();
-  }
-  
-  return {
-    productNumber,
-    size
-  };
 }
 
 export const actions = {
   quickcheck: async ({ request }) => {
     try {
       const formData = Object.fromEntries(await request.formData());
-      const { ProductId, quantity } = formData;
+      console.log(formData,"formData");
+      
+      const { ProductId, quantity,stockId } = formData;
       if (!ProductId || !quantity) {
         return {
           type: 'error',
@@ -100,7 +181,7 @@ export const actions = {
         };
       }
 
-      const record = await quickcheck({ ProductId, quantity });
+      const record = await quickcheck({ ProductId, stockId, quantity });
       return {
         record,
       };
@@ -194,6 +275,7 @@ export const actions = {
   uploadFile: async ({ request }) => {
     try {
       const data = await request.formData();
+console.log(data,"data");
 
 
       const file = data.get('file');

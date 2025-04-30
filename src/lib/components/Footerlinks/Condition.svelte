@@ -57,7 +57,7 @@
       </div>
 </div>
 
-    <h1 class="sm:text-2xl text-xl font-bold sm:mb-10 mb-4 text-center mt-5 sm:mt-0">Product Licenses</h1>
+    <h1 class="sm:text-2xl text-xl font-bold mb-4 text-center mt-2">Product Licenses</h1>
     <p class=" text-justify sm:text-sm text-xs lg:ml-5">
         To allow us to offer the latest technology, some of our products can only be used under specific label licenses. Depending on the product, the label license may restrict quantities, commercial applications, or other specifications. Each license applies only to the products mentioned in the license.
     </p>

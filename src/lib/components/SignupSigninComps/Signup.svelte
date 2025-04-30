@@ -4,6 +4,7 @@
   import { toast, Toaster } from "svelte-sonner";
   import Icon from "@iconify/svelte";
   import { goto } from "$app/navigation";
+  import { countries, phoneNumberPatterns, countryCurrencyMap } from "$lib/Data/constants.js";
   let username = "";
   let email = "";
   let country = "";
@@ -191,589 +192,18 @@
     enteredOtp = enteredOtp.replace(/[^0-9]/g, "").trim();
   }
 
-  const countryCurrencyMap = {
-    Afghanistan: "AFN",
-    Albania: "ALL",
-    Algeria: "DZD",
-    Andorra: "EUR",
-    Angola: "AOA",
-    "Antigua and Barbuda": "XCD",
-    Argentina: "ARS",
-    Armenia: "AMD",
-    Australia: "AUD",
-    Austria: "EUR",
-    Azerbaijan: "AZN",
-    Bahamas: "BSD",
-    Bahrain: "BHD",
-    Bangladesh: "BDT",
-    Barbados: "BBD",
-    Belarus: "BYN",
-    Belgium: "EUR",
-    Belize: "BZD",
-    Benin: "XOF",
-    Bhutan: "BTN",
-    Bolivia: "BOB",
-    "Bosnia and Herzegovina": "BAM",
-    Botswana: "BWP",
-    Brazil: "BRL",
-    Brunei: "BND",
-    Bulgaria: "BGN",
-    "Burkina Faso": "XOF",
-    Burundi: "BIF",
-    "Cabo Verde": "CVE",
-    Cambodia: "KHR",
-    Cameroon: "XAF",
-    Canada: "CAD",
-    "Central African Republic": "XAF",
-    Chad: "XAF",
-    Chile: "CLP",
-    China: "CNY",
-    Colombia: "COP",
-    Comoros: "KMF",
-    "Congo, Democratic Republic of the": "CDF",
-    "Congo, Republic of the": "XAF",
-    "Costa Rica": "CRC",
-    Croatia: "HRK",
-    Cuba: "CUP",
-    Cyprus: "EUR",
-    "Czech Republic": "CZK",
-    Denmark: "DKK",
-    Djibouti: "DJF",
-    Dominica: "XCD",
-    "Dominican Republic": "DOP",
-    Ecuador: "USD",
-    Egypt: "EGP",
-    "El Salvador": "USD",
-    "Equatorial Guinea": "XAF",
-    Eritrea: "ERN",
-    Estonia: "EUR",
-    Eswatini: "SZL",
-    Ethiopia: "ETB",
-    Fiji: "FJD",
-    Finland: "EUR",
-    France: "EUR",
-    Gabon: "XAF",
-    Gambia: "GMD",
-    Georgia: "GEL",
-    Germany: "EUR",
-    Ghana: "GHS",
-    Greece: "EUR",
-    Grenada: "XCD",
-    Guatemala: "GTQ",
-    Guinea: "GNF",
-    "Guinea-Bissau": "XOF",
-    Guyana: "GYD",
-    Haiti: "HTG",
-    Honduras: "HNL",
-    Hungary: "HUF",
-    Iceland: "ISK",
-    India: "INR",
-    Indonesia: "IDR",
-    Iran: "IRR",
-    Iraq: "IQD",
-    Ireland: "EUR",
-    Israel: "ILS",
-    Italy: "EUR",
-    Jamaica: "JMD",
-    Japan: "JPY",
-    Jordan: "JOD",
-    Kazakhstan: "KZT",
-    Kenya: "KES",
-    Kiribati: "AUD",
-    Kuwait: "KWD",
-    Kyrgyzstan: "KGS",
-    Laos: "LAK",
-    Latvia: "EUR",
-    Lebanon: "LBP",
-    Lesotho: "LSL",
-    Liberia: "LRD",
-    Libya: "LYD",
-    Liechtenstein: "CHF",
-    Lithuania: "EUR",
-    Luxembourg: "EUR",
-    Madagascar: "MGA",
-    Malawi: "MWK",
-    Malaysia: "MYR",
-    Maldives: "MVR",
-    Mali: "XOF",
-    Malta: "EUR",
-    "Marshall Islands": "USD",
-    Mauritania: "MRU",
-    Mauritius: "MUR",
-    Mexico: "MXN",
-    Micronesia: "USD",
-    Moldova: "MDL",
-    Monaco: "EUR",
-    Mongolia: "MNT",
-    Montenegro: "EUR",
-    Morocco: "MAD",
-    Mozambique: "MZN",
-    Myanmar: "MMK",
-    Namibia: "NAD",
-    Nauru: "AUD",
-    Nepal: "NPR",
-    Netherlands: "EUR",
-    "New Zealand": "NZD",
-    Nicaragua: "NIO",
-    Niger: "XOF",
-    Nigeria: "NGN",
-    "North Macedonia": "MKD",
-    Norway: "NOK",
-    Oman: "OMR",
-    Pakistan: "PKR",
-    Palau: "USD",
-    Palestine: "ILS",
-    Panama: "PAB",
-    "Papua New Guinea": "PGK",
-    Paraguay: "PYG",
-    Peru: "PEN",
-    Philippines: "PHP",
-    Poland: "PLN",
-    Portugal: "EUR",
-    Qatar: "QAR",
-    Romania: "RON",
-    Russia: "RUB",
-    Rwanda: "RWF",
-    "Saint Kitts and Nevis": "XCD",
-    "Saint Lucia": "XCD",
-    "Saint Vincent and the Grenadines": "XCD",
-    Samoa: "WST",
-    "San Marino": "EUR",
-    "Sao Tome and Principe": "STN",
-    "Saudi Arabia": "SAR",
-    Senegal: "XOF",
-    Serbia: "RSD",
-    Seychelles: "SCR",
-    "Sierra Leone": "SLL",
-    Singapore: "SGD",
-    Slovakia: "EUR",
-    Slovenia: "EUR",
-    "Solomon Islands": "SBD",
-    Somalia: "SOS",
-    "South Africa": "ZAR",
-    "South Korea": "KRW",
-    Spain: "EUR",
-    "Sri Lanka": "LKR",
-    Sudan: "SDG",
-    Suriname: "SRD",
-    Sweden: "SEK",
-    Switzerland: "CHF",
-    Syria: "SYP",
-    Taiwan: "TWD",
-    Tajikistan: "TJS",
-    Tanzania: "TZS",
-    Thailand: "THB",
-    Togo: "XOF",
-    Tonga: "TOP",
-    "Trinidad and Tobago": "TTD",
-    Tunisia: "TND",
-    Turkey: "TRY",
-    Turkmenistan: "TMT",
-    Tuvalu: "AUD",
-    Uganda: "UGX",
-    Ukraine: "UAH",
-    "United Arab Emirates": "AED",
-    "United Kingdom": "GBP",
-    "United States": "USD",
-    Uruguay: "UYU",
-    Uzbekistan: "UZS",
-    Vanuatu: "VUV",
-    "Vatican City": "EUR",
-    Venezuela: "VES",
-    Vietnam: "VND",
-    Yemen: "YER",
-    Zambia: "ZMW",
-    Zimbabwe: "ZWL",
-  };
-
-  const countries = [
-    { name: "Afghanistan", code: "+93" },
-    { name: "Albania", code: "+355" },
-    { name: "Algeria", code: "+213" },
-    { name: "Andorra", code: "+376" },
-    { name: "Angola", code: "+244" },
-    { name: "Antigua and Barbuda", code: "+1-268" },
-    { name: "Argentina", code: "+54" },
-    { name: "Armenia", code: "+374" },
-    { name: "Australia", code: "+61" },
-    { name: "Austria", code: "+43" },
-    { name: "Azerbaijan", code: "+994" },
-    { name: "Bahamas", code: "+1-242" },
-    { name: "Bahrain", code: "+973" },
-    { name: "Bangladesh", code: "+880" },
-    { name: "Barbados", code: "+1-246" },
-    { name: "Belarus", code: "+375" },
-    { name: "Belgium", code: "+32" },
-    { name: "Belize", code: "+501" },
-    { name: "Benin", code: "+229" },
-    { name: "Bhutan", code: "+975" },
-    { name: "Bolivia", code: "+591" },
-    { name: "Bosnia and Herzegovina", code: "+387" },
-    { name: "Botswana", code: "+267" },
-    { name: "Brazil", code: "+55" },
-    { name: "Brunei", code: "+673" },
-    { name: "Bulgaria", code: "+359" },
-    { name: "Burkina Faso", code: "+226" },
-    { name: "Burundi", code: "+257" },
-    { name: "Cabo Verde", code: "+238" },
-    { name: "Cambodia", code: "+855" },
-    { name: "Cameroon", code: "+237" },
-    { name: "Canada", code: "+1" },
-    { name: "Central African Republic", code: "+236" },
-    { name: "Chad", code: "+235" },
-    { name: "Chile", code: "+56" },
-    { name: "China", code: "+86" },
-    { name: "Colombia", code: "+57" },
-    { name: "Comoros", code: "+269" },
-    { name: "Congo, Republic of the", code: "+242" },
-    { name: "Congo, Democratic Republic of the", code: "+243" },
-    { name: "Costa Rica", code: "+506" },
-    { name: "Croatia", code: "+385" },
-    { name: "Cuba", code: "+53" },
-    { name: "Cyprus", code: "+357" },
-    { name: "Czech Republic", code: "+420" },
-    { name: "Denmark", code: "+45" },
-    { name: "Djibouti", code: "+253" },
-    { name: "Dominica", code: "+1-767" },
-    { name: "Dominican Republic", code: "+1-809" },
-    { name: "Ecuador", code: "+593" },
-    { name: "Egypt", code: "+20" },
-    { name: "El Salvador", code: "+503" },
-    { name: "Equatorial Guinea", code: "+240" },
-    { name: "Eritrea", code: "+291" },
-    { name: "Estonia", code: "+372" },
-    { name: "Eswatini", code: "+268" },
-    { name: "Ethiopia", code: "+251" },
-    { name: "Fiji", code: "+679" },
-    { name: "Finland", code: "+358" },
-    { name: "France", code: "+33" },
-    { name: "Gabon", code: "+241" },
-    { name: "Gambia", code: "+220" },
-    { name: "Georgia", code: "+995" },
-    { name: "Germany", code: "+49" },
-    { name: "Ghana", code: "+233" },
-    { name: "Greece", code: "+30" },
-    { name: "Grenada", code: "+1-473" },
-    { name: "Guatemala", code: "+502" },
-    { name: "Guinea", code: "+224" },
-    { name: "Guinea-Bissau", code: "+245" },
-    { name: "Guyana", code: "+592" },
-    { name: "Haiti", code: "+509" },
-    { name: "Honduras", code: "+504" },
-    { name: "Hungary", code: "+36" },
-    { name: "Iceland", code: "+354" },
-    { name: "India", code: "+91" },
-    { name: "Indonesia", code: "+62" },
-    { name: "Iran", code: "+98" },
-    { name: "Iraq", code: "+964" },
-    { name: "Ireland", code: "+353" },
-    { name: "Israel", code: "+972" },
-    { name: "Italy", code: "+39" },
-    { name: "Jamaica", code: "+1-876" },
-    { name: "Japan", code: "+81" },
-    { name: "Jordan", code: "+962" },
-    { name: "Kazakhstan", code: "+7" },
-    { name: "Kenya", code: "+254" },
-    { name: "Kiribati", code: "+686" },
-    { name: "Kuwait", code: "+965" },
-    { name: "Kyrgyzstan", code: "+996" },
-    { name: "Laos", code: "+856" },
-    { name: "Latvia", code: "+371" },
-    { name: "Lebanon", code: "+961" },
-    { name: "Lesotho", code: "+266" },
-    { name: "Liberia", code: "+231" },
-    { name: "Libya", code: "+218" },
-    { name: "Liechtenstein", code: "+423" },
-    { name: "Lithuania", code: "+370" },
-    { name: "Luxembourg", code: "+352" },
-    { name: "Madagascar", code: "+261" },
-    { name: "Malawi", code: "+265" },
-    { name: "Malaysia", code: "+60" },
-    { name: "Maldives", code: "+960" },
-    { name: "Mali", code: "+223" },
-    { name: "Malta", code: "+356" },
-    { name: "Marshall Islands", code: "+692" },
-    { name: "Mauritania", code: "+222" },
-    { name: "Mauritius", code: "+230" },
-    { name: "Mexico", code: "+52" },
-    { name: "Micronesia", code: "+691" },
-    { name: "Moldova", code: "+373" },
-    { name: "Monaco", code: "+377" },
-    { name: "Mongolia", code: "+976" },
-    { name: "Montenegro", code: "+382" },
-    { name: "Morocco", code: "+212" },
-    { name: "Mozambique", code: "+258" },
-    { name: "Myanmar", code: "+95" },
-    { name: "Namibia", code: "+264" },
-    { name: "Nauru", code: "+674" },
-    { name: "Nepal", code: "+977" },
-    { name: "Netherlands", code: "+31" },
-    { name: "New Zealand", code: "+64" },
-    { name: "Nicaragua", code: "+505" },
-    { name: "Niger", code: "+227" },
-    { name: "Nigeria", code: "+234" },
-    { name: "North Macedonia", code: "+389" },
-    { name: "Norway", code: "+47" },
-    { name: "Oman", code: "+968" },
-    { name: "Pakistan", code: "+92" },
-    { name: "Palau", code: "+680" },
-    { name: "Palestine", code: "+970" },
-    { name: "Panama", code: "+507" },
-    { name: "Papua New Guinea", code: "+675" },
-    { name: "Paraguay", code: "+595" },
-    { name: "Peru", code: "+51" },
-    { name: "Philippines", code: "+63" },
-    { name: "Poland", code: "+48" },
-    { name: "Portugal", code: "+351" },
-    { name: "Qatar", code: "+974" },
-    { name: "Romania", code: "+40" },
-    { name: "Russia", code: "+7" },
-    { name: "Rwanda", code: "+250" },
-    { name: "Saint Kitts and Nevis", code: "+1-869" },
-    { name: "Saint Lucia", code: "+1-758" },
-    { name: "Saint Vincent and the Grenadines", code: "+1-784" },
-    { name: "Samoa", code: "+685" },
-    { name: "San Marino", code: "+378" },
-    { name: "Sao Tome and Principe", code: "+239" },
-    { name: "Saudi Arabia", code: "+966" },
-    { name: "Senegal", code: "+221" },
-    { name: "Serbia", code: "+381" },
-    { name: "Seychelles", code: "+248" },
-    { name: "Sierra Leone", code: "+232" },
-    { name: "Singapore", code: "+65" },
-    { name: "Slovakia", code: "+421" },
-    { name: "Slovenia", code: "+386" },
-    { name: "Solomon Islands", code: "+677" },
-    { name: "Somalia", code: "+252" },
-    { name: "South Africa", code: "+27" },
-    { name: "South Korea", code: "+82" },
-    { name: "Spain", code: "+34" },
-    { name: "Sri Lanka", code: "+94" },
-    { name: "Sudan", code: "+249" },
-    { name: "Suriname", code: "+597" },
-    { name: "Sweden", code: "+46" },
-    { name: "Switzerland", code: "+41" },
-    { name: "Syria", code: "+963" },
-    { name: "Taiwan", code: "+886" },
-    { name: "Tajikistan", code: "+992" },
-    { name: "Tanzania", code: "+255" },
-    { name: "Thailand", code: "+66" },
-    { name: "Togo", code: "+228" },
-    { name: "Tonga", code: "+676" },
-    { name: "Trinidad and Tobago", code: "+1-868" },
-    { name: "Tunisia", code: "+216" },
-    { name: "Turkey", code: "+90" },
-    { name: "Turkmenistan", code: "+993" },
-    { name: "Tuvalu", code: "+688" },
-    { name: "Uganda", code: "+256" },
-    { name: "Ukraine", code: "+380" },
-    { name: "United Arab Emirates", code: "+971" },
-    { name: "United Kingdom", code: "+44" },
-    { name: "United States", code: "+1" },
-    { name: "Uruguay", code: "+598" },
-    { name: "Uzbekistan", code: "+998" },
-    { name: "Vanuatu", code: "+678" },
-    { name: "Vatican City", code: "+39" },
-    { name: "Venezuela", code: "+58" },
-    { name: "Vietnam", code: "+84" },
-    { name: "Yemen", code: "+967" },
-    { name: "Zambia", code: "+260" },
-    { name: "Zimbabwe", code: "+263" },
-  ];
-
   let currencies = [
-    "AFN",
-    "ALL",
-    "DZD",
-    "EUR",
-    "AOA",
-    "XCD",
-    "ARS",
-    "AMD",
-    "AUD",
-    "EUR",
-    "AZN",
-    "BSD",
-    "BHD",
-    "BDT",
-    "BBD",
-    "BYN",
-    "EUR",
-    "BZD",
-    "XOF",
-    "BTN",
-    "BOB",
-    "BAM",
-    "BWP",
-    "BRL",
-    "BND",
-    "BGN",
-    "XOF",
-    "BIF",
-    "CVE",
-    "KHR",
-    "XAF",
-    "CAD",
-    "XAF",
-    "XAF",
-    "CLP",
-    "CNY",
-    "COP",
-    "KMF",
-    "CDF",
-    "XAF",
-    "CRC",
-    "HRK",
-    "CUP",
-    "EUR",
-    "CZK",
-    "DKK",
-    "DJF",
-    "XCD",
-    "DOP",
-    "USD",
-    "EGP",
-    "USD",
-    "XAF",
-    "ERN",
-    "EUR",
-    "SZL",
-    "ETB",
-    "FJD",
-    "EUR",
-    "EUR",
-    "XAF",
-    "GMD",
-    "GEL",
-    "EUR",
-    "GHS",
-    "EUR",
-    "XCD",
-    "GTQ",
-    "GNF",
-    "XOF",
-    "GYD",
-    "HTG",
-    "HNL",
-    "HUF",
-    "ISK",
-    "INR",
-    "IDR",
-    "IRR",
-    "IQD",
-    "EUR",
-    "ILS",
-    "EUR",
-    "JMD",
-    "JPY",
-    "JOD",
-    "KZT",
-    "KES",
-    "AUD",
-    "KWD",
-    "KGS",
-    "LAK",
-    "EUR",
-    "LBP",
-    "LSL",
-    "LRD",
-    "LYD",
-    "CHF",
-    "EUR",
-    "EUR",
-    "MGA",
-    "MWK",
-    "MYR",
-    "MVR",
-    "XOF",
-    "EUR",
-    "USD",
-    "MRU",
-    "MUR",
-    "MXN",
-    "USD",
-    "MDL",
-    "EUR",
-    "MNT",
-    "EUR",
-    "MAD",
-    "MZN",
-    "MMK",
-    "NAD",
-    "AUD",
-    "NPR",
-    "EUR",
-    "NZD",
-    "NIO",
-    "XOF",
-    "NGN",
-    "MKD",
-    "NOK",
-    "OMR",
-    "PKR",
-    "USD",
-    "ILS",
-    "PAB",
-    "PGK",
-    "PYG",
-    "PEN",
-    "PHP",
-    "PLN",
-    "EUR",
-    "QAR",
-    "RON",
-    "RUB",
-    "RWF",
-    "XCD",
-    "XCD",
-    "XCD",
-    "WST",
-    "EUR",
-    "STN",
-    "SAR",
-    "XOF",
-    "RSD",
-    "SCR",
-    "SLL",
-    "SGD",
-    "EUR",
-    "EUR",
-    "SBD",
-    "SOS",
-    "ZAR",
-    "KRW",
-    "EUR",
-    "LKR",
-    "SDG",
-    "SRD",
-    "SEK",
-    "CHF",
-    "SYP",
-    "TWD",
-    "TJS",
-    "TZS",
-    "THB",
-    "XOF",
-    "TOP",
-    "TTD",
-    "TND",
-    "TRY",
-    "TMT",
-    "AUD",
-    "UGX",
-    "UAH",
-    "AED",
-    "GBP",
-    "USD",
-    "UYU",
-    "UZS",
-    "VUV",
-    "EUR",
-    "VES",
-    "VND",
-    "YER",
-    "ZMW",
-    "ZWL",
+    "AFN","ALL","DZD","EUR","AOA","XCD","ARS","AMD","AUD","EUR","AZN","BSD","BHD","BDT","BBD","BYN","EUR","BZD","XOF",
+    "BTN","BOB","BAM","BWP","BRL","BND","BGN","XOF","BIF","CVE","KHR","XAF","CAD","XAF","XAF","CLP","CNY","COP","KMF",
+    "CDF","XAF","CRC","HRK","CUP","EUR","CZK","DKK","DJF","XCD","DOP","USD","EGP","USD","XAF","ERN","EUR","SZL","ETB",
+    "FJD","EUR","EUR","XAF","GMD","GEL","EUR","GHS","EUR","XCD","GTQ","GNF","XOF","GYD","HTG","HNL","HUF","ISK","INR",
+    "IDR","IRR","IQD","EUR","ILS","EUR","JMD","JPY","JOD","KZT","KES","AUD","KWD","KGS","LAK","EUR","LBP","LSL","LRD",
+    "LYD","CHF","EUR","EUR","MGA","MWK","MYR","MVR","XOF","EUR","USD","MRU","MUR","MXN","USD","MDL","EUR","MNT","EUR",
+    "MAD","MZN","MMK","NAD","AUD","NPR","EUR","NZD","NIO","XOF","NGN","MKD","NOK","OMR","PKR","USD","ILS","PAB","PGK",
+    "PYG","PEN","PHP","PLN","EUR","QAR","RON","RUB","RWF","XCD","XCD","XCD","WST","EUR","STN","SAR","XOF","RSD","SCR",
+    "SLL","SGD","EUR","EUR","SBD","SOS","ZAR","KRW","EUR","LKR","SDG","SRD","SEK","CHF","SYP","TWD","TJS","TZS","THB",
+    "XOF","TOP","TTD","TND","TRY","TMT","AUD","UGX","UAH","AED","GBP","USD","UYU","UZS","VUV","EUR","VES","VND","YER",
+    "ZMW","ZWL",
   ];
 
   function updateCurrency(country) {
@@ -790,225 +220,6 @@
   }
 
   currencies = currencies.sort();
-
-  const phoneNumberPatterns = {
-    Afghanistan: /^[7-9]\d{8}$/,
-    Algeria: /^[5-9]\d{8}$/,
-    Andorra: /^\+376[0-9]{6}$/,
-    Angola: /^(\+244|0)9\d{8}$/,
-    "Antigua and Barbuda": /^\+1[2689]\d{7}$/,
-    Armenia: /^(\+374|0)(10|20|30|40|50|60|70|80)\d{6}$/,
-    Austria: /^\+43\d{1,12}$/,
-    Azerbaijan: /^(\+994|0)5[0-9]\d{7}$/,
-    Bahamas: /^\+1[242]\d{7}$/,
-    Bangladesh: /^(\+8801|01)\d{9}$/,
-    Belarus: /^(\+375|0)29\d{7}$/,
-    Belgium: /^(\+32|0)4\d{8}$/,
-    Belize: /^(\+501|0)\d{7}$/,
-    Benin: /^(\+229|0)\d{8}$/,
-    Bolivia: /^(\+591|0)\d{8}$/,
-    "Bosnia and Herzegovina": /^(\+387|0)\d{8}$/,
-    "Burkina Faso": /^(\+226|0)\d{8}$/,
-    Burundi: /^(\+257|0)\d{8}$/,
-    "Cabo Verde": /^(\+238|0)\d{7}$/,
-    Cambodia: /^(\+855|0)\d{8,9}$/,
-    Cameroon: /^(\+237|0)\d{8}$/,
-    "Central African Republic": /^(\+236|0)\d{8}$/,
-    Chad: /^(\+235|0)\d{8}$/,
-    Comoros: /^(\+269|0)\d{7}$/,
-    "Congo, Republic of the": /^(\+242|0)\d{7}$/,
-    "Congo, Democratic Republic of the": /^(\+243|0)\d{9}$/,
-    "Costa Rica": /^(\+506|0)\d{8}$/,
-    Croatia: /^(\+385|0)9\d{8}$/,
-    Cyprus: /^(\+357|0)\d{8}$/,
-    "Czech Republic": /^(\+420|0)\d{9}$/,
-    Djibouti: /^(\+253|0)\d{7}$/,
-    Dominica: /^(\+1[7678]|0)\d{7}$/,
-    "Dominican Republic": /^(\+1[809]|0)\d{7}$/,
-    Ecuador: /^(\+593|0)\d{9}$/,
-    "El Salvador": /^(\+503|0)\d{8}$/,
-    "Equatorial Guinea": /^(\+240|0)\d{8}$/,
-    Eritrea: /^(\+291|0)\d{7}$/,
-    Estonia: /^(\+372|0)\d{7}$/,
-    Eswatini: /^(\+268|0)\d{8}$/,
-    Finland: /^(\+358|0)\d{9}$/,
-    France: /^(\+33|0)\d{9}$/,
-    Gabon: /^(\+241|0)\d{7}$/,
-    Gambia: /^(\+220|0)\d{7}$/,
-    Georgia: /^(\+995|0)\d{9}$/,
-    Germany: /^(\+49|0)\d{10}$/,
-    Greece: /^(\+30|0)\d{10}$/,
-    Grenada: /^(\+1[473]|0)\d{7}$/,
-    Guatemala: /^(\+502|0)\d{8}$/,
-    Guinea: /^(\+224|0)\d{9}$/,
-    "Guinea-Bissau": /^(\+245|0)\d{7}$/,
-    Guyana: /^(\+592|0)\d{7}$/,
-    Honduras: /^(\+504|0)\d{8}$/,
-    Iran: /^(\+98|0)\d{10}$/,
-    Iraq: /^(\+964|0)\d{9}$/,
-    Ireland: /^(\+353|0)\d{9}$/,
-    Italy: /^(\+39|0)\d{10}$/,
-    Jamaica: /^(\+1[876]|0)\d{7}$/,
-    Kenya: /^(\+254|0)\d{9}$/,
-    Kiribati: /^(\+686|0)\d{4}$/,
-    Laos: /^(\+856|0)\d{8}$/,
-    Latvia: /^(\+371|0)\d{8}$/,
-    Lebanon: /^(\+961|0)\d{8}$/,
-    Lesotho: /^(\+266|0)\d{8}$/,
-    Liechtenstein: /^(\+423|0)\d{7}$/,
-    Lithuania: /^(\+370|0)\d{8}$/,
-    Luxembourg: /^(\+352|0)\d{6}$/,
-    Malawi: /^(\+265|0)\d{9}$/,
-    Maldives: /^(\+960|0)\d{7}$/,
-    Mali: /^(\+223|0)\d{8}$/,
-    Malta: /^(\+356|0)\d{8}$/,
-    "Marshall Islands": /^(\+692|0)\d{7}$/,
-    Mauritania: /^(\+222|0)\d{8}$/,
-    Micronesia: /^(\+691|0)\d{7}$/,
-    Monaco: /^(\+377|0)\d{8}$/,
-    Mongolia: /^(\+976|0)\d{8}$/,
-    Montenegro: /^(\+382|0)\d{8}$/,
-    Mozambique: /^(\+258|0)\d{9}$/,
-    Myanmar: /^(\+95|0)\d{9}$/,
-    Nauru: /^(\+674|0)\d{4}$/,
-    Netherlands: /^(\+31|0)\d{9}$/,
-    "New Zealand": /^(\+64|0)\d{9}$/,
-    Niger: /^(\+227|0)\d{8}$/,
-    Nigeria: /^(\+234|0)\d{10}$/,
-    "North Macedonia": /^(\+389|0)\d{9}$/,
-    Oman: /^(\+968|0)\d{8}$/,
-    Palau: /^(\+680|0)\d{7}$/,
-    Palestine: /^(\+970|0)\d{9}$/,
-    Panama: /^(\+507|0)\d{7}$/,
-    "Papua New Guinea": /^(\+675|0)\d{7}$/,
-    Paraguay: /^(\+595|0)\d{9}$/,
-    Poland: /^(\+48|0)\d{9}$/,
-    Portugal: /^(\+351|0)\d{9}$/,
-    Romania: /^(\+40|0)\d{9}$/,
-    "Saint Kitts and Nevis": /^(\+1[869]|0)\d{7}$/,
-    "Saint Lucia": /^(\+1[758]|0)\d{7}$/,
-    "Saint Vincent and the Grenadines": /^(\+1[784]|0)\d{7}$/,
-    Samoa: /^(\+685|0)\d{5}$/,
-    "San Marino": /^(\+378|0)\d{7}$/,
-    "Sao Tome and Principe": /^(\+239|0)\d{7}$/,
-    "Saudi Arabia": /^(\+966|0)\d{9}$/,
-    Senegal: /^(\+221|0)\d{9}$/,
-    Seychelles: /^(\+248|0)\d{7}$/,
-    "Sierra Leone": /^(\+232|0)\d{8}$/,
-    Slovakia: /^(\+421|0)\d{9}$/,
-    Slovenia: /^(\+386|0)\d{8}$/,
-    "Solomon Islands": /^(\+677|0)\d{5}$/,
-    Somalia: /^(\+252|0)\d{8}$/,
-    "South Africa": /^(\+27|0)\d{9}$/,
-    "South Korea": /^(\+82|0)\d{9}$/,
-    Spain: /^(\+34|0)\d{9}$/,
-    "Sri Lanka": /^(\+94|0)\d{9}$/,
-    Syria: /^(\+963|0)\d{9}$/,
-    Togo: /^(\+228|0)\d{8}$/,
-    "Trinidad and Tobago": /^(\+1[868]|0)\d{7}$/,
-    Tuvalu: /^(\+688|0)\d{4}$/,
-    Uganda: /^(\+256|0)\d{9}$/,
-    Ukraine: /^(\+380|0)\d{9}$/,
-    "United Arab Emirates": /^(\+971|0)\d{9}$/,
-    "United Kingdom": /^(\+44|0)\d{10}$/,
-    "United States": /^(\+1|0)\d{10}$/,
-    Uruguay: /^(\+598|0)\d{8}$/,
-    Uzbekistan: /^(\+998|0)\d{9}$/,
-    Vanuatu: /^(\+678|0)\d{5}$/,
-    "Vatican City": /^(\+379|0)\d{7}$/,
-    Venezuela: /^(\+58|0)\d{10}$/,
-    Yemen: /^(\+967|0)\d{9}$/,
-    Zimbabwe: /^(\+263|0)\d{9}$/,
-
-    Albania: /^\d{9}$/,
-    USA: /^[2-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}$/,
-    UK: /^\d{4}[\s-]?\d{6}$/,
-    Eurozone: /^\d{8,15}$/,
-    Japan: /^\d{10,11}$/,
-    Canada: /^[2-9]\d{2}[\s-]?\d{3}[\s-]?\d{4}$/,
-    Australia: /^[4-5]\d{8}$/,
-    Switzerland: /^\d{9}$/,
-    China: /^[1-9]\d{10}$/,
-    Sweden: /^\d{6,13}$/,
-    NewZealand: /^[2-9]\d{7,9}$/,
-    Singapore: /^[8-9]\d{7}$/,
-    HongKong: /^[5-9]\d{7}$/,
-    Norway: /^\d{8}$/,
-    Mexico: /^\d{10}$/,
-    India: /^[6-9]\d{9}$/,
-    Brazil: /^\d{10,11}$/,
-    Russia: /^[1-9]\d{9}$/,
-    SouthAfrica: /^\d{10}$/,
-    Israel: /^[5-7]\d{8}$/,
-    Thailand: /^[6-9]\d{8}$/,
-    Malaysia: /^[1-9]\d{7,9}$/,
-    Philippines: /^[8-9]\d{9}$/,
-    UAE: /^[5-9]\d{8}$/,
-    Colombia: /^\d{10}$/,
-    Pakistan: /^[3-9]\d{9}$/,
-    CzechRepublic: /^\d{9}$/,
-    Argentina: /^\d{10,11}$/,
-    Denmark: /^\d{8}$/,
-    Hungary: /^\d{9}$/,
-    Turkey: /^[5-9]\d{9}$/,
-    Chile: /^\d{9}$/,
-    SaudiArabia: /^[5-9]\d{8}$/,
-    Taiwan: /^[9]\d{8}$/,
-    Indonesia: /^[8-9]\d{9,10}$/,
-    Vietnam: /^[3-9]\d{8,9}$/,
-    Egypt: /^[1-9]\d{9}$/,
-    Bahrain: /^\d{8}$/,
-    Qatar: /^\d{8}$/,
-    Kuwait: /^\d{8}$/,
-    Morocco: /^[5-9]\d{8}$/,
-    Jordan: /^\d{8,9}$/,
-    Kazakhstan: /^\d{10}$/,
-    Serbia: /^\d{9}$/,
-    Peru: /^\d{9}$/,
-    Tunisia: /^\d{8}$/,
-    WestAfrica: /^\d{8}$/,
-    CentralAfrica: /^\d{8}$/,
-    Zambia: /^\d{9}$/,
-    Nepal: /^[9]\d{9}$/,
-    SriLanka: /^[7]\d{8}$/,
-    Turkmenistan: /^\d{8}$/,
-    Moldova: /^\d{8}$/,
-    Ethiopia: /^\d{9}$/,
-    Tanzania: /^\d{9}$/,
-    Ghana: /^[2-9]\d{8}$/,
-    Nicaragua: /^\d{8}$/,
-    Bulgaria: /^\d{8,10}$/,
-    BosniaHerzegovina: /^\d{8,9}$/,
-    Namibia: /^\d{9}$/,
-    CaymanIslands: /^\d{7}$/,
-    Fiji: /^\d{7}$/,
-    Macau: /^\d{8}$/,
-    Mauritius: /^\d{8}$/,
-    Tajikistan: /^\d{9}$/,
-    Aruba: /^\d{7}$/,
-    Suriname: /^\d{7}$/,
-    Iceland: /^\d{7}$/,
-    SierraLeone: /^\d{8}$/,
-    Madagascar: /^\d{8,9}$/,
-    EastCaribbean: /^\d{7}$/,
-    Barbados: /^\d{7}$/,
-    CFPFranc: /^\d{6,9}$/,
-    PapuaNewGuinea: /^\d{8}$/,
-    ElSalvador: /^\d{8}$/,
-    Gibraltar: /^\d{8}$/,
-    Liberia: /^\d{7}$/,
-    Rwanda: /^\d{9}$/,
-    Botswana: /^\d{7,8}$/,
-    Kyrgyzstan: /^\d{9}$/,
-    Brunei: /^\d{7}$/,
-    Sudan: /^\d{9}$/,
-    Libya: /^\d{8,9}$/,
-    Cuba: /^\d{8}$/,
-    Bhutan: /^\d{8}$/,
-    DominicanRepublic: /^\d{10}$/,
-    Haiti: /^\d{8}$/,
-    Tonga: /^\d{7}$/,
-  };
 
   function getCountryByCode(code) {
     const country = countries.find((c) => c.code === code || c.name === code);
@@ -1142,15 +353,38 @@
     }
   }
 
-  function filterCountriesWithoutAutoSelect() {
-    filteredCountries = countries.filter(
-      (country) =>
-        country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        country.code
-          .replace("+", "")
-          .includes(searchTerm.replace("+", "").toLowerCase())
-    );
-  }
+  // function filterCountriesWithoutAutoSelect() {
+  //   filteredCountries = countries.filter(
+  //     (country) =>
+  //       country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       country.code
+  //         .replace("+", "")
+  //         .includes(searchTerm.replace("+", "").toLowerCase())
+  //   );
+  // }
+
+function filterCountriesWithoutAutoSelect() {
+
+const countriesStartingWith = countries.filter(
+    (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+);
+
+const countriesContaining = countries.filter(
+    (country) => 
+        !country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) && 
+        country.name.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+filteredCountries = [...countriesStartingWith, ...countriesContaining];
+const codeMatches = countries.filter(
+    (country) => country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
+);
+codeMatches.forEach(country => {
+    if (!filteredCountries.some(c => c.name === country.name)) {
+        filteredCountries.push(country);
+    }
+});
+}
 
   function handleKeyDowncountry(event) {
     const exactCountryMatch = countries.some((c) => c.name === country);
@@ -1809,10 +1043,8 @@
             name="currency"
             bind:value={currency}
             id="currency-select"
-            disabled
-          >
-            <option class="Currency" disabled selected value="">Currency</option
-            >
+            disabled>
+            <option class="Currency" disabled selected value="">Currency</option>
             {#each currencies as currency}
               <option class="bg-primary-50" value={currency}>{currency}</option>
             {/each}
@@ -1825,9 +1057,7 @@
       </div>
 
       <div class="mb-4">
-        <label for="phone" class="block text-sm font-medium text-gray-600"
-          >Phone Number</label
-        >
+        <label for="phone" class="block text-sm font-medium text-gray-600">Phone Number</label>
         <input
           type="tel"
           id="phone"
@@ -1838,8 +1068,7 @@
           placeholder="Enter your phone number"
           class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
                     focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400
-                    placeholder:text-sm h-10"
-        />
+                    placeholder:text-sm h-10" />
         {#if errors.phone}
           <div class="text-red-500 text-xs mt-1">{errors.phone}</div>
         {/if}
@@ -1923,14 +1152,12 @@
             bind:value={password}
             on:input={() => validatePassword()}
             placeholder="Enter your password"
-            class="mt-1 block w-full p-2 pr-10 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 text-sm placeholder:text-sm h-10"
-          />
+            class="mt-1 block w-full p-2 pr-10 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 text-sm placeholder:text-sm h-10"/>
           <button
             type="button"
             on:click={togglePasswordVisibility}
             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-            aria-label={passwordVisible ? "Hide password" : "Show password"}
-          >
+            aria-label={passwordVisible ? "Hide password" : "Show password"}>
             {#if passwordVisible}
               <Icon icon="mdi:eye-off-outline" class="w-5 h-5" />
             {:else}
@@ -1938,16 +1165,12 @@
             {/if}
           </button>
         </div>
-
         {#if errors.password}
           <div class="text-red-500 text-xs mt-1">{errors.password}</div>
         {/if}
       </div>
-
       {#if typing}
-        <div
-          class="bg-primary-50 px-2 mt-3 py-2 rounded-md border border-gray-200"
-        >
+        <div class="bg-primary-50 px-2 mt-3 py-2 rounded-md border border-gray-200">
           <ul class="w-full text-xs text-gray-500 text-left list-none ml-1">
             <li class="flex justify-start items-center sm:text-xs text-2s py-1">
               {#if password.length >= 8}
@@ -1971,10 +1194,7 @@
                 </span>
               {:else}
                 <span class="text-red-500">
-                  <Icon
-                    icon="lets-icons:close-ring-duotone"
-                    class="w-4 h-4 mr-1"
-                  />
+                  <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1"/>
                 </span>
               {/if}
               Cannot contain common or guessable text
@@ -1986,10 +1206,7 @@
                 </span>
               {:else}
                 <span class="text-red-500">
-                  <Icon
-                    icon="lets-icons:close-ring-duotone"
-                    class="w-4 h-4 mr-1"
-                  />
+                  <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1"/>
                 </span>
               {/if}
               Contain one of the following special characters !@#$%_-*
@@ -2001,10 +1218,7 @@
                 </span>
               {:else}
                 <span class="text-red-500">
-                  <Icon
-                    icon="lets-icons:close-ring-duotone"
-                    class="w-4 h-4 mr-1"
-                  />
+                  <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1" />
                 </span>
               {/if}
               Contain at least one uppercase letter, one lowercase letter, one number
@@ -2041,10 +1255,8 @@
       <div class="mb-4 relative">
         <label
           for="passwordConfirm"
-          class="block text-sm font-medium text-gray-600"
-        >
-          Confirm Password</label
-        >
+          class="block text-sm font-medium text-gray-600">
+          Confirm Password</label>
         <div class="relative">
           <input
             id="passwordConfirm"
@@ -2053,17 +1265,14 @@
             bind:value={passwordConfirm}
             on:input={validateConfirmPassword}
             placeholder="Confirm your password"
-            class="mt-1 block w-full p-2 pr-10 border text-sm border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10"
-          />
-
+            class="mt-1 block w-full p-2 pr-10 border text-sm border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10"/>
           <button
             type="button"
             on:click={toggleConfirmPasswordVisibility}
             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
             aria-label={confirmPasswordVisible
               ? "Hide confirm password"
-              : "Show confirm password"}
-          >
+              : "Show confirm password"}>
             {#if confirmPasswordVisible}
               <Icon icon="mdi:eye-off-outline" class="w-5 h-5" />
             {:else}
@@ -2088,26 +1297,12 @@
         </p>
       </div>
       <div class="flex gap-2 {errors.termsAndConditions ? 'mb-1' : 'mb-6'}">
-        <input
-          type="checkbox"
-          name="termsAndConditions"
-          value={true}
-          on:change={handleCheckboxChange}
-          class="mt-0.5 text-primary-500 rounded focus:ring-0 outline-none"
-        />
+        <input type="checkbox" name="termsAndConditions" value={true} on:change={handleCheckboxChange} class="mt-0.5 text-primary-500 rounded focus:ring-0 outline-none" />
         <div class=" sm:text-sm text-xs">
           I have read and agreed to the
-          <a
-            class="font-medium text-primary-500 hover:underline"
-            href="/terms/site-and-terms"
-          >
-            Terms of Service
-          </a>
+          <a class="font-medium text-primary-500 hover:underline" href="/terms/site-and-terms"> Terms of Service </a>
           and
-          <a
-            class="font-medium text-primary-500 hover:underline"
-            href="/terms/privacy-notice">Privacy Policy</a
-          >
+          <a class="font-medium text-primary-500 hover:underline" href="/terms/privacy-notice">Privacy Policy</a>
         </div>
       </div>
       {#if !isTermsAccepted && errors.termsAndConditions}
@@ -2118,15 +1313,12 @@
 
       <button
         type="submit"
-        class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center sm:hidden"
-      >
+        class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center sm:hidden">
         <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
         Create Account
       </button>
       <div class="hidden sm:flex sm:space-x-4 sm:justify-between w-full py-2">
-        <div
-          class="flex items-center justify-center py-2 px-6 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200"
-        >
+        <div class="flex items-center justify-center py-2 px-6 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200">
           <a href={linkedinUrl} class="flex items-center space-x-2">
             <Icon icon="bi:linkedin" class="text-xl" />
             <span class="text-sm font-medium">Continue with LinkedIn</span>
@@ -2139,8 +1331,7 @@
         </div>
         <button
           type="submit"
-          class="w-full sm:w-auto bg-primary-400 text-white py-2 px-6 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center"
-        >
+          class="w-full sm:w-auto bg-primary-400 text-white py-2 px-6 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center" >
           <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
           Create Account
         </button>
@@ -2151,9 +1342,7 @@
       <span class="px-2 text-sm text-gray-500 font-bold bg-white">OR</span>
       <div class="flex-grow border-t border-gray-300"></div>
     </div>
-    <button
-      class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-600 rounded-md transition duration-200 sm:hidden"
-    >
+    <button class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-600 rounded-md transition duration-200 sm:hidden">
       <a href={linkedinUrl} class="flex items-center space-x-2">
         <Icon icon="bi:linkedin" class="text-2xl" />
         <span class="text-sm font-medium">Continue with LinkedIn</span>

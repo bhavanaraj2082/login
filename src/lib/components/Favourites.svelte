@@ -258,10 +258,11 @@ function calculateTotalPrice(price, quantity) {
          },1400);
     }
 
-    function increaseQuantity(item) {
+    function increaseQuantity(item,orderMultiple) {
+        console.log(item);
        // const maxQuantity = Math.floor(item.stockInfo.stock / item.stockInfo.orderMultiple) * item.stockInfo.orderMultiple;
        // if (item.quantity + item.stockInfo.orderMultiple <= maxQuantity) {
-            item.quantity += item.stockInfo.orderMultiple;
+            item.quantity = parseInt(item.quantity) + orderMultiple;
             favData = [...favData];
         // } else {
         //     toast.warning("Maximum stock reached", { 
@@ -270,9 +271,10 @@ function calculateTotalPrice(price, quantity) {
         // }
     }
 
-    function decreaseQuantity(item) {
-        if (item.quantity > item.stockInfo.orderMultiple) {
-            item.quantity -= item.stockInfo.orderMultiple;
+    function decreaseQuantity(item,orderMultiple) {
+        
+        if (item.quantity > orderMultiple) {
+            item.quantity = parseInt(item.quantity) - orderMultiple;
             favData = [...favData];
         }
     }
@@ -610,14 +612,14 @@ onMount(() => {
                     class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">   
                     <div class=" {tog === index ? "hidden" : ""} flex items-center justify-center md:justify-start space-x-4">
                         <button 
-                            on:click={() => decreaseQuantity(item)} 
+                            on:click={() => decreaseQuantity(item,item.stockInfo[item.specIndex].orderMultiple)} 
                             class="px-2 py-1 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
                             disabled={item.quantity <= item.stockInfo[item.specIndex].orderMultiple}>
                             -
                         </button>
                         <button class="text-sm font-medium">{item.quantity}</button>
                         <button 
-                            on:click={() => increaseQuantity(item)} 
+                            on:click={() => increaseQuantity(item,item.stockInfo[item.specIndex].orderMultiple)} 
                             class="px-2 py-1 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50">
                             +
                         </button>
@@ -639,7 +641,7 @@ onMount(() => {
             {/each}
         {/if}
     </div>
-    {#if totalPages}
+    {#if totalPages > 1}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
         class="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center justify-around border bg-white shadow px-4 py-4 rounded-b-md md:mt-2 my-1 md:m-0"

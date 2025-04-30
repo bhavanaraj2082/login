@@ -59,7 +59,7 @@ let showTooltip = false;
 			{/if}
 		  </div>
 	</div>
-	<h1 class="sm:text-2xl text-xl font-bold sm:mb-10 mb-4 mt-5 sm:mt-0 text-center ">Data Privacy Notice</h1>
+	<h1 class="sm:text-2xl text-xl font-bold sm:mb-6 mb-4 mt-2 text-center ">Data Privacy Notice</h1>
 	<p class="font-semibold mb-2">Last modified August 6, 2024</p>
 	<p class="text-justify sm:text-sm text-xs">
 		We take your data privacy and the protection of your personal data seriously and our data

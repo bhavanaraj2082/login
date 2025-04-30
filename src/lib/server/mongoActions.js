@@ -122,8 +122,9 @@ export const submitContactInfo = async (data) => {
 
 export const getOrderresultData = async (body) => {
 	try {
-		const records = await Order.findOne({ orderid: body.orderNumber });
-		if (records) {
+		const records = await Order.findOne({ orderid: body.orderNumber }).populate('profileId');
+
+		if (records?.profileId?.email === body.email) {
 			return {
 				success: true,
 				msg: 'Success',
@@ -1184,11 +1185,21 @@ let cleanedQuery = body.query.replace(/[^\w]/g, "").toLowerCase();;
 	  };
 	  
 	try {
-		const result = await Product.find(queryFilter)
-			.limit(10)
-			.populate('category')
-			.populate('subCategory')
-			.exec();
+		let result = await Product.find(queryFilter)
+			.limit(20)
+			.populate('category','urlName')
+			.populate('subCategory','urlName')
+			.select('productName CAS productNumber manufacturerName')
+			.lean();
+
+		let seenCAS= new Set()
+		result = result.filter(prod => {
+			if(!prod.CAS) return true
+			if(seenCAS.has(prod.CAS)) return false
+			seenCAS.add(prod.CAS)
+			return true
+		})
+
 		return JSON.parse(JSON.stringify(result));
 	} catch (error) {
 		console.log(error);
@@ -1835,26 +1846,20 @@ export const getcancelreturn = async (id) => {
 // 	}
 // }
 
-
-
-
 export async function quickcheck(data) {
-	const { ProductId, quantity } = data;
-
-	if (!ProductId || !quantity) {
+	const { stockId, quantity } = data;
+	if (!stockId || !quantity) {
 		return {
 			type: 'error',
-			message: 'Product ID and Quantity are required.'
+			message: 'Product and Quantity are required'
 		};
 	}
-
 	const requestedQuantity = parseInt(quantity, 10);
 
 	try {
-		const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
-
+		const stockRecord = await Stock.findOne({ _id: stockId }).exec();		
 		if (!stockRecord) {
-			console.log(`No stock record found for ProductId: ${ProductId}`);
+			console.log(`No stock record found for stockId: ${stockId}`);
 			return {
 				message: 'Out of stock',
 				stock: 'Unavailable',
@@ -1862,29 +1867,33 @@ export async function quickcheck(data) {
 			};
 		}
 
-		const totalStock = stockRecord.stock;
+		const totalStock = stockRecord.stock || 0;
 		const orderedQty = stockRecord.orderedQty || 0;
 		const availableStock = totalStock - orderedQty;
-
-		if (availableStock > 0) {
-			if (requestedQuantity <= availableStock) {
-				return {
-					message: `${availableStock} is available to ship`,
-					stock: 'Available',
-					type: 'success'
-				};
-			} else {
-				return {
-					message: `Only ${availableStock} units available.`,
-					stock: 'Limited Availability',
-					type: 'error'
-				};
-			}
-		} else {
+		if (availableStock <= 0) {
 			return {
 				message: 'Out of Stock',
 				stock: 'Unavailable',
 				type: 'error'
+			};
+		}
+		if (requestedQuantity <= availableStock) {
+			return {
+				message: 'In Stock',
+				stock: 'Available',
+				type: 'success'
+			};
+		} else if(requestedQuantity > availableStock){
+			return {
+				message: `Only ${availableStock} units are available to ship out of the requested ${requestedQuantity}`,
+				stock: 'Available',
+				type: 'success'
+			};
+		} else {
+			return {
+				message: `Only ${availableStock} units are available, requested ${requestedQuantity}`,
+				stock: 'Limited Stock',
+				type: 'success'
 			};
 		}
 	} catch (error) {
@@ -1896,6 +1905,66 @@ export async function quickcheck(data) {
 		};
 	}
 }
+
+
+// export async function quickcheck(data) {
+// 	const { ProductId, quantity } = data;
+
+// 	if (!ProductId || !quantity) {
+// 		return {
+// 			type: 'error',
+// 			message: 'Product ID and Quantity are required.'
+// 		};
+// 	}
+
+// 	const requestedQuantity = parseInt(quantity, 10);
+
+// 	try {
+// 		const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
+
+// 		if (!stockRecord) {
+// 			console.log(`No stock record found for ProductId: ${ProductId}`);
+// 			return {
+// 				message: 'Out of stock',
+// 				stock: 'Unavailable',
+// 				type: 'error'
+// 			};
+// 		}
+
+// 		const totalStock = stockRecord.stock;
+// 		const orderedQty = stockRecord.orderedQty || 0;
+// 		const availableStock = totalStock - orderedQty;
+
+// 		if (availableStock > 0) {
+// 			if (requestedQuantity <= availableStock) {
+// 				return {
+// 					message: `${availableStock} is available to ship`,
+// 					stock: 'Available',
+// 					type: 'success'
+// 				};
+// 			} else {
+// 				return {
+// 					message: `Only ${availableStock} units available.`,
+// 					stock: 'Limited Availability',
+// 					type: 'error'
+// 				};
+// 			}
+// 		} else {
+// 			return {
+// 				message: 'Out of Stock',
+// 				stock: 'Unavailable',
+// 				type: 'error'
+// 			};
+// 		}
+// 	} catch (error) {
+// 		console.error('Error during stock check:', error);
+// 		return {
+// 			message: 'Something went wrong with the stock check.',
+// 			stock: 'Unavailable',
+// 			type: 'error'
+// 		};
+// 	}
+// }
 
 export const validateProductDetails = async (productNumber, size, quantity) => {
 	try {
@@ -2347,30 +2416,160 @@ export const addAllToCart = async (items, userId, userEmail) => {
 
 //Myfavouries actions ends
 
-export const quicksearch = async ({ query }) => {
-console.log(query,"query");
+// export const quicksearch = async ({ query }) => {
+// console.log(query,"query");
 
   
+// 	try {
+// 	  const baseProducts = await Product.find({
+// 		productNumber: { $regex: query, $options: 'i' }
+// 	  })
+// 		.select('_id productName productNumber prodDesc image')
+// 		.limit(20)
+// 		.lean()
+// 		.exec();
+  
+// 	  const enrichedProducts = [];
+  
+// 	  for (const baseProduct of baseProducts) {
+// 		const stockEntries = await Stock.find({ 
+// 		  productNumber: baseProduct.productNumber 
+// 		})
+// 		  .select('_id stock pricing distributor manufacturer')
+// 		  .lean()
+// 		  .exec();
+  
+// 		if (!stockEntries || stockEntries.length === 0) {
+// 		  enrichedProducts.push({
+// 			id: baseProduct._id.toString(),
+// 			image: baseProduct.image || null,
+// 			description: baseProduct.prodDesc || null,
+// 			productName: baseProduct.productName,
+// 			productNumber: baseProduct.productNumber,
+// 			stockId: null,
+// 			manufacturer: null,
+// 			distributer: null,
+// 			stock: 0,
+// 			priceone: "",
+// 			pricing: []
+// 		  });
+// 		  continue;
+// 		}
+  
+// 		for (const entry of stockEntries) {
+// 		  let processedPricing = [];
+// 		  let priceoneValue = "";
+  
+// 		  if (entry.pricing) {
+// 			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
+// 			const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+  
+// 			if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
+// 			  processedPricing = originalPricing.map(price => {
+// 				const inrValue = price.INR;
+// 				const usdValue = inrValue / currency.rate;
+// 				return {
+// 				  ...price,
+// 				  USD: usdValue.toFixed(2)
+// 				};
+// 			  });
+  
+// 			  priceoneValue = originalPricing[0]?.INR || "";
+  
+// 			} else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
+// 			  processedPricing = originalPricing.map(price => {
+// 				const usdValue = price.USD;
+// 				const inrValue = usdValue * currency.rate;
+// 				return {
+// 				  ...price,
+// 				  INR: inrValue.toFixed(2)
+// 				};
+// 			  });
+  
+// 			  priceoneValue = originalPricing[0]?.USD || "";
+// 			} else {
+// 			  processedPricing = originalPricing;
+// 			}
+// 		  }
+  
+// 		  const productEntry = {
+// 			id: baseProduct._id.toString(),
+// 			image: baseProduct.image || null,
+// 			description: baseProduct.prodDesc || null,
+// 			productName: baseProduct.productName,
+// 			productNumber: baseProduct.productNumber,
+// 			stockId: entry._id.toString(),
+// 			manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
+// 			distributer: entry.distributor ? entry.distributor.toString() : null,
+// 			stock: entry.stock || 0,
+// 			priceone: priceoneValue,
+// 			pricing: processedPricing
+// 		  };
+  
+// 		  console.log("Final Product Entry:", JSON.stringify(productEntry, null, 2));
+  
+// 		  enrichedProducts.push(productEntry);
+// 		}
+// 	  }
+  
+// 	  return enrichedProducts;
+// 	} catch (error) {
+// 	  console.error("Error in quicksearch:", error);
+// 	  throw new Error("An error occurred while processing the quicksearch.");
+// 	}
+//   };
+
+export const quicksearch = async ({ query }) => {
+	const startTime = Date.now();
+
+	console.log(query, "query");
+   
 	try {
+	  // Find all matching products in a single query
 	  const baseProducts = await Product.find({
 		productNumber: { $regex: query, $options: 'i' }
 	  })
 		.select('_id productName productNumber prodDesc image')
-		.limit(20)
 		.lean()
 		.exec();
-  
+	  
+	  if (baseProducts.length === 0) {
+		return [];
+	  }
+	  
+	  // Extract all product numbers for batch lookup
+	  const productNumbers = baseProducts.map(product => product.productNumber);
+	  
+	  // Get all stock entries for these products in a single query
+	  const allStockEntries = await Stock.find({
+		productNumber: { $in: productNumbers }
+	  })
+		.select('_id stock pricing distributor manufacturer productNumber')
+		.lean()
+		.exec();
+	  
+	  // Create a lookup map of stock entries by productNumber
+	  const stockEntriesByProduct = {};
+	  allStockEntries.forEach(entry => {
+		if (!stockEntriesByProduct[entry.productNumber]) {
+		  stockEntriesByProduct[entry.productNumber] = [];
+		}
+		stockEntriesByProduct[entry.productNumber].push(entry);
+	  });
+	  
+	  // Get currency conversion rate once instead of for each product
+	  const currency = await Curconversion.findOne({ currency: 'USD' })
+		.sort({ createdAt: -1 })
+		.lean()
+		.exec();
+	  
 	  const enrichedProducts = [];
-  
+	  
+	  // Process each product with its stock entries
 	  for (const baseProduct of baseProducts) {
-		const stockEntries = await Stock.find({ 
-		  productNumber: baseProduct.productNumber 
-		})
-		  .select('_id stock pricing distributor manufacturer')
-		  .lean()
-		  .exec();
-  
-		if (!stockEntries || stockEntries.length === 0) {
+		const stockEntries = stockEntriesByProduct[baseProduct.productNumber] || [];
+		
+		if (stockEntries.length === 0) {
 		  enrichedProducts.push({
 			id: baseProduct._id.toString(),
 			image: baseProduct.image || null,
@@ -2386,15 +2585,15 @@ console.log(query,"query");
 		  });
 		  continue;
 		}
-  
+		
+		// Process stock entries for this product
 		for (const entry of stockEntries) {
 		  let processedPricing = [];
 		  let priceoneValue = "";
-  
+		  
 		  if (entry.pricing) {
 			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
-			const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
-  
+			
 			if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
 			  processedPricing = originalPricing.map(price => {
 				const inrValue = price.INR;
@@ -2404,9 +2603,9 @@ console.log(query,"query");
 				  USD: usdValue.toFixed(2)
 				};
 			  });
-  
+			  
 			  priceoneValue = originalPricing[0]?.INR || "";
-  
+			  
 			} else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
 			  processedPricing = originalPricing.map(price => {
 				const usdValue = price.USD;
@@ -2416,14 +2615,14 @@ console.log(query,"query");
 				  INR: inrValue.toFixed(2)
 				};
 			  });
-  
+			  
 			  priceoneValue = originalPricing[0]?.USD || "";
 			} else {
 			  processedPricing = originalPricing;
 			}
 		  }
-  
-		  const productEntry = {
+		  
+		  enrichedProducts.push({
 			id: baseProduct._id.toString(),
 			image: baseProduct.image || null,
 			description: baseProduct.prodDesc || null,
@@ -2435,245 +2634,280 @@ console.log(query,"query");
 			stock: entry.stock || 0,
 			priceone: priceoneValue,
 			pricing: processedPricing
-		  };
-  
-		  console.log("Final Product Entry:", JSON.stringify(productEntry, null, 2));
-  
-		  enrichedProducts.push(productEntry);
+		  });
 		}
 	  }
-  
+	  console.log(enrichedProducts.length,"enrichedProducts");
+	  
+	  console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
 	  return enrichedProducts;
 	} catch (error) {
 	  console.error("Error in quicksearch:", error);
 	  throw new Error("An error occurred while processing the quicksearch.");
 	}
   };
-  
+  export const uploadFile = async ({ query }) => {
+	const startTime = Date.now();
 
+	if (!query || query.length === 0) {
+	  return [];
+	}
 
-// export const uploadFile = async ({ query }) => {
-// 	const validQueries = query.filter(([productNumberAndSize, quantity]) =>
-// 		productNumberAndSize?.trim() && String(quantity)?.trim()
-// 	);
-// 	console.log(validQueries, "validone");
+	const skuData = [];
+	
+	for (const item of query) {
+	  const [sku, quantity] = item;
+	  
+	  if (!sku?.trim()) continue;
+	  
+	  const original = sku.trim();
+	  const normalizedSku = original.replace(/[-\s]/g, '').toLowerCase();
+	  const quantityNum = parseInt(quantity?.trim() || '1');
+	  
+	  skuData.push({
+		original,
+		normalizedSku,
+		quantity: quantityNum
+	  });
+	}
 
-// 	if (validQueries.length === 0) {
-// 		return validQueries.map(() => ({
-// 			productNumber: "Unknown",
-// 			isValid: false,
-// 			message: "Product number is invalid",
-// 		}));
+	if (skuData.length === 0) {
+	  return [];
+	}
+
+	const normalizedSkus = skuData.map(item => item.normalizedSku);
+	const stockItems = await Stock.aggregate([
+	  {
+		$match: {
+		  $expr: {
+			$in: [
+			  { $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
+			  normalizedSkus
+			]
+		  }
+		}
+	  },
+	  {
+		$addFields: {
+		  normalizedSku: {
+			$toLower: {
+			  $replaceAll: {
+				input: "$sku",
+				find: "-",
+				replacement: ""
+			  }
+			}
+		  }
+		}
+	  },
+	  {
+		$project: {
+		  _id: 1,
+		  productid: 1,
+		  stock: 1,
+		  pricing: 1,
+		  distributor: 1,
+		  manufacturer: 1,
+		  productName: 1,
+		  productNumber: 1,
+		  sku: 1,
+		  normalizedSku: 1
+		}
+	  }
+	]).exec();
+	
+	const stockItemMap = {};
+	for (const item of stockItems) {
+	  stockItemMap[item.normalizedSku] = item;
+	}
+	
+	const results = skuData.map(({ normalizedSku, original, quantity }) => {
+	  const matchedStock = stockItemMap[normalizedSku];
+	  
+	  if (!matchedStock) {
+		return {
+		  productNumber: original,
+		  quantity,
+		  isValid: false,
+		  message: "Stock information is missing",
+		};
+	  }
+	  
+	  return {
+		id: matchedStock._id.toString(),
+		productId: matchedStock.productid.toString(),
+		productNumber: matchedStock.productNumber,
+		productName: matchedStock.productName,
+		sku: matchedStock.sku,
+		quantity,
+		stockId: matchedStock._id.toString(),
+		stock: Number(matchedStock?.stock) || 0,
+		manufacturer: matchedStock.manufacturer?.toString() || null,
+		distributer: matchedStock.distributor?.toString() || null,
+		isValid: true,
+		message: "SKU is valid",
+	  };
+	});
+	
+	console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
+	return results;
+  };
+//   export const uploadFile = async ({ query }) => {
+// 	const startTime = Date.now();
+// 	console.log(query, "query");
+	
+// 	// Early return for empty queries
+// 	if (!query || query.length === 0) {
+// 	  return [];
 // 	}
-
-// 	const results = [];
-
-// 	for (const [productNumberAndSize, quantity] of validQueries) {
-// 		let inputStr = productNumberAndSize.trim();
-// 		let productNumber, size;
-// 		const spaceHyphenPattern = /^(.*?)\s+-\s+(.+)$/;
-// 		const spaceHyphenMatch = inputStr.match(spaceHyphenPattern);
-// 		const complexSizePattern = /^([A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)*)-(\d+(?:-[A-Za-z]+)(?:-\d+)?)$/;
-// 		const complexSizeMatch = inputStr.match(complexSizePattern);
-// 		const measurementPattern = /^(.*?)-(\d+[-]?[A-Za-z]+)$/;
-// 		const measurementMatch = inputStr.match(measurementPattern);
-
-// 		// Updated pattern to handle both "each" and "case" with more flexibility
-// 		const quantityPatterns = [
-// 			/^(.*?)[-\s]+(each\s*(?:of)?\s*[-\s]*\d+|each[-\s]*of[-\s]*\d+|\d+\s*(?:each|pcs|units|items))$/i,
-// 			/^(.*?)[-\s]+(case\s*(?:of)?\s*[-\s]*\d+|case[-\s]*of[-\s]*\d+|\d+\s*(?:case|pcs|units|items))$/i,
-// 			/^(.*?)[-\s]+(pack\s*(?:of)?\s*[-\s]*\d+|pack[-\s]*of[-\s]*\d+|\d+\s*(?:pack|pcs|units|items))$/i
-
-// 		];
-
-// 		let eachMatch = null;
-// 		for (const pattern of quantityPatterns) {
-// 			const match = inputStr.match(pattern);
-// 			if (match) {
-// 				eachMatch = match;
-// 				break;
-// 			}
-// 		}
-
-// 		if (spaceHyphenMatch) {
-// 			productNumber = spaceHyphenMatch[1].trim();
-// 			size = spaceHyphenMatch[2].trim();
-// 		} else if (complexSizeMatch) {
-// 			productNumber = complexSizeMatch[1].trim();
-// 			size = complexSizeMatch[2].trim();
-// 		} else if (measurementMatch) {
-// 			productNumber = measurementMatch[1].trim();
-// 			size = measurementMatch[2].trim();
-// 		} else if (eachMatch) {
-// 			productNumber = eachMatch[1].trim();
-// 			size = eachMatch[2].trim();
-// 		} else {
-// 			const parts = inputStr.split('-');
-// 			if (parts.length >= 2) {
-// 				productNumber = parts.slice(0, parts.length - 1).join('-');
-// 				size = parts[parts.length - 1];
-// 			} else {
-// 				productNumber = inputStr;
-// 				size = "";
-// 			}
-// 		}
-
-// 		const sizeWithQuantityPattern = /^(.*?)(\d+)$/;
-// 		const sizeWithQuantityMatch = size.match(sizeWithQuantityPattern);
-
-// 		if (sizeWithQuantityMatch && !quantity) {
-// 			size = sizeWithQuantityMatch[1].trim();
-// 		}
-
-// 		console.log(`Parsed: Product Number = "${productNumber}", Size = "${size}"`);
-
-// 		const product = await Product.findOne({
-// 			productNumber: new RegExp('^' + productNumber.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '$', 'i')
-// 		}).exec();
-
-// 		if (product) {
-// 			const stockInfo = await Stock.find({
-// 				productNumber: product.productNumber
-// 			}).select('id stock pricing distributor manufacturer');
-
-// 			console.log(stockInfo, "asadsdsfsdfxdrdr********************8");
-
-// 			let convertedPricing = [];
-// 			for (let stock of stockInfo) {
-// 				const { pricing = [], distributor, manufacturer } = stock || [];
-
-// 				if (pricing && pricing[0] && pricing[0].INR) {
-// 					convertedPricing = convertedPricing.concat(pricing);
-// 				} else {
-// 					const converted = await convertToINR([pricing] || []);
-// 					convertedPricing = convertedPricing.concat(converted);
-// 				}
-
-// 				console.log('Distributor:', distributor);
-// 				console.log('Manufacturer:', manufacturer);
-// 			}
-
-// 			if (stockInfo.length === 0) {
-// 				results.push({
-// 					productNumber,
-// 					quantity: parseInt(quantity),
-// 					isValid: false,
-// 					message: "Stock information missing",
-// 				});
-// 				continue;
-// 			}
-// 			const normalizedUserSize = size
-// 				.toLowerCase()
-// 				.replace(/\s+/g, '')
-// 				.replace(/[-_]/g, '')
-// 				.replace(/of/g, '')
-// 				.replace(/each/g, 'each')
-// 				.replace(/ea/g, 'each')
-// 				.replace(/pack/g, 'pack')
-// 				.replace(/pa/g, 'pack')
-// 				.replace(/case/g, 'case')
-// 				.replace(/ca/g, 'case');
-
-// 			let validSizePrice = convertedPricing.find(item => {
-// 				const normalizedItemSize = (item.break || '')
-// 					.toLowerCase()
-// 					.replace(/\s+/g, '')
-// 					.replace(/[-_]/g, '')
-// 					.replace(/of/g, '')
-// 					.replace(/each/g, 'each')
-// 					.replace(/ea/g, 'each')
-// 					.replace(/pack/g, 'pack')
-// 					.replace(/pa/g, 'pack')
-// 					.replace(/case/g, 'case')
-// 					.replace(/ca/g, 'case');
-
-// 				return normalizedItemSize === normalizedUserSize;
-// 			});
-
-// 			if (!validSizePrice && normalizedUserSize) {
-// 				console.log(`No exact size match for ${size}, trying partial match...`);
-// 				const partialMatch = convertedPricing.find(item => {
-// 					const normalizedItemSize = (item.break || '')
-// 						.toLowerCase()
-// 						.replace(/\s+/g, '')
-// 						.replace(/[-_]/g, '')
-// 						.replace(/of/g, '')
-// 						.replace(/each/g, 'each')
-// 						.replace(/ea/g, 'each')
-// 						.replace(/pack/g, 'pack')
-// 						.replace(/pa/g, 'pack')
-// 						.replace(/case/g, 'case')
-// 						.replace(/ca/g, 'case');
-// 					return normalizedItemSize.includes(normalizedUserSize) ||
-// 						normalizedUserSize.includes(normalizedItemSize);
-// 				});
-
-// 				if (partialMatch) {
-// 					console.log(`Found partial match: ${partialMatch.break}`);
-// 					validSizePrice = partialMatch;
-// 				}
-// 			}
-
-// 			if (!validSizePrice) {
-// 				console.log(`Size ${size} is invalid or not available for product ${productNumber}`);
-// 				results.push({
-// 					productNumber,
-// 					quantity: parseInt(quantity),
-// 					isValid: false,
-// 					message: `Size ${size} is invalid or not available for product ${productNumber}`,
-// 				});
-// 				continue;
-// 			}
-
-// 			let availableStock = Number(stockInfo[0]?.stock) || 0;
-// 			results.push({
-// 				id: product._id.toString(),
-// 				image: product.image || "No image available",
-// 				description: product.prodDesc || "No description available",
-// 				productName: product.productName || "No product name available",
-// 				productNumber: product.productNumber,
-// 				quantity: parseInt(quantity),
-// 				stockId: stockInfo[0]?.id.toString() || null,
-// 				stock: availableStock,
-// 				manufacturer: stockInfo[0]?.manufacturer?.toString() || null,
-// 				distributer: stockInfo[0]?.distributor?.toString() || null,
-// 				isValid: true,
-// 				message: "Product number and size are valid",
-// 				pricing: [{
-// 					break: validSizePrice.break,
-// 					price: validSizePrice.INR || "N/A",
-// 				}],
-// 			});
-// 		} else {
-// 			results.push({
-// 				productNumber: productNumberAndSize,
-// 				quantity: parseInt(quantity),
-// 				isValid: false,
-// 				message: "Product number is invalid",
-// 			});
-// 		}
+	
+// 	// Process valid queries and create normalized SKU map in one pass
+// 	const skuMap = new Map();
+// 	const normalizedSkus = [];
+	
+// 	for (const item of query) {
+// 	  const [sku, quantity] = item;
+	  
+// 	  if (!sku?.trim()) continue;
+	  
+// 	  const normalizedSku = sku.trim().replace(/[-\s]/g, '').toLowerCase();
+// 	  skuMap.set(normalizedSku, { 
+// 		original: sku.trim(), 
+// 		quantity: parseInt(quantity?.trim() || '1') 
+// 	  });
+// 	  normalizedSkus.push(normalizedSku);
 // 	}
-// 	console.log(results, "results");
-
+	
+// 	// Early return if no valid SKUs
+// 	if (normalizedSkus.length === 0) {
+// 	  return [];
+// 	}
+	
+// 	// Query optimization: Use lean() for faster query execution
+// 	const stockItems = await Stock.aggregate([
+// 	  {
+// 		$match: {
+// 		  $expr: {
+// 			$in: [
+// 			  { $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
+// 			  normalizedSkus
+// 			]
+// 		  }
+// 		}
+// 	  },
+// 	  {
+// 		$addFields: {
+// 		  normalizedSku: {
+// 			$toLower: {
+// 			  $replaceAll: {
+// 				input: "$sku",
+// 				find: "-",
+// 				replacement: ""
+// 			  }
+// 			}
+// 		  }
+// 		}
+// 	  },
+// 	  {
+// 		$project: {
+// 		  _id: 1,
+// 		  productid: 1,
+// 		  stock: 1,
+// 		  pricing: 1,
+// 		  distributor: 1,
+// 		  manufacturer: 1,
+// 		  productName: 1,
+// 		  productNumber: 1,
+// 		  sku: 1,
+// 		  normalizedSku: 1
+// 		}
+// 	  }
+// 	]).exec();
+	
+// 	// Create lookup map for faster processing
+// 	const stockItemsByNormalizedSku = {};
+// 	for (const item of stockItems) {
+// 	  if (!stockItemsByNormalizedSku[item.normalizedSku]) {
+// 		stockItemsByNormalizedSku[item.normalizedSku] = [];
+// 	  }
+// 	  stockItemsByNormalizedSku[item.normalizedSku].push(item);
+// 	}
+	
+// 	// Process results (avoid using Promise.all for a synchronous operation)
+// 	const results = normalizedSkus.map(normalizedSku => {
+// 	  const { original, quantity } = skuMap.get(normalizedSku);
+// 	  const matchedItems = stockItemsByNormalizedSku[normalizedSku];
+	  
+// 	  if (!matchedItems || matchedItems.length === 0) {
+// 		return {
+// 		  productNumber: original,
+// 		  quantity,
+// 		  isValid: false,
+// 		  message: "Stock information is missing",
+// 		};
+// 	  }
+	  
+// 	  const matchedStock = matchedItems[0];
+// 	  let availableStock = Number(matchedStock?.stock) || 0;
+	  
+// 	  return {
+// 		id: matchedStock._id.toString(),
+// 		productId: matchedStock.productid.toString(),
+// 		productNumber: matchedStock.productNumber,
+// 		productName: matchedStock.productName,
+// 		sku: matchedStock.sku,
+// 		quantity: quantity,
+// 		stockId: matchedStock._id.toString(),
+// 		stock: availableStock,
+// 		manufacturer: matchedStock.manufacturer?.toString() || null,
+// 		distributer: matchedStock.distributor?.toString() || null,
+// 		isValid: true,
+// 		message: "SKU is valid",
+// 	  };
+// 	});
+// 	console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
+// 	// console.log(results, "result");
 // 	return results;
-// };
+//   };
+
+
 // export const uploadFile = async ({ query }) => {
-// 	const validQueries = query.filter(([sku, quantity]) =>
-// 	  sku?.trim() && String(quantity)?.trim()
-// 	);
+// 	console.log(query,"query");
+	
+
+// 	let validQueries = [];
+	
+// 	for (const item of query) {
+// 	  const [sku, quantity] = item;
+	  
+// 	  if (sku?.trim()) {
+// 		// If it's format 2 (only SKU, no quantity), assign quantity as 1
+// 		if (quantity === undefined) {
+// 		  validQueries.push([sku.trim(), '1']);
+// 		} 
+// 		// If it's format 1 (SKU with quantity), use the provided quantity
+// 		else if (String(quantity)?.trim()) {
+// 		  validQueries.push([sku.trim(), quantity.trim()]);
+// 		}
+// 	  }
+// 	}
+	
+// 	console.log(validQueries, "validQueries");
 	
 // 	if (validQueries.length === 0) {
 // 	  return [];
 // 	}
+	
 // 	const skuMap = new Map();
 // 	const normalizedSkus = [];
 	
 // 	for (const [sku, quantity] of validQueries) {
-// 	  const cleanSku = sku.trim().replace(/[-\s]/g, '').toLowerCase();
-// 	  skuMap.set(cleanSku, { original: sku.trim(), quantity: parseInt(quantity) });
+// 	  const cleanSku = sku.replace(/[-\s]/g, '').toLowerCase();
+// 	  skuMap.set(cleanSku, { original: sku, quantity: parseInt(quantity) });
 // 	  normalizedSkus.push(cleanSku);
 // 	}
-//   const stockItems = await Stock.aggregate([
+  
+// 	const stockItems = await Stock.aggregate([
 // 	  {
 // 		$addFields: {
 // 		  normalizedSku: {
@@ -2700,7 +2934,7 @@ console.log(query,"query");
 // 		  pricing: 1,
 // 		  distributor: 1,
 // 		  manufacturer: 1,
-// 		  productName:1,
+// 		  productName: 1,
 // 		  productNumber: 1,
 // 		  sku: 1,
 // 		  normalizedSku: 1
@@ -2715,11 +2949,12 @@ console.log(query,"query");
 // 	  acc[item.normalizedSku].push(item);
 // 	  return acc;
 // 	}, {});
+	
 // 	const results = await Promise.all(
 // 	  normalizedSkus.map(async (normalizedSku) => {
 // 		const { original, quantity } = skuMap.get(normalizedSku);
 // 		const matchedItems = stockItemsByNormalizedSku[normalizedSku];
-  
+		
 // 		if (!matchedItems || matchedItems.length === 0) {
 // 		  return {
 // 			productNumber: original,
@@ -2728,7 +2963,7 @@ console.log(query,"query");
 // 			message: "Stock information is missing",
 // 		  };
 // 		}
-  
+		
 // 		const matchedStock = matchedItems[0];
 // 		let availableStock = Number(matchedStock?.stock) || 0;
 		
@@ -2736,8 +2971,9 @@ console.log(query,"query");
 // 		  id: matchedStock._id.toString(),
 // 		  productId: matchedStock.productid.toString(),
 // 		  productNumber: matchedStock.productNumber,
-// 		  productName:matchedStock.productName,
+// 		  productName: matchedStock.productName,
 // 		  sku: matchedStock.sku,
+// 		  quantity: quantity, // Use the quantity from skuMap instead of matchedStock.quantity
 // 		  stockId: matchedStock._id.toString(),
 // 		  stock: availableStock,
 // 		  manufacturer: matchedStock.manufacturer?.toString() || null,
@@ -2747,127 +2983,11 @@ console.log(query,"query");
 // 		};
 // 	  })
 // 	);
-// 	console.log(results,"result");
-  
+	
+// 	console.log(results, "result");
+	
 // 	return results;
 //   };
-export const uploadFile = async ({ query }) => {
-	// First, handle both formats:
-	// 1. [[sku, quantity]] format
-	// 2. [[sku]] format (assign quantity = 1)
-	let validQueries = [];
-	
-	for (const item of query) {
-	  const [sku, quantity] = item;
-	  
-	  if (sku?.trim()) {
-		// If it's format 2 (only SKU, no quantity), assign quantity as 1
-		if (quantity === undefined) {
-		  validQueries.push([sku.trim(), '1']);
-		} 
-		// If it's format 1 (SKU with quantity), use the provided quantity
-		else if (String(quantity)?.trim()) {
-		  validQueries.push([sku.trim(), quantity.trim()]);
-		}
-	  }
-	}
-	
-	console.log(validQueries, "validQueries");
-	
-	if (validQueries.length === 0) {
-	  return [];
-	}
-	
-	const skuMap = new Map();
-	const normalizedSkus = [];
-	
-	for (const [sku, quantity] of validQueries) {
-	  const cleanSku = sku.replace(/[-\s]/g, '').toLowerCase();
-	  skuMap.set(cleanSku, { original: sku, quantity: parseInt(quantity) });
-	  normalizedSkus.push(cleanSku);
-	}
-  
-	const stockItems = await Stock.aggregate([
-	  {
-		$addFields: {
-		  normalizedSku: {
-			$toLower: {
-			  $replaceAll: {
-				input: "$sku",
-				find: "-",
-				replacement: ""
-			  }
-			}
-		  }
-		}
-	  },
-	  {
-		$match: {
-		  normalizedSku: { $in: normalizedSkus }
-		}
-	  },
-	  {
-		$project: {
-		  _id: 1,
-		  productid: 1,
-		  stock: 1,
-		  pricing: 1,
-		  distributor: 1,
-		  manufacturer: 1,
-		  productName: 1,
-		  productNumber: 1,
-		  sku: 1,
-		  normalizedSku: 1
-		}
-	  }
-	]).exec();
-	
-	const stockItemsByNormalizedSku = stockItems.reduce((acc, item) => {
-	  if (!acc[item.normalizedSku]) {
-		acc[item.normalizedSku] = [];
-	  }
-	  acc[item.normalizedSku].push(item);
-	  return acc;
-	}, {});
-	
-	const results = await Promise.all(
-	  normalizedSkus.map(async (normalizedSku) => {
-		const { original, quantity } = skuMap.get(normalizedSku);
-		const matchedItems = stockItemsByNormalizedSku[normalizedSku];
-		
-		if (!matchedItems || matchedItems.length === 0) {
-		  return {
-			productNumber: original,
-			quantity,
-			isValid: false,
-			message: "Stock information is missing",
-		  };
-		}
-		
-		const matchedStock = matchedItems[0];
-		let availableStock = Number(matchedStock?.stock) || 0;
-		
-		return {
-		  id: matchedStock._id.toString(),
-		  productId: matchedStock.productid.toString(),
-		  productNumber: matchedStock.productNumber,
-		  productName: matchedStock.productName,
-		  sku: matchedStock.sku,
-		  quantity: quantity, // Use the quantity from skuMap instead of matchedStock.quantity
-		  stockId: matchedStock._id.toString(),
-		  stock: availableStock,
-		  manufacturer: matchedStock.manufacturer?.toString() || null,
-		  distributer: matchedStock.distributor?.toString() || null,
-		  isValid: true,
-		  message: "SKU is valid",
-		};
-	  })
-	);
-	
-	console.log(results, "result");
-	
-	return results;
-  };
 export const CreateProductQuote = async (formattedData) => {
 	console.log("formattedData",formattedData);
 	

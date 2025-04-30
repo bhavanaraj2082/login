@@ -61,7 +61,7 @@
 		</p>
 		<div class="bg-white px-6 py-3 rounded-md shadow text-center">
 			<form method="post" action="?/orderStatus" use:enhance={handleSubmit}>
-				<div class="flex flex-col md:flex-row md:space-x-4 mb-4 p-4 rounded">
+				<div class="flex flex-col md:flex-row md:space-x-4 mb-2 p-4 rounded">
 					<div class="flex-1 mb-4 md:mb-0">
 						<label for="email" class="block text-sm font-medium text-gray-700 text-start">
 							Enter Email
@@ -117,7 +117,7 @@
 					<p class="mt-1 text-sm text-description">Please check the details and try again.</p>
 					<button
 						on:click={() => (showErrorPopup = false)}
-						class="mt-4 bg-primary-500 text-white rounded px-4 py-2 float-right">
+						class="mt-4 bg-primary-500 hover:bg-primary-600 text-white rounded px-4 py-2 float-right">
 						Close
 					</button>
 				</div>

@@ -215,6 +215,71 @@
     showQuoteModal = !showQuoteModal;
     productQuote = selectedProduct;
   }
+
+  const DOTS = "...";
+  const VISIBLE_PAGES = 5;
+  let currentPage = writable(1);
+  const rowsPerPage = 10;
+
+  $: totalPages = Math.ceil(allVariants.length / rowsPerPage);
+  $: paginatedVariants = getPaginatedData(
+    allVariants,
+    $currentPage,
+    rowsPerPage
+  );
+  $: pageNumbers = getPageRange($currentPage, allVariants.length);
+
+  function getPageRange(current, totalItems) {
+    const range = [];
+    const totalPages = Math.ceil(totalItems / rowsPerPage);
+
+    if (totalPages <= VISIBLE_PAGES) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    range.push(1);
+    let start = Math.max(2, current - Math.floor(VISIBLE_PAGES / 2));
+    let end = Math.min(totalPages - 1, start + VISIBLE_PAGES - 3);
+
+    if (current > totalPages - 2) {
+      start = totalPages - VISIBLE_PAGES + 1;
+      end = totalPages - 1;
+    }
+    if (current <= 2) {
+      start = 2;
+      end = Math.min(VISIBLE_PAGES - 1, totalPages - 1);
+    }
+
+    if (start > 2) {
+      range.push(DOTS);
+    }
+
+    for (let i = start; i <= end; i++) {
+      range.push(i);
+    }
+
+    if (end < totalPages - 1) {
+      range.push(DOTS);
+    }
+
+    if (totalPages > 1) {
+      range.push(totalPages);
+    }
+
+    return range;
+  }
+
+  function getPaginatedData(items, currentPageNum, itemsPerPageNum) {
+    const startIndex = (currentPageNum - 1) * itemsPerPageNum;
+    const endIndex = startIndex + itemsPerPageNum;
+    return items.slice(startIndex, endIndex);
+  }
+
+  function handlePageChange(page) {
+    if (page >= 1 && page <= totalPages && page !== $currentPage) {
+      currentPage.set(page);
+    }
+  }
 </script>
 
 <form
@@ -247,7 +312,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each allVariants as variant (variant._id)}
+          {#each paginatedVariants as variant (variant._id)}
             {@const { minPriceINR, maxPriceINR, minPriceUSD, maxPriceUSD } =
               getMinMaxPrices(variant.pricing)}
             <tr
@@ -470,6 +535,64 @@
           {/each}
         </tbody>
       </table>
+    </div>
+
+    <div class="flex items-center justify-center gap-2 flex-wrap my-6">
+      <button
+        class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+        on:click={() => handlePageChange(1)}
+        disabled={$currentPage === 1}
+        aria-label="First page"
+      >
+        <Icon icon="charm:chevrons-left" class="w-4 h-4" />
+      </button>
+
+      <button
+        class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+        on:click={() => handlePageChange($currentPage - 1)}
+        disabled={$currentPage === 1}
+        aria-label="Previous page"
+      >
+        <Icon icon="charm:chevron-left" class="w-4 h-4" />
+      </button>
+
+      {#each pageNumbers as page}
+        {#if page === DOTS}
+          <span class="px-2 text-gray-500 text-sm font-medium">{DOTS}</span>
+        {:else}
+          <button
+            class={`inline-flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-sm shadow-sm border transition-all duration-200 transform ${
+              page === $currentPage
+                ? "bg-primary-500 text-white border-primary-500 hover:bg-primary-600"
+                : "bg-white text-gray-800 border-gray-300 hover:bg-primary-500 hover:text-white active:scale-110"
+            }`}
+            on:click={() => handlePageChange(page)}
+            disabled={page === $currentPage}
+            aria-label="Go to page {page}"
+            aria-current={page === $currentPage ? "page" : undefined}
+          >
+            {page}
+          </button>
+        {/if}
+      {/each}
+
+      <button
+        class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+        on:click={() => handlePageChange($currentPage + 1)}
+        disabled={$currentPage === totalPages}
+        aria-label="Next page"
+      >
+        <Icon icon="charm:chevron-right" class="w-4 h-4" />
+      </button>
+
+      <button
+        class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+        on:click={() => handlePageChange(totalPages)}
+        disabled={$currentPage === totalPages}
+        aria-label="Last page"
+      >
+        <Icon icon="charm:chevrons-right" class="w-4 h-4" />
+      </button>
     </div>
   </div>
 </div>

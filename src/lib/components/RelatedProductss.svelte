@@ -15,7 +15,7 @@
   let showQuoteModal = false;
   let productQuote = null;
   let form5;
-  // console.log("relatedProducts",relatedProducts);
+  console.log("relatedProducts",relatedProducts);
   import { enhance } from "$app/forms";
   $: displayPrice =
     $currencyState === "usd"
@@ -456,8 +456,8 @@
       <hr class="my-4" />
 
       <div class="pl-2">
-        {#if selectedProduct?.variants?.length > 0}
-          {#if selectedProduct?.variants?.length > 0}
+        <!-- {#if selectedProduct?.variants?.length > 0} -->
+          <!-- {#if selectedProduct?.variants?.length > 0}
             <p class="text-gray-700 text-sm">
               Multiple variants of this product are available with different
               prices. View more details below.
@@ -469,10 +469,10 @@
             >
               View Products
             </button>
-          {/if}
+          {/if} -->
 
-          {#if selectedProduct?.variants?.length === 0}
-            {#if selectedPrice}
+          <!-- {#if selectedProduct?.variants?.length === 0} -->
+            <!-- {#if selectedPrice}
               <div
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start"
               >
@@ -499,9 +499,10 @@
                   </span>
                 </p>
               </div>
-            {/if}
-          {/if}
-        {:else if selectedProduct?.variants?.length === 0 && selectedProduct?.priceSize?.length === 0}
+            {/if} -->
+          <!-- {/if} -->
+        <!-- {:else if selectedProduct?.variants?.length === 0 && selectedProduct?.priceSize?.length === 0} -->
+        {#if selectedProduct?.priceSize?.length === 0}
           <div>
             <p class="text-gray-700 text-sm">
               The price for this product is unavailable. Please request a quote

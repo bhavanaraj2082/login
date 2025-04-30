@@ -18,6 +18,8 @@
   import { isFavoriteStore } from "$lib/stores/favorites.js";
 
   export let data;
+  console.log("productData",data);
+  
   export let isauthedUser;
   // export let isFavorite;
   export let profile;
@@ -481,8 +483,8 @@
             </div>
           {/if} -->
         </div>
-        <!-- {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && ((variant.pricing.INR && variant.pricing.INR > 0) || (variant.pricing.USD && variant.pricing.USD > 0)))} -->
-        {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant?.pricing && variant.pricing.length > 0 && variant.pricing.some((pricingItem) => (pricingItem.INR && Number(pricingItem.INR) > 0) || (pricingItem.USD && Number(pricingItem.USD) > 0)))}
+
+        <!-- {#if product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant?.pricing && variant.pricing.length > 0 && variant.pricing.some((pricingItem) => (pricingItem.INR && Number(pricingItem.INR) > 0) || (pricingItem.USD && Number(pricingItem.USD) > 0)))}
           <div class="flex justify-between {!authedEmail ? '!mt-6' : '!mt-3'} ">
             <p class="text-gray-900 text-lg font-semibold text-start">
               {#if $currencyState === "usd"}
@@ -504,26 +506,29 @@
               {/if}
             </p>
           </div>
-        {/if}
-        {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
+        {/if} -->
+
+
+        <!-- {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)} -->
+        {#if !(product?.priceSize?.length === 0)}
           <div class="!mt-6 max-[640px]:hidden block">
             <h4 class="bg-white text-heading font-bold text-left uppercase">
               Select a Size
             </h4>
             <table
-              class="w-full mt-2 text-xs sm:text-sm font-medium text-left text-gray-700 border-separate border-spacing-y-2"
+              class="w-full text-xs sm:text-sm font-medium text-left text-gray-700 border-separate border-spacing-y-2"
             >
               <thead>
                 <tr class="text-sm sm:font-semibold">
                   <th
-                    class="px-1 pl-0 py-2 whitespace-nowrap border-b border-gray-300"
+                    class="px-1 pl-0 whitespace-nowrap border-b border-gray-300"
                     >Pack Size</th
                   >
-                  <th class="px-1 py-2 border-b border-gray-300">SKU</th>
-                  <th class="px-1 py-2 border-b border-gray-300"
+                  <th class="px-1 border-b border-gray-300">SKU</th>
+                  <th class="px-1 border-b border-gray-300"
                     >Availability</th
                   >
-                  <th class="py-2 px-1 border-b border-gray-300">Price</th>
+                  <th class="px-1 border-b border-gray-300">Price</th>
                 </tr>
               </thead>
               <tbody>
@@ -614,6 +619,7 @@
             </table>
           </div>
         {/if}
+        {#if !(product?.priceSize?.length === 0)}
         <div class="max-[640px]:block hidden">
           <h4
             class="bg-white font-bold text-heading text-base uppercase text-left max-md:mt-6"
@@ -648,7 +654,9 @@
             {/each}
           </div>
         </div>
-        {#if !((product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && Object.keys(variant.pricing).length > 0)) || product?.priceSize?.length > 0)}
+        {/if}
+        <!-- {#if !((product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && Object.keys(variant.pricing).length > 0)) || product?.priceSize?.length > 0)} -->
+        {#if !(product?.priceSize?.length > 0)}
           <div>
             <p class="text-gray-700 text-sm {!authedEmail ? 'mt-6' : ''}">
               The price for this product is unavailable. Please request a quote
@@ -664,7 +672,8 @@
         <AboutTheItem {data} />
       </div>
     </div>
-    {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
+    <!-- {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)} -->
+    {#if !(product?.priceSize?.length === 0)}
       <SideCart
         {data}
         {quantity}

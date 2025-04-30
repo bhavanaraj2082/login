@@ -423,11 +423,20 @@ async function getMatchedComponents(search) {
       ],
     };
 
-    const components = await Product.find(queryFilter)
-      .limit(9)
-      .populate("category")
-      .populate("subCategory")
-      .exec();
+    let components = await Product.find(queryFilter)
+    .limit(12)
+    .populate('category','urlName')
+    .populate('subCategory','urlName')
+    .select('productName CAS productNumber manufacturerName')
+    .lean();
+
+    let seenCAS= new Set()
+		components = components.filter(prod => {
+			if(!prod.CAS) return true
+			if(seenCAS.has(prod.CAS)) return false
+			seenCAS.add(prod.CAS)
+			return true
+		})
 
     return components;
   } catch (error) {
@@ -686,30 +695,6 @@ export const loadProductsubcategory = async (
       { $match: matchCondition },
       {
         $lookup: {
-          from: "subcategories",
-          localField: "subCategory",
-          foreignField: "_id",
-          as: "subCategoryDetails",
-        },
-      },
-      {
-        $lookup: {
-          from: "manufacturers",
-          localField: "manufacturer",
-          foreignField: "_id",
-          as: "manufacturerDetails",
-        },
-      },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "categoryDetails",
-        },
-      },
-      {
-        $lookup: {
           from: "stocks",
           let: { productId: "$_id" },  // use let to pass local field to the pipeline
           pipeline: [
@@ -718,16 +703,14 @@ export const loadProductsubcategory = async (
                 $expr: { $eq: ["$productid", "$$productId"] },  // match the stock with product id
               },
             },
-            { $project: { _id: 1, pricing: 1, stock: 1, orderMultiple: 1, distributor: 1 } },  // choose fields you need
+            { $project: { _id: 1, pricing: 1, stock: 1, orderMultiple: 1, distributor: 1,manufacturer:1 } },  // choose fields you need
           ],
           as: "stockDetails",
         },
       },
       
       { $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true } },
-      { $unwind: "$manufacturerDetails" },
-      { $unwind: "$categoryDetails" },
-      { $unwind: "$subCategoryDetails" },
+      
       {
         $addFields: {
           // Check if pricing is an empty object
@@ -756,7 +739,15 @@ export const loadProductsubcategory = async (
       {
         $limit: Number(pageSize),
       },
-  
+      // {
+      //   $lookup: {
+      //     from: "manufacturers",
+      //     localField: "manufacturer",
+      //     foreignField: "_id",
+      //     as: "manufacturerDetails",
+      //   },
+      // },
+      // { $unwind: "$manufacturerDetails" },
       {
         $facet: {
           data: [
@@ -767,16 +758,19 @@ export const loadProductsubcategory = async (
                 productName: 1,
                 prodDesc: 1,
                 image: 1,
+                CAS:1,
                 variants:1,
-                "categoryDetails.name": 1,
-                "categoryDetails.urlName": 1,
-                "manufacturerDetails.name": 1,
-                "manufacturerDetails._id": 1,
+                manufacturerName:1,
+                // "categoryDetails.name": 1,
+                // "categoryDetails.urlName": 1,
+                // "manufacturerDetails.name": 1,
+                // "manufacturerDetails._id": 1,
                 "stockDetails._id": 1,
                 "stockDetails.pricing": 1,
                 "stockDetails.stock": 1,
                 "stockDetails.orderMultiple": 1,
                 "stockDetails.distributor": 1,
+                "stockDetails.manufacturer": 1,
               },
             },
           ],
@@ -787,7 +781,7 @@ export const loadProductsubcategory = async (
     const products = await Product.aggregate(aggregation);
     
     const totalCount = await Product.countDocuments(matchCondition);
-    console.log("products",JSON.stringify(products,null,2));
+    //console.log("products",JSON.stringify(products,null,2));
     const profile = await Profile.findOne({userId},{firstName:1,lastName:2,cellPhone:1,email:1,isEmailVerified:1,companyName:1,_id:0})
     
 
@@ -811,9 +805,9 @@ export const loadProductsubcategory = async (
         prodDesc,
         image,
         variants,
-        stockDetails={},
-        manufacturerDetails,
-        categoryDetails,
+        manufacturerName,
+        CAS,
+        stockDetails={}
       } = product;
       const priceConversion = await convertToINR(stockDetails.pricing)
       return {
@@ -823,6 +817,7 @@ export const loadProductsubcategory = async (
         prodDesc,
         image,
         variants,
+        CAS,
         pricing: priceConversion,
         totalPrice:{ priceINR:priceConversion.INR*stockDetails.orderMultiple,priceUSD:priceConversion.USD*stockDetails.orderMultiple},
         quantity: stockDetails.orderMultiple,
@@ -830,9 +825,8 @@ export const loadProductsubcategory = async (
         distributorId: stockDetails.distributor,
         stock: stockDetails.stock,
         stockId: stockDetails._id,
-        categoryDetails,
         subCategoryDetails,
-        manufacturerDetails,
+        manufacturerDetails:{name:manufacturerName,_id:stockDetails.manufacturer},
       };
     })
   )
@@ -855,6 +849,241 @@ export const loadProductsubcategory = async (
     throw error(err.status || 500, err.message || "Failed to load product subcategory");
   }
 };
+
+
+
+// export const loadProductsubcategory = async (
+//   suburl,
+//   pageNum,
+//   manufacturer,
+//   search,
+//   price,
+//   userId,
+//   filter
+// ) => {
+//   const page = Number(pageNum) || 1;
+//   const pageSize = 10;
+
+//   try {
+//     const subcategory = await SubCategory.findOne({ urlName: suburl })
+//       .populate({ path: "manufacturerIds", select: "-_id name" })
+//       .populate({ path: "subSubCategoryIds", select: "-_id name urlName" })
+//       .populate({ path: "category", select: "-_id name urlName" });
+
+//     if (!subcategory?.name || !subcategory?.urlName) {
+//       throw error(404, "Subcategory not found for URL");
+//     }
+
+//     const subCategoryDetails = {
+//       subCatName: subcategory.name,
+//       subCatUrlName: subcategory.urlName,
+//       catName: subcategory.category.name,
+//       catUrlName: subcategory.category.urlName,
+//       specifications: subcategory.specifications,
+//     };
+
+//     let matchCondition = { subCategory: subcategory._id };
+
+//     if (manufacturer) {
+//       matchCondition.manufacturerName = manufacturer;
+//     }
+
+//     if (search) {
+//       matchCondition.$or = [
+//         { CAS: { $regex: search, $options: "i" } },
+//         { productNumber: { $regex: search, $options: "i" } },
+//         { productName: { $regex: search, $options: "i" } },
+//       ];
+//     }
+
+//     if (filter && Object.keys(filter).length > 0) {
+//       matchCondition.$or = [filter];
+//     }
+
+//     let sortConditions = { isEmptyPricing: 1 };
+//     if (price === "asc") {
+//       sortConditions["stockDetails.pricing.USD"] = 1;
+//       sortConditions["stockDetails.pricing.INR"] = 1;
+//     } else if (price === "desc") {
+//       sortConditions["stockDetails.pricing.USD"] = -1;
+//       sortConditions["stockDetails.pricing.INR"] = -1;
+//     } else {
+//       sortConditions["productNumber"] = 1;
+//     }
+
+//     const aggregation = [
+//       { $match: matchCondition },
+
+//       {
+//         $lookup: {
+//           from: "stocks",
+//           let: { productId: "$_id" },
+//           pipeline: [
+//             { $match: { $expr: { $eq: ["$productid", "$$productId"] } } },
+//             { $project: { pricing: 1, stock: 1, orderMultiple: 1, distributor: 1 } },
+//           ],
+//           as: "stockDetails",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "manufacturers",
+//           localField: "manufacturer",
+//           foreignField: "_id",
+//           as: "manufacturerDetails",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "categories",
+//           localField: "category",
+//           foreignField: "_id",
+//           as: "categoryDetails",
+//         },
+//       },
+//       {
+//         $lookup: {
+//           from: "subcategories",
+//           localField: "subCategory",
+//           foreignField: "_id",
+//           as: "subCategoryDetails",
+//         },
+//       },
+//       { $addFields: {
+//           manufacturerDetails: { $arrayElemAt: ["$manufacturerDetails", 0] },
+//           categoryDetails: { $arrayElemAt: ["$categoryDetails", 0] },
+//           subCategoryDetails: { $arrayElemAt: ["$subCategoryDetails", 0] },
+//           // isEmptyPricing: {
+//           //   $cond: [
+//           //     { $eq: [{ $size: { $objectToArray: { $ifNull: ["$stockDetails.0.pricing", {}] } } }, 0] },
+//           //     true,
+//           //     false
+//           //   ]
+//           // },
+//           isEmptyPricing: {
+//             $cond: [
+//               {
+//                 $eq: [
+//                   {
+//                     $size: {
+//                       $objectToArray: {
+//                         $ifNull: [{ $first: "$stockDetails.pricing" }, {}]
+//                       }
+//                     }
+//                   },
+//                   0
+//                 ]
+//               },
+//               true,
+//               false
+//             ]
+//           }
+                  
+//         }
+//       },
+//     ];
+
+//     if (subcategory.name !== "Primary Antibodies" && subcategory.name !== "Uncategorized") {
+//       aggregation.push({ $sort: sortConditions });
+//     }
+
+//     aggregation.push(
+//       { $skip: (page - 1) * pageSize },
+//       { $limit: pageSize },
+//       {
+//         $facet: {
+//           data: [
+//             {
+//               $project: {
+//                 productNumber: 1,
+//                 productName: 1,
+//                 prodDesc: 1,
+//                 image: 1,
+//                 CAS: 1,
+//                 variants: 1,
+//                 manufacturerDetails: { name: 1, _id: 1 },
+//                 categoryDetails: { name: 1, urlName: 1 },
+//                 subCategoryDetails: { name: 1, urlName: 1 },
+//                 stockDetails: {
+//                   $arrayElemAt: ["$stockDetails", 0],
+//                 },
+//               },
+//             },
+//           ],
+//           count: [{ $count: "total" }],
+//         },
+//       }
+//     );
+
+//     const result = await Product.aggregate(aggregation);
+//     const products = result[0].data;
+//     const totalCount = result[0].count[0]?.total || 0;
+
+//     const filtered = await Promise.all(
+//       products.map(async (product) => {
+//         const {
+//           _id,
+//           productName,
+//           productNumber,
+//           prodDesc,
+//           image,
+//           variants,
+//           CAS,
+//           stockDetails = {},
+//           manufacturerDetails,
+//           categoryDetails,
+//         } = product;
+
+//         const pricing = await convertToINR(stockDetails.pricing || {});
+//         const orderMultiple = stockDetails.orderMultiple || 1;
+
+//         return {
+//           _id,
+//           productName,
+//           productNumber,
+//           prodDesc,
+//           image,
+//           variants,
+//           CAS,
+//           pricing,
+//           totalPrice: {
+//             priceINR: pricing.INR * orderMultiple,
+//             priceUSD: pricing.USD * orderMultiple,
+//           },
+//           quantity: orderMultiple,
+//           orderMultiple,
+//           distributorId: stockDetails.distributor,
+//           stock: stockDetails.stock,
+//           stockId: stockDetails._id,
+//           categoryDetails,
+//           subCategoryDetails,
+//           manufacturerDetails,
+//         };
+//       })
+//     );
+
+//     const profile = await Profile.findOne(
+//       { userId },
+//       { firstName: 1, lastName: 1, cellPhone: 1, email: 1, isEmailVerified: 1, companyName: 1, _id: 0 }
+//     );
+//     console.log(filtered);
+//     return {
+//       products: JSON.parse(JSON.stringify(filtered)),
+//       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
+//       productCount: JSON.parse(JSON.stringify(totalCount)),
+//       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
+//       subCategoryDetails,
+//       specifications: JSON.parse(JSON.stringify(subcategory.specifications)) || {},
+//       profile,
+//     };
+
+//   } catch (err) {
+//     console.error("Error loading product subcategory:", err);
+//     throw error(err.status || 500, err.message || "Failed to load product subcategory");
+//   }
+// };
+
+
 
 export async function RelatedApplicationData(name) {
   // console.log("name",name);
@@ -1118,7 +1347,8 @@ export async function DifferentProds(productId) {
     throw new Error("Product not found");
   }
 
-  const productid = product._id; 
+  const productid = product._id;
+  const CAS = product.CAS;
 
   let stockQuantity = 0;
   let orderMultiple = 0;
@@ -1157,23 +1387,17 @@ export async function DifferentProds(productId) {
             pricingStockId: pricingStockId,
           };
 
-          if (currencies.INR && !currencies.USD) {
+          const currentRates = await conversionRates();
+          const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;
+          const inrRate = currentRates["USD"] || null;
+
+          if (currencies.INR && !currencies.USD && usdRate) {
             priceData.INR = currencies.INR;
-            const currentRates = await conversionRates();
-            const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;
-            if (usdRate) {
-              priceData.USD = Number(currencies.INR * usdRate).toFixed(2);
-            }
-          }
-          if (currencies.USD && !currencies.INR) {
+            priceData.USD = Number(currencies.INR * usdRate).toFixed(2);
+          } else if (currencies.USD && !currencies.INR && inrRate) {
             priceData.USD = currencies.USD;
-            const currentRates = await conversionRates();
-            const inrRate = currentRates["USD"] ? currentRates["USD"] : null;
-            if (inrRate) {
-              priceData.INR = Number(currencies.USD * inrRate).toFixed(2);
-            }
-          }
-          if (currencies.INR && currencies.USD) {
+            priceData.INR = Number(currencies.USD * inrRate).toFixed(2);
+          } else if (currencies.INR && currencies.USD) {
             priceData.USD = currencies.USD;
             priceData.INR = currencies.INR;
           }
@@ -1187,89 +1411,95 @@ export async function DifferentProds(productId) {
     }
   }
 
-  const variants = product.variants || [];
-  const variantRecord = await Promise.all(
-    variants.map(async (variantId) => {
-      const variant = await Product.findById(variantId).lean();
-      if (!variant) return {};
-  
-      const stockRecords = await Stock.find({ productid: variant._id }).lean(); // array
-  
-      let variantPricing = [];
-      let variantStockId = "";
-      let variantAvailableStock = 0;
-      let variantOrderMultiple = 1;
-      let variantDistributorId = "";
-      let variantManufacturerId = "";
-  
-      for (const stock of stockRecords) {
-        let variantStockQuantity = stock?.stock || 0;
-        let variantOrderedQty = stock?.orderedQty || 0;
-        variantAvailableStock = variantStockQuantity - variantOrderedQty;
-        variantOrderMultiple = stock.orderMultiple || 1;
-        variantStockId = stock._id?.toString() || "";
-        variantDistributorId = stock.distributor?.toString() || "";
-        variantManufacturerId = stock.manufacturer?.toString() || "";
-  
-        if (stock.pricing) {
-          const { break: breakPoint, offer, ...variantCurrencies } = stock.pricing;
-  
-          let variantPriceData = {
-            break: breakPoint,
-            offer: offer || undefined,
-            USD: 0,
-            INR: 0,
-            productid: variant._id?.toString() || "",
-            manufacturerId: variantManufacturerId,
-            distributorId: variantDistributorId,
-            stockId: variantStockId,
-          };
-  
-          if (variantCurrencies.INR && !variantCurrencies.USD) {
-            variantPriceData.INR = variantCurrencies.INR;
-            const currentRates = await conversionRates();
-            const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;
-            if (usdRate) {
+  let variantRecord = [];
+  if (CAS) {
+    const variants = await Product.find({ CAS, _id: { $ne: product._id } }).lean();
+
+    if (variants.length > 0) {
+      const variantIds = variants.map(v => v._id);
+      const stockRecords = await Stock.find({ productid: { $in: variantIds } }).lean();
+      const currentRates = await conversionRates();
+      const usdRate = currentRates["USD"] ? 1 / currentRates["USD"] : null;
+      const inrRate = currentRates["USD"] || null;
+
+      const stockByProductId = {};
+      stockRecords.forEach(stock => {
+        const pid = stock.productid?.toString();
+        if (!stockByProductId[pid]) stockByProductId[pid] = [];
+        stockByProductId[pid].push(stock);
+      });
+
+      variantRecord = variants.map(variant => {
+        const stocks = stockByProductId[variant._id.toString()] || [];
+
+        let variantPricing = [];
+        let variantStockId = "";
+        let variantAvailableStock = 0;
+        let variantOrderMultiple = 1;
+        let variantDistributorId = "";
+        let variantManufacturerId = "";
+
+        for (const stock of stocks) {
+          const variantStockQuantity = stock?.stock || 0;
+          const variantOrderedQty = stock?.orderedQty || 0;
+          variantAvailableStock = variantStockQuantity - variantOrderedQty;
+          variantOrderMultiple = stock.orderMultiple || 1;
+          variantStockId = stock._id?.toString() || "";
+          variantDistributorId = stock.distributor?.toString() || "";
+          variantManufacturerId = stock.manufacturer?.toString() || "";
+
+          if (stock.pricing) {
+            const { break: breakPoint, offer, ...variantCurrencies } = stock.pricing;
+
+            let variantPriceData = {
+              break: breakPoint,
+              offer: offer || undefined,
+              USD: 0,
+              INR: 0,
+              productid: variant._id?.toString() || "",
+              manufacturerId: variantManufacturerId,
+              distributorId: variantDistributorId,
+              stockId: variantStockId,
+            };
+
+            if (variantCurrencies.INR && !variantCurrencies.USD && usdRate) {
+              variantPriceData.INR = variantCurrencies.INR;
               variantPriceData.USD = Number(variantCurrencies.INR * usdRate).toFixed(2);
-            }
-          } else if (variantCurrencies.USD && !variantCurrencies.INR) {
-            variantPriceData.USD = variantCurrencies.USD;
-            const currentRates = await conversionRates();
-            const inrRate = currentRates["USD"] || null;
-            if (inrRate) {
+            } else if (variantCurrencies.USD && !variantCurrencies.INR && inrRate) {
+              variantPriceData.USD = variantCurrencies.USD;
               variantPriceData.INR = Number(variantCurrencies.USD * inrRate).toFixed(2);
+            } else if (variantCurrencies.INR && variantCurrencies.USD) {
+              variantPriceData.USD = variantCurrencies.USD;
+              variantPriceData.INR = variantCurrencies.INR;
             }
-          } else if (variantCurrencies.INR && variantCurrencies.USD) {
-            variantPriceData.USD = variantCurrencies.USD;
-            variantPriceData.INR = variantCurrencies.INR;
+
+            variantPricing.push(variantPriceData);
           }
-  
-          variantPricing.push(variantPriceData);
         }
-      }
-  
-      return {
-        _id: variant?._id?.toString() || "",
-        productName: variant?.productName || "Unknown Product",
-        prodDesc: variant?.prodDesc || "No description available",
-        description: Array.isArray(variant?.description) ? variant.description : [],
-        properties: variant?.properties || {},
-        manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
-        productNumber: variant?.productNumber || "N/A",
-        imageSrc: variant?.image || variant?.imageSrc || "",
-        pricing: variantPricing,
-        stockId: variantStockId,
-        distributorId: variantDistributorId,
-        manufacturerId: variantManufacturerId,
-        stock: variantAvailableStock,
-        orderMultiple: variantOrderMultiple,
-      };
-    })
-  );
+
+        return {
+          _id: variant._id?.toString() || "",
+          productName: variant.productName || "--",
+          prodDesc: variant.prodDesc || "--",
+          description: Array.isArray(variant.description) ? variant.description : [],
+          properties: variant.properties || {},
+          manufacturerName: variant.manufacturerName?.toString() || "--",
+          productNumber: variant.productNumber || "--",
+          imageSrc: variant.image || variant.imageSrc || "",
+          pricing: variantPricing,
+          stockId: variantStockId,
+          distributorId: variantDistributorId,
+          manufacturerId: variantManufacturerId,
+          stock: variantAvailableStock,
+          orderMultiple: variantOrderMultiple,
+        };
+      });
+    }
+  }
 
   const formattedRecord = {
     productId: product?._id?.toString() || "",
-    productName: product?.productName || "Unknown Product",
+    productName: product?.productName || "--",
     CAS: product?.CAS,
     productNumber: product?.productNumber || "N/A",
     prodDesc: product?.prodDesc,
@@ -1289,23 +1519,8 @@ export async function DifferentProds(productId) {
     stockId,
     stock,
     distributorId,
-    sku, 
-    variants: variantRecord.map((variant) => ({
-      _id: variant?._id?.toString() || "",
-      productName: variant?.productName || "Unknown Product",
-      prodDesc: variant?.prodDesc || "No description available",
-      description: variant?.description || [],
-      properties: variant?.properties || {},
-      manufacturerName: variant?.manufacturerName ? variant.manufacturerName.toString() : "Unknown Manufacturer",
-      productNumber: variant?.productNumber || "N/A",
-      imageSrc: variant?.image || variant?.imageSrc || "",
-      pricing: variant?.pricing,
-      stockId: variant?.stockId,
-      distributorId: variant?.distributorId,
-      manufacturerId: variant?.manufacturerId,
-      stock:variant?.stock,
-      orderMultiple:variant?.orderMultiple,
-    })),
+    sku,
+    variants: variantRecord,
   };
 
   return { records: [formattedRecord] };
@@ -1860,20 +2075,31 @@ export async function getUserMycart(userId) {
     }
 
     const userCart = await Cart.findOne({ userId }).lean();
-    
-    if (!userCart || !userCart.cartItems || userCart.cartItems.length === 0) {
+
+    if (!userCart) {
       return {
         success: true,
         data: [],
-        message: 'No Cart found'
+        message: 'No cart found'
+      };
+    }
+
+    if (!userCart.cartItems || userCart.cartItems.length === 0) {
+      return {
+        success: true,
+        data: [{
+          ...userCart,
+          cartItems: []
+        }],
+        message: 'Cart is empty'
       };
     }
 
     const cart = await Cart.aggregate([
-      { 
-        $match: { 
-          userId: userId 
-        } 
+      {
+        $match: {
+          userId: userId
+        }
       },
       {
         $project: {
@@ -1889,8 +2115,11 @@ export async function getUserMycart(userId) {
           recurrence: 1
         }
       },
-      { 
-        $unwind: '$cartItems'
+      {
+        $unwind: {
+          path: '$cartItems',
+          preserveNullAndEmptyArrays: true
+        }
       },
       {
         $lookup: {
@@ -1976,10 +2205,15 @@ export async function getUserMycart(userId) {
       }
     ]).exec();
 
+    const cleanedCart = cart.map(c => ({
+      ...c,
+      cartItems: c.cartItems.filter(item => item.productInfo?.productId)
+    }));
+
     return {
       success: true,
-      data: cart || [],
-      message: cart.length > 0 ? 'Cart found' : 'No Cart found'
+      data: cleanedCart,
+      message: 'Cart found'
     };
 
   } catch (error) {

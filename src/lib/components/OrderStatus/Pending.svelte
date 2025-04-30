@@ -28,10 +28,10 @@
     </div>
   {/if}
   <div class="mb-5">
-    {#each remainingProducts as product}
     <div class="mb-3">
       <h1 class="text-base text-gray-600 font-semibold">Pending Products</h1>
     </div>
+    {#each remainingProducts as product}
       <div class="rounded-lg mb-5 bg-white">
         <div
           class="flex justify-between items-center px-4 py-2 rounded-md shadow"
@@ -43,9 +43,11 @@
               onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
               class="w-16 rounded-lg" />
             <div class="flex flex-col">
+              <a href="/products/details/{product.productNumber}">
               <p class="text-gray-600 text-sm font-semibold">
                 {product.productName || "--"}
               </p>
+            </a>
               <p class="font-medium text-sm text-gray-500">
                 Qty : <span class="text-gray-700"
                   >{product.remainingQuantity || "--"}</span

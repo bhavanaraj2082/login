@@ -1,5 +1,7 @@
 <script>
     export let data;
+    import { PUBLIC_COMPBUY_IMAGE_PATH } from '$env/static/public';
+
     import Icon from "@iconify/svelte";
     const { singleNewsData } = data;  // Extract single news data
     console.log(singleNewsData);
@@ -46,7 +48,22 @@
           </p>
           </div>
           <div class="sm:w-1/3 w-full h-60">
-            <img src={singleNewsData.image} alt="Blog Post" class="rounded-lg w-full h-full object-cover" />
+            <!-- <img src={singleNewsData.image} alt="Blog Post" class="rounded-lg w-full h-full object-cover" /> -->
+
+
+            <img
+            src={
+              singleNewsData.image && singleNewsData.image.includes('/')
+                ? singleNewsData.image
+                : `${PUBLIC_COMPBUY_IMAGE_PATH}/prod/${singleNewsData.image || 'default.jpg'}`
+            }
+                alt="img"
+                class="rounded-lg w-full h-full object-cover"
+              />     
+
+              
+
+
           </div>
         </div>
         <p class="text-gray-700 xl:text-xl md:text-lg sm:text-md font-semibold mt-2">About Chemikart</p>
