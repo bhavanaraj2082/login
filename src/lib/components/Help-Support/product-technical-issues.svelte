@@ -8,6 +8,8 @@
 	let formLoading = false;
 
 	let form;
+	let highlightedIndex = -1;
+    let dropdownEl;
 	let searchTerm = "";
 	let errors = {};
 	let products = [{ itemNumber: "" }];
@@ -16,7 +18,7 @@
 	let attachments = [];
 	let totalSize = 0;
 	let country = data?.profile?.country || "";
-	let firstName = data?.profile?.firstName || "";
+	let firstName = data?.profile?.firstName ||data?.authedUser?.username|| "";
 	let lastName = data?.profile?.lastName || "";
 	let email = data?.profile?.email || "";
 	let phoneNumber = data?.profile?.cellPhone || "";
@@ -101,36 +103,71 @@
 			}
 		}
 
-		if (!fieldName || fieldName === "phoneNumber") {
-			if (!country) {
-				errors.phoneNumber =
-					"Please select the country before entering the phone number";
-				return;
-			}
+		// if (!fieldName || fieldName === "phoneNumber") {
+		// 	if (!country) {
+		// 		errors.phoneNumber =
+		// 			"Please select the country before entering the phone number";
+		// 		return;
+		// 	}
 
-			if (!phoneNumber || phoneNumber === "") {
-				errors.phoneNumber = "Required for the selected country";
-			} else {
-				const countryDetails = getCountryByCode(country);
-				if (!countryDetails) {
-					errors.phoneNumber = "Invalid country selected";
-					errors.country = "Invalid country selected";
-				} else {
-					const phonePattern = getPhonePattern(country);
-					if (!phonePattern) {
-						errors.phoneNumber =
-							"Phone number pattern for country not found";
-					} else {
-						const phoneRegex = new RegExp(phonePattern);
-						if (!phoneRegex.test(phoneNumber)) {
-							errors.phoneNumber = `Please enter a valid phone number for ${countryDetails.name}.`;
-						} else {
-							delete errors.phoneNumber;
-						}
-					}
-				}
-			}
-		}
+		// 	if (!phoneNumber || phoneNumber === "") {
+		// 		errors.phoneNumber = "Required for the selected country";
+		// 	} else {
+		// 		const countryDetails = getCountryByCode(country);
+		// 		if (!countryDetails) {
+		// 			errors.phoneNumber = "Invalid country selected";
+		// 			errors.country = "Invalid country selected";
+		// 		} else {
+		// 			const phonePattern = getPhonePattern(country);
+		// 			if (!phonePattern) {
+		// 				errors.phoneNumber =
+		// 					"Phone number pattern for country not found";
+		// 			} else {
+		// 				const phoneRegex = new RegExp(phonePattern);
+		// 				if (!phoneRegex.test(phoneNumber)) {
+		// 					errors.phoneNumber = `Please enter a valid phone number for ${countryDetails.name}.`;
+		// 				} else {
+		// 					delete errors.phoneNumber;
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
+		if (!fieldName || fieldName === "phoneNumber") {
+            if (!country) {
+                errors.phoneNumber =
+                    "Please select the country before entering the phone number";
+                return;
+            }
+            if (!phoneNumber || phoneNumber === "") {
+                errors.phone = "Required for the selected country";
+            } else {
+                const countryDetails = getCountryByCode(country);
+
+                if (!countryDetails) {
+                    errors.phoneNumber =
+                        "Invalid country selected. Please reselect country.";
+                    errors.country = "Invalid country selected";
+                } else {
+                    const phonePattern = getPhonePattern(country);
+                    if (!phonePattern) {
+                        errors.phoneNumber =
+                            "Phone number pattern for country not found";
+                    } else {
+                        const phoneRegex = new RegExp(phonePattern);
+                        if (!phoneRegex.test(phoneNumber)) {
+                            const countryName =
+                                countryDetails.name ||
+                                country ||
+                                "selected country";
+                            errors.phoneNumber = `Please enter a valid phone number for ${countryName}.`;
+                        } else {
+                            delete errors.phoneNumber;
+                        }
+                    }
+                }
+            }
+        }
 
 		if (!fieldName || fieldName === "country") {
 			if (!country) {
@@ -193,15 +230,14 @@
 		// filteredCountries = countries;
 		searchTerm = `${selectedCountry.name} `;
 		showDropdown = false;
+		highlightedIndex = -1;
 		validateField("country");
 		validatePhoneNumber(country, phoneNumber);
 
 		delete errors.country;
 		// console.log('Selected Country:', country);
 	}
-	function toggleDropdown() {
-		showDropdown = !showDropdown;
-	}
+
 	function filterCountries() {
 		filteredCountries = countries.filter(
 			(country) =>
@@ -222,53 +258,179 @@
 			showDropdown = filteredCountries.length > 0; // Show dropdown only if results exist
 		}
 	}
+	function handleKeyDown(event) {
+        const exactCountryMatch = countries.some(
+            (c) => c.name === country && c.name === searchTerm,
+        );
+        if (
+            exactCountryMatch &&
+            !(
+                event.key === "Backspace" ||
+                event.key === "Delete" ||
+                event.key === "ArrowLeft" ||
+                event.key === "ArrowRight" ||
+                event.key === "Home" ||
+                event.key === "End" ||
+                event.key === "Tab" ||
+                event.key === "Escape" ||
+                event.ctrlKey ||
+                event.key === "ArrowUp" ||
+                event.key === "ArrowDown"
+            )
+        ) {
+            const input = document.querySelector('input[name="country"]');
+            if (
+                input &&
+                (input.selectionStart !== input.selectionEnd ||
+                    input.selectionStart === 0)
+            ) {
+                return true;
+            }
+            event.preventDefault();
+            return false;
+        }
 
+        if (showDropdown) {
+            switch (event.key) {
+                case "ArrowDown":
+                    event.preventDefault();
+                    if (filteredCountries.length > 0) {
+                        highlightedIndex =
+                            (highlightedIndex + 1) % filteredCountries.length;
+                        scrollToHighlighted();
+                    }
+                    break;
+                case "ArrowUp":
+                    event.preventDefault();
+                    if (filteredCountries.length > 0) {
+                        highlightedIndex =
+                            highlightedIndex <= 0
+                                ? filteredCountries.length - 1
+                                : highlightedIndex - 1;
+                        scrollToHighlighted();
+                    }
+                    break;
+            }
+        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            showDropdown = true;
+            if (filteredCountries.length > 0) {
+                highlightedIndex = 0;
+            }
+            event.preventDefault();
+        }
+        if (event.key === "Enter") {
+            if (
+                highlightedIndex >= 0 &&
+                highlightedIndex < filteredCountries.length
+            ) {
+                selectCountry(filteredCountries[highlightedIndex]);
+                event.preventDefault();
+            } else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
+                selectCountry(filteredCountries[0]);
+                event.preventDefault();
+            }
+        } else if (event.key === "Escape") {
+            showDropdown = false;
+            highlightedIndex = -1;
+        }
+    }
+    function scrollToHighlighted() {
+        if (!dropdownEl) return;
+        const items = dropdownEl.querySelectorAll("li");
+        if (items[highlightedIndex]) {
+            items[highlightedIndex].scrollIntoView({
+                block: "nearest",
+            });
+        }
+    }
+    function toggleDropdown() {
+        showDropdown = !showDropdown;
+        if (showDropdown) {
+            if (country.length > 0) {
+                searchTerm = country;
+                filterCountriesWithoutAutoSelect();
+            } else {
+                filteredCountries = countries;
+            }
+        }
+    }
+    function handleInputChange(event) {
+        searchTerm = event.target.value;
+        country = event.target.value;
+        const isDeleting =
+            event.inputType === "deleteContentBackward" ||
+            event.inputType === "deleteContentForward";
+        filterCountriesWithoutAutoSelect();
+        showDropdown = filteredCountries.length > 0;
+
+        if (searchTerm.length > 0 && !isDeleting) {
+            const codeSearch = searchTerm.replace("+", "").trim();
+            if (codeSearch.length > 0) {
+                const exactCodeMatches = filteredCountries.filter(
+                    (country) => country.code.replace("+", "") === codeSearch,
+                );
+
+                if (exactCodeMatches.length === 1) {
+                    selectCountry(exactCodeMatches[0]);
+                    return;
+                }
+            }
+
+            const countriesStartingWith = filteredCountries.filter((country) =>
+                country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+            );
+
+            if (countriesStartingWith.length === 1) {
+                selectCountry(countriesStartingWith[0]);
+            }
+        }
+    }
 	// function handleInputChange(event) {
 	// 	searchTerm = event.target.value;
 	// 	filterCountries();
 	// }
 
-	function handleInputChange(event) {
-		// Get the current input value
-		searchTerm = event.target.value;
+	// function handleInputChange(event) {
+	// 	// Get the current input value
+	// 	searchTerm = event.target.value;
 
-		// Track if user is deleting text
-		const isDeleting =
-			event.inputType === "deleteContentBackward" ||
-			event.inputType === "deleteContentForward";
+	// 	// Track if user is deleting text
+	// 	const isDeleting =
+	// 		event.inputType === "deleteContentBackward" ||
+	// 		event.inputType === "deleteContentForward";
 
-		if (searchTerm.length > 0 && !isDeleting) {
-			// Filter countries
-			filterCountriesWithoutAutoSelect();
+	// 	if (searchTerm.length > 0 && !isDeleting) {
+	// 		// Filter countries
+	// 		filterCountriesWithoutAutoSelect();
 
-			// Show dropdown with filtered results
-			showDropdown = filteredCountries.length > 0;
+	// 		// Show dropdown with filtered results
+	// 		showDropdown = filteredCountries.length > 0;
 
-			// Check for country code matches specifically
-			const codeSearch = searchTerm.replace("+", "").trim();
-			if (codeSearch.length > 0) {
-				const exactCodeMatches = filteredCountries.filter(
-					(country) => country.code.replace("+", "") === codeSearch,
-				);
+	// 		// Check for country code matches specifically
+	// 		const codeSearch = searchTerm.replace("+", "").trim();
+	// 		if (codeSearch.length > 0) {
+	// 			const exactCodeMatches = filteredCountries.filter(
+	// 				(country) => country.code.replace("+", "") === codeSearch,
+	// 			);
 
-				if (exactCodeMatches.length === 1) {
-					selectCountry(exactCodeMatches[0]);
-					return;
-				}
-			}
+	// 			if (exactCodeMatches.length === 1) {
+	// 				selectCountry(exactCodeMatches[0]);
+	// 				return;
+	// 			}
+	// 		}
 
-			const countriesStartingWith = filteredCountries.filter((country) =>
-				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
-			);
+	// 		const countriesStartingWith = filteredCountries.filter((country) =>
+	// 			country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+	// 		);
 
-			if (countriesStartingWith.length === 1) {
-				selectCountry(countriesStartingWith[0]);
-			}
-		} else {
-			filterCountriesWithoutAutoSelect();
-			showDropdown = filteredCountries.length > 0;
-		}
-	}
+	// 		if (countriesStartingWith.length === 1) {
+	// 			selectCountry(countriesStartingWith[0]);
+	// 		}
+	// 	} else {
+	// 		filterCountriesWithoutAutoSelect();
+	// 		showDropdown = filteredCountries.length > 0;
+	// 	}
+	// }
 	// function filterCountriesWithoutAutoSelect() {
 	// 	filteredCountries = countries.filter(
 	// 		(country) =>
@@ -729,6 +891,7 @@ codeMatches.forEach(country => {
 								placeholder="Search Country"
 								on:input={handleInputChange}
 								on:click={toggleDropdown}
+								on:keydown={handleKeyDown}
 								on:input={(e) => {
 									country = country.trim();
 
@@ -746,22 +909,42 @@ codeMatches.forEach(country => {
 							/>
 							{#if showDropdown}
 								<div
+									bind:this={dropdownEl}
 									class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
 								>
 									<ul
 										class="max-h-60 overflow-y-auto text-sm"
 									>
-										{#each filteredCountries as country (country.name)}
+										{#each filteredCountries as country, index}
 											<!-- svelte-ignore a11y-click-events-have-key-events -->
 											<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 											<li
 												on:click={() =>
 													selectCountry(country)}
-												class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+												class="px-4 py-2 cursor-pointer {highlightedIndex ===
+												index
+													? 'bg-primary-100'
+													: 'hover:bg-primary-50'}"
 											>
 												{country.name} ({country.code})
 											</li>
 										{/each}
+										{#if filteredCountries.length === 0}
+											<div
+												class="flex items-center px-4 py-3"
+											>
+												<Icon
+													icon="tabler:info-square-rounded-filled"
+													class="text-red-500 text-base mr-2"
+												/>
+												<li
+													class="text-gray-800 text-xs"
+												>
+													No matching countries
+													found!
+												</li>
+											</div>
+										{/if}
 									</ul>
 								</div>
 							{/if}
