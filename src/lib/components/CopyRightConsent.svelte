@@ -3,21 +3,23 @@
     import { enhance } from "$app/forms";
     import { toast, Toaster } from "svelte-sonner";
     import Icon from "@iconify/svelte";
-    import { countries, phoneNumberPatterns} from "$lib/Data/constants.js";
+    import { countries, phoneNumberPatterns } from "$lib/Data/constants.js";
     export let data;
     // console.log(data, "i a consent");
     let submitting = false;
-    let isChecked =  false;
-	let mathQuestion = '';
-	let mathAnswer = 0;
-	let userAnswer = '';
-	let mathError = '';
+    let isChecked = false;
+    let highlightedIndex = -1;
+    let dropdownEl;
+    let mathQuestion = "";
+    let mathAnswer = 0;
+    let userAnswer = "";
+    let mathError = "";
     let submittingForm = false;
-	let isLoadingemail = false;
-	let progress = 0;
-	let errorMessagecap = '';
-	let inputReadOnly = false;
-    let captchaToken = '';
+    let isLoadingemail = false;
+    let progress = 0;
+    let errorMessagecap = "";
+    let inputReadOnly = false;
+    let captchaToken = "";
 
     let isLoadingPhone = false;
     let isEmailVerified = false;
@@ -39,8 +41,8 @@
     let enteredOtpemail = "";
     let isOtpVerified = false;
     let form3;
-    let errorMessage = '';
-	let rotationClass = '';
+    let errorMessage = "";
+    let rotationClass = "";
     let thankYouMessageVisible = false;
     let uploadOption = "";
     let email = "";
@@ -70,131 +72,132 @@
     let ExtractedData = null;
     let image = null;
     let fileName = "";
-    let successMessage = '';
+    let successMessage = "";
     let showCaptchaPopup = false;
-    let loading=false;
+    let loading = false;
     function submitFormAutomatically() {
-		loading = false;
-		if (form) {
-			const formData = new FormData(form);
+        loading = false;
+        if (form) {
+            const formData = new FormData(form);
 
-			fetch(form.action, {
-				method: form.method,
-				body: formData
-			})
-				.then((response) => response.json())
-				.then((data) => {
-					// console.log("respose Status",data.status);
-					window.scrollTo({ top: 0, behavior: 'smooth' });
-					if (data.status === 200) {
-						showSuccesDiv = true;
-						window.scrollTo({ top: 0, behavior: 'smooth' });
-					} else {
-						showFailureDiv = true;
-						window.scrollTo({ top: 0, behavior: 'smooth' });
-					}
-				});
-		}
-	}
-    
-	function generateMathQuestion() {
-		const num1 = Math.floor(Math.random() * 10) + 1;
-		const num2 = Math.floor(Math.random() * 10) + 1;
-		const operations = ['+', '-', '*'];
-		const randomOperation = operations[Math.floor(Math.random() * operations.length)];
+            fetch(form.action, {
+                method: form.method,
+                body: formData,
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    // console.log("respose Status",data.status);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    if (data.status === 200) {
+                        showSuccesDiv = true;
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                    } else {
+                        showFailureDiv = true;
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                });
+        }
+    }
 
-		if (randomOperation === '-') {
-			const larger = Math.max(num1, num2);
-			const smaller = Math.min(num1, num2);
-			mathQuestion = `What is ${larger} - ${smaller}?`;
-			mathAnswer = larger - smaller;
-		} else if (randomOperation === '+') {
-			mathQuestion = `What is ${num1} + ${num2}?`;
-			mathAnswer = num1 + num2;
-		} else if (randomOperation === '*') {
-			mathQuestion = `What is ${num1} * ${num2}?`;
-			mathAnswer = num1 * num2;
-		}
-	}
+    function generateMathQuestion() {
+        const num1 = Math.floor(Math.random() * 10) + 1;
+        const num2 = Math.floor(Math.random() * 10) + 1;
+        const operations = ["+", "-", "*"];
+        const randomOperation =
+            operations[Math.floor(Math.random() * operations.length)];
+
+        if (randomOperation === "-") {
+            const larger = Math.max(num1, num2);
+            const smaller = Math.min(num1, num2);
+            mathQuestion = `What is ${larger} - ${smaller}?`;
+            mathAnswer = larger - smaller;
+        } else if (randomOperation === "+") {
+            mathQuestion = `What is ${num1} + ${num2}?`;
+            mathAnswer = num1 + num2;
+        } else if (randomOperation === "*") {
+            mathQuestion = `What is ${num1} * ${num2}?`;
+            mathAnswer = num1 * num2;
+        }
+    }
     function validateMathCaptcha(e) {
-		const userResponse = parseInt(userAnswer.trim());
-		if (userResponse === mathAnswer) {
-			submittingForm = true;
-			if (submittingForm) {
-				const interval = setInterval(() => {
-					progress += 5;
-					if ((progress = 96)) {
-						clearInterval(interval);
-					}
-				}, 500);
-			}
-			errorMessagecap = '';
-			successMessage = 'Captcha verified Successfully!!!';
-			isChecked = true;
-			captchaVerified = true;
-			loading = true;
-			inputReadOnly = true;
+        const userResponse = parseInt(userAnswer.trim());
+        if (userResponse === mathAnswer) {
+            submittingForm = true;
+            if (submittingForm) {
+                const interval = setInterval(() => {
+                    progress += 5;
+                    if ((progress = 96)) {
+                        clearInterval(interval);
+                    }
+                }, 500);
+            }
+            errorMessagecap = "";
+            successMessage = "Captcha verified Successfully!!!";
+            isChecked = true;
+            captchaVerified = true;
+            loading = true;
+            inputReadOnly = true;
 
-			const tokenPayload = {
-				question: mathQuestion,
-				answer: mathAnswer
-			};
-			captchaToken = btoa(JSON.stringify(tokenPayload));
+            const tokenPayload = {
+                question: mathQuestion,
+                answer: mathAnswer,
+            };
+            captchaToken = btoa(JSON.stringify(tokenPayload));
 
-			setTimeout(() => {
-				submitFormAutomatically();
-			}, 50);
-		} else {
-			successMessage = '';
-			errorMessagecap = 'Incorrect answer, try again.';
-			isChecked = false;
+            setTimeout(() => {
+                submitFormAutomatically();
+            }, 50);
+        } else {
+            successMessage = "";
+            errorMessagecap = "Incorrect answer, try again.";
+            isChecked = false;
 
-			// setTimeout(() => {
-			// 	generateMathQuestion();
-			// 	userAnswer = '';
-			// 	errorMessagecap = '';
-			// 	// setActionMessage('Something went wrong while processing your message', false);
-			// }, 4000);
-		}
-	}
+            // setTimeout(() => {
+            // 	generateMathQuestion();
+            // 	userAnswer = '';
+            // 	errorMessagecap = '';
+            // 	// setActionMessage('Something went wrong while processing your message', false);
+            // }, 4000);
+        }
+    }
     function handleClickOutside(event) {
         if (!event.target.closest(".dropdown-container")) {
             showDropdown = false;
         }
     }
     // function refreshMathQuestion() {
-	// 	rotationClass = 'rotate-[360deg]';
+    // 	rotationClass = 'rotate-[360deg]';
 
-	// 	setTimeout(() => {
-	// 		generateMathQuestion();
-	// 		rotationClass = '';
-	// 	}, 1000);
-	// }
-	function refreshMathQuestion(event) {
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
-  
-  rotationClass = "rotate-[360deg]";
+    // 	setTimeout(() => {
+    // 		generateMathQuestion();
+    // 		rotationClass = '';
+    // 	}, 1000);
+    // }
+    function refreshMathQuestion(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
 
-  setTimeout(() => {
-    generateMathQuestion();
-    rotationClass = "";
-    userAnswer = ""; // Clear the previous answer when refreshing
-    errorMessagecap = ""; // Clear any error messages
-    successMessage = ""; // Clear any success messages
-  }, 1000);
-}
-	function showPopup() {
-		if (isChecked) {
-			showCaptchaPopup = true;
-			generateMathQuestion();
-		}
-	}
+        rotationClass = "rotate-[360deg]";
+
+        setTimeout(() => {
+            generateMathQuestion();
+            rotationClass = "";
+            userAnswer = ""; // Clear the previous answer when refreshing
+            errorMessagecap = ""; // Clear any error messages
+            successMessage = ""; // Clear any success messages
+        }, 1000);
+    }
+    function showPopup() {
+        if (isChecked) {
+            showCaptchaPopup = true;
+            generateMathQuestion();
+        }
+    }
     onMount(() => {
         if (data && data.profile) {
-            firstname = `${data.profile.firstName || ""} `.trim();
+            firstname = `${data.profile.firstName || data?.authedUser?.username|| ""} `.trim();
             lastname = `${data.profile.lastName || ""}`.trim();
             email = data.profile.email || "";
             phone = data.profile.cellPhone || "";
@@ -237,37 +240,37 @@
         document.addEventListener("click", handleClickOutside);
         return () => document.removeEventListener("click", handleClickOutside);
     });
-	// function onInputChange() {
-	// 	if (userAnswer.trim()) {
-	// 		validateMathCaptcha();
-	// 	} else {
-	// 		errorMessagecap = '';
-	// 	}
-	// }
+    // function onInputChange() {
+    // 	if (userAnswer.trim()) {
+    // 		validateMathCaptcha();
+    // 	} else {
+    // 		errorMessagecap = '';
+    // 	}
+    // }
     function onInputChange() {
-  if (errorMessagecap && userAnswer.trim()) {
-    errorMessagecap = "";
-  }
-}
-function verifyCaptcha() {
-  if (userAnswer.trim()) {
-    validateMathCaptcha();
-  } else {
-    errorMessagecap = "Please answer the question";
-  }
-}
+        if (errorMessagecap && userAnswer.trim()) {
+            errorMessagecap = "";
+        }
+    }
+    function verifyCaptcha() {
+        if (userAnswer.trim()) {
+            validateMathCaptcha();
+        } else {
+            errorMessagecap = "Please answer the question";
+        }
+    }
 
-	function closeCaptchaPopup() {
-		showCaptchaPopup = false;
+    function closeCaptchaPopup() {
+        showCaptchaPopup = false;
 
-		userAnswer = '';
+        userAnswer = "";
 
-		if (successMessage) {
-			isChecked = true;
-		} else {
-			isChecked = false;
-		}
-	}
+        if (successMessage) {
+            isChecked = true;
+        } else {
+            isChecked = false;
+        }
+    }
 
     function handleFileChange(event) {
         const file = event.target.files[0];
@@ -315,7 +318,6 @@ function verifyCaptcha() {
     }
 
     const handlesubmit = async (data) => {
-        
         if (!formValid()) {
             cancel();
             return;
@@ -333,7 +335,6 @@ function verifyCaptcha() {
                     submitting = false;
 
                     showSuccesDiv = true;
-                  
                 }
             };
         } catch (error) {
@@ -353,7 +354,6 @@ function verifyCaptcha() {
     };
 
     const validateField = (fieldName) => {
-    
         if (!fieldName || fieldName === "title") {
             if (!title) {
                 errors = { ...errors, title: "Title is required" };
@@ -412,21 +412,20 @@ function verifyCaptcha() {
             }
         }
 
-
         if (!fieldName || fieldName === "email") {
-    if (!email) {
-        errors.email = "Email is required.";
-    } else if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)) {
-        errors.email = "Please enter a valid email address.";
-    } else if (email.split("@")[1].includes("gamil")) {
-        errors.email = "Email domain cannot be gmail.com.";
-    } else {
-        delete errors.email;
-    }
-}
+            if (!email) {
+                errors.email = "Email is required.";
+            } else if (
+                !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
+            ) {
+                errors.email = "Please enter a valid email address.";
+            } else if (email.split("@")[1].includes("gamil")) {
+                errors.email = "Email domain cannot be gmail.com.";
+            } else {
+                delete errors.email;
+            }
+        }
 
-
-       
         if (!fieldName || fieldName === "description") {
             if (
                 !description ||
@@ -442,41 +441,47 @@ function verifyCaptcha() {
         }
 
         if (!fieldName || fieldName === "country") {
-    if (!country || country === "") {
-        errors.country = "Please select a country";
-    } else {
-        delete errors.country;
-    }
-}
-        if (!fieldName || fieldName === "phone") {
-    if (!country) {
-        errors.phone = "Please select the country before entering the phone number";
-        return;
-    }
-    if (!phone || phone === "") {
-        errors.phone = "Required for the selected country";
-    } else {
-        const countryDetails = getCountryByCode(country);
-        
-        if (!countryDetails) {
-            errors.phone = "Invalid country selected. Please reselect country.";
-            errors.country = "Invalid country selected";
-        } else {
-            const phonePattern = getPhonePattern(country);
-            if (!phonePattern) {
-                errors.phone = "Phone number pattern for country not found";
+            if (!country || country === "") {
+                errors.country = "Please select a country";
             } else {
-                const phoneRegex = new RegExp(phonePattern);
-                if (!phoneRegex.test(phone)) {
-                    const countryName = countryDetails.name || country || "selected country";
-                    errors.phone = `Please enter a valid phone number for ${countryName}.`;
+                delete errors.country;
+            }
+        }
+        if (!fieldName || fieldName === "phone") {
+            if (!country) {
+                errors.phone =
+                    "Please select the country before entering the phone number";
+                return;
+            }
+            if (!phone || phone === "") {
+                errors.phone = "Required for the selected country";
+            } else {
+                const countryDetails = getCountryByCode(country);
+
+                if (!countryDetails) {
+                    errors.phone =
+                        "Invalid country selected. Please reselect country.";
+                    errors.country = "Invalid country selected";
                 } else {
-                    delete errors.phone;
+                    const phonePattern = getPhonePattern(country);
+                    if (!phonePattern) {
+                        errors.phone =
+                            "Phone number pattern for country not found";
+                    } else {
+                        const phoneRegex = new RegExp(phonePattern);
+                        if (!phoneRegex.test(phone)) {
+                            const countryName =
+                                countryDetails.name ||
+                                country ||
+                                "selected country";
+                            errors.phone = `Please enter a valid phone number for ${countryName}.`;
+                        } else {
+                            delete errors.phone;
+                        }
+                    }
                 }
             }
         }
-    }
-}
         if (Object.keys(errors).length > 0) {
             isValid = false;
         }
@@ -508,79 +513,26 @@ function verifyCaptcha() {
 
     let searchTerm = "";
     function selectCountry(selectedCountry) {
-		country = selectedCountry.name;
-		searchTerm = selectedCountry.name;
-		showDropdown = false;
-		validateField('country');
-		validatePhoneNumber(country, phone);
+        country = selectedCountry.name;
+        searchTerm = selectedCountry.name;
+        showDropdown = false;
+        highlightedIndex = -1;
+        validateField("country");
+        validatePhoneNumber(country, phone);
         validateField("phone");
 
-		delete errors.country;
-		const countryInput = document.querySelector('input[name="country"]');
-		if (countryInput) {
-			countryInput.value = selectedCountry.name;
-		}
-        if (!phone || phone === "") {
-               errors.phone = "Required for the selected country.";
+        delete errors.country;
+        const countryInput = document.querySelector('input[name="country"]');
+        if (countryInput) {
+            countryInput.value = selectedCountry.name;
         }
-        else {
-        delete errors.phone; // Remove any errors if conditions are satisfied
+        if (!phone || phone === "") {
+            errors.phone = "Required for the selected country.";
+        } else {
+            delete errors.phone; // Remove any errors if conditions are satisfied
+        }
     }
-	}
 
-
-function handleKeyDown(event) {
-		const exactCountryMatch = countries.some((c) => c.name === country && c.name === searchTerm);
-		if (
-			exactCountryMatch &&
-			!(
-				event.key === 'Backspace' ||
-				event.key === 'Delete' ||
-				event.key === 'ArrowLeft' ||
-				event.key === 'ArrowRight' ||
-				event.key === 'Home' ||
-				event.key === 'End' ||
-				event.key === 'Tab' ||
-				event.key === 'Escape' ||
-				event.ctrlKey
-			)
-		) {
-			// Block adding characters to an exact match
-			event.preventDefault();
-			return false;
-		}
-
-		if (event.key === 'Enter' && searchTerm.length >= 3 && filteredCountries.length > 0) {
-			selectCountry(filteredCountries[0]);
-			event.preventDefault();
-		} else if (event.key === 'Escape') {
-			showDropdown = false;
-		}
-		// Allow backspace/delete to work normally - no special handling needed
-	}
-    function toggleDropdown() {
-        showDropdown = !showDropdown;
-    }
-    // function filterCountries() {
-    //     filteredCountries = countries.filter(
-    //         (country) =>
-    //             country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    //             country.code
-    //                 .replace("+", "")
-    //                 .includes(searchTerm.replace("+", "").toLowerCase()),
-    //     );
-    //     if (
-    //         filteredCountries.length === 1 &&
-    //         (filteredCountries[0].name.toLowerCase() ===
-    //             searchTerm.toLowerCase() ||
-    //             filteredCountries[0].code.replace("+", "").toLowerCase() ===
-    //                 searchTerm.replace("+", "").toLowerCase())
-    //     ) {
-    //         selectCountry(filteredCountries[0]);
-    //     } else {
-    //         showDropdown = filteredCountries.length > 0;
-    //     }
-    // }
     function filterCountries() {
         filteredCountries = countries.filter(
             (country) =>
@@ -601,74 +553,159 @@ function handleKeyDown(event) {
             showDropdown = filteredCountries.length > 0; // Show dropdown only if results exist
         }
     }
-    // function handleInputChange(event) {
-    //     searchTerm = event.target.value;
-    //     filterCountries();
-    // }
-	function handleInputChange(event) {
-		searchTerm = event.target.value;
-		const isDeleting =
-			event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward';
+    function handleKeyDown(event) {
+        const exactCountryMatch = countries.some(
+            (c) => c.name === country && c.name === searchTerm,
+        );
+        if (
+            exactCountryMatch &&
+            !(
+                event.key === "Backspace" ||
+                event.key === "Delete" ||
+                event.key === "ArrowLeft" ||
+                event.key === "ArrowRight" ||
+                event.key === "Home" ||
+                event.key === "End" ||
+                event.key === "Tab" ||
+                event.key === "Escape" ||
+                event.ctrlKey ||
+                event.key === "ArrowUp" ||
+                event.key === "ArrowDown"
+            )
+        ) {
+            const input = document.querySelector('input[name="country"]');
+            if (
+                input &&
+                (input.selectionStart !== input.selectionEnd ||
+                    input.selectionStart === 0)
+            ) {
+                return true;
+            }
+            event.preventDefault();
+            return false;
+        }
 
-		if (searchTerm.length > 0 && !isDeleting) {
-			filterCountriesWithoutAutoSelect();
-			showDropdown = filteredCountries.length > 0;
-			const codeSearch = searchTerm.replace('+', '').trim();
-			if (codeSearch.length > 0) {
-				const exactCodeMatches = filteredCountries.filter(
-					(country) => country.code.replace('+', '') === codeSearch
-				);
+        if (showDropdown) {
+            switch (event.key) {
+                case "ArrowDown":
+                    event.preventDefault();
+                    if (filteredCountries.length > 0) {
+                        highlightedIndex =
+                            (highlightedIndex + 1) % filteredCountries.length;
+                        scrollToHighlighted();
+                    }
+                    break;
+                case "ArrowUp":
+                    event.preventDefault();
+                    if (filteredCountries.length > 0) {
+                        highlightedIndex =
+                            highlightedIndex <= 0
+                                ? filteredCountries.length - 1
+                                : highlightedIndex - 1;
+                        scrollToHighlighted();
+                    }
+                    break;
+            }
+        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            showDropdown = true;
+            if (filteredCountries.length > 0) {
+                highlightedIndex = 0;
+            }
+            event.preventDefault();
+        }
+        if (event.key === "Enter") {
+            if (
+                highlightedIndex >= 0 &&
+                highlightedIndex < filteredCountries.length
+            ) {
+                selectCountry(filteredCountries[highlightedIndex]);
+                event.preventDefault();
+            } else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
+                selectCountry(filteredCountries[0]);
+                event.preventDefault();
+            }
+        } else if (event.key === "Escape") {
+            showDropdown = false;
+            highlightedIndex = -1;
+        }
+    }
+    function scrollToHighlighted() {
+        if (!dropdownEl) return;
+        const items = dropdownEl.querySelectorAll("li");
+        if (items[highlightedIndex]) {
+            items[highlightedIndex].scrollIntoView({
+                block: "nearest",
+            });
+        }
+    }
+    function toggleDropdown() {
+        showDropdown = !showDropdown;
+        if (showDropdown) {
+            if (country.length > 0) {
+                searchTerm = country;
+                filterCountriesWithoutAutoSelect();
+            } else {
+                filteredCountries = countries;
+            }
+        }
+    }
+    function handleInputChange(event) {
+        searchTerm = event.target.value;
+        country = event.target.value;
+        const isDeleting =
+            event.inputType === "deleteContentBackward" ||
+            event.inputType === "deleteContentForward";
+        filterCountriesWithoutAutoSelect();
+        showDropdown = filteredCountries.length > 0;
 
-				if (exactCodeMatches.length === 1) {
-					selectCountry(exactCodeMatches[0]);
-					return;
-				}
-			}
+        if (searchTerm.length > 0 && !isDeleting) {
+            const codeSearch = searchTerm.replace("+", "").trim();
+            if (codeSearch.length > 0) {
+                const exactCodeMatches = filteredCountries.filter(
+                    (country) => country.code.replace("+", "") === codeSearch,
+                );
 
-			const countriesStartingWith = filteredCountries.filter((country) =>
-				country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-			);
+                if (exactCodeMatches.length === 1) {
+                    selectCountry(exactCodeMatches[0]);
+                    return;
+                }
+            }
 
-			if (countriesStartingWith.length === 1) {
-				selectCountry(countriesStartingWith[0]);
-			}
-		} else {
-			filterCountriesWithoutAutoSelect();
-			showDropdown = filteredCountries.length > 0;
-		}
-	}
-    // function filterCountriesWithoutAutoSelect() {
-    //     filteredCountries = countries.filter(
-    //         (country) =>
-    //             country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    //             country.code
-    //                 .replace("+", "")
-    //                 .includes(searchTerm.replace("+", "").toLowerCase()),
-    //     );
-    // }
+            const countriesStartingWith = filteredCountries.filter((country) =>
+                country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+            );
+
+            if (countriesStartingWith.length === 1) {
+                selectCountry(countriesStartingWith[0]);
+            }
+        }
+    }
 
     function filterCountriesWithoutAutoSelect() {
+        const countriesStartingWith = countries.filter((country) =>
+            country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+        );
 
-const countriesStartingWith = countries.filter(
-    (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-);
+        const countriesContaining = countries.filter(
+            (country) =>
+                !country.name
+                    .toLowerCase()
+                    .startsWith(searchTerm.toLowerCase()) &&
+                country.name.toLowerCase().includes(searchTerm.toLowerCase()),
+        );
 
-const countriesContaining = countries.filter(
-    (country) => 
-        !country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) && 
-        country.name.toLowerCase().includes(searchTerm.toLowerCase())
-);
-
-filteredCountries = [...countriesStartingWith, ...countriesContaining];
-const codeMatches = countries.filter(
-    (country) => country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
-);
-codeMatches.forEach(country => {
-    if (!filteredCountries.some(c => c.name === country.name)) {
-        filteredCountries.push(country);
+        filteredCountries = [...countriesStartingWith, ...countriesContaining];
+        const codeMatches = countries.filter((country) =>
+            country.code
+                .replace("+", "")
+                .includes(searchTerm.replace("+", "").toLowerCase()),
+        );
+        codeMatches.forEach((country) => {
+            if (!filteredCountries.some((c) => c.name === country.name)) {
+                filteredCountries.push(country);
+            }
+        });
     }
-});
-}
     let filteredCountries = countries;
     let showDropdown = false;
     function getCountryByCode(name) {
@@ -722,8 +759,8 @@ codeMatches.forEach(country => {
         }
     };
     $: if (country) {
-    validateField("phone");
-}
+        validateField("phone");
+    }
 </script>
 
 {#if showSuccesDiv}
@@ -768,17 +805,21 @@ codeMatches.forEach(country => {
 {:else}
     <div class="lg:w-11/12 max-w-7xl px-3 mx-auto mb-8">
         <div
-            class="bg-white mx-auto shadow rounded-lg  lg:w-full w-11/12 py-6 px-4 md:px-8 lg:px-10">
-            <h1 class="sm:text-3xl text-xl font-bold mb-6 mt-3 text-center text-gray-800">
+            class="bg-white mx-auto shadow rounded-lg lg:w-full w-11/12 py-6 px-4 md:px-8 lg:px-10"
+        >
+            <h1
+                class="sm:text-3xl text-xl font-bold mb-6 mt-3 text-center text-gray-800"
+            >
                 Copyright Consent
             </h1>
 
             <div
-                class="bg-primary-50 border-l-4 border-primary-400 p-4 mb-6 rounded-r">
+                class="bg-primary-50 border-l-4 border-primary-400 p-4 mb-6 rounded-r"
+            >
                 <p class="mb-2 sm:text-sm text-xs text-gray-700">
                     In case you are requesting our consent to use copyrighted
                     material available on our website, please make sure that you
-                    have checked our <br>
+                    have checked our <br />
                     <a
                         href="/terms/site-and-terms"
                         class="text-primary-500 hover:text-primary-600 font-sm"
@@ -814,7 +855,7 @@ codeMatches.forEach(country => {
                 bind:this={form}
                 use:enhance={handlesubmit}
                 on:keydown={(event) => {
-                    if (event.key === 'Enter') {
+                    if (event.key === "Enter") {
                         event.preventDefault();
                     }
                 }}
@@ -869,7 +910,10 @@ codeMatches.forEach(country => {
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="First Name"
                             on:input={(e) => {
-                                e.target.value = e.target.value.replace(/^\s+/, '');
+                                e.target.value = e.target.value.replace(
+                                    /^\s+/,
+                                    "",
+                                );
                                 firstname = e.target.value;
                                 validateField("firstname");
                                 errors.firstname = !firstname
@@ -900,8 +944,11 @@ codeMatches.forEach(country => {
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Last Name"
                             on:input={(e) => {
-                                 e.target.value = e.target.value.replace(/^\s+/, '');
-                                 lastname = e.target.value;
+                                e.target.value = e.target.value.replace(
+                                    /^\s+/,
+                                    "",
+                                );
+                                lastname = e.target.value;
                                 validateField("lastname");
                                 errors.lastname = !lastname
                                     ? "*Required"
@@ -935,8 +982,11 @@ codeMatches.forEach(country => {
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Company Name"
                             on:input={(e) => {
-                                 e.target.value = e.target.value.replace(/^\s+/, '');
-                                 company = e.target.value;
+                                e.target.value = e.target.value.replace(
+                                    /^\s+/,
+                                    "",
+                                );
+                                company = e.target.value;
                                 validateField("company");
                                 errors.company = !company
                                     ? "*Required"
@@ -968,8 +1018,11 @@ codeMatches.forEach(country => {
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Street Name"
                             on:input={(e) => {
-                                 e.target.value = e.target.value.replace(/^\s+/, '');
-                                 street = e.target.value;
+                                e.target.value = e.target.value.replace(
+                                    /^\s+/,
+                                    "",
+                                );
+                                street = e.target.value;
                                 validateField("street");
                                 errors.street = !street
                                     ? "*Required"
@@ -995,7 +1048,6 @@ codeMatches.forEach(country => {
                             name="email"
                             id="email"
                             bind:value={email}
-                            
                         />
                         <form
                             action="?/verifyemail"
@@ -1059,11 +1111,15 @@ codeMatches.forEach(country => {
                                         id="email"
                                         bind:value={email}
                                         maxlength="50"
-                                        class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                                        class="w-full pr-10 placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                                         placeholder="Email"
                                         on:input={(e) => {
-                                             e.target.value = e.target.value.replace(/^\s+/, '');
-                                             email = e.target.value;
+                                            e.target.value =
+                                                e.target.value.replace(
+                                                    /^\s+/,
+                                                    "",
+                                                );
+                                            email = e.target.value;
                                             email = email.trim();
                                             validateField("email");
                                             errors.email = !email
@@ -1237,7 +1293,7 @@ codeMatches.forEach(country => {
                                             disabled={loadingotp}
                                             class="text-primary-400 hover:text-primary-500 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                          Get a new code
+                                            Get a new code
                                         </button>
                                     </div>
                                 </form>
@@ -1259,8 +1315,11 @@ codeMatches.forEach(country => {
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="City"
                             on:input={(e) => {
-                                 e.target.value = e.target.value.replace(/^\s+/, '');
-                                 city = e.target.value;
+                                e.target.value = e.target.value.replace(
+                                    /^\s+/,
+                                    "",
+                                );
+                                city = e.target.value;
                                 validateField("city");
                                 errors.city = !city
                                     ? "*Required"
@@ -1294,28 +1353,36 @@ codeMatches.forEach(country => {
                                 on:click={toggleDropdown}
                                 on:keydown={handleKeyDown}
                                 on:input={() => {
-                                    country= country.trim();
+                                    country = country.trim();
                                     validateField("country");
-                                    
-                                      
                                 }}
                                 class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             />
 
+                            <Icon
+                                icon={showDropdown
+                                    ? "ep:arrow-up-bold"
+                                    : "ep:arrow-down-bold"}
+                                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
+                            />
                             {#if showDropdown}
                                 <div
+                                    bind:this={dropdownEl}
                                     class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
                                 >
                                     <ul
                                         class="max-h-60 overflow-y-auto text-sm"
                                     >
-                                        {#each filteredCountries as country (country.name)}
+                                        {#each filteredCountries as country, index}
                                             <!-- svelte-ignore a11y-click-events-have-key-events -->
                                             <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                                             <li
                                                 on:click={() =>
                                                     selectCountry(country)}
-                                                class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                                                class="px-4 py-2 cursor-pointer {highlightedIndex ===
+                                                index
+                                                    ? 'bg-primary-100'
+                                                    : 'hover:bg-primary-50'}"
                                             >
                                                 {country.name} ({country.code})
                                             </li>
@@ -1389,14 +1456,17 @@ codeMatches.forEach(country => {
                             bind:value={description}
                             maxlength="200"
                             on:input={(e) => {
-                                 e.target.value = e.target.value.replace(/^\s+/, '');
-                                 description = e.target.value;
+                                e.target.value = e.target.value.replace(
+                                    /^\s+/,
+                                    "",
+                                );
+                                description = e.target.value;
                                 validateField("description");
                                 errors.description = !description
                                     ? "*Required"
                                     : /<script.*?>.*?<\/script>/i.test(
                                             description,
-                                        ) 
+                                        )
                                       ? "Script tags are not allowed."
                                       : !/^[A-Za-z" "/?().,:;""''*$#0-9\s]+$/.test(
                                               description,
@@ -1428,12 +1498,13 @@ codeMatches.forEach(country => {
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             title="Please enter a valid URL"
                             on:input={(e) => {
-                                e.target.value = e.target.value.replace(/^\s+/, '');
+                                e.target.value = e.target.value.replace(
+                                    /^\s+/,
+                                    "",
+                                );
                                 url = e.target.value;
-                               validateField("url");
-                               
-                                
-                           }}
+                                validateField("url");
+                            }}
                         />
                         {#if errors.url}
                             <p class="text-red-500 text-xs mt-1">
@@ -1443,11 +1514,16 @@ codeMatches.forEach(country => {
                     </div>
                 </div>
                 <span class="flex-1 w-1/3 mb-4">
-                    <label for="recaptcha" class="block text-sm font-medium text-gray-700">
+                    <label
+                        for="recaptcha"
+                        class="block text-sm font-medium text-gray-700"
+                    >
                     </label>
                     <input type="hidden" name="token" value={captchaToken} />
                     <div id="g-recaptcha-response">
-                        <label class="flex mt-5 md:mt-6 items-center justify-end space-x-2 mb-4 cursor-pointer">
+                        <label
+                            class="flex mt-5 md:mt-6 items-center justify-end space-x-2 mb-4 cursor-pointer"
+                        >
                             <input
                                 type="checkbox"
                                 name="captcha"
@@ -1461,68 +1537,87 @@ codeMatches.forEach(country => {
                                         showPopup();
                                     } else {
                                         if (Object.keys(errors).length > 0) {
-                                            toast.error('Please fill all the required fields.');
+                                            toast.error(
+                                                "Please fill all the required fields.",
+                                            );
                                             return;
                                         }
-                                        if (!(ProfileEmailVerified || authedUserEmailVerified === true)) {
+                                        if (
+                                            !(
+                                                ProfileEmailVerified ||
+                                                authedUserEmailVerified === true
+                                            )
+                                        ) {
                                             {
-                                                toast.error('Please verify your email to proceed');
+                                                toast.error(
+                                                    "Please verify your email to proceed",
+                                                );
                                                 return;
                                             }
                                         }
-                
+
                                         isChecked = false;
                                     }
                                 }}
-                                	on:keydown={(event) => {
-                                        if (event.key === 'Enter') {
-                                            event.preventDefault();
-                                        }
-                                    }}
+                                on:keydown={(event) => {
+                                    if (event.key === "Enter") {
+                                        event.preventDefault();
+                                    }
+                                }}
                             />
-                            <span class="text-gray-700 font-medium text-sm">Please verify you are human</span>
+                            <span class="text-gray-700 font-medium text-sm"
+                                >Please verify you are human</span
+                            >
                         </label>
 
                         <div class="mt-4 rounded flex items-center justify-end">
                             <button
-                                class="px-4 py-3 rounded bg-primary-400 to-primary-500 text-white font-medium shadow-lg hover:shadow-xl  md:w-1/4 w-1/2 transform transition hover:bg-primary-600"
+                                class="px-4 py-3 rounded bg-primary-400 to-primary-500 text-white font-medium shadow-lg hover:shadow-xl md:w-1/4 w-1/2 transform transition hover:bg-primary-600"
                                 on:click={(event) => {
                                     event.preventDefault();
-                
-                            
+
                                     if (!formValid()) {
                                         if (Object.keys(errors).length > 0) {
-                                            toast.error('Please fill all the required fields.');
+                                            toast.error(
+                                                "Please fill all the required fields.",
+                                            );
                                             return;
                                         }
-                
-                                        if (!(ProfileEmailVerified || authedUserEmailVerified === true)) {
+
+                                        if (
+                                            !(
+                                                ProfileEmailVerified ||
+                                                authedUserEmailVerified === true
+                                            )
+                                        ) {
                                             {
                                                 toast.error(
-                                                    'Please verify either your email or your phone number to proceed'
+                                                    "Please verify either your email or your phone number to proceed",
                                                 );
                                                 return;
                                             }
                                         }
                                     }
-                
+
                                     if (!isChecked) {
                                         toast.error(
-                                            'Please complete the CAPTCHA to proceed with the submission.'
+                                            "Please complete the CAPTCHA to proceed with the submission.",
                                         );
                                         return;
                                     }
-                
+
                                     handlesubmit({ event });
                                 }}
-                              	on:keydown={(event) => {
-                                    if (event.key === 'Enter') {
+                                on:keydown={(event) => {
+                                    if (event.key === "Enter") {
                                         event.preventDefault();
                                     }
                                 }}
                             >
                                 {#if submitting}
-                                    <span class="flex items-center justify-center">
+                                    <span
+                                        class="flex items-center justify-center"
+                                    >
                                         <Icon
                                             icon="line-md:loading-alt-loop"
                                             class="w-4 h-4 mr-2 animate-spin"
@@ -1534,101 +1629,130 @@ codeMatches.forEach(country => {
                                 {/if}
                             </button>
                         </div>
-                
+
                         {#if errorMessage}
-                            <p class="text-red-500 text-sm mt-2">{errorMessage}</p>
+                            <p class="text-red-500 text-sm mt-2">
+                                {errorMessage}
+                            </p>
                         {/if}
                     </div>
                 </span>
                 {#if showCaptchaPopup}
-                <!-- svelte-ignore a11y-click-events-have-key-events -->
-                <!-- svelte-ignore a11y-no-static-element-interactions -->
-                <div
-                    class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
-                    on:click={closeCaptchaPopup}
-                >
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <!-- svelte-ignore a11y-no-static-element-interactions -->
                     <div
-                        class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100"
-                        on:click|stopPropagation
+                        class="fixed !mt-0 inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
+                        on:click={closeCaptchaPopup}
                     >
-                        <h2 class="text-xl font-bold mb-6 text-gray-800 text-center">
-                            Verify You're Human
-                        </h2>
-            
-                        <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                            <p class="flex items-center justify-between text-gray-700 font-medium">
-                                <span class="text-lg">{mathQuestion}</span>
-                                <button
-                                class="ml-4 text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-all duration-300 {submittingForm ? 'opacity-50 cursor-not-allowed' : ''}"
-                                on:click={submittingForm ? null : (e) => refreshMathQuestion(e)}
-                                disabled={submittingForm}
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <div
+                            class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100"
+                            on:click|stopPropagation
+                        >
+                            <h2
+                                class="text-xl font-bold mb-6 text-gray-800 text-center"
+                            >
+                                Verify You're Human
+                            </h2>
+
+                            <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                                <p
+                                    class="flex items-center justify-between text-gray-700 font-medium"
                                 >
-                                <Icon
-                                    icon="ic:round-refresh"
-                                    class={`w-5 h-5 text-primary-600 ${submittingForm ? '' : 'cursor-pointer hover:scale-110'} transition transform ${rotationClass}`}
+                                    <span class="text-lg">{mathQuestion}</span>
+                                    <button
+                                        class="ml-4 text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-all duration-300 {submittingForm
+                                            ? 'opacity-50 cursor-not-allowed'
+                                            : ''}"
+                                        on:click={submittingForm
+                                            ? null
+                                            : (e) => refreshMathQuestion(e)}
+                                        disabled={submittingForm}
+                                    >
+                                        <Icon
+                                            icon="ic:round-refresh"
+                                            class={`w-5 h-5 text-primary-600 ${submittingForm ? "" : "cursor-pointer hover:scale-110"} transition transform ${rotationClass}`}
+                                        />
+                                    </button>
+                                </p>
+                            </div>
+
+                            <div class="mb-6">
+                                <input
+                                    type="text"
+                                    bind:value={userAnswer}
+                                    placeholder="Your Answer"
+                                    class="border border-gray-300 rounded-lg w-full p-3 text-gray-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all"
+                                    on:input={onInputChange}
+                                    readonly={inputReadOnly}
                                 />
-                            </button>
-                            </p>
-                        </div>
-                        
-                        <div class="mb-6">
-                            <input
-                                type="text"
-                                bind:value={userAnswer}
-                                placeholder="Your Answer"
-                                class="border border-gray-300 rounded-lg w-full p-3 text-gray-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all"
-                                on:input={onInputChange}
-                                readonly={inputReadOnly}
-                            />
-            
-                            {#if errorMessagecap}
-                                <p class="text-red-500 text-sm mt-2 flex items-center">
-                                    <Icon icon="mdi:alert-circle" class="w-4 h-4 mr-1" />
-                                    {errorMessagecap}
-                                </p>
-                            {/if}
-                            
-                            {#if successMessage}
-                                <p class="text-green-500 text-sm mt-2 flex items-center">
-                                    <Icon icon="mdi:check-circle" class="w-4 h-4 mr-1" />
-                                    {successMessage}
-                                </p>
-                            {/if}
-                        </div>
-                        
-                        {#if submittingForm}
-                            <div class="w-full mb-4">
-                                <p class="text-sm mb-2 flex items-center text-primary-600">
-                                    <Icon icon="mdi:loading" class="w-4 h-4 mr-2 animate-spin" />
-                                    Submitting form
-                                </p>
-                                <div class="relative">
-                                    <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                                        <!-- Bind the width of the progress bar to the progress variable -->
+
+                                {#if errorMessagecap}
+                                    <p
+                                        class="text-red-500 text-sm mt-2 flex items-center"
+                                    >
+                                        <Icon
+                                            icon="mdi:alert-circle"
+                                            class="w-4 h-4 mr-1"
+                                        />
+                                        {errorMessagecap}
+                                    </p>
+                                {/if}
+
+                                {#if successMessage}
+                                    <p
+                                        class="text-green-500 text-sm mt-2 flex items-center"
+                                    >
+                                        <Icon
+                                            icon="mdi:check-circle"
+                                            class="w-4 h-4 mr-1"
+                                        />
+                                        {successMessage}
+                                    </p>
+                                {/if}
+                            </div>
+
+                            {#if submittingForm}
+                                <div class="w-full mb-4">
+                                    <p
+                                        class="text-sm mb-2 flex items-center text-primary-600"
+                                    >
+                                        <Icon
+                                            icon="mdi:loading"
+                                            class="w-4 h-4 mr-2 animate-spin"
+                                        />
+                                        Submitting form
+                                    </p>
+                                    <div class="relative">
                                         <div
-                                            class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
-                                            style="width: {progress}%;"
-                                        ></div>
+                                            class="w-full h-2 bg-gray-200 rounded-full overflow-hidden"
+                                        >
+                                            <!-- Bind the width of the progress bar to the progress variable -->
+                                            <div
+                                                class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
+                                                style="width: {progress}%;"
+                                            ></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        {/if}
-                        <button
-  class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base {submittingForm ? 'opacity-50 cursor-not-allowed' : ''}"
-  on:click={(e) => {
-    if (!submittingForm) {
-      e.preventDefault();
-      e.stopPropagation();
-      verifyCaptcha();
-    }
-  }}
-  disabled={submittingForm}
->
-  {submittingForm ? 'Verifying...' : 'Verify Now'}
-</button>
-                        <!-- <button
+                            {/if}
+                            <button
+                                class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base {submittingForm
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : ''}"
+                                on:click={(e) => {
+                                    if (!submittingForm) {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        verifyCaptcha();
+                                    }
+                                }}
+                                disabled={submittingForm}
+                            >
+                                {submittingForm ? "Verifying..." : "Verify Now"}
+                            </button>
+                            <!-- <button
                             class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base"
                             on:click={() => {
                                 onInputChange();
@@ -1646,9 +1770,9 @@ codeMatches.forEach(country => {
                         >
                             Verify Now
                         </button> -->
+                        </div>
                     </div>
-                </div>
-            {/if}
+                {/if}
                 <!-- <div class="flex items-center justify-end mt-6">
                     <button
                         class="px-6 py-3 bg-primary-400 text-white text-sm rounded-md transition duration-300 hover:bg-primary-600 font-semibold sm:text-sm text-xs shadow-sm"
