@@ -1,25 +1,23 @@
 <script>
-  import Icon from "@iconify/svelte"
-  import {PUBLIC_IMAGE_URL} from "$env/static/public"
+  import Icon from "@iconify/svelte";
+  import { PUBLIC_IMAGE_URL } from "$env/static/public";
   export let data;
   let product = data.records;
   export let ImageclosePopup;
   let isZoomed = false;
-  let offsetX = 0;
-  let offsetY = 0;
+  let offsetX = 50;
+  let offsetY = 50;
   let container = null;
 
   function toggleZoom(event) {
     isZoomed = !isZoomed;
-
     if (isZoomed) {
       updateZoomPosition(event);
     }
   }
 
   function updateZoomPosition(event) {
-    if (!isZoomed || !container) return;
-
+    if (!container) return;
     const rect = container.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
@@ -33,13 +31,11 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50"
     on:click={ImageclosePopup}
   >
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="w-full md:max-w-lg bg-white rounded-md shadow-md p-5 relative"
+      class="w-[50vw] h-[90vh] bg-white rounded-md shadow-md p-4 relative overflow-hidden"
       on:click|stopPropagation
     >
       <div class="flex justify-end">
@@ -54,11 +50,9 @@
         </button>
       </div>
 
-      <!-- Zoomable Image Container -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div class="flex justify-center items-center">
+      <div class="flex justify-center items-center w-full h-full">
         <div
-          class="relative w-96 h-96 overflow-hidden"
+          class="relative w-full h-full cursor-pointer"
           bind:this={container}
           on:mousemove={updateZoomPosition}
           on:click={toggleZoom}
@@ -67,11 +61,10 @@
           <img
             src="{PUBLIC_IMAGE_URL}/{product?.imageSrc}"
             alt="Product Image"
-            class="w-full h-full object-contain transition-transform duration-300"
-            class:scale-150={isZoomed}
+            class="w-full h-full pb-6 object-contain transition-transform duration-300"
             class:cursor-zoom-in={!isZoomed}
             class:cursor-zoom-out={isZoomed}
-            style="transform-origin: {offsetX}% {offsetY}%;"
+            style="transform: scale({isZoomed ? 2 : 1}); transform-origin: {offsetX}% {offsetY}%;"
             onerror="this.src='/fallback.jpg'"
           />
         </div>
