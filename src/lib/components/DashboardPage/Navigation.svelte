@@ -36,7 +36,7 @@
         { id: 'myCart', icon: 'mdi:cart-outline', label: 'My Cart', route: '/dashboard/mycart', requiresRegistration: true },
         { id: 'quotes', icon: 'carbon:document-configuration', label: 'My Quotes', route: '/dashboard/myquotes', requiresRegistration: true },
         { id: 'favourite', icon: 'mdi:favourite-border', label: 'My Favourites', route: '/dashboard/myfavourite', requiresRegistration: true },
-        { id: 'return', icon: 'hugeicons:truck-return', label: 'Return History', route: '/dashboard/returnshistory', requiresRegistration: true }
+        // { id: 'return', icon: 'hugeicons:truck-return', label: 'Return History', route: '/dashboard/returnshistory', requiresRegistration: true }
       ]
     },
   ];
