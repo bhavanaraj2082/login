@@ -469,7 +469,7 @@
 									<button on:click={()=>{
 										cartOpen = false
 										goto(`/products/details/${item?.productDetails?.productNumber}`)
-									}} class="hover:text-primary-500 hover:underline font-semibold text-sm">
+									}} class="text-primary-500 hover:underline font-semibold text-sm">
 										{item?.productDetails?.productNumber}
 									</button>
 									<p class="font-medium text-xs text-gray-800">

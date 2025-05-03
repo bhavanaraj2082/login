@@ -1383,6 +1383,7 @@ function formatDate(dateString) {
 										name="cartName"
 										pattern="[a-zA-Z0-9]+"
 										inputmode="text"
+										maxlength="25"
 										value={newCartName}
 										on:input={handleNameChange}
 										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent {!newCartName.trim()
@@ -1447,7 +1448,7 @@ function formatDate(dateString) {
 								<thead>
 									<tr class="bg-gradient-to-r from-primary-500 to-primary-600 text-white">
 										<th class="p-3 text-left font-semibold text-sm">Product</th>
-										<th class="p-3 text-center font-semibold text-sm">Reference</th>
+										<!-- <th class="p-3 text-center font-semibold text-sm">Reference</th> -->
 										<th class="p-3 text-left font-semibold text-sm">Description</th>
 										<th class="p-3 text-center font-semibold text-sm w-24">Quantity</th>
 									</tr>
@@ -1463,9 +1464,9 @@ function formatDate(dateString) {
 													{item.manufacturerInfo?.name || 'Unknown Manufacturer'}
 												</div>
 											</td>
-											<td class="p-3 text-center text-gray-600">
+											<!-- <td class="p-3 text-center text-gray-600">
 												{item.reference?.referenceNumber || '-'}
-											</td>
+											</td> -->
 											<td class="p-3">
 												<div class="text-sm text-gray-600 max-w-md line-clamp-2">
 													{item.component?.description || 'No description found'}
@@ -1613,7 +1614,7 @@ function formatDate(dateString) {
 			<form method="POST" action="?/createcart" use:enhance={handleCreateCart} class="space-y-4">
 				<div>
 					<h4 class="text-sm font-medium mb-2">Cart name</h4>
-					<input type="text" name="cartName" bind:value={newCartName} on:input={handleCreateCartNameChange} placeholder="Enter cart name" class="w-full text-sm px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary-500 focus:ring-0"/>
+					<input type="text" name="cartName" bind:value={newCartName} maxlength="25" on:input={handleCreateCartNameChange} placeholder="Enter cart name" required class="w-full text-sm px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-primary-500 focus:ring-0"/>
 				</div>
 				<input type="hidden" name="cartName" value={newCartName} />
 				<input type="hidden" name="cartId" value={generateCartId()} />

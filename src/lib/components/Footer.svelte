@@ -122,7 +122,7 @@
 					<li><a href="/quick-order" class="font-medium sm:text-sm text-xs hover:underline">Quick Order</a></li>
 					<li><a href="/order-status" class="font-medium sm:text-sm text-xs hover:underline">Order Status</a></li>
 					<li><a href="/quotes" class="font-medium sm:text-sm text-xs hover:underline">Quotes</a></li>
-					<li><a href="/returns" class="font-medium sm:text-sm text-xs hover:underline">Returns & its Status</a></li>
+					<!-- <li><a href="/returns" class="font-medium sm:text-sm text-xs hover:underline">Returns & its Status</a></li> -->
 				</ul>
 				<div class="sm:mt-14 md:mt-0 lg:mt-14">
 					{#if !excludedUrls.includes(currentUrl)}					
