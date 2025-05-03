@@ -94,7 +94,8 @@
               </div>
               <div class="flex flex-col justify-center">
                 <a href="/products/details/{item.productNumber}">
-                <p class="text-gray-600 text-sm font-semibold">
+                  <p class="text-primary-400 hover:underline text-sm font-semibold">{item.productNumber}</p>
+                <p class="text-gray-600 hover:underline hover:text-primary-400 text-sm font-semibold">
                   {item.productName || "--"}
                 </p>
                 </a>

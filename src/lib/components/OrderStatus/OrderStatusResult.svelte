@@ -26,6 +26,12 @@
     image : product.image
   }));
 
+  let showCancelButton = true;
+
+  if(shipedProducts?.length >= 1){
+  showCancelButton = false
+  }
+
   const shippedDetails = shipedProducts
     .filter(
       (shipment) =>
@@ -48,12 +54,6 @@
       });
     })
     .flat();
-
-    let showCancelButton = true;
-
-    if(shippedDetails?.length >= 1){
-      showCancelButton = false
-    }
 
   const orderedproduct = orderDetails.map((order) => {
     const product = productDetails.find(
@@ -294,7 +294,7 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
         {#if isAllActive}
-          <AllOrders {orderedproduct} {orderStatus} {currencyType} />
+          <AllOrders {orderedproduct} {data} {orderStatus} {currencyType} />
         {:else if isShippedActive}
           <Shipments {data} {currencyType} />
         {:else}
