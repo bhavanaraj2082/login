@@ -13,13 +13,13 @@
       {#if Array.isArray(product.description)}
         <ul class="list-disc pl-6">
           {#each product.description as item}
-            <li class="text-gray-700 text-sm mt-2">{item}</li>
+            <li class="text-gray-700 text-sm mt-2 break-words">{item}</li>
           {/each}
         </ul>
       {:else}
         <ul>
           {#each Object.entries(product.description) as [key, value]}
-            <li class="text-gray-700 text-sm mt-2">
+            <li class="text-gray-700 text-sm mt-2 break-words">
               <strong class="text-sm font-bold capitalize">{key}:</strong>
               {value}
             </li>
