@@ -1,5 +1,5 @@
 <script>
-	import { toast,Toaster } from 'svelte-sonner';
+  import { toast, Toaster } from "svelte-sonner";
   // import LinkOrganization from "$lib/components/Profile/LinkOrganization.svelte";
   import BookAddress from "$lib/components/Profile/BookAddress.svelte";
   import ProfileSideBar from "$lib/components/Profile/ProfileSideBar.svelte";
@@ -7,13 +7,22 @@
   import PersonalInfo from "$lib/components/Profile/PersonalInfo.svelte";
   import PaymentMethod from "$lib/components/Profile/PaymentMethod.svelte";
   import SitePreference from "$lib/components/Profile/SitePreference.svelte";
-  import EmailVerifyPopup from '$lib/components/Profile/EmailVerifyPopup.svelte';
-
+  import EmailVerifyPopup from "$lib/components/Profile/EmailVerifyPopup.svelte";
   export let data;
-  // console.log('profiledata=========>>',data)
-  let activeComp = 0
-  let message = ''
-  
+  import SEO from "$lib/components/SEO.svelte";
+  import {
+    PUBLIC_WEBSITE_URL,
+    PUBLIC_COMPBUY_IMAGE_PATH,
+    PUBLIC_WEBSITE_NAME,
+  } from "$env/static/public";
+
+  let metadata = {
+    title: `Profile | ${PUBLIC_WEBSITE_NAME}` || "Default Product Title",
+  };
+
+  let activeComp = 0;
+  let message = "";
+
   $: ({
     _id,
     isEmailVerified,
@@ -26,26 +35,25 @@
     emailPreferences,
     paymentMethods,
     ...contact
-  } = data.profileData)
+  } = data.profileData);
 
- $: recordId = _id
-  const changeTabs = (value)=>{
-    activeComp = value
-  }
+  $: recordId = _id;
+  const changeTabs = (value) => {
+    activeComp = value;
+  };
 
-   const handleEvent = (e)=>{
-      console.log(e.detail);
-      message = e.detail
-      if(e.detail.success){
-					toast.success('',{description:e.detail.message})
-				}else{
-					toast.error('',{description:e.detail.message})
-				}
-   }
-
+  const handleEvent = (e) => {
+    console.log(e.detail);
+    message = e.detail;
+    if (e.detail.success) {
+      toast.success("", { description: e.detail.message });
+    } else {
+      toast.error("", { description: e.detail.message });
+    }
+  };
 </script>
 
-
+<SEO {metadata} />
 
 <div class="w-full md:w-11/12 px-4 pb-10 mx-auto max-w-7xl">
   <!-- {#if !isEmailVerified}
@@ -58,22 +66,22 @@
     </div>
     <div class="w-full">
       {#if activeComp === 1}
-        <BookAddress 
-            on:onSuccess={handleEvent} 
-            {recordId} 
-            {organizationAddress} 
-            {shippingAddress} 
-            {billingAddress} 
+        <BookAddress
+          on:onSuccess={handleEvent}
+          {recordId}
+          {organizationAddress}
+          {shippingAddress}
+          {billingAddress}
         />
 
-      <!-- {:else if activeComp === 2}
+        <!-- {:else if activeComp === 2}
         <EmailPreference 
             on:onSuccess={handleEvent} 
             {recordId} 
             {emailPreferences} 
         /> -->
 
-      <!-- {:else if activeComp === 3}
+        <!-- {:else if activeComp === 3}
         <PaymentMethod 
             on:onSuccess={handleEvent}
             {recordId}  
@@ -81,7 +89,7 @@
             {paymentMethods} 
         /> -->
 
-      <!-- {:else if activeComp === 4}
+        <!-- {:else if activeComp === 4}
         <LinkOrganization 
             on:onSuccess={handleEvent} 
             {recordId} 
@@ -91,21 +99,19 @@
             {billingAddress} 
             {paymentAddress}
         /> -->
-
       {:else if activeComp === 2}
-        <SitePreference 
-            on:onSuccess={handleEvent} 
-            {recordId} 
-            {changeTabs}
-            {sitePreferences} 
+        <SitePreference
+          on:onSuccess={handleEvent}
+          {recordId}
+          {changeTabs}
+          {sitePreferences}
         />
-
       {:else}
-        <PersonalInfo 
-            on:onSuccess={handleEvent} 
-            {recordId} 
-            {contact} 
-            {isEmailVerified}
+        <PersonalInfo
+          on:onSuccess={handleEvent}
+          {recordId}
+          {contact}
+          {isEmailVerified}
         />
       {/if}
     </div>
