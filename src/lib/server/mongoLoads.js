@@ -2345,11 +2345,13 @@ export async function getUserFavorites(userId) {
           },
           quantity: { $toString: '$favorite.quantity' },
           stock: { $toString: '$favorite.stock' },
+          createdDate: '$favorite.createdDate',
           "stockDetails":1
         }
       }
     ]).exec();
-    console.log(favorites,"--------");
+    // console.log(favorites,"----fav----");
+
     const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
     favorites = favorites.map(fav=>{
       let {stockDetails,...data} = fav
@@ -2369,7 +2371,7 @@ export async function getUserFavorites(userId) {
       // }else{
       //  stockInfo.pricing.INR = stockInfo.pricing.USD * currency.rate;
       // }
-      return {stockInfo,...data}
+      return {stockInfo, ...data}
     })
     
     return {
