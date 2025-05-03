@@ -1,4 +1,4 @@
-import { deleteFavoriteItem, clearAllFavorites, favaddToCart, addAllToCart } from "$lib/server/mongoactions.js";
+import { deleteFavoriteItem, clearAllFavorites, favaddToCart, addAllToCart } from "$lib/server/mongoActions.js";
 import { getUserProfileData, getProfileDetails } from '$lib/server/mongoLoads.js';
 
 export const load = async ({ locals,depends }) => {
@@ -67,7 +67,7 @@ export const actions = {
     }
   },
 
-  addAllToCart: async ({ request, locals }) => {
+  addalltocart: async ({ request, locals }) => {
     try {
       const formData = await request.formData();
       const items = JSON.parse(formData.get('items'));
@@ -75,7 +75,7 @@ export const actions = {
       if (!items?.length) {
         return { success: false, message: 'No items to add to cart' };
       }
-
+       console.log('object2');
       const result = await addAllToCart(
         items,
         locals.authedUser.id,

@@ -40,10 +40,17 @@
 	cart.set(cartdata)
 
 	const calculateTotalPrice = (cart)=>{
-       priceINR = cart.reduce((sum,crt)=> sum + crt.pricing.INR* (1 + (18 / 100))*crt.quantity,0)
-       priceUSD = cart.reduce((sum,crt)=> sum + crt.pricing.USD * (1 + (18 / 100))*crt.quantity,0)
+	   if(!$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india")){
+		 priceINR = cart.reduce((sum,crt)=> sum + crt.currentPrice.INR*crt.quantity,0)
+         priceUSD = cart.reduce((sum,crt)=> sum + crt.currentPrice.USD*crt.quantity,0)
+	   }else{
+         priceINR = cart.reduce((sum,crt)=> sum + crt.currentPrice.INR* (1 + (18 / 100))*crt.quantity,0)
+         priceUSD = cart.reduce((sum,crt)=> sum + crt.currentPrice.USD * (1 + (18 / 100))*crt.quantity,0)
+	   }
 	}
-
+    $:if($billingAddress && $shippingAddress){
+	calculateTotalPrice($cart)
+	}
 	calculateTotalPrice($cart)
 
 	const downloadExcel = () => {
@@ -64,18 +71,29 @@
         item?.mfrDetails?.name,
         item.quantity,
         item.quantity - item?.stockDetails?.stock < 0 ? 0 : item.quantity - item?.stockDetails?.stock,
-        $currencyState === "inr" ? "₹ "+item.currentPrice?.INR.toLocaleString("en-IN") : "$ "+item?.currentPrice?.USD.toLocaleString("en-IN"),
-        $currencyState === "inr" ? "₹ "+(item?.pricing?.INR * item.quantity).toLocaleString("en-IN") : "$ "+ (item?.pricing?.USD * item.quantity).toLocaleString("en-IN"),
+		!$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india") ?
+		$currencyState === "inr" ? "₹ "+item.currentPrice?.INR.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) : "$ "+item?.currentPrice?.USD.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) :
+        $currencyState === "inr" ? "₹ "+(item.currentPrice?.INR*(1 + (18 / 100))).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) : "$ "+(item?.currentPrice?.USD*(1 + (18 / 100))).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}),
+		!$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india") ?
+        $currencyState === "inr" ? "₹ "+(item?.currentPrice?.INR * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) : "$ "+ (item?.currentPrice?.USD * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) :
+        $currencyState === "inr" ? "₹ "+((item?.currentPrice?.INR*(1 + (18 / 100))) * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) : "$ "+ ((item?.currentPrice?.USD*(1 + (18 / 100))) * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})
 	]);
-
-    // Calculate total price (sum of the last column - 'Extended Price')
-    const totalPrice = $cart.reduce((total, item) => {
-        return total + ($currencyState === "inr" ? (item?.pricing?.INR * item.quantity) : (item?.pricing?.USD * item.quantity));
+	
+    let totalPrice
+	if(!$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india")){
+		totalPrice = $cart.reduce((total, item) => {
+        return total + ($currencyState === "inr" ? (item?.currentPrice?.INR * item.quantity) : (item?.currentPrice?.USD * item.quantity));
     }, 0);
+	}else{
+		totalPrice = $cart.reduce((total, item) => {
+        return total + ($currencyState === "inr" ? ((item?.currentPrice?.INR*(1 + (18 / 100))) * item.quantity) : ((item?.currentPrice?.USD*(1 + (18 / 100))) * item.quantity));
+    }, 0);
+	}
+     
 
     // Add a new row for the total price at the bottom
     const totalRow = [
-        '', '', '', '', 'Total Price',($currencyState === "inr" ? "₹ " : "$")+totalPrice.toLocaleString("en-IN")
+        '', '', '', '', 'Total Price',($currencyState === "inr" ? "₹ " : "$")+totalPrice.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})
     ];
 
     // Prepare the data for SheetJS
@@ -367,7 +385,7 @@
 						<p>Subtotal</p>
 						<div class=" flex flex-col items-end">
 						<p class=" font-semibold">{$currencyState === "inr" ? "₹" + priceINR.toLocaleString("en-IN"): "$"+ priceUSD.toLocaleString("en-IN")}</p>
-                         <span class=" text-xs">including GST</span>
+                         <span class=" text-xs">including GST(18%)</span>
 						</div>
 					</div>
 					<div class="flex justify-between font-medium text-sm">
@@ -464,7 +482,7 @@
 								<div class="ml-2">
 									<p class="text-sm text-black font-semibold">{item?.productDetails?.productNumber}</p>
 									<p class=" text-gray-800 text-xs lg:text-3s font-medium">{item?.productDetails?.productName}</p>
-									<p class=" text-gray-600 text-xs font-semibold">{item?.pricing?.break}</p>
+									<p class=" text-gray-600 text-xs font-semibold">{item?.currentPrice?.break}</p>
 									<p class=" {item.quantity > item?.stockDetails?.stock ? " text-red-500" :" text-green-500"} text-xs font-semibold">
 										{item.quantity > item?.stockDetails?.stock ? item.quantity - item?.stockDetails?.stock + " Back Order" : item?.stockDetails?.stock + " In Stock"}
 										<span class="{item.quantity > item?.stockDetails?.stock ? "" : " hidden"} text-green-500 ml-1">{item?.stockDetails?.stock + " In Stock"}</span>
@@ -477,20 +495,20 @@
 									<h3 class=" lg:hidden mt-3 font-medium text-xs sm:text-sm">Price</h3>
 									<div class="{item.isCart || item.isQuote ? " text-green-500" : ""} text-xs gap-1 w-full font-semibold">
 										<div class=" flex gap-2 sm:block">
-									        {$currencyState === "inr" ? "₹" + (item?.currentPrice?.INR * (1 + (18 / 100))).toLocaleString("en-IN"): "$"+ (item?.currentPrice?.USD * (1 + (18 / 100))).toLocaleString("en-IN")} with GST
+									        {$currencyState === "inr" ? "₹" + (item?.currentPrice?.INR * (1 + (18 / 100))).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}): "$"+ (item?.currentPrice?.USD * (1 + (18 / 100))).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})} with GST
 										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} line-through text-slate-300">
-										    {$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR * (1 + (18 / 100))).toLocaleString("en-IN"): "$"+ (item?.normalPrice?.USD * (1 + (18 / 100))).toLocaleString("en-IN")} with GST
+										    {$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR * (1 + (18 / 100))).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}): "$"+ (item?.normalPrice?.USD * (1 + (18 / 100))).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})} with GST
 										    </p>
 									    </div>
 									<div class=" text-2s text-gray-400 flex gap-2 sm:block">
-										{$currencyState === "inr" ? "₹" + item?.currentPrice?.INR.toLocaleString("en-IN"): "$"+ item?.currentPrice?.USD.toLocaleString("en-IN")} without GST
+										{$currencyState === "inr" ? "₹" + item?.currentPrice?.INR.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}): "$"+ item?.currentPrice?.USD.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})} without GST
 										<p class=" {item.isCart || item.isQuote ? "" : "hidden"} line-through text-slate-300">
-										{$currencyState === "inr" ? "₹" + item?.normalPrice?.INR.toLocaleString("en-IN"): "$"+ item.normalPrice?.USD.toLocaleString("en-IN")} without GST
+										{$currencyState === "inr" ? "₹" + item?.normalPrice?.INR.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}): "$"+ item.normalPrice?.USD.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})} without GST
 										</p>
 									</div>
 									</div>
 									<!-- <div class="text-xs w-full font-semibold">
-									    <p>₹{(item.pricing.INR * (1 + (18 / 100))).toLocaleString("en-IN")} with GST</p>
+									    <p>₹{(item.currentPrice.INR * (1 + (18 / 100))).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})} with GST</p>
 									 
 									</div> -->
 								
@@ -518,15 +536,15 @@
 							        <div class=" w-full flex justify-start items-center">
 									<div class=" {item.isCart || item.isQuote ? " text-green-500" : ""} text-xs w-full font-semibold">
 										<div class=" flex gap-2 sm:block">
-											{$currencyState === "inr" ? "₹" + (item?.currentPrice?.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN"): "$"+ (item?.currentPrice?.USD * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST
+											{$currencyState === "inr" ? "₹" + (item?.currentPrice?.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}): "$"+ (item?.currentPrice?.USD * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})} with GST
 										    <p class=" {item.isCart || item.isQuote ? "" : "hidden"} line-through text-slate-300">
-										    {$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN"): "$"+ (item?.normalPrice?.USD * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN")} with GST
+										    {$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}): "$"+ (item?.normalPrice?.USD * (1 + (18 / 100)) * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})} with GST
 										    </p>
 										</div>
 										<div class="  text-gray-400 text-2s flex gap-2 sm:block">
-											{$currencyState === "inr" ? "₹" + (item?.currentPrice?.INR * item.quantity).toLocaleString("en-IN"): "$"+ (item?.currentPrice?.USD * item.quantity).toLocaleString("en-IN")} without GST
+											{$currencyState === "inr" ? "₹" + (item?.currentPrice?.INR * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}): "$"+ (item?.currentPrice?.USD * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})} without GST
 											<p class=" {item.isCart || item.isQuote ? "" : "hidden"} line-through text-slate-300">
-											{$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR * item.quantity).toLocaleString("en-IN"): "$"+ (item?.normalPrice?.USD * item.quantity).toLocaleString("en-IN")} without GST
+											{$currencyState === "inr" ? "₹" + (item?.normalPrice?.INR * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}): "$"+ (item?.normalPrice?.USD * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})} without GST
 											</p>
 									    </div>
 										</div>

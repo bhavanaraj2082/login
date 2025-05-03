@@ -26,6 +26,7 @@
 	let checkout,items
 	let scrollto = false
 	let isHide = false
+	let isDeleteAll = false
 	let tog = null
 	let checkoutDisabled = false
 	let selectedId = ''
@@ -279,6 +280,7 @@
 	}
 
 	const incrementQuantity = (quantity,stock,_id,indx) => {
+		if (quantity >= 10000000) return
 		clearTimeout(timeout)
         checkoutDisabled = true
 		if(!isLoggedIn){
@@ -397,6 +399,7 @@
 			}else{
 				toast.error(result.message)
 			}
+			isDeleteAll = false
 			invalidate("data:cart")
 
 		})
@@ -483,7 +486,7 @@
 						</button>
 				        <button
 					        type="button"
-					        on:click={emptyCart}
+					        on:click={()=>isDeleteAll = true}
 					        class=" text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded-md text-white bg-primary-500 hover:bg-primary-600 font-medium">
 							<Icon icon="mdi:delete-forever" class="text-lg sm:text-xl rounded-md text-white"/>
 							<span class="hidden sm:block">Delete All</span>
@@ -599,7 +602,19 @@
 										on:input={e=>handleQty(parseInt(e.target.value),item?.stockDetails,item._id,index)}
 										class="{tog === index ? "" : "hidden"} border border-gray-200 rounded-md outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
 							        	<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded-md">
-							        		{#if !item.isCart || !item.isQuote}
+							        		{#if item.isCart || item.isQuote}
+											<button
+											class="p-1.5 bg-gray-200 text-white "
+											><Icon icon="rivet-icons:minus" class="text-xs" /></button
+										     >
+										     <button class="w-fit px-3 py-0.5 text-xs font-medium outline-none text-center">
+											     {item.quantity === null ? "" : item.quantity}
+										     </button>
+										     <button
+											    class="p-1.5 bg-gray-200 text-white ">
+											   <Icon icon="rivet-icons:plus" class="text-xs" />
+										      </button>
+											{:else}
 											<button disabled={selectedId.length && item._id !== selectedId}
 							        			on:click={() => decrementQuantity(item.quantity,item?.stockDetails,item._id,index)}
 							        			class="p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
@@ -613,18 +628,6 @@
 							        			class="p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
 												<Icon icon="rivet-icons:plus" class="text-xs" />
 											</button>
-											{:else}
-											<button
-											class="p-1.5 bg-gray-200 text-white "
-											><Icon icon="rivet-icons:minus" class="text-xs" /></button
-										     >
-										     <button class="w-fit px-3 py-0.5 text-xs font-medium outline-none text-center">
-											     {item.quantity === null ? "" : item.quantity}
-										     </button>
-										     <button
-											    class="p-1.5 bg-gray-200 text-white ">
-											   <Icon icon="rivet-icons:plus" class="text-xs" />
-										      </button>
 											{/if}
 							        	</div>
 							        </div>
@@ -812,3 +815,27 @@
 <img src="{PUBLIC_IMAGE_URL}/{selectedImage}" onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"  alt="" class=" w-72 h-72 md:w-96 md:h-96 mx-auto bject-cover " /></div>
 </div>
 {/if}
+
+{#if isDeleteAll}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		on:click={(e) => {
+			if (e.target === e.currentTarget) {
+				isDeleteAll = false;
+			}
+		}}
+		class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+	>
+		<div
+			class="bg-white py-6 px-4 rounded flex flex-col shadow-lg w-11/12 sm:w-2/4 lg:w-96 space-y-2"
+		>
+			<p class=" font-medium">Are you sure you want to delete all the products?</p>
+			<div class="flex items-center gap-5">
+				<button class=" w-full py-1.5 bg-primary-500 text-white rounded" on:click={() => emptyCart()}>Delete</button>
+				<button class=" w-full py-1.5 text-primary-500 bg-white border-1 border-primary-500 rounded" on:click={() => (isDeleteAll = false)}>Cancel</button>
+			</div>
+		</div>
+	</div>
+{/if}
+

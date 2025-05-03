@@ -825,7 +825,7 @@ $:console.log(location,"location");
 
         <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Street</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-				type="text" name="street" maxlength="100"
+				type="text" name="street" maxlength="60"
 		    bind:value={street}/>
             {#if street.length > 0 && !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(street)}
 				<span class="text-red-500 text-xs block">Please enter a valid street name</span>

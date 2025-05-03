@@ -61,6 +61,7 @@
     const DOTS = '...';
     const VISIBLE_PAGES = 7;
     let tog = null
+    let isDeleteAll = false
 
     let filters = {
         searchTerm: '',
@@ -245,30 +246,29 @@ function calculateTotalPrice(price, quantity) {
 
     let timeout
     function handleQty(item,quantity){
+        console.log(item,"input");
+        clearTimeout(timeout)
         if(isNaN(quantity)){
-            return
+            quantity = 1
         }
-        if(quantity >10000000) quantity = 10000000
-         clearTimeout(timeout)
+        if(quantity >= 10000000) quantity = 10000000
          timeout = setTimeout(()=>{
-         let selectedQty = Math.ceil(quantity/ item.stockInfo.orderMultiple) * item.stockInfo.orderMultiple;
-         console.log(quantity);
+            let selectedQty = Math.ceil(quantity/ item.stockInfo[0].orderMultiple) * item.stockInfo[0].orderMultiple;
+        //if(selectedQty >= 10000000) selectedQty = 10000000
+        console.log(selectedQty,"qty");
          item.quantity = selectedQty
+         favData = [...favData];
          tog = null
-         },1400);
+         },1500);
     }
 
     function increaseQuantity(item,orderMultiple) {
         console.log(item);
-       // const maxQuantity = Math.floor(item.stockInfo.stock / item.stockInfo.orderMultiple) * item.stockInfo.orderMultiple;
-       // if (item.quantity + item.stockInfo.orderMultiple <= maxQuantity) {
-            item.quantity = parseInt(item.quantity) + orderMultiple;
+               if(item.quantity >= 10000000){
+                return
+               }
+              item.quantity = parseInt(item.quantity) + orderMultiple;
             favData = [...favData];
-        // } else {
-        //     toast.warning("Maximum stock reached", { 
-        //         description: `Only ${maxQuantity} items available in multiples of ${item.stockInfo.orderMultiple}` 
-        //     });
-        // }
     }
 
     function decreaseQuantity(item,orderMultiple) {
@@ -283,11 +283,9 @@ function calculateTotalPrice(price, quantity) {
 
     return async ({ result }) => {
         try {
-            // console.log(result);
+             console.log(result);
             if (result.type === 'success') {
-                toast.success("Added to Cart", { 
-                    description: `Product added successfully` 
-                });
+                toast.success(result.data.message);
             }
         //await update();
         form.requestSubmit();
@@ -313,9 +311,7 @@ function calculateTotalPrice(price, quantity) {
         return async ({ result, update }) => {
             
             if (result.type === 'success') {
-                toast.success("All available items added to cart", { 
-                    description: "Added all items that are in stock to your cart" 
-                });
+                toast.success(result.data.message);
             } else {
                 toast.error("Cart Error", { 
                     description: result.data?.message || "Failed to add items to cart" 
@@ -345,24 +341,24 @@ function calculateTotalPrice(price, quantity) {
         }
     };
     }
-function handleDataCart() {
+    function handleDataCart() {
     return async ({ result }) => {
         const totalComps = result.data?.cart[0]?.cartItems.length;
         localStorage.setItem("totalCompsChemi", totalComps);        
         syncLocalStorageToStore();
     };
-}
+    }
 
-function syncLocalStorageToStore() {
+    function syncLocalStorageToStore() {
     if (typeof window !== "undefined") {
         const storedTotalComps = localStorage.getItem("totalCompsChemi");
         if (storedTotalComps) {
             cartTotalComps.set(Number(storedTotalComps));
         }
     }
-}
+    }
 
-function handleClearAll() {
+    function handleClearAll() {
     return async ({ result }) => {
         if (result.type === 'success') {
             favData = [];
@@ -374,10 +370,21 @@ function handleClearAll() {
                 description: result.data?.message || 'Failed to clear favourites'
             });
         }
+        isDeleteAll = false
         fetchMyFav()
         invalidate("data:fav")
     };
-}
+    }
+    let selectedImage = null;
+	let showimage=false;
+	function imagemodal(imageSrc) {
+		selectedImage = imageSrc;
+		showimage=true;
+	}
+	function closePopup() {
+		showimage = false;
+		selectedImage = null;
+	}
 
 onMount(() => {
     const earliestDate = getEarliestFavoriteDate(favData);
@@ -469,12 +476,10 @@ onMount(() => {
         <div class="flex w-fit self-end space-x-4 items-center text-primary-400 overflow-hidden font-semibold">
             <form 
                 method="POST" 
-                action="?/addAllToCart"
+                action="?/addalltocart"
                 use:enhance={handleAddAllToCart}>
                 <input type="hidden" name="items" value={JSON.stringify(
-                    favData
-                        .filter(item => item.stockInfo.stock > 0)
-                        .map(item => ({
+                    favData.map(item => ({
                             productId: item.id,
                             stockId: item.stockInfo[item.specIndex]._id,
                             manufacturerId: item.manufacturerInfo.id,
@@ -488,17 +493,12 @@ onMount(() => {
                     <span class=" md:text-sm font-medium text-xs">Add All to Cart</span>
                 </button>
             </form>
-            <form 
-                method="POST" 
-                action="?/removeAllItem"
-                use:enhance={handleClearAll}>
                 <button 
-                    type="submit" 
+                    type="button" on:click={()=>isDeleteAll = true}
                     class="flex w-full bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2.5 rounded-md whitespace-nowrap">
                     <Icon icon="mdi:delete-forever" width="20" />
                     <span class=" font-medium md:text-sm text-xs">Remove All</span>
                 </button>
-            </form>
         </div>
     </div>
     <div class="space-y-2">
@@ -509,12 +509,15 @@ onMount(() => {
 		{:else}
             {#each $fav as item,index}
                 <div class="flex flex-col md:flex-row items-center justify-between p-6 border bg-white border-gray-200 rounded-md w-full shadow">
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                 <img 
                     src="{PUBLIC_IMAGE_URL}/{item.image}"
                   onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
+                  on:click={() => imagemodal(item.image)}
                     alt={item.name} 
                     class=" w-32 h-32 object-cover rounded-md-md mb-3 md:mb-0 md:mr-4"/>
-                
+                     
                 <div class="flex-1 text-center md:text-left space-y-0.5">
                     <h2 class="text-sm font-bold text-gray-800">
                         <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline transition-all duration-300">{item?.name || ""}</a>
@@ -608,20 +611,20 @@ onMount(() => {
                     </div>
                     <div class="flex items-center">
                     <input type="number" bind:value={item.quantity}
-                    
-                    class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">   
-                    <div class=" {tog === index ? "hidden" : ""} flex items-center justify-center md:justify-start space-x-4">
+                     on:input={e=>handleQty(item,parseInt(e.target.value))}
+                    class="{tog === index ? "" : "hidden"} border-1 w-32 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">   
+                    <div class=" {tog === index ? "hidden" : ""} flex items-center justify-center md:justify-start border-1 rounded">
                         <button 
                             on:click={() => decreaseQuantity(item,item.stockInfo[item.specIndex].orderMultiple)} 
-                            class="px-2 py-1 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
+                            class="px-2 py-1.5 rounded-md text-primary-500 disabled:opacity-50"
                             disabled={item.quantity <= item.stockInfo[item.specIndex].orderMultiple}>
-                            -
+                            <Icon icon="rivet-icons:minus" class="text-xs" />
                         </button>
-                        <button class="text-sm font-medium">{item.quantity}</button>
+                        <button on:click={()=>tog = index} class="text-sm py-1.5 w-24 font-medium">{item.quantity}</button>
                         <button 
                             on:click={() => increaseQuantity(item,item.stockInfo[item.specIndex].orderMultiple)} 
-                            class="px-2 py-1 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50">
-                            +
+                            class="px-2 py-1.5 rounded-md text-primary-500 disabled:opacity-50">
+                            <Icon icon="rivet-icons:plus" class="text-xs" />
                         </button>
                     </div>
                     </div>
@@ -700,4 +703,57 @@ onMount(() => {
     {/if}
     <Toaster position="bottom-right" richColors />
 </div>
-<!-- {/if} -->
+
+
+{#if showimage}
+
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div on:click={(e) => {
+	if (e.target === e.currentTarget) {
+	showimage = false;}
+	}} class="fixed inset-0 bg-black shadow-xl bg-opacity-75 flex items-center justify-center z-50">
+	<div class="bg-white rounded-lg shadow-lg p-6 mx-4 w-full md:w-1/2 lg:w-1/3">
+	<div class="flex justify-end items-center mb-2">
+		<button
+		class="p-1 hover:bg-gray-100 rounded transition-colors duration-200"
+		on:click={closePopup}>
+		<Icon icon="mdi:close" class="text-xl text-red-500 hover:text-red-700" />
+	  </button>
+   </div>
+<img src="{PUBLIC_IMAGE_URL}/{selectedImage}" onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"  alt="" class=" w-72 h-72 md:w-96 md:h-96 mx-auto bject-cover " /></div>
+</div>
+{/if}
+
+{#if isDeleteAll}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		on:click={(e) => {
+			if (e.target === e.currentTarget) {
+				isDeleteAll = false;
+			}
+		}}
+		class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+	>
+		<div
+			class="bg-white py-6 px-4 rounded flex flex-col shadow-lg w-11/12 sm:w-2/4 lg:w-96 space-y-2"
+		>
+			<p class=" font-medium">Are you sure you want to delete all the components?</p>
+			<div class="flex items-center gap-5">
+                <form class=" w-full"
+                method="POST" 
+                action="?/removeAllItem"
+                use:enhance={handleClearAll}>
+                <button 
+                    type="submit" 
+                    class="flex justify-center w-full bg-red-600 space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2 rounded-md whitespace-nowrap">
+                    Delete
+                </button>
+            </form>
+				<button class=" w-full py-1.5 border-1 border-primary-500 text-primary-500 bg-white rounded" eventFunction={() => (isDeleteAll = false)}>Cancel</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
