@@ -1,30 +1,87 @@
 <script>
   import Icon from "@iconify/svelte";
+  import * as XLSX from 'xlsx';
   export let orderedproduct;
   // export let orderStatus;
-  import {PUBLIC_IMAGE_URL} from "$env/static/public"
+  import { PUBLIC_IMAGE_URL } from "$env/static/public";
   export let currencyType;
+  export let data;
+
+  console.log("daaaaaaaaa",data);
 
   function priceShowing(price, currency) {
     if (price === undefined || price === null || price === 0) {
-        return '--';
+      return "--";
     }
     const formattedPrice = Number(price.toFixed(2));
     if (currency === "inr") {
-        let showingPrice = formattedPrice.toLocaleString("en-IN");
-        return `₹ ${showingPrice}`;
+      let showingPrice = formattedPrice.toLocaleString("en-IN");
+      return `₹ ${showingPrice}`;
     }
     if (currency === "usd") {
-        return `$ ${formattedPrice}`;
+      return `$ ${formattedPrice}`;
     }
-    return formattedPrice; 
-}
+    return formattedPrice;
+  }
+  function downloadExcel() {
+    if (orderedproduct && orderedproduct.length > 0) {
+      const excelData = orderedproduct.map(product => ({
+        'Product Name': product.productName || '--',
+        'Manufacturer Name': product.manufacturerName || '--',
+        'Order Qty': product.orderQty || '--',
+        'Unit Price': formatPriceForExcel(product.unitPrice),
+        'Extended Price': formatPriceForExcel(product.extendedPrice)
+      }));
+
+      let subtotal = data.order?.subtotalprice || 0;
+
+      let orderId = data.order?.orderid || "";
+      
+      const worksheet = XLSX.utils.json_to_sheet(excelData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
+
+      const totalRowIdx = excelData.length + 1;
+      XLSX.utils.sheet_add_aoa(worksheet, 
+        [['', '', '', 'Subtotal:', formatPriceForExcel(subtotal)]], 
+        {origin: `A${totalRowIdx}`}
+      );
+      
+      if (!worksheet['!rows']) worksheet['!rows'] = [];
+      worksheet['!rows'][totalRowIdx] = { hidden: false, hpx: 16, level: 0, outlineLevel: 0 };
+
+      const columnWidths = [
+        { wch: 40 }, 
+        { wch: 20 }, 
+        { wch: 10 }, 
+        { wch: 15 }, 
+        { wch: 15 }  
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      XLSX.writeFile(workbook, `orderNo${orderId}.xlsx`);
+    }
+  }
+
+  function formatPriceForExcel(price) {
+    if (price === undefined || price === null || price === 0) {
+      return '--';
+    }
+    return Number(price.toFixed(2));
+  }
 </script>
 
 <div class="col-span-2 mt-2">
   <div class="mb-5">
-    <div class="mb-3">
+    <div class="mb-3 flex justify-between pr-4">
       <h1 class="text-base text-gray-600 font-semibold">All Products</h1>
+      <button 
+        on:click={downloadExcel}
+        class="bg-primary-500 px-4 py-1 rounded flex justify-center group hover:bg-primary-400 items-center gap-2 text-sm text-white"
+      >
+        Download Excel
+        <Icon icon="basil:download-solid" width="18" height="18" />
+      </button>
     </div>
     {#each orderedproduct as product}
       <div class="rounded-lg mb-5 bg-white">
@@ -35,32 +92,39 @@
             class="flex gap-3 items-center col-span-3 sm:col-span-2 mb-2 sm:mb-0"
           >
             <!-- svelte-ignore a11y-missing-attribute -->
-            <img  
-            src="{PUBLIC_IMAGE_URL}/{product?.image}"
-            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
-            class="w-16 rounded-lg" />
+            <img
+              src="{PUBLIC_IMAGE_URL}/{product?.image}"
+              onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+              class="w-16 rounded-lg"
+            />
             <div class="flex flex-col">
               <a href="/products/details/{product.productNumber}">
-              <p class="text-gray-600 text-sm font-semibold">
-                {product.productName || "--"}
-              </p>
-            </a>
+                <p
+                  class="text-primary-400 hover:underline text-sm font-semibold"
+                >
+                  {product.productNumber}
+                </p>
+                <p
+                  class="text-gray-700 hover:underline hover:text-primary-400 text-sm font-semibold"
+                >
+                  {product.productName || "--"}
+                </p>
+              </a>
               <p class="font-medium text-sm text-gray-500">
                 Qty : <span class="text-gray-700"
                   >{product.orderQty || "--"}</span
                 >
               </p>
-             
             </div>
           </div>
 
           <div
-          class="flex flex-col justify-between items-start ml-3 sm:ml-0 sm:items-center"
+            class="flex flex-col justify-between items-start ml-3 sm:ml-0 sm:items-center"
           >
             <p class="font-medium text-sm text-gray-600">unit price</p>
-             <p class="font-medium text-sm text-gray-700">
-                {priceShowing(product.unitPrice, currencyType)}
-              </p>
+            <p class="font-medium text-sm text-gray-700">
+              {priceShowing(product.unitPrice, currencyType)}
+            </p>
           </div>
 
           <div
@@ -71,42 +135,6 @@
               {priceShowing(product.extendedPrice, currencyType)}
             </p>
           </div>
-
-          <!-- <div class="flex gap-2 justify-end items-center">
-            {#if orderStatus == "pending" || orderStatus == "pending cancellation"}
-              <div class="flex gap-2">
-                <Icon
-                  icon="mingcute:time-duration-line"
-                  class="text-primary-500 text-xl"
-                />
-                <h3 class="font-semibold text-sm text-gray-500">In Progress</h3>
-              </div>
-            {:else if orderStatus == "shipped"}
-              <div class="flex gap-2">
-                <Icon
-                  icon="iconoir:delivery-truck"
-                  class="text-green-700 text-xl"
-                />
-                <h3 class="font-semibold text-sm text-gray-500">Shipped</h3>
-              </div>
-            {:else if orderStatus == "completed"}
-              <div class="flex gap-2">
-                <Icon
-                  icon="hugeicons:package-delivered"
-                  class="text-green-700 text-xl"
-                />
-                <h3 class="font-semibold text-sm text-gray-500">Delivered</h3>
-              </div>
-            {:else if orderStatus == "cancelled"}
-              <div class="flex gap-2">
-                <Icon
-                  icon="pajamas:canceled-circle"
-                  class="text-primary-500 text-xl"
-                />
-                <h3 class="font-semibold text-sm text-gray-500">Cancelled</h3>
-              </div>
-            {/if}
-          </div> -->
         </div>
       </div>
     {/each}

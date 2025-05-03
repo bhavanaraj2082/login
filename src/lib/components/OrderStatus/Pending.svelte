@@ -21,7 +21,7 @@
 }
 </script>
 
-<div class="col-span-2 mt-6"> 
+<div class="col-span-2 mt-2"> 
   {#if !remainingProducts.length > 0}
     <div class="flex justify-center mt-5">
       <p class="text-content font-light">No pending products available.</p>
@@ -44,7 +44,8 @@
               class="w-16 rounded-lg" />
             <div class="flex flex-col">
               <a href="/products/details/{product.productNumber}">
-              <p class="text-gray-600 text-sm font-semibold">
+              <p class="text-primary-400 hover:underline text-sm font-semibold">{product.productNumber}</p>
+              <p class="text-gray-600 text-sm hover:underline hover:text-primary-400 font-semibold">
                 {product.productName || "--"}
               </p>
             </a>
