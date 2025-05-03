@@ -4,7 +4,11 @@
   import { toast, Toaster } from "svelte-sonner";
   import Icon from "@iconify/svelte";
   import { goto } from "$app/navigation";
-  import { countries, phoneNumberPatterns, countryCurrencyMap } from "$lib/Data/constants.js";
+  import {
+    countries,
+    phoneNumberPatterns,
+    countryCurrencyMap,
+  } from "$lib/Data/constants.js";
   let username = "";
   let email = "";
   let country = "";
@@ -34,6 +38,8 @@
   let gstNumber = "";
   let highlightedIndex = -1;
   let dropdownEl;
+  let showRedirectModal = false;
+  let isProcessing = false;
   const clientId = import.meta.env.VITE_LINKEDIN_CLIENT_ID;
   const callbackUrl = import.meta.env.VITE_LINKEDIN_CALLBACK_URL;
   const scope = import.meta.env.VITE_LINKEDIN_SCOPE;
@@ -139,25 +145,24 @@
       newErrors.password = "*Required";
       passwordStrength = 0;
     } else if (password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters long.";
-    }
-    // Check if the password contains the word 'password'
-    else if (password.toLowerCase().includes("password")) {
-      newErrors.password = "Password cannot contain common or guessable text.";
+      newErrors.password = "Password must be at least 8 characters long";
+    } else if (password.toLowerCase().includes("password")) {
+      newErrors.password = "Password cannot contain common or guessable text";
+    } else if (/[^a-zA-Z0-9!@#$%^&*]/.test(password)) {
+      newErrors.password = "Only !@#$%^&* special characters are allowed";
     } else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/.test(
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(
         password
       )
     ) {
       newErrors.password =
-        "Ensure your password matches the format outlined below.";
+        "Ensure your password matches the format outlined below";
       passwordStrength = 50;
     } else {
       delete newErrors.password;
       passwordStrength = calculateStrength(password);
     }
-
-    errors = newErrors; // Reassign to trigger reactivity
+    errors = newErrors;
   }
 
   function calculateStrength(password) {
@@ -272,13 +277,22 @@
   const missingPatterns = countryNames.filter(
     (name) => !phoneNumberPatterns.hasOwnProperty(name)
   );
+
   function validateCountry() {
-    if (!country) {
+    if (!country || country.trim() === "") {
       errors.country = "*Required";
     } else {
-      delete errors.country;
+      const match = countries.find(
+        (c) => c.name.toLowerCase() === country.toLowerCase()
+      );
+      if (!match) {
+        errors.country = "Invalid country selected";
+      } else {
+        delete errors.country;
+      }
     }
   }
+
   let filteredCountries = countries;
   let showDropdown = false;
 
@@ -366,157 +380,178 @@
   //   );
   // }
 
-
   function handleKeyDown(event) {
-        const exactCountryMatch = countries.some(
-            (c) => c.name === country && c.name === searchTerm,
-        );
-        if (
-            exactCountryMatch &&
-            !(
-                event.key === "Backspace" ||
-                event.key === "Delete" ||
-                event.key === "ArrowLeft" ||
-                event.key === "ArrowRight" ||
-                event.key === "Home" ||
-                event.key === "End" ||
-                event.key === "Tab" ||
-                event.key === "Escape" ||
-                event.ctrlKey ||
-                event.key === "ArrowUp" ||
-                event.key === "ArrowDown"
-            )
-        ) {
-            const input = document.querySelector('input[name="country"]');
-            if (
-                input &&
-                (input.selectionStart !== input.selectionEnd ||
-                    input.selectionStart === 0)
-            ) {
-                return true;
-            }
-            event.preventDefault();
-            return false;
-        }
+    const exactCountryMatch = countries.some(
+      (c) => c.name === country && c.name === searchTerm
+    );
 
-        if (showDropdown) {
-            switch (event.key) {
-                case "ArrowDown":
-                    event.preventDefault();
-                    if (filteredCountries.length > 0) {
-                        highlightedIndex =
-                            (highlightedIndex + 1) % filteredCountries.length;
-                        scrollToHighlighted();
-                    }
-                    break;
-                case "ArrowUp":
-                    event.preventDefault();
-                    if (filteredCountries.length > 0) {
-                        highlightedIndex =
-                            highlightedIndex <= 0
-                                ? filteredCountries.length - 1
-                                : highlightedIndex - 1;
-                        scrollToHighlighted();
-                    }
-                    break;
-            }
-        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-            showDropdown = true;
-            if (filteredCountries.length > 0) {
-                highlightedIndex = 0;
-            }
-            event.preventDefault();
-        }
-        if (event.key === "Enter") {
-            if (
-                highlightedIndex >= 0 &&
-                highlightedIndex < filteredCountries.length
-            ) {
-                selectCountry(filteredCountries[highlightedIndex]);
-                event.preventDefault();
-            } else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
-                selectCountry(filteredCountries[0]);
-                event.preventDefault();
-            }
-        } else if (event.key === "Escape") {
-            showDropdown = false;
-            highlightedIndex = -1;
-        }
+    if (
+      exactCountryMatch &&
+      !(
+        event.key === "Backspace" ||
+        event.key === "Delete" ||
+        event.key === "ArrowLeft" ||
+        event.key === "ArrowRight" ||
+        event.key === "Home" ||
+        event.key === "End" ||
+        event.key === "Tab" ||
+        event.key === "Escape" ||
+        event.ctrlKey ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown"
+      )
+    ) {
+      const input = document.querySelector('input[name="country"]');
+      if (
+        input &&
+        (input.selectionStart !== input.selectionEnd ||
+          input.selectionStart === 0)
+      ) {
+        return true;
+      }
+      event.preventDefault();
+      return false;
     }
-    function scrollToHighlighted() {
-        if (!dropdownEl) return;
-        const items = dropdownEl.querySelectorAll("li");
-        if (items[highlightedIndex]) {
-            items[highlightedIndex].scrollIntoView({
-                block: "nearest",
-            });
-        }
+
+    if (showDropdown) {
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          if (filteredCountries.length > 0) {
+            highlightedIndex =
+              (highlightedIndex + 1) % filteredCountries.length;
+            scrollToHighlighted();
+          }
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          if (filteredCountries.length > 0) {
+            highlightedIndex =
+              highlightedIndex <= 0
+                ? filteredCountries.length - 1
+                : highlightedIndex - 1;
+            scrollToHighlighted();
+          }
+          break;
+      }
+    } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      showDropdown = true;
+      if (filteredCountries.length > 0) {
+        highlightedIndex = 0;
+      }
+      event.preventDefault();
     }
-    function toggleDropdown() {
-        showDropdown = !showDropdown;
-        if (showDropdown) {
-            if (country.length > 0) {
-                searchTerm = country;
-                filterCountriesWithoutAutoSelect();
-            } else {
-                filteredCountries = countries;
-            }
-        }
+
+    if (event.key === "Enter") {
+      if (
+        highlightedIndex >= 0 &&
+        highlightedIndex < filteredCountries.length
+      ) {
+        selectCountry(filteredCountries[highlightedIndex]);
+        event.preventDefault();
+      } else if (filteredCountries.length > 0) {
+        selectCountry(filteredCountries[0]);
+        event.preventDefault();
+      } else {
+        errors.country = "Invalid country selected";
+        showDropdown = true;
+      }
+    } else if (event.key === "Escape") {
+      showDropdown = false;
+      highlightedIndex = -1;
     }
-    function handleInputChange(event) {
-        searchTerm = event.target.value;
-        country = event.target.value;
-        const isDeleting =
-            event.inputType === "deleteContentBackward" ||
-            event.inputType === "deleteContentForward";
+  }
+
+  function scrollToHighlighted() {
+    if (!dropdownEl) return;
+    const items = dropdownEl.querySelectorAll("li");
+    if (items[highlightedIndex]) {
+      items[highlightedIndex].scrollIntoView({
+        block: "nearest",
+      });
+    }
+  }
+  function toggleDropdown() {
+    showDropdown = !showDropdown;
+    if (showDropdown) {
+      if (country.length > 0) {
+        searchTerm = country;
         filterCountriesWithoutAutoSelect();
-        showDropdown = filteredCountries.length > 0;
+      } else {
+        filteredCountries = countries;
+      }
+    }
+  }
 
-        if (searchTerm.length > 0 && !isDeleting) {
-            const codeSearch = searchTerm.replace("+", "").trim();
-            if (codeSearch.length > 0) {
-                const exactCodeMatches = filteredCountries.filter(
-                    (country) => country.code.replace("+", "") === codeSearch,
-                );
+  function handleInputChange(event) {
+    searchTerm = event.target.value;
+    country = event.target.value;
 
-                if (exactCodeMatches.length === 1) {
-                    selectCountry(exactCodeMatches[0]);
-                    return;
-                }
-            }
+    const isDeleting =
+      event.inputType === "deleteContentBackward" ||
+      event.inputType === "deleteContentForward";
 
-            const countriesStartingWith = filteredCountries.filter((country) =>
-                country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
-            );
+    filterCountriesWithoutAutoSelect();
+    showDropdown = true;
 
-            if (countriesStartingWith.length === 1) {
-                selectCountry(countriesStartingWith[0]);
-            }
+    const match = countries.find(
+      (c) => c.name.toLowerCase() === searchTerm.toLowerCase()
+    );
+
+    if (match) {
+      delete errors.country;
+    } else if (searchTerm.trim().length > 0) {
+      errors.country = "Invalid country selected";
+    } else {
+      delete errors.country;
+    }
+
+    if (searchTerm.length > 0 && !isDeleting) {
+      const codeSearch = searchTerm.replace("+", "").trim();
+      if (codeSearch.length > 0) {
+        const exactCodeMatches = filteredCountries.filter(
+          (country) => country.code.replace("+", "") === codeSearch
+        );
+
+        if (exactCodeMatches.length === 1) {
+          selectCountry(exactCodeMatches[0]);
+          return;
         }
+      }
+
+      const countriesStartingWith = filteredCountries.filter((country) =>
+        country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+      );
+
+      if (countriesStartingWith.length === 1) {
+        selectCountry(countriesStartingWith[0]);
+      }
     }
+  }
 
-function filterCountriesWithoutAutoSelect() {
+  function filterCountriesWithoutAutoSelect() {
+    const countriesStartingWith = countries.filter((country) =>
+      country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+    );
 
-const countriesStartingWith = countries.filter(
-    (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-);
-
-const countriesContaining = countries.filter(
-    (country) => 
-        !country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) && 
+    const countriesContaining = countries.filter(
+      (country) =>
+        !country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) &&
         country.name.toLowerCase().includes(searchTerm.toLowerCase())
-);
+    );
 
-filteredCountries = [...countriesStartingWith, ...countriesContaining];
-const codeMatches = countries.filter(
-    (country) => country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
-);
-codeMatches.forEach(country => {
-    if (!filteredCountries.some(c => c.name === country.name)) {
+    filteredCountries = [...countriesStartingWith, ...countriesContaining];
+    const codeMatches = countries.filter((country) =>
+      country.code
+        .replace("+", "")
+        .includes(searchTerm.replace("+", "").toLowerCase())
+    );
+    codeMatches.forEach((country) => {
+      if (!filteredCountries.some((c) => c.name === country.name)) {
         filteredCountries.push(country);
-    }
-});
-}
+      }
+    });
+  }
 
   function handleKeyDowncountry(event) {
     const exactCountryMatch = countries.some((c) => c.name === country);
@@ -703,13 +738,16 @@ codeMatches.forEach(country => {
   async function handleFormSubmission({ cancel }) {
     if (!validateForm()) {
       cancel();
+      return;
     }
     // if (!validateForm()) {
     //   cancel();
     //   return;
     // }
+    isProcessing = true;
     return async ({ result, update }) => {
       console.log("result", result);
+      isProcessing = false;
 
       if (result.type === "redirect") {
         await applyAction(result);
@@ -723,7 +761,20 @@ codeMatches.forEach(country => {
           await goto("/dashboard");
           location.reload();
         } else {
-          toast.error(result.data.message);
+          const errorText = result.data.message;
+          if (
+            errorText !==
+            "This email already exists. Please login or try with another."
+          ) {
+            toast.error(errorText);
+          }
+
+          if (
+            errorText ===
+            "This email already exists. Please login or try with another."
+          ) {
+            showRedirectModal = true;
+          }
         }
       }
     };
@@ -759,6 +810,15 @@ codeMatches.forEach(country => {
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   });
+
+  function handleRedirectConfirm() {
+    showRedirectModal = false;
+    goto("/signin");
+  }
+
+  function handleRedirectCancel() {
+    showRedirectModal = false;
+  }
 </script>
 
 <div
@@ -782,7 +842,7 @@ codeMatches.forEach(country => {
     <p class="text-gray-500 mb-5 md:text-sm text-xs">
       Already have an account? <a
         href="/signin"
-        class="text-primary-500 hover:text-primary-600 font-semibold">SignIn</a
+        class="text-primary-500 hover:text-primary-600 font-semibold">Sign In</a
       >
     </p>
     <!-- <p class="text-gray-500 mb-5">
@@ -840,10 +900,11 @@ codeMatches.forEach(country => {
             type="text"
             id="username"
             name="username"
+            maxlength="50"
             bind:value={username}
             on:input={() => validateUsername()}
             placeholder="Enter your username"
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
           />
           {#if errors.username}
             <div class="text-red-500 text-xs mt-1">{errors.username}</div>
@@ -897,6 +958,7 @@ codeMatches.forEach(country => {
                 type="email"
                 id="email"
                 name="email"
+                maxlength="100"
                 bind:value={email}
                 on:input={() => {
                   validateEmail();
@@ -905,7 +967,7 @@ codeMatches.forEach(country => {
                   isOtpVerified = false;
                 }}
                 placeholder="Enter your email"
-                class="mt-1 block w-full p-2 pr-24 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm text-sm h-10"
+                class="mt-1 block w-full p-2 pr-24 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm text-sm h-10"
               />
 
               {#if isLoading}
@@ -999,7 +1061,7 @@ codeMatches.forEach(country => {
                 on:input={handleInput}
                 placeholder="Enter 6-digit OTP"
                 class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
-                    focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400
+                    focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
                     placeholder:text-sm h-10"
               />
               <button
@@ -1031,7 +1093,7 @@ codeMatches.forEach(country => {
             >Company Name</label
           >
           <input
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
             type="text"
             name="companyname"
             bind:value={companyName}
@@ -1055,7 +1117,7 @@ codeMatches.forEach(country => {
             >Company Type
           </label>
           <input
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
             type="text"
             name="companytype"
             bind:value={companyType}
@@ -1080,9 +1142,10 @@ codeMatches.forEach(country => {
             >First Name</label
           >
           <input
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
             type="text"
             name="firstName"
+            maxlength="50"
             bind:value={firstName}
             placeholder="First Name"
             on:input={validateFirstName}
@@ -1096,9 +1159,10 @@ codeMatches.forEach(country => {
             >Last Name
           </label>
           <input
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
             type="text"
             name="lastName"
+            maxlength="50"
             bind:value={lastName}
             placeholder="Last Name"
             on:input={validateLastName}
@@ -1117,14 +1181,14 @@ codeMatches.forEach(country => {
             <input
               type="text"
               name="country"
+              maxlength="50"
               bind:value={country}
               placeholder="Search Country"
               on:input={handleInputChange}
               on:click={toggleDropdown}
-             
               on:keydown={handleKeyDown}
               class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
-                    focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400
+                    focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
                     placeholder:text-sm h-10"
             />
             <Icon
@@ -1132,46 +1196,38 @@ codeMatches.forEach(country => {
               class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
             />
             {#if showDropdown}
-            <div
-              bind:this={dropdownEl}
-              class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
-            >
-              <ul
-                class="max-h-60 overflow-y-auto text-sm"
+              <div
+                bind:this={dropdownEl}
+                class="absolute w-full mt-px bg-white border border-gray-300 rounded-md shadow-lg z-10"
               >
-                {#each filteredCountries as country, index}
-                  <!-- svelte-ignore a11y-click-events-have-key-events -->
-                  <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                  <li
-                    on:click={() =>
-                      selectCountry(country)}
-                    class="px-4 py-2 cursor-pointer {highlightedIndex ===
-                    index
-                      ? 'bg-primary-100'
-                      : 'hover:bg-primary-50'}"
-                  >
-                    {country.name} ({country.code})
-                  </li>
-                {/each}
-                {#if filteredCountries.length === 0}
-                  <div
-                    class="flex items-center px-4 py-3"
-                  >
-                    <Icon
-                      icon="tabler:info-square-rounded-filled"
-                      class="text-red-500 text-base mr-2"
-                    />
+                <ul class="max-h-60 overflow-y-auto text-sm">
+                  {#each filteredCountries as country, index}
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                     <li
-                      class="text-gray-800 text-xs"
+                      on:click={() => selectCountry(country)}
+                      class="px-4 py-2 cursor-pointer {highlightedIndex ===
+                      index
+                        ? 'bg-primary-100'
+                        : 'hover:bg-primary-50'}"
                     >
-                      No matching countries
-                      found!
+                      {country.name} ({country.code})
                     </li>
-                  </div>
-                {/if}
-              </ul>
-            </div>
-          {/if}
+                  {/each}
+                  {#if filteredCountries.length === 0}
+                    <div class="flex items-center px-4 py-3">
+                      <Icon
+                        icon="tabler:info-square-rounded-filled"
+                        class="text-red-500 text-base mr-2"
+                      />
+                      <li class="text-gray-800 text-xs">
+                        No matching countries found!
+                      </li>
+                    </div>
+                  {/if}
+                </ul>
+              </div>
+            {/if}
             {#if errors.country}
               <div class="text-red-500 text-xs mt-1">{errors.country}</div>
             {/if}
@@ -1184,13 +1240,19 @@ codeMatches.forEach(country => {
           >
           <select
             class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
-                    focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400
+                    focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
                     placeholder:text-sm h-10"
             name="currency"
             bind:value={currency}
             id="currency-select"
-            disabled>
-            <option class="Currency" disabled selected value="">Currency</option>
+            disabled
+          >
+            <option
+              class="Currency placeholder:text-sm"
+              disabled
+              selected
+              value="">Currency</option
+            >
             {#each currencies as currency}
               <option class="bg-primary-50" value={currency}>{currency}</option>
             {/each}
@@ -1203,18 +1265,31 @@ codeMatches.forEach(country => {
       </div>
 
       <div class="mb-4">
-        <label for="phone" class="block text-sm font-medium text-gray-600">Phone Number</label>
+        <label for="phone" class="block text-sm font-medium text-gray-600"
+          >Phone Number</label
+        >
         <input
           type="tel"
           id="phone"
           name="phone"
+          maxlength="20"
           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
           bind:value={phone}
           on:input={() => validatePhoneNumber(country, phone)}
           placeholder="Enter your phone number"
           class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
-                    focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400
-                    placeholder:text-sm h-10" />
+                    focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
+                    placeholder:text-sm h-10"
+        />
+        <div class="flex items-center text-sm text-gray-700">
+          <Icon
+            icon="carbon:location-info-filled"
+            class="text-sm inline text-primary-400"
+          />
+          <span class="text-2s text-gray-700"
+            >Enter phone number without country code</span
+          >
+        </div>
         {#if errors.phone}
           <div class="text-red-500 text-xs mt-1">{errors.phone}</div>
         {/if}
@@ -1231,7 +1306,7 @@ codeMatches.forEach(country => {
               id="gstNumber"
               name="gstNumber"
               placeholder="Enter your GST number"
-              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
               bind:value={gstNumber}
               on:input={validateGstNumber}
             />
@@ -1251,7 +1326,7 @@ codeMatches.forEach(country => {
                 id="tanNumber"
                 name="tanNumber"
                 placeholder="Enter your TAN number"
-                class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm text-sm h-10"
+                class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm text-sm h-10"
                 on:input={validateTanNumber}
                 bind:value={tanNumber}
               />
@@ -1273,7 +1348,7 @@ codeMatches.forEach(country => {
           bind:value={password}
           on:input={() => validatePassword()}
           placeholder="Enter your password"
-          class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 text-sm placeholder:text-sm h-10"
+          class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 text-sm placeholder:text-sm h-10"
         />
         {#if errors.password}
           <div class="text-red-500 text-xs mt-1">{errors.password}</div>
@@ -1295,15 +1370,18 @@ codeMatches.forEach(country => {
             id="password"
             name="password"
             type="password"
+            maxlength="50"
             bind:value={password}
             on:input={() => validatePassword()}
             placeholder="Enter your password"
-            class="mt-1 block w-full p-2 pr-10 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 text-sm placeholder:text-sm h-10"/>
+            class="mt-1 block w-full p-2 pr-10 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 text-sm placeholder:text-sm h-10"
+          />
           <button
             type="button"
             on:click={togglePasswordVisibility}
             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-            aria-label={passwordVisible ? "Hide password" : "Show password"}>
+            aria-label={passwordVisible ? "Hide password" : "Show password"}
+          >
             {#if passwordVisible}
               <Icon icon="mdi:eye-off-outline" class="w-5 h-5" />
             {:else}
@@ -1316,7 +1394,9 @@ codeMatches.forEach(country => {
         {/if}
       </div>
       {#if typing}
-        <div class="bg-primary-50 px-2 mt-3 py-2 rounded-md border border-gray-200">
+        <div
+          class="bg-primary-50 px-2 mt-3 py-2 rounded-md border border-gray-200"
+        >
           <ul class="w-full text-xs text-gray-500 text-left list-none ml-1">
             <li class="flex justify-start items-center sm:text-xs text-2s py-1">
               {#if password.length >= 8}
@@ -1340,22 +1420,28 @@ codeMatches.forEach(country => {
                 </span>
               {:else}
                 <span class="text-red-500">
-                  <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1"/>
+                  <Icon
+                    icon="lets-icons:close-ring-duotone"
+                    class="w-4 h-4 mr-1"
+                  />
                 </span>
               {/if}
               Cannot contain common or guessable text
             </li>
             <li class="flex justify-start items-center sm:text-xs text-2s py-1">
-              {#if /[!@#$%_*\\-]/.test(password)}
+              {#if /[!@#$%^&*\\-]/.test(password)}
                 <span class="text-green-500">
                   <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
                 </span>
               {:else}
                 <span class="text-red-500">
-                  <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1"/>
+                  <Icon
+                    icon="lets-icons:close-ring-duotone"
+                    class="w-4 h-4 mr-1"
+                  />
                 </span>
               {/if}
-              Contain one of the following special characters !@#$%_-*
+              Contain one of the following special characters !@#$%^&*
             </li>
             <li class="flex justify-start items-center sm:text-xs text-2s py-1">
               {#if /[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password)}
@@ -1364,61 +1450,71 @@ codeMatches.forEach(country => {
                 </span>
               {:else}
                 <span class="text-red-500">
-                  <Icon icon="lets-icons:close-ring-duotone" class="w-4 h-4 mr-1" />
+                  <Icon
+                    icon="lets-icons:close-ring-duotone"
+                    class="w-4 h-4 mr-1"
+                  />
                 </span>
               {/if}
               Contain at least one uppercase letter, one lowercase letter, one number
             </li>
           </ul>
         </div>
-      {/if}
-      <div class="mt-2">
-        <div class="relative pt-1">
-          <div class="flex mb-2 items-center justify-between"></div>
-          <div class="flex mb-2">
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-              <div
-                class="h-2.5 rounded-full transition-all duration-300 ease-in-out"
-                style="width: {passwordStrength}%"
-                class:bg-red-500={passwordStrength <= 33}
-                class:bg-yellow-500={passwordStrength > 33 &&
-                  passwordStrength <= 66}
-                class:bg-green-500={passwordStrength > 66}
-              ></div>
+
+        <div class="mt-2">
+          <div class="relative pt-1">
+            <div class="flex mb-2 items-center justify-between"></div>
+            <div class="flex mb-2">
+              <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div
+                  class="h-2.5 rounded-full transition-all duration-300 ease-in-out"
+                  style="width: {passwordStrength}%"
+                  class:bg-red-500={passwordStrength <= 33}
+                  class:bg-yellow-500={passwordStrength > 33 &&
+                    passwordStrength <= 66}
+                  class:bg-green-500={passwordStrength > 66}
+                ></div>
+              </div>
+            </div>
+            <div class="mt-1 md:text-xs text-2s font-medium pb-2">
+              {#if passwordStrength <= 33}
+                <span class="text-red-500">Weak</span>
+              {:else if passwordStrength <= 66}
+                <span class="text-yellow-500">Moderate</span>
+              {:else}
+                <span class="text-green-500">Strong</span>
+              {/if}
             </div>
           </div>
-          <div class="mt-1 md:text-xs text-2s font-medium pb-2">
-            {#if passwordStrength <= 33}
-              <span class="text-red-500">Weak</span>
-            {:else if passwordStrength <= 66}
-              <span class="text-yellow-500">Moderate</span>
-            {:else}
-              <span class="text-green-500">Strong</span>
-            {/if}
-          </div>
         </div>
-      </div>
+      {/if}
+
       <div class="mb-4 relative">
         <label
           for="passwordConfirm"
-          class="block text-sm font-medium text-gray-600">
-          Confirm Password</label>
+          class="block text-sm font-medium text-gray-600"
+        >
+          Confirm Password</label
+        >
         <div class="relative">
           <input
             id="passwordConfirm"
             name="confirmpassword"
             type="password"
+            maxlength="50"
             bind:value={passwordConfirm}
             on:input={validateConfirmPassword}
             placeholder="Confirm your password"
-            class="mt-1 block w-full p-2 pr-10 border text-sm border-gray-300 rounded-md focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10"/>
+            class="mt-1 block w-full p-2 pr-10 border text-sm border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10"
+          />
           <button
             type="button"
             on:click={toggleConfirmPasswordVisibility}
             class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
             aria-label={confirmPasswordVisible
               ? "Hide confirm password"
-              : "Show confirm password"}>
+              : "Show confirm password"}
+          >
             {#if confirmPasswordVisible}
               <Icon icon="mdi:eye-off-outline" class="w-5 h-5" />
             {:else}
@@ -1443,12 +1539,26 @@ codeMatches.forEach(country => {
         </p>
       </div>
       <div class="flex gap-2 {errors.termsAndConditions ? 'mb-1' : 'mb-6'}">
-        <input type="checkbox" name="termsAndConditions" value={true} on:change={handleCheckboxChange} class="mt-0.5 text-primary-500 rounded focus:ring-0 outline-none" />
+        <input
+          type="checkbox"
+          name="termsAndConditions"
+          value={true}
+          on:change={handleCheckboxChange}
+          class="mt-0.5 text-primary-500 rounded focus:ring-0 outline-none"
+        />
         <div class=" sm:text-sm text-xs">
           I have read and agreed to the
-          <a class="font-medium text-primary-500 hover:underline" href="/terms/site-and-terms"> Terms of Service </a>
+          <a
+            class="font-medium text-primary-500 hover:underline"
+            href="/terms/site-and-terms"
+          >
+            Terms of Service
+          </a>
           and
-          <a class="font-medium text-primary-500 hover:underline" href="/terms/privacy-notice">Privacy Policy</a>
+          <a
+            class="font-medium text-primary-500 hover:underline"
+            href="/terms/privacy-notice">Privacy Policy</a
+          >
         </div>
       </div>
       {#if !isTermsAccepted && errors.termsAndConditions}
@@ -1459,12 +1569,23 @@ codeMatches.forEach(country => {
 
       <button
         type="submit"
-        class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center sm:hidden">
-        <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
-        Create Account
+        class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center sm:hidden"
+      >
+        {#if isProcessing}
+          <Icon
+            icon="line-md:loading-alt-loop"
+            class="text-lg text-center inline"
+          />
+          Processing...
+        {:else}
+          <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
+          Create Account
+        {/if}
       </button>
       <div class="hidden sm:flex sm:space-x-4 sm:justify-between w-full py-2">
-        <div class="flex items-center justify-center py-2 px-6 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200">
+        <div
+          class="flex items-center justify-center py-2 px-6 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200"
+        >
           <a href={linkedinUrl} class="flex items-center space-x-2">
             <Icon icon="bi:linkedin" class="text-xl" />
             <span class="text-sm font-medium">Continue with LinkedIn</span>
@@ -1477,9 +1598,18 @@ codeMatches.forEach(country => {
         </div>
         <button
           type="submit"
-          class="w-full sm:w-auto bg-primary-400 text-white py-2 px-6 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center" >
-          <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
-          Create Account
+          class="w-full sm:w-auto bg-primary-400 text-white py-2 px-6 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center"
+        >
+          {#if isProcessing}
+            <Icon
+              icon="line-md:loading-alt-loop"
+              class="text-lg text-center inline"
+            />
+            Processing...
+          {:else}
+            <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
+            Create Account
+          {/if}
         </button>
       </div>
     </form>
@@ -1488,7 +1618,9 @@ codeMatches.forEach(country => {
       <span class="px-2 text-sm text-gray-500 font-bold bg-white">OR</span>
       <div class="flex-grow border-t border-gray-300"></div>
     </div>
-    <button class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-600 rounded-md transition duration-200 sm:hidden">
+    <button
+      class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-600 rounded-md transition duration-200 sm:hidden"
+    >
       <a href={linkedinUrl} class="flex items-center space-x-2">
         <Icon icon="bi:linkedin" class="text-2xl" />
         <span class="text-sm font-medium">Continue with LinkedIn</span>
@@ -1497,3 +1629,34 @@ codeMatches.forEach(country => {
   </div>
 </div>
 <Toaster position="bottom-right" richColors />
+{#if showRedirectModal}
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+  >
+    <div
+      class="bg-white rounded-xl border border-gray-300 shadow-2xl p-8 max-w-md w-full transform transition-all ease-in-out scale-100 opacity-100"
+    >
+      <h2 class="text-2xl font-semibold mb-4 text-gray-800">
+        Email Already Exists
+      </h2>
+      <p class="mb-6 text-sm text-gray-600">
+        This email is already registered. Would you like to go to the sign in
+        page?
+      </p>
+      <div class="flex justify-end space-x-4">
+        <button
+          on:click={handleRedirectCancel}
+          class="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50 transition duration-200"
+        >
+          Cancel
+        </button>
+        <button
+          on:click={handleRedirectConfirm}
+          class="px-5 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50 transition duration-200"
+        >
+          Go to Sign in
+        </button>
+      </div>
+    </div>
+  </div>
+{/if}
