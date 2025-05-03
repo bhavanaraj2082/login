@@ -159,7 +159,9 @@
           type="number"
           min="1"
           max="999"
+          maxlength="10"
           name="units"
+          oninput="this.value = this.value.replace(/[^0-9]/g, '')"
           bind:value={units}
           class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
           placeholder="Units Required"
@@ -182,6 +184,7 @@
         <input
           type="text"
           name="Firstname"
+          maxlength="50"
           bind:value={firstName}
           class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm mt-1 placeholder:text-sm"
           placeholder="First Name"
@@ -206,6 +209,7 @@
         <input
           type="text"
           name="lastname"
+          maxlength="50"
           bind:value={lastName}
           class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 text-sm placeholder:text-sm"
           placeholder="Last Name"
@@ -231,6 +235,7 @@
         <input
           type="text"
           name="organisation"
+          maxlength="50"
           bind:value={organisation}
           class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
           placeholder="Organisation Name"
@@ -256,9 +261,11 @@
         <input
           type="tel"
           name="phone"
+          maxlength="20"
           bind:value={phone}
           class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
           placeholder="Phone Number"
+          oninput="this.value = this.value.replace(/[^0-9]/g, '')"
           on:input={() => {
             if (!phone.trim()) {
               formErrors.phone = "Phone number is required.";
@@ -321,6 +328,7 @@
             <input
               type="email"
               name="email"
+              maxlength="80"
               bind:value={email}
               class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
               placeholder="Your email"
@@ -477,13 +485,13 @@
       <div class="flex justify-between items-center mt-4">
         <button
           on:click={toggleQuoteModal}
-          class="bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium py-1.5 px-4 rounded"
+          class="bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm py-1.5 px-4 rounded"
         >
           Close
         </button>
         <button
           type="submit"
-          class="bg-primary-500 hover:bg-primary-600 text-white font-medium rounded py-1.5 px-4"
+          class="bg-primary-500 hover:bg-primary-600 text-white text-sm rounded py-1.5 px-4"
         >
           {#if isSubmitting}
             <Icon
