@@ -427,15 +427,16 @@ async function getMatchedComponents(search) {
     .limit(12)
     .populate('category','urlName')
     .populate('subCategory','urlName')
-    .select('productName CAS productNumber manufacturerName')
+    .select('productName CAS productNumber manufacturerName image')
     .lean();
 
-    let seenCAS= new Set()
+    let seen = new Set();
 		components = components.filter(prod => {
-			if(!prod.CAS) return true
-			if(seenCAS.has(prod.CAS)) return false
-			seenCAS.add(prod.CAS)
-			return true
+      if (!prod.CAS || !prod.productName) return true;
+      const key = `${prod.CAS}__${prod.productName}`;
+      if (seen.has(key)) return false; 
+      seen.add(key);
+      return true; 
 		})
 
     return components;

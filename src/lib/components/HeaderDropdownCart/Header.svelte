@@ -609,9 +609,10 @@ async function submitForm() {
 				<div class=" w-full flex items-center">
 					<input
 						type="text"
-						placeholder="Search for Product Names, Numbers, or CAS Numbers"
+						placeholder="Search for Product Names or CAS Numbers"
 						bind:value={searchQuery}
 						name="query"
+						maxlength="90"
 						on:input={handleInput}
 						class=" border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 w-full px-3 py-2 md:py-3 text-sm placeholder:text-xs truncate pr-12 sm:pr-10"/>
 					{#if isLoading}

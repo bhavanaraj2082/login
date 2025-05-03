@@ -357,7 +357,7 @@
 					<a href="/products/{item?.category?.urlName}/{item?.subCategory?.urlName}/{item?.productNumber}" class="block bg-white">
 						<div class="flex gap-3 shadow rounded-md p-4 cursor-pointer hover:shadow-md transition-all duration-300 ease-in-out">
 							<img
-							    src={`${PUBLIC_IMAGE_URL}/${item?.image}`}
+							    src="{PUBLIC_IMAGE_URL}/{item?.image}"
 								class="w-20 h-20 object-cover rounded-md text-sm"
 								onerror="this.src='/fallback.jpg'"
 								alt={item?.productName}/>

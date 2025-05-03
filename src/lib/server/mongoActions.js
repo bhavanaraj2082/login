@@ -1192,13 +1192,14 @@ let cleanedQuery = body.query.replace(/[^\w]/g, "").toLowerCase();;
 			.select('productName CAS productNumber manufacturerName')
 			.lean();
 
-		let seenCAS= new Set()
+		let seen = new Set();
 		result = result.filter(prod => {
-			if(!prod.CAS) return true
-			if(seenCAS.has(prod.CAS)) return false
-			seenCAS.add(prod.CAS)
-			return true
-		})
+		  if (!prod.CAS || !prod.productName) return true;
+		  const key = `${prod.CAS}__${prod.productName}`;
+		  if (seen.has(key)) return false; 
+		  seen.add(key);
+		  return true; 
+			})
 
 		return JSON.parse(JSON.stringify(result));
 	} catch (error) {
