@@ -266,36 +266,36 @@
       "name3": "Safety Data Sheets (SDS)",
       "link3": "/documents/safety-data-sheets",
       "subcategories3": [
-          { "name3": "Search SDS", "link3": "/documents" },
-          { "name3": "SDS by Product", "link3": "/documents" },
-          { "name3": "SDS Compliance", "link3": "/documents" }
+          { "name3": "Search SDS", "link3": "/documents?name=safetydata sheets" },
+          { "name3": "SDS by Product", "link3": "/documents?name=safetydata sheets" },
+          { "name3": "SDS Compliance", "link3": "/documents?name=safetydata sheets" }
       ]
     },
     {
       "name3": "Certificates of Analysis (COA)",
       "link3": "/documents/certificates-of-analysis",
       "subcategories3": [
-          { "name3": "View COA", "link3": "/documents" },
-          { "name3": "Request COA", "link3": "/documents" },
-          { "name3": "COA Compliance", "link3": "/documents" }
+          { "name3": "View COA", "link3": "/documents?name=certificates of analysis" },
+          { "name3": "Request COA", "link3": "/documents?name=certificates of analysis" },
+          { "name3": "COA Compliance", "link3": "/documents?name=certificates of analysis" }
       ]
     },
     {
       "name3": "Certificates of Origin (COO)",
       "link3": "/documents/certificates-of-origin",
       "subcategories3": [
-          { "name3": "View COO", "link3": "/documents" },
-          { "name3": "Request COO", "link3": "/documents" },
-          { "name3": "COO Compliance", "link3": "/documents" }
+          { "name3": "View COO", "link3": "/documents?name=certificates of origin" },
+          { "name3": "Request COO", "link3": "/documents?name=certificates of origin" },
+          { "name3": "COO Compliance", "link3": "/documents?name=certificates of origin" }
       ]
     },
     {
       "name3": "Certificates of Quality (COQ)",
       "link3": "/documents/certificates-of-quality",
       "subcategories3": [
-          { "name3": "View COQ", "link3": "/documents" },
-          { "name3": "Request COQ", "link3": "/documents" },
-          { "name3": "COQ Compliance", "link3": "/documents" }
+          { "name3": "View COQ", "link3": "/documents?name=certificates of quality" },
+          { "name3": "Request COQ", "link3": "/documents?name=certificates of quality" },
+          { "name3": "COQ Compliance", "link3": "/documents?name=certificates of quality" }
       ]
     }
   ],

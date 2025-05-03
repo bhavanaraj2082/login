@@ -1,4 +1,5 @@
 <script>
+	import { page } from '$app/stores';
   import { enhance } from "$app/forms";
   import { goto } from "$app/navigation";
   import Icon from "@iconify/svelte";
@@ -7,7 +8,7 @@
   let showErrors = false;
   let showProductDetails = false;
   let showProductDetails1 = false;
-  let activeTab = "SafetyData Sheets";
+  let activeTab = "safetydata sheets";
   let inputValue = "";
   let inputValue1 = "";
   let inputValue2 = "";
@@ -60,10 +61,10 @@
     rotations = rotations.map((_, i) => (i === index ? !rotations[i] : false));
   }
   const tabs = [
-    { name: "SafetyData Sheets" },
-    { name: "Certificates of Analysis" },
-    { name: "Certificates of Origin" },
-    { name: "Certificates of Quality" },
+    { name: "safetydata sheets" },
+    { name: "certificates of analysis" },
+    { name: "certificates of origin" },
+    { name: "certificates of quality" },
   ];
   const productCodes = [
     { code: "705578-5MG-PW" },
@@ -88,22 +89,22 @@
   let cqLotNumberError = "";
   let scrollContainer;
   function toggleProductDetails2(tab) {
-    if (tab === "Safety Data Sheets") {
+    if (tab === "safetydata sheets") {
       showProductDetailsSafety = !showProductDetailsSafety;
-    } else if (tab === "Certificates of Analysis") {
+    } else if (tab === "certificates of analysis") {
       showProductDetailsCertificates = !showProductDetailsCertificates;
-    } else if (tab === "Certificates of Origin") {
+    } else if (tab === "certificates of origin") {
       showProductDetailsOrigin = !showProductDetailsOrigin;
-    } else if (tab === "Certificates of Quality") {
+    } else if (tab === "certificates of quality") {
       showProductDetailsQuality = !showProductDetailsQuality;
     }
   }
   function toggleLotDetails(tab) {
-    if (tab === "Certificates of Analysis") {
+    if (tab === "certificates of analysis") {
       showLotDetailsCertificates = !showLotDetailsCertificates;
-    } else if (tab === "Certificates of Origin") {
+    } else if (tab === "certificates of origin") {
       showLotDetailsOrigin = !showLotDetailsOrigin;
-    } else if (tab === "Certificates of Quality") {
+    } else if (tab === "certificates of quality") {
       showLotDetailsQuality = !showLotDetailsQuality;
     }
   }
@@ -186,6 +187,20 @@
   const handleClick = () => {
     goto('/contact-us'); // Navigate to a specific route
   };
+
+  let Url = $page?.url?.searchParams?.get("name");
+
+  if (Url) {
+    activeTab = Url;
+  }
+
+function RemoveUrl(urlToRemove) {
+    if (urlToRemove !== Url) {
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.delete("name");
+      window.history.replaceState({}, document.title, currentUrl.toString());
+    }
+}
 </script>
 
 <div class="w-[90%] mx-auto pb-10">
@@ -198,7 +213,9 @@
     {#each tabs as tab}
     <div class="inline-block w-full">
       <button
-        on:click={() => (activeTab = tab.name)}
+        on:click={() => {
+          activeTab = tab.name; 
+          RemoveUrl(tab.name)}}
         class="w-full py-2 sm:py-1 h-12 px-4 sm:px-2 sm:text-sm md:text-base focus:outline-none transition duration-300
           {activeTab === tab.name
           ? 'bg-primary-100 text-primary-500 font-semibold'
@@ -222,7 +239,7 @@
 
   <div class="flex flex-col lg:flex-row lg:space-y-0 space-y-5">
     <div class="w-full lg:w-7/12 px-4 py-2  pt-3 rounded-md bg-white shadow h-1/4">
-      {#if activeTab === "SafetyData Sheets"}
+      {#if activeTab === "safetydata sheets"}
         <div class="mb-2 max-sm:w-full">
           <h2 class="sm:text-lg text-md font-semibold mb-4 text-heading">
             SafetyData Sheets (SDS)
@@ -317,7 +334,7 @@
           </form>
         </div>
       {/if}
-      {#if activeTab === "Certificates of Analysis"}
+      {#if activeTab === "certificates of analysis"}
         <div class="mb-2 max-sm:w-full">
           <h2 class="sm:text-lg text-md font-semibold text-heading mb-4">
             Certificates of Analysis (COA)
@@ -426,7 +443,7 @@
           </form>
         </div>
       {/if}
-      {#if activeTab === "Certificates of Origin"}
+      {#if activeTab === "certificates of origin"}
         <div class="mb-2 max-sm:w-full">
           <h2 class="sm:text-lg text-md text-heading font-semibold mb-4">
             Certificates of Origin (COO)
@@ -538,7 +555,7 @@
           </form>
         </div>
       {/if}
-      {#if activeTab === "Certificates of Quality"}
+      {#if activeTab === "certificates of quality"}
         <div class="mb-2 max-sm:w-full">
           <h2 class="sm:text-lg text-md text-heading font-semibold mb-4">
             Certificates of Quality (COQ)
@@ -661,7 +678,7 @@
 
 
     <div class="w-full lg:w-5/12 md:pl-2 pl-0">
-      {#if activeTab === "SafetyData Sheets"}
+      {#if activeTab === "safetydata sheets"}
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div
@@ -742,7 +759,7 @@
           {/if}
         </div>
       {/if}
-      {#if activeTab === "Certificates of Analysis"}
+      {#if activeTab === "certificates of analysis"}
         <div class="flex flex-wrap space-y-4 ml-0 lg:ml-1">
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -885,7 +902,7 @@
           </div>
         </div>
       {/if}
-      {#if activeTab === "Certificates of Origin"}
+      {#if activeTab === "certificates of origin"}
         <div class="flex flex-wrap space-y-4 ml-0 lg:ml-1">
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -1044,7 +1061,7 @@
           </div>
         </div>
       {/if}
-      {#if activeTab === "Certificates of Quality"}
+      {#if activeTab === "certificates of quality"}
         <div class="flex flex-wrap space-y-4 ml-0 lg:ml-1">
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <!-- svelte-ignore a11y-click-events-have-key-events -->
