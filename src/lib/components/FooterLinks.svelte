@@ -58,7 +58,7 @@
     <PageNotFound />
 {:else}
     <div class="w-11/12 mx-auto max-w-7xl">
-        <div class="flex flex-row pt-3 lg:px-0 px-4">
+        <div class="flex flex-col lg:flex-row pt-3 lg:px-0 px-4">
             <aside class="w-full md:w-1/3  lg:px-4">
                 <h1 class="text-heading font-bold text-xl md:text-2xl">
                     {#if contentComponent === Terms}

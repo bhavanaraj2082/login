@@ -15,7 +15,7 @@
     // console.log('favdata==>>', data)
     let form;
     let fav = writable([])
-    $: isAuthenticated = !!data?.locals?.user?.email;
+    // $: isAuthenticated = !!data?.locals?.user?.email;
     
     const fetchMyFav = ()=>{
         const formdata = new FormData()
@@ -138,7 +138,7 @@ function updateFilters(key, value) {
         const fromDate = new Date(value);
         const toDate = new Date(filters.dateTo);
         if (fromDate > toDate) {
-            toast.error('From date cannot be later than To date');
+            // toast.error('From date cannot be later than To date');
             return;
         }
     }
@@ -400,28 +400,6 @@ onMount(() => {
 	use:enhance={handleDataCart}>
 	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
 </form>
-<!-- {#if !isAuthenticated}
-<div class="p-6 max-w-7xl mx-auto w-11/12">
-    <div class="bg-primary-50 border-l-4 border-primary-500 p-4 rounded-lg shadow-sm">
-        <div class="flex items-center">
-            <div class="ml-4">
-                <h3 class="text-lg font-medium text-primary-800">
-                    Login Required
-                </h3>
-                <p class="mt-1 text-sm text-primary-600">
-                    Please login to view and manage your favorites list.
-                </p>
-                <div class="mt-4">
-                    <a href="/login"
-                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
-                        Login to continue
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{:else} -->
 <div class="pb-10 max-w-7xl mx-auto w-11/12">
     <h1 class="sm:text-2xl text-xl font-bold mb-4 md:mb-6">My Favourites</h1>
     {#if !favData || favData.length === 0}
@@ -613,7 +591,7 @@ onMount(() => {
                     <input type="number" bind:value={item.quantity}
                      on:input={e=>handleQty(item,parseInt(e.target.value))}
                     class="{tog === index ? "" : "hidden"} border-1 w-32 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">   
-                    <div class=" {tog === index ? "hidden" : ""} flex items-center justify-center md:justify-start border-1 rounded">
+                    <div class=" {tog === index ? "hidden" : ""} flex items-center justify-center md:justify-start border-1 rounded-md">
                         <button 
                             on:click={() => decreaseQuantity(item,item.stockInfo[item.specIndex].orderMultiple)} 
                             class="px-2 py-1.5 rounded-md text-primary-500 disabled:opacity-50"
@@ -734,11 +712,9 @@ onMount(() => {
 				isDeleteAll = false;
 			}
 		}}
-		class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-	>
+		class="fixed inset-0 bg-gray-400 backdrop-blur-sm bg-opacity-50 flex justify-center items-center z-50">
 		<div
-			class="bg-white py-6 px-4 rounded flex flex-col shadow-lg w-11/12 sm:w-2/4 lg:w-96 space-y-2"
-		>
+			class="bg-white py-6 px-4 rounded-md flex flex-col shadow-lg w-11/12 sm:w-2/4 lg:w-96 space-y-2">
 			<p class=" font-medium">Are you sure you want to delete all the components?</p>
 			<div class="flex items-center gap-5">
                 <form class=" w-full"
@@ -751,7 +727,7 @@ onMount(() => {
                     Delete
                 </button>
             </form>
-				<button class=" w-full py-1.5 border-1 border-primary-500 text-primary-500 bg-white rounded" eventFunction={() => (isDeleteAll = false)}>Cancel</button>
+				<button class=" w-full py-1.5 border-1 border-primary-500 text-primary-500 bg-white rounded-md" on:click={() => (isDeleteAll = false)}>Cancel</button>
 			</div>
 		</div>
 	</div>
