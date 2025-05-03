@@ -614,9 +614,26 @@ function handleMouseLeave() {
     <!-- products -->
     <div class=" w-full h-auto space-y-3 lg:w-3/4">
         {#if paginatedProducts.length === 0}
-        <div>
+        <!-- <div>
             <p class=" text-center font-medium pt-44">No Product Found</p>
-        </div>
+        </div> -->
+        <div
+        class="mt-8 flex flex-col items-center bg-white shadow rounded-md justify-center p-8 text-center"
+      >
+        <Icon
+          icon="ph:package-duotone"
+          width="64"
+          height="64"
+          class="text-primary-400 mb-4"
+        />
+        <h3 class="text-xl font-medium text-gray-900 mb-2">
+          No products available
+        </h3>
+        <p class="text-gray-500 max-w-md">
+          We couldn't find any categories matching your search criteria. Please
+          try a different search term or check back later.
+        </p>
+      </div>
         {:else}
        {#each paginatedProducts as product,index}
         <div class=" relative bg-white shadow p-2 sm:px-4 space-y-2 rounded-md">
