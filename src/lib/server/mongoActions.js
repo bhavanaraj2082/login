@@ -1347,7 +1347,7 @@ function finalformdata(formData) {
 		email: formData.email || '',
 		phoneNumber: formData.phoneNumber || '',
 		companyName: formData.companyName || '',
-		location: formData.location || '',
+		location: formData.country || '',
 		accountNumber: formData.accountNumber || '',
 		shippingStreetAddress: formData.streetAddress || '',
 		shippingCity: formData.city || '',

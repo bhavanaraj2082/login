@@ -197,7 +197,8 @@
     }
     onMount(() => {
         if (data && data.profile) {
-            firstname = `${data.profile.firstName || data?.authedUser?.username|| ""} `.trim();
+            firstname =
+                `${data.profile.firstName || data?.authedUser?.username || ""} `.trim();
             lastname = `${data.profile.lastName || ""}`.trim();
             email = data.profile.email || "";
             phone = data.profile.cellPhone || "";
@@ -365,15 +366,21 @@
         if (!fieldName || fieldName === "firstname") {
             if (
                 !firstname ||
-                !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(firstname)
+                firstname.length < 3 ||
+                !/^[A-Za-z\s]+$/.test(firstname)
             ) {
-                errors.firstname = "First Name is required";
+                errors.firstname = !firstname
+                    ? "First Name is required"
+                    : firstname.length < 3
+                      ? "First Name must be at least 3 characters"
+                      : "Please enter a valid name";
             } else {
                 delete errors.firstname;
             }
         }
+
         if (!fieldName || fieldName === "lastname") {
-            if (!lastname || !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(lastname)) {
+            if (!lastname || !/^[A-Za-z\s]+$/.test(lastname)) {
                 errors.lastname = "Last Name is required";
             } else {
                 delete errors.lastname;
@@ -381,28 +388,58 @@
         }
 
         if (!fieldName || fieldName === "company") {
-            const companyPattern = /^[A-Za-z0-9@.,\s&-]+$/;
+            const companyPattern = /^[A-Za-z@.,\s&-]+$/;
             if (!companyPattern.test(company)) {
                 errors.company = "Please enter a valid company name";
             } else {
                 delete errors.company;
             }
         }
+   
         if (!fieldName || fieldName === "street") {
-            if (!street || !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(street)) {
-                errors.street = "Street Name is required";
-            } else {
-                delete errors.street;
-            }
-        }
+    const isOnlyNumbers = /^[0-9\s]+$/.test(street);
+    const isValidChars = /^[A-Za-z0-9@!#$%^&*(_).,:;'"+-\s]+$/.test(street);
 
-        if (!fieldName || fieldName === "city") {
-            if (!city || !/^[A-Za-z0-9@!#$%^&*.,:;'"(_)+-\s]+$/.test(city)) {
-                errors.city = "City Name is required";
-            } else {
-                delete errors.city;
-            }
-        }
+    if (
+        !street ||
+        street.length < 3 ||
+        isOnlyNumbers ||
+        !isValidChars
+    ) {
+        errors.street = !street
+            ? "Street Name is required"
+            : street.length < 3
+                ? "Street name must be at least 3 characters"
+                : isOnlyNumbers
+                    ? "Street name cannot be only numbers"
+                    : "Please enter a valid street name";
+    } else {
+        delete errors.street;
+    }
+}
+
+if (!fieldName || fieldName === "city") {
+    const isOnlyNumbers = /^[0-9\s]+$/.test(city);
+    const isValidChars = /^[A-Za-z0-9@!#$%^&*(_).,:;'"+-\s]+$/.test(city);
+
+    if (
+        !city ||
+        city.length < 3 ||
+        isOnlyNumbers ||
+        !isValidChars
+    ) {
+        errors.city = !city
+            ? "City Name is required"
+            : city.length < 3
+                ? "City name must be at least 3 characters"
+                : isOnlyNumbers
+                    ? "City name cannot be only numbers"
+                    : "Please enter a valid city name";
+    } else {
+        delete errors.city;
+    }
+}
+
 
         if (!fieldName || fieldName === "postalcode") {
             if (!postalcode || !/^[0-9\s]+$/.test(postalcode)) {
@@ -427,18 +464,18 @@
         }
 
         if (!fieldName || fieldName === "description") {
-            if (
-                !description ||
-                !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(description) ||
-                /<script.*?>.*?<\/script>/i.test(description) ||
-                /<[^>]*>/i.test(description)
-            ) {
-                errors.description =
-                    "Description is required and must not contain HTML tags or scripts.";
-            } else {
-                delete errors.description;
-            }
-        }
+    const hasInvalidChars = !/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(description);
+    const hasHtmlScript = /<script.*?>.*?<\/script>/i.test(description) || /<[^>]*>/i.test(description);
+
+    if (!description) {
+        errors.description = "Description is required";
+    } else if (hasInvalidChars || hasHtmlScript) {
+        errors.description = "Please enter a valid description";
+    } else {
+        delete errors.description;
+    }
+}
+
 
         if (!fieldName || fieldName === "country") {
             if (!country || country === "") {
@@ -512,26 +549,38 @@
     let errors = {};
 
     let searchTerm = "";
-    function selectCountry(selectedCountry) {
-        country = selectedCountry.name;
-        searchTerm = selectedCountry.name;
-        showDropdown = false;
-        highlightedIndex = -1;
-        validateField("country");
-        validatePhoneNumber(country, phone);
-        validateField("phone");
+    // function selectCountry(selectedCountry) {
+    //     country = selectedCountry.name;
+    //     searchTerm = selectedCountry.name;
+    //     showDropdown = false;
+    //     highlightedIndex = -1;
+    //     validateField("country");
+    //     validatePhoneNumber(country, phone);
+        
 
-        delete errors.country;
-        const countryInput = document.querySelector('input[name="country"]');
-        if (countryInput) {
-            countryInput.value = selectedCountry.name;
-        }
-        if (!phone || phone === "") {
-            errors.phone = "Required for the selected country.";
-        } else {
-            delete errors.phone; // Remove any errors if conditions are satisfied
-        }
-    }
+    //     delete errors.country;
+    //     const countryInput = document.querySelector('input[name="country"]');
+    //     if (countryInput) {
+    //         countryInput.value = selectedCountry.name;
+    //     }
+    //     if (!phone || phone === "") {
+    //         errors.phone = "Required for the selected country.";
+    //     } else {
+    //         delete errors.phone; // Remove any errors if conditions are satisfied
+    //     }
+    // }
+    function selectCountry(selectedCountry) {
+		country = selectedCountry.name;
+		// filteredCountries = countries;
+		searchTerm = `${selectedCountry.name} `;
+		showDropdown = false;
+		highlightedIndex = -1;
+		validateField("country");
+		validatePhoneNumber(country, phone);
+
+		delete errors.country;
+		// console.log('Selected Country:', country);
+	}
 
     function filterCountries() {
         filteredCountries = countries.filter(
@@ -758,9 +807,7 @@
             // startTimer();
         }
     };
-    $: if (country) {
-        validateField("phone");
-    }
+
 </script>
 
 {#if showSuccesDiv}
@@ -916,11 +963,14 @@
                                 );
                                 firstname = e.target.value;
                                 validateField("firstname");
+
                                 errors.firstname = !firstname
                                     ? "*Required"
-                                    : !/^[A-Za-z\s]+$/.test(firstname)
-                                      ? "Please enter a valid name"
-                                      : "";
+                                    : firstname.length < 3
+                                      ? "Minimum 3 characters required"
+                                      : !/^[A-Za-z\s]+$/.test(firstname)
+                                        ? "Please enter a valid name"
+                                        : "";
                             }}
                         />
                         {#if errors?.firstname}
@@ -990,7 +1040,7 @@
                                 validateField("company");
                                 errors.company = !company
                                     ? "*Required"
-                                    : !/^[A-Za-z0-9@!#$%^&*(_)+-\s]+$/.test(
+                                    : !/^[A-Za-z@!#$%^&*(_)+-\s]+$/.test(
                                             company,
                                         )
                                       ? "Please enter a valid company name"
@@ -1018,20 +1068,24 @@
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Street Name"
                             on:input={(e) => {
-                                e.target.value = e.target.value.replace(
-                                    /^\s+/,
-                                    "",
-                                );
+                                e.target.value = e.target.value.replace(/^\s+/, "");
                                 street = e.target.value;
                                 validateField("street");
+                            
+                                const isOnlyNumbers = /^[0-9\s]+$/.test(street);
+                                const isValidChars = /^[A-Za-z0-9@!#$%^&*(_).,:;'"+-\s]+$/.test(street);
+                            
                                 errors.street = !street
                                     ? "*Required"
-                                    : !/^[A-Za-z0-9@!#$%^&*(_).,:;'"+-\s]+$/.test(
-                                            street,
-                                        )
-                                      ? "Please enter a valid street name"
-                                      : "";
+                                    : street.length < 3
+                                        ? "Street name must be at least 3 characters"
+                                        : isOnlyNumbers
+                                            ? "Street name cannot be only numbers"
+                                            : !isValidChars
+                                                ? "Please enter a valid street name"
+                                                : "";
                             }}
+                            
                         />
                         {#if errors?.street}
                             <span class="text-red-500 text-xs mt-1 block"
@@ -1315,18 +1369,24 @@
                             class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="City"
                             on:input={(e) => {
-                                e.target.value = e.target.value.replace(
-                                    /^\s+/,
-                                    "",
-                                );
+                                e.target.value = e.target.value.replace(/^\s+/, "");
                                 city = e.target.value;
                                 validateField("city");
+                            
+                                const isOnlyNumbers = /^[0-9\s]+$/.test(city);
+                                const isValidChars = /^[A-Za-z0-9@!#$%^&*(_).,:;'"+-\s]+$/.test(city);
+                            
                                 errors.city = !city
                                     ? "*Required"
-                                    : !/^[A-Za-z" "/?()*$#0-9\s]+$/.test(city)
-                                      ? "Please enter a valid city name"
-                                      : "";
+                                    : city.length < 3
+                                        ? "City name must be at least 3 characters"
+                                        : isOnlyNumbers
+                                            ? "City name cannot be only numbers"
+                                            : !isValidChars
+                                                ? "Please enter a valid city name"
+                                                : "";
                             }}
+               
                         />
                         {#if errors?.city}
                             <span class="text-red-500 text-xs mt-1 block"
@@ -1343,7 +1403,7 @@
                             class="block text-gray-700 font-semibold text-sm mb-2"
                             >*Country</label
                         >
-                        <div class="relative">
+                        <div class="relative dropdown-container">
                             <input
                                 type="text"
                                 name="country"
@@ -1456,24 +1516,20 @@
                             bind:value={description}
                             maxlength="200"
                             on:input={(e) => {
-                                e.target.value = e.target.value.replace(
-                                    /^\s+/,
-                                    "",
-                                );
+                                e.target.value = e.target.value.replace(/^\s+/, "");
                                 description = e.target.value;
                                 validateField("description");
+                            
+                                const hasHtmlScript = /<script.*?>.*?<\/script>/i.test(description) || /<[^>]*>/i.test(description);
+                                const isValidChars = /^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(description);
+                            
                                 errors.description = !description
                                     ? "*Required"
-                                    : /<script.*?>.*?<\/script>/i.test(
-                                            description,
-                                        )
-                                      ? "Script tags are not allowed."
-                                      : !/^[A-Za-z" "/?().,:;""''*$#0-9\s]+$/.test(
-                                              description,
-                                          )
+                                    : hasHtmlScript || !isValidChars
                                         ? "Please enter a valid description"
                                         : "";
                             }}
+                            
                             class="bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 rounded-md w-full p-3 text-sm"
                         ></textarea>
                         {#if errors.description}
@@ -1513,7 +1569,7 @@
                         {/if}
                     </div>
                 </div>
-                <span class="flex-1 w-1/3 mb-4">
+                <!-- <span class="flex-1 w-1/2 mb-4">
                     <label
                         for="recaptcha"
                         class="block text-sm font-medium text-gray-700"
@@ -1565,7 +1621,7 @@
                                     }
                                 }}
                             />
-                            <span class="text-gray-700 font-medium text-sm"
+                            <span class="text-gray-700  font-medium text-sm"
                                 >Please verify you are human</span
                             >
                         </label>
@@ -1630,6 +1686,127 @@
                             </button>
                         </div>
 
+                        {#if errorMessage}
+                            <p class="text-red-500 text-sm mt-2">
+                                {errorMessage}
+                            </p>
+                        {/if}
+                    </div>
+                </span> -->
+
+                <span class="flex-1 w-1/2 mb-4">
+                    <input type="hidden" name="token" value={captchaToken} />
+                    <div id="g-recaptcha-response">
+                        <!-- Remove the label wrapper and place elements side by side -->
+                        <div class="flex mt-5 md:mt-6 items-center justify-end space-x-2 mb-4">
+                            <input
+                                type="checkbox"
+                                id="captcha-checkbox"
+                                name="captcha"
+                                value="captcha"
+                                class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded cursor-pointer hover:border-primary-500 transition-colors duration-300"
+                                bind:checked={isChecked}
+                                on:click={(event) => {
+                                     event.preventDefault();
+                                    // Don't prevent default here, so checkbox works normally
+                                    if (formValid()) {
+                                        isChecked = true;
+                                        showPopup();
+                                    } else {
+                                        if (Object.keys(errors).length > 0) {
+                                            toast.error(
+                                                "Please fill all the required fields."
+                                            );
+                                            return;
+                                        }
+                                        if (
+                                            !(
+                                                ProfileEmailVerified ||
+                                                authedUserEmailVerified === true
+                                            )
+                                        ) {
+                                            toast.error(
+                                                "Please verify your email to proceed"
+                                            );
+                                            return;
+                                        }
+                
+                                        isChecked = false;
+                                    }
+                                }}
+                                on:keydown={(event) => {
+                                    if (event.key === "Enter") {
+                                        event.preventDefault();
+                                    }
+                                }}
+                            />
+                            <!-- Use label with "for" attribute to associate with checkbox but keep them separate -->
+                            <label 
+                                for="captcha-checkbox"
+                                class="text-gray-700 font-medium text-sm cursor-pointer"
+                            >
+                                Please verify you are human
+                            </label>
+                        </div>
+                
+                        <div class="mt-4 rounded flex items-center justify-end">
+                            <button
+                                class="px-4 py-3 rounded bg-primary-400 to-primary-500 text-white font-medium shadow-lg hover:shadow-xl md:w-1/4 w-1/2 transform transition hover:bg-primary-600"
+                                on:click={(event) => {
+                                    event.preventDefault();
+                
+                                    if (!formValid()) {
+                                        if (Object.keys(errors).length > 0) {
+                                            toast.error(
+                                                "Please fill all the required fields."
+                                            );
+                                            return;
+                                        }
+                
+                                        if (
+                                            !(
+                                                ProfileEmailVerified ||
+                                                authedUserEmailVerified === true
+                                            )
+                                        ) {
+                                            toast.error(
+                                                "Please verify either your email or your phone number to proceed"
+                                            );
+                                            return;
+                                        }
+                                    }
+                
+                                    if (!isChecked) {
+                                        toast.error(
+                                            "Please complete the CAPTCHA to proceed with the submission."
+                                        );
+                                        return;
+                                    }
+                
+                                    handlesubmit({ event });
+                                }}
+                                on:keydown={(event) => {
+                                    if (event.key === "Enter") {
+                                        event.preventDefault();
+                                    }
+                                }}
+                            >
+                                {#if submitting}
+                                    <span
+                                        class="flex items-center justify-center"
+                                    >
+                                        <Icon
+                                            icon="line-md:loading-alt-loop"
+                                            class="w-4 h-4 mr-2 animate-spin"
+                                        />
+                                        Submitting...
+                                    </span>
+                                {:else}
+                                    Submit Request
+                                {/if}
+                            </button>
+                        </div>
+                
                         {#if errorMessage}
                             <p class="text-red-500 text-sm mt-2">
                                 {errorMessage}

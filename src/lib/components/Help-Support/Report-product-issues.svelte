@@ -10,6 +10,17 @@
 	let dropdownEl;
 	export let data;
 	let form;
+	let form3;
+	let enteredOtpemail;
+	let enteredOtp = "";
+	let ProfileEmailVerified;
+	let isOtpVerified = false;
+	let verificationMessage = "";
+	let loadingotp = false;
+	let isLoading = false;
+	let emailSent = false;
+	let displayMessage = "";
+	let authedUserEmailVerified = data?.profile?.isEmailVerified;
 	let searchTerm = "";
 	let errors = {};
 	let issue = "";
@@ -74,18 +85,22 @@
 	};
 	const validateField = (fieldName) => {
 		if (!fieldName || fieldName === "firstName") {
-			if (!firstName || !/^[A-Za-z\s]+$/.test(firstName)) {
-				errors.firstName =
-					"First name is required and should contain only letters";
+			if (!firstName) {
+				errors.firstName = "*Required";
+			} else if (firstName.length < 3) {
+				errors.firstName = "Must be at least 3 characters.";
+			} else if (!/^[A-Za-z\s]+$/.test(firstName)) {
+				errors.firstName = "Only letters and spaces are allowed.";
 			} else {
 				delete errors.firstName;
 			}
 		}
 
 		if (!fieldName || fieldName === "lastName") {
-			if (!lastName || !/^[A-Za-z\s]+$/.test(lastName)) {
-				errors.lastName =
-					"Last name is required and should contain only letters";
+			if (!lastName) {
+				errors.lastName = "*Required";
+			} else if (!/^[A-Za-z\s]+$/.test(lastName)) {
+				errors.lastName = "Only letters and spaces are allowed.";
 			} else {
 				delete errors.lastName;
 			}
@@ -154,21 +169,30 @@
 			}
 		}
 		if (!fieldName || fieldName === "companyName") {
-			if (!companyName || !/^[A-Za-z0-9@.,\s&-]+$/.test(companyName)) {
-				errors.companyName = "Please enter a valid Company name ";
+			if (!companyName) {
+				errors.companyName = "*Required";
+			} else if (companyName.length < 3) {
+				errors.companyName = "Must be at least 3 characters.";
+			} else if (!/^[A-Za-z0-9@.,!#$%^&*(_)+\-\s]+$/.test(companyName)) {
+				errors.companyName = "Please enter a valid company name.";
 			} else {
 				delete errors.companyName;
 			}
 		}
 
+
 		if (!fieldName || fieldName === "assistance") {
-			if (
-				!assistance ||
-				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(assistance) ||
+			if (!assistance) {
+				errors.assistance = "*Required";
+			} else if (assistance.length < 3) {
+				errors.assistance = "Must be at least 3 characters.";
+			} else if (
+				!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(assistance) ||
 				/<script.*?>.*?<\/script>/i.test(assistance) ||
 				/<[^>]*>/i.test(assistance)
 			) {
-				errors.assistance = "Please enter valid assistance details.";
+				errors.assistance =
+					"Please enter valid assistance details.";
 			} else {
 				delete errors.assistance;
 			}
@@ -520,6 +544,12 @@
 		document.addEventListener("click", handleClickOutside);
 		return () => document.removeEventListener("click", handleClickOutside);
 	});
+	const handleResendOtpemail = () => {
+		if (!loadingotp) {
+			form3.requestSubmit();
+			// startTimer();
+		}
+	};
 </script>
 
 {#if showSuccesDiv}
@@ -672,6 +702,8 @@
 							validateField("assistance");
 							errors.assistance = !assistance
 								? "*Required"
+								: assistance.length < 3
+										? "Must be at least 3 characters"
 								: !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(
 											assistance,
 									  )
@@ -697,6 +729,7 @@
 						<input
 							name="firstName"
 							type="text"
+							maxlength="50"
 							placeholder="First Name"
 							bind:value={firstName}
 							class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
@@ -708,12 +741,16 @@
 									"",
 								);
 								firstName = e.target.value;
+
 								validateField("firstName");
+
 								errors.firstName = !firstName
 									? "*Required"
-									: !/^[A-Za-z\s]+$/.test(firstName)
-										? "Please enter a valid last name"
-										: "";
+									: firstName.length < 3
+										? "Must be at least 3 characters"
+										: !/^[A-Za-z\s]+$/.test(firstName)
+											? "Please enter a valid first name"
+											: "";
 							}}
 						/>
 						{#if errors?.firstName}
@@ -739,10 +776,12 @@
 									"",
 								);
 								lastName = e.target.value;
+
 								validateField("lastName");
-								errors.lastname = !lastName
+
+								errors.lastName = !lastName
 									? "*Required"
-									: !/^[A-Za-z]+$/.test(lastName)
+									: !/^[A-Za-z\s]+$/.test(lastName)
 										? "Please enter a valid last name"
 										: "";
 							}}
@@ -755,37 +794,270 @@
 					</div>
 
 					<!-- Email Input -->
-					<div class="flex flex-col">
+					<div>
 						<input
+							type="hidden"
 							name="email"
-							type="email"
-							placeholder="Email"
+							id="email"
 							bind:value={email}
-							class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
-							required
-							on:input={() => validateField("email")}
-							on:input={(e) => {
-								e.target.value = e.target.value.replace(
-									/^\s+/,
-									"",
-								);
-								email = e.target.value;
-								email = email.trim();
-								validateField("email");
-								errors.email = !email
-									? "*Required"
-									: !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-												email,
-										  ) ||
-										  email.split("@")[1].includes("gamil")
-										? "Please enter a valid email address"
-										: "";
-							}}
 						/>
-						{#if errors?.email}
-							<p class="text-red-500 text-xs mt-1">
-								{errors.email}
-							</p>
+						<form
+							action="?/verifyemail"
+							bind:this={form3}
+							method="POST"
+							use:enhance={({}) => {
+								return async ({ result }) => {
+									isLoading = false;
+									console.log("result", result);
+									if (result.data?.status === 200) {
+										ProfileEmailVerified =
+											result.data.isEmailVerified;
+										if (
+											authedUserEmailVerified === true
+										) {
+											ProfileEmailVerified = true;
+										}
+
+										verificationMessage =
+											result.data.message;
+
+										if (
+											verificationMessage.includes(
+												"Verification email sent successfully. Please check your inbox.",
+											)
+										) {
+											displayMessage =
+												"Please check your inbox.";
+											emailSent = true;
+											enteredOtp = "";
+											isOtpVerified = false;
+										} else {
+											displayMessage =
+												verificationMessage;
+											emailSent = false;
+											isOtpVerified = false;
+										}
+
+										toast.success(verificationMessage);
+									} else {
+										toast.error(result.data.message);
+										ProfileEmailVerified =
+											result.data.isEmailVerified;
+										emailSent = false;
+									}
+								};
+							}}
+							class="w-full"
+							on:submit={() => {
+								isLoading = true;
+							}}
+						>
+							<div class="relative w-full">
+							
+								<div class="relative">
+									<input
+										type="text"
+										name="email"
+										id="email"
+										bind:value={email}
+										maxlength="50"
+							class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
+										placeholder="Email"
+										on:input={(e) => {
+											e.target.value =
+												e.target.value.replace(
+													/^\s+/,
+													"",
+												);
+											email = e.target.value;
+											email = email.trim();
+											validateField("email");
+											errors.email = !email
+												? "*Required"
+												: !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+															email,
+													  ) ||
+													  email
+															.split("@")[1]
+															.includes(
+																"gamil",
+															)
+													? "Please enter a valid email address"
+													: "";
+											ProfileEmailVerified = false;
+											emailSent = false;
+											authedUserEmailVerified = false;
+										}}
+									/>
+									{#if isLoading}
+										<span
+											class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-600 flex items-center"
+										>
+											<Icon
+												icon="line-md:loading-alt-loop"
+												class="w-4 h-4 mr-1 animate-spin"
+											/>
+											Verifying...
+										</span>
+										<!-- {:else if !ProfileEmailVerified && !emailSent && isEmailVerified !== true} -->
+									{:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
+										<button
+											type="submit"
+											class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-500 hover:text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+											disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+												email,
+											) ||
+												email
+													.split("@")[1]
+													.includes("gamil")}
+										>
+											Verify
+										</button>
+									{:else if emailSent}
+										<span
+											class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-green-600 flex items-center"
+										>
+											{#if isOtpVerified}
+												Verified
+												<Icon
+													icon="material-symbols:verified-rounded"
+													class="w-4 h-4 ml-1"
+												/>
+											{:else}
+												<Icon
+													icon="fluent:mail-all-read-16-filled"
+													class="w-4 h-4 mr-1"
+												/>
+												Check your inbox
+											{/if}
+										</span>
+									{:else}
+										<span
+											class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-green-600 flex items-center"
+										>
+											Verified
+											<Icon
+												icon="material-symbols:verified-rounded"
+												class="w-4 h-4 ml-1"
+											/>
+										</span>
+									{/if}
+								</div>
+								{#if errors?.email}
+									<span
+										class="text-red-500 text-xs mt-1 block"
+										>{errors.email}</span
+									>
+								{/if}
+							</div>
+						</form>
+						{#if emailSent && isOtpVerified === false}
+							<div
+								class="mt-3 bg-gray-50 p-3 rounded-md border border-gray-200"
+							>
+								<form
+									action="?/verifyOtpEmail"
+									method="POST"
+									use:enhance={() => {
+										return async ({ result }) => {
+											loadingotp = false; // Hide loading spinner when the request is complete
+											if (result.status === 200) {
+												if (
+													result.data.status ===
+													200
+												) {
+													const verifiedMessage =
+														result.data.message;
+													toast.success(
+														verifiedMessage,
+													);
+													isOtpVerified =
+														result.data
+															.isEmailVerified;
+													enteredOtpemail = "";
+													ProfileEmailVerified = true;
+													console.log(
+														isOtpVerified,
+														"isOtpVerified",
+													);
+												} else {
+													const errorMessage =
+														result.data
+															.message ||
+														"An unknown error occurred!";
+													toast.error(
+														errorMessage,
+													);
+												}
+											} else {
+												const errorMessage =
+													result.data.message ||
+													"Request failed. Please try again.";
+												toast.error(errorMessage);
+											}
+										};
+									}}
+									on:submit={() => {
+										loadingotp = true; // Show loading message when form is submitted
+									}}
+								>
+									<div class="relative w-full mb-2">
+										<input
+											type="hidden"
+											name="email"
+											id="email"
+											bind:value={email}
+										/>
+										<input
+											type="text"
+											name="enteredOtp"
+											bind:value={enteredOtpemail}
+											placeholder="Enter 6-digit OTP"
+											class="w-full text-sm border-gray-300 border rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 p-2.5"
+											on:input={() => {
+												enteredOtpemail =
+													enteredOtpemail.trim();
+												enteredOtpemail =
+													enteredOtpemail
+														.replace(/\D/g, "")
+														.slice(0, 6);
+											}}
+										/>
+										<button
+											type="submit"
+											class="absolute top-1/2 right-3 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
+											disabled={loadingotp}
+										>
+											{#if loadingotp}
+												<span
+													class="flex items-center"
+												>
+													<Icon
+														icon="line-md:loading-alt-loop"
+														class="w-4 h-4 mr-1 animate-spin"
+													/>
+													Verifying...
+												</span>
+											{:else}
+												Verify
+											{/if}
+										</button>
+									</div>
+									<div class="flex justify-end text-xs">
+										<span>
+											Didn't receive the code?</span
+										>
+										<button
+											type="button"
+											on:click={handleResendOtpemail}
+											disabled={loadingotp}
+											class="text-primary-400 hover:text-primary-500 hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+										>
+											Get a new code
+										</button>
+									</div>
+								</form>
+							</div>
 						{/if}
 					</div>
 
@@ -813,6 +1085,7 @@
 							name="companyName"
 							placeholder="Company Name "
 							bind:value={companyName}
+							maxlength="50"
 							class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 							required
 							on:input={(e) => {
@@ -821,14 +1094,18 @@
 									"",
 								);
 								companyName = e.target.value;
+
 								validateField("companyName");
-								errors.company = !companyName
+
+								errors.companyName = !companyName
 									? "*Required"
-									: !/^[A-Za-z0-9@.,!#$%^&*(_)+-\s]+$/.test(
-												companyName,
-										  )
-										? "Please enter a valid company name"
-										: "";
+									: companyName.length < 3
+										? "Must be at least 3 characters"
+										: !/^[A-Za-z@.,!#$%^&*(_)+\-\s]+$/.test(
+													companyName,
+											  )
+											? "Please enter a valid company name"
+											: "";
 							}}
 						/>
 						{#if errors?.companyName}
@@ -956,9 +1233,7 @@ on:input={() => validateField('accountNumber')}
 					<button
 						class="w-full md:w-1/2 bg-primary-400 text-white p-2 rounded hover:bg-primary-500 mt-4"
 						on:click={(event) => {
-							// event.preventDefault();
-
-							// Check form validity
+							// Then check form validity
 							if (!formValid()) {
 								toast.error(
 									"Please fill all the required fields.",
@@ -967,6 +1242,19 @@ on:input={() => validateField('accountNumber')}
 								return;
 							} else {
 								handlesubmit();
+							}
+
+							if (
+								!(
+									ProfileEmailVerified ||
+									authedUserEmailVerified === true
+								)
+							) {
+								toast.error(
+									"Please verify your email to proceed",
+								);
+								event.preventDefault();
+								return;
 							}
 						}}
 						on:keydown={(event) => {
