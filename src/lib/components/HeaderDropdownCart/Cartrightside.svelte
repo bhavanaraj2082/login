@@ -92,7 +92,6 @@
 		quantity = Math.abs(quantity)
 		clearTimeout(timeout);
 		if (quantity > 10000000) quantity = 10000000;
-		selectedId = _id
 		timeout = setTimeout(() => {
 		if(quantity <= stock.orderMultiple ) quantity = stock.orderMultiple
 		const selectedQty = Math.ceil(quantity/ stock.orderMultiple) * stock.orderMultiple
@@ -111,12 +110,9 @@
 			tog = null;
 			return;
 		}
-	//}, 1500);
-
-
+		selectedId = _id
 		const index = $cart.findIndex((item) => item._id === _id);
 		
-	//	timeout = setTimeout(() => {
 			if (index !== -1) {
 			cart.update((item) => {
 				item[index].quantity = Math.ceil(quantity/ stock.orderMultiple) * stock.orderMultiple;
@@ -137,22 +133,17 @@
 		}, 1400);
 	};
 	const incrementQuantity = (stock, _id, indx) => {
+
 		clearTimeout(timeout);
 		// console.log("stock",stock);
 		// console.log("_id",_id);
 		// console.log("indx",indx);
 		if (!isLoggedIn) {
 			cart.update((item) => {
+				if(item[indx].quantity >= 10000000) return item
 				item[indx].quantity += item[indx].stockDetails.orderMultiple;
 				return item;
 			});
-			// console.log("afterrrrrrrrrrr updationn",$cart);
-
-			// guestCart.update((item) => {
-			// 	console.log(item,"llllllll");
-			// 	item[indx].quantity += item[indx].stockDetails.orderMultiple;
-			// 	return item;
-			// });
 			calculateTotalPrice($cart);
 			return;
 		}
@@ -160,6 +151,7 @@
 		const index = $cart.findIndex((item) => item._id === _id);
 		if (index !== -1) {
 			cart.update((item) => {
+				if(item[indx].quantity >= 10000000) return item
 				item[index].quantity += item[indx].stockDetails.orderMultiple;
 				return item;
 			});
@@ -456,20 +448,20 @@
 						<div class="flex flex-col py-4 border-b">
 							<div class="flex items-center space-x-1.5">
 								<div
-									class="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 bg-stone-300 rounded-md overflow-hidden"
+									class="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-md overflow-hidden"
 								>
 									<img
 										src="{PUBLIC_IMAGE_URL}/{item?.productDetails?.image}"
 										onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
 										alt="img"
-										class="w-full h-full object-cover"
+										class="w-full h-full object-contain"
 									/>
 								</div>
 								<div class="flex-1">
 									<button on:click={()=>{
 										cartOpen = false
 										goto(`/products/details/${item?.productDetails?.productNumber}`)
-									}} class="hover:text-primary-500 hover:underline font-semibold text-sm">
+									}} class="text-primary-500 hover:underline font-semibold text-sm">
 										{item?.productDetails?.productNumber}
 									</button>
 									<p class="font-medium text-xs text-gray-800">
@@ -490,14 +482,14 @@
 										)}
 								>
 									<Icon
-										icon="codicon:trash"
+										icon="mdi:delete-forever"
 										class="text-xl sm:text-2xl hover:scale-105"
 									/>
 								</button>
 							</div>
 
 							<div class="flex items-center justify-between mt-3">
-								<p class="text-sm font-semibold text-gray-600">
+								<p class=" {item?.isCart || item?.isQuote ? " text-green-500" : ""} text-sm font-semibold text-gray-600">
 									{$currencyState === "inr"
 										? "₹" +
 											item?.pricing?.INR.toLocaleString(
@@ -509,68 +501,39 @@
 											)}
 								</p>
 								<div class="flex items-center">
-									<input
-										type="number"
-										bind:value={item.quantity}
-										on:input={(e) =>
-											handleQty(
-												parseInt(e.target.value),
-												item?.stockDetails,
-												item._id,
-												index,
-											)}
-										class="{tog === index
-											? ''
-											: 'hidden'} border-1 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400"
-										min="1"
-										max="10000000"
-									/>
-									<div
-										class=" {tog === index
-											? 'hidden'
-											: ''} flex items-center border-1 rounded"
-									>
-										<button
-										disabled={item.isCart || item.isQuote || selectedId.length && item._id !== selectedId}
-											on:click={() =>
-												decrementQuantity(
-													item?.stockDetails,
-													item._id,
-													index,
-												)}
-											class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
-											><Icon
-												icon="rivet-icons:minus"
-												class="text-xs"
-											/></button
-										>
-										<button
-										    disabled={selectedId.length && item._id !== selectedId}
-											on:click={() => {
-												tog = index;
-											}}
-											class="w-fit px-3 py-1 text-xs font-medium outline-none text-center"
-										>
+					
+									<input type="number" bind:value={item.quantity} on:input={(e) =>handleQty(parseInt(e.target.value),item?.stockDetails,item._id,index)}
+										class="{tog === index ? '' : 'hidden'} border-1 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400"
+							            min="1" max="10000000" />
+									<div class=" {tog === index ? 'hidden' : ''} flex items-center border-1 rounded">
+									  {#if item.isCart || item.isQuote}
+									   <button class=" border-r-1 p-1.5 bg-gray-200 text-white ">
+										<Icon icon="rivet-icons:minus" class="text-xs"/>
+									  </button>
+									  <button class="w-fit px-3 py-1 text-xs font-medium outline-none text-center">
+										{item.quantity === null ? "" : item.quantity}
+									  </button>
+									  <button
+										class=" border-l-1 p-1.5 bg-gray-200 text-white ">
+										<Icon icon="rivet-icons:plus" class="text-xs"/>
+									  </button>
+									  {:else}
+										<button disabled={selectedId.length && item._id !== selectedId} on:click={() =>decrementQuantity(item?.stockDetails,item._id,index)}
+											class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
+											<Icon icon="rivet-icons:minus" class="text-xs"/>
+										</button>
+										<button disabled={selectedId.length && item._id !== selectedId} on:click={() => { tog = index}}
+											class="w-fit px-3 py-1 text-xs font-medium outline-none text-center">
 											{item.quantity === null ? "" : item.quantity}
 										</button>
-										<button
-										disabled={item.isCart || item.isQuote || selectedId.length && item._id !== selectedId}
-											on:click={() =>
-												incrementQuantity(
-													item.stockDetails,
-													item._id,
-													index,
-												)}
-											class=" border-l-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
-										>
-											<Icon
-												icon="rivet-icons:plus"
-												class="text-xs"
-											/>
+										<button disabled={selectedId.length && item._id !== selectedId} on:click={() =>incrementQuantity(item.stockDetails,item._id,index)}
+											class=" border-l-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
+											<Icon icon="rivet-icons:plus" class="text-xs"/>
 										</button>
+									  {/if}
 									</div>
 								</div>
-								<p class="text-sm font-semibold text-gray-600">
+								<p class="{item?.isCart || item?.isQuote ? " text-green-500" : ""} text-sm font-semibold text-gray-600">
 									{$currencyState === "inr"
 										? "₹" +
 											(

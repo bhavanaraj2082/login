@@ -223,13 +223,10 @@ function handleMouseLeave() {
     const incrementQuantity = (id, quantity) => {
     products = products.map(product => {
         if (product._id === id) {
+            if(product.quantity >= 10000000) return product
             let priceINR = product.pricing.INR*(product.quantity+product.orderMultiple)
             let priceUSD = product.pricing.USD*(product.quantity+product.orderMultiple)
-            return {
-                ...product, // Copy the product object
-                quantity: product.quantity + product.orderMultiple, // Increment the quantity
-                totalPrice:{priceINR,priceUSD}
-            };
+            return {...product,quantity: product.quantity + product.orderMultiple,totalPrice:{priceINR,priceUSD}};
         }
         return product; // Keep other products unchanged
     });
@@ -359,6 +356,18 @@ function handleMouseLeave() {
     }
   };
 
+  const searchClear = ()=>{
+    search = null
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.delete('search');
+    goto(newUrl.toString(), {
+        invalidateAll: true, 
+        keepfocus: true, 
+        replaceState: true, 
+        noScroll: true 
+    });
+  }
+
   const handleFavorites = (product)=>{
     try {
      console.log(product);
@@ -473,7 +482,7 @@ function handleMouseLeave() {
   </form>
 <section class=" space-y-3 lg:flex items-start gap-4">
     <!-- filters -->
-    <div class=" w-full h-fit sticky top-0 z-20 lg:w-1/4">
+    <div class=" w-full h-fit lg:sticky lg:top-0 lg:z-20 lg:w-1/4">
         <div class=" p-2 sm:p-4 bg-white shadow rounded-md space-y-2 mt-3">
             
             <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -489,7 +498,7 @@ function handleMouseLeave() {
                 selectedSort = ""
                 selectedManufacturer = null
                 goto(`/products/${categoryName}/${subCategoryName}`)
-                }} class="{Object.entries(selectedValues).length > 0 || selectedManufacturer !== null || selectedSort.length ? "" : "hidden"} lg:hidden bg-primary-500 text-xs px-2 py-1 rounded-md text-white font-normal">Clear All</button>
+                }} class="{Object.entries(selectedValues).length > 0 || selectedManufacturer !== null || selectedSort.length ? "" : "hidden"} lg:hidden bg-primary-500 hover:bg-primary-600 text-xs px-2 py-1 rounded-md text-white font-normal">Clear All</button>
               </div>
                <Icon icon={toggleFilter ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-3xl p-0.5 rounded-full hover:bg-gray-100 lg:hidden"/>
             </div>
@@ -504,8 +513,9 @@ function handleMouseLeave() {
                 }} class="{Object.entries(selectedValues).length > 0 || selectedManufacturer !== null || selectedSort.length ? "" : "hidden"} bg-primary-500 text-[11px] px-2 py-1 rounded-md text-white font-normal">Clear All</button>
             </div>
             <div class=" max-h-[80vh] overflow-y-auto scroll space-y-2 {toggleFilter ? "block":" hidden lg:block"}">
-            <div class="relative pr-1">
+            <div class="relative flex items-center pr-1">
                 <input type="text" placeholder="Search..." bind:value={search} on:input={e=>handleSearch(e.target.value)} class=" w-full text-xs font-medium rounded-md border-1 border-gray-300 focus:ring-0 focus:border-primary-500"/>
+                <button class="{search !== null ? "" : "hidden"} absolute right-3" on:click={searchClear}><Icon icon="gridicons:cross"/></button>
                 {#if searchLoading}
                     <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
                 {/if}
@@ -588,7 +598,7 @@ function handleMouseLeave() {
                     
                  </div>
                 {/each}
-                <button on:click={() => handleShowMore()} class="text-xs xl:hidden w-full text-end text-primary-600 hover:text-primary-400 mt-3">
+                <button on:click={() => handleShowMore()} class="{!specifications || specifications === null ? "hidden" : ""} text-xs xl:hidden w-full text-end text-primary-600 hover:text-primary-400 mt-3">
                   {showAllForIndex ? '- Show Less' : '+ Show More'}
                 </button>
              </div>
@@ -596,7 +606,7 @@ function handleMouseLeave() {
              {/if}
             
             </div>
-            <button on:click={() => handleShowMore()} class="text-xs hidden xl:block w-full text-end text-primary-600 hover:text-primary-400 mt-3">
+            <button on:click={() => handleShowMore()} class="{!specifications || specifications === null ? "hidden" : ""} text-xs hidden xl:block w-full text-end text-primary-600 hover:text-primary-400 mt-3">
               {showAllForIndex ? '- Show Less' : '+ Show More'}
             </button>
         </div>

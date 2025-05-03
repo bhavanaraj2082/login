@@ -2311,12 +2311,20 @@ export const favaddToCart = async (cartData, userId, userEmail) => {
             );
 
             if (itemIndex > -1) {
-                existingCart.cartItems[itemIndex].quantity += parseInt(cartData.quantity) || 1;
-                await existingCart.save();
-                return {
-                    status: 'success',
-                    message: 'Item quantity updated in cart'
-                };
+				if(existingCart.cartItems[itemIndex].isCart === false && existingCart.cartItems[itemIndex].isQuote){
+					existingCart.cartItems[itemIndex].quantity += parseInt(cartData.quantity) || 1;
+                    await existingCart.save();
+                    return {
+                       status: 'success',
+                       message: 'Item quantity updated in cart'
+                    };
+				}else{
+					return {
+						status: 'success',
+						message: 'Product is Offered in cart'
+					 };
+				}
+                
             } else {
                 existingCart.cartItems.push(cartData);
                 await existingCart.save();
@@ -2374,11 +2382,13 @@ export const addAllToCart = async (items, userId, userEmail) => {
         if (existingCart) {
             for (const newItem of cartItems) {
                 const existingItemIndex = existingCart.cartItems.findIndex(
-                    item => item.productId.toString() === newItem.productId.toString()
+                    item => item.stockId.toString() === newItem.stockId.toString()
                 );
-
+                console.log(existingItemIndex,"-==-=-=-=-=-=-=-=-=-=-==-=-===+-");
                 if (existingItemIndex > -1) {
-                    existingCart.cartItems[existingItemIndex].quantity += newItem.quantity;
+					if(existingCart.cartItems[existingItemIndex].isCart === false && existingCart.cartItems[existingItemIndex].isQuote === false){
+						existingCart.cartItems[existingItemIndex].quantity += newItem.quantity;
+					}
                 } else {
                     existingCart.cartItems.push(newItem);
                 }
@@ -2879,7 +2889,7 @@ export const saveMailId = async (body) => {
 };
 
 export const addToCart = async (item, userId, userEmail) => {
-	console.log(item);
+	//console.log(item);
 	const a = Date.now()
 	const cart = await Cart.findOne({
 	  userId,
@@ -2903,19 +2913,21 @@ export const addToCart = async (item, userId, userEmail) => {
 		return { success: true, message: "Product is added to new cart" };
 	  } else {
 		await Cart.findOneAndUpdate(
-		  { userId, userEmail, isActiveCart: true },
+		  { userId, userEmail, isActiveCart: true, },
 		  { $push: { cartItems: item } },
 		  { new: true }
 		);
 		return { success: true, message: "Product is added to cart" };
 	  }
 	} else {
-	  await Cart.findOneAndUpdate(
+	 const updateCart = await Cart.findOneAndUpdate(
 		{
 		  userId,
 		  userEmail,
 		  isActiveCart: true,
-		  "cartItems.stockId": item.stockId
+		  "cartItems.stockId": item.stockId,
+		  "cartItems.isCart": false,
+		  "cartItems.isQuote": false
 		},
 		{
 		  $set: {
@@ -2927,7 +2939,11 @@ export const addToCart = async (item, userId, userEmail) => {
 	  );
 	  const b = Date.now()
 	  console.log(b-a,"millisecond");
-	  return { success: true, message: "Product quantity is updated in cart" };
+	  if(updateCart !== null){
+		return { success: true, message: "Product quantity is updated in cart" };
+	  }else{
+	    return { success: true, message: "Product quantity won't update due to an active offer price." };
+	  }
 	}
   };
   
@@ -3505,7 +3521,7 @@ export const recurrenceCartActive = async(userId,body) =>{
 
 export const getMyFavorites = async(userId) => {
 	const myFav = await MyFavourites.findOne({userId},{favorite:1,_id:0}).lean()
-	let favorite = JSON.parse(JSON.stringify(myFav.favorite.map(x=>x.stockId)))
+	let favorite = JSON.parse(JSON.stringify(myFav.favorite.map(x=>x.productId)))
 	return {favorite}
 }
 
