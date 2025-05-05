@@ -84,8 +84,8 @@
 			}
 		}
 		isEditable = false;
-		document.addEventListener("click", handleClickOutside);
-		return () => document.removeEventListener("click", handleClickOutside);
+		// document.addEventListener("click", handleClickOutside);
+		// return () => document.removeEventListener("click", handleClickOutside);
 	});
 	let isChecked = true;
 	let phone = "";
@@ -133,52 +133,136 @@
 		}
 	}
 	function handleSubmit(event) {
-		if (
-			number?.length === 0 ||
-			email.length === 0 ||
-			fname.length === 0 ||
-			fname.trim() === "" ||
-			!/^[A-Za-z\s]+$/.test(fname) ||
-			/<[^>]*>/.test(fname) ||
-			lname.length === 0 ||
-			lname.trim() === "" ||
-			!/^[A-Za-z\s]+$/.test(lname) ||
-			/<[^>]*>/.test(lname) ||
-			company.length === 0 ||
-			company.trim() === "" ||
-			company.trim().length < 3 || // ✅ Minimum 3 characters validation
-			!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) ||
-			/<[^>]*>/.test(company) ||
-			details.length === 0 ||
-			details.trim() === "" ||
-			!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) ||
-			/<[^>]*>/.test(details) ||
-			role.length === 0 ||
-			role.trim() === "" ||
-			!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(role) ||
-			/<[^>]*>/.test(role) ||
-			reason.length === 0 ||
-			!isChecked
-		) {
-			console.log("Validation failed: Missing required fields");
-			event.preventDefault();
-			formValid = false;
-			showErrors = true;
-		} else {
-			formValid = true;
-			formSubmitted = true;
-			showErrors = false;
-		}
-		if (!formValid) {
-			event.preventDefault();
-		}
-	}
-	function showPopup() {
-		if (isCheckedcap) {
-			showCaptchaPopup = true;
-			generateMathQuestion();
-		}
-	}
+    console.log("Form Validation Started");
+
+    // Log the state of all fields
+    console.log({ number, email, fname, lname, company, details, role, reason, isChecked });
+
+    if (
+        number?.length === 0 ||
+        email.length === 0 ||
+        fname.length === 0 ||
+        fname.trim() === "" ||
+        !/^[A-Za-z\s]+$/.test(fname) ||
+        /<[^>]*>/.test(fname) ||
+		fname.trim().length < 3 ||
+		fname.trim().length > 50 ||
+        lname.length === 0 ||
+        lname.trim() === "" ||
+        !/^[A-Za-z\s]+$/.test(lname) ||
+        /<[^>]*>/.test(lname) ||
+		lname.trim().length > 50 ||
+        company.length === 0 ||
+        company.trim() === "" ||
+        company.trim().length < 3 ||
+		company.trim().length > 100 ||
+        !/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(company) ||
+        /<[^>]*>/.test(company) ||
+        details.length === 0 ||
+        details.trim() === "" ||
+		details.trim().length < 5 ||
+		details.trim().length > 500 ||
+        // !/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(details) ||
+        // /<[^>]*>/.test(details) ||
+        role.length === 0 ||
+        role.trim() === "" ||
+        !/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(role) ||
+        /<[^>]*>/.test(role) ||
+		role.trim().length < 3 ||
+		role.trim().length > 150 ||
+        reason.length === 0 
+		
+       
+    ) {
+        console.log("Validation failed: Missing required fields");
+        event.preventDefault();
+        formValid = false;
+        showErrors = true;
+    } else {
+        console.log("Validation Passed");
+        formValid = true;
+        formSubmitted = true;
+        showErrors = false;
+    }
+
+    if (!formValid) {
+        event.preventDefault();
+    }
+}
+
+function showPopup() {
+    console.log("Attempting to show CAPTCHA Popup...");
+
+    // Log the state of CAPTCHA and form validation
+    console.log({ showCaptchaPopup, formValid, isCheckedcap });
+
+    if (isCheckedcap && !showCaptchaPopup) { // Only show CAPTCHA if needed
+        console.log("Displaying CAPTCHA Popup");
+        showCaptchaPopup = true;
+        generateMathQuestion();
+    }
+}
+
+function closeCaptcha() {
+    console.log("Closing CAPTCHA Popup...");
+
+    // Reset form state and CAPTCHA popup
+    showCaptchaPopup = false;
+    isCheckedcap = false;  // Reset CAPTCHA state (if required)
+    formValid = false;     // Reset form validation state
+    formSubmitted = false; // Reset form submission state
+    showErrors = false;    // Hide error messages
+    console.log("State after closing CAPTCHA:", { showCaptchaPopup, formValid, isCheckedcap });
+}
+
+
+	// function handleSubmit(event) {
+	// 	if (
+	// 		number?.length === 0 ||
+	// 		email.length === 0 ||
+	// 		fname.length === 0 ||
+	// 		fname.trim() === "" ||
+	// 		!/^[A-Za-z\s]+$/.test(fname) ||
+	// 		/<[^>]*>/.test(fname) ||
+	// 		lname.length === 0 ||
+	// 		lname.trim() === "" ||
+	// 		!/^[A-Za-z\s]+$/.test(lname) ||
+	// 		/<[^>]*>/.test(lname) ||
+	// 		company.length === 0 ||
+	// 		company.trim() === "" ||
+	// 		company.trim().length < 3 || // ✅ Minimum 3 characters validation
+	// 		!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(company) ||
+	// 		/<[^>]*>/.test(company) ||
+	// 		details.length === 0 ||
+	// 		details.trim() === "" ||
+	// 		!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) ||
+	// 		/<[^>]*>/.test(details) ||
+	// 		role.length === 0 ||
+	// 		role.trim() === "" ||
+	// 		!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(role) ||
+	// 		/<[^>]*>/.test(role) ||
+	// 		reason.length === 0 ||
+	// 		!isChecked
+	// 	) {
+	// 		console.log("Validation failed: Missing required fields");
+	// 		event.preventDefault();
+	// 		formValid = false;
+	// 		showErrors = true;
+	// 	} else {
+	// 		formValid = true;
+	// 		formSubmitted = true;
+	// 		showErrors = false;
+	// 	}
+	// 	if (!formValid) {
+	// 		event.preventDefault();
+	// 	}
+	// }
+	// function showPopup() {
+	// 	if (isCheckedcap) {
+	// 		showCaptchaPopup = true;
+	// 		generateMathQuestion();
+	// 	}
+	// }
 	function generateMathQuestion() {
 		const num1 = Math.floor(Math.random() * 10) + 1;
 		const num2 = Math.floor(Math.random() * 10) + 1;
@@ -269,6 +353,19 @@
 	// 		rotationClass = "";
 	// 	}, 1000);
 	// }
+
+	$: trimmedRole = role.trim();
+	$: isValidRole =
+		trimmedRole.length >= 3 &&
+		trimmedRole.length <= 150 &&
+		/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(trimmedRole) &&
+		!/<[^>]*>/.test(trimmedRole);
+
+		$: trimmedDetails = details.trim();
+	$: isValidDetails =
+		trimmedDetails.length >= 5 &&
+		trimmedDetails.length <= 500 ;
+
 	function refreshMathQuestion(event) {
 		if (event) {
 			event.preventDefault();
@@ -296,6 +393,8 @@
 	// 		errorMessagecap = "";
 	// 	}
 	// }
+	let showdisErrors = false;
+	let showdatErrors = false;
 
 	function onInputChange() {
 		// Just clear the error message when typing, don't validate yet
@@ -337,15 +436,17 @@
 			}, 2000);
 		}
 	}
+	
 	function validatePhoneNumber(location, number) {
-		const pattern = phoneNumberPatterns[location];
-		if (!pattern) {
-			throw new Error(
-				`No validation pattern found for location: ${location}`,
-			);
-		}
-		return pattern.test(number);
+	const pattern = phoneNumberPatterns[location];
+	if (!pattern) {
+		console.warn(`No validation pattern found for location: ${location}`);
+		return false;
 	}
+	return pattern.test(number);
+}
+
+
 	let loadingotp = false;
 	const handleResendOtpemail = () => {
 		if (!loadingotp) {
@@ -354,7 +455,7 @@
 	};
 	let searchTerm = "";
 	let showDropdown = false;
-	let filteredCountries = [];
+	let filteredCountries = countries;
 
 	function filterCountries() {
 		filteredCountries = countries.filter(
@@ -432,14 +533,24 @@
 		showDropdown = !showDropdown;
 	}
 
-	function handleClickOutside(event) {
-		if (!event.target.closest(".dropdown-container")) {
-			showDropdown = false;
-		}
-	}
-	function handleFocus() {
-		showErrors = false;
-	}
+	// function handleClickOutside(event) {
+	// 	if (!event.target.closest(".dropdown-container")) {
+	// 		showDropdown = false;
+	// 	}
+	// }
+	// function handleFocus() {
+	// 	showErrors = false;
+	// }
+
+	let countryDropdownRef;
+
+function handleFormClick(event) {
+const isInCountry = countryDropdownRef?.contains(event.target);
+if (!isInCountry) {
+  showDropdown = false;
+}
+}
+
 </script>
 
 {#if showSuccesDiv}
@@ -491,7 +602,9 @@
 		</div>
 	</div>
 {:else}
-	<section class="md:w-11/12 mx-auto max-w-7xl bg-gray-50 sm:pb-0 px-2 pb-10">
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<section class="md:w-11/12 mx-auto max-w-7xl bg-gray-50 sm:pb-0 px-2 pb-10" on:click={handleFormClick}>
 		<section>
 			<div class="font-bold text-xl text-gray-700 md:text-2xl pb-4">
 				Chemikart Solutions
@@ -865,65 +978,69 @@
 					</p>
 				</div>
 				<div>
-					<label class="flex items-center space-x-2 text-lg">
+					<div class="flex items-center space-x-2 text-lg">
 						<input
-							type="checkbox"
-							bind:group={selectedNames}
-							class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0"
-							value="I have a question about an existing B2B connection "
+						  id="questionCheckbox"
+						  type="checkbox"
+						  bind:group={selectedNames}
+						  class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
+						  value="I have a question about an existing B2B connection "
 						/>
-						<span class="mb-5 text-xs"
-							>I have a question about an existing B2B connection.</span
-						>
-					</label>
-					<label class="flex items-center space-x-2 text-lg">
+						<label for="questionCheckbox" class="mb-5 text-xs cursor-default select-none">
+						  I have a question about an existing B2B connection.
+						</label>
+					  </div>
+					  <div class="flex items-center space-x-2 text-lg">
 						<input
-							type="checkbox"
-							bind:group={selectedNames}
-							class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0"
-							value=" I would like to have more information about B2B solutions "
+						  id="infoCheckbox1"
+						  type="checkbox"
+						  bind:group={selectedNames}
+						  class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
+						  value="I would like to have more information about B2B solutions"
 						/>
-						<span class="mb-5 text-xs"
-							>I would like to have more information about B2B
-							solutions</span
-						>
-					</label>
-					<label class="flex items-center space-x-2 text-lg">
+						<label for="infoCheckbox1" class="mb-5 text-xs cursor-default select-none">
+						  I would like to have more information about B2B solutions
+						</label>
+					  </div>
+					  
+					  <div class="flex items-center space-x-2 text-lg">
 						<input
-							type="checkbox"
-							bind:group={selectedNames}
-							class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0"
-							value=" I would like to be contacted about setting up a B2B connection "
+						  id="infoCheckbox2"
+						  type="checkbox"
+						  bind:group={selectedNames}
+						  class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
+						  value="I would like to be contacted about setting up a B2B connection"
 						/>
-						<span class="mb-5 text-xs"
-							>I would like to be contacted about setting up a B2B
-							connection</span
-						>
-					</label>
-					<label class="flex items-center space-x-2 text-lg">
+						<label for="infoCheckbox2" class="mb-5 text-xs cursor-default select-none">
+						  I would like to be contacted about setting up a B2B connection
+						</label>
+					  </div>
+					  
+					  <div class="flex items-center space-x-2 text-lg">
 						<input
-							type="checkbox"
-							bind:group={selectedNames}
-							class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0"
-							value=" I would like to know if there is an existing B2B connection for my organization "
+						  id="infoCheckbox3"
+						  type="checkbox"
+						  bind:group={selectedNames}
+						  class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
+						  value="I would like to know if there is an existing B2B connection for my organization"
 						/>
-						<span class="mb-5 text-xs"
-							>I would like to know if there is an existing B2B
-							connection for my organization</span
-						>
-					</label>
-					<label class="flex items-center space-x-2 text-lg">
+						<label for="infoCheckbox3" class="mb-5 text-xs cursor-default select-none">
+						  I would like to know if there is an existing B2B connection for my organization
+						</label>
+					  </div>
+					  
+					  <div class="flex items-center space-x-2 text-lg">
 						<input
-							type="checkbox"
-							bind:group={selectedNames}
-							class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0"
-							value=" I have another question (fill in Additional details)"
+						  id="infoCheckbox4"
+						  type="checkbox"
+						  bind:group={selectedNames}
+						  class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
+						  value="I have another question (fill in Additional details)"
 						/>
-						<span class="mb-5 text-xs"
-							>I have another question (fill in Additional
-							details)</span
-						>
-					</label>
+						<label for="infoCheckbox4" class="mb-5 text-xs cursor-default select-none">
+						  I have another question (fill in Additional details)
+						</label>
+					  </div>
 				</div>
 				<div>
 					<label class=" items-center space-x-2 hidden">
@@ -932,7 +1049,7 @@
 							name="query"
 							bind:value={reason}
 							bind:checked={isChecked}
-							class="w-4 h-4 ml-1 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0"
+							class="w-4 h-4 ml-1 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
 						/>
 						<span class=" text-xs">
 							I confirm that I have selected the correct queries</span
@@ -970,7 +1087,14 @@
 											...errors,
 											name: "First Name should contain only letters and spaces",
 										};
-									} else {
+									}
+									else if (fname.trim().length < 3 || fname.trim().length > 50) {
+										errors = {
+											...errors,
+											name: "First name Name must be between 3 and 50 characters",
+										};
+									}
+									 else {
 										const { name, ...rest } = errors;
 										errors = rest; // Remove error when valid
 									}
@@ -1007,7 +1131,14 @@
 											...errors,
 											lname: "Last Name should contain only letters and spaces",
 										};
-									} else {
+									}
+									else if (lname.trim().length > 50) {
+										errors = {
+											...errors,
+											lname: "Last name Name must be between 3 and 50 characters",
+										};
+									} 
+									else {
 										const { lname, ...rest } = errors;
 										errors = rest; // Remove error when valid
 									}
@@ -1029,7 +1160,8 @@
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 relative w-full">
-							<div class="relative">
+							<div class="relative" bind:this={countryDropdownRef}>
+								<div class="flex items-center relative overflow-hidden w-full bg-gray-50">
 								<input
 									type="text"
 									id="location"
@@ -1045,13 +1177,25 @@
 									}}
 									class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 								/>
-								<Icon
-									icon={showDropdown
-										? "ep:arrow-up-bold"
-										: "ep:arrow-down-bold"}
-									class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-									on:click={toggleDropdown}
-								/>
+								<!-- SVG Icon -->
+											<!-- svelte-ignore a11y-no-static-element-interactions -->
+											<svg
+											  xmlns="http://www.w3.org/2000/svg"
+											  class="h-5 w-5 text-gray-500 transition-transform duration-200 cursor-pointer absolute right-2"
+											  fill="none"
+											  viewBox="0 0 24 24"
+											  stroke="currentColor"
+											  stroke-width="2"
+											  style:transform={showDropdown ? 'rotate(180deg)' : 'rotate(0deg)'}
+											  on:click={toggleDropdown}
+											>
+											  <path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												d="M19 9l-7 7-7-7"
+											  />
+											</svg>
+							</div>
 							</div>
 							{#if showDropdown}
 								<div
@@ -1071,13 +1215,21 @@
 												{location.name} ({location.code})
 											</li>
 										{/each}
-										{#if filteredCountries.length === 1}
+										{#if filteredCountries.length === 0}
 											<div
 												class="px-4 py-2 text-gray-600 text-xs"
 											>
 												No matching countries found!
 											</div>
 										{/if}
+
+
+
+
+
+
+
+
 									</ul>
 								</div>
 							{/if}
@@ -1143,13 +1295,15 @@
 											...errors,
 											company: "Company Name is required",
 										};
-									} else if (company.trim().length < 3) {
+									} 
+									else if (company.trim().length < 3 || company.trim().length > 100) {
 										errors = {
 											...errors,
-											company:
-												"Company Name must be at least 3 characters",
+											company: "Company Name must be between 3 and 100 characters",
 										};
-									} else if (
+									}
+									
+									else if (
 										!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(
 											company,
 										)
@@ -1186,24 +1340,23 @@
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
-								type="text"
-								name="role"
-								id="role"
-								bind:value={role}
-								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-								placeholder="Role*"
-								on:input={() => {
-									const trimmedRole = role.trimStart();
-									role = trimmedRole;
-								}}
-							/>
-							{#if showErrors && (!role || role.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(role) || /<[^>]*>/.test(role))}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-								>
-									Role is required.
-								</span>
-							{/if}
+	type="text"
+	name="role"
+	id="role"
+	bind:value={role}
+	class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+	placeholder="Role*"
+	on:input={() => {
+		role = role.trimStart();
+		showdisErrors = true;
+	}}
+/>
+
+{#if showdisErrors && !isValidRole}
+	<span class="text-red-500 sm:text-xs text-2s font-medium">
+		Required and must be between 3 and 150 valid characters.
+	</span>
+{/if}					
 						</div>
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
@@ -1306,7 +1459,7 @@
 									{:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
 										<button
 											type="submit"
-											class="absolute right-2 top-1/2 mt- transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
+											class={`absolute right-2  transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed ${!showErrors ? 'top-1/2' : 'top-1/3'}`}
 											disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
 												email,
 											) ||
@@ -1316,6 +1469,7 @@
 										>
 											Verify
 										</button>
+										
 									{:else if emailSent}
 										<span
 											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
@@ -1458,15 +1612,23 @@
 							on:input={() => {
 								const trimmedDetails = details.trimStart();
 								details = trimmedDetails;
+								showdatErrors = true;
 							}}
 						></textarea>
-						{#if showErrors && (!details || details.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) || /<[^>]*>/.test(details))}
+						<!-- {#if showErrors && (!details || details.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) || /<[^>]*>/.test(details))}
 							<span
 								class="text-red-500 sm:text-xs text-2s font-medium"
 							>
 								Additional Details are required.
 							</span>
-						{/if}
+						{/if} -->
+
+						{#if showdatErrors && !isValidDetails}
+	<span class="text-red-500 sm:text-xs text-2s font-medium">
+		Required and must be between 5 and 500 valid characters.
+	</span>
+{/if}
+
 					</div>
 					<span class="flex-1 w-1/3 mb-4">
 						<label
