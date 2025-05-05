@@ -683,7 +683,7 @@ function RemoveUrl(urlToRemove) {
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div
           class="bg-white p-4 rounded-md  shadow w-full self-start cursor-pointer"
-          on:click={() => toggleProductDetails2("Safety Data Sheets")}
+          on:click={() => toggleProductDetails2("safetydata sheets")}
         >
           <div class="flex items-center justify-between">
             <h3 class="sm:text-md text-sm font-medium text-gray-700">
@@ -765,7 +765,7 @@ function RemoveUrl(urlToRemove) {
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
             class="bg-white p-4 rounded-md shadow w-full self-start cursor-pointer"
-            on:click={() => toggleProductDetails2("Certificates of Analysis")}
+            on:click={() => toggleProductDetails2("certificates of analysis")}
           >
             <div class="flex items-center justify-between">
               <h3 class="sm:text-md text-sm font-medium text-gray-700">
@@ -844,7 +844,7 @@ function RemoveUrl(urlToRemove) {
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
             class="bg-white p-4 rounded-md shadow w-full self-start cursor-pointer"
-            on:click={() => toggleLotDetails("Certificates of Analysis")}
+            on:click={() => toggleLotDetails("certificates of analysis")}
           >
             <div class="flex items-center justify-between">
               <h3 class="sm:text-md text-sm font-medium text-gray-700">
@@ -908,7 +908,7 @@ function RemoveUrl(urlToRemove) {
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
             class="bg-white p-4 rounded-md shadow w-full self-start cursor-pointer"
-            on:click={() => toggleProductDetails2("Certificates of Origin")}
+            on:click={() => toggleProductDetails2("certificates of origin")}
           >
             <div class="flex items-center justify-between">
               <h3 class="sm:text-md text-sm font-medium text-gray-700">
@@ -987,7 +987,7 @@ function RemoveUrl(urlToRemove) {
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
             class="bg-white p-4 rounded-md shadow w-full self-start cursor-pointer"
-            on:click={() => toggleLotDetails("Certificates of Origin")}
+            on:click={() => toggleLotDetails("certificates of origin")}
           >
             <div class="flex items-center justify-between">
               <h3 class="sm:text-md text-sm font-medium text-gray-700">
@@ -1067,7 +1067,7 @@ function RemoveUrl(urlToRemove) {
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class="bg-white p-4 rounded-md shadow w-full self-start cursor-pointer"
-            on:click={() => toggleProductDetails2("Certificates of Quality")}
+            on:click={() => toggleProductDetails2("certificates of quality")}
           >
             <div class="flex items-center justify-between">
               <h3 class="sm:text-md text-sm font-medium text-gray-700">
@@ -1146,7 +1146,7 @@ function RemoveUrl(urlToRemove) {
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
             class="bg-white p-4 rounded-md shadow w-full self-start cursor-pointer"
-            on:click={() => toggleLotDetails("Certificates of Quality")}
+            on:click={() => toggleLotDetails("certificates of quality")}
           >
             <div class="flex items-center justify-between">
               <h3 class="sm:text-md text-sm font-medium text-gray-700">
