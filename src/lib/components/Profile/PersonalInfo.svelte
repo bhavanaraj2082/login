@@ -132,8 +132,8 @@ const validateField = (name, value) => {
                 message = "First name is required";
             } else if (value.length < 3) {
                 message = "First name must be at least 3 characters";
-            } else if (value.length > 10) {
-                message = "First name must not exceed 10 characters";
+            } else if (value.length > 20) {
+                message = "First name must not exceed 20 characters";
             } else if (!/^[A-Za-z\s]+$/.test(value)) {
                 message = "First name must contain only letters";
             }
@@ -141,8 +141,8 @@ const validateField = (name, value) => {
 
         case "lastName":
             if (value) {
-              if (value.length > 10) {
-                    message = "Last name must not exceed 10 characters";
+              if (value.length > 20) {
+                    message = "Last name must not exceed 20 characters";
                 } else if (!/^[A-Za-z\s]+$/.test(value)) {
                     message = "Last name must contain only letters";
                 }

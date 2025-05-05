@@ -48,10 +48,10 @@
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div class="shadow rounded-md px-4 py-4 bg-white hover:scale-105 transition-all duration-300 ease-in-out hover:shadow-primary-100 cursor-pointer" on:click={changeTabs(id)}>
             <div class=" flex items-center gap-2 text-primary-500 mb-2">
-                <Icon icon={logo} class=" text-xl md:text-2xl bg-primary-50 rounded-full p-1" />
-                <button on:click={changeTabs(id)} class="font-semibold text-xs lg:text-sm text-primary-500 text-left">{title}</button>
+                <Icon icon={logo} class=" text-xl md:text-3xl bg-primary-50 rounded-full p-1" />
+                <button on:click={changeTabs(id)} class="font-semibold text-sm lg:text-lg text-primary-500 text-left">{title}</button>
             </div>
-            <p class="text-2s text-content text-justify">{desc}</p>
+            <p class="text-xs text-content text-justify">{desc}</p>
         </div>
     {/each}
 </nav>

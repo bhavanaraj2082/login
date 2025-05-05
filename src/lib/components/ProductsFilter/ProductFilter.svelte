@@ -184,7 +184,7 @@ function handleMouseLeave() {
          clearTimeout(timeout)
          timeout = setTimeout(()=>{
             products = products.map(product => {
-        if (product._id === id) {
+        if (product.stockId === id) {
             let selectedQty = Math.ceil(quantity/ product.orderMultiple) * product.orderMultiple;
             let priceINR = product.pricing.INR*selectedQty
             let priceUSD = product.pricing.USD*selectedQty
@@ -202,7 +202,7 @@ function handleMouseLeave() {
 
     const decrementQuantity = (id) => {
     products = products.map(product => {
-        if (product._id === id) {
+        if (product.stockId === id) {
           if (product.quantity > product.orderMultiple) {
             let priceINR = product.pricing.INR*(product.quantity-product.orderMultiple)
             let priceUSD = product.pricing.USD*(product.quantity-product.orderMultiple)
@@ -222,7 +222,7 @@ function handleMouseLeave() {
 
     const incrementQuantity = (id, quantity) => {
     products = products.map(product => {
-        if (product._id === id) {
+        if (product.stockId === id) {
             if(product.quantity >= 10000000) return product
             let priceINR = product.pricing.INR*(product.quantity+product.orderMultiple)
             let priceUSD = product.pricing.USD*(product.quantity+product.orderMultiple)
@@ -598,7 +598,7 @@ function handleMouseLeave() {
                     
                  </div>
                 {/each}
-                <button on:click={() => handleShowMore()} class="{!specifications || specifications === null ? "hidden" : ""} text-xs xl:hidden w-full text-end text-primary-600 hover:text-primary-400 mt-3">
+                <button on:click={() => handleShowMore()} class="{Object.entries(specifications).length === 0 ? "hidden" : "block"} text-xs xl:hidden w-full text-end text-primary-600 hover:text-primary-400 mt-3">
                   {showAllForIndex ? '- Show Less' : '+ Show More'}
                 </button>
              </div>
@@ -606,7 +606,7 @@ function handleMouseLeave() {
              {/if}
             
             </div>
-            <button on:click={() => handleShowMore()} class="{!specifications || specifications === null ? "hidden" : ""} text-xs hidden xl:block w-full text-end text-primary-600 hover:text-primary-400 mt-3">
+            <button on:click={() => handleShowMore()} class="{Object.entries(specifications).length === 0 ? "xl:hidden" : "xl:block"} text-xs hidden w-full text-end text-primary-600 hover:text-primary-400 mt-3">
               {showAllForIndex ? '- Show Less' : '+ Show More'}
             </button>
         </div>
@@ -711,11 +711,11 @@ function handleMouseLeave() {
                         <div class="flex items-center">
                             <div class="flex items-center">
                                 <input type="number" bind:value={product.quantity}
-					            on:input={e=>handleQty(product._id,parseInt(e.target.value))}
+					            on:input={e=>handleQty(product.stockId,parseInt(e.target.value))}
 					            class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
 					        <div class=" {tog === index ? "hidden" : ""} flex items-center border-1 border-primary-300 rounded-md">
 						    <button
-							on:click={() => decrementQuantity(product._id)}
+							on:click={() => decrementQuantity(product.stockId)}
 							class=" p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							><Icon icon="rivet-icons:minus" class="text-xs" /></button>
 						    <button on:click={async()=>{
@@ -724,7 +724,7 @@ function handleMouseLeave() {
 							    {product.quantity}
 						    </button>
 						    <button
-							    on:click={() => incrementQuantity(product._id)}
+							    on:click={() => incrementQuantity(product.stockId)}
 							    class=" p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
 							    <Icon icon="rivet-icons:plus" class="text-xs" />
 						    </button>

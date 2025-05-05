@@ -751,7 +751,7 @@ onMount(() => {
                     Delete
                 </button>
             </form>
-				<button class=" w-full py-1.5 border-1 border-primary-500 text-primary-500 bg-white rounded" eventFunction={() => (isDeleteAll = false)}>Cancel</button>
+				<button class=" w-full py-1.5 border-1 border-primary-500 text-primary-500 bg-white rounded" on:click={() => (isDeleteAll = false)}>Cancel</button>
 			</div>
 		</div>
 	</div>
