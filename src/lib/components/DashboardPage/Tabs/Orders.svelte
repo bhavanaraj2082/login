@@ -9,7 +9,7 @@
     import { toast, Toaster } from 'svelte-sonner';
     
     export let data;
-    // console.log("ordersdata=>", data);
+    console.log("ordersdata=>", data);
     let initialOrders = [];
     let orders = [];
     let expandedOrderId = null;
@@ -102,26 +102,26 @@
     $: totalPages = Math.ceil(totalItems / $itemsPerPage);
     $: paginatedOrders = getPaginatedData($currentPage, $itemsPerPage, orders).map(order => ({
         ...order,
-        orderid: order.orderid || 'N/A',
-        purchaseorder: order.purchaseorder || 'N/A',
+        orderid: order?.orderid || 'N/A',
+        purchaseorder: order?.purchaseorder || 'N/A',
         status: getOrderStatus(order),
-        currency: order.currency || 'INR',
-        totalprice: order.totalprice || 0,
-        subtotalprice: order.subtotalprice || 0,
-        shippingprice: order.shippingprice || 0,
-        transactionid: order.transactionid || 'N/A',
-        Invoice: order.invoice || 'N/A',
-        orderType: order.orderType || 'personal',
-        orderdetails: (order.orderdetails || []).map(item => ({
-            customerReference: item.customerReference || '--',
-            productName: item.productName || item.manufacturerProductName || 'N/A',
-            orderQty: item.orderQty || 0,
-            readyToShip: item.readyToShip || 0,
-            backOrder: item.backOrder || 0,
-            unitPrice: item.unitPrice || 0,
-            extendedPrice: item.extendedPrice || 0,
-            leadtime: item.leadtime || '--',
-            currency: item.currency || order.currency || 'INR'
+        currency: order?.currency || 'INR',
+        totalprice: order?.totalprice || 0,
+        subtotalprice: order?.subtotalprice || 0,
+        shippingprice: order?.shippingprice || 0,
+        transactionid: order?.transactionid || 'N/A',
+        Invoice: order?.invoice || 'N/A',
+        orderType: order?.orderType || 'personal',
+        orderdetails: (order?.orderdetails || []).map(item => ({
+            customerReference: item?.customerReference || '--',
+            productName: item?.productName || item?.manufacturerProductName || 'N/A',
+            orderQty: item?.orderQty || 0,
+            readyToShip: item?.readyToShip || 0,
+            backOrder: item?.backOrder || 0,
+            unitPrice: item?.unitPrice || 0,
+            extendedPrice: item?.extendedPrice || 0,
+            leadtime: item?.leadtime || '--',
+            currency: item?.currency || order.currency || 'INR'
         }))
     }));
 
