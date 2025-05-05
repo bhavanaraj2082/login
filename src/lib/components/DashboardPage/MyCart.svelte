@@ -1024,9 +1024,9 @@ function formatDate(dateString) {
 								View
 							</button>
 							<button
-								class="flex-1 border border-green-500 text-green-500 px-1 py-2 text-xs rounded-md hover:bg-green-600 hover:text-white flex items-center justify-center whitespace-nowrap"
+								class="flex-1 border border-green-500 text-green-500 px-1 py-2 text-xs rounded-md hover:bg-green-600 hover:text-white flex items-center justify-center whitespace-nowrap {cart.cartItems?.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
 								type="button"
-								disabled={isLoading}
+								disabled={isLoading || cart.cartItems?.length === 0}
 								on:click={() => handleRecurrenceClick(cart)}>
 								<Icon icon={isLoading ? 'mdi:loading' : 'mdi:refresh'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
 								Recurrence
@@ -1120,9 +1120,9 @@ function formatDate(dateString) {
 									<span class="text-gray-400 px-2">|</span>
 									<button
 										type="button"
-										disabled={isLoading}
+										disabled={isLoading || cart.cartItems?.length === 0}
 										on:click={() => handleRecurrenceClick(cart)}
-										class="px-2 py-1 border text-green-600 hover:text-white rounded-md hover:bg-green-700 transition-all duration-300 flex items-center gap-1 relative group">
+										class="px-2 py-1 border text-green-600 hover:text-white rounded-md hover:bg-green-700 transition-all duration-300 flex items-center gap-1 relative group {cart.cartItems?.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}">
 										<span class="relative">
 											<Icon icon={isLoading ? 'mdi:loading' : 'mdi:refresh'} class={`text-xl ${isLoading ? 'animate-spin' : ''}`}/>
 											<span class="absolute left-1/2 transform -translate-x-1/2 z-auto whitespace-nowrap top-full mt-2 px-2 bg-gray-200 text-gray-600 text-xs py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">

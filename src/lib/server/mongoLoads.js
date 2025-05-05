@@ -2060,7 +2060,7 @@ export async function getProfileDetails(userId) {
 
 
 export const newsroom = async () => {
-  const records = await Newsroom.find({});
+  const records = await Newsroom.find({}).sort({ createdAt: -1 });
   return JSON.parse(JSON.stringify(records));
 };
 
