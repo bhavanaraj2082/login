@@ -9,7 +9,7 @@
   $: status = $page.status;
   
   // $: console.log("Full error object:", pageError);
-  // $: console.log("Error status:", status);
+  $: console.log(errorInfo,'"errorInfo error:--"');
   
   $: errorInfo = (() => {
     // Default values
