@@ -15,7 +15,7 @@
     let expandedOrderId = null;
     let isInfoPopupOpen = false;
     let userOrderType = null;
-    let userEmail = data.authedUser.email;
+    let userEmail = data?.authedUser?.email;
     let calendarComponent;
     let isLoading = false;
     
@@ -32,9 +32,9 @@
         productList: item.productList || []
     }));
 
-    $: isAnyFilterActive = filters.dateRange !== '' || 
-       filters.status !== '' || 
-       filters.searchTerm !== '';
+    // $: isAnyFilterActive = filters.dateRange !== '' || 
+    //    filters.status !== '' || 
+    //    filters.searchTerm !== '';
     
     $: {
         if (data?.orders) {

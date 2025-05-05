@@ -63,7 +63,7 @@
           <Icon icon="uil:calendar-alt" class="mr-1" width="16" height="16" />
           <span>{formatDate(singleNewsData.createdAt)}</span>
         </div>
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-700 leading-tight">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-700 leading-tight overflow-x-auto hide">
           {singleNewsData.title || "News Title"}
         </h1>
       </div>
@@ -74,9 +74,9 @@
         <div class="md:w-3/4 pr-4">
           <div class="text-base text-gray-700 leading-relaxed">
             {#if isExpanded}
-              <p class="text-justify">{singleNewsData.previewText || ""}</p>
+              <p class="text-justify text-wrap">{singleNewsData.previewText || ""}</p>
             {:else}
-              <p class="text-justify">
+              <p class="text-justify text-wrap">
                 {truncateText(singleNewsData.previewText || "", wordLimit)}
               </p>
             {/if}
@@ -85,8 +85,7 @@
               <button
                 class="text-primary-500 font-medium hover:text-primary-600 hover:underline mt-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded"
                 on:click={toggleExpand}
-                aria-expanded={isExpanded}
-              >
+                aria-expanded={isExpanded}>
                 {isExpanded ? "Read less" : "Read more"}
               </button>
             {/if}
@@ -118,19 +117,19 @@
         <h2 class="text-xl font-semibold text-gray-800 mb-3">
           About Chemikart
         </h2>
-        <p class="text-gray-600">
+        <p class="text-gray-600 text-justify">
           At Chemikart, our mission is to provide high-quality chemical products
           with unparalleled service. We aim to be the trusted partner for
           industries by delivering reliable solutions that meet our customers'
           needs efficiently and safely.
         </p>
-        <p class="text-gray-600 mt-3">
+        <p class="text-gray-600 mt-3 text-justify">
           We envision a world where businesses thrive with access to premium
           chemical products and services. Our goal is to be the leading
           distributor in the chemical industry, known for our commitment to
           excellence and innovation.
         </p>
-        <p class="text-gray-600 mt-3">
+        <p class="text-gray-600 mt-3 text-justify">
           Our knowledgeable team can assist you in selecting the right products
           for your applications. We pride ourselves on our consistent supply
           chain and timely deliveries. We offer tailored solutions to meet the
