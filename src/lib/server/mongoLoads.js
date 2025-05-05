@@ -2436,7 +2436,7 @@ export async function getUserProfileData(userId) {
       cart: cart.success ? cart.data : []
     };
 
-    // console.log('Final data structure:', JSON.stringify(data, null, 2));
+    console.log('Final order-- data structure:', JSON.stringify(data.orders, null, 2));
 
     return JSON.parse(JSON.stringify(data));
 
