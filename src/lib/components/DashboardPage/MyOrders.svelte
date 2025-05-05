@@ -1,17 +1,17 @@
 <script>
     import Icon from '@iconify/svelte';
     import OrdersTab from '$lib/components/DashboardPage/Tabs/Orders.svelte';
-    import InvoicesTab from '$lib/components/DashboardPage/Tabs/Invoices.svelte';
-    import ProductsTab from '$lib/components/DashboardPage/Tabs/Products.svelte';
+    // import InvoicesTab from '$lib/components/DashboardPage/Tabs/Invoices.svelte';
+    // import ProductsTab from '$lib/components/DashboardPage/Tabs/Products.svelte';
 //  import ReportsTab from '$lib/components/AccountPage/Tabs/Reports.svelte';
     
     export let data;
     // console.log("myorders=>",data)
-    let activeTab = 'orders';
+    // let activeTab = 'orders';
     
 //  const tabs = ['Orders', 'Invoices', 'Products', 'Reports'];
     // const tabs = ['Orders', 'Invoices', 'Products'];
-    const tabs = ['Orders'];
+    // const tabs = ['Orders'];
 </script>
 
 <div class="w-full lg:w-11/12 max-w-7xl mx-auto py-2 px-4 bg-gray-50"> 
@@ -38,7 +38,7 @@
             {/each}
         </div> -->
         <div class="transition-opacity duration-500 ease-in-out">
-            {#if activeTab === 'orders'}
+            <!-- {#if activeTab === 'orders'} -->
             <OrdersTab {data} />
             <!-- {:else if activeTab === 'invoices'}
             <InvoicesTab {data} /> -->
@@ -46,7 +46,7 @@
             <ProductsTab {data} /> -->
             <!-- {:else if activeTab === 'reports'}
             <ReportsTab {data}/> -->
-            {/if}
+            <!-- {/if} -->
         </div>
    {/if}
 </div>
