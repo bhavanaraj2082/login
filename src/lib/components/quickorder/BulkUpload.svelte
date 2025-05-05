@@ -1,6 +1,4 @@
 <script>
-  import { goto } from "$app/navigation";
-
   import { cart, guestCart } from "$lib/stores/cart.js";
   import Icon from "@iconify/svelte";
   import { enhance } from "$app/forms";
@@ -161,13 +159,6 @@
       isValidated = false;
     }
   }
-  // function handleTextChange(event) {
-  //   rawFileData = event.target.value;
-  //   const { duplicates } = checkForDuplicates(rawFileData);
-  //   duplicateEntries = duplicates;
-  //   isValidated = false;
-  //   invalidProductLines = [];
-  // }
   let formatError = false;
   function handleTextChange(event) {
   rawFileData = event.target.value;
@@ -317,90 +308,18 @@
     }
   }
 
-
-
-//   function submitFileData() {
-//   if (!rawFileData.trim()) {
-//     toast.error("Please enter product data before submitting");
-//     cartloading = false;
-//     cancel();
-//     return;
-//   }
-
-//   const lines = rawFileData.split("\n").filter(line => line.trim());
-//   let formatError = false;
-//   let errorMessage = "";
-  
-//   for (let i = 0; i < lines.length; i++) {
-//     const line = lines[i];
-//     const parts = line.split(",");
-    
-//     if (parts.length >0 || !parts[0].trim() && parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
-//       formatError = true;
-//       errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number and optional quantity (e.g., 7987565-50G,1)`;
-//       break;
-//     }
-    
-//     // Check if quantity is a number (if provided)
-//     // if (parts.length > 1 && parts[1].trim() && isNaN(parts[1].trim())) {
-//     //   formatError = true;
-//     //   errorMessage = `Invalid quantity at line ${i + 1}. Quantity must be a number.`;
-//     //   break;
-//     // }
-//   }
-  
-//   if (formatError) {
-//     fileError = errorMessage;
-//     toast.error(errorMessage);
-//     return;
-//   }
-
-//   // Process and submit if format is valid
-//   const updatedFile = new File(
-//     [rawFileData],
-//     selectedFileName || "upload.csv",
-//     {
-//       type: "text/csv",
-//     },
-//   );
-
-//   const dataTransfer = new DataTransfer();
-//   dataTransfer.items.add(updatedFile);
-
-//   const fileInput =
-//     document.getElementById("bulkupload") ||
-//     document.querySelector('input[type="file"]');
-
-//   if (fileInput) {
-//     fileInput.files = dataTransfer.files;
-
-//     const form = fileInput.closest("form");
-
-//     if (form) {
-//       setTimeout(() => {
-//         form.requestSubmit();
-//       }, 100);
-//     } else {
-//       console.error("Form not found");
-//     }
-//   } else {
-//     console.error("File input element not found");
-//   }
-// }
 function submitFileData() {
   if (!rawFileData.trim()) {
     toast.error("Please enter product data before submitting");
     cartloading = false;
-    // cancel();
-    return { cancel: true };
-    
+    return;
   }
 
   const lines = rawFileData.split("\n").filter(line => line.trim());
   let formatError = false;
   let errorMessage = "";
+  const processedLines = [];
   
-  // Simplified format check
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     const parts = line.split(",");
@@ -410,12 +329,21 @@ function submitFileData() {
       errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
       break;
     }
-    
-    // Only check quantity if a second part exists
     if (parts.length > 1 && parts[1].trim() && isNaN(Number(parts[1].trim()))) {
       formatError = true;
       errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
       break;
+    }
+    if (parts.length > 1 && parts[1].trim()) {
+      let quantity = Number(parts[1].trim());
+      if (!isNaN(quantity)) {
+        quantity = Math.min(quantity, 999);
+        processedLines.push(`${parts[0]},${quantity}`);
+      } else {
+        processedLines.push(line);
+      }
+    } else {
+      processedLines.push(line);
     }
   }
   
@@ -424,8 +352,7 @@ function submitFileData() {
     toast.error(errorMessage);
     return;
   }
-
-  // Process and submit if format is valid
+  rawFileData = processedLines.join("\n");
   const updatedFile = new File(
     [rawFileData],
     selectedFileName || "upload.csv",
@@ -804,19 +731,15 @@ function submitFileData() {
     }
   }
   onMount(() => {
-    // Initialize component
     calculateLineHeight();
 
     if (textareaElement) {
       viewportHeight = textareaElement.clientHeight;
     }
-
-    // Set initial scroll position
     handleScroll();
   });
 
   afterUpdate(() => {
-    // Recalculate positions after content changes
     if (isValidated) {
       calculateLineHeight();
     }
@@ -833,7 +756,6 @@ function submitFileData() {
       if (computedLineHeight !== "normal") {
         lineHeight = parseInt(computedLineHeight, 10);
       } else {
-        // Estimate line height based on font size if 'normal'
         const fontSize = parseInt(style.fontSize, 10);
         lineHeight = Math.floor(fontSize * 1.2);
       }
@@ -1027,51 +949,7 @@ Example file content:
 345678-25G,3"
           ></textarea>
 
-          <!-- {#if isValidated && rawFileData.trim()}
-            <div
-              class="absolute mt-2 top-0 left-0 w-full h-full pointer-events-none"
-              bind:this={overlayElement}
-              style="transform: translateY({-scrollTop}px);"
-            >
-              {#each rawFileData.trim().split("\n") as line, index}
-                {#if index * lineHeight >= scrollTop - lineHeight * 2 && index * lineHeight <= scrollTop + viewportHeight}
-                  <div
-                    class="flex items-center pointer-events-auto"
-                    style="position: absolute; top: {3 +
-                      index * lineHeight}px; right: 10px;"
-                  >
-                    {#if validationMessages.some( (msg) => line.includes(msg.productNumber), )}
-                      {@const message = validationMessages.find((msg) =>
-                        line.includes(msg.productNumber),
-                      )}
-                      {#if message?.isValid}
-                        <div
-                          class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
-                        >
-                          <span class="text-xs mr-1">Valid</span>
-                          <Icon icon="mdi:check-circle" class="text-base" />
-                        </div>
-                      {:else}
-                        <div
-                          class="flex items-center mt-2 text-red-500 bg-white bg-opacity-75 rounded px-1 mr-3"
-                        >
-                          <span class="text-xs mr-1">{message?.message}</span>
-                          <button
-                            type="button"
-                            class="text-red-500 hover:text-red-700 pointer-events-auto"
-                            title="Remove invalid product"
-                            on:click={() => removeInvalidProduct(index)}
-                          >
-                            <Icon icon="mdi:close-circle" class="text-base" />
-                          </button>
-                        </div>
-                      {/if}
-                    {/if}
-                  </div>
-                {/if}
-              {/each}
-            </div>
-          {/if} -->
+
           {#if isValidated && rawFileData.trim()}
             <div
               class="absolute mt-2 top-0 left-0 w-full h-full pointer-events-none"

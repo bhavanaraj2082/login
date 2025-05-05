@@ -11,82 +11,7 @@ import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import sendemail from '$lib/data/sendemail.json';
 import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
 import {getCart} from '$lib/server/mongoLoads.js'
-// function parseProductQuery(query) {
-//   let inputStr = query.trim();
-//   let productNumber, size;
-  
-//   // Various patterns for different types of product number and size combinations
-//   const spaceHyphenPattern = /^(.*?)\s+-\s+(.+)$/;
-//   const spaceHyphenMatch = inputStr.match(spaceHyphenPattern);
-  
-//   const complexSizePattern = /^([A-Za-z0-9.]+(?:-[A-Za-z0-9.]+)*)-(\d+(?:-[A-Za-z\u00B0-\u9FFF]+)(?:-\d+)?)$/;
-//   const complexSizeMatch = inputStr.match(complexSizePattern);
-  
-//   // Pattern for measurements including Unicode characters like μL, μg
-//   const measurementPattern = /^(.*?)-(\d+[-]?[A-Za-z\u00B0-\u9FFF]+)$/;
-//   const measurementMatch = inputStr.match(measurementPattern);
-  
-//   // Specific pattern for micro units
-//   const unicodeUnitPattern = /^(.*?)-(\d+[-]?[μ][A-Za-z]+)$/;
-//   const unicodeUnitMatch = inputStr.match(unicodeUnitPattern);
-  
-//   // Patterns for quantity descriptions (each, case, pack)
-//   const quantityPatterns = [
-//     /^(.*?)[-\s]+(each\s*(?:of)?\s*[-\s]*\d+|each[-\s]*of[-\s]*\d+|\d+\s*(?:each|pcs|units|items))$/i,
-//     /^(.*?)[-\s]+(case\s*(?:of)?\s*[-\s]*\d+|case[-\s]*of[-\s]*\d+|\d+\s*(?:case|pcs|units|items))$/i,
-//     /^(.*?)[-\s]+(pack\s*(?:of)?\s*[-\s]*\d+|pack[-\s]*of[-\s]*\d+|\d+\s*(?:pack|pcs|units|items))$/i
-//   ];
-  
-//   let eachMatch = null;
-//   for (const pattern of quantityPatterns) {
-//     const match = inputStr.match(pattern);
-//     if (match) {
-//       eachMatch = match;
-//       break;
-//     }
-//   }
-  
-//   // Apply patterns in order to determine product number and size
-//   if (unicodeUnitMatch) {
-//     productNumber = unicodeUnitMatch[1].trim();
-//     size = unicodeUnitMatch[2].trim();
-//   } else if (spaceHyphenMatch) {
-//     productNumber = spaceHyphenMatch[1].trim();
-//     size = spaceHyphenMatch[2].trim();
-//   } else if (complexSizeMatch) {
-//     productNumber = complexSizeMatch[1].trim();
-//     size = complexSizeMatch[2].trim();
-//   } else if (measurementMatch) {
-//     productNumber = measurementMatch[1].trim();
-//     size = measurementMatch[2].trim();
-//   } else if (eachMatch) {
-//     productNumber = eachMatch[1].trim();
-//     size = eachMatch[2].trim();
-//   } else {
-//     // Default fallback: split by hyphen
-//     const parts = inputStr.split('-');
-//     if (parts.length >= 2) {
-//       productNumber = parts.slice(0, parts.length - 1).join('-');
-//       size = parts[parts.length - 1];
-//     } else {
-//       productNumber = inputStr;
-//       size = "";
-//     }
-//   }
-  
-//   // Final cleanup for size with quantity
-//   const sizeWithQuantityPattern = /^(.*?)(\d+)$/;
-//   const sizeWithQuantityMatch = size.match(sizeWithQuantityPattern);
-  
-//   if (sizeWithQuantityMatch) {
-//     size = sizeWithQuantityMatch[1].trim();
-//   }
-  
-//   return {
-//     productNumber,
-//     size
-//   };
-// }
+
 function parseProductQuery(query) {
   let inputStr = query.trim();
   
@@ -272,114 +197,216 @@ export const actions = {
     }
   },
   
-  uploadFile: async ({ request }) => {
-    try {
-      const data = await request.formData();
-console.log(data,"data");
+//   uploadFile: async ({ request }) => {
+//     try {
+//       const data = await request.formData();
+// console.log(data,"data");
 
 
-      const file = data.get('file');
-      if (!file || file.size === 0) {
-        return {
-          error: 'No file uploaded or file is empty',
-        };
-      }
+//       const file = data.get('file');
+//       if (!file || file.size === 0) {
+//         return {
+//           error: 'No file uploaded or file is empty',
+//         };
+//       }
 
-      const fileData = Buffer.from(await file.arrayBuffer());
-      let fileContent = '';
-      if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
-        fileContent = fileData.toString('utf8');
-        const results = Papa.parse(fileContent, { header: false, skipEmptyLines: true });
-        const records = results.data;
+//       const fileData = Buffer.from(await file.arrayBuffer());
+//       let fileContent = '';
+//       if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+//         fileContent = fileData.toString('utf8');
+//         const results = Papa.parse(fileContent, { header: false, skipEmptyLines: true });
+//         const records = results.data;
 
-        const validationResults = await uploadFile({
-          query: records,
-          uploadedQuantities: {},
-        });
-        return validationResults;
+//         const validationResults = await uploadFile({
+//           query: records,
+//           uploadedQuantities: {},
+//         });
+//         return validationResults;
 
-      } else if (file.type === 'application/vnd.ms-excel' || file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
-        const workbook = XLSX.read(fileData, { type: 'buffer' });
-        const sheetName = workbook.SheetNames[0];
-        const sheet = workbook.Sheets[sheetName];
+//       } else if (file.type === 'application/vnd.ms-excel' || file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+//         const workbook = XLSX.read(fileData, { type: 'buffer' });
+//         const sheetName = workbook.SheetNames[0];
+//         const sheet = workbook.Sheets[sheetName];
 
-        const records = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+//         const records = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
 
-        const validationResults = await uploadFile({
-          query: records,
-          uploadedQuantities: {},
-        });
-        return validationResults;
+//         const validationResults = await uploadFile({
+//           query: records,
+//           uploadedQuantities: {},
+//         });
+//         return validationResults;
 
-      } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-        fileContent = fileData.toString('utf8');
+//       } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+//         fileContent = fileData.toString('utf8');
 
-        const lines = fileContent.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-        const records = lines.map(line => line.split(','));
+//         const lines = fileContent.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+//         const records = lines.map(line => line.split(','));
 
-        const validationResults = await uploadFile({
-          query: records,
-          uploadedQuantities: {},
-        });
-        return validationResults;
+//         const validationResults = await uploadFile({
+//           query: records,
+//           uploadedQuantities: {},
+//         });
+//         return validationResults;
 
-      } else {
-        throw new Error('Unsupported file type');
-      }
+//       } else {
+//         throw new Error('Unsupported file type');
+//       }
 
-    } catch (error) {
-      console.error('File upload error:', error);
+//     } catch (error) {
+//       console.error('File upload error:', error);
+//       return {
+//         error: 'Error processing the file',
+//       };
+//     }
+//   },
+// +page.server.js
+uploadFile: async ({ request }) => {
+  try {
+    const data = await request.formData();
+    const performanceStart = Date.now();
+    
+    const file = data.get('file');
+    if (!file || file.size === 0) {
       return {
-        error: 'Error processing the file',
+        error: 'No file uploaded or file is empty',
       };
     }
-  },
+    const supportedTypes = [
+      'text/csv', 
+      'application/vnd.ms-excel', 
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'text/plain'
+    ];
+    
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    const supportedExts = ['csv', 'xls', 'xlsx', 'txt'];
+    
+    if (!supportedTypes.includes(file.type) && !supportedExts.includes(fileExt)) {
+      return {
+        error: 'Unsupported file type. Please upload CSV, Excel or TXT files only.',
+      };
+    }
+    let records = [];
+    const fileData = Buffer.from(await file.arrayBuffer());
+    if (file.type === 'text/csv' || fileExt === 'csv') {
+      if (file.size < 500000) {
+        const fileContent = fileData.toString('utf8');
+        const results = Papa.parse(fileContent, { 
+          header: false, 
+          skipEmptyLines: true,
+          dynamicTyping: false,
+          fastMode: true,
+          worker: false,
+          chunk: null
+        });
+        records = results.data;
+      } else {
+        const fileContent = fileData.toString('utf8');
+        const results = Papa.parse(fileContent, { 
+          header: false, 
+          skipEmptyLines: true,
+          worker: true
+        });
+        records = results.data;
+      }
+    } 
+    else if (file.type === 'application/vnd.ms-excel' || 
+             file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
+             fileExt === 'xls' || fileExt === 'xlsx') {
+      const workbook = XLSX.read(fileData, { 
+        type: 'buffer',
+        cellFormula: false, 
+        cellHTML: false,   
+        cellText: false     
+      });
+      
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
 
+      records = XLSX.utils.sheet_to_json(sheet, { 
+        header: 1, 
+        defval: '',
+        raw: true,         
+        range: 0          
+      });
+    } 
+    else if (file.type === 'text/plain' || fileExt === 'txt') {
+      const fileContent = fileData.toString('utf8');
+      records = fileContent
+        .split('\n')
+        .filter(line => line.trim().length > 0)
+        .map(line => line.split(',').map(item => item.trim()));
+    }
+
+    const BATCH_SIZE = 500;
+    const processedResults = [];
+    for (let i = 0; i < records.length; i += BATCH_SIZE) {
+      const batch = records.slice(i, i + BATCH_SIZE);
+      const batchResults = await uploadFile({
+        query: batch,
+        uploadedQuantities: {}
+      });
+      processedResults.push(...batchResults);
+    }
+
+    console.log(`[PERF] Total server processing time: ${Date.now() - performanceStart}ms for ${records.length} records`);
+    return processedResults;
+
+  } catch (error) {
+    console.error('File upload error:', error);
+    return {
+      error: 'Error processing the file: ' + (error.message || 'Unknown error'),
+    };
+  }
+},
+  // addToCart: async ({ request, locals }) => {
+  //   try {
+  //     const formData = await request.formData();
+
+  //     const cartItems = JSON.parse(formData.get('cartItems')) || JSON.parse(formData.get('manualEntries'));
+
+  //     if (!locals.user) {
+  //       console.error('User not authenticated');
+  //       return fail(401, { message: 'User not authenticated' });
+  //     }
+
+  //     const userId = locals.user.userId;
+  //     const userEmail = locals.user.email;
+  //      const daaa = await bulkUploadToCart(cartItems, userId, userEmail)
+    
+  //     return {
+  //       success: true,
+  //       message: `${cartItems.length} item(s) added to cart successfully`
+  //     };
+  //   } catch (err) {
+  //     return fail(500, { message: 'Failed to add items to cart' });
+  //   }
+  // },
   addToCart: async ({ request, locals }) => {
     try {
       const formData = await request.formData();
-
+      
       const cartItems = JSON.parse(formData.get('cartItems')) || JSON.parse(formData.get('manualEntries'));
-
+      
       if (!locals.user) {
         console.error('User not authenticated');
         return fail(401, { message: 'User not authenticated' });
       }
-
+      
       const userId = locals.user.userId;
       const userEmail = locals.user.email;
-       const daaa = await bulkUploadToCart(cartItems, userId, userEmail)
-      // Process each cart item
-      // for (const item of cartItems) {
-      //   // console.log('Processing item:', item);
-      //   // const backorder =Math.max(item.quantity-item.stock)
-
-      //   const cartItem = {
-      //     productId: item.id,
-      //     manufacturerId: item.manufacturerId || '',
-      //     distributorId: item.distributerId || '',
-      //     stockId: item.stockId || '',
-      //     quantity: item.quantity || '',
-      //     backOrder: item.backOrder,
-      //   };
-
-      //   // console.log('Prepared Cart Item:', cartItem);
-      //   const result = await addToCart(cartItem, userId, userEmail);
-      //   // console.log('Add to Cart Result:', result);
-
-      //   if (!result.success) {
-      //     console.error('Failed to add item to cart:', result.message);
-      //     return fail(400, { message: result.message });
-      //   }
-      // }
+      
+      const result = await bulkUploadToCart(cartItems, userId, userEmail);
+      
       return {
-        success: true,
-        message: `${cartItems.length} item(s) added to cart successfully`
+        success: result.success,
+        message: result.message
       };
     } catch (err) {
       return fail(500, { message: 'Failed to add items to cart' });
     }
   },
+  
   createQuote: async ({ request }) => {
     try {
       const data = Object.fromEntries(await request.formData());
