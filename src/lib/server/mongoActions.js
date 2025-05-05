@@ -2763,73 +2763,167 @@ export const quicksearch = async ({ query }) => {
 // 	console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
 // 	return results;
 //   };
+// export const uploadFile = async ({ query }) => {
+// 	const startTime = Date.now();
+  
+// 	if (!query || query.length === 0) {
+// 	  return [];
+// 	}
+// 	const skuData = [];
+// 	for (const item of query) {
+// 	  const [sku, quantity] = item;
+	  
+// 	  if (!sku?.trim()) continue;
+	  
+// 	  const original = sku.trim();
+// 	  const normalizedSku = original.replace(/[-\s]/g, '').toLowerCase();
+// 	  const quantityNum = parseInt(quantity?.trim() || '1');
+	  
+// 	  skuData.push({
+// 		original,
+// 		normalizedSku,
+// 		quantity: quantityNum
+// 	  });
+// 	}
+  
+// 	if (skuData.length === 0) {
+// 	  return [];
+// 	}
+// 	const normalizedSkus = skuData.map(item => item.normalizedSku);
+// 	let stockItems = [];
+// 	if (normalizedSkus.length <= 3) {
+// 	  stockItems = await Stock.find({
+// 		$expr: {
+// 		  $in: [
+// 			{ $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
+// 			normalizedSkus
+// 		  ]
+// 		}
+// 	  })
+// 	  .select('_id productid stock pricing distributor manufacturer productName productNumber sku')
+// 	  .lean()
+// 	  .exec();
+// 	  stockItems = stockItems.map(item => ({
+// 		...item,
+// 		normalizedSku: item.sku.replace(/[-\s]/g, '').toLowerCase()
+// 	  }));
+// 	} 
+// 	else {
+// 	  stockItems = await Stock.aggregate([
+// 		{
+// 		  $match: {
+// 			$expr: {
+// 			  $in: [
+// 				{ $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
+// 				normalizedSkus
+// 			  ]
+// 			}
+// 		  }
+// 		},
+// 		{
+// 		  $addFields: {
+// 			normalizedSku: {
+// 			  $toLower: {
+// 				$replaceAll: {
+// 				  input: "$sku",
+// 				  find: "-", 
+// 				  replacement: ""
+// 				}
+// 			  }
+// 			}
+// 		  }
+// 		},
+// 		{
+// 		  $project: {
+// 			_id: 1,
+// 			productid: 1,
+// 			stock: 1,
+// 			pricing: 1,
+// 			distributor: 1,
+// 			manufacturer: 1,
+// 			productName: 1,
+// 			productNumber: 1,
+// 			sku: 1,
+// 			normalizedSku: 1
+// 		  }
+// 		}
+// 	  ]).exec();
+// 	}
+// 	const stockItemMap = {};
+// 	for (const item of stockItems) {
+// 	  stockItemMap[item.normalizedSku] = item;
+// 	}
+
+// 	const results = skuData.map(({ normalizedSku, original, quantity }) => {
+// 	  const matchedStock = stockItemMap[normalizedSku];
+	  
+// 	  if (!matchedStock) {
+// 		return {
+// 		  productNumber: original,
+// 		  quantity,
+// 		  isValid: false,
+// 		  message: "Stock information is missing",
+// 		};
+// 	  }
+	  
+// 	  return {
+// 		id: matchedStock._id.toString(),
+// 		productId: matchedStock.productid.toString(),
+// 		productNumber: matchedStock.productNumber,
+// 		productName: matchedStock.productName,
+// 		sku: matchedStock.sku,
+// 		quantity,
+// 		stockId: matchedStock._id.toString(),
+// 		stock: Number(matchedStock?.stock) || 0,
+// 		manufacturer: matchedStock.manufacturer?.toString() || null,
+// 		distributer: matchedStock.distributor?.toString() || null,
+// 		isValid: true,
+// 		message: "SKU is valid",
+// 	  };
+// 	});
+	
+// 	console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
+// 	return results;
+//   };
 export const uploadFile = async ({ query }) => {
 	const startTime = Date.now();
-  
+	
 	if (!query || query.length === 0) {
 	  return [];
 	}
 	const skuData = [];
-	for (const item of query) {
-	  const [sku, quantity] = item;
-	  
+	const normalizedSkuSet = new Set();
+	
+	for (let i = 0; i < query.length; i++) {
+	  const sku = query[i][0];
 	  if (!sku?.trim()) continue;
 	  
 	  const original = sku.trim();
 	  const normalizedSku = original.replace(/[-\s]/g, '').toLowerCase();
-	  const quantityNum = parseInt(quantity?.trim() || '1');
+	  const quantityNum = parseInt(query[i][1]?.trim() || '1');
 	  
 	  skuData.push({
 		original,
 		normalizedSku,
 		quantity: quantityNum
 	  });
+	  normalizedSkuSet.add(normalizedSku);
 	}
-  
+	
 	if (skuData.length === 0) {
 	  return [];
 	}
-	const normalizedSkus = skuData.map(item => item.normalizedSku);
-	let stockItems = [];
-	if (normalizedSkus.length <= 3) {
-	  stockItems = await Stock.find({
-		$expr: {
-		  $in: [
-			{ $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
-			normalizedSkus
-		  ]
-		}
-	  })
-	  .select('_id productid stock pricing distributor manufacturer productName productNumber sku')
-	  .lean()
-	  .exec();
-	  stockItems = stockItems.map(item => ({
-		...item,
-		normalizedSku: item.sku.replace(/[-\s]/g, '').toLowerCase()
-	  }));
-	} 
-	else {
-	  stockItems = await Stock.aggregate([
+	const normalizedSkusArray = [...normalizedSkuSet];
+	
+	try {
+	  const stockItems = await Stock.aggregate([
 		{
 		  $match: {
 			$expr: {
 			  $in: [
 				{ $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
-				normalizedSkus
+				normalizedSkusArray
 			  ]
-			}
-		  }
-		},
-		{
-		  $addFields: {
-			normalizedSku: {
-			  $toLower: {
-				$replaceAll: {
-				  input: "$sku",
-				  find: "-", 
-				  replacement: ""
-				}
-			  }
 			}
 		  }
 		},
@@ -2838,52 +2932,62 @@ export const uploadFile = async ({ query }) => {
 			_id: 1,
 			productid: 1,
 			stock: 1,
-			pricing: 1,
 			distributor: 1,
 			manufacturer: 1,
 			productName: 1,
 			productNumber: 1,
 			sku: 1,
-			normalizedSku: 1
+			normalizedSku: { $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } }
 		  }
 		}
 	  ]).exec();
-	}
-	const stockItemMap = {};
-	for (const item of stockItems) {
-	  stockItemMap[item.normalizedSku] = item;
-	}
-
-	const results = skuData.map(({ normalizedSku, original, quantity }) => {
-	  const matchedStock = stockItemMap[normalizedSku];
-	  
-	  if (!matchedStock) {
-		return {
-		  productNumber: original,
+	  const stockItemMap = {};
+	  for (let i = 0; i < stockItems.length; i++) {
+		const item = stockItems[i];
+		stockItemMap[item.normalizedSku] = item;
+	  }
+	  const results = new Array(skuData.length);
+	  for (let i = 0; i < skuData.length; i++) {
+		const { normalizedSku, original, quantity } = skuData[i];
+		const matchedStock = stockItemMap[normalizedSku];
+		
+		if (!matchedStock) {
+		  results[i] = {
+			productNumber: original,
+			quantity,
+			isValid: false,
+			message: "Stock information is missing",
+		  };
+		  continue;
+		}
+		
+		results[i] = {
+		  id: matchedStock._id.toString(),
+		  productId: matchedStock.productid.toString(),
+		  productNumber: matchedStock.productNumber,
+		  productName: matchedStock.productName,
+		  sku: matchedStock.sku,
 		  quantity,
-		  isValid: false,
-		  message: "Stock information is missing",
+		  stockId: matchedStock._id.toString(),
+		  stock: Number(matchedStock?.stock) || 0,
+		  manufacturer: matchedStock.manufacturer?.toString() || null,
+		  distributer: matchedStock.distributor?.toString() || null,
+		  isValid: true,
+		  message: "SKU is valid",
 		};
 	  }
 	  
-	  return {
-		id: matchedStock._id.toString(),
-		productId: matchedStock.productid.toString(),
-		productNumber: matchedStock.productNumber,
-		productName: matchedStock.productName,
-		sku: matchedStock.sku,
+	  console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
+	  return results;
+	} catch (error) {
+	  console.error(`Error in uploadFile: ${error.message}`);
+	  return skuData.map(({ original, quantity }) => ({
+		productNumber: original,
 		quantity,
-		stockId: matchedStock._id.toString(),
-		stock: Number(matchedStock?.stock) || 0,
-		manufacturer: matchedStock.manufacturer?.toString() || null,
-		distributer: matchedStock.distributor?.toString() || null,
-		isValid: true,
-		message: "SKU is valid",
-	  };
-	});
-	
-	console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
-	return results;
+		isValid: false,
+		message: "Error processing SKU",
+	  }));
+	}
   };
 export const CreateProductQuote = async (formattedData) => {
 	console.log("formattedData",formattedData);
@@ -3571,77 +3675,120 @@ export const getMyFavorites = async(userId) => {
 
 
 export const bulkUploadToCart = async (items, userId, userEmail) => {
-	let cart = await Cart.findOne({ userId, isActiveCart: true });
-	const results = {
-	  added: 0,
-	  updated: 0,
-	  offered: 0,
-	  offeredItems: [] 
-	};
+	if (!items || items.length === 0) {
+	  return { success: false, message: "No items to add" };
+	}
+	const stockIds = items.map(item => item.stockId);
+	const itemsMap = new Map();
+	items.forEach(item => itemsMap.set(item.stockId, item));
 	
-	if (!cart) {
-	  const newCartData = {
-		cartId: nanoid(8),
-		cartName: "mycart",
-		cartItems: items,
-		userId,
-		userEmail,
-		isDeleted: false,
-		isActiveCart: true,
-	  };
+	try {
+	  const cart = await Cart.findOne(
+		{ userId, userEmail, isActiveCart: true },
+		{ cartId: 1, cartItems: 1 }
+	  ).lean();
 	  
-	  await Cart.create(newCartData);
-	  return { success: true, message: `${items.length} item(s) added to new cart` };
-	} else {
-	  if (!cart.cartItems) {
-		cart.cartItems = [];
-	  }
-	  for (const newItem of items) {
-		const itemIndex = cart.cartItems.findIndex(
-		  (item) => item.stockId.toString() === newItem.stockId.toString()
-		);
+	  if (!cart) {
+		const newCart = await Cart.create({
+		  cartId: nanoid(8),
+		  cartName: "mycart",
+		  cartItems: items,
+		  userId,
+		  userEmail,
+		  isActiveCart: true
+		});
 		
-		if (itemIndex > -1) {
-		  const existingItem = cart.cartItems[itemIndex];
-		  if (existingItem.isCart === false && existingItem.isQuote) {
-			existingItem.quantity += parseInt(newItem.quantity) || 1;
-			results.updated++;
-		  } else {
-			results.offered++;
-			results.offeredItems.push(newItem.stockId);
-		  }
+		return {
+		  success: true,
+		  message: `${items.length} item(s) added to cart`
+		};
+	  }
+	  let added = 0, updated = 0, offered = 0;
+	  const offeredItems = [];
+	  const existingItems = cart.cartItems.filter(item => stockIds.includes(item.stockId));
+	  const existingItemsMap = new Map();
+	  existingItems.forEach(item => existingItemsMap.set(item.stockId, item));
+	  const itemsToAdd = [];
+	  const bulkUpdateOps = [];
+	  
+	  for (const stockId of stockIds) {
+		const newItem = itemsMap.get(stockId);
+		const existingItem = existingItemsMap.get(stockId);
+		
+		if (!existingItem) {
+		  itemsToAdd.push(newItem);
+		  added++;
+		} else if (existingItem.isCart || existingItem.isQuote) {
+		  offered++;
+		  offeredItems.push(stockId);
 		} else {
-		  cart.cartItems.push(newItem);
-		  results.added++;
+		  bulkUpdateOps.push({
+			updateOne: {
+			  filter: {
+				_id: cart._id,
+				"cartItems.stockId": stockId
+			  },
+			  update: {
+				$set: {
+				  "cartItems.$.quantity": newItem.quantity,
+				  "cartItems.$.backOrder": newItem.backOrder
+				}
+			  }
+			}
+		  });
+		  updated++;
 		}
 	  }
-	  await cart.save();
-	  if (results.offered > 0 && results.added === 0 && results.updated === 0) {
-		return { 
-		  success: true, 
-		  message: `${results.offered} item(s) already offered in cart`
-		};
-	  } else if (results.offered > 0) {
+	  const operations = [];
+	  
+	  if (itemsToAdd.length > 0) {
+		operations.push(
+		  Cart.updateOne(
+			{ _id: cart._id },
+			{ $push: { cartItems: { $each: itemsToAdd } } }
+		  )
+		);
+	  }
+	  
+	  if (bulkUpdateOps.length > 0) {
+		operations.push(Cart.bulkWrite(bulkUpdateOps));
+	  }
+	  if (operations.length > 0) {
+		await Promise.all(operations);
+	  }
+	  if (offered > 0 && added === 0 && updated === 0) {
 		return {
 		  success: true,
-		  message: `${results.added + results.updated} item(s) added to cart. ${results.offered} item(s) already offered in cart.`,
-		  offeredItems: results.offeredItems
+		  message: `${offered} item(s) already offered in cart`
 		};
-	  } else if (results.updated > 0 && results.added === 0) {
+	  } else if (offered > 0) {
 		return {
 		  success: true,
-		  message: `${results.updated} item(s) quantities updated in cart`
+		  message: `${added + updated} item(s) added to cart. ${offered} item(s) already offered in cart.`,
+		  offeredItems
 		};
-	  } else if (results.added > 0 && results.updated === 0) {
+	  } else if (updated > 0 && added === 0) {
 		return {
 		  success: true,
-		  message: `${results.added} item(s) added to cart`
+		  message: `${updated} item(s) quantities updated in cart`
+		};
+	  } else if (added > 0 && updated === 0) {
+		return {
+		  success: true,
+		  message: `${added} item(s) added to cart`
 		};
 	  } else {
 		return {
 		  success: true,
-		  message: `${results.added + results.updated} item(s) added/updated in cart`
+		  message: `${added + updated} item(s) added/updated in cart`
 		};
 	  }
+	} catch (error) {
+	  console.error("Error in bulkUploadToCart:", error);
+	  return {
+		success: false,
+		message: "Failed to process items",
+		error: error.message
+	  };
 	}
   };
