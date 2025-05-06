@@ -701,11 +701,15 @@ export const loadProductsubcategory = async (
                 $expr: { $eq: ["$productid", "$$productId"] },  // match the stock with product id
               },
             },
+            {
+              $limit:1
+            },
             { $project: { _id: 1, pricing: 1, stock: 1, orderMultiple: 1, distributor: 1,manufacturer:1 } },  // choose fields you need
           ],
           as: "stockDetails",
         },
       },
+     
       { $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true } },
     ]
       
