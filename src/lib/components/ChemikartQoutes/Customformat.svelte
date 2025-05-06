@@ -2,25 +2,37 @@
 	import Icon from '@iconify/svelte';
 	import { formatType } from '$lib/stores/solution_stores.js';
 	import { get } from 'svelte/store';
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte'; // <-- added tick
 	export let tog;
 	export let tog1;
 	let selectedColor = 'Neat';
+
 	const Neatsolution = (type) => {
 		selectedColor = type;
 		formatType.set(type);
 	};
+
 	onMount(() => {
 		selectedColor = get(formatType) || 'Neat';
 	});
-	const sub = () => {
+
+	const sub = async () => {
 		const currentSelection = get(formatType);
 		if (!currentSelection) {
 			formatType.set('Neat');
 		}
 		tog1();
 	};
+
+	// New: Scroll to step 1 after toggling
+	async function editStep1() {
+		tog(); // show the component again
+		await tick(); // wait for DOM update
+		const el = document.getElementById('step1');
+		el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	}
 </script>
+
 <style>
 	.tooltip::after {
 		content: '';
@@ -34,12 +46,12 @@
 	}
 </style>
 
-<div class="pb-10 flex justify-between bg-white">
+<div  id="step1" class="pb-10 flex justify-between bg-white">
 	<span class="flex items-center gap-2">
 		<Icon icon="ph:test-tube-fill" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300" />
 	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">Step 1: Select custom solution type</h1>
 	</span>
-	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={tog()}>Edit</button>
+	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={editStep1}>Edt</button>
 </div>
 <hr />
 <div class="bg-white">

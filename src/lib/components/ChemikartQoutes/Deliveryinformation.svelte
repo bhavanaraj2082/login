@@ -10,6 +10,11 @@
 	  export let tog3
 	  export let tog4
 	  export let tog5
+      export let showStep1 = true;
+    export let showStep2 = true;
+    export let showStep3 = true;
+    export let showStep4 = true;
+    export let showStep5 = true;
 	  let selectbox=false;
 	  $:{
 		if ($Cusdetails.Country=== "India") {
@@ -188,47 +193,67 @@ onMount(() => {
 	  Object.assign($Delivery, storedDetails);
 	  }
   });
+
+  const scrollToStep = (stepId) => {
+		const element = document.getElementById(stepId);
+		if (element) {
+			element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}
+	};
+
+const handleEdit = (step, toggleFn) => {
+		toggleFn();
+		scrollToStep(step);
+	};
   
 	  </script>
-  <div class="pb-10 bg-white  flex justify-between">
+      {#if showStep1}
+  <div id="step1" class="pb-10 bg-white  flex justify-between">
     <span class="flex items-center gap-2">
 		<Icon icon="ph:test-tube-fill" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300" />
 		  <h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 			  Step 1: Select custom solution type
 		  </h1>
     </span>
-		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={tog()}>Edit</button>
+		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={() => handleEdit('step1', tog)}>Edit</button>
 	  </div>
+      {/if}
 	  <hr /><hr />
-	  <div class="py-10 bg-white  flex justify-between">
+      {#if showStep2}
+	  <div id="step2" class="py-10 bg-white  flex justify-between">
         <span class="flex items-center gap-2">
             <Icon icon="wpf:edit-file" class="sm:w-7 sm:h-7 w-5 h-5 text-primary-300" />
 		  <h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 			  Step 2: Select custom format 
 		  </h1>
         </span>
-		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={tog1()}>Edit</button>
+		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={() => handleEdit('step2', tog1)}>Edit</button>
 	  </div>
+      {/if}
 	  <hr /><hr />
-	  <div class="py-10 bg-white  flex justify-between">
+      {#if showStep3}
+	  <div id="step3" class="py-10 bg-white  flex justify-between">
         <span class="flex items-center gap-2">
             <Icon icon="hugeicons:test-tube" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300" />
 		  <h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 			  Step 3: Configure custom solution 
 		  </h1>
         </span>
-		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={tog2()}>Edit</button>
+		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={() => handleEdit('step3', tog2)}>Edit</button>
 	  </div>
+      {/if}
 	  <hr /><hr />
-	  <div class="py-10 bg-white  flex justify-between">
+      {#if showStep4}
+	  <div id="step4" class="py-10 bg-white  flex justify-between">
         <span class="flex items-center gap-2">
             <Icon icon="material-symbols:add-notes-outline-rounded" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300 " style="stroke-width: 2;"  />
 		  <h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
 			  Step 4: Additional notes
 		  </h1>
         </span>
-		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={tog3()}>Edit</button>
+		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={() => handleEdit('step4', tog3)}>Edit</button>
 	  </div>
+      {/if}
 	  <hr /><hr />
 	  <!-- <div class="py-10 bg-white  flex justify-between">
         <span class="flex items-center gap-2">
@@ -240,16 +265,17 @@ onMount(() => {
 	  </div> -->
 
 
-
-      <div class="py-10 bg-white  flex justify-between">
+      {#if showStep5}
+      <div id="step5" class="py-10 bg-white  flex justify-between">
         <span class="flex items-center gap-2">
             <Icon icon="ph:user-list-bold" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300 "  />
 		  <h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">
             Step 5: Customer details
 		  </h1>
         </span>
-		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={tog4()}>Edit</button>
+		  <button type="button" class="sm:text-lg text-xs font-semibold text-primary-500" on:click={() => handleEdit('step5', tog4)}>Edit</button>
 	  </div>
+      {/if}
 	  <hr /><hr />
 	  <div class="bg-white ">
 		  <div>

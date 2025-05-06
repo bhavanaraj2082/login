@@ -36,6 +36,11 @@
   const toggleQoutes6 = () => {
     currentView = currentView === "qoutes6" ? null : "qoutes6";
   };
+
+  const handleResetForm = () => {
+    resetFormData(); // Reset form data
+    currentView = "qoutes"; // Reset to initial view or a particular one
+  };
 </script>
 
 <div class="w-11/12 mx-auto max-w-7xl border rounded rounded-t-xl bg-white mb-6 shadow-md">
@@ -89,7 +94,7 @@
         </p>
         <button 
           class="sm:text-sm text-xs font-semibold text-primary-500 hover:text-primary-600"
-          on:click={resetFormData}>
+          on:click={handleResetForm}>
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
@@ -125,7 +130,7 @@
         </p>
         <button 
           class="sm:text-sm text-xs font-semibold text-primary-500 hover:text-primary-600"
-          on:click={resetFormData}>
+          on:click={handleResetForm}>
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
@@ -161,7 +166,7 @@
         </p>
         <button 
           class="sm:text-sm text-xs font-semibold text-primary-500 hover:text-primary-600"
-          on:click={resetFormData}>
+          on:click={handleResetForm}>
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
@@ -205,7 +210,7 @@
         </p>
         <button 
           class="sm:text-sm text-xs font-semibold text-primary-500 hover:text-primary-600"
-          on:click={resetFormData}>
+          on:click={handleResetForm}>
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
@@ -248,7 +253,7 @@
         </p>
         <button 
           class="sm:text-sm text-xs font-semibold text-primary-500 hover:text-primary-600"
-          on:click={resetFormData}>
+          on:click={handleResetForm}>
           {$isCleared ? "You can edit from the start" : "Clear your form"}
         </button>
       </div>
