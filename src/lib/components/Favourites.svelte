@@ -248,7 +248,7 @@ function calculateTotalPrice(price, quantity) {
     function handleQty(item,quantity){
         console.log(item,"input");
         clearTimeout(timeout)
-        if(isNaN(quantity)){
+        if(isNaN(quantity) || quantity === 0){
             quantity = 1
         }
         if(quantity >= 10000000) quantity = 10000000
@@ -263,7 +263,6 @@ function calculateTotalPrice(price, quantity) {
     }
 
     function increaseQuantity(item,orderMultiple) {
-        console.log(item);
                if(item.quantity >= 10000000){
                 return
                }
@@ -462,7 +461,7 @@ onMount(() => {
                             stockId: item.stockInfo[item.specIndex]._id,
                             manufacturerId: item.manufacturerInfo.id,
                             distributorId: item.distributorInfo.id,
-                            quantity: item.quantity
+                            quantity: isNaN(item.quantity)|| item.quantity === 0 ? 1 : item.quantity
                         })))} />
                 <button 
                     type="submit"
@@ -559,7 +558,7 @@ onMount(() => {
                         stockId: item.stockInfo[item.specIndex]._id,
                         manufacturerId: item.manufacturerInfo.id,
                         distributorId: item.distributorInfo.id,
-                        quantity: item.quantity,
+                        quantity: isNaN(item.quantity)|| item.quantity === 0 ? 1 : item.quantity,
                         backOrder:item.quantity > item.stockInfo[item.specIndex].stock ? item.quantity - item.stockInfo[item.specIndex].stock : 0
                     })} />
                         <button 
@@ -727,7 +726,7 @@ onMount(() => {
                     Delete
                 </button>
             </form>
-				<button class=" w-full py-1.5 border-1 border-primary-500 text-primary-500 bg-white rounded-md" on:click={() => (isDeleteAll = false)}>Cancel</button>
+				<button class=" w-full py-1.5 border-1 border-primary-500 text-primary-500 bg-white rounded" on:click={() => (isDeleteAll = false)}>Cancel</button>
 			</div>
 		</div>
 	</div>

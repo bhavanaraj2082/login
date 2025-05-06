@@ -365,7 +365,7 @@ export const checkoutOrder = async (order) => {
 				 manufacturerId:rec.manufacturerId,
 				 distributorId:rec.distributorId,
 				 quantity:rec.orderQty,
-				 totalStock:stock.stock - rec.orderQty,
+				 totalStock:stock.stock - stock.orderedQty,
 				 actionType:"-",
 				 actionName:"Ordered"
 			})

@@ -61,7 +61,7 @@
   {/if} -->
   <h1 class=" text-lg md:text-xl font-bold mb-4">Profile</h1>
   <div class=" w-full flex flex-col md:flex-row gap-1">
-    <div class=" w-full md:w-2/5 lg:w-80 xl:w-1/4">
+    <div class=" w-full md:w-2/5 lg:w-80 xl:w-2/6">
       <ProfileSideBar {changeTabs} />
     </div>
     <div class="w-full">
