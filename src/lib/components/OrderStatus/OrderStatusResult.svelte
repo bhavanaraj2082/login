@@ -68,6 +68,9 @@
       }),
     };
   });
+
+  console.log("orderedproduct--------",orderedproduct);
+
   const shippedQuantities = shippedDetails.reduce((acc, item) => {
     if (!acc[item.id]) {
       acc[item.id] = 0;
@@ -75,6 +78,8 @@
     acc[item.id] += item.quantity;
     return acc;
   }, {});
+
+  // console.log("shippedQuantities--->",shippedQuantities);
 
   const remainingProducts = orderedproduct
     .map((product) => {
@@ -95,7 +100,7 @@
     })
     .filter((item) => item !== null);
 
-    console.log("--------------remainingProducts",remainingProducts);
+    // console.log("------remainingProducts",remainingProducts);
 
   function formatDate(dateString) {
     const date = new Date(dateString);

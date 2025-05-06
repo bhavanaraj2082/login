@@ -29,6 +29,7 @@
         'Product Name': product.productName || '--',
         'Manufacturer Name': product.manufacturerName || '--',
         'Order Qty': product.orderQty || '--',
+        'Backorder' : product.backOrder || "--",
         'Unit Price': formatPriceForExcel(product.unitPrice),
         'Extended Price': formatPriceForExcel(product.extendedPrice)
       }));
@@ -41,9 +42,10 @@
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
 
-      const totalRowIdx = excelData.length + 1;
+      const totalRowIdx = excelData.length + 2;
+
       XLSX.utils.sheet_add_aoa(worksheet, 
-        [['', '', '', 'Subtotal:', formatPriceForExcel(subtotal)]], 
+        [['', '', '', '', 'Subtotal:', formatPriceForExcel(subtotal)]], 
         {origin: `A${totalRowIdx}`}
       );
       
@@ -53,6 +55,7 @@
       const columnWidths = [
         { wch: 40 }, 
         { wch: 20 }, 
+        { wch: 10 }, 
         { wch: 10 }, 
         { wch: 15 }, 
         { wch: 15 }  
@@ -110,11 +113,20 @@
                   {product.productName || "--"}
                 </p>
               </a>
-              <p class="font-medium text-sm text-gray-500">
-                Qty : <span class="text-gray-700"
-                  >{product.orderQty || "--"}</span
-                >
-              </p>
+              <div class="flex gap-4">
+                <p class="font-medium text-sm text-gray-500">
+                  Qty : <span class="text-gray-700"
+                    >{product.orderQty || "--"}</span
+                  >
+                </p>
+                {#if product.backOrder > 0}
+                <p class="font-medium text-sm text-gray-500">
+                  Backorder :<span class="text-gray-700"
+                    >{product.backOrder || "--"}</span
+                  >
+                </p>
+                {/if}
+              </div>
             </div>
           </div>
 
