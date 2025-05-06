@@ -22,6 +22,7 @@
 	let dropdownEl;
 	let searchTerm = "";
 	let errors = {};
+	let itemNumber;
 	let products = [{ itemNumber: "" }];
 	let poNumber = "";
 	let assistance = "";
@@ -667,12 +668,12 @@
 				<label for="PoNumber" class="block text-sm"
 					>Please provide the Item Number, if you have one</label
 				>
-				{#each products as product, index}
+				<!-- {#each products as product, index} -->
 					<input
 						type="text"
-						id="itemNumber-{index}"
+						id="itemNumber"
 						name="itemNumber"
-						bind:value={product.itemNumber}
+						bind:value={itemNumber}
 						on:input={(e) => {
 							const allowedChars = /^[a-zA-Z0-9\-.,;"']*$/;
 							let inputValue = e.target.value;
@@ -684,7 +685,7 @@
 								);
 							}
 
-							product.itemNumber = inputValue.trim();
+							itemNumber = inputValue.trim();
 							validateField("itemNumber");
 						}}
 						required
@@ -695,7 +696,7 @@
 							{errors.itemNumber}
 						</p>
 					{/if}
-				{/each}
+				<!-- {/each} -->
 
 				<input
 					hidden
