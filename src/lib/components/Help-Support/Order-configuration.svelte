@@ -19,7 +19,7 @@
 	let displayMessage = "";
 
 	let highlightedIndex = -1;
-    let dropdownEl;
+	let dropdownEl;
 	let selectOptionNumber = "";
 	let isValidOrder = false;
 	let isValidating = false;
@@ -31,7 +31,8 @@
 	let products = [{ itemNumber: "" }];
 	let poNumber = "";
 	let country = data?.profile?.country || "";
-	let firstName = data?.profile?.firstName || data?.authedUser?.username|| "";
+	let firstName =
+		data?.profile?.firstName || data?.authedUser?.username || "";
 	let lastName = data?.profile?.lastName || "";
 	let email = data?.profile?.email || "";
 	let phoneNumber = data?.profile?.cellPhone || "";
@@ -89,40 +90,40 @@
 		}
 
 		if (!fieldName || fieldName === "phoneNumber") {
-            if (!country) {
-                errors.phoneNumber =
-                    "Please select the country before entering the phone number";
-                return;
-            }
-            if (!phoneNumber || phoneNumber === "") {
-                errors.phone = "Required for the selected country";
-            } else {
-                const countryDetails = getCountryByCode(country);
+			if (!country) {
+				errors.phoneNumber =
+					"Please select the country before entering the phone number";
+				return;
+			}
+			if (!phoneNumber || phoneNumber === "") {
+				errors.phone = "Required for the selected country";
+			} else {
+				const countryDetails = getCountryByCode(country);
 
-                if (!countryDetails) {
-                    errors.phoneNumber =
-                        "Invalid country selected. Please reselect country.";
-                    errors.country = "Invalid country selected";
-                } else {
-                    const phonePattern = getPhonePattern(country);
-                    if (!phonePattern) {
-                        errors.phoneNumber =
-                            "Phone number pattern for country not found";
-                    } else {
-                        const phoneRegex = new RegExp(phonePattern);
-                        if (!phoneRegex.test(phoneNumber)) {
-                            const countryName =
-                                countryDetails.name ||
-                                country ||
-                                "selected country";
-                            errors.phoneNumber = `Please enter a valid phone number for ${countryName}.`;
-                        } else {
-                            delete errors.phoneNumber;
-                        }
-                    }
-                }
-            }
-        }
+				if (!countryDetails) {
+					errors.phoneNumber =
+						"Invalid country selected. Please reselect country.";
+					errors.country = "Invalid country selected";
+				} else {
+					const phonePattern = getPhonePattern(country);
+					if (!phonePattern) {
+						errors.phoneNumber =
+							"Phone number pattern for country not found";
+					} else {
+						const phoneRegex = new RegExp(phonePattern);
+						if (!phoneRegex.test(phoneNumber)) {
+							const countryName =
+								countryDetails.name ||
+								country ||
+								"selected country";
+							errors.phoneNumber = `Please enter a valid phone number for ${countryName}.`;
+						} else {
+							delete errors.phoneNumber;
+						}
+					}
+				}
+			}
+		}
 
 		if (!fieldName || fieldName === "country") {
 			if (!country) {
@@ -205,132 +206,132 @@
 		// console.log('Selected Country:', country);
 	}
 	function handleKeyDown(event) {
-        const exactCountryMatch = countries.some(
-            (c) => c.name === country && c.name === searchTerm,
-        );
-        if (
-            exactCountryMatch &&
-            !(
-                event.key === "Backspace" ||
-                event.key === "Delete" ||
-                event.key === "ArrowLeft" ||
-                event.key === "ArrowRight" ||
-                event.key === "Home" ||
-                event.key === "End" ||
-                event.key === "Tab" ||
-                event.key === "Escape" ||
-                event.ctrlKey ||
-                event.key === "ArrowUp" ||
-                event.key === "ArrowDown"
-            )
-        ) {
-            const input = document.querySelector('input[name="country"]');
-            if (
-                input &&
-                (input.selectionStart !== input.selectionEnd ||
-                    input.selectionStart === 0)
-            ) {
-                return true;
-            }
-            event.preventDefault();
-            return false;
-        }
+		const exactCountryMatch = countries.some(
+			(c) => c.name === country && c.name === searchTerm,
+		);
+		if (
+			exactCountryMatch &&
+			!(
+				event.key === "Backspace" ||
+				event.key === "Delete" ||
+				event.key === "ArrowLeft" ||
+				event.key === "ArrowRight" ||
+				event.key === "Home" ||
+				event.key === "End" ||
+				event.key === "Tab" ||
+				event.key === "Escape" ||
+				event.ctrlKey ||
+				event.key === "ArrowUp" ||
+				event.key === "ArrowDown"
+			)
+		) {
+			const input = document.querySelector('input[name="country"]');
+			if (
+				input &&
+				(input.selectionStart !== input.selectionEnd ||
+					input.selectionStart === 0)
+			) {
+				return true;
+			}
+			event.preventDefault();
+			return false;
+		}
 
-        if (showDropdown) {
-            switch (event.key) {
-                case "ArrowDown":
-                    event.preventDefault();
-                    if (filteredCountries.length > 0) {
-                        highlightedIndex =
-                            (highlightedIndex + 1) % filteredCountries.length;
-                        scrollToHighlighted();
-                    }
-                    break;
-                case "ArrowUp":
-                    event.preventDefault();
-                    if (filteredCountries.length > 0) {
-                        highlightedIndex =
-                            highlightedIndex <= 0
-                                ? filteredCountries.length - 1
-                                : highlightedIndex - 1;
-                        scrollToHighlighted();
-                    }
-                    break;
-            }
-        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-            showDropdown = true;
-            if (filteredCountries.length > 0) {
-                highlightedIndex = 0;
-            }
-            event.preventDefault();
-        }
-        if (event.key === "Enter") {
-            if (
-                highlightedIndex >= 0 &&
-                highlightedIndex < filteredCountries.length
-            ) {
-                selectCountry(filteredCountries[highlightedIndex]);
-                event.preventDefault();
-            } else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
-                selectCountry(filteredCountries[0]);
-                event.preventDefault();
-            }
-        } else if (event.key === "Escape") {
-            showDropdown = false;
-            highlightedIndex = -1;
-        }
-    }
-    function scrollToHighlighted() {
-        if (!dropdownEl) return;
-        const items = dropdownEl.querySelectorAll("li");
-        if (items[highlightedIndex]) {
-            items[highlightedIndex].scrollIntoView({
-                block: "nearest",
-            });
-        }
-    }
-    function toggleDropdown() {
-        showDropdown = !showDropdown;
-        if (showDropdown) {
-            if (country.length > 0) {
-                searchTerm = country;
-                filterCountriesWithoutAutoSelect();
-            } else {
-                filteredCountries = countries;
-            }
-        }
-    }
-    function handleInputChange(event) {
-        searchTerm = event.target.value;
-        country = event.target.value;
-        const isDeleting =
-            event.inputType === "deleteContentBackward" ||
-            event.inputType === "deleteContentForward";
-        filterCountriesWithoutAutoSelect();
-        showDropdown = filteredCountries.length > 0;
+		if (showDropdown) {
+			switch (event.key) {
+				case "ArrowDown":
+					event.preventDefault();
+					if (filteredCountries.length > 0) {
+						highlightedIndex =
+							(highlightedIndex + 1) % filteredCountries.length;
+						scrollToHighlighted();
+					}
+					break;
+				case "ArrowUp":
+					event.preventDefault();
+					if (filteredCountries.length > 0) {
+						highlightedIndex =
+							highlightedIndex <= 0
+								? filteredCountries.length - 1
+								: highlightedIndex - 1;
+						scrollToHighlighted();
+					}
+					break;
+			}
+		} else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+			showDropdown = true;
+			if (filteredCountries.length > 0) {
+				highlightedIndex = 0;
+			}
+			event.preventDefault();
+		}
+		if (event.key === "Enter") {
+			if (
+				highlightedIndex >= 0 &&
+				highlightedIndex < filteredCountries.length
+			) {
+				selectCountry(filteredCountries[highlightedIndex]);
+				event.preventDefault();
+			} else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
+				selectCountry(filteredCountries[0]);
+				event.preventDefault();
+			}
+		} else if (event.key === "Escape") {
+			showDropdown = false;
+			highlightedIndex = -1;
+		}
+	}
+	function scrollToHighlighted() {
+		if (!dropdownEl) return;
+		const items = dropdownEl.querySelectorAll("li");
+		if (items[highlightedIndex]) {
+			items[highlightedIndex].scrollIntoView({
+				block: "nearest",
+			});
+		}
+	}
+	function toggleDropdown() {
+		showDropdown = !showDropdown;
+		if (showDropdown) {
+			if (country.length > 0) {
+				searchTerm = country;
+				filterCountriesWithoutAutoSelect();
+			} else {
+				filteredCountries = countries;
+			}
+		}
+	}
+	function handleInputChange(event) {
+		searchTerm = event.target.value;
+		country = event.target.value;
+		const isDeleting =
+			event.inputType === "deleteContentBackward" ||
+			event.inputType === "deleteContentForward";
+		filterCountriesWithoutAutoSelect();
+		showDropdown = filteredCountries.length > 0;
 
-        if (searchTerm.length > 0 && !isDeleting) {
-            const codeSearch = searchTerm.replace("+", "").trim();
-            if (codeSearch.length > 0) {
-                const exactCodeMatches = filteredCountries.filter(
-                    (country) => country.code.replace("+", "") === codeSearch,
-                );
+		if (searchTerm.length > 0 && !isDeleting) {
+			const codeSearch = searchTerm.replace("+", "").trim();
+			if (codeSearch.length > 0) {
+				const exactCodeMatches = filteredCountries.filter(
+					(country) => country.code.replace("+", "") === codeSearch,
+				);
 
-                if (exactCodeMatches.length === 1) {
-                    selectCountry(exactCodeMatches[0]);
-                    return;
-                }
-            }
+				if (exactCodeMatches.length === 1) {
+					selectCountry(exactCodeMatches[0]);
+					return;
+				}
+			}
 
-            const countriesStartingWith = filteredCountries.filter((country) =>
-                country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
-            );
+			const countriesStartingWith = filteredCountries.filter((country) =>
+				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+			);
 
-            if (countriesStartingWith.length === 1) {
-                selectCountry(countriesStartingWith[0]);
-            }
-        }
-    }
+			if (countriesStartingWith.length === 1) {
+				selectCountry(countriesStartingWith[0]);
+			}
+		}
+	}
 	// function toggleDropdown() {
 	// 	showDropdown = !showDropdown;
 	// }
@@ -668,19 +669,21 @@
 									class="w-full border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm rounded-md"
 									required
 									on:input={(e) => {
-										const allowedChars = /^[a-zA-Z0-9\-.,;"']*$/;
-											let inputValue = e.target.value;
-									  
-											if (!allowedChars.test(inputValue)) {
-										  
-											  inputValue = inputValue.replace(/[^a-zA-Z0-9\-.,;"']/g, '');
-											}
-											poNumber = inputValue.trim();
+										const allowedChars =
+											/^[a-zA-Z0-9\-.,;"']*$/;
+										let inputValue = e.target.value;
+
+										if (!allowedChars.test(inputValue)) {
+											inputValue = inputValue.replace(
+												/[^a-zA-Z0-9\-.,;"']/g,
+												"",
+											);
+										}
+										poNumber = inputValue.trim();
 										poNumber = poNumber.trim();
 										poVerified = false;
 										validateField("poNumber");
 									}}
-									
 								/>
 								{#if email && poNumber && !poVerified}
 									<button
@@ -711,6 +714,7 @@
 								id="email"
 								bind:value={email}
 							/>
+
 						</form>
 
 						<!-- Display validation status -->
@@ -723,7 +727,12 @@
 								PO number verified successfully
 							</p>
 						{/if}
-
+<input
+												type="hidden"
+												name="poNumber"
+												id="poNumber"
+												bind:value={poNumber}
+											/>
 						<!-- <label class="hidden mb-1" for={`poNumber-${index}`}>poNumber</label> -->
 						{#each products as product, index}
 							<input
@@ -733,20 +742,28 @@
 								maxlength="100"
 								bind:value={product.itemNumber}
 								on:input={(e) => {
-									const allowedChars = /^[a-zA-Z0-9\-.,;"']*$/;
-											let inputValue = e.target.value;
-									  
-											if (!allowedChars.test(inputValue)) {
-										  
-											  inputValue = inputValue.replace(/[^a-zA-Z0-9\-.,;"']/g, '');
-											}
-											product.itemNumber = inputValue.trim();
+									const allowedChars =
+										/^[a-zA-Z0-9\-.,;"']*$/;
+									let inputValue = e.target.value;
+
+									if (!allowedChars.test(inputValue)) {
+										inputValue = inputValue.replace(
+											/[^a-zA-Z0-9\-.,;"']/g,
+											"",
+										);
+									}
+									product.itemNumber = inputValue.trim();
 									product.itemNumber =
 										product.itemNumber.trim();
 								}}
 								class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
 								required
-							/>
+							/><input
+							type="hidden"
+							name="itemNumber"
+							id="itemNumber"
+							bind:value={product.itemNumber}
+						/>
 
 							{#if index > 0}
 								<button
@@ -758,6 +775,7 @@
 								</button>
 							{/if}
 						{/each}
+						
 					</div>
 
 					<button
@@ -806,7 +824,6 @@
 												? "Please enter a valid first name"
 												: "";
 								}}
-							
 							/>
 							{#if errors?.firstName}
 								<p class="text-red-500 text-xs mt-1">
@@ -906,7 +923,6 @@
 								}}
 							>
 								<div class="relative w-full">
-								
 									<div class="relative">
 										<input
 											type="text"
@@ -914,7 +930,7 @@
 											id="email"
 											bind:value={email}
 											maxlength="50"
-								class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
+											class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 											placeholder="Email"
 											on:input={(e) => {
 												e.target.value =
@@ -1113,7 +1129,6 @@
 								</div>
 							{/if}
 						</div>
-
 
 						<!-- Company Name Input -->
 						<!-- <div class="flex flex-col">
