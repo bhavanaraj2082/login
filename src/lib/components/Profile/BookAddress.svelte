@@ -44,7 +44,7 @@ let autoSelectedOnce = false;
 let previousSearchTerm = '';
 
 function selectCountry(selectedCountry) {
-   let country = selectedCountry.name;
+    activeAddress.location = selectedCountry.name;
     filteredCountries = countries; 
     showDropdown = false; 
     validateForm('location');
@@ -198,17 +198,23 @@ onDestroy(() => {
        organizationAddress === null ? activeAddress = dummy : activeAddress = organizationAddress
     }
 
-    const activeBook = (val,addressType)=>{
-      active = val
-      activeAddressType = addressType
-      console.log('form dummy',dummy);
-      if(activeAddressType === "shipping"){
-        shippingAddress === null ? activeAddress = dummy : activeAddress = shippingAddress
-      }
-      if(activeAddressType === "billing"){
-        billingAddress === null ? activeAddress = dummy : activeAddress = billingAddress
-      }
-    }
+    const activeBook = (val, addressType) => {
+  active = val;
+  activeAddressType = addressType;
+
+  if (activeAddressType === "shipping") {
+    activeAddress = shippingAddress === null ? dummy : shippingAddress;
+  }
+
+  if (activeAddressType === "billing") {
+    activeAddress = billingAddress === null ? dummy : billingAddress;
+  }
+  stateSearch = activeAddress?.state || '';
+  filteredStates = states; 
+  showStateDropdown = false;
+  autoSelectedStateOnce = false;
+};
+
 
     const validateField = (field) => {
         const country = activeAddress.location;
@@ -440,7 +446,7 @@ const handleSubmit = ({ cancel }) => {
                         <input
                           class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-none "
                           type="text"
-                          bind:value={stateSearch}
+                          name="state" id="" bind:value={stateSearch }
                           on:input={() => {
                             showStateDropdown = true;
                             if (stateSearch.length < 2) autoSelectedStateOnce = false;
@@ -491,9 +497,10 @@ const handleSubmit = ({ cancel }) => {
                           </ul>
                         {/if}
                       </div>
-                      {#if  !state}
+                      {#if !stateSearch}
                       <span class="text-red-500 text-xs block">State is required</span>
-                      {/if}
+                    {/if}
+                    
                     {:else}
                          <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                     type="text" name="state" bind:value={activeAddress.state } on:input={() => {validateField('state');activeAddress.state=activeAddress.state.trimStart();}}/>
