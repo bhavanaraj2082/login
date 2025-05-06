@@ -351,119 +351,8 @@ const handleEdit = (step, toggleFn) => {
             </span>
 			  <div class="sm:ml-10 ml-0">
 			  <h1 class="font-semibold py-5 text-primary-500 sm:text-md text-sm">Address</h1>
-			  <div class="">
-				  <label for="" class="sm:text-sm text-xs">Address line 1 <span class="text-primary-500"> *</span> </label>
-				  <br>
-				  <input type="text" name="Address" bind:value={$Delivery.Address1} id="" 
-				  class="block rounded  md:w-3/4 w-full lg:w-1/2 py-1.5 sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-				             
-                              on:input={() => {
-                                validateAdd1
-                                const trimmedAdd1 = $Delivery.Address1.trimStart();
-                                          $Delivery.Address1= trimmedAdd1;
-
-                                          if (!trimmedAdd1) {
-      errors = { ...errors, Address1: "" };
-    } else if (trimmedAdd1.length < 3 || trimmedAdd1.length > 200) {
-  errors = { ...errors, Address1: "Address1 must be between 3–200 chars" };
-}else if (!/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(trimmedAdd1)) {
-      errors = { ...errors, Address1: "Invalid chars in Address1" };
-    } else if (/<[^>]*>/.test(trimmedAdd1)) {
-      errors = { ...errors, Address1: "Address1 should not contain HTML tags" };
-    } else {
-      const { Address1, ...rest } = errors;
-      errors = rest; 
-    }
-                                }}
-		/>
-        <!-- {#if errorMessages.address1}
-		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-			{errorMessages.address1}</div>
-		{/if} -->
-        {#if errorMessage && !$Delivery.Address1}
-                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-                    Address1 is required</div>
-                {/if}
-                {#if errors?.Address1}
-		<span class="text-red-500 text-xs sm:text-xs text-2s font-medium">
-		  {errors.Address1}
-		</span>
-	  {/if}
-
-			  </div>
-			  <div class="mt-2 mb-2 ">
-				  <label for="" class="sm:text-sm text-xs">Address line 2 <span class="text-primary-500"> *</span> </label>
-				  <br>
-				  <input type="text" name="Address2" bind:value={$Delivery.Address2} id="" 
-				  class="block rounded md:w-3/4 w-full lg:w-1/2 py-1.5  sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-                  on:input={() => {
-                    validateAdd2
-                    const trimmedAdd2 = $Delivery.Address2.trimStart();
-                              $Delivery.Address2= trimmedAdd2;
-
-                              if (!trimmedAdd2) {
-      errors = { ...errors, Address2: "" };
-    } else if (trimmedAdd2.length < 3 || trimmedAdd2.length > 200) {
-  errors = { ...errors, Address2: "Address2 must be between 3–200 chars" };
-}else if (!/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(trimmedAdd2)) {
-      errors = { ...errors, Address2: "Invalid chars in Address2" };
-    } else if (/<[^>]*>/.test(trimmedAdd2)) {
-      errors = { ...errors, Address2: "Address2 should not contain HTML tags" };
-    } else {
-      const { Address2, ...rest } = errors;
-      errors = rest; 
-    }
-                    }}
-		/>
-        <!-- {#if errorMessages.address2}
-		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-			{errorMessages.address2}</div>
-		{/if} -->
-        {#if errors?.Address2}
-		<span class="text-red-500 text-xs sm:text-xs text-2s font-medium">
-		  {errors.Address2}
-		</span>
-	  {/if}
-        {#if errorMessage && !$Delivery.Address2}
-                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-                    Address2 is required</div>
-                {/if}
-
-			  </div>
-			  <div class="mt-2 mb-2 ">
-				<label for="" class="sm:text-sm text-xs">City <span class="text-primary-500"> *</span> </label>
-				<br>
-				<input type="text" name="City" id="" 
-				class="block rounded  md:w-3/4 w-full lg:w-1/2 py-1.5  sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-				bind:value={$Delivery.City}
-                on:input={() => {
-                    validateCity
-                    const trimmedCity = $Delivery.City.trimStart();
-                              $Delivery.City= trimmedCity;
-
-                              if (!trimmedCity) {
-      errors = { ...errors, City: "" };
-    } else if (trimmedCity.length < 3 || trimmedCity.length > 200) {
-  errors = { ...errors, City: "City must be between 3–200 chars" };
-}else if (!/^[a-zA-Z\s,.'\-/#()]*$/.test(trimmedCity)) {
-      errors = { ...errors, City: "Invalid chars in City" };
-    } else if (/<[^>]*>/.test(trimmedCity)) {
-      errors = { ...errors, City: "City should not contain HTML tags" };
-    } else {
-      const { City, ...rest } = errors;
-      errors = rest; 
-    }
-                    }} />
-                {#if errorMessage && !$Delivery.City}
-                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-                    City is required</div>
-                {/if}
-                {#if errors?.City}
-		<span class="text-red-500 text-xs sm:text-xs text-2s font-medium">
-		  {errors.City}
-		</span>
-	  {/if}
-			</div>
+			 
+			 
 			  <div class="mt-2 mb-2 ">
 				  <label for="" class="sm:text-sm text-xs">State <span class="text-primary-500"> *</span> </label>
 				  <br>
@@ -580,6 +469,122 @@ const handleEdit = (step, toggleFn) => {
 	  {/if}
 				 {/if}
 			  </div>
+
+        <div class="mt-2 mb-2 ">
+          <label for="" class="sm:text-sm text-xs">City <span class="text-primary-500"> *</span> </label>
+          <br>
+          <input type="text" name="City" id="" 
+          class="block rounded  md:w-3/4 w-full lg:w-1/2 py-1.5  sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+          bind:value={$Delivery.City}
+                  on:input={() => {
+                      validateCity
+                      const trimmedCity = $Delivery.City.trimStart();
+                                $Delivery.City= trimmedCity;
+  
+                                if (!trimmedCity) {
+        errors = { ...errors, City: "" };
+      } else if (trimmedCity.length < 3 || trimmedCity.length > 200) {
+    errors = { ...errors, City: "City must be between 3–200 chars" };
+  }else if (!/^[a-zA-Z\s,.'\-/#()]*$/.test(trimmedCity)) {
+        errors = { ...errors, City: "Invalid chars in City" };
+      } else if (/<[^>]*>/.test(trimmedCity)) {
+        errors = { ...errors, City: "City should not contain HTML tags" };
+      } else {
+        const { City, ...rest } = errors;
+        errors = rest; 
+      }
+                      }} />
+                  {#if errorMessage && !$Delivery.City}
+                  <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                      City is required</div>
+                  {/if}
+                  {#if errors?.City}
+      <span class="text-red-500 text-xs sm:text-xs text-2s font-medium">
+        {errors.City}
+      </span>
+      {/if}
+        </div>
+
+        <div class="">
+				  <label for="" class="sm:text-sm text-xs">Address line 1 <span class="text-primary-500"> *</span> </label>
+				  <br>
+				  <input type="text" name="Address" bind:value={$Delivery.Address1} id="" 
+				  class="block rounded  md:w-3/4 w-full lg:w-1/2 py-1.5 sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+				             
+                              on:input={() => {
+                                validateAdd1
+                                const trimmedAdd1 = $Delivery.Address1.trimStart();
+                                          $Delivery.Address1= trimmedAdd1;
+
+                                          if (!trimmedAdd1) {
+      errors = { ...errors, Address1: "" };
+    } else if (trimmedAdd1.length < 3 || trimmedAdd1.length > 200) {
+  errors = { ...errors, Address1: "Address1 must be between 3–200 chars" };
+}else if (!/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(trimmedAdd1)) {
+      errors = { ...errors, Address1: "Invalid chars in Address1" };
+    } else if (/<[^>]*>/.test(trimmedAdd1)) {
+      errors = { ...errors, Address1: "Address1 should not contain HTML tags" };
+    } else {
+      const { Address1, ...rest } = errors;
+      errors = rest; 
+    }
+                                }}
+		/>
+        <!-- {#if errorMessages.address1}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			{errorMessages.address1}</div>
+		{/if} -->
+        {#if errorMessage && !$Delivery.Address1}
+                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                    Address1 is required</div>
+                {/if}
+                {#if errors?.Address1}
+		<span class="text-red-500 text-xs sm:text-xs text-2s font-medium">
+		  {errors.Address1}
+		</span>
+	  {/if}
+
+			  </div>
+			  <div class="mt-2 mb-2 ">
+				  <label for="" class="sm:text-sm text-xs">Address line 2 <span class="text-primary-500"> *</span> </label>
+				  <br>
+				  <input type="text" name="Address2" bind:value={$Delivery.Address2} id="" 
+				  class="block rounded md:w-3/4 w-full lg:w-1/2 py-1.5  sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+                  on:input={() => {
+                    validateAdd2
+                    const trimmedAdd2 = $Delivery.Address2.trimStart();
+                              $Delivery.Address2= trimmedAdd2;
+
+                              if (!trimmedAdd2) {
+      errors = { ...errors, Address2: "" };
+    } else if (trimmedAdd2.length < 3 || trimmedAdd2.length > 200) {
+  errors = { ...errors, Address2: "Address2 must be between 3–200 chars" };
+}else if (!/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(trimmedAdd2)) {
+      errors = { ...errors, Address2: "Invalid chars in Address2" };
+    } else if (/<[^>]*>/.test(trimmedAdd2)) {
+      errors = { ...errors, Address2: "Address2 should not contain HTML tags" };
+    } else {
+      const { Address2, ...rest } = errors;
+      errors = rest; 
+    }
+                    }}
+		/>
+        <!-- {#if errorMessages.address2}
+		<div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+			{errorMessages.address2}</div>
+		{/if} -->
+        {#if errors?.Address2}
+		<span class="text-red-500 text-xs sm:text-xs text-2s font-medium">
+		  {errors.Address2}
+		</span>
+	  {/if}
+        {#if errorMessage && !$Delivery.Address2}
+                <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
+                    Address2 is required</div>
+                {/if}
+
+			  </div>
+
 			  <div class="mt-2 mb-2 ">
 				  <label for="text1" class="sm:text-sm text-xs">Post code <span class="text-primary-500"> *</span> </label>
 				  <br>
