@@ -134,14 +134,22 @@
                     />
                     <h3 class="font-semibold text-sm text-gray-500">Shipped</h3>
                   </div>
-                {:else if ( shipment.status === "Order Loaded") || (shipment.status === "Picked up from warehouse")}
+                {:else if ( shipment.status === "Order Loaded")}
                   <div class="flex gap-2">
                     <Icon
                       icon="mingcute:time-duration-line"
                       class="text-primary-500 text-xl"
                     />
-                    <h3 class="font-semibold text-sm text-gray-500">Pending</h3>
+                    <h3 class="font-semibold text-sm text-gray-500">{shipment.status}</h3>
                   </div>
+                {:else if shipment.status === "Picked up from warehouse"}
+                <div class="flex gap-2">
+                  <Icon
+                    icon="mingcute:time-duration-line"
+                    class="text-primary-500 text-xl"
+                  />
+                  <h3 class="font-semibold text-sm text-gray-500">{shipment.status}</h3>
+                </div>
                 {:else if shipment.status === "Cancelled"}
                   <div class="flex gap-2">
                     <Icon
