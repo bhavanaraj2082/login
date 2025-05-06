@@ -118,21 +118,6 @@
     errors = newErrors; // Update errors object to trigger reactivity
   }
 
-  function validatePhone() {
-    if (!phone) {
-      errors.phone = "*Required";
-    } else {
-      const phonePattern = getPhonePattern(country);
-      const phoneRegex = new RegExp(phonePattern);
-
-      if (!phoneRegex.test(phone)) {
-        errors.phone = `Please enter a valid phone number for ${country}.`;
-      } else {
-        delete errors.phone;
-      }
-    }
-  }
-
   let errors = {};
   let passwordStrength = 0;
 
@@ -253,7 +238,7 @@
 
       if (!matchedCountry) {
         newErrors.phone = "Invalid country selected to validate phone";
-        newErrors.country = "Invalid country selected";
+        // newErrors.country = "Invalid country selected";
       } else {
         const phonePattern = getPhonePattern(matchedCountry.code);
         const phoneRegex = new RegExp(phonePattern);
@@ -302,7 +287,7 @@
     showDropdown = false;
     highlightedIndex = -1;
     validateCountry();
-    validatePhoneNumber(country, phone);
+    // validatePhoneNumber(country, phone);
     updateCurrency(country);
     delete errors.country;
     localStorage.setItem("selectedCountry", JSON.stringify(selectedCountry));
@@ -1177,61 +1162,63 @@
           <label for="country" class="block text-sm font-medium text-gray-600"
             >Country</label
           >
-          <div class="relative dropdown-container">
-            <input
-              type="text"
-              name="country"
-              maxlength="50"
-              bind:value={country}
-              placeholder="Search Country"
-              on:input={handleInputChange}
-              on:click={toggleDropdown}
-              on:keydown={handleKeyDown}
-              class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
-                    focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
-                    placeholder:text-sm h-10"
-            />
-            <Icon
-              icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
-              class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
-            />
-            {#if showDropdown}
-              <div
-                bind:this={dropdownEl}
-                class="absolute w-full mt-px bg-white border border-gray-300 rounded-md shadow-lg z-10"
-              >
-                <ul class="max-h-60 overflow-y-auto text-sm">
-                  {#each filteredCountries as country, index}
-                    <!-- svelte-ignore a11y-click-events-have-key-events -->
-                    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                    <li
-                      on:click={() => selectCountry(country)}
-                      class="px-4 py-2 cursor-pointer {highlightedIndex ===
-                      index
-                        ? 'bg-primary-100'
-                        : 'hover:bg-primary-50'}"
-                    >
-                      {country.name} ({country.code})
-                    </li>
-                  {/each}
-                  {#if filteredCountries.length === 0}
-                    <div class="flex items-center px-4 py-3">
-                      <Icon
-                        icon="tabler:info-square-rounded-filled"
-                        class="text-red-500 text-base mr-2"
-                      />
-                      <li class="text-gray-800 text-xs">
-                        No matching countries found!
-                      </li>
-                    </div>
-                  {/if}
-                </ul>
+            <div class="dropdown-container">
+              <div class="relative">
+                <input
+                  type="text"
+                  name="country"
+                  maxlength="50"
+                  bind:value={country}
+                  placeholder="Search Country"
+                  on:input={handleInputChange}
+                  on:click={toggleDropdown}
+                  on:keydown={handleKeyDown}
+                  class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
+                        focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
+                        placeholder:text-sm h-10"
+                />
+                <Icon
+                  icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
+                />
+
+                {#if showDropdown}
+                  <div
+                    bind:this={dropdownEl}
+                    class="absolute w-full top-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
+                  >
+                    <ul class="max-h-60 overflow-y-auto text-sm">
+                      {#each filteredCountries as country, index}
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                        <li
+                          on:click={() => selectCountry(country)}
+                          class="px-4 py-2 cursor-pointer {highlightedIndex === index
+                            ? 'bg-primary-100'
+                            : 'hover:bg-primary-50'}"
+                        >
+                          {country.name} ({country.code})
+                        </li>
+                      {/each}
+                      {#if filteredCountries.length === 0}
+                        <div class="flex items-center px-4 py-3">
+                          <Icon
+                            icon="tabler:info-square-rounded-filled"
+                            class="text-red-500 text-base mr-2"
+                          />
+                          <li class="text-gray-800 text-xs">
+                            No matching countries found!
+                          </li>
+                        </div>
+                      {/if}
+                    </ul>
+                  </div>
+                {/if}
               </div>
-            {/if}
-            {#if errors.country}
-              <div class="text-red-500 text-xs mt-1">{errors.country}</div>
-            {/if}
-          </div>
+              {#if errors.country}
+                <div class="text-red-500 text-xs mt-1">{errors.country}</div>
+              {/if}
+            </div>
         </div>
 
         <div class="w-full sm:mx-auto grid">
