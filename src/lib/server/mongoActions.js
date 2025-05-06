@@ -1264,7 +1264,7 @@ export const Addquotes = async (data) => {
 		Delivery_information: {
             Address1: data.address1,
             Address2: data.address2,
-			Country1: data.country1,
+			State: data.country1,
             GST: data.county,
             City: data.city,
             Post: data.post
