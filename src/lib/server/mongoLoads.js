@@ -706,29 +706,10 @@ export const loadProductsubcategory = async (
           as: "stockDetails",
         },
       },
-      
       { $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true } },
+    ]
       
-    //   {
-    //     $addFields: {
-    //       // Check if pricing is an empty object
-    //       isEmptyPricing: {
-    //         $cond: {
-    //           if:                                                                                                                                                  {
-    //             $eq: [
-    //               { $size: { $objectToArray: { $ifNull: ["$stockDetails.pricing", {}] } } }, 0
-    //             ], // If pricing is an empty object
-    //           },
-    //           then: true,
-    //           else: false,
-    //         },
-    //       },
-    //     },
-    //   },
-     ];
-    // if (subcategory.name !== "Primary Antibodies" && subcategory.name !== "Uncategorized") {
-    //   aggregation.push({ $sort:{isEmptyPricing:-1} });
-    // }
+   
     aggregation.push(
        
       {

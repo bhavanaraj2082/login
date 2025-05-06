@@ -14,6 +14,7 @@
 	let cartOpen = false;
 	export let loading
 	let cartItems = [];
+	let filteredGuestCart = [];
 	let subtotal = 0;
 	let priceINR = 0;
 	let priceUSD = 0;
@@ -300,7 +301,20 @@
 
 			
 			cartId = result.data?.cart[0]?.cartId;
-			$cart = result.data?.cart[0]?.cartItems || [];
+			filteredGuestCart = $guestCart.filter(guestItem => 
+            !$cart.some(cartItem => cartItem.productId === guestItem.productId)
+            );
+			if(isLoggedIn && filteredGuestCart.length && !cartId.length){
+	    	const formdata = new FormData()
+	    	formdata.append("guestCart",JSON.stringify(filteredGuestCart))
+	    	sendMessage("/cart?/newcart",formdata,(result)=>{
+	    		console.log(result);
+	    		localStorage.removeItem("cart")
+				filteredGuestCart = []
+	    		invalidate("data:cart")
+	    	})
+		}
+		$cart = result.data?.cart[0]?.cartItems || [];
 			syncLocalStorageToStore();
 		};
 	}
