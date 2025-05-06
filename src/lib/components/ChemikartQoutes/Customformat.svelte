@@ -51,7 +51,7 @@
 		<Icon icon="ph:test-tube-fill" class="sm:w-8 sm:h-8 w-6 h-6 text-primary-300" />
 	<h1 class="font-bold sm:text-2xl text-sm text-black text-opacity-25">Step 1: Select custom solution type</h1>
 	</span>
-	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={editStep1}>Edt</button>
+	<button type="button" class="font-semibold text-primary-500 sm:text-lg text-xs" on:click={editStep1}>Edit</button>
 </div>
 <hr />
 <div class="bg-white">

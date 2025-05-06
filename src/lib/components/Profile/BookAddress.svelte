@@ -34,7 +34,7 @@ onMount(() => {
         "Arunachal Pradesh",
         "Assam",
         "Bihar",
-        "Chhattisgarh",
+        "Chattisgarh",
         "Goa",
         "Gujarat",
         "Haryana",
@@ -531,8 +531,66 @@ function validateLocation() {
   }
 }
 
+let state = '';
+
+let stateSearch = '';
+  let showStateDropdown = false;
+  let autoSelectedStateOnce = false;
+
+
+
+  // Reactive filteredStates: filter states by search input
+  $: filteredStates = stateSearch
+    ? states.filter(s => s.toLowerCase().includes(stateSearch.toLowerCase()))
+    : states;
+
+  // Function to select a state from the dropdown
+  function selectState(selected) {
+    state = selected;
+    stateSearch = selected;
+    activeAddress.state = selected;
+    showStateDropdown = false;
+    autoSelectedStateOnce = true;
+  }
+
+  // Auto select if exactly one match after typing 2+ chars and not auto selected before
+  $: {
+    if (
+      filteredStates.length === 1 &&
+      stateSearch.length >= 2 &&
+      !autoSelectedStateOnce
+    ) {
+      const autoSelected = filteredStates[0];
+      setTimeout(() => {
+        selectState(autoSelected);
+        autoSelectedStateOnce = true;
+      }, 200);
+    }
+    if (stateSearch.length < 2) {
+      autoSelectedStateOnce = false;
+    }
+  }
+
+
+let stateDropdownRef;
+
+
+
+
+
+
+function handleFormClick(event) {
+    const isState = stateDropdownRef?.contains(event.target);
+    if (!isState) {
+      showStateDropdown = false;
+    }
+  
+  }
+
 function toggleDropdown() {
     showDropdown = !showDropdown; 
+    showStateDropdown = !showStateDropdown;
+
 }
 
 import {  onDestroy } from 'svelte';
@@ -554,6 +612,7 @@ onMount(() => {
 onDestroy(() => {
   document.removeEventListener('click', handleClickOutside);
 });
+
 
 
 
@@ -721,7 +780,10 @@ const handleSubmit = ({ cancel }) => {
 };
 
  </script>
- <div class="shadow  rounded-md p-5 bg-white">
+ 
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+ <div class="shadow  rounded-md p-5 bg-white"  on:click={handleFormClick}>
     {#if toggleEdit}
       <!-- address edit form -->
         <div class=" max-w-2xl">
@@ -790,20 +852,82 @@ const handleSubmit = ({ cancel }) => {
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="state"><span class=" text-sm font-bold text-red-500">*</span>State</label><br>
                     {#if activeAddress.location === 'India'}
-                          <select name="state" id="" bind:value={activeAddress.state } on:change={() => validateField('state')}
+                          <!-- <select name="state" id="" bind:value={activeAddress.state } on:change={() => validateField('state')}
                     class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500">
                         {#each states as state}
                             <option value={state}>{state}</option>
                         {/each}
-                    </select>
+                    </select> -->
+
+
+                    <div class="relative w-full text-xs" bind:this={stateDropdownRef}>
+                        <div class="flex items-center border border-gray-300 rounded my-1 overflow-hidden">
+                        <input
+                          class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-none "
+                          type="text"
+                          bind:value={stateSearch}
+                          on:input={() => {
+                            showStateDropdown = true;
+                            if (stateSearch.length < 2) autoSelectedStateOnce = false;
+                          }}
+                          on:focus={() => (showStateDropdown = true)}
+                          on:keydown={(e) => {
+                            if (e.key === 'Enter' && filteredStates.length > 0) {
+                              e.preventDefault();
+                              selectState(filteredStates[0]);
+                            }
+                          }}
+                          placeholder="Search state"
+                          autocomplete="off"
+                        />
+                        <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5 text-gray-500 transition-transform duration-200 cursor-pointer mr-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        style:transform={showStateDropdown ? 'rotate(180deg)' : 'rotate(0deg)'}
+                        on:click={toggleDropdown}
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                        </div>
+                        {#if showStateDropdown}
+                          <ul
+                            class="absolute z-10 bg-white border border-gray-200 w-full max-h-40 overflow-y-auto text-xs mt-1 shadow"
+                          >
+                            {#each filteredStates as option}
+                              <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                              <li
+                                class="px-2 py-1 cursor-pointer sm:text-sm text-xs hover:bg-gray-200"
+                                on:click={() => selectState(option)}
+                              >
+                                {option}
+                              </li>
+                            {/each}
+                            {#if filteredStates.length === 0}
+                              <li class="px-2 py-1 text-gray-500">No results</li>
+                            {/if}
+                          </ul>
+                        {/if}
+                      </div>
+                      {#if  !state}
+                      <span class="text-red-500 text-xs block">State is required</span>
+                      {/if}
                     {:else}
                          <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                     type="text" name="state" bind:value={activeAddress.state } on:input={() => {validateField('state');activeAddress.state=activeAddress.state.trimStart();}}/>
+                    {#if errors?.state}
+                    <span class="text-red-600 text-xs">{errors.state}</span>
+                    {/if}
                     {/if}
                    
-                    {#if errors?.state}
-                     <span class="text-red-600 text-xs">{errors.state}</span>
-                     {/if}
+                   
                 </div>
             </div>
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">

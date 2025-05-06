@@ -469,7 +469,10 @@
     const regex = /^[A-Za-z\s]*$/; 
     if (!regex.test(input)) {
         errorMessage1 = 'First Name cannot contain numbers or special characters';
-    } else {
+    } else if (input.length < 3 || input.length > 50) {
+	errorMessage1 = 'First Name must be between 3 and 50 characters';
+	return false;
+}else {
         errorMessage1 = '';
     }
 }
@@ -478,7 +481,11 @@ function validateLastName(event) {
     const regex = /^[A-Za-z\s]*$/; 
     if (!regex.test(input)) {
         errorMessage2 = 'Last Name cannot contain numbers or special characters';
-    } else {
+    } else if ( input.length > 50) {
+	errorMessage1 = 'Last Name must be less than 50 characters';
+	return false;
+}
+else {
         errorMessage2 = '';
     }
 }
@@ -487,12 +494,12 @@ function validatecompany(event) {
 	const regex = /^[a-zA-Z0-9\s&\-.,!@():;"']+$/;
 
 	if (!input) {
-		errorMessage5 = 'Company Name is required';
+		errorMessage5 = '';
 		return false;
-	} else if (input.length < 3) {
-		errorMessage5 = 'Company Name must be at least 3 characters';
-		return false;
-	} else if (!regex.test(input)) {
+	} else if (input.length < 3 || input.length > 100) {
+	errorMessage5 = 'Company Name must be between 3 and 100 characters';
+	return false;
+}else if (!regex.test(input)) {
 		errorMessage5 = 'Invalid characters in Company Name';
 		return false;
 	} else if (/<[^>]*>/.test(input)) {
@@ -599,8 +606,8 @@ onMount(() => {
     }
 
     isEditable = false;
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    // document.addEventListener('click', handleClickOutside);
+    // return () => document.removeEventListener('click', handleClickOutside);
 });
 	$: if (ProfileEmailVerified) {
     localStorage.setItem("ProfileEmailVerified", "true");
@@ -681,11 +688,21 @@ function filterCountriesWithoutAutoSelect() {
         showDropdown = !showDropdown;
     }
 
-	function handleClickOutside(event) {
-		if (!event.target.closest('.dropdown-container')) {
-			showDropdown = false;
-		}
-	}
+	// function handleClickOutside(event) {
+	// 	if (!event.target.closest('.dropdown-container')) {
+	// 		showDropdown = false;
+	// 	}
+	// }
+
+	let countryDropdownRef;
+
+function handleFormClick(event) {
+const isInCountry = countryDropdownRef?.contains(event.target);
+if (!isInCountry) {
+  showDropdown = false;
+}
+}
+
 	let errors = {};
 	function handleKeyDown(event) {
     if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
@@ -746,7 +763,9 @@ const handleEdit = (step, toggleFn) => {
 </div>
 {/if}
 <hr /><hr />
-<div class="bg-white ">
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div class="bg-white " on:click={handleFormClick}>
 	<span class="flex items-center gap-2 pt-10">
 		<Icon icon="ph:user-list-bold" class="sm:w-8 sm:h-8 w-6 h-6 text-heading" />
 	<h1 class="font-bold sm:text-2xl text-sm ">Step 5: Customer details</h1>
@@ -790,9 +809,26 @@ const handleEdit = (step, toggleFn) => {
 				validateFirstName
 				const trimmedName = $Cusdetails.FirstName.trim();
 						  $Cusdetails.FirstName= trimmedName;
+						  if (!trimmedName) {
+      errors = { ...errors, FirstName: "" };
+    } else if (trimmedName.length < 3 || trimmedName.length > 50) {
+  errors = { ...errors, FirstName: "Must be between 3–50 chars" };
+}else if (!/^[A-Za-z\s&\-.,!@():;"']+$/.test(trimmedName)) {
+      errors = { ...errors, FirstName: "Invalid chars in First Name" };
+    } else if (/<[^>]*>/.test(trimmedName)) {
+      errors = { ...errors, FirstName: "First Name should not contain HTML tags" };
+    } else {
+      const { FirstName, ...rest } = errors;
+      errors = rest; 
+    }
 				}}
 			required
 		/>
+		{#if errors?.FirstName}
+		<span class="text-red-500 text-xs sm:text-xs text-2s font-medium">
+		  {errors.FirstName}
+		</span>
+	  {/if}
         {#if errorMessage && !$Cusdetails.FirstName}
 		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">   
 			FirstName is required</div>
@@ -802,6 +838,7 @@ const handleEdit = (step, toggleFn) => {
 			{errorMessage1}</div>
 		{/if}
 		  </div>
+		 
 		</div>
 		<div class="sm:col-span-2">
 			<label for="" class="sm:text-sm text-xs">Last name <span class="text-primary-500"> *</span></label>
@@ -817,8 +854,26 @@ const handleEdit = (step, toggleFn) => {
 						validateLastName
 						const trimmedLName = $Cusdetails.LastName.trim();
 								  $Cusdetails.LastName= trimmedLName;
+
+								  if (!trimmedLName) {
+      errors = { ...errors, LastName: "" };
+    } else if ( trimmedLName.length > 50) {
+  errors = { ...errors, LastName: "Must be less than 50 chars" };
+}else if (!/^[A-Za-z\s&\-.,!@():;"']+$/.test(trimmedLName)) {
+      errors = { ...errors, LastName: "Invalid chars in Last Name" };
+    } else if (/<[^>]*>/.test(trimmedLName)) {
+      errors = { ...errors, LastName: "Last Name should not contain HTML tags" };
+    } else {
+      const { LastName, ...rest } = errors;
+      errors = rest; 
+    }
 						}}
 				/>
+				{#if errors?.LastName}
+		<span class="text-red-500 text-xs sm:text-xs text-2s font-medium">
+		  {errors.LastName}
+		</span>
+	  {/if}
                 {#if errorMessage && !$Cusdetails.LastName}
                 <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
                     LastName is required</div>
@@ -831,18 +886,18 @@ const handleEdit = (step, toggleFn) => {
 		</div>
 	  </div>
 	<div class=" mb-2">
-		{#if errorMessage1}
+		<!-- {#if errorMessage1}
 		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1 md:block hidden ">
 			{errorMessage1}</div>
-		{/if}
+		{/if} -->
 		{#if errorMessage2}
 		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1 md:block hidden">
 			{errorMessage2}</div>
 		{/if}
 		<label for="" class="sm:text-sm text-xs">Country <span class="text-primary-500"> *</span></label>
 		<br />
-		<div class="flex-1 mb-4 relative w-full">
-			<div class="relative w-full md:w-3/4 sm:2/5 lg:w-1/2">
+		<div class="flex-1 mb-4 relative w-full" bind:this={countryDropdownRef}>
+				<div class="flex items-center relative overflow-hidden w-full bg-gray-50 md:w-3/4 sm:2/5 lg:w-1/2 ">
     <input
         type="text"
         id="country"
@@ -852,14 +907,27 @@ const handleEdit = (step, toggleFn) => {
         on:input={handleInputChange}
         on:click={toggleDropdown}
 		on:keydown={handleKeyDown}
-        class="block w-full sm:text-sm text-xs rounded p-1.5 pr-8 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
+        class="block w-full sm:text-sm text-xs rounded py-1.5 pr-8 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 bg-white"
         required
     />
-    <Icon
-        icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
-        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-        on:click={toggleDropdown}
-    />
+    <!-- SVG Icon -->
+											<!-- svelte-ignore a11y-no-static-element-interactions -->
+											<svg
+											  xmlns="http://www.w3.org/2000/svg"
+											  class="h-5 w-5 text-gray-500 transition-transform duration-200 cursor-pointer absolute right-2"
+											  fill="none"
+											  viewBox="0 0 24 24"
+											  stroke="currentColor"
+											  stroke-width="2"
+											  style:transform={showDropdown ? 'rotate(180deg)' : 'rotate(0deg)'}
+											  on:click={toggleDropdown}
+											>
+											  <path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												d="M19 9l-7 7-7-7"
+											  />
+											</svg>
 			</div>
 			{#if showDropdown}
 				<div class="absolute md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs bg-white border border-gray-300 rounded-md shadow-lg z-10 mt-1">
@@ -869,13 +937,13 @@ const handleEdit = (step, toggleFn) => {
 							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 							<li
 								on:click={() => selectCountry(country)}
-								class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+								class="px-4 py-1.5 cursor-pointer hover:bg-gray-100"
 							>
 								{country.name} ({country.code})
 							</li>
 						{/each}
 						{#if filteredCountries.length === 0}
-							<div class="px-4 py-2 text-gray-600 text-xs">No matching countries found!</div>
+							<div class="px-4 py-1.5 text-gray-600 text-xs">No matching countries found!</div>
 						{/if}
 					</ul>
 				</div>
@@ -890,7 +958,7 @@ const handleEdit = (step, toggleFn) => {
 		<label for="" class="sm:text-sm text-xs">Phone number <span class="text-primary-500"> *</span></label>
 		<br />
 		<input
-			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 placeholder:text-sm"
+			class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 placeholder:text-sm"
 			type="tel"
 			name="phone"
 			id="phone"
@@ -966,7 +1034,7 @@ const handleEdit = (step, toggleFn) => {
 			}}
 		>
 			<div
-				class="flex items-center space-x-2 rounded md:w-3/4 sm:2/5 lg:w-1/2 w-full py-0.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 pr-1"
+				class="flex items-center space-x-2 rounded md:w-3/4 sm:2/5 lg:w-1/2 w-full py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500 pr-1"
 			>
 				<input
 					type="text"
@@ -1145,17 +1213,17 @@ const handleEdit = (step, toggleFn) => {
   name="organisation"
   id="organisation"
   bind:value={$Cusdetails.Organisation}
-  class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full p-1 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
+  class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
   on:input={() => {
     $Cusdetails.Organisation = $Cusdetails.Organisation.trimStart(); // Avoid leading spaces
 
     const org = $Cusdetails.Organisation.trim();
 
     if (!org) {
-      errors = { ...errors, organisation: "Company Name is required" };
-    } else if (org.length < 3) {
-      errors = { ...errors, organisation: "Company Name must be at least 3 characters" };
-    } else if (!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(org)) {
+      errors = { ...errors, organisation: "" };
+    } else if (org.length < 3 || org.length > 100) {
+  errors = { ...errors, organisation: "Company Name must be between 3 and 100 characters" };
+}else if (!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(org)) {
       errors = { ...errors, organisation: "Invalid characters in Company Name" };
     } else if (/<[^>]*>/.test(org)) {
       errors = { ...errors, organisation: "Company Name should not contain HTML tags" };
@@ -1167,7 +1235,7 @@ const handleEdit = (step, toggleFn) => {
 />
 
 {#if errors?.organisation}
-  <span class="text-red-500 text-xs">
+  <span class="text-red-500 text-xs sm:text-xs text-2s font-medium">
     {errors.organisation}
   </span>
 {/if}
