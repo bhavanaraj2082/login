@@ -9,13 +9,13 @@
     import { toast, Toaster } from 'svelte-sonner';
     
     export let data;
-    // console.log("ordersdata=>", data);
+    console.log("ordersdata=>", data);
     let initialOrders = [];
     let orders = [];
     let expandedOrderId = null;
     let isInfoPopupOpen = false;
     let userOrderType = null;
-    let userEmail = data.authedUser.email;
+    let userEmail = data?.authedUser?.email;
     let calendarComponent;
     let isLoading = false;
     
@@ -32,9 +32,9 @@
         productList: item.productList || []
     }));
 
-    $: isAnyFilterActive = filters.dateRange !== '' || 
-       filters.status !== '' || 
-       filters.searchTerm !== '';
+    // $: isAnyFilterActive = filters.dateRange !== '' || 
+    //    filters.status !== '' || 
+    //    filters.searchTerm !== '';
     
     $: {
         if (data?.orders) {
@@ -102,26 +102,26 @@
     $: totalPages = Math.ceil(totalItems / $itemsPerPage);
     $: paginatedOrders = getPaginatedData($currentPage, $itemsPerPage, orders).map(order => ({
         ...order,
-        orderid: order.orderid || 'N/A',
-        purchaseorder: order.purchaseorder || 'N/A',
+        orderid: order?.orderid || 'N/A',
+        purchaseorder: order?.purchaseorder || 'N/A',
         status: getOrderStatus(order),
-        currency: order.currency || 'INR',
-        totalprice: order.totalprice || 0,
-        subtotalprice: order.subtotalprice || 0,
-        shippingprice: order.shippingprice || 0,
-        transactionid: order.transactionid || 'N/A',
-        Invoice: order.invoice || 'N/A',
-        orderType: order.orderType || 'personal',
-        orderdetails: (order.orderdetails || []).map(item => ({
-            customerReference: item.customerReference || '--',
-            productName: item.productName || item.manufacturerProductName || 'N/A',
-            orderQty: item.orderQty || 0,
-            readyToShip: item.readyToShip || 0,
-            backOrder: item.backOrder || 0,
-            unitPrice: item.unitPrice || 0,
-            extendedPrice: item.extendedPrice || 0,
-            leadtime: item.leadtime || '--',
-            currency: item.currency || order.currency || 'INR'
+        currency: order?.currency || 'INR',
+        totalprice: order?.totalprice || 0,
+        subtotalprice: order?.subtotalprice || 0,
+        shippingprice: order?.shippingprice || 0,
+        transactionid: order?.transactionid || 'N/A',
+        Invoice: order?.invoice || 'N/A',
+        orderType: order?.orderType || 'personal',
+        orderdetails: (order?.orderdetails || []).map(item => ({
+            customerReference: item?.customerReference || '--',
+            productName: item?.productName || item?.manufacturerProductName || 'N/A',
+            orderQty: item?.orderQty || 0,
+            readyToShip: item?.readyToShip || 0,
+            backOrder: item?.backOrder || 0,
+            unitPrice: item?.unitPrice || 0,
+            extendedPrice: item?.extendedPrice || 0,
+            leadtime: item?.leadtime || '--',
+            currency: item?.currency || order.currency || 'INR'
         }))
     }));
 
@@ -586,31 +586,31 @@
                              </span>
                             <!-- </a> -->
                         </td>
-                        <td class="text-center px-1 py-4 flex justify-center gap-1">
+                        <td class="text-center px-1 py-1.5 flex justify-center gap-1">
                             <button
                               type="button"
                               disabled={isLoading}
                               on:click={() => toggleOrderDetails(order?._id)}
-                              class="px-2 py-1 border text-primary-500 hover:text-white rounded hover:bg-primary-600 transition-all duration-300 flex items-center gap-1 relative group">
+                              class=" border text-primary-500 hover:text-white rounded hover:bg-primary-600 transition-all duration-300 flex items-center gap-1 relative group">
                               <!-- svelte-ignore a11y-click-events-have-key-events -->
                               <!-- svelte-ignore a11y-no-static-element-interactions -->
                               <span class="relative" on:click={() => toggleOrderDetails(order?._id)}>
                                 <Icon
                                   icon={isLoading ? 'mdi:loading' : (expandedOrderId === order?._id ? 'mdi:chevron-up' : 'mdi:chevron-down')}
-                                  class="text-xl {isLoading ? 'animate-spin' : ''}"/>
-                                  <span class="absolute left-1/2 transform -translate-x-1/2 z-50 whitespace-nowrap top-full mt-2 px-2 bg-gray-200 text-gray-600 text-2s py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                  class="text-4xl px-2 {isLoading ? 'animate-spin' : ''}"/>
+                                  <span class="absolute left-1/2 transform -translate-x-1/2 z-50 whitespace-nowrap top-full mt-1 px-2 bg-gray-200 text-gray-600 text-2s py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                       {expandedOrderId === order?._id ? 'Hide Details' : 'Show Details'}
                                     </span>
                               </span>
                             </button>
-                              <span class="text-gray-400 px-2">|</span>
+                              <span class="text-gray-400 px-2 py-2">|</span>
                               <a href={`/order-status/${order?.orderid}?email=${userEmail}`} >
                                   <button
                                       type="button"
-                                      class="px-2 py-1 border text-primary-500 hover:text-white rounded hover:bg-primary-600 transition-all duration-300 flex items-center gap-1 relative group">
+                                      class="px-2 py-2 border text-primary-500 hover:text-white rounded hover:bg-primary-600 transition-all duration-300 flex items-center gap-1 relative group">
                                       <span class="relative">
                                           <Icon icon="fluent:open-24-filled" class="text-xl" />
-                                          <span class="absolute left-1/2 transform -translate-x-1/2 z-50 whitespace-nowrap top-full mt-2 px-2 bg-gray-200 text-gray-600 text-2s py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <span class="absolute left-1/2 transform -translate-x-1/2 z-50 whitespace-nowrap top-full mt-2.5 px-2 bg-gray-200 text-gray-600 text-2s py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                                               Order Status
                                           </span>
                                       </span>
@@ -762,7 +762,8 @@
                                 <td colspan="6" class="border px-4 py-1 text-end bg-white">
                                     <button 
                                         on:click={() => downloadAsExcel(order)} 
-                                        class="bg-white text-heading px-3 py-1 border rounded-md shadow my-1 md:text-sm text-2s hover:text-white hover:bg-green-700 transition-all">
+                                        class="bg-primary-500 text-white px-3 py-1.5 border rounded-md shadow my-1 md:text-sm text-2s hover:bg-primary-600 inline-flex transition-all duration-300">
+                                        <Icon icon="basil:download-solid" class="text-xl mr-2" />
                                         Download as Excel
                                     </button>
                                 </td>
@@ -945,8 +946,8 @@
                             <div class="text-right pt-2">
                                 <button 
                                     on:click|stopPropagation={() => downloadAsExcel(order)} 
-                                    class="bg-white text-heading px-3 py-1 border rounded-md shadow text-xs hover:text-white hover:bg-green-700 transition-all inline-flex items-center gap-1">
-                                    <Icon icon="mdi:file-excel" width="16" height="16" />
+                                    class="bg-primary-500 text-white px-3 py-1 rounded shadow text-xs hover:bg-primary-600 transition-all duration-300 inline-flex items-center gap-1">
+                                    <Icon icon="basil:download-solid" width="16" height="16" />
                                     Download as Excel
                                 </button>
                             </div>

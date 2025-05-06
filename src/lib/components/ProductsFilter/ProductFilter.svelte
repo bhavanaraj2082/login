@@ -21,6 +21,8 @@
     export let specifications
     export let profile
 
+   //$: console.log(products);
+
 	let isLoggedIn = $authedUser?.id ? true : false
   let selectedProductName = "";
     let hoveredItem = null; 
@@ -174,7 +176,7 @@ function handleMouseLeave() {
     }
 };   
     let timeout
-    const handleQty = (id,quantity) =>{
+    const handleQty = (id,stockId,quantity) =>{
         if(isNaN(quantity)){
             quantity = 1
         }
@@ -184,15 +186,18 @@ function handleMouseLeave() {
          clearTimeout(timeout)
          timeout = setTimeout(()=>{
             products = products.map(product => {
-        if (product.stockId === id) {
-            let selectedQty = Math.ceil(quantity/ product.orderMultiple) * product.orderMultiple;
-            let priceINR = product.pricing.INR*selectedQty
-            let priceUSD = product.pricing.USD*selectedQty
-            return {
-                ...product, // Copy the product object
-                quantity:selectedQty, // Increment the quantity
-                totalPrice:{priceINR,priceUSD}
-            };
+        if (product._id === id) {
+          let stockDetails = product.stockDetails.map(x=>{
+          if(x.stockId === stockId){
+            let selectedQty = Math.ceil(quantity/ x.orderMultiple) * x.orderMultiple;
+            let priceINR = x.pricing.INR*selectedQty
+            let priceUSD = x.pricing.USD*selectedQty
+            return {...x,quantity:selectedQty,totalPrice:{priceINR,priceUSD}};
+          }else{
+            return x
+          }
+        })
+        return {...product,stockDetails}
         }
         return product; 
          })
@@ -200,33 +205,40 @@ function handleMouseLeave() {
          },1000);
     }
 
-    const decrementQuantity = (id) => {
+    const decrementQuantity = (id,stockId) => {
     products = products.map(product => {
-        if (product.stockId === id) {
-          if (product.quantity > product.orderMultiple) {
-            let priceINR = product.pricing.INR*(product.quantity-product.orderMultiple)
-            let priceUSD = product.pricing.USD*(product.quantity-product.orderMultiple)
-                return {
-                    ...product,
-                    quantity:product.quantity - product.orderMultiple,
-                    totalPrice:{priceINR,priceUSD}
-                    
-                };
-           }
-            return product;
+      if (product._id === id) {
+           let stockDetails = product.stockDetails.map(x=>{
+              if(x.stockId === stockId){
+          if (x.quantity === x.orderMultiple || x.quantity === 0)  return x
+            let priceINR = x.pricing.INR*(x.quantity-x.orderMultiple)
+            let priceUSD = x.pricing.USD*(x.quantity-x.orderMultiple)
+            return {...x,quantity:x.quantity - x.orderMultiple,totalPrice:{priceINR,priceUSD}};
+          }else{
+             return x
+          }
+        })
+            return {...product,stockDetails};
         }
         return product;
     });
 };
 
 
-    const incrementQuantity = (id, quantity) => {
+    const incrementQuantity = (id, stockId) => {
     products = products.map(product => {
-        if (product.stockId === id) {
-            if(product.quantity >= 10000000) return product
-            let priceINR = product.pricing.INR*(product.quantity+product.orderMultiple)
-            let priceUSD = product.pricing.USD*(product.quantity+product.orderMultiple)
-            return {...product,quantity: product.quantity + product.orderMultiple,totalPrice:{priceINR,priceUSD}};
+        if (product._id === id) {
+           let stockDetails = product.stockDetails.map(x=>{
+              if(x.stockId === stockId){
+                if(x.quantity >= 10000000) return x
+                let priceINR = x.pricing.INR*(x.quantity+x.orderMultiple)
+                let priceUSD = x.pricing.USD*(x.quantity+x.orderMultiple)
+                return {...x,quantity: x.quantity + x.orderMultiple,totalPrice:{priceINR,priceUSD}};
+              }else{
+                return x
+              }
+            })
+            return {...product,stockDetails}
         }
         return product; // Keep other products unchanged
     });
@@ -262,16 +274,16 @@ function handleMouseLeave() {
   return pageNumbers;
   };
 
-  const addToCart = (product) =>{
+  const addToCart = (product,index) =>{
     //console.log(product,"============");
-    const backOrder = product.quantity > product.stock ? product.quantity - product.stock : 0
+    const backOrder = product.stockDetails[index].quantity > product.stockDetails[index].stock ? product.stockDetails[index].quantity - product.stockDetails[index].stock : 0
     if(isLoggedIn === false){
         const addCart = {
         productId:product._id,
         manufacturerId:product.manufacturerDetails._id,
-        distributorId:product.distributorId,
-        stockId:product.stockId,
-        quantity:product.quantity,
+        distributorId:product.stockDetails[index].distributorId,
+        stockId:product.stockDetails[index].stockId,
+        quantity:product.stockDetails[index].quantity,
         backOrder
      }
      addItemToCart(addCart)
@@ -284,9 +296,9 @@ function handleMouseLeave() {
     formdata.append("item",JSON.stringify({
         productId:product._id,
         manufacturerId:product.manufacturerDetails._id,
-        distributorId:product.distributorId,
-        stockId:product.stockId,
-        quantity:product.quantity ? product.quantity: 1,
+        distributorId:product.stockDetails[index].distributorId,
+        stockId:product.stockDetails[index].stockId,
+        quantity:product.stockDetails[index].quantity ? product.stockDetails[index].quantity: 1,
         backOrder
     }))
     sendMessage("?/addtocart",formdata,async(result)=>{
@@ -637,7 +649,7 @@ function handleMouseLeave() {
         {:else}
        {#each paginatedProducts as product,index}
         <div class=" relative bg-white shadow p-2 sm:px-4 space-y-2 rounded-md">
-            <button on:click={()=>handleFavorites(product)} class="{$authedUser?.id && Object.keys(product.pricing).length > 0 ? "" : "hidden"} absolute top-6 right-6">
+            <button on:click={()=>handleFavorites(product)} class="{$authedUser?.id && product?.stockDetails.length > 0 && Object.keys(product?.stockDetails[0]?.pricing).length > 0 ? "" : "hidden"} absolute top-6 right-6">
                 <Icon icon={$myFavorites.find(x=> x === product._id) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
             </button>
             <div class=" w-10/12 ">
@@ -704,34 +716,43 @@ function handleMouseLeave() {
                    {/if}
                     <p>Manufacturer : <span class=" font-semibold ">{product?.manufacturerDetails.name || ""}</span></p>
                     <!-- <p>Price : <span class=" font-semibold">{$currencyState === "inr" ? "₹" + product?.pricing.INR.toLocaleString("en-IN"): "$"+ product?.pricing.USD.toLocaleString("en-IN")}</span></p> -->
-                    {#if product?.pricing && Object.keys(product.pricing).length > 0}
-                    <p>Size : <span class=" font-semibold">{product?.pricing?.break || ""}</span></p>
+                    {#if product?.stockDetails.length > 0 && Object.keys(product?.stockDetails[0]?.pricing).length > 0}
+                    <div class=" flex gap-1 items-center">Size :
+                      {#each product?.stockDetails as {pricing},index }
+                      <button on:click={()=>{
+                        let search = products.find(x=>x._id === product._id)
+                        //console.log(search);
+                        search.stockIndex = index
+                         products = products
+                         }} class=" {index === product.stockIndex ? " bg-primary-300" : " bg-gray-200"} text-xs px-2 py-1 rounded">{pricing?.break}</button>
+                      {/each}
+                    </div>
                     <div class=" hidden sm:flex items-center justify-between">
-                        <p class=" font-bold text-4s">{$currencyState === "inr" ? "₹" + product?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
+                        <p class=" font-bold text-4s">{$currencyState === "inr" ? "₹" + product?.stockDetails[product.stockIndex]?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
                         <div class="flex items-center">
                             <div class="flex items-center">
-                                <input type="number" bind:value={product.quantity}
-					            on:input={e=>handleQty(product.stockId,parseInt(e.target.value))}
+                                <input type="number" value={product?.stockDetails[product.stockIndex]?.quantity}
+					            on:input={e=>handleQty(product?._id,product?.stockDetails[product.stockIndex]?.stockId,parseInt(e.target.value))}
 					            class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
 					        <div class=" {tog === index ? "hidden" : ""} flex items-center border-1 border-primary-300 rounded-md">
 						    <button
-							on:click={() => decrementQuantity(product.stockId)}
+							on:click={() => decrementQuantity(product?._id, product?.stockDetails[product.stockIndex].stockId)}
 							class=" p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							><Icon icon="rivet-icons:minus" class="text-xs" /></button>
 						    <button on:click={async()=>{
                                 tog = index
                                 }} class="w-fit px-3 py-1 text-sm font-medium outline-none text-center">
-							    {product.quantity}
+							    {product?.stockDetails[product.stockIndex]?.quantity}
 						    </button>
 						    <button
-							    on:click={() => incrementQuantity(product.stockId)}
+							    on:click={() => incrementQuantity(product?._id,product?.stockDetails[product.stockIndex].stockId)}
 							    class=" p-2.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
 							    <Icon icon="rivet-icons:plus" class="text-xs" />
 						    </button>
 					        </div>
                             </div>
                         </div>
-                        <button type="button" on:click={()=>addToCart(product)} class="text-xs flex items-center gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300">
+                        <button type="button" on:click={()=>addToCart(product,product?.stockIndex)} class="text-xs flex items-center gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300">
                             <Icon icon="mdi:cart" class="text-xl" />
                             Add to Cart
                         </button>
@@ -757,34 +778,34 @@ function handleMouseLeave() {
                     {/if}
                 </div>
             </div>
-            {#if product?.pricing && Object.keys(product.pricing).length > 0}
+            {#if product?.stockDetails.length > 0 && Object.keys(product?.stockDetails[0]?.pricing).length > 0}
             <div class=" flex sm:hidden items-center justify-between">
-                <p class=" text-xs font-bold">{$currencyState === "inr" ? "₹" + product?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
+                <p class=" text-xs font-bold">{$currencyState === "inr" ? "₹" + product?.stockDetails[product.stockIndex]?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
                 <div class="flex items-center">
                     <div class="flex items-center">
-                        <input type="number" bind:value={product.quantity}
-					on:input={e=>handleQty(product._id,parseInt(e.target.value))}
+                        <input type="number" value={product?.stockDetails[product.stockIndex]?.quantity}
+					on:input={e=>handleQty(product._id,product?.stockDetails[product?.stockIndex]?.stockId,parseInt(e.target.value))}
 					class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
 					<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded-md">
 						<button
-							on:click={() => decrementQuantity(product._id)}
+							on:click={() => decrementQuantity(product?._id,product?.stockDetails[product.stockIndex].stockId)}
 							class=" border-r-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500"
 							><Icon icon="rivet-icons:minus" class="text-xs" /></button
 						>
 						<button on:click={async()=>{
                             tog = index
                         }} class="w-fit px-3 py-0.5 text-sm font-medium outline-none text-center">
-							{product.quantity}
+							{product?.stockDetails[product.stockIndex]?.quantity}
 						</button>
 						<button
-							on:click={() => incrementQuantity(product._id)}
+							on:click={() => incrementQuantity(product?._id,product?.stockDetails[product.stockIndex].stockId)}
 							class=" border-l-1 p-1.5 disabled:bg-gray-200 disabled:text-white text-primary-500">
 							<Icon icon="rivet-icons:plus" class="text-xs" />
 						</button>
 					</div>
                     </div>
                 </div>
-                <button type="button" on:click={()=>addToCart(product)} class=" text-xs sm:text-sm px-3 py-1 flex items-center gap-1 sm:p-1.5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md ">
+                <button type="button" on:click={()=>addToCart(product,product?.stockIndex)} class=" text-xs sm:text-sm px-3 py-1 flex items-center gap-1 sm:p-1.5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md ">
                     <Icon icon="mdi:cart" class="text-xl" />
                     <span class="hidden xs:block">Add to Cart</span>
                 </button>

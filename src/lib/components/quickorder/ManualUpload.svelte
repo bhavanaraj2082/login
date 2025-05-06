@@ -1878,22 +1878,40 @@ addItemToCart(currentCart)
                   if (result.type === "success") {
                     const resultData = result.data;
                     console.log(resultData, "resultData");
-
+              
                     if (resultData && resultData.success === true) {
-                      if ($authedUser.id) {
-                        submitForm();
+
+                      if (resultData.message && resultData.message.includes("already offered in cart")) {
+                        if (!resultData.message.includes("added") && !resultData.message.includes("updated")) {
+                          toast.info(resultData.message);
+                        } else {
+                          toast.success(resultData.message);
+                          if ($authedUser.id) {
+                            submitForm();
+                          } else {
+                            submitAlternateForm();
+                          }
+                          
+                          setTimeout(() => {
+                            resetRows();
+                          }, 1000);
+                          showCartPopup(prepareManualEntriesToCart());
+                        }
                       } else {
-                        submitAlternateForm();
+                        if ($authedUser.id) {
+                          submitForm();
+                        } else {
+                          submitAlternateForm();
+                        }
+              
+                        toast.success(resultData.message || "");
+                        
+                        setTimeout(() => {
+                          resetRows();
+                        }, 1000);
+              
+                        showCartPopup(prepareManualEntriesToCart());
                       }
-
-                      toast.success(
-                        resultData[2] || "Items added to cart successfully",
-                      );
-                      setTimeout(() => {
-                        resetRows();
-                      }, 1000);
-
-                      showCartPopup(prepareManualEntriesToCart());
                     } else {
                       toast.error(
                         resultData.message || "Failed to add item to cart",
@@ -1902,7 +1920,7 @@ addItemToCart(currentCart)
                   } else {
                     toast.error("Failed to add items to cart");
                   }
-
+              
                   cartloading = false;
                 };
               }}

@@ -79,21 +79,36 @@
 		}
 	}
 
+	let countryDropdownRef;
+
+	function handleFormClick(event) {
+    const isInCountry = countryDropdownRef?.contains(event.target);
+    if (!isInCountry) {
+      showDropdown = false;
+    }
+  }
+
 	const validateField = (fieldName) => {
-	if (!fieldName || fieldName === "name") {
+		
+		if (!fieldName || fieldName === "name") {
 	if (!name) {
 		errors.name = "User Name is required";
-	} else if (!/^[A-Za-z\s]+$/.test(name)) {
+	} else if (name.trim().length < 3 || name.trim().length > 50) {
+	errors.name = "User Name must be between 3 and 50 characters";
+}else if (!/^[A-Za-z\s]+$/.test(name)) {
 		errors.name = "User Name should contain only letters and spaces";
 	} else {
 		delete errors.name;
 	}
+	errors = { ...errors }; // ✅ triggers Svelte to re-render error messages
 }
+
+
 
 
 		if (!fieldName || fieldName === "country") {
     if (!country || country === "") {
-        errors.country = "Please select a country";
+        errors.country = "Country is required";
     } else {
         delete errors.country;
     }
@@ -106,20 +121,20 @@
 				) ||
 				email.split("@")[1].includes("gamil")
 			) {
-				errors.email = "Please enter a valid email address ";
+				errors.email = "Email is required"
 			} else {
 				delete errors.email;
 			}
 		}
 
 		if (!fieldName || fieldName === "phone") {
-			if (!country) {
+			if (!country && phone){
         errors.phone = "Please select the country before entering the phone number";
         return;
     }
 
 			if (!phone || phone === "") {
-				errors.phone = "Required for the selected country";
+				errors.phone = "Number is required";
 			} else {
 				const countryDetails = getCountryByCode(country);
 				if (!countryDetails) {
@@ -144,30 +159,36 @@
 		}
 
 		if (!fieldName || fieldName === "message") {
-			if (
-				!message ||
-				message.trim() === "" ||
-				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(message) ||
-				/<[^>]*>/.test(message)
-			) {
-				errors.message = "Message is required";
-			} else {
-				delete errors.message;
-			}
-		}
+			if (!message || message.trim().length < 3 || message.trim().length > 500) {
+	errors.message = "Message must be between 3 and 500 characters";
+}
+ else if (
+		!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(message) ||
+		/<[^>]*>/.test(message)
+	) {
+		errors.message = "Message is required";
+	} else {
+		delete errors.message;
+	}
+	errors = { ...errors }; // ✅ reassign to trigger Svelte update
+}
 
-		if (!fieldName || fieldName === "subject") {
-			if (
-				!subject ||
-				subject.trim() === "" ||
-				!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(subject) ||
-				/<[^>]*>/.test(subject)
-			) {
-				errors.subject = "Subject is required";
-			} else {
-				delete errors.subject;
-			}
-		}
+if (!fieldName || fieldName === "subject") {
+	if (!subject || subject.trim().length < 3 || subject.trim().length > 250) {
+	errors.subject = "Subject must be between 3 and 250 characters";
+}
+else if (
+		!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(subject) ||
+		/<[^>]*>/.test(subject)
+	) {
+		errors.subject = "Subject is required";
+	} else {
+		delete errors.subject;
+	}
+	errors = { ...errors }; // ✅ reassign to trigger Svelte update
+}
+
+
 
 		if (!fieldName || fieldName === "company") {
 	const trimmedCompany = company ? company.trim() : "";
@@ -175,9 +196,10 @@
 
 	if (!trimmedCompany) {
 		newErrors.company = "Company name is required";
-	} else if (trimmedCompany.length < 3) {
-		newErrors.company = "Company name must be at least 3 characters";
-	} else if (
+	} else if (trimmedCompany.length < 3 || trimmedCompany.length > 100) {
+	newErrors.company = "Company name must be between 3 and 100 characters";
+}
+else if (
 		!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(trimmedCompany) ||
 		/<[^>]*>/.test(trimmedCompany)
 	) {
@@ -228,11 +250,11 @@
 				});
 		}
 	}
-	function handleClickOutside(event) {
-		if (!event.target.closest(".dropdown-container")) {
-			showDropdown = false;
-		}
-	}
+	// function handleClickOutside(event) {
+	// 	if (!event.target.closest(".dropdown-container")) {
+	// 		showDropdown = false;
+	// 	}
+	// }
 	function handleKeyDown(event) {
     if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
         selectCountry(filteredCountries[0]);
@@ -274,7 +296,7 @@
 			countryInput.value = selectedCountry.name;
 		}
         if (!phone || phone === "") {
-               errors.phone = "Required for the selected country.";
+               errors.phone = "";
         }
         else {
         delete errors.phone; 
@@ -529,7 +551,7 @@ function verifyCaptcha() {
 		validateField("message");
 		validateField("subject");
 		validateField("country");
-		validateField("company");
+		
 
 		const isEmailVerified = ProfileEmailVerified;
 		const isOtpPhoneVerified = ProfilePhoneVerified;
@@ -546,6 +568,31 @@ function verifyCaptcha() {
 		return isValid;
 	}
 
+	function compvalid() {
+  if (
+    company &&
+    company.trim().length > 0 &&
+    (company.trim().length < 3 || company.trim().length > 100)
+  ) {
+    errors.company = "Company name must be between 3 and 100 characters long.";
+    errors = { ...errors }; 
+    console.log("Company name length is invalid");
+    return false;
+  } else {
+    if (Number.isInteger(Number(company))) {
+      errors.company = "Company name cannot be a whole number. Please enter a valid name.";
+      errors = { ...errors }; 
+      console.log("Company name cannot be a whole number");
+      return false;
+    } else {
+      delete errors.company;
+      errors = { ...errors }; 
+      console.log("Company name is valid");
+      return true;
+    }
+  }
+}
+	
 	function showPopup() {
 		if (isChecked) {
 			showCaptchaPopup = true;
@@ -587,8 +634,8 @@ function verifyCaptcha() {
 			}
 		}
 		isEditable = false;
-		document.addEventListener("click", handleClickOutside);
-        return () => document.removeEventListener("click", handleClickOutside);
+		// document.addEventListener("click", handleClickOutside);
+        // return () => document.removeEventListener("click", handleClickOutside);
 
 		setTimeout(() => {
 			isChecked = false;
@@ -622,9 +669,9 @@ function verifyCaptcha() {
 			form3.requestSubmit();
 		}
 	};
-	$: if (country) {
-    validateField("phone");
-}
+// 	$: if (country) {
+//     validateField("phone");
+// }
 </script>
 
 {#if showSuccesDiv}
@@ -668,11 +715,14 @@ function verifyCaptcha() {
 			<h1 class="sm:text-2xl text-md font-bold bg-primary-400 text-white py-4 pl-4 rounded-t-lg">
 				Get in Touch with Us
 			</h1>
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			<form
 				method="POST"
 				action="?/contactus"
 				class="space-y-4"
 				bind:this={form}
+				on:click={handleFormClick}
 				use:enhance={(event) => {
 					const isEmailVerified = ProfileEmailVerified; 
 					const isAuthedUserEmailVerified = authedUserEmailVerified; 
@@ -720,7 +770,7 @@ function verifyCaptcha() {
 						>
 							<Icon
 								icon="mdi:phone"
-								class="text-heading sm:w-5 w-4 h-5 mr-2"
+								class="text-heading sm:w-5 w-4 h-5 mr-2 sm:mt-1 mt-0"
 							/>
 							<div>
 								<p
@@ -741,7 +791,7 @@ function verifyCaptcha() {
 						>
 							<Icon
 								icon="material-symbols:mail-rounded"
-								class="text-heading sm:w-5 w-4 h-5 mr-2"
+								class="text-heading sm:w-5 w-4 h-5 mr-2 sm:mt-1 mt-0"
 							/>
 							<div>
 								<p
@@ -764,7 +814,7 @@ function verifyCaptcha() {
 						>
 							<Icon
 								icon="ic:sharp-location-on"
-								class="text-heading sm:w-5 w-4 h-5 mr-2 shrink-0"
+								class="text-heading sm:w-5 w-4 h-5 mr-2 shrink-0 sm:mt-1 mt-0"
 							/>
 							<div>
 								<p
@@ -813,7 +863,7 @@ function verifyCaptcha() {
   }}
 />
 {#if errors?.name}
-  <span class="text-red-500 text-xs">
+  <span class="text-xs ml-1 mt-1 text-red-600">
     {errors.name}
   </span>
 {/if}
@@ -824,8 +874,8 @@ function verifyCaptcha() {
 									name="email"
 									id="email"
 									bind:value={email}/>
-								<div class="flex-1 mb-4">
-									<div class="flex-1 mb-4">
+								<div class="flex-1">
+									<div class="flex-1 ">
 										<form
 											action="?/verifyemail"
 											bind:this={form3}
@@ -921,58 +971,59 @@ function verifyCaptcha() {
 													}}
 												/>
 												{#if isLoading}
-													<span
-														class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
-													>
+												<div class="flex justify-end items-center w-full pt-2 sm:pt-0 sm:absolute sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2 text-2s font-semibold text-primary-600">
+													<span class="flex items-center">
 														<Icon
 															icon="line-md:loading-alt-loop"
 															class="w-4 h-4 mr-1"
 														/>
 														Verifying...
 													</span>
+												</div>
+												
 												{:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
+												<div class="flex justify-end items-center w-full sm:absolute sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2">
 													<button
 														type="submit"
-														class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
-														disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-															email,
-														) ||
-															email
-																.split("@")[1]
-																.includes(
-																	"gamil",
-																)}
+														class="text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
+														disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email) || email.split("@")[1].includes("gamil")}
 													>
 														Verify
 													</button>
+												</div>
+																						  
 												{:else if emailSent}
-													<span
-														class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-													>
-														{#if isOtpVerified}
+												<div class="flex justify-end items-center w-full pt-2 sm:pt-0 sm:absolute sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2 text-2s font-semibold text-green-600">
+													{#if isOtpVerified}
+														<span class="flex items-center">
 															Verified
 															<Icon
 																icon="material-symbols:verified-rounded"
 																class="w-4 h-4 mt-2 ml-1"
 															/>
-														{:else}
+														</span>
+													{:else}
+														<span class="flex items-center">
 															<Icon
 																icon="fluent:mail-all-read-16-filled"
-																class="w-4  h-4 mr-1"
+																class="w-4 h-4 mr-1"
 															/>
 															Check your inbox
-														{/if}
-													</span>
+														</span>
+													{/if}
+												</div>
+												
 												{:else}
-													<span
-														class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-													>
+												<div class="flex justify-end items-center w-full pt-2 sm:pt-0 sm:absolute sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2 text-2s font-semibold text-green-600">
+													<span class="flex items-center">
 														Verified
 														<Icon
 															icon="material-symbols:verified-rounded"
 															class="w-4 h-4 ml-1"
 														/>
 													</span>
+												</div>
+												
 												{/if}
 											</div>
 										</form>
@@ -1104,7 +1155,7 @@ function verifyCaptcha() {
 											</form>
 										{/if}
 										{#if errors?.email}
-											<span class="text-red-500 text-xs"
+											<span class=" text-xs ml-1 mt-1 text-red-600"
 												>{errors.email}</span
 											>
 										{/if}
@@ -1118,82 +1169,102 @@ function verifyCaptcha() {
 								<div
 									class="grid grid-cols-1 md:grid-cols-2 my-4 gap-6"
 								>
-									<div>
-										<div class="relative">
+								<div>
+									<div class="relative" bind:this={countryDropdownRef}>
+										<div class="flex items-center relative overflow-hidden w-full bg-gray-50">
+											<!-- Input Field -->
 											<input
-												type="text"
-												name="country"
-												bind:value={country}
-												placeholder="Search country"
-												on:input={handleInputChange}
-												on:click={toggleDropdown}
-												on:keydown={handleKeyDown}
-												on:input={() => {
-													validateField("country");
-													const trimmedCountry = country.trim();
-													country = trimmedCountry;
-													
-													  
-												}}
-												class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+											  type="text"
+											  name="country"
+											  bind:value={country}
+											  placeholder="Search country"
+											  on:click={toggleDropdown}
+											  on:keydown={handleKeyDown}
+											  on:input={(e) => {
+												handleInputChange(e);
+												validateField("country", "input");
+												country = e.target.value.trim();
+											  }}
+											  class="w-full placeholder:text-xs text-sm px-2 py-2 pr-10 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											/>
-
-											{#if showDropdown}
-												<div
-													class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
+											
+											<!-- SVG Icon -->
+											<!-- svelte-ignore a11y-no-static-element-interactions -->
+											<svg
+											  xmlns="http://www.w3.org/2000/svg"
+											  class="h-5 w-5 text-gray-500 transition-transform duration-200 cursor-pointer absolute right-2"
+											  fill="none"
+											  viewBox="0 0 24 24"
+											  stroke="currentColor"
+											  stroke-width="2"
+											  style:transform={showDropdown ? 'rotate(180deg)' : 'rotate(0deg)'}
+											  on:click={toggleDropdown}
+											>
+											  <path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												d="M19 9l-7 7-7-7"
+											  />
+											</svg>
+										  </div>
+										  
+									{#if showDropdown}
+									<div
+										class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
+									>
+										<ul
+											class="max-h-60 overflow-y-auto text-sm"
+										>
+											{#each filteredCountries as country (country.name)}
+												<!-- svelte-ignore a11y-click-events-have-key-events -->
+												<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+												<li
+													on:click={() =>
+														selectCountry(
+															country,
+														)}
+													class="px-4 py-2 cursor-pointer hover:bg-gray-100"
 												>
-													<ul
-														class="max-h-60 overflow-y-auto text-sm"
+													{country.name}
+													({country.code})
+												</li>
+											{/each}
+											{#if filteredCountries.length === 0}
+												<div
+													class="flex items-center px-4 py-3"
+												>
+													<Icon
+														icon="tabler:info-square-rounded-filled"
+														class="text-red-500 text-base mr-2"
+													/>
+													<li
+														class="text-gray-800 text-xs"
 													>
-														{#each filteredCountries as country (country.name)}
-															<!-- svelte-ignore a11y-click-events-have-key-events -->
-															<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-															<li
-																on:click={() =>
-																	selectCountry(
-																		country,
-																	)}
-																class="px-4 py-2 cursor-pointer hover:bg-gray-100"
-															>
-																{country.name}
-																({country.code})
-															</li>
-														{/each}
-														{#if filteredCountries.length === 0}
-															<div
-																class="flex items-center px-4 py-3"
-															>
-																<Icon
-																	icon="tabler:info-square-rounded-filled"
-																	class="text-red-500 text-base mr-2"
-																/>
-																<li
-																	class="text-gray-800 text-xs"
-																>
-																	No matching
-																	countries
-																	found!
-																</li>
-															</div>
-														{/if}
-													</ul>
+														No matching
+														countries
+														found!
+													</li>
 												</div>
 											{/if}
-											{#if errors?.country}
-												<p
-													class="text-red-500 text-xs mt-1"
-												>
-													{errors.country}
-												</p>
-											{/if}
-										</div>
+										</ul>
 									</div>
+								{/if}
+									</div>
+										{#if errors?.country}
+											<p
+												class="ml-1 text-red-600 text-xs mt-1 "
+											>
+												{errors.country}
+											</p>
+										{/if}
+										
+								</div>
 
 									<div>
 										<input
 											type="tel"
 											name="phone"
-											placeholder="Enter Contact Number"
+											placeholder="Phone number"
 											class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											bind:value={phone}
 											title="Please enter a valid phone number"
@@ -1208,28 +1279,33 @@ function verifyCaptcha() {
 											}}
 										/>
 										{#if errors?.phone}
-											<p class="text-red-500 text-xs mt-1">
+											<p class=" text-xs ml-1 mt-1 text-red-600">
 												{errors.phone}
 											</p>
+												
+											
 										{/if}
 									</div>
 								</div>
 								<div class="pb-4">
 									<input
-									type="text"
-									name="company"
-									placeholder="Enter Company Name"
-									class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-									bind:value={company}
-									title="Please enter a valid company name"
-									on:input={() => {
-									  company = company.trimStart(); // optional: keep user input natural
-									  validateField("company"); // will set the right error message
-									}}
-								  />
-								  {#if errors?.company}
-									<span class="text-red-500 text-xs">{errors.company}</span>
-								  {/if}
+	type="text"
+	name="company"
+	placeholder=" Company Name"
+	class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+	bind:value={company}
+	title="Please enter a valid company name"
+	on:input={() => {
+		company = company.trimStart();
+		compvalid(); // ✅ call compvalid on input to validate in real-time
+	}}
+/>
+{#if errors?.company}
+	<span class="text-xs ml-1 mt-1 text-red-600">
+		{errors.company}
+	</span>
+{/if}
+
 								  
 								</div>
 								<div class="flex flex-col md:flex-row md:space-x-4">
@@ -1245,23 +1321,13 @@ function verifyCaptcha() {
 												const trimmedSubject = subject.trimStart();
 												subject = trimmedSubject;
 												validateField("subject");
-												errors.subject =
-													!subject
-														? "Subject is required"
-														: !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(
-																	subject,
-															  ) ||
-															  /<[^>]*>/.test(
-																	subject,
-															  )
-															? 'No special characters allowed except &-.,!@():;"'
-															: "";
+												
 
 
 											}}
 										/>
 										{#if errors?.subject}
-											<span class="text-red-500 text-xs"
+											<span class=" text-xs ml-1 mt-1 text-red-600"
 												>{errors.subject}</span
 											>
 										{/if}
@@ -1280,22 +1346,11 @@ function verifyCaptcha() {
 												const trimmedMessage = message.trimStart();
 												message = trimmedMessage;
 												validateField("message");
-												errors.message =
-													!message ||
-													message.trim() === ""
-														? "Message is required"
-														: !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(
-																	message,
-															  ) ||
-															  /<[^>]*>/.test(
-																	message,
-															  )
-															? 'No special characters allowed except &-.,!@():;"'
-															: "";
+												
 											}}
 										></textarea>
 										{#if errors?.message}
-											<span class="text-red-500 text-xs"
+											<span class=" text-xs ml-1 mt-1 text-red-600"
 												>{errors.message}</span
 											>
 										{/if}
@@ -1315,55 +1370,44 @@ function verifyCaptcha() {
 											value={captchaToken}
 										/>
 										<div id="g-recaptcha-response">
-											<label
-												class="flex mt-5 md:mt-6 items-center justify-end space-x-2 mb-4 cursor-pointer"
-											>
-												<input
+											<div class="flex justify-end mt-5 md:mt-6 mb-4">
+												<label class="flex items-center space-x-2 cursor-pointer">
+												 
+												  <input
 													type="checkbox"
 													name="captcha"
 													value="captcha"
 													class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded-md cursor-pointer hover:border-primary-500 transition-colors duration-300"
 													bind:checked={isChecked}
 													on:click={(event) => {
-														event.preventDefault();
-														if (formValid()) {
-															isChecked = true;
-															showPopup();
-														} else {
-															if (
-																Object.keys(
-																	errors,
-																).length > 0
-															) {
-																toast.error(
-																	"Please fill all the required fields .",
-																);
-																return;
-															}
-															if (
-																!(
-																	ProfileEmailVerified ||
-																	authedUserEmailVerified ===
-																		true
-																)
-															) {
-																{
-																	toast.error(
-																		"Please verify your email to proceed",
-																	);
-																	return;
-																}
-															}
-
-															isChecked = false;
+													  event.preventDefault(); // prevent auto toggle
+											  
+													  const isFormValid = formValid();
+													  const isCompanyValid = compvalid();
+											  
+													  if (isFormValid && isCompanyValid) {
+														isChecked = true;
+														showPopup();
+													  } else {
+														isChecked = false;
+											  
+														if (Object.keys(errors).length > 0) {
+														  toast.error("Please fill all the required fields.");
+														  return;
 														}
+											  
+														if (!(ProfileEmailVerified || authedUserEmailVerified === true)) {
+														  toast.error("Please verify your email to proceed");
+														  return;
+														}
+													  }
 													}}
-												/>
-												<span
-													class="text-gray-700 font-medium text-sm"
-													>Please verify you are human</span
-												>
-											</label>
+												  />
+												  <span class="text-gray-700 font-medium text-sm">
+													Please verify you are human
+												  </span>
+												</label>
+											  </div>
 
 											<div
 												class="mt-4 rounded flex items-center justify-end"
@@ -1451,7 +1495,7 @@ function verifyCaptcha() {
 										<!-- svelte-ignore a11y-click-events-have-key-events -->
 										<!-- svelte-ignore a11y-no-static-element-interactions -->
 										<div
-											class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100"
+											class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-100 mx-4"
 											on:click|stopPropagation
 										>
 											<h2 class="text-xl font-bold mb-6 text-gray-800 text-center">

@@ -678,17 +678,14 @@ export const loadProductsubcategory = async (
 
     if(price === "asc"){
       sortConditions = {}
-      sortConditions.isEmptyPricing = 1
-      sortConditions["stockDetails.pricing.USD"] = 1
-      sortConditions["stockDetails.pricing.INR"] = 1
+      sortConditions.pricingINRSort = 1
+      sortConditions.pricingUSDSort = 1
     }else if(price === "desc"){
       sortConditions = {}
-      sortConditions.isEmptyPricing = 1
-      sortConditions["stockDetails.pricing.USD"] = -1
-      sortConditions["stockDetails.pricing.INR"] = -1
+      sortConditions.pricingINRSort = -1
+      sortConditions.pricingUSDSort = -1
+
     }else{
-      sortConditions = {}
-      sortConditions.isEmptyPricing = 1
       sortConditions["productNumber"] = 1;
     }
      
@@ -712,67 +709,81 @@ export const loadProductsubcategory = async (
       
       { $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true } },
       
-      {
-        $addFields: {
-          // Check if pricing is an empty object
-          isEmptyPricing: {
-            $cond: {
-              if:                                                                                                                                                  {
-                $eq: [
-                  { $size: { $objectToArray: { $ifNull: ["$stockDetails.pricing", {}] } } }, 0
-                ], // If pricing is an empty object
-              },
-              then: true,
-              else: false,
-            },
-          },
-        },
-      },
-    ];
-    if (subcategory.name !== "Primary Antibodies" && subcategory.name !== "Uncategorized") {
-      aggregation.push({ $sort: sortConditions });
-    }
+    //   {
+    //     $addFields: {
+    //       // Check if pricing is an empty object
+    //       isEmptyPricing: {
+    //         $cond: {
+    //           if:                                                                                                                                                  {
+    //             $eq: [
+    //               { $size: { $objectToArray: { $ifNull: ["$stockDetails.pricing", {}] } } }, 0
+    //             ], // If pricing is an empty object
+    //           },
+    //           then: true,
+    //           else: false,
+    //         },
+    //       },
+    //     },
+    //   },
+     ];
+    // if (subcategory.name !== "Primary Antibodies" && subcategory.name !== "Uncategorized") {
+    //   aggregation.push({ $sort:{isEmptyPricing:-1} });
+    // }
     aggregation.push(
-      {
-        $skip: (Number(page) - 1) * Number(pageSize),
-      },
-  
-      {
-        $limit: Number(pageSize),
-      },
-      // {
-      //   $lookup: {
-      //     from: "manufacturers",
-      //     localField: "manufacturer",
-      //     foreignField: "_id",
-      //     as: "manufacturerDetails",
-      //   },
-      // },
-      // { $unwind: "$manufacturerDetails" },
+       
       {
         $facet: {
           data: [
-         
+            {
+              $group: {
+                _id: "$_id",
+                productNumber: { $first: "$productNumber" },
+                productName: { $first: "$productName" },
+                prodDesc: { $first: "$prodDesc" },
+                image: { $first: "$image" },
+                CAS: { $first: "$CAS" },
+                variants: { $first: "$variants" },
+                manufacturerName: { $first: "$manufacturerName" },
+                stockDetails: { $push: "$stockDetails" },
+                pricingINRSort: { $first: "$stockDetails.pricing.INR" },
+                pricingUSDSort: { $first: "$stockDetails.pricing.USD" }
+              }
+            },
+            {
+              $sort:sortConditions
+            },
             {
               $project: {
+                _id: 1,
                 productNumber: 1,
                 productName: 1,
                 prodDesc: 1,
                 image: 1,
-                CAS:1,
-                variants:1,
-                manufacturerName:1,
-                // "categoryDetails.name": 1,
-                // "categoryDetails.urlName": 1,
-                // "manufacturerDetails.name": 1,
-                // "manufacturerDetails._id": 1,
-                "stockDetails._id": 1,
-                "stockDetails.pricing": 1,
-                "stockDetails.stock": 1,
-                "stockDetails.orderMultiple": 1,
-                "stockDetails.distributor": 1,
-                "stockDetails.manufacturer": 1,
-              },
+                CAS: 1,
+                variants: 1,
+                manufacturerName: 1,
+                stockDetails: {
+                  $map: {
+                    input: "$stockDetails",
+                    as: "stock",
+                    in: {
+                      _id: "$$stock._id",
+                      pricing: "$$stock.pricing",
+                      stock: "$$stock.stock",
+                      orderMultiple: "$$stock.orderMultiple",
+                      distributor: "$$stock.distributor",
+                      manufacturer: "$$stock.manufacturer"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              $skip: (Number(page) - 1) * Number(pageSize),
+            },
+        
+            {
+              $limit: Number(pageSize),
             },
           ],
         },
@@ -782,7 +793,7 @@ export const loadProductsubcategory = async (
     const products = await Product.aggregate(aggregation);
     
     const totalCount = await Product.countDocuments(matchCondition);
-    //console.log("products",JSON.stringify(products,null,2));
+   // console.log("products",JSON.stringify(products,null,2));
     const profile = await Profile.findOne({userId},{firstName:1,lastName:2,cellPhone:1,email:1,isEmailVerified:1,companyName:1,_id:0})
     
 
@@ -799,7 +810,7 @@ export const loadProductsubcategory = async (
    }
 
     const filtered = await Promise.all(products[0].data.map(async(product) => {
-      const {
+      let {
         _id,
         productName,
         productNumber,
@@ -808,9 +819,27 @@ export const loadProductsubcategory = async (
         variants,
         manufacturerName,
         CAS,
-        stockDetails={}
+        stockDetails
       } = product;
-      const priceConversion = await convertToINR(stockDetails.pricing)
+      const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+      stockDetails = stockDetails.map((x)=>{
+        let {_id,pricing,stock,orderMultiple,distributor,manufacturer} = x
+        if(pricing.INR !== undefined && pricing.INR !== null){
+          pricing.USD = pricing.INR/currency.rate
+        }else{
+         pricing.INR = pricing.USD * currency.rate;
+        }
+        return {
+           stock,
+           orderMultiple,
+           quantity:orderMultiple,
+           distributorId:distributor,
+           pricing,
+           stockId:_id,
+           manufacturer,
+           totalPrice:{ priceINR:pricing.INR*orderMultiple,priceUSD:pricing.USD*orderMultiple}
+        }
+      })
       return {
         _id,
         productName,
@@ -819,15 +848,17 @@ export const loadProductsubcategory = async (
         image,
         variants,
         CAS,
-        pricing: priceConversion,
-        totalPrice:{ priceINR:priceConversion.INR*stockDetails.orderMultiple,priceUSD:priceConversion.USD*stockDetails.orderMultiple},
-        quantity: stockDetails.orderMultiple,
-        orderMultiple: stockDetails.orderMultiple,
-        distributorId: stockDetails.distributor,
-        stock: stockDetails.stock,
-        stockId: stockDetails._id,
+        stockIndex:0,
+        stockDetails,
+        // pricing: priceConversion,
+        // totalPrice:{ priceINR:priceConversion.INR*stockDetails.orderMultiple,priceUSD:priceConversion.USD*stockDetails.orderMultiple},
+        // quantity: stockDetails.orderMultiple,
+        // orderMultiple: stockDetails.orderMultiple,
+        // distributorId: stockDetails.distributor,
+        // stock: stockDetails.stock,
+        // stockId: stockDetails._id,
         subCategoryDetails,
-        manufacturerDetails:{name:manufacturerName,_id:stockDetails.manufacturer},
+        manufacturerDetails:{name:manufacturerName,_id:stockDetails[0]?.manufacturer},
       };
     })
   )
@@ -2060,7 +2091,7 @@ export async function getProfileDetails(userId) {
 
 
 export const newsroom = async () => {
-  const records = await Newsroom.find({});
+  const records = await Newsroom.find({}).sort({ createdAt: -1 });
   return JSON.parse(JSON.stringify(records));
 };
 
@@ -2345,11 +2376,13 @@ export async function getUserFavorites(userId) {
           },
           quantity: { $toString: '$favorite.quantity' },
           stock: { $toString: '$favorite.stock' },
+          createdDate: '$favorite.createdDate',
           "stockDetails":1
         }
       }
     ]).exec();
-    console.log(favorites,"--------");
+    // console.log(favorites,"----fav----");
+
     const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
     favorites = favorites.map(fav=>{
       let {stockDetails,...data} = fav
@@ -2369,7 +2402,7 @@ export async function getUserFavorites(userId) {
       // }else{
       //  stockInfo.pricing.INR = stockInfo.pricing.USD * currency.rate;
       // }
-      return {stockInfo,...data}
+      return {stockInfo, ...data}
     })
     
     return {
@@ -2434,7 +2467,7 @@ export async function getUserProfileData(userId) {
       cart: cart.success ? cart.data : []
     };
 
-    // console.log('Final data structure:', JSON.stringify(data, null, 2));
+    console.log('Final order-- data structure:', JSON.stringify(data.orders, null, 2));
 
     return JSON.parse(JSON.stringify(data));
 
