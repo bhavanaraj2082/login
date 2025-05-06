@@ -809,84 +809,192 @@ export  const zipCodePatterns = {
 };
 
 export const postalCodePatterns = {
-  'United States': /^[0-9]{5}(?:-[0-9]{4})?$/,
-  'Canada': /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/,
-  'United Kingdom': /^[A-Za-z]{1,2}\d[A-Za-z\d]? \d[A-Za-z]{2}$/,
-  'Germany': /^\d{5}$/,
-  'India': /^\d{6}$/,
-  'Australia': /^\d{4}$/,
-  'France': /^\d{5}$/,
-  'Italy': /^\d{5}$/,
-  'Spain': /^\d{5}$/,
-  'Poland': /^\d{5}$/,
-  'Russia': /^\d{6}$/,
-  'China': /^\d{6}$/,
-  'Japan': /^\d{3}-\d{4}$/,
-  'Brazil': /^\d{5}-\d{3}$/,
-  'Mexico': /^\d{5}$/,
-  'New Zealand': /^\d{4}$/,
-  'Singapore': /^\d{6}$/,
-  'South Africa': /^\d{4}$/,
-  'Belgium': /^\d{4}$/,
-  'Netherlands': /^\d{4}\s?[A-Za-z]{2}$/,
-  'Austria': /^\d{4}$/,
-  'Sweden': /^\d{3} \d{2}$/,
-  'Denmark': /^\d{4}$/,
-  'Norway': /^\d{4}$/,
-  'Finland': /^\d{5}$/,
-  'Switzerland': /^\d{4}$/,
-  'South Korea': /^\d{5}$/,
-  'Thailand': /^\d{5}$/,
-  'Hong Kong': /^\d{4}$/,
-  'United Arab Emirates': /^\d{5}$/,
-  'Malaysia': /^\d{5}$/,
-  'Kuwait': /^\d{5}$/,
-  'Saudi Arabia': /^\d{5}$/,
-  'Egypt': /^\d{5}$/,
-  'Pakistan': /^\d{5}$/,
-  'Philippines': /^\d{4}$/,
-  'Indonesia': /^\d{5}$/,
-  'Greece': /^\d{5}$/,
-  'Turkey': /^\d{5}$/,
-  'Iran': /^\d{5}-\d{5}$/,
-  'Colombia': /^\d{6}$/,
-  'Chile': /^\d{7}$/,
-  'Peru': /^\d{5}$/,
-  'Venezuela': /^\d{4}$/,
-  'Argentina': /^\d{4}$/,
-  'Ukraine': /^\d{5}$/,
-  'Romania': /^\d{6}$/,
-  'Czech Republic': /^\d{5}$/,
-  'Slovakia': /^\d{5}$/,
-  'Hungary': /^\d{4}$/,
-  'Lithuania': /^\d{5}$/,
-  'Latvia': /^\d{4}$/,
-  'Estonia': /^\d{5}$/,
-  'Bulgaria': /^\d{4}$/,
-  'Croatia': /^\d{5}$/,
-  'Slovenia': /^\d{4}$/,
-  'North Macedonia': /^\d{4}$/,
-  'Serbia': /^\d{5}$/,
-  'Montenegro': /^\d{5}$/,
-  'Albania': /^\d{4}$/,
-  'Armenia': /^\d{4}$/,
-  'Georgia': /^\d{4}$/,
-  'Moldova': /^\d{4}$/,
-  'Belarus': /^\d{6}$/,
-  'Kosovo': /^\d{5}$/,
-  'Bosnia and Herzegovina': /^\d{5}$/,
-  'Iceland': /^\d{3}$/,
-  'Luxembourg': /^\d{4}$/,
-  'Malta': /^\d{4}$/,
-  'Andorra': /^\d{3}$/,
-  'Liechtenstein': /^\d{4}$/,
-  'San Marino': /^\d{5}$/,
-  'Monaco': /^\d{5}$/,
-  'Vatican City': /^\d{5}$/,
-  'Taiwan': /^\d{5}$/,
-  'Haiti': /^\d{4}$/,
-  'Jamaica': /^\d{5}$/,
-  'Barbados': /^\d{5}$/,
-  'Bahamas': /^\d{5}$/,
-  'Bermuda': /^\d{5}$/,
+  "Afghanistan": /^\d{4}$/,               // Example: 1001
+  "Algeria": /^\d{5}$/,                   // Example: 16000
+  "Andorra": /^\d{3}$/,                   // Example: AD100
+  "Angola": /^\d{6}$/,                    // Example: 00100
+  "Antigua and Barbuda": /^\d{4}$/,       // Example: 1234
+  "Argentina": /^\d{4}$/,                 // Example: C1000
+  "Armenia": /^\d{4}$/,                   // Example: 0001
+  "Australia": /^\d{4}$/,                 // Example: 2000
+  "Austria": /^\d{4}$/,                   // Example: 1010
+  "Azerbaijan": /^\d{4}$/,                // Example: 1000
+  "Bahamas": /^\d{5}$/,                   // Example: 1020
+  "Bahrain": /^\d{3}$/,                   // Example: 100
+  "Bangladesh": /^\d{4}$/,                // Example: 1212
+  "Barbados": /^\d{4}$/,                  // Example: 1234
+  "Belarus": /^\d{6}$/,                   // Example: 220000
+  "Belgium": /^\d{4}$/,                   // Example: 1000
+  "Belize": /^\d{6}$/,                    // Example: 123456
+  "Benin": /^\d{4}$/,                     // Example: 1234
+  "Bhutan": /^\d{5}$/,                    // Example: 11001
+  "Bolivia": /^\d{4}$/,                   // Example: 1010
+  "Bosnia and Herzegovina": /^\d{5}$/,    // Example: 71000
+  "Botswana": /^\d{5}$/,                  // Example: 10101
+  "Brazil": /^\d{5}-\d{3}$/,              // Example: 01000-000
+  "Brunei": /^\d{6}$/,                    // Example: 123456
+  "Bulgaria": /^\d{4}$/,                  // Example: 1000
+  "Burkina Faso": /^\d{5}$/,              // Example: 12345
+  "Burundi": /^\d{5}$/,                   // Example: 12345
+  "Cambodia": /^\d{5}$/,                  // Example: 12345
+  "Cameroon": /^\d{5}$/,                  // Example: 12345
+  "Canada": /^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/, // Example: K1A 0B1
+  "Cape Verde": /^\d{4}$/,                // Example: 1234
+  "Cayman Islands": /^\d{5}$/,            // Example: KY1-1000
+  "Central African Republic": /^\d{5}$/,  // Example: 12345
+  "Chad": /^\d{5}$/,                      // Example: 12345
+  "Chile": /^\d{7}$/,                     // Example: 1234567
+  "China": /^\d{6}$/,                     // Example: 100000
+  "Colombia": /^\d{6}$/,                  // Example: 110001
+  "Comoros": /^\d{5}$/,                   // Example: 12345
+  "Congo (Republic of the)": /^\d{5}$/,   // Example: 12345
+  "Congo (Democratic Republic of the)": /^\d{5}$/, // Example: 12345
+  "Costa Rica": /^\d{5}$/,                // Example: 10101
+  "Croatia": /^\d{5}$/,                   // Example: 10000
+  "Cuba": /^\d{5}$/,                      // Example: 10100
+  "Cyprus": /^\d{4}$/,                    // Example: 2300
+  "Czech Republic": /^\d{5}$/,            // Example: 11000
+  "Denmark": /^\d{4}$/,                   // Example: 1000
+  "Djibouti": /^\d{5}$/,                  // Example: 12345
+  "Dominica": /^\d{4}$/,                  // Example: 1234
+  "Dominican Republic": /^\d{5}$/,        // Example: 10101
+  "Ecuador": /^\d{6}$/,                   // Example: 170001
+  "Egypt": /^\d{5}$/,                     // Example: 11511
+  "El Salvador": /^\d{4}$/,               // Example: 1101
+  "Equatorial Guinea": /^\d{5}$/,         // Example: 12345
+  "Eritrea": /^\d{4}$/,                   // Example: 1234
+  "Estonia": /^\d{5}$/,                   // Example: 10123
+  "Eswatini": /^\d{4}$/,                  // Example: 1234
+  "Ethiopia": /^\d{4}$/,                  // Example: 1234
+  "Fiji": /^\d{4}$/,                      // Example: 1234
+  "Finland": /^\d{5}$/,                   // Example: 00100
+  "France": /^\d{5}$/,                    // Example: 75001
+  "Gabon": /^\d{5}$/,                     // Example: 12345
+  "Gambia": /^\d{5}$/,                    // Example: 10000
+  "Georgia": /^\d{4}$/,                   // Example: 0101
+  "Germany": /^\d{5}$/,                   // Example: 10115
+  "Ghana": /^\d{5}$/,                     // Example: 12345
+  "Greece": /^\d{5}$/,                    // Example: 10558
+  "Grenada": /^\d{4}$/,                   // Example: 1234
+  "Guatemala": /^\d{5}$/,                 // Example: 01010
+  "Guinea": /^\d{4}$/,                    // Example: 1234
+  "Guinea-Bissau": /^\d{4}$/,             // Example: 1234
+  "Guyana": /^\d{5}$/,                    // Example: 12345
+  "Haiti": /^\d{4}$/,                     // Example: 1234
+  "Honduras": /^\d{5}$/,                  // Example: 11101
+  "Hungary": /^\d{4}$/,                   // Example: 1012
+  "Iceland": /^\d{3}$/,                   // Example: 101
+  "India": /^\d{6}$/,                     // Example: 110001
+  "Indonesia": /^\d{5}$/,                 // Example: 10220
+  "Iran": /^\d{5}$/,                      // Example: 12345
+  "Iraq": /^\d{5}$/,                      // Example: 12345
+  "Ireland": /^\d{4}$/,                   // Example: 1234
+  "Israel": /^\d{5}$/,                    // Example: 10000
+  "Italy": /^\d{5}$/,                     // Example: 00100
+  "Jamaica": /^\d{5}$/,                   // Example: 00000
+  "Japan": /^\d{3}-\d{4}$/,               // Example: 100-0001
+  "Jordan": /^\d{5}$/,                    // Example: 11822
+  "Kazakhstan": /^\d{6}$/,                // Example: 100000
+  "Kenya": /^\d{5}$/,                     // Example: 00100
+  "Kiribati": /^\d{4}$/,                  // Example: 1234
+  "Korea (North)": /^\d{5}$/,             // Example: 12345
+  "Korea (South)": /^\d{5}$/,             // Example: 12345
+  "Kuwait": /^\d{5}$/,                    // Example: 12345
+  "Kyrgyzstan": /^\d{6}$/,                // Example: 720000
+  "Laos": /^\d{5}$/,                      // Example: 12345
+  "Latvia": /^\d{4}$/,                    // Example: 1001
+  "Lebanon": /^\d{4}$/,                   // Example: 1234
+  "Lesotho": /^\d{4}$/,                   // Example: 1234
+  "Liberia": /^\d{5}$/,                   // Example: 12345
+  "Libya": /^\d{5}$/,                     // Example: 12345
+  "Liechtenstein": /^\d{4}$/,             // Example: 9490
+  "Lithuania": /^\d{5}$/,                 // Example: 1000
+  "Luxembourg": /^\d{4}$/,                // Example: 1234
+  "Madagascar": /^\d{5}$/,                // Example: 101
+  "Malawi": /^\d{5}$/,                    // Example: 12345
+  "Malaysia": /^\d{5}$/,                  // Example: 50000
+  "Maldives": /^\d{5}$/,                  // Example: 2030
+  "Mali": /^\d{5}$/,                      // Example: 12345
+  "Malta": /^\d{4}$/,                     // Example: 1234
+  "Marshall Islands": /^\d{5}$/,          // Example: 12345
+  "Mauritania": /^\d{5}$/,                // Example: 12345
+  "Mauritius": /^\d{3}$/,                 // Example: 123
+  "Mexico": /^\d{5}$/,                    // Example: 01000
+  "Micronesia": /^\d{5}$/,                // Example: 12345
+  "Moldova": /^\d{4}$/,                   // Example: 1234
+  "Monaco": /^\d{5}$/,                    // Example: 98000
+  "Mongolia": /^\d{5}$/,                  // Example: 01000
+  "Montenegro": /^\d{5}$/,                // Example: 81000
+  "Morocco": /^\d{5}$/,                   // Example: 10000
+  "Mozambique": /^\d{5}$/,                // Example: 12345
+  "Myanmar": /^\d{5}$/,                   // Example: 12345
+  "Namibia": /^\d{4}$/,                   // Example: 1234
+  "Nauru": /^\d{4}$/,                     // Example: 1234
+  "Nepal": /^\d{5}$/,                     // Example: 44600
+  "Netherlands": /^\d{4}\s?[A-Za-z]{2}$/, // Example: 1000 AB
+  "New Zealand": /^\d{4}$/,               // Example: 6011
+  "Nicaragua": /^\d{5}$/,                 // Example: 11000
+  "Niger": /^\d{4}$/,                     // Example: 1234
+  "Nigeria": /^\d{6}$/,                   // Example: 110001
+  "North Macedonia": /^\d{4}$/,            // Example: 1000
+  "Norway": /^\d{4}$/,                    // Example: 0150
+  "Oman": /^\d{3}$/,                      // Example: 100
+  "Pakistan": /^\d{5}$/,                  // Example: 11000
+  "Palau": /^\d{5}$/,                     // Example: 12345
+  "Panama": /^\d{4}$/,                    // Example: 0801
+  "Papua New Guinea": /^\d{3}$/,          // Example: 100
+  "Paraguay": /^\d{4}$/,                  // Example: 1234
+  "Peru": /^\d{5}$/,                      // Example: 15073
+  "Philippines": /^\d{4}$/,               // Example: 1000
+  "Poland": /^\d{5}$/,                    // Example: 00-001
+  "Portugal": /^\d{4}-\d{3}$/,            // Example: 1000-001
+  "Qatar": /^\d{5}$/,                     // Example: 12345
+  "Romania": /^\d{6}$/,                   // Example: 100000
+  "Russia": /^\d{6}$/,                    // Example: 101000
+  "Rwanda": /^\d{5}$/,                    // Example: 10000
+  "Saint Kitts and Nevis": /^\d{5}$/,     // Example: 12345
+  "Saint Lucia": /^\d{4}$/,               // Example: 1234
+  "Saint Vincent and the Grenadines": /^\d{4}$/, // Example: 1234
+  "Samoa": /^\d{5}$/,                     // Example: 12345
+  "San Marino": /^\d{5}$/,                // Example: 47890
+  "Sao Tome and Principe": /^\d{5}$/,     // Example: 12345
+  "Saudi Arabia": /^\d{5}$/,              // Example: 12345
+  "Senegal": /^\d{5}$/,                   // Example: 12345
+  "Serbia": /^\d{5}$/,                    // Example: 11000
+  "Seychelles": /^\d{4}$/,                // Example: 1234
+  "Sierra Leone": /^\d{5}$/,              // Example: 12345
+  "Singapore": /^\d{6}$/,                 // Example: 123456
+  "Slovakia": /^\d{5}$/,                  // Example: 01001
+  "Slovenia": /^\d{4}$/,                  // Example: 1000
+  "Solomon Islands": /^\d{4}$/,           // Example: 1234
+  "Somalia": /^\d{5}$/,                   // Example: 12345
+  "South Africa": /^\d{4}$/,              // Example: 2000
+  "South Sudan": /^\d{5}$/,               // Example: 12345
+  "Spain": /^\d{5}$/,                     // Example: 28001
+  "Sri Lanka": /^\d{5}$/,                 // Example: 10100
+  "Sudan": /^\d{5}$/,                     // Example: 12345
+  "Suriname": /^\d{5}$/,                  // Example: 10000
+  "Sweden": /^\d{3}\s?\d{2}$/,            // Example: 123 45
+  "Switzerland": /^\d{4}$/,               // Example: 8000
+  "Syria": /^\d{5}$/,                     // Example: 12345
+  "Taiwan": /^\d{5}$/,                    // Example: 100
+  "Tajikistan": /^\d{6}$/,                // Example: 100000
+  "Tanzania": /^\d{5}$/,                  // Example: 12345
+  "Thailand": /^\d{5}$/,                  // Example: 10100
+  "Togo": /^\d{5}$/,                      // Example: 12345
+  "Tonga": /^\d{4}$/,                     // Example: 1234
+  "Trinidad and Tobago": /^\d{6}$/,       // Example: 10101
+  "Tunisia": /^\d{4}$/,                   // Example: 1000
+  "Turkey": /^\d{5}$/,                    // Example: 34000
+  "Turkmenistan": /^\d{6}$/,              // Example: 744000
+  "Tuvalu": /^\d{5}$/,                    // Example: 12345
+  "Uganda": /^\d{5}$/,                    // Example: 12345
+  "Ukraine": /^\d{5}$/,                   // Example: 01000
+  "United Arab Emirates": /^\d{5}$/,      // Example: 12345
+  "United Kingdom": /^[A-Za-z]{1,2}\d[A-Za-z\d]? \d[A-Za-z]{2}$/, // Example: SW1A 1AA
+  "United States": /^\d{5}(-\d{4})?$/,    // Example: 90210 or 90210-1234
+  "Uruguay": /^\d{5}$/,                   // Example: 11000
+  "Uzbekistan": /^\d{6}$/,                // Example: 100000
+  "Vanuatu": /^\d{4}$/,                   // Example: 1234
+  "Vatican City": /^\d{5}$/,              // Example: 00120
 };
