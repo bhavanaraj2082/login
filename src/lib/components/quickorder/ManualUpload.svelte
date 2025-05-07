@@ -7,8 +7,12 @@
   import { cartState } from "$lib/stores/cartStores.js";
   import Bulkupload from "./Bulkupload.svelte";
   import { toast } from "svelte-sonner";
-  import {addItemToCart} from "$lib/stores/cart.js"
+  import { addItemToCart } from "$lib/stores/cart.js";
   import { PUBLIC_IMAGE_URL } from "$env/static/public";
+  import { countries, phoneNumberPatterns } from "$lib/Data/constants.js";
+  let highlightedIndex = -1;
+  let dropdownEl;
+  let dropdownContainer;
   let uploadedRows = [];
   let showSavedCarts = false;
   // console.log(currencyState, "currencyState");
@@ -178,72 +182,6 @@
     });
   }
 
-  // function filterProducts(query) {
-  //   if (!Array.isArray(products) || !query) {
-  //     return [];
-  //   }
-
-  //   const searchValue = query.trim().toLowerCase();
-  //   return products.filter((product) => {
-  //     if (!product.productNumber) return false;
-
-  //     const productNumber = String(product.productNumber).toLowerCase();
-
-  //     return (
-  //       productNumber.includes(searchValue) ||
-  //       productNumber.startsWith(searchValue) ||
-  //       searchValue.split("").every((char) => productNumber.includes(char))
-  //     );
-  //   });
-  // }
-  //   function filterProducts(query) {
-  //   // Log the input query
-  //   console.log('Input query:', query);
-
-  //   // Check if products is an array and query is not empty
-  //   if (!Array.isArray(products) || !query) {
-  //     console.log('Returning empty array because products is not an array or query is empty');
-  //     return [];
-  //   }
-
-  //   // Trim and lowercase the query
-  //   const searchValue = query.trim().toLowerCase();
-  //   console.log('Trimmed and lowercased search value:', searchValue);
-
-  //   // Handle search with product number and size separately
-  //   let productQuery = searchValue;
-
-  //   // Check if the search contains a hyphen, indicating product-size format
-  //   if (searchValue.includes('-')) {
-  //     // Extract just the product number part before the hyphen
-  //     productQuery = searchValue.split('-')[0].trim();
-  //     console.log('Extracted product number from query:', productQuery);
-  //   }
-
-  //   // Filter products
-  //   const filteredProducts = products.filter((product) => {
-  //     // Log each product being processed
-  //     console.log('Processing product:', product);
-
-  //     // Check if productNumber exists
-  //     if (!product.productNumber) {
-  //       console.log('Product does not have a productNumber. Skipping...');
-  //       return false;
-  //     }
-
-  //     // Get the product number as a lowercase string
-  //     const productNumber = String(product.productNumber).toLowerCase();
-
-  //     const match =
-  //       productNumber.includes(productQuery) ||
-  //       productNumber.startsWith(productQuery) ||
-  //       productQuery.split("").every((char) => productNumber.includes(char));
-  //     return match;
-  //   });
-  //   console.log('Filtered products:', filteredProducts);
-
-  //   return filteredProducts;
-  // }
   let debounceTimeout;
 
   function handleInput(event, sku, index) {
@@ -399,15 +337,6 @@
     isCartPopupVisible = false;
   }
 
-  // $: {
-  //   if (products && products.length > 0) {
-  //     console.log("Products loaded:", products.length);
-  //     console.log(
-  //       "Sample product numbers:",
-  //       products.map((p) => p.productNumber),
-  //     );
-  //   }
-  // }
   let cartRowIndexToBeCleared = null;
 
   let cartItemsValue = "";
@@ -454,11 +383,7 @@
       cart = JSON.parse(localStorage.getItem("cart")) || [];
     }
   }
-  onMount(() => {
-    if (userLoggedIn) {
-      cart();
-    }
-  });
+
 
   const showDetails = (index, product) => {
     selectedProduct = product;
@@ -526,42 +451,26 @@
     }
   }
 
-  // $: {
-  //   rows.forEach((row, index) => {
-  //     row.filteredProducts = filterProducts(row.sku);
-  //   });
-  // }
-  // function formatPrice(price, quantity = 1) {
-  //   if (price === undefined || price === null) return "";
-
-  //   const numPrice = typeof price === "string" ? parseFloat(price) : price;
-  //   const numQuantity =
-  //     typeof quantity === "string" ? parseFloat(quantity) : quantity;
-  //   if (isNaN(numPrice) || isNaN(numQuantity)) return "";
-  //   const total = numPrice * numQuantity;
-  //   return total.toFixed(2);
-  // }
-
   function formatPrice(price, quantity = 1) {
-  if (price === undefined || price === null) return "";
+    if (price === undefined || price === null) return "";
 
-  const numPrice = typeof price === "string" ? parseFloat(price) : price;
-  const numQuantity = 
-    typeof quantity === "string" ? parseFloat(quantity) : quantity;
-  
-  if (isNaN(numPrice) || isNaN(numQuantity)) return "";
-  
-  const total = numPrice * numQuantity;
-  let formattedNumber = total.toFixed(2);
-  if ($currencyState !== "usd") {
-    return total.toLocaleString('en-IN', {
-      minimumFractionDigits: 2, 
-      maximumFractionDigits: 2
-    });
+    const numPrice = typeof price === "string" ? parseFloat(price) : price;
+    const numQuantity =
+      typeof quantity === "string" ? parseFloat(quantity) : quantity;
+
+    if (isNaN(numPrice) || isNaN(numQuantity)) return "";
+
+    const total = numPrice * numQuantity;
+    let formattedNumber = total.toFixed(2);
+    if ($currencyState !== "usd") {
+      return total.toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+    }
+
+    return formattedNumber;
   }
-  
-  return formattedNumber;
-}
   function hideDetails() {
     showDetailsModal = false;
     // selectProduct = null;
@@ -622,6 +531,7 @@
   let lastName = data?.profile?.lastName || "";
   let organisation = data?.profile?.companyName || "";
   let phone = data?.profile?.cellPhone || "";
+  let country = data?.profile?.country || "";
   let futherdetails = "";
   let formErrors = {};
 
@@ -646,6 +556,7 @@
     } else {
       delete formErrors.lastName;
     }
+
     if (!organisation.trim()) {
       formErrors.organisation = "Organisation name is required.";
     } else if (/[^a-zA-Z0-9\s]/.test(organisation)) {
@@ -653,6 +564,13 @@
         "Organisation name cannot contain special characters.";
     } else {
       delete formErrors.organisation;
+    }
+    if (!country.trim()) {
+      if (!country || country === "") {
+        formErrors.country = "Please select a country";
+      } else {
+        delete formErrors.country;
+      }
     }
 
     if (!futherdetails.trim()) {
@@ -685,334 +603,146 @@
   }
 
   const enhanceForm = (index) => {
-  const requestStartTime = Date.now();
-  loadingState[index] = true;
-  const loadingStartTime = Date.now();
-  return async ({ result }) => {
-    if (result && result.data) {
-      console.log("Raw result:", result);
-      if (Array.isArray(result.data)) {
-        const normalizeKey = (productNumber, breakSize) => {
-          return `${productNumber}_${breakSize}`.toLowerCase().replace(/[\s-]+/g, '');
-        };
-        
-        const uniqueKeys = new Set();
-        const newProducts = result.data.filter((product) => {
-          const breakSize = product?.pricing?.[0]?.break || '';
-          const uniqueKey = normalizeKey(product.productNumber, breakSize);
-         
-          if (!uniqueKeys.has(uniqueKey)) {
-            uniqueKeys.add(uniqueKey);
-            return true;
-          }
-          return false;
-        });
+    const requestStartTime = Date.now();
+    loadingState[index] = true;
+    const loadingStartTime = Date.now();
+    return async ({ result }) => {
+      if (result && result.data) {
+        console.log("Raw result:", result);
+        if (Array.isArray(result.data)) {
+          const normalizeKey = (productNumber, breakSize) => {
+            return `${productNumber}_${breakSize}`
+              .toLowerCase()
+              .replace(/[\s-]+/g, "");
+          };
 
-        const searchTerm = rows[index].sku.toLowerCase().trim();
-        const normalizedSearchTerm = searchTerm.replace(/[\s-]+/g, '');
-        
-        const sortedProducts = [...newProducts].sort((a, b) => {
-          // Create full SKU strings for comparison (product number + size)
-          const aFullSKU = `${a.productNumber} - ${a.pricing?.[0]?.break || ''}`.toLowerCase().trim();
-          const bFullSKU = `${b.productNumber} - ${b.pricing?.[0]?.break || ''}`.toLowerCase().trim();
-          
-          // Normalized versions for more accurate matching
-          const aNormalizedSKU = aFullSKU.replace(/[\s-]+/g, '');
-          const bNormalizedSKU = bFullSKU.replace(/[\s-]+/g, '');
-          
-          // Exact match with full SKU (product number + size) gets highest priority
-          if (aNormalizedSKU === normalizedSearchTerm) return -1;
-          if (bNormalizedSKU === normalizedSearchTerm) return 1;
-          
-          // Next, check if product number matches exactly
-          const aProductNumber = a.productNumber.toLowerCase().trim().replace(/[\s-]+/g, '');
-          const bProductNumber = b.productNumber.toLowerCase().trim().replace(/[\s-]+/g, '');
-          
-          if (aProductNumber === normalizedSearchTerm) return -1;
-          if (bProductNumber === normalizedSearchTerm) return 1;
-          
-          // Next, check if full SKU starts with search term
-          if (aNormalizedSKU.startsWith(normalizedSearchTerm) && !bNormalizedSKU.startsWith(normalizedSearchTerm)) return -1;
-          if (bNormalizedSKU.startsWith(normalizedSearchTerm) && !aNormalizedSKU.startsWith(normalizedSearchTerm)) return 1;
-          
-          // Finally, check if product number starts with search term
-          if (aProductNumber.startsWith(normalizedSearchTerm) && !bProductNumber.startsWith(normalizedSearchTerm)) return -1;
-          if (bProductNumber.startsWith(normalizedSearchTerm) && !aProductNumber.startsWith(normalizedSearchTerm)) return 1;
-          
-          // Otherwise maintain original order
-          return 0;
-        });
-        
-        rows = rows.map((row, i) => {
-          if (i === index) {
-            return {
-              ...row,
-              filteredProducts: sortedProducts,
-            };
-          }
-          return row;
-        });
-        
-        // Rest of the function with improved normalization for existingKeys
-        const existingKeys = new Set(
-          products.map((p) => {
-            const breakSize = p?.pricing?.[0]?.break || '';
-            return normalizeKey(p.productNumber, breakSize);
-          })
-        );
-        
-        const filteredNewProducts = newProducts.filter((p) => {
-          const breakSize = p?.pricing?.[0]?.break || '';
-          const key = normalizeKey(p.productNumber, breakSize);
-          return !existingKeys.has(key);
-        });
-        
-        console.log("Filtered new products to be added to global list:", filteredNewProducts);
-        products = [...products, ...filteredNewProducts];
-        if (result.data.length === 0) {
-          toast.error("No Components found");
-        } else {
-          productNumbers = Array.from(
-            new Set(result.data.map((record) => record.productNumber))
+          const uniqueKeys = new Set();
+          const newProducts = result.data.filter((product) => {
+            const breakSize = product?.pricing?.[0]?.break || "";
+            const uniqueKey = normalizeKey(product.productNumber, breakSize);
+
+            if (!uniqueKeys.has(uniqueKey)) {
+              uniqueKeys.add(uniqueKey);
+              return true;
+            }
+            return false;
+          });
+
+          const searchTerm = rows[index].sku.toLowerCase().trim();
+          const normalizedSearchTerm = searchTerm.replace(/[\s-]+/g, "");
+
+          const sortedProducts = [...newProducts].sort((a, b) => {
+            // Create full SKU strings for comparison (product number + size)
+            const aFullSKU =
+              `${a.productNumber} - ${a.pricing?.[0]?.break || ""}`
+                .toLowerCase()
+                .trim();
+            const bFullSKU =
+              `${b.productNumber} - ${b.pricing?.[0]?.break || ""}`
+                .toLowerCase()
+                .trim();
+
+            // Normalized versions for more accurate matching
+            const aNormalizedSKU = aFullSKU.replace(/[\s-]+/g, "");
+            const bNormalizedSKU = bFullSKU.replace(/[\s-]+/g, "");
+
+            // Exact match with full SKU (product number + size) gets highest priority
+            if (aNormalizedSKU === normalizedSearchTerm) return -1;
+            if (bNormalizedSKU === normalizedSearchTerm) return 1;
+
+            // Next, check if product number matches exactly
+            const aProductNumber = a.productNumber
+              .toLowerCase()
+              .trim()
+              .replace(/[\s-]+/g, "");
+            const bProductNumber = b.productNumber
+              .toLowerCase()
+              .trim()
+              .replace(/[\s-]+/g, "");
+
+            if (aProductNumber === normalizedSearchTerm) return -1;
+            if (bProductNumber === normalizedSearchTerm) return 1;
+
+            // Next, check if full SKU starts with search term
+            if (
+              aNormalizedSKU.startsWith(normalizedSearchTerm) &&
+              !bNormalizedSKU.startsWith(normalizedSearchTerm)
+            )
+              return -1;
+            if (
+              bNormalizedSKU.startsWith(normalizedSearchTerm) &&
+              !aNormalizedSKU.startsWith(normalizedSearchTerm)
+            )
+              return 1;
+
+            // Finally, check if product number starts with search term
+            if (
+              aProductNumber.startsWith(normalizedSearchTerm) &&
+              !bProductNumber.startsWith(normalizedSearchTerm)
+            )
+              return -1;
+            if (
+              bProductNumber.startsWith(normalizedSearchTerm) &&
+              !aProductNumber.startsWith(normalizedSearchTerm)
+            )
+              return 1;
+
+            // Otherwise maintain original order
+            return 0;
+          });
+
+          rows = rows.map((row, i) => {
+            if (i === index) {
+              return {
+                ...row,
+                filteredProducts: sortedProducts,
+              };
+            }
+            return row;
+          });
+
+          // Rest of the function with improved normalization for existingKeys
+          const existingKeys = new Set(
+            products.map((p) => {
+              const breakSize = p?.pricing?.[0]?.break || "";
+              return normalizeKey(p.productNumber, breakSize);
+            }),
           );
+
+          const filteredNewProducts = newProducts.filter((p) => {
+            const breakSize = p?.pricing?.[0]?.break || "";
+            const key = normalizeKey(p.productNumber, breakSize);
+            return !existingKeys.has(key);
+          });
+
+          console.log(
+            "Filtered new products to be added to global list:",
+            filteredNewProducts,
+          );
+          products = [...products, ...filteredNewProducts];
+          if (result.data.length === 0) {
+            toast.error("No Components found");
+          } else {
+            productNumbers = Array.from(
+              new Set(result.data.map((record) => record.productNumber)),
+            );
+          }
+        } else {
+          productNumbers = [];
+          toast.error("No Components found");
         }
-      } else {
-        productNumbers = [];
-        toast.error("No Components found");
       }
-    }
-    const loadingEndTime = Date.now();
-    loadingState[index] = false;
-    const loadingDuration = (loadingEndTime - loadingStartTime) / 1000;
-    const processingEndTime = Date.now();
-    const totalRequestDuration = (processingEndTime - requestStartTime) / 1000;
-    console.log(`Loading duration: ${loadingDuration}s`);
-    console.log(`Total request processing time: ${totalRequestDuration}s`);
+      const loadingEndTime = Date.now();
+      loadingState[index] = false;
+      const loadingDuration = (loadingEndTime - loadingStartTime) / 1000;
+      const processingEndTime = Date.now();
+      const totalRequestDuration =
+        (processingEndTime - requestStartTime) / 1000;
+      console.log(`Loading duration: ${loadingDuration}s`);
+      console.log(`Total request processing time: ${totalRequestDuration}s`);
+    };
   };
-};
 
-//   const enhanceForm = (index) => {
-//   const requestStartTime = Date.now();
-//   loadingState[index] = true;
-//   const loadingStartTime = Date.now();
-//   return async ({ result }) => {
-//     if (result && result.data) {
-//       console.log("Raw result:", result);
-//       if (Array.isArray(result.data)) {
-//         const normalizeKey = (productNumber, breakSize) => {
-//           return `${productNumber}_${breakSize}`.toLowerCase().replace(/\s+/g, '');
-//         };
-        
-//         // Parse the search input to separate product number and size
-//         const searchTerm = rows[index].sku.toLowerCase().trim();
-//         let searchProductNumber = searchTerm;
-//         let searchSize = '';
-        
-//         // Try to extract product number and size from the search term
-//         const parts = searchTerm.split(/[-_]/); // Split by dash or underscore
-//         if (parts.length > 1) {
-//           searchProductNumber = parts[0].trim();
-//           searchSize = parts.slice(1).join('-').trim(); // Combine remaining parts as size
-//         }
-        
-//         // Normalize for comparison
-//         const normalizedSearchProductNumber = searchProductNumber.replace(/\s+/g, '');
-//         const normalizedSearchSize = searchSize.replace(/\s+/g, '');
-//         const normalizedFullSearch = `${normalizedSearchProductNumber}_${normalizedSearchSize}`;
-        
-//         const uniqueKeys = new Set();
-//         const newProducts = result.data.filter((product) => {
-//           const breakSize = product?.pricing?.[0]?.break || '';
-//           const uniqueKey = normalizeKey(product.productNumber, breakSize);
-         
-//           if (!uniqueKeys.has(uniqueKey)) {
-//             uniqueKeys.add(uniqueKey);
-//             return true;
-//           }
-//           return false;
-//         });
-        
-//         const sortedProducts = [...newProducts].sort((a, b) => {
-//           const aProductNumber = a.productNumber.toLowerCase().trim().replace(/\s+/g, '');
-//           const bProductNumber = b.productNumber.toLowerCase().trim().replace(/\s+/g, '');
-          
-//           const aBreakSize = (a.pricing?.[0]?.break || '').toLowerCase().trim().replace(/\s+/g, '');
-//           const bBreakSize = (b.pricing?.[0]?.break || '').toLowerCase().trim().replace(/\s+/g, '');
-          
-//           const aKey = `${aProductNumber}_${aBreakSize}`;
-//           const bKey = `${bProductNumber}_${bBreakSize}`;
-          
-//           // Exact match with both product number and size gets highest priority
-//           if (aKey === normalizedFullSearch) return -1;
-//           if (bKey === normalizedFullSearch) return 1;
-          
-//           // Next priority: exact product number match and partial size match
-//           if (aProductNumber === normalizedSearchProductNumber && aBreakSize.includes(normalizedSearchSize)) return -1;
-//           if (bProductNumber === normalizedSearchProductNumber && bBreakSize.includes(normalizedSearchSize)) return 1;
-          
-//           // Next priority: exact product number match
-//           if (aProductNumber === normalizedSearchProductNumber) return -1;
-//           if (bProductNumber === normalizedSearchProductNumber) return 1;
-//           if (aProductNumber.startsWith(normalizedSearchProductNumber) && !bProductNumber.startsWith(normalizedSearchProductNumber)) return -1;
-//           if (bProductNumber.startsWith(normalizedSearchProductNumber) && !aProductNumber.startsWith(normalizedSearchProductNumber)) return 1;
-
-//           return 0;
-//         });
-        
-//         // Rest of your code remains the same...
-//         rows = rows.map((row, i) => {
-//           if (i === index) {
-//             return {
-//               ...row,
-//               filteredProducts: sortedProducts,
-//             };
-//           }
-//           return row;
-//         });
-        
-//         const existingKeys = new Set(
-//           products.map((p) => {
-//             const breakSize = p?.pricing?.[0]?.break || '';
-//             return normalizeKey(p.productNumber, breakSize);
-//           })
-//         );
-        
-//         const filteredNewProducts = newProducts.filter((p) => {
-//           const breakSize = p?.pricing?.[0]?.break || '';
-//           const key = normalizeKey(p.productNumber, breakSize);
-//           return !existingKeys.has(key);
-//         });
-        
-//         console.log("Filtered new products to be added to global list:", filteredNewProducts);
-//         products = [...products, ...filteredNewProducts];
-//         if (result.data.length === 0) {
-//           toast.error("No Components found");
-//         } else {
-//           productNumbers = Array.from(
-//             new Set(result.data.map((record) => record.productNumber))
-//           );
-//         }
-//       } else {
-//         productNumbers = [];
-//         toast.error("No Components found");
-//       }
-//     }
-//     const loadingEndTime = Date.now();
-//     loadingState[index] = false;
-//     const loadingDuration = (loadingEndTime - loadingStartTime) / 1000;
-//     const processingEndTime = Date.now();
-//     const totalRequestDuration = (processingEndTime - requestStartTime) / 1000;
-//     console.log(`Loading duration: ${loadingDuration}s`);
-//     console.log(`Total request processing time: ${totalRequestDuration}s`);
-//   };
-// };
-
-// const enhanceForm = (index) => {
-//   const requestStartTime = Date.now();
-//   loadingState[index] = true;
-//   const loadingStartTime = Date.now();
-//   return async ({ result }) => {
-//     if (result && result.data) {
-//       console.log("Raw result:", result);
-//       if (Array.isArray(result.data)) {
-//         const normalizeKey = (productNumber, breakSize) => {
-//           return `${productNumber}_${breakSize}`.toLowerCase().replace(/\s+/g, '');
-//         };
-        
-//         const uniqueKeys = new Set();
-//         const newProducts = result.data.filter((product) => {
-//           const breakSize = product?.pricing?.[0]?.break || '';
-//           const uniqueKey = normalizeKey(product.productNumber, breakSize);
-         
-//           if (!uniqueKeys.has(uniqueKey)) {
-//             uniqueKeys.add(uniqueKey);
-//             return true;
-//           }
-//           return false;
-//         });
-
-//         const searchTerm = rows[index].sku.toLowerCase().trim();
-//         const normalizedSearchTerm = searchTerm.replace(/\s+/g, '');
-        
-//         const sortedProducts = [...newProducts].sort((a, b) => {
-//           // Create full SKU strings for comparison (product number + size)
-//           const aFullSKU = `${a.productNumber} - ${a.pricing?.[0]?.break || ''}`.toLowerCase().trim();
-//           const bFullSKU = `${b.productNumber} - ${b.pricing?.[0]?.break || ''}`.toLowerCase().trim();
-          
-//           // Normalized versions for more accurate matching
-//           const aNormalizedSKU = aFullSKU.replace(/\s+/g, '');
-//           const bNormalizedSKU = bFullSKU.replace(/\s+/g, '');
-          
-//           // Exact match with full SKU (product number + size) gets highest priority
-//           if (aNormalizedSKU === normalizedSearchTerm) return -1;
-//           if (bNormalizedSKU === normalizedSearchTerm) return 1;
-          
-//           // Next, check if product number matches exactly
-//           const aProductNumber = a.productNumber.toLowerCase().trim().replace(/\s+/g, '');
-//           const bProductNumber = b.productNumber.toLowerCase().trim().replace(/\s+/g, '');
-          
-//           if (aProductNumber === normalizedSearchTerm) return -1;
-//           if (bProductNumber === normalizedSearchTerm) return 1;
-          
-//           // Next, check if full SKU starts with search term
-//           if (aNormalizedSKU.startsWith(normalizedSearchTerm) && !bNormalizedSKU.startsWith(normalizedSearchTerm)) return -1;
-//           if (bNormalizedSKU.startsWith(normalizedSearchTerm) && !aNormalizedSKU.startsWith(normalizedSearchTerm)) return 1;
-          
-//           // Finally, check if product number starts with search term
-//           if (aProductNumber.startsWith(normalizedSearchTerm) && !bProductNumber.startsWith(normalizedSearchTerm)) return -1;
-//           if (bProductNumber.startsWith(normalizedSearchTerm) && !aProductNumber.startsWith(normalizedSearchTerm)) return 1;
-          
-//           // Otherwise maintain original order
-//           return 0;
-//         });
-        
-//         rows = rows.map((row, i) => {
-//           if (i === index) {
-//             return {
-//               ...row,
-//               filteredProducts: sortedProducts,
-//             };
-//           }
-//           return row;
-//         });
-        
-//         // Rest of the function with improved normalization for existingKeys
-//         const existingKeys = new Set(
-//           products.map((p) => {
-//             const breakSize = p?.pricing?.[0]?.break || '';
-//             return normalizeKey(p.productNumber, breakSize);
-//           })
-//         );
-        
-//         const filteredNewProducts = newProducts.filter((p) => {
-//           const breakSize = p?.pricing?.[0]?.break || '';
-//           const key = normalizeKey(p.productNumber, breakSize);
-//           return !existingKeys.has(key);
-//         });
-        
-//         console.log("Filtered new products to be added to global list:", filteredNewProducts);
-//         products = [...products, ...filteredNewProducts];
-//         if (result.data.length === 0) {
-//           toast.error("No Components found");
-//         } else {
-//           productNumbers = Array.from(
-//             new Set(result.data.map((record) => record.productNumber))
-//           );
-//         }
-//       } else {
-//         productNumbers = [];
-//         toast.error("No Components found");
-//       }
-//     }
-//     const loadingEndTime = Date.now();
-//     loadingState[index] = false;
-//     const loadingDuration = (loadingEndTime - loadingStartTime) / 1000;
-//     const processingEndTime = Date.now();
-//     const totalRequestDuration = (processingEndTime - requestStartTime) / 1000;
-//     console.log(`Loading duration: ${loadingDuration}s`);
-//     console.log(`Total request processing time: ${totalRequestDuration}s`);
-//   };
-// };
   const closeCartPopDetails = (index) => {
     const cartPopup = document.getElementById("cart-popup-details");
     if (cartPopup) {
@@ -1126,8 +856,8 @@
     localStorage.setItem("cart", JSON.stringify(currentCart));
     localStorage.setItem("totalCompsChemi", currentCart.length);
     // toast.success(`Product added to the cart`);
-syncLocalStorageToStore();
-addItemToCart(currentCart)
+    syncLocalStorageToStore();
+    addItemToCart(currentCart);
     cartRowIndexToBeCleared = currentIndex;
     showCartPopupdetails(cartItem);
 
@@ -1139,207 +869,119 @@ addItemToCart(currentCart)
   }
 
   let manualEntriesForm;
+  function prepareManualEntriesToCart() {
+    const validRows = rows.filter((row) => {
+      return row.sku.trim() !== "" && row.selectedSize;
+    });
 
+    console.log(validRows, "validRows.................");
 
-
-
-//   function prepareManualEntriesToCart() {
-//   const validRows = rows.filter((row) => {
-//     return row.sku.trim() !== "" && row.selectedSize;
-//   });
-  
-//   console.log(validRows, "validRows.................");
-  
-//   if (validRows.length === 0) {
-//     toast.error("No valid items to add to cart");
-//     cartloading = false;
-//     return [];
-//   }
-  
-
-  
-//   const cartItems = validRows
-//     .map((row) => {
-//       const productNumber = row.sku.split(" -")[0].trim();
-//       const validProduct = row.selectedProduct || products.find(
-//         (p) =>
-//           String(p.productNumber).trim().toLowerCase() ===
-//           productNumber.toLowerCase(),
-//       );
-      
-//       if (!validProduct) {
-//         toast.error(`Product ${productNumber} not found`);
-//         cartloading = false;
-//         return null;
-//       }
-      
-//       const normalize = (str) =>
-//         str?.trim().replace(/\s+/g, " ").toLowerCase(); // collapses any extra spaces
-      
-//       console.log(normalize, "normalize");
-      
-//       const sizePriceInfo = row.selectedProduct?.pricing || validProduct?.pricing;
-//       const selectedSizePricing = sizePriceInfo?.find(
-//         (item) => normalize(item?.break) === normalize(row?.selectedSize)
-//       );
-//       const pricingObject = {
-//         price: selectedSizePricing?.price || selectedSizePricing?.usd || sizePriceInfo?.[0]?.usd || "N/A"
-//       };
-            
-//       if (!sizePriceInfo) {
-//         toast.error(
-//           `Product ${validProduct.productNumber} cannot be added to cart because size ${row.selectedSize} is invalid`,
-//         );
-//         cartloading = false;
-//         return null;
-//       }
-      
-//       const quantity =
-//         selectedProduct &&
-//         selectedProduct.productNumber === validProduct.productNumber
-//           ? selectedProduct.quantity
-//           : row.quantity > 0
-//             ? row.quantity
-//             : 1;
-      
-//       const rowQuantity = parseInt(row.quantity, 10) || 0;
-//       const productStock = parseInt(validProduct.stock, 10) || 0;
-//       const backOrder = Math.max(rowQuantity - productStock, 0);
-      
-//       return {
-//         id: validProduct.id,
-//         image: validProduct.image,
-//         productName: validProduct.productName,
-//         productNumber: validProduct.productNumber,
-//         manufacturerId: validProduct.manufacturer,
-//         distributorId: validProduct.distributer,
-//         stockId: validProduct.stockId,
-//         stock: validProduct.stock,
-//         productId: validProduct.id,
-//         priceSize: {
-//           price: pricingObject.price,
-//           size: row.selectedSize,
-//         },
-//         usdPrice: selectedSizePricing?.usd || "N/A",
-//         inrPrice: selectedSizePricing?.inr || "N/A",
-//         size: row.selectedSize,
-//         backOrder: backOrder,
-//         quantity: quantity || row.quantity > 0 ? row.quantity : 1,
-//       };
-//     })
-//     .filter(Boolean);
-  
-//   if (cartItems.length === 0) {
-//     return [];
-//   }
-  
-//   return cartItems;
-// }
-
-// adding quantity for the same id's
-function prepareManualEntriesToCart() {
-  const validRows = rows.filter((row) => {
-    return row.sku.trim() !== "" && row.selectedSize;
-  });
-  
-  console.log(validRows, "validRows.................");
-  
-  if (validRows.length === 0) {
-    toast.error("No valid items to add to cart");
-    cartloading = false;
-    return [];
-  }
-  
-  const initialCartItems = validRows
-    .map((row) => {
-      const productNumber = row.sku.split(" -")[0].trim();
-      const validProduct = row.selectedProduct || products.find(
-        (p) =>
-          String(p.productNumber).trim().toLowerCase() ===
-          productNumber.toLowerCase(),
-      );
-      
-      if (!validProduct) {
-        toast.error(`Product ${productNumber} not found`);
-        cartloading = false;
-        return null;
-      }
-      
-      const normalize = (str) =>
-        str?.trim().replace(/\s+/g, " ").toLowerCase(); // collapses any extra spaces
-      
-      console.log(normalize, "normalize");
-      
-      const sizePriceInfo = row.selectedProduct?.pricing || validProduct?.pricing;
-      const selectedSizePricing = sizePriceInfo?.find(
-        (item) => normalize(item?.break) === normalize(row?.selectedSize)
-      );
-      const pricingObject = {
-        price: selectedSizePricing?.price || selectedSizePricing?.usd || sizePriceInfo?.[0]?.usd || "N/A"
-      };
-            
-      if (!sizePriceInfo) {
-        toast.error(
-          `Product ${validProduct.productNumber} cannot be added to cart because size ${row.selectedSize} is invalid`,
-        );
-        cartloading = false;
-        return null;
-      }
-      
-      const quantity =
-        selectedProduct &&
-        selectedProduct.productNumber === validProduct.productNumber
-          ? selectedProduct.quantity
-          : row.quantity > 0
-            ? row.quantity
-            : 1;
-      
-      const rowQuantity = parseInt(row.quantity, 10) || 0;
-      const productStock = parseInt(validProduct.stock, 10) || 0;
-      const backOrder = Math.max(rowQuantity - productStock, 0);
-      
-      return {
-        id: validProduct.id,
-        image: validProduct.image,
-        productName: validProduct.productName,
-        productNumber: validProduct.productNumber,
-        manufacturerId: validProduct.manufacturer,
-        distributorId: validProduct.distributer,
-        stockId: validProduct.stockId,
-        stock: validProduct.stock,
-        productId: validProduct.id,
-        priceSize: {
-          price: pricingObject.price,
-          size: row.selectedSize,
-        },
-        usdPrice: selectedSizePricing?.usd || "N/A",
-        inrPrice: selectedSizePricing?.inr || "N/A",
-        size: row.selectedSize,
-        backOrder: backOrder,
-        quantity: quantity || row.quantity > 0 ? row.quantity : 1,
-      };
-    })
-    .filter(Boolean);
-  
-  if (initialCartItems.length === 0) {
-    return [];
-  }
-  const combinedCartItems = [];
-  const itemsMap = new Map();
-  
-  initialCartItems.forEach(item => {
-    const key = `${item.id}-${item.distributorId}-${item.stockId}-${item.size}`;
-    
-    if (itemsMap.has(key)) {
-      const existingItem = itemsMap.get(key);
-      existingItem.quantity += item.quantity;
-      existingItem.backOrder = Math.max(existingItem.quantity - parseInt(existingItem.stock, 10), 0);
-    } else {
-      itemsMap.set(key, {...item});
+    if (validRows.length === 0) {
+      toast.error("No valid items to add to cart");
+      cartloading = false;
+      return [];
     }
-  });
-  return Array.from(itemsMap.values());
-}
+
+    const initialCartItems = validRows
+      .map((row) => {
+        const productNumber = row.sku.split(" -")[0].trim();
+        const validProduct =
+          row.selectedProduct ||
+          products.find(
+            (p) =>
+              String(p.productNumber).trim().toLowerCase() ===
+              productNumber.toLowerCase(),
+          );
+
+        if (!validProduct) {
+          toast.error(`Product ${productNumber} not found`);
+          cartloading = false;
+          return null;
+        }
+
+        const normalize = (str) =>
+          str?.trim().replace(/\s+/g, " ").toLowerCase(); // collapses any extra spaces
+
+        console.log(normalize, "normalize");
+
+        const sizePriceInfo =
+          row.selectedProduct?.pricing || validProduct?.pricing;
+        const selectedSizePricing = sizePriceInfo?.find(
+          (item) => normalize(item?.break) === normalize(row?.selectedSize),
+        );
+        const pricingObject = {
+          price:
+            selectedSizePricing?.price ||
+            selectedSizePricing?.usd ||
+            sizePriceInfo?.[0]?.usd ||
+            "N/A",
+        };
+
+        if (!sizePriceInfo) {
+          toast.error(
+            `Product ${validProduct.productNumber} cannot be added to cart because size ${row.selectedSize} is invalid`,
+          );
+          cartloading = false;
+          return null;
+        }
+
+        const quantity =
+          selectedProduct &&
+          selectedProduct.productNumber === validProduct.productNumber
+            ? selectedProduct.quantity
+            : row.quantity > 0
+              ? row.quantity
+              : 1;
+
+        const rowQuantity = parseInt(row.quantity, 10) || 0;
+        const productStock = parseInt(validProduct.stock, 10) || 0;
+        const backOrder = Math.max(rowQuantity - productStock, 0);
+
+        return {
+          id: validProduct.id,
+          image: validProduct.image,
+          productName: validProduct.productName,
+          productNumber: validProduct.productNumber,
+          manufacturerId: validProduct.manufacturer,
+          distributorId: validProduct.distributer,
+          stockId: validProduct.stockId,
+          stock: validProduct.stock,
+          productId: validProduct.id,
+          priceSize: {
+            price: pricingObject.price,
+            size: row.selectedSize,
+          },
+          usdPrice: selectedSizePricing?.usd || "N/A",
+          inrPrice: selectedSizePricing?.inr || "N/A",
+          size: row.selectedSize,
+          backOrder: backOrder,
+          quantity: quantity || row.quantity > 0 ? row.quantity : 1,
+        };
+      })
+      .filter(Boolean);
+
+    if (initialCartItems.length === 0) {
+      return [];
+    }
+    const combinedCartItems = [];
+    const itemsMap = new Map();
+
+    initialCartItems.forEach((item) => {
+      const key = `${item.id}-${item.distributorId}-${item.stockId}-${item.size}`;
+
+      if (itemsMap.has(key)) {
+        const existingItem = itemsMap.get(key);
+        existingItem.quantity += item.quantity;
+        existingItem.backOrder = Math.max(
+          existingItem.quantity - parseInt(existingItem.stock, 10),
+          0,
+        );
+      } else {
+        itemsMap.set(key, { ...item });
+      }
+    });
+    return Array.from(itemsMap.values());
+  }
 
   function resetRows() {
     rows = rows.map(() => ({
@@ -1375,21 +1017,14 @@ function prepareManualEntriesToCart() {
           cartItem.manufacturerId === item.manufacturerId,
       );
 
-      // if (existingItemIndex > -1) {
-      //   // Add the new quantity to the existing quantity
-      //   currentCart[existingItemIndex].quantity += item.quantity;
-      //   currentCart[existingItemIndex].backOrder += item.backOrder;
-      // } else {
-        currentCart.push(simplifiedItem);
-      // }
+      currentCart.push(simplifiedItem);
     }
 
-    
     localStorage.setItem("cart", JSON.stringify(currentCart));
     localStorage.setItem("totalCompsChemi", currentCart.length);
     toast.success(`Product added to the cart`);
-syncLocalStorageToStore();
-addItemToCart(currentCart)
+    syncLocalStorageToStore();
+    addItemToCart(currentCart);
 
     if (typeof showCartPopup === "function") {
       showCartPopup(cartItems);
@@ -1412,11 +1047,13 @@ addItemToCart(currentCart)
     //   return;
     // }
     if (!cartItems) {
-      console.error("Cart items are undefined - check prepareManualEntriesToCart function");
+      console.error(
+        "Cart items are undefined - check prepareManualEntriesToCart function",
+      );
       cartloading = false;
       return;
     }
-    if (manualEntriesForm && cartItems.length>0) {
+    if (manualEntriesForm && cartItems.length > 0) {
       const input = manualEntriesForm.querySelector('input[name="cartItems"]');
       input.value = JSON.stringify(cartItems);
       manualEntriesForm.requestSubmit();
@@ -1487,6 +1124,225 @@ addItemToCart(currentCart)
       currentIndexqoute = null;
     }
   };
+  let searchTerm = "";
+  function selectCountry(selectedCountry) {
+    country = selectedCountry.name;
+    searchTerm = `${selectedCountry.name} `;
+    showDropdown = false;
+    highlightedIndex = -1;
+    // validateForm("country");
+    validatePhoneNumber(country, phone);
+
+    delete formErrors.country;
+  }
+
+  function handleKeyDown(event) {
+        const exactCountryMatch = countries.some(
+            (c) => c.name === country && c.name === searchTerm,
+        );
+        if (
+            exactCountryMatch &&
+            !(
+                event.key === "Backspace" ||
+                event.key === "Delete" ||
+                event.key === "ArrowLeft" ||
+                event.key === "ArrowRight" ||
+                event.key === "Home" ||
+                event.key === "End" ||
+                event.key === "Tab" ||
+                event.key === "Escape" ||
+                event.ctrlKey ||
+                event.key === "ArrowUp" ||
+                event.key === "ArrowDown"
+            )
+        ) {
+            const input = document.querySelector('input[name="country"]');
+            if (
+                input &&
+                (input.selectionStart !== input.selectionEnd ||
+                    input.selectionStart === 0)
+            ) {
+                return true;
+            }
+            event.preventDefault();
+            return false;
+        }
+
+        if (showDropdown) {
+            switch (event.key) {
+                case "ArrowDown":
+                    event.preventDefault();
+                    if (filteredCountries.length > 0) {
+                        highlightedIndex =
+                            (highlightedIndex + 1) % filteredCountries.length;
+                        scrollToHighlighted();
+                    }
+                    break;
+                case "ArrowUp":
+                    event.preventDefault();
+                    if (filteredCountries.length > 0) {
+                        highlightedIndex =
+                            highlightedIndex <= 0
+                                ? filteredCountries.length - 1
+                                : highlightedIndex - 1;
+                        scrollToHighlighted();
+                    }
+                    break;
+            }
+        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            showDropdown = true;
+            if (filteredCountries.length > 0) {
+                highlightedIndex = 0;
+            }
+            event.preventDefault();
+        }
+        if (event.key === "Enter") {
+            if (
+                highlightedIndex >= 0 &&
+                highlightedIndex < filteredCountries.length
+            ) {
+                selectCountry(filteredCountries[highlightedIndex]);
+                event.preventDefault();
+            } else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
+                selectCountry(filteredCountries[0]);
+                event.preventDefault();
+            }
+        } else if (event.key === "Escape") {
+            showDropdown = false;
+            highlightedIndex = -1;
+        }
+    }
+  function scrollToHighlighted() {
+    if (!dropdownEl) return;
+    const items = dropdownEl.querySelectorAll("li");
+    if (items[highlightedIndex]) {
+      items[highlightedIndex].scrollIntoView({
+        block: "nearest",
+      });
+    }
+  }
+  function toggleDropdown() {
+    showDropdown = !showDropdown;
+    if (showDropdown) {
+      if (country.length > 0) {
+        searchTerm = country;
+        filterCountriesWithoutAutoSelect();
+      } else {
+        filteredCountries = countries;
+      }
+    }
+  }
+
+  function handleInputChange(event) {
+		searchTerm = event.target.value;
+		const isDeleting =
+			event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward';
+
+		if (searchTerm.length > 0 && !isDeleting) {
+			filterCountriesWithoutAutoSelect();
+			showDropdown = filteredCountries.length > 0;
+			const codeSearch = searchTerm.replace('+', '').trim();
+			if (codeSearch.length > 0) {
+				const exactCodeMatches = filteredCountries.filter(
+					(country) => country.code.replace('+', '') === codeSearch
+				);
+
+				if (exactCodeMatches.length === 1) {
+					selectCountry(exactCodeMatches[0]);
+					return;
+				}
+			}
+
+			const countriesStartingWith = filteredCountries.filter((country) =>
+				country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+			);
+
+			if (countriesStartingWith.length === 1) {
+				selectCountry(countriesStartingWith[0]);
+			}
+		} else {
+			filterCountriesWithoutAutoSelect();
+			showDropdown = filteredCountries.length > 0;
+		}
+	}
+  function filterCountriesWithoutAutoSelect() {
+    const countriesStartingWith = countries.filter((country) =>
+      country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+    );
+
+    const countriesContaining = countries.filter(
+      (country) =>
+        !country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) &&
+        country.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+
+    filteredCountries = [...countriesStartingWith, ...countriesContaining];
+    const codeMatches = countries.filter((country) =>
+      country.code
+        .replace("+", "")
+        .includes(searchTerm.replace("+", "").toLowerCase()),
+    );
+    codeMatches.forEach((country) => {
+      if (!filteredCountries.some((c) => c.name === country.name)) {
+        filteredCountries.push(country);
+      }
+    });
+  }
+  let filteredCountries = countries;
+  let showDropdown = false;
+  function getCountryByCode(name) {
+    const country = countries.find((c) => c.name === name);
+
+    return country ? country.name : null;
+  }
+  function getPhonePattern(countryCode) {
+    const countryName = getCountryByCode(countryCode);
+    if (!countryName) return "^[0-9]+$";
+    const regex = phoneNumberPatterns[countryName];
+    return regex || "^[0-9]+$";
+  }
+
+  function validatePhoneNumber(countryCode, phone) {
+    if (!phone || !countryCode || phone.trim() === "") {
+      // errors.contactNumber = `*Required`;
+      return false;
+    }
+
+    const country = getCountryByCode(countryCode);
+
+    // console.log('Validating phone number for country:', country);
+
+    if (!country) {
+      formErrors.phone = "Invalid country selected";
+      formErrors.country = "Invalid country selected";
+      return false;
+    }
+
+    const phonePattern = getPhonePattern(countryCode);
+    if (!phonePattern) {
+      formErrors.phone = "Phone number pattern for country not found";
+      return false;
+    }
+
+    const phoneRegex = new RegExp(phonePattern);
+
+    if (!phoneRegex.test(phone)) {
+      formErrors.phone = `Please enter a valid phone number for ${country}.`;
+      return false;
+    } else {
+      formErrors.phone = "";
+      return true;
+    }
+  }
+  function handleClickOutside(event) {
+  if (showDropdown && dropdownContainer && !dropdownContainer.contains(event.target)) {
+    showDropdown = false;
+  }
+}
+  onMount(() => {
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    });
 
   const tabs = [{ name: "Manual Entry" }, { name: "Bulk Upload" }];
   let activeTab = "Manual Entry";
@@ -1714,12 +1570,10 @@ addItemToCart(currentCart)
                       }, 10);
                     }}
                     on:blur={(e) => {
-                      // Only reset to 1 if the field is empty or zero
                       if (e.target.value === "" || e.target.value === "0") {
                         row.quantity = 1;
                         e.target.value = "1";
                       } else {
-                        // Preserve the valid value the user entered
                         const parsedValue = parseInt(e.target.value, 10);
                         if (
                           !isNaN(parsedValue) &&
@@ -1728,7 +1582,6 @@ addItemToCart(currentCart)
                         ) {
                           row.quantity = parsedValue;
                         } else {
-                          // Use previous value if new value is invalid
                           row.quantity = parseInt(
                             e.target.dataset.previousValue || "1",
                             10,
@@ -1809,7 +1662,9 @@ addItemToCart(currentCart)
                     {#if $currencyState === "usd"}
                       $ {row.selectedProduct.pricing[0]?.usd}
                     {:else}
-                    ₹ {Number(row.selectedProduct.pricing[0]?.inr || 0).toLocaleString('en-IN')}
+                      ₹ {Number(
+                        row.selectedProduct.pricing[0]?.inr || 0,
+                      ).toLocaleString("en-IN")}
                     {/if}
                   {:else}
                     <button
@@ -1837,7 +1692,7 @@ addItemToCart(currentCart)
                         productName: row.selectedProduct.productName,
                         productNumber: row.selectedProduct.productNumber,
                         size: row.selectedSize,
-                        stockId:row.selectedProduct.stockId,
+                        stockId: row.selectedProduct.stockId,
                         usdPrice: usdPrice,
                         inrPrice: inrPrice,
                         quantity: row.quantity,
@@ -1878,11 +1733,16 @@ addItemToCart(currentCart)
                   if (result.type === "success") {
                     const resultData = result.data;
                     console.log(resultData, "resultData");
-              
-                    if (resultData && resultData.success === true) {
 
-                      if (resultData.message && resultData.message.includes("already offered in cart")) {
-                        if (!resultData.message.includes("added") && !resultData.message.includes("updated")) {
+                    if (resultData && resultData.success === true) {
+                      if (
+                        resultData.message &&
+                        resultData.message.includes("already offered in cart")
+                      ) {
+                        if (
+                          !resultData.message.includes("added") &&
+                          !resultData.message.includes("updated")
+                        ) {
                           toast.info(resultData.message);
                         } else {
                           toast.success(resultData.message);
@@ -1891,7 +1751,7 @@ addItemToCart(currentCart)
                           } else {
                             submitAlternateForm();
                           }
-                          
+
                           setTimeout(() => {
                             resetRows();
                           }, 1000);
@@ -1903,13 +1763,13 @@ addItemToCart(currentCart)
                         } else {
                           submitAlternateForm();
                         }
-              
+
                         toast.success(resultData.message || "");
-                        
+
                         setTimeout(() => {
                           resetRows();
                         }, 1000);
-              
+
                         showCartPopup(prepareManualEntriesToCart());
                       }
                     } else {
@@ -1920,7 +1780,7 @@ addItemToCart(currentCart)
                   } else {
                     toast.error("Failed to add items to cart");
                   }
-              
+
                   cartloading = false;
                 };
               }}
@@ -1999,13 +1859,25 @@ addItemToCart(currentCart)
               checking = false;
               console.log(result, "result");
               const { message, stock, type } = result.data.record;
-              stockStatus = message;
+              stockStatus = "";
               if (stock === "Available" && type === "success") {
-                stockStatus = ` ✔️${message}`;
+                stockStatus = {
+                  icon: "ix:success-filled",
+                  color: "text-green-500",
+                  message,
+                };
               } else if (stock === "Limited Availability") {
-                stockStatus = `⚠️ ${message} `;
+                stockStatus = {
+                  icon: "ix:warning-filled",
+                  color: "text-amber-500",
+                  message,
+                };
               } else if (stock === "Unavailable" || type === "error") {
-                stockStatus = `❌ ${message}`;
+                stockStatus = {
+                  icon: "ix:error-filled",
+                  color: "text-red-500",
+                  message,
+                };
               }
             };
           }}
@@ -2017,10 +1889,10 @@ addItemToCart(currentCart)
               value={selectedProduct.productNumber}
             />
             <input
-            type="hidden"
-            name="stockId"
-            value={selectedProduct.stockId}
-          />
+              type="hidden"
+              name="stockId"
+              value={selectedProduct.stockId}
+            />
             <input
               type="hidden"
               name="quantity"
@@ -2120,9 +1992,16 @@ addItemToCart(currentCart)
               </button>
             </div>
           </div>
-          <p class="mt-4 mb-2 text-sm text-gray-600 flex items-center">
-            <span class="ml-2">{stockStatus}</span>
-          </p>
+
+          {#if stockStatus}
+            <p class="mt-4 mb-2 text-sm text-gray-600 flex items-center gap-2">
+              <Icon
+                icon={stockStatus.icon}
+                class={`text-lg ${stockStatus.color}`}
+              />
+              <span>{stockStatus.message}</span>
+            </p>
+          {/if}
         </form>
 
         {#if data?.authedUser && data?.authedUser?.id}
@@ -2140,10 +2019,10 @@ addItemToCart(currentCart)
 
                   if (resultData && resultData.success === true) {
                     if ($authedUser.id) {
-                        submitForm();
-                      } else {
-                        submitAlternateForm();
-                      }
+                      submitForm();
+                    } else {
+                      submitAlternateForm();
+                    }
                     const cartItem = prepareCartItem();
                     cartloadingpop = false;
 
@@ -2215,23 +2094,30 @@ addItemToCart(currentCart)
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
-        class="bg-white rounded-lg p-6 md:w-2/5 w-full md:h-5/6 h-2/5  overflow-y-auto"
+        class="bg-white rounded-lg p-6 md:w-2/5 w-full md:h-5/6 h-2/5 overflow-y-auto"
         on:click|stopPropagation
       >
         <h2 class="text-xl font-semibold mb-4 text-primary-400">
           Request a Quote
         </h2>
+        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
         <form
           method="POST"
           action="?/createQuote"
+          on:keydown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+            }
+          }}
           use:enhance={(event) => {
             submitting = true;
-            if (!validateForm()) {
+            if (!validateForm() || !validatePhoneNumber(country, phone)) {
               submitting = false;
               toast.error("Please fix the errors before submitting.");
               event.preventDefault();
               return;
             }
+
             if (!ProfileEmailVerified && !authedUserEmailVerified) {
               submitting = false;
               toast.error("Please verify your email to proceed.");
@@ -2304,19 +2190,19 @@ addItemToCart(currentCart)
               class="w-full px-4 py-2 border border-gray-300 hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 rounded mt-1"
               placeholder="Units Required"
               on:input={(e) => {
-                let input = e.target.value.replace(/^\s+/, ''); 
-                input = input.replace(/[^\d]/g, ''); 
+                let input = e.target.value.replace(/^\s+/, "");
+                input = input.replace(/[^\d]/g, "");
 
                 e.target.value = input;
                 units = input;
 
                 if (!units || +units < 1 || +units > 999) {
-                  formErrors.units = "Units must be a number between 1 and 999.";
+                  formErrors.units =
+                    "Units must be a number between 1 and 999.";
                 } else {
                   formErrors.units = "";
                 }
               }}
-              
             />
             {#if formErrors.units}
               <p class="text-red-500 text-xs">{formErrors.units}</p>
@@ -2334,7 +2220,7 @@ addItemToCart(currentCart)
               class="w-full px-4 py-2 borderhover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
               placeholder="First Name"
               on:input={() => {
-                firstName=firstName.trim();
+                firstName = firstName.trim();
                 if (!firstName.trim()) {
                   formErrors.firstName = "First name is required.";
                 } else if (!/^[A-Za-z\s]+$/.test(firstName)) {
@@ -2389,7 +2275,7 @@ addItemToCart(currentCart)
               class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
               placeholder="Organisation Name"
               on:input={() => {
-                organisation=organisation.trim();
+                organisation = organisation.trim();
                 if (!organisation.trim()) {
                   formErrors.organisation = "Organisation name is required.";
                 } else if (!/^[A-Za-z0-9\s]+$/.test(organisation)) {
@@ -2404,6 +2290,73 @@ addItemToCart(currentCart)
               <p class="text-red-500 text-xs">{formErrors.organisation}</p>
             {/if}
           </div>
+          <div class="relative mb-4 dropdown-parent" bind:this={dropdownContainer}>
+            <label for="country" class="block text-sm font-medium text-gray-700">
+              Country
+            </label>
+            <input
+              type="text"
+              id="country"
+              name="country"
+              bind:value={country}
+              placeholder="Search country"
+              on:input={handleInputChange}
+              on:click={(e) => {
+                e.stopPropagation();
+                toggleDropdown();
+              }}
+              on:keydown={handleKeyDown}
+              class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
+            />
+            <Icon
+              icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
+              class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
+              on:click={(e) => {
+                e.stopPropagation();
+                toggleDropdown();
+              }}
+            />
+            {#if showDropdown}
+              <div
+                bind:this={dropdownEl}
+                class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
+              >
+                <ul class="max-h-60 overflow-y-auto text-sm">
+                  {#each filteredCountries as country, index}
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                    <li
+                      on:click={(e) => {
+                        e.stopPropagation();
+                        selectCountry(country);
+                      }}
+                      class="px-4 py-2 cursor-pointer {highlightedIndex === index
+                        ? 'bg-primary-100'
+                        : 'hover:bg-primary-50'}"
+                    >
+                      {country.name} ({country.code})
+                    </li>
+                  {/each}
+                  {#if filteredCountries.length === 0}
+                    <div class="flex items-center px-4 py-3">
+                      <Icon
+                        icon="tabler:info-square-rounded-filled"
+                        class="text-red-500 text-base mr-2"
+                      />
+                      <li class="text-gray-800 text-xs">
+                        No matching countries found!
+                      </li>
+                    </div>
+                  {/if}
+                </ul>
+              </div>
+            {/if}
+            {#if formErrors?.country}
+              <p class="text-red-500 text-xs mt-1">
+                {formErrors.country}
+              </p>
+            {/if}
+          </div>
           <div class="mb-4">
             <label for="phone" class="block text-sm font-medium text-gray-700"
               >Phone Number</label
@@ -2415,14 +2368,9 @@ addItemToCart(currentCart)
               class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
               placeholder="Phone Number"
               on:input={() => {
-                phone=phone.trim();
-                if (!phone.trim()) {
-                  formErrors.phone = "Phone number is required.";
-                } else if (!/^\+?[0-9\s-]{7,15}$/.test(phone)) {
-                  formErrors.phone = "Enter a valid phone number";
-                } else {
-                  formErrors.phone = "";
-                }
+                phone = phone.trim();
+                validatePhoneNumber(country, phone);
+                phone = phone.replace(/[^+\d]/g, "").trim();
               }}
             />
             {#if formErrors.phone}
@@ -2484,11 +2432,10 @@ addItemToCart(currentCart)
                   bind:value={email}
                   class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
                   placeholder="Your email"
-                 
                   on:input={(e) => {
-                       e.target.value = e.target.value.replace(/^\s+/, '');
-                       email = e.target.value;
-                    email=email.trim();
+                    e.target.value = e.target.value.replace(/^\s+/, "");
+                    email = e.target.value;
+                    email = email.trim();
                     if (!email.trim()) {
                       formErrors.email = "Email is required.";
                     } else if (
@@ -2608,13 +2555,11 @@ addItemToCart(currentCart)
                     placeholder="Enter 6-digit OTP"
                     class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
                     on:input={() => {
-                      enteredOtpemail =
-                          enteredOtpemail.trim();
-                      enteredOtpemail =
-                          enteredOtpemail
-                              .replace(/\D/g, "")
-                              .slice(0, 6);
-                  }}
+                      enteredOtpemail = enteredOtpemail.trim();
+                      enteredOtpemail = enteredOtpemail
+                        .replace(/\D/g, "")
+                        .slice(0, 6);
+                    }}
                   />
                   <button
                     type="submit"
@@ -2664,9 +2609,8 @@ addItemToCart(currentCart)
               name="futherdetails"
               bind:value={futherdetails}
               on:input={() => {
-
                 formErrors.futherdetails = "";
-futherdetails=futherdetails.trim();
+                futherdetails = futherdetails.trim();
                 if (!futherdetails.trim()) {
                   formErrors.futherdetails = "Further details are required.";
                 } else if (!/^[A-Za-z0-9\s\.,\/\";-]+$/.test(futherdetails)) {
@@ -2706,6 +2650,11 @@ futherdetails=futherdetails.trim();
             <button
               type="submit"
               class="bg-gradient-to-r from-primary-400 to-primary-500 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
+              on:keydown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                }
+              }}
             >
               {#if submitting}
                 Submitting...
@@ -2825,7 +2774,7 @@ futherdetails=futherdetails.trim();
 
         <a href="/cart">
           <button
-          on:click={hideCartPopup}
+            on:click={hideCartPopup}
             class="text-primary-400 px-3 py-1.5 rounded font-normal flex items-center gap-2 border border-primary-400 hover:border-primary-500 hover:bg-primary-500 hover:text-white transition-all ease-in-out duration-300 shadow-sm"
           >
             View Cart
