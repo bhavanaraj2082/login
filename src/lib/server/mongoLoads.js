@@ -680,12 +680,10 @@ export const loadProductsubcategory = async (
 
     if(price === "asc"){
       sortConditions = {}
-      sortConditions.isEmptyPricing = 1
       sortConditions.pricingINRSort = 1
       sortConditions.pricingUSDSort = 1
     }else if(price === "desc"){
       sortConditions = {}
-      sortConditions.isEmptyPricing = 1
       sortConditions.pricingINRSort = -1
       sortConditions.pricingUSDSort = -1
 
@@ -717,23 +715,9 @@ export const loadProductsubcategory = async (
           as: "stockDetails",
         },
       },
-      { $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true } },
       {
-              $addFields: {
-                // Check if pricing is an empty object
-                isEmptyPricing: {
-                  $cond: {
-                    if:                                                                                                                                                  {
-                      $eq: [
-                        { $size: { $objectToArray: { $ifNull: ["$stockDetails.pricing", {}] } } }, 0
-                      ], // If pricing is an empty object
-                    },
-                    then: true,
-                    else: false,
-                  },
-                },
-              },
-            },
+        $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true }
+      },
       
     ]
      
@@ -832,8 +816,21 @@ export const loadProductsubcategory = async (
               }
             },
             {
-              $sort:sortConditions
+              $addFields: {
+                hasStockDetails: {
+                  $gt: [{ $size: "$stockDetails" }, 0]  // true if stockDetails has items
+                }
+              }
             },
+            {
+              $sort: Object.assign(
+                { hasStockDetails: -1 },  // true (non-empty) comes first
+                sortConditions           // then apply your original sort
+              )
+            },
+            // {
+            //   $sort:sortConditions
+            // },
             {
               $project: {
                 _id: 1,
@@ -883,7 +880,7 @@ export const loadProductsubcategory = async (
 
     const products = await Product.aggregate(aggregation);
    const totalCount = await Product.countDocuments(matchCondition);
-    console.log("products",products[0].data);
+    //console.log("products",products[0].data);
     const profile = await Profile.findOne({userId},{firstName:1,lastName:2,cellPhone:1,email:1,isEmailVerified:1,companyName:1,_id:0})
     
 
