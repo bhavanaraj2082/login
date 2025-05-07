@@ -764,12 +764,7 @@ function handleMouseLeave() {
                             Add to Cart
                         </button>
                     </div>
-                    {:else if  product?.variants && product?.variants?.length > 0}
-                    <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`}>
-                        <button class="bg-primary-500 py-2 px-3 hover:bg-primary-500 rounded-md text-sm text-white mt-2">
-                          View variants
-                        </button>
-                      </a>                      
+                                  
                     {:else}
                     <div>
                         <p class="text-gray-700 text-sm">

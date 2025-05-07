@@ -680,12 +680,12 @@ export const loadProductsubcategory = async (
 
     if(price === "asc"){
       sortConditions = {}
-      sortConditions.isEmptyPricing = -1
+      sortConditions.isEmptyPricing = 1
       sortConditions.pricingINRSort = 1
       sortConditions.pricingUSDSort = 1
     }else if(price === "desc"){
       sortConditions = {}
-      sortConditions.isEmptyPricing = -1
+      sortConditions.isEmptyPricing = 1
       sortConditions.pricingINRSort = -1
       sortConditions.pricingUSDSort = -1
 
