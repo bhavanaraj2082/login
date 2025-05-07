@@ -660,17 +660,30 @@ async function submitForm() {
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<!-- svelte-ignore a11y-no-static-element-interactions -->
 			<div class="relative p-2 text-white hidden md:block cursor-pointer rounded-md hover:bg-primary-300 transition-all" on:click={handleProfile} bind:this={dropdown}>
-				<button
-						class="mr-2 flex flex-row justify-center cursor-pointer z-10 gap-2 m-1">
-						<p class="w-7 h-7 flex items-center justify-center bg-white text-primary-400 rounded-full font-semibold text-lg">{getInitial($authedUser?.firstname || userName)}
-					</p>
-						<h2 class="text-sm text-white mt-1 capitalize">{$authedUser?.firstname || userName}</h2>
-						<button on:click={handleProfile}>
-							<Icon
-								icon={showUserOptions ? 'ion:chevron-up' : 'ion:chevron-down'}
-								class="text-white mt-0.5"/>
-					</button>
-				</button>
+				<!-- Large screens (default: shown at sm and up) -->
+<button
+class="hidden lg:flex mr-2 flex-row justify-center cursor-pointer z-10 gap-2 m-1">
+<p class="w-7 h-7 flex items-center justify-center bg-white text-primary-400 rounded-full font-semibold text-lg">
+  {getInitial($authedUser?.firstname || userName)}
+</p>
+<h2 class="text-sm text-white mt-1 capitalize">
+  {($authedUser?.firstname || userName)?.slice(0, 15)}
+</h2>
+<button on:click={handleProfile}>
+  <Icon
+	icon={showUserOptions ? 'ion:chevron-up' : 'ion:chevron-down'}
+	class="text-white mt-0.5"
+  />
+</button>
+</button>
+
+<!-- Tablet and smaller (default: shown below sm) -->
+<button
+class="lg:hidden sm:w-6 sm:h-6 w-4 h-4 flex items-center justify-center bg-white text-primary-400 font-semibold rounded-full text-sm sm:text-lg"
+on:click={handleProfile}>
+{getInitial($authedUser?.firstname || userName)}
+</button>
+
 		
 				{#if showUserOptions}
 				<div class="relative">

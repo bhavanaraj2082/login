@@ -1,3 +1,4 @@
+import { PUBLIC_SDS_URL   } from "$env/static/public";
 import Contact from '$lib/server/models/Contact.js';
 import Order from '$lib/server/models/Order.js';
 import Product from '$lib/server/models/Product.js';
@@ -1292,20 +1293,31 @@ export const Addquotes = async (data) => {
  */
 export async function fetchcertificate(inputValue) {
 	try {
-		const record = JSON.parse(
-			JSON.stringify(
-				await Products.findOne(
-					{ productNumber: inputValue },
-					'safetyDatasheet productNumber'
-				).lean()
-			)
-		);
-		return record || null;
+		const record = await Products.findOne(
+			{ productNumber: inputValue },
+			'safetyDatasheet sds productNumber'
+		).lean();
+
+		if (!record) return null;
+
+		// Append base URL to sds and/or safetyDatasheet
+		const baseUrl = PUBLIC_SDS_URL  ;
+		return {
+			productNumber: record.productNumber,
+			safetyDatasheet: record.safetyDatasheet
+				? baseUrl + record.safetyDatasheet
+				: null,
+			sds: record.sds
+				? baseUrl + record.sds
+				: null
+		};
 	} catch (error) {
 		console.error('Error fetching certificate:', error);
 		throw new Error('Unable to fetch certificate.');
 	}
 }
+
+
 
 //CHEMIKART HELP & SUPPORT
 function finalformdata(formData) {
