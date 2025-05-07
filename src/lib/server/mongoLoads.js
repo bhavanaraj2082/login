@@ -19,6 +19,7 @@ import Quotes from "$lib/server/models/Quotes.js";
 import Cart from "$lib/server/models/Cart.js";
 import Returns from "$lib/server/models/Return.js"
 import { error } from "@sveltejs/kit";
+import { getSkipObject } from "$lib/server/utils/utilityfunc.js";
 
 export async function getProductdatas() {
   const records = await Category.find();
@@ -639,6 +640,7 @@ export const loadProductsubcategory = async (
 ) => {
   const page = pageNum || 1;
   const pageSize = 10;
+  const num = getSkipObject(parseInt(pageNum))
   try {
     const subcategory = await SubCategory.findOne({ urlName: suburl })
       .populate({ path: "manufacturerIds", select: "-_id name" })
@@ -690,7 +692,14 @@ export const loadProductsubcategory = async (
     }
      
     const aggregation = [
+
       { $match: matchCondition },
+      {
+        $skip:num
+      },
+      {
+        $limit:20000
+      },
       {
         $lookup: {
           from: "stocks",
@@ -701,15 +710,12 @@ export const loadProductsubcategory = async (
                 $expr: { $eq: ["$productid", "$$productId"] },  // match the stock with product id
               },
             },
-            {
-              $limit:1
-            },
             { $project: { _id: 1, pricing: 1, stock: 1, orderMultiple: 1, distributor: 1,manufacturer:1 } },  // choose fields you need
           ],
           as: "stockDetails",
         },
       },
-     
+      
       { $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true } },
     ]
      
@@ -856,12 +862,10 @@ export const loadProductsubcategory = async (
       },
     );
   }
-    let a = Date.now()
+
     const products = await Product.aggregate(aggregation);
-   // const totalCount = await Product.countDocuments(matchCondition);
-    let b = Date.now()
+   const totalCount = await Product.countDocuments(matchCondition);
     //console.log("products",products[0].totalCount);
-    console.log(b-a,"milliseconds");
     const profile = await Profile.findOne({userId},{firstName:1,lastName:2,cellPhone:1,email:1,isEmailVerified:1,companyName:1,_id:0})
     
 
@@ -927,6 +931,7 @@ export const loadProductsubcategory = async (
       products: JSON.parse(JSON.stringify(filtered)),
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
       productCount: products[0].totalCount[0].count,
+      totalCount,
       subCategoryDetails,
       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
       specifications: subcategory?.specifications ? JSON.parse(JSON.stringify(subcategory?.specifications)) : {},
