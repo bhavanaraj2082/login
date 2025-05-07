@@ -1,4 +1,4 @@
-import { PUBLIC_CERTIFICATE_URL } from "$env/static/public";
+import { PUBLIC_SDS_URL   } from "$env/static/public";
 import Contact from '$lib/server/models/Contact.js';
 import Order from '$lib/server/models/Order.js';
 import Product from '$lib/server/models/Product.js';
@@ -1301,7 +1301,7 @@ export async function fetchcertificate(inputValue) {
 		if (!record) return null;
 
 		// Append base URL to sds and/or safetyDatasheet
-		const baseUrl = PUBLIC_CERTIFICATE_URL;
+		const baseUrl = PUBLIC_SDS_URL  ;
 		return {
 			productNumber: record.productNumber,
 			safetyDatasheet: record.safetyDatasheet
