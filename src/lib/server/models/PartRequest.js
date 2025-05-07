@@ -14,6 +14,8 @@ const productSchema = new mongoose.Schema(
     lastname: String,
     organisation: String,
     phone: String,
+    country: String,
+    currency: String,
     email: String,
     futherdetails: String
   },

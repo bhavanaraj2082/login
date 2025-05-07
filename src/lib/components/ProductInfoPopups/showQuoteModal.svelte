@@ -2,6 +2,7 @@
   import Icon from "@iconify/svelte";
   import { enhance, applyAction } from "$app/forms";
   import { toast, Toaster } from "svelte-sonner";
+  import { countries, phoneNumberPatterns, countryCurrencyMap } from "$lib/Data/constants.js";
 
   export let productName;
   export let toggleQuoteModal;
@@ -27,6 +28,12 @@
   let email = profile?.email || "";
   let formErrors = {};
   let isSubmitting = false;
+  let country = "";
+  let currency = "";
+  let searchTerm = "";
+  let dropdownEl;
+  let highlightedIndex = -1;
+  let modalContent;
 
   const handleResendemailOtp = () => {
     form5.requestSubmit();
@@ -76,6 +83,9 @@
       formErrors.email = "Enter a valid email address.";
     }
 
+    validateCountry();
+    validatePhoneNumber(country, phone);
+
     if (!(isOtpVerified === true)) {
       toast.error("Please verify your email to proceed");
     }
@@ -104,6 +114,157 @@
       isSubmitting = false;
     };
   }
+
+let currencies = [
+  "AFN", "ALL", "DZD", "EUR", "AOA", "XCD", "ARS", "AMD", "AUD", "EUR", "AZN", "BSD", "BHD",
+  "BDT", "BBD", "BYN", "EUR", "BZD", "XOF", "BTN", "BOB", "BAM", "BWP", "BRL", "BND", "BGN",
+  "XOF", "BIF", "CVE", "KHR", "XAF", "CAD", "XAF", "XAF", "CLP", "CNY", "COP", "KMF", "CDF",
+  "XAF", "CRC", "HRK", "CUP", "EUR", "CZK", "DKK", "DJF", "XCD", "DOP", "USD", "EGP", "USD",
+  "XAF", "ERN", "EUR", "SZL", "ETB", "FJD", "EUR", "EUR", "XAF", "GMD", "GEL", "EUR", "GHS",
+  "EUR", "XCD", "GTQ", "GNF", "XOF", "GYD", "HTG", "HNL", "HUF", "ISK", "INR", "IDR", "IRR",
+  "IQD", "EUR", "ILS", "EUR", "JMD", "JPY", "JOD", "KZT", "KES", "AUD", "KWD", "KGS", "LAK",
+  "EUR", "LBP", "LSL", "LRD", "LYD", "CHF", "EUR", "EUR", "MGA", "MWK", "MYR", "MVR", "XOF",
+  "EUR", "USD", "MRU", "MUR", "MXN", "USD", "MDL", "EUR", "MNT", "EUR", "MAD", "MZN", "MMK",
+  "NAD", "AUD", "NPR", "EUR", "NZD", "NIO", "XOF", "NGN", "MKD", "NOK", "OMR", "PKR", "USD",
+  "ILS", "PAB", "PGK", "PYG", "PEN", "PHP", "PLN", "EUR", "QAR", "RON", "RUB", "RWF", "XCD",
+  "XCD", "XCD", "WST", "EUR", "STN", "SAR", "XOF", "RSD", "SCR", "SLL", "SGD", "EUR", "EUR",
+  "SBD", "SOS", "ZAR", "KRW", "EUR", "LKR", "SDG", "SRD", "SEK", "CHF", "SYP", "TWD", "TJS",
+  "TZS", "THB", "XOF", "TOP", "TTD", "TND", "TRY", "TMT", "AUD", "UGX", "UAH", "AED", "GBP",
+  "USD", "UYU", "UZS", "VUV", "EUR", "VES", "VND", "YER", "ZMW", "ZWL",
+];
+
+currencies = currencies.sort();
+let filteredCountries = countries;
+let showDropdown = false;
+
+function updateCurrency(country) {
+  const normalizedCountry = country.trim().toLowerCase();
+  const selectedCurrency = Object.keys(countryCurrencyMap).find(
+    (key) => key.toLowerCase() === normalizedCountry
+  );
+  currency = selectedCurrency ? countryCurrencyMap[selectedCurrency] : "";
+}
+
+function getCountryByCode(code) {
+  const country = countries.find((c) => c.code === code || c.name === code);
+  return country ? country.name : null;
+}
+
+function getPhonePattern(countryCode) {
+  const countryName = getCountryByCode(countryCode);
+  if (!countryName) return "^[0-9]+$";
+  const regex = phoneNumberPatterns[countryName];
+  return regex ? regex.source : "^[0-9]+$";
+}
+
+function validatePhoneNumber(countryName, phone) {
+  let newErrors = { ...formErrors };
+
+  if (!phone) {
+    newErrors.phone = "*Required";
+  } else if (!countryName) {
+    newErrors.phone = "Select a country before entering your phone number";
+  } else {
+    const matchedCountry = countries.find((c) => c.name === countryName);
+    if (!matchedCountry) {
+      newErrors.phone = "Invalid country selected to validate phone";
+    } else {
+      const phonePattern = getPhonePattern(matchedCountry.code);
+      const phoneRegex = new RegExp(phonePattern);
+      if (!phoneRegex.test(phone)) {
+        newErrors.phone = `Please enter a valid phone number for ${countryName}.`;
+      } else {
+        delete newErrors.phone;
+        delete newErrors.country;
+      }
+    }
+  }
+  formErrors = newErrors;
+}
+
+function validateCountry() {
+  if (!country || country.trim() === "") {
+    formErrors.country = "*Required";
+  } else {
+    const match = countries.find(
+      (c) => c.name.toLowerCase() === country.toLowerCase()
+    );
+    if (!match) {
+      formErrors.country = "Invalid country selected";
+    } else {
+      delete formErrors.country;
+    }
+  }
+}
+
+function handleInputChange(event) {
+  searchTerm = event.target.value;
+  country = searchTerm;
+
+  filteredCountries = countries
+  .filter((c) => c.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  .sort((a, b) => {
+    const aStarts = a.name.toLowerCase().startsWith(searchTerm.toLowerCase());
+    const bStarts = b.name.toLowerCase().startsWith(searchTerm.toLowerCase());
+    if (aStarts && !bStarts) return -1;
+    if (!aStarts && bStarts) return 1;
+    return a.name.localeCompare(b.name);
+  });
+  showDropdown = true;
+  highlightedIndex = -1;
+
+  updateCurrency(country);
+  validateCountry();
+  // validatePhoneNumber(country, phone);
+}
+
+function toggleDropdown() {
+  showDropdown = !showDropdown;
+  if (showDropdown) {
+    filteredCountries = countries;
+    highlightedIndex = -1;
+  }
+}
+
+function handleKeyDown(event) {
+  if (!showDropdown) return;
+
+  if (event.key === "ArrowDown") {
+    highlightedIndex = (highlightedIndex + 1) % filteredCountries.length;
+    scrollToHighlighted();
+  } else if (event.key === "ArrowUp") {
+    highlightedIndex =
+      (highlightedIndex - 1 + filteredCountries.length) % filteredCountries.length;
+    scrollToHighlighted();
+  } else if (event.key === "Enter") {
+  if (highlightedIndex >= 0) {
+    selectCountry(filteredCountries[highlightedIndex]);
+  } else if (filteredCountries.length > 0) {
+    selectCountry(filteredCountries[0]);
+  }
+}
+}
+
+function scrollToHighlighted() {
+  setTimeout(() => {
+    const list = dropdownEl?.querySelectorAll("li");
+    if (list && list[highlightedIndex]) {
+      list[highlightedIndex].scrollIntoView({
+        block: "nearest",
+        behavior: "smooth",
+      });
+    }
+  }, 0);
+}
+
+function selectCountry(selectedCountry) {
+  country = selectedCountry.name;
+  searchTerm = selectedCountry.name;
+  updateCurrency(country);
+  validateCountry();
+  // validatePhoneNumber(country, phone);
+  showDropdown = false;
+}
 </script>
 
 <!-- {#each data.records as product} -->
@@ -115,8 +276,10 @@
 >
   <div
     class="bg-white rounded-md p-6 w-full sm:w-3/5 md:w-3/5 lg:w-2/5 h-5/6 overflow-y-auto"
+    bind:this={modalContent}
     on:click|stopPropagation
   >
+    <!-- your modal content -->
     <h2 class="text-xl font-bold mb-4 text-heading">Request a Quote</h2>
     <!-- Form -->
     <form
@@ -163,7 +326,7 @@
           name="units"
           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
           bind:value={units}
-          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
           placeholder="Units Required"
           on:input={() => {
             if (!units || units < 1 || units > 999) {
@@ -186,7 +349,7 @@
           name="Firstname"
           maxlength="50"
           bind:value={firstName}
-          class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm mt-1 placeholder:text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm mt-1 placeholder:text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
           placeholder="First Name"
           on:input={() => {
             if (!firstName.trim()) {
@@ -211,7 +374,7 @@
           name="lastname"
           maxlength="50"
           bind:value={lastName}
-          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 text-sm placeholder:text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 text-sm placeholder:text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
           placeholder="Last Name"
           on:input={() => {
             if (!lastName.trim()) {
@@ -237,7 +400,7 @@
           name="organisation"
           maxlength="50"
           bind:value={organisation}
-          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
           placeholder="Organisation Name"
           on:input={() => {
             if (!organisation.trim()) {
@@ -255,32 +418,84 @@
         {/if}
       </div>
       <div class="mb-4">
-        <label for="phone" class="block text-sm font-medium text-gray-700"
-          >Phone Number</label
+        <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
+        <div class="relative">
+          <input
+            type="text"
+            name="country"
+            bind:value={country}
+            placeholder="Search Country"
+            on:input={handleInputChange}
+            on:click={toggleDropdown}
+            on:keydown={handleKeyDown}
+            class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
+          />
+          <Icon icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"} class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs mr-1" />
+          {#if showDropdown}
+            <ul bind:this={dropdownEl} class="absolute bg-white border w-full mt-px z-10 max-h-60 overflow-y-auto rounded-md shadow">
+              {#each filteredCountries as countryItem, index}
+                <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                <li
+                  class="px-4 py-2 text-sm cursor-pointer hover:bg-primary-50 {highlightedIndex === index ? 'bg-primary-50' : ''}"
+                  on:click={() => selectCountry(countryItem)}
+                >
+                  {countryItem.name} ({countryItem.code})
+                </li>
+              {/each}
+              {#if filteredCountries.length === 0}
+              <div class="flex items-center px-4 py-3">
+                <Icon
+                  icon="tabler:info-square-rounded-filled"
+                  class="text-red-500 text-base mr-2"
+                />
+                <li class="text-gray-800 text-xs">
+                  No matching countries found!
+                </li>
+              </div>
+            {/if}
+            </ul>
+          {/if}
+        </div>
+        {#if formErrors.country}
+          <p class="text-red-500 text-xs">{formErrors.country}</p>
+        {/if}
+      </div>
+      <div class="mb-4">
+        <label for="currency" class="block text-sm font-medium text-gray-700">Currency</label>
+        <select
+          name="currency"
+          bind:value={currency}
+          disabled
+          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm bg-gray-50 focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
         >
+          <option disabled value="">Currency</option>
+          {#each currencies as c}
+            <option value={c}>{c}</option>
+          {/each}
+        </select>
+      </div>
+      <input name="currency" type="hidden" bind:value={currency}/>
+      <div class="mb-4">
+        <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
         <input
+          id="phone"
           type="tel"
           name="phone"
-          maxlength="20"
           bind:value={phone}
-          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
-          placeholder="Phone Number"
+          on:input={() => validatePhoneNumber(country, phone)}
           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-          on:input={() => {
-            if (!phone.trim()) {
-              formErrors.phone = "Phone number is required.";
-            } else if (!/^\+?[0-9\s-]{7,15}$/.test(phone)) {
-              formErrors.phone = "Enter a valid phone number";
-            } else {
-              formErrors.phone = "";
-            }
-          }}
+          placeholder="Enter phone number without country code"
+          maxlength="20"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
         />
+        <div class="text-base">
+          <Icon icon="carbon:location-info-filled" class="inline-block text-primary-400" />
+          <span class="text-2s text-gray-600">Enter phone number without country code</span>
+        </div>
         {#if formErrors.phone}
           <p class="text-red-500 text-xs">{formErrors.phone}</p>
         {/if}
       </div>
-
       <div class="mb-4">
         <label for="email" class="block text-sm font-medium text-gray-700"
           >Email</label
@@ -330,7 +545,7 @@
               name="email"
               maxlength="80"
               bind:value={email}
-              class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
+              class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
               placeholder="Your email"
               on:input={() => {
                 if (!email.trim()) {
@@ -436,7 +651,7 @@
               on:input={handleInput}
               placeholder="Enter 6-digit OTP"
               class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
-				  focus:border-primary-400 focus:ring-1 focus:ring-primary-400 placeholder-gray-400
+				  focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
 				  placeholder:text-sm h-10"
             />
             <button
@@ -466,7 +681,7 @@
           class="block text-sm font-medium text-gray-700">Message</label
         >
         <textarea
-          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm"
+          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
           placeholder="Your message"
           name="futherdetails"
         ></textarea>
