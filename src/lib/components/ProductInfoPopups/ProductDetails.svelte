@@ -1,5 +1,5 @@
 <script>
-  import { PUBLIC_IMAGE_URL } from "$env/static/public";
+  import { PUBLIC_IMAGE_URL, PUBLIC_SDS_URL } from "$env/static/public";
   import { writable } from "svelte/store";
   import { addItemToCart } from "$lib/stores/cart.js";
   import { sendMessage } from "$lib/utils.js";
@@ -320,7 +320,7 @@
             <div class="rounded-lg space-y-1">
               <!-- {#if showDropdown} -->
               <div class="text-primary-400 text-sm text-left cursor-pointer">
-                <a href={product?.safetyDatasheet} target="_blank">
+                <a href="{PUBLIC_SDS_URL}/{product?.safetyDatasheet}" target="_blank">
                   <Icon
                     icon="ic:round-download"
                     class="text-lg font-bold inline"

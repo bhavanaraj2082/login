@@ -1522,7 +1522,7 @@ export async function DifferentProds(productId) {
     prodDesc: product?.prodDesc,
     returnPolicy: product?.returnPolicy,
     imageSrc: product?.image || product?.imageSrc || "",
-    safetyDatasheet: product?.safetyDatasheet || "",
+    safetyDatasheet: product?.sds || "",
     priceSize,
     properties: product?.properties || {},
     description: product?.description || {},
