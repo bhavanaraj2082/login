@@ -54,10 +54,10 @@ const skipArray = [
   export function getSkipObject(pageValue) {
 	for (let i = skipArray.length - 1; i >= 0; i--) {
 	  if (pageValue > skipArray[i].page) {
-		return skipArray[i].skip;
+		return skipArray[i];
 	  }
 	}
-	return 0;
+	return {page:0,skip:0};
   }
 
   

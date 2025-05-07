@@ -640,7 +640,7 @@ export const loadProductsubcategory = async (
 ) => {
   const page = pageNum || 1;
   const pageSize = 10;
-  const num = getSkipObject(parseInt(pageNum))
+  let num = getSkipObject(parseInt(pageNum))
   try {
     const subcategory = await SubCategory.findOne({ urlName: suburl })
       .populate({ path: "manufacturerIds", select: "-_id name" })
@@ -694,12 +694,7 @@ export const loadProductsubcategory = async (
     const aggregation = [
 
       { $match: matchCondition },
-      {
-        $skip:num
-      },
-      {
-        $limit:20000
-      },
+     
       {
         $lookup: {
           from: "stocks",
@@ -715,83 +710,89 @@ export const loadProductsubcategory = async (
           as: "stockDetails",
         },
       },
+      {
+        $skip:num.skip
+      },
+      {
+        $limit:20000
+      },
       
       { $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true } },
     ]
      
-    if (subcategory.name === "Primary Antibodies" || subcategory.name === "Reference Materials") {
-    aggregation.push(
-      {
-        $addFields: {
-          // Check if pricing is an empty object
-          isEmptyPricing: {
-            $cond: {
-              if:                                                                                                                                                  {
-                $eq: [
-                  { $size: { $objectToArray: { $ifNull: ["$stockDetails.pricing", {}] } } }, 0
-                ], // If pricing is an empty object
-              },
-              then: true,
-              else: false,
-            },
-          },
-        },
-      },
-      {
-        $sort:{
-          isEmptyPricing:1
-        }
-      },
-      {
-        $skip: (Number(page) - 1) * Number(pageSize),
-      },
+  //   if (subcategory.name === "Primary Antibodies" || subcategory.name === "Reference Materials") {
+  //   aggregation.push(
+  //     {
+  //       $addFields: {
+  //         // Check if pricing is an empty object
+  //         isEmptyPricing: {
+  //           $cond: {
+  //             if:                                                                                                                                                  {
+  //               $eq: [
+  //                 { $size: { $objectToArray: { $ifNull: ["$stockDetails.pricing", {}] } } }, 0
+  //               ], // If pricing is an empty object
+  //             },
+  //             then: true,
+  //             else: false,
+  //           },
+  //         },
+  //       },
+  //     },
+  //     {
+  //       $sort:{
+  //         isEmptyPricing:1
+  //       }
+  //     },
+  //     {
+  //       $skip:  num.skip > 0 ? ( (Number(page) - num.page)-1)* Number(pageSize) : (Number(page) - 1) * Number(pageSize),
+  //     },
   
-      {
-        $limit: Number(pageSize),
-      },
-      {
-        $facet: {
-          data: [
+  //     {
+  //       $limit: Number(pageSize),
+  //     },
+  //     {
+  //       $facet: {
+  //         data: [
          
-            {
-              $project: {
-                productNumber: 1,
-                productName: 1,
-                prodDesc: 1,
-                image: 1,
-                CAS:1,
-                variants:1,
-                manufacturerName:1,
-                stockDetails: {
-                  $map: {
-                    input: {
-                      $cond: {
-                        if: { $isArray: "$stockDetails" },
-                        then: "$stockDetails",
-                        else: [{ $ifNull: ["$stockDetails", {}] }]
-                      }
-                    },
-                    as: "item",
-                    in: {
-                      stockId: "$$item._id",
-                      pricing: "$$item.pricing",
-                      stock: "$$item.stock",
-                      orderMultiple: "$$item.orderMultiple",
-                      distributor: "$$item.distributor",
-                      manufacturer: "$$item.manufacturer"
-                    }
-                  }
-                }
-              },
-            },
-          ],
-          totalCount: [
-            { $count: "count" }
-          ]
-        },
-      },
-    );
-  }else{
+  //           {
+  //             $project: {
+  //               productNumber: 1,
+  //               productName: 1,
+  //               prodDesc: 1,
+  //               image: 1,
+  //               CAS:1,
+  //               variants:1,
+  //               manufacturerName:1,
+  //               stockDetails: {
+  //                 $map: {
+  //                   input: {
+  //                     $cond: {
+  //                       if: { $isArray: "$stockDetails" },
+  //                       then: "$stockDetails",
+  //                       else: [{ $ifNull: ["$stockDetails", {}] }]
+  //                     }
+  //                   },
+  //                   as: "item",
+  //                   in: {
+  //                     stockId: "$$item._id",
+  //                     pricing: "$$item.pricing",
+  //                     stock: "$$item.stock",
+  //                     orderMultiple: "$$item.orderMultiple",
+  //                     distributor: "$$item.distributor",
+  //                     manufacturer: "$$item.manufacturer"
+  //                   }
+  //                 }
+  //               }
+  //             },
+  //           },
+  //         ],
+  //         totalCount: [
+  //           { $count: "count" }
+  //         ]
+  //       },
+  //     },
+  //   );
+  // }else{
    
     aggregation.push(
        
@@ -843,7 +844,7 @@ export const loadProductsubcategory = async (
               }
             },
             {
-              $skip: (Number(page) - 1) * Number(pageSize),
+              $skip:  num.skip > 0 ? ((Number(page)- num.page)-1)* Number(pageSize) : (Number(page) - 1) * Number(pageSize),
             },
         
             {
@@ -861,11 +862,11 @@ export const loadProductsubcategory = async (
         },
       },
     );
-  }
+  //}
 
     const products = await Product.aggregate(aggregation);
    const totalCount = await Product.countDocuments(matchCondition);
-    //console.log("products",products[0].totalCount);
+    console.log("products",products[0].data);
     const profile = await Profile.findOne({userId},{firstName:1,lastName:2,cellPhone:1,email:1,isEmailVerified:1,companyName:1,_id:0})
     
 
