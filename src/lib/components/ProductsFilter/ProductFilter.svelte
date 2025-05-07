@@ -17,6 +17,7 @@
     export let products
     export let manufacturers
     export let productCount
+    export let totalCount
     export let subCategoryDetails
     export let specifications
     export let profile
@@ -61,14 +62,20 @@ function handleMouseLeave() {
 
     let searchManufacture = manufacturers
     
-	let arr
+	let arr = null
+  let total
 	let showSortByDropdown = false;
 	let showMfrDropdown = false;
     let toggleFilter = false
     let currentPage = parseInt($page.url.searchParams.get('page')) || 1;
     let search = $page.url.searchParams.get('search') || null
     let selectedManufacturer = $page.url.searchParams.get('manufacturer') || null;
-    $: totalPages = Math.ceil(productCount/10);
+    $:if(arr === null && search === null && selectedManufacturer === null){
+       total = totalCount
+    }else{
+      total = productCount
+    }
+    $: totalPages = Math.ceil(total/10);
     let tog= null
     let form;
     let selectedSort =''
