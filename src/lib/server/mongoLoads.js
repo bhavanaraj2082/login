@@ -680,10 +680,12 @@ export const loadProductsubcategory = async (
 
     if(price === "asc"){
       sortConditions = {}
+      sortConditions.isEmptyPricing = -1
       sortConditions.pricingINRSort = 1
       sortConditions.pricingUSDSort = 1
     }else if(price === "desc"){
       sortConditions = {}
+      sortConditions.isEmptyPricing = -1
       sortConditions.pricingINRSort = -1
       sortConditions.pricingUSDSort = -1
 
@@ -694,7 +696,12 @@ export const loadProductsubcategory = async (
     const aggregation = [
 
       { $match: matchCondition },
-     
+      {
+        $skip:num.skip
+      },
+      {
+        $limit:20000
+      },
       {
         $lookup: {
           from: "stocks",
@@ -710,14 +717,24 @@ export const loadProductsubcategory = async (
           as: "stockDetails",
         },
       },
-      {
-        $skip:num.skip
-      },
-      {
-        $limit:20000
-      },
-      
       { $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true } },
+      {
+              $addFields: {
+                // Check if pricing is an empty object
+                isEmptyPricing: {
+                  $cond: {
+                    if:                                                                                                                                                  {
+                      $eq: [
+                        { $size: { $objectToArray: { $ifNull: ["$stockDetails.pricing", {}] } } }, 0
+                      ], // If pricing is an empty object
+                    },
+                    then: true,
+                    else: false,
+                  },
+                },
+              },
+            },
+      
     ]
      
   //   if (subcategory.name === "Primary Antibodies" || subcategory.name === "Reference Materials") {
