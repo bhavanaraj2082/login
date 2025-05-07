@@ -719,7 +719,7 @@ export const loadProductsubcategory = async (
       { $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true } },
     ]
      
-    if (subcategory.name === "Primary Antibodies" || subcategory.name === "Uncategorized") {
+    if (subcategory.name === "Primary Antibodies" || subcategory.name === "Reference Materials") {
     aggregation.push(
       {
         $addFields: {

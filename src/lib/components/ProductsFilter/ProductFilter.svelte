@@ -22,7 +22,6 @@
     export let specifications
     export let profile
 
-   //$: console.log(products);
 
 	let isLoggedIn = $authedUser?.id ? true : false
   let selectedProductName = "";
@@ -76,6 +75,7 @@ function handleMouseLeave() {
       total = productCount
     }
     $: totalPages = Math.ceil(total/10);
+   $: console.log(total,totalPages);
     let tog= null
     let form;
     let selectedSort =''
@@ -510,7 +510,7 @@ function handleMouseLeave() {
                <div class=" flex gap-2 items-center">
                 <Icon icon="ic:sharp-segment" class="text-2xl text-primary-500" />
                 <h1>Filter</h1>
-                <p class=" lg:hidden font-normal text-xs"><span class=" font-semibold text-sm">{productCount}</span> Products</p>
+                <p class=" lg:hidden font-normal text-xs"><span class=" font-semibold text-sm">{total}</span> Products</p>
               <button on:click={()=>{
                 localStorage.removeItem("specs")
                 selectedValues = {}
@@ -522,7 +522,7 @@ function handleMouseLeave() {
                <Icon icon={toggleFilter ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-3xl p-0.5 rounded-full hover:bg-gray-100 lg:hidden"/>
             </div>
             <div class="hidden lg:flex justify-between items-center">
-              <p class=" text-xs"><span class=" font-semibold text-sm">{productCount}</span> Products</p>
+              <p class=" text-xs"><span class=" font-semibold text-sm">{total}</span> Products</p>
               <button on:click={()=>{
                 localStorage.removeItem("specs")
                 selectedValues = {}
@@ -823,7 +823,7 @@ function handleMouseLeave() {
        {/if}
        
        <!-- pagination -->
-       <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {totalPages <= 1 || productCount <= 10 ? "hidden": "flex"}">
+       <div class=" w-fit gap-1 sm:gap-1.5  mx-auto {totalPages <= 1 || total <= 10 ? "hidden": "flex"}">
       <button class="border shadow-md  bg-white border-gray-300 hover:bg-gray-100 rounded-md text-gray-400 disabled:border-gray-200 disabled:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
         on:click={() => goToPage(1)} 
         disabled={currentPage == 1}
