@@ -8,6 +8,8 @@
   import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
   export let data;
   import { fade } from "svelte/transition";
+  let textEditedAfterValidation = false;
+  let showValidateButton = false;
   $: console.log($cart);
   let validationMessages = [];
   let isLoggedIn = $authedUser?.id ? true : false;
@@ -160,54 +162,115 @@
     }
   }
   let formatError = false;
+  //   function handleTextChange(event) {
+  //   rawFileData = event.target.value;
+  //   const { duplicates } = checkForDuplicates(rawFileData);
+  //   duplicateEntries = duplicates;
+  //   isValidated = false;
+  //   invalidProductLines = [];
+  //   formatError = false;
+  //   fileError = "";
+
+  //   if (!rawFileData.trim()) {
+  //     return;
+  //   }
+
+  //   const lines = rawFileData.split("\n").filter(line => line.trim());
+
+  //   // Simplified format check - just ensure each line has content
+  //   for (let i = 0; i < lines.length; i++) {
+  //     const line = lines[i].trim();
+  //     const parts = line.split(",");
+
+  //     if (parts.length === 0 || !parts[0].trim()) {
+  //       formatError = true;
+  //       cartloading = false;
+  //       fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+  //       toast.error(fileError);
+  //       break;
+  //     }
+
+  //     // Only check quantity if a second part exists
+  //     if (parts.length > 1 && parts[1].trim() && isNaN(Number(parts[1].trim()))) {
+  //       formatError = true;
+  //       cartloading = false;
+  //       fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+  //       toast.error(fileError);
+  //       break;
+  //     }
+  //        if (parts.length > 1 && parts[1].trim()) {
+  //       const quantity = Number(parts[1].trim());
+  //       if (!isNaN(quantity) && quantity > 999) {
+  //         formatError = true;
+  //         cartloading = false;
+  //         fileError = `Quantity at line ${i + 1} must not be greater than 999.`;
+  //         toast.error(fileError);
+  //         break;
+  //       }
+  //     }
+  //   }
+  // }
   function handleTextChange(event) {
-  rawFileData = event.target.value;
-  const { duplicates } = checkForDuplicates(rawFileData);
-  duplicateEntries = duplicates;
-  isValidated = false;
-  invalidProductLines = [];
-  formatError = false;
-  fileError = "";
-  
-  if (!rawFileData.trim()) {
-    return;
-  }
-  
-  const lines = rawFileData.split("\n").filter(line => line.trim());
-  
-  // Simplified format check - just ensure each line has content
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    const parts = line.split(",");
-    
-    if (parts.length === 0 || !parts[0].trim()) {
-      formatError = true;
-      cartloading = false;
-      fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
-      toast.error(fileError);
-      break;
+    rawFileData = event.target.value;
+    const { duplicates } = checkForDuplicates(rawFileData);
+    duplicateEntries = duplicates;
+
+    if (isValidated) {
+      textEditedAfterValidation = true;
+      showValidateButton = true;
     }
-    
-    // Only check quantity if a second part exists
-    if (parts.length > 1 && parts[1].trim() && isNaN(Number(parts[1].trim()))) {
-      formatError = true;
-      cartloading = false;
-      fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
-      toast.error(fileError);
-      break;
+
+    formatError = false;
+    fileError = "";
+
+    if (!rawFileData.trim()) {
+      return;
     }
-       if (parts.length > 1 && parts[1].trim()) {
-      const quantity = Number(parts[1].trim());
-      if (!isNaN(quantity) && quantity > 999) {
+
+    const lines = rawFileData.split("\n").filter((line) => line.trim());
+
+    // Simplified format check - just ensure each line has content
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      const parts = line.split(",");
+
+      if (parts.length === 0 || !parts[0].trim()) {
         formatError = true;
         cartloading = false;
-        fileError = `Quantity at line ${i + 1} must not be greater than 999.`;
+        fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
         toast.error(fileError);
         break;
       }
+
+      // Only check quantity if a second part exists
+      if (
+        parts.length > 1 &&
+        parts[1].trim() &&
+        isNaN(Number(parts[1].trim()))
+      ) {
+        formatError = true;
+        cartloading = false;
+        fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+        toast.error(fileError);
+        break;
+      }
+      if (parts.length > 1 && parts[1].trim()) {
+        const quantity = Number(parts[1].trim());
+        if (!isNaN(quantity) && quantity > 999) {
+          formatError = true;
+          cartloading = false;
+          fileError = `Quantity at line ${i + 1} must not be greater than 999.`;
+          toast.error(fileError);
+          break;
+        }
+      }
     }
   }
-}
+  function handleValidateClick() {
+    submitFileData();
+    showValidateButton = false;
+    textEditedAfterValidation = false;
+  }
 
   function handleFileInputChange(event) {
     fileError = "";
@@ -308,76 +371,155 @@
     }
   }
 
-function submitFileData() {
-  if (!rawFileData.trim()) {
-    toast.error("Please enter product data before submitting");
-    cartloading = false;
-    return;
-  }
+  // function submitFileData() {
+  //   if (!rawFileData.trim()) {
+  //     toast.error("Please enter product data before submitting");
+  //     cartloading = false;
+  //     return;
+  //   }
 
-  const lines = rawFileData.split("\n").filter(line => line.trim());
-  let formatError = false;
-  let errorMessage = "";
-  const processedLines = [];
-  
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    const parts = line.split(",");
-    
-    if (parts.length === 0 || !parts[0].trim()) {
-      formatError = true;
-      errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
-      break;
+  //   const lines = rawFileData.split("\n").filter(line => line.trim());
+  //   let formatError = false;
+  //   let errorMessage = "";
+  //   const processedLines = [];
+
+  //   for (let i = 0; i < lines.length; i++) {
+  //     const line = lines[i].trim();
+  //     const parts = line.split(",");
+
+  //     if (parts.length === 0 || !parts[0].trim()) {
+  //       formatError = true;
+  //       errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+  //       break;
+  //     }
+  //     if (parts.length > 1 && parts[1].trim() && isNaN(Number(parts[1].trim()))) {
+  //       formatError = true;
+  //       errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+  //       break;
+  //     }
+  //     if (parts.length > 1 && parts[1].trim()) {
+  //       let quantity = Number(parts[1].trim());
+  //       if (!isNaN(quantity)) {
+  //         quantity = Math.min(quantity, 999);
+  //         processedLines.push(`${parts[0]},${quantity}`);
+  //       } else {
+  //         processedLines.push(line);
+  //       }
+  //     } else {
+  //       processedLines.push(line);
+  //     }
+  //   }
+
+  //   if (formatError) {
+  //     fileError = errorMessage;
+  //     toast.error(errorMessage);
+  //     return;
+  //   }
+  //   rawFileData = processedLines.join("\n");
+  //   const updatedFile = new File(
+  //     [rawFileData],
+  //     selectedFileName || "upload.csv",
+  //     { type: "text/csv" }
+  //   );
+
+  //   const dataTransfer = new DataTransfer();
+  //   dataTransfer.items.add(updatedFile);
+
+  //   const fileInput = document.getElementById("bulkupload") || document.querySelector('input[type="file"]');
+
+  //   if (fileInput) {
+  //     fileInput.files = dataTransfer.files;
+  //     const form = fileInput.closest("form");
+  //     if (form) {
+  //       setTimeout(() => {
+  //         form.requestSubmit();
+  //       }, 100);
+  //     } else {
+  //       console.error("Form not found");
+  //     }
+  //   } else {
+  //     console.error("File input element not found");
+  //   }
+  // }
+
+  function submitFileData() {
+    if (!rawFileData.trim()) {
+      toast.error("Please enter product data before submitting");
+      cartloading = false;
+      return;
     }
-    if (parts.length > 1 && parts[1].trim() && isNaN(Number(parts[1].trim()))) {
-      formatError = true;
-      errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
-      break;
-    }
-    if (parts.length > 1 && parts[1].trim()) {
-      let quantity = Number(parts[1].trim());
-      if (!isNaN(quantity)) {
-        quantity = Math.min(quantity, 999);
-        processedLines.push(`${parts[0]},${quantity}`);
+
+    const lines = rawFileData.split("\n").filter((line) => line.trim());
+    let formatError = false;
+    let errorMessage = "";
+    const processedLines = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      const parts = line.split(",");
+
+      if (parts.length === 0 || !parts[0].trim()) {
+        formatError = true;
+        errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+        break;
+      }
+      if (
+        parts.length > 1 &&
+        parts[1].trim() &&
+        isNaN(Number(parts[1].trim()))
+      ) {
+        formatError = true;
+        errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+        break;
+      }
+      if (parts.length > 1 && parts[1].trim()) {
+        let quantity = Number(parts[1].trim());
+        if (!isNaN(quantity)) {
+          quantity = Math.min(quantity, 999);
+          processedLines.push(`${parts[0]},${quantity}`);
+        } else {
+          processedLines.push(line);
+        }
       } else {
         processedLines.push(line);
       }
+    }
+
+    if (formatError) {
+      fileError = errorMessage;
+      toast.error(errorMessage);
+      return;
+    }
+    rawFileData = processedLines.join("\n");
+    const updatedFile = new File(
+      [rawFileData],
+      selectedFileName || "upload.csv",
+      { type: "text/csv" },
+    );
+
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(updatedFile);
+
+    const fileInput =
+      document.getElementById("bulkupload") ||
+      document.querySelector('input[type="file"]');
+
+    if (fileInput) {
+      fileInput.files = dataTransfer.files;
+      const form = fileInput.closest("form");
+      if (form) {
+        textEditedAfterValidation = false;
+        showValidateButton = false;
+        setTimeout(() => {
+          form.requestSubmit();
+        }, 100);
+      } else {
+        console.error("Form not found");
+      }
     } else {
-      processedLines.push(line);
+      console.error("File input element not found");
     }
   }
-  
-  if (formatError) {
-    fileError = errorMessage;
-    toast.error(errorMessage);
-    return;
-  }
-  rawFileData = processedLines.join("\n");
-  const updatedFile = new File(
-    [rawFileData],
-    selectedFileName || "upload.csv",
-    { type: "text/csv" }
-  );
-
-  const dataTransfer = new DataTransfer();
-  dataTransfer.items.add(updatedFile);
-
-  const fileInput = document.getElementById("bulkupload") || document.querySelector('input[type="file"]');
-
-  if (fileInput) {
-    fileInput.files = dataTransfer.files;
-    const form = fileInput.closest("form");
-    if (form) {
-      setTimeout(() => {
-        form.requestSubmit();
-      }, 100);
-    } else {
-      console.error("Form not found");
-    }
-  } else {
-    console.error("File input element not found");
-  }
-}
 
   function removeAllDuplicates(event) {
     if (duplicateEntries.length === 0) return;
@@ -559,11 +701,43 @@ function submitFileData() {
     return productsToAdd;
   }
 
+  // function attemptAddToCart() {
+  //   if (!isValidated || duplicateEntries.length > 0) {
+  //     submitFileData();
+  //     return;
+  //   }
+  //   const validProducts = validatedProducts.filter(
+  //     (product) => product.isValid === true,
+  //   );
+
+  //   if (validProducts.length === 0) {
+  //     toast.error(
+  //       "No valid products to add to cart. Please remove invalid products and try again.",
+  //     );
+  //     return;
+  //   }
+
+  //   if (data?.authedUser && data?.authedUser?.id) {
+  //     const cartForm = document.getElementById("cartForm");
+  //     if (cartForm) cartForm.requestSubmit();
+  //   } else {
+  //     handleLocalStorage();
+  //     submitAlternateForm();
+  //   }
+  // }
   function attemptAddToCart() {
+    if (textEditedAfterValidation) {
+      toast.warning(
+        "Content has changed. Please validate before adding to cart.",
+      );
+      return;
+    }
+
     if (!isValidated || duplicateEntries.length > 0) {
       submitFileData();
       return;
     }
+
     const validProducts = validatedProducts.filter(
       (product) => product.isValid === true,
     );
@@ -583,7 +757,6 @@ function submitFileData() {
       submitAlternateForm();
     }
   }
-
   async function submitAlternateForm() {
     const storedCart = JSON.parse(localStorage.getItem("cart") || "[]");
     localStorage.setItem("totalCompsChemi", storedCart.length);
@@ -786,45 +959,52 @@ function submitFileData() {
   enctype="multipart/form-data"
   use:enhance={() => {
     isLoading = true;
-const lines = rawFileData.trim().split("\n");
-let formatError = false;
-let errorMessage = "";
+    textEditedAfterValidation = false; // Reset the edited flag
+    showValidateButton = false; // Hide validate button during validation
 
-for (let i = 0; i < lines.length; i++) {
-  const line = lines[i].trim();
-  const parts = line.split(",");
-  
-  if (parts.length === 0 || !parts[0]?.trim()) {
-    formatError = true;
-    cartloading = false;
-    errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
-    break;
-  }
+    const lines = rawFileData.trim().split("\n");
+    let formatError = false;
+    let errorMessage = "";
 
-  if (parts.length > 1 && parts[1]?.trim() && isNaN(Number(parts[1].trim()))) {
-    formatError = true;
-    cartloading = false;
-    errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
-    break;
-  }
-  if (parts.length > 1 && parts[1]?.trim()) {
-      const quantity = Number(parts[1].trim());
-      if (!isNaN(quantity) && quantity > 999) {
-        cartloading = false;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      const parts = line.split(",");
+
+      if (parts.length === 0 || !parts[0]?.trim()) {
         formatError = true;
-        errorMessage = `Quantity at line ${i + 1} must not be greater than 999.`;
+        cartloading = false;
+        errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
         break;
       }
+
+      if (
+        parts.length > 1 &&
+        parts[1]?.trim() &&
+        isNaN(Number(parts[1].trim()))
+      ) {
+        formatError = true;
+        cartloading = false;
+        errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+        break;
+      }
+      if (parts.length > 1 && parts[1]?.trim()) {
+        const quantity = Number(parts[1].trim());
+        if (!isNaN(quantity) && quantity > 999) {
+          cartloading = false;
+          formatError = true;
+          errorMessage = `Quantity at line ${i + 1} must not be greater than 999.`;
+          break;
+        }
+      }
     }
-}
-    
+
     if (formatError) {
       toast.error(errorMessage);
       fileError = errorMessage;
       isLoading = false;
       return { cancel: true }; // Cancel form submission
     }
-    
+
     // Continue with processing if format is valid
     const processedLines = lines.map((line) => {
       const parts = line.includes(",") ? line.split(",") : line.split(/\s+/);
@@ -834,10 +1014,10 @@ for (let i = 0; i < lines.length; i++) {
         quantity = "1";
         return `${productNumberAndSize},${quantity}`;
       }
-  
+
       return line.trim();
     });
-  
+
     rawFileData = processedLines.join("\n");
     return async ({ result }) => {
       const { duplicates } = checkForDuplicates(rawFileData);
@@ -859,6 +1039,8 @@ for (let i = 0; i < lines.length; i++) {
       validatedProducts = products;
       isLoading = false;
       isValidated = true;
+      textEditedAfterValidation = false;
+      showValidateButton = false;
 
       if (result.data && Array.isArray(result.data)) {
         validationMessages = result.data.map((item) => ({
@@ -948,9 +1130,7 @@ Example file content:
 657890-100G,5
 345678-25G,3"
           ></textarea>
-
-
-          {#if isValidated && rawFileData.trim()}
+          {#if isValidated && rawFileData.trim() && !textEditedAfterValidation}
             <div
               class="absolute mt-2 top-0 left-0 w-full h-full pointer-events-none"
               bind:this={overlayElement}
@@ -1010,17 +1190,23 @@ Example file content:
                 {/if}
               {/each}
             </div>
+          {:else if isValidated && textEditedAfterValidation}
+            <div
+              class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-md text-xs font-medium"
+            >
+              Content changed. Please validate again.
+            </div>
           {/if}
         </div>
       </div>
       {#if fileError && !selectedFileName}
-      <div class="mt-2 p-2 text-sm text-red-500 bg-red-50 rounded">
-        <div class="flex items-center">
-          <Icon icon="mdi:alert-circle" class="mr-1" />
-          {fileError}
+        <div class="mt-2 p-2 text-sm text-red-500 bg-red-50 rounded">
+          <div class="flex items-center">
+            <Icon icon="mdi:alert-circle" class="mr-1" />
+            {fileError}
+          </div>
         </div>
-      </div>
-    {/if}
+      {/if}
     </div>
 
     <!-- </div> -->
@@ -1120,7 +1306,8 @@ Example file content:
       </ul>
     </div>
   {/if}
-  {#if validationMessages.length > 0 && isValidated}
+  <!-- {#if validationMessages.length > 0 && isValidated} -->
+  {#if validationMessages.length > 0 && isValidated && !textEditedAfterValidation}
     <div class="mt-4">
       {#if validationMessages.some((message) => !message.isValid)}
         <button
@@ -1165,55 +1352,76 @@ Example file content:
             These products are ready to be added to cart.
           </p>
         </div>
+      {:else if validationMessages.length > 0 && isValidated && textEditedAfterValidation}
+        <div class="mt-4 p-4 bg-yellow-50 rounded-md">
+          <h3 class="text-yellow-700 font-medium mb-2">
+            Content Changed After Validation
+          </h3>
+          <p class="text-sm text-yellow-600">
+            You've edited the content after validation. Please validate again to
+            ensure your changes are properly checked.
+          </p>
+        </div>
       {/if}
     </div>
   {/if}
 </form>
 
-<div class="flex justify-end">
-  {#if data?.authedUser && data?.authedUser?.id}
+<div class="flex justify-end gap-4">
+  {#if showValidateButton}
+    <button
+      type="button"
+      on:click={handleValidateClick}
+      class="p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center justify-center gap-2"
+    >
+      <Icon icon="mdi:check-circle" class="text-xl" />
+      <span>Validate Again</span>
+    </button>
+  {/if}
+
+  {#if data?.authedUser && data?.authedUser?.id && !showValidateButton}
     <form
       id="cartForm"
       method="POST"
       action="?/addToCart"
       use:enhance={({ formData, cancel }) => {
-          if (formatError) {
+        if (formatError) {
           toast.error("Please fix format errors before adding to cart");
-          // return cancel();
           return { cancel: true };
         }
+
+        if (textEditedAfterValidation) {
+          toast.warning(
+            "Content has changed. Please validate before adding to cart.",
+          );
+          return { cancel: true };
+        }
+
         cartloading = true;
         if (!isValidated || duplicateEntries.length > 0) {
-          // validateAndSubmitData();
           submitFileData();
-          return false;
+          return { cancel: true };
         }
+
         let productsToAdd = prepareValidatedProductsForCart();
 
         if (productsToAdd.length === 0) {
           cartloading = false;
           toast.error("No valid items to add to cart");
-          // return cancel();
           return { cancel: true };
         }
-        // productsToAdd = productsToAdd.filter(y=>{
-        //   const search = $cart.find(x=>x.stockId === y.stockId)
-        //   if(search === undefined) return y
-        // })
-        console.log(productsToAdd, "form");
+
         if (!isLoggedIn) {
           localStorage.setItem("cart", JSON.stringify(productsToAdd));
           guestCart.set(productsToAdd);
-          console.log("is kmdk  ej k");
-          // goto("/cart")
           setTimeout(() => {
             window.location.href = "/cart";
           }, 2000);
-          // cancel();
           return { cancel: true };
         }
+
         formData.set("cartItems", JSON.stringify(productsToAdd));
-        //cancel()
+
         return async ({ result }) => {
           cartloading = false;
 
@@ -1225,7 +1433,6 @@ Example file content:
               toast.success(
                 `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`,
               );
-              // goto("/cart")
               setTimeout(() => {
                 window.location.href = "/cart";
               }, 2000);
@@ -1239,58 +1446,39 @@ Example file content:
         };
       }}
     >
-    <button
-    type="submit"
-    on:click={(e) => {
-      if (formatError || fileError) {
-        e.preventDefault(); // Prevent the default submit action
-        toast.error("Please fix format errors before adding to cart");
-        return false;
-      }
-    }}
-    disabled={
-      cartloading || 
-      (isValidated && 
-       validatedProducts.length > 0 && 
-       !validatedProducts.some((p) => p.isValid))
-    }
-    class={`lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 transition rounded-md flex items-center justify-center gap-2
-      ${cartloading ||
-        (isValidated && validatedProducts.length > 0 && !validatedProducts.some(p => p.isValid))
-        ? 'opacity-50 cursor-not-allowed bg-white'
-        : 'hover:bg-primary-500 hover:text-white'}
-    `}
-  >
-    {#if cartloading && !fileError && !formatError}
-      <span>Adding...</span>
-    {:else}
-      <Icon icon="ic:round-shopping-cart" class="text-2xl" />
-      <span>Add to Cart</span>
-    {/if}
-  </button>
-
-      <!-- <button
+      <button
         type="submit"
-        class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center gap-2"
-        disabled={cartloading || 
-          fileError || 
+        disabled={cartloading ||
+          textEditedAfterValidation ||
           (isValidated &&
-           validatedProducts.length > 0 &&
-           !validatedProducts.some((p) => p.isValid))}
+            validatedProducts.length > 0 &&
+            !validatedProducts.some((p) => p.isValid))}
+        class={`lg:ml-0 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 transition rounded-md flex items-center justify-center gap-2
+          ${
+            cartloading ||
+            textEditedAfterValidation ||
+            (isValidated &&
+              validatedProducts.length > 0 &&
+              !validatedProducts.some((p) => p.isValid))
+              ? "opacity-50 cursor-not-allowed bg-white"
+              : "hover:bg-primary-500 hover:text-white"
+          }
+        `}
       >
-        {#if cartloading}
+        {#if cartloading && !fileError && !formatError}
           <span>Adding...</span>
         {:else}
           <Icon icon="ic:round-shopping-cart" class="text-2xl" />
           <span>Add to Cart</span>
         {/if}
-      </button> -->
+      </button>
     </form>
-  {:else}
+  {:else if !showValidateButton}
     <button
-      class="lg:ml-60 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center gap-2"
+      class="lg:ml-0 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center gap-2"
       on:click={attemptAddToCart}
       disabled={cartloading ||
+        textEditedAfterValidation ||
         (isValidated &&
           validatedProducts.length > 0 &&
           !validatedProducts.some((p) => p.isValid))}
