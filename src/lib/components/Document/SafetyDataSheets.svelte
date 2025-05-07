@@ -261,7 +261,7 @@ function RemoveUrl(urlToRemove) {
 
                 try {
                   if (result.data) {
-                    const safetyDatasheet = result.data.safetyDatasheet;
+                    const safetyDatasheet = result.data.sds;
                     showMessage(safetyDatasheet);
                     submitting = true;
                     console.log("pdf_url", safetyDatasheet);
