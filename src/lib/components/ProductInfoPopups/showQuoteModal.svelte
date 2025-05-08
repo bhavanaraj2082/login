@@ -28,8 +28,8 @@
   let email = profile?.email || "";
   let formErrors = {};
   let isSubmitting = false;
-  let country = "";
-  let currency = "";
+  let country = profile?.country || "";
+  let currency = profile?.currency || "";  
   let searchTerm = "";
   let dropdownEl;
   let highlightedIndex = -1;
