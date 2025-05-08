@@ -122,16 +122,46 @@
 		role = "";
 		selectedNames = [];
 	}
+	// function handleKeyDown(event) {
+	// 	if (
+	// 		event.key === "Enter" &&
+	// 		searchTerm.length >= 3 &&
+	// 		filteredCountries.length > 0
+	// 	) {
+	// 		selectlocation(filteredCountries[0]);
+	// 		event.preventDefault();
+	// 	}
+	// }
+
+	let highlightedIndex = -1;
+
 	function handleKeyDown(event) {
-		if (
-			event.key === "Enter" &&
-			searchTerm.length >= 3 &&
-			filteredCountries.length > 0
-		) {
+	if (!showDropdown) return;
+
+	if (event.key === 'ArrowDown') {
+		event.preventDefault();
+		highlightedIndex = (highlightedIndex + 1) % filteredCountries.length;
+		scrollToHighlightedItem();
+	} else if (event.key === 'ArrowUp') {
+		event.preventDefault();
+		highlightedIndex = (highlightedIndex - 1 + filteredCountries.length) % filteredCountries.length;
+		scrollToHighlightedItem();
+	} else if (event.key === 'Enter') {
+		event.preventDefault();
+		if (highlightedIndex >= 0) {
+			selectlocation(filteredCountries[highlightedIndex]);
+		} else {
 			selectlocation(filteredCountries[0]);
-			event.preventDefault();
 		}
+		showDropdown = false;
+		highlightedIndex = -1;
 	}
+}
+
+function scrollToHighlightedItem() {
+  const item = document.getElementById(`dropdown-item-${highlightedIndex}`);
+  if (item) item.scrollIntoView({ block: "nearest" });
+}
 	function handleSubmit(event) {
     console.log("Form Validation Started");
 
@@ -1204,16 +1234,19 @@ if (!isInCountry) {
 									<ul
 										class="max-h-60 overflow-y-auto sm:text-sm text-xs"
 									>
-										{#each filteredCountries as location (location.name)}
+										{#each filteredCountries as location, index (location.name)}
 											<!-- svelte-ignore a11y-click-events-have-key-events -->
 											<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+											
 											<li
-												on:click={() =>
-													selectlocation(location)}
-												class="px-4 py-2 cursor-pointer hover:bg-gray-100"
-											>
-												{location.name} ({location.code})
-											</li>
+	id={`dropdown-item-${index}`}
+	class="px-4 py-2 cursor-pointer {highlightedIndex === index
+	? 'bg-primary-100'
+	: 'hover:bg-primary-50'}"
+	on:click={() => selectlocation(location)}
+>
+{location.name} ({location.code})
+</li>
 										{/each}
 										{#if filteredCountries.length === 0}
 											<div
@@ -1256,26 +1289,23 @@ if (!isInCountry) {
 								}}
 							/>
 
-							{#if showErrors && number?.length === 0}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-								>
-									Number is required
-								</span>
-							{:else if !location && hovered}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-								>
-									Please select your country before entering
-									Number
-								</span>
-							{:else if number?.length > 0 && !validatePhoneNumber(location, number)}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-								>
-									Please enter a valid phone number for {location}
-								</span>
-							{/if}
+							{#if showErrors && !number}
+	<span class="text-red-500 sm:text-xs text-2s font-medium">
+		Number is required
+	</span>
+
+{:else if !location && hovered}
+	<span class="text-red-500 sm:text-xs text-2s font-medium">
+		Please select your country before entering Number
+	</span>
+
+{:else if number?.length > 0 && !validatePhoneNumber(location, number) && (showErrors || dirty)}
+	<span class="text-red-500 sm:text-xs text-2s font-medium">
+		Please enter a valid phone number for {location}
+	</span>
+{/if}
+
+							
 						</div>
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
@@ -1356,7 +1386,14 @@ if (!isInCountry) {
 	<span class="text-red-500 sm:text-xs text-2s font-medium">
 		Required and must be between 3 and 150 valid characters.
 	</span>
-{/if}					
+{/if}		
+{#if showErrors && role.length === 0}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Role is required
+								</span>
+							{/if}			
 						</div>
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
@@ -1628,7 +1665,13 @@ if (!isInCountry) {
 		Required and must be between 5 and 500 valid characters.
 	</span>
 {/if}
-
+{#if showErrors && details.length === 0}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Details are required
+								</span>
+							{/if}
 					</div>
 					<span class="flex-1 w-1/3 mb-4">
 						<label
