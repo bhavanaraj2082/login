@@ -81,6 +81,9 @@
 
 	let countryDropdownRef;
 
+	let highlightedIndex = -1;
+
+
 	function handleFormClick(event) {
     const isInCountry = countryDropdownRef?.contains(event.target);
     if (!isInCountry) {
@@ -250,13 +253,44 @@ else if (
 				});
 		}
 	}
-	// function handleClickOutside(event) {
-	// 	if (!event.target.closest(".dropdown-container")) {
-	// 		showDropdown = false;
-	// 	}
-	// }
+
+
+
 	function handleKeyDown(event) {
-    if (event.key === "Enter" && searchTerm.length >= 3 && filteredCountries.length > 0) {
+	if (!showDropdown) return;
+
+	if (event.key === 'ArrowDown') {
+		event.preventDefault();
+		highlightedIndex = (highlightedIndex + 1) % filteredCountries.length;
+		scrollToHighlightedItem();
+	} else if (event.key === 'ArrowUp') {
+		event.preventDefault();
+		highlightedIndex = (highlightedIndex - 1 + filteredCountries.length) % filteredCountries.length;
+		scrollToHighlightedItem();
+	} else if (event.key === 'Enter') {
+		event.preventDefault();
+		if (highlightedIndex >= 0) {
+			selectCountry(filteredCountries[highlightedIndex]);
+		} else {
+			selectCountry(filteredCountries[0]);
+		}
+		showDropdown = false;
+		highlightedIndex = -1;
+	}
+}
+
+function scrollToHighlightedItem() {
+  const item = document.getElementById(`dropdown-item-${highlightedIndex}`);
+  if (item) item.scrollIntoView({ block: "nearest" });
+}
+
+
+
+
+
+
+	function handleEnter(event) {
+    if (event.key === "Enter" && filteredCountries.length > 0) {
         selectCountry(filteredCountries[0]);
         event.preventDefault();
     }
@@ -1180,6 +1214,7 @@ function verifyCaptcha() {
 											  placeholder="Search country"
 											  on:click={toggleDropdown}
 											  on:keydown={handleKeyDown}
+											 
 											  on:input={(e) => {
 												handleInputChange(e);
 												validateField("country", "input");
@@ -1215,19 +1250,29 @@ function verifyCaptcha() {
 										<ul
 											class="max-h-60 overflow-y-auto text-sm"
 										>
-											{#each filteredCountries as country (country.name)}
+											{#each filteredCountries as country, index  (country.name)}
 												<!-- svelte-ignore a11y-click-events-have-key-events -->
 												<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 												<li
-													on:click={() =>
-														selectCountry(
-															country,
-														)}
-													class="px-4 py-2 cursor-pointer hover:bg-gray-100"
-												>
-													{country.name}
-													({country.code})
-												</li>
+	id={`dropdown-item-${index}`}
+	class="px-4 py-2 cursor-pointer {highlightedIndex === index
+	? 'bg-primary-100'
+	: 'hover:bg-primary-50'}"
+	on:click={() => selectCountry(country)}
+>
+{country.name} ({country.code})
+</li>
+
+<!-- <li
+                          on:click={() => selectCountry(country)}
+                          class="px-4 py-2 cursor-pointer {highlightedIndex === index
+                            ? 'bg-primary-100'
+                            : 'hover:bg-primary-50'}"
+                        >
+                          {country.name} ({country.code})
+                        </li> -->
+
+
 											{/each}
 											{#if filteredCountries.length === 0}
 												<div

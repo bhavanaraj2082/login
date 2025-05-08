@@ -116,11 +116,41 @@ function filterCountries(event) {
 
 
 
+// function handleKeyDown(event) {
+//     if (event.key === "Enter" && country.length >= 3 && filteredCountries.length > 0) {
+//         selectCountry(filteredCountries[0]);
+//         event.preventDefault();
+//     }
+// }
+
+let highlightedIndex = -1;
+
 function handleKeyDown(event) {
-    if (event.key === "Enter" && country.length >= 3 && filteredCountries.length > 0) {
+if (!showDropdown) return;
+
+if (event.key === 'ArrowDown') {
+    event.preventDefault();
+    highlightedIndex = (highlightedIndex + 1) % filteredCountries.length;
+    scrollToHighlightedItem();
+} else if (event.key === 'ArrowUp') {
+    event.preventDefault();
+    highlightedIndex = (highlightedIndex - 1 + filteredCountries.length) % filteredCountries.length;
+    scrollToHighlightedItem();
+} else if (event.key === 'Enter') {
+    event.preventDefault();
+    if (highlightedIndex >= 0) {
+        selectCountry(filteredCountries[highlightedIndex]);
+    } else {
         selectCountry(filteredCountries[0]);
-        event.preventDefault();
     }
+    showDropdown = false;
+    highlightedIndex = -1;
+}
+}
+
+function scrollToHighlightedItem() {
+const item = document.getElementById(`dropdown-item-${highlightedIndex}`);
+if (item) item.scrollIntoView({ block: "nearest" });
 }
 
 const validateField = (name, value) => {
@@ -341,12 +371,21 @@ const handleSubmit =({cancel})=>{
                     </div>
                           {#if showDropdown}
                             <ul class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-auto">
-                              {#each filteredCountries as { name, code }}
+                              {#each filteredCountries as { name, code },index}
                                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                                <li on:click|stopPropagation={() => selectCountry({ name, code })} class="cursor-pointer px-1 py-0 sm:text-sm text-xs hover:bg-gray-200">
+                                <!-- <li on:click|stopPropagation={() => selectCountry({ name, code })} class="cursor-pointer px-1 py-0 sm:text-sm text-xs hover:bg-gray-200">
                                   <option value={code}>{name} ({code})</option>
-                                </li>
+                                </li> -->
+                                <li
+	id={`dropdown-item-${index}`}
+	class="px-4 py-2 cursor-pointer {highlightedIndex === index
+	? 'bg-primary-100'
+	: 'hover:bg-primary-50'}"
+	on:click|stopPropagation={() => selectCountry({ name, code })}
+>
+{name} ({code})
+</li>
                               {/each}
                               {#if filteredCountries.length === 0}
                                 <li class="px-2 py-1 text-gray-500">No results found</li>
