@@ -125,7 +125,7 @@ let stateSearch = '';
 
   // Reactive filteredStates: filter states by search input
   $: filteredStates = stateSearch
-    ? states.filter(s => s.toLowerCase().includes(stateSearch.toLowerCase()))
+    ? states.filter(s => s.toLowerCase().startsWith(stateSearch.toLowerCase()))
     : states;
 
   // Function to select a state from the dropdown
@@ -238,6 +238,29 @@ if (event.key === 'ArrowDown') {
     showDropdown = false;
     highlightedIndex = -1;
 }
+}
+let activeIndex= -1;
+function handleKeyDown1(e) {
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    activeIndex = (activeIndex + 1) % filteredStates.length;
+    scrollToHighlightedItem1();
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    activeIndex = (activeIndex - 1 + filteredStates.length) % filteredStates.length;
+    scrollToHighlightedItem1();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    const indexToSelect = activeIndex === -1 ? 0 : activeIndex;
+    if (filteredStates.length > 0) {
+      selectState(filteredStates[indexToSelect]);
+    }
+  }
+}
+
+function scrollToHighlightedItem1() {
+  const item = document.getElementById(`dropdown-item-${activeIndex}`);
+  if (item) item.scrollIntoView({ block: "nearest" });
 }
 
 function scrollToHighlightedItem() {
@@ -485,20 +508,28 @@ const handleSubmit = ({ cancel }) => {
                           class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-none "
                           type="text"
                           name="state" id="" bind:value={stateSearch }
+                          on:keydown={handleKeyDown1}
                           on:input={() => {
                             showStateDropdown = true;
                             if (stateSearch.length < 2) autoSelectedStateOnce = false;
-                          }}
-                          on:focus={() => (showStateDropdown = true)}
-                          on:keydown={(e) => {
-                            if (e.key === 'Enter' && filteredStates.length > 0) {
-                              e.preventDefault();
-                              selectState(filteredStates[0]);
-                            }
+                            activeIndex = -1;
                           }}
                           placeholder="Search state"
                           autocomplete="off"
                         />
+
+                        <!-- on:input={() => {
+                          showStateDropdown = true;
+                          if (stateSearch.length < 2) autoSelectedStateOnce = false;
+                        }}
+                        on:focus={() => (showStateDropdown = true)}
+                        on:keydown={(e) => {
+                          if (e.key === 'Enter' && filteredStates.length > 0) {
+                            e.preventDefault();
+                            selectState(filteredStates[0]);
+                          }
+                        }} -->
+
                         <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="h-5 w-5 text-gray-500 transition-transform duration-200 cursor-pointer mr-2"
@@ -520,14 +551,14 @@ const handleSubmit = ({ cancel }) => {
                           <ul
                             class="absolute z-10 bg-white border border-gray-200 w-full max-h-40 overflow-y-auto text-xs mt-1 shadow"
                           >
-                            {#each filteredStates as option}
+                            {#each filteredStates as option, index}
                               <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                              <li
-                                class="px-2 py-1 cursor-pointer sm:text-sm text-xs hover:bg-gray-200"
-                                on:click={() => selectState(option)}
-                              >
-                                {option}
-                              </li>
+                              <li id={`dropdown-item-${index}`} 
+                              class=" py-1 cursor-pointer hover:bg-primary-100 {index === activeIndex ? 'bg-primary-100 font-semibold' : ''}"
+                              on:click={() => selectState(option)}
+                            >
+                              {option}
+                            </li>
                             {/each}
                             {#if filteredStates.length === 0}
                               <li class="px-2 py-1 text-gray-500">No results</li>
