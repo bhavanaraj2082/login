@@ -265,6 +265,7 @@ function selectCountry(selectedCountry) {
   // validatePhoneNumber(country, phone);
   showDropdown = false;
 }
+updateCurrency(country);
 </script>
 
 <!-- {#each data.records as product} -->
