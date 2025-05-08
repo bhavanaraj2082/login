@@ -360,6 +360,7 @@ export const checkoutOrder = async (order) => {
 			const stock = await Stock.findOneAndUpdate({_id:rec.stockId},{$inc:{orderedQty:rec.orderQty}},{new:true})
 			//console.log(stock);
 			await StockLog.create({
+				 orderId:newOrder.orderid,
                  productId:rec.productId,
                  stockId:rec.stockId,
 				 manufacturerId:rec.manufacturerId,

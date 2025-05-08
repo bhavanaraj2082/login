@@ -1,6 +1,7 @@
 import mongoose from "mongoose"
 
 const stockLogsSchema = new mongoose.Schema({
+    orderId:Number,
     productId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Product"

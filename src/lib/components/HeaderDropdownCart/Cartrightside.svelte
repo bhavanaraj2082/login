@@ -23,7 +23,25 @@
 	let form2;
 	let isLoggedIn = $authedUser?.id ? true : false;
 	let selectedId = ''
+	let container
+	let addToCartModal = false
 
+	const handleClick = (e) => {
+		if (!container.contains(e.target)) {
+			addToCartModal = !addToCartModal;
+		}
+	};
+
+	function handleCart({ cancel }) {
+		return async ({ result }) => {
+			// console.log(result);
+			addToCartModal = !addToCartModal;
+			removeFromCart();
+			calculateTotalPrice($cart)
+			toast.success('Components are added to cart');
+			form.requestSubmit()
+		};
+	}
 	function formatPriceToNumber(priceString) {
 		if (!priceString) return 0;
 		const formattedPrice = String(priceString)
@@ -295,16 +313,13 @@
 		return async ({ result }) => {
 			// console.log("result from page server for carat data",result.data);
 			const totalComps = result.data?.cart[0]?.cartItems.length;
-			// console.log("totalComps",totalComps);
 			localStorage.setItem("totalCompsChemi", totalComps);
-			
-
-			
 			cartId = result.data?.cart[0]?.cartId;
+			//console.log("totalComps",cartId);
 			filteredGuestCart = $guestCart.filter(guestItem => 
             !$cart.some(cartItem => cartItem.productId === guestItem.productId)
             );
-			if(isLoggedIn && filteredGuestCart.length && !cartId.length){
+			if(isLoggedIn && filteredGuestCart.length && !cartId?.length){
 	    	const formdata = new FormData()
 	    	formdata.append("guestCart",JSON.stringify(filteredGuestCart))
 	    	sendMessage("/cart?/newcart",formdata,(result)=>{
@@ -592,6 +607,54 @@
 					{/if}
 				</div>
 			</div>
+		</div>
+	</div>
+{/if}
+
+
+{#if isLoggedIn  && filteredGuestCart.length && cartId?.length}
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div
+		on:click={handleClick}
+		class="fixed {addToCartModal ? 'hidden' : ''} inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+	>
+		<div bind:this={container} class="bg-white relative p-6 rounded-md shadow-lg w-11/12 sm:w-3/5 md:w-2/5 2xl:w-2/6 space-y-2">
+            <button on:click={()=>{
+				addToCartModal = !addToCartModal
+				browser ? localStorage.clear() : ""
+				invalidate("data:cart")
+			}} class=" absolute right-5 top-5">
+				<Icon icon="maki:cross" class=" text-lg sm:text-xl"/>
+			</button>
+			<Icon
+				icon="fa-solid:cart-plus"
+				width="60"
+				height="60"
+				class=" w-full text-center text-primary-600"
+			/>
+			<h1 class=" font-medium pt-2">You have added components to cart before SignIn</h1>
+			<p class=" text-sm">{cartId.length ? "Are you willing to add in existing cart or create a new cart": "Create a new cart"}</p>
+			<form method="POST" use:enhance={handleCart} class=" w-full flex items-center gap-6">
+				{#if isLoggedIn && filteredGuestCart.length}
+					<input type="hidden" name="cartId" value={cartId} />
+				{/if}
+				<input type="hidden" name="guestCart" value={JSON.stringify(filteredGuestCart)} />
+				{#if cartId.length}
+					<button
+						type="submit"
+						formaction="/cart?/existingcart"
+						class=" py-2 bg-primary-600 w-full rounded-md text-white font-medium text-sm"
+						>Existing Cart</button
+					>
+				{/if}
+				<button
+					type="submit"
+					formaction="/cart?/newcart"
+					class=" py-2 bg-primary-600 w-full rounded-md text-white font-medium text-sm"
+					>New Cart</button
+				>
+			</form>
 		</div>
 	</div>
 {/if}

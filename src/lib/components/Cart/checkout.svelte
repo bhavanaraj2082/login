@@ -385,7 +385,7 @@
 						<p>Subtotal</p>
 						<div class=" flex flex-col items-end">
 						<p class=" font-semibold">{$currencyState === "inr" ? "₹" + priceINR.toLocaleString("en-IN"): "$"+ priceUSD.toLocaleString("en-IN")}</p>
-                         <span class=" text-xs">including GST(18%)</span>
+                         <span class=" text-xs">{!$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india") ? "Excluding" : "Including"} GST(18%)</span>
 						</div>
 					</div>
 					<div class="flex justify-between font-medium text-sm">
@@ -482,7 +482,7 @@
 								<div class="ml-2">
 									<p class="text-sm text-black font-semibold">{item?.productDetails?.productNumber}</p>
 									<p class=" text-gray-800 text-xs lg:text-3s font-medium">{item?.productDetails?.productName}</p>
-									<p class=" text-gray-600 text-xs font-semibold">{item?.currentPrice?.break}</p>
+									<p class=" text-gray-600 text-xs font-semibold">{item?.stockDetails?.pricing?.break}</p>
 									<p class=" {item.quantity > item?.stockDetails?.stock ? " text-red-500" :" text-green-500"} text-xs font-semibold">
 										{item.quantity > item?.stockDetails?.stock ? item.quantity - item?.stockDetails?.stock + " Back Order" : item?.stockDetails?.stock + " In Stock"}
 										<span class="{item.quantity > item?.stockDetails?.stock ? "" : " hidden"} text-green-500 ml-1">{item?.stockDetails?.stock + " In Stock"}</span>
