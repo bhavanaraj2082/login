@@ -1185,7 +1185,7 @@
                 {#if showDropdown}
                   <div
                     bind:this={dropdownEl}
-                    class="absolute w-full top-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
+                    class="absolute w-full top-full mt-px bg-white border border-gray-300 rounded-md shadow-lg z-10"
                   >
                     <ul class="max-h-60 overflow-y-auto text-sm">
                       {#each filteredCountries as country, index}

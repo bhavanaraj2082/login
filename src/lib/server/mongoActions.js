@@ -39,6 +39,7 @@ import Return from '$lib/server/models/Return.js';
 import Counter from '$lib/server/models/Counter.js';
 import { sendEmail } from '$lib/server/utils/sendEmail.js';
 import PartRequest from '$lib/server/models/PartRequest.js';
+
 async function conversionRates() {
 	const rates = await Curconversion.find().exec();
 	const currentRates = {};
@@ -776,61 +777,6 @@ const sendVerificationEmail = async (email, verificationUrl) => {
 	}
 };
 
-
-const sendVerificationEmailSignup = async (email, verificationUrl) => {
-	const transporter = nodemailer.createTransport({
-		service: 'partskeys',
-		host: MAIL_HOST,
-		port: 587,
-		secure: false,
-		auth: {
-			user: SENDER_EMAIL,
-			pass: SENDER_PASSWORD
-		}
-	});
-
-	const mailOptions = {
-		from: SENDER_EMAIL,
-		to: email,
-		subject: 'Email Verification for Your Account',
-		html: `
-		<html>
-			<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-				<div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-					<h2 style="color: #333333; text-align: center; font-size: 24px;">Verify Your Email Address</h2>
-					<p style="font-size: 16px; color: #555555; line-height: 1.5; text-align: center;">
-						Hi there,<br/><br/>
-						Welcome to ${PUBLIC_WEBSITE_NAME}! Please verify your email address by using the OTP below.
-					</p>
-					<div style="text-align: center; margin: 20px 0;">
-						<span style="display: inline-block; font-size: 20px; font-weight: bold; color: #333333; padding: 10px 20px; background-color: #f0f0f0; border-radius: 4px;">
-							${verificationUrl}
-						</span>
-					</div>
-					<p style="font-size: 14px; color: #777777; text-align: center; margin-top: 30px;">
-						If you didn't sign up for this account, you can ignore this email.
-					</p>
-					<p style="font-size: 14px; color: #777777; text-align: center;">
-						Thanks,<br/>
-						The ${PUBLIC_WEBSITE_NAME} Team
-					</p>
-				</div>
-			</body>
-		</html>
-		`
-	};
-
-	try {
-		const result = await transporter.sendMail(mailOptions);
-		console.log('Verification email sent: ', result);
-		return true;
-	} catch (error) {
-		console.error('Error sending verification email:', error);
-		return false;
-	}
-};
-
-
 const sendVerificationEmailform = async (email, verificationUrl) => {
 	const transporter = nodemailer.createTransport({
 	  service: "partskeys",
@@ -895,11 +841,16 @@ const sendVerificationEmailform = async (email, verificationUrl) => {
   };
 
 export const sendemailOtp = async (email) => {
-	const otp = Math.floor(100000 + Math.random() * 900000).toString();
-	console.log(otp,"OTP");
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const emailSent = await sendVerificationEmailform(email, otp);
+    console.log(otp, "OTP sent");
 	
-    // const token = uuidv4();
-	const expiry = new Date(Date.now() + 5 * 60 * 1000);
+    if (!emailSent) {
+        console.log("Failed to send email");
+        return null;
+    }
+
+    const expiry = new Date(Date.now() + 5 * 60 * 1000);
     const existingRecord = await TokenVerification.findOne({ email });
 
     if (existingRecord) {
@@ -915,9 +866,7 @@ export const sendemailOtp = async (email) => {
         });
     }
 
-    const verificationUrl = otp;
-    const emailSent = await sendVerificationEmailform(email, verificationUrl);
-    return emailSent ? verificationUrl : null;
+    return otp;
 };
 
 export async function verifyemailOtp(email, enteredOtp) {
@@ -1644,6 +1593,14 @@ export const ResetPassword = async (body) => {
 
   export const generateVerificationUrl = async (email, userId) => {
 	const token = uuidv4();
+	const verificationUrl = token;
+
+	const emailSent = await sendVerificationEmail(email, verificationUrl);
+
+	if (!emailSent) {
+        console.log("Failed to send email");
+        return null;
+    }
 
 	await TokenVerification.create({
 		email,
@@ -1652,10 +1609,6 @@ export const ResetPassword = async (body) => {
 		userId: userId,
 		expiry: new Date(Date.now() + 24 * 60 * 60 * 1000)
 	});
-
-	const verificationUrl = token;
-
-	const emailSent = await sendVerificationEmail(email, verificationUrl);
 
 	return emailSent ? verificationUrl : null;
 };
