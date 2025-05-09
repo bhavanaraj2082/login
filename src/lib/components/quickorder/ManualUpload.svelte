@@ -12,6 +12,7 @@
   import { countries, phoneNumberPatterns } from "$lib/Data/constants.js";
   let highlightedIndex = -1;
   let dropdownEl;
+  let dropdownRef;
   let dropdownContainer;
   let uploadedRows = [];
   let showSavedCarts = false;
@@ -1203,7 +1204,7 @@
             ) {
                 selectCountry(filteredCountries[highlightedIndex]);
                 event.preventDefault();
-            } else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
+            } else if (searchTerm) {
                 selectCountry(filteredCountries[0]);
                 event.preventDefault();
             }
@@ -1334,11 +1335,16 @@
       return true;
     }
   }
-  function handleClickOutside(event) {
-  if (showDropdown && dropdownContainer && !dropdownContainer.contains(event.target)) {
-    showDropdown = false;
-  }
-}
+//   function handleClickOutside(event) {
+//   if (showDropdown && dropdownContainer && !dropdownContainer.contains(event.target)) {
+//     showDropdown = false;
+//   }
+// }
+function handleClickOutside(event) {
+		if (!dropdownRef?.contains(event.target)) {
+			showDropdown = false;
+		}
+	}
   onMount(() => {
         document.addEventListener("click", handleClickOutside);
         return () => document.removeEventListener("click", handleClickOutside);
@@ -1829,7 +1835,7 @@
       on:click|self={hideDetails}
     >
       <div
-        class="bg-white p-8 rounded-lg relative shadow-lg max-w-xl w-full sm:w-auto mx-4 sm:mx-0"
+      class="bg-white rounded-lg w-full max-w-lg p-6 md:p-8 mx-4 md:mx-0 relative shadow-lg"
         on:click|self={hideDetails}
       >
         <button
@@ -1843,7 +1849,7 @@
           />
         </button>
 
-        <h3 class="text-xl font-bold text-left">
+        <h3 class="text-xl font-bold text-left mb-2 border-b-1 pb-3">
           Availability for {selectedProduct.productNumber} - {selectedProduct.size}
         </h3>
         <p class="text-gray-500 mb-10 text-left mt-2">
@@ -1898,9 +1904,9 @@
               name="quantity"
               value={selectedProduct.quantity}
             />
-
+            <div class="flex items-center space-x-4 border border-gray-300 rounded">
             <button
-              class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-md border border-gray-300 hover:bg-primary-50 transition"
+            class="w-8 h-8 text-primary-400 flex items-center justify-center"
               on:click|preventDefault={decreaseQuantity}
             >
               <Icon icon="ic:round-minus" class="text-xl" />
@@ -1911,7 +1917,7 @@
               min="1"
               maxlength="4"
               bind:value={selectedProduct.quantity}
-              class="w-16 h-10 text-center p-2 border border-gray-300 rounded-md outline-none focus:ring-0 focus:none focus:border-primary-400"
+  class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
               on:focus={(e) => {
                 e.target.dataset.previousValue = e.target.value;
 
@@ -1972,11 +1978,12 @@
               max="9999"
             />
             <button
-              class="flex justify-center items-center w-16 h-10 bg-white text-primary-500 rounded-md border border-gray-300 hover:bg-primary-50 transition"
+class="w-8 h-8 text-primary-400 flex items-center justify-center"
               on:click|preventDefault={increaseQuantity}
             >
               <Icon icon="ic:round-plus" class="text-xl" />
             </button>
+            </div>
             <div class="flex justify-end w-full">
               <button
                 type="submit"
@@ -2290,71 +2297,47 @@
               <p class="text-red-500 text-xs">{formErrors.organisation}</p>
             {/if}
           </div>
-          <div class="relative mb-4 dropdown-parent" bind:this={dropdownContainer}>
-            <label for="country" class="block text-sm font-medium text-gray-700">
-              Country
-            </label>
-            <input
-              type="text"
-              id="country"
-              name="country"
-              bind:value={country}
-              placeholder="Search country"
-              on:input={handleInputChange}
-              on:click={(e) => {
-                e.stopPropagation();
-                toggleDropdown();
-              }}
-              on:keydown={handleKeyDown}
-              class="w-full px-4 py-2 border hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 border-gray-300 rounded-md mt-1"
-            />
-            <Icon
-              icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
-              class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
-              on:click={(e) => {
-                e.stopPropagation();
-                toggleDropdown();
-              }}
-            />
-            {#if showDropdown}
-              <div
-                bind:this={dropdownEl}
-                class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
-              >
-                <ul class="max-h-60 overflow-y-auto text-sm">
-                  {#each filteredCountries as country, index}
-                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div class="mb-4">
+            <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
+            <div class="relative">
+              <input
+                type="text"
+                name="country"
+                bind:value={country}
+                placeholder="Search Country"
+                on:input={handleInputChange}
+                on:click={toggleDropdown}
+                on:keydown={handleKeyDown}
+                class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
+              />
+              <Icon icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"} class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs mr-1" />
+              {#if showDropdown}
+                <ul bind:this={dropdownEl} class="absolute bg-white border w-full mt-px z-10 max-h-60 overflow-y-auto rounded-md shadow">
+                  {#each filteredCountries as countryItem, index}
                     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                     <li
-                      on:click={(e) => {
-                        e.stopPropagation();
-                        selectCountry(country);
-                      }}
-                      class="px-4 py-2 cursor-pointer {highlightedIndex === index
-                        ? 'bg-primary-100'
-                        : 'hover:bg-primary-50'}"
+                      class="px-4 py-2 text-sm cursor-pointer hover:bg-primary-50 {highlightedIndex === index ? 'bg-primary-50' : ''}"
+                      on:click={() => selectCountry(countryItem)}
                     >
-                      {country.name} ({country.code})
+                      {countryItem.name} ({countryItem.code})
                     </li>
                   {/each}
                   {#if filteredCountries.length === 0}
-                    <div class="flex items-center px-4 py-3">
-                      <Icon
-                        icon="tabler:info-square-rounded-filled"
-                        class="text-red-500 text-base mr-2"
-                      />
-                      <li class="text-gray-800 text-xs">
-                        No matching countries found!
-                      </li>
-                    </div>
-                  {/if}
+                  <div class="flex items-center px-4 py-3">
+                    <Icon
+                      icon="tabler:info-square-rounded-filled"
+                      class="text-red-500 text-base mr-2"
+                    />
+                    <li class="text-gray-800 text-xs">
+                      No matching countries found!
+                    </li>
+                  </div>
+                {/if}
                 </ul>
-              </div>
-            {/if}
-            {#if formErrors?.country}
-              <p class="text-red-500 text-xs mt-1">
-                {formErrors.country}
-              </p>
+              {/if}
+            </div>
+            {#if formErrors.country}
+              <p class="text-red-500 text-xs">{formErrors.country}</p>
             {/if}
           </div>
           <div class="mb-4">
@@ -2373,6 +2356,10 @@
                 phone = phone.replace(/[^+\d]/g, "").trim();
               }}
             />
+            <div class="text-base">
+              <Icon icon="carbon:location-info-filled" class="inline-block text-primary-400" />
+              <span class="text-2s text-gray-600">Enter phone number without country code</span>
+            </div>
             {#if formErrors.phone}
               <p class="text-red-500 text-xs">{formErrors.phone}</p>
             {/if}
@@ -2643,13 +2630,13 @@
           <div class="flex justify-between items-center mt-4">
             <button
               on:click={toggleQuoteModal}
-              class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-2 px-5 rounded-lg shadow-md transition duration-300 ease-in-out"
+             class="bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm py-1.5 px-4 rounded"
             >
               Close
             </button>
             <button
               type="submit"
-              class="bg-gradient-to-r from-primary-400 to-primary-500 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transform hover:scale-105 transition duration-300 ease-in-out"
+ class="bg-primary-500 hover:bg-primary-600 text-white text-sm rounded py-1.5 px-4"
               on:keydown={(event) => {
                 if (event.key === "Enter") {
                   event.preventDefault();
