@@ -17,6 +17,14 @@ function updateCell(rowIndex, cellIndex, event) {
     data.rows[rowIndex][cellIndex] = event.target.textContent.trim();
     data = { ...data }; 
 }
+
+const scrollToStep = (stepId) => {
+		const element = document.getElementById(stepId);
+		if (element) {
+			element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}
+	};
+
     let fileInput;
 	import * as XLSX from 'xlsx';
 	import Icon from "@iconify/svelte";
@@ -241,6 +249,7 @@ if (invalidRows.length > 0) {
 			unsubscribe();
 		});
 		const saveAndContinue = () => {
+			scrollToStep('step2');
 			if (!isFormData) { 
     errorMessage = "Please fill all the fields.";
     setTimeout(() => {
@@ -270,12 +279,7 @@ else if (selectedSolvent === "Yes") {
     }
 });
 
-const scrollToStep = (stepId) => {
-		const element = document.getElementById(stepId);
-		if (element) {
-			element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-		}
-	};
+
 
 const handleEdit = (step, toggleFn) => {
 		toggleFn();

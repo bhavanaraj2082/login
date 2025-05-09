@@ -28,7 +28,7 @@
     import { onMount, onDestroy } from 'svelte';
 
 let containerRef;
-
+let showErrors = false;
 let handleClickOutside;
 
 onMount(() => {
@@ -281,17 +281,20 @@ const validateForm = () => {
 
 const handleSubmit =({cancel})=>{
     // const isCountryValid = otherstr();
+    showErrors = true;
     
 
         if(!validateForm()){
             cancel()
         }
-    return async({result,update})=>{
+    return async({result})=>{
         console.log('form result==>',result)
         if(result.type === "success"){
             toggleEdit = false
             dispatch("onSuccess",result.data)
-            await update()
+            // await update()
+            location.reload()
+
         }
     }
 }
@@ -310,7 +313,7 @@ const handleSubmit =({cancel})=>{
                         <span class=" text-sm font-bold text-red-500">*</span>First Name</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500"
                      type="text" name="firstName" bind:value={firstName} on:input={()=>{firstName=firstName.trimStart();validateField("firstName", firstName);}}/>
-                     {#if errors?.firstName}
+                     {#if showErrors && errors?.firstName}
 					<span class="text-red-600 text-xs">{errors.firstName}</span>
 				     {/if}
                 </div>
@@ -402,7 +405,7 @@ const handleSubmit =({cancel})=>{
                 <label class=" text-xs md:text-sm font-medium" for="cellPhone"><span class=" text-sm font-bold text-red-500">*</span>Primary Phone</label><br>
                 <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                 type="text" name="cellPhone" bind:value={cellPhone} on:input={()=>{cellPhone=cellPhone.trimStart();validateField("cellPhone", cellPhone);checkcountry();}}/>
-                {#if errors?.cellPhone}
+                {#if showErrors && errors?.cellPhone}
 				    <span class="text-red-600 text-xs">{errors.cellPhone}</span>
 			    {/if}
             </div>
@@ -470,7 +473,7 @@ const handleSubmit =({cancel})=>{
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
                 <button type="button" on:click={()=>{
                     toggleEdit = false
-                    // window.location.reload()
+                    window.location.reload()
                 }} class=" w-full rounded-md py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
                 <button type="submit" class=" w-full rounded-md py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Submit</button>
             </div>
@@ -495,13 +498,28 @@ const handleSubmit =({cancel})=>{
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <!-- svelte-ignore a11y-no-static-element-interactions -->
                     <!-- svelte-ignore a11y-missing-attribute -->
-                    {#if !firstName}
+
+                    <!-- {#if !firstName}
                     <a on:click={() => toggleEdit = true} class="text-primary-500 font-medium ml-2 text-sm hover:underline cursor-pointer">
                         Update Name
                     </a>
                     {:else}
                         <p class="ml-2 text-sm">{firstName || "Update Name"} {lastName || ""}</p>
-                    {/if}
+                    {/if} -->
+                    {#if firstName && firstName !== 'N/A' || lastName && lastName !== 'N/A'}
+                    <span class="text-description text-xs sm:text-sm">{firstName}</span>
+                  {:else}
+                    <span class="text-description text-xs sm:text-sm">
+                      {#if email && email.includes('@')}
+                        {email.split('@')[0]}
+                      {:else}
+                        {email}
+                      {/if}
+                    </span>
+                  {/if}
+
+
+
                 </div>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2">
                     <label class="text-xs md:text-sm font-semibold" for="cellPhone">
@@ -552,23 +570,23 @@ const handleSubmit =({cancel})=>{
                 <h2 class="font-semibold text-4s border-b-1 pb-2 pt-5">Business Information</h2>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
                     <h4 class="font-normal text-sm">Company Name:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{companyName || "__"}</p>
+                    <p class=" text-sm ml-2 font-semibold">{companyName || "--"}</p>
                 </div>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
                     <h4 class=" font-normal text-sm">Company Type:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{companytype || "__"}</p>
+                    <p class=" text-sm ml-2 font-semibold">{companytype || "--"}</p>
                 </div>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
                     <h4 class=" font-normal text-sm">Job Title:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{jobtitle || "__"}</p>
+                    <p class=" text-sm ml-2 font-semibold">{jobtitle || "--"}</p>
                 </div>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
                     <h4 class=" font-normal text-sm">GST Number:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{gstNumber || "__"}</p>
+                    <p class=" text-sm ml-2 font-semibold">{gstNumber || "--"}</p>
                 </div>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
                     <h4 class=" font-normal text-sm">TAN Number:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{tanNumber || "__"}</p>
+                    <p class=" text-sm ml-2 font-semibold">{tanNumber || "--"}</p>
                 </div>
             </div>
         </div>
