@@ -7,7 +7,6 @@ import {
 } from "$env/static/private";
 import FooterLink from "$lib/server/models/FooterLink.js";
 import { singleCartForCount, getCart } from "$lib/server/mongoLoads.js";
-import {} from "../lib/server/mongoActions.js";
 
 export async function load() {
   try {

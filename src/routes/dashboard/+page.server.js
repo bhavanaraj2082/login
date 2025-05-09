@@ -1,5 +1,4 @@
 import { getUserProfileData, getProfileDetails } from '$lib/server/mongoLoads.js';
-// import { getProfileDetails } from '$lib/server/mongoLoads.js';
 
 export const load = async ({ locals }) => {
   try {
@@ -24,7 +23,6 @@ export const load = async ({ locals }) => {
       };
     }
 
-    // Get full user data including orders, quotes, etc.
     const userData = await getUserProfileData(locals.authedUser.id);
     
     return {
