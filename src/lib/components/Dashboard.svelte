@@ -6,10 +6,11 @@
   import cardsData from '$lib/data/cardsData.json';
 
   export let data;
-
+  
   let user = data?.authedUser || null;
+  // console.log('user--data',user)
   $: orders = data?.orders || [];
-  $: isRegistrationComplete = user && user.firstname && user.phone;
+  $: isRegistrationComplete = user && user?.firstname && user?.phone;
   $: navigationProps = {
     user,
     isRegistrationComplete
@@ -55,7 +56,7 @@
             {:else}
             <div>
               <h1 class="sm:text-xl text-md font-semibold text-gray-800">
-                Welcome, <span class="text-primary-600 capitalize">{user?.firstname || 'Guest'}</span>
+                Welcome, <span class="text-primary-600 capitalize">{user?.firstname || user?.username}</span>
               </h1>
               <p class="text-gray-500 sm:text-sm text-xs mt-1">{user?.email || 'N/A'}</p>
             </div>
