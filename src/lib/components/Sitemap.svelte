@@ -7,6 +7,7 @@
 	let searchTerm = "";
 	let expandedCategories1 = {};
 	let expandedCategories2 = {};
+	let expandedCategories4 = {};
 
 	let categories1 = updateCategoryNames(data1.categories1);
 	let categories2 = updateCategoryNames(data1.categories2);
@@ -19,11 +20,12 @@
 	let filteredCategories4 = [...categories4];
 	let manuallyExpanded1 = {};
 	let manuallyExpanded2 = {};
+	let manuallyExpanded4 = {};
 
 	function updateCategoryNames(categories) {
 		return categories.map((category) => {
 			if (category.name1 === "Chemistry And Biochemicals") {
-				category.name1 = "Chemistry & Biochemicals"
+				category.name1 = "Chemistry & Biochemicals";
 			}
 			if (
 				category.name1 === "Molecular Biology And Functional Genomics"
@@ -128,6 +130,9 @@
 		categories2.forEach((_, index) => {
 			if (!manuallyExpanded2[index]) expandedCategories2[index] = false;
 		});
+		categories4.forEach((_, index) => {
+			if (!manuallyExpanded4[index]) expandedCategories4[index] = false;
+		});
 	}
 
 	$: {
@@ -140,8 +145,10 @@
 		} else {
 			let newExpandedCategories1 = {};
 			let newExpandedCategories2 = {};
+			let newExpandedCategories4 = {};
 			manuallyExpanded1 = {};
 			manuallyExpanded2 = {};
+			manuallyExpanded4 = {};
 			filteredCategories1 = filterCategories(
 				categories1,
 				expandedCategories1,
@@ -168,11 +175,11 @@
 			);
 			filteredCategories4 = filterCategories(
 				categories4,
-				{},
+				expandedCategories4,
 				"name4",
 				"subcategories4",
 				"Resources",
-				false,
+				true,
 			);
 			expandedCategories1 = {
 				...expandedCategories1,
@@ -181,6 +188,10 @@
 			expandedCategories2 = {
 				...expandedCategories2,
 				...newExpandedCategories2,
+			};
+			expandedCategories4 = {
+				...expandedCategories4,
+				...newExpandedCategories4,
 			};
 		}
 	}
@@ -199,6 +210,12 @@
 			manuallyExpanded2[categoryIndex] =
 				expandedCategories2[categoryIndex];
 			expandedCategories2 = { ...expandedCategories2 };
+		} else if (categoryType === 4) {
+			expandedCategories4[categoryIndex] =
+				!expandedCategories4[categoryIndex];
+			manuallyExpanded4[categoryIndex] =
+				expandedCategories4[categoryIndex];
+			expandedCategories4 = { ...expandedCategories4 };
 		}
 	}
 
@@ -208,6 +225,7 @@
 		}
 		expandedCategories1 = {};
 		expandedCategories2 = {};
+		expandedCategories4 = {};
 	}
 
 	onMount(() => {
@@ -392,28 +410,48 @@
 		</h1>
 	{/if}
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 sm:gap-6 gap-0">
-		{#each filteredCategories4 as { name4, link4, subcategories4 }}
-			{#if filterCategories(categories4, {}, "name4", "subcategories4", "Resources", false)}
+		{#each filteredCategories4 as { name4, link4, subcategories4 }, index}
+			{#if filterCategories(categories4, expandedCategories4, "name4", "subcategories4", "Resources")}
 				<div class="break-inside-avoid mb-4 p-4">
 					<h2
-						class="text-sm font-semibold mb-4 border-b-1 border-description"
+						class="text-sm mb-4 border-b-1 border-description flex flex-nowrap"
 					>
 						<p class="text-gray-600 w-fit p-2 font-bold">
 							{name4}
 						</p>
+						<span class="py-2 text-1s"
+							>({subcategories4.length} items)</span
+						>
 					</h2>
 					{#if subcategories4 && subcategories4.length > 0}
 						<ul class="list-none pl-0 space-y-2">
-							{#each subcategories4 as { name4: subName4, link4: subLink4 }}
-								<li class="flex flex-wrap">
-									<a
-										href={subLink4}
-										class="px-2 text-gray-700 hover:underline text-xs break-words transition-transform transform hover:scale-105 hover:text-gray-800 hover:font-semibold ease-in-out duration-100 visited:text-primary-600 visited:hover:text-primary-600"
-										>{subName4}</a
+							{#each subcategories4 as { name4: subName4, link4: subLink4 }, i}
+								{#if i < 3 || expandedCategories4[index]}
+									<li
+										class="flex flex-wrap"
+										transition:slide={{ duration: 300 }}
 									>
-								</li>
+										<a
+											href={subLink4}
+											class="px-2 text-gray-700 hover:underline text-xs break-words transition-transform transform hover:scale-105 hover:text-gray-800 hover:font-semibold ease-in-out duration-100 visited:text-primary-600 visited:hover:text-primary-600"
+											>{subName4}</a
+										>
+									</li>
+								{/if}
 							{/each}
 						</ul>
+
+						{#if subcategories4.length > 3}
+							<button
+								on:click={(event) =>
+									toggleExpand(index, 4, event)}
+								class="mt-2 ml-2 text-xs text-primary-400 hover:text-white hover:bg-primary-400 hover:border-primary-400 p-1 border border-primary-400 rounded font-semibold see-more-btn"
+							>
+								{expandedCategories4[index]
+									? "Show Less"
+									: "See More..."}
+							</button>
+						{/if}
 					{/if}
 				</div>
 			{/if}
@@ -430,7 +468,9 @@
 				class="text-primary-500"
 			/>
 			<span class="mx-2">No results found.</span>
-			<span class="text-sm text-gray-500">Please try a different search.</span>
+			<span class="text-sm text-gray-500"
+				>Please try a different search.</span
+			>
 		</div>
 	{/if}
 </div>

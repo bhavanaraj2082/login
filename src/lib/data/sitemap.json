@@ -301,17 +301,54 @@
   ],
   "categories4": [
     {
-      "name4": "About",
+      "name4": "About Information",
       "link4": "/careers/about",
       "subcategories4": [
-          { "name4": "Corporate Profile", "link4": "/about-us" }
+          { "name4": "About Us", "link4": "/about-us" },
+          { "name4": "Newsroom", "link4": "/newsroom" },
+          { "name4": "Contact Us", "link4": "/contact-us" }
       ]
     },
     {
-      "name4": "Contact",
-      "link4": "/careers/contact",
+      "name4": "Help & Support",
+      "link4": "/careers/help-support",
       "subcategories4": [
-          { "name4": "Site Questions and Suggestions", "link4": "/help-support" }
+          { "name4": "Customer Support", "link4": "/help-support" },
+          { "name4": "FAQs", "link4": "/faq" },
+          { "name4": "Copyright Consent", "link4": "/copy-consent" },
+          { "name4": "Chemikart Solutions", "link4": "/ecom-solutions" }
+      ]
+    },
+    {
+      "name4": "Shopping & Orders",
+      "link4": "/careers/shopping-orders",
+      "subcategories4": [
+          { "name4": "Quick Order", "link4": "/quick-order" },
+          { "name4": "Quotes", "link4": "/quotes" },
+          { "name4": "My Favourites", "link4": "/dashboard/myfavourite" },
+          { "name4": "Cart", "link4": "/cart" },
+          { "name4": "Order Status", "link4": "/order-status" }
+      ]
+    },
+    {
+      "name4": "Legal & Terms",
+      "link4": "/careers/legal-terms",
+      "subcategories4": [
+          { "name4": "Privacy Notice", "link4": "/terms/privacy-notice" },
+          { "name4": "Site & Terms", "link4": "/terms/site-and-terms" },
+          { "name4": "General Terms of Sale", "link4": "/terms/conditions" },
+          { "name4": "Product Licenses", "link4": "/product-license" }
+      ]
+    },
+    {
+      "name4": "Safety & Compliance",
+      "link4": "/careers/safety-compliance",
+      "subcategories4": [
+          { "name4": "Product Safety", "link4": "/safety" },
+          { "name4": "Understanding Product Labels", "link4": "/safety/understanding-product-labels" },
+          { "name4": "Globally Harmonized System", "link4": "/safety/globally-harmonized-system" },
+          { "name4": "TSCA 8 Notification", "link4": "/safety/tsca-8-notification" },
+          { "name4": "Hazard & Precautions", "link4": "/safety/hazard-and-precautionary-statements" }
       ]
     }
   ]

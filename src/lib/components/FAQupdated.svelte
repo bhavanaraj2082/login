@@ -88,7 +88,7 @@
             <div class="space-y-3">
               {#each sections[activeIndex].faqs as { question, answer1, answer2 }, index}
                 <div
-                  class="relative shadow-md rounded-md p-4 cursor-pointer"
+                  class={`relative shadow-md rounded-md p-4 cursor-pointer border-t border-x hover:bg-gray-100 transition-all duration-300 ease-in-out ${expandedFAQIndex === index ? 'bg-gray-100' : ''}`}
                   on:click={() => toggleFAQ(index)}
                   role="button"
                   tabindex="0"
