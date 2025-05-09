@@ -59,7 +59,7 @@ const handleSubmit =()=>{
 }
 </script>
 
-<div class="shadow  rounded-md p-5 bg-white">
+<div class="shadow  rounded-md space-y-5 p-5 bg-white">
     <h1 class=" text-xl font-bold"> Manage Your Site Preferences</h1>
     {#if !toggleEdit}
        <div>

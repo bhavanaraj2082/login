@@ -20,7 +20,7 @@
 		} else {
 			showRequiredMessage = false;
 			tog3();
-			scrollToStep('step5');
+			// scrollToStep('step5');
 		}
 	};
 

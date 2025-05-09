@@ -349,7 +349,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
 
         {#if selectedRating === 'Website design & usability'}
         <legend class="text-sm font-semibold text-gray-900">Enhancing Website Performance and Customer Satisfaction</legend>
-          {#each ['Slow Website Loading Speed','Poor Mobile Responsiveness', 'Poor Search Functionality', 'Lack of Payment Options', 'Good Website design'] as issue}
+          {#each ['The website is loading slowly','Poor Mobile Responsiveness', 'Poor Search Functionality', 'Lack of Payment Options', 'Good Website design'] as issue}
             <div class="flex items-center gap-2">
               <input
                 type="checkbox"

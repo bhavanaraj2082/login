@@ -31,12 +31,13 @@ let dummy = {
     building:''
 }
 
-    let states = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa",
-    "Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh",
-    "Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan",
-    "Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal",
-    "Andaman and Nicobar Islands","Chandigarh","Dadra and Nagar Haveli and Daman and Diu","Lakshadweep","Delhi","Puducherry"
-    ];
+let states = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
+  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
+  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
+  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+];
 
 let showDropdown = false;
 let filteredCountries = countries;
@@ -276,7 +277,7 @@ const pattern = postalCodePatterns[country] || /^\d{6}$/;
                 errors.street = "Street is required";
             } else if (activeAddress.street.length < 3 || activeAddress.street.length > 100) {
                 errors.street = "Street must be between 3 and 100 characters";
-            } else if (!/^[A-Za-z0-9\s]+$/.test(activeAddress.street)) {
+            } else if (!/^[A-Z/a-z0-9\s]+$/.test(activeAddress.street)) {
                 errors.street = "Street must contain only letters, numbers, and spaces";
             } else {
                 delete errors.street;
@@ -300,8 +301,8 @@ const pattern = postalCodePatterns[country] || /^\d{6}$/;
         case 'city':
             if (!activeAddress.city) {
                 errors.city = "City is required";
-            } else if (activeAddress.city.length < 2 || activeAddress.city.length > 50) {
-                errors.city = "City must be between 2 and 50 characters";
+            } else if (activeAddress.city.length < 3 || activeAddress.city.length > 80) {
+                errors.city = "City must be between 3 and 80 characters";
             } else if (!/^[A-Za-z\s]+$/.test(activeAddress.city)) {
                 errors.city = "City must contain only letters and spaces";
             } else {
@@ -312,8 +313,8 @@ const pattern = postalCodePatterns[country] || /^\d{6}$/;
         case 'state':
             if (!activeAddress.state) {
                 errors.state = "State is required";
-            } else if (activeAddress.state.length < 2 || activeAddress.state.length > 50) {
-                errors.state = "State must be between 2 and 50 characters";
+            } else if (activeAddress.state.length < 3 || activeAddress.state.length > 80) {
+                errors.state = "State must be between 3 and 80 characters";
             } else if (!/^[A-Za-z\s]+$/.test(activeAddress.state)) {
                 errors.state = "State must contain only letters and spaces";
             } else {
@@ -353,7 +354,7 @@ const pattern = postalCodePatterns[country] || /^\d{6}$/;
         errors.street = "Street is required";
     } else if (activeAddress.street.length < 3 || activeAddress.street.length > 25) {
         errors.street = "Street must be between 3 and 25 characters";
-    } else if (!/^[A-Za-z0-9\s]+$/.test(activeAddress.street)) {
+    } else if (!/^[A-Z/a-z0-9\s]+$/.test(activeAddress.street)) {
         errors.street = "Street must contain only letters, numbers, and spaces";
     }
 
@@ -367,16 +368,16 @@ const pattern = postalCodePatterns[country] || /^\d{6}$/;
 
     if (!activeAddress.city) {
         errors.city = "City is required";
-    } else if (activeAddress.city.length < 2 || activeAddress.city.length > 25) {
-        errors.city = "City must be between 2 and 25 characters";
+    } else if (activeAddress.city.length < 3 || activeAddress.city.length > 80) {
+        errors.city = "City must be between 3 and 80 characters";
     } else if (!/^[A-Za-z\s]+$/.test(activeAddress.city)) {
         errors.city = "City must contain only letters and spaces";
     }
 
     if (!activeAddress.state) {
         errors.state = "State is required";
-    } else if (activeAddress.state.length < 2 || activeAddress.state.length > 25) {
-        errors.state = "State must be between 2 and 25 characters";
+    } else if (activeAddress.state.length < 3 || activeAddress.state.length > 80) {
+        errors.state = "State must be between 3 and 80 characters";
     } else if (!/^[A-Za-z\s]+$/.test(activeAddress.state)) {
         errors.state = "State must contain only letters and spaces";
     }
@@ -395,11 +396,28 @@ const pattern = postalCodePatterns[country] || /^\d{6}$/;
     return Object.keys(errors).length === 0;
 };
 
+function ValiditState(state, location) {
+  if (location === "India" && !states.includes(state)) {
+    return "Please select a valid state from the dropdown list.";
+  }
+  return null; // No error
+}
+let stateError = '';
+let showErrors = false;
+
+
+
 const handleSubmit = ({ cancel }) => {
-    if (!validateForm()) {
-        cancel(); 
-        return;
+  showErrors = true;
+
+     stateError = ValiditState(stateSearch, activeAddress.location);
+  if (!validateForm() || stateError) {
+    if (stateError) {
+      console.error(stateError); // Log the error or handle it as needed
     }
+    cancel(); 
+    return;
+  }
     return async ({ result, update }) => {
         if (result.type === "success") {
             await update();
@@ -504,12 +522,19 @@ const handleSubmit = ({ cancel }) => {
 
                     <div class="relative w-full text-xs" bind:this={stateDropdownRef}>
                         <div class="flex items-center border border-gray-300 rounded my-1 overflow-hidden">
-                        <input
-                          class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-none "
+                          <input
+                          class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-none"
                           type="text"
-                          name="state" id="" bind:value={stateSearch }
+                          name="state"
+                          id=""
+                          bind:value={stateSearch}
                           on:keydown={handleKeyDown1}
                           on:input={() => {
+                            const error = ValiditState(stateSearch, activeAddress.location);
+                            stateError = ValiditState(stateSearch, activeAddress.location) || '';
+                            if (error) {
+                              console.error(error); // Handle the error as needed
+                            }
                             showStateDropdown = true;
                             if (stateSearch.length < 2) autoSelectedStateOnce = false;
                             activeIndex = -1;
@@ -517,6 +542,7 @@ const handleSubmit = ({ cancel }) => {
                           placeholder="Search state"
                           autocomplete="off"
                         />
+                        
 
                         <!-- on:input={() => {
                           showStateDropdown = true;
@@ -566,10 +592,19 @@ const handleSubmit = ({ cancel }) => {
                           </ul>
                         {/if}
                       </div>
-                      {#if !stateSearch}
+                      <!-- {#if !stateSearch && showErrors}
                       <span class="text-red-500 text-xs block">State is required</span>
+                    {/if} -->
+
+                    {#if !stateSearch && showErrors}
+                    <span class="text-red-500 text-xs block">State is required</span>
+                    {:else if  stateError}
+                    <span class="text-red-500 text-xs block">{stateError}</span> 
                     {/if}
-                    
+
+                    <!-- {#if stateError}
+                    <span class="text-red-500 text-xs block">{stateError}</span>
+                    {/if} -->
                     {:else}
                          <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                     type="text" name="state" bind:value={activeAddress.state } on:input={() => {validateField('state');activeAddress.state=activeAddress.state.trimStart();}}/>
@@ -588,7 +623,7 @@ const handleSubmit = ({ cancel }) => {
                         <span class=" text-sm font-bold text-red-500">*</span>City</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                     type="text" name="city" bind:value={activeAddress.city } on:input={() => {validateField('city');activeAddress.city=activeAddress.city.trimStart()}}/>
-                    {#if errors?.city}
+                    {#if errors?.city && showErrors}
                      <span class="text-red-600 text-xs">{errors.city}</span>
                      {/if}
                 </div>
@@ -597,7 +632,7 @@ const handleSubmit = ({ cancel }) => {
                         <span class=" text-sm font-bold text-red-500">*</span>Street</label><br>
                         <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                         type="text" name="street" bind:value={activeAddress.street } on:input={() => {validateField('street');activeAddress.street=activeAddress.street.trimStart();}}/>
-                        {#if errors?.street}
+                        {#if errors?.street && showErrors}
                      <span class="text-red-600 text-xs">{errors.street}</span>
                      {/if}
                 </div>
@@ -617,7 +652,7 @@ const handleSubmit = ({ cancel }) => {
                     <label class=" text-xs md:text-sm font-medium" for="postalCode"><span class=" text-sm font-bold text-red-500">*</span>Postal Code</label><br>
                     <input class=" outline-none w-full border-1 focus:ring-0 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500" 
                     type="text" name="postalCode" bind:value={activeAddress.postalCode } on:input={()=>{activeAddress.postalCode =activeAddress.postalCode .trim();validateField("postalCode");}}/>
-                    {#if errors?.postalCode}
+                    {#if errors?.postalCode && showErrors}
                         <span class="text-red-600 text-xs">{errors.postalCode}</span>
                     {/if}
                 </div>
@@ -626,7 +661,10 @@ const handleSubmit = ({ cancel }) => {
                 <div class=" w-full"></div>
             </div>
             <div class=" w-full flex flex-col sm:flex-row gap-y-3 sm:gap-4">
-                <button type="button" on:click={()=>toggleEdit = false} class=" w-full rounded-md py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
+                <button type="button" on:click={()=>{
+                  toggleEdit = false
+                  // window.location.reload()
+                  }} class=" w-full rounded-md py-1.5 font-medium text-primary-500 hover:bg-primary-50 bg-white border-1 border-primary-500">Cancel</button>
                 <button type="submit" class=" w-full rounded-md py-1.5 font-medium text-white hover:bg-primary-600 bg-primary-500 border-1 border-primary-500">Submit</button>
             </div>
         </form>
@@ -639,8 +677,8 @@ const handleSubmit = ({ cancel }) => {
                 <button on:click={()=>activeBook(2,"shipping")} class="{2 === active ? " border-b-2 border-primary-500 text-primary-500 transition duration-300 " :"border-white"} border-b-2 shrink-0 font-semibold px-4 py-1">Shipping</button>
                 <button on:click={()=>activeBook(3,"billing")} class="{3 === active ? " border-b-2 border-primary-500 text-primary-500 transition duration-300 " :"border-white"} border-b-2 shrink-0 font-semibold px-4 py-1">Billing</button>
             </section>
-            <div class=" w-full flex flex-col gap-3">
-                <div class=" w-full h-20 border-1 font-medium capitalize rounded-md border-gray-300 p-4 md:p-5 text-xs md:text-sm leading-5">
+            <div class=" w-full flex flex-col gap-3 ">
+                <div class=" w-full h-50 border-1 font-medium capitalize rounded-md border-gray-300 p-4 md:p-5 text-xs md:text-sm leading-5 ">
                     
                     <div class="text-gray-700 font-semibold">
                         Address:
