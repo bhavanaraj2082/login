@@ -570,23 +570,23 @@ const handleSubmit =({cancel})=>{
                 <h2 class="font-semibold text-4s border-b-1 pb-2 pt-5">Business Information</h2>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
                     <h4 class="font-normal text-sm">Company Name:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{companyName || "__"}</p>
+                    <p class=" text-sm ml-2 font-semibold">{companyName || "--"}</p>
                 </div>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
                     <h4 class=" font-normal text-sm">Company Type:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{companytype || "__"}</p>
+                    <p class=" text-sm ml-2 font-semibold">{companytype || "--"}</p>
                 </div>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
                     <h4 class=" font-normal text-sm">Job Title:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{jobtitle || "__"}</p>
+                    <p class=" text-sm ml-2 font-semibold">{jobtitle || "--"}</p>
                 </div>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
                     <h4 class=" font-normal text-sm">GST Number:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{gstNumber || "__"}</p>
+                    <p class=" text-sm ml-2 font-semibold">{gstNumber || "--"}</p>
                 </div>
                 <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
                     <h4 class=" font-normal text-sm">TAN Number:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{tanNumber || "__"}</p>
+                    <p class=" text-sm ml-2 font-semibold">{tanNumber || "--"}</p>
                 </div>
             </div>
         </div>
