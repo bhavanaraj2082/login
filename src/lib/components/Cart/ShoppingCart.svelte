@@ -694,7 +694,14 @@
 				<div class="mt-4 w-full gap-2">
 					{#if isLoggedIn}
 						<button disabled={checkoutDisabled}
-							on:click={()=>goto('/checkout')}
+							on:click={()=>{
+								if(!data?.profile?.cellPhone){
+									toast.info("Please add phone number to checkout")
+                                    goto('/dashboard/profile')
+								}else{
+								    goto('/checkout')
+								}
+								}}
 							class="flex w-full text-xs sm:text-sm items-center justify-center gap-2 bg-primary-500 text-white hover:bg-primary-600 py-2 rounded-md font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed">
 							Checkout
 				        </button>
