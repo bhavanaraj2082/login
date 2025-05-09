@@ -387,7 +387,7 @@ function handleMouseLeave() {
     });
   }
 
-  const handleFavorites = (product)=>{
+  const handleFavorites = (product,index)=>{
     try {
      console.log(product);
     addLocalToFavorites(product._id)
@@ -395,10 +395,10 @@ function handleMouseLeave() {
     formdata.append("authedEmail",$authedUser.email)
     formdata.append("productId",product._id)
     formdata.append("manufacturerId",product.manufacturerDetails._id)
-    formdata.append("stockId",product.stockId)
-    formdata.append("distributorId",product.distributorId)
-    formdata.append("quantity",product.orderMultiple)
-    formdata.append("stock",product.stock)
+    formdata.append("stockId",product.stockDetails[index].stockId)
+    formdata.append("distributorId",product.stockDetails[index].distributorId)
+    formdata.append("quantity",product.stockDetails[index].orderMultiple)
+    formdata.append("stock",product.stockDetails[index].stock)
     sendMessage("?/favorite",formdata,async(result)=>{
         console.log(result);
         toast.success(result.message)
@@ -656,7 +656,7 @@ function handleMouseLeave() {
         {:else}
        {#each paginatedProducts as product,index}
         <div class=" relative bg-white shadow p-2 sm:px-4 space-y-2 rounded-md">
-            <button on:click={()=>handleFavorites(product)} class="{$authedUser?.id && product?.stockDetails.length > 0 && Object.keys(product?.stockDetails[0]?.pricing).length > 0 ? "" : "hidden"} absolute top-6 right-6">
+            <button on:click={()=>handleFavorites(product,product?.stockIndex)} class="{$authedUser?.id && product?.stockDetails.length > 0 && Object.keys(product?.stockDetails[0]?.pricing).length > 0 ? "" : "hidden"} absolute top-6 right-6">
                 <Icon icon={$myFavorites.find(x=> x === product._id) ? "mdi:heart" : "mdi:heart-outline"} class="text-2xl text-primary-500"/>
             </button>
             <div class=" w-10/12 ">
