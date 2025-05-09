@@ -137,7 +137,7 @@ export const actions = {
 							attributes: { email, username: `${email.split('@')[0]}` }
 						});
 						user = luciaUser;
-						await new Profile({ userId: luciaUser.userId, email, needsPasswordSetup: true, sitePreferences: {
+						await new Profile({ userId: luciaUser.userId, email, firstName: `${email.split('@')[0]}`, needsPasswordSetup: true, sitePreferences: {
 							productEntryType : "Manual Entry",
 							noOfQuickOrderFields: 3,
 							noOfOrdersPerPage: 3,
