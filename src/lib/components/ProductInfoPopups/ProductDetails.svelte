@@ -361,7 +361,7 @@
               {product?.productNumber}
             </span>
           </div>
-          {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)}
+          {#if !(product?.priceSize?.length === 0)}
             <div class="flex items-center gap-x-2">
               <form
                 method="POST"
