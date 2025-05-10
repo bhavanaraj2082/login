@@ -305,7 +305,7 @@
         <thead class="text-xs text-gray-700 uppercase bg-primary-50">
           <tr>
             <th scope="col" class="py-3 px-6">Image</th>
-            <th scope="col" class="py-3 px-6">Product Number</th>
+            <th scope="col" class="py-3 px-6">Product Name</th>
             <th scope="col" class="py-3 px-6">Manufacturer</th>
             <th scope="col" class="py-3 px-6">Price Range</th>
             <th scope="col" class="py-3 px-6"></th>
@@ -323,7 +323,7 @@
                 // Optional: handle row click
               }}
             >
-              <td class="py-1 px-6">
+              <td class="py-1 px-2">
                 <a href={variant.productNumber}>
                   <img
                     src="{PUBLIC_IMAGE_URL}/{variant?.imageSrc}"
@@ -333,15 +333,22 @@
                   />
                 </a>
               </td>
-              <td
-                class="py-1 px-6 text-primary-400 hover:text-primary-500 font-medium cursor-pointer"
-              >
-                <a href={variant.productNumber}>
-                  {variant.productNumber}
+              <td class="relative py-1 px-2 text-primary-500 text-sm cursor-pointer group">
+                <a 
+                  href={variant.productNumber}
+                  class="block whitespace-normal break-words w-60 relative z-0"
+                >
+                  {variant.productName.split(" ").slice(0, 5).join(" ")}{variant.productName.split(" ").length > 5 ? '...' : ''}
+                  
+                  {#if variant.productName.split(" ").length > 5}
+                    <div class="absolute inset-0 z-10 hidden group-hover:flex items-center justify-center bg-white bg-opacity-95 text-gray-700 text-xs px-2 py-4 rounded shadow-md break-words text-left select-text">
+                      {variant.productName}
+                    </div>
+                  {/if}
                 </a>
               </td>
-              <td class="py-1 px-6">{variant.manufacturerName}</td>
-              <td class="py-1 px-6">
+              <td class="py-1 px-2">{variant.manufacturerName}</td>
+              <td class="py-1 px-2">
                 {#if $currencyState === "usd"}
                   {#if minPriceUSD === maxPriceUSD && minPriceUSD !== "--"}
                     <span class="font-semibold text-black">
@@ -430,7 +437,7 @@
                   >Pack Size</th
                 >
                 <th class="py-3 px-6 text-gray-800 text-sm font-semibold"
-                  >SKU</th
+                  >Product Number</th
                 >
                 <th class="py-3 px-6 text-gray-800 text-sm font-semibold"
                   >Price</th
@@ -446,7 +453,7 @@
                 <tr class="bg-blue-50">
                   <td class="py-1 px-6 font-medium">{priceItem.break}</td>
                   <td class="py-1 px-6 font-medium"
-                    >{variant.productNumber}-{priceItem.break}</td
+                    >{variant.productNumber}</td
                   >
                   <td class="py-1 px-6 font-medium">
                     {#if $currencyState === "usd"}

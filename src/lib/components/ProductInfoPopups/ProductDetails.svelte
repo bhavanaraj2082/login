@@ -18,7 +18,7 @@
   import { isFavoriteStore } from "$lib/stores/favorites.js";
 
   export let data;
-  console.log("productData",data);
+  // console.log("productData",data);
   
   export let isauthedUser;
   // export let isFavorite;
@@ -459,7 +459,7 @@
             </p>
           {/if}
 
-          {#if !product?.returnPolicy}
+          <!-- {#if !product?.returnPolicy}
             <div
               class="flex items-center gap-2 text-red-500 font-medium text-sm"
             >
@@ -469,7 +469,7 @@
               />
               <span>Non-Returnable</span>
             </div>
-          {/if}
+          {/if} -->
 
           <!-- {#if !authedEmail}
             <div
