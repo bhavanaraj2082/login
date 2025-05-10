@@ -280,7 +280,7 @@
                   errors.street = "Street is required";
               } else if (activeAddress.street.length < 3 || activeAddress.street.length > 100) {
                   errors.street = "Street must be between 3 and 100 characters";
-              } else if (!/^[A-Za-z0-9\s]+$/.test(activeAddress.street)) {
+              } else if (!/^[A-Za-z/0-9\s]+$/.test(activeAddress.street)) {
                   errors.street = "Street must contain only letters, numbers, and spaces";
               } else {
                   delete errors.street;

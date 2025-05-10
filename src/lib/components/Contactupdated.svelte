@@ -93,21 +93,34 @@
 
 	const validateField = (fieldName) => {
 		
-		if (!fieldName || fieldName === "name") {
+// 		if (!fieldName || fieldName === "name") {
+// 	if (!name) {
+// 		errors.name = "User Name is required";
+// 	} else if (name.trim().length < 3 || name.trim().length > 50) {
+// 	errors.name = "User Name must be between 3 and 50 characters";
+// }else if (!/^[A-Za-z\s]+$/.test(name)) {
+// 		errors.name = "User Name should contain only letters and spaces";
+// 	} else {
+// 		delete errors.name;
+// 	}
+// 	errors = { ...errors }; // ✅ triggers Svelte to re-render error messages
+// }
+
+if (!fieldName || fieldName === "name") {
 	if (!name) {
 		errors.name = "User Name is required";
-	} else if (name.trim().length < 3 || name.trim().length > 50) {
-	errors.name = "User Name must be between 3 and 50 characters";
-}else if (!/^[A-Za-z\s]+$/.test(name)) {
-		errors.name = "User Name should contain only letters and spaces";
 	} else {
-		delete errors.name;
+		const normalizedName = name.replace(/\s+/g, ' ').trim();
+		if (normalizedName.length < 3 || normalizedName.length > 50) {
+			errors.name = "User Name must be between 3 and 50 characters";
+		} else if (!/^[A-Za-z\s]+$/.test(normalizedName)) {
+			errors.name = "User Name should contain only letters and spaces";
+		} else {
+			delete errors.name;
+		}
 	}
 	errors = { ...errors }; // ✅ triggers Svelte to re-render error messages
 }
-
-
-
 
 		if (!fieldName || fieldName === "country") {
     if (!country || country === "") {
@@ -161,34 +174,65 @@
 			}
 		}
 
-		if (!fieldName || fieldName === "message") {
-			if (!message || message.trim().length < 3 || message.trim().length > 500) {
-	errors.message = "Message must be between 3 and 500 characters";
-}
- else if (
-		!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(message) ||
-		/<[^>]*>/.test(message)
+// 		if (!fieldName || fieldName === "message") {
+// 			if (!message || message.trim().length < 3 || message.trim().length > 500) {
+// 	errors.message = "Message must be between 3 and 500 characters";
+// }
+//  else if (
+// 		!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(message) ||
+// 		/<[^>]*>/.test(message)
+// 	) {
+// 		errors.message = "Message is required";
+// 	} else {
+// 		delete errors.message;
+// 	}
+// 	errors = { ...errors }; // ✅ reassign to trigger Svelte update
+// }
+
+// if (!fieldName || fieldName === "subject") {
+// 	if (!subject || subject.trim().length < 3 || subject.trim().length > 250) {
+// 	errors.subject = "Subject must be between 3 and 250 characters";
+// }
+// else if (
+// 		!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(subject) ||
+// 		/<[^>]*>/.test(subject)
+// 	) {
+// 		errors.subject = "Subject is required";
+// 	} else {
+// 		delete errors.subject;
+// 	}
+// 	errors = { ...errors }; // ✅ reassign to trigger Svelte update
+// }
+
+
+if (!fieldName || fieldName === "message") {
+	const normalizedMessage = message?.replace(/\s+/g, ' ').trim();
+	if (!normalizedMessage || normalizedMessage.length < 3 || normalizedMessage.length > 500) {
+		errors.message = "Message must be between 3 and 500 characters";
+	} else if (
+		!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(normalizedMessage) ||
+		/<[^>]*>/.test(normalizedMessage)
 	) {
 		errors.message = "Message is required";
 	} else {
 		delete errors.message;
 	}
-	errors = { ...errors }; // ✅ reassign to trigger Svelte update
+	errors = { ...errors };
 }
 
 if (!fieldName || fieldName === "subject") {
-	if (!subject || subject.trim().length < 3 || subject.trim().length > 250) {
-	errors.subject = "Subject must be between 3 and 250 characters";
-}
-else if (
-		!/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(subject) ||
-		/<[^>]*>/.test(subject)
+	const normalizedSubject = subject?.replace(/\s+/g, ' ').trim();
+	if (!normalizedSubject || normalizedSubject.length < 3 || normalizedSubject.length > 250) {
+		errors.subject = "Subject must be between 3 and 250 characters";
+	} else if (
+		!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(normalizedSubject) ||
+		/<[^>]*>/.test(normalizedSubject)
 	) {
 		errors.subject = "Subject is required";
 	} else {
 		delete errors.subject;
 	}
-	errors = { ...errors }; // ✅ reassign to trigger Svelte update
+	errors = { ...errors };
 }
 
 

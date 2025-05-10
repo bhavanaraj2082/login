@@ -43,7 +43,7 @@
     const link = document.createElement("a");
     link.href = safetyDatasheet;
     link.target = "_blank"; 
-    link.innerText = "Open Safety Datasheet"; 
+    link.innerText = ""; 
     document.body.appendChild(link);
     link.click(); 
   } else {
@@ -296,7 +296,7 @@ function RemoveUrl(urlToRemove) {
                 on:input={handleInput}
                 id="product-number-sds"
                 name="productNumber"
-                placeholder="E.G. IPAKKIT00"
+                placeholder="E.G. ZWCL01F50"
                 class="flex w-full border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
               />
               <!-- <p>{inputValue}</p> -->
@@ -382,7 +382,7 @@ function RemoveUrl(urlToRemove) {
                 type="text"
                 id="product-number-sds"
                 name="productNumber"
-                placeholder="E.G. IPAKKIT00"
+                placeholder="E.G. ZWCL01F50"
                 class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
               />
               <!-- <p>{inputValue1}</p> -->
@@ -492,7 +492,7 @@ function RemoveUrl(urlToRemove) {
                 type="text"
                 id="product-number-sds"
                 name="productNumber"
-                placeholder="E.G. IPAKKIT00"
+                placeholder="E.G. ZWCL01F50"
                 class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
               />
               <!-- <p>{inputValue2}</p> -->
@@ -604,7 +604,7 @@ function RemoveUrl(urlToRemove) {
                 type="text"
                 id="product-number-sds"
                 name="productNumber"
-                placeholder="E.G. IPAKKIT00"
+                placeholder="E.G. ZWCL01F50"
                 class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
               />
               <!-- <p>{inputValue3}</p> -->
@@ -709,18 +709,18 @@ function RemoveUrl(urlToRemove) {
                 Product numbers are combined with Pack Sizes/Quantity when
                 displayed on the website (example: <code
                   class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded"
-                  >TIPAKKIT00-25G</code
+                  >TZWCL01F50-25G</code
                 >). Please make sure you enter <strong>ONLY</strong> the product
                 number in the Product Number field (example:
                 <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded"
-                  >TIPAKKIT00</code
+                  >TZWCL01F50</code
                 >).
               </p>
               <div class="bg-gray-50 p-4 border border-gray-300 rounded mt-3">
                 <p class="font-semibold mb-2">Example:</p>
                 <p>
                   <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded"
-                    >TIPAKKIT00</code
+                    >TZWCL01F50</code
                   >
                   <span class="font-bold">Product Number</span>
                 </p>
@@ -791,18 +791,18 @@ function RemoveUrl(urlToRemove) {
                   Product numbers are combined with Pack Sizes/Quantity when
                   displayed on the website (example: <code
                     class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded"
-                    >TIPAKKIT00-25G</code
+                    >TZWCL01F50-25G</code
                   >). Please make sure you enter <strong>ONLY</strong> the
                   product number in the Product Number field (example:
                   <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded"
-                    >TIPAKKIT00</code
+                    >TZWCL01F50</code
                   >).
                 </p>
                 <div class="bg-gray-50 p-4 border border-gray-300 rounded mt-3">
                   <p class="font-semibold mb-2">Example:</p>
                   <p>
                     <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded"
-                      >TIPAKKIT00</code
+                      >TZWCL01F50</code
                     >
                     <span class="font-bold">Product Number</span>
                   </p>
@@ -934,18 +934,18 @@ function RemoveUrl(urlToRemove) {
                   Product numbers are combined with Pack Sizes/Quantity when
                   displayed on the website (example: <code
                     class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded"
-                    >TIPAKKIT00-25G</code
+                    >TZWCL01F50-25G</code
                   >). Please make sure you enter <strong>ONLY</strong> the
                   product number in the Product Number field (example:
                   <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded"
-                    >TIPAKKIT00</code
+                    >TZWCL01F50</code
                   >).
                 </p>
                 <div class="bg-gray-50 p-4 border border-gray-300 rounded mt-3">
                   <p class="font-semibold mb-2">Example:</p>
                   <p>
                     <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded"
-                      >TIPAKKIT00</code
+                      >TZWCL01F50</code
                     >
                     <span class="font-bold">Product Number</span>
                   </p>
@@ -1093,18 +1093,18 @@ function RemoveUrl(urlToRemove) {
                   Product numbers are combined with Pack Sizes/Quantity when
                   displayed on the website (example: <code
                     class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded"
-                    >TIPAKKIT00-25G</code
+                    >TZWCL01F50-25G</code
                   >). Please make sure you enter <strong>ONLY</strong> the
                   product number in the Product Number field (example:
                   <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded"
-                    >TIPAKKIT00</code
+                    >TZWCL01F50</code
                   >).
                 </p>
                 <div class="bg-gray-50 p-4 border border-gray-300 rounded mt-3">
                   <p class="font-semibold mb-2">Example:</p>
                   <p>
                     <code class="text-gray-800 bg-gray-100 px-1 py-0.5 rounded"
-                      >TIPAKKIT00</code
+                      >TZWCL01F50</code
                     >
                     <span class="font-bold">Product Number</span>
                   </p>
