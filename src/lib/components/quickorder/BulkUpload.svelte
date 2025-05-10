@@ -341,34 +341,49 @@
         submitFileData();
       }
     };
+if (["xlsx", "xls"].includes(fileType)) {
+  if (typeof XLSX === "undefined") {
+    fileError = "Excel support requires SheetJS. Use CSV instead.";
+    return;
+  }
 
-    if (["xlsx", "xls"].includes(fileType)) {
-      if (typeof XLSX === "undefined") {
-        fileError = "Excel support requires SheetJS. Use CSV instead.";
-        return;
-      }
-
-      reader.onload = (e) => {
-        try {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: "array" });
-          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-          let csvData = XLSX.utils.sheet_to_csv(worksheet);
-          processFileData(csvData);
-        } catch (err) {
-          fileError = "Error processing Excel file.";
-          console.error(err);
-        }
-      };
-
-      reader.readAsArrayBuffer(file);
-    } else {
-      reader.onload = (e) => {
-        processFileData(e.target.result);
-      };
-
-      reader.readAsText(file);
+  reader.onload = (e) => {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      
+      // Change: Instead of using sheet_to_csv which adds quotes, extract data directly
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+      
+      // Transform the data to our needed format without quotes
+      let processedData = jsonData
+        .filter(row => row.length > 0 && row[0])
+        .map(row => {
+          // First cell is the product code
+          const productCode = String(row[0]).trim();
+          // Second cell (if exists) is quantity, default to 1
+          const quantity = row.length > 1 && row[1] ? String(row[1]).trim() : "1";
+          
+          return `${productCode},${quantity}`;
+        })
+        .join("\n");
+      
+      processFileData(processedData);
+    } catch (err) {
+      fileError = "Error processing Excel file.";
+      console.error(err);
     }
+  };
+
+  reader.readAsArrayBuffer(file);
+} else {
+  reader.onload = (e) => {
+    processFileData(e.target.result);
+  };
+
+  reader.readAsText(file);
+}
   }
 
   // function submitFileData() {
@@ -849,6 +864,7 @@
       );
 
       cartloading = false;
+   isLoading = true;
       setTimeout(() => {
         window.location.href = "/cart";
       }, 2000);
@@ -1414,6 +1430,7 @@ Example file content:
         if (!isLoggedIn) {
           localStorage.setItem("cart", JSON.stringify(productsToAdd));
           guestCart.set(productsToAdd);
+          isLoading = true;
           setTimeout(() => {
             window.location.href = "/cart";
           }, 2000);
@@ -1433,6 +1450,7 @@ Example file content:
               toast.success(
                 `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`,
               );
+           isLoading = true;
               setTimeout(() => {
                 window.location.href = "/cart";
               }, 2000);
