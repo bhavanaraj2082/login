@@ -735,7 +735,7 @@ function handleMouseLeave() {
                       {/each}
                     </div>
                     <div class=" hidden sm:flex items-center justify-between">
-                        <p class=" font-bold text-4s">{$currencyState === "inr" ? "₹" + product?.stockDetails[product.stockIndex]?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
+                        <p class=" font-bold text-4s">{$currencyState === "inr" ? "₹" + product?.stockDetails[product.stockIndex]?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.stockDetails[product.stockIndex]?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
                         <div class="flex items-center">
                             <div class="flex items-center">
                                 <input type="number" value={product?.stockDetails[product.stockIndex]?.quantity}
@@ -782,7 +782,7 @@ function handleMouseLeave() {
             </div>
             {#if product?.stockDetails.length > 0 && Object.keys(product?.stockDetails[0]?.pricing).length > 0}
             <div class=" flex sm:hidden items-center justify-between">
-                <p class=" text-xs font-bold">{$currencyState === "inr" ? "₹" + product?.stockDetails[product.stockIndex]?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
+                <p class=" text-xs font-bold">{$currencyState === "inr" ? "₹" + product?.stockDetails[product.stockIndex]?.totalPrice?.priceINR?.toLocaleString("en-IN"): "$"+ product?.stockDetails[product.stockIndex]?.totalPrice?.priceUSD?.toLocaleString("en-IN")}</p>
                 <div class="flex items-center">
                     <div class="flex items-center">
                         <input type="number" value={product?.stockDetails[product.stockIndex]?.quantity}
