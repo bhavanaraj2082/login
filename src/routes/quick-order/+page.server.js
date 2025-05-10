@@ -396,7 +396,7 @@ uploadFile: async ({ request }) => {
       const userId = locals.user.userId;
       const userEmail = locals.user.email;
       
-      const result = await bulkUploadToCart(cartItems, userId, userEmail);
+      const result = await addToCart(cartItems, userId, userEmail);
       
       return {
         success: result.success,
