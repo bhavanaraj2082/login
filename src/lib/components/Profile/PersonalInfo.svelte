@@ -494,7 +494,7 @@ const handleSubmit =({cancel})=>{
             </div>
             <section class=" w-full flex flex-col sm:flex-row flex-wrap gap-y-4 py-3">
                 <div class="flex sm:flex-row items-center text-sm md:text-4s w-full sm:w-1/2">
-                    <h4 class="font-medium">Name :</h4>
+                    <h4 class="font-medium">Name :  </h4>
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <!-- svelte-ignore a11y-no-static-element-interactions -->
                     <!-- svelte-ignore a11y-missing-attribute -->
@@ -507,9 +507,9 @@ const handleSubmit =({cancel})=>{
                         <p class="ml-2 text-sm">{firstName || "Update Name"} {lastName || ""}</p>
                     {/if} -->
                     {#if firstName && firstName !== 'N/A' || lastName && lastName !== 'N/A'}
-                    <span class="text-description text-xs sm:text-sm">{firstName}</span>
+                    <span class="text-description text-xs sm:text-sm ml-2">{firstName}</span>
                   {:else}
-                    <span class="text-description text-xs sm:text-sm">
+                    <span class="text-description text-xs sm:text-sm ml-2">
                       {#if email && email.includes('@')}
                         {email.split('@')[0]}
                       {:else}

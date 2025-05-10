@@ -1255,10 +1255,10 @@ export async function fetchcertificate(inputValue) {
 		return {
 			productNumber: record.productNumber,
 			safetyDatasheet: record.safetyDatasheet
-				? baseUrl + record.safetyDatasheet
+				? baseUrl  + '/' +  record.safetyDatasheet
 				: null,
 			sds: record.sds
-				? baseUrl + record.sds
+				? baseUrl  + '/' +  record.sds
 				: null
 		};
 	} catch (error) {
