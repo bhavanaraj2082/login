@@ -341,7 +341,7 @@
                   {variant.productName.split(" ").slice(0, 5).join(" ")}{variant.productName.split(" ").length > 5 ? '...' : ''}
                   
                   {#if variant.productName.split(" ").length > 5}
-                    <div class="absolute inset-0 z-10 hidden group-hover:flex items-center justify-center bg-white bg-opacity-95 text-gray-700 text-xs px-2 py-4 rounded shadow-md break-words text-left select-text">
+                    <div class="absolute inset-0 z-10 hidden group-hover:flex items-center justify-center bg-white bg-opacity-95 h-fit text-gray-700 text-xs px-2 py-2 rounded shadow-md break-words text-left select-text">
                       {variant.productName}
                     </div>
                   {/if}
