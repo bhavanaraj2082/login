@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
-import { uploadFile, quicksearch, quickcheck, addToCart, CreateProductQuote,bulkUploadToCart } from '$lib/server/mongoActions';
+import { uploadFile, quicksearch, quickcheck, addToCart, CreateProductQuote, bulkUploadToCart } from '$lib/server/mongoActions';
 import { error, fail } from '@sveltejs/kit';
 import { nanoid } from 'nanoid';
 import Profile from '$lib/server/models/Profile.js';
@@ -10,43 +10,43 @@ import { APP_URL } from '$env/static/private';
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import sendemail from '$lib/data/sendemail.json';
 import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
-import {getCart} from '$lib/server/mongoLoads.js'
+import { getCart } from '$lib/server/mongoLoads.js'
 
 function parseProductQuery(query) {
   let inputStr = query.trim();
-  
+
   const packOfPattern = /^(.*?)[-\s]+(pack-of-\d+|case-of-\d+|each-of-\d+)$/i;
   const packOfMatch = inputStr.match(packOfPattern);
-  
+
   if (packOfMatch) {
     return {
       productNumber: packOfMatch[1].trim(),
       size: packOfMatch[2].trim()
     };
   }
-  
+
   const complexPattern = /^([A-Za-z0-9]+-[A-Za-z0-9]+-[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*)-((?:Pack|Case|Each)[-\s]+of[-\s]+\d+|\d+[-\s]*(?:pack|case|each|pcs|units|items)|[A-Za-z0-9\u00B0-\u9FFF]+(?:-[A-Za-z0-9\u00B0-\u9FFF]+)*)$/i;
   const complexMatch = inputStr.match(complexPattern);
-  
+
   if (complexMatch) {
     return {
       productNumber: complexMatch[1].trim(),
       size: complexMatch[2].trim()
     };
   }
-  
+
   const spaceHyphenPattern = /^(.*?)\s+-\s+(.+)$/;
   const spaceHyphenMatch = inputStr.match(spaceHyphenPattern);
-  
+
   const measurementPattern = /^(.*?)-(\d+[-]?[A-Za-z\u00B0-\u9FFF]+)$/;
   const measurementMatch = inputStr.match(measurementPattern);
-  
+
   const quantityPatterns = [
     /^(.*?)[-\s]+(each\s*(?:of)?\s*[-\s]*\d+|each[-\s]*of[-\s]*\d+|\d+\s*(?:each|pcs|units|items))$/i,
     /^(.*?)[-\s]+(case\s*(?:of)?\s*[-\s]*\d+|case[-\s]*of[-\s]*\d+|\d+\s*(?:case|pcs|units|items))$/i,
     /^(.*?)[-\s]+(pack\s*(?:of)?\s*[-\s]*\d+|pack[-\s]*of[-\s]*\d+|\d+\s*(?:pack|pcs|units|items))$/i
   ];
-  
+
   let quantityMatch = null;
   for (const pattern of quantityPatterns) {
     const match = inputStr.match(pattern);
@@ -74,11 +74,11 @@ function parseProductQuery(query) {
   } else {
     const parts = inputStr.split('-');
     const lastPart = parts[parts.length - 1].toLowerCase();
-    if (parts.length > 1 && 
-        (lastPart.includes('pack') || 
-         lastPart.includes('case') || 
-         lastPart.includes('each') ||
-         /^\d+[a-z\u00B0-\u9FFF]+$/.test(lastPart))) {
+    if (parts.length > 1 &&
+      (lastPart.includes('pack') ||
+        lastPart.includes('case') ||
+        lastPart.includes('each') ||
+        /^\d+[a-z\u00B0-\u9FFF]+$/.test(lastPart))) {
       return {
         productNumber: parts.slice(0, parts.length - 1).join('-'),
         size: parts[parts.length - 1]
@@ -96,9 +96,9 @@ export const actions = {
   quickcheck: async ({ request }) => {
     try {
       const formData = Object.fromEntries(await request.formData());
-      console.log(formData,"formData");
-      
-      const { ProductId, quantity,stockId } = formData;
+      console.log(formData, "formData");
+
+      const { ProductId, quantity, stockId } = formData;
       if (!ProductId || !quantity) {
         return {
           type: 'error',
@@ -120,11 +120,11 @@ export const actions = {
     }
   },
 
- 
+
   quicksearch: async ({ request }) => {
     const data = Object.fromEntries(await request.formData());
     const { quickSearch } = data;
-  
+
     if (quickSearch && quickSearch.length >= 0) {
       try {
         const parsedQuery = parseProductQuery(quickSearch);
@@ -132,13 +132,13 @@ export const actions = {
         console.log("Parsed Product Number:", parsedQuery.productNumber);
         console.log("Parsed Size:", parsedQuery.size);
         const results = await quicksearch({ query: parsedQuery.productNumber });
-        
+
         const processedResults = results.map(product => {
           let processedPricing = [];
           if (product.pricing && Array.isArray(product.pricing)) {
             processedPricing = product.pricing.map(item => {
               const processedItem = { ...item };
-  
+
               if (item.INR) {
                 processedItem.inr = item.INR;
               }
@@ -147,7 +147,7 @@ export const actions = {
               } else if (item.USD) {
                 processedItem.usd = item.USD;
               }
-  
+
               return {
                 break: item.break || 'N/A',
                 usd: item.usd || item.USD || 'N/A',
@@ -156,14 +156,14 @@ export const actions = {
               };
             });
           }
-  
+
           let relevance = 1;
           if (parsedQuery.size && product.size) {
             const productSizeLower = product.size.toLowerCase();
             const parsedSizeLower = parsedQuery.size.toLowerCase();
             relevance = productSizeLower.includes(parsedSizeLower) ? 2 : 0.5;
           }
-  
+
           return {
             id: product.id,
             image: product.image,
@@ -185,7 +185,7 @@ export const actions = {
         if (parsedQuery.size) {
           processedResults.sort((a, b) => b.relevance - a.relevance);
         }
-  
+
         return processedResults;
       } catch (error) {
         console.error('Error in quicksearch action:', error);
@@ -196,217 +196,135 @@ export const actions = {
       return { error: 'Search query must be at least 2 characters.' };
     }
   },
-  
-//   uploadFile: async ({ request }) => {
-//     try {
-//       const data = await request.formData();
-// console.log(data,"data");
 
 
-//       const file = data.get('file');
-//       if (!file || file.size === 0) {
-//         return {
-//           error: 'No file uploaded or file is empty',
-//         };
-//       }
+  uploadFile: async ({ request }) => {
+    try {
+      const data = await request.formData();
+      const performanceStart = Date.now();
 
-//       const fileData = Buffer.from(await file.arrayBuffer());
-//       let fileContent = '';
-//       if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
-//         fileContent = fileData.toString('utf8');
-//         const results = Papa.parse(fileContent, { header: false, skipEmptyLines: true });
-//         const records = results.data;
-
-//         const validationResults = await uploadFile({
-//           query: records,
-//           uploadedQuantities: {},
-//         });
-//         return validationResults;
-
-//       } else if (file.type === 'application/vnd.ms-excel' || file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
-//         const workbook = XLSX.read(fileData, { type: 'buffer' });
-//         const sheetName = workbook.SheetNames[0];
-//         const sheet = workbook.Sheets[sheetName];
-
-//         const records = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-
-//         const validationResults = await uploadFile({
-//           query: records,
-//           uploadedQuantities: {},
-//         });
-//         return validationResults;
-
-//       } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-//         fileContent = fileData.toString('utf8');
-
-//         const lines = fileContent.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-//         const records = lines.map(line => line.split(','));
-
-//         const validationResults = await uploadFile({
-//           query: records,
-//           uploadedQuantities: {},
-//         });
-//         return validationResults;
-
-//       } else {
-//         throw new Error('Unsupported file type');
-//       }
-
-//     } catch (error) {
-//       console.error('File upload error:', error);
-//       return {
-//         error: 'Error processing the file',
-//       };
-//     }
-//   },
-// +page.server.js
-uploadFile: async ({ request }) => {
-  try {
-    const data = await request.formData();
-    const performanceStart = Date.now();
-    
-    const file = data.get('file');
-    if (!file || file.size === 0) {
-      return {
-        error: 'No file uploaded or file is empty',
-      };
-    }
-    const supportedTypes = [
-      'text/csv', 
-      'application/vnd.ms-excel', 
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'text/plain'
-    ];
-    
-    const fileExt = file.name.split('.').pop().toLowerCase();
-    const supportedExts = ['csv', 'xls', 'xlsx', 'txt'];
-    
-    if (!supportedTypes.includes(file.type) && !supportedExts.includes(fileExt)) {
-      return {
-        error: 'Unsupported file type. Please upload CSV, Excel or TXT files only.',
-      };
-    }
-    let records = [];
-    const fileData = Buffer.from(await file.arrayBuffer());
-    if (file.type === 'text/csv' || fileExt === 'csv') {
-      if (file.size < 500000) {
-        const fileContent = fileData.toString('utf8');
-        const results = Papa.parse(fileContent, { 
-          header: false, 
-          skipEmptyLines: true,
-          dynamicTyping: false,
-          fastMode: true,
-          worker: false,
-          chunk: null
-        });
-        records = results.data;
-      } else {
-        const fileContent = fileData.toString('utf8');
-        const results = Papa.parse(fileContent, { 
-          header: false, 
-          skipEmptyLines: true,
-          worker: true
-        });
-        records = results.data;
+      const file = data.get('file');
+      if (!file || file.size === 0) {
+        return {
+          error: 'No file uploaded or file is empty',
+        };
       }
-    } 
-    else if (file.type === 'application/vnd.ms-excel' || 
-             file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
-             fileExt === 'xls' || fileExt === 'xlsx') {
-      const workbook = XLSX.read(fileData, { 
-        type: 'buffer',
-        cellFormula: false, 
-        cellHTML: false,   
-        cellText: false     
-      });
-      
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
+      const supportedTypes = [
+        'text/csv',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'text/plain'
+      ];
 
-      records = XLSX.utils.sheet_to_json(sheet, { 
-        header: 1, 
-        defval: '',
-        raw: true,         
-        range: 0          
-      });
-    } 
-    else if (file.type === 'text/plain' || fileExt === 'txt') {
-      const fileContent = fileData.toString('utf8');
-      records = fileContent
-        .split('\n')
-        .filter(line => line.trim().length > 0)
-        .map(line => line.split(',').map(item => item.trim()));
+      const fileExt = file.name.split('.').pop().toLowerCase();
+      const supportedExts = ['csv', 'xls', 'xlsx', 'txt'];
+
+      if (!supportedTypes.includes(file.type) && !supportedExts.includes(fileExt)) {
+        return {
+          error: 'Unsupported file type. Please upload CSV, Excel or TXT files only.',
+        };
+      }
+      let records = [];
+      const fileData = Buffer.from(await file.arrayBuffer());
+      if (file.type === 'text/csv' || fileExt === 'csv') {
+        if (file.size < 500000) {
+          const fileContent = fileData.toString('utf8');
+          const results = Papa.parse(fileContent, {
+            header: false,
+            skipEmptyLines: true,
+            dynamicTyping: false,
+            fastMode: true,
+            worker: false,
+            chunk: null
+          });
+          records = results.data;
+        } else {
+          const fileContent = fileData.toString('utf8');
+          const results = Papa.parse(fileContent, {
+            header: false,
+            skipEmptyLines: true,
+            worker: true
+          });
+          records = results.data;
+        }
+      }
+      else if (file.type === 'application/vnd.ms-excel' ||
+        file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+        fileExt === 'xls' || fileExt === 'xlsx') {
+        const workbook = XLSX.read(fileData, {
+          type: 'buffer',
+          cellFormula: false,
+          cellHTML: false,
+          cellText: false
+        });
+
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+
+        records = XLSX.utils.sheet_to_json(sheet, {
+          header: 1,
+          defval: '',
+          raw: true,
+          range: 0
+        });
+      }
+      else if (file.type === 'text/plain' || fileExt === 'txt') {
+        const fileContent = fileData.toString('utf8');
+        records = fileContent
+          .split('\n')
+          .filter(line => line.trim().length > 0)
+          .map(line => line.split(',').map(item => item.trim()));
+      }
+
+      const BATCH_SIZE = 500;
+      const processedResults = [];
+      for (let i = 0; i < records.length; i += BATCH_SIZE) {
+        const batch = records.slice(i, i + BATCH_SIZE);
+        const batchResults = await uploadFile({
+          query: batch,
+          uploadedQuantities: {}
+        });
+        processedResults.push(...batchResults);
+      }
+
+      console.log(`[PERF] Total server processing time: ${Date.now() - performanceStart}ms for ${records.length} records`);
+      return processedResults;
+
+    } catch (error) {
+      console.error('File upload error:', error);
+      return {
+        error: 'Error processing the file: ' + (error.message || 'Unknown error'),
+      };
     }
+  },
 
-    const BATCH_SIZE = 500;
-    const processedResults = [];
-    for (let i = 0; i < records.length; i += BATCH_SIZE) {
-      const batch = records.slice(i, i + BATCH_SIZE);
-      const batchResults = await uploadFile({
-        query: batch,
-        uploadedQuantities: {}
-      });
-      processedResults.push(...batchResults);
-    }
-
-    console.log(`[PERF] Total server processing time: ${Date.now() - performanceStart}ms for ${records.length} records`);
-    return processedResults;
-
-  } catch (error) {
-    console.error('File upload error:', error);
-    return {
-      error: 'Error processing the file: ' + (error.message || 'Unknown error'),
-    };
-  }
-},
-  // addToCart: async ({ request, locals }) => {
-  //   try {
-  //     const formData = await request.formData();
-
-  //     const cartItems = JSON.parse(formData.get('cartItems')) || JSON.parse(formData.get('manualEntries'));
-
-  //     if (!locals.user) {
-  //       console.error('User not authenticated');
-  //       return fail(401, { message: 'User not authenticated' });
-  //     }
-
-  //     const userId = locals.user.userId;
-  //     const userEmail = locals.user.email;
-  //      const daaa = await bulkUploadToCart(cartItems, userId, userEmail)
-    
-  //     return {
-  //       success: true,
-  //       message: `${cartItems.length} item(s) added to cart successfully`
-  //     };
-  //   } catch (err) {
-  //     return fail(500, { message: 'Failed to add items to cart' });
-  //   }
-  // },
   addToCart: async ({ request, locals }) => {
     try {
       const formData = await request.formData();
-      
+
       const cartItems = JSON.parse(formData.get('cartItems')) || JSON.parse(formData.get('manualEntries'));
-      
+
       if (!locals.user) {
         console.error('User not authenticated');
         return fail(401, { message: 'User not authenticated' });
       }
-      
+
       const userId = locals.user.userId;
       const userEmail = locals.user.email;
-      
-      const result = await addToCart(cartItems, userId, userEmail);
-      
+
+      const result = await bulkUploadToCart(cartItems, userId, userEmail);
+
+
       return {
         success: result.success,
-        message: result.message
+        message: result.message,
+
       };
     } catch (err) {
       return fail(500, { message: 'Failed to add items to cart' });
     }
   },
-  
+
   createQuote: async ({ request }) => {
     try {
       const data = Object.fromEntries(await request.formData());
@@ -450,7 +368,7 @@ uploadFile: async ({ request }) => {
         .replaceAll('{{productNumber}}', data.productNumber || '')
         .replaceAll('{{units}}', data.units || '')
         .replaceAll('{{Firstname}}', data.Firstname || '')
-        .replaceAll('{{Lastname}}', data.lastname|| '')
+        .replaceAll('{{Lastname}}', data.lastname || '')
         .replaceAll('{{organisation}}', data.organisation || '')
         .replaceAll('{{email}}', data.email || '')
         .replaceAll('{{phone}}', data.phone || '')
@@ -620,11 +538,11 @@ export const load = async ({ locals }) => {
   const authedUser = { id: locals.user.userId };
   const userProfile = await Profile.findOne({ userId: authedUser.id });
   const cart = await getCart(authedUser.id)
-  console.log(authedUser,"userProile");
+  console.log(authedUser, "userProile");
 
 
   if (!userProfile) {
     return null;
   }
-  return JSON.parse(JSON.stringify({ profile: userProfile,cart }));
+  return JSON.parse(JSON.stringify({ profile: userProfile, cart }));
 };

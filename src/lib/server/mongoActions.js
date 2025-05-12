@@ -1,4 +1,4 @@
-import { PUBLIC_SDS_URL   } from "$env/static/public";
+import { PUBLIC_SDS_URL } from "$env/static/public";
 import Contact from '$lib/server/models/Contact.js';
 import Order from '$lib/server/models/Order.js';
 import Product from '$lib/server/models/Product.js';
@@ -12,7 +12,7 @@ import Solution from '$lib/server/models/Solution.js';
 import Quotes from '$lib/server/models/Quotes.js';
 import Products from '$lib/server/models/Product.js';
 import Helpsupport from '$lib/server/models/Helpsupport.js';
-import  User from '$lib/server/models/User.js'
+import User from '$lib/server/models/User.js'
 import Cart from '$lib/server/models/cart.js';
 import TokenVerification from '$lib/server/models/TokenVerification.js';
 import MyFavourites from '$lib/server/models/MyFavourite.js';
@@ -34,7 +34,7 @@ import {
 	WEBSITE_NAME,
 	MAIL_HOST
 } from '$env/static/private';
-import { PUBLIC_WEBSITE_NAME } from '$env/static/public'; 
+import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 import Return from '$lib/server/models/Return.js';
 import Counter from '$lib/server/models/Counter.js';
 import { sendEmail } from '$lib/server/utils/sendEmail.js';
@@ -44,36 +44,36 @@ async function conversionRates() {
 	const rates = await Curconversion.find().exec();
 	const currentRates = {};
 	rates.forEach(rate => {
-	  currentRates[rate.currency] = rate.rate;
+		currentRates[rate.currency] = rate.rate;
 	});
 	return currentRates;
-  }
-  
-  export async function convertToINR(pricing) {
+}
+
+export async function convertToINR(pricing) {
 	if (!Array.isArray(pricing)) return [];
 	const currentRates = await conversionRates();
-  
+
 	return pricing.map((priceItem) => {
-	  const { break: breakPoint, offer, ...currencies } = priceItem;
-	  const newPriceItem = {
-		break: breakPoint,
-		...(offer !== undefined && { offer }),
-	  };
-  
-	  if (currencies.INR) {
-		newPriceItem.INR = currencies.INR;
-		return newPriceItem;
-	  }
-  
-	  for (const [currency, amount] of Object.entries(currencies)) {
-		if (currentRates[currency]) {
-		  newPriceItem.INR = Number(amount * currentRates[currency]);
-		  return newPriceItem;
+		const { break: breakPoint, offer, ...currencies } = priceItem;
+		const newPriceItem = {
+			break: breakPoint,
+			...(offer !== undefined && { offer }),
+		};
+
+		if (currencies.INR) {
+			newPriceItem.INR = currencies.INR;
+			return newPriceItem;
 		}
-	  }
-	  return priceItem;
+
+		for (const [currency, amount] of Object.entries(currencies)) {
+			if (currentRates[currency]) {
+				newPriceItem.INR = Number(amount * currentRates[currency]);
+				return newPriceItem;
+			}
+		}
+		return priceItem;
 	});
-  }
+}
 
 export const createOrder = async (body) => {
 	try {
@@ -166,7 +166,7 @@ export async function checkavailabilityproduct(data) {
 	const requestedQuantity = parseInt(quantity, 10);
 
 	try {
-		const stockRecord = await Stock.findOne({ _id: stockId }).exec();		
+		const stockRecord = await Stock.findOne({ _id: stockId }).exec();
 		if (!stockRecord) {
 			console.log(`No stock record found for stockId: ${stockId}`);
 			return {
@@ -192,7 +192,7 @@ export async function checkavailabilityproduct(data) {
 				stock: 'Available',
 				type: 'success'
 			};
-		} else if(requestedQuantity > availableStock){
+		} else if (requestedQuantity > availableStock) {
 			return {
 				message: `Only ${availableStock} units are available to ship out of the requested ${requestedQuantity}`,
 				stock: 'Available',
@@ -217,67 +217,67 @@ export async function checkavailabilityproduct(data) {
 
 export async function favorite(favdata) {
 	const authedUser = favdata.authedEmail;
-  
+
 	if (authedUser) {
-	  const chemiDashProfileId = await Profile.findOne({ email: authedUser });
-	  const userId = chemiDashProfileId.userId;
-	  
-	  const existingRecord = await MyFavourite.findOne({ userId: userId });
-  
-	  // Initialize favoriteItem object
-	  const favoriteItem = {
-		productId: favdata.productId,
-		manufacturerId: favdata.manufacturerId,
-		stockId: favdata.stockId,
-		distributorId: favdata.distributorId,
-		productNumber: favdata.productNumber,
-		quantity: favdata.quantity,
-		stock: favdata.stock,
-	  };
-  
-	  if (existingRecord) {
-		if (!Array.isArray(existingRecord.favorite)) {
-		  existingRecord.favorite = [];
-		}
-  
-		// Check if product already exists in favorites
-		const productIndex = existingRecord.favorite.findIndex(
-		  (item) => item.productId.toString() === favdata.productId
-		);
-  
-		if (productIndex !== -1) {
-		  // Product exists, remove it
-		  existingRecord.favorite.splice(productIndex, 1);
-		  await existingRecord.save();
-		  return {
-			success: true,
-			type: "success",
-			message: "Product Removed from favorites!",
-		  };
-		} else {
-		  // Product does not exist, add it
-		  existingRecord.favorite.push(favoriteItem);
-		  await existingRecord.save();
-		  return {
-			success: true,
-			type: "success",
-			message: "Product Added to favorites!",
-		  };
-		}
-	  } else {
-		// If no existing favorite list, create a new record
-		await MyFavourite.create({
-		  userId: chemiDashProfileId.userId,
-		  userEmail: chemiDashProfileId.email,
-		  favorite: [favoriteItem],
-		});
-  
-		return {
-		  success: true,
-		  type: "success",
-		  message: "Product Added to favorites!",
+		const chemiDashProfileId = await Profile.findOne({ email: authedUser });
+		const userId = chemiDashProfileId.userId;
+
+		const existingRecord = await MyFavourite.findOne({ userId: userId });
+
+		// Initialize favoriteItem object
+		const favoriteItem = {
+			productId: favdata.productId,
+			manufacturerId: favdata.manufacturerId,
+			stockId: favdata.stockId,
+			distributorId: favdata.distributorId,
+			productNumber: favdata.productNumber,
+			quantity: favdata.quantity,
+			stock: favdata.stock,
 		};
-	  }
+
+		if (existingRecord) {
+			if (!Array.isArray(existingRecord.favorite)) {
+				existingRecord.favorite = [];
+			}
+
+			// Check if product already exists in favorites
+			const productIndex = existingRecord.favorite.findIndex(
+				(item) => item.productId.toString() === favdata.productId
+			);
+
+			if (productIndex !== -1) {
+				// Product exists, remove it
+				existingRecord.favorite.splice(productIndex, 1);
+				await existingRecord.save();
+				return {
+					success: true,
+					type: "success",
+					message: "Product Removed from favorites!",
+				};
+			} else {
+				// Product does not exist, add it
+				existingRecord.favorite.push(favoriteItem);
+				await existingRecord.save();
+				return {
+					success: true,
+					type: "success",
+					message: "Product Added to favorites!",
+				};
+			}
+		} else {
+			// If no existing favorite list, create a new record
+			await MyFavourite.create({
+				userId: chemiDashProfileId.userId,
+				userEmail: chemiDashProfileId.email,
+				favorite: [favoriteItem],
+			});
+
+			return {
+				success: true,
+				type: "success",
+				message: "Product Added to favorites!",
+			};
+		}
 	}
 }
 
@@ -346,37 +346,37 @@ export async function favorite(favdata) {
 
 export const checkoutOrder = async (order) => {
 	try {
-        let orderid 
+		let orderid
 		const counter = JSON.parse(JSON.stringify(await Counter.findOne({})))
-		if(counter?._id){
-			orderid = JSON.parse(JSON.stringify(await Counter.findOneAndUpdate({_id:counter._id},{$inc:{counter:1}},{new:true})))
-		}else{
-			orderid = JSON.parse(JSON.stringify(await Counter.create({counter:1})))
+		if (counter?._id) {
+			orderid = JSON.parse(JSON.stringify(await Counter.findOneAndUpdate({ _id: counter._id }, { $inc: { counter: 1 } }, { new: true })))
+		} else {
+			orderid = JSON.parse(JSON.stringify(await Counter.create({ counter: 1 })))
 		}
 		order.orderid = orderid.counter
 		const currency = JSON.parse(JSON.stringify(await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 })))
 
 		order.currentUsdRate = currency.rate
 		const newOrder = await Order.create(order);
-        for(let rec of order.orderdetails){
-			const stock = await Stock.findOneAndUpdate({_id:rec.stockId},{$inc:{orderedQty:rec.orderQty}},{new:true})
+		for (let rec of order.orderdetails) {
+			const stock = await Stock.findOneAndUpdate({ _id: rec.stockId }, { $inc: { orderedQty: rec.orderQty } }, { new: true })
 			//console.log(stock);
 			await StockLog.create({
-				 orderId:newOrder.orderid,
-                 productId:rec.productId,
-                 stockId:rec.stockId,
-				 manufacturerId:rec.manufacturerId,
-				 distributorId:rec.distributorId,
-				 quantity:rec.orderQty,
-				 totalStock:stock.stock - stock.orderedQty,
-				 actionType:"-",
-				 actionName:"Ordered"
+				orderId: newOrder.orderid,
+				productId: rec.productId,
+				stockId: rec.stockId,
+				manufacturerId: rec.manufacturerId,
+				distributorId: rec.distributorId,
+				quantity: rec.orderQty,
+				totalStock: stock.stock - stock.orderedQty,
+				actionType: "-",
+				actionName: "Ordered"
 			})
 		}
-		await Cart.findOneAndUpdate({userId:order.userId,isActiveCart:true},{isActiveCart:false})
-		
+		await Cart.findOneAndUpdate({ userId: order.userId, isActiveCart: true }, { isActiveCart: false })
+
 		if (newOrder._id) {
-			return { success: true, message: 'Successfully Ordered',orderId:newOrder.orderid,email:newOrder.userEmail };
+			return { success: true, message: 'Successfully Ordered', orderId: newOrder.orderid, email: newOrder.userEmail };
 		} else {
 			return {
 				success: false,
@@ -385,7 +385,7 @@ export const checkoutOrder = async (order) => {
 		}
 	} catch (error) {
 		//console.error('Error creating order:', error);
-		return { success: false, message: 'Something went wrong',error };
+		return { success: false, message: 'Something went wrong', error };
 	}
 };
 
@@ -521,41 +521,41 @@ export const signUp = async (body, cookies) => {
 	// const existingPhoneKey = await auth
 	//   .getKey("phone", body.phone)
 	//   .catch(() => null);
-  
+
 	if (existingUser) {
-	  return {
-		success: false,
-		message: "This email already exists. Please login or try with another.",
-	  };
+		return {
+			success: false,
+			message: "This email already exists. Please login or try with another.",
+		};
 	}
 
 	if (existingUsernameKey) {
-	  return {
-		success: false,
-		message: "This username already exists. Please login or try with another.",
-	  };
+		return {
+			success: false,
+			message: "This username already exists. Please login or try with another.",
+		};
 	}
-  
+
 	// if (existingPhoneKey) {
 	//   return {
 	// 	success: false,
 	// 	message: "This phone already exists. Please login or try with another.",
 	//   };
 	// }
-  
+
 	const luciaUser = await auth.createUser({
-	  key: {
-		providerId: "email",
-		providerUserId: body.email,
-		password: body.password,
-	  },
-	  attributes: {
-		username: body.username,
-		email: body.email,
-		// phone: body.phone,
-	  },
+		key: {
+			providerId: "email",
+			providerUserId: body.email,
+			password: body.password,
+		},
+		attributes: {
+			username: body.username,
+			email: body.email,
+			// phone: body.phone,
+		},
 	});
-  
+
 	// if (!existingPhoneKey) {
 	//   await auth.createKey({
 	// 	userId: luciaUser.userId,
@@ -566,65 +566,65 @@ export const signUp = async (body, cookies) => {
 	// }
 
 	if (!existingUsernameKey) {
-	  await auth.createKey({
-		userId: luciaUser.userId,
-		providerId: "username",
-		providerUserId: body.username,
-		password: body.password,
-	  });
+		await auth.createKey({
+			userId: luciaUser.userId,
+			providerId: "username",
+			providerUserId: body.username,
+			password: body.password,
+		});
 	}
 	console.log(luciaUser, "luciaUser");
-  
+
 	const newProfile = new Profile({
 		userId: luciaUser.userId,
-      firstName:body.firstName,
-	  lastName : body.lastName,
-        cellPhone: body.phone,
-        companyname: body.companyname,
-        companytype: body.companytype,
-        jobTitle: body.jobTitle,
-        email: body.email,
-        isPhoneVerified: body.isPhoneVerified,
-        isEmailVerified: body.isEmailVerified,
-        gstNumber: body.gstNumber,
-        tanNumber: body.tanNumber,
-        country: body.country,
-        currency: body.currency,
+		firstName: body.firstName,
+		lastName: body.lastName,
+		cellPhone: body.phone,
+		companyname: body.companyname,
+		companytype: body.companytype,
+		jobTitle: body.jobTitle,
+		email: body.email,
+		isPhoneVerified: body.isPhoneVerified,
+		isEmailVerified: body.isEmailVerified,
+		gstNumber: body.gstNumber,
+		tanNumber: body.tanNumber,
+		country: body.country,
+		currency: body.currency,
 		sitePreferences: {
-			productEntryType : "Manual Entry",
+			productEntryType: "Manual Entry",
 			noOfQuickOrderFields: 3,
 			noOfOrdersPerPage: 3,
 			noOfQuotesPerPage: 3
 		}
 	});
-  
+
 	const savedProfile = JSON.parse(JSON.stringify(await newProfile.save()));
 	console.log(savedProfile, "savedProfile");
-  
+
 	const key = await auth.useKey("email", body.email, body.password);
-	console.log("key.userId",key);
-	
+	console.log("key.userId", key);
+
 	const user = await auth.getUser(key.userId);
 	const session = await auth.createSession({
-	  userId: user.userId,
-	  attributes: {},
+		userId: user.userId,
+		attributes: {},
 	});
-  
+
 	const sessionCookie = auth.createSessionCookie(session);
 	cookies.set(
-	  sessionCookie.name,
-	  sessionCookie.value,
-	  sessionCookie.attributes
+		sessionCookie.name,
+		sessionCookie.value,
+		sessionCookie.attributes
 	);
 	console.log("Session created successfully");
-  
-	return {
-	  success: true,
-	  message: "Signup successful",
-	};
-  };
 
-  export const loginWithLinkedIn = async (userData, cookies) => {
+	return {
+		success: true,
+		message: "Signup successful",
+	};
+};
+
+export const loginWithLinkedIn = async (userData, cookies) => {
 	// console.log(userData, 'linkedinluciauser');
 	try {
 		const existingUser = await auth.getKey('email', userData.email);
@@ -643,7 +643,7 @@ export const signUp = async (body, cookies) => {
 			let session;
 			try {
 				session = await auth.createSession({
-					userId: existingUser.userId, 
+					userId: existingUser.userId,
 					attributes: {}
 				});
 				console.log('Session created:', session);
@@ -701,7 +701,7 @@ export const signUp = async (body, cookies) => {
 			country: 'N/A',
 			needsPasswordSetup: true,
 			sitePreferences: {
-				productEntryType : "Manual Entry",
+				productEntryType: "Manual Entry",
 				noOfQuickOrderFields: 3,
 				noOfOrdersPerPage: 3,
 				noOfQuotesPerPage: 3
@@ -779,21 +779,21 @@ const sendVerificationEmail = async (email, verificationUrl) => {
 
 const sendVerificationEmailform = async (email, verificationUrl) => {
 	const transporter = nodemailer.createTransport({
-	  service: "partskeys",
-	  host: MAIL_HOST,
-	  port: 587,
-	  secure: false,
-	  auth: {
-		user: SENDER_EMAIL,
-		pass: SENDER_PASSWORD,
-	  },
+		service: "partskeys",
+		host: MAIL_HOST,
+		port: 587,
+		secure: false,
+		auth: {
+			user: SENDER_EMAIL,
+			pass: SENDER_PASSWORD,
+		},
 	});
-  
+
 	const mailOptions = {
-	  from: SENDER_EMAIL,
-	  to: email,
-	  subject: "Email Verification for Your Account",
-	  html: `
+		from: SENDER_EMAIL,
+		to: email,
+		subject: "Email Verification for Your Account",
+		html: `
 <html>
   <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f2f2f2;">
 	  <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" style="background-color: #f2f2f2; padding: 20px;">
@@ -829,97 +829,97 @@ const sendVerificationEmailform = async (email, verificationUrl) => {
   </body>
 </html> `,
 	};
-  
+
 	try {
-	  const result = await transporter.sendMail(mailOptions);
-	  console.log("Verification email sent: ", result);
-	  return true;
+		const result = await transporter.sendMail(mailOptions);
+		console.log("Verification email sent: ", result);
+		return true;
 	} catch (error) {
-	  console.error("Error sending verification email:", error);
-	  return false;
+		console.error("Error sending verification email:", error);
+		return false;
 	}
-  };
+};
 
 export const sendemailOtp = async (email) => {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const emailSent = await sendVerificationEmailform(email, otp);
-    console.log(otp, "OTP sent");
-	
-    if (!emailSent) {
-        console.log("Failed to send email");
-        return null;
-    }
+	const otp = Math.floor(100000 + Math.random() * 900000).toString();
+	const emailSent = await sendVerificationEmailform(email, otp);
+	console.log(otp, "OTP sent");
 
-    const expiry = new Date(Date.now() + 5 * 60 * 1000);
-    const existingRecord = await TokenVerification.findOne({ email });
+	if (!emailSent) {
+		console.log("Failed to send email");
+		return null;
+	}
 
-    if (existingRecord) {
-        existingRecord.token = otp;
-        existingRecord.expiry = expiry;
-        await existingRecord.save(); 
-    } else {
-        await TokenVerification.create({
-            email,
-            token: otp,
-            verificationType: 'Non-Registered Users',
-            expiry
-        });
-    }
+	const expiry = new Date(Date.now() + 5 * 60 * 1000);
+	const existingRecord = await TokenVerification.findOne({ email });
 
-    return otp;
+	if (existingRecord) {
+		existingRecord.token = otp;
+		existingRecord.expiry = expiry;
+		await existingRecord.save();
+	} else {
+		await TokenVerification.create({
+			email,
+			token: otp,
+			verificationType: 'Non-Registered Users',
+			expiry
+		});
+	}
+
+	return otp;
 };
 
 export async function verifyemailOtp(email, enteredOtp) {
 	try {
-	  const tokenVerificationRecord = await TokenVerification.findOne({ email, token: enteredOtp });
-	  console.log(tokenVerificationRecord, "tokenVerificationRecord");
-  
-	  if (!tokenVerificationRecord) {
-		console.log("Invalid OTP or email.");
-		return { success: false, message: "The OTP entered is incorrect or has expired. Please try again." };
-	  }
-  
-	  if (Date.now() >= tokenVerificationRecord.expiry.getTime()) {
-		console.log("Token has expired.");
-		return { success: false, message: "Token has expired. Please verify your email again." };
-	  }
-  
-	  const profileRecord = await Profile.findOne({ email });
-  
-	  if (profileRecord) {
-		if (!profileRecord.isEmailVerified) {
-		  const profileUpdate = await Profile.updateOne(
-			{ email },
-			{ $set: { isEmailVerified: true } }
-		  );
-		  console.log(profileUpdate, "profileUpdate");
-  
-		  if (profileUpdate.matchedCount === 0) {
-			console.log("Failed to update the Profile record.");
-			return { success: false, message: "Failed to update the Profile record." };
-		  }
-  
-		  return { success: true, message: "Email verified successfully in Profile." };
+		const tokenVerificationRecord = await TokenVerification.findOne({ email, token: enteredOtp });
+		console.log(tokenVerificationRecord, "tokenVerificationRecord");
+
+		if (!tokenVerificationRecord) {
+			console.log("Invalid OTP or email.");
+			return { success: false, message: "The OTP entered is incorrect or has expired. Please try again." };
+		}
+
+		if (Date.now() >= tokenVerificationRecord.expiry.getTime()) {
+			console.log("Token has expired.");
+			return { success: false, message: "Token has expired. Please verify your email again." };
+		}
+
+		const profileRecord = await Profile.findOne({ email });
+
+		if (profileRecord) {
+			if (!profileRecord.isEmailVerified) {
+				const profileUpdate = await Profile.updateOne(
+					{ email },
+					{ $set: { isEmailVerified: true } }
+				);
+				console.log(profileUpdate, "profileUpdate");
+
+				if (profileUpdate.matchedCount === 0) {
+					console.log("Failed to update the Profile record.");
+					return { success: false, message: "Failed to update the Profile record." };
+				}
+
+				return { success: true, message: "Email verified successfully in Profile." };
+			} else {
+				return { success: true, message: "Email is already verified in Profile." };
+			}
 		} else {
-		  return { success: true, message: "Email is already verified in Profile." };
+			const tokenUpdate = await TokenVerification.updateOne(
+				{ email, token: enteredOtp },
+				{ $set: { isEmailVerified: true } }
+			);
+			console.log(tokenUpdate, "tokenUpdate");
+
+			if (tokenUpdate.matchedCount === 0) {
+				console.log("Failed to update the TokenVerification record.");
+				return { success: false, message: "Failed to update the TokenVerification record." };
+			}
+
+			return { success: true, message: "Email verified successfully" };
 		}
-	  } else {
-		const tokenUpdate = await TokenVerification.updateOne(
-		  { email, token: enteredOtp },
-		  { $set: { isEmailVerified: true } }
-		);
-		console.log(tokenUpdate, "tokenUpdate");
-  
-		if (tokenUpdate.matchedCount === 0) {
-		  console.log("Failed to update the TokenVerification record.");
-		  return { success: false, message: "Failed to update the TokenVerification record." };
-		}
-  
-		return { success: true, message: "Email verified successfully" };
-	  }
 	} catch (error) {
-	  console.error("Error verifying OTP:", error);
-	  return { success: false, message: "An unexpected error occurred while verifying the OTP." };
+		console.error("Error verifying OTP:", error);
+		return { success: false, message: "An unexpected error occurred while verifying the OTP." };
 	}
 };
 
@@ -1124,33 +1124,33 @@ export async function editProfileEmailPreferences(body) {
 
 export const searchByQuery = async (body) => {
 	// console.log("body.query",body.query);
-let cleanedQuery = body.query.replace(/[^\w]/g, "").toLowerCase();;
-// console.log("body.query",body.query);
+	let cleanedQuery = body.query.replace(/[^\w]/g, "").toLowerCase();;
+	// console.log("body.query",body.query);
 
 	const queryFilter = {
 		$or: [
-		{ cleanedName: { $eq: cleanedQuery } },
-		{ $text: { $search: cleanedQuery } },
-		{ CAS: { $eq: body.query } }
+			{ cleanedName: { $eq: cleanedQuery } },
+			{ $text: { $search: cleanedQuery } },
+			{ CAS: { $eq: body.query } }
 		]
-	  };
-	  
+	};
+
 	try {
 		let result = await Product.find(queryFilter)
 			.limit(20)
-			.populate('category','urlName')
-			.populate('subCategory','urlName')
+			.populate('category', 'urlName')
+			.populate('subCategory', 'urlName')
 			.select('productName CAS productNumber manufacturerName')
 			.lean();
 
 		let seen = new Set();
 		result = result.filter(prod => {
-		  if (!prod.CAS || !prod.productName) return true;
-		  const key = `${prod.CAS}__${prod.productName}`;
-		  if (seen.has(key)) return false; 
-		  seen.add(key);
-		  return true; 
-			})
+			if (!prod.CAS || !prod.productName) return true;
+			const key = `${prod.CAS}__${prod.productName}`;
+			if (seen.has(key)) return false;
+			seen.add(key);
+			return true;
+		})
 
 		return JSON.parse(JSON.stringify(result));
 	} catch (error) {
@@ -1162,15 +1162,15 @@ let cleanedQuery = body.query.replace(/[^\w]/g, "").toLowerCase();;
 export async function submitForm(data) {
 	try {
 
-	  const formEntries = data;  
-	  const response = await CopyConsent.create(formEntries);
+		const formEntries = data;
+		const response = await CopyConsent.create(formEntries);
 
-	  return { status: 200, success: true };
+		return { status: 200, success: true };
 	} catch (error) {
-	  console.error("Error saving form data:", error);
-	  return { status: 500, body: { success: false, error: error.message } };
+		console.error("Error saving form data:", error);
+		return { status: 500, body: { success: false, error: error.message } };
 	}
-  }
+}
 
 //CHEMIKART SOLUTIONS
 export const submitContactData = async (data) => {
@@ -1186,52 +1186,52 @@ export const submitContactData = async (data) => {
 
 //CHEMIKART QUOTES
 export const Addquotes = async (data) => {
-    const components = JSON.parse(data.components);
-    const formattedData = {
-        Custom_solution_type: data.solutionValue,
-        Custom_format: data.selectedColor,
-        Configure_custom_solution: {
-            components: components,
-            solvent: data.solvent,
-            packagingType: data.packagingType,
-            volume: data.volume,
-            units: data.units,
-            qualityLevel: data.qualityLevel,
-            analyticalTechnique: data.analyticalTechnique
-        },
-        Additional_notes: data.futherdetails,
-        status: data.status,
-        Customer_details: {
-            Title: data.title,
-            Firstname: data.first,
-            Lastname: data.last,
-            organisation: data.organisation,
+	const components = JSON.parse(data.components);
+	const formattedData = {
+		Custom_solution_type: data.solutionValue,
+		Custom_format: data.selectedColor,
+		Configure_custom_solution: {
+			components: components,
+			solvent: data.solvent,
+			packagingType: data.packagingType,
+			volume: data.volume,
+			units: data.units,
+			qualityLevel: data.qualityLevel,
+			analyticalTechnique: data.analyticalTechnique
+		},
+		Additional_notes: data.futherdetails,
+		status: data.status,
+		Customer_details: {
+			Title: data.title,
+			Firstname: data.first,
+			Lastname: data.last,
+			organisation: data.organisation,
 			country: data.country,
-            // invoiceNumber: data.lgc,
-            email: data.email,
-            number: data.number
+			// invoiceNumber: data.lgc,
+			email: data.email,
+			number: data.number
 			// userId: data.userId
-        },
+		},
 		Delivery_information: {
-            Address1: data.address1,
-            Address2: data.address2,
+			Address1: data.address1,
+			Address2: data.address2,
 			State: data.country1,
-            GST: data.county,
-            City: data.city,
-            Post: data.post
-        }
-    };
-    const quoteCount = await Quotes.countDocuments();
-    formattedData.quoteId = quoteCount + 1;  
-	formattedData.userId = data.userId;  
-    const newQuote = new Quotes(formattedData);
-    console.log("mongoactions newQuote",newQuote);
-    try {
-        await newQuote.save();
-        return { success: true, message: 'Quote added successfully', quoteId: formattedData.quoteId };
-    } catch (error) {
-        return { success: false, message: error.message };
-    }
+			GST: data.county,
+			City: data.city,
+			Post: data.post
+		}
+	};
+	const quoteCount = await Quotes.countDocuments();
+	formattedData.quoteId = quoteCount + 1;
+	formattedData.userId = data.userId;
+	const newQuote = new Quotes(formattedData);
+	console.log("mongoactions newQuote", newQuote);
+	try {
+		await newQuote.save();
+		return { success: true, message: 'Quote added successfully', quoteId: formattedData.quoteId };
+	} catch (error) {
+		return { success: false, message: error.message };
+	}
 };
 
 //CHEMIKART DOCUMENTS
@@ -1251,14 +1251,14 @@ export async function fetchcertificate(inputValue) {
 		if (!record) return null;
 
 		// Append base URL to sds and/or safetyDatasheet
-		const baseUrl = PUBLIC_SDS_URL  ;
+		const baseUrl = PUBLIC_SDS_URL;
 		return {
 			productNumber: record.productNumber,
 			safetyDatasheet: record.safetyDatasheet
-				? baseUrl  + '/' +  record.safetyDatasheet
+				? baseUrl + '/' + record.safetyDatasheet
 				: null,
 			sds: record.sds
-				? baseUrl  + '/' +  record.sds
+				? baseUrl + '/' + record.sds
 				: null
 		};
 	} catch (error) {
@@ -1330,7 +1330,7 @@ export const saveContactInfo = async (data) => {
 	try {
 		let finalData = finalformdata(data);
 		const record = await Helpsupport.create(finalData);
-		return { success: true, message:"Details Submittied Succesfully" };
+		return { success: true, message: "Details Submittied Succesfully" };
 	} catch (error) {
 		console.error('Error saving contact info:', error);
 		return { success: false, error: error.message };
@@ -1426,7 +1426,7 @@ export const passwordVerificationToken = async (body, verifyType) => {
 	console.log(user, 'User fetched');
 	const token = uuidv4();
 	const expiry = new Date(Date.now() + 15 * 60 * 1000);
-	console.log(token,expiry);
+	console.log(token, expiry);
 	const verification = await TokenVerification.create({
 		email,
 		token,
@@ -1436,16 +1436,16 @@ export const passwordVerificationToken = async (body, verifyType) => {
 	});
 	console.log('-------', verification);
 	const transporter = nodemailer.createTransport({
-		service: 'partskeys', 
+		service: 'partskeys',
 		host: 'mail.partskeys.com',
-		port: 587, 
+		port: 587,
 		secure: false,
 		auth: {
-			user: SENDER_EMAIL, 
-			pass: SENDER_PASSWORD 
+			user: SENDER_EMAIL,
+			pass: SENDER_PASSWORD
 		}
 	});
-	console.log('=======',transporter);
+	console.log('=======', transporter);
 	const mailOptions = {
 		from: SENDER_EMAIL,
 		to: email,
@@ -1476,7 +1476,7 @@ export const passwordVerificationToken = async (body, verifyType) => {
 	  </html>
 	`
 	};
-	console.log("+++++++",mailOptions);
+	console.log("+++++++", mailOptions);
 	try {
 		const res = await transporter.sendMail(mailOptions);
 		console.log('mail response', res);
@@ -1591,16 +1591,16 @@ export const ResetPassword = async (body) => {
 	}
 };
 
-  export const generateVerificationUrl = async (email, userId) => {
+export const generateVerificationUrl = async (email, userId) => {
 	const token = uuidv4();
 	const verificationUrl = token;
 
 	const emailSent = await sendVerificationEmail(email, verificationUrl);
 
 	if (!emailSent) {
-        console.log("Failed to send email");
-        return null;
-    }
+		console.log("Failed to send email");
+		return null;
+	}
 
 	await TokenVerification.create({
 		email,
@@ -1763,10 +1763,10 @@ export const getcancelreturn = async (id) => {
 // 	const requestedQuantity = parseInt(quantity, 10);
 
 // 	try {
-	
+
 // 		// console.log(`Querying stock with ProductId: ${ProductId}`);
 
-	
+
 // 		const stockRecord = await Stock.findOne({ productNumber: ProductId }).exec();
 
 // 		// console.log('Stock Record:', stockRecord);
@@ -1824,7 +1824,7 @@ export async function quickcheck(data) {
 	const requestedQuantity = parseInt(quantity, 10);
 
 	try {
-		const stockRecord = await Stock.findOne({ _id: stockId }).exec();		
+		const stockRecord = await Stock.findOne({ _id: stockId }).exec();
 		if (!stockRecord) {
 			console.log(`No stock record found for stockId: ${stockId}`);
 			return {
@@ -1850,7 +1850,7 @@ export async function quickcheck(data) {
 				stock: 'Available',
 				type: 'success'
 			};
-		} else if(requestedQuantity > availableStock){
+		} else if (requestedQuantity > availableStock) {
 			return {
 				message: `Only ${availableStock} units are available to ship out of the requested ${requestedQuantity}`,
 				stock: 'Available',
@@ -2054,11 +2054,11 @@ export const handleFileUpload = async (fileData) => {
 //             { $pull: { favorite: { productId: itemId } } },
 //             { new: true }
 //         );
-        
+
 //         if (!updatedDoc) {
 //             throw new Error('User favorites not found');
 //         }
-        
+
 //         return {
 //             status: 'success',
 //             message: 'Item deleted successfully',
@@ -2070,41 +2070,41 @@ export const handleFileUpload = async (fileData) => {
 //     }
 // };
 export const deleteFavoriteItem = async (itemId, userId) => {
-    try {
-        const existingFavorites = await MyFavourites.findOne({ userId });
-        
-        if (!existingFavorites) {
-            return {
-                status: 'error',
-                message: 'No favorites found for this user'
-            };
-        }
+	try {
+		const existingFavorites = await MyFavourites.findOne({ userId });
 
-        const updatedDoc = await MyFavourites.findOneAndUpdate(
-            { userId },
-            { $pull: { favorite: { productId: itemId } } },
-            { new: true }
-        );
-        
-        if (!updatedDoc) {
-            return {
-                status: 'error',
-                message: 'Failed to remove item from favorites'
-            };
-        }
-        
-        return {
-            status: 'success',
-            message: 'Item removed successfully',
-            favorite: JSON.parse(JSON.stringify(updatedDoc.favorite))
-        };
-    } catch (error) {
-        console.error('Error deleting favorite item:', error);
-        return {
-            status: 'error',
-            message: 'An error occurred while removing the item'
-        };
-    }
+		if (!existingFavorites) {
+			return {
+				status: 'error',
+				message: 'No favorites found for this user'
+			};
+		}
+
+		const updatedDoc = await MyFavourites.findOneAndUpdate(
+			{ userId },
+			{ $pull: { favorite: { productId: itemId } } },
+			{ new: true }
+		);
+
+		if (!updatedDoc) {
+			return {
+				status: 'error',
+				message: 'Failed to remove item from favorites'
+			};
+		}
+
+		return {
+			status: 'success',
+			message: 'Item removed successfully',
+			favorite: JSON.parse(JSON.stringify(updatedDoc.favorite))
+		};
+	} catch (error) {
+		console.error('Error deleting favorite item:', error);
+		return {
+			status: 'error',
+			message: 'An error occurred while removing the item'
+		};
+	}
 };
 
 
@@ -2115,11 +2115,11 @@ export const deleteFavoriteItem = async (itemId, userId) => {
 //             { $set: { favorite: [] } },
 //             { new: true }
 //         );
-        
+
 //         if (!updatedDoc) {
 //             throw new Error('User favorites not found');
 //         }
-        
+
 //         return {
 //             status: 'success',
 //             message: 'All favorite items deleted successfully',
@@ -2132,41 +2132,41 @@ export const deleteFavoriteItem = async (itemId, userId) => {
 // };
 
 export const clearAllFavorites = async (userId) => {
-    try {
-        const existingFavorites = await MyFavourites.findOne({ userId });
-        
-        if (!existingFavorites) {
-            return {
-                status: 'error',
-                message: 'No favorites found for this user'
-            };
-        }
+	try {
+		const existingFavorites = await MyFavourites.findOne({ userId });
 
-        const updatedDoc = await MyFavourites.findOneAndUpdate(
-            { userId },
-            { $set: { favorite: [] } },
-            { new: true }
-        );
-        
-        if (!updatedDoc) {
-            return {
-                status: 'error',
-                message: 'Failed to clear favorites'
-            };
-        }
-        
-        return {
-            status: 'success',
-            message: 'All favorites cleared successfully',
-            favorite: []
-        };
-    } catch (error) {
-        console.error('Error clearing favorites:', error);
-        return {
-            status: 'error',
-            message: 'An error occurred while clearing favorites'
-        };
-    }
+		if (!existingFavorites) {
+			return {
+				status: 'error',
+				message: 'No favorites found for this user'
+			};
+		}
+
+		const updatedDoc = await MyFavourites.findOneAndUpdate(
+			{ userId },
+			{ $set: { favorite: [] } },
+			{ new: true }
+		);
+
+		if (!updatedDoc) {
+			return {
+				status: 'error',
+				message: 'Failed to clear favorites'
+			};
+		}
+
+		return {
+			status: 'success',
+			message: 'All favorites cleared successfully',
+			favorite: []
+		};
+	} catch (error) {
+		console.error('Error clearing favorites:', error);
+		return {
+			status: 'error',
+			message: 'An error occurred while clearing favorites'
+		};
+	}
 };
 
 // export const favaddToCart = async (cartData, userId, userEmail) => {
@@ -2246,149 +2246,149 @@ export const clearAllFavorites = async (userId) => {
 // };
 
 export const favaddToCart = async (cartData, userId, userEmail) => {
-    try {
-        if (!cartData || !userId || !userEmail) {
-            return {
-                status: 'error',
-                message: 'Missing required data for cart operation'
-            };
-        }
+	try {
+		if (!cartData || !userId || !userEmail) {
+			return {
+				status: 'error',
+				message: 'Missing required data for cart operation'
+			};
+		}
 
-        const existingCart = await Cart.findOne({
-            userId,
-            isActiveCart: true,
-            isDeleted: false
-        });
+		const existingCart = await Cart.findOne({
+			userId,
+			isActiveCart: true,
+			isDeleted: false
+		});
 
-        // const cartItem = {
-        //     productId: cartData.productId,
-        //     stockId: cartData.stockId,
-        //     manufacturerId: cartData.manufacturerId,
-        //     distributorId: cartData.distributorId,
-        //     quantity: parseInt(cartData.quantity) || 1,
-        //     backOrder: cartData.backOrder,
-        //     isCart: false,
-        //     isQuote: false,
-        //     quoteOfferPrice: { INR: 0, USD: 0 },
-        //     cartOfferPrice: { INR: 0, USD: 0 }
-        // };
-        //console.log(cartData,"opopopop");
-        if (existingCart) {
-            const itemIndex = existingCart.cartItems.findIndex(
-                item => item.stockId.toString() === cartData.stockId
-            );
+		// const cartItem = {
+		//     productId: cartData.productId,
+		//     stockId: cartData.stockId,
+		//     manufacturerId: cartData.manufacturerId,
+		//     distributorId: cartData.distributorId,
+		//     quantity: parseInt(cartData.quantity) || 1,
+		//     backOrder: cartData.backOrder,
+		//     isCart: false,
+		//     isQuote: false,
+		//     quoteOfferPrice: { INR: 0, USD: 0 },
+		//     cartOfferPrice: { INR: 0, USD: 0 }
+		// };
+		//console.log(cartData,"opopopop");
+		if (existingCart) {
+			const itemIndex = existingCart.cartItems.findIndex(
+				item => item.stockId.toString() === cartData.stockId
+			);
 
-            if (itemIndex > -1) {
-				if(existingCart.cartItems[itemIndex].isCart === false && existingCart.cartItems[itemIndex].isQuote){
+			if (itemIndex > -1) {
+				if (existingCart.cartItems[itemIndex].isCart === false && existingCart.cartItems[itemIndex].isQuote) {
 					existingCart.cartItems[itemIndex].quantity += parseInt(cartData.quantity) || 1;
-                    await existingCart.save();
-                    return {
-                       status: 'success',
-                       message: 'Item quantity updated in cart'
-                    };
-				}else{
+					await existingCart.save();
+					return {
+						status: 'success',
+						message: 'Item quantity updated in cart'
+					};
+				} else {
 					return {
 						status: 'success',
 						message: 'Product is Offered in cart'
-					 };
+					};
 				}
-                
-            } else {
-                existingCart.cartItems.push(cartData);
-                await existingCart.save();
-                return {
-                    status: 'success',
-                    message: 'Item added to cart'
-                };
-            }
-        } else {
-            await Cart.create({
-                cartId: nanoid(8),
-                cartName: 'mycart',
-                cartItems: [cartData],
-                userId,
-                userEmail,
-                isDeleted: false,
-                isActiveCart: true
-            });
 
-            return {
-                status: 'success',
-                message: 'Item added to new cart'
-            };
-        }
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        return {
-            status: 'error',
-            message: 'Failed to add item to cart'
-        };
-    }
+			} else {
+				existingCart.cartItems.push(cartData);
+				await existingCart.save();
+				return {
+					status: 'success',
+					message: 'Item added to cart'
+				};
+			}
+		} else {
+			await Cart.create({
+				cartId: nanoid(8),
+				cartName: 'mycart',
+				cartItems: [cartData],
+				userId,
+				userEmail,
+				isDeleted: false,
+				isActiveCart: true
+			});
+
+			return {
+				status: 'success',
+				message: 'Item added to new cart'
+			};
+		}
+	} catch (error) {
+		console.error('Error adding to cart:', error);
+		return {
+			status: 'error',
+			message: 'Failed to add item to cart'
+		};
+	}
 };
 
 export const addAllToCart = async (items, userId, userEmail) => {
-    try {
-        const cartItems = items.map(item => ({
-            productId: item.productId,
-            stockId: item.stockId,
-            manufacturerId: item.manufacturerId,
-            distributorId: item.distributorId,
-            quantity: item.quantity,
-            backOrder: 0,
-            isCart: false,
-            isQuote: false,
-            quoteOfferPrice: { INR: 0, USD: 0 },
-            cartOfferPrice: { INR: 0, USD: 0 }
-        }));
+	try {
+		const cartItems = items.map(item => ({
+			productId: item.productId,
+			stockId: item.stockId,
+			manufacturerId: item.manufacturerId,
+			distributorId: item.distributorId,
+			quantity: item.quantity,
+			backOrder: 0,
+			isCart: false,
+			isQuote: false,
+			quoteOfferPrice: { INR: 0, USD: 0 },
+			cartOfferPrice: { INR: 0, USD: 0 }
+		}));
 
-        const existingCart = await Cart.findOne({
-            userId: userId,
-            isActiveCart: true,
-            isDeleted: false
-        });
+		const existingCart = await Cart.findOne({
+			userId: userId,
+			isActiveCart: true,
+			isDeleted: false
+		});
 
-        if (existingCart) {
-            for (const newItem of cartItems) {
-                const existingItemIndex = existingCart.cartItems.findIndex(
-                    item => item.stockId.toString() === newItem.stockId.toString()
-                );
-                console.log(existingItemIndex,"-==-=-=-=-=-=-=-=-=-=-==-=-===+-");
-                if (existingItemIndex > -1) {
-					if(existingCart.cartItems[existingItemIndex].isCart === false && existingCart.cartItems[existingItemIndex].isQuote === false){
+		if (existingCart) {
+			for (const newItem of cartItems) {
+				const existingItemIndex = existingCart.cartItems.findIndex(
+					item => item.stockId.toString() === newItem.stockId.toString()
+				);
+				console.log(existingItemIndex, "-==-=-=-=-=-=-=-=-=-=-==-=-===+-");
+				if (existingItemIndex > -1) {
+					if (existingCart.cartItems[existingItemIndex].isCart === false && existingCart.cartItems[existingItemIndex].isQuote === false) {
 						existingCart.cartItems[existingItemIndex].quantity += newItem.quantity;
 					}
-                } else {
-                    existingCart.cartItems.push(newItem);
-                }
-            }
+				} else {
+					existingCart.cartItems.push(newItem);
+				}
+			}
 
-            const updatedCart = await existingCart.save();
-            return {
-                status: 'success',
-                message: 'All items added to existing cart',
-                cart: updatedCart
-            };
-        } else {
-            const newCart = await Cart.create({
-                cartId: nanoid(8),
-                cartName: `mycart`,
-                cartItems: cartItems,
-                userId: userId,
-                userEmail: userEmail,
-                isDeleted: false,
-                isActiveCart: true
-            });
+			const updatedCart = await existingCart.save();
+			return {
+				status: 'success',
+				message: 'All items added to existing cart',
+				cart: updatedCart
+			};
+		} else {
+			const newCart = await Cart.create({
+				cartId: nanoid(8),
+				cartName: `mycart`,
+				cartItems: cartItems,
+				userId: userId,
+				userEmail: userEmail,
+				isDeleted: false,
+				isActiveCart: true
+			});
 
-            return {
-                status: 'success',
-                message: 'New cart created with all items',
-                cart: newCart
-            };
-        }
-    } catch (error) {
-        console.error('Error adding all items to cart:', error);
-        throw error;
-    }
+			return {
+				status: 'success',
+				message: 'New cart created with all items',
+				cart: newCart
+			};
+		}
+	} catch (error) {
+		console.error('Error adding all items to cart:', error);
+		throw error;
+	}
 };
 
 //Myfavouries actions ends
@@ -2396,7 +2396,7 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // export const quicksearch = async ({ query }) => {
 // console.log(query,"query");
 
-  
+
 // 	try {
 // 	  const baseProducts = await Product.find({
 // 		productNumber: { $regex: query, $options: 'i' }
@@ -2405,9 +2405,9 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 		.limit(20)
 // 		.lean()
 // 		.exec();
-  
+
 // 	  const enrichedProducts = [];
-  
+
 // 	  for (const baseProduct of baseProducts) {
 // 		const stockEntries = await Stock.find({ 
 // 		  productNumber: baseProduct.productNumber 
@@ -2415,7 +2415,7 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 		  .select('_id stock pricing distributor manufacturer')
 // 		  .lean()
 // 		  .exec();
-  
+
 // 		if (!stockEntries || stockEntries.length === 0) {
 // 		  enrichedProducts.push({
 // 			id: baseProduct._id.toString(),
@@ -2432,15 +2432,15 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 		  });
 // 		  continue;
 // 		}
-  
+
 // 		for (const entry of stockEntries) {
 // 		  let processedPricing = [];
 // 		  let priceoneValue = "";
-  
+
 // 		  if (entry.pricing) {
 // 			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
 // 			const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
-  
+
 // 			if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
 // 			  processedPricing = originalPricing.map(price => {
 // 				const inrValue = price.INR;
@@ -2450,9 +2450,9 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 				  USD: usdValue.toFixed(2)
 // 				};
 // 			  });
-  
+
 // 			  priceoneValue = originalPricing[0]?.INR || "";
-  
+
 // 			} else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
 // 			  processedPricing = originalPricing.map(price => {
 // 				const usdValue = price.USD;
@@ -2462,13 +2462,13 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 				  INR: inrValue.toFixed(2)
 // 				};
 // 			  });
-  
+
 // 			  priceoneValue = originalPricing[0]?.USD || "";
 // 			} else {
 // 			  processedPricing = originalPricing;
 // 			}
 // 		  }
-  
+
 // 		  const productEntry = {
 // 			id: baseProduct._id.toString(),
 // 			image: baseProduct.image || null,
@@ -2482,13 +2482,13 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 			priceone: priceoneValue,
 // 			pricing: processedPricing
 // 		  };
-  
+
 // 		  console.log("Final Product Entry:", JSON.stringify(productEntry, null, 2));
-  
+
 // 		  enrichedProducts.push(productEntry);
 // 		}
 // 	  }
-  
+
 // 	  return enrichedProducts;
 // 	} catch (error) {
 // 	  console.error("Error in quicksearch:", error);
@@ -2500,129 +2500,129 @@ export const quicksearch = async ({ query }) => {
 	const startTime = Date.now();
 
 	console.log(query, "query");
-   
+
 	try {
-	  // Find all matching products in a single query
-	  const baseProducts = await Product.find({
-		productNumber: { $regex: query, $options: 'i' }
-	  })
-		.select('_id productName productNumber prodDesc image')
-		.lean()
-		.exec();
-	  
-	  if (baseProducts.length === 0) {
-		return [];
-	  }
-	  
-	  // Extract all product numbers for batch lookup
-	  const productNumbers = baseProducts.map(product => product.productNumber);
-	  
-	  // Get all stock entries for these products in a single query
-	  const allStockEntries = await Stock.find({
-		productNumber: { $in: productNumbers }
-	  })
-		.select('_id stock pricing distributor manufacturer productNumber')
-		.lean()
-		.exec();
-	  
-	  // Create a lookup map of stock entries by productNumber
-	  const stockEntriesByProduct = {};
-	  allStockEntries.forEach(entry => {
-		if (!stockEntriesByProduct[entry.productNumber]) {
-		  stockEntriesByProduct[entry.productNumber] = [];
+		// Find all matching products in a single query
+		const baseProducts = await Product.find({
+			productNumber: { $regex: query, $options: 'i' }
+		})
+			.select('_id productName productNumber prodDesc image')
+			.lean()
+			.exec();
+
+		if (baseProducts.length === 0) {
+			return [];
 		}
-		stockEntriesByProduct[entry.productNumber].push(entry);
-	  });
-	  
-	  // Get currency conversion rate once instead of for each product
-	  const currency = await Curconversion.findOne({ currency: 'USD' })
-		.sort({ createdAt: -1 })
-		.lean()
-		.exec();
-	  
-	  const enrichedProducts = [];
-	  
-	  // Process each product with its stock entries
-	  for (const baseProduct of baseProducts) {
-		const stockEntries = stockEntriesByProduct[baseProduct.productNumber] || [];
-		
-		if (stockEntries.length === 0) {
-		  enrichedProducts.push({
-			id: baseProduct._id.toString(),
-			image: baseProduct.image || null,
-			description: baseProduct.prodDesc || null,
-			productName: baseProduct.productName,
-			productNumber: baseProduct.productNumber,
-			stockId: null,
-			manufacturer: null,
-			distributer: null,
-			stock: 0,
-			priceone: "",
-			pricing: []
-		  });
-		  continue;
-		}
-		
-		// Process stock entries for this product
-		for (const entry of stockEntries) {
-		  let processedPricing = [];
-		  let priceoneValue = "";
-		  
-		  if (entry.pricing) {
-			const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
-			
-			if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
-			  processedPricing = originalPricing.map(price => {
-				const inrValue = price.INR;
-				const usdValue = inrValue / currency.rate;
-				return {
-				  ...price,
-				  USD: usdValue.toFixed(2)
-				};
-			  });
-			  
-			  priceoneValue = originalPricing[0]?.INR || "";
-			  
-			} else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
-			  processedPricing = originalPricing.map(price => {
-				const usdValue = price.USD;
-				const inrValue = usdValue * currency.rate;
-				return {
-				  ...price,
-				  INR: inrValue.toFixed(2)
-				};
-			  });
-			  
-			  priceoneValue = originalPricing[0]?.USD || "";
-			} else {
-			  processedPricing = originalPricing;
+
+		// Extract all product numbers for batch lookup
+		const productNumbers = baseProducts.map(product => product.productNumber);
+
+		// Get all stock entries for these products in a single query
+		const allStockEntries = await Stock.find({
+			productNumber: { $in: productNumbers }
+		})
+			.select('_id stock pricing distributor manufacturer productNumber')
+			.lean()
+			.exec();
+
+		// Create a lookup map of stock entries by productNumber
+		const stockEntriesByProduct = {};
+		allStockEntries.forEach(entry => {
+			if (!stockEntriesByProduct[entry.productNumber]) {
+				stockEntriesByProduct[entry.productNumber] = [];
 			}
-		  }
-		  
-		  enrichedProducts.push({
-			id: baseProduct._id.toString(),
-			image: baseProduct.image || null,
-			description: baseProduct.prodDesc || null,
-			productName: baseProduct.productName,
-			productNumber: baseProduct.productNumber,
-			stockId: entry._id.toString(),
-			manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
-			distributer: entry.distributor ? entry.distributor.toString() : null,
-			stock: entry.stock || 0,
-			priceone: priceoneValue,
-			pricing: processedPricing
-		  });
+			stockEntriesByProduct[entry.productNumber].push(entry);
+		});
+
+		// Get currency conversion rate once instead of for each product
+		const currency = await Curconversion.findOne({ currency: 'USD' })
+			.sort({ createdAt: -1 })
+			.lean()
+			.exec();
+
+		const enrichedProducts = [];
+
+		// Process each product with its stock entries
+		for (const baseProduct of baseProducts) {
+			const stockEntries = stockEntriesByProduct[baseProduct.productNumber] || [];
+
+			if (stockEntries.length === 0) {
+				enrichedProducts.push({
+					id: baseProduct._id.toString(),
+					image: baseProduct.image || null,
+					description: baseProduct.prodDesc || null,
+					productName: baseProduct.productName,
+					productNumber: baseProduct.productNumber,
+					stockId: null,
+					manufacturer: null,
+					distributer: null,
+					stock: 0,
+					priceone: "",
+					pricing: []
+				});
+				continue;
+			}
+
+			// Process stock entries for this product
+			for (const entry of stockEntries) {
+				let processedPricing = [];
+				let priceoneValue = "";
+
+				if (entry.pricing) {
+					const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
+
+					if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
+						processedPricing = originalPricing.map(price => {
+							const inrValue = price.INR;
+							const usdValue = inrValue / currency.rate;
+							return {
+								...price,
+								USD: usdValue.toFixed(2)
+							};
+						});
+
+						priceoneValue = originalPricing[0]?.INR || "";
+
+					} else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
+						processedPricing = originalPricing.map(price => {
+							const usdValue = price.USD;
+							const inrValue = usdValue * currency.rate;
+							return {
+								...price,
+								INR: inrValue.toFixed(2)
+							};
+						});
+
+						priceoneValue = originalPricing[0]?.USD || "";
+					} else {
+						processedPricing = originalPricing;
+					}
+				}
+
+				enrichedProducts.push({
+					id: baseProduct._id.toString(),
+					image: baseProduct.image || null,
+					description: baseProduct.prodDesc || null,
+					productName: baseProduct.productName,
+					productNumber: baseProduct.productNumber,
+					stockId: entry._id.toString(),
+					manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
+					distributer: entry.distributor ? entry.distributor.toString() : null,
+					stock: entry.stock || 0,
+					priceone: priceoneValue,
+					pricing: processedPricing
+				});
+			}
 		}
-	  }
-	  console.log(enrichedProducts.length,"enrichedProducts");
-	  
-	  console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
-	  return enrichedProducts;
+		console.log(enrichedProducts.length, "enrichedProducts");
+
+		console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
+		return enrichedProducts;
 	} catch (error) {
-	  console.error("Error in quicksearch:", error);
-	  throw new Error("An error occurred while processing the quicksearch.");
+		console.error("Error in quicksearch:", error);
+		throw new Error("An error occurred while processing the quicksearch.");
 	}
-  };
+};
 //   export const uploadFile = async ({ query }) => {
 // 	const startTime = Date.now();
 
@@ -2631,16 +2631,16 @@ export const quicksearch = async ({ query }) => {
 // 	}
 
 // 	const skuData = [];
-	
+
 // 	for (const item of query) {
 // 	  const [sku, quantity] = item;
-	  
+
 // 	  if (!sku?.trim()) continue;
-	  
+
 // 	  const original = sku.trim();
 // 	  const normalizedSku = original.replace(/[-\s]/g, '').toLowerCase();
 // 	  const quantityNum = parseInt(quantity?.trim() || '1');
-	  
+
 // 	  skuData.push({
 // 		original,
 // 		normalizedSku,
@@ -2692,15 +2692,15 @@ export const quicksearch = async ({ query }) => {
 // 		}
 // 	  }
 // 	]).exec();
-	
+
 // 	const stockItemMap = {};
 // 	for (const item of stockItems) {
 // 	  stockItemMap[item.normalizedSku] = item;
 // 	}
-	
+
 // 	const results = skuData.map(({ normalizedSku, original, quantity }) => {
 // 	  const matchedStock = stockItemMap[normalizedSku];
-	  
+
 // 	  if (!matchedStock) {
 // 		return {
 // 		  productNumber: original,
@@ -2709,7 +2709,7 @@ export const quicksearch = async ({ query }) => {
 // 		  message: "Stock information is missing",
 // 		};
 // 	  }
-	  
+
 // 	  return {
 // 		id: matchedStock._id.toString(),
 // 		productId: matchedStock.productid.toString(),
@@ -2725,33 +2725,33 @@ export const quicksearch = async ({ query }) => {
 // 		message: "SKU is valid",
 // 	  };
 // 	});
-	
+
 // 	console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
 // 	return results;
 //   };
 // export const uploadFile = async ({ query }) => {
 // 	const startTime = Date.now();
-  
+
 // 	if (!query || query.length === 0) {
 // 	  return [];
 // 	}
 // 	const skuData = [];
 // 	for (const item of query) {
 // 	  const [sku, quantity] = item;
-	  
+
 // 	  if (!sku?.trim()) continue;
-	  
+
 // 	  const original = sku.trim();
 // 	  const normalizedSku = original.replace(/[-\s]/g, '').toLowerCase();
 // 	  const quantityNum = parseInt(quantity?.trim() || '1');
-	  
+
 // 	  skuData.push({
 // 		original,
 // 		normalizedSku,
 // 		quantity: quantityNum
 // 	  });
 // 	}
-  
+
 // 	if (skuData.length === 0) {
 // 	  return [];
 // 	}
@@ -2822,7 +2822,7 @@ export const quicksearch = async ({ query }) => {
 
 // 	const results = skuData.map(({ normalizedSku, original, quantity }) => {
 // 	  const matchedStock = stockItemMap[normalizedSku];
-	  
+
 // 	  if (!matchedStock) {
 // 		return {
 // 		  productNumber: original,
@@ -2831,7 +2831,7 @@ export const quicksearch = async ({ query }) => {
 // 		  message: "Stock information is missing",
 // 		};
 // 	  }
-	  
+
 // 	  return {
 // 		id: matchedStock._id.toString(),
 // 		productId: matchedStock.productid.toString(),
@@ -2847,117 +2847,117 @@ export const quicksearch = async ({ query }) => {
 // 		message: "SKU is valid",
 // 	  };
 // 	});
-	
+
 // 	console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
 // 	return results;
 //   };
 export const uploadFile = async ({ query }) => {
 	const startTime = Date.now();
-	
+
 	if (!query || query.length === 0) {
-	  return [];
+		return [];
 	}
 	const skuData = [];
 	const normalizedSkuSet = new Set();
-	
+
 	for (let i = 0; i < query.length; i++) {
-	  const sku = query[i][0];
-	  if (!sku?.trim()) continue;
-	  
-	  const original = sku.trim();
-	  const normalizedSku = original.replace(/[-\s]/g, '').toLowerCase();
-	  const quantityNum = parseInt(query[i][1]?.trim() || '1');
-	  
-	  skuData.push({
-		original,
-		normalizedSku,
-		quantity: quantityNum
-	  });
-	  normalizedSkuSet.add(normalizedSku);
+		const sku = query[i][0];
+		if (!sku?.trim()) continue;
+
+		const original = sku.trim();
+		const normalizedSku = original.replace(/[-\s]/g, '').toLowerCase();
+		const quantityNum = parseInt(query[i][1]?.trim() || '1');
+
+		skuData.push({
+			original,
+			normalizedSku,
+			quantity: quantityNum
+		});
+		normalizedSkuSet.add(normalizedSku);
 	}
-	
+
 	if (skuData.length === 0) {
-	  return [];
+		return [];
 	}
 	const normalizedSkusArray = [...normalizedSkuSet];
-	
+
 	try {
-	  const stockItems = await Stock.aggregate([
-		{
-		  $match: {
-			$expr: {
-			  $in: [
-				{ $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
-				normalizedSkusArray
-			  ]
+		const stockItems = await Stock.aggregate([
+			{
+				$match: {
+					$expr: {
+						$in: [
+							{ $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
+							normalizedSkusArray
+						]
+					}
+				}
+			},
+			{
+				$project: {
+					_id: 1,
+					productid: 1,
+					stock: 1,
+					distributor: 1,
+					manufacturer: 1,
+					productName: 1,
+					productNumber: 1,
+					sku: 1,
+					normalizedSku: { $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } }
+				}
 			}
-		  }
-		},
-		{
-		  $project: {
-			_id: 1,
-			productid: 1,
-			stock: 1,
-			distributor: 1,
-			manufacturer: 1,
-			productName: 1,
-			productNumber: 1,
-			sku: 1,
-			normalizedSku: { $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } }
-		  }
+		]).exec();
+		const stockItemMap = {};
+		for (let i = 0; i < stockItems.length; i++) {
+			const item = stockItems[i];
+			stockItemMap[item.normalizedSku] = item;
 		}
-	  ]).exec();
-	  const stockItemMap = {};
-	  for (let i = 0; i < stockItems.length; i++) {
-		const item = stockItems[i];
-		stockItemMap[item.normalizedSku] = item;
-	  }
-	  const results = new Array(skuData.length);
-	  for (let i = 0; i < skuData.length; i++) {
-		const { normalizedSku, original, quantity } = skuData[i];
-		const matchedStock = stockItemMap[normalizedSku];
-		
-		if (!matchedStock) {
-		  results[i] = {
+		const results = new Array(skuData.length);
+		for (let i = 0; i < skuData.length; i++) {
+			const { normalizedSku, original, quantity } = skuData[i];
+			const matchedStock = stockItemMap[normalizedSku];
+
+			if (!matchedStock) {
+				results[i] = {
+					productNumber: original,
+					quantity,
+					isValid: false,
+					message: "Stock information is missing",
+				};
+				continue;
+			}
+
+			results[i] = {
+				id: matchedStock._id.toString(),
+				productId: matchedStock.productid.toString(),
+				productNumber: matchedStock.productNumber,
+				productName: matchedStock.productName,
+				sku: matchedStock.sku,
+				quantity,
+				stockId: matchedStock._id.toString(),
+				stock: Number(matchedStock?.stock) || 0,
+				manufacturer: matchedStock.manufacturer?.toString() || null,
+				distributer: matchedStock.distributor?.toString() || null,
+				isValid: true,
+				message: "SKU is valid",
+			};
+		}
+
+		console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
+		return results;
+	} catch (error) {
+		console.error(`Error in uploadFile: ${error.message}`);
+		return skuData.map(({ original, quantity }) => ({
 			productNumber: original,
 			quantity,
 			isValid: false,
-			message: "Stock information is missing",
-		  };
-		  continue;
-		}
-		
-		results[i] = {
-		  id: matchedStock._id.toString(),
-		  productId: matchedStock.productid.toString(),
-		  productNumber: matchedStock.productNumber,
-		  productName: matchedStock.productName,
-		  sku: matchedStock.sku,
-		  quantity,
-		  stockId: matchedStock._id.toString(),
-		  stock: Number(matchedStock?.stock) || 0,
-		  manufacturer: matchedStock.manufacturer?.toString() || null,
-		  distributer: matchedStock.distributor?.toString() || null,
-		  isValid: true,
-		  message: "SKU is valid",
-		};
-	  }
-	  
-	  console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
-	  return results;
-	} catch (error) {
-	  console.error(`Error in uploadFile: ${error.message}`);
-	  return skuData.map(({ original, quantity }) => ({
-		productNumber: original,
-		quantity,
-		isValid: false,
-		message: "Error processing SKU",
-	  }));
+			message: "Error processing SKU",
+		}));
 	}
-  };
+};
 export const CreateProductQuote = async (formattedData) => {
-	console.log("formattedData",formattedData);
-	
+	console.log("formattedData", formattedData);
+
 	const newQuote = new PartRequest(formattedData);
 	await newQuote.save();
 	return { status: 200 };
@@ -2966,10 +2966,10 @@ export const CreateProductQuote = async (formattedData) => {
 
 export const saveMailId = async (body) => {
 	// console.log(body);
-	
+
 	const newSearchQuery = new SearchQueries(body);
 	// console.log(newSearchQuery);
-	
+
 	await newSearchQuery.save();
 	return { status: 200 };
 };
@@ -2978,92 +2978,92 @@ export const addToCart = async (item, userId, userEmail) => {
 	//console.log(item);
 	const a = Date.now()
 	const cart = await Cart.findOne({
-	  userId,
-	  userEmail,
-	  isActiveCart: true,
-	  cartItems: { $elemMatch: { stockId: item.stockId } }
+		userId,
+		userEmail,
+		isActiveCart: true,
+		cartItems: { $elemMatch: { stockId: item.stockId } }
 	});
-  
+
 	if (!cart) {
-	  const existingCart = await Cart.findOne({ userId, userEmail, isActiveCart: true });
-  
-	  if (!existingCart) {
-		await Cart.create({
-		  cartId: nanoid(8),
-		  cartName: "mycart",
-		  cartItems: [item],
-		  userId,
-		  userEmail,
-		  isActiveCart: true
-		});
-		return { success: true, message: "Product is added to new cart" };
-	  } else {
-		await Cart.findOneAndUpdate(
-		  { userId, userEmail, isActiveCart: true, },
-		  { $push: { cartItems: item } },
-		  { new: true }
-		);
-		return { success: true, message: "Product is added to cart" };
-	  }
+		const existingCart = await Cart.findOne({ userId, userEmail, isActiveCart: true });
+
+		if (!existingCart) {
+			await Cart.create({
+				cartId: nanoid(8),
+				cartName: "mycart",
+				cartItems: [item],
+				userId,
+				userEmail,
+				isActiveCart: true
+			});
+			return { success: true, message: "Product is added to new cart" };
+		} else {
+			await Cart.findOneAndUpdate(
+				{ userId, userEmail, isActiveCart: true, },
+				{ $push: { cartItems: item } },
+				{ new: true }
+			);
+			return { success: true, message: "Product is added to cart" };
+		}
 	} else {
-	 const updateCart = await Cart.findOneAndUpdate(
-		{
-		  userId,
-		  userEmail,
-		  isActiveCart: true,
-		  "cartItems.stockId": item.stockId,
-		  "cartItems.isCart": false,
-		  "cartItems.isQuote": false
-		},
-		{
-		  $set: {
-			"cartItems.$.quantity": item.quantity,
-			"cartItems.$.backOrder": item.backOrder
-		  }
-		},
-		{ new: true }
-	  );
-	  const b = Date.now()
-	  console.log(b-a,"millisecond");
-	  if(updateCart !== null){
-		return { success: true, message: "Product quantity is updated in cart" };
-	  }else{
-	    return { success: true, message: "Product quantity won't update due to an active offer price." };
-	  }
+		const updateCart = await Cart.findOneAndUpdate(
+			{
+				userId,
+				userEmail,
+				isActiveCart: true,
+				"cartItems.stockId": item.stockId,
+				"cartItems.isCart": false,
+				"cartItems.isQuote": false
+			},
+			{
+				$set: {
+					"cartItems.$.quantity": item.quantity,
+					"cartItems.$.backOrder": item.backOrder
+				}
+			},
+			{ new: true }
+		);
+		const b = Date.now()
+		console.log(b - a, "millisecond");
+		if (updateCart !== null) {
+			return { success: true, message: "Product quantity is updated in cart" };
+		} else {
+			return { success: true, message: "Product quantity won't update due to an active offer price." };
+		}
 	}
-  };
-  
-export const updateItemQty = async(body,userId)=>{
-	const {quantity,_id,cartId,stock} = body
+};
+
+export const updateItemQty = async (body, userId) => {
+	const { quantity, _id, cartId, stock } = body
 	const backOrder = quantity > stock ? quantity - stock : 0;
 	const cart = await Cart.findOneAndUpdate(
-		{userId,cartId,isActiveCart:true,'cartItems._id': _id},
-		{ $set: { 'cartItems.$.quantity': quantity, 'cartItems.$.backOrder': backOrder }},
-		{new:true}
+		{ userId, cartId, isActiveCart: true, 'cartItems._id': _id },
+		{ $set: { 'cartItems.$.quantity': quantity, 'cartItems.$.backOrder': backOrder } },
+		{ new: true }
 	)
-	return {success:true}
+	return { success: true }
 }
 
 export const deleteAllFromCart = async (body, userId) => {
 	const { cartId } = body;
 	const result = await Cart.findOneAndUpdate(
-		{ userId, cartId,isActiveCart:true },
+		{ userId, cartId, isActiveCart: true },
 		{ $set: { cartItems: [] } },
 		{ new: true }
 	);
 	console.log(result);
-	return { success:true, message: `All components are deleted` };
+	return { success: true, message: `All components are deleted` };
 };
 
 export const deleteOneFromCart = async (body, userId) => {
-	const {productNumber,_id,cartId} = body;
+	const { productNumber, _id, cartId } = body;
 	const result = await Cart.findOneAndUpdate(
 		{ userId, cartId },
-		{ $pull: { cartItems: { _id }}},
+		{ $pull: { cartItems: { _id } } },
 		{ new: true }
 	);
 	//console.log(result);
-	return {success:true, message: `${productNumber} is removed from Cart` };
+	return { success: true, message: `${productNumber} is removed from Cart` };
 };
 
 // export const getGuestCart = async(body)=>{
@@ -3099,106 +3099,106 @@ export const deleteOneFromCart = async (body, userId) => {
 // }
 export const getGuestCart = async (body) => {
 	try {
-	const productIds = body.map(item => item.productId);
-	//const distributorIds = body.map(item => item.distributorId);
-	const stockIds = body.map(item => item.stockId);
-  
-	// Fetch conversion rate once
-	const currencyPromise = Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
-  
-	// Fetch all product details in a single query
-	const productMapPromise = Product.find(
-	  { _id: { $in: productIds } },
-	  { imageSrc: 1, productName: 1, productNumber: 1 }
-	).then(products =>
-	  products.reduce((acc, p) => {
-		acc[p._id] = p;
-		return acc;
-	  }, {})
-	);
-  
-	// Fetch all stock details in a single query
-	const stockMapPromise = Stock.find(
-	  { _id: { $in: stockIds } },
-	  { productid: 1, distributor: 1, stock: 1, orderMultiple: 1, pricing: 1 }
-	).then(stocks =>
-	  stocks.reduce((acc, s) => {
-		acc[s._id] = s;
-		return acc;
-	  }, {})
-	);
-  
-	// Wait for all async data to be ready
-	const [currency, productMap, stockMap] = await Promise.all([
-	  currencyPromise,
-	  productMapPromise,
-	  stockMapPromise
-	]);
-	// Now process the cart
-	const cart = body.map(({ productId, manufacturerId, stockId, quantity }) => {
-	  const productDetails = productMap[productId];
-	  const stockDetails = stockMap[`${stockId}`];
-      console.log(stockDetails);
-	  let pricing = stockDetails?.pricing || {};
-  
-	  if (pricing.INR !== undefined && pricing.INR !== null) {
-		pricing.USD = pricing.INR / currency.rate;
-	  } else if (pricing.USD !== undefined && pricing.USD !== null) {
-		pricing.INR = pricing.USD * currency.rate;
-	  }
-	  const totalINR = pricing.INR * quantity;
-	  const totalUSD = pricing.USD * quantity;
-  
-	  return {
-		productDetails,
-		stockDetails,
-		manufacturerId,
-		quantity,
-		currentPrice: { INR: pricing.INR, USD: pricing.USD },
-		normalPrice: { INR: pricing.INR, USD: pricing.USD },
-		pricing,
-		itemTotalPrice: { totalINR, totalUSD }
-	  };
-	});
-   //  console.log(cart);
-	return { cart: JSON.parse(JSON.stringify(cart)) };
-  
+		const productIds = body.map(item => item.productId);
+		//const distributorIds = body.map(item => item.distributorId);
+		const stockIds = body.map(item => item.stockId);
+
+		// Fetch conversion rate once
+		const currencyPromise = Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
+
+		// Fetch all product details in a single query
+		const productMapPromise = Product.find(
+			{ _id: { $in: productIds } },
+			{ imageSrc: 1, productName: 1, productNumber: 1 }
+		).then(products =>
+			products.reduce((acc, p) => {
+				acc[p._id] = p;
+				return acc;
+			}, {})
+		);
+
+		// Fetch all stock details in a single query
+		const stockMapPromise = Stock.find(
+			{ _id: { $in: stockIds } },
+			{ productid: 1, distributor: 1, stock: 1, orderMultiple: 1, pricing: 1 }
+		).then(stocks =>
+			stocks.reduce((acc, s) => {
+				acc[s._id] = s;
+				return acc;
+			}, {})
+		);
+
+		// Wait for all async data to be ready
+		const [currency, productMap, stockMap] = await Promise.all([
+			currencyPromise,
+			productMapPromise,
+			stockMapPromise
+		]);
+		// Now process the cart
+		const cart = body.map(({ productId, manufacturerId, stockId, quantity }) => {
+			const productDetails = productMap[productId];
+			const stockDetails = stockMap[`${stockId}`];
+			console.log(stockDetails);
+			let pricing = stockDetails?.pricing || {};
+
+			if (pricing.INR !== undefined && pricing.INR !== null) {
+				pricing.USD = pricing.INR / currency.rate;
+			} else if (pricing.USD !== undefined && pricing.USD !== null) {
+				pricing.INR = pricing.USD * currency.rate;
+			}
+			const totalINR = pricing.INR * quantity;
+			const totalUSD = pricing.USD * quantity;
+
+			return {
+				productDetails,
+				stockDetails,
+				manufacturerId,
+				quantity,
+				currentPrice: { INR: pricing.INR, USD: pricing.USD },
+				normalPrice: { INR: pricing.INR, USD: pricing.USD },
+				pricing,
+				itemTotalPrice: { totalINR, totalUSD }
+			};
+		});
+		//  console.log(cart);
+		return { cart: JSON.parse(JSON.stringify(cart)) };
+
 	} catch (error) {
 		console.log(error);
 	}
-	};
-  
+};
 
-export const addItemsToExistingCart = async(body,cartId)=>{
+
+export const addItemsToExistingCart = async (body, cartId) => {
 	const updatedCart = await Cart.findOneAndUpdate(
-		{ cartId:cartId },  // Find the cart by its ID
+		{ cartId: cartId },  // Find the cart by its ID
 		{
-		  $addToSet: {
-			cartItems: { $each: body }  // Add multiple items only if they don't already exist in the array
-		  }
+			$addToSet: {
+				cartItems: { $each: body }  // Add multiple items only if they don't already exist in the array
+			}
 		},
 		{ new: true }  // Return the updated document
 	)
 	//console.log(updatedCart);
-	return { success:true}
+	return { success: true }
 }
 
-export const addItemsToNewCart = async(body,userId,userEmail)=>{
-		const cartId = nanoid(8)
-		const cartName = ""
-		await Cart.updateMany(
-			{ userId: userId }, 	
-			{ $set: { isActiveCart: false } } 
-		);
-		const newCart = await Cart.create({
-			userId,
-			userEmail,
-			cartId,
-			cartName,
-			isActiveCart:true,
-			cartItems:body
-		})
-	return { success:true}
+export const addItemsToNewCart = async (body, userId, userEmail) => {
+	const cartId = nanoid(8)
+	const cartName = ""
+	await Cart.updateMany(
+		{ userId: userId },
+		{ $set: { isActiveCart: false } }
+	);
+	const newCart = await Cart.create({
+		userId,
+		userEmail,
+		cartId,
+		cartName,
+		isActiveCart: true,
+		cartItems: body
+	})
+	return { success: true }
 }
 
 export const updateShippingAddress = async (body) => {
@@ -3224,7 +3224,7 @@ export const updateShippingAddress = async (body) => {
 
 export const updateBillingAddress = async (body) => {
 	const { userId, addAlternate, ...billingDetails } = body;
-	
+
 	try {
 		const userProfile = await Profile.findById(userId).select('billingAddress');
 		if (!userProfile) {
@@ -3235,7 +3235,7 @@ export const updateBillingAddress = async (body) => {
 		return {
 			field: 'billing',
 			success: true,
-			message:'Added address successfully'
+			message: 'Added address successfully'
 		};
 	} catch (error) {
 		console.error('Error updating billing address:', error);
@@ -3244,60 +3244,60 @@ export const updateBillingAddress = async (body) => {
 };
 
 export const addRecurrence = async (body, userId) => {
-	const { cartId,recurring, startingDate,recurringDate } = body;
-    let recurrence = {} 
-	const search = await Cart.findOne({userId,cartId,recurrence:{$exists:true}})
+	const { cartId, recurring, startingDate, recurringDate } = body;
+	let recurrence = {}
+	const search = await Cart.findOne({ userId, cartId, recurrence: { $exists: true } })
 	const tog = search?.recurrence ? 'updated' : 'added';
-	if(search === null){
+	if (search === null) {
 		recurrence = {
 			recurring,
 			recurringDate,
-			previousRecurringDate:startingDate,
+			previousRecurringDate: startingDate,
 			addedDate: startingDate
 		}
-	}else{
+	} else {
 		recurrence = {
 			recurring,
 			recurringDate,
-			previousRecurringDate:startingDate,
+			previousRecurringDate: startingDate,
 			addedDate: search.recurrence.addedDate
 		}
 	}
-	const recure = await Cart.findOneAndUpdate({ userId, cartId },{ $set: { recurrence }});
-	
+	const recure = await Cart.findOneAndUpdate({ userId, cartId }, { $set: { recurrence } });
+
 	if (recure) {
 		return { success: true, msg: `Recurrence is ${tog} successfully` };
 	}
 };
 
-export const deleteRecurrence = async(body)=>{
-	const {cartId} = body
-	const deleteRecurrence =  await Cart.updateOne({ cartId },{ $unset: { recurrence: 1 } });
+export const deleteRecurrence = async (body) => {
+	const { cartId } = body
+	const deleteRecurrence = await Cart.updateOne({ cartId }, { $unset: { recurrence: 1 } });
 	//console.log(deleteRecurrence,"fff");   
 	return { success: true, msg: `Recurrence deleted successfully` };
 }
 
 
-export const addToCartquick = async(item,userId,userEmail)=>{
-	const search = await Cart.findOne({userId,userEmail,isActiveCart:true}).lean()
+export const addToCartquick = async (item, userId, userEmail) => {
+	const search = await Cart.findOne({ userId, userEmail, isActiveCart: true }).lean()
 	let cart
-	if(search === null){
-		cart = await Cart.create({cartId:nanoid(8),cartName:"mycart",cartItems:item,userId,userEmail,isActiveCart:true})
-		return {success:true,message:"Product is added to cart2"}
-	}else{
-		const findItem = search.cartItems.find(x=>x.stockId.toString() === item.stockId)
-	   console.log(item,"sdffffffffff",findItem);
-		if(findItem === undefined){
-		cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$push:{cartItems:item}},{new:true})
-		return {success:true,message:"Product is added to cart"}
-		}else{
-		 findItem.quantity = item.quantity
-		 findItem.backOrder = item.backOrder
-		cart = await Cart.findOneAndUpdate({userId,userEmail,isActiveCart:true},{$set:{cartItems:search.cartItems}},{new:true})
-		return {success:true,message:"Product quantity is updated in cart"}
+	if (search === null) {
+		cart = await Cart.create({ cartId: nanoid(8), cartName: "mycart", cartItems: item, userId, userEmail, isActiveCart: true })
+		return { success: true, message: "Product is added to cart2" }
+	} else {
+		const findItem = search.cartItems.find(x => x.stockId.toString() === item.stockId)
+		console.log(item, "sdffffffffff", findItem);
+		if (findItem === undefined) {
+			cart = await Cart.findOneAndUpdate({ userId, userEmail, isActiveCart: true }, { $push: { cartItems: item } }, { new: true })
+			return { success: true, message: "Product is added to cart" }
+		} else {
+			findItem.quantity = item.quantity
+			findItem.backOrder = item.backOrder
+			cart = await Cart.findOneAndUpdate({ userId, userEmail, isActiveCart: true }, { $set: { cartItems: search.cartItems } }, { new: true })
+			return { success: true, message: "Product quantity is updated in cart" }
 		}
 	}
-} 
+}
 
 export const resumeCart = async (cartId, userId) => {
 	if (!cartId || !userId) {
@@ -3358,403 +3358,406 @@ export const updateCart = async (cartId) => {
 
 export const updateCartName = async (cartId, cartName) => {
 	try {
-	  const result = await Cart.findByIdAndUpdate(
-		cartId,
-		{
-		  $set: {
-			cartName: cartName,
-			updatedAt: new Date()
-		  }
-		},
-		{ new: true }
-	  );
-	   
-	  if (!result) {
-		throw new Error('Cart not found');
-	  }
-  
-	  return result;
+		const result = await Cart.findByIdAndUpdate(
+			cartId,
+			{
+				$set: {
+					cartName: cartName,
+					updatedAt: new Date()
+				}
+			},
+			{ new: true }
+		);
+
+		if (!result) {
+			throw new Error('Cart not found');
+		}
+
+		return result;
 	} catch (error) {
-	  console.error('Error updating cart name:', error);
-	  throw error;
+		console.error('Error updating cart name:', error);
+		throw error;
 	}
 };
 export const createNewCart = async (body) => {
-    try {
-        const { userId, userEmail, customCartName } = body;
+	try {
+		const { userId, userEmail, customCartName } = body;
 
-        if (!userId || !userEmail) {
-            return { 
-                success: false, 
-                error: 'Missing required fields: userId or userEmail.' 
-            };
-        }
+		if (!userId || !userEmail) {
+			return {
+				success: false,
+				error: 'Missing required fields: userId or userEmail.'
+			};
+		}
 
-        const updateResult = await Cart.updateMany(
-            { userId, isActiveCart: true }, 
-            { $set: { isActiveCart: false } }
-        );
-        // console.log(`Deactivated ${updateResult.modifiedCount} cart(s)`);
+		const updateResult = await Cart.updateMany(
+			{ userId, isActiveCart: true },
+			{ $set: { isActiveCart: false } }
+		);
+		// console.log(`Deactivated ${updateResult.modifiedCount} cart(s)`);
 
-        const cartId = nanoid(8);
+		const cartId = nanoid(8);
 
-        const cartName = customCartName && customCartName.length > 0 
-		? customCartName 
-		: `MyCart`;
+		const cartName = customCartName && customCartName.length > 0
+			? customCartName
+			: `MyCart`;
 
-        const newCart = await Cart.create({
-            userId,
-            userEmail,
-            cartId,
-            cartName,
-            isActiveCart: true
-        });
+		const newCart = await Cart.create({
+			userId,
+			userEmail,
+			cartId,
+			cartName,
+			isActiveCart: true
+		});
 
-        return { 
-            success: true, 
-            cartId: newCart.cartId, 
-            message: 'Cart created successfully.' 
-        };
-    } catch (err) {
-        console.error('Error creating new cart:', err);
-        return { 
-            success: false, 
-            error: 'Failed to create new cart. Please try again later.' 
-        };
-    }
+		return {
+			success: true,
+			cartId: newCart.cartId,
+			message: 'Cart created successfully.'
+		};
+	} catch (err) {
+		console.error('Error creating new cart:', err);
+		return {
+			success: false,
+			error: 'Failed to create new cart. Please try again later.'
+		};
+	}
 };
 
-export const updateRecurrence = async (body ) => {
+export const updateRecurrence = async (body) => {
 	const { cartId, recurring, dayOfMonth, recurringDate } = body;
-	
+
 	try {
-	  const existingCart = await Cart.findOne({ _id: cartId });
-	  
-	  if (!existingCart) {
-		return {
-		  success: false,
-		  msg: 'Cart not found'
+		const existingCart = await Cart.findOne({ _id: cartId });
+
+		if (!existingCart) {
+			return {
+				success: false,
+				msg: 'Cart not found'
+			};
+		}
+
+		const currentDate = new Date();
+
+		const recurrenceData = {
+			recurring: recurring,
+			recurringDate: recurringDate || calculateRecurringDate(recurring, dayOfMonth),
+			previousRecurringDate: currentDate,
+			addedDate: existingCart.recurrence?.addedDate || currentDate
 		};
-	  }
-	  
-	  const currentDate = new Date();
-	  
-	  const recurrenceData = {
-		recurring: recurring,
-		recurringDate: recurringDate || calculateRecurringDate(recurring, dayOfMonth),
-		previousRecurringDate: currentDate,
-		addedDate: existingCart.recurrence?.addedDate || currentDate
-	  };
-	  
-	  const updatedCart = await Cart.findOneAndUpdate(
-		{ _id: cartId },
-		{ $set: { recurrence: recurrenceData } },
-		{ new: true }
-	  );
-	  
-	  if (!updatedCart) {
+
+		const updatedCart = await Cart.findOneAndUpdate(
+			{ _id: cartId },
+			{ $set: { recurrence: recurrenceData } },
+			{ new: true }
+		);
+
+		if (!updatedCart) {
+			return {
+				success: false,
+				msg: 'Failed to update recurrence'
+			};
+		}
+
+		const action = existingCart.recurrence ? 'updated' : 'added';
 		return {
-		  success: false,
-		  msg: 'Failed to update recurrence'
+			success: true,
+			msg: `Recurrence ${action} successfully`,
+			data: updatedCart.recurrence
 		};
-	  }
-	  
-	  const action = existingCart.recurrence ? 'updated' : 'added';
-	  return {
-		success: true,
-		msg: `Recurrence ${action} successfully`,
-		data: updatedCart.recurrence
-	  };
 	} catch (error) {
-	  console.error('Error in updateRecurrence:', error);
-	  return {
-		success: false,
-		msg: 'An error occurred while processing recurrence'
-	  };
+		console.error('Error in updateRecurrence:', error);
+		return {
+			success: false,
+			msg: 'An error occurred while processing recurrence'
+		};
 	}
 };
-  
-export const deleteCartRecurrence = async (cartId ) => {
+
+export const deleteCartRecurrence = async (cartId) => {
 	try {
-	  const existingCart = await Cart.findOne({ _id: cartId });
-	  
-	  if (!existingCart) {
+		const existingCart = await Cart.findOne({ _id: cartId });
+
+		if (!existingCart) {
+			return {
+				success: false,
+				msg: 'Cart not found'
+			};
+		}
+
+		const updatedCart = await Cart.findOneAndUpdate(
+			{ _id: cartId },
+			{ $unset: { recurrence: 1 } },
+			{ new: true }
+		);
+
+		if (!updatedCart) {
+			return {
+				success: false,
+				msg: 'Failed to remove recurrence'
+			};
+		}
+
 		return {
-		  success: false,
-		  msg: 'Cart not found'
+			success: true,
+			msg: 'Recurrence removed successfully',
+			data: null
 		};
-	  }
-	  
-	  const updatedCart = await Cart.findOneAndUpdate(
-		{ _id: cartId },
-		{ $unset: { recurrence: 1 } },
-		{ new: true }
-	  );
-	  
-	  if (!updatedCart) {
-		return {
-		  success: false,
-		  msg: 'Failed to remove recurrence'
-		};
-	  }
-	  
-	  return {
-		success: true,
-		msg: 'Recurrence removed successfully',
-		data: null
-	  };
 	} catch (error) {
-	  console.error('Error in deleteCartRecurrence:', error);
-	  return {
-		success: false,
-		msg: 'An error occurred while removing recurrence'
-	  };
+		console.error('Error in deleteCartRecurrence:', error);
+		return {
+			success: false,
+			msg: 'An error occurred while removing recurrence'
+		};
 	}
 };
-  
+
 function calculateRecurringDate(recurring, dayOfMonth) {
 	const today = new Date();
 	const futureDate = new Date();
 	futureDate.setMonth(today.getMonth() + recurring);
-	
+
 	const targetDay = parseInt(dayOfMonth) || today.getDate();
 	const lastDayOfTargetMonth = new Date(futureDate.getFullYear(), futureDate.getMonth() + 1, 0).getDate();
 	const adjustedDay = Math.min(targetDay, lastDayOfTargetMonth);
-	
+
 	futureDate.setDate(adjustedDay);
-	
+
 	return futureDate;
 }
 
 export const submitFeedback = async (data) => {
 	try {
-	  const newFeedback = new Feedback(data); // Use the Feedback model here
-	  const savedFeedback = await newFeedback.save();
-	  console.log("savedFeedback",savedFeedback);
-	  
-	  return savedFeedback;
+		const newFeedback = new Feedback(data); // Use the Feedback model here
+		const savedFeedback = await newFeedback.save();
+		console.log("savedFeedback", savedFeedback);
+
+		return savedFeedback;
 	} catch (error) {
-	//   console.error('Error saving feedback:', error);
-	  throw new Error('Failed to save feedback information');
+		//   console.error('Error saving feedback:', error);
+		throw new Error('Failed to save feedback information');
 	}
-  };
+};
 
-  export const createShareCart = async(userId,userEmail,cartId)=>{
-	const sharecart = await Cart.findOne({cartId})
+export const createShareCart = async (userId, userEmail, cartId) => {
+	const sharecart = await Cart.findOne({ cartId })
 
-	const cartItems = sharecart.cartItems.map(cart=>{
+	const cartItems = sharecart.cartItems.map(cart => {
 		cart.isQuote = false
 		cart.isCart = false
-		cart.cartOfferPrice = {INR:0,USD:0}
-		cart.offerPrice = {INR:0,USD:0}
-		cart.bomOfferPrice = {INR:0,USD:0}
+		cart.cartOfferPrice = { INR: 0, USD: 0 }
+		cart.offerPrice = { INR: 0, USD: 0 }
+		cart.bomOfferPrice = { INR: 0, USD: 0 }
 		return cart
 	})
 	const newcart = await Cart.create({
 		userId,
 		userEmail,
-		cartId:nanoid(8),
-		cartName:"mycart",
-		isActiveCart:true,
+		cartId: nanoid(8),
+		cartName: "mycart",
+		isActiveCart: true,
 		cartItems
 	});
 	//console.log(newcart);
-	const remove = await Cart.updateOne({userId,isActiveCart:true},{isActiveCart:false})
-	if(newcart.userId === userId && remove.acknowledged){
-		return {success:true}
-	}else{
-		return {success:false}
+	const remove = await Cart.updateOne({ userId, isActiveCart: true }, { isActiveCart: false })
+	if (newcart.userId === userId && remove.acknowledged) {
+		return { success: true }
+	} else {
+		return { success: false }
 	}
 }
 
-export const addNewRecurrenceDate = async(userId,body) =>{
-	const {cartId,newDate} = body
-	
-	const findCart = await Cart.findOne({cartId})
+export const addNewRecurrenceDate = async (userId, body) => {
+	const { cartId, newDate } = body
+
+	const findCart = await Cart.findOne({ cartId })
 	let timePortion = findCart.recurrence.recurringDate.toISOString().split("T")[1]
 	let updatedDateTime = newDate + "T" + timePortion;
-    const findcart = await Cart.findOne({cartId,'recurrenceLogs.recurringDate':findCart.recurrence.recurringDate,'recurrenceLogs.action':"Extended Date"})
-	if(findcart?._id){
-	    return { success:true,message:"Recurrence date is already updated"}
+	const findcart = await Cart.findOne({ cartId, 'recurrenceLogs.recurringDate': findCart.recurrence.recurringDate, 'recurrenceLogs.action': "Extended Date" })
+	if (findcart?._id) {
+		return { success: true, message: "Recurrence date is already updated" }
 	}
-    await Cart.findOneAndUpdate({cartId},
-		{'recurrence.recurringDate':updatedDateTime,
-		$push:{recurrenceLogs:{recurringDate:findCart.recurrence.recurringDate,action:"Extended Date"}}},{new:true})
-	return { success:true,message:"Recurrence date updated successfully"}
+	await Cart.findOneAndUpdate({ cartId },
+		{
+			'recurrence.recurringDate': updatedDateTime,
+			$push: { recurrenceLogs: { recurringDate: findCart.recurrence.recurringDate, action: "Extended Date" } }
+		}, { new: true })
+	return { success: true, message: "Recurrence date updated successfully" }
 }
 
-export const addRecurrenceReject = async(userId,body) =>{
-	const {cartId,recurringDate} = body
-	const findcart = await Cart.findOne({cartId,'recurrenceLogs.recurringDate':recurringDate,'recurrenceLogs.action':"Rejected"})
+export const addRecurrenceReject = async (userId, body) => {
+	const { cartId, recurringDate } = body
+	const findcart = await Cart.findOne({ cartId, 'recurrenceLogs.recurringDate': recurringDate, 'recurrenceLogs.action': "Rejected" })
 	console.log(findcart);
-	if(findcart?._id){
-	    return { success:true,message:"Recurrence is already rejected"}
+	if (findcart?._id) {
+		return { success: true, message: "Recurrence is already rejected" }
 	}
-    await Cart.findOneAndUpdate({cartId},{$push:{recurrenceLogs:{recurringDate,action:"Rejected"}}},{new:true})
-	await sendEmail("Recurrence Order Rejected","recurrence order is rejected by user","yusuf@partskeys.com")
-	return { success:true,action:"reject",message:"Recurrence date updated successfully"}
+	await Cart.findOneAndUpdate({ cartId }, { $push: { recurrenceLogs: { recurringDate, action: "Rejected" } } }, { new: true })
+	await sendEmail("Recurrence Order Rejected", "recurrence order is rejected by user", "yusuf@partskeys.com")
+	return { success: true, action: "reject", message: "Recurrence date updated successfully" }
 }
-export const recurrenceCartActive = async(userId,body) =>{
-	const {cartId,recurringDate} = body
-	const findcart = await Cart.findOne({cartId,'recurrenceLogs.recurringDate':recurringDate,'recurrenceLogs.action':"Accepted"})
-	if(findcart?._id){
-	    return { success:true,message:"Recurrence order is completed"}
+export const recurrenceCartActive = async (userId, body) => {
+	const { cartId, recurringDate } = body
+	const findcart = await Cart.findOne({ cartId, 'recurrenceLogs.recurringDate': recurringDate, 'recurrenceLogs.action': "Accepted" })
+	if (findcart?._id) {
+		return { success: true, message: "Recurrence order is completed" }
 	}
-    await Cart.findOneAndUpdate({userId,isActiveCart:true},{isActiveCart:false})
-    await Cart.findOneAndUpdate({cartId},{isActiveCart:true,$push:{recurrenceLogs:{recurringDate,action:"Accepted"}}})
-	return { success:true,action:"accept",message:"Recurrence date updated successfully"}
+	await Cart.findOneAndUpdate({ userId, isActiveCart: true }, { isActiveCart: false })
+	await Cart.findOneAndUpdate({ cartId }, { isActiveCart: true, $push: { recurrenceLogs: { recurringDate, action: "Accepted" } } })
+	return { success: true, action: "accept", message: "Recurrence date updated successfully" }
 }
 
-export const getMyFavorites = async(userId) => {
-	const myFav = await MyFavourites.findOne({userId},{favorite:1,_id:0}).lean()
-	let favorite = JSON.parse(JSON.stringify(myFav.favorite.map(x=>x.productId)))
-	return {favorite}
+export const getMyFavorites = async (userId) => {
+	const myFav = await MyFavourites.findOne({ userId }, { favorite: 1, _id: 0 }).lean()
+	let favorite = JSON.parse(JSON.stringify(myFav.favorite.map(x => x.productId)))
+	return { favorite }
 }
 
-// export const bulkUploadToCart = async(items,userId,userEmail) =>{
-// 	const bulk = await Cart.findOneAndUpdate(
-// 		{userId,isActiveCart:true},
-// 		{
-// 		  $push: {
-// 			cartItems: { $each: items }
-// 		  }
-// 		},
-// 		{ new: true }
-// 	  );
-
-//     if(bulk === null){
-// 		await Cart.create({
-// 			cartId: nanoid(8),
-// 			cartName: "mycart",
-// 			cartItems: items,
-// 			userId,
-// 			userEmail,
-// 			isActiveCart: true
-// 		  });
-// 		  return { success: true, message: "Product is added to new cart" };
-	  
-// 	}else{
-// 		return { success: true, message: "Product is added to new cart" };
-// 	}
-	  
-// }
 
 
 export const bulkUploadToCart = async (items, userId, userEmail) => {
 	if (!items || items.length === 0) {
-	  return { success: false, message: "No items to add" };
+		return { success: false, message: "No items to add" };
 	}
-	const stockIds = items.map(item => item.stockId);
-	const itemsMap = new Map();
-	items.forEach(item => itemsMap.set(item.stockId, item));
-	
+
 	try {
-	  const cart = await Cart.findOne(
-		{ userId, userEmail, isActiveCart: true },
-		{ cartId: 1, cartItems: 1 }
-	  ).lean();
-	  
-	  if (!cart) {
-		const newCart = await Cart.create({
-		  cartId: nanoid(8),
-		  cartName: "mycart",
-		  cartItems: items,
-		  userId,
-		  userEmail,
-		  isActiveCart: true
-		});
-		
-		return {
-		  success: true,
-		  message: `${items.length} item(s) added to cart`
-		};
-	  }
-	  let added = 0, updated = 0, offered = 0;
-	  const offeredItems = [];
-	  const existingItems = cart.cartItems.filter(item => stockIds.includes(item.stockId));
-	  const existingItemsMap = new Map();
-	  existingItems.forEach(item => existingItemsMap.set(item.stockId, item));
-	  const itemsToAdd = [];
-	  const bulkUpdateOps = [];
-	  
-	  for (const stockId of stockIds) {
-		const newItem = itemsMap.get(stockId);
-		const existingItem = existingItemsMap.get(stockId);
-		
-		if (!existingItem) {
-		  itemsToAdd.push(newItem);
-		  added++;
-		} else if (existingItem.isCart || existingItem.isQuote) {
-		  offered++;
-		  offeredItems.push(stockId);
-		} else {
-		  bulkUpdateOps.push({
-			updateOne: {
-			  filter: {
-				_id: cart._id,
-				"cartItems.stockId": stockId
-			  },
-			  update: {
-				$set: {
-				  "cartItems.$.quantity": newItem.quantity,
-				  "cartItems.$.backOrder": newItem.backOrder
-				}
-			  }
-			}
-		  });
-		  updated++;
+		let existingCart = await Cart.findOne({ userId, userEmail, isActiveCart: true });
+
+		if (!existingCart) {
+			await Cart.create({
+				cartId: nanoid(8),
+				cartName: "mycart",
+				cartItems: items,
+				userId,
+				userEmail,
+				isActiveCart: true
+			});
+
+			return {
+				success: true,
+				message: "Items added to new cart"
+			};
 		}
-	  }
-	  const operations = [];
-	  
-	  if (itemsToAdd.length > 0) {
-		operations.push(
-		  Cart.updateOne(
-			{ _id: cart._id },
-			{ $push: { cartItems: { $each: itemsToAdd } } }
-		  )
-		);
-	  }
-	  
-	  if (bulkUpdateOps.length > 0) {
-		operations.push(Cart.bulkWrite(bulkUpdateOps));
-	  }
-	  if (operations.length > 0) {
-		await Promise.all(operations);
-	  }
-	  if (offered > 0 && added === 0 && updated === 0) {
+
+		let updatedItemsCount = 0;
+		let addedItemsCount = 0;
+		let notUpdatedDueToOffer = [];
+
+		for (const item of items) {
+			const itemIndex = existingCart.cartItems.findIndex(
+				cartItem => cartItem.stockId.toString() === item.stockId
+			);
+
+			if (itemIndex > -1) {
+				const isOffered = existingCart.cartItems[itemIndex].isCart || existingCart.cartItems[itemIndex].isQuote;
+
+				if (isOffered) {
+					notUpdatedDueToOffer.push(item.stockId);
+				} else {
+					existingCart.cartItems[itemIndex].quantity = item.quantity;
+					existingCart.cartItems[itemIndex].backOrder = item.backOrder || false;
+					updatedItemsCount++;
+				}
+			} else {
+				existingCart.cartItems.push(item);
+				addedItemsCount++;
+			}
+		}
+
+		await existingCart.save();
+		if (notUpdatedDueToOffer.length > 0 && addedItemsCount === 0 && updatedItemsCount === 0) {
+			return {
+				success: true,
+				message: "Product quantity won't update due to an active offer price.",
+				notUpdatedStockIds: notUpdatedDueToOffer
+			};
+		}
+
 		return {
-		  success: true,
-		  message: `${offered} item(s) already offered in cart`
+			success: true,
+			message: `Valid products added to the cart.${notUpdatedDueToOffer.length > 0 ? " Some products were not updated due to an active offer." : ""}`,
+			notUpdatedStockIds: notUpdatedDueToOffer
 		};
-	  } else if (offered > 0) {
-		return {
-		  success: true,
-		  message: `${added + updated} item(s) added to cart. ${offered} item(s) already offered in cart.`,
-		  offeredItems
-		};
-	  } else if (updated > 0 && added === 0) {
-		return {
-		  success: true,
-		  message: `${updated} item(s) quantities updated in cart`
-		};
-	  } else if (added > 0 && updated === 0) {
-		return {
-		  success: true,
-		  message: `${added} item(s) added to cart`
-		};
-	  } else {
-		return {
-		  success: true,
-		  message: `${added + updated} item(s) added/updated in cart`
-		};
-	  }
+
 	} catch (error) {
-	  console.error("Error in bulkUploadToCart:", error);
-	  return {
-		success: false,
-		message: "Failed to process items",
-		error: error.message
-	  };
+		console.error("Error in bulkUploadToCart:", error);
+		return {
+			success: false,
+			message: "Failed to add/update items in cart",
+			error: error.message
+		};
 	}
-  };
+};
+
+
+// export const bulkUploadToCart = async (items, userId, userEmail) => {
+// 	if (!items || items.length === 0) {
+// 		return { success: false, message: "No items to add" };
+// 	}
+
+// 	try {
+// 		let existingCart = await Cart.findOne({ userId, userEmail, isActiveCart: true });
+
+// 		if (!existingCart) {
+// 			await Cart.create({
+// 				cartId: nanoid(8),
+// 				cartName: "mycart",
+// 				cartItems: items,
+// 				userId,
+// 				userEmail,
+// 				isActiveCart: true
+// 			});
+
+// 			return {
+// 				success: true,
+// 				message: "Items added to new cart"
+// 			};
+// 		}
+
+// 		for (const item of items) {
+// 			const itemIndex = existingCart.cartItems.findIndex(
+// 				cartItem => cartItem.stockId.toString() === item.stockId
+// 			);
+
+// 			if (itemIndex > -1) {
+// 				const validToUpdate = await Cart.findOne({
+// 					userId,
+// 					userEmail,
+// 					isActiveCart: true,
+// 					"cartItems.stockId": item.stockId,
+// 					"cartItems.isCart": false,
+// 					"cartItems.isQuote": false
+// 				});
+
+// 				if (validToUpdate) {
+// 					existingCart.cartItems[itemIndex].quantity = item.quantity;
+// 					existingCart.cartItems[itemIndex].backOrder = item.backOrder || false;
+// 				} else {
+// 					return {
+// 						success: true,
+// 						message: "Product quantity won't update due to an active offer price."
+// 					};
+// 					continue;
+// 				}
+// 			} else {
+// 				// Add new item
+// 				existingCart.cartItems.push(item);
+// 			}
+// 		}
+
+// 		await existingCart.save();
+// 		return {
+// 			success: true,
+// 			message: "Items added/updated in cart"
+// 		};
+// 	} catch (error) {
+// 		console.error("Error in bulkUploadToCart:", error);
+// 		return {
+// 			success: false,
+// 			message: "Failed to add/update items in cart",
+// 			error: error.message
+// 		};
+// 	}
+// };
+
+
