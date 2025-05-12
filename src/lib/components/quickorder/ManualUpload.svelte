@@ -8,7 +8,7 @@
   import Bulkupload from "./Bulkupload.svelte";
   import { toast } from "svelte-sonner";
   import { addItemToCart } from "$lib/stores/cart.js";
-  import { PUBLIC_IMAGE_URL } from "$env/static/public";
+  import { PUBLIC_IMAGE_URL, PUBLIC_WEBSITE_URL } from "$env/static/public";
   import { countries, phoneNumberPatterns } from "$lib/Data/constants.js";
   let highlightedIndex = -1;
   let dropdownEl;
@@ -1839,19 +1839,24 @@ function handleClickOutside(event) {
         on:click|self={hideDetails}
       >
         <button
-          class="absolute top-2 right-2 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
+          class="absolute sm:top-6 top-2 sm:right-6 right-2 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
           on:click={hideDetails}
-          aria-label="Close"
-        >
+          aria-label="Close">
           <Icon
             icon="mdi:close"
-            class="text-2xl font-bold text-red-600 border rounded hover:p-px"
-          />
+            class="text-2xl font-bold text-red-600 border rounded hover:p-px"/>
         </button>
-
-        <h3 class="text-xl font-bold text-left mb-2 border-b-1 pb-3">
-          Availability for {selectedProduct.productNumber} - {selectedProduct.size}
+        <h3 class="text-xl font-medium text-left mb-2 border-b-1 pb-3">
+          Availability for 
+          <a 
+            href={`${PUBLIC_WEBSITE_URL}/products/details/${selectedProduct?.productNumber}`} 
+            class="text-primary-500 hover:underline" >
+            {selectedProduct?.productNumber} - {selectedProduct?.size}
+          </a>
         </h3>
+        <!-- <h3 class="text-xl font-bold text-left mb-2 border-b-1 pb-3">
+          Availability for {selectedProduct.productNumber} - {selectedProduct.size}
+        </h3> -->
         <p class="text-gray-500 mb-10 text-left mt-2">
           Enter quantity to check availability.
         </p>
