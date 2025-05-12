@@ -8,7 +8,7 @@
   import Bulkupload from "./Bulkupload.svelte";
   import { toast } from "svelte-sonner";
   import { addItemToCart } from "$lib/stores/cart.js";
-  import { PUBLIC_IMAGE_URL, PUBLIC_WEBSITE_URL } from "$env/static/public";
+  import { PUBLIC_IMAGE_URL } from "$env/static/public";
   import { countries, phoneNumberPatterns } from "$lib/Data/constants.js";
   let highlightedIndex = -1;
   let dropdownEl;
@@ -384,7 +384,6 @@
       cart = JSON.parse(localStorage.getItem("cart")) || [];
     }
   }
-
 
   const showDetails = (index, product) => {
     selectedProduct = product;
@@ -1138,81 +1137,81 @@
   }
 
   function handleKeyDown(event) {
-        const exactCountryMatch = countries.some(
-            (c) => c.name === country && c.name === searchTerm,
-        );
-        if (
-            exactCountryMatch &&
-            !(
-                event.key === "Backspace" ||
-                event.key === "Delete" ||
-                event.key === "ArrowLeft" ||
-                event.key === "ArrowRight" ||
-                event.key === "Home" ||
-                event.key === "End" ||
-                event.key === "Tab" ||
-                event.key === "Escape" ||
-                event.ctrlKey ||
-                event.key === "ArrowUp" ||
-                event.key === "ArrowDown"
-            )
-        ) {
-            const input = document.querySelector('input[name="country"]');
-            if (
-                input &&
-                (input.selectionStart !== input.selectionEnd ||
-                    input.selectionStart === 0)
-            ) {
-                return true;
-            }
-            event.preventDefault();
-            return false;
-        }
-
-        if (showDropdown) {
-            switch (event.key) {
-                case "ArrowDown":
-                    event.preventDefault();
-                    if (filteredCountries.length > 0) {
-                        highlightedIndex =
-                            (highlightedIndex + 1) % filteredCountries.length;
-                        scrollToHighlighted();
-                    }
-                    break;
-                case "ArrowUp":
-                    event.preventDefault();
-                    if (filteredCountries.length > 0) {
-                        highlightedIndex =
-                            highlightedIndex <= 0
-                                ? filteredCountries.length - 1
-                                : highlightedIndex - 1;
-                        scrollToHighlighted();
-                    }
-                    break;
-            }
-        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-            showDropdown = true;
-            if (filteredCountries.length > 0) {
-                highlightedIndex = 0;
-            }
-            event.preventDefault();
-        }
-        if (event.key === "Enter") {
-            if (
-                highlightedIndex >= 0 &&
-                highlightedIndex < filteredCountries.length
-            ) {
-                selectCountry(filteredCountries[highlightedIndex]);
-                event.preventDefault();
-            } else if (searchTerm) {
-                selectCountry(filteredCountries[0]);
-                event.preventDefault();
-            }
-        } else if (event.key === "Escape") {
-            showDropdown = false;
-            highlightedIndex = -1;
-        }
+    const exactCountryMatch = countries.some(
+      (c) => c.name === country && c.name === searchTerm,
+    );
+    if (
+      exactCountryMatch &&
+      !(
+        event.key === "Backspace" ||
+        event.key === "Delete" ||
+        event.key === "ArrowLeft" ||
+        event.key === "ArrowRight" ||
+        event.key === "Home" ||
+        event.key === "End" ||
+        event.key === "Tab" ||
+        event.key === "Escape" ||
+        event.ctrlKey ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown"
+      )
+    ) {
+      const input = document.querySelector('input[name="country"]');
+      if (
+        input &&
+        (input.selectionStart !== input.selectionEnd ||
+          input.selectionStart === 0)
+      ) {
+        return true;
+      }
+      event.preventDefault();
+      return false;
     }
+
+    if (showDropdown) {
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          if (filteredCountries.length > 0) {
+            highlightedIndex =
+              (highlightedIndex + 1) % filteredCountries.length;
+            scrollToHighlighted();
+          }
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          if (filteredCountries.length > 0) {
+            highlightedIndex =
+              highlightedIndex <= 0
+                ? filteredCountries.length - 1
+                : highlightedIndex - 1;
+            scrollToHighlighted();
+          }
+          break;
+      }
+    } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      showDropdown = true;
+      if (filteredCountries.length > 0) {
+        highlightedIndex = 0;
+      }
+      event.preventDefault();
+    }
+    if (event.key === "Enter") {
+      if (
+        highlightedIndex >= 0 &&
+        highlightedIndex < filteredCountries.length
+      ) {
+        selectCountry(filteredCountries[highlightedIndex]);
+        event.preventDefault();
+      } else if (searchTerm) {
+        selectCountry(filteredCountries[0]);
+        event.preventDefault();
+      }
+    } else if (event.key === "Escape") {
+      showDropdown = false;
+      highlightedIndex = -1;
+    }
+  }
   function scrollToHighlighted() {
     if (!dropdownEl) return;
     const items = dropdownEl.querySelectorAll("li");
@@ -1235,37 +1234,38 @@
   }
 
   function handleInputChange(event) {
-		searchTerm = event.target.value;
-		const isDeleting =
-			event.inputType === 'deleteContentBackward' || event.inputType === 'deleteContentForward';
+    searchTerm = event.target.value;
+    const isDeleting =
+      event.inputType === "deleteContentBackward" ||
+      event.inputType === "deleteContentForward";
 
-		if (searchTerm.length > 0 && !isDeleting) {
-			filterCountriesWithoutAutoSelect();
-			showDropdown = filteredCountries.length > 0;
-			const codeSearch = searchTerm.replace('+', '').trim();
-			if (codeSearch.length > 0) {
-				const exactCodeMatches = filteredCountries.filter(
-					(country) => country.code.replace('+', '') === codeSearch
-				);
+    if (searchTerm.length > 0 && !isDeleting) {
+      filterCountriesWithoutAutoSelect();
+      showDropdown = filteredCountries.length > 0;
+      const codeSearch = searchTerm.replace("+", "").trim();
+      if (codeSearch.length > 0) {
+        const exactCodeMatches = filteredCountries.filter(
+          (country) => country.code.replace("+", "") === codeSearch,
+        );
 
-				if (exactCodeMatches.length === 1) {
-					selectCountry(exactCodeMatches[0]);
-					return;
-				}
-			}
+        if (exactCodeMatches.length === 1) {
+          selectCountry(exactCodeMatches[0]);
+          return;
+        }
+      }
 
-			const countriesStartingWith = filteredCountries.filter((country) =>
-				country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-			);
+      const countriesStartingWith = filteredCountries.filter((country) =>
+        country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+      );
 
-			if (countriesStartingWith.length === 1) {
-				selectCountry(countriesStartingWith[0]);
-			}
-		} else {
-			filterCountriesWithoutAutoSelect();
-			showDropdown = filteredCountries.length > 0;
-		}
-	}
+      if (countriesStartingWith.length === 1) {
+        selectCountry(countriesStartingWith[0]);
+      }
+    } else {
+      filterCountriesWithoutAutoSelect();
+      showDropdown = filteredCountries.length > 0;
+    }
+  }
   function filterCountriesWithoutAutoSelect() {
     const countriesStartingWith = countries.filter((country) =>
       country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
@@ -1335,20 +1335,20 @@
       return true;
     }
   }
-//   function handleClickOutside(event) {
-//   if (showDropdown && dropdownContainer && !dropdownContainer.contains(event.target)) {
-//     showDropdown = false;
-//   }
-// }
-function handleClickOutside(event) {
-		if (!dropdownRef?.contains(event.target)) {
-			showDropdown = false;
-		}
-	}
+  //   function handleClickOutside(event) {
+  //   if (showDropdown && dropdownContainer && !dropdownContainer.contains(event.target)) {
+  //     showDropdown = false;
+  //   }
+  // }
+  function handleClickOutside(event) {
+    if (!dropdownRef?.contains(event.target)) {
+      showDropdown = false;
+    }
+  }
   onMount(() => {
-        document.addEventListener("click", handleClickOutside);
-        return () => document.removeEventListener("click", handleClickOutside);
-    });
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  });
 
   const tabs = [{ name: "Manual Entry" }, { name: "Bulk Upload" }];
   let activeTab = "Manual Entry";
@@ -1743,7 +1743,9 @@ function handleClickOutside(event) {
                     if (resultData && resultData.success === true) {
                       if (
                         resultData.message &&
-                        resultData.message.includes("already offered in cart")
+                        resultData.message.includes(
+                          "Product quantity won't update due to an active offer price.",
+                        )
                       ) {
                         if (
                           !resultData.message.includes("added") &&
@@ -1802,7 +1804,7 @@ function handleClickOutside(event) {
                   <span>Adding...</span>
                 {:else}
                   <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
-                  <span>Add to Cart</span>
+                  <span>Add to Cart complete</span>
                 {/if}
               </button>
             </form>
@@ -1818,7 +1820,7 @@ function handleClickOutside(event) {
                 <span>Adding...</span>
               {:else}
                 <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
-                <span>Add to Cart</span>
+                <span>Add to Cart </span>
               {/if}
             </button>
           {/if}
@@ -1835,28 +1837,23 @@ function handleClickOutside(event) {
       on:click|self={hideDetails}
     >
       <div
-      class="bg-white rounded-lg w-full max-w-lg p-6 md:p-8 mx-4 md:mx-0 relative shadow-lg"
+        class="bg-white rounded-lg w-full max-w-lg p-6 md:p-8 mx-4 md:mx-0 relative shadow-lg"
         on:click|self={hideDetails}
       >
         <button
-          class="absolute sm:top-6 top-2 sm:right-6 right-2 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
+          class="absolute top-2 right-2 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
           on:click={hideDetails}
-          aria-label="Close">
+          aria-label="Close"
+        >
           <Icon
             icon="mdi:close"
-            class="text-2xl font-bold text-red-600 border rounded hover:p-px"/>
+            class="text-2xl font-bold text-red-600 border rounded hover:p-px"
+          />
         </button>
-        <h3 class="text-xl font-medium text-left mb-2 border-b-1 pb-3">
-          Availability for 
-          <a 
-            href={`${PUBLIC_WEBSITE_URL}/products/details/${selectedProduct?.productNumber}`} 
-            class="text-primary-500 hover:underline" >
-            {selectedProduct?.productNumber} - {selectedProduct?.size}
-          </a>
-        </h3>
-        <!-- <h3 class="text-xl font-bold text-left mb-2 border-b-1 pb-3">
+
+        <h3 class="text-xl font-bold text-left mb-2 border-b-1 pb-3">
           Availability for {selectedProduct.productNumber} - {selectedProduct.size}
-        </h3> -->
+        </h3>
         <p class="text-gray-500 mb-10 text-left mt-2">
           Enter quantity to check availability.
         </p>
@@ -1909,85 +1906,87 @@ function handleClickOutside(event) {
               name="quantity"
               value={selectedProduct.quantity}
             />
-            <div class="flex items-center space-x-4 border border-gray-300 rounded">
-            <button
-            class="w-8 h-8 text-primary-400 flex items-center justify-center"
-              on:click|preventDefault={decreaseQuantity}
+            <div
+              class="flex items-center space-x-4 border border-gray-300 rounded"
             >
-              <Icon icon="ic:round-minus" class="text-xl" />
-            </button>
+              <button
+                class="w-8 h-8 text-primary-400 flex items-center justify-center"
+                on:click|preventDefault={decreaseQuantity}
+              >
+                <Icon icon="ic:round-minus" class="text-xl" />
+              </button>
 
-            <input
-              type="text"
-              min="1"
-              maxlength="4"
-              bind:value={selectedProduct.quantity}
-  class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
-              on:focus={(e) => {
-                e.target.dataset.previousValue = e.target.value;
+              <input
+                type="text"
+                min="1"
+                maxlength="4"
+                bind:value={selectedProduct.quantity}
+                class="w-12 h-6 p-0 text-center border-none focus:border-none outline-none focus:outline-none appearance-none focus:ring-0 focus:ring-transparent bg-transparent"
+                on:focus={(e) => {
+                  e.target.dataset.previousValue = e.target.value;
 
-                setTimeout(() => {
-                  e.target.select();
-                }, 10);
-              }}
-              on:blur={(e) => {
-                if (e.target.value === "" || e.target.value === "0") {
-                  selectedProduct.quantity = 1;
-                  e.target.value = "1";
-                } else {
-                  const parsedValue = parseInt(e.target.value, 10);
-                  if (
-                    !isNaN(parsedValue) &&
-                    parsedValue >= 1 &&
-                    parsedValue <= 999
-                  ) {
-                    selectedProduct.quantity = parsedValue;
+                  setTimeout(() => {
+                    e.target.select();
+                  }, 10);
+                }}
+                on:blur={(e) => {
+                  if (e.target.value === "" || e.target.value === "0") {
+                    selectedProduct.quantity = 1;
+                    e.target.value = "1";
                   } else {
-                    selectedProduct.quantity = parseInt(
-                      e.target.dataset.previousValue || "1",
-                      10,
-                    );
-                    e.target.value = selectedProduct.quantity.toString();
+                    const parsedValue = parseInt(e.target.value, 10);
+                    if (
+                      !isNaN(parsedValue) &&
+                      parsedValue >= 1 &&
+                      parsedValue <= 999
+                    ) {
+                      selectedProduct.quantity = parsedValue;
+                    } else {
+                      selectedProduct.quantity = parseInt(
+                        e.target.dataset.previousValue || "1",
+                        10,
+                      );
+                      e.target.value = selectedProduct.quantity.toString();
+                    }
                   }
-                }
-              }}
-              on:input={(e) => {
-                e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                }}
+                on:input={(e) => {
+                  e.target.value = e.target.value.replace(/[^0-9]/g, "");
 
-                if (
-                  e.target.value.startsWith("0") &&
-                  e.target.value.length > 1
-                ) {
-                  e.target.value = e.target.value.slice(1);
-                }
+                  if (
+                    e.target.value.startsWith("0") &&
+                    e.target.value.length > 1
+                  ) {
+                    e.target.value = e.target.value.slice(1);
+                  }
 
-                if (e.target.value.length > 3) {
-                  e.target.value = e.target.value.slice(0, 3);
-                }
+                  if (e.target.value.length > 3) {
+                    e.target.value = e.target.value.slice(0, 3);
+                  }
 
-                const parsedValue = parseInt(e.target.value, 10);
+                  const parsedValue = parseInt(e.target.value, 10);
 
-                if (parsedValue >= 1 && parsedValue <= 999) {
-                  selectedProduct.quantity = parsedValue;
-                } else if (e.target.value === "" || parsedValue < 1) {
-                  selectedProduct.quantity =
-                    e.target.value === "" ? "" : parsedValue;
-                } else {
-                  selectedProduct.quantity = 999;
-                  e.target.value = "999";
-                }
+                  if (parsedValue >= 1 && parsedValue <= 999) {
+                    selectedProduct.quantity = parsedValue;
+                  } else if (e.target.value === "" || parsedValue < 1) {
+                    selectedProduct.quantity =
+                      e.target.value === "" ? "" : parsedValue;
+                  } else {
+                    selectedProduct.quantity = 999;
+                    e.target.value = "999";
+                  }
 
-                updateCartItemsValue();
-              }}
-              aria-label="Quantity"
-              max="9999"
-            />
-            <button
-class="w-8 h-8 text-primary-400 flex items-center justify-center"
-              on:click|preventDefault={increaseQuantity}
-            >
-              <Icon icon="ic:round-plus" class="text-xl" />
-            </button>
+                  updateCartItemsValue();
+                }}
+                aria-label="Quantity"
+                max="9999"
+              />
+              <button
+                class="w-8 h-8 text-primary-400 flex items-center justify-center"
+                on:click|preventDefault={increaseQuantity}
+              >
+                <Icon icon="ic:round-plus" class="text-xl" />
+              </button>
             </div>
             <div class="flex justify-end w-full">
               <button
@@ -2030,38 +2029,57 @@ class="w-8 h-8 text-primary-400 flex items-center justify-center"
                   const resultData = result.data;
 
                   if (resultData && resultData.success === true) {
-                    if ($authedUser.id) {
-                      submitForm();
+                    if (
+                      resultData.message &&
+                      resultData.message.includes(
+                        "Product quantity won't update due to an active offer price.",
+                      )
+                    ) {
+                      if (
+                        !resultData.message.includes("added") &&
+                        !resultData.message.includes("updated")
+                      ) {
+                        toast.info(resultData.message);
+                      } else {
+                        toast.success(resultData.message);
+
+                        if ($authedUser.id) {
+                          submitForm();
+                        } else {
+                          submitAlternateForm();
+                        }
+
+                        setTimeout(() => {
+                          clearSelectedProductcart(cartRowIndexToBeCleared);
+                        }, 1000);
+
+                        showCartPopupdetails(prepareCartItem());
+                      }
                     } else {
-                      submitAlternateForm();
+                      if ($authedUser.id) {
+                        submitForm();
+                      } else {
+                        submitAlternateForm();
+                      }
+
+                      toast.success(resultData.message || "");
+                      setTimeout(() => {
+                        clearSelectedProductcart(cartRowIndexToBeCleared);
+                      }, 1000);
+
+                      showCartPopupdetails(prepareCartItem());
                     }
-                    const cartItem = prepareCartItem();
-                    cartloadingpop = false;
-
-                    toast.success(`Product added to the cart!`);
-                    cartRowIndexToBeCleared = cartItem.rowIndex;
-
-                    hideDetails();
-                    showCartPopupdetails(cartItem);
-
-                    setTimeout(() => {
-                      clearSelectedProductcart(cartRowIndexToBeCleared);
-                    }, 1000);
-
-                    showCartMessage = true;
-                    cartloadingpop = false;
                   } else {
                     toast.error(
                       resultData.message || "Failed to add item to cart",
                     );
-                    cartloadingpop = false;
                   }
                 } else {
                   toast.error("Failed to add item to cart");
-                  cartloadingpop = false;
                 }
+
+                cartloadingpop = false;
               };
-              cartloadingpop = false;
             }}
           >
             <input type="hidden" name="cartItems" value={cartItemsValue} />
@@ -2303,7 +2321,9 @@ class="w-8 h-8 text-primary-400 flex items-center justify-center"
             {/if}
           </div>
           <div class="mb-4">
-            <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
+            <label for="country" class="block text-sm font-medium text-gray-700"
+              >Country</label
+            >
             <div class="relative">
               <input
                 type="text"
@@ -2315,29 +2335,38 @@ class="w-8 h-8 text-primary-400 flex items-center justify-center"
                 on:keydown={handleKeyDown}
                 class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
               />
-              <Icon icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"} class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs mr-1" />
+              <Icon
+                icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs mr-1"
+              />
               {#if showDropdown}
-                <ul bind:this={dropdownEl} class="absolute bg-white border w-full mt-px z-10 max-h-60 overflow-y-auto rounded-md shadow">
+                <ul
+                  bind:this={dropdownEl}
+                  class="absolute bg-white border w-full mt-px z-10 max-h-60 overflow-y-auto rounded-md shadow"
+                >
                   {#each filteredCountries as countryItem, index}
                     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                     <li
-                      class="px-4 py-2 text-sm cursor-pointer hover:bg-primary-50 {highlightedIndex === index ? 'bg-primary-50' : ''}"
+                      class="px-4 py-2 text-sm cursor-pointer hover:bg-primary-50 {highlightedIndex ===
+                      index
+                        ? 'bg-primary-50'
+                        : ''}"
                       on:click={() => selectCountry(countryItem)}
                     >
                       {countryItem.name} ({countryItem.code})
                     </li>
                   {/each}
                   {#if filteredCountries.length === 0}
-                  <div class="flex items-center px-4 py-3">
-                    <Icon
-                      icon="tabler:info-square-rounded-filled"
-                      class="text-red-500 text-base mr-2"
-                    />
-                    <li class="text-gray-800 text-xs">
-                      No matching countries found!
-                    </li>
-                  </div>
-                {/if}
+                    <div class="flex items-center px-4 py-3">
+                      <Icon
+                        icon="tabler:info-square-rounded-filled"
+                        class="text-red-500 text-base mr-2"
+                      />
+                      <li class="text-gray-800 text-xs">
+                        No matching countries found!
+                      </li>
+                    </div>
+                  {/if}
                 </ul>
               {/if}
             </div>
@@ -2362,8 +2391,13 @@ class="w-8 h-8 text-primary-400 flex items-center justify-center"
               }}
             />
             <div class="text-base">
-              <Icon icon="carbon:location-info-filled" class="inline-block text-primary-400" />
-              <span class="text-2s text-gray-600">Enter phone number without country code</span>
+              <Icon
+                icon="carbon:location-info-filled"
+                class="inline-block text-primary-400"
+              />
+              <span class="text-2s text-gray-600"
+                >Enter phone number without country code</span
+              >
             </div>
             {#if formErrors.phone}
               <p class="text-red-500 text-xs">{formErrors.phone}</p>
@@ -2635,13 +2669,13 @@ class="w-8 h-8 text-primary-400 flex items-center justify-center"
           <div class="flex justify-between items-center mt-4">
             <button
               on:click={toggleQuoteModal}
-             class="bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm py-1.5 px-4 rounded"
+              class="bg-gray-200 text-gray-700 hover:bg-gray-300 text-sm py-1.5 px-4 rounded"
             >
               Close
             </button>
             <button
               type="submit"
- class="bg-primary-500 hover:bg-primary-600 text-white text-sm rounded py-1.5 px-4"
+              class="bg-primary-500 hover:bg-primary-600 text-white text-sm rounded py-1.5 px-4"
               on:keydown={(event) => {
                 if (event.key === "Enter") {
                   event.preventDefault();
