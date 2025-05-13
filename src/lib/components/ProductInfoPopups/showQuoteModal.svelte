@@ -2,7 +2,11 @@
   import Icon from "@iconify/svelte";
   import { enhance, applyAction } from "$app/forms";
   import { toast, Toaster } from "svelte-sonner";
-  import { countries, phoneNumberPatterns, countryCurrencyMap } from "$lib/Data/constants.js";
+  import {
+    countries,
+    phoneNumberPatterns,
+    countryCurrencyMap,
+  } from "$lib/Data/constants.js";
 
   export let productName;
   export let toggleQuoteModal;
@@ -29,7 +33,7 @@
   let formErrors = {};
   let isSubmitting = false;
   let country = profile?.country || "";
-  let currency = profile?.currency || "";  
+  let currency = profile?.currency || "";
   let searchTerm = "";
   let dropdownEl;
   let highlightedIndex = -1;
@@ -46,43 +50,11 @@
   function validateForm() {
     formErrors = {};
 
-    if (!units) {
-      formErrors.units = "*Required";
-    }
-
-    if (!firstName.trim()) {
-      formErrors.firstName = "First name is required.";
-    } else if (/[\d]/.test(firstName)) {
-      formErrors.firstName = "First name cannot contain numbers.";
-    } else {
-      delete formErrors.firstName;
-    }
-
-    if (!lastName.trim()) {
-      formErrors.lastName = "Last name is required.";
-    } else if (/[\d]/.test(lastName)) {
-      formErrors.lastName = "Last name cannot contain numbers.";
-    } else {
-      delete formErrors.lastName;
-    }
-
-    if (!organisation.trim()) {
-      formErrors.organisation = "Organisation name is required.";
-    } else if (/[^a-zA-Z0-9\s]/.test(organisation)) {
-      formErrors.organisation =
-        "Organisation name cannot contain special characters.";
-    } else {
-      delete formErrors.organisation;
-    }
-
-    if (!/^\+?[1-9]\d{1,14}$/.test(phone)) {
-      formErrors.phone = "Enter a valid phone number";
-    }
-
-    if (!email.match(/^\S+@\S+\.\S+$/)) {
-      formErrors.email = "Enter a valid email address.";
-    }
-
+    validateUnits();
+    validateFirstName();
+    validateLastName();
+    validateOrganisation();
+    validateEmail();
     validateCountry();
     validatePhoneNumber(country, phone);
 
@@ -115,157 +87,390 @@
     };
   }
 
-let currencies = [
-  "AFN", "ALL", "DZD", "EUR", "AOA", "XCD", "ARS", "AMD", "AUD", "EUR", "AZN", "BSD", "BHD",
-  "BDT", "BBD", "BYN", "EUR", "BZD", "XOF", "BTN", "BOB", "BAM", "BWP", "BRL", "BND", "BGN",
-  "XOF", "BIF", "CVE", "KHR", "XAF", "CAD", "XAF", "XAF", "CLP", "CNY", "COP", "KMF", "CDF",
-  "XAF", "CRC", "HRK", "CUP", "EUR", "CZK", "DKK", "DJF", "XCD", "DOP", "USD", "EGP", "USD",
-  "XAF", "ERN", "EUR", "SZL", "ETB", "FJD", "EUR", "EUR", "XAF", "GMD", "GEL", "EUR", "GHS",
-  "EUR", "XCD", "GTQ", "GNF", "XOF", "GYD", "HTG", "HNL", "HUF", "ISK", "INR", "IDR", "IRR",
-  "IQD", "EUR", "ILS", "EUR", "JMD", "JPY", "JOD", "KZT", "KES", "AUD", "KWD", "KGS", "LAK",
-  "EUR", "LBP", "LSL", "LRD", "LYD", "CHF", "EUR", "EUR", "MGA", "MWK", "MYR", "MVR", "XOF",
-  "EUR", "USD", "MRU", "MUR", "MXN", "USD", "MDL", "EUR", "MNT", "EUR", "MAD", "MZN", "MMK",
-  "NAD", "AUD", "NPR", "EUR", "NZD", "NIO", "XOF", "NGN", "MKD", "NOK", "OMR", "PKR", "USD",
-  "ILS", "PAB", "PGK", "PYG", "PEN", "PHP", "PLN", "EUR", "QAR", "RON", "RUB", "RWF", "XCD",
-  "XCD", "XCD", "WST", "EUR", "STN", "SAR", "XOF", "RSD", "SCR", "SLL", "SGD", "EUR", "EUR",
-  "SBD", "SOS", "ZAR", "KRW", "EUR", "LKR", "SDG", "SRD", "SEK", "CHF", "SYP", "TWD", "TJS",
-  "TZS", "THB", "XOF", "TOP", "TTD", "TND", "TRY", "TMT", "AUD", "UGX", "UAH", "AED", "GBP",
-  "USD", "UYU", "UZS", "VUV", "EUR", "VES", "VND", "YER", "ZMW", "ZWL",
-];
+  let currencies = [
+    "AFN",
+    "ALL",
+    "DZD",
+    "EUR",
+    "AOA",
+    "XCD",
+    "ARS",
+    "AMD",
+    "AUD",
+    "EUR",
+    "AZN",
+    "BSD",
+    "BHD",
+    "BDT",
+    "BBD",
+    "BYN",
+    "EUR",
+    "BZD",
+    "XOF",
+    "BTN",
+    "BOB",
+    "BAM",
+    "BWP",
+    "BRL",
+    "BND",
+    "BGN",
+    "XOF",
+    "BIF",
+    "CVE",
+    "KHR",
+    "XAF",
+    "CAD",
+    "XAF",
+    "XAF",
+    "CLP",
+    "CNY",
+    "COP",
+    "KMF",
+    "CDF",
+    "XAF",
+    "CRC",
+    "HRK",
+    "CUP",
+    "EUR",
+    "CZK",
+    "DKK",
+    "DJF",
+    "XCD",
+    "DOP",
+    "USD",
+    "EGP",
+    "USD",
+    "XAF",
+    "ERN",
+    "EUR",
+    "SZL",
+    "ETB",
+    "FJD",
+    "EUR",
+    "EUR",
+    "XAF",
+    "GMD",
+    "GEL",
+    "EUR",
+    "GHS",
+    "EUR",
+    "XCD",
+    "GTQ",
+    "GNF",
+    "XOF",
+    "GYD",
+    "HTG",
+    "HNL",
+    "HUF",
+    "ISK",
+    "INR",
+    "IDR",
+    "IRR",
+    "IQD",
+    "EUR",
+    "ILS",
+    "EUR",
+    "JMD",
+    "JPY",
+    "JOD",
+    "KZT",
+    "KES",
+    "AUD",
+    "KWD",
+    "KGS",
+    "LAK",
+    "EUR",
+    "LBP",
+    "LSL",
+    "LRD",
+    "LYD",
+    "CHF",
+    "EUR",
+    "EUR",
+    "MGA",
+    "MWK",
+    "MYR",
+    "MVR",
+    "XOF",
+    "EUR",
+    "USD",
+    "MRU",
+    "MUR",
+    "MXN",
+    "USD",
+    "MDL",
+    "EUR",
+    "MNT",
+    "EUR",
+    "MAD",
+    "MZN",
+    "MMK",
+    "NAD",
+    "AUD",
+    "NPR",
+    "EUR",
+    "NZD",
+    "NIO",
+    "XOF",
+    "NGN",
+    "MKD",
+    "NOK",
+    "OMR",
+    "PKR",
+    "USD",
+    "ILS",
+    "PAB",
+    "PGK",
+    "PYG",
+    "PEN",
+    "PHP",
+    "PLN",
+    "EUR",
+    "QAR",
+    "RON",
+    "RUB",
+    "RWF",
+    "XCD",
+    "XCD",
+    "XCD",
+    "WST",
+    "EUR",
+    "STN",
+    "SAR",
+    "XOF",
+    "RSD",
+    "SCR",
+    "SLL",
+    "SGD",
+    "EUR",
+    "EUR",
+    "SBD",
+    "SOS",
+    "ZAR",
+    "KRW",
+    "EUR",
+    "LKR",
+    "SDG",
+    "SRD",
+    "SEK",
+    "CHF",
+    "SYP",
+    "TWD",
+    "TJS",
+    "TZS",
+    "THB",
+    "XOF",
+    "TOP",
+    "TTD",
+    "TND",
+    "TRY",
+    "TMT",
+    "AUD",
+    "UGX",
+    "UAH",
+    "AED",
+    "GBP",
+    "USD",
+    "UYU",
+    "UZS",
+    "VUV",
+    "EUR",
+    "VES",
+    "VND",
+    "YER",
+    "ZMW",
+    "ZWL",
+  ];
 
-currencies = currencies.sort();
-let filteredCountries = countries;
-let showDropdown = false;
+  currencies = currencies.sort();
+  let filteredCountries = countries;
+  let showDropdown = false;
 
-function updateCurrency(country) {
-  const normalizedCountry = country.trim().toLowerCase();
-  const selectedCurrency = Object.keys(countryCurrencyMap).find(
-    (key) => key.toLowerCase() === normalizedCountry
-  );
-  currency = selectedCurrency ? countryCurrencyMap[selectedCurrency] : "";
-}
+  function updateCurrency(country) {
+    const normalizedCountry = country.trim().toLowerCase();
+    const selectedCurrency = Object.keys(countryCurrencyMap).find(
+      (key) => key.toLowerCase() === normalizedCountry
+    );
+    currency = selectedCurrency ? countryCurrencyMap[selectedCurrency] : "";
+  }
 
-function getCountryByCode(code) {
-  const country = countries.find((c) => c.code === code || c.name === code);
-  return country ? country.name : null;
-}
+  function getCountryByCode(code) {
+    const country = countries.find((c) => c.code === code || c.name === code);
+    return country ? country.name : null;
+  }
 
-function getPhonePattern(countryCode) {
-  const countryName = getCountryByCode(countryCode);
-  if (!countryName) return "^[0-9]+$";
-  const regex = phoneNumberPatterns[countryName];
-  return regex ? regex.source : "^[0-9]+$";
-}
+  function getPhonePattern(countryCode) {
+    const countryName = getCountryByCode(countryCode);
+    if (!countryName) return "^[0-9]+$";
+    const regex = phoneNumberPatterns[countryName];
+    return regex ? regex.source : "^[0-9]+$";
+  }
 
-function validatePhoneNumber(countryName, phone) {
-  let newErrors = { ...formErrors };
+  function validatePhoneNumber(countryName, phone) {
+    let newErrors = { ...formErrors };
 
-  if (!phone) {
-    newErrors.phone = "*Required";
-  } else if (!countryName) {
-    newErrors.phone = "Select a country before entering your phone number";
-  } else {
-    const matchedCountry = countries.find((c) => c.name === countryName);
-    if (!matchedCountry) {
-      newErrors.phone = "Invalid country selected to validate phone";
+    if (!phone) {
+      newErrors.phone = "*Required";
+    } else if (!countryName) {
+      newErrors.phone = "Select a country before entering your phone number";
     } else {
-      const phonePattern = getPhonePattern(matchedCountry.code);
-      const phoneRegex = new RegExp(phonePattern);
-      if (!phoneRegex.test(phone)) {
-        newErrors.phone = `Please enter a valid phone number for ${countryName}.`;
+      const matchedCountry = countries.find((c) => c.name === countryName);
+      if (!matchedCountry) {
+        newErrors.phone = "Invalid country selected to validate phone";
       } else {
-        delete newErrors.phone;
-        delete newErrors.country;
+        const phonePattern = getPhonePattern(matchedCountry.code);
+        const phoneRegex = new RegExp(phonePattern);
+        if (!phoneRegex.test(phone)) {
+          newErrors.phone = `Please enter a valid phone number for ${countryName}.`;
+        } else {
+          delete newErrors.phone;
+          delete newErrors.country;
+        }
+      }
+    }
+    formErrors = newErrors;
+  }
+
+  function validateCountry() {
+    if (!country || country.trim() === "") {
+      formErrors.country = "*Required";
+    } else {
+      const match = countries.find(
+        (c) => c.name.toLowerCase() === country.toLowerCase()
+      );
+      if (!match) {
+        formErrors.country = "Invalid country selected";
+      } else {
+        delete formErrors.country;
       }
     }
   }
-  formErrors = newErrors;
-}
 
-function validateCountry() {
-  if (!country || country.trim() === "") {
-    formErrors.country = "*Required";
-  } else {
-    const match = countries.find(
-      (c) => c.name.toLowerCase() === country.toLowerCase()
-    );
-    if (!match) {
-      formErrors.country = "Invalid country selected";
+  function validateUnits() {
+    if (!units) {
+      formErrors.units = "*Required";
+    } else if (Number(units) < 1 || Number(units) > 999) {
+      formErrors.units = "Units must be between 1 and 999.";
     } else {
-      delete formErrors.country;
+      delete formErrors.units;
     }
   }
-}
 
-function handleInputChange(event) {
-  searchTerm = event.target.value;
-  country = searchTerm;
-
-  filteredCountries = countries
-  .filter((c) => c.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  .sort((a, b) => {
-    const aStarts = a.name.toLowerCase().startsWith(searchTerm.toLowerCase());
-    const bStarts = b.name.toLowerCase().startsWith(searchTerm.toLowerCase());
-    if (aStarts && !bStarts) return -1;
-    if (!aStarts && bStarts) return 1;
-    return a.name.localeCompare(b.name);
-  });
-  showDropdown = true;
-  highlightedIndex = -1;
-
-  updateCurrency(country);
-  validateCountry();
-  // validatePhoneNumber(country, phone);
-}
-
-function toggleDropdown() {
-  showDropdown = !showDropdown;
-  if (showDropdown) {
-    filteredCountries = countries;
-    highlightedIndex = -1;
+  function validateFirstName() {
+    if (!firstName || firstName.trim() === "") {
+      formErrors.firstName = "*Required";
+    } else if (/[\d]/.test(firstName)) {
+      formErrors.firstName = "First name cannot contain numbers.";
+    } else {
+      delete formErrors.firstName;
+    }
   }
-}
 
-function handleKeyDown(event) {
-  if (!showDropdown) return;
-
-  if (event.key === "ArrowDown") {
-    highlightedIndex = (highlightedIndex + 1) % filteredCountries.length;
-    scrollToHighlighted();
-  } else if (event.key === "ArrowUp") {
-    highlightedIndex =
-      (highlightedIndex - 1 + filteredCountries.length) % filteredCountries.length;
-    scrollToHighlighted();
-  } else if (event.key === "Enter") {
-  if (highlightedIndex >= 0) {
-    selectCountry(filteredCountries[highlightedIndex]);
-  } else if (filteredCountries.length > 0) {
-    selectCountry(filteredCountries[0]);
+  function validateLastName() {
+    if (!lastName || lastName.trim() === "") {
+      formErrors.lastName = "*Required";
+    } else if (/[\d]/.test(lastName)) {
+      formErrors.lastName = "Last name cannot contain numbers.";
+    } else {
+      delete formErrors.lastName;
+    }
   }
-}
-}
 
-function scrollToHighlighted() {
-  setTimeout(() => {
-    const list = dropdownEl?.querySelectorAll("li");
-    if (list && list[highlightedIndex]) {
-      list[highlightedIndex].scrollIntoView({
-        block: "nearest",
-        behavior: "smooth",
+  function validateOrganisation() {
+    if (!organisation || organisation.trim() === "") {
+      formErrors.organisation = "*Required";
+    } else if (/[^a-zA-Z0-9\s]/.test(organisation)) {
+      formErrors.organisation =
+        "Organisation name cannot contain special characters.";
+    } else {
+      delete formErrors.organisation;
+    }
+  }
+
+  function validateEmail() {
+    if (!email.trim()) {
+      formErrors.email = "*Required";
+    } else if (!/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+      formErrors.email = "Enter a valid email address.";
+    } else {
+      delete formErrors.email;
+    }
+  }
+
+  function handleInputChange(event) {
+    searchTerm = event.target.value;
+    country = searchTerm;
+
+    filteredCountries = countries
+      .filter((c) => c.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      .sort((a, b) => {
+        const aStarts = a.name
+          .toLowerCase()
+          .startsWith(searchTerm.toLowerCase());
+        const bStarts = b.name
+          .toLowerCase()
+          .startsWith(searchTerm.toLowerCase());
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return a.name.localeCompare(b.name);
       });
-    }
-  }, 0);
-}
+    showDropdown = true;
+    highlightedIndex = -1;
 
-function selectCountry(selectedCountry) {
-  country = selectedCountry.name;
-  searchTerm = selectedCountry.name;
+    updateCurrency(country);
+    validateCountry();
+    // validatePhoneNumber(country, phone);
+  }
+
+  function toggleDropdown() {
+    showDropdown = !showDropdown;
+    if (showDropdown) {
+      filteredCountries = countries;
+      highlightedIndex = -1;
+    }
+  }
+
+  function handleKeyDown(event) {
+    if (!showDropdown) return;
+
+    if (event.key === "ArrowDown") {
+      highlightedIndex = (highlightedIndex + 1) % filteredCountries.length;
+      scrollToHighlighted();
+    } else if (event.key === "ArrowUp") {
+      highlightedIndex =
+        (highlightedIndex - 1 + filteredCountries.length) %
+        filteredCountries.length;
+      scrollToHighlighted();
+    } else if (event.key === "Enter") {
+      if (highlightedIndex >= 0) {
+        selectCountry(filteredCountries[highlightedIndex]);
+      } else if (filteredCountries.length > 0) {
+        selectCountry(filteredCountries[0]);
+      }
+    }
+  }
+
+  function scrollToHighlighted() {
+    setTimeout(() => {
+      const list = dropdownEl?.querySelectorAll("li");
+      if (list && list[highlightedIndex]) {
+        list[highlightedIndex].scrollIntoView({
+          block: "nearest",
+          behavior: "smooth",
+        });
+      }
+    }, 0);
+  }
+
+  function selectCountry(selectedCountry) {
+    country = selectedCountry.name;
+    searchTerm = selectedCountry.name;
+    updateCurrency(country);
+    validateCountry();
+    // validatePhoneNumber(country, phone);
+    showDropdown = false;
+  }
   updateCurrency(country);
-  validateCountry();
-  // validatePhoneNumber(country, phone);
-  showDropdown = false;
-}
-updateCurrency(country);
 </script>
 
 <!-- {#each data.records as product} -->
@@ -329,13 +534,7 @@ updateCurrency(country);
           bind:value={units}
           class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
           placeholder="Units Required"
-          on:input={() => {
-            if (!units || units < 1 || units > 999) {
-              formErrors.units = "Units must be between 1 and 999.";
-            } else {
-              formErrors.units = "";
-            }
-          }}
+          on:input={validateUnits}
         />
         {#if formErrors.units}
           <p class="text-red-500 text-xs">{formErrors.units}</p>
@@ -352,15 +551,7 @@ updateCurrency(country);
           bind:value={firstName}
           class="w-full px-4 py-2 border border-gray-300 rounded-md text-sm mt-1 placeholder:text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
           placeholder="First Name"
-          on:input={() => {
-            if (!firstName.trim()) {
-              formErrors.firstName = "First name is required.";
-            } else if (!/^[A-Za-z\s]+$/.test(firstName)) {
-              formErrors.firstName = "First name should contain only letters.";
-            } else {
-              formErrors.firstName = "";
-            }
-          }}
+          on:input={validateFirstName}
         />
         {#if formErrors.firstName}
           <p class="text-red-500 text-xs">{formErrors.firstName}</p>
@@ -377,15 +568,7 @@ updateCurrency(country);
           bind:value={lastName}
           class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 text-sm placeholder:text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
           placeholder="Last Name"
-          on:input={() => {
-            if (!lastName.trim()) {
-              formErrors.lastName = "Last name is required.";
-            } else if (!/^[A-Za-z\s]+$/.test(lastName)) {
-              formErrors.lastName = "Last name should contain only letters.";
-            } else {
-              formErrors.lastName = "";
-            }
-          }}
+          on:input={validateLastName}
         />
         {#if formErrors.lastName}
           <p class="text-red-500 text-xs">{formErrors.lastName}</p>
@@ -403,23 +586,16 @@ updateCurrency(country);
           bind:value={organisation}
           class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
           placeholder="Organisation Name"
-          on:input={() => {
-            if (!organisation.trim()) {
-              formErrors.organisation = "Organisation name is required.";
-            } else if (!/^[A-Za-z0-9\s]+$/.test(organisation)) {
-              formErrors.organisation =
-                "Organisation name should not contain special characters.";
-            } else {
-              formErrors.organisation = "";
-            }
-          }}
+          on:input={validateOrganisation}
         />
         {#if formErrors.organisation}
           <p class="text-red-500 text-xs">{formErrors.organisation}</p>
         {/if}
       </div>
       <div class="mb-4">
-        <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
+        <label for="country" class="block text-sm font-medium text-gray-700"
+          >Country</label
+        >
         <div class="relative">
           <input
             type="text"
@@ -431,29 +607,38 @@ updateCurrency(country);
             on:keydown={handleKeyDown}
             class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
           />
-          <Icon icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"} class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs mr-1" />
+          <Icon
+            icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 text-xs mr-1"
+          />
           {#if showDropdown}
-            <ul bind:this={dropdownEl} class="absolute bg-white border w-full mt-px z-10 max-h-60 overflow-y-auto rounded-md shadow">
+            <ul
+              bind:this={dropdownEl}
+              class="absolute bg-white border w-full mt-px z-10 max-h-60 overflow-y-auto rounded-md shadow"
+            >
               {#each filteredCountries as countryItem, index}
                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                 <li
-                  class="px-4 py-2 text-sm cursor-pointer hover:bg-primary-50 {highlightedIndex === index ? 'bg-primary-50' : ''}"
+                  class="px-4 py-2 text-sm cursor-pointer hover:bg-primary-50 {highlightedIndex ===
+                  index
+                    ? 'bg-primary-50'
+                    : ''}"
                   on:click={() => selectCountry(countryItem)}
                 >
                   {countryItem.name} ({countryItem.code})
                 </li>
               {/each}
               {#if filteredCountries.length === 0}
-              <div class="flex items-center px-4 py-3">
-                <Icon
-                  icon="tabler:info-square-rounded-filled"
-                  class="text-red-500 text-base mr-2"
-                />
-                <li class="text-gray-800 text-xs">
-                  No matching countries found!
-                </li>
-              </div>
-            {/if}
+                <div class="flex items-center px-4 py-3">
+                  <Icon
+                    icon="tabler:info-square-rounded-filled"
+                    class="text-red-500 text-base mr-2"
+                  />
+                  <li class="text-gray-800 text-xs">
+                    No matching countries found!
+                  </li>
+                </div>
+              {/if}
             </ul>
           {/if}
         </div>
@@ -462,7 +647,9 @@ updateCurrency(country);
         {/if}
       </div>
       <div class="mb-4">
-        <label for="currency" class="block text-sm font-medium text-gray-700">Currency</label>
+        <label for="currency" class="block text-sm font-medium text-gray-700"
+          >Currency</label
+        >
         <select
           name="currency"
           bind:value={currency}
@@ -475,9 +662,11 @@ updateCurrency(country);
           {/each}
         </select>
       </div>
-      <input name="currency" type="hidden" bind:value={currency}/>
+      <input name="currency" type="hidden" bind:value={currency} />
       <div class="mb-4">
-        <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+        <label for="phone" class="block text-sm font-medium text-gray-700"
+          >Phone Number</label
+        >
         <input
           id="phone"
           type="tel"
@@ -490,8 +679,13 @@ updateCurrency(country);
           class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
         />
         <div class="text-base">
-          <Icon icon="carbon:location-info-filled" class="inline-block text-primary-400" />
-          <span class="text-2s text-gray-600">Enter phone number without country code</span>
+          <Icon
+            icon="carbon:location-info-filled"
+            class="inline-block text-primary-400"
+          />
+          <span class="text-2s text-gray-600"
+            >Enter phone number without country code</span
+          >
         </div>
         {#if formErrors.phone}
           <p class="text-red-500 text-xs">{formErrors.phone}</p>
@@ -549,15 +743,7 @@ updateCurrency(country);
               class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
               placeholder="Your email"
               on:input={() => {
-                if (!email.trim()) {
-                  formErrors.email = "Email is required.";
-                } else if (
-                  !/^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)
-                ) {
-                  formErrors.email = "Enter a valid email address.";
-                } else {
-                  formErrors.email = "";
-                }
+                validateEmail();
                 ProfileEmailVerified = false;
                 emailSent = false;
                 isOtpVerified = false;
