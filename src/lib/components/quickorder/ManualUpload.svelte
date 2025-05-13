@@ -750,31 +750,42 @@
     }
     clearSelectedProductcart(index);
   };
-
   const clearSelectedProductcart = (index) => {
-    if (typeof index === "undefined") {
-      console.error("Index is undefined, cannot clear product.");
-      return;
-    }
-    console.log("Rows:", rows);
-    console.log("Index:", index);
-
-    if (rows && index >= 0 && index < rows.length) {
-      rows[index].selectedProduct = null;
-      rows[index].sku = "";
-      rows[index].size = "";
-      rows[index].filteredProducts = [];
-      rows[index].error = "";
-      rows[index].selectedSize = null;
-      rows[index].quantity = 1;
-      if (selectedProducts && selectedProducts[index]) {
-        selectedProducts[index].quantity = 1;
+    try {
+      if (typeof index !== "number" || index < 0) {
+        console.error("Invalid index for clearing product:", index);
+        return;
       }
+      if (!rows || !rows[index]) {
+        console.error(
+          "Cannot clear row - rows is undefined or index out of bounds",
+        );
+        return;
+      }
+      rows[index] = {
+        ...rows[index],
+        selectedProduct: null,
+        sku: "",
+        size: "",
+        filteredProducts: [],
+        error: "",
+        selectedSize: null,
+        quantity: 1,
+      };
+      if (selectedProducts && selectedProducts[index]) {
+        selectedProducts[index] = {
+          ...selectedProducts[index],
+          quantity: 1,
+        };
+      }
+      selectedProduct = null;
+      rows = rows;
+      selectedProducts = selectedProducts;
 
-      console.log(`Row at index ${index} after reset:`, rows[index]);
+      console.log(`Row at index ${index} cleared:`, rows[index]);
+    } catch (error) {
+      console.error("Error in clearSelectedProductcart:", error);
     }
-    selectedProduct = null;
-    console.log("Selected Product after reset:", selectedProduct);
   };
   let currency = "inr";
 
@@ -1743,9 +1754,7 @@
                     if (resultData && resultData.success === true) {
                       if (
                         resultData.message &&
-                        resultData.message.includes(
-                          "Product quantity won't update due to an active offer price.",
-                        )
+                        resultData.message.includes("already offered in cart")
                       ) {
                         if (
                           !resultData.message.includes("added") &&
@@ -1804,7 +1813,7 @@
                   <span>Adding...</span>
                 {:else}
                   <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
-                  <span>Add to Cart complete</span>
+                  <span>Add to Cart</span>
                 {/if}
               </button>
             </form>
@@ -1820,7 +1829,7 @@
                 <span>Adding...</span>
               {:else}
                 <Icon icon="ic:round-shopping-cart" class="text-2xl mr-2" />
-                <span>Add to Cart </span>
+                <span>Add to Cart</span>
               {/if}
             </button>
           {/if}
@@ -2029,57 +2038,38 @@
                   const resultData = result.data;
 
                   if (resultData && resultData.success === true) {
-                    if (
-                      resultData.message &&
-                      resultData.message.includes(
-                        "Product quantity won't update due to an active offer price.",
-                      )
-                    ) {
-                      if (
-                        !resultData.message.includes("added") &&
-                        !resultData.message.includes("updated")
-                      ) {
-                        toast.info(resultData.message);
-                      } else {
-                        toast.success(resultData.message);
-
-                        if ($authedUser.id) {
-                          submitForm();
-                        } else {
-                          submitAlternateForm();
-                        }
-
-                        setTimeout(() => {
-                          clearSelectedProductcart(cartRowIndexToBeCleared);
-                        }, 1000);
-
-                        showCartPopupdetails(prepareCartItem());
-                      }
+                    if ($authedUser.id) {
+                      submitForm();
                     } else {
-                      if ($authedUser.id) {
-                        submitForm();
-                      } else {
-                        submitAlternateForm();
-                      }
-
-                      toast.success(resultData.message || "");
-                      setTimeout(() => {
-                        clearSelectedProductcart(cartRowIndexToBeCleared);
-                      }, 1000);
-
-                      showCartPopupdetails(prepareCartItem());
+                      submitAlternateForm();
                     }
+                    const cartItem = prepareCartItem();
+                    cartloadingpop = false;
+
+                    toast.success(`Product added to the cart!`);
+                    cartRowIndexToBeCleared = cartItem.rowIndex;
+
+                    hideDetails();
+                    showCartPopupdetails(cartItem);
+
+                    setTimeout(() => {
+                      clearSelectedProductcart(cartRowIndexToBeCleared);
+                    }, 1000);
+
+                    showCartMessage = true;
+                    cartloadingpop = false;
                   } else {
                     toast.error(
                       resultData.message || "Failed to add item to cart",
                     );
+                    cartloadingpop = false;
                   }
                 } else {
                   toast.error("Failed to add item to cart");
+                  cartloadingpop = false;
                 }
-
-                cartloadingpop = false;
               };
+              cartloadingpop = false;
             }}
           >
             <input type="hidden" name="cartItems" value={cartItemsValue} />
