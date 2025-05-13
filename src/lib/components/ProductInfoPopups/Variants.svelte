@@ -333,15 +333,24 @@
                   />
                 </a>
               </td>
-              <td class="relative py-1 px-2 text-primary-500 text-sm cursor-pointer group">
-                <a 
+              <td
+                class="relative py-1 px-2 text-primary-500 text-sm cursor-pointer group"
+              >
+                <a
                   href={variant.productNumber}
                   class="block whitespace-normal break-words w-60 relative z-0"
                 >
-                  {variant.productName.split(" ").slice(0, 5).join(" ")}{variant.productName.split(" ").length > 5 ? '...' : ''}
-                  
+                  {variant.productName
+                    .split(" ")
+                    .slice(0, 5)
+                    .join(" ")}{variant.productName.split(" ").length > 5
+                    ? "..."
+                    : ""}
+
                   {#if variant.productName.split(" ").length > 5}
-                    <div class="absolute inset-0 z-10 hidden group-hover:flex items-center justify-center bg-white bg-opacity-95 h-fit text-gray-700 text-xs px-2 py-2 rounded shadow-md break-words text-left select-text">
+                    <div
+                      class="absolute inset-0 z-10 hidden group-hover:flex items-center justify-center bg-white bg-opacity-95 h-fit text-gray-700 text-xs px-2 py-2 rounded shadow-md break-words text-left select-text"
+                    >
                       {variant.productName}
                     </div>
                   {/if}
@@ -452,9 +461,7 @@
               {#each variant.pricing as priceItem, i}
                 <tr class="bg-blue-50">
                   <td class="py-1 px-6 font-medium">{priceItem.break}</td>
-                  <td class="py-1 px-6 font-medium"
-                    >{variant.productNumber}</td
-                  >
+                  <td class="py-1 px-6 font-medium">{variant.productNumber}</td>
                   <td class="py-1 px-6 font-medium">
                     {#if $currencyState === "usd"}
                       $ {(Number(priceItem.USD) || 0).toLocaleString("en-US", {
@@ -545,63 +552,63 @@
     </div>
 
     {#if totalPages > 1}
-    <div class="flex items-center justify-center gap-2 flex-wrap my-6">
-      <button
-        class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-        on:click={() => handlePageChange(1)}
-        disabled={$currentPage === 1}
-        aria-label="First page"
-      >
-        <Icon icon="charm:chevrons-left" class="w-4 h-4" />
-      </button>
+      <div class="flex items-center justify-center gap-2 flex-wrap my-6">
+        <button
+          class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+          on:click={() => handlePageChange(1)}
+          disabled={$currentPage === 1}
+          aria-label="First page"
+        >
+          <Icon icon="charm:chevrons-left" class="w-4 h-4" />
+        </button>
 
-      <button
-        class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-        on:click={() => handlePageChange($currentPage - 1)}
-        disabled={$currentPage === 1}
-        aria-label="Previous page"
-      >
-        <Icon icon="charm:chevron-left" class="w-4 h-4" />
-      </button>
+        <button
+          class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+          on:click={() => handlePageChange($currentPage - 1)}
+          disabled={$currentPage === 1}
+          aria-label="Previous page"
+        >
+          <Icon icon="charm:chevron-left" class="w-4 h-4" />
+        </button>
 
-      {#each pageNumbers as page}
-        {#if page === DOTS}
-          <span class="px-2 text-gray-500 text-sm font-medium">{DOTS}</span>
-        {:else}
-          <button
-            class={`inline-flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-sm shadow-sm border transition-all duration-200 transform ${
-              page === $currentPage
-                ? "bg-primary-500 text-white border-primary-500 hover:bg-primary-600"
-                : "bg-white text-gray-800 border-gray-300 hover:bg-primary-500 hover:text-white active:scale-110"
-            }`}
-            on:click={() => handlePageChange(page)}
-            disabled={page === $currentPage}
-            aria-label="Go to page {page}"
-            aria-current={page === $currentPage ? "page" : undefined}
-          >
-            {page}
-          </button>
-        {/if}
-      {/each}
+        {#each pageNumbers as page}
+          {#if page === DOTS}
+            <span class="px-2 text-gray-500 text-sm font-medium">{DOTS}</span>
+          {:else}
+            <button
+              class={`inline-flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-sm shadow-sm border transition-all duration-200 transform ${
+                page === $currentPage
+                  ? "bg-primary-500 text-white border-primary-500 hover:bg-primary-600"
+                  : "bg-white text-gray-800 border-gray-300 hover:bg-primary-500 hover:text-white active:scale-110"
+              }`}
+              on:click={() => handlePageChange(page)}
+              disabled={page === $currentPage}
+              aria-label="Go to page {page}"
+              aria-current={page === $currentPage ? "page" : undefined}
+            >
+              {page}
+            </button>
+          {/if}
+        {/each}
 
-      <button
-        class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-        on:click={() => handlePageChange($currentPage + 1)}
-        disabled={$currentPage === totalPages}
-        aria-label="Next page"
-      >
-        <Icon icon="charm:chevron-right" class="w-4 h-4" />
-      </button>
+        <button
+          class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+          on:click={() => handlePageChange($currentPage + 1)}
+          disabled={$currentPage === totalPages}
+          aria-label="Next page"
+        >
+          <Icon icon="charm:chevron-right" class="w-4 h-4" />
+        </button>
 
-      <button
-        class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
-        on:click={() => handlePageChange(totalPages)}
-        disabled={$currentPage === totalPages}
-        aria-label="Last page"
-      >
-        <Icon icon="charm:chevrons-right" class="w-4 h-4" />
-      </button>
-    </div>
+        <button
+          class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+          on:click={() => handlePageChange(totalPages)}
+          disabled={$currentPage === totalPages}
+          aria-label="Last page"
+        >
+          <Icon icon="charm:chevrons-right" class="w-4 h-4" />
+        </button>
+      </div>
     {/if}
   </div>
 </div>
