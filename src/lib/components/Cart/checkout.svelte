@@ -224,6 +224,8 @@
 		});
         console.log('object',gstNumber);
 		let order = {
+			firstname:userData?.firstName,
+			lastname:userData?.lastName,
 			invoice:generateInvoiceNumber(),
 			subtotalprice: $currencyState === "inr" ? priceINR : priceUSD,
 			shippingprice: 0,

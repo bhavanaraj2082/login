@@ -32,6 +32,7 @@ import {
 	SENDER_EMAIL,
 	SENDER_PASSWORD,
 	WEBSITE_NAME,
+	NOTIFICATION_TARGET_EMAIL,
 	MAIL_HOST
 } from '$env/static/private';
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
@@ -39,6 +40,7 @@ import Return from '$lib/server/models/Return.js';
 import Counter from '$lib/server/models/Counter.js';
 import { sendEmail } from '$lib/server/utils/sendEmail.js';
 import PartRequest from '$lib/server/models/PartRequest.js';
+import { orderMsgToAdmin, orderMsgToUser } from "$lib/server/utils/emailtemplates";
 
 async function conversionRates() {
 	const rates = await Curconversion.find().exec();
@@ -75,16 +77,6 @@ export async function convertToINR(pricing) {
 	});
 }
 
-export const createOrder = async (body) => {
-	try {
-		const record = JSON.parse(JSON.stringify(await Order.create(body)));
-		console.log('Order created successfully:', record);
-		return record;
-	} catch (error) {
-		console.error('Error creating order:', error);
-		throw error;
-	}
-};
 export const updateTransactionDetails = async (body) => {
 	// console.log('------updateTransactionDetails-----', body, Number(body.productinfo), body.txnid);
 	try {
@@ -344,8 +336,9 @@ export async function favorite(favdata) {
 // 	}
 // }
 
-export const checkoutOrder = async (order) => {
+export const checkoutOrder = async (data) => {
 	try {
+		const {firstname,lastname,...order} = data
 		let orderid
 		const counter = JSON.parse(JSON.stringify(await Counter.findOne({})))
 		if (counter?._id) {
@@ -357,7 +350,7 @@ export const checkoutOrder = async (order) => {
 		const currency = JSON.parse(JSON.stringify(await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 })))
 
 		order.currentUsdRate = currency.rate
-		const newOrder = await Order.create(order);
+		const newOrder = JSON.parse(JSON.stringify(await Order.create(order)))
 		for (let rec of order.orderdetails) {
 			const stock = await Stock.findOneAndUpdate({ _id: rec.stockId }, { $inc: { orderedQty: rec.orderQty } }, { new: true })
 			//console.log(stock);
@@ -373,7 +366,11 @@ export const checkoutOrder = async (order) => {
 				actionName: "Ordered"
 			})
 		}
-		await Cart.findOneAndUpdate({ userId: order.userId, isActiveCart: true }, { isActiveCart: false })
+		const cart = await Cart.findOneAndUpdate({userId:order.userId,isActiveCart:true},{ $set: {"cartItems.$[elem].isQuote": false,"cartItems.$[elem].isCart": false},isActiveCart:false},{arrayFilters:[{ "elem._id": { $exists: true } } ]})
+		const admin = orderMsgToAdmin(newOrder,firstname,lastname)
+		const user = orderMsgToUser(newOrder,firstname,lastname)
+		sendEmail("New Order Created in Chemikart",admin,NOTIFICATION_TARGET_EMAIL)
+		sendEmail("Order Created Successfully",user,newOrder.userEmail)
 
 		if (newOrder._id) {
 			return { success: true, message: 'Successfully Ordered', orderId: newOrder.orderid, email: newOrder.userEmail };
