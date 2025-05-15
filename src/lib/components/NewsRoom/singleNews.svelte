@@ -14,7 +14,9 @@
 
   onMount(() => {
     if (record && record.previewText) {
-      shouldShowToggle = record.previewText.split(/\s+/).length > WORD_LIMIT;
+      // shouldShowToggle = record.previewText.split(/\s+/).length > WORD_LIMIT;
+        const words = record.previewText.replace(/<[^>]*>/g, '').split(/\s+/);
+      shouldShowToggle = words.length > WORD_LIMIT;
     }
 
     window.scrollTo(0, 0);
@@ -94,10 +96,10 @@
               <div class="text-gray-700 leading-relaxed">
                 {#if shouldShowToggle}
                   {#if isExpanded}
-                    <p class="text-justify">{record.previewText}</p>
+                    <p class="text-justify">{@html record.previewText}</p>
                   {:else}
                     <p class="text-justify">
-                      {truncateText(record.previewText, WORD_LIMIT)}
+                      {@html truncateText(record.previewText, WORD_LIMIT)}
                     </p>
                   {/if}
                   <button
@@ -112,7 +114,7 @@
                       height="16"/>
                   </button>
                 {:else}
-                  <p class="text-justify">{record.previewText}</p>
+                  <p class="text-justify">{@html record.previewText}</p>
                 {/if}
               </div>
             {:else}

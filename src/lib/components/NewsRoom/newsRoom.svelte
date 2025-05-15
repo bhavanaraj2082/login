@@ -1,6 +1,7 @@
 <script>
   import Icon from "@iconify/svelte";
   import { PUBLIC_COMPBUY_IMAGE_PATH } from "$env/static/public";
+  import { browser } from '$app/environment';
   
   export let data;
 
@@ -10,6 +11,7 @@
   let filteredItems = items;
   let searchQuery = "";
   let searchTimeout;
+  
   
   const DOTS = '...';
   const VISIBLE_PAGES = 5;
@@ -238,9 +240,11 @@
             <h2 class="font-semibold text-lg mb-2 line-clamp-2">
               {item.title || "Untitled"}
             </h2>
-            <p class="text-sm text-gray-600 mb-2 line-clamp-3">
-              {truncateText(item.previewText || "No description available", 120)}
-            </p>
+            {#if browser}
+             <div class="prose text-sm text-gray-600 mb-2 line-clamp-3">
+  {@html truncateText(item.previewText || "No description available", 120)}
+</div>
+{/if}
             <div class="pt-3 border-t border-gray-200 flex items-center text-sm text-gray-500">
               <Icon icon="uil:calendar-alt" class="mr-1" width="16" height="16"/>
               <span>{formatDate(item.createdAt)}</span>
