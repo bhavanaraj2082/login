@@ -21,7 +21,7 @@
   let recurring
   let isSave = true
   let lastDayOfMonth = null
-  let lastDay =  new Date(recurrence?.recurringDate).getDate()||''
+  let lastDay =  new Date(recurrence?.recurringDate).getDate()|| new Date().getDate()
 
   let oldDate = recurrence?.previousRecurringDate ? new Date(recurrence.previousRecurringDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
 
@@ -186,9 +186,16 @@
          {/if}
          <p class="{!monthError.length ? "hidden" : ""} text-red-500 text-xs">{monthError}</p>
         <div class="flex gap-4 justify-between text-sm font-medium mt-4">
-          <button disabled={isSave} type="submit" class="w-full py-2 bg-primary-600 text-white rounded hover:bg-primary-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
+          {#if !isSave}
+          <button type="submit" class="w-full py-2 bg-primary-600 text-white rounded hover:bg-primary-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
             Save
           </button>
+          {:else}
+           <button type="button" class="w-full py-2 bg-primary-600 text-white rounded hover:bg-primary-700 focus:outline-none opacity-50 cursor-not-allowed">
+            Save
+          </button>
+          {/if}
+         
           <button formaction="?/deleteRecurring" type="submit" class="{!recurrence?.recurring ? "hidden":""} w-full py-2 bg-white text-primary-600 border-1 border-primary-600 rounded hover:bg-primary-100 focus:outline-none">
             Delete
           </button>

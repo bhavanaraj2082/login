@@ -22,7 +22,6 @@ export async function sendEmail(subject, content,userEmail) {
                 <head>
                     <style>
                         body { font-family: Arial, sans-serif; }
-                        h1 { color: #A020F0; }
                     </style>
                 </head>
                 <body>
