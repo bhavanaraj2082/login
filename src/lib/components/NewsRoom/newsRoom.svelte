@@ -11,6 +11,13 @@
   let filteredItems = items;
   let searchQuery = "";
   let searchTimeout;
+
+  function getImageUrl(image) {
+    if (!image) return '/fallback.webp';
+    return image.includes('/')
+      ? image
+      : `${PUBLIC_COMPBUY_IMAGE_PATH}/prod/${image}`;
+  }
   
   
   const DOTS = '...';
@@ -185,7 +192,7 @@
   </div>
   {#if !items || items.length === 0}
     <div class="mt-8 flex flex-col items-center bg-white shadow rounded-md justify-center p-8 text-center">
-      <Icon icon="ph:package-duotone" width="64" height="64" class="text-primary-400 mb-4"/>
+      <Icon icon="tabler:news-off" width="64" height="64" class="text-primary-400 mb-4"/>
       <h3 class="text-xl font-medium text-gray-900 mb-2">
         No news available
       </h3>
@@ -214,43 +221,46 @@
       {#each paginatedItems as item (item._id)}
         <a
           href={`newsroom/${item.newsLink}`}
-          class="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all duration-300"
+          class="flex flex-col h-full bg-white rounded-md overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:translate-y-[-4px]"
           aria-label={item.title}>
-          <div class="relative aspect-[4/3] overflow-hidden">
-            {#if item.image}
-            <img
-              src={`${PUBLIC_COMPBUY_IMAGE_PATH}/prod/${item.image}`}
-              onerror="this.src='/fallback.webp'"
+          <div class="relative aspect-[3/2] overflow-hidden">
+            <!-- {#if item.image} -->
+             <img
+              src={getImageUrl(item.image)}
               alt={item.title || "News image"}
-              class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              loading="lazy"/>
+              class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              loading="lazy"
+              onerror="this.onerror=null; this.src='/fallback.webp'" />
               <!-- <img
                 src={`${PUBLIC_COMPBUY_IMAGE_PATH}/prod/${item.image}`}
                 onerror="this.onerror=null; this.src='/fallback.webp'"
                 alt={item.title || "News image"}
                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"/> -->
-            {:else}
+            <!-- {:else}
               <div class="w-full h-full bg-gray-200 flex items-center justify-center">
                 <Icon icon="ph:image-duotone" width="48" height="48" class="text-gray-400" />
               </div>
-            {/if}
+            {/if} -->
           </div>
-          <div class="p-4">
-            <h2 class="font-semibold text-lg mb-2 line-clamp-2">
-              {item.title || "Untitled"}
+          <div class="flex flex-col flex-grow p-5">
+            <h2 class="font-bold text-lg mb-3 line-clamp-2 text-gray-800">
+              {item?.title || "Untitled"}
             </h2>
             {#if browser}
              <div class="prose text-sm text-gray-600 mb-2 line-clamp-3">
-  {@html truncateText(item.previewText || "No description available", 120)}
+  {@html truncateText(item?.previewText || "No description available", 120)}
 </div>
 {/if}
-            <div class="pt-3 border-t border-gray-200 flex items-center text-sm text-gray-500">
-              <Icon icon="uil:calendar-alt" class="mr-1" width="16" height="16"/>
+            <div class="mt-auto pt-4 border-t border-gray-100 flex items-center text-sm text-gray-500">
+              <Icon icon="uil:calendar-alt" class="mr-2 text-primary-500" width="16" height="16"/>
               <span>{formatDate(item.createdAt)}</span>
             </div>
           </div>
         </a>
+
+
+       
       {/each}
     </div>
     {#if totalPages > 1}
