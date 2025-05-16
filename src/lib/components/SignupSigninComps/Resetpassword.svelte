@@ -25,37 +25,50 @@
   let error = {};
   let newPassword = "";
   let confirmPassword = "";
-  const validation = () => {
-    error = {};
+
+  function validateNewPassword() {
+    let newErrors = { ...error };
+
     if (!newPassword) {
-      error.password = "*Required";
+      newErrors.password = "*Required";
     } else if (!/^[A-Za-z\d!@#$%^&*]*$/.test(newPassword)) {
-      error.password = "Only !@#$%^&* characters are allowed";
+      newErrors.password = "Only !@#$%^&* characters are allowed";
     } else if (
       !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{7,}$/.test(
         newPassword
       )
     ) {
-      error.password = "Ensure your password matches the format outlined below";
+      newErrors.password =
+        "Ensure your password matches the format outlined below";
     } else {
-      delete error.password;
+      delete newErrors.password;
     }
+
+    error = newErrors;
+  }
+
+  function validateConfirmPassword() {
+    let newErrors = { ...error };
 
     if (!confirmPassword) {
-      error.passwordConfirm = "*Required";
+      newErrors.passwordConfirm = "*Required";
     } else if (confirmPassword !== newPassword) {
-      error.passwordConfirm =
+      newErrors.passwordConfirm =
         "Current password does not match the entered password";
     } else {
-      delete error.passwordConfirm;
+      delete newErrors.passwordConfirm;
     }
 
-    if (Object.keys(error).length > 0) {
-      return false;
-    } else {
-      return true;
-    }
+    error = newErrors;
+  }
+
+  const validation = () => {
+    error = {};
+    validateNewPassword();
+    validateConfirmPassword();
+    return Object.keys(error).length === 0
   };
+  
   let showNewPassword = false;
   let showConfirmPassword = false;
 
@@ -202,24 +215,7 @@
                   placeholder="Enter new password"
                   class="w-full px-4 py-2 pr-10 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-0 focus:ring-primary-500 focus:border-primary-500"
                   bind:value={newPassword}
-                  on:input={() => {
-                    const allowedSpecialCharactersRegex =
-                      /^[A-Za-z\d!@#$%^&*]*$/;
-                    const formatRegex =
-                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{7,}$/;
-                    if (!newPassword) {
-                      error.password = "*Required";
-                    } else if (
-                      !allowedSpecialCharactersRegex.test(newPassword)
-                    ) {
-                      error.password = "Only !@#$%^&* characters are allowed";
-                    } else if (!formatRegex.test(newPassword)) {
-                      error.password =
-                        "Ensure your password matches the format outlined below";
-                    } else {
-                      error.password = "";
-                    }
-                  }}
+                  on:input={validateNewPassword}
                 />
               {:else}
                 <input
@@ -229,24 +225,7 @@
                   placeholder="Enter new password"
                   class="w-full px-4 py-2 pr-10 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-0 focus:ring-primary-500 focus:border-primary-500"
                   bind:value={newPassword}
-                  on:input={() => {
-                    const allowedSpecialCharactersRegex =
-                      /^[A-Za-z\d!@#$%^&*]*$/;
-                    const formatRegex =
-                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{7,}$/;
-                    if (!newPassword) {
-                      error.password = "*Required";
-                    } else if (
-                      !allowedSpecialCharactersRegex.test(newPassword)
-                    ) {
-                      error.password = "Only !@#$%^&* characters are allowed";
-                    } else if (!formatRegex.test(newPassword)) {
-                      error.password =
-                        "Ensure your password matches the format outlined below";
-                    } else {
-                      error.password = "";
-                    }
-                  }}
+                  on:input={validateNewPassword}
                 />
               {/if}
 
@@ -300,13 +279,7 @@
                   placeholder="Confirm new password"
                   class="w-full px-4 py-2 pr-10 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-0 focus:ring-primary-500 focus:border-primary-500"
                   bind:value={confirmPassword}
-                  on:input={() => {
-                    error.passwordConfirm = !confirmPassword
-                      ? "*Required"
-                      : confirmPassword !== newPassword
-                        ? "Current password does not match the entered password"
-                        : "";
-                  }}
+                  on:input={validateConfirmPassword}
                 />
               {:else}
                 <input
@@ -316,13 +289,7 @@
                   placeholder="Confirm new password"
                   class="w-full px-4 py-2 pr-10 border border-gray-300 text-sm rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                   bind:value={confirmPassword}
-                  on:input={() => {
-                    error.passwordConfirm = !confirmPassword
-                      ? "*Required"
-                      : confirmPassword !== newPassword
-                        ? "Current password does not match the entered password"
-                        : "";
-                  }}
+                  on:input={validateConfirmPassword}
                 />
               {/if}
 
