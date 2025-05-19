@@ -12,13 +12,19 @@
     isHelpVisible = !isHelpVisible;
     showCrcl = false;
   }
+  
+      function toggleHelps() {
+      isHelpVisible = !isHelpVisible;
+      // showCrcl = false;
+      showCrcl = true;
 
-  function togglePage() {
-    showCrcl = true;
-    goto('/feedback');
-    isHelpVisible = !isHelpVisible;
-  }
+    }
 
+  function togglePage(path) {
+  showCrcl = true;
+  goto(path); 
+  isHelpVisible = !isHelpVisible;
+}
 
   function hideHelp() {
     isHelpVisible = false;
@@ -47,8 +53,8 @@
         on:click={toggleHelp}
     >
         <!-- Inner div with larger content -->
-        <div class="w-72 max-w-xs h-10 bg-primary-400 text-white rounded-lg flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
-            <p class="text-lg sm:text-xl md:text-2xl">Help section</p>
+        <div class="w-full h-10 bg-primary-400 text-white rounded-lg flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
+            <p class="text-lg sm:text-xl md:text-2xl">Feedback</p>
             <Icon icon="material-symbols:chat-outline-rounded" class="text-bold text-2xl ml-2 mt-1" />
         </div>
     </button>
@@ -86,36 +92,77 @@
     </div>
     <div class="text-xs bg-white overflow-y-auto scroll p-3" style="max-height: 400px">
   
-      <div class="w-full max-w-lg">
+      <div class="w-full">
         <div class="slide h-10 flex justify-start items-start text-center text-sm font-semibold font-montserrat">
             <Icon icon="noto:waving-hand" class="text-bold text-3xl" />
             &nbsp; &nbsp; Hi! there
         </div>
-        <div class="slide flex justify-start items-start text-center text-lg font-semibold font-serif">
-          We value your Feedback
-        </div>
-        <!-- <div class="slide flex justify-start items-start text-center text-lg font-semibold font-serif">
-           value 
-        </div>
-        <div class="slide flex justify-start items-start text-center text-lg font-semibold font-serif">
-        your 
-        </div>
-        <div class="slide flex justify-start items-start text-center text-lg font-semibold font-serif">
-        Feedback
-        </div> -->
-        <div class="slide mb-4 mt-4 flex justify-start items-start text-center lg:text-sm md:text-xs text-3s font-semibold font-montserrat">
-          Please take a moment to fill out our form      
-        </div>
+
+         <div class="text-lg font-semibold font-serif">
+      We value your Feedback
+    </div>
+        <div class="flex flex-row items-center w-full p-1">
+
+  <!-- Left side: Text content (3/4 width) -->
+  <div class="w-3/4 flex flex-col space-y-0">
   
-        <div class="relative w-full h-10 flex items-center justify-end cursor-pointer" on:click={togglePage} >
-          <button class="absolute text-md text-primary-500 font-semibold border-1 p-2 rounded-md mb-5" type='submit'>
+    <div class="text-sm font-semibold font-montserrat">
+      Please take a moment to fill out our form
+    </div>
+  </div>
+
+  <!-- Right side: Button with icon (1/4 width) -->
+  <div class="w-1/4 flex justify-end items-center cursor-pointer mt-2" on:click={() => { toggleHelps(); goto('/feedback'); }}>
+   <button class="absolute text-sm text-primary-500 font-semibold border-1 p-2 rounded-md mb-5" type='submit'>
             Click here
           </button>
             <Icon icon="ph:hand-pointing-thin" class="absolute text-bold text-3xl text-gray-500 icon-1 mt-6" />
-            <!-- <Icon icon="svg-spinners:pulse-rings-multiple" class="absolute text-bold text-lg text-gray-700 icon-2 mr-2" /> -->
-          </div>
+</div>
+
+
+
+</div>
+
+
+ <div class="w-full">
+   
+        <div class="text-lg font-semibold font-serif">
+      We're here to help
+    </div>
+
+     <div class="flex flex-row items-center w-full p-1">
+
+  <!-- Left side: Text content (3/4 width) -->
+  <div class="w-1/2 flex flex-col space-y-0">
+  
+    <div class="text-sm font-semibold font-montserrat">
+     Get in touch if you have any questions, issues
+    </div>
+  </div>
+
+  <!-- Right side: Button with icon (1/4 width) -->
+  <div class="w-1/2 flex justify-end items-center cursor-pointer mt-2" on:click={() => { toggleHelps(); goto('/help-support'); }}>
+   <button class="absolute text-sm text-primary-500 font-semibold border-1 p-2 rounded-md mb-5" type='submit'>
+            Click here
+          </button>
+            <Icon icon="ph:hand-pointing-thin" class="absolute text-bold text-3xl text-gray-500 icon-1 mt-6" />
+</div>
+
+
+
+</div>
+
+
+
+     
+    </div>
       </div>
     </div>
+
+
+
+
+    
   </div>
 </div>
   <!-- svelte-ignore a11y-click-events-have-key-events -->

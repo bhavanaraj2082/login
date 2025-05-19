@@ -47,7 +47,7 @@
     document.body.appendChild(link);
     link.click(); 
   } else {
-    toast.error("Invalid datasheet URL");
+    toast.error("No data sheet present for this Product Number");
   }
 }
   function toggleProductDetails() {
