@@ -357,39 +357,39 @@
     const validateField = (fieldName) => {
         if (!fieldName || fieldName === "title") {
             if (!title) {
-                errors = { ...errors, title: "Title is required" };
+                errors = { ...errors, title: "* Required" };
             } else {
                 const { title: _, ...rest } = errors;
                 errors = rest;
             }
         }
+
         if (!fieldName || fieldName === "firstname") {
-            if (
-                !firstname ||
-                firstname.length < 3 ||
-                !/^[A-Za-z\s]+$/.test(firstname)
-            ) {
-                errors.firstname = !firstname
-                    ? "First Name is required"
-                    : firstname.length < 3
-                      ? "First Name must be at least 3 characters"
-                      : "Please enter a valid name";
+            if (!firstname) {
+                errors.firstname = "* Required";
+            } else if (firstname.length < 3) {
+                errors.firstname = "First Name must be at least 3 characters";
+            } else if (!/^[A-Za-z\s]+$/.test(firstname)) {
+                errors.firstname = "Please enter a valid name";
             } else {
                 delete errors.firstname;
             }
         }
 
         if (!fieldName || fieldName === "lastname") {
-            if (!lastname || !/^[A-Za-z\s]+$/.test(lastname)) {
-                errors.lastname = "Last Name is required";
+            if (!lastname || lastname.length === 0) {
+                errors.lastname = "* Required";
+            } else if (!/^[A-Za-z\s]+$/.test(lastname)) {
+                errors.lastname = "Please enter a valid last name";
             } else {
                 delete errors.lastname;
             }
         }
 
         if (!fieldName || fieldName === "company") {
-            const companyPattern = /^[A-Za-z@.,\s&-]+$/;
-            if (!companyPattern.test(company)) {
+            if (!company) {
+                errors.company = "* Required";
+            } else if (!/^[A-Za-z@.,\s&-]+$/.test(company)) {
                 errors.company = "Please enter a valid company name";
             } else {
                 delete errors.company;
@@ -397,51 +397,38 @@
         }
 
         if (!fieldName || fieldName === "street") {
-            const isOnlyNumbers = /^[0-9\s]+$/.test(street);
-            const isValidChars = /^[A-Za-z0-9@!#$%^&*(_).,:;'"+-\s]+$/.test(
-                street,
-            );
-
-            if (
-                !street ||
-                street.length < 3 ||
-                isOnlyNumbers ||
-                !isValidChars
-            ) {
-                errors.street = !street
-                    ? "Street Name is required"
-                    : street.length < 3
-                      ? "Street name must be at least 3 characters"
-                      : isOnlyNumbers
-                        ? "Street name cannot be only numbers"
-                        : "Please enter a valid street name";
+            if (!street) {
+                errors.street = "* Required";
+            } else if (street.length < 3) {
+                errors.street = "Street name must be at least 3 characters";
+            } else if (/^[0-9\s]+$/.test(street)) {
+                errors.street = "Street name cannot be only numbers";
+            } else if (!/^[A-Za-z0-9@!#$%^&*(_).,:;'"+-\s]+$/.test(street)) {
+                errors.street = "Please enter a valid street name";
             } else {
                 delete errors.street;
             }
         }
 
         if (!fieldName || fieldName === "city") {
-            const isOnlyNumbers = /^[0-9\s]+$/.test(city);
-            const isValidChars = /^[A-Za-z0-9@!#$%^&*(_).,:;'"+-\s]+$/.test(
-                city,
-            );
-
-            if (!city || city.length < 3 || isOnlyNumbers || !isValidChars) {
-                errors.city = !city
-                    ? "City Name is required"
-                    : city.length < 3
-                      ? "City name must be at least 3 characters"
-                      : isOnlyNumbers
-                        ? "City name cannot be only numbers"
-                        : "Please enter a valid city name";
+            if (!city) {
+                errors.city = "* Required";
+            } else if (city.length < 3) {
+                errors.city = "City name must be at least 3 characters";
+            } else if (/^[0-9\s]+$/.test(city)) {
+                errors.city = "City name cannot be only numbers";
+            } else if (!/^[A-Za-z0-9@!#$%^&*(_).,:;'"+-\s]+$/.test(city)) {
+                errors.city = "Please enter a valid city name";
             } else {
                 delete errors.city;
             }
         }
 
         if (!fieldName || fieldName === "postalcode") {
-            if (!postalcode || !/^[0-9\s]+$/.test(postalcode)) {
-                errors.postalcode = "Postal Code is required";
+            if (!postalcode) {
+                errors.postalcode = "* Required";
+            } else if (!/^[0-9\s]+$/.test(postalcode)) {
+                errors.postalcode = "Please enter a valid postal code";
             } else {
                 delete errors.postalcode;
             }
@@ -449,7 +436,7 @@
 
         if (!fieldName || fieldName === "email") {
             if (!email) {
-                errors.email = "Email is required.";
+                errors.email = "* Required";
             } else if (
                 !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
             ) {
@@ -462,16 +449,14 @@
         }
 
         if (!fieldName || fieldName === "description") {
-            const hasInvalidChars = !/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(
-                description,
-            );
-            const hasHtmlScript =
-                /<script.*?>.*?<\/script>/i.test(description) ||
-                /<[^>]*>/i.test(description);
-
             if (!description) {
-                errors.description = "Description is required";
-            } else if (hasInvalidChars || hasHtmlScript) {
+                errors.description = "* Required";
+            } else if (!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(description)) {
+                errors.description = "Please enter a valid description";
+            } else if (
+                /<script.*?>.*?<\/script>/i.test(description) ||
+                /<[^>]*>/i.test(description)
+            ) {
                 errors.description = "Please enter a valid description";
             } else {
                 delete errors.description;
@@ -480,12 +465,17 @@
 
         if (!fieldName || fieldName === "country") {
             if (!country || country === "") {
-                errors.country = "Please select a country";
+                errors.country = "* Required";
             } else {
                 delete errors.country;
             }
         }
+
         if (!fieldName || fieldName === "phone") {
+            if (!phone) {
+                errors.phone = "*Required";
+                return;
+            }
             if (!country) {
                 errors.phone =
                     "Please select the country before entering the phone number";
@@ -526,7 +516,7 @@
     };
 
     function formValid() {
-        console.log("Errors before validation:", errors);
+        // console.log("Errors before validation:", errors);
         validateField("title");
         validateField("firstname");
         validateField("lastname");
@@ -569,17 +559,26 @@
     //         delete errors.phone; // Remove any errors if conditions are satisfied
     //     }
     // }
+
     function selectCountry(selectedCountry) {
         country = selectedCountry.name;
-        // filteredCountries = countries;
-        searchTerm = `${selectedCountry.name} `;
+        searchTerm = selectedCountry.name;
         showDropdown = false;
         highlightedIndex = -1;
         validateField("country");
         validatePhoneNumber(country, phone);
+        // validateField('phone');
 
         delete errors.country;
-        // console.log('Selected Country:', country);
+        const countryInput = document.querySelector('input[name="country"]');
+        if (countryInput) {
+            countryInput.value = selectedCountry.name;
+        }
+        // if (!phone || phone === '') {
+        // 	errors.phone = 'Required for the selected country.';
+        // } else {
+        // 	delete errors.phone;
+        // }
     }
 
     function filterCountries() {
@@ -1315,7 +1314,7 @@
                                             name="enteredOtp"
                                             bind:value={enteredOtpemail}
                                             placeholder="Enter 6-digit OTP"
-                                            class="w-full text-sm border-gray-300 border rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 p-2.5"
+                                            class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
                                             on:input={() => {
                                                 enteredOtpemail =
                                                     enteredOtpemail.trim();
@@ -1328,7 +1327,11 @@
                                         <button
                                             type="submit"
                                             class="absolute top-1/2 right-3 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
-                                            disabled={loadingotp}
+                                            disabled={loadingotp ||
+                                                !enteredOtpemail ||
+                                                !/^\d{6}$/.test(
+                                                    enteredOtpemail,
+                                                )}
                                         >
                                             {#if loadingotp}
                                                 <span class="flex items-center">

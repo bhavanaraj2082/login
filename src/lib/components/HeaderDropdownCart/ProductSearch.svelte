@@ -190,6 +190,7 @@
 								id="email"
 								bind:value={email}
 								required
+								maxlength="50"
 								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 								placeholder="Email"
 								on:input={() => {
@@ -283,15 +284,20 @@
 									bind:value={enteredOtpemail}
 									placeholder="Enter 6-digit OTP"
 									class="flex-1 outline-none w-full border-gray-300 border rounded focus:border-primary-400 focus:ring-0 p-2 text-sm"
-									on:input={() => {
-										enteredOtpemail = enteredOtpemail.trim();
-									}}
+									 on:input={() => {
+                                                enteredOtpemail =
+                                                    enteredOtpemail.trim();
+                                                enteredOtpemail =
+                                                    enteredOtpemail
+                                                        .replace(/\D/g, "")
+                                                        .slice(0, 6);
+                                            }}
 								/>
 								<button
-									type="submit"
-									class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded hover:underline"
-									disabled={loadingotp}
-								>
+										type="submit"
+										class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-600 font-bold text-2s py-1 rounded hover:underline cursor-pointer disabled:cursor-not-allowed"
+										disabled={loadingotp || !enteredOtpemail || !/^\d{6}$/.test(enteredOtpemail)}
+									>
 									<!-- {loadingotp ? 'Verifying...' : 'Verify'} -->
 									{#if loadingotp}
 										<span
