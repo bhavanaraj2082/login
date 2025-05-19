@@ -2000,7 +2000,7 @@
             <div class="flex justify-end w-full">
               <button
                 type="submit"
-                class="bg-primary-400 text-white p-2 rounded flex items-center justify-center w-full sm:w-[160px] min-h-[40px]"
+                class="bg-primary-400 text-white p-2 rounded flex items-center justify-center w-full sm:w-[160px] min-h-[40px] hover:opacity-65"
               >
                 <span
                   class={checking ? "hidden" : "flex items-center space-x-1"}
@@ -2626,7 +2626,7 @@
               bind:value={futherdetails}
               on:input={() => {
                 formErrors.futherdetails = "";
-                futherdetails = futherdetails.trim();
+               
                 if (!futherdetails.trim()) {
                   formErrors.futherdetails = "Further details are required.";
                 } else if (!/^[A-Za-z0-9\s\.,\/\";-]+$/.test(futherdetails)) {
