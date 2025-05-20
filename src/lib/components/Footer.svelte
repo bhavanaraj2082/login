@@ -37,12 +37,12 @@
   "/terms/privacy-notice"
 ];
 </script>
-{#if currentUrl !== "/feedback"}
+{#if currentUrl !== "/feedback" && currentUrl !== "/help-support"}
 <Helpsection1 />
 <Helpsection2 />
 {/if}
 <footer class="w-full bg-primary-400 p-6 font-workSans" bind:this={footer}>
-	{#if currentUrl !== "/feedback" && currentUrl !== "/order-status" && currentUrl !== "/dashboard/myfavourite" && currentUrl !== "/safety/tsca-8-notification" && currentUrl !== "/documents" && currentUrl !== "/quick-order" && currentUrl !== "/dashboard/profile"}
+	{#if currentUrl !== "/feedback" && currentUrl !== "/help-support" && currentUrl !== "/order-status" && currentUrl !== "/dashboard/myfavourite" && currentUrl !== "/safety/tsca-8-notification" && currentUrl !== "/documents" && currentUrl !== "/quick-order" && currentUrl !== "/dashboard/profile"}
 	<Helpsection {footer} />
 	{/if}
 
