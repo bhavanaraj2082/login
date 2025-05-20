@@ -695,7 +695,6 @@ export const loginWithLinkedIn = async (userData, cookies) => {
 			lastName: userData.lastname,
 			email: userData.email,
 			isEmailVerified: userData.isEmailVerified,
-			country: 'N/A',
 			needsPasswordSetup: true,
 			sitePreferences: {
 				productEntryType: "Manual Entry",

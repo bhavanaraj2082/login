@@ -720,7 +720,7 @@
     }
   };
 
-  async function handleFormSubmission({ cancel }) {
+  async function handleFormSubmission({ cancel, formData }) {
     if (!validateForm()) {
       cancel();
       return;
@@ -730,6 +730,7 @@
     //   return;
     // }
     isProcessing = true;
+    formData.append('currency', currency);
     return async ({ result, update }) => {
       console.log("result", result);
       isProcessing = false;
@@ -1221,7 +1222,7 @@
             </div>
         </div>
 
-        <div class="w-full sm:mx-auto grid">
+        <!-- <div class="w-full sm:mx-auto grid">
           <label for="currency" class="block text-sm font-medium text-gray-600"
             >Currency</label
           >
@@ -1248,7 +1249,7 @@
           {#if errors.country}
             <div class="text-red-500 text-xs mt-1">{errors.country}</div>
           {/if}
-        </div>
+        </div> -->
       </div>
 
       <div class="mb-4">
