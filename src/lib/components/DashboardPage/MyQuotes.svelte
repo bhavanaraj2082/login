@@ -412,7 +412,7 @@ function getStatusColor (status) {
                               <p class="text-sm font-semibold text-heading">Delivery Address</p>
                               <p class="mt-2 text-sm text-gray-900">{selectedQuote?.Delivery_information?.Address1 || 'N/A'}</p>
                               <p class="mt-1 text-sm text-gray-600">
-                                  {selectedQuote.Delivery_information?.City}, {selectedQuote?.Delivery_information?.Country1 || 'N/A'}
+                                  {selectedQuote.Delivery_information?.City}, {selectedQuote?.Delivery_information?.State || ''}
                               </p>
                               <p class="text-sm text-gray-600">{selectedQuote.Delivery_information?.Post || 'N/A'}</p>
                           </div>

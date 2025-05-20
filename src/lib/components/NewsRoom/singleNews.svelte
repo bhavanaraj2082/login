@@ -66,16 +66,16 @@
 
 <div class="max-w-7xl mx-auto px-4 py-2 lg:w-11/12">
   {#if record}
-    <div class="bg-white rounded-md shadow-md overflow-hidden" id="news-content-top">
+    <div class="bg-white rounded-md shadow-md overflow-hidden mb-6" id="news-content-top">
       <div class="p-6 md:p-8">
         <div class="mb-6">
-          <div class="flex items-center text-sm text-gray-500 mb-2">
+          <div class="flex items-center sm:text-sm text-xs text-gray-500 mb-2">
             <Icon icon="uil:calendar-alt" class="mr-1" width="16" height="16" />
             <time datetime={record.createdAt}>
               {formatDate(record.createdAt)}
             </time>
           </div>
-          <h1 class="text-xl md:text-2xl font-bold text-gray-700 leading-tight overflow-x-auto hide">
+          <h1 class="text-xl font-semibold md:text-2xl md:font-bold text-gray-700 leading-tight overflow-x-auto hide">
             {record.title || "News Title"}
           </h1>
         </div>
@@ -93,7 +93,7 @@
           </div>
           <div class="prose max-w-none">
             {#if record.previewText}
-              <div class="text-gray-700 leading-relaxed">
+              <div class="text-gray-700 leading-relaxed sm:text-base text-xs">
                 {#if shouldShowToggle}
                   {#if isExpanded}
                     <p class="text-justify">{@html record.previewText}</p>
@@ -124,13 +124,13 @@
           <div class="clear-both"></div>
         </div>
         {#if isExpanded && record.fullContent}
-          <div class="mt-6 text-justify text-gray-700">
+          <div class="mt-6 text-justify text-gray-700 sm:text-base text-xs">
             <p class="mb-3">
               {record.fullContent}
             </p>
           </div>
         {/if}
-        <div class="mt-8" id="about-section">
+        <div class="mt-8 sm:text-base text-xs" id="about-section">
           <h2 class="text-xl font-semibold text-gray-800 mb-3">
             About Chemikart
           </h2>
@@ -152,7 +152,7 @@
             chain and timely deliveries. We offer tailored solutions to meet the
             specific requirements of our clients.
           </p>
-          <div class="mt-4">
+          <div class="mt-4 sm:text-base text-xs">
             <span class="text-gray-700">Follow us:</span>
             <div class="flex flex-wrap items-center gap-2 mt-2">
               <a href="https://chemikart.partskeys.com/"
@@ -191,10 +191,10 @@
             </div>
           </div>
         </div>
-        <div class="mt-10 pt-6 border-t border-gray-200">
+        <div class="mt-4 pt-6 border-t border-gray-200">
           <a
             href="/newsroom"
-            class="group inline-flex items-center gap-2 px-4 py-2 text-white bg-primary-400 font-semibold rounded-md shadow transition-all duration-200 ease-in-out hover:text-primary-50 hover:bg-primary-500 focus:outline-none " >
+            class="group inline-flex items-center sm:text-base text-xs gap-2 px-4 py-2 text-white bg-primary-400 font-semibold rounded-md shadow transition-all duration-200 ease-in-out hover:text-primary-50 hover:bg-primary-500 focus:outline-none " >
             <Icon icon="mdi:arrow-left" class="transition-transform duration-200 group-hover:-translate-x-1" width="20" height="20" />
             <span>Back to Newsroom</span>
           </a>
