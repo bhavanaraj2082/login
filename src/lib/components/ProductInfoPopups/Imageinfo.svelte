@@ -35,7 +35,9 @@
     on:click={ImageclosePopup}
   >
     <div
-      class="w-[50vw] h-[90vh] bg-white rounded-md shadow-md p-4 relative overflow-hidden"
+        class="w-[90vw] sm:w-[80vw] md:w-[60vw] lg:w-[50vw] 
+         h-[80vh] sm:h-[85vh] md:h-[90vh] 
+         bg-white rounded-md shadow-md p-4 relative overflow-hidden"
       on:click|stopPropagation
     >
       <div class="flex justify-end">

@@ -299,7 +299,7 @@
     Other Options
   </h1>
 
-  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+  <div class="bg-white shadow-md rounded-lg">
     <div class="overflow-x-auto">
       <table class="min-w-full text-sm text-left text-gray-500">
         <thead class="text-xs text-gray-700 uppercase bg-primary-50">
@@ -333,28 +333,19 @@
                   />
                 </a>
               </td>
-              <td
-                class="relative py-1 px-2 text-primary-500 text-sm cursor-pointer group"
-              >
-                <a
-                  href={variant.productNumber}
-                  class="block whitespace-normal break-words w-60 relative z-0"
-                >
-                  {variant.productName
-                    .split(" ")
-                    .slice(0, 5)
-                    .join(" ")}{variant.productName.split(" ").length > 5
-                    ? "..."
-                    : ""}
-
-                  {#if variant.productName.split(" ").length > 5}
-                    <div
-                      class="absolute inset-0 z-10 hidden group-hover:flex items-center justify-center bg-white bg-opacity-95 h-fit text-gray-700 text-xs px-2 py-2 rounded shadow-md break-words text-left select-text"
-                    >
-                      {variant.productName}
-                    </div>
-                  {/if}
-                </a>
+              <td class="py-1 px-2 text-primary-500 text-sm cursor-pointer">
+                <div class="relative group w-52 max-w-full">
+                  <div
+                    class="overflow-hidden text-ellipsis whitespace-nowrap
+                          group-hover:whitespace-normal group-hover:overflow-visible
+                          group-hover:z-10 group-hover:absolute group-hover:bg-white
+                          group-hover:shadow-md group-hover:p-2 group-hover:rounded-md
+                          group-hover:max-w-xs group-hover:w-max group-hover:h-max group-hover:text-gray-800
+                          group-hover:text-xs group-hover:top-1/2 group-hover:left-0 group-hover:-translate-y-1/2"
+                  >
+                    {variant.productName}
+                  </div>
+                </div>
               </td>
               <td class="py-1 px-2">{variant.manufacturerName}</td>
               <td class="py-1 px-2">

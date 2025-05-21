@@ -5,7 +5,6 @@
   import {
     countries,
     phoneNumberPatterns,
-    countryCurrencyMap,
   } from "$lib/Data/constants.js";
 
   export let productName;
@@ -33,7 +32,6 @@
   let formErrors = {};
   let isSubmitting = false;
   let country = profile?.country || "";
-  let currency = profile?.currency || "";
   let searchTerm = "";
   let dropdownEl;
   let highlightedIndex = -1;
@@ -286,14 +284,6 @@
   let filteredCountries = countries;
   let showDropdown = false;
 
-  function updateCurrency(country) {
-    const normalizedCountry = country.trim().toLowerCase();
-    const selectedCurrency = Object.keys(countryCurrencyMap).find(
-      (key) => key.toLowerCase() === normalizedCountry
-    );
-    currency = selectedCurrency ? countryCurrencyMap[selectedCurrency] : "";
-  }
-
   function getCountryByCode(code) {
     const country = countries.find((c) => c.code === code || c.name === code);
     return country ? country.name : null;
@@ -398,28 +388,52 @@
   }
 
   function handleInputChange(event) {
-    searchTerm = event.target.value;
+    searchTerm = event.target.value.trim();
+    const searchLower = searchTerm.toLowerCase();
+    const normalizedSearch = searchTerm.replace(/^\+/, '');
     country = searchTerm;
 
     filteredCountries = countries
-      .filter((c) => c.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      .filter((c) =>
+        c.name.toLowerCase().includes(searchLower) ||
+        c.code.replace(/^\+/, '').includes(normalizedSearch) 
+      )
       .sort((a, b) => {
-        const aStarts = a.name
-          .toLowerCase()
-          .startsWith(searchTerm.toLowerCase());
-        const bStarts = b.name
-          .toLowerCase()
-          .startsWith(searchTerm.toLowerCase());
+        const aName = a.name.toLowerCase();
+        const bName = b.name.toLowerCase();
+        const aCode = a.code.replace(/^\+/, '');
+        const bCode = b.code.replace(/^\+/, '');
+
+        const aExact = aName === searchLower || aCode === normalizedSearch;
+        const bExact = bName === searchLower || bCode === normalizedSearch;
+        if (aExact && !bExact) return -1;
+        if (!aExact && bExact) return 1;
+
+        const aStarts = aName.startsWith(searchLower) || aCode.startsWith(normalizedSearch);
+        const bStarts = bName.startsWith(searchLower) || bCode.startsWith(normalizedSearch);
         if (aStarts && !bStarts) return -1;
         if (!aStarts && bStarts) return 1;
+
         return a.name.localeCompare(b.name);
       });
+
+    if (
+      filteredCountries.length > 0 &&
+      (
+        filteredCountries[0].name.toLowerCase() === searchLower ||
+        filteredCountries[0].code.replace(/^\+/, '') === normalizedSearch
+      )
+    ) {
+      selectCountry(filteredCountries[0]);
+      showDropdown = false;
+      highlightedIndex = -1;
+      return;
+    }
+
     showDropdown = true;
     highlightedIndex = -1;
 
-    updateCurrency(country);
     validateCountry();
-    // validatePhoneNumber(country, phone);
   }
 
   function toggleDropdown() {
@@ -465,20 +479,35 @@
   function selectCountry(selectedCountry) {
     country = selectedCountry.name;
     searchTerm = selectedCountry.name;
-    updateCurrency(country);
+    // updateCurrency(country);
     validateCountry();
     // validatePhoneNumber(country, phone);
     showDropdown = false;
   }
-  updateCurrency(country);
+  // updateCurrency(country);
+
+  const sanitizeInput = (e) => {
+    let value = e.target.value;
+    value = value.replace(/<script.*?>.*?<\/script>/gi, '');
+    value = value.replace(/[&*+\-<>|^+-/%{}/]/g, '');
+    message = value;
+  };
 </script>
 
 <!-- {#each data.records as product} -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 <div
   class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity"
   on:click={toggleQuoteModal}
+  on:keydown={(e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }}
+  tabindex="0"
 >
   <div
     class="bg-white rounded-md p-6 w-full sm:w-3/5 md:w-3/5 lg:w-2/5 h-5/6 overflow-y-auto"
@@ -647,23 +676,6 @@
         {/if}
       </div>
       <div class="mb-4">
-        <label for="currency" class="block text-sm font-medium text-gray-700"
-          >Currency</label
-        >
-        <select
-          name="currency"
-          bind:value={currency}
-          disabled
-          class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm bg-gray-50 focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
-        >
-          <option disabled value="">Currency</option>
-          {#each currencies as c}
-            <option value={c}>{c}</option>
-          {/each}
-        </select>
-      </div>
-      <input name="currency" type="hidden" bind:value={currency} />
-      <div class="mb-4">
         <label for="phone" class="block text-sm font-medium text-gray-700"
           >Phone Number</label
         >
@@ -675,7 +687,7 @@
           on:input={() => validatePhoneNumber(country, phone)}
           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
           placeholder="Enter phone number without country code"
-          maxlength="20"
+          maxlength="16"
           class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
         />
         <div class="text-base">
@@ -871,6 +883,8 @@
           class="w-full px-4 py-2 border border-gray-300 rounded-md mt-1 placeholder:text-sm text-sm focus:border-primary-400 focus:ring-0 focus:ring-primary-400"
           placeholder="Your message"
           name="futherdetails"
+          bind:value={message}
+    on:input={sanitizeInput}
         ></textarea>
       </div>
       {#if successMessage}
