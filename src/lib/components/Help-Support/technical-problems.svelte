@@ -9,18 +9,18 @@
   let form;
   export let data;
   let form3;
-	let enteredOtpemail;
-	let enteredOtp = "";
-	let ProfileEmailVerified;
-	let isOtpVerified = false;
-	let verificationMessage = "";
-	let loadingotp = false;
-	let isLoading = false;
-	let emailSent = false;
-	let displayMessage = "";
-	let authedUserEmailVerified = data?.profile?.isEmailVerified;
+  let enteredOtpemail;
+  let enteredOtp = "";
+  let ProfileEmailVerified;
+  let isOtpVerified = false;
+  let verificationMessage = "";
+  let loadingotp = false;
+  let isLoading = false;
+  let emailSent = false;
+  let displayMessage = "";
+  let authedUserEmailVerified = data?.profile?.isEmailVerified;
   let highlightedIndex = -1;
-    let dropdownEl;
+  let dropdownEl;
   let searchTerm = "";
   let errors = {};
   let technical_issue = "";
@@ -29,11 +29,11 @@
   let attachments = [];
   let totalSize = 0;
   let country = "";
-  let firstName =  "";
-  let lastName =  "";
-  let email =  "";
-  let phoneNumber =  "";
-  let companyName =  "";
+  let firstName = "";
+  let lastName = "";
+  let email = "";
+  let phoneNumber = "";
+  let companyName = "";
 
   let location = "";
   let accountNumber = "";
@@ -128,30 +128,32 @@
     }
   }
   const validateField = (fieldName) => {
-		if (!fieldName || fieldName === "firstName") {
-			if (!firstName) {
-				errors.firstName = "*Required";
-			} else if (firstName.length < 3) {
-				errors.firstName = "Must be at least 3 characters.";
-			} else if (!/^[A-Za-z\s]+$/.test(firstName)) {
-				errors.firstName = "Only letters and spaces are allowed.";
-			} else {
-				delete errors.firstName;
-			}
-		}
+    if (!fieldName || fieldName === "firstName") {
+      if (!firstName) {
+        errors.firstName = "*Required";
+      } else if (firstName.length < 3) {
+        errors.firstName = "Must be at least 3 characters.";
+      } else if (!/^[A-Za-z\s]+$/.test(firstName)) {
+        errors.firstName = "Only letters and spaces are allowed.";
+      } else {
+        delete errors.firstName;
+      }
+    }
 
-		if (!fieldName || fieldName === "lastName") {
-			if (!lastName) {
-				errors.lastName = "*Required";
-			} else if (!/^[A-Za-z\s]+$/.test(lastName)) {
-				errors.lastName = "Only letters and spaces are allowed.";
-			} else {
-				delete errors.lastName;
-			}
-		}
-
+    if (!fieldName || fieldName === "lastName") {
+      if (!lastName) {
+        errors.lastName = "*Required";
+      } else if (!/^[A-Za-z\s]+$/.test(lastName)) {
+        errors.lastName = "Only letters and spaces are allowed.";
+      } else {
+        delete errors.lastName;
+      }
+    }
 
     if (!fieldName || fieldName === "email") {
+      if (!email) {
+        errors.email = "*Required";
+      } else
       if (
         !email ||
         !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
@@ -163,13 +165,13 @@
     }
 
     if (!fieldName || fieldName === "phoneNumber") {
-      if (!country) {
+      if (!phoneNumber) {
+        errors.phoneNumber = "*Required";
+      } else if (!country) {
         errors.phoneNumber =
           "Please select the country before entering the phone number";
         return;
-      }
-
-      if (!phoneNumber || phoneNumber === "") {
+      } else if (!phoneNumber || phoneNumber === "") {
         errors.phoneNumber = "Required for the selected country";
       } else {
         const countryDetails = getCountryByCode(country);
@@ -194,7 +196,7 @@
 
     if (!fieldName || fieldName === "country") {
       if (!country) {
-        errors.country = "Country is required";
+        errors.country = "*Required";
       } else {
         delete errors.country;
       }
@@ -208,16 +210,16 @@
       }
     }
     if (!fieldName || fieldName === "companyName") {
-			if (!companyName) {
-				errors.companyName = "*Required";
-			} else if (companyName.length < 3) {
-				errors.companyName = "Must be at least 3 characters.";
-			} else if (!/^[A-Za-z0-9@.,!#$%^&*(_)+\-\s]+$/.test(companyName)) {
-				errors.companyName = "Please enter a valid company name.";
-			} else {
-				delete errors.companyName;
-			}
-		}
+      if (!companyName) {
+        errors.companyName = "*Required";
+      } else if (companyName.length < 3) {
+        errors.companyName = "Must be at least 3 characters.";
+      } else if (!/^[A-Za-z0-9@.,!#$%^&*(_)+\-\s]+$/.test(companyName)) {
+        errors.companyName = "Please enter a valid company name.";
+      } else {
+        delete errors.companyName;
+      }
+    }
 
     if (fieldName === "technical_issue") {
       if (!selectedOption) {
@@ -229,20 +231,19 @@
 
     if (!fieldName || fieldName === "assistance") {
       if (!assistance) {
-				errors.assistance = "*Required";
-			} else if (assistance.length < 3) {
-				errors.assistance = "Must be at least 3 characters.";
-			} else if (
-				!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(assistance) ||
-				/<script.*?>.*?<\/script>/i.test(assistance) ||
-				/<[^>]*>/i.test(assistance)
-			) {
-				errors.assistance =
-					"Please enter valid assistance details.";
-			} else {
-				delete errors.assistance;
-			}
-}
+        errors.assistance = "*Required";
+      } else if (assistance.length < 3) {
+        errors.assistance = "Must be at least 3 characters.";
+      } else if (
+        !/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(assistance) ||
+        /<script.*?>.*?<\/script>/i.test(assistance) ||
+        /<[^>]*>/i.test(assistance)
+      ) {
+        errors.assistance = "Please enter valid assistance details.";
+      } else {
+        delete errors.assistance;
+      }
+    }
 
     if (!fieldName || fieldName === "issue") {
       if (!issue) {
@@ -292,196 +293,196 @@
   //   searchTerm = event.target.value;
   //   filterCountries();
   // }
-//   function handleInputChange(event) {
-//   searchTerm = event.target.value;
-//   const isDeleting = event.inputType === 'deleteContentBackward' || 
-//                      event.inputType === 'deleteContentForward';
-  
-//   if (searchTerm.length > 0 && !isDeleting) {
-//     filterCountriesWithoutAutoSelect();
-//     showDropdown = filteredCountries.length > 0;
-//     const codeSearch = searchTerm.replace('+', '').trim();
-//     if (codeSearch.length > 0) {
-//       const exactCodeMatches = filteredCountries.filter(
-//         (country) => country.code.replace('+', '') === codeSearch
-//       );
+  //   function handleInputChange(event) {
+  //   searchTerm = event.target.value;
+  //   const isDeleting = event.inputType === 'deleteContentBackward' ||
+  //                      event.inputType === 'deleteContentForward';
 
-//       if (exactCodeMatches.length === 1) {
-//         selectCountry(exactCodeMatches[0]);
-//         return;
-//       }
-//     }
+  //   if (searchTerm.length > 0 && !isDeleting) {
+  //     filterCountriesWithoutAutoSelect();
+  //     showDropdown = filteredCountries.length > 0;
+  //     const codeSearch = searchTerm.replace('+', '').trim();
+  //     if (codeSearch.length > 0) {
+  //       const exactCodeMatches = filteredCountries.filter(
+  //         (country) => country.code.replace('+', '') === codeSearch
+  //       );
 
-//     const countriesStartingWith = filteredCountries.filter(
-//       (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-//     );
-    
-//     if (countriesStartingWith.length === 1) {
-//       selectCountry(countriesStartingWith[0]);
-//     }
-//   } else {
-//     filterCountriesWithoutAutoSelect();
-//     showDropdown = filteredCountries.length > 0;
-//   }
-// }
-// function filterCountriesWithoutAutoSelect() {
-//   filteredCountries = countries.filter(
-//     (country) =>
-//       country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//       country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
-//   );
-// }
+  //       if (exactCodeMatches.length === 1) {
+  //         selectCountry(exactCodeMatches[0]);
+  //         return;
+  //       }
+  //     }
 
+  //     const countriesStartingWith = filteredCountries.filter(
+  //       (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+  //     );
 
-function handleKeyDown(event) {
-        const exactCountryMatch = countries.some(
-            (c) => c.name === country && c.name === searchTerm,
-        );
-        if (
-            exactCountryMatch &&
-            !(
-                event.key === "Backspace" ||
-                event.key === "Delete" ||
-                event.key === "ArrowLeft" ||
-                event.key === "ArrowRight" ||
-                event.key === "Home" ||
-                event.key === "End" ||
-                event.key === "Tab" ||
-                event.key === "Escape" ||
-                event.ctrlKey ||
-                event.key === "ArrowUp" ||
-                event.key === "ArrowDown"
-            )
-        ) {
-            const input = document.querySelector('input[name="country"]');
-            if (
-                input &&
-                (input.selectionStart !== input.selectionEnd ||
-                    input.selectionStart === 0)
-            ) {
-                return true;
-            }
-            event.preventDefault();
-            return false;
-        }
+  //     if (countriesStartingWith.length === 1) {
+  //       selectCountry(countriesStartingWith[0]);
+  //     }
+  //   } else {
+  //     filterCountriesWithoutAutoSelect();
+  //     showDropdown = filteredCountries.length > 0;
+  //   }
+  // }
+  // function filterCountriesWithoutAutoSelect() {
+  //   filteredCountries = countries.filter(
+  //     (country) =>
+  //       country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //       country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
+  //   );
+  // }
 
-        if (showDropdown) {
-            switch (event.key) {
-                case "ArrowDown":
-                    event.preventDefault();
-                    if (filteredCountries.length > 0) {
-                        highlightedIndex =
-                            (highlightedIndex + 1) % filteredCountries.length;
-                        scrollToHighlighted();
-                    }
-                    break;
-                case "ArrowUp":
-                    event.preventDefault();
-                    if (filteredCountries.length > 0) {
-                        highlightedIndex =
-                            highlightedIndex <= 0
-                                ? filteredCountries.length - 1
-                                : highlightedIndex - 1;
-                        scrollToHighlighted();
-                    }
-                    break;
-            }
-        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-            showDropdown = true;
-            if (filteredCountries.length > 0) {
-                highlightedIndex = 0;
-            }
-            event.preventDefault();
-        }
-        if (event.key === "Enter") {
-            if (
-                highlightedIndex >= 0 &&
-                highlightedIndex < filteredCountries.length
-            ) {
-                selectCountry(filteredCountries[highlightedIndex]);
-                event.preventDefault();
-            } else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
-                selectCountry(filteredCountries[0]);
-                event.preventDefault();
-            }
-        } else if (event.key === "Escape") {
-            showDropdown = false;
-            highlightedIndex = -1;
-        }
+  function handleKeyDown(event) {
+    const exactCountryMatch = countries.some(
+      (c) => c.name === country && c.name === searchTerm,
+    );
+    if (
+      exactCountryMatch &&
+      !(
+        event.key === "Backspace" ||
+        event.key === "Delete" ||
+        event.key === "ArrowLeft" ||
+        event.key === "ArrowRight" ||
+        event.key === "Home" ||
+        event.key === "End" ||
+        event.key === "Tab" ||
+        event.key === "Escape" ||
+        event.ctrlKey ||
+        event.key === "ArrowUp" ||
+        event.key === "ArrowDown"
+      )
+    ) {
+      const input = document.querySelector('input[name="country"]');
+      if (
+        input &&
+        (input.selectionStart !== input.selectionEnd ||
+          input.selectionStart === 0)
+      ) {
+        return true;
+      }
+      event.preventDefault();
+      return false;
     }
-    function scrollToHighlighted() {
-        if (!dropdownEl) return;
-        const items = dropdownEl.querySelectorAll("li");
-        if (items[highlightedIndex]) {
-            items[highlightedIndex].scrollIntoView({
-                block: "nearest",
-            });
-        }
+
+    if (showDropdown) {
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault();
+          if (filteredCountries.length > 0) {
+            highlightedIndex =
+              (highlightedIndex + 1) % filteredCountries.length;
+            scrollToHighlighted();
+          }
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          if (filteredCountries.length > 0) {
+            highlightedIndex =
+              highlightedIndex <= 0
+                ? filteredCountries.length - 1
+                : highlightedIndex - 1;
+            scrollToHighlighted();
+          }
+          break;
+      }
+    } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      showDropdown = true;
+      if (filteredCountries.length > 0) {
+        highlightedIndex = 0;
+      }
+      event.preventDefault();
     }
-    function toggleDropdown() {
-        showDropdown = !showDropdown;
-        if (showDropdown) {
-            if (country.length > 0) {
-                searchTerm = country;
-                filterCountriesWithoutAutoSelect();
-            } else {
-                filteredCountries = countries;
-            }
-        }
+    if (event.key === "Enter") {
+      if (
+        highlightedIndex >= 0 &&
+        highlightedIndex < filteredCountries.length
+      ) {
+        selectCountry(filteredCountries[highlightedIndex]);
+        event.preventDefault();
+      } else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
+        selectCountry(filteredCountries[0]);
+        event.preventDefault();
+      }
+    } else if (event.key === "Escape") {
+      showDropdown = false;
+      highlightedIndex = -1;
     }
-    function handleInputChange(event) {
-        searchTerm = event.target.value;
-        country = event.target.value;
-        const isDeleting =
-            event.inputType === "deleteContentBackward" ||
-            event.inputType === "deleteContentForward";
+  }
+  function scrollToHighlighted() {
+    if (!dropdownEl) return;
+    const items = dropdownEl.querySelectorAll("li");
+    if (items[highlightedIndex]) {
+      items[highlightedIndex].scrollIntoView({
+        block: "nearest",
+      });
+    }
+  }
+  function toggleDropdown() {
+    showDropdown = !showDropdown;
+    if (showDropdown) {
+      if (country.length > 0) {
+        searchTerm = country;
         filterCountriesWithoutAutoSelect();
-        showDropdown = filteredCountries.length > 0;
+      } else {
+        filteredCountries = countries;
+      }
+    }
+  }
+  function handleInputChange(event) {
+    searchTerm = event.target.value;
+    country = event.target.value;
+    const isDeleting =
+      event.inputType === "deleteContentBackward" ||
+      event.inputType === "deleteContentForward";
+    filterCountriesWithoutAutoSelect();
+    showDropdown = filteredCountries.length > 0;
 
-        if (searchTerm.length > 0 && !isDeleting) {
-            const codeSearch = searchTerm.replace("+", "").trim();
-            if (codeSearch.length > 0) {
-                const exactCodeMatches = filteredCountries.filter(
-                    (country) => country.code.replace("+", "") === codeSearch,
-                );
+    if (searchTerm.length > 0 && !isDeleting) {
+      const codeSearch = searchTerm.replace("+", "").trim();
+      if (codeSearch.length > 0) {
+        const exactCodeMatches = filteredCountries.filter(
+          (country) => country.code.replace("+", "") === codeSearch,
+        );
 
-                if (exactCodeMatches.length === 1) {
-                    selectCountry(exactCodeMatches[0]);
-                    return;
-                }
-            }
-
-            const countriesStartingWith = filteredCountries.filter((country) =>
-                country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
-            );
-
-            if (countriesStartingWith.length === 1) {
-                selectCountry(countriesStartingWith[0]);
-            }
+        if (exactCodeMatches.length === 1) {
+          selectCountry(exactCodeMatches[0]);
+          return;
         }
+      }
+
+      const countriesStartingWith = filteredCountries.filter((country) =>
+        country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+      );
+
+      if (countriesStartingWith.length === 1) {
+        selectCountry(countriesStartingWith[0]);
+      }
     }
-function filterCountriesWithoutAutoSelect() {
+  }
+  function filterCountriesWithoutAutoSelect() {
+    const countriesStartingWith = countries.filter((country) =>
+      country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+    );
 
-const countriesStartingWith = countries.filter(
-    (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-);
+    const countriesContaining = countries.filter(
+      (country) =>
+        !country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) &&
+        country.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
 
-const countriesContaining = countries.filter(
-    (country) => 
-        !country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) && 
-        country.name.toLowerCase().includes(searchTerm.toLowerCase())
-);
-
-filteredCountries = [...countriesStartingWith, ...countriesContaining];
-const codeMatches = countries.filter(
-    (country) => country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
-);
-codeMatches.forEach(country => {
-    if (!filteredCountries.some(c => c.name === country.name)) {
+    filteredCountries = [...countriesStartingWith, ...countriesContaining];
+    const codeMatches = countries.filter((country) =>
+      country.code
+        .replace("+", "")
+        .includes(searchTerm.replace("+", "").toLowerCase()),
+    );
+    codeMatches.forEach((country) => {
+      if (!filteredCountries.some((c) => c.name === country.name)) {
         filteredCountries.push(country);
-    }
-});
-}
+      }
+    });
+  }
 
   let filteredCountries = countries;
   let showDropdown = false;
@@ -545,7 +546,7 @@ codeMatches.forEach(country => {
     validateField("companyName");
     validateField("country");
     // validateField("accountNumber");
-      validateField('technical_issue');
+    validateField("technical_issue");
     validateField("issue");
     validateField("assistance");
 
@@ -579,12 +580,10 @@ codeMatches.forEach(country => {
             await update();
 
             showFailureDiv = true;
-            
           } else {
             form = result.data;
             await update();
             showSuccesDiv = true;
-          
           }
         }
       };
@@ -610,58 +609,58 @@ codeMatches.forEach(country => {
 
   let isDataAvailable = false;
   onMount(() => {
-        if (data && data.profile) {
-          firstName = `${data.profile.firstName || data?.authedUser?.username || ""} `.trim();
-          lastName = `${data.profile.lastName || ""}`.trim();
-            email = data.profile.email || "";
-            phoneNumber = data.profile.cellPhone || "";
-            companyName = data.profile.companyName || "";
+    if (data && data.profile) {
+      firstName =
+        `${data.profile.firstName || data?.authedUser?.username || ""} `.trim();
+      lastName = `${data.profile.lastName || ""}`.trim();
+      email = data.profile.email || "";
+      phoneNumber = data.profile.cellPhone || "";
+      companyName = data.profile.companyName || "";
 
-            const profileCountry = data.profile.country?.trim();
-            if (profileCountry) {
-                const foundCountry = countries.find(
-                    (c) =>
-                        c.name.toLowerCase() === profileCountry.toLowerCase(),
-                );
-                if (foundCountry) {
-                    country = foundCountry.name;
-                }
-            }
-
-            isDataAvailable = true;
-        } else {
-          firstName = "";
-          lastName = "";
-            email = data?.email || "";
-            phoneNumber = "";
-            companyName = "";
-            country = "";
-            isDataAvailable = false;
-
+      const profileCountry = data.profile.country?.trim();
+      if (profileCountry) {
+        const foundCountry = countries.find(
+          (c) => c.name.toLowerCase() === profileCountry.toLowerCase(),
+        );
+        if (foundCountry) {
+          country = foundCountry.name;
         }
-        document.addEventListener("click", handleClickOutside);
-        return () => document.removeEventListener("click", handleClickOutside);
-    });
-    const handleResendOtpemail = () => {
-		if (!loadingotp) {
-			form3.requestSubmit();
-			// startTimer();
-		}
-	};
+      }
+
+      isDataAvailable = true;
+    } else {
+      firstName = "";
+      lastName = "";
+      email = data?.email || "";
+      phoneNumber = "";
+      companyName = "";
+      country = "";
+      isDataAvailable = false;
+    }
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  });
+  const handleResendOtpemail = () => {
+    if (!loadingotp) {
+      form3.requestSubmit();
+      // startTimer();
+    }
+  };
 </script>
 
 {#if showSuccesDiv}
   <div
     class="h-4/5 w-full flex items-center justify-center bg-gray-50 mx-auto max-w-7xl"
   >
-  <div
-  class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
->
-    <h3 class="text-2xl font-semibold text-green-600 mb-4">
-      Customer Support Form Submission
+    <div
+      class="w-full lg:w-11/12 p-10 md:w-3/4 text-center bg-white rounded-lg"
+    >
+      <h3 class="text-2xl font-semibold text-green-600 mb-4">
+        Customer Support Form Submission
       </h3>
       <p class="text-lg text-gray-700 mb-6">
-      Thank you for reaching out to our customer support team! We have received your request and will get back to you as soon as possible.
+        Thank you for reaching out to our customer support team! We have
+        received your request and will get back to you as soon as possible.
       </p>
 
       <div class="w-10/12 mx-auto my-6 border-t-2 border-green-300"></div>
@@ -702,7 +701,9 @@ codeMatches.forEach(country => {
         <input hidden name="issueName" value="Technical Problems" />
         <div class="relative dropdown-container">
           <!-- svelte-ignore a11y-label-has-associated-control -->
-          <label class="block text-sm pb-2">Where are you experiencing difficulties on our website?</label>
+          <label class="block text-sm pb-2"
+            >Where are you experiencing difficulties on our website?</label
+          >
           <div class="border rounded-md cursor-pointer">
             <input
               type="text"
@@ -732,11 +733,10 @@ codeMatches.forEach(country => {
                 </ul>
               </div>
             {/if}
-          
           </div>
           {#if errors.technical_issue}
-          <p class="text-red-500 text-xs mt-1">{errors.technical_issue}</p>
-        {/if}
+            <p class="text-red-500 text-xs mt-1">{errors.technical_issue}</p>
+          {/if}
         </div>
         <div class="mt-4">
           <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -750,20 +750,16 @@ codeMatches.forEach(country => {
             maxlength="200"
             on:input={() => validateField("assistance")}
             on:input={(e) => {
-              e.target.value = e.target.value.replace(
-                /^\s+/,
-                "",
-              );
+              e.target.value = e.target.value.replace(/^\s+/, "");
               assistance = e.target.value;
               validateField("assistance");
               errors.assistance = !assistance
                 ? "*Required"
                 : assistance.length < 3
-										? "Must be at least 3 characters"
-                : !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(assistance) 
-
-                  ? "Please enter a valid assistance "
-                  : "";
+                  ? "Must be at least 3 characters"
+                  : !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(assistance)
+                    ? "Please enter a valid assistance "
+                    : "";
             }}
             class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm"
             required
@@ -896,10 +892,7 @@ codeMatches.forEach(country => {
               required
               on:input={() => validateField("firstName")}
               on:input={(e) => {
-                e.target.value = e.target.value.replace(
-                  /^\s+/,
-                  "",
-                );
+                e.target.value = e.target.value.replace(/^\s+/, "");
                 firstName = e.target.value;
 
                 validateField("firstName");
@@ -932,10 +925,7 @@ codeMatches.forEach(country => {
               required
               on:input={() => validateField("lastName")}
               on:input={(e) => {
-                e.target.value = e.target.value.replace(
-                  /^\s+/,
-                  "",
-                );
+                e.target.value = e.target.value.replace(/^\s+/, "");
                 lastName = e.target.value;
 
                 validateField("lastName");
@@ -956,12 +946,7 @@ codeMatches.forEach(country => {
 
           <!-- Email Input -->
           <div>
-            <input
-              type="hidden"
-              name="email"
-              id="email"
-              bind:value={email}
-            />
+            <input type="hidden" name="email" id="email" bind:value={email} />
             <form
               action="?/verifyemail"
               bind:this={form3}
@@ -971,30 +956,24 @@ codeMatches.forEach(country => {
                   isLoading = false;
                   console.log("result", result);
                   if (result.data?.status === 200) {
-                    ProfileEmailVerified =
-                      result.data.isEmailVerified;
-                    if (
-                      authedUserEmailVerified === true
-                    ) {
+                    ProfileEmailVerified = result.data.isEmailVerified;
+                    if (authedUserEmailVerified === true) {
                       ProfileEmailVerified = true;
                     }
 
-                    verificationMessage =
-                      result.data.message;
+                    verificationMessage = result.data.message;
 
                     if (
                       verificationMessage.includes(
                         "Verification email sent successfully. Please check your inbox.",
                       )
                     ) {
-                      displayMessage =
-                        "Please check your inbox.";
+                      displayMessage = "Please check your inbox.";
                       emailSent = true;
                       enteredOtp = "";
                       isOtpVerified = false;
                     } else {
-                      displayMessage =
-                        verificationMessage;
+                      displayMessage = verificationMessage;
                       emailSent = false;
                       isOtpVerified = false;
                     }
@@ -1002,8 +981,7 @@ codeMatches.forEach(country => {
                     toast.success(verificationMessage);
                   } else {
                     toast.error(result.data.message);
-                    ProfileEmailVerified =
-                      result.data.isEmailVerified;
+                    ProfileEmailVerified = result.data.isEmailVerified;
                     emailSent = false;
                   }
                 };
@@ -1014,7 +992,6 @@ codeMatches.forEach(country => {
               }}
             >
               <div class="relative w-full">
-              
                 <div class="relative">
                   <input
                     type="text"
@@ -1022,14 +999,10 @@ codeMatches.forEach(country => {
                     id="email"
                     bind:value={email}
                     maxlength="50"
-              class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
+                    class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
                     placeholder="Email"
                     on:input={(e) => {
-                      e.target.value =
-                        e.target.value.replace(
-                          /^\s+/,
-                          "",
-                        );
+                      e.target.value = e.target.value.replace(/^\s+/, "");
                       email = e.target.value;
                       email = email.trim();
                       validateField("email");
@@ -1037,12 +1010,7 @@ codeMatches.forEach(country => {
                         ? "*Required"
                         : !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
                               email,
-                            ) ||
-                            email
-                              .split("@")[1]
-                              .includes(
-                                "gamil",
-                              )
+                            ) || email.split("@")[1].includes("gamil")
                           ? "Please enter a valid email address"
                           : "";
                       ProfileEmailVerified = false;
@@ -1067,10 +1035,7 @@ codeMatches.forEach(country => {
                       class="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-primary-500 hover:text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
                       disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
                         email,
-                      ) ||
-                        email
-                          .split("@")[1]
-                          .includes("gamil")}
+                      ) || email.split("@")[1].includes("gamil")}
                     >
                       Verify
                     </button>
@@ -1105,8 +1070,7 @@ codeMatches.forEach(country => {
                   {/if}
                 </div>
                 {#if errors?.email}
-                  <span
-                    class="text-red-500 text-xs mt-1 block"
+                  <span class="text-red-500 text-xs mt-1 block"
                     >{errors.email}</span
                   >
                 {/if}
@@ -1114,7 +1078,7 @@ codeMatches.forEach(country => {
             </form>
             {#if emailSent && isOtpVerified === false}
               <div
-                class="mt-3 bg-gray-50 p-3 rounded-md border border-gray-200"
+                class="mt-3 "
               >
                 <form
                   action="?/verifyOtpEmail"
@@ -1123,32 +1087,17 @@ codeMatches.forEach(country => {
                     return async ({ result }) => {
                       loadingotp = false; // Hide loading spinner when the request is complete
                       if (result.status === 200) {
-                        if (
-                          result.data.status ===
-                          200
-                        ) {
-                          const verifiedMessage =
-                            result.data.message;
-                          toast.success(
-                            verifiedMessage,
-                          );
-                          isOtpVerified =
-                            result.data
-                              .isEmailVerified;
+                        if (result.data.status === 200) {
+                          const verifiedMessage = result.data.message;
+                          toast.success(verifiedMessage);
+                          isOtpVerified = result.data.isEmailVerified;
                           enteredOtpemail = "";
                           ProfileEmailVerified = true;
-                          console.log(
-                            isOtpVerified,
-                            "isOtpVerified",
-                          );
+                          console.log(isOtpVerified, "isOtpVerified");
                         } else {
                           const errorMessage =
-                            result.data
-                              .message ||
-                            "An unknown error occurred!";
-                          toast.error(
-                            errorMessage,
-                          );
+                            result.data.message || "An unknown error occurred!";
+                          toast.error(errorMessage);
                         }
                       } else {
                         const errorMessage =
@@ -1176,23 +1125,21 @@ codeMatches.forEach(country => {
                       placeholder="Enter 6-digit OTP"
                       class="w-full text-sm border-gray-300 border rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 p-2.5"
                       on:input={() => {
-                        enteredOtpemail =
-                          enteredOtpemail.trim();
-                        enteredOtpemail =
-                          enteredOtpemail
-                            .replace(/\D/g, "")
-                            .slice(0, 6);
+                        enteredOtpemail = enteredOtpemail.trim();
+                        enteredOtpemail = enteredOtpemail
+                          .replace(/\D/g, "")
+                          .slice(0, 6);
                       }}
                     />
                     <button
                       type="submit"
                       class="absolute top-1/2 right-3 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
-                      disabled={loadingotp}
+                      disabled={loadingotp ||
+                        !enteredOtpemail ||
+                        !/^\d{6}$/.test(enteredOtpemail)}
                     >
                       {#if loadingotp}
-                        <span
-                          class="flex items-center"
-                        >
+                        <span class="flex items-center">
                           <Icon
                             icon="line-md:loading-alt-loop"
                             class="w-4 h-4 mr-1 animate-spin"
@@ -1205,9 +1152,7 @@ codeMatches.forEach(country => {
                     </button>
                   </div>
                   <div class="flex justify-end text-xs">
-                    <span>
-                      Didn't receive the code?</span
-                    >
+                    <span> Didn't receive the code?</span>
                     <button
                       type="button"
                       on:click={handleResendOtpemail}
@@ -1244,15 +1189,12 @@ codeMatches.forEach(country => {
               type="text"
               name="companyName"
               placeholder="Company Name "
-               maxlength="50"
+              maxlength="50"
               bind:value={companyName}
               class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
               required
               on:input={(e) => {
-                e.target.value = e.target.value.replace(
-                  /^\s+/,
-                  "",
-                );
+                e.target.value = e.target.value.replace(/^\s+/, "");
                 companyName = e.target.value;
 
                 validateField("companyName");
@@ -1261,15 +1203,10 @@ codeMatches.forEach(country => {
                   ? "*Required"
                   : companyName.length < 3
                     ? "Must be at least 3 characters"
-                    : !/^[A-Za-z@.,!#$%^&*(_)+\-\s]+$/.test(
-                          companyName,
-                        )
+                    : !/^[A-Za-z@.,!#$%^&*(_)+\-\s]+$/.test(companyName)
                       ? "Please enter a valid company name"
                       : "";
               }}
-
-
-                              
             />
             {#if errors?.companyName}
               <p class="text-red-500 text-xs mt-1">
@@ -1279,6 +1216,8 @@ codeMatches.forEach(country => {
           </div>
 
           <div class="flex flex-col">
+            <!-- svelte-ignore a11y-click-events-have-key-events -->
+            <!-- svelte-ignore a11y-no-static-element-interactions -->
             <div class="relative dropdown-container">
               <input
                 type="text"
@@ -1296,53 +1235,51 @@ codeMatches.forEach(country => {
                 class="flex-1 outline-none w-full border border-gray-300 rounded focus:ring-0 focus:border-primary-400 p-2 text-sm"
                 required
               />
-              <Icon
-                icon={showDropdown
-                  ? "ep:arrow-up-bold"
-                  : "ep:arrow-down-bold"}
-                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
-              />
-             	{#if showDropdown}
-             <div
-               bind:this={dropdownEl}
-               class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
-             >
-               <ul
-                 class="max-h-60 overflow-y-auto text-sm"
-               >
-                 {#each filteredCountries as country, index}
-                   <!-- svelte-ignore a11y-click-events-have-key-events -->
-                   <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                   <li
-                     on:click={() =>
-                       selectCountry(country)}
-                     class="px-4 py-2 cursor-pointer {highlightedIndex ===
-                     index
-                       ? 'bg-primary-100'
-                       : 'hover:bg-primary-50'}"
-                   >
-                     {country.name} ({country.code})
-                   </li>
-                 {/each}
-                 {#if filteredCountries.length === 0}
-                   <div
-                     class="flex items-center px-4 py-3"
-                   >
-                     <Icon
-                       icon="tabler:info-square-rounded-filled"
-                       class="text-red-500 text-base mr-2"
-                     />
-                     <li
-                       class="text-gray-800 text-xs"
-                     >
-                       No matching countries
-                       found!
-                     </li>
-                   </div>
-                 {/if}
-               </ul>
-             </div>
-           {/if}
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <div
+                on:click|stopPropagation={toggleDropdown}
+                class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
+              >
+                <Icon
+                  icon={showDropdown
+                    ? "ep:arrow-up-bold"
+                    : "ep:arrow-down-bold"}
+                  class="text-gray-500 mr-1 text-2s font-bold"
+                />
+              </div>
+              {#if showDropdown}
+                <div
+                  bind:this={dropdownEl}
+                  class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
+                >
+                  <ul class="max-h-60 overflow-y-auto text-sm">
+                    {#each filteredCountries as country, index}
+                      <!-- svelte-ignore a11y-click-events-have-key-events -->
+                      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                      <li
+                        on:click={() => selectCountry(country)}
+                        class="px-4 py-2 cursor-pointer {highlightedIndex ===
+                        index
+                          ? 'bg-primary-100'
+                          : 'hover:bg-primary-50'}"
+                      >
+                        {country.name} ({country.code})
+                      </li>
+                    {/each}
+                    {#if filteredCountries.length === 0}
+                      <div class="flex items-center px-4 py-3">
+                        <Icon
+                          icon="tabler:info-square-rounded-filled"
+                          class="text-red-500 text-base mr-2"
+                        />
+                        <li class="text-gray-800 text-xs">
+                          No matching countries found!
+                        </li>
+                      </div>
+                    {/if}
+                  </ul>
+                </div>
+              {/if}
             </div>
             {#if errors.country}
               <p class="text-red-500 text-xs mt-1">
@@ -1361,9 +1298,7 @@ codeMatches.forEach(country => {
               class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
               required
               on:input={() => {
-                phoneNumber = phoneNumber
-                  .replace(/[^+\d]/g, "")
-                  .trim();
+                phoneNumber = phoneNumber.replace(/[^+\d]/g, "").trim();
                 validateField("phoneNumber");
                 validatePhoneNumber(country, phoneNumber);
               }}
@@ -1396,24 +1331,15 @@ codeMatches.forEach(country => {
             on:click={(event) => {
               // Then check form validity
               if (!formValid()) {
-                toast.error(
-                  "Please fill all the required fields.",
-                );
+                toast.error("Please fill all the required fields.");
                 event.preventDefault();
                 return;
               } else {
                 handlesubmit();
               }
 
-              if (
-                !(
-                  ProfileEmailVerified ||
-                  authedUserEmailVerified === true
-                )
-              ) {
-                toast.error(
-                  "Please verify your email to proceed",
-                );
+              if (!(ProfileEmailVerified || authedUserEmailVerified === true)) {
+                toast.error("Please verify your email to proceed");
                 event.preventDefault();
                 return;
               }

@@ -29,6 +29,7 @@
 	let poVerified = false;
 	//   let country="";
 	let products = [{ itemNumber: "" }];
+	let itemNumber = "";
 	let poNumber = "";
 	let country = data?.profile?.country || "";
 	let firstName =
@@ -79,6 +80,10 @@
 		}
 
 		if (!fieldName || fieldName === "email") {
+			if (!email) {
+				errors.email = "*Required";
+				return;
+			}
 			if (
 				!email ||
 				!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
@@ -90,6 +95,10 @@
 		}
 
 		if (!fieldName || fieldName === "phoneNumber") {
+			if (!phoneNumber) {
+				errors.phoneNumber = "*Required";
+				return;
+			}
 			if (!country) {
 				errors.phoneNumber =
 					"Please select the country before entering the phone number";
@@ -127,7 +136,7 @@
 
 		if (!fieldName || fieldName === "country") {
 			if (!country) {
-				errors.country = "Country is required";
+				errors.country = "*Required";
 			} else {
 				delete errors.country;
 			}
@@ -153,42 +162,24 @@
 				delete errors.companyName;
 			}
 		}
-		// if (!fieldName || fieldName === 'selectedOption') {
-		//   if (!selectedOption ) {
-		// 	errors.selectedOption = 'Please select one of the reference options (PO Number, Order Number, or Invoice Number)';
 
-		// 	// toast.error('Please select the option');
-		//   } else {
-		// 	delete errors.selectedOption; // Clear error once a valid option is selected
-		//   }
-		// }
-
-		// if (!fieldName || fieldName === 'selectOptionNumber') {
-		//   if (!selectOptionNumber || selectOptionNumber.trim() === '' || !/^[a-zA-Z0-9]+$/.test(selectOptionNumber)) {
-		// 	errors.selectOptionNumber = 'Please provide the valid reference number';
-		//   } else {
-		// 	delete errors.selectOptionNumber;
-		//   }
-		// }
-
-		if (!fieldName || fieldName === "confirmationNumber") {
-			if (
-				confirmationNumber &&
-				!/^[A-Za-z0-9-]+$/.test(confirmationNumber)
-			) {
-				errors.confirmationNumber =
-					"Confirmation number should contain only alphanumeric characters and dashes";
+		if (!fieldName || fieldName === "itemNumber") {
+			if (!itemNumber) {
+				errors.itemNumber = "*Required";
+			} else if (!/^[A-Za-z0-9-\s]+$/.test(itemNumber)) {
+				errors.itemNumber = "Only letters and spaces are allowed.";
 			} else {
-				delete errors.confirmationNumber;
+				delete errors.itemNumber;
 			}
 		}
 
-		if (!fieldName || fieldName === "itemNumber") {
-			if (itemNumber && !/^[A-Za-z0-9-]+$/.test(itemNumber)) {
-				errors.itemNumber =
-					"Item number should contain only alphanumeric characters and dashes";
+		if (!fieldName || fieldName === "poNumber") {
+			if (!poNumber) {
+				errors.poNumber = "*Required";
+			} else if (!/^[A-Za-z0-9-\s]+$/.test(poNumber)) {
+				errors.poNumber = "Only letters and spaces are allowed.";
 			} else {
-				delete errors.itemNumber;
+				delete errors.poNumber;
 			}
 		}
 	};
@@ -272,7 +263,7 @@
 			) {
 				selectCountry(filteredCountries[highlightedIndex]);
 				event.preventDefault();
-			} else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
+			} else if (searchTerm && filteredCountries.length > 0) {
 				selectCountry(filteredCountries[0]);
 				event.preventDefault();
 			}
@@ -497,8 +488,8 @@
 		validateField("companyName");
 		validateField("country");
 		// validateField('accountNumber');
-		// validateField('selectedOption');
-		// validateField('selectOptionNumber')
+		validateField("poNumber");
+		validateField("itemNumber");
 
 		const isValid = Object.keys(errors).length === 0;
 
@@ -664,7 +655,7 @@
 									id={`item-number-${1}`}
 									type="text"
 									maxlength="100"
-									placeholder="PO Number / Order Number"
+									placeholder="Order Number"
 									bind:value={poNumber}
 									class="w-full border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm rounded-md"
 									required
@@ -714,7 +705,6 @@
 								id="email"
 								bind:value={email}
 							/>
-
 						</form>
 
 						<!-- Display validation status -->
@@ -724,67 +714,53 @@
 							</p>
 						{:else if isValidOrder}
 							<p class="text-green-500 text-xs mb-2">
-								PO number verified successfully
+								Order number verified successfully
 							</p>
 						{/if}
-<input
-												type="hidden"
-												name="poNumber"
-												id="poNumber"
-												bind:value={poNumber}
-											/>
+						<input
+							type="hidden"
+							name="poNumber"
+							id="poNumber"
+							bind:value={poNumber}
+						/>
 						<!-- <label class="hidden mb-1" for={`poNumber-${index}`}>poNumber</label> -->
-						{#each products as product, index}
-							<input
-								id={`poNumber-${index}`}
-								type="text"
-								placeholder="Item Number"
-								maxlength="100"
-								bind:value={product.itemNumber}
-								on:input={(e) => {
-									const allowedChars =
-										/^[a-zA-Z0-9\-.,;"']*$/;
-									let inputValue = e.target.value;
+						<!-- {#each products as product, index} -->
+						<input
+							name="itemNumber"
+							id={`poNumber`}
+							type="text"
+							placeholder="Product Number"
+							maxlength="100"
+							bind:value={itemNumber}
+							on:input={(e) => {
+								validateField("itemNumber");
+								const allowedChars = /^[a-zA-Z0-9\-.,;"']*$/;
+								let inputValue = e.target.value;
 
-									if (!allowedChars.test(inputValue)) {
-										inputValue = inputValue.replace(
-											/[^a-zA-Z0-9\-.,;"']/g,
-											"",
-										);
-									}
-									product.itemNumber = inputValue.trim();
-									product.itemNumber =
-										product.itemNumber.trim();
-								}}
-								class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
-								required
-							/><input
+								if (!allowedChars.test(inputValue)) {
+									inputValue = inputValue.replace(
+										/[^a-zA-Z0-9\-.,;"']/g,
+										"",
+									);
+								}
+								itemNumber = inputValue.trim();
+								itemNumber = itemNumber.trim();
+							}}
+							class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
+						/>
+						{#if errors?.itemNumber}
+							<p class="text-red-500 text-xs mt-1">
+								{errors.itemNumber}
+							</p>
+						{/if}
+						<input
 							type="hidden"
 							name="itemNumber"
 							id="itemNumber"
-							bind:value={product.itemNumber}
+							bind:value={itemNumber}
 						/>
-
-							{#if index > 0}
-								<button
-									type="button"
-									on:click={() => removeProduct(index)}
-									class="ml-2 text-primary-400"
-								>
-									&times;
-								</button>
-							{/if}
-						{/each}
-						
 					</div>
 
-					<button
-						type="button"
-						on:click={addProduct}
-						class=" text-primary-400 border border-primary-400 mb-4 px-2 py-1 rounded-md hover:text-white hover:bg-primary-400"
-					>
-						Add another product
-					</button>
 					<input
 						hidden
 						name="products"
@@ -1022,7 +998,7 @@
 							</form>
 							{#if emailSent && isOtpVerified === false}
 								<div
-									class="mt-3 bg-gray-50 p-3 rounded-md border border-gray-200"
+									class="mt-3"
 								>
 									<form
 										action="?/verifyOtpEmail"
@@ -1095,7 +1071,11 @@
 											<button
 												type="submit"
 												class="absolute top-1/2 right-3 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
-												disabled={loadingotp}
+												 disabled={loadingotp ||
+                                                !enteredOtpemail ||
+                                                !/^\d{6}$/.test(
+                                                    enteredOtpemail,
+                                                )}
 											>
 												{#if loadingotp}
 													<span
@@ -1185,6 +1165,7 @@
 						</div>
 
 						<div class="flex flex-col">
+							<!-- svelte-ignore a11y-no-static-element-interactions -->
 							<div class="relative dropdown-container">
 								<input
 									type="text"
@@ -1203,12 +1184,18 @@
 									class="flex-1 outline-none w-full border border-gray-300 rounded focus:ring-0 focus:border-primary-400 p-2 text-sm"
 									required
 								/>
-								<Icon
-									icon={showDropdown
-										? "ep:arrow-up-bold"
-										: "ep:arrow-down-bold"}
-									class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
-								/>
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<div
+									on:click|stopPropagation={toggleDropdown}
+									class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
+								>
+									<Icon
+										icon={showDropdown
+											? "ep:arrow-up-bold"
+											: "ep:arrow-down-bold"}
+										class="text-gray-500 mr-1 text-2s font-bold"
+									/>
+								</div>
 								{#if showDropdown}
 									<div
 										bind:this={dropdownEl}
@@ -1327,7 +1314,7 @@
 								}
 								if (!poVerified) {
 									toast.error(
-										"please verify your PO number to proceed",
+										"please verify your Order number to proceed",
 									);
 									event.preventDefault();
 									return;

@@ -2389,216 +2389,126 @@ export const addAllToCart = async (items, userId, userEmail) => {
 
 //Myfavouries actions ends
 
+
+
 export const quicksearch = async ({ query }) => {
-	const startTime = Date.now();
-
-	console.log(query, "query");
-
-	try {
-		const productIndexHint = { productNumber: 1 };
-		const stockIndexHint = { productNumber: 1 };
-		const productProjection = {
-			_id: 1,
-			productName: 1,
-			productNumber: 1,
-			prodDesc: 1,
-			image: 1
-		};
-		const baseProducts = await Product.find({
-			productNumber: { $regex: query, $options: 'i' }
-		})
-			.select(productProjection)
-			.hint(productIndexHint)
-			.lean()
-			.exec();
-
-		if (baseProducts.length === 0) {
-			return [];
-		}
-		const [allStockEntries, currency] = await Promise.all([
-			Stock.find({
-				productNumber: { $in: baseProducts.map(product => product.productNumber) }
-			})
-				.select('_id stock pricing distributor manufacturer productNumber')
-				.hint(stockIndexHint)
-				.lean()
-				.exec(),
-			Curconversion.findOne({ currency: 'USD' })
-				.sort({ createdAt: -1 })
-				.lean()
-				.exec()
-		]);
-		const stockEntriesByProduct = allStockEntries.reduce((acc, entry) => {
-			if (!acc[entry.productNumber]) {
-				acc[entry.productNumber] = [];
-			}
-			acc[entry.productNumber].push(entry);
-			return acc;
-		}, {});
-		const processPricing = (originalPricing) => {
-			const rate = currency.rate;
-			
-			if (!originalPricing || !Array.isArray(originalPricing) || originalPricing.length === 0) {
-				return { processedPricing: [], priceoneValue: "" };
-			}
-			
-			if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
-				const processedPricing = originalPricing.map(price => ({
-					...price,
-					USD: (price.INR / rate).toFixed(2)
-				}));
-				return { processedPricing, priceoneValue: originalPricing[0]?.INR || "" };
-			} 
-			else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
-				const processedPricing = originalPricing.map(price => ({
-					...price,
-					INR: (price.USD * rate).toFixed(2)
-				}));
-				return { processedPricing, priceoneValue: originalPricing[0]?.USD || "" };
-			} 
-			
-			return { processedPricing: originalPricing, priceoneValue: "" };
-		};
-		const enrichedProducts = [];
-		const estimatedSize = baseProducts.reduce(
-			(count, product) => count + Math.max(1, (stockEntriesByProduct[product.productNumber] || []).length),
-			0
-		);
-		enrichedProducts.length = estimatedSize;
-		
-		let resultIndex = 0;
-		for (const baseProduct of baseProducts) {
-			const stockEntries = stockEntriesByProduct[baseProduct.productNumber] || [];
-			const productId = baseProduct._id.toString();
-			const productCommonData = {
-				id: productId,
-				image: baseProduct.image || null,
-				description: baseProduct.prodDesc || null,
-				productName: baseProduct.productName,
-				productNumber: baseProduct.productNumber
-			};
-
-			if (stockEntries.length === 0) {
-				enrichedProducts[resultIndex++] = {
-					...productCommonData,
-					stockId: null,
-					manufacturer: null,
-					distributer: null,
-					stock: 0,
-					priceone: "",
-					pricing: []
-				};
-				continue;
-			}
-			for (const entry of stockEntries) {
-				const entryPricing = entry.pricing ? 
-					(Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing]) : [];
-				
-				const { processedPricing, priceoneValue } = processPricing(entryPricing);
-
-				enrichedProducts[resultIndex++] = {
-					...productCommonData,
-					stockId: entry._id.toString(),
-					manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
-					distributer: entry.distributor ? entry.distributor.toString() : null,
-					stock: entry.stock || 0,
-					priceone: priceoneValue,
-					pricing: processedPricing
-				};
-			}
-		}
-
-		if (resultIndex < estimatedSize) {
-			enrichedProducts.length = resultIndex;
-		}
-
-		console.log(enrichedProducts.length, "enrichedProducts");
-		// console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
-		return enrichedProducts;
-	} catch (error) {
-		// console.error("Error in quicksearch:", error);
-		throw new Error("An error occurred while processing the quicksearch.");
-	}
+    const startTime = Date.now();
+    console.log(query, "query");
+    try {
+        if (!query || !query.trim()) {
+            return [];
+        }
+        // First find matching stock items based on productNumber
+        const stockIndexHint = { sku: 1 };
+       
+        // Use a more specific regex pattern to improve match speed
+        const regexPattern = new RegExp('^' + query, 'i');
+       
+        // Add limit to prevent processing too many records
+        const stockItems = await Stock.find({
+            sku: { $regex: regexPattern }
+        })
+            .select('_id stock pricing distributor manufacturer productNumber productid sku')
+            .hint(stockIndexHint)
+            .limit(100) // Limit results for faster response
+            .lean()
+            .exec();
+        if (stockItems.length === 0) {
+            return [];
+        }
+        console.log(stockItems,"stockItems");
+       
+        const productIds = [...new Set(stockItems.map(item => item.productid).filter(Boolean))];
+       
+        // Run currency and product queries in parallel
+        const [currency, products] = await Promise.all([
+            Curconversion.findOne({ currency: 'USD' })
+                .sort({ createdAt: -1 })
+                .lean()
+                .exec(),
+           
+            Product.find({
+                _id: { $in: productIds }
+            })
+                .select('_id productName productNumber image')
+                .lean()
+                .exec()
+        ]);
+       
+        // Create a map for quick product lookup
+        const productMap = products.reduce((map, product) => {
+            map[product._id.toString()] = product;
+            return map;
+        }, {});
+        const rate = currency?.rate || 1;
+       
+        // Build the enriched products array
+        const enrichedProducts = stockItems
+            .map(stockItem => {
+                const productId = stockItem.productid?.toString();
+                const product = productId ? productMap[productId] : null;
+               
+                if (!product) {
+                    // Skip if we couldn't find the product
+                    return null;
+                }
+               
+                const entryPricing = stockItem.pricing ?
+                    (Array.isArray(stockItem.pricing) ? stockItem.pricing : [stockItem.pricing]) : [];
+               
+                let processedPricing = entryPricing;
+                let priceoneValue = "";
+               
+                // Process pricing directly instead of using a separate function
+                if (entryPricing.length > 0) {
+                    if (entryPricing[0]?.INR !== undefined && entryPricing[0]?.INR !== null) {
+                        processedPricing = entryPricing.map(price => ({
+                            ...price,
+                            USD: (price.INR / rate).toFixed(2)
+                        }));
+                        priceoneValue = entryPricing[0]?.INR || "";
+                    } else if (entryPricing[0]?.USD !== undefined && entryPricing[0]?.USD !== null) {
+                        processedPricing = entryPricing.map(price => ({
+                            ...price,
+                            INR: (price.USD * rate).toFixed(2)
+                        }));
+                        priceoneValue = entryPricing[0]?.USD || "";
+                    }
+                }
+                return {
+                    id: product._id.toString(),
+                    image: product.image || null,
+                    description: product.prodDesc || null,
+                    productName: product.productName,
+                    productNumber: product.productNumber,
+                    stockId: stockItem._id.toString(),
+                    manufacturer: stockItem.manufacturer ? stockItem.manufacturer.toString() : null,
+                    distributer: stockItem.distributor ? stockItem.distributor.toString() : null,
+                    stock: stockItem.stock || 0,
+                    priceone: priceoneValue,
+                    pricing: processedPricing,
+                    sku: stockItem.sku || null
+                };
+            })
+            .filter(Boolean); // Remove null entries
+        console.log(enrichedProducts.length, "enrichedProducts");
+        // console.log([TIMING] Total function execution time: ${Date.now() - startTime}ms);
+        return enrichedProducts;
+    } catch (error) {
+        // console.error("Error in quicksearch:", error);
+        throw new Error("An error occurred while processing the quicksearch.");
+    }
 };
+
 export const uploadFile = async ({ query }) => {
 	const startTime = Date.now();
 
 	if (!query || query.length === 0) {
 		return [];
 	}
-
-	const isSingleRecord = query.length === 1;
-	if (isSingleRecord) {
-		const sku = query[0][0];
-		if (!sku?.trim()) return [];
-		
-		const original = sku.trim();
-		const normalizedSku = original.replace(/[-\s]/g, '').toLowerCase();
-		const quantityNum = parseInt(query[0][1]?.trim() || '1');
-
-		try {
-			const stockItem = await Stock.findOne(
-				{ 
-					$expr: { 
-						$eq: [
-							{ $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
-							normalizedSku
-						] 
-					} 
-				},
-				{
-					_id: 1,
-					productid: 1,
-					stock: 1,
-					distributor: 1,
-					manufacturer: 1,
-					productName: 1,
-					productNumber: 1,
-					sku: 1
-				}
-			).lean();
-
-			if (!stockItem) {
-				const result = [{
-					productNumber: original,
-					quantity: quantityNum,
-					isValid: false,
-					message: "Stock information is missing",
-				}];
-				console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
-				return result;
-			}
-
-			const result = [{
-				id: stockItem._id.toString(),
-				productId: stockItem.productid.toString(),
-				productNumber: stockItem.productNumber,
-				productName: stockItem.productName,
-				sku: stockItem.sku,
-				quantity: quantityNum,
-				stockId: stockItem._id.toString(),
-				stock: Number(stockItem?.stock) || 0,
-				manufacturer: stockItem.manufacturer?.toString() || null,
-				distributer: stockItem.distributor?.toString() || null,
-				isValid: true,
-				message: "SKU is valid",
-			}];
-
-			console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
-			return result;
-		} catch (error) {
-			console.error(`Error in uploadFile: ${error.message}`);
-			return [{
-				productNumber: original,
-				quantity: quantityNum,
-				isValid: false,
-				message: "Error processing SKU",
-			}];
-		}
-	}
-	const skuData = new Array(query.length);
+	const skuData = [];
 	const normalizedSkuSet = new Set();
-	let validSkuCount = 0;
+
 	for (let i = 0; i < query.length; i++) {
 		const sku = query[i][0];
 		if (!sku?.trim()) continue;
@@ -2607,37 +2517,33 @@ export const uploadFile = async ({ query }) => {
 		const normalizedSku = original.replace(/[-\s]/g, '').toLowerCase();
 		const quantityNum = parseInt(query[i][1]?.trim() || '1');
 
-		skuData[validSkuCount++] = {
+		skuData.push({
 			original,
 			normalizedSku,
 			quantity: quantityNum
-		};
+		});
 		normalizedSkuSet.add(normalizedSku);
 	}
-	if (validSkuCount < query.length) {
-		skuData.length = validSkuCount;
-	}
 
-	if (validSkuCount === 0) {
+	if (skuData.length === 0) {
 		return [];
 	}
-	const normalizedSkusArray = Array.from(normalizedSkuSet);
+	const normalizedSkusArray = [...normalizedSkuSet];
 
 	try {
-		let stockItems;
-		if (normalizedSkusArray.length <= 10) {
-			stockItems = await Stock.find(
-				{
-					$or: normalizedSkusArray.map(normalizedSku => ({
-						$expr: { 
-							$eq: [
-								{ $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
-								normalizedSku
-							] 
-						}
-					}))
-				},
-				{
+		const stockItems = await Stock.aggregate([
+			{
+				$match: {
+					$expr: {
+						$in: [
+							{ $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
+							normalizedSkusArray
+						]
+					}
+				}
+			},
+			{
+				$project: {
 					_id: 1,
 					productid: 1,
 					stock: 1,
@@ -2645,65 +2551,28 @@ export const uploadFile = async ({ query }) => {
 					manufacturer: 1,
 					productName: 1,
 					productNumber: 1,
-					sku: 1
+					sku: 1,
+					normalizedSku: { $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } }
 				}
-			)
-			.lean()
-			.exec();
-
-			stockItems = stockItems.map(item => ({
-				...item,
-				normalizedSku: item.sku.replace(/[-\s]/g, '').toLowerCase()
-			}));
-		} else {
-			stockItems = await Stock.aggregate([
-				{
-					$match: {
-						$expr: {
-							$in: [
-								{ $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
-								normalizedSkusArray
-							]
-						}
-					}
-				},
-				{
-					$project: {
-						_id: 1,
-						productid: 1,
-						stock: 1,
-						distributor: 1,
-						manufacturer: 1,
-						productName: 1,
-						productNumber: 1,
-						sku: 1,
-						normalizedSku: { $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } }
-					}
-				}
-			])
-			.option({ allowDiskUse: true }) 
-			.exec();
-		}
-
-		const stockItemMap = Object.create(null); 
-		for (const item of stockItems) {
+			}
+		]).exec();
+		const stockItemMap = {};
+		for (let i = 0; i < stockItems.length; i++) {
+			const item = stockItems[i];
 			stockItemMap[item.normalizedSku] = item;
 		}
 		const results = new Array(skuData.length);
-	
-		const createInvalidResult = (original, quantity) => ({
-			productNumber: original,
-			quantity,
-			isValid: false,
-			message: "Stock information is missing",
-		});
-		
 		for (let i = 0; i < skuData.length; i++) {
 			const { normalizedSku, original, quantity } = skuData[i];
 			const matchedStock = stockItemMap[normalizedSku];
 
 			if (!matchedStock) {
-				results[i] = createInvalidResult(original, quantity);
+				results[i] = {
+					productNumber: original,
+					quantity,
+					isValid: false,
+					message: "Stock information is missing",
+				};
 				continue;
 			}
 
@@ -2723,11 +2592,10 @@ export const uploadFile = async ({ query }) => {
 			};
 		}
 
-		// console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
+		console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
 		return results;
 	} catch (error) {
 		console.error(`Error in uploadFile: ${error.message}`);
-
 		return skuData.map(({ original, quantity }) => ({
 			productNumber: original,
 			quantity,
@@ -2736,239 +2604,6 @@ export const uploadFile = async ({ query }) => {
 		}));
 	}
 };
-
-// export const quicksearch = async ({ query }) => {
-// 	const startTime = Date.now();
-
-// 	console.log(query, "query");
-
-// 	try {
-// 		// Find all matching products in a single query
-// 		const baseProducts = await Product.find({
-// 			productNumber: { $regex: query, $options: 'i' }
-// 		})
-// 			.select('_id productName productNumber prodDesc image')
-// 			.lean()
-// 			.exec();
-
-// 		if (baseProducts.length === 0) {
-// 			return [];
-// 		}
-
-// 		// Extract all product numbers for batch lookup
-// 		const productNumbers = baseProducts.map(product => product.productNumber);
-
-// 		// Get all stock entries for these products in a single query
-// 		const allStockEntries = await Stock.find({
-// 			productNumber: { $in: productNumbers }
-// 		})
-// 			.select('_id stock pricing distributor manufacturer productNumber')
-// 			.lean()
-// 			.exec();
-
-// 		// Create a lookup map of stock entries by productNumber
-// 		const stockEntriesByProduct = {};
-// 		allStockEntries.forEach(entry => {
-// 			if (!stockEntriesByProduct[entry.productNumber]) {
-// 				stockEntriesByProduct[entry.productNumber] = [];
-// 			}
-// 			stockEntriesByProduct[entry.productNumber].push(entry);
-// 		});
-
-// 		// Get currency conversion rate once instead of for each product
-// 		const currency = await Curconversion.findOne({ currency: 'USD' })
-// 			.sort({ createdAt: -1 })
-// 			.lean()
-// 			.exec();
-
-// 		const enrichedProducts = [];
-
-// 		// Process each product with its stock entries
-// 		for (const baseProduct of baseProducts) {
-// 			const stockEntries = stockEntriesByProduct[baseProduct.productNumber] || [];
-
-// 			if (stockEntries.length === 0) {
-// 				enrichedProducts.push({
-// 					id: baseProduct._id.toString(),
-// 					image: baseProduct.image || null,
-// 					description: baseProduct.prodDesc || null,
-// 					productName: baseProduct.productName,
-// 					productNumber: baseProduct.productNumber,
-// 					stockId: null,
-// 					manufacturer: null,
-// 					distributer: null,
-// 					stock: 0,
-// 					priceone: "",
-// 					pricing: []
-// 				});
-// 				continue;
-// 			}
-
-// 			// Process stock entries for this product
-// 			for (const entry of stockEntries) {
-// 				let processedPricing = [];
-// 				let priceoneValue = "";
-
-// 				if (entry.pricing) {
-// 					const originalPricing = Array.isArray(entry.pricing) ? entry.pricing : [entry.pricing];
-
-// 					if (originalPricing[0]?.INR !== undefined && originalPricing[0]?.INR !== null) {
-// 						processedPricing = originalPricing.map(price => {
-// 							const inrValue = price.INR;
-// 							const usdValue = inrValue / currency.rate;
-// 							return {
-// 								...price,
-// 								USD: usdValue.toFixed(2)
-// 							};
-// 						});
-
-// 						priceoneValue = originalPricing[0]?.INR || "";
-
-// 					} else if (originalPricing[0]?.USD !== undefined && originalPricing[0]?.USD !== null) {
-// 						processedPricing = originalPricing.map(price => {
-// 							const usdValue = price.USD;
-// 							const inrValue = usdValue * currency.rate;
-// 							return {
-// 								...price,
-// 								INR: inrValue.toFixed(2)
-// 							};
-// 						});
-
-// 						priceoneValue = originalPricing[0]?.USD || "";
-// 					} else {
-// 						processedPricing = originalPricing;
-// 					}
-// 				}
-
-// 				enrichedProducts.push({
-// 					id: baseProduct._id.toString(),
-// 					image: baseProduct.image || null,
-// 					description: baseProduct.prodDesc || null,
-// 					productName: baseProduct.productName,
-// 					productNumber: baseProduct.productNumber,
-// 					stockId: entry._id.toString(),
-// 					manufacturer: entry.manufacturer ? entry.manufacturer.toString() : null,
-// 					distributer: entry.distributor ? entry.distributor.toString() : null,
-// 					stock: entry.stock || 0,
-// 					priceone: priceoneValue,
-// 					pricing: processedPricing
-// 				});
-// 			}
-// 		}
-// 		console.log(enrichedProducts.length, "enrichedProducts");
-
-// 		console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
-// 		return enrichedProducts;
-// 	} catch (error) {
-// 		console.error("Error in quicksearch:", error);
-// 		throw new Error("An error occurred while processing the quicksearch.");
-// 	}
-// };
-
-// export const uploadFile = async ({ query }) => {
-// 	const startTime = Date.now();
-
-// 	if (!query || query.length === 0) {
-// 		return [];
-// 	}
-// 	const skuData = [];
-// 	const normalizedSkuSet = new Set();
-
-// 	for (let i = 0; i < query.length; i++) {
-// 		const sku = query[i][0];
-// 		if (!sku?.trim()) continue;
-
-// 		const original = sku.trim();
-// 		const normalizedSku = original.replace(/[-\s]/g, '').toLowerCase();
-// 		const quantityNum = parseInt(query[i][1]?.trim() || '1');
-
-// 		skuData.push({
-// 			original,
-// 			normalizedSku,
-// 			quantity: quantityNum
-// 		});
-// 		normalizedSkuSet.add(normalizedSku);
-// 	}
-
-// 	if (skuData.length === 0) {
-// 		return [];
-// 	}
-// 	const normalizedSkusArray = [...normalizedSkuSet];
-
-// 	try {
-// 		const stockItems = await Stock.aggregate([
-// 			{
-// 				$match: {
-// 					$expr: {
-// 						$in: [
-// 							{ $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } },
-// 							normalizedSkusArray
-// 						]
-// 					}
-// 				}
-// 			},
-// 			{
-// 				$project: {
-// 					_id: 1,
-// 					productid: 1,
-// 					stock: 1,
-// 					distributor: 1,
-// 					manufacturer: 1,
-// 					productName: 1,
-// 					productNumber: 1,
-// 					sku: 1,
-// 					normalizedSku: { $toLower: { $replaceAll: { input: "$sku", find: "-", replacement: "" } } }
-// 				}
-// 			}
-// 		]).exec();
-// 		const stockItemMap = {};
-// 		for (let i = 0; i < stockItems.length; i++) {
-// 			const item = stockItems[i];
-// 			stockItemMap[item.normalizedSku] = item;
-// 		}
-// 		const results = new Array(skuData.length);
-// 		for (let i = 0; i < skuData.length; i++) {
-// 			const { normalizedSku, original, quantity } = skuData[i];
-// 			const matchedStock = stockItemMap[normalizedSku];
-
-// 			if (!matchedStock) {
-// 				results[i] = {
-// 					productNumber: original,
-// 					quantity,
-// 					isValid: false,
-// 					message: "Stock information is missing",
-// 				};
-// 				continue;
-// 			}
-
-// 			results[i] = {
-// 				id: matchedStock._id.toString(),
-// 				productId: matchedStock.productid.toString(),
-// 				productNumber: matchedStock.productNumber,
-// 				productName: matchedStock.productName,
-// 				sku: matchedStock.sku,
-// 				quantity,
-// 				stockId: matchedStock._id.toString(),
-// 				stock: Number(matchedStock?.stock) || 0,
-// 				manufacturer: matchedStock.manufacturer?.toString() || null,
-// 				distributer: matchedStock.distributor?.toString() || null,
-// 				isValid: true,
-// 				message: "SKU is valid",
-// 			};
-// 		}
-
-// 		console.log(`[TIMING] Total function execution time: ${Date.now() - startTime}ms`);
-// 		return results;
-// 	} catch (error) {
-// 		console.error(`Error in uploadFile: ${error.message}`);
-// 		return skuData.map(({ original, quantity }) => ({
-// 			productNumber: original,
-// 			quantity,
-// 			isValid: false,
-// 			message: "Error processing SKU",
-// 		}));
-// 	}
-// };
 export const CreateProductQuote = async (formattedData) => {
 	console.log("formattedData", formattedData);
 

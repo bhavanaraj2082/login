@@ -107,6 +107,10 @@
 		}
 
 		if (!fieldName || fieldName === "email") {
+			if (!email){
+				errors.email="*Required"
+			}
+			else
 			if (
 				!email ||
 				!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
@@ -118,6 +122,10 @@
 		}
 
 		if (!fieldName || fieldName === "phoneNumber") {
+			if(!phoneNumber){
+				errors.phoneNumber="*Required"
+			}
+			else
 			if (!country) {
 				errors.phoneNumber =
 					"Please select the country before entering the phone number";
@@ -155,7 +163,7 @@
 
 		if (!fieldName || fieldName === "country") {
 			if (!country) {
-				errors.country = "Country is required";
+				errors.country = "*Required";
 			} else {
 				delete errors.country;
 			}
@@ -953,7 +961,7 @@
 						</form>
 						{#if emailSent && isOtpVerified === false}
 							<div
-								class="mt-3 bg-gray-50 p-3 rounded-md border border-gray-200"
+								class="mt-3"
 							>
 								<form
 									action="?/verifyOtpEmail"
@@ -1026,7 +1034,11 @@
 										<button
 											type="submit"
 											class="absolute top-1/2 right-3 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
-											disabled={loadingotp}
+											 disabled={loadingotp ||
+                                                !enteredOtpemail ||
+                                                !/^\d{6}$/.test(
+                                                    enteredOtpemail,
+                                                )}
 										>
 											{#if loadingotp}
 												<span
@@ -1134,12 +1146,17 @@
 								class="flex-1 outline-none w-full border border-gray-300 rounded focus:ring-0 focus:border-primary-400 p-2 text-sm"
 								required
 							/>
-							<Icon
-								icon={showDropdown
-									? "ep:arrow-up-bold"
-									: "ep:arrow-down-bold"}
-								class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
-							/>
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<!-- svelte-ignore a11y-no-static-element-interactions -->
+						<div
+								on:click|stopPropagation={toggleDropdown}
+								class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
+							>
+								<Icon
+									icon={showDropdown ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'}
+									class="text-gray-500 mr-1 text-2s font-bold"
+								/>
+							</div>
 							{#if showDropdown}
 								<div
 									bind:this={dropdownEl}

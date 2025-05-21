@@ -15,6 +15,17 @@ import { getCart } from '$lib/server/mongoLoads.js'
 function parseProductQuery(query) {
   let inputStr = query.trim();
 
+  const quantityUnitPattern = /^(.*?)-(\d+[-]?[A-Za-z]{1,3})$/i;
+  const quantityUnitMatch = inputStr.match(quantityUnitPattern);
+
+  if (quantityUnitMatch) {
+    return {
+      productNumber: quantityUnitMatch[1].trim(),
+      size: quantityUnitMatch[2].trim()
+    };
+  }
+
+
   const packOfPattern = /^(.*?)[-\s]+(pack-of-\d+|case-of-\d+|each-of-\d+)$/i;
   const packOfMatch = inputStr.match(packOfPattern);
 
@@ -127,11 +138,12 @@ export const actions = {
 
     if (quickSearch && quickSearch.length >= 0) {
       try {
-        const parsedQuery = parseProductQuery(quickSearch);
-        console.log("Original Query:", quickSearch);
-        console.log("Parsed Product Number:", parsedQuery.productNumber);
-        console.log("Parsed Size:", parsedQuery.size);
-        const results = await quicksearch({ query: parsedQuery.productNumber });
+        // const parsedQuery = parseProductQuery(quickSearch);
+        const parsedQuery = quickSearch;
+        // console.log("Original Query:", quickSearch);
+        // console.log("Parsed Product Number:", parsedQuery.productNumber);
+        // console.log("Parsed Size:", parsedQuery.size);
+        const results = await quicksearch({ query: parsedQuery });
 
         const processedResults = results.map(product => {
           let processedPricing = [];
