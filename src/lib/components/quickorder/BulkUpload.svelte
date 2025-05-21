@@ -8,6 +8,8 @@
   import { authedUser, cartTotalComps } from "$lib/stores/mainStores.js";
   export let data;
   import { fade } from "svelte/transition";
+  let editedLines = new Set();
+  let originalLineContent = [];
   let textEditedAfterValidation = false;
   let showValidateButton = false;
   $: console.log($cart);
@@ -162,63 +164,39 @@
     }
   }
   let formatError = false;
-  //   function handleTextChange(event) {
-  //   rawFileData = event.target.value;
-  //   const { duplicates } = checkForDuplicates(rawFileData);
-  //   duplicateEntries = duplicates;
-  //   isValidated = false;
-  //   invalidProductLines = [];
-  //   formatError = false;
-  //   fileError = "";
 
-  //   if (!rawFileData.trim()) {
-  //     return;
-  //   }
-
-  //   const lines = rawFileData.split("\n").filter(line => line.trim());
-
-  //   // Simplified format check - just ensure each line has content
-  //   for (let i = 0; i < lines.length; i++) {
-  //     const line = lines[i].trim();
-  //     const parts = line.split(",");
-
-  //     if (parts.length === 0 || !parts[0].trim()) {
-  //       formatError = true;
-  //       cartloading = false;
-  //       fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
-  //       toast.error(fileError);
-  //       break;
-  //     }
-
-  //     // Only check quantity if a second part exists
-  //     if (parts.length > 1 && parts[1].trim() && isNaN(Number(parts[1].trim()))) {
-  //       formatError = true;
-  //       cartloading = false;
-  //       fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
-  //       toast.error(fileError);
-  //       break;
-  //     }
-  //        if (parts.length > 1 && parts[1].trim()) {
-  //       const quantity = Number(parts[1].trim());
-  //       if (!isNaN(quantity) && quantity > 999) {
-  //         formatError = true;
-  //         cartloading = false;
-  //         fileError = `Quantity at line ${i + 1} must not be greater than 999.`;
-  //         toast.error(fileError);
-  //         break;
-  //       }
-  //     }
-  //   }
-  // }
   function handleTextChange(event) {
-    rawFileData = event.target.value;
+    const newText = event.target.value;
+    const newLines = newText.split("\n");
+    const oldLines = rawFileData.split("\n");
+    if (isValidated && originalLineContent.length === 0) {
+      originalLineContent = [...oldLines];
+    }
+    if (isValidated) {
+      const newEditedLines = new Set();
+      for (
+        let i = 0;
+        i < Math.max(newLines.length, originalLineContent.length);
+        i++
+      ) {
+        const newLine = i < newLines.length ? newLines[i] : "";
+        const originalLine =
+          i < originalLineContent.length ? originalLineContent[i] : "";
+
+        if (newLine !== originalLine) {
+          newEditedLines.add(Number(i));
+          // console.log(`Line ${i} was edited: "${originalLine}" → "${newLine}"`);
+        }
+      }
+      editedLines = newEditedLines;
+      // console.log("Updated editedLines:", Array.from(editedLines));
+      textEditedAfterValidation = editedLines.size > 0;
+      showValidateButton = editedLines.size > 0;
+    }
+
+    rawFileData = newText;
     const { duplicates } = checkForDuplicates(rawFileData);
     duplicateEntries = duplicates;
-
-    if (isValidated) {
-      textEditedAfterValidation = true;
-      showValidateButton = true;
-    }
 
     formatError = false;
     fileError = "";
@@ -227,9 +205,14 @@
       return;
     }
 
-    const lines = rawFileData.split("\n").filter((line) => line.trim());
-
-    // Simplified format check - just ensure each line has content
+    const lines = newLines.filter((line) => line.trim());
+    if (lines.length > 100) {
+      formatError = true;
+      cartloading = false;
+      fileError =
+        "Error(s) found in product input:\n* Bulk upload limited to 100 items at a time";
+      return;
+    }
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       const parts = line.split(",");
@@ -241,8 +224,6 @@
         toast.error(fileError);
         break;
       }
-
-      // Only check quantity if a second part exists
       if (
         parts.length > 1 &&
         parts[1].trim() &&
@@ -254,22 +235,26 @@
         toast.error(fileError);
         break;
       }
-      if (parts.length > 1 && parts[1].trim()) {
-        const quantity = Number(parts[1].trim());
-        if (!isNaN(quantity) && quantity > 999) {
-          formatError = true;
-          cartloading = false;
-          fileError = `Quantity at line ${i + 1} must not be greater than 999.`;
-          toast.error(fileError);
-          break;
-        }
-      }
+      // if (parts.length > 1 && parts[1].trim()) {
+      //   const quantity = Number(parts[1].trim());
+      //   if (!isNaN(quantity) && quantity > 999) {
+      //     formatError = true;
+      //     cartloading = false;
+      //     fileError = `Quantity at line ${i + 1} must not be greater than 999.`;
+      //     toast.error(fileError);
+      //     break;
+      //   }
+      // }
     }
   }
   function handleValidateClick() {
-    submitFileData();
+    editedLines = new Set();
+    originalLineContent = [];
+
     showValidateButton = false;
     textEditedAfterValidation = false;
+    editedLines = new Set();
+    submitFileData();
   }
 
   function handleFileInputChange(event) {
@@ -322,7 +307,13 @@
         .filter((line) => line.trim())
         .map((line) => {
           const parts = line.split(",").map((p) => p.trim());
-          if (parts.length === 1 || (parts.length === 2 && isNaN(+parts[1]))) {
+          if (parts.length >= 2 && !isNaN(+parts[1])) {
+            const quantity = Math.min(Number(parts[1]), 999);
+            return `${parts[0]},${quantity}`;
+          } else if (
+            parts.length === 1 ||
+            (parts.length === 2 && isNaN(+parts[1]))
+          ) {
             return `${parts[0]},1`;
           }
           return line;
@@ -341,121 +332,51 @@
         submitFileData();
       }
     };
-if (["xlsx", "xls"].includes(fileType)) {
-  if (typeof XLSX === "undefined") {
-    fileError = "Excel support requires SheetJS. Use CSV instead.";
-    return;
-  }
+    if (["xlsx", "xls"].includes(fileType)) {
+      if (typeof XLSX === "undefined") {
+        fileError = "Excel support requires SheetJS. Use CSV instead.";
+        return;
+      }
 
-  reader.onload = (e) => {
-    try {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      
-      // Change: Instead of using sheet_to_csv which adds quotes, extract data directly
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
-      
-      // Transform the data to our needed format without quotes
-      let processedData = jsonData
-        .filter(row => row.length > 0 && row[0])
-        .map(row => {
-          // First cell is the product code
-          const productCode = String(row[0]).trim();
-          // Second cell (if exists) is quantity, default to 1
-          const quantity = row.length > 1 && row[1] ? String(row[1]).trim() : "1";
-          
-          return `${productCode},${quantity}`;
-        })
-        .join("\n");
-      
-      processFileData(processedData);
-    } catch (err) {
-      fileError = "Error processing Excel file.";
-      console.error(err);
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+            header: 1,
+            defval: "",
+          });
+          let processedData = jsonData
+            .filter((row) => row.length > 0 && row[0])
+            .map((row) => {
+              const productCode = String(row[0]).trim();
+              let quantity =
+                row.length > 1 && row[1] ? String(row[1]).trim() : "1";
+              if (!isNaN(Number(quantity)) && Number(quantity) > 999) {
+                quantity = "999";
+              }
+
+              return `${productCode},${quantity}`;
+            })
+            .join("\n");
+
+          processFileData(processedData);
+        } catch (err) {
+          fileError = "Error processing Excel file.";
+          console.error(err);
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    } else {
+      reader.onload = (e) => {
+        processFileData(e.target.result);
+      };
+
+      reader.readAsText(file);
     }
-  };
-
-  reader.readAsArrayBuffer(file);
-} else {
-  reader.onload = (e) => {
-    processFileData(e.target.result);
-  };
-
-  reader.readAsText(file);
-}
   }
-
-  // function submitFileData() {
-  //   if (!rawFileData.trim()) {
-  //     toast.error("Please enter product data before submitting");
-  //     cartloading = false;
-  //     return;
-  //   }
-
-  //   const lines = rawFileData.split("\n").filter(line => line.trim());
-  //   let formatError = false;
-  //   let errorMessage = "";
-  //   const processedLines = [];
-
-  //   for (let i = 0; i < lines.length; i++) {
-  //     const line = lines[i].trim();
-  //     const parts = line.split(",");
-
-  //     if (parts.length === 0 || !parts[0].trim()) {
-  //       formatError = true;
-  //       errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
-  //       break;
-  //     }
-  //     if (parts.length > 1 && parts[1].trim() && isNaN(Number(parts[1].trim()))) {
-  //       formatError = true;
-  //       errorMessage = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
-  //       break;
-  //     }
-  //     if (parts.length > 1 && parts[1].trim()) {
-  //       let quantity = Number(parts[1].trim());
-  //       if (!isNaN(quantity)) {
-  //         quantity = Math.min(quantity, 999);
-  //         processedLines.push(`${parts[0]},${quantity}`);
-  //       } else {
-  //         processedLines.push(line);
-  //       }
-  //     } else {
-  //       processedLines.push(line);
-  //     }
-  //   }
-
-  //   if (formatError) {
-  //     fileError = errorMessage;
-  //     toast.error(errorMessage);
-  //     return;
-  //   }
-  //   rawFileData = processedLines.join("\n");
-  //   const updatedFile = new File(
-  //     [rawFileData],
-  //     selectedFileName || "upload.csv",
-  //     { type: "text/csv" }
-  //   );
-
-  //   const dataTransfer = new DataTransfer();
-  //   dataTransfer.items.add(updatedFile);
-
-  //   const fileInput = document.getElementById("bulkupload") || document.querySelector('input[type="file"]');
-
-  //   if (fileInput) {
-  //     fileInput.files = dataTransfer.files;
-  //     const form = fileInput.closest("form");
-  //     if (form) {
-  //       setTimeout(() => {
-  //         form.requestSubmit();
-  //       }, 100);
-  //     } else {
-  //       console.error("Form not found");
-  //     }
-  //   } else {
-  //     console.error("File input element not found");
-  //   }
-  // }
 
   function submitFileData() {
     if (!rawFileData.trim()) {
@@ -496,7 +417,7 @@ if (["xlsx", "xls"].includes(fileType)) {
           processedLines.push(line);
         }
       } else {
-        processedLines.push(line);
+        processedLines.push(`${parts[0]},1`);
       }
     }
 
@@ -715,31 +636,6 @@ if (["xlsx", "xls"].includes(fileType)) {
 
     return productsToAdd;
   }
-
-  // function attemptAddToCart() {
-  //   if (!isValidated || duplicateEntries.length > 0) {
-  //     submitFileData();
-  //     return;
-  //   }
-  //   const validProducts = validatedProducts.filter(
-  //     (product) => product.isValid === true,
-  //   );
-
-  //   if (validProducts.length === 0) {
-  //     toast.error(
-  //       "No valid products to add to cart. Please remove invalid products and try again.",
-  //     );
-  //     return;
-  //   }
-
-  //   if (data?.authedUser && data?.authedUser?.id) {
-  //     const cartForm = document.getElementById("cartForm");
-  //     if (cartForm) cartForm.requestSubmit();
-  //   } else {
-  //     handleLocalStorage();
-  //     submitAlternateForm();
-  //   }
-  // }
   function attemptAddToCart() {
     if (textEditedAfterValidation) {
       toast.warning(
@@ -864,7 +760,7 @@ if (["xlsx", "xls"].includes(fileType)) {
       );
 
       cartloading = false;
-   isLoading = true;
+      isLoading = true;
       setTimeout(() => {
         window.location.href = "/cart";
       }, 2000);
@@ -950,12 +846,12 @@ if (["xlsx", "xls"].includes(fileType)) {
       }
     }
   }
+
+  // $: {
+  //   console.log("REACTIVE: editedLines changed:", Array.from(editedLines));
+  // }
 </script>
 
-<!-- <div class="text-black text-sm md:ml-2 mb-1">
-  *Type or paste product number-size,quantity (e.g., PV4384-each of 1,1),
-  separated by commas*. Enter separate products on new lines.
-</div> -->
 <div class="text-black text-sm md:ml-2 mb-1">
   *Upload a file containing product data (e.g., PV4384-each of 1,1). Each
   product should be on a new line.*
@@ -975,13 +871,21 @@ if (["xlsx", "xls"].includes(fileType)) {
   enctype="multipart/form-data"
   use:enhance={() => {
     isLoading = true;
-    textEditedAfterValidation = false; // Reset the edited flag
-    showValidateButton = false; // Hide validate button during validation
+    textEditedAfterValidation = false;
+    showValidateButton = false;
 
     const lines = rawFileData.trim().split("\n");
     let formatError = false;
     let errorMessage = "";
-
+    if (lines.length > 100) {
+      formatError = true;
+      errorMessage =
+        "Error(s) found in product input:\n* Bulk upload limited to 100 items at a time";
+      // toast.error(errorMessage);
+      fileError = errorMessage;
+      isLoading = false;
+      return { cancel: true }; // Cancel form submission
+    }
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       const parts = line.split(",");
@@ -1018,7 +922,7 @@ if (["xlsx", "xls"].includes(fileType)) {
       toast.error(errorMessage);
       fileError = errorMessage;
       isLoading = false;
-      return { cancel: true }; // Cancel form submission
+      return { cancel: true };
     }
 
     // Continue with processing if format is valid
@@ -1125,20 +1029,14 @@ if (["xlsx", "xls"].includes(fileType)) {
   {/if}
 
   <section class="w-full mx-auto md:flex items-center gap-5">
-    <!-- <div
-      class="md:w-3/5 h-72 border bg-white rounded-md overflow-hidden p-5 relative"
-    > -->
-    <div
-      class="w-full relative overflow-hidden border border-primary-200 focus:ring-0 focus:border-primary-400 h-72 md:w-3/5 rounded-md"
-    >
+    <div class="w-full overflow-hidden focus:ring-0 md:w-3/5">
       <div class="overflow-hidden" bind:this={scrollContainer}>
         <div class="relative">
-          <!-- Main textarea for product entry -->
           <textarea
             bind:value={rawFileData}
             on:input={handleTextChange}
             on:scroll={handleScroll}
-            class="w-full h-72 p-3 font-mono border-primary-200 focus:ring-0 focus:border-primary-400"
+            class="w-full placeholder:text-sm min-h-72 p-3 border border-primary-200 rounded-md focus:ring-0 focus:border-primary-400"
             bind:this={textareaElement}
             placeholder="Upload a file containing product data...
 Example file content:
@@ -1146,71 +1044,75 @@ Example file content:
 657890-100G,5
 345678-25G,3"
           ></textarea>
-          {#if isValidated && rawFileData.trim() && !textEditedAfterValidation}
+          {#if isValidated && rawFileData.trim()}
             <div
               class="absolute mt-2 top-0 left-0 w-full h-full pointer-events-none"
               bind:this={overlayElement}
               style="transform: translateY({-scrollTop}px);"
             >
               {#each rawFileData.trim().split("\n") as line, lineIndex}
-                {@const productInfo = line.split(",")[0].trim()}
-                {@const validationMessage = validationMessages.find(
-                  (msg) => msg.productNumber === productInfo,
-                )}
+                {@const fullProductInfo = line.split(",")[0].trim()}
+                {@const baseProductNumber = fullProductInfo
+                  .split("-")[0]
+                  .split(" ")[0]
+                  .trim()}
+                {@const validationMessage = validationMessages.find((msg) => {
+                  // Try exact match first
+                  if (msg.productNumber === fullProductInfo) return true;
+                  // Then try base product number match
+                  if (msg.productNumber === baseProductNumber) return true;
+                  // Finally try checking if the full product info contains the validation product number
+                  return fullProductInfo.startsWith(msg.productNumber);
+                })}
 
                 {#if lineIndex * lineHeight >= scrollTop - lineHeight * 2 && lineIndex * lineHeight <= scrollTop + viewportHeight}
                   <div
                     class="flex items-center pointer-events-auto"
                     style="position: absolute; top: {3 +
                       lineIndex * lineHeight}px; right: 10px;"
-                    bind:this={scrollContainer}
                   >
-                    {#if validationMessage}
-                      {#if validationMessage.isValid === true}
-                        <div
-                          class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
-                          bind:this={scrollContainer}
-                        >
-                          <span class="text-xs mr-1">Valid</span>
-                          <Icon icon="mdi:check-circle" class="text-base" />
+                    <div class="validation-status">
+                      {#if editedLines.has(lineIndex)}
+                        <div class="validation-status edited-line">
+                          <span class="text-amber-500 font-medium">
+                            <Icon
+                              icon="tabler:alert-triangle"
+                              class="inline w-4 h-4 mr-1"
+                            />
+                            Changes need validation
+                          </span>
                         </div>
-                      {:else}
-                        <div
-                          class="flex items-center mt-2 text-red-500 bg-white bg-opacity-75 rounded px-1 mr-3"
-                          bind:this={scrollContainer}
-                        >
-                          <span class="text-xs mr-1"
-                            >{validationMessage.message ||
-                              "Invalid product"}</span
+                      {:else if validationMessage}
+                        {#if validationMessage.isValid === true}
+                          <div
+                            class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
                           >
-                          <button
-                            type="button"
-                            class="text-red-500 hover:text-red-700 pointer-events-auto"
-                            title="Remove invalid product"
-                            on:click={() => removeInvalidProduct(lineIndex)}
+                            <span class="text-xs mr-1">Valid</span>
+                            <Icon icon="mdi:check-circle" class="text-base" />
+                          </div>
+                        {:else}
+                          <div
+                            class="flex items-center mt-2 text-red-500 bg-white bg-opacity-75 rounded px-1 mr-3"
                           >
-                            <Icon icon="mdi:close-circle" class="text-base" />
-                          </button>
-                        </div>
+                            <span class="text-xs mr-1"
+                              >{validationMessage.message ||
+                                "Invalid product"}</span
+                            >
+                            <button
+                              type="button"
+                              class="text-red-500 hover:text-red-700 pointer-events-auto"
+                              title="Remove invalid product"
+                              on:click={() => removeInvalidProduct(lineIndex)}
+                            >
+                              <Icon icon="mdi:close-circle" class="text-base" />
+                            </button>
+                          </div>
+                        {/if}
                       {/if}
-                    {:else if isValidated}
-                      <div
-                        class="flex items-center text-green-500 mt-2 bg-white bg-opacity-75 rounded px-1 mr-3"
-                        bind:this={scrollContainer}
-                      >
-                        <span class="text-xs mr-1">Valid</span>
-                        <Icon icon="mdi:check-circle" class="text-base" />
-                      </div>
-                    {/if}
+                    </div>
                   </div>
                 {/if}
               {/each}
-            </div>
-          {:else if isValidated && textEditedAfterValidation}
-            <div
-              class="absolute top-2 right-2 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-md text-xs font-medium"
-            >
-              Content changed. Please validate again.
             </div>
           {/if}
         </div>
@@ -1219,13 +1121,28 @@ Example file content:
         <div class="mt-2 p-2 text-sm text-red-500 bg-red-50 rounded">
           <div class="flex items-center">
             <Icon icon="mdi:alert-circle" class="mr-1" />
-            {fileError}
+            {#if fileError.includes("Error(s) found in product input:")}
+              <div class="whitespace-pre-line">{fileError}</div>
+            {:else}
+              {fileError}
+            {/if}
+          </div>
+        </div>
+      {/if}
+
+      {#if fileError && selectedFileName}
+        <div class="mt-2 p-2 text-sm text-red-500 bg-red-50 rounded">
+          <div class="flex items-center">
+            <Icon icon="mdi:alert-circle" class="mr-1" />
+            {#if fileError.includes("Error(s) found in product input:")}
+              <div class="whitespace-pre-line">{fileError}</div>
+            {:else}
+              {fileError}
+            {/if}
           </div>
         </div>
       {/if}
     </div>
-
-    <!-- </div> -->
 
     <section class="mt-3 md:mt-0 md:w-2/5">
       <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -1395,12 +1312,12 @@ Example file content:
     </button>
   {/if}
 
-  {#if data?.authedUser && data?.authedUser?.id && !showValidateButton}
+  {#if data?.authedUser && data?.authedUser?.id && !showValidateButton && validationMessages.length !== 0}
     <form
       id="cartForm"
       method="POST"
       action="?/addToCart"
-      use:enhance={({ formData, cancel }) => {
+      use:enhance={({ formData }) => {
         if (formatError) {
           toast.error("Please fix format errors before adding to cart");
           return { cancel: true };
@@ -1450,7 +1367,7 @@ Example file content:
               toast.success(
                 `${productsAddedCount} ${productsAddedCount === 1 ? "item" : "items"} added to the cart.`,
               );
-           isLoading = true;
+              isLoading = true;
               setTimeout(() => {
                 window.location.href = "/cart";
               }, 2000);
@@ -1471,7 +1388,7 @@ Example file content:
           (isValidated &&
             validatedProducts.length > 0 &&
             !validatedProducts.some((p) => p.isValid))}
-        class={`lg:ml-0 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 transition rounded-md flex items-center justify-center gap-2
+        class={`lg:ml-60 mr-5 p-2 w-40 mt-4 h-9  flex items-center text-xs   gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300
           ${
             cartloading ||
             textEditedAfterValidation ||
@@ -1491,9 +1408,9 @@ Example file content:
         {/if}
       </button>
     </form>
-  {:else if !showValidateButton}
+  {:else if !showValidateButton && validationMessages.length !== 0}
     <button
-      class="lg:ml-0 mr-5 p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center gap-2"
+      class="  mb-5 lg:ml-60 mr-5 p-2 w-40 mt-4 h-9 flex items-center text-xs gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300"
       on:click={attemptAddToCart}
       disabled={cartloading ||
         textEditedAfterValidation ||
@@ -1507,6 +1424,15 @@ Example file content:
         <Icon icon="ic:round-shopping-cart" class="text-2xl" />
         <span>Add to Cart</span>
       {/if}
+    </button>
+  {:else if showValidateButton === false}
+    <button
+      type="button"
+      on:click={handleValidateClick}
+      class="p-2 w-40 mt-4 mb-5 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded-md flex items-center justify-center gap-2"
+    >
+      <Icon icon="mdi:check-circle" class="text-xl" />
+      <span>Validate </span>
     </button>
   {/if}
 </div>

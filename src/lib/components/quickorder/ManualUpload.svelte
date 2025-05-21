@@ -727,10 +727,11 @@
               new Set(result.data.map((record) => record.productNumber)),
             );
           }
-        } else {
-          productNumbers = [];
-          toast.error("No Components found");
         }
+        // else {
+        //   productNumbers = [];
+        //   toast.error("No Components found");
+        // }
       }
       const loadingEndTime = Date.now();
       loadingState[index] = false;
@@ -1807,7 +1808,7 @@
               <button
                 type="button"
                 on:click={handleManualEntriesSubmit}
-                class="lg:ml-60 mr-5 p-2 w-40 mt-4 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded flex items-center"
+                class="lg:ml-60 mr-5 p-2 w-40 mt-4 h-9 flex items-center text-xs gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300"
               >
                 {#if cartloading}
                   <span>Adding...</span>
@@ -1823,7 +1824,7 @@
                 cartloading = true;
                 handleLocalManualEntries();
               }}
-              class="lg:ml-60 mr-5 p-2 w-40 mt-4 h-9 border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition rounded flex items-center gap-2"
+              class="lg:ml-60 mr-5 p-2 w-40 mt-4 h-9 flex items-center text-xs gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300"
             >
               {#if cartloading}
                 <span>Adding...</span>
@@ -2000,7 +2001,7 @@
             <div class="flex justify-end w-full">
               <button
                 type="submit"
-                class="bg-primary-400 text-white p-2 rounded flex items-center justify-center w-full sm:w-[160px] min-h-[40px] hover:opacity-65"
+                class=" border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white p-2 rounded flex items-center justify-center w-full sm:w-[180px] min-h-[40px]"
               >
                 <span
                   class={checking ? "hidden" : "flex items-center space-x-1"}
@@ -2076,7 +2077,7 @@
             <div class="flex justify-end">
               <button
                 type="submit"
-                class="bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
+                class="hover:bg-primary-500 hover:text-white text-primary-500 border border-primary-500 py-3 px-4 rounded-md flex items-center space-x-1"
               >
                 {#if cartloadingpop}
                   <span>Adding...</span>
@@ -2093,7 +2094,7 @@
           <div class=" flex justify-end">
             <button
               on:click={handleLocalCart}
-              class=" bg-primary-400 text-white py-3 px-4 rounded-md flex items-center space-x-1"
+              class=" hover:bg-primary-500 hover:text-white border border-primary-500 text-primary-500 py-3 px-4 rounded-md flex items-center space-x-1"
             >
               <Icon icon="ic:round-shopping-cart" class="text-xl" /><span
                 class="text-sm">Add To Cart</span
@@ -2626,7 +2627,7 @@
               bind:value={futherdetails}
               on:input={() => {
                 formErrors.futherdetails = "";
-               
+
                 if (!futherdetails.trim()) {
                   formErrors.futherdetails = "Further details are required.";
                 } else if (!/^[A-Za-z0-9\s\.,\/\";-]+$/.test(futherdetails)) {

@@ -165,6 +165,9 @@
 		}
 
 		if (!fieldName || fieldName === "email") {
+			if(!email){
+				errors.email="*Required"
+			} else
 			if (
 				!email ||
 				!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
@@ -175,38 +178,11 @@
 			}
 		}
 
-		// if (!fieldName || fieldName === "phoneNumber") {
-		// 	if (!country) {
-		// 		errors.phoneNumber =
-		// 			"Please select the country before entering the phone number";
-		// 		return;
-		// 	}
-
-		// 	if (!phoneNumber || phoneNumber === "") {
-		// 		errors.phoneNumber = "Required for the selected country";
-		// 	} else {
-		// 		const countryDetails = getCountryByCode(country);
-		// 		if (!countryDetails) {
-		// 			errors.phoneNumber = "Invalid country selected";
-		// 			errors.country = "Invalid country selected";
-		// 		} else {
-		// 			const phonePattern = getPhonePattern(country);
-		// 			if (!phonePattern) {
-		// 				errors.phoneNumber =
-		// 					"Phone number pattern for country not found";
-		// 			} else {
-		// 				const phoneRegex = new RegExp(phonePattern);
-		// 				if (!phoneRegex.test(phoneNumber)) {
-		// 					errors.phoneNumber = `Please enter a valid phone number for ${countryDetails.name}.`;
-		// 				} else {
-		// 					delete errors.phoneNumber;
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// }
 		if (!fieldName || fieldName === "phoneNumber") {
-            if (!country) {
+			if(!phoneNumber){
+errors.phoneNumber = "*Required"
+			}
+      else      if (!country) {
                 errors.phoneNumber =
                     "Please select the country before entering the phone number";
                 return;
@@ -243,7 +219,7 @@
 
 		if (!fieldName || fieldName === "country") {
 			if (!country) {
-				errors.country = "Country is required";
+				errors.country = "*Required";
 			} else {
 				delete errors.country;
 			}
@@ -305,6 +281,52 @@
 				delete errors.issue; // Clear error once a valid option is selected
 			}
 		}
+		if (!fieldName || fieldName.startsWith("itemNumber")) {
+        let index = 0;
+        if (fieldName !== "itemNumber") {
+            // Extract index from fieldName if it's in form "itemNumber-X"
+            const matches = fieldName.match(/itemNumber-(\d+)/);
+            if (matches && matches[1]) {
+                index = parseInt(matches[1]);
+            }
+        }
+        
+        const itemNumber = products[index]?.itemNumber;
+        const errorKey = `itemNumber-${index}`;
+        
+        if (!itemNumber) {
+            errors[errorKey] = "*Required";
+        } else if (!/^[a-zA-Z0-9\-.,;"']+$/.test(itemNumber)) {
+            errors[errorKey] = "Please enter a valid item number.";
+        } else {
+            delete errors[errorKey];
+        }
+    }
+
+    // Add validation for quantity with index handling
+    if (!fieldName || fieldName.startsWith("quantity")) {
+        let index = 0;
+        if (fieldName !== "quantity") {
+            // Extract index from fieldName if it's in form "quantity-X"
+            const matches = fieldName.match(/quantity-(\d+)/);
+            if (matches && matches[1]) {
+                index = parseInt(matches[1]);
+            }
+        }
+        
+        const quantity = products[index]?.quantity;
+        const errorKey = `quantity-${index}`;
+        
+        if (!quantity) {
+            errors[errorKey] = "*Required";
+        } else if (!/^[0-9]+$/.test(quantity)) {
+            errors[errorKey] = "Only numbers are allowed.";
+        } else if (parseInt(quantity) < 1) {
+            errors[errorKey] = "Quantity must be at least 1.";
+        } else {
+            delete errors[errorKey];
+        }
+    }
 	};
 
 	function selectCountry(selectedCountry) {
@@ -407,7 +429,7 @@
             ) {
                 selectCountry(filteredCountries[highlightedIndex]);
                 event.preventDefault();
-            } else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
+            } else if (searchTerm&& filteredCountries.length > 0) {
                 selectCountry(filteredCountries[0]);
                 event.preventDefault();
             }
@@ -552,6 +574,8 @@ codeMatches.forEach(country => {
 		validateField("phoneNumber");
 		validateField("companyName");
 		validateField("country");
+		validateField("quantity");
+		validateField("itemNumber")
 
 		const isValid = Object.keys(errors).length === 0;
 
@@ -721,78 +745,79 @@ codeMatches.forEach(country => {
 				<h3 class="block mb-2 text-sm">
 					Please provide the following product information
 				</h3>
-				{#each products as product, index}
-					<div class="mb-4 flex flex-col items-start">
-						<div class="flex-1 w-3/4">
-							<label
-								class=" mb-1 hidden"
-								for={`item-number-${index}`}>Item Number</label
-							>
-							<input
-								id={`item-number-${index}`}
-								type="text"
-								placeholder="*Item Number"
-								maxlength="100"
-								bind:value={product.itemNumber}
-								
-								    on:input={(e) => {
-										const allowedChars = /^[a-zA-Z0-9\-.,;"']*$/;
-										let inputValue = e.target.value;
-								  
-										if (!allowedChars.test(inputValue)) {
-									  
-										  inputValue = inputValue.replace(/[^a-zA-Z0-9\-.,;"']/g, '');
-										}
-								  
-										product.itemNumber = inputValue.trim();
-										validateField("itemNumber");
-									  }}
-								class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
-								required
-							/>
-							{#if errors[`itemNumber-${index}`]}
-								<span class="text-red-500 text-xs mt-1"
-									>{errors[`itemNumber-${index}`]}</span
-								>
-							{/if}
-							<label class="hidden mb-1" for={`quantity-${index}`}
-								>Quantity</label
-							>
-							<input
-								id={`quantity-${index}`}
-								type="number"
-								placeholder="*Quantity"
-						
-								bind:value={product.quantity}
-							maxlength="10"
-								    on:input={(e) => {
-										const allowedChars = /^[0-9]*$/;
-										let inputValue = e.target.value;
-								  
-										if (!allowedChars.test(inputValue)) {
-									  
-										  inputValue = inputValue.replace(/[^0-9]/g, '');
-										}
-								  
-										product.quantity = inputValue.trim();
-										validateField("qunatity");
-									  }}
-								class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full lg:w-3/4 md:w-3/4 mb-2 text-sm rounded-md"
-								required
-								min="1"
-							/>
-						</div>
-						{#if index > 0}
-							<button
-								type="button"
-								on:click={() => removeProduct(index)}
-								class="ml-2 text-red-500 hover:scale-105"
-							>
-								&times;
-							</button>
-						{/if}
-					</div>
-				{/each}
+{#each products as product, index}
+    <div class="mb-4 flex flex-col items-start">
+        <div class="w-full lg:w-3/4 md:w-3/4">
+            <label
+                class="mb-1 hidden"
+                for={`item-number-${index}`}>Item Number</label
+            >
+            <input
+                id={`item-number-${index}`}
+                type="text"
+                placeholder="*Item Number"
+                maxlength="100"
+                bind:value={product.itemNumber}
+                on:input={(e) => {
+                    const allowedChars = /^[a-zA-Z0-9\-.,;"']*$/;
+                    let inputValue = e.target.value;
+                   
+                    if (!allowedChars.test(inputValue)) {
+                        inputValue = inputValue.replace(/[^a-zA-Z0-9\-.,;"']/g, '');
+                    }
+                   
+                    product.itemNumber = inputValue.trim();
+                    validateField(`itemNumber-${index}`);
+                }}
+                class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full mb-1 text-sm rounded-md"
+            />
+            {#if errors[`itemNumber-${index}`]}
+                <span class="text-red-500 text-xs mb-2 block"
+                    >{errors[`itemNumber-${index}`]}</span
+                >
+            {/if}
+            
+            <label class="hidden mb-1" for={`quantity-${index}`}
+                >Quantity</label
+            >
+            <input
+                id={`quantity-${index}`}
+                type="number"
+                placeholder="*Quantity"
+                bind:value={product.quantity}
+                maxlength="10"
+                on:input={(e) => {
+                    const allowedChars = /^[0-9]*$/;
+                    let inputValue = e.target.value;
+                   
+                    if (!allowedChars.test(inputValue)) {
+                        inputValue = inputValue.replace(/[^0-9]/g, '');
+                    }
+                   
+                    product.quantity = inputValue.trim();
+                    validateField(`quantity-${index}`);
+                }}
+                class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full mb-1 text-sm rounded-md"
+                min="1"
+            />
+            {#if errors[`quantity-${index}`]}
+                <span class="text-red-500 text-xs mb-2 block"
+                    >{errors[`quantity-${index}`]}</span
+                >
+            {/if}
+        </div>
+        
+        {#if index > 0}
+            <button
+                type="button"
+                on:click={() => removeProduct(index)}
+                class="mt-2 text-red-500 hover:scale-105"
+            >
+                &times;
+            </button>
+        {/if}
+    </div>
+{/each}
 
 				<button
 					type="button"
@@ -1091,7 +1116,7 @@ codeMatches.forEach(country => {
 						</form>
 						{#if emailSent && isOtpVerified === false}
 							<div
-								class="mt-3 bg-gray-50 p-3 rounded-md border border-gray-200"
+								class="mt-3 "
 							>
 								<form
 									action="?/verifyOtpEmail"
@@ -1164,7 +1189,11 @@ codeMatches.forEach(country => {
 										<button
 											type="submit"
 											class="absolute top-1/2 right-3 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
-											disabled={loadingotp}
+											 disabled={loadingotp ||
+                                                !enteredOtpemail ||
+                                                !/^\d{6}$/.test(
+                                                    enteredOtpemail,
+                                                )}
 										>
 											{#if loadingotp}
 												<span
@@ -1256,6 +1285,7 @@ codeMatches.forEach(country => {
 					</div>
 
 					<div class="flex flex-col">
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<div class="relative dropdown-container">
 							<input
 								type="text"
@@ -1274,12 +1304,16 @@ codeMatches.forEach(country => {
 								class="flex-1 outline-none w-full border border-gray-300 rounded focus:ring-0 focus:border-primary-400 p-2 text-sm"
 								required
 							/>
-							<Icon
-								icon={showDropdown
-									? "ep:arrow-up-bold"
-									: "ep:arrow-down-bold"}
-								class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
-							/>
+							<!-- svelte-ignore a11y-no-static-element-interactions -->
+							<div
+								on:click|stopPropagation={toggleDropdown}
+								class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
+							>
+								<Icon
+									icon={showDropdown ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'}
+									class="text-gray-500 mr-1 text-2s font-bold"
+								/>
+							</div>
 							{#if showDropdown}
 							<div
 								bind:this={dropdownEl}

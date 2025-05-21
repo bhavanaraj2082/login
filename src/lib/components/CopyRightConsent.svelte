@@ -388,9 +388,13 @@
 
         if (!fieldName || fieldName === "company") {
             if (!company) {
-                errors.company = "* Required";
-            } else if (!/^[A-Za-z@.,\s&-]+$/.test(company)) {
+                errors.company = "*Required";
+            } else if (company.length < 3) {
+                errors.company = "Company name must be at least 3 characters";
+            } else if (!/^[A-Za-z0-9@.,\s&-]+$/.test(company)) {
                 errors.company = "Please enter a valid company name";
+            } else if (/^\d+$/.test(company)) {
+                errors.company = "Company name cannot contain only numbers";
             } else {
                 delete errors.company;
             }
@@ -451,6 +455,9 @@
         if (!fieldName || fieldName === "description") {
             if (!description) {
                 errors.description = "* Required";
+            } else if (description.length < 3) {
+                errors.description =
+                    "Description name must be at least 3 characters";
             } else if (!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(description)) {
                 errors.description = "Please enter a valid description";
             } else if (
@@ -516,7 +523,7 @@
     };
 
     function formValid() {
-        // console.log("Errors before validation:", errors);
+        console.log("Errors before validation:", errors);
         validateField("title");
         validateField("firstname");
         validateField("lastname");
@@ -533,6 +540,8 @@
         const isValid =
             Object.keys(errors).length === 0 &&
             (isEmailVerified || authedUserEmailVerified === true);
+        console.log(isValid, "iujdiuhdi");
+        console.log(errors, "after validation");
 
         return isValid;
     }
@@ -1035,14 +1044,24 @@
                                     "",
                                 );
                                 company = e.target.value;
+                                if (!company) {
+                                    errors.company = "*Required";
+                                } else if (company.length < 3) {
+                                    errors.company =
+                                        "Company name must be at least 3 characters";
+                                } else if (
+                                    !/^[A-Za-z0-9@.,\s&-]+$/.test(company)
+                                ) {
+                                    errors.company =
+                                        "Please enter a valid company name";
+                                } else if (/^\d+$/.test(company)) {
+                                    errors.company =
+                                        "Company name cannot contain only numbers";
+                                } else {
+                                    delete errors.company;
+                                }
+
                                 validateField("company");
-                                errors.company = !company
-                                    ? "*Required"
-                                    : !/^[A-Za-z@!#$%^&*(_)+-\s]+$/.test(
-                                            company,
-                                        )
-                                      ? "Please enter a valid company name"
-                                      : "";
                             }}
                         />
                         {#if errors?.company}
@@ -1431,12 +1450,19 @@
                                 class="w-full placeholder:text-gray-400 text-sm px-3 py-2.5 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
                             />
 
-                            <Icon
-                                icon={showDropdown
-                                    ? "ep:arrow-up-bold"
-                                    : "ep:arrow-down-bold"}
-                                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
-                            />
+                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                            <!-- svelte-ignore a11y-no-static-element-interactions -->
+                            <div
+                                on:click|stopPropagation={toggleDropdown}
+                                class="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer"
+                            >
+                                <Icon
+                                    icon={showDropdown
+                                        ? "ep:arrow-up-bold"
+                                        : "ep:arrow-down-bold"}
+                                    class="text-gray-500 mr-1 text-sm font-bold"
+                                />
+                            </div>
                             {#if showDropdown}
                                 <div
                                     bind:this={dropdownEl}
@@ -1546,9 +1572,11 @@
 
                                 errors.description = !description
                                     ? "*Required"
-                                    : hasHtmlScript || !isValidChars
-                                      ? "Please enter a valid description"
-                                      : "";
+                                    : description.length < 3
+                                      ? "Description name must be at least 3 characters"
+                                      : hasHtmlScript || !isValidChars
+                                        ? "Please enter a valid description"
+                                        : "";
                             }}
                             class="bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 rounded-md w-full p-3 text-sm"
                         ></textarea>
@@ -1580,6 +1608,18 @@
                                 );
                                 url = e.target.value;
                                 validateField("url");
+                                const urlPattern =
+                                    /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/i;
+
+                                if (url) {
+                                    if (!urlPattern.test(url)) {
+                                        errors.url = "Please enter a valid URL";
+                                    } else {
+                                        delete errors.url;
+                                    }
+                                } else {
+                                    delete errors.url;
+                                }
                             }}
                         />
                         {#if errors.url}
@@ -1589,131 +1629,6 @@
                         {/if}
                     </div>
                 </div>
-                <!-- <span class="flex-1 w-1/2 mb-4">
-                    <label
-                        for="recaptcha"
-                        class="block text-sm font-medium text-gray-700"
-                    >
-                    </label>
-                    <input type="hidden" name="token" value={captchaToken} />
-                    <div id="g-recaptcha-response">
-                        <label
-                            class="flex mt-5 md:mt-6 items-center justify-end space-x-2 mb-4 cursor-pointer"
-                        >
-                            <input
-                                type="checkbox"
-                                name="captcha"
-                                value="captcha"
-                                class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded cursor-pointer hover:border-primary-500 transition-colors duration-300"
-                                bind:checked={isChecked}
-                                on:click={(event) => {
-                                    event.preventDefault();
-                                    if (formValid()) {
-                                        isChecked = true;
-                                        showPopup();
-                                    } else {
-                                        if (Object.keys(errors).length > 0) {
-                                            toast.error(
-                                                "Please fill all the required fields.",
-                                            );
-                                            return;
-                                        }
-                                        if (
-                                            !(
-                                                ProfileEmailVerified ||
-                                                authedUserEmailVerified === true
-                                            )
-                                        ) {
-                                            {
-                                                toast.error(
-                                                    "Please verify your email to proceed",
-                                                );
-                                                return;
-                                            }
-                                        }
-
-                                        isChecked = false;
-                                    }
-                                }}
-                                on:keydown={(event) => {
-                                    if (event.key === "Enter") {
-                                        event.preventDefault();
-                                    }
-                                }}
-                            />
-                            <span class="text-gray-700  font-medium text-sm"
-                                >Please verify you are human</span
-                            >
-                        </label>
-
-                        <div class="mt-4 rounded flex items-center justify-end">
-                            <button
-                                class="px-4 py-3 rounded bg-primary-400 to-primary-500 text-white font-medium shadow-lg hover:shadow-xl md:w-1/4 w-1/2 transform transition hover:bg-primary-600"
-                                on:click={(event) => {
-                                    event.preventDefault();
-
-                                    if (!formValid()) {
-                                        if (Object.keys(errors).length > 0) {
-                                            toast.error(
-                                                "Please fill all the required fields.",
-                                            );
-                                            return;
-                                        }
-
-                                        if (
-                                            !(
-                                                ProfileEmailVerified ||
-                                                authedUserEmailVerified === true
-                                            )
-                                        ) {
-                                            {
-                                                toast.error(
-                                                    "Please verify either your email or your phone number to proceed",
-                                                );
-                                                return;
-                                            }
-                                        }
-                                    }
-
-                                    if (!isChecked) {
-                                        toast.error(
-                                            "Please complete the CAPTCHA to proceed with the submission.",
-                                        );
-                                        return;
-                                    }
-
-                                    handlesubmit({ event });
-                                }}
-                                on:keydown={(event) => {
-                                    if (event.key === "Enter") {
-                                        event.preventDefault();
-                                    }
-                                }}
-                            >
-                                {#if submitting}
-                                    <span
-                                        class="flex items-center justify-center"
-                                    >
-                                        <Icon
-                                            icon="line-md:loading-alt-loop"
-                                            class="w-4 h-4 mr-2 animate-spin"
-                                        />
-                                        Submitting...
-                                    </span>
-                                {:else}
-                                    Submit Request
-                                {/if}
-                            </button>
-                        </div>
-
-                        {#if errorMessage}
-                            <p class="text-red-500 text-sm mt-2">
-                                {errorMessage}
-                            </p>
-                        {/if}
-                    </div>
-                </span> -->
-
                 <span class="flex-1 w-1/2 mb-4">
                     <input type="hidden" name="token" value={captchaToken} />
                     <div id="g-recaptcha-response">

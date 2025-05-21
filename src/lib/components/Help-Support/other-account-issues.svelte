@@ -157,7 +157,10 @@
 		}
 
 		if (!fieldName || fieldName === "email") {
-			if (
+			if(!email){
+				errors.email="*Required"
+			}
+		else if (
 				!email ||
 				!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
 			) {
@@ -168,13 +171,16 @@
 		}
 
 		if (!fieldName || fieldName === "phoneNumber") {
+			if(!phoneNumber){
+				errors.phoneNumber = "*Required"
+			} else
 			if (!country) {
 				errors.phoneNumber =
 					"Please select the country before entering the phone number";
 				return;
 			}
 
-			if (!phoneNumber || phoneNumber === "") {
+		else	if (!phoneNumber || phoneNumber === "") {
 				errors.phoneNumber = "Required for the selected country";
 			} else {
 				const countryDetails = getCountryByCode(country);
@@ -204,7 +210,7 @@
 
 		if (!fieldName || fieldName === "country") {
 			if (!country) {
-				errors.country = "Country is required";
+				errors.country = "*Required";
 			} else {
 				delete errors.country;
 			}
@@ -297,52 +303,6 @@
 		}
 	}
 
-	// function handleInputChange(event) {
-	//   searchTerm = event.target.value;
-	//   filterCountries();
-	// // }
-	// function handleInputChange(event) {
-	// 	searchTerm = event.target.value;
-	// 	const isDeleting =
-	// 		event.inputType === "deleteContentBackward" ||
-	// 		event.inputType === "deleteContentForward";
-
-	// 	if (searchTerm.length > 0 && !isDeleting) {
-	// 		filterCountriesWithoutAutoSelect();
-	// 		showDropdown = filteredCountries.length > 0;
-	// 		const codeSearch = searchTerm.replace("+", "").trim();
-	// 		if (codeSearch.length > 0) {
-	// 			const exactCodeMatches = filteredCountries.filter(
-	// 				(country) => country.code.replace("+", "") === codeSearch,
-	// 			);
-
-	// 			if (exactCodeMatches.length === 1) {
-	// 				selectCountry(exactCodeMatches[0]);
-	// 				return;
-	// 			}
-	// 		}
-
-	// 		const countriesStartingWith = filteredCountries.filter((country) =>
-	// 			country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
-	// 		);
-
-	// 		if (countriesStartingWith.length === 1) {
-	// 			selectCountry(countriesStartingWith[0]);
-	// 		}
-	// 	} else {
-	// 		filterCountriesWithoutAutoSelect();
-	// 		showDropdown = filteredCountries.length > 0;
-	// 	}
-	// }
-	// function filterCountriesWithoutAutoSelect() {
-	// 	filteredCountries = countries.filter(
-	// 		(country) =>
-	// 			country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-	// 			country.code
-	// 				.replace("+", "")
-	// 				.includes(searchTerm.replace("+", "").toLowerCase()),
-	// 	);
-	// }
 
 
 	function handleKeyDown(event) {
@@ -412,7 +372,7 @@
             ) {
                 selectCountry(filteredCountries[highlightedIndex]);
                 event.preventDefault();
-            } else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
+            } else if (searchTerm && filteredCountries.length > 0) {
                 selectCountry(filteredCountries[0]);
                 event.preventDefault();
             }
@@ -1023,7 +983,7 @@ codeMatches.forEach(country => {
 							</form>
 							{#if emailSent && isOtpVerified === false}
 								<div
-									class="mt-3 bg-gray-50 p-3 rounded-md border border-gray-200"
+									class="mt-3"
 								>
 									<form
 										action="?/verifyOtpEmail"
@@ -1096,7 +1056,11 @@ codeMatches.forEach(country => {
 											<button
 												type="submit"
 												class="absolute top-1/2 right-3 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
-												disabled={loadingotp}
+											 disabled={loadingotp ||
+                                                !enteredOtpemail ||
+                                                !/^\d{6}$/.test(
+                                                    enteredOtpemail,
+                                                )}
 											>
 												{#if loadingotp}
 													<span
@@ -1171,6 +1135,7 @@ codeMatches.forEach(country => {
 						</div>
 
 						<div class="flex flex-col">
+							<!-- svelte-ignore a11y-no-static-element-interactions -->
 							<div class="relative dropdown-container">
 								<input
 									type="text"
@@ -1189,12 +1154,16 @@ codeMatches.forEach(country => {
 									class="flex-1 outline-none w-full border border-gray-300 rounded focus:ring-0 focus:border-primary-400 p-2 text-sm"
 									required
 								/>
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<div
+								on:click|stopPropagation={toggleDropdown}
+								class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
+							>
 								<Icon
-									icon={showDropdown
-										? "ep:arrow-up-bold"
-										: "ep:arrow-down-bold"}
-									class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
+									icon={showDropdown ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'}
+									class="text-gray-500 mr-1 text-2s font-bold"
 								/>
+							</div>
 								{#if showDropdown}
 								<div
 									bind:this={dropdownEl}
