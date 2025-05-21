@@ -62,7 +62,7 @@ function handleMouseLeave() {
     let searchManufacture = manufacturers
     
 	let arr = null
-  let total
+  let total = 0
 	let showSortByDropdown = false;
 	let showMfrDropdown = false;
     let toggleFilter = false
@@ -75,7 +75,7 @@ function handleMouseLeave() {
       total = productCount
     }
     $: totalPages = Math.ceil(total/10);
-   $: console.log(total,totalPages);
+   $: console.log(total,totalPages,productCount,totalCount);
     let tog= null
     let form;
     let selectedSort =''
@@ -342,6 +342,8 @@ function handleMouseLeave() {
   let typingTimeout;
   let searchLoading = false
   const handleSearch = (searchName) => {
+    searchName = searchName.trim()
+    if(searchName.length < 3) return
     try{
       if(/<\/?script\b[^>]*>/.test(searchName)) return
     clearTimeout(typingTimeout);
@@ -356,6 +358,7 @@ function handleMouseLeave() {
             newUrl.searchParams.set('search', searchName);
         } else {
             newUrl.searchParams.delete('search');
+            search = ""
         }
         newUrl.searchParams.set('page', '1');
 

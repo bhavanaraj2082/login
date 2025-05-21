@@ -767,6 +767,7 @@ $:console.log(location,"location");
 				class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text"
 				name="attentionTo"
+        minlength="5"
         maxlength="50"
 				bind:value={attentionTo}/>
         <p class="{!errors?.attentionTo ? "hidden" : ""} text-red-500 text-xs">{errors?.attentionTo}</p>
@@ -775,6 +776,7 @@ $:console.log(location,"location");
 				class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text"
 				name="organizationName"
+        minlength="10"
         maxlength="50"
 				bind:value={organizationName}/>
         <p class="{!errors?.organizationName ? "hidden" : ""} text-red-500 text-xs">{errors?.organizationName}</p>
@@ -809,12 +811,12 @@ $:console.log(location,"location");
 			
         <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Department</label>
         <input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-          type="text" name="department" maxlength="40"
+          type="text" name="department" minlength="5" maxlength="40"
           bind:value={department}/>
           <p class="{!errors?.department ? "hidden" : ""} text-red-500 text-xs">{errors?.department}</p>
       <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Building</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-				type="text" name="building"
+				type="text" name="building" minlength="10" maxlength="60"
 		    bind:value={building}/>
             {#if building.length > 0 && !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(building)}
 				<span class="text-red-500 text-xs block">Please enter a valid building name</span>
@@ -825,7 +827,7 @@ $:console.log(location,"location");
 
         <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Street</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-				type="text" name="street" maxlength="60"
+				type="text" name="street" minlength="10" maxlength="60"
 		    bind:value={street}/>
             {#if street.length > 0 && !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(street)}
 				<span class="text-red-500 text-xs block">Please enter a valid street name</span>
@@ -879,7 +881,7 @@ $:console.log(location,"location");
             
             <label class="w-full text-xs md:text-sm font-medium mt-1" for="city">City</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-				type="text" name="city" maxlength="30"
+				type="text" name="city" minlength="3" maxlength="30"
 			bind:value={city}/>
 			{#if city.length > 0 && !/^[a-zA-Z\s.'-]+$/.test(city)}
 				<span class="text-red-500 text-xs block">Please enter a valid city Name</span>
@@ -907,7 +909,7 @@ $:console.log(location,"location");
             {:else}
 
             <input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-				type="text" name="state"
+				type="text" name="state" maxlength="20" minlength="3"
 			bind:value={state}/>
 	        {#if state.length > 0 && !/^[a-zA-Z\s.'-]+$/.test(state)}
 				<span class="text-red-500 text-xs block">Please enter a valid state Name</span>
@@ -920,7 +922,7 @@ $:console.log(location,"location");
 
 			<label class="w-full text-xs md:text-sm font-medium mt-1" for="postalCode">Postal code</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-			type="text" name="postalCode" bind:value={postalCode} maxlength="12"
+			type="text" name="postalCode" bind:value={postalCode} minlength="3" maxlength="12"
 			on:input={() => {
 				validateForm('postalCode'); 
 				validatePostalCode(location, postalCode);  // Validate postal code as user types

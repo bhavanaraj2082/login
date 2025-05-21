@@ -2275,7 +2275,7 @@ export const favaddToCart = async (cartData, userId, userEmail) => {
 			);
 
 			if (itemIndex > -1) {
-				if (existingCart.cartItems[itemIndex].isCart === false && existingCart.cartItems[itemIndex].isQuote) {
+				if (existingCart.cartItems[itemIndex].isCart === false && existingCart.cartItems[itemIndex].isQuote === false) {
 					existingCart.cartItems[itemIndex].quantity += parseInt(cartData.quantity) || 1;
 					await existingCart.save();
 					return {
@@ -3123,7 +3123,7 @@ export const getGuestCart = async (body) => {
 		// Fetch all product details in a single query
 		const productMapPromise = Product.find(
 			{ _id: { $in: productIds } },
-			{ imageSrc: 1, productName: 1, productNumber: 1 }
+			{ image: 1, productName: 1, productNumber: 1 }
 		).then(products =>
 			products.reduce((acc, p) => {
 				acc[p._id] = p;

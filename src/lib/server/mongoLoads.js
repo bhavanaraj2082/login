@@ -889,6 +889,7 @@ export const loadProductsubcategory = async (
       products: [],
       manufacturers: JSON.parse(JSON.stringify(subcategory.manufacturerIds)),
       productCount: 0,
+      totalCount,
       subSubCategory: JSON.parse(JSON.stringify(subcategory.subSubCategoryIds)),
       subCategoryDetails,
       specifications:  subcategory?.specifications ? JSON.parse(JSON.stringify(subcategory?.specifications)) : {},

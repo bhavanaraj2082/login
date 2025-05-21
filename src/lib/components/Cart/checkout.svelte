@@ -1,4 +1,5 @@
 <script>
+	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { invalidate } from '$app/navigation';
 	import { cart } from '$lib/stores/cart.js';
@@ -25,11 +26,15 @@
 	let isShowbox = true
 	let order = ''
 	let taxError = ''
-	let gstNumber
+	let gstNumber = ''
 	let orderLoad = false
-	$:{
-	  gstNumber	= userData?.gstNumber || ''
+	$: if (gstNumber){
+	  gstNumber	= userData?.gstNumber || browser ? localStorage.getItem("num") : ""
 	} 
+	onMount(()=>{
+	  gstNumber	= userData?.gstNumber || browser ? localStorage.getItem("num") : ""
+      validateTax(gstNumber)
+	})
 	let checkout
 	let onSubmit = false
 	let addressError = false
@@ -52,7 +57,6 @@
 	calculateTotalPrice($cart)
 	}
 	calculateTotalPrice($cart)
-
 	const downloadExcel = () => {
     // Define the data (same as the original CSV content)
     const headers = [
@@ -248,6 +252,7 @@
 		console.log(e.detail,"detail");
 		//if(e.detail.success){
 			invalidate("data:checkout")
+			gstNumber = userData?.gstNumber || ''
 		//}
 	}
 
@@ -282,12 +287,17 @@
 		console.log('clicked');
 		dispatch('orderData', order);
 	};
-
+     
 	const validateTax = (taxNum)=>{
 		taxError = ''
-		if(!taxNum.length) return
-	   !/^[0-9]{2}[A-Za-z]{1}/.test(taxNum) || taxNum.length !== 15 ? taxError = "invalid GST number": taxError = ""
+		if(!taxNum.length){
+		    gstNumber =''
+	        browser ? localStorage.setItem("num",gstNumber) : ""
+            return
+		}
+	   !/^[0-9]{2}[A-Za-z].{10}z/.test(taxNum) || taxNum.length !== 15 ? taxError = "invalid GST number": taxError = ""
 	   gstNumber = taxNum
+	   browser ? localStorage.setItem("num",gstNumber) : ""
 	   handleCheckout($cart)
 	}
 
@@ -324,7 +334,7 @@
 					    <Icon icon="ic:round-mode-edit" class=" text-md" />
 					</button>
 				</div>
-				<input value={gstNumber} on:input={e=>validateTax(e.target.value)} class="mt-2 w-full uppercase outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
+				<input  value={gstNumber} on:input={e=>validateTax(e.target.value)} class="mt-2 w-full uppercase outline-none rounded border-gray-200 focus:ring-0 border-1 focus:border-primary-500 p-1.5 text-sm" type="text">
 		        <p class="{taxError.length ? "": "hidden text-green-400"} text-xs font-normal text-red-500 ">{taxError}</p>
 			</div>
 		 </div>

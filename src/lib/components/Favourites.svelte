@@ -8,7 +8,7 @@
     import { toast, Toaster } from "svelte-sonner";
     import { writable } from 'svelte/store';
     import { authedUser, cartTotalComps, currencyState } from '$lib/stores/mainStores.js'
-    import Icon from "@iconify/svelte";
+    import Icon, { addAPIProvider } from "@iconify/svelte";
     import Calender from '$lib/components/Calender.svelte';
 
     export let data;
@@ -278,26 +278,6 @@ function calculateTotalPrice(price, quantity) {
         }
     }
 
-    function handleAddToCart() {
-
-    return async ({ result }) => {
-        try {
-             console.log(result);
-            if (result.type === 'success') {
-                toast.success(result.data.message);
-            }
-        //await update();
-        form.requestSubmit();
-        } catch (error) {
-            // console.error('Error handling cart update:', error);
-            toast.error("Cart Error", { 
-                description: result.data?.message || "Failed to add item to cart" 
-                // description: "Failed to process cart update" 
-            });
-        }
-    };
-}
-
     function handleAddAllToCart() {
         // const availableItems = favData.filter(item => item.stockInfo.stock > 0);
         
@@ -307,17 +287,7 @@ function calculateTotalPrice(price, quantity) {
         //     });
         //     return;
         // }
-        return async ({ result, update }) => {
-            
-            if (result.type === 'success') {
-                toast.success(result.data.message);
-            } else {
-                toast.error("Cart Error", { 
-                    description: result.data?.message || "Failed to add items to cart" 
-                });
-            }
-            form.requestSubmit();
-        };
+       
     }
 
     function handleRemoveItem() {
@@ -333,7 +303,6 @@ function calculateTotalPrice(price, quantity) {
         invalidate("data:fav")
     }
         catch (error) {
-           // console.error('Error handling cart update:', error);
             toast.error("Cart Error", { 
                 description: result.data?.message || "Failed to add item to cart"  
             });
@@ -454,15 +423,26 @@ onMount(() => {
             <form 
                 method="POST" 
                 action="?/addalltocart"
-                use:enhance={handleAddAllToCart}>
-                <input type="hidden" name="items" value={JSON.stringify(
+                use:enhance={({formData})=>{
+                    formData.append("items",JSON.stringify(
                     favData.map(item => ({
                             productId: item.id,
                             stockId: item.stockInfo[item.specIndex]._id,
                             manufacturerId: item.manufacturerInfo.id,
                             distributorId: item.distributorInfo.id,
                             quantity: isNaN(item.quantity)|| item.quantity === 0 ? 1 : item.quantity
-                        })))} />
+                        }))))
+                    return async ({ result, update }) => {
+                        if (result.type === 'success') {
+                            toast.success(result.data.message);
+                        } else {
+                            toast.error("Cart Error", { 
+                                description: result.data?.message || "Failed to add items to cart" 
+                            });
+                        }
+                        form.requestSubmit();
+                    };
+                }}>
                 <button 
                     type="submit"
                     class="flex w-full bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 px-5 py-2.5 rounded-md whitespace-nowrap">
@@ -485,7 +465,7 @@ onMount(() => {
             </div>
 		{:else}
             {#each $fav as item,index}
-                <div class="flex flex-col md:flex-row items-center justify-between p-6 border bg-white border-gray-200 rounded-md w-full shadow">
+                <div class="flex flex-col sm:flex-row gap-2 items-center justify-between p-6 sm:p-3 md:p-6 border bg-white border-gray-200 rounded-md w-full shadow">
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                 <img 
@@ -493,25 +473,25 @@ onMount(() => {
                   onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
                   on:click={() => imagemodal(item.image)}
                     alt={item.name} 
-                    class=" w-32 h-32 object-cover rounded-md-md mb-3 md:mb-0 md:mr-4"/>
+                    class=" w-32 h-32 sm:w-20 sm:h-20 md:w-28 md:h-28 xl:w-32 xl:h-32 object-contain rounded-md-md mb-3 md:mb-0 md:mr-4"/>
                      
-                <div class="flex-1 text-center md:text-left space-y-0.5">
-                    <h2 class="text-sm font-bold text-gray-800">
-                        <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline transition-all duration-300">{item?.name || ""}</a>
+                <div class="flex-1 w-fit text-start md:text-left space-y-0.5 sm:space-y-0 space-x-0.5">
+                    <h2 class=" text-sm sm:text-2s md:text-sm font-bold text-gray-800">
+                        <a href={`/products/details/${item?.partNumber}`} class=" text-sm sm:text-2s md:text-sm font-semibold text-primary-500 hover:underline transition-all duration-300">{item?.name || ""}</a>
                     </h2>
                     <!-- <div class=" w-10/12 ">
-                        <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm:text-sm font-semibold text-primary-500 hover:underline">{item?.partNumber || ""}</a>
+                        <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm: text2sm sm:text-2s md:text-sm font-semibold text-primary-500 hover:underline">{item?.partNumber || ""}</a>
                     </div> -->
-                    <p class="text-sm">
-                        <span class="font-semibold">Product Number:</span> <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm:text-sm font-semibold hover:text-primary-500 hover:underline transition-all duration-300">{item?.partNumber || ""}</a>
+                    <p class=" text-sm sm:text-2s md:text-sm">
+                        <span class="font-semibold">Product Number:</span> <a href={`/products/details/${item?.partNumber}`} class="text-sm sm:text-2s md:text-sm font-semibold hover:text-primary-500 hover:underline transition-all duration-300">{item?.partNumber || ""}</a>
                     </p>
-                    <p class="text-sm">
+                    <p class=" text-sm sm:text-2s md:text-sm">
                         <span class="font-semibold">Manufacturer:</span> {item?.manufacturerName || ''}
                     </p>
-                    <p class="text-sm">
+                    <p class=" text-sm sm:text-2s md:text-sm">
                         <span class="font-semibold">Distributor:</span> {item?.distributorName || ''}
                     </p>
-                    <p class="text-sm font-semibold">
+                    <p class=" text-sm sm:text-2s md:text-sm font-semibold">
                         Price: <span class="text-black">
                             { $currencyState === "usd" 
                                 ? `$${item.stockInfo[item.specIndex].pricing.USD.toLocaleString("en-IN")}` 
@@ -520,7 +500,7 @@ onMount(() => {
                                     : 'Price not available'}
                         </span>
                     </p>
-                        <div class="text-sm font-semibold flex gap-2">
+                        <div class=" text-sm sm:text-2s md:text-sm font-semibold flex gap-2">
                             Specification: 
                             {#each item.stockInfo as spec,index }
                             <button on:click={()=>{
@@ -528,7 +508,7 @@ onMount(() => {
                                    console.log(search);
                                    search.specIndex = index
                                    fav.set($fav)
-                            }} class=" {index === item.specIndex ? " bg-primary-300" : " bg-gray-200"} text-xs px-2 py-1 rounded">{spec.specification}</button>
+                            }} class=" {index === item.specIndex ? " bg-primary-300" : " bg-gray-200"} text-xs sm:text-2s md:text-xs px-2 py-1 rounded">{spec.specification}</button>
                             {/each}
                         </div>
                 </div>
@@ -537,52 +517,84 @@ onMount(() => {
                         <p class="font-semibold" 
                            class:text-green-600={item.stockInfo[item.specIndex].stock > 0} 
                            class:text-red-600={item.stockInfo[item.specIndex].stock === 0}>
-                            <span class="text-gray-500 text-xs">Available Stock:</span> {item.stockInfo[item.specIndex]?.stock || 0}
+                            <span class="text-gray-500 text-xs sm:text-2s md:text-xs">Available Stock:</span> {item.stockInfo[item.specIndex]?.stock || 0}
                         </p>
                         <p class="{item.quantity > item.stockInfo[item.specIndex].stock ? "" : "hidden"} text-xs font-semibold text-gray-500">Back Order: <span class=" text-sm text-red-500">{item.quantity > item.stockInfo[item.specIndex].stock ? item.quantity - item.stockInfo[item.specIndex].stock : 0}</span></p>
                         {#if item.stockInfo[item.specIndex].orderMultiple > 1}
-                            <p class="text-xs text-gray-500">
+                            <p class="text-xs sm:text-2s md:text-xs text-gray-500">
                                 Order Multiple: {item.stockInfo[item.specIndex]?.orderMultiple}
                             </p>
                         {/if}
                     </div>
                 </div>
                 <div class="flex flex-col md:items-end items-center mt-4 md:mt-0 space-y-4">
-                    <div class="flex md:flex-col lg:flex-row gap-3 space-x-4 relative">
+                    <div class="flex lg:flex-row gap-3 space-x-4 relative">
                    <form 
                         method="POST" 
                         action="?/addItemToCart"
-                        use:enhance={handleAddToCart}>
-                        <input type="hidden" name="itemData" value={JSON.stringify({
-                        productId: item.id,
-                        stockId: item.stockInfo[item.specIndex]._id,
-                        manufacturerId: item.manufacturerInfo.id,
-                        distributorId: item.distributorInfo.id,
-                        quantity: isNaN(item.quantity)|| item.quantity === 0 ? 1 : item.quantity,
-                        backOrder:item.quantity > item.stockInfo[item.specIndex].stock ? item.quantity - item.stockInfo[item.specIndex].stock : 0
-                    })} />
+                        use:enhance={({formData})=>{
+                            formData.append("itemData",JSON.stringify({
+                                productId: item.id,
+                                stockId: item.stockInfo[item.specIndex]._id,
+                                manufacturerId: item.manufacturerInfo.id,
+                                distributorId: item.distributorInfo.id,
+                                quantity: isNaN(item.quantity)|| item.quantity === 0 ? 1 : item.quantity,
+                                backOrder:item.quantity > item.stockInfo[item.specIndex].stock ? item.quantity - item.stockInfo[item.specIndex].stock : 0
+                            }))
+                            return async ({ result }) => {
+                                try {
+                                     console.log(result);
+                                    if (result.type === 'success') {
+                                        toast.success(result.data.message);
+                                    }
+                                form.requestSubmit();
+                                } catch (error) {
+                                    toast.error("Cart Error", { 
+                                        description: result.data?.message || "Failed to add item to cart" 
+                                    });
+                                }
+                            };
+                        }}>
                         <button 
                             type="submit" 
                             class="flex bg-primary-500 items-center text-white hover:scale-95 transition-all duration-300 border-primary-500 px-2.5 py-2 rounded-md"
                             >
                             <Icon 
                             icon="heroicons-solid:shopping-cart" 
-                            class="text-xl" 
+                            class="text-xl sm:text-lg md:text-xl" 
                             aria-label="Add to Cart Icon" />
-                            <span class="hidden text-xs font-medium md:inline">Add to Cart</span>
+                            <span class="hidden text-xs font-medium lg:inline">Add to Cart</span>
                            
                         </button>
                     </form>
                         <form 
                             method="POST" 
                             action="?/removeItem"
-                            use:enhance={handleRemoveItem}>
-                            <input type="hidden" name="itemId" value={item.id} />
+                            use:enhance={({formData})=>{
+                                formData.append("itemId",item.id)
+                                 return async ({ result }) => {
+                                     console.log(result);
+                                    try{
+                                        if (result.type === 'success') {
+                                            toast.success('Item removed', {
+                                                description: `Product removed from favourites`
+                                            });
+                                        }
+                                        fetchMyFav()
+                                        invalidate("data:fav")
+                                    }
+                                    catch (error) {
+                                        toast.error("Cart Error", { 
+                                            description: result.data?.message || "Failed to add item to cart"  
+                                        });
+                                    }
+                                };
+                            }}>
                             <button 
                                 type="submit" 
                                 class="flex bg-red-600 items-center text-white hover:scale-95 transition-all duration-300 border-red-600 px-2.5 py-2 rounded-md">
-                                <Icon icon="mdi:delete-forever" class="text-xl" aria-label="Remove Icon" />
-                                <span class="hidden text-xs font-medium md:inline">Remove</span>
+                                <Icon icon="mdi:delete-forever" class="text-xl sm:text-lg md:text-xl" aria-label="Remove Icon" />
+                                <span class="hidden text-xs font-medium lg:inline">Remove</span>
                             </button>
                         </form>
                     </div>
@@ -606,13 +618,13 @@ onMount(() => {
                     </div>
                     </div>
                     {#if item.stockInfo[item.specIndex].pricing}
-                        <p class="text-sm font-semibold text-gray-800">
+                        <p class="text-sm sm:text-xs md:text-sm font-semibold text-gray-800">
                             Total: { $currencyState === "usd" 
                                 ? `$${(item.stockInfo[item.specIndex].pricing.USD * item.quantity).toLocaleString("en-IN")}`
                                 : `₹${(item.stockInfo[item.specIndex].pricing.INR * item.quantity).toLocaleString("en-IN")}`}
                         </p>
                     {:else}
-                        <p class="text-sm font-semibold text-gray-800">
+                        <p class="text-sm sm:text-xs md:text-sm font-semibold text-gray-800">
                             Total: Price not available
                         </p>
                     {/if}
