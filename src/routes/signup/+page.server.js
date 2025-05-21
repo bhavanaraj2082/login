@@ -7,7 +7,7 @@ import TokenVerification from "$lib/server/models/TokenVerification.js";
 export const actions = {
   register: async ({ request,cookies }) => {
     try {
-      const body = Object.fromEntries(await request.formData());
+      const body = Object.fromEntries(await request.formData());      
       return await signUp(body,cookies);  
     } catch (error) {
       return {

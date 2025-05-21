@@ -731,6 +731,8 @@
     // }
     isProcessing = true;
     formData.append('currency', currency);
+    formData.append('isEmailVerified', isOtpVerified);
+    formData.append('email', email);
     return async ({ result, update }) => {
       console.log("result", result);
       isProcessing = false;
@@ -905,7 +907,8 @@
               action="?/verifyemail"
               bind:this={form5}
               method="POST"
-              use:enhance={({}) => {
+              use:enhance={({formData}) => {
+                formData.append('email', email);
                 return async ({ result }) => {
                   console.log("result", result);
 
@@ -1004,7 +1007,6 @@
               {/if}
             </form>
           </div>
-          <input type="hidden" name="email" bind:value={email} />
           {#if errors.email}
             <div class="text-red-500 text-xs mt-1">{errors.email}</div>
           {/if}
@@ -1016,7 +1018,8 @@
           <form
             action="?/verifyOtp"
             method="POST"
-            use:enhance={() => {
+            use:enhance={({formData}) => {
+              formData.append('email', email);
               return async ({ result }) => {
                 console.log(result);
                 isOtpVerified = result.data.isEmailVerified;
@@ -1033,7 +1036,6 @@
             }}
           >
             <div class="relative w-full">
-              <input type="hidden" name="email" bind:value={email} />
               <label
                 for="enteredOtp"
                 class="block text-sm font-medium text-gray-600"
@@ -1070,7 +1072,6 @@
           </p>
         {/if}
       </div>
-      <input name="isEmailVerified" type="hidden" bind:value={isOtpVerified} />
       <!-- <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
         <div class="flex-1 mb-2 md:mb-0">
           <label
@@ -1245,7 +1246,6 @@
               <option class="bg-primary-50" value={currency}>{currency}</option>
             {/each}
           </select>
-          <input type="hidden" name="currency" bind:value={currency} />
           {#if errors.country}
             <div class="text-red-500 text-xs mt-1">{errors.country}</div>
           {/if}
@@ -1387,21 +1387,6 @@
         >
           <ul class="w-full text-xs text-gray-500 text-left list-none ml-1">
             <li class="flex justify-start items-center sm:text-xs text-2s py-1">
-              {#if password.length >= 8}
-                <span class="text-green-500">
-                  <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
-                </span>
-              {:else}
-                <span class="text-red-500">
-                  <Icon
-                    icon="lets-icons:close-ring-duotone"
-                    class="w-4 h-4 mr-1"
-                  />
-                </span>
-              {/if}
-              Contain at least 8 characters
-            </li>
-            <li class="flex justify-start items-center sm:text-xs text-2s py-1">
               {#if !password.includes("password")}
                 <span class="text-green-500">
                   <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
@@ -1417,7 +1402,7 @@
               Cannot contain common or guessable text
             </li>
             <li class="flex justify-start items-center sm:text-xs text-2s py-1">
-              {#if /[!@#$%^&*\\-]/.test(password)}
+              {#if password.length >= 8}
                 <span class="text-green-500">
                   <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
                 </span>
@@ -1429,7 +1414,7 @@
                   />
                 </span>
               {/if}
-              Contain one of the following special characters !@#$%^&*
+              Contain at least 8 characters
             </li>
             <li class="flex justify-start items-center sm:text-xs text-2s py-1">
               {#if /[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password)}
@@ -1445,6 +1430,21 @@
                 </span>
               {/if}
               Contain at least one uppercase letter, one lowercase letter, one number
+            </li>
+            <li class="flex justify-start items-center sm:text-xs text-2s py-1">
+              {#if /[!@#$%^&*\\-]/.test(password)}
+                <span class="text-green-500">
+                  <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+                </span>
+              {:else}
+                <span class="text-red-500">
+                  <Icon
+                    icon="lets-icons:close-ring-duotone"
+                    class="w-4 h-4 mr-1"
+                  />
+                </span>
+              {/if}
+              Contain one of the following special characters !@#$%^&*
             </li>
           </ul>
         </div>
