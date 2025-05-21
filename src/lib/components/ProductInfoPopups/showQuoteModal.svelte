@@ -63,12 +63,13 @@
     return Object.keys(formErrors).length === 0 && isOtpVerified === true;
   }
 
-  async function handleQuoteSubmission({ cancel }) {
+  async function handleQuoteSubmission({ cancel, formData }) {
     if (!validateForm()) {
       cancel();
       return;
     }
     isSubmitting = true;
+    formData.append('email', email);
     return async ({ result, update }) => {
       console.log("result", result);
 
@@ -809,7 +810,6 @@
             {/if}
           </form>
         </div>
-        <input type="hidden" name="email" bind:value={email} />
         {#if formErrors.email}
           <p class="text-red-500 text-xs">{formErrors.email}</p>
         {/if}
@@ -819,7 +819,8 @@
         <form
           action="/signup?/verifyOtp"
           method="POST"
-          use:enhance={() => {
+          use:enhance={({formData}) => {
+            formData.append('email', email);
             return async ({ result }) => {
               console.log(result);
               isOtpVerified = result.data.isEmailVerified;
@@ -836,7 +837,6 @@
           }}
         >
           <div class="relative w-full mb-4">
-            <input type="hidden" name="email" bind:value={email} />
             <label
               for="enteredOtp"
               class="block text-sm font-medium text-gray-600"
