@@ -162,13 +162,15 @@
       <form
         action="?/updatePassword"
         method="POST"
-        use:enhance={({ cancel }) => {
+        use:enhance={({ cancel, formData }) => {
           if (!validation()) {
             successMessage = "";
             cancel();
             return;
           }
-
+          formData.append('token', token);
+          formData.append('userEmail', userEmail);
+          formData.append('email', $authedUser?.email);
           return async ({ result }) => {
             console.log("result", result);
             if (result.data.success === true) {
@@ -318,11 +320,6 @@
               </p>
             {/if}
           </div>
-
-          <input type="hidden" name="token" value={token} />
-          <input type="hidden" name="userEmail" value={userEmail} />
-          <input type="hidden" name="email" value={$authedUser?.email} />
-
           <div class="mt-6">
             <button
               type="submit"

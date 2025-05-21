@@ -266,7 +266,8 @@
                 <form
                   action="?/verifyOtp"
                   method="POST"
-                  use:enhance={() => {
+                  use:enhance={({formData}) => {
+                    formData.append('email', email);
                     return async ({ result, update }) => {
                       if (result.type === "failure") {
                         toast.error(result.data.errorMsg);
@@ -296,7 +297,6 @@
                       Enter the 6-digit OTP sent to your email to complete
                       verification.
                     </p>
-                    <input type="hidden" name="email" bind:value={email} />
 
                     <div class="flex gap-2 items-center">
                       <div class="relative flex-1">
@@ -331,7 +331,8 @@
                 <form
                   action="?/sendOtp"
                   method="POST"
-                  use:enhance={() => {
+                  use:enhance={({formData}) => {
+                    formData.append('email', email);
                     return async ({ result }) => {
                       console.log(result);
                       otpStatus = result.status;
@@ -356,7 +357,6 @@
                     </div>
                   {:else}
                     <div class="flex justify-center mt-3">
-                      <input type="hidden" name="email" bind:value={email} />
                       <button
                         on:click={handleResendOtp}
                         type="submit"

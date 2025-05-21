@@ -19,7 +19,7 @@
 
   export let data;
   // console.log("productData",data);
-  
+
   export let isauthedUser;
   // export let isFavorite;
   export let profile;
@@ -320,7 +320,10 @@
             <div class="rounded-lg space-y-1">
               <!-- {#if showDropdown} -->
               <div class="text-primary-400 text-sm text-left cursor-pointer">
-                <a href="{PUBLIC_SDS_URL}/{product?.safetyDatasheet}" target="_blank">
+                <a
+                  href="{PUBLIC_SDS_URL}/{product?.safetyDatasheet}"
+                  target="_blank"
+                >
                   <Icon
                     icon="ic:round-download"
                     class="text-lg font-bold inline"
@@ -366,7 +369,14 @@
               <form
                 method="POST"
                 action="?/favorite"
-                use:enhance={() => {
+                use:enhance={({ formData }) => {
+                  formData.append("productId", product.productId);
+                  formData.append("manufacturerId", product?.manufacturer?._id);
+                  formData.append("authedEmail", authedEmail);
+                  formData.append("stockId", selectedStockId);
+                  formData.append("distributorId", product?.distributorId);
+                  formData.append("quantity", product?.orderMultiple || 1);
+
                   return async ({ result }) => {
                     let status = "";
                     console.log(result);
@@ -379,28 +389,6 @@
                   };
                 }}
               >
-                <input
-                  type="hidden"
-                  name="productId"
-                  value={product.productId}
-                />
-                <input
-                  type="hidden"
-                  name="manufacturerId"
-                  value={product?.manufacturer?._id}
-                />
-                <input type="hidden" name="authedEmail" value={authedEmail} />
-                <input type="hidden" name="stockId" value={selectedStockId} />
-                <input
-                  type="hidden"
-                  name="distributorId"
-                  value={product?.distributorId}
-                />
-                <input
-                  type="hidden"
-                  name="quantity"
-                  value={product?.orderMultiple || 1}
-                />
                 {#if authedEmail}
                   <button class="mt-0.5" type="submit" on:click={toggleLike}>
                     <Icon
@@ -508,7 +496,6 @@
           </div>
         {/if} -->
 
-
         <!-- {#if !((product?.variants && product?.variants.length > 0) || product?.priceSize?.length === 0)} -->
         {#if !(product?.priceSize?.length === 0)}
           <div class="!mt-6 max-[640px]:hidden block">
@@ -525,9 +512,7 @@
                     >Pack Size</th
                   >
                   <th class="px-1 border-b border-gray-300">SKU</th>
-                  <th class="px-1 border-b border-gray-300"
-                    >Availability</th
-                  >
+                  <th class="px-1 border-b border-gray-300">Availability</th>
                   <th class="px-1 border-b border-gray-300">Price</th>
                 </tr>
               </thead>
@@ -620,40 +605,40 @@
           </div>
         {/if}
         {#if !(product?.priceSize?.length === 0)}
-        <div class="max-[640px]:block hidden">
-          <h4
-            class="bg-white font-bold text-heading text-base uppercase text-left max-md:mt-6"
-          >
-            Select a Size
-          </h4>
-          <div class="grid grid-cols-3 !mt-1 gap-2 max-[350px]:grid-cols-2">
-            {#each product?.priceSize as priceItem, i}
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <div
-                class={`border border-gray-300 rounded w-28  p-2 shadow-sm hover:shadow-sm  cursor-pointer ${index === i ? "border-1 border-primary-500 bg-primary-50" : "border-1 border-gray-300"}`}
-                on:click={() => handleThumbnailClick(i, product)}
-              >
-                <div class="lg:text-lg text-base font-bold text-gray-800">
-                  {priceItem?.break}
+          <div class="max-[640px]:block hidden">
+            <h4
+              class="bg-white font-bold text-heading text-base uppercase text-left max-md:mt-6"
+            >
+              Select a Size
+            </h4>
+            <div class="grid grid-cols-3 !mt-1 gap-2 max-[350px]:grid-cols-2">
+              {#each product?.priceSize as priceItem, i}
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                <div
+                  class={`border border-gray-300 rounded w-28  p-2 shadow-sm hover:shadow-sm  cursor-pointer ${index === i ? "border-1 border-primary-500 bg-primary-50" : "border-1 border-gray-300"}`}
+                  on:click={() => handleThumbnailClick(i, product)}
+                >
+                  <div class="lg:text-lg text-base font-bold text-gray-800">
+                    {priceItem?.break}
+                  </div>
+                  <div class="text-sm text-gray-700">
+                    {#if $currencyState === "usd"}
+                      $ {(Number(priceItem.USD) || 0).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    {:else}
+                      ₹ {(Number(priceItem.INR) || 0).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    {/if}
+                  </div>
                 </div>
-                <div class="text-sm text-gray-700">
-                  {#if $currencyState === "usd"}
-                    $ {(Number(priceItem.USD) || 0).toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  {:else}
-                    ₹ {(Number(priceItem.INR) || 0).toLocaleString("en-IN", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  {/if}
-                </div>
-              </div>
-            {/each}
+              {/each}
+            </div>
           </div>
-        </div>
         {/if}
         <!-- {#if !((product?.variants && product?.variants.length > 0 && product?.variants.some((variant) => variant.pricing && Object.keys(variant.pricing).length > 0)) || product?.priceSize?.length > 0)} -->
         {#if !(product?.priceSize?.length > 0)}
