@@ -131,7 +131,7 @@
 {#if recureModal}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div on:click={handleClick} class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+  <div on:click|once={handleClick} class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div class="bg-white p-6 rounded shadow-lg max-w-sm w-11/12" bind:this={popup}>
         {#if message.length}
            <div class=" h-32 text-green-600 flex flex-col items-center justify-center gap-2 font-medium ">

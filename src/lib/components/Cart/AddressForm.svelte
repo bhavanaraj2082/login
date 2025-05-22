@@ -547,9 +547,10 @@ function selectCountry(selectedCountry) {
 	function filterCountries(event) {
 		const searchTerm = event.target.value.toLowerCase();
 		filteredCountries = countries.filter(country => 
-			country.name.toLowerCase().includes(searchTerm) || 
+			country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) || 
 			country.code.toLowerCase().includes(searchTerm)
 		);
+    console.log(filteredCountries,"sdfghhdjjjjjjd");
 		location = searchTerm; // Update the bound value with the search term
 	}
 
@@ -769,6 +770,11 @@ $:console.log(location,"location");
 				name="attentionTo"
         minlength="5"
         maxlength="50"
+         on:keydown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); 
+              }
+            }}
 				bind:value={attentionTo}/>
         <p class="{!errors?.attentionTo ? "hidden" : ""} text-red-500 text-xs">{errors?.attentionTo}</p>
 			<label class="w-full text-xs md:text-sm font-medium mt-1" for="lastname">Company Name</label>
@@ -776,8 +782,13 @@ $:console.log(location,"location");
 				class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text"
 				name="organizationName"
-        minlength="10"
+        minlength="3"
         maxlength="50"
+         on:keydown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); 
+              }
+            }}
 				bind:value={organizationName}/>
         <p class="{!errors?.organizationName ? "hidden" : ""} text-red-500 text-xs">{errors?.organizationName}</p>
 				<!-- <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="email">Email</label>
@@ -811,12 +822,22 @@ $:console.log(location,"location");
 			
         <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Department</label>
         <input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
-          type="text" name="department" minlength="5" maxlength="40"
+          type="text" name="department" minlength="2" maxlength="40"
+           on:keydown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); 
+              }
+            }}
           bind:value={department}/>
           <p class="{!errors?.department ? "hidden" : ""} text-red-500 text-xs">{errors?.department}</p>
       <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Building</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text" name="building" minlength="10" maxlength="60"
+         on:keydown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); 
+              }
+            }}
 		    bind:value={building}/>
             {#if building.length > 0 && !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(building)}
 				<span class="text-red-500 text-xs block">Please enter a valid building name</span>
@@ -828,6 +849,11 @@ $:console.log(location,"location");
         <label class="w-full text-xs md:text-sm font-medium mt-1 block" for="address">Street</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text" name="street" minlength="10" maxlength="60"
+         on:keydown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); 
+              }
+            }}
 		    bind:value={street}/>
             {#if street.length > 0 && !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(street)}
 				<span class="text-red-500 text-xs block">Please enter a valid street name</span>
@@ -840,7 +866,14 @@ $:console.log(location,"location");
             <label class="w-full text-xs md:text-sm font-medium mt-1" for="country">Country</label>
             <div class="relative z-10">
             <div class="flex items-center border border-gray-300 rounded my-1 overflow-hidden">
-            <input type="text" name="location" bind:value={location} maxlength="30" placeholder="Search Country"
+            <input type="text" name="location" bind:value={location} maxlength="30" placeholder="Search Country" 
+            on:keydown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); 
+                location = filteredCountries[0].name
+                toggleDropdown()
+              }
+            }}
             on:input={toggleDropdown} on:click={toggleDropdown} on:input={filterCountries} on:input={delete errors.country}
             class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-none"
             required/>
@@ -882,6 +915,11 @@ $:console.log(location,"location");
             <label class="w-full text-xs md:text-sm font-medium mt-1" for="city">City</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text" name="city" minlength="3" maxlength="30"
+         on:keydown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); 
+              }
+            }}
 			bind:value={city}/>
 			{#if city.length > 0 && !/^[a-zA-Z\s.'-]+$/.test(city)}
 				<span class="text-red-500 text-xs block">Please enter a valid city Name</span>
@@ -910,6 +948,11 @@ $:console.log(location,"location");
 
             <input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 				type="text" name="state" maxlength="20" minlength="3"
+         on:keydown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); 
+              }
+            }}
 			bind:value={state}/>
 	        {#if state.length > 0 && !/^[a-zA-Z\s.'-]+$/.test(state)}
 				<span class="text-red-500 text-xs block">Please enter a valid state Name</span>
@@ -923,6 +966,11 @@ $:console.log(location,"location");
 			<label class="w-full text-xs md:text-sm font-medium mt-1" for="postalCode">Postal code</label>
 			<input class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"
 			type="text" name="postalCode" bind:value={postalCode} minlength="3" maxlength="12"
+       on:keydown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); 
+              }
+            }}
 			on:input={() => {
 				validateForm('postalCode'); 
 				validatePostalCode(location, postalCode);  // Validate postal code as user types

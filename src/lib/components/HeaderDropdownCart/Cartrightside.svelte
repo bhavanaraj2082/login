@@ -622,7 +622,7 @@
 		<div bind:this={container} class="bg-white relative p-6 rounded-md shadow-lg w-11/12 sm:w-3/5 md:w-2/5 2xl:w-2/6 space-y-2">
             <button on:click={()=>{
 				addToCartModal = !addToCartModal
-				browser ? localStorage.clear() : ""
+				browser ? localStorage.setItem("cart",JSON.stringify([])) : ""
 				invalidate("data:cart")
 			}} class=" absolute right-5 top-5">
 				<Icon icon="maki:cross" class=" text-lg sm:text-xl"/>
