@@ -122,6 +122,8 @@
 		role = "";
 		selectedNames = [];
 	}
+			let showDropdown = false;
+
 	// function handleKeyDown(event) {
 	// 	if (
 	// 		event.key === "Enter" &&
@@ -157,6 +159,18 @@
 		highlightedIndex = -1;
 	}
 }
+
+
+$: isDetailsEmpty = trimmedDetails.length === 0;
+
+$: isDetailsCharsValid =
+  /^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(trimmedDetails) &&
+  !/<[^>]*>/.test(trimmedDetails);
+
+$: isDetailsLengthValid =
+  trimmedDetails.length >= 5 && trimmedDetails.length <= 500;
+
+
 
 function scrollToHighlightedItem() {
   const item = document.getElementById(`dropdown-item-${highlightedIndex}`);
@@ -196,14 +210,15 @@ function scrollToHighlightedItem() {
         details.trim() === "" ||
 		details.trim().length < 5 ||
 		details.trim().length > 500 ||
-        // !/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(details) ||
-        // /<[^>]*>/.test(details) ||
+        !/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(details) ||
+        /<[^>]*>/.test(details) ||
         role.length === 0 ||
         role.trim() === "" ||
         !/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(role) ||
         /<[^>]*>/.test(role) ||
 		role.trim().length < 3 ||
 		role.trim().length > 150 ||
+		/^\d+$/.test(role.trim())||
         reason.length === 0 
 		
        
@@ -297,6 +312,7 @@ function closeCaptcha() {
 	// 		generateMathQuestion();
 	// 	}
 	// }
+
 	function generateMathQuestion() {
 		const num1 = Math.floor(Math.random() * 10) + 1;
 		const num2 = Math.floor(Math.random() * 10) + 1;
@@ -389,13 +405,15 @@ function closeCaptcha() {
 	// }
 
 	$: trimmedRole = role.trim();
-	$: isValidRole =
-		trimmedRole.length >= 3 &&
-		trimmedRole.length <= 150 &&
-		/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(trimmedRole) &&
-		!/<[^>]*>/.test(trimmedRole);
+$: isRoleLengthValid = trimmedRole.length >= 3 && trimmedRole.length <= 150;
+$: isRoleNotOnlyNumbers = !Number.isInteger(Number(trimmedRole)) || trimmedRole === "";
 
-		$: trimmedDetails = details.trim();
+$: isRoleCharsValid =
+	/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(trimmedRole) &&
+	!/<[^>]*>/.test(trimmedRole);
+
+$: isValidRole = isRoleLengthValid && isRoleCharsValid && isRoleNotOnlyNumbers;
+$: trimmedDetails = details.trim();
 	$: isValidDetails =
 		trimmedDetails.length >= 5 &&
 		trimmedDetails.length <= 500 ;
@@ -488,7 +506,6 @@ function closeCaptcha() {
 		}
 	};
 	let searchTerm = "";
-	let showDropdown = false;
 	let filteredCountries = countries;
 
 	function filterCountries() {
@@ -537,30 +554,33 @@ function closeCaptcha() {
 			event.inputType === "deleteContentForward";
 
 		if (searchTerm.length > 0 && !isDeleting) {
-			filterCountriesWithoutAutoSelect();
-			showDropdown = filteredCountries.length > 0;
-			const codeSearch = searchTerm.replace("+", "").trim();
-			if (codeSearch.length > 0) {
-				const exactCodeMatches = filteredCountries.filter(
-					(country) => country.code.replace("+", "") === codeSearch,
-				);
+	filterCountriesWithoutAutoSelect();
+	showDropdown = true; // Always show, even if no matches
 
-				if (exactCodeMatches.length === 1) {
-					selectlocation(exactCodeMatches[0]);
-					return;
-				}
-			}
-			const countriesStartingWith = filteredCountries.filter((country) =>
-				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
-			);
+	const codeSearch = searchTerm.replace("+", "").trim();
+	if (codeSearch.length > 0) {
+		const exactCodeMatches = filteredCountries.filter(
+			(country) => country.code.replace("+", "") === codeSearch
+		);
 
-			if (countriesStartingWith.length === 1) {
-				selectlocation(countriesStartingWith[0]);
-			}
-		} else {
-			filterCountriesWithoutAutoSelect();
-			showDropdown = filteredCountries.length > 0;
+		if (exactCodeMatches.length === 1) {
+			selectlocation(exactCodeMatches[0]);
+			return;
 		}
+	}
+
+	const countriesStartingWith = filteredCountries.filter((country) =>
+		country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+	);
+
+	if (countriesStartingWith.length === 1) {
+		selectlocation(countriesStartingWith[0]);
+	}
+} else {
+	filterCountriesWithoutAutoSelect();
+	showDropdown = true; // Keep it open regardless
+}
+
 	}
 
 	function toggleDropdown() {
@@ -959,7 +979,8 @@ if (!isInCountry) {
 				action="?/contactus"
 				bind:this={form}
 				class="w-full md:mt-3 mt-0 max-w-3xl sm:ml-3 ml-0"
-				use:enhance={(event) => {
+				use:enhance={({event,formData}) => {
+					formData.append("email",email)
 					const isEmailVerified = ProfileEmailVerified;
 					const isAuthedUserEmailVerified = authedUserEmailVerified;
 					console.log(
@@ -1143,7 +1164,7 @@ if (!isInCountry) {
 								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
 								>
-									First Name is required.
+									*Required
 								</span>
 							{/if}
 						</div>
@@ -1273,9 +1294,16 @@ if (!isInCountry) {
 							{#if showErrors && location.length === 0}
 								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
-									>Location is required</span
+									>*Required</span
 								>
 							{/if}
+
+							{#if filteredCountries.length === 0}
+											<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+									>No matching countries found!</span
+								>
+										{/if}
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
@@ -1295,7 +1323,7 @@ if (!isInCountry) {
 
 							{#if showErrors && !number}
 	<span class="text-red-500 sm:text-xs text-2s font-medium">
-		Number is required
+		*Required
 	</span>
 
 {:else if !location && hovered}
@@ -1306,7 +1334,12 @@ if (!isInCountry) {
 <!-- {:else if number?.length > 0 && !validatePhoneNumber(location, number) && (showErrors || dirty)} -->
  {:else if number?.length > 0 && !validatePhoneNumber(location, number)}
 	<span class="text-red-500 sm:text-xs text-2s font-medium">
-		Please enter a valid phone number for {location}
+	{#if filteredCountries.find(c => c.name === location)}
+  Please enter a valid phone number for {location}
+{:else}
+ First select a valid country from the dropdown
+{/if}
+
 	</span>
 {/if}
 
@@ -1390,33 +1423,45 @@ if (!isInCountry) {
 	}}
 />
 
-{#if showdisErrors && !isValidRole}
+{#if showdisErrors && !isRoleCharsValid}
 	<span class="text-red-500 sm:text-xs text-2s font-medium">
-		Required and must be between 3 and 150 valid characters.
+		Only letters, numbers, and valid symbols (& - . , ! @ ( ) : ; " ') are allowed.
 	</span>
-{/if}		
+{:else if showdisErrors && !isRoleLengthValid}
+	<span class="text-red-500 sm:text-xs text-2s font-medium">
+		Must be between 3 and 150 characters.
+	</span>
+{:else if showdisErrors && !isRoleNotOnlyNumbers}
+	<span class="text-red-500 sm:text-xs text-2s font-medium">
+		Role cannot contain only numbers, Please include letters as well.
+	</span>
+{/if}
+
+
+	
 {#if showErrors && role.length === 0}
 								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
 								>
-									Role is required
+									*Required
 								</span>
 							{/if}			
 						</div>
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
-							<input
+							<!-- <input
 								type="hidden"
 								name="email"
 								id="email"
 								bind:value={email}
-							/>
+							/> -->
 							<form
 								action="?/verifyemail"
 								bind:this={form3}
 								method="POST"
-								use:enhance={({}) => {
+								use:enhance={({formData}) => {
+												formData.append("email",email)
 									return async ({ result }) => {
 										isLoading = false;
 										console.log("result", result);
@@ -1482,7 +1527,7 @@ if (!isInCountry) {
 									{#if showErrors && email.length === 0}
 										<span
 											class="text-red-500 sm:text-xs text-2s font-medium"
-											>Email is required</span
+											>*Required</span
 										>
 									{/if}
 									{#if email.length > 0 && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)}
@@ -1520,11 +1565,15 @@ if (!isInCountry) {
 											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
 										>
 											{#if isOtpVerified}
-												Verified
-												<Icon
-													icon="material-symbols:verified-rounded-md"
-													class="w-4 h-4 mt-2 ml-1"
-												/>
+												<span
+											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+										>
+											Verified
+											<Icon
+																icon="material-symbols:verified-rounded"
+																class="w-4 h-4 ml-1"
+															/>
+										</span>
 											{:else}
 												<Icon
 													icon="fluent:mail-all-read-16-filled"
@@ -1552,7 +1601,8 @@ if (!isInCountry) {
 								<form
 									action="?/verifyOtpEmail"
 									method="POST"
-									use:enhance={() => {
+									use:enhance={({formData}) => {
+													formData.append("email",email)
 										return async ({ result }) => {
 											loadingotp = false;
 											if (result.status === 200) {
@@ -1592,12 +1642,12 @@ if (!isInCountry) {
 									}}
 								>
 									<div class="relative w-full">
-										<input
+										<!-- <input
 											type="hidden"
 											name="email"
 											id="email"
 											bind:value={email}
-										/>
+										/> -->
 										<input
 											type="text"
 											name="enteredOtp"
@@ -1660,26 +1710,22 @@ if (!isInCountry) {
 								showdatErrors = true;
 							}}
 						></textarea>
-						<!-- {#if showErrors && (!details || details.trim() === "" || !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(details) || /<[^>]*>/.test(details))}
-							<span
-								class="text-red-500 sm:text-xs text-2s font-medium"
-							>
-								Additional Details are required.
-							</span>
-						{/if} -->
-
-						{#if showdatErrors && !isValidDetails}
-	<span class="text-red-500 sm:text-xs text-2s font-medium">
-		Required and must be between 5 and 500 valid characters.
-	</span>
+						{#if showErrors || showdatErrors}
+  {#if isDetailsEmpty}
+    <span class="text-red-500 sm:text-xs text-2s font-medium">
+      *Required
+    </span>
+  {:else if !isDetailsCharsValid}
+    <span class="text-red-500 sm:text-xs text-2s font-medium">
+      Invalid characters in Details
+    </span>
+  {:else if !isDetailsLengthValid}
+    <span class="text-red-500 sm:text-xs text-2s font-medium">
+      Must be between 5 and 500 valid characters.
+    </span>
+  {/if}
 {/if}
-{#if showErrors && details.length === 0}
-								<span
-									class="text-red-500 sm:text-xs text-2s font-medium"
-								>
-									Details are required
-								</span>
-							{/if}
+
 					</div>
 					<span class="flex-1 w-1/3 mb-4">
 						<label
