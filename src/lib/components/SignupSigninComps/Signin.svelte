@@ -235,7 +235,7 @@
                     bind:value={email}
                     on:input={validateEmail}
                     placeholder="username@example.com"
-                    class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                    class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-0 focus:ring-primary-500"
                   />
                 </div>
                 {#if errors.email}
@@ -316,7 +316,7 @@
                               .trim();
                           }}
                           placeholder="6-digit OTP"
-                          class="pl-10 w-full rounded-md border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                          class="pl-10 w-full rounded-md border border-gray-300 bg-white p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-0 focus:ring-primary-500"
                         />
                       </div>
                       <button
@@ -424,7 +424,7 @@
                     bind:value={emailOrUsername}
                     on:input={validateEmailOrUsername}
                     placeholder="Enter your email or username"
-                    class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                    class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-0 focus:ring-primary-500"
                   />
                 </div>
                 {#if errors.emailOrUsername}
@@ -458,7 +458,7 @@
                           ? "Please enter a valid Password"
                           : "";
                       }}
-                      class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                      class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-0 focus:ring-primary-500"
                     />
                   {:else}
                     <input
@@ -473,7 +473,7 @@
                           ? "Please enter a valid Password"
                           : "";
                       }}
-                      class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                      class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-0 focus:ring-primary-500"
                     />
                   {/if}
                   <button

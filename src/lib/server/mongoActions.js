@@ -1509,7 +1509,7 @@ export const userUpdatePassword = async (body) => {
 		console.error('Error updating password:', error);
 
 		if (error instanceof LuciaError) {
-			return { success: false, message: 'Failed to update password: ' + error.message };
+			return { success: false, message: 'Authentication failed: ' + error.message };
 		} else {
 			return { success: false, message: 'An unexpected error occurred.' };
 		}

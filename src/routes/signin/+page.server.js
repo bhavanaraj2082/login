@@ -239,12 +239,12 @@ export const actions = {
           } catch (err) {
             console.error("Error handling invalid password case:", err);
             return fail(500, {
-              errorMsg: "Failed to update password. Please try again later.",
+              errorMsg: "Authentication failed. Please try again later",
             });
           }
         } else {
           return fail(500, {
-            errorMsg: "Authentication failed. Please try again later.",
+            errorMsg: "Authentication failed. Please try again later",
           });
         }
       }
