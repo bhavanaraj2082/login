@@ -82,6 +82,7 @@ let form3;
   let formValid = true;
   let showErrors = false;
   let showNameError = false;
+  let showUrlError = false;
   let showEmailError = false;
   let showFeedbackError = false;
   let showIssueError = false;
@@ -126,10 +127,26 @@ let form3;
 // }
 
 function isValidName() {
-  const namepattern =/^[A-Za-z\s]+$/;
-  nameIsValid = namepattern.test(formData.name);
+  const name = formData.name.trim();
+  const namePattern = /^[A-Za-z\s]+$/;
+  const nameIsValid = namePattern.test(name) && name.length >= 3 && name.length <= 50;
   return nameIsValid;
 }
+
+function validateUrlInput(value) {
+    if (/[<>]/.test(value)) {
+      errors = {
+        ...errors,
+        messageurl: 'Characters "<" and ">" are not allowed',
+      };
+      formValid = false;
+    } else {
+      const { messageurl, ...rest } = errors;
+      errors = rest;
+      formValid = true;
+    }
+  }
+
   // const handleSubmit = async (event) => {
   //   const { name, email, feedback, issue, rating } = formData;
   //   if (name.length === 0 || email.length === 0 || feedback.length === 0 || issue.length === 0 || rating.length === 0) {
@@ -156,6 +173,7 @@ const handleSubmit = async (event) => {
   // Reset all error flags
   formValid = true;
   showNameError = false;
+  showUrlError = false;
   showEmailError = false;
   showFeedbackError = false;
   showIssueError = false;
@@ -163,7 +181,7 @@ const handleSubmit = async (event) => {
   showEmailVerifyError = false;
   showNameValidError = false;
 
-  const { name, email, feedback, issue, rating } = formData;
+  const { name, email, feedback, issue, rating , url} = formData;
 
   // Check if each required field is filled
   if (name.length === 0) {
@@ -171,15 +189,52 @@ const handleSubmit = async (event) => {
     formValid = false;
   }
 
+if (urls.length === 0) {
+  showUrlError = true;
+  formValid = false;
+} else {
+  showUrlError = false;
+}
+
+if (/[<>]/.test(urls)) {
+  errors = {
+    ...errors,
+    messageurl: 'Characters "<" and ">" are not allowed',
+  };
+  formValid = false;
+} else {
+  const { messageurl, ...rest } = errors;
+  errors = rest;
+}
+
+
   if (email.length === 0) {
     showEmailError = true;
     formValid = false;
   }
 
-  if (feedback.length === 0) {
-    showFeedbackError = true;
-    formValid = false;
-  }
+
+if (feedback.length === 0) {
+  showFeedbackError = true;
+  formValid = false;
+} else if (!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(feedback)) {
+  errors.message = 'No special characters allowed except "&-.,!@():;"';
+  showFeedbackError = true;
+  formValid = false;
+}else if (feedback.length < 5 || feedback.length > 700) {
+  errors.message = "Feedback must be between 5 and 700 characters.";
+  showFeedbackError = true;
+  formValid = false;
+}  else if (/<[^>]*>/.test(feedback)) {
+  errors.message = "HTML tags are not allowed in the message.";
+  showFeedbackError = true;
+  formValid = false;
+} else {
+  delete errors.message;
+  showFeedbackError = false;
+}
+
+
 
   if (issue.length === 0) {
     showIssueError = true;
@@ -419,9 +474,16 @@ on:input={() => {
   }}
             class="block w-full rounded-md focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
           />
+         
+
           {#if formData.name.length > 0 && !/^[A-Za-z\s]+$/.test(formData.name)}  
-          <span class="text-red-500 text-xs font-normal">Please enter a valid user name.</span>
-         {/if}{#if showNameError}
+          <span class="text-red-500 text-xs font-normal">Please enter a valid user name</span>
+          {:else if ((formData.name.length > 0 && formData.name.trim().length < 3) || (formData.name.length > 0 && formData.name.trim().length > 50))}  
+            <span class="text-red-500 text-xs font-normal">User Name must be between 3 and 50 characters</span>
+         {/if}
+         
+         
+         {#if showNameError}
           <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please enter your name.</div>
         {/if}
       </div>
@@ -670,31 +732,60 @@ on:input={() => {
         </div>
 
         <div class="sm:col-span-2">
-          <label for="url" class="block sm:text-sm text-xs font-base text-gray-900 pb-1">URL/</label>
-          <input
-            type="url"
-            name="url"
-            id="url"
-            bind:value={urls}
-            class="block w-full rounded-md focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
-          />
-        </div>
+  <label for="url" class="block sm:text-sm text-xs font-base text-gray-900 pb-1">URL/</label>
+  <input
+    type="url"
+    name="url"
+    id="url"
+    bind:value={urls}
+   on:input={(e) => validateUrlInput(e.target.value)}
+    class="block w-full rounded-md focus:ring-0 focus:outline-none border border-gray-300 focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
+  />
+
+  {#if showUrlError}
+    <div class="text-red-500 sm:text-xs font-medium mt-1">Please provide the URL</div>
+  {/if}
+
+  {#if errors.messageurl}
+    <div class="text-red-500 sm:text-xs font-medium mt-1">{errors.messageurl}</div>
+  {/if}
+</div>
+
         <div class="sm:col-span-4">
           <label for="feedback" class="block sm:text-sm text-xs font-base text-gray-900 pb-1">Tell us what we can do better!<span class="text-red-500 text-xs font-semibold">*</span></label>
-          <textarea
-            name="feedback"
-            id="feedback"
-            bind:value={formData.feedback}
-            on:input={() => {
-              showFeedbackError = false;
-              const trimmedFeedback = formData.feedback.trimStart();
-                        formData.feedback= trimmedFeedback;
-              }}
-            rows="3"
-            class="block w-full rounded-md bg-white px-3 py-1.5 text-sm text-gray-900 focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500"
-          ></textarea>
-          {#if showFeedbackError}
+       <textarea
+  name="feedback"
+  id="feedback"
+  bind:value={formData.feedback}
+  on:input={() => {
+    showFeedbackError = false;
+    const trimmedFeedback = formData.feedback.trimStart();
+    formData.feedback = trimmedFeedback;
+
+    const normalizedMessage = formData.feedback.trim();
+
+    if (normalizedMessage.length === 0) {
+      errors.message = "Feedback is required.";
+    }  else if (!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(normalizedMessage)) {
+      errors.message = 'No special characters allowed except "&-.,!@():;"';
+    }else if (normalizedMessage.length < 5 || normalizedMessage.length > 700) {
+      errors.message = "Feedback must be between 5 and 700 characters.";
+    } else if (/<[^>]*>/.test(normalizedMessage)) {
+      errors.message = "HTML tags are not allowed in the message.";
+    } else {
+      delete errors.message;
+    }
+  }}
+  rows="3"
+  class="block w-full rounded-md bg-white px-3 py-1.5 text-sm text-gray-900 focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500"
+/>
+
+          {#if showFeedbackError && formData.feedback.length === 0 }
     <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please provide your feedback.</div>
+  {/if}
+
+  {#if errors.message}
+    <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">{errors.message}</div>
   {/if}
         </div>
       </div>
