@@ -1,12 +1,13 @@
 <script>
   import Icon from "@iconify/svelte";
   import { onMount } from "svelte";
-  import {PUBLIC_IMAGE_URL} from "$env/static/public"
+  import { PUBLIC_IMAGE_URL } from "$env/static/public";
 
   export let data;
   export let SharePopup;
   let productURL = "";
   let showToast = false;
+  let isStillOpen = true;
 
   function copyToClipboard() {
     navigator.clipboard
@@ -17,7 +18,10 @@
           showToast = false;
         }, 2000);
         setTimeout(() => {
-          SharePopup();
+          if (isStillOpen) {
+            isStillOpen = false;
+            SharePopup();
+          }
         }, 4000);
       })
       .catch((err) => {
@@ -35,7 +39,10 @@
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity !m-0"
-    on:click={SharePopup}
+    on:click={() => {
+      isStillOpen = false;
+      SharePopup();
+    }}
   >
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -48,7 +55,10 @@
       >
         <h2 class="text-lg font-bold text-heading">Share Product</h2>
         <button
-          on:click={SharePopup}
+          on:click={() => {
+            isStillOpen = false;
+            SharePopup();
+          }}
           class="hover:bg-red-100 text-white rounded font-bold transition-colors duration-300"
         >
           <Icon
@@ -120,29 +130,32 @@
 
       <div class="mt-4">
         <p class="text-sm font-semibold text-heading mb-1">Direct Link</p>
-        <div
-          class="relative flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0 items-center"
-        >
+
+        <div class="relative mb-2">
           {#if showToast}
             <div
-              class="absolute -top-8 transform -translate-x-1/2 left-1/2 bg-gray-800 text-white py-1 px-3 rounded text-xs sm:text-sm"
+              class="absolute -top-7 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white py-1 px-3 rounded text-xs sm:text-sm shadow"
             >
               Copied!
             </div>
           {/if}
+        </div>
 
+        <div
+          class="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0 items-center"
+        >
           <input
             type="text"
             readonly
             bind:value={productURL}
-            class="text-xs sm:text-sm md:text-sm border border-primary-400 p-2 rounded-lg text-gray-600 outline-none flex-grow w-full"
+            class="text-xs sm:text-sm md:text-sm border border-primary-400 p-2 rounded text-gray-600 outline-none flex-grow w-full focus:ring-0"
           />
 
           <button
             on:click={copyToClipboard}
-            class="text-primary-400 text-xs sm:text-sm md:text-sm font-semibold border p-2 border-primary-400 rounded-lg flex items-center justify-center space-x-1 w-full sm:w-auto"
+            class="text-primary-400 hover:text-white hover:bg-primary-400 text-xs sm:text-sm md:text-sm font-semibold border p-2 border-primary-400 rounded flex items-center justify-center space-x-1 w-full sm:w-auto"
           >
-            <Icon icon="mingcute:copy-fill" class="text-md" />
+            <Icon icon="mingcute:copy-fill" class="text-lg" />
             <span>Copy</span>
           </button>
         </div>
