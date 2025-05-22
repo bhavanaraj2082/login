@@ -2,7 +2,7 @@
   import { enhance } from '$app/forms';
   import { onMount } from 'svelte';
   import { toast, Toaster } from "svelte-sonner";
-import Icon from "@iconify/svelte";
+import Icon, { addAPIProvider } from "@iconify/svelte";
     import { prev } from '../stores/feedStore.js'
 
   let emailIsValid = true;
@@ -336,7 +336,8 @@ if (feedback.length === 0) {
   action="?/feedbacks"
   id="feedback-form"
   class="p-4"
-  use:enhance={(event) => {
+  use:enhance={(event,data) => {
+      data?.append("email",formData.email)
     // Check email verification first
     const isEmailVerified = ProfileEmailVerified; // Assuming this is the first email verification check
 const isAuthedUserEmailVerified = authedUserEmailVerified; // The second email verification check
@@ -438,7 +439,7 @@ console.log(isEmailVerified, isAuthedUserEmailVerified, "Email verification stat
         {/if}
         </div>
         {#if showIssueError}
-        <div class="text-red-500 sm:text-xs text-2s font-medium mt-3">Please select at least one issue.</div>
+        <div class="text-red-500 sm:text-xs text-2s font-medium mt-3">*Required</div>
       {/if}
     </fieldset>
       
@@ -484,7 +485,7 @@ on:input={() => {
          
          
          {#if showNameError}
-          <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please enter your name.</div>
+          <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">*Required</div>
         {/if}
       </div>
         
@@ -500,7 +501,8 @@ on:input={() => {
   action="?/verifyemail"
   bind:this={form3}
   method="POST"
-  use:enhance={({}) => {
+ use:enhance={({data}) => {
+      data?.append("email",formData.email)
       return async ({ result }) => {
           isLoading = false;
           // console.log("result", result);
@@ -574,7 +576,7 @@ on:input={() => {
           }}
       />
       {#if showEmailError}
-    <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please enter your email.</div>
+    <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">*Required</div>
   {/if}
   <!-- {#if showEmailVerifyError}
   <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please select at least one issue.</div>
@@ -644,7 +646,8 @@ on:input={() => {
  <form
      action="?/verifyOtpEmail"
      method="POST"
-     use:enhance={() => {
+     use:enhance={({data}) => {
+      data?.append("email",formData.email)
          return async ({ result }) => {
              loadingotp = false; // Hide loading spinner when the request is complete
              if (result.status === 200) {
@@ -732,7 +735,7 @@ on:input={() => {
         </div>
 
         <div class="sm:col-span-2">
-  <label for="url" class="block sm:text-sm text-xs font-base text-gray-900 pb-1">URL/</label>
+  <label for="url" class="block sm:text-sm text-xs font-base text-gray-900 pb-1">URL/<span class="text-red-500 text-xs font-semibold">*</span></label>
   <input
     type="url"
     name="url"
@@ -743,7 +746,7 @@ on:input={() => {
   />
 
   {#if showUrlError}
-    <div class="text-red-500 sm:text-xs font-medium mt-1">Please provide the URL</div>
+    <div class="text-red-500 sm:text-xs font-medium mt-1">*Required</div>
   {/if}
 
   {#if errors.messageurl}
@@ -781,7 +784,7 @@ on:input={() => {
 />
 
           {#if showFeedbackError && formData.feedback.length === 0 }
-    <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please provide your feedback.</div>
+    <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">*Required</div>
   {/if}
 
   {#if errors.message}
@@ -812,7 +815,7 @@ on:input={() => {
                 </div>
               {/each}
               {#if showRatingError}
-    <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please enter a rating.</div>
+    <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">*Required</div>
   {/if}
             </div>
           </fieldset>

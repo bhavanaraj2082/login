@@ -108,7 +108,7 @@
 
 if (!fieldName || fieldName === "name") {
 	if (!name) {
-		errors.name = "User Name is required";
+		errors.name = "*Required";
 	} else {
 		const normalizedName = name.replace(/\s+/g, ' ').trim();
 		if (normalizedName.length < 3 || normalizedName.length > 50) {
@@ -124,7 +124,7 @@ if (!fieldName || fieldName === "name") {
 
 		if (!fieldName || fieldName === "country") {
     if (!country || country === "") {
-        errors.country = "Country is required";
+        errors.country = "*Required";
     } else {
         delete errors.country;
     }
@@ -137,7 +137,7 @@ if (!fieldName || fieldName === "name") {
 				) ||
 				email.split("@")[1].includes("gamil")
 			) {
-				errors.email = "Email is required"
+				errors.email = "*Required"
 			} else {
 				delete errors.email;
 			}
@@ -150,7 +150,7 @@ if (!fieldName || fieldName === "name") {
     }
 
 			if (!phone || phone === "") {
-				errors.phone = "Number is required";
+				errors.phone = "*Required";
 			} else {
 				const countryDetails = getCountryByCode(country);
 				if (!countryDetails) {
@@ -211,7 +211,7 @@ if (!fieldName || fieldName === "message") {
 
 
 if (!normalizedMessage) {
-		errors.message = "Message is required";
+		errors.message = "*Required";
 	} 
 	else if (
 		!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(normalizedMessage) ||
@@ -230,7 +230,7 @@ if (!fieldName || fieldName === "subject") {
 	const normalizedSubject = subject?.replace(/\s+/g, ' ').trim();
 
 if (!normalizedSubject){
-	errors.subject = "Subject is required";
+	errors.subject = "*Required";
 }
 else if (
 		!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(normalizedSubject) ||
@@ -400,32 +400,33 @@ function scrollToHighlightedItem() {
 			event.inputType === "deleteContentBackward" ||
 			event.inputType === "deleteContentForward";
 
-		if (searchTerm.length > 0 && !isDeleting) {
-			filterCountriesWithoutAutoSelect();
-		showDropdown = filteredCountries.length > 0;
-			const codeSearch = searchTerm.replace("+", "").trim();
-			if (codeSearch.length > 0) {
-				const exactCodeMatches = filteredCountries.filter(
-					(country) => country.code.replace("+", "") === codeSearch,
-				);
+				if (searchTerm.length > 0 && !isDeleting) {
+	filterCountriesWithoutAutoSelect();
+	showDropdown = true; // Always show, even if no matches
 
-				if (exactCodeMatches.length === 1) {
-					selectCountry(exactCodeMatches[0]);
-					return;
-				}
-			}
+	const codeSearch = searchTerm.replace("+", "").trim();
+	if (codeSearch.length > 0) {
+		const exactCodeMatches = filteredCountries.filter(
+			(country) => country.code.replace("+", "") === codeSearch
+		);
 
-			const countriesStartingWith = filteredCountries.filter((country) =>
-				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
-			);
-
-			if (countriesStartingWith.length === 1) {
-				selectCountry(countriesStartingWith[0]);
-			}
-		} else {
-			filterCountriesWithoutAutoSelect();
-			showDropdown = filteredCountries.length > 0;
+		if (exactCodeMatches.length === 1) {
+			selectlocation(exactCodeMatches[0]);
+			return;
 		}
+	}
+
+	const countriesStartingWith = filteredCountries.filter((country) =>
+		country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+	);
+
+	if (countriesStartingWith.length === 1) {
+		selectlocation(countriesStartingWith[0]);
+	}
+} else {
+	filterCountriesWithoutAutoSelect();
+	showDropdown = true; // Keep it open regardless
+}
 	}
 
 	function filterCountriesWithoutAutoSelect() {
@@ -460,7 +461,7 @@ function scrollToHighlightedItem() {
 		const country = getCountryByCode(countryCode);
 		if (!country) {
 			errors.phone = "Select your country before entering number";
-			errors.country = "Invalid country selected";
+			errors.country = "";
 			return false;
 		}
 
@@ -811,7 +812,8 @@ function verifyCaptcha() {
 				class="space-y-4"
 				bind:this={form}
 				on:click={handleFormClick}
-				use:enhance={(event) => {
+				use:enhance={({event,formData}) => {
+					formData.append("email",email)
 					const isEmailVerified = ProfileEmailVerified; 
 					const isAuthedUserEmailVerified = authedUserEmailVerified; 
 					console.log(
@@ -944,7 +946,7 @@ function verifyCaptcha() {
   id="name"
   bind:value={name}
   class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-  placeholder="User Name"
+  placeholder="User Name*"
   on:input={() => {
     name = name.trimStart(); 
     validateField("name");
@@ -957,18 +959,19 @@ function verifyCaptcha() {
 {/if}
 
 								  </div>
-								<input
+								<!-- <input
 									type="hidden"
 									name="email"
 									id="email"
-									bind:value={email}/>
+									bind:value={email}/> -->
 								<div class="flex-1">
 									<div class="flex-1 ">
 										<form
 											action="?/verifyemail"
 											bind:this={form3}
 											method="POST"
-											use:enhance={({}) => {
+											use:enhance={({formData}) => {
+												formData.append("email",email)
 												return async ({ result }) => {
 													isLoading = false;
 													console.log(
@@ -1035,7 +1038,7 @@ function verifyCaptcha() {
     id="email"
     bind:value={email}
     class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-    placeholder="Email"
+    placeholder="Email*"
     on:input={() => {
       email = email.trim();
       validateField("email");
@@ -1100,7 +1103,8 @@ function verifyCaptcha() {
 											<form
 												action="?/verifyOtpEmail"
 												method="POST"
-												use:enhance={() => {
+												use:enhance={({formData}) => {
+													formData.append("email",email)
 													return async ({
 														result,
 													}) => {
@@ -1157,12 +1161,12 @@ function verifyCaptcha() {
 												<div
 													class="relative w-full mb-2"
 												>
-													<input
+													<!-- <input
 														type="hidden"
 														name="email"
 														id="email"
 														bind:value={email}
-													/>
+													/> -->
 													<input
 														type="text"
 														name="enteredOtp"
@@ -1246,7 +1250,7 @@ function verifyCaptcha() {
 											  type="text"
 											  name="country"
 											  bind:value={country}
-											  placeholder="Search country"
+											  placeholder="Search country*"
 											  on:click={toggleDropdown}
 											  on:keydown={handleKeyDown}
 											 
@@ -1313,10 +1317,10 @@ function verifyCaptcha() {
 												<div
 													class="flex items-center px-4 py-3"
 												>
-													<Icon
+													<!-- <Icon
 														icon="tabler:info-square-rounded-filled"
 														class="text-red-500 text-base mr-2"
-													/>
+													/> -->
 													<li
 														class="text-gray-800 text-xs"
 													>
@@ -1337,6 +1341,15 @@ function verifyCaptcha() {
 												{errors.country}
 											</p>
 										{/if}
+
+
+										{#if filteredCountries.length === 0}
+												<p
+												class="ml-1 text-red-600 text-xs mt-1 "
+											>
+												Invalid country selected
+											</p>
+											{/if}
 										
 								</div>
 
@@ -1344,7 +1357,7 @@ function verifyCaptcha() {
 										<input
 											type="tel"
 											name="phone"
-											placeholder="Phone number"
+											placeholder="Phone number*"
 											class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 											bind:value={phone}
 											title="Please enter a valid phone number"
@@ -1396,7 +1409,7 @@ function verifyCaptcha() {
 											id="subject"
 											bind:value={subject}
 											class="w-full text-sm placeholder:text-xs px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-											placeholder="Subject"
+											placeholder="Subject*"
 											on:input={() => {
 												const trimmedSubject = subject.trimStart();
 												subject = trimmedSubject;
@@ -1421,7 +1434,7 @@ function verifyCaptcha() {
 											id="message"
 											bind:value={message}
 											class="w-full text-sm h-24 placeholder:text-xs px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-											placeholder="Message"
+											placeholder="Message*"
 											on:input={() => {
 												const trimmedMessage = message.trimStart();
 												message = trimmedMessage;
@@ -1444,11 +1457,7 @@ function verifyCaptcha() {
 											class="block text-sm font-medium text-gray-700"
 										>
 										</label>
-										<input
-											type="hidden"
-											name="token"
-											value={captchaToken}
-										/>
+										
 										<div id="g-recaptcha-response">
 											<div class="flex justify-end mt-5 md:mt-6 mb-4">
 												<label class="flex items-center space-x-2 cursor-pointer">
