@@ -28,9 +28,11 @@
     </div>
   {/if}
   <div class="mb-5">
+    {#if remainingProducts.length > 0}
     <div class="mb-3">
       <h1 class="text-base text-gray-600 font-semibold">Pending Products</h1>
     </div>
+    {/if}
     {#each remainingProducts as product}
       <div class="rounded-lg mb-5 bg-white">
         <div
