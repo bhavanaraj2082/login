@@ -772,26 +772,36 @@ on:click={handleProfile}>
 							</button>
 						</div>
 						{#if menu.submenus && menu.submenus.length > 0}
-							<div
-								class={`absolute shadow-md z-50 rounded-sm mt-0 ml-2 bg-white transition-opacity duration-200 w-60 ${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-								role="menu">
-								{#each menu.submenus as submenu}
-									<!-- svelte-ignore a11y-interactive-supports-focus -->
-									<div
-										class="relative group hover:text-primary-950"
-										role="menu"
-										on:mouseenter={() => handleMouseEnterSubmenu(submenu)}
-										on:mouseleave={handleMouseLeaveSubmenu}>
-										<button
-											on:click={() => navigateTo(`${menu.href}${submenu.href}`)}
-											class="flex relative text-left mr-24 pl-4 py-1 px-4 md:text-xs lg:text-sm hover:bg-primary-50 w-full"
-											role="menuitem">
-											<span class={`absolute left-0 top-0 h-full w-1 bg-primary-400 transition-all duration-200 ${activeSubmenu === submenu ? 'opacity-100 text-gray-800' : 'opacity-0'}`}></span>
-											{submenu.title}
-											<Icon icon="material-symbols:chevron-right" class={`absolute right-2 w-5 h-5 transition-colors duration-200 ${activeSubmenu === submenu ? 'text-primary-600' : 'text-gray-300'}`}/>
-										</button>
-									</div>
-									{#if submenu.subSubmenus && submenu.subSubmenus.length > 0}
+						<div
+	class={`absolute shadow-md z-50 rounded-sm mt-0 ml-2 bg-white transition-opacity duration-200 w-60
+		${activeMenu === menu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+	role="menu"
+>
+<div class=" max-h-96 overflow-y-auto overflow-x-hidden scroll">
+	{#each menu.submenus as submenu}
+		<!-- svelte-ignore a11y-interactive-supports-focus -->
+		<div
+			class="relative group hover:text-primary-950"
+			role="menu"
+			on:mouseenter={() => handleMouseEnterSubmenu(submenu)}
+			on:mouseleave={handleMouseLeaveSubmenu}
+		>
+			<button
+				on:click={() => navigateTo(`${menu.href}${submenu.href}`)}
+				class="flex relative text-left mr-24 pl-4 py-1 px-4 md:text-xs lg:text-sm hover:bg-primary-50 w-full"
+				role="menuitem"
+			>
+				<span
+					class={`absolute left-0 top-0 h-full w-1 bg-primary-400 transition-all duration-200 ${activeSubmenu === submenu ? 'opacity-100 text-gray-800' : 'opacity-0'}`}
+				></span>
+				{submenu.title}
+				<Icon
+					icon="material-symbols:chevron-right"
+					class={`absolute right-2 w-5 h-5 transition-colors duration-200 ${activeSubmenu === submenu ? 'text-primary-600' : 'text-gray-300'}`}
+				/>
+			</button>
+		</div>
+			{#if submenu.subSubmenus && submenu.subSubmenus.length > 0}
 										<div class={`mt-0 ml-0 border-gray-300 border-l h-full overflow-y-scroll scroll absolute left-full rounded-sm pb-2 top-0 z-30 w-full bg-white shadow-sm transition-opacity duration-200 ${activeSubmenu === submenu ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
 											role="menu">
 											<ul>
@@ -816,9 +826,8 @@ on:click={handleProfile}>
 											</ul>
 										</div>
 									{/if}
-								{/each}
-								
-								
+	{/each}
+</div>		
 							</div>
 							
 						{/if}

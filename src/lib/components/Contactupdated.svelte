@@ -207,13 +207,19 @@ if (!fieldName || fieldName === "name") {
 
 if (!fieldName || fieldName === "message") {
 	const normalizedMessage = message?.replace(/\s+/g, ' ').trim();
-	if (!normalizedMessage || normalizedMessage.length < 3 || normalizedMessage.length > 500) {
-		errors.message = "Message must be between 3 and 500 characters";
-	} else if (
+
+
+
+if (!normalizedMessage) {
+		errors.message = "Message is required";
+	} 
+	else if (
 		!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(normalizedMessage) ||
 		/<[^>]*>/.test(normalizedMessage)
 	) {
-		errors.message = "Message is required";
+				errors.message = 'No special characters allowed except "&-.,!@():;"';
+	} else if ((normalizedMessage && normalizedMessage.length < 3) || (normalizedMessage && normalizedMessage.length > 500))  {
+		errors.message = "Message must be between 3 and 500 characters";
 	} else {
 		delete errors.message;
 	}
@@ -222,13 +228,17 @@ if (!fieldName || fieldName === "message") {
 
 if (!fieldName || fieldName === "subject") {
 	const normalizedSubject = subject?.replace(/\s+/g, ' ').trim();
-	if (!normalizedSubject || normalizedSubject.length < 3 || normalizedSubject.length > 250) {
-		errors.subject = "Subject must be between 3 and 250 characters";
-	} else if (
+
+if (!normalizedSubject){
+	errors.subject = "Subject is required";
+}
+else if (
 		!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(normalizedSubject) ||
 		/<[^>]*>/.test(normalizedSubject)
 	) {
-		errors.subject = "Subject is required";
+		errors.subject = 'No special characters allowed except "&-.,!@():;"';
+	} else if ((normalizedSubject && normalizedSubject.length < 3) ||(normalizedSubject && normalizedSubject.length > 250)) {
+				errors.subject = "Subject must be between 3 and 250 characters";
 	} else {
 		delete errors.subject;
 	}
@@ -657,8 +667,8 @@ function verifyCaptcha() {
     console.log("Company name length is invalid");
     return false;
   } else {
-    if (Number.isInteger(Number(company))) {
-      errors.company = "Company name cannot be a whole number. Please enter a valid name.";
+    if (company && Number.isInteger(Number(company))) {
+      errors.company = "Company name cannot contain only numbers, Please include letters as well";
       errors = { ...errors }; 
       console.log("Company name cannot be a whole number");
       return false;
@@ -1019,91 +1029,72 @@ function verifyCaptcha() {
 											}}
 										>
 											<div class="relative w-full">
-												<input
-													type="text"
-													name="email"
-													id="email"
-													bind:value={email}
-													class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-													placeholder="Email"
-													on:input={() => {
-														email = email.trim();
-														validateField("email");
-														errors.email = !email
-															? "Please enter a valid email address"
-															: !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-																		email,
-																  ) ||
-																  email
-																		.split(
-																			"@",
-																		)[1]
-																		.includes(
-																			"gamil",
-																		)
-																? "Please enter a valid email address"
-																: "";
-														ProfileEmailVerified = false;
-														emailSent = false;
-														authedUserEmailVerified = false;
-													}}
-												/>
-												{#if isLoading}
-												<div class="flex justify-end items-center w-full pt-2 sm:pt-0 sm:absolute sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2 text-2s font-semibold text-primary-600">
-													<span class="flex items-center">
-														<Icon
-															icon="line-md:loading-alt-loop"
-															class="w-4 h-4 mr-1"
-														/>
-														Verifying...
-													</span>
-												</div>
-												
-												{:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
-												<div class="flex justify-end items-center w-full sm:absolute sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2">
-													<button
-														type="submit"
-														class="text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
-														disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email) || email.split("@")[1].includes("gamil")}
-													>
-														Verify
-													</button>
-												</div>
-																						  
-												{:else if emailSent}
-												<div class="flex justify-end items-center w-full pt-2 sm:pt-0 sm:absolute sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2 text-2s font-semibold text-green-600">
-													{#if isOtpVerified}
-														<span class="flex items-center">
-															Verified
-															<Icon
-																icon="material-symbols:verified-rounded"
-																class="w-4 h-4 mt-2 ml-1"
-															/>
-														</span>
-													{:else}
-														<span class="flex items-center">
-															<Icon
-																icon="fluent:mail-all-read-16-filled"
-																class="w-4 h-4 mr-1"
-															/>
-															Check your inbox
-														</span>
-													{/if}
-												</div>
-												
-												{:else}
-												<div class="flex justify-end items-center w-full pt-2 sm:pt-0 sm:absolute sm:top-1/2 sm:right-2 sm:transform sm:-translate-y-1/2 text-2s font-semibold text-green-600">
-													<span class="flex items-center">
-														Verified
-														<Icon
-															icon="material-symbols:verified-rounded"
-															class="w-4 h-4 ml-1"
-														/>
-													</span>
-												</div>
-												
-												{/if}
-											</div>
+  <input
+    type="text"
+    name="email"
+    id="email"
+    bind:value={email}
+    class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+    placeholder="Email"
+    on:input={() => {
+      email = email.trim();
+      validateField("email");
+      errors.email = !email
+        ? "Please enter a valid email address"
+        : !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email) ||
+          email.split("@")[1].includes("gamil")
+        ? "Please enter a valid email address"
+        : "";
+      ProfileEmailVerified = false;
+      emailSent = false;
+      authedUserEmailVerified = false;
+    }}
+  />
+
+  {#if isLoading}
+    <div class="absolute top-1/2 right-2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 pointer-events-none">
+      <span class="flex items-center">
+        <Icon icon="line-md:loading-alt-loop" class="w-4 h-4 mr-1" />
+        Verifying...
+      </span>
+    </div>
+
+  {:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
+    <div class="absolute top-1/2 right-2 transform -translate-y-1/2">
+      <button
+        type="submit"
+        class="text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
+        disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email) || email.split("@")[1].includes("gamil")}
+      >
+        Verify
+      </button>
+    </div>
+
+  {:else if emailSent}
+    <div class="absolute top-1/2 right-2 transform -translate-y-1/2 text-2s font-semibold text-green-600 pointer-events-none">
+      {#if isOtpVerified}
+        <span class="flex items-center">
+          Verified
+          <Icon icon="material-symbols:verified-rounded" class="w-4 h-4 ml-1" />
+        </span>
+      {:else}
+        <span class="flex items-center">
+          <Icon icon="fluent:mail-all-read-16-filled" class="w-4 h-4 mr-1" />
+          Check your inbox
+        </span>
+      {/if}
+    </div>
+
+  {:else}
+    <div class="absolute top-1/2 right-2 transform -translate-y-1/2 text-2s font-semibold text-green-600 pointer-events-none">
+      <span class="flex items-center">
+        Verified
+        <Icon icon="material-symbols:verified-rounded" class="w-4 h-4 ml-1" />
+      </span>
+    </div>
+  {/if}
+</div>
+
 										</form>
 										{#if emailSent && isOtpVerified === false}
 											<form

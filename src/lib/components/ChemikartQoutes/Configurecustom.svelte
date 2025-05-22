@@ -338,7 +338,7 @@ const handleEdit = (step, toggleFn) => {
 		</div>
 		<div class="bg-white">
 			<button
-			class="box-content rounded h-25 w-4/5 p-4 border-dashed border-primary-500 border-2 ml-3 md:ml-8 py-10 bg-white"
+class="box-content rounded h-25 w-4/5 p-4 border-dashed border-2 ml-3 md:ml-8 py-10 bg-white border-primary-500 hover:border-primary-700 hover:shadow-md transform transition-all duration-200 hover:scale-105"
 			type="button"
 			on:click={triggerFileInput}
 		>
@@ -352,7 +352,8 @@ const handleEdit = (step, toggleFn) => {
 				<a 
 					href={fileLink} 
 					download="Custom_Quote_Template.xls" 
-					class="text-primary-500 underline ml-1.5 mr-1.5 sm:text-lg text-sm"
+					class="text-primary-500 underline hover:text-primary-600 hover:text-xl ml-1.5 mr-1.5 sm:text-lg text-sm transition-colors duration-200"
+
 					role="button"
 					on:click|stopPropagation
 				>

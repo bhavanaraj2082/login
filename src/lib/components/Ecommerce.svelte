@@ -177,17 +177,21 @@ function scrollToHighlightedItem() {
         /<[^>]*>/.test(fname) ||
 		fname.trim().length < 3 ||
 		fname.trim().length > 50 ||
-        lname.length === 0 ||
-        lname.trim() === "" ||
-        !/^[A-Za-z\s]+$/.test(lname) ||
-        /<[^>]*>/.test(lname) ||
+       (lname.trim().length > 0 && !/^[A-Za-z\s]+$/.test(lname)) ||
+      (lname.trim().length > 0 &&  /<[^>]*>/.test(lname)) ||
 		lname.trim().length > 50 ||
-        company.length === 0 ||
-        company.trim() === "" ||
-        company.trim().length < 3 ||
+
+
+       (company.trim().length > 0 && company.trim().length < 3) ||
 		company.trim().length > 100 ||
         !/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(company) ||
         /<[^>]*>/.test(company) ||
+		 (company.trim().length > 0 && Number.isInteger(Number(company)))||
+
+
+
+
+
         details.length === 0 ||
         details.trim() === "" ||
 		details.trim().length < 5 ||
@@ -1145,47 +1149,47 @@ if (!isInCountry) {
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
-								type="text"
-								name="lname"
-								id="lname"
-								bind:value={lname}
-								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-								placeholder="Last Name*"
-								on:input={() => {
-									lname = lname.trimStart(); // Update value reactively
+	type="text"
+	name="lname"
+	id="lname"
+	bind:value={lname}
+	class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+	placeholder="Last Name"
+	on:input={() => {
+		lname = lname.trimStart(); // Optional: trim leading spaces
 
-									if (!lname) {
-										errors = { ...errors, lname: "" };
-									} else if (!/^[A-Za-z\s]+$/.test(lname)) {
-										errors = {
-											...errors,
-											lname: "Last Name should contain only letters and spaces",
-										};
-									}
-									else if (lname.trim().length > 50) {
-										errors = {
-											...errors,
-											lname: "Last name Name must be between 3 and 50 characters",
-										};
-									} 
-									else {
-										const { lname, ...rest } = errors;
-										errors = rest; // Remove error when valid
-									}
-								}}
-							/>
+		if (lname.trim() === "") {
+			const { lname, ...rest } = errors;
+			errors = rest; // Clear any last name errors if field is empty (optional)
+		} else if (!/^[A-Za-z\s]+$/.test(lname)) {
+			errors = {
+				...errors,
+				lname: "Last Name should contain only letters and spaces",
+			};
+		} else if (lname.trim().length > 50) {
+			errors = {
+				...errors,
+				lname: "Last Name must be less than 50 characters",
+			};
+		} else {
+			const { lname, ...rest } = errors;
+			errors = rest; // Clear error if valid
+		}
+	}}
+/>
+
 							{#if errors?.lname}
 								<span class="text-red-500 text-xs">
 									{errors.lname}
 								</span>
 							{/if}
-							{#if showErrors && !lname}
+							<!-- {#if showErrors && !lname}
 								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
 								>
 									Last Name is required.
 								</span>
-							{/if}
+							{/if} -->
 						</div>
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
@@ -1299,7 +1303,8 @@ if (!isInCountry) {
 		Please select your country before entering Number
 	</span>
 
-{:else if number?.length > 0 && !validatePhoneNumber(location, number) && (showErrors || dirty)}
+<!-- {:else if number?.length > 0 && !validatePhoneNumber(location, number) && (showErrors || dirty)} -->
+ {:else if number?.length > 0 && !validatePhoneNumber(location, number)}
 	<span class="text-red-500 sm:text-xs text-2s font-medium">
 		Please enter a valid phone number for {location}
 	</span>
@@ -1316,20 +1321,23 @@ if (!isInCountry) {
 								id="company"
 								bind:value={company}
 								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-								placeholder="Company Name*"
+								placeholder="Company Name"
 								on:input={() => {
 									company = company.trimStart(); // Avoid leading spaces
 
-									if (!company || company.trim() === "") {
-										errors = {
-											...errors,
-											company: "Company Name is required",
-										};
-									} 
-									else if (company.trim().length < 3 || company.trim().length > 100) {
+								 if (company.trim().length > 0 && (company.trim().length < 3 || company.trim().length > 100)) {
 										errors = {
 											...errors,
 											company: "Company Name must be between 3 and 100 characters",
+										};
+									}
+
+									else if (Number.isInteger(Number(company))
+									) {
+										errors = {
+											...errors,
+											company:
+												"Company name cannot contain only numbers. Please include letters as well.",
 										};
 									}
 									
@@ -1355,13 +1363,13 @@ if (!isInCountry) {
 									}
 								}}
 							/>
-							{#if showErrors && company.length === 0}
+							<!-- {#if showErrors && company.length === 0}
 								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
 								>
 									Company is required
 								</span>
-							{/if}
+							{/if} -->
 							{#if errors?.company}
 								<span class="text-red-500 text-xs">
 									{errors.company}
@@ -1531,9 +1539,9 @@ if (!isInCountry) {
 										>
 											Verified
 											<Icon
-												icon="material-symbols:verified-rounded-md"
-												class="w-4 h-4 ml-1"
-											/>
+																icon="material-symbols:verified-rounded"
+																class="w-4 h-4 ml-1"
+															/>
 										</span>
 									{/if}
 								</div>
@@ -1737,7 +1745,7 @@ if (!isInCountry) {
 								>
 							</label>
 							<div
-								class="mt-0 flex items-center justify-end mr-10 gap-x-6"
+								class="mt-0 flex items-center justify-end gap-x-6"
 							>
 								<button
 									type="submit"
