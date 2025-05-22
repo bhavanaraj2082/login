@@ -168,10 +168,9 @@
 		}
 
 		if (!fieldName || fieldName === "email") {
-			if(!email){
-				errors.email="*Required"
-			}
-			else if (
+			if (!email) {
+				errors.email = "*Required";
+			} else if (
 				!email ||
 				!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
 			) {
@@ -182,15 +181,13 @@
 		}
 
 		if (!fieldName || fieldName === "phoneNumber") {
-			if (!phoneNumber){
-				errors.phoneNumber = "*Required"
-			}
-		else	if (!country) {
+			if (!phoneNumber) {
+				errors.phoneNumber = "*Required";
+			} else if (!country) {
 				errors.phoneNumber =
 					"Please select the country before entering the phone number";
 				return;
-			}
-		else	if (!phoneNumber || phoneNumber === "") {
+			} else if (!phoneNumber || phoneNumber === "") {
 				errors.phone = "Required for the selected country";
 			} else {
 				const countryDetails = getCountryByCode(country);
@@ -223,8 +220,12 @@
 		if (!fieldName || fieldName === "country") {
 			if (!country) {
 				errors.country = "*Required";
-			} else {
-				delete errors.country;
+			} else if (!country || country === "country") {
+				if (!country || country === "") {
+					errors.country = "Please select a country";
+				} else {
+					delete errors.country;
+				}
 			}
 		}
 
@@ -235,17 +236,19 @@
 				delete errors.accountNumber;
 			}
 		}
-		if (!fieldName || fieldName === "companyName") {
-			if (!companyName) {
-				errors.companyName = "*Required";
-			} else if (companyName.length < 3) {
-				errors.companyName = "Must be at least 3 characters.";
-			} else if (!/^[A-Za-z0-9@.,!#$%^&*(_)+\-\s]+$/.test(companyName)) {
-				errors.companyName = "Please enter a valid company name.";
-			} else {
-				delete errors.companyName;
-			}
-		}
+        if (!fieldName || fieldName === "companyName") {
+            if (!companyName) {
+                errors.companyName = "*Required";
+            } else if (companyName.length < 3) {
+                errors.companyName = "Company name must be at least 3 characters";
+            } else if (!/^[A-Za-z0-9@.,\s&-]+$/.test(companyName)) {
+                errors.companyName = "Please enter a valid company name";
+            } else if (/^\d+$/.test(companyName)) {
+                errors.companyName = "Company name cannot contain only numbers";
+            } else {
+                delete errors.companyName;
+            }
+        }
 
 		if (fieldName === "technical_issue") {
 			if (!selectedOption) {
@@ -286,7 +289,7 @@
 	function selectCountry(selectedCountry) {
 		country = selectedCountry.name;
 		// filteredCountries = countries;
-		searchTerm = `${selectedCountry.name} `;
+		searchTerm = selectedCountry.name;
 		showDropdown = false;
 		highlightedIndex = -1;
 		validateField("country");
@@ -415,11 +418,25 @@
 	function handleInputChange(event) {
 		searchTerm = event.target.value;
 		country = event.target.value;
+
 		const isDeleting =
 			event.inputType === "deleteContentBackward" ||
 			event.inputType === "deleteContentForward";
+
 		filterCountriesWithoutAutoSelect();
-		showDropdown = filteredCountries.length > 0;
+		showDropdown = true;
+
+		const match = countries.find(
+			(c) => c.name.toLowerCase() === searchTerm.toLowerCase(),
+		);
+
+		if (match) {
+			delete errors.country;
+		} else if (searchTerm.trim().length > 0) {
+			errors.country = "Invalid country selected";
+		} else {
+			delete errors.country;
+		}
 
 		if (searchTerm.length > 0 && !isDeleting) {
 			const codeSearch = searchTerm.replace("+", "").trim();
@@ -751,9 +768,13 @@
 						<h2
 							class="text-primary-400 font-semibold text-base pb-6"
 						>
-							Other  Website Issues
+							Other Website Issues
 						</h2>
-						<input hidden name="issueName" value="Other website Issues" />
+						<input
+							hidden
+							name="issueName"
+							value="Other website Issues"
+						/>
 					</div>
 					<div>
 						<label
@@ -1028,9 +1049,7 @@
 								</div>
 							</form>
 							{#if emailSent && isOtpVerified === false}
-								<div
-									class="mt-3 "
-								>
+								<div class="mt-3">
 									<form
 										action="?/verifyOtpEmail"
 										method="POST"
@@ -1102,11 +1121,11 @@
 											<button
 												type="submit"
 												class="absolute top-1/2 right-3 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
-												 disabled={loadingotp ||
-                                                !enteredOtpemail ||
-                                                !/^\d{6}$/.test(
-                                                    enteredOtpemail,
-                                                )}
+												disabled={loadingotp ||
+													!enteredOtpemail ||
+													!/^\d{6}$/.test(
+														enteredOtpemail,
+													)}
 											>
 												{#if loadingotp}
 													<span
@@ -1159,15 +1178,7 @@
 
 									validateField("companyName");
 
-									errors.companyName = !companyName
-										? "*Required"
-										: companyName.length < 3
-											? "Must be at least 3 characters"
-											: !/^[A-Za-z@.,!#$%^&*(_)+\-\s]+$/.test(
-														companyName,
-												  )
-												? "Please enter a valid company name"
-												: "";
+								
 								}}
 							/>
 							{#if errors?.companyName}
@@ -1199,14 +1210,16 @@
 								/>
 								<!-- svelte-ignore a11y-click-events-have-key-events -->
 								<div
-								on:click|stopPropagation={toggleDropdown}
-								class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
-							>
-								<Icon
-									icon={showDropdown ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'}
-									class="text-gray-500 mr-1 text-2s font-bold"
-								/>
-							</div>
+									on:click|stopPropagation={toggleDropdown}
+									class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
+								>
+									<Icon
+										icon={showDropdown
+											? "ep:arrow-up-bold"
+											: "ep:arrow-down-bold"}
+										class="text-gray-500 mr-1 text-2s font-bold"
+									/>
+								</div>
 								{#if showDropdown}
 									<div
 										bind:this={dropdownEl}

@@ -816,6 +816,10 @@
     }
   }
   onMount(() => {
+    cartloading = false;
+    isLoading = false;
+    rawFileData = "";
+    validationMessages = "";
     calculateLineHeight();
 
     if (textareaElement) {
@@ -1388,7 +1392,7 @@ Example file content:
           (isValidated &&
             validatedProducts.length > 0 &&
             !validatedProducts.some((p) => p.isValid))}
-        class={`lg:ml-60 mr-5 p-2 w-40 mt-4 h-9  flex items-center text-xs   gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300
+        class={`lg:ml-60 mr-5 p-2 w-40 mt-4 h-9 mb-4 flex items-center text-xs   gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300
           ${
             cartloading ||
             textEditedAfterValidation ||

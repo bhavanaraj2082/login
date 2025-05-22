@@ -153,8 +153,7 @@
     if (!fieldName || fieldName === "email") {
       if (!email) {
         errors.email = "*Required";
-      } else
-      if (
+      } else if (
         !email ||
         !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
       ) {
@@ -197,8 +196,12 @@
     if (!fieldName || fieldName === "country") {
       if (!country) {
         errors.country = "*Required";
-      } else {
-        delete errors.country;
+      } else if (!country || country === "country") {
+        if (!country || country === "") {
+          errors.country = "Please select a country";
+        } else {
+          delete errors.country;
+        }
       }
     }
 
@@ -209,18 +212,19 @@
         delete errors.accountNumber;
       }
     }
-    if (!fieldName || fieldName === "companyName") {
-      if (!companyName) {
-        errors.companyName = "*Required";
-      } else if (companyName.length < 3) {
-        errors.companyName = "Must be at least 3 characters.";
-      } else if (!/^[A-Za-z0-9@.,!#$%^&*(_)+\-\s]+$/.test(companyName)) {
-        errors.companyName = "Please enter a valid company name.";
-      } else {
-        delete errors.companyName;
-      }
-    }
-
+         if (!fieldName || fieldName === "companyName") {
+            if (!companyName) {
+                errors.companyName = "*Required";
+            } else if (companyName.length < 3) {
+                errors.companyName = "Company name must be at least 3 characters";
+            } else if (!/^[A-Za-z0-9@.,\s&-]+$/.test(companyName)) {
+                errors.companyName = "Please enter a valid company name";
+            } else if (/^\d+$/.test(companyName)) {
+                errors.companyName = "Company name cannot contain only numbers";
+            } else {
+                delete errors.companyName;
+            }
+        }
     if (fieldName === "technical_issue") {
       if (!selectedOption) {
         errors.technical_issue = "Please select an option";
@@ -259,7 +263,7 @@
   function selectCountry(selectedCountry) {
     country = selectedCountry.name;
     // filteredCountries = countries;
-    searchTerm = `${selectedCountry.name} `;
+    searchTerm = selectedCountry.name;
     showDropdown = false;
     highlightedIndex = -1;
     validateField("country");
@@ -289,126 +293,84 @@
     }
   }
 
-  // function handleInputChange(event) {
-  //   searchTerm = event.target.value;
-  //   filterCountries();
-  // }
-  //   function handleInputChange(event) {
-  //   searchTerm = event.target.value;
-  //   const isDeleting = event.inputType === 'deleteContentBackward' ||
-  //                      event.inputType === 'deleteContentForward';
+ 
 
-  //   if (searchTerm.length > 0 && !isDeleting) {
-  //     filterCountriesWithoutAutoSelect();
-  //     showDropdown = filteredCountries.length > 0;
-  //     const codeSearch = searchTerm.replace('+', '').trim();
-  //     if (codeSearch.length > 0) {
-  //       const exactCodeMatches = filteredCountries.filter(
-  //         (country) => country.code.replace('+', '') === codeSearch
-  //       );
+	function handleKeyDown(event) {
+		const exactCountryMatch = countries.some(
+			(c) => c.name === country && c.name === searchTerm,
+		);
+		if (
+			exactCountryMatch &&
+			!(
+				event.key === "Backspace" ||
+				event.key === "Delete" ||
+				event.key === "ArrowLeft" ||
+				event.key === "ArrowRight" ||
+				event.key === "Home" ||
+				event.key === "End" ||
+				event.key === "Tab" ||
+				event.key === "Escape" ||
+				event.ctrlKey ||
+				event.key === "ArrowUp" ||
+				event.key === "ArrowDown"
+			)
+		) {
+			const input = document.querySelector('input[name="country"]');
+			if (
+				input &&
+				(input.selectionStart !== input.selectionEnd ||
+					input.selectionStart === 0)
+			) {
+				return true;
+			}
+			event.preventDefault();
+			return false;
+		}
 
-  //       if (exactCodeMatches.length === 1) {
-  //         selectCountry(exactCodeMatches[0]);
-  //         return;
-  //       }
-  //     }
-
-  //     const countriesStartingWith = filteredCountries.filter(
-  //       (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-  //     );
-
-  //     if (countriesStartingWith.length === 1) {
-  //       selectCountry(countriesStartingWith[0]);
-  //     }
-  //   } else {
-  //     filterCountriesWithoutAutoSelect();
-  //     showDropdown = filteredCountries.length > 0;
-  //   }
-  // }
-  // function filterCountriesWithoutAutoSelect() {
-  //   filteredCountries = countries.filter(
-  //     (country) =>
-  //       country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
-  //   );
-  // }
-
-  function handleKeyDown(event) {
-    const exactCountryMatch = countries.some(
-      (c) => c.name === country && c.name === searchTerm,
-    );
-    if (
-      exactCountryMatch &&
-      !(
-        event.key === "Backspace" ||
-        event.key === "Delete" ||
-        event.key === "ArrowLeft" ||
-        event.key === "ArrowRight" ||
-        event.key === "Home" ||
-        event.key === "End" ||
-        event.key === "Tab" ||
-        event.key === "Escape" ||
-        event.ctrlKey ||
-        event.key === "ArrowUp" ||
-        event.key === "ArrowDown"
-      )
-    ) {
-      const input = document.querySelector('input[name="country"]');
-      if (
-        input &&
-        (input.selectionStart !== input.selectionEnd ||
-          input.selectionStart === 0)
-      ) {
-        return true;
-      }
-      event.preventDefault();
-      return false;
-    }
-
-    if (showDropdown) {
-      switch (event.key) {
-        case "ArrowDown":
-          event.preventDefault();
-          if (filteredCountries.length > 0) {
-            highlightedIndex =
-              (highlightedIndex + 1) % filteredCountries.length;
-            scrollToHighlighted();
-          }
-          break;
-        case "ArrowUp":
-          event.preventDefault();
-          if (filteredCountries.length > 0) {
-            highlightedIndex =
-              highlightedIndex <= 0
-                ? filteredCountries.length - 1
-                : highlightedIndex - 1;
-            scrollToHighlighted();
-          }
-          break;
-      }
-    } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      showDropdown = true;
-      if (filteredCountries.length > 0) {
-        highlightedIndex = 0;
-      }
-      event.preventDefault();
-    }
-    if (event.key === "Enter") {
-      if (
-        highlightedIndex >= 0 &&
-        highlightedIndex < filteredCountries.length
-      ) {
-        selectCountry(filteredCountries[highlightedIndex]);
-        event.preventDefault();
-      } else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
-        selectCountry(filteredCountries[0]);
-        event.preventDefault();
-      }
-    } else if (event.key === "Escape") {
-      showDropdown = false;
-      highlightedIndex = -1;
-    }
-  }
+		if (showDropdown) {
+			switch (event.key) {
+				case "ArrowDown":
+					event.preventDefault();
+					if (filteredCountries.length > 0) {
+						highlightedIndex =
+							(highlightedIndex + 1) % filteredCountries.length;
+						scrollToHighlighted();
+					}
+					break;
+				case "ArrowUp":
+					event.preventDefault();
+					if (filteredCountries.length > 0) {
+						highlightedIndex =
+							highlightedIndex <= 0
+								? filteredCountries.length - 1
+								: highlightedIndex - 1;
+						scrollToHighlighted();
+					}
+					break;
+			}
+		} else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+			showDropdown = true;
+			if (filteredCountries.length > 0) {
+				highlightedIndex = 0;
+			}
+			event.preventDefault();
+		}
+		if (event.key === "Enter") {
+			if (
+				highlightedIndex >= 0 &&
+				highlightedIndex < filteredCountries.length
+			) {
+				selectCountry(filteredCountries[highlightedIndex]);
+				event.preventDefault();
+			} else if (searchTerm.length && filteredCountries.length > 0) {
+				selectCountry(filteredCountries[0]);
+				event.preventDefault();
+			}
+		} else if (event.key === "Escape") {
+			showDropdown = false;
+			highlightedIndex = -1;
+		}
+	}
   function scrollToHighlighted() {
     if (!dropdownEl) return;
     const items = dropdownEl.querySelectorAll("li");
@@ -430,36 +392,50 @@
     }
   }
   function handleInputChange(event) {
-    searchTerm = event.target.value;
-    country = event.target.value;
-    const isDeleting =
-      event.inputType === "deleteContentBackward" ||
-      event.inputType === "deleteContentForward";
-    filterCountriesWithoutAutoSelect();
-    showDropdown = filteredCountries.length > 0;
+        searchTerm = event.target.value;
+        country = event.target.value;
 
-    if (searchTerm.length > 0 && !isDeleting) {
-      const codeSearch = searchTerm.replace("+", "").trim();
-      if (codeSearch.length > 0) {
-        const exactCodeMatches = filteredCountries.filter(
-          (country) => country.code.replace("+", "") === codeSearch,
+        const isDeleting =
+            event.inputType === "deleteContentBackward" ||
+            event.inputType === "deleteContentForward";
+
+        filterCountriesWithoutAutoSelect();
+        showDropdown = true;
+
+        const match = countries.find(
+            (c) => c.name.toLowerCase() === searchTerm.toLowerCase(),
         );
 
-        if (exactCodeMatches.length === 1) {
-          selectCountry(exactCodeMatches[0]);
-          return;
+        if (match) {
+            delete errors.country;
+        } else if (searchTerm.trim().length > 0) {
+            errors.country = "Invalid country selected";
+        } else {
+            delete errors.country;
         }
-      }
 
-      const countriesStartingWith = filteredCountries.filter((country) =>
-        country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
-      );
+        if (searchTerm.length > 0 && !isDeleting) {
+            const codeSearch = searchTerm.replace("+", "").trim();
+            if (codeSearch.length > 0) {
+                const exactCodeMatches = filteredCountries.filter(
+                    (country) => country.code.replace("+", "") === codeSearch,
+                );
 
-      if (countriesStartingWith.length === 1) {
-        selectCountry(countriesStartingWith[0]);
-      }
+                if (exactCodeMatches.length === 1) {
+                    selectCountry(exactCodeMatches[0]);
+                    return;
+                }
+            }
+
+            const countriesStartingWith = filteredCountries.filter((country) =>
+                country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+            );
+
+            if (countriesStartingWith.length === 1) {
+                selectCountry(countriesStartingWith[0]);
+            }
+        }
     }
-  }
   function filterCountriesWithoutAutoSelect() {
     const countriesStartingWith = countries.filter((country) =>
       country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
@@ -555,48 +531,45 @@
     return isValid;
   }
 
-  const handlesubmit = async (data) => {
+const handlesubmit = ({ formData } = {}) => {
     if (!formValid()) {
-      // cancel();
-      return;
+        return;
     }
 
-    try {
-      const result = await submitForm(data);
-      console.log(result, "result");
+    // Only append email if formData exists (from use:enhance)
+    if (formData) {
+        formData.append("email", email);
+    }
 
-      return async ({ result, update }) => {
-        if (result.type === "success") {
-          const status = result.data.status;
-
-          if (status === 1) {
-            form = result.data;
-            await update();
-
-            // thankYouMessageVisible = true;
-            showSuccesDiv = true;
-          } else if (status === 2) {
-            form = result.data;
-            await update();
-
+    return async ({ result, update }) => {
+        try {
+            console.log(result, "result");
+            
+            if (result.type === "success") {
+                const status = result.data.status;
+                
+                if (status === 1) {
+                    form = result.data;
+                    await update();
+                    showSuccesDiv = true;
+                } else if (status === 2) {
+                    form = result.data;
+                    await update();
+                    showFailureDiv = true;
+                } else {
+                    form = result.data;
+                    await update();
+                    showSuccesDiv = true;
+                }
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
             showFailureDiv = true;
-          } else {
-            form = result.data;
-            await update();
-            showSuccesDiv = true;
-          }
         }
-      };
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      // Handle failure actions
-      // loading = false;
-      showFailureDiv = true;
-    }
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
+        
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+};
   const submitForm = async (data) => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -688,6 +661,7 @@
   </div>
 {:else}
   <div class="w-full p-4">
+    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <form
       method="POST"
       action="?/contact"
@@ -714,6 +688,11 @@
               bind:value={selectedOption}
               on:click={toggleDropdownoption}
               on:input={() => validateField("technical_issue")}
+               on:keydown={(event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                    }
+                }}
             />
             {#if isDropdownOpen}
               <div
@@ -761,6 +740,11 @@
                     ? "Please enter a valid assistance "
                     : "";
             }}
+             on:keydown={(event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                    }
+                }}
             class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm"
             required
           ></textarea>
@@ -769,55 +753,7 @@
           {/if}
         </div>
 
-        <!-- <div class="mt-4">
-          <label class="block text-sm pb-2"
-            >Please attach any images or files that may assist in
-            troubleshooting or investigation:</label
-          >
-          <button
-            type="button "
-            on:click={triggerFileInput}
-            class=" text-primary-400 border border-primary-400 mb-4 px-2 rounded-md md:ml-3 hover:text-white hover:bg-primary-400"
-          >
-            Choose Files
-          </button>
-          <input
-            type="file"
-            multiple
-            on:change={handleFileChange}
-            bind:this={fileInputRef}
-            class="hidden"
-          />
 
-          {#each attachments as file, index}
-            <div class="flex items-center mt-2">
-              <span class="mr-2">{file.name}</span>
-              <a
-                href={URL.createObjectURL(file)}
-                download
-                class="text-blue-500 mr-2"
-                ><Icon
-                  icon="line-md:download-loop"
-                  class="w-8 h-5 text-black"
-                /></a
-              >
-              <button
-                type="button"
-                on:click={() => removeAttachment(index)}
-                class="text-red-500"
-                ><Icon
-                  icon="material-symbols:delete"
-                  class="w-8 h-5 text-red"
-                /></button
-              >
-            </div>
-          {/each}
-        </div>
-        <div class="flex justify-center">
-          <p class="text-gray-400 text-sm">
-            Attachments are limited to a combined size of 25MB
-          </p>
-        </div> -->
         <div class="mt-4">
           <!-- svelte-ignore a11y-label-has-associated-control -->
           <label class="block text-sm">*Would you like us to contact you?</label
@@ -832,6 +768,11 @@
                 on:input={() => {
                   validateField("issue");
                   clearError("issue");
+                }}
+                 on:keydown={(event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                    }
                 }}
                 class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500 mr-2"
                 required
@@ -848,6 +789,11 @@
                   validateField("issue");
                   clearError("issue");
                 }}
+                 on:keydown={(event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                    }
+                }}
                 class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500 mr-2"
                 required
               />
@@ -862,6 +808,11 @@
                 on:input={() => {
                   validateField("issue");
                   clearError("issue");
+                }}
+                 on:keydown={(event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                    }
                 }}
                 class="form-radio w-3.5 h-3.5 text-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-primary-500 mr-2"
                 required
@@ -905,6 +856,11 @@
                       ? "Please enter a valid first name"
                       : "";
               }}
+               on:keydown={(event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                    }
+                }}
             />
             {#if errors?.firstName}
               <p class="text-red-500 text-xs mt-1">
@@ -936,6 +892,11 @@
                     ? "Please enter a valid last name"
                     : "";
               }}
+               on:keydown={(event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                    }
+                }}
             />
             {#if errors?.lastName}
               <p class="text-red-500 text-xs mt-1">
@@ -946,12 +907,13 @@
 
           <!-- Email Input -->
           <div>
-            <input type="hidden" name="email" id="email" bind:value={email} />
+
             <form
               action="?/verifyemail"
               bind:this={form3}
               method="POST"
-              use:enhance={({}) => {
+              use:enhance={({formData}) => {
+                formData.append("email",email)
                 return async ({ result }) => {
                   isLoading = false;
                   console.log("result", result);
@@ -1017,6 +979,11 @@
                       emailSent = false;
                       authedUserEmailVerified = false;
                     }}
+                     on:keydown={(event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                    }
+                }}
                   />
                   {#if isLoading}
                     <span
@@ -1077,13 +1044,12 @@
               </div>
             </form>
             {#if emailSent && isOtpVerified === false}
-              <div
-                class="mt-3 "
-              >
+              <div class="mt-3">
                 <form
                   action="?/verifyOtpEmail"
                   method="POST"
-                  use:enhance={() => {
+                  use:enhance={({formData}) => {
+                    formData.append("email",email)
                     return async ({ result }) => {
                       loadingotp = false; // Hide loading spinner when the request is complete
                       if (result.status === 200) {
@@ -1112,12 +1078,7 @@
                   }}
                 >
                   <div class="relative w-full mb-2">
-                    <input
-                      type="hidden"
-                      name="email"
-                      id="email"
-                      bind:value={email}
-                    />
+                   
                     <input
                       type="text"
                       name="enteredOtp"
@@ -1130,6 +1091,11 @@
                           .replace(/\D/g, "")
                           .slice(0, 6);
                       }}
+                       on:keydown={(event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                    }
+                }}
                     />
                     <button
                       type="submit"
@@ -1166,23 +1132,7 @@
               </div>
             {/if}
           </div>
-          <!-- Company Name Input -->
-          <!-- <div class="flex flex-col">
-      <input
-        name="companyName"
-        type="text"
-        id="companyName"
-        placeholder="Company/Institution Name"
-        bind:value={companyName}
-        required
-        class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
-        on:input={() => validateField('companyName')}
-      />
-      
-      </div>
-      {#if errors.companyName}
-        <p class="text-red-500 text-xs mt-1">{errors.companyName}</p>
-      {/if} -->
+
 
           <div class="flex flex-col">
             <input
@@ -1199,14 +1149,13 @@
 
                 validateField("companyName");
 
-                errors.companyName = !companyName
-                  ? "*Required"
-                  : companyName.length < 3
-                    ? "Must be at least 3 characters"
-                    : !/^[A-Za-z@.,!#$%^&*(_)+\-\s]+$/.test(companyName)
-                      ? "Please enter a valid company name"
-                      : "";
+               
               }}
+               on:keydown={(event) => {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                    }
+                }}
             />
             {#if errors?.companyName}
               <p class="text-red-500 text-xs mt-1">
@@ -1226,11 +1175,13 @@
                 placeholder="Search Country"
                 on:input={handleInputChange}
                 on:click={toggleDropdown}
+                on:keydown={handleKeyDown}
                 on:input={(e) => {
                   country = country.trim();
 
                   validateField("country");
                 }}
+                
                 autocomplete="off"
                 class="flex-1 outline-none w-full border border-gray-300 rounded focus:ring-0 focus:border-primary-400 p-2 text-sm"
                 required

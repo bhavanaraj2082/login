@@ -190,7 +190,8 @@ export const actions = {
             priceone: product.priceone || (processedPricing[0]?.inr || processedPricing[0]?.INR || ''),
             size: product.size || null,
             parsedSize: parsedQuery.size,
-            relevance: relevance
+            relevance: relevance,
+            sku: product.sku
           };
         });
 

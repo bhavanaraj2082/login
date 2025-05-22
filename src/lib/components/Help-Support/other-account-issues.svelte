@@ -208,13 +208,17 @@
 			}
 		}
 
-		if (!fieldName || fieldName === "country") {
-			if (!country) {
-				errors.country = "*Required";
-			} else {
-				delete errors.country;
-			}
-		}
+		 if (!fieldName || fieldName === "country") {
+            if (!country) {
+                errors.country = "*Required";
+            } else if (!country || country === "country") {
+                if (!country || country === "") {
+                    errors.country = "Please select a country";
+                } else {
+                    delete errors.country;
+                }
+            }
+        }
 
 		if (!fieldName || fieldName === "accountNumber") {
 			if (!accountNumber || !/^[a-zA-Z0-9]+$/.test(accountNumber)) {
@@ -223,17 +227,19 @@
 				delete errors.accountNumber;
 			}
 		}
-		if (!fieldName || fieldName === "companyName") {
-			if (!companyName) {
-				errors.companyName = "*Required";
-			} else if (companyName.length < 3) {
-				errors.companyName = "Must be at least 3 characters.";
-			} else if (!/^[A-Za-z0-9@.,!#$%^&*(_)+\-\s]+$/.test(companyName)) {
-				errors.companyName = "Please enter a valid company name.";
-			} else {
-				delete errors.companyName;
-			}
-		}
+        if (!fieldName || fieldName === "companyName") {
+            if (!companyName) {
+                errors.companyName = "*Required";
+            } else if (companyName.length < 3) {
+                errors.companyName = "Company name must be at least 3 characters";
+            } else if (!/^[A-Za-z0-9@.,\s&-]+$/.test(companyName)) {
+                errors.companyName = "Please enter a valid company name";
+            } else if (/^\d+$/.test(companyName)) {
+                errors.companyName = "Company name cannot contain only numbers";
+            } else {
+                delete errors.companyName;
+            }
+        }
 		if (fieldName === "technical_issue") {
 			if (!selectedOption) {
 				errors.technical_issue = "Please select an option";
@@ -272,7 +278,7 @@
 	function selectCountry(selectedCountry) {
 		country = selectedCountry.name;
 		// filteredCountries = countries;
-		searchTerm = `${selectedCountry.name} `;
+		searchTerm = selectedCountry.name;
 		showDropdown = false;
 		highlightedIndex = -1;
 		validateField("country");
@@ -401,14 +407,28 @@
             }
         }
     }
-    function handleInputChange(event) {
+  function handleInputChange(event) {
         searchTerm = event.target.value;
         country = event.target.value;
+
         const isDeleting =
             event.inputType === "deleteContentBackward" ||
             event.inputType === "deleteContentForward";
+
         filterCountriesWithoutAutoSelect();
-        showDropdown = filteredCountries.length > 0;
+        showDropdown = true;
+
+        const match = countries.find(
+            (c) => c.name.toLowerCase() === searchTerm.toLowerCase(),
+        );
+
+        if (match) {
+            delete errors.country;
+        } else if (searchTerm.trim().length > 0) {
+            errors.country = "Invalid country selected";
+        } else {
+            delete errors.country;
+        }
 
         if (searchTerm.length > 0 && !isDeleting) {
             const codeSearch = searchTerm.replace("+", "").trim();
@@ -526,46 +546,42 @@ codeMatches.forEach(country => {
 		return isValid;
 	}
 
-	const handlesubmit = async (data) => {
+	const handlesubmit = ({ formData } = {}) => {
 		if (!formValid()) {
 			// cancel();
 			return;
 		}
-
-		try {
-			const result = await submitForm(data);
-			console.log(result, "result");
-
-			return async ({ result, update }) => {
-				if (result.type === "success") {
-					const status = result.data.status;
-
-					if (status === 1) {
-						form = result.data;
-						await update();
-
-						// thankYouMessageVisible = true;
-						showSuccesDiv = true;
-					} else if (status === 2) {
-						form = result.data;
-						await update();
-
-						showFailureDiv = true;
-					} else {
-						form = result.data;
-						await update();
-						showSuccesDiv = true;
-					}
-				}
-			};
-		} catch (error) {
-			console.error("Error submitting form:", error);
-			// Handle failure actions
-			// loading = false;
-			showFailureDiv = true;
-		}
-
-		window.scrollTo({ top: 0, behavior: "smooth" });
+if(formData){
+	formData.append("email",email);
+}
+		   return async ({ result, update }) => {
+        try {
+            console.log(result, "result");
+            
+            if (result.type === "success") {
+                const status = result.data.status;
+                
+                if (status === 1) {
+                    form = result.data;
+                    await update();
+                    showSuccesDiv = true;
+                } else if (status === 2) {
+                    form = result.data;
+                    await update();
+                    showFailureDiv = true;
+                } else {
+                    form = result.data;
+                    await update();
+                    showSuccesDiv = true;
+                }
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            showFailureDiv = true;
+        }
+        
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 	};
 
 	const submitForm = async (data) => {
@@ -825,17 +841,13 @@ codeMatches.forEach(country => {
 							{/if}
 						</div>
 						<div>
-							<input
-								type="hidden"
-								name="email"
-								id="email"
-								bind:value={email}
-							/>
+							
 							<form
 								action="?/verifyemail"
 								bind:this={form3}
 								method="POST"
-								use:enhance={({}) => {
+								use:enhance={({formData}) => {
+									formData.append("email",email)
 									return async ({ result }) => {
 										isLoading = false;
 										console.log("result", result);
@@ -988,7 +1000,8 @@ codeMatches.forEach(country => {
 									<form
 										action="?/verifyOtpEmail"
 										method="POST"
-										use:enhance={() => {
+										use:enhance={({formData}) => {
+											formData.append("email",email)
 											return async ({ result }) => {
 												loadingotp = false; // Hide loading spinner when the request is complete
 												if (result.status === 200) {
@@ -1032,12 +1045,7 @@ codeMatches.forEach(country => {
 										}}
 									>
 										<div class="relative w-full mb-2">
-											<input
-												type="hidden"
-												name="email"
-												id="email"
-												bind:value={email}
-											/>
+										
 											<input
 												type="text"
 												name="enteredOtp"
@@ -1113,15 +1121,7 @@ codeMatches.forEach(country => {
 
 									validateField("companyName");
 
-									errors.companyName = !companyName
-										? "*Required"
-										: companyName.length < 3
-											? "Must be at least 3 characters"
-											: !/^[A-Za-z@.,!#$%^&*(_)+\-\s]+$/.test(
-														companyName,
-												  )
-												? "Please enter a valid company name"
-												: "";
+									
 								}}
 
 
