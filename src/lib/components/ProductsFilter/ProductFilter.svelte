@@ -75,7 +75,7 @@ function handleMouseLeave() {
       total = productCount
     }
     $: totalPages = Math.ceil(total/10);
-   $: console.log(total,totalPages,productCount,totalCount);
+  // $: console.log(total,totalPages,productCount,totalCount);
     let tog= null
     let form;
     let selectedSort =''
@@ -341,20 +341,25 @@ function handleMouseLeave() {
 
   let typingTimeout;
   let searchLoading = false
+
   const handleSearch = (searchName) => {
+    clearTimeout(typingTimeout);
     searchName = searchName.trim()
+    const newUrl = new URL(window.location.href);
+    [...newUrl.searchParams.keys()].forEach(name => {
+    newUrl.searchParams.delete(name);
+    });
+
+    selectedValues = {}
     if(searchName.length < 3) return
     try{
       if(/<\/?script\b[^>]*>/.test(searchName)) return
-    clearTimeout(typingTimeout);
-    const newUrl = new URL(window.location.href);
-    typingTimeout = setTimeout( async() => {
-    searchLoading = true
+    
+    typingTimeout = setTimeout(() => {
+       searchLoading = true
+       
         if (searchName.length >= 3) {
-          newUrl.searchParams.forEach((value, name) => {
-              newUrl.searchParams.delete(name);
-          });
-          selectedValues = {}
+            
             newUrl.searchParams.set('search', searchName);
         } else {
             newUrl.searchParams.delete('search');
@@ -362,7 +367,7 @@ function handleMouseLeave() {
         }
         newUrl.searchParams.set('page', '1');
 
-        await goto(newUrl.toString(), {
+       goto(newUrl.toString(), {
             invalidateAll: true, 
             keepfocus: true, 
             replaceState: true, 
@@ -381,6 +386,9 @@ function handleMouseLeave() {
   const searchClear = ()=>{
     search = null
     const newUrl = new URL(window.location.href);
+     newUrl.searchParams.forEach((value, name) => {
+              newUrl.searchParams.delete(name);
+     });
     newUrl.searchParams.delete('search');
     goto(newUrl.toString(), {
         invalidateAll: true, 
@@ -444,7 +452,8 @@ function handleMouseLeave() {
 
   function handleCheckboxChange(index, value,key, event) {
     const newUrl = new URL(window.location.href);
-    
+    newUrl.searchParams.delete("search")
+    search = ''
     if (event.target.checked) {
       
       if (!selectedValues[key]) {
@@ -530,6 +539,7 @@ function handleMouseLeave() {
                 localStorage.removeItem("specs")
                 selectedValues = {}
                 selectedSort = ""
+                search = ""
                 selectedManufacturer = null
                 goto(`/products/${categoryName}/${subCategoryName}`)
                 }} class="{Object.entries(selectedValues).length > 0 || selectedManufacturer !== null || selectedSort.length ? "" : "hidden"} bg-primary-500 text-[11px] px-2 py-1 rounded-md text-white font-normal">Clear All</button>
@@ -552,9 +562,9 @@ function handleMouseLeave() {
                <input type="text" bind:value={selectedManufacturer}
                       placeholder="Search manufacturers..." 
                       on:input={e => handleManufacturer(e.target.value)} 
-                      class="w-full text-xs rounded-md border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
+                      class="w-full {searchManufacture.length <5 ? "hidden" : ""} text-xs rounded-md border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
                       {#if loading}
-                        <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
+                        <Icon icon="line-md:loading-loop" class=" absolute {searchManufacture.length <5 ? "hidden" : ""} right-2 top-2.5 text-xl text-primary-500"/>
                       {/if}
                <div class="space-y-2.5 py-2.5 border-1 rounded-md px-2 overflow-y-auto my-1 scroll">
                    {#if !searchManufacture.length}

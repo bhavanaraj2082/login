@@ -29,6 +29,7 @@
 	let isDeleteAll = false
 	let tog = null
 	let checkoutDisabled = false
+	let isDeleteOffered = false
 	let selectedId = ''
 
 	$: cartData = data?.cart[0]?.cartItems || [];
@@ -382,6 +383,7 @@
 			invalidate("data:cart")
 
 		})
+		isDeleteOffered = false
 	};
 
 	const emptyCart = () => {
@@ -546,29 +548,6 @@
 									</div>
 									</div>
 								  {/if}
-									<!-- {#if showimage}
-										<div
-										on:click={(e) => {
-											if (e.target === e.currentTarget) {
-												showimage = false;
-											}
-										}}
-										class="fixed inset-0 bg-gray-900 bg-opacity-25 backdrop-blur-xs flex items-center justify-center z-50">
-										<div class="bg-white rounded-lg shadow-md p-6 mx-4 w-full md:w-1/2 lg:w-1/3">
-											<div class="flex justify-end items-center mb-2">
-												<button
-													on:click={closePopup}
-													class="rounded-md hover:bg-slate-200 duration-200"
-												>
-													<Icon icon="si:close-duotone" class="text-3xl text-red-600" />
-												</button>
-											</div>
-										   <img src="{PUBLIC_IMAGE_URL}/{selectedImage}" 
-											onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
-											alt="image" class="" />
-										</div>
-									</div>
-								    {/if} -->
 								</div>
 								<div class="ml-2">
 									<a href="/products/details/{item.productDetails?.productNumber}" class="text-xs hover:text-primary-500 hover:underline text-black font-semibold">{item?.productDetails?.productNumber}</a>
@@ -648,15 +627,47 @@
 									    </div>
 							        	<button
 							        		type="button"
-							        		on:click={() => removeItem(item?.productDetails?.productNumber,item._id,index)}
+							        		on:click={() =>{
+												if(item.isCart || item.isQuote){
+										            isDeleteOffered = true
+									            }else{
+									            	removeItem(item?.productDetails?.productNumber,item._id,index)
+									            }
+											}}
 							        		class=" text-lg sm:hidden text-primary-600"
 							        	>
 							        		<Icon icon="mdi:delete-forever" class=" text-xl" />
 							        	</button>
+										{#if isDeleteOffered}
+	                                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+	                                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+	                                        <div
+	                                        	on:click={(e) => {
+	                                        		if (e.target === e.currentTarget) {
+	                                        			isDeleteOffered = false;
+	                                        		}
+	                                        	}}
+	                                        	class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+	                                        	<div class="bg-white py-6 px-4 rounded flex flex-col shadow-lg w-11/12 sm:w-2/4 lg:w-96 space-y-2">
+	                                        		<p class=" text-lg font-medium">Are you sure you want to delete a offered Product?</p>
+	                                        		<div class="flex items-center gap-5">
+	                                        			<button class=" py-2 bg-primary-600 w-full rounded-md text-white font-medium text-sm" on:click={() =>removeItem(item?.productDetails?.productNumber,item._id,index)}>Delete</button>
+	                                        			<button class=" py-2 bg-white w-full border-1 border-primary-600 rounded-md text-primary-600 font-medium text-sm" on:click={() => (isDeleteOffered = false)}>Cancel</button>
+	                                        		</div>
+	                                        	</div>
+	                                        </div>
+                                        {/if}
 							        </div>
 								</div>
 								<button
-							        type="button" on:click={() => removeItem(item?.productDetails?.productNumber,item._id,index)}
+							        type="button" 
+									on:click={() =>{
+										if(item.isCart || item.isQuote){
+										    isDeleteOffered = true
+									    }else{
+									    	removeItem(item?.productDetails?.productNumber,item._id,index)
+									    }
+									}}
 							        class=" text-lg hidden sm:block text-primary-600">
 							        <Icon icon="mdi:delete-forever" class=" text-2xl" />
 							    </button>

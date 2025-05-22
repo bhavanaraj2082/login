@@ -29,10 +29,10 @@
 	let gstNumber = ''
 	let orderLoad = false
 	$: if (gstNumber){
-	  gstNumber	= userData?.gstNumber || browser ? localStorage.getItem("num") : ""
+	  gstNumber	= userData?.gstNumber || browser && localStorage.getItem("num") ? localStorage.getItem("num") : ""
 	} 
 	onMount(()=>{
-	  gstNumber	= userData?.gstNumber || browser ? localStorage.getItem("num") : ""
+	  gstNumber	= userData?.gstNumber || browser && localStorage.getItem("num") ? localStorage.getItem("num") : ""
       validateTax(gstNumber)
 	})
 	let checkout
