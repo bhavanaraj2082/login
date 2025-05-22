@@ -20,7 +20,7 @@
 	let displayMessage = "";
 	let authedUserEmailVerified = data?.profile?.isEmailVerified;
 	let highlightedIndex = -1;
-    let dropdownEl;
+	let dropdownEl;
 	let searchTerm = "";
 	let errors = {};
 	let products = [{ itemNumber: "", quantity: "" }];
@@ -165,10 +165,9 @@
 		}
 
 		if (!fieldName || fieldName === "email") {
-			if(!email){
-				errors.email="*Required"
-			} else
-			if (
+			if (!email) {
+				errors.email = "*Required";
+			} else if (
 				!email ||
 				!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
 			) {
@@ -179,51 +178,54 @@
 		}
 
 		if (!fieldName || fieldName === "phoneNumber") {
-			if(!phoneNumber){
-errors.phoneNumber = "*Required"
+			if (!phoneNumber) {
+				errors.phoneNumber = "*Required";
+			} else if (!country) {
+				errors.phoneNumber =
+					"Please select the country before entering the phone number";
+				return;
 			}
-      else      if (!country) {
-                errors.phoneNumber =
-                    "Please select the country before entering the phone number";
-                return;
-            }
-            if (!phoneNumber || phoneNumber === "") {
-                errors.phone = "Required for the selected country";
-            } else {
-                const countryDetails = getCountryByCode(country);
+			if (!phoneNumber || phoneNumber === "") {
+				errors.phone = "Required for the selected country";
+			} else {
+				const countryDetails = getCountryByCode(country);
 
-                if (!countryDetails) {
-                    errors.phoneNumber =
-                        "Invalid country selected. Please reselect country.";
-                    errors.country = "Invalid country selected";
+				if (!countryDetails) {
+					errors.phoneNumber =
+						"Invalid country selected. Please reselect country.";
+					errors.country = "Invalid country selected";
+				} else {
+					const phonePattern = getPhonePattern(country);
+					if (!phonePattern) {
+						errors.phoneNumber =
+							"Phone number pattern for country not found";
+					} else {
+						const phoneRegex = new RegExp(phonePattern);
+						if (!phoneRegex.test(phoneNumber)) {
+							const countryName =
+								countryDetails.name ||
+								country ||
+								"selected country";
+							errors.phoneNumber = `Please enter a valid phone number for ${countryName}.`;
+						} else {
+							delete errors.phoneNumber;
+						}
+					}
+				}
+			}
+		}
+
+	 if (!fieldName || fieldName === "country") {
+            if (!country) {
+                errors.country = "*Required";
+            } else if (!country || country === "country") {
+                if (!country || country === "") {
+                    errors.country = "Please select a country";
                 } else {
-                    const phonePattern = getPhonePattern(country);
-                    if (!phonePattern) {
-                        errors.phoneNumber =
-                            "Phone number pattern for country not found";
-                    } else {
-                        const phoneRegex = new RegExp(phonePattern);
-                        if (!phoneRegex.test(phoneNumber)) {
-                            const countryName =
-                                countryDetails.name ||
-                                country ||
-                                "selected country";
-                            errors.phoneNumber = `Please enter a valid phone number for ${countryName}.`;
-                        } else {
-                            delete errors.phoneNumber;
-                        }
-                    }
+                    delete errors.country;
                 }
             }
         }
-
-		if (!fieldName || fieldName === "country") {
-			if (!country) {
-				errors.country = "*Required";
-			} else {
-				delete errors.country;
-			}
-		}
 
 		if (!fieldName || fieldName === "accountNumber") {
 			if (!accountNumber || !/^[a-zA-Z0-9]+$/.test(accountNumber)) {
@@ -232,18 +234,20 @@ errors.phoneNumber = "*Required"
 				delete errors.accountNumber;
 			}
 		}
-		if (!fieldName || fieldName === "companyName") {
-			if (!companyName) {
-				errors.companyName = "*Required";
-			} else if (companyName.length < 3) {
-				errors.companyName = "Must be at least 3 characters.";
-			} else if (!/^[A-Za-z@.,!#$%^&*(_)+\-\s]+$/.test(companyName)) {
-				errors.companyName = "Please enter a valid company name.";
-			} else {
-				delete errors.companyName;
-			}
-		}
-
+									
+        if (!fieldName || fieldName === "companyName") {
+            if (!companyName) {
+                errors.companyName = "*Required";
+            } else if (companyName.length < 3) {
+                errors.companyName = "Company name must be at least 3 characters";
+            } else if (!/^[A-Za-z0-9@.,\s&-]+$/.test(companyName)) {
+                errors.companyName = "Please enter a valid company name";
+            } else if (/^\d+$/.test(companyName)) {
+                errors.companyName = "Company name cannot contain only numbers";
+            } else {
+                delete errors.companyName;
+            }
+        }
 
 		if (fieldName === "technical_issue") {
 			if (!selectedOption) {
@@ -252,7 +256,6 @@ errors.phoneNumber = "*Required"
 				delete errors.technical_issue;
 			}
 		}
-
 
 		if (!fieldName || fieldName === "assistance") {
 			if (!assistance) {
@@ -264,13 +267,11 @@ errors.phoneNumber = "*Required"
 				/<script.*?>.*?<\/script>/i.test(assistance) ||
 				/<[^>]*>/i.test(assistance)
 			) {
-				errors.assistance =
-					"Please enter valid assistance details.";
+				errors.assistance = "Please enter valid assistance details.";
 			} else {
 				delete errors.assistance;
 			}
 		}
-
 
 		if (!fieldName || fieldName === "issue") {
 			if (!issue) {
@@ -282,57 +283,57 @@ errors.phoneNumber = "*Required"
 			}
 		}
 		if (!fieldName || fieldName.startsWith("itemNumber")) {
-        let index = 0;
-        if (fieldName !== "itemNumber") {
-            // Extract index from fieldName if it's in form "itemNumber-X"
-            const matches = fieldName.match(/itemNumber-(\d+)/);
-            if (matches && matches[1]) {
-                index = parseInt(matches[1]);
-            }
-        }
-        
-        const itemNumber = products[index]?.itemNumber;
-        const errorKey = `itemNumber-${index}`;
-        
-        if (!itemNumber) {
-            errors[errorKey] = "*Required";
-        } else if (!/^[a-zA-Z0-9\-.,;"']+$/.test(itemNumber)) {
-            errors[errorKey] = "Please enter a valid item number.";
-        } else {
-            delete errors[errorKey];
-        }
-    }
+			let index = 0;
+			if (fieldName !== "itemNumber") {
+				// Extract index from fieldName if it's in form "itemNumber-X"
+				const matches = fieldName.match(/itemNumber-(\d+)/);
+				if (matches && matches[1]) {
+					index = parseInt(matches[1]);
+				}
+			}
 
-    // Add validation for quantity with index handling
-    if (!fieldName || fieldName.startsWith("quantity")) {
-        let index = 0;
-        if (fieldName !== "quantity") {
-            // Extract index from fieldName if it's in form "quantity-X"
-            const matches = fieldName.match(/quantity-(\d+)/);
-            if (matches && matches[1]) {
-                index = parseInt(matches[1]);
-            }
-        }
-        
-        const quantity = products[index]?.quantity;
-        const errorKey = `quantity-${index}`;
-        
-        if (!quantity) {
-            errors[errorKey] = "*Required";
-        } else if (!/^[0-9]+$/.test(quantity)) {
-            errors[errorKey] = "Only numbers are allowed.";
-        } else if (parseInt(quantity) < 1) {
-            errors[errorKey] = "Quantity must be at least 1.";
-        } else {
-            delete errors[errorKey];
-        }
-    }
+			const itemNumber = products[index]?.itemNumber;
+			const errorKey = `itemNumber-${index}`;
+
+			if (!itemNumber) {
+				errors[errorKey] = "*Required";
+			} else if (!/^[a-zA-Z0-9\-.,;"']+$/.test(itemNumber)) {
+				errors[errorKey] = "Please enter a valid item number.";
+			} else {
+				delete errors[errorKey];
+			}
+		}
+
+		// Add validation for quantity with index handling
+		if (!fieldName || fieldName.startsWith("quantity")) {
+			let index = 0;
+			if (fieldName !== "quantity") {
+				// Extract index from fieldName if it's in form "quantity-X"
+				const matches = fieldName.match(/quantity-(\d+)/);
+				if (matches && matches[1]) {
+					index = parseInt(matches[1]);
+				}
+			}
+
+			const quantity = products[index]?.quantity;
+			const errorKey = `quantity-${index}`;
+
+			if (!quantity) {
+				errors[errorKey] = "*Required";
+			} else if (!/^[0-9]+$/.test(quantity)) {
+				errors[errorKey] = "Only numbers are allowed.";
+			} else if (parseInt(quantity) < 1) {
+				errors[errorKey] = "Quantity must be at least 1.";
+			} else {
+				delete errors[errorKey];
+			}
+		}
 	};
 
 	function selectCountry(selectedCountry) {
 		country = selectedCountry.name;
 		// filteredCountries = countries;
-		searchTerm = `${selectedCountry.name} `;
+		searchTerm = selectedCountry.name;
 		showDropdown = false;
 		highlightedIndex = -1;
 		validateField("country");
@@ -363,109 +364,123 @@ errors.phoneNumber = "*Required"
 		}
 	}
 	function handleKeyDown(event) {
-        const exactCountryMatch = countries.some(
-            (c) => c.name === country && c.name === searchTerm,
-        );
-        if (
-            exactCountryMatch &&
-            !(
-                event.key === "Backspace" ||
-                event.key === "Delete" ||
-                event.key === "ArrowLeft" ||
-                event.key === "ArrowRight" ||
-                event.key === "Home" ||
-                event.key === "End" ||
-                event.key === "Tab" ||
-                event.key === "Escape" ||
-                event.ctrlKey ||
-                event.key === "ArrowUp" ||
-                event.key === "ArrowDown"
-            )
-        ) {
-            const input = document.querySelector('input[name="country"]');
-            if (
-                input &&
-                (input.selectionStart !== input.selectionEnd ||
-                    input.selectionStart === 0)
-            ) {
-                return true;
-            }
-            event.preventDefault();
-            return false;
-        }
+		const exactCountryMatch = countries.some(
+			(c) => c.name === country && c.name === searchTerm,
+		);
+		if (
+			exactCountryMatch &&
+			!(
+				event.key === "Backspace" ||
+				event.key === "Delete" ||
+				event.key === "ArrowLeft" ||
+				event.key === "ArrowRight" ||
+				event.key === "Home" ||
+				event.key === "End" ||
+				event.key === "Tab" ||
+				event.key === "Escape" ||
+				event.ctrlKey ||
+				event.key === "ArrowUp" ||
+				event.key === "ArrowDown"
+			)
+		) {
+			const input = document.querySelector('input[name="country"]');
+			if (
+				input &&
+				(input.selectionStart !== input.selectionEnd ||
+					input.selectionStart === 0)
+			) {
+				return true;
+			}
+			event.preventDefault();
+			return false;
+		}
 
-        if (showDropdown) {
-            switch (event.key) {
-                case "ArrowDown":
-                    event.preventDefault();
-                    if (filteredCountries.length > 0) {
-                        highlightedIndex =
-                            (highlightedIndex + 1) % filteredCountries.length;
-                        scrollToHighlighted();
-                    }
-                    break;
-                case "ArrowUp":
-                    event.preventDefault();
-                    if (filteredCountries.length > 0) {
-                        highlightedIndex =
-                            highlightedIndex <= 0
-                                ? filteredCountries.length - 1
-                                : highlightedIndex - 1;
-                        scrollToHighlighted();
-                    }
-                    break;
-            }
-        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-            showDropdown = true;
-            if (filteredCountries.length > 0) {
-                highlightedIndex = 0;
-            }
-            event.preventDefault();
-        }
-        if (event.key === "Enter") {
-            if (
-                highlightedIndex >= 0 &&
-                highlightedIndex < filteredCountries.length
-            ) {
-                selectCountry(filteredCountries[highlightedIndex]);
-                event.preventDefault();
-            } else if (searchTerm&& filteredCountries.length > 0) {
-                selectCountry(filteredCountries[0]);
-                event.preventDefault();
-            }
-        } else if (event.key === "Escape") {
-            showDropdown = false;
-            highlightedIndex = -1;
-        }
-    }
-    function scrollToHighlighted() {
-        if (!dropdownEl) return;
-        const items = dropdownEl.querySelectorAll("li");
-        if (items[highlightedIndex]) {
-            items[highlightedIndex].scrollIntoView({
-                block: "nearest",
-            });
-        }
-    }
-    function toggleDropdown() {
-        showDropdown = !showDropdown;
-        if (showDropdown) {
-            if (country.length > 0) {
-                searchTerm = country;
-                filterCountriesWithoutAutoSelect();
-            } else {
-                filteredCountries = countries;
-            }
-        }
-    }
-    function handleInputChange(event) {
+		if (showDropdown) {
+			switch (event.key) {
+				case "ArrowDown":
+					event.preventDefault();
+					if (filteredCountries.length > 0) {
+						highlightedIndex =
+							(highlightedIndex + 1) % filteredCountries.length;
+						scrollToHighlighted();
+					}
+					break;
+				case "ArrowUp":
+					event.preventDefault();
+					if (filteredCountries.length > 0) {
+						highlightedIndex =
+							highlightedIndex <= 0
+								? filteredCountries.length - 1
+								: highlightedIndex - 1;
+						scrollToHighlighted();
+					}
+					break;
+			}
+		} else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+			showDropdown = true;
+			if (filteredCountries.length > 0) {
+				highlightedIndex = 0;
+			}
+			event.preventDefault();
+		}
+		if (event.key === "Enter") {
+			if (
+				highlightedIndex >= 0 &&
+				highlightedIndex < filteredCountries.length
+			) {
+				selectCountry(filteredCountries[highlightedIndex]);
+				event.preventDefault();
+			} else if (searchTerm && filteredCountries.length > 0) {
+				selectCountry(filteredCountries[0]);
+				event.preventDefault();
+			}
+		} else if (event.key === "Escape") {
+			showDropdown = false;
+			highlightedIndex = -1;
+		}
+	}
+	function scrollToHighlighted() {
+		if (!dropdownEl) return;
+		const items = dropdownEl.querySelectorAll("li");
+		if (items[highlightedIndex]) {
+			items[highlightedIndex].scrollIntoView({
+				block: "nearest",
+			});
+		}
+	}
+	function toggleDropdown() {
+		showDropdown = !showDropdown;
+		if (showDropdown) {
+			if (country.length > 0) {
+				searchTerm = country;
+				filterCountriesWithoutAutoSelect();
+			} else {
+				filteredCountries = countries;
+			}
+		}
+	}
+  function handleInputChange(event) {
         searchTerm = event.target.value;
         country = event.target.value;
+
         const isDeleting =
             event.inputType === "deleteContentBackward" ||
             event.inputType === "deleteContentForward";
+
         filterCountriesWithoutAutoSelect();
-        showDropdown = filteredCountries.length > 0;
+        showDropdown = true;
+
+        const match = countries.find(
+            (c) => c.name.toLowerCase() === searchTerm.toLowerCase(),
+        );
+
+        if (match) {
+            delete errors.country;
+        } else if (searchTerm.trim().length > 0) {
+            errors.country = "Invalid country selected";
+        } else {
+            delete errors.country;
+        }
 
         if (searchTerm.length > 0 && !isDeleting) {
             const codeSearch = searchTerm.replace("+", "").trim();
@@ -491,27 +506,30 @@ errors.phoneNumber = "*Required"
     }
 
 	function filterCountriesWithoutAutoSelect() {
+		const countriesStartingWith = countries.filter((country) =>
+			country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+		);
 
-const countriesStartingWith = countries.filter(
-    (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-);
+		const countriesContaining = countries.filter(
+			(country) =>
+				!country.name
+					.toLowerCase()
+					.startsWith(searchTerm.toLowerCase()) &&
+				country.name.toLowerCase().includes(searchTerm.toLowerCase()),
+		);
 
-const countriesContaining = countries.filter(
-    (country) => 
-        !country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) && 
-        country.name.toLowerCase().includes(searchTerm.toLowerCase())
-);
-
-filteredCountries = [...countriesStartingWith, ...countriesContaining];
-const codeMatches = countries.filter(
-    (country) => country.code.replace('+', '').includes(searchTerm.replace('+', '').toLowerCase())
-);
-codeMatches.forEach(country => {
-    if (!filteredCountries.some(c => c.name === country.name)) {
-        filteredCountries.push(country);
-    }
-});
-}
+		filteredCountries = [...countriesStartingWith, ...countriesContaining];
+		const codeMatches = countries.filter((country) =>
+			country.code
+				.replace("+", "")
+				.includes(searchTerm.replace("+", "").toLowerCase()),
+		);
+		codeMatches.forEach((country) => {
+			if (!filteredCountries.some((c) => c.name === country.name)) {
+				filteredCountries.push(country);
+			}
+		});
+	}
 
 	let filteredCountries = countries;
 	let showDropdown = false;
@@ -575,55 +593,94 @@ codeMatches.forEach(country => {
 		validateField("companyName");
 		validateField("country");
 		validateField("quantity");
-		validateField("itemNumber")
+		validateField("itemNumber");
 
 		const isValid = Object.keys(errors).length === 0;
 
 		return isValid;
 	}
 
-	const handlesubmit = async (data) => {
-		if (!formValid()) {
-			// cancel();
-			return;
-		}
+	// const handlesubmit = async (data) => {
+	// 	if (!formValid()) {
+	// 		// cancel();
+	// 		return;
+	// 	}
 
-		try {
-			const result = await submitForm(data);
-			console.log(result, "result");
+	// 	try {
+	// 		const result = await submitForm(data);
+	// 		console.log(result, "result");
 
-			return async ({ result, update }) => {
-				if (result.type === "success") {
-					const status = result.data.status;
+	// 		return async ({ result, update }) => {
+	// 			if (result.type === "success") {
+	// 				const status = result.data.status;
 
-					if (status === 1) {
-						form = result.data;
-						await update();
+	// 				if (status === 1) {
+	// 					form = result.data;
+	// 					await update();
 
-						// thankYouMessageVisible = true;
-						showSuccesDiv = true;
-					} else if (status === 2) {
-						form = result.data;
-						await update();
+	// 					// thankYouMessageVisible = true;
+	// 					showSuccesDiv = true;
+	// 				} else if (status === 2) {
+	// 					form = result.data;
+	// 					await update();
 
-						showFailureDiv = true;
-					} else {
-						form = result.data;
-						await update();
-						showSuccesDiv = true;
-					}
-				}
-			};
-		} catch (error) {
-			console.error("Error submitting form:", error);
-			// Handle failure actions
-			// loading = false;
-			showFailureDiv = true;
-		}
+	// 					showFailureDiv = true;
+	// 				} else {
+	// 					form = result.data;
+	// 					await update();
+	// 					showSuccesDiv = true;
+	// 				}
+	// 			}
+	// 		};
+	// 	} catch (error) {
+	// 		console.error("Error submitting form:", error);
+	// 		// Handle failure actions
+	// 		// loading = false;
+	// 		showFailureDiv = true;
+	// 	}
 
-		window.scrollTo({ top: 0, behavior: "smooth" });
-	};
+	// 	window.scrollTo({ top: 0, behavior: "smooth" });
+	// };
+const handlesubmit = ({ formData } = {}) => {
+    if (!formValid()) {
+        return;
+    }
 
+    // Only append email if formData exists (from use:enhance)
+    if (formData) {
+        formData.append("email", email);
+		formData.append("products",JSON.stringify(products))
+    }
+
+    return async ({ result, update }) => {
+        try {
+            console.log(result, "result");
+            
+            if (result.type === "success") {
+                const status = result.data.status;
+                
+                if (status === 1) {
+                    form = result.data;
+                    await update();
+                    showSuccesDiv = true;
+                } else if (status === 2) {
+                    form = result.data;
+                    await update();
+                    showFailureDiv = true;
+                } else {
+                    form = result.data;
+                    await update();
+                    showSuccesDiv = true;
+                }
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            showFailureDiv = true;
+        }
+        
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+};
 	const submitForm = async (data) => {
 		return new Promise((resolve) => {
 			setTimeout(() => {
@@ -640,7 +697,8 @@ codeMatches.forEach(country => {
 	let isDataAvailable = false;
 	onMount(() => {
 		if (data && data.profile) {
-			firstName = `${data.profile.firstName || data?.authedUser.username || ""} `.trim();
+			firstName =
+				`${data.profile.firstName || data?.authedUser.username || ""} `.trim();
 			lastName = `${data.profile.lastName || ""}`.trim();
 			email = data.profile.email || "";
 			phoneNumber = data.profile.cellPhone || "";
@@ -745,79 +803,85 @@ codeMatches.forEach(country => {
 				<h3 class="block mb-2 text-sm">
 					Please provide the following product information
 				</h3>
-{#each products as product, index}
-    <div class="mb-4 flex flex-col items-start">
-        <div class="w-full lg:w-3/4 md:w-3/4">
-            <label
-                class="mb-1 hidden"
-                for={`item-number-${index}`}>Item Number</label
-            >
-            <input
-                id={`item-number-${index}`}
-                type="text"
-                placeholder="*Item Number"
-                maxlength="100"
-                bind:value={product.itemNumber}
-                on:input={(e) => {
-                    const allowedChars = /^[a-zA-Z0-9\-.,;"']*$/;
-                    let inputValue = e.target.value;
-                   
-                    if (!allowedChars.test(inputValue)) {
-                        inputValue = inputValue.replace(/[^a-zA-Z0-9\-.,;"']/g, '');
-                    }
-                   
-                    product.itemNumber = inputValue.trim();
-                    validateField(`itemNumber-${index}`);
-                }}
-                class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full mb-1 text-sm rounded-md"
-            />
-            {#if errors[`itemNumber-${index}`]}
-                <span class="text-red-500 text-xs mb-2 block"
-                    >{errors[`itemNumber-${index}`]}</span
-                >
-            {/if}
-            
-            <label class="hidden mb-1" for={`quantity-${index}`}
-                >Quantity</label
-            >
-            <input
-                id={`quantity-${index}`}
-                type="number"
-                placeholder="*Quantity"
-                bind:value={product.quantity}
-                maxlength="10"
-                on:input={(e) => {
-                    const allowedChars = /^[0-9]*$/;
-                    let inputValue = e.target.value;
-                   
-                    if (!allowedChars.test(inputValue)) {
-                        inputValue = inputValue.replace(/[^0-9]/g, '');
-                    }
-                   
-                    product.quantity = inputValue.trim();
-                    validateField(`quantity-${index}`);
-                }}
-                class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full mb-1 text-sm rounded-md"
-                min="1"
-            />
-            {#if errors[`quantity-${index}`]}
-                <span class="text-red-500 text-xs mb-2 block"
-                    >{errors[`quantity-${index}`]}</span
-                >
-            {/if}
-        </div>
-        
-        {#if index > 0}
-            <button
-                type="button"
-                on:click={() => removeProduct(index)}
-                class="mt-2 text-red-500 hover:scale-105"
-            >
-                &times;
-            </button>
-        {/if}
-    </div>
-{/each}
+				{#each products as product, index}
+					<div class="mb-4 flex flex-col items-start">
+						<div class="w-full lg:w-3/4 md:w-3/4">
+							<label
+								class="mb-1 hidden"
+								for={`item-number-${index}`}>Item Number</label
+							>
+							<input
+								id={`item-number-${index}`}
+								type="text"
+								placeholder="*Product Number"
+								maxlength="50"
+								bind:value={product.itemNumber}
+								on:input={(e) => {
+									const allowedChars =
+										/^[a-zA-Z0-9\-.,;"']*$/;
+									let inputValue = e.target.value;
+
+									if (!allowedChars.test(inputValue)) {
+										inputValue = inputValue.replace(
+											/[^a-zA-Z0-9\-.,;"']/g,
+											"",
+										);
+									}
+
+									product.itemNumber = inputValue.trim();
+									validateField(`itemNumber-${index}`);
+								}}
+								class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full mb-1 text-sm rounded-md"
+							/>
+							{#if errors[`itemNumber-${index}`]}
+								<span class="text-red-500 text-xs mb-2 block"
+									>{errors[`itemNumber-${index}`]}</span
+								>
+							{/if}
+
+							<label class="hidden mb-1" for={`quantity-${index}`}
+								>Quantity</label
+							>
+							<input
+								id={`quantity-${index}`}
+								type="number"
+								placeholder="*Quantity"
+								bind:value={product.quantity}
+								maxlength="10"
+								on:input={(e) => {
+									const allowedChars = /^[0-9]*$/;
+									let inputValue = e.target.value;
+									if (!allowedChars.test(inputValue)) {
+										inputValue = inputValue.replace(
+											/[^0-9]/g,
+											"",
+										);
+									}
+									inputValue = inputValue.slice(0, 5);
+									product.quantity = inputValue.trim();
+									validateField(`quantity-${index}`);
+								}}
+								class="border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 w-full mb-1 text-sm rounded-md"
+								min="1"
+							/>
+							{#if errors[`quantity-${index}`]}
+								<span class="text-red-500 text-xs mb-2 block"
+									>{errors[`quantity-${index}`]}</span
+								>
+							{/if}
+						</div>
+
+						{#if index > 0}
+							<button
+								type="button"
+								on:click={() => removeProduct(index)}
+								class="mt-2 text-red-500 hover:scale-105"
+							>
+								&times;
+							</button>
+						{/if}
+					</div>
+				{/each}
 
 				<button
 					type="button"
@@ -826,61 +890,12 @@ codeMatches.forEach(country => {
 				>
 					+ Add another product
 				</button>
-				<input
+				<!-- <input
 					hidden
 					name="products"
 					value={JSON.stringify(products)}
-				/>
+				/> -->
 
-				<!-- <div class="mt-4">
-			<label class="block text-sm pb-2"
-			  >Please attach any images or files that may assist in
-			  troubleshooting or investigation:</label
-			>
-			<button
-			  type="button "
-			  on:click={triggerFileInput}
-			  class=" text-primary-400 border border-primary-400 mb-4 px-2 rounded-md md:ml-3 hover:text-white hover:bg-primary-400"
-			>
-			  Choose Files
-			</button>
-			<input
-			  type="file"
-			  multiple
-			  on:change={handleFileChange}
-			  bind:this={fileInputRef}
-			  class="hidden"
-			/>
-  
-			{#each attachments as file, index}
-			  <div class="flex items-center mt-2">
-				<span class="mr-2">{file.name}</span>
-				<a
-				  href={URL.createObjectURL(file)}
-				  download
-				  class="text-blue-500 mr-2"
-				  ><Icon
-					icon="line-md:download-loop"
-					class="w-8 h-5 text-black"
-				  /></a
-				>
-				<button
-				  type="button"
-				  on:click={() => removeAttachment(index)}
-				  class="text-red-500"
-				  ><Icon
-					icon="material-symbols:delete"
-					class="w-8 h-5 text-red"
-				  /></button
-				>
-			  </div>
-			{/each}
-		  </div>
-		  <div class="flex justify-center">
-			<p class="text-gray-400 text-sm">
-			  Attachments are limited to a combined size of 25MB
-			</p>
-		  </div> -->
 			</div>
 			<div class=" w-full pb-6 mx-auto h-full">
 				<h2 class="text-primary-400 font-semibold text-base pb-6">
@@ -958,26 +973,20 @@ codeMatches.forEach(country => {
 					</div>
 
 					<div>
-						<input
-							type="hidden"
-							name="email"
-							id="email"
-							bind:value={email}
-						/>
+					
 						<form
 							action="?/verifyemail"
 							bind:this={form3}
 							method="POST"
-							use:enhance={({}) => {
+							use:enhance={({formData}) => {
+								formData.append("email",email)
 								return async ({ result }) => {
 									isLoading = false;
 									console.log("result", result);
 									if (result.data?.status === 200) {
 										ProfileEmailVerified =
 											result.data.isEmailVerified;
-										if (
-											authedUserEmailVerified === true
-										) {
+										if (authedUserEmailVerified === true) {
 											ProfileEmailVerified = true;
 										}
 
@@ -1016,7 +1025,6 @@ codeMatches.forEach(country => {
 							}}
 						>
 							<div class="relative w-full">
-							
 								<div class="relative">
 									<input
 										type="text"
@@ -1024,7 +1032,7 @@ codeMatches.forEach(country => {
 										id="email"
 										bind:value={email}
 										maxlength="50"
-							class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
+										class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 										placeholder="Email"
 										on:input={(e) => {
 											e.target.value =
@@ -1042,9 +1050,7 @@ codeMatches.forEach(country => {
 													  ) ||
 													  email
 															.split("@")[1]
-															.includes(
-																"gamil",
-															)
+															.includes("gamil")
 													? "Please enter a valid email address"
 													: "";
 											ProfileEmailVerified = false;
@@ -1115,19 +1121,17 @@ codeMatches.forEach(country => {
 							</div>
 						</form>
 						{#if emailSent && isOtpVerified === false}
-							<div
-								class="mt-3 "
-							>
+							<div class="mt-3">
 								<form
 									action="?/verifyOtpEmail"
 									method="POST"
-									use:enhance={() => {
+									use:enhance={({formData}) => {
+										formData.append("email",email)
 										return async ({ result }) => {
 											loadingotp = false; // Hide loading spinner when the request is complete
 											if (result.status === 200) {
 												if (
-													result.data.status ===
-													200
+													result.data.status === 200
 												) {
 													const verifiedMessage =
 														result.data.message;
@@ -1145,12 +1149,9 @@ codeMatches.forEach(country => {
 													);
 												} else {
 													const errorMessage =
-														result.data
-															.message ||
+														result.data.message ||
 														"An unknown error occurred!";
-													toast.error(
-														errorMessage,
-													);
+													toast.error(errorMessage);
 												}
 											} else {
 												const errorMessage =
@@ -1165,12 +1166,7 @@ codeMatches.forEach(country => {
 									}}
 								>
 									<div class="relative w-full mb-2">
-										<input
-											type="hidden"
-											name="email"
-											id="email"
-											bind:value={email}
-										/>
+										
 										<input
 											type="text"
 											name="enteredOtp"
@@ -1189,16 +1185,14 @@ codeMatches.forEach(country => {
 										<button
 											type="submit"
 											class="absolute top-1/2 right-3 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
-											 disabled={loadingotp ||
-                                                !enteredOtpemail ||
-                                                !/^\d{6}$/.test(
-                                                    enteredOtpemail,
-                                                )}
+											disabled={loadingotp ||
+												!enteredOtpemail ||
+												!/^\d{6}$/.test(
+													enteredOtpemail,
+												)}
 										>
 											{#if loadingotp}
-												<span
-													class="flex items-center"
-												>
+												<span class="flex items-center">
 													<Icon
 														icon="line-md:loading-alt-loop"
 														class="w-4 h-4 mr-1 animate-spin"
@@ -1211,9 +1205,7 @@ codeMatches.forEach(country => {
 										</button>
 									</div>
 									<div class="flex justify-end text-xs">
-										<span>
-											Didn't receive the code?</span
-										>
+										<span> Didn't receive the code?</span>
 										<button
 											type="button"
 											on:click={handleResendOtpemail}
@@ -1227,23 +1219,7 @@ codeMatches.forEach(country => {
 							</div>
 						{/if}
 					</div>
-					<!-- Company Name Input -->
-					<!-- <div class="flex flex-col">
-			<input
-			  name="companyName"
-			  type="text"
-			  id="companyName"
-			  placeholder="Company/Institution Name"
-			  bind:value={companyName}
-			  required
-			  class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
-			  on:input={() => validateField('companyName')}
-			/>
-			
-			</div>
-			{#if errors.companyName}
-			  <p class="text-red-500 text-xs mt-1">{errors.companyName}</p>
-			{/if} -->
+
 
 					<div class="flex flex-col">
 						<input
@@ -1263,19 +1239,7 @@ codeMatches.forEach(country => {
 
 								validateField("companyName");
 
-								errors.companyName = !companyName
-									? "*Required"
-									: companyName.length < 3
-										? "Must be at least 3 characters"
-										: !/^[A-Za-z@.,!#$%^&*(_)+\-\s]+$/.test(
-													companyName,
-											  )
-											? "Please enter a valid company name"
-											: "";
 							}}
-
-
-														
 						/>
 						{#if errors?.companyName}
 							<p class="text-red-500 text-xs mt-1">
@@ -1310,51 +1274,52 @@ codeMatches.forEach(country => {
 								class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
 							>
 								<Icon
-									icon={showDropdown ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'}
+									icon={showDropdown
+										? "ep:arrow-up-bold"
+										: "ep:arrow-down-bold"}
 									class="text-gray-500 mr-1 text-2s font-bold"
 								/>
 							</div>
 							{#if showDropdown}
-							<div
-								bind:this={dropdownEl}
-								class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
-							>
-								<ul
-									class="max-h-60 overflow-y-auto text-sm"
+								<div
+									bind:this={dropdownEl}
+									class="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10"
 								>
-									{#each filteredCountries as country, index}
-										<!-- svelte-ignore a11y-click-events-have-key-events -->
-										<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-										<li
-											on:click={() =>
-												selectCountry(country)}
-											class="px-4 py-2 cursor-pointer {highlightedIndex ===
-											index
-												? 'bg-primary-100'
-												: 'hover:bg-primary-50'}"
-										>
-											{country.name} ({country.code})
-										</li>
-									{/each}
-									{#if filteredCountries.length === 0}
-										<div
-											class="flex items-center px-4 py-3"
-										>
-											<Icon
-												icon="tabler:info-square-rounded-filled"
-												class="text-red-500 text-base mr-2"
-											/>
+									<ul
+										class="max-h-60 overflow-y-auto text-sm"
+									>
+										{#each filteredCountries as country, index}
+											<!-- svelte-ignore a11y-click-events-have-key-events -->
+											<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 											<li
-												class="text-gray-800 text-xs"
+												on:click={() =>
+													selectCountry(country)}
+												class="px-4 py-2 cursor-pointer {highlightedIndex ===
+												index
+													? 'bg-primary-100'
+													: 'hover:bg-primary-50'}"
 											>
-												No matching countries
-												found!
+												{country.name} ({country.code})
 											</li>
-										</div>
-									{/if}
-								</ul>
-							</div>
-						{/if}
+										{/each}
+										{#if filteredCountries.length === 0}
+											<div
+												class="flex items-center px-4 py-3"
+											>
+												<Icon
+													icon="tabler:info-square-rounded-filled"
+													class="text-red-500 text-base mr-2"
+												/>
+												<li
+													class="text-gray-800 text-xs"
+												>
+													No matching countries found!
+												</li>
+											</div>
+										{/if}
+									</ul>
+								</div>
+							{/if}
 						</div>
 						{#if errors.country}
 							<p class="text-red-500 text-xs mt-1">
@@ -1384,7 +1349,6 @@ codeMatches.forEach(country => {
 							</p>
 						{/if}
 					</div>
-
 				</div>
 
 				<div

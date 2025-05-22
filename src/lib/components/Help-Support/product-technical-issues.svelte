@@ -168,13 +168,17 @@
 			}
 		}
 
-		if (!fieldName || fieldName === "country") {
-			if (!country) {
-				errors.country = "*Required";
-			} else {
-				delete errors.country;
-			}
-		}
+ if (!fieldName || fieldName === "country") {
+            if (!country) {
+                errors.country = "*Required";
+            } else if (!country || country === "country") {
+                if (!country || country === "") {
+                    errors.country = "Please select a country";
+                } else {
+                    delete errors.country;
+                }
+            }
+        }
 		if (!fieldName || fieldName === "itemNumber") {
 			if (!itemNumber) {
 				errors.itemNumber = "item Number is required";
@@ -190,17 +194,19 @@
 				delete errors.accountNumber;
 			}
 		}
-		if (!fieldName || fieldName === "companyName") {
-			if (!companyName) {
-				errors.companyName = "*Required";
-			} else if (companyName.length < 3) {
-				errors.companyName = "Must be at least 3 characters.";
-			} else if (!/^[A-Za-z0-9@.,!#$%^&*(_)+\-\s]+$/.test(companyName)) {
-				errors.companyName = "Please enter a valid company name.";
-			} else {
-				delete errors.companyName;
-			}
-		}
+        if (!fieldName || fieldName === "companyName") {
+            if (!companyName) {
+                errors.companyName = "*Required";
+            } else if (companyName.length < 3) {
+                errors.companyName = "Company name must be at least 3 characters";
+            } else if (!/^[A-Za-z0-9@.,\s&-]+$/.test(companyName)) {
+                errors.companyName = "Please enter a valid company name";
+            } else if (/^\d+$/.test(companyName)) {
+                errors.companyName = "Company name cannot contain only numbers";
+            } else {
+                delete errors.companyName;
+            }
+        }
 		if (!fieldName || fieldName === "assistance") {
 			if (!assistance) {
 				errors.assistance = "*Required";
@@ -234,7 +240,7 @@
 	function selectCountry(selectedCountry) {
 		country = selectedCountry.name;
 		// filteredCountries = countries;
-		searchTerm = `${selectedCountry.name} `;
+		searchTerm = selectedCountry.name;
 		showDropdown = false;
 		highlightedIndex = -1;
 		validateField("country");
@@ -331,7 +337,7 @@
 			) {
 				selectCountry(filteredCountries[highlightedIndex]);
 				event.preventDefault();
-			} else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
+			} else if (searchTerm && filteredCountries.length > 0) {
 				selectCountry(filteredCountries[0]);
 				event.preventDefault();
 			}
@@ -360,92 +366,52 @@
 			}
 		}
 	}
-	function handleInputChange(event) {
-		searchTerm = event.target.value;
-		country = event.target.value;
-		const isDeleting =
-			event.inputType === "deleteContentBackward" ||
-			event.inputType === "deleteContentForward";
-		filterCountriesWithoutAutoSelect();
-		showDropdown = filteredCountries.length > 0;
+  function handleInputChange(event) {
+        searchTerm = event.target.value;
+        country = event.target.value;
 
-		if (searchTerm.length > 0 && !isDeleting) {
-			const codeSearch = searchTerm.replace("+", "").trim();
-			if (codeSearch.length > 0) {
-				const exactCodeMatches = filteredCountries.filter(
-					(country) => country.code.replace("+", "") === codeSearch,
-				);
+        const isDeleting =
+            event.inputType === "deleteContentBackward" ||
+            event.inputType === "deleteContentForward";
 
-				if (exactCodeMatches.length === 1) {
-					selectCountry(exactCodeMatches[0]);
-					return;
-				}
-			}
+        filterCountriesWithoutAutoSelect();
+        showDropdown = true;
 
-			const countriesStartingWith = filteredCountries.filter((country) =>
-				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
-			);
+        const match = countries.find(
+            (c) => c.name.toLowerCase() === searchTerm.toLowerCase(),
+        );
 
-			if (countriesStartingWith.length === 1) {
-				selectCountry(countriesStartingWith[0]);
-			}
-		}
-	}
-	// function handleInputChange(event) {
-	// 	searchTerm = event.target.value;
-	// 	filterCountries();
-	// }
+        if (match) {
+            delete errors.country;
+        } else if (searchTerm.trim().length > 0) {
+            errors.country = "Invalid country selected";
+        } else {
+            delete errors.country;
+        }
 
-	// function handleInputChange(event) {
-	// 	// Get the current input value
-	// 	searchTerm = event.target.value;
+        if (searchTerm.length > 0 && !isDeleting) {
+            const codeSearch = searchTerm.replace("+", "").trim();
+            if (codeSearch.length > 0) {
+                const exactCodeMatches = filteredCountries.filter(
+                    (country) => country.code.replace("+", "") === codeSearch,
+                );
 
-	// 	// Track if user is deleting text
-	// 	const isDeleting =
-	// 		event.inputType === "deleteContentBackward" ||
-	// 		event.inputType === "deleteContentForward";
+                if (exactCodeMatches.length === 1) {
+                    selectCountry(exactCodeMatches[0]);
+                    return;
+                }
+            }
 
-	// 	if (searchTerm.length > 0 && !isDeleting) {
-	// 		// Filter countries
-	// 		filterCountriesWithoutAutoSelect();
+            const countriesStartingWith = filteredCountries.filter((country) =>
+                country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+            );
 
-	// 		// Show dropdown with filtered results
-	// 		showDropdown = filteredCountries.length > 0;
+            if (countriesStartingWith.length === 1) {
+                selectCountry(countriesStartingWith[0]);
+            }
+        }
+    }
 
-	// 		// Check for country code matches specifically
-	// 		const codeSearch = searchTerm.replace("+", "").trim();
-	// 		if (codeSearch.length > 0) {
-	// 			const exactCodeMatches = filteredCountries.filter(
-	// 				(country) => country.code.replace("+", "") === codeSearch,
-	// 			);
-
-	// 			if (exactCodeMatches.length === 1) {
-	// 				selectCountry(exactCodeMatches[0]);
-	// 				return;
-	// 			}
-	// 		}
-
-	// 		const countriesStartingWith = filteredCountries.filter((country) =>
-	// 			country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
-	// 		);
-
-	// 		if (countriesStartingWith.length === 1) {
-	// 			selectCountry(countriesStartingWith[0]);
-	// 		}
-	// 	} else {
-	// 		filterCountriesWithoutAutoSelect();
-	// 		showDropdown = filteredCountries.length > 0;
-	// 	}
-	// }
-	// function filterCountriesWithoutAutoSelect() {
-	// 	filteredCountries = countries.filter(
-	// 		(country) =>
-	// 			country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-	// 			country.code
-	// 				.replace("+", "")
-	// 				.includes(searchTerm.replace("+", "").toLowerCase()),
-	// 	);
-	// }
 	function filterCountriesWithoutAutoSelect() {
 		const countriesStartingWith = countries.filter((country) =>
 			country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
@@ -542,47 +508,44 @@
 		return isValid;
 	}
 
-	const handlesubmit = async (data) => {
-		if (!formValid()) {
-			cancel();
-			return;
-		} else {
-			try {
-				const result = await submitForm(data);
-				console.log(result, "result");
+const handlesubmit = ({ formData } = {}) => {
+    if (!formValid()) {
+        return;
+    }
+    if (formData) {
+        formData.append("email", email);
+		formData.append("products",JSON.stringify(products))
+    }
 
-				return async ({ result, update }) => {
-					if (result.type === "success") {
-						const status = result.data.status;
-
-						if (status === 1) {
-							form = result.data;
-							await update();
-
-							// thankYouMessageVisible = true;
-							showSuccesDiv = true;
-						} else if (status === 2) {
-							form = result.data;
-							await update();
-
-							showFailureDiv = true;
-						} else {
-							form = result.data;
-							await update();
-							showSuccesDiv = true;
-						}
-					}
-				};
-			} catch (error) {
-				console.error("Error submitting form:", error);
-				// Handle failure actions
-				// loading = false;
-				showFailureDiv = true;
-			}
-		}
-
-		window.scrollTo({ top: 0, behavior: "smooth" });
-	};
+    return async ({ result, update }) => {
+        try {
+            console.log(result, "result");
+            
+            if (result.type === "success") {
+                const status = result.data.status;
+                
+                if (status === 1) {
+                    form = result.data;
+                    await update();
+                    showSuccesDiv = true;
+                } else if (status === 2) {
+                    form = result.data;
+                    await update();
+                    showFailureDiv = true;
+                } else {
+                    form = result.data;
+                    await update();
+                    showSuccesDiv = true;
+                }
+            }
+        } catch (error) {
+            console.error("Error submitting form:", error);
+            showFailureDiv = true;
+        }
+        
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+};
 
 	const submitForm = async (data) => {
 		return new Promise((resolve) => {
@@ -826,17 +789,18 @@
 					</div>
 
 					<div>
-						<input
+						<!-- <input
 							type="hidden"
 							name="email"
 							id="email"
 							bind:value={email}
-						/>
+						/> -->
 						<form
 							action="?/verifyemail"
 							bind:this={form3}
 							method="POST"
-							use:enhance={({}) => {
+							use:enhance={({formData}) => {
+								formData.append("email",email)
 								return async ({ result }) => {
 									isLoading = false;
 									console.log("result", result);
@@ -984,7 +948,8 @@
 								<form
 									action="?/verifyOtpEmail"
 									method="POST"
-									use:enhance={() => {
+									use:enhance={({formData}) => {
+										formData.append("email",email)
 										return async ({ result }) => {
 											loadingotp = false; // Hide loading spinner when the request is complete
 											if (result.status === 200) {
@@ -1024,12 +989,12 @@
 									}}
 								>
 									<div class="relative w-full mb-2">
-										<input
+										<!-- <input
 											type="hidden"
 											name="email"
 											id="email"
 											bind:value={email}
-										/>
+										/> -->
 										<input
 											type="text"
 											name="enteredOtp"
@@ -1082,23 +1047,7 @@
 							</div>
 						{/if}
 					</div>
-					<!-- Company Name Input -->
-					<!-- <div class="flex flex-col">
-			<input
-			  name="companyName"
-			  type="text"
-			  id="companyName"
-			  placeholder="Company/Institution Name"
-			  bind:value={companyName}
-			  required
-			  class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
-			  on:input={() => validateField('companyName')}
-			/>
-			
-			</div>
-			{#if errors.companyName}
-			  <p class="text-red-500 text-xs mt-1">{errors.companyName}</p>
-			{/if} -->
+
 
 					<div class="flex flex-col">
 						<input
@@ -1117,15 +1066,7 @@
 
 								validateField("companyName");
 
-								errors.companyName = !companyName
-									? "*Required"
-									: companyName.length < 3
-										? "Must be at least 3 characters"
-										: !/^[A-Za-z@.,!#$%^&*(_)+\-\s]+$/.test(
-													companyName,
-											  )
-											? "Please enter a valid company name"
-											: "";
+								
 							}}
 						/>
 						{#if errors?.companyName}

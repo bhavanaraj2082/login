@@ -137,11 +137,14 @@
 		if (!fieldName || fieldName === "country") {
 			if (!country) {
 				errors.country = "*Required";
-			} else {
-				delete errors.country;
+			} else if (!country || country === "country") {
+				if (!country || country === "") {
+					errors.country = "Please select a country";
+				} else {
+					delete errors.country;
+				}
 			}
 		}
-
 		if (!fieldName || fieldName === "accountNumber") {
 			if (!accountNumber || !/^[a-zA-Z0-9]+$/.test(accountNumber)) {
 				errors.accountNumber =
@@ -151,18 +154,31 @@
 			}
 		}
 
+		// if (!fieldName || fieldName === "companyName") {
+		// 	if (!companyName) {
+		// 		errors.companyName = "*Required";
+		// 	} else if (companyName.length < 3) {
+		// 		errors.companyName = "Must be at least 3 characters.";
+		// 	} else if (!/^[A-Za-z0-9@.,!#$%^&*(_)+\-\s]+$/.test(companyName)) {
+		// 		errors.companyName = "Please enter a valid company name.";
+		// 	} else {
+		// 		delete errors.companyName;
+		// 	}
+		// }
 		if (!fieldName || fieldName === "companyName") {
 			if (!companyName) {
 				errors.companyName = "*Required";
 			} else if (companyName.length < 3) {
-				errors.companyName = "Must be at least 3 characters.";
-			} else if (!/^[A-Za-z0-9@.,!#$%^&*(_)+\-\s]+$/.test(companyName)) {
-				errors.companyName = "Please enter a valid company name.";
+				errors.companyName =
+					"Company name must be at least 3 characters";
+			} else if (!/^[A-Za-z0-9@.,\s&-]+$/.test(companyName)) {
+				errors.companyName = "Please enter a valid company name";
+			} else if (/^\d+$/.test(companyName)) {
+				errors.companyName = "Company name cannot contain only numbers";
 			} else {
 				delete errors.companyName;
 			}
 		}
-
 		if (!fieldName || fieldName === "itemNumber") {
 			if (!itemNumber) {
 				errors.itemNumber = "*Required";
@@ -187,14 +203,17 @@
 	function selectCountry(selectedCountry) {
 		country = selectedCountry.name;
 		// filteredCountries = countries;
-		searchTerm = `${selectedCountry.name} `;
+		searchTerm = selectedCountry.name;
 		showDropdown = false;
 		highlightedIndex = -1;
 		validateField("country");
 		validatePhoneNumber(country, phoneNumber);
 
 		delete errors.country;
-		// console.log('Selected Country:', country);
+		const countryInput = document.querySelector('input[name="country"]');
+		if (countryInput) {
+			countryInput.value = selectedCountry.name;
+		}
 	}
 	function handleKeyDown(event) {
 		const exactCountryMatch = countries.some(
@@ -263,7 +282,7 @@
 			) {
 				selectCountry(filteredCountries[highlightedIndex]);
 				event.preventDefault();
-			} else if (searchTerm && filteredCountries.length > 0) {
+			} else if (searchTerm) {
 				selectCountry(filteredCountries[0]);
 				event.preventDefault();
 			}
@@ -295,11 +314,25 @@
 	function handleInputChange(event) {
 		searchTerm = event.target.value;
 		country = event.target.value;
+
 		const isDeleting =
 			event.inputType === "deleteContentBackward" ||
 			event.inputType === "deleteContentForward";
+
 		filterCountriesWithoutAutoSelect();
-		showDropdown = filteredCountries.length > 0;
+		showDropdown = true;
+
+		const match = countries.find(
+			(c) => c.name.toLowerCase() === searchTerm.toLowerCase(),
+		);
+
+		if (match) {
+			delete errors.country;
+		} else if (searchTerm.trim().length > 0) {
+			errors.country = "Invalid country selected";
+		} else {
+			delete errors.country;
+		}
 
 		if (searchTerm.length > 0 && !isDeleting) {
 			const codeSearch = searchTerm.replace("+", "").trim();
@@ -452,7 +485,7 @@
 		// console.log('Validating phone number for country:', country);
 
 		if (!country) {
-			errors.phoneNumber = "Invalid country selected";
+			errors.country = "Invalid country selected";
 			errors.phoneNumber = "Invalid country selected";
 			return false;
 		}
@@ -496,30 +529,29 @@
 		return isValid;
 	}
 
-	const handlesubmit = async (data) => {
+	const handlesubmit = ({ formData } = {}) => {
 		if (!formValid()) {
-			cancel();
 			return;
 		}
+		if (formData) {
+			formData.append("email", email);
+			formData.append("poNumber", poNumber);
+		}
 
-		try {
-			const result = await submitForm(data);
-			console.log(result, "result");
+		return async ({ result, update }) => {
+			try {
+				console.log(result, "result");
 
-			return async ({ result, update }) => {
 				if (result.type === "success") {
 					const status = result.data.status;
 
 					if (status === 1) {
 						form = result.data;
 						await update();
-
-						// thankYouMessageVisible = true;
 						showSuccesDiv = true;
 					} else if (status === 2) {
 						form = result.data;
 						await update();
-
 						showFailureDiv = true;
 					} else {
 						form = result.data;
@@ -527,15 +559,13 @@
 						showSuccesDiv = true;
 					}
 				}
-			};
-		} catch (error) {
-			console.error("Error submitting form:", error);
-			// Handle failure actions
-			// loading = false;
-			showFailureDiv = true;
-		}
+			} catch (error) {
+				console.error("Error submitting form:", error);
+				showFailureDiv = true;
+			}
 
-		window.scrollTo({ top: 0, behavior: "smooth" });
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		};
 	};
 
 	const submitForm = async (data) => {
@@ -629,7 +659,9 @@
 						<form
 							action="?/validatepo"
 							method="POST"
-							use:enhance={({}) => {
+							use:enhance={({ formData }) => {
+								formData.append("email", email);
+								formData.append("poNumber", poNumber);
 								return async ({ result }) => {
 									isValidating = false;
 									console.log("result", result);
@@ -699,12 +731,6 @@
 									</span>
 								{/if}
 							</div>
-							<input
-								type="hidden"
-								name="email"
-								id="email"
-								bind:value={email}
-							/>
 						</form>
 
 						<!-- Display validation status -->
@@ -717,12 +743,12 @@
 								Order number verified successfully
 							</p>
 						{/if}
-						<input
+						<!-- <input
 							type="hidden"
 							name="poNumber"
 							id="poNumber"
 							bind:value={poNumber}
-						/>
+						/> -->
 						<!-- <label class="hidden mb-1" for={`poNumber-${index}`}>poNumber</label> -->
 						<!-- {#each products as product, index} -->
 						<input
@@ -841,17 +867,12 @@
 							{/if}
 						</div>
 						<div>
-							<input
-								type="hidden"
-								name="email"
-								id="email"
-								bind:value={email}
-							/>
 							<form
 								action="?/verifyemail"
 								bind:this={form3}
 								method="POST"
-								use:enhance={({}) => {
+								use:enhance={({ formData }) => {
+									formData.append("email", email);
 									return async ({ result }) => {
 										isLoading = false;
 										console.log("result", result);
@@ -997,13 +1018,12 @@
 								</div>
 							</form>
 							{#if emailSent && isOtpVerified === false}
-								<div
-									class="mt-3"
-								>
+								<div class="mt-3">
 									<form
 										action="?/verifyOtpEmail"
 										method="POST"
-										use:enhance={() => {
+										use:enhance={({ formData }) => {
+											formData.append("email", email);
 											return async ({ result }) => {
 												loadingotp = false; // Hide loading spinner when the request is complete
 												if (result.status === 200) {
@@ -1047,12 +1067,12 @@
 										}}
 									>
 										<div class="relative w-full mb-2">
-											<input
+											<!-- <input
 												type="hidden"
 												name="email"
 												id="email"
 												bind:value={email}
-											/>
+											/> -->
 											<input
 												type="text"
 												name="enteredOtp"
@@ -1071,11 +1091,11 @@
 											<button
 												type="submit"
 												class="absolute top-1/2 right-3 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
-												 disabled={loadingotp ||
-                                                !enteredOtpemail ||
-                                                !/^\d{6}$/.test(
-                                                    enteredOtpemail,
-                                                )}
+												disabled={loadingotp ||
+													!enteredOtpemail ||
+													!/^\d{6}$/.test(
+														enteredOtpemail,
+													)}
 											>
 												{#if loadingotp}
 													<span
@@ -1145,16 +1165,6 @@
 									companyName = e.target.value;
 
 									validateField("companyName");
-
-									errors.companyName = !companyName
-										? "*Required"
-										: companyName.length < 3
-											? "Must be at least 3 characters"
-											: !/^[A-Za-z@.,!#$%^&*(_)+\-\s]+$/.test(
-														companyName,
-												  )
-												? "Please enter a valid company name"
-												: "";
 								}}
 							/>
 							{#if errors?.companyName}
@@ -1176,6 +1186,10 @@
 									on:click={toggleDropdown}
 									on:keydown={handleKeyDown}
 									on:input={(e) => {
+										e.target.value = e.target.value.replace(
+											/^\s+/,
+											"",
+										);
 										country = country.trim();
 
 										validateField("country");
@@ -1258,7 +1272,7 @@
 									phoneNumber = phoneNumber
 										.replace(/[^+\d]/g, "")
 										.trim();
-									validateField("phoneNumber");
+									// validateField("phoneNumber");
 									validatePhoneNumber(country, phoneNumber);
 								}}
 							/>
@@ -1347,3 +1361,4 @@
 		{/if}
 	</div>
 {/if}
+F

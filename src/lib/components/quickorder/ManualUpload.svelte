@@ -184,35 +184,90 @@
   }
 
   let debounceTimeout;
+let debounceTimeouts = {}; 
+  // function handleInput(event, sku, index) {
+  //   let value = event.target.value.trim();
+  //   rows[index].sku = value;
+  //   searchQuery = value;
+  //   if (
+  //     rows[index].selectedProduct &&
+  //     value !==
+  //       `${rows[index].selectedProduct.productNumber} - ${rows[index].selectedSize}`
+  //   ) {
+  //     rows[index] = {
+  //       ...rows[index],
+  //       selectedProduct: null,
+  //       selectedSize: "",
+  //       sku: value,
+  //     };
+  //   }
 
-  function handleInput(event, sku, index) {
-    let value = event.target.value.trim();
-    rows[index].sku = value;
-    searchQuery = value;
-    if (
-      rows[index].selectedProduct &&
-      value !==
-        `${rows[index].selectedProduct.productNumber} - ${rows[index].selectedSize}`
-    ) {
-      rows[index] = {
-        ...rows[index],
-        selectedProduct: null,
-        selectedSize: "",
-        sku: value,
-      };
-    }
+  //   if (value.length > 2) {
+  //     clearTimeout(debounceTimeout);
+  //     debounceTimeout = setTimeout(() => {
+  //       const form = document.querySelector(`#form-${index}`);
+  //       if (form) {
+  //         form.requestSubmit();
+  //       }
 
-    if (value.length > 2) {
-      clearTimeout(debounceTimeout);
-      debounceTimeout = setTimeout(() => {
+  //       // Only update the filteredProducts for the current index
+  //       const filteredProds = filterProducts(value);
+  //       // Create a new array reference so Svelte detects the change
+  //       rows = rows.map((row, i) => {
+  //         if (i === index) {
+  //           return {
+  //             ...row,
+  //             filteredProducts: filteredProds,
+  //           };
+  //         }
+  //         return row;
+  //       });
+  //     }, 300);
+  //   } else {
+  //     rows = rows.map((row, i) => {
+  //       if (i === index) {
+  //         return {
+  //           ...row,
+  //           filteredProducts: [],
+  //         };
+  //       }
+  //       return row;
+  //     });
+  //   }
+  // }
+
+
+function handleInput(event, sku, index) {
+  let value = event.target.value.trim();
+  rows[index].sku = value;
+  searchQuery = value;
+  
+  if (
+    rows[index].selectedProduct &&
+    value !==
+      `${rows[index].selectedProduct.productNumber} - ${rows[index].selectedSize}`
+  ) {
+    rows[index] = {
+      ...rows[index],
+      selectedProduct: null,
+      selectedSize: "",
+      sku: value,
+    };
+  }
+
+  if (debounceTimeouts[index]) {
+    clearTimeout(debounceTimeouts[index]);
+  }
+
+  if (value.length > 2) {
+    debounceTimeouts[index] = setTimeout(() => {
+      if (rows[index].sku.trim() === value && value.length > 2) {
         const form = document.querySelector(`#form-${index}`);
         if (form) {
+          console.log(`Submitting form for index ${index} with value: ${value}`);
           form.requestSubmit();
         }
-
-        // Only update the filteredProducts for the current index
-        const filteredProds = filterProducts(value);
-        // Create a new array reference so Svelte detects the change
+        const filteredProds = filterProducts(value, index);
         rows = rows.map((row, i) => {
           if (i === index) {
             return {
@@ -222,19 +277,20 @@
           }
           return row;
         });
-      }, 300);
-    } else {
-      rows = rows.map((row, i) => {
-        if (i === index) {
-          return {
-            ...row,
-            filteredProducts: [],
-          };
-        }
-        return row;
-      });
-    }
+      }
+    }, 800); 
+  } else {
+    rows = rows.map((row, i) => {
+      if (i === index) {
+        return {
+          ...row,
+          filteredProducts: [],
+        };
+      }
+      return row;
+    });
   }
+}
 
   function formatDate(date) {
     const options = { year: "numeric", month: "short", day: "numeric" };
@@ -291,9 +347,11 @@
 
     const currentQuantity = selectedProducts[index]?.quantity || 1;
     stockStatus = "";
+    const skuValue = product.sku || product.productNumber;
     rows[index] = {
       ...rows[index],
-      sku: `${product.productNumber} - ${size.break}`,
+      // sku: `${product.sku}`||`${product.productNumber}`,
+      sku: `${skuValue}`,
       size: size.break,
       filteredProducts: [],
       selectedSize: size.break,
@@ -1492,7 +1550,7 @@
                                       selectProduct(result, index, size);
                                     }}
                                   >
-                                    {result.productNumber} - {size.break}
+                                    {result.sku}
                                   </label>
                                   <input
                                     type="radio"
@@ -1737,9 +1795,20 @@
         <div
           class="mt-2 flex mb-5 items-center justify-between space-x-2 lg:space-x-54"
         >
-          <button on:click={addRows} class="text-primary-500 text-md mt-6 ml-5">
+          <!-- <button on:click={addRows} class="text-primary-500 text-md mt-6 ml-5">
             + Add More</button
+          > -->
+          <div
+            class="mt-2 flex mb-5 items-center justify-between space-x-2 lg:space-x-54"
           >
+            <button
+              on:click={addRows}
+              class="text-primary-500 text-md mt-6 ml-5 cursor-pointer disabled:cursor-not-allowed"
+              disabled={!rows.some((row) => row.sku.trim().length > 0)}
+            >
+              + Add More
+            </button>
+          </div>
 
           {#if data?.authedUser && data?.authedUser?.id}
             <form
@@ -1804,11 +1873,11 @@
               }}
             >
               <input type="hidden" name="cartItems" value="" />
-
               <button
                 type="button"
                 on:click={handleManualEntriesSubmit}
-                class="lg:ml-60 mr-5 p-2 w-40 mt-4 h-9 flex items-center text-xs gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300"
+                class="lg:ml-60 mr-5 p-2 w-40 mt-4 h-9 flex items-center text-xs gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300 cursor-pointer disabled:cursor-not-allowed"
+                disabled={!rows.some((row) => row.sku.trim().length > 0)}
               >
                 {#if cartloading}
                   <span>Adding...</span>
@@ -1824,7 +1893,8 @@
                 cartloading = true;
                 handleLocalManualEntries();
               }}
-              class="lg:ml-60 mr-5 p-2 w-40 mt-4 h-9 flex items-center text-xs gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300"
+              class="lg:ml-60 mr-5 p-2 w-40 mt-4 h-9 flex items-center text-xs gap-1 sm:text-sm px-3 py-1 sm:p-1.5 sm:px-5 border-1 border-primary-500 text-primary-500 bg-white font-medium hover:text-white hover:bg-primary-500 rounded-md transition ease-in-out duration-300 cursor-pointer disabled:cursor-not-allowed"
+              disabled={!rows.some((row) => row.sku.trim().length > 0)}
             >
               {#if cartloading}
                 <span>Adding...</span>
@@ -1850,8 +1920,11 @@
         class="bg-white rounded-lg w-full max-w-lg p-6 md:p-8 mx-4 md:mx-0 relative shadow-lg"
         on:click|self={hideDetails}
       >
+        <h3 class="text-xl font-bold text-left mb-2 border-b-1 pb-3">
+          Availability for {selectedProduct.productNumber} - {selectedProduct.size}
+        </h3>
         <button
-          class="absolute top-2 right-2 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
+          class="absolute top-8 right-6 hover:bg-red-100 hover:scale-105 text-primary-500 font-semibold transition duration-300 ease-in-out"
           on:click={hideDetails}
           aria-label="Close"
         >
@@ -1860,10 +1933,6 @@
             class="text-2xl font-bold text-red-600 border rounded hover:p-px"
           />
         </button>
-
-        <h3 class="text-xl font-bold text-left mb-2 border-b-1 pb-3">
-          Availability for {selectedProduct.productNumber} - {selectedProduct.size}
-        </h3>
         <p class="text-gray-500 mb-10 text-left mt-2">
           Enter quantity to check availability.
         </p>
@@ -2001,7 +2070,7 @@
             <div class="flex justify-end w-full">
               <button
                 type="submit"
-                class=" border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white p-2 rounded flex items-center justify-center w-full sm:w-[180px] min-h-[40px]"
+                class=" border border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white p-2 rounded flex items-center justify-center w-full sm:w-[180px] min-h-[40px] transition-colors duration-300"
               >
                 <span
                   class={checking ? "hidden" : "flex items-center space-x-1"}
@@ -2077,7 +2146,7 @@
             <div class="flex justify-end">
               <button
                 type="submit"
-                class="hover:bg-primary-500 hover:text-white text-primary-500 border border-primary-500 py-3 px-4 rounded-md flex items-center space-x-1"
+                class="hover:bg-primary-500 hover:text-white text-primary-500 border border-primary-500 py-3 px-4 rounded-md flex items-center space-x-1 transition-colors duration-300"
               >
                 {#if cartloadingpop}
                   <span>Adding...</span>
@@ -2094,7 +2163,7 @@
           <div class=" flex justify-end">
             <button
               on:click={handleLocalCart}
-              class=" hover:bg-primary-500 hover:text-white border border-primary-500 text-primary-500 py-3 px-4 rounded-md flex items-center space-x-1"
+              class=" hover:bg-primary-500 hover:text-white border border-primary-500 text-primary-500 py-3 px-4 rounded-md flex items-center space-x-1 transition-colors duration-300"
             >
               <Icon icon="ic:round-shopping-cart" class="text-xl" /><span
                 class="text-sm">Add To Cart</span

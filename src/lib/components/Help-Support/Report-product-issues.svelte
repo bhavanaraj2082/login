@@ -28,7 +28,8 @@
 	let attachments = [];
 	let totalSize = 0;
 	let country = data?.profile?.country || "";
-	let firstName = data?.profile?.firstName || data?.authedUser?.username ||"";
+	let firstName =
+		data?.profile?.firstName || data?.authedUser?.username || "";
 	let lastName = data?.profile?.lastName || "";
 	let email = data?.profile?.email || "";
 	let phoneNumber = data?.profile?.cellPhone || "";
@@ -107,11 +108,9 @@
 		}
 
 		if (!fieldName || fieldName === "email") {
-			if (!email){
-				errors.email="*Required"
-			}
-			else
-			if (
+			if (!email) {
+				errors.email = "*Required";
+			} else if (
 				!email ||
 				!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email)
 			) {
@@ -122,11 +121,9 @@
 		}
 
 		if (!fieldName || fieldName === "phoneNumber") {
-			if(!phoneNumber){
-				errors.phoneNumber="*Required"
-			}
-			else
-			if (!country) {
+			if (!phoneNumber) {
+				errors.phoneNumber = "*Required";
+			} else if (!country) {
 				errors.phoneNumber =
 					"Please select the country before entering the phone number";
 				return;
@@ -164,8 +161,12 @@
 		if (!fieldName || fieldName === "country") {
 			if (!country) {
 				errors.country = "*Required";
-			} else {
-				delete errors.country;
+			} else if (!country || country === "country") {
+				if (!country || country === "") {
+					errors.country = "Please select a country";
+				} else {
+					delete errors.country;
+				}
 			}
 		}
 
@@ -176,18 +177,19 @@
 				delete errors.accountNumber;
 			}
 		}
-		if (!fieldName || fieldName === "companyName") {
-			if (!companyName) {
-				errors.companyName = "*Required";
-			} else if (companyName.length < 3) {
-				errors.companyName = "Must be at least 3 characters.";
-			} else if (!/^[A-Za-z0-9@.,!#$%^&*(_)+\-\s]+$/.test(companyName)) {
-				errors.companyName = "Please enter a valid company name.";
-			} else {
-				delete errors.companyName;
-			}
-		}
-
+        if (!fieldName || fieldName === "companyName") {
+            if (!companyName) {
+                errors.companyName = "*Required";
+            } else if (companyName.length < 3) {
+                errors.companyName = "Company name must be at least 3 characters";
+            } else if (!/^[A-Za-z0-9@.,\s&-]+$/.test(companyName)) {
+                errors.companyName = "Please enter a valid company name";
+            } else if (/^\d+$/.test(companyName)) {
+                errors.companyName = "Company name cannot contain only numbers";
+            } else {
+                delete errors.companyName;
+            }
+        }
 
 		if (!fieldName || fieldName === "assistance") {
 			if (!assistance) {
@@ -199,8 +201,7 @@
 				/<script.*?>.*?<\/script>/i.test(assistance) ||
 				/<[^>]*>/i.test(assistance)
 			) {
-				errors.assistance =
-					"Please enter valid assistance details.";
+				errors.assistance = "Please enter valid assistance details.";
 			} else {
 				delete errors.assistance;
 			}
@@ -220,7 +221,7 @@
 	function selectCountry(selectedCountry) {
 		country = selectedCountry.name;
 		// filteredCountries = countries;
-		searchTerm = `${selectedCountry.name} `;
+		searchTerm = selectedCountry.name;
 		showDropdown = false;
 		highlightedIndex = -1;
 		validateField("country");
@@ -331,7 +332,7 @@
 			) {
 				selectCountry(filteredCountries[highlightedIndex]);
 				event.preventDefault();
-			} else if (searchTerm.length >= 3 && filteredCountries.length > 0) {
+			} else if (searchTerm.length && filteredCountries.length > 0) {
 				selectCountry(filteredCountries[0]);
 				event.preventDefault();
 			}
@@ -363,11 +364,25 @@
 	function handleInputChange(event) {
 		searchTerm = event.target.value;
 		country = event.target.value;
+
 		const isDeleting =
 			event.inputType === "deleteContentBackward" ||
 			event.inputType === "deleteContentForward";
+
 		filterCountriesWithoutAutoSelect();
-		showDropdown = filteredCountries.length > 0;
+		showDropdown = true;
+
+		const match = countries.find(
+			(c) => c.name.toLowerCase() === searchTerm.toLowerCase(),
+		);
+
+		if (match) {
+			delete errors.country;
+		} else if (searchTerm.trim().length > 0) {
+			errors.country = "Invalid country selected";
+		} else {
+			delete errors.country;
+		}
 
 		if (searchTerm.length > 0 && !isDeleting) {
 			const codeSearch = searchTerm.replace("+", "").trim();
@@ -486,49 +501,45 @@
 
 		return isValid;
 	}
-
-	const handlesubmit = async (data) => {
+	const handlesubmit = ({ formData } = {}) => {
 		if (!formValid()) {
-			cancel();
 			return;
-		} else {
-			try {
-				const result = await submitForm(data);
-				console.log(result, "result");
-
-				return async ({ result, update }) => {
-					if (result.type === "success") {
-						const status = result.data.status;
-
-						if (status === 1) {
-							form = result.data;
-							await update();
-
-							// thankYouMessageVisible = true;
-							showSuccesDiv = true;
-						} else if (status === 2) {
-							form = result.data;
-							await update();
-
-							showFailureDiv = true;
-						} else {
-							form = result.data;
-							await update();
-							showSuccesDiv = true;
-						}
-					}
-				};
-			} catch (error) {
-				console.error("Error submitting form:", error);
-				// Handle failure actions
-				// loading = false;
-				showFailureDiv = true;
-			}
 		}
 
-		window.scrollTo({ top: 0, behavior: "smooth" });
-	};
+		// Only append email if formData exists (from use:enhance)
+		if (formData) {
+			formData.append("email", email);
+		}
 
+		return async ({ result, update }) => {
+			try {
+				console.log(result, "result");
+
+				if (result.type === "success") {
+					const status = result.data.status;
+
+					if (status === 1) {
+						form = result.data;
+						await update();
+						showSuccesDiv = true;
+					} else if (status === 2) {
+						form = result.data;
+						await update();
+						showFailureDiv = true;
+					} else {
+						form = result.data;
+						await update();
+						showSuccesDiv = true;
+					}
+				}
+			} catch (error) {
+				console.error("Error submitting form:", error);
+				showFailureDiv = true;
+			}
+
+			window.scrollTo({ top: 0, behavior: "smooth" });
+		};
+	};
 	const submitForm = async (data) => {
 		return new Promise((resolve) => {
 			setTimeout(() => {
@@ -711,12 +722,12 @@
 							errors.assistance = !assistance
 								? "*Required"
 								: assistance.length < 3
-										? "Must be at least 3 characters"
-								: !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(
-											assistance,
-									  )
-									? "Please enter a valid assistance "
-									: "";
+									? "Must be at least 3 characters"
+									: !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(
+												assistance,
+										  )
+										? "Please enter a valid assistance "
+										: "";
 						}}
 						class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm w-full"
 					></textarea>
@@ -803,26 +814,19 @@
 
 					<!-- Email Input -->
 					<div>
-						<input
-							type="hidden"
-							name="email"
-							id="email"
-							bind:value={email}
-						/>
 						<form
 							action="?/verifyemail"
 							bind:this={form3}
 							method="POST"
-							use:enhance={({}) => {
+							use:enhance={({ formData }) => {
+								formData.append("email", email);
 								return async ({ result }) => {
 									isLoading = false;
 									console.log("result", result);
 									if (result.data?.status === 200) {
 										ProfileEmailVerified =
 											result.data.isEmailVerified;
-										if (
-											authedUserEmailVerified === true
-										) {
+										if (authedUserEmailVerified === true) {
 											ProfileEmailVerified = true;
 										}
 
@@ -861,7 +865,6 @@
 							}}
 						>
 							<div class="relative w-full">
-							
 								<div class="relative">
 									<input
 										type="text"
@@ -869,7 +872,7 @@
 										id="email"
 										bind:value={email}
 										maxlength="50"
-							class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
+										class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
 										placeholder="Email"
 										on:input={(e) => {
 											e.target.value =
@@ -887,9 +890,7 @@
 													  ) ||
 													  email
 															.split("@")[1]
-															.includes(
-																"gamil",
-															)
+															.includes("gamil")
 													? "Please enter a valid email address"
 													: "";
 											ProfileEmailVerified = false;
@@ -960,19 +961,17 @@
 							</div>
 						</form>
 						{#if emailSent && isOtpVerified === false}
-							<div
-								class="mt-3"
-							>
+							<div class="mt-3">
 								<form
 									action="?/verifyOtpEmail"
 									method="POST"
-									use:enhance={() => {
+									use:enhance={({ formData }) => {
+										formData.append("email", email);
 										return async ({ result }) => {
 											loadingotp = false; // Hide loading spinner when the request is complete
 											if (result.status === 200) {
 												if (
-													result.data.status ===
-													200
+													result.data.status === 200
 												) {
 													const verifiedMessage =
 														result.data.message;
@@ -990,12 +989,9 @@
 													);
 												} else {
 													const errorMessage =
-														result.data
-															.message ||
+														result.data.message ||
 														"An unknown error occurred!";
-													toast.error(
-														errorMessage,
-													);
+													toast.error(errorMessage);
 												}
 											} else {
 												const errorMessage =
@@ -1010,12 +1006,6 @@
 									}}
 								>
 									<div class="relative w-full mb-2">
-										<input
-											type="hidden"
-											name="email"
-											id="email"
-											bind:value={email}
-										/>
 										<input
 											type="text"
 											name="enteredOtp"
@@ -1034,16 +1024,14 @@
 										<button
 											type="submit"
 											class="absolute top-1/2 right-3 transform -translate-y-1/2 text-primary-600 font-semibold text-xs py-1 rounded hover:text-primary-800 hover:underline disabled:opacity-50"
-											 disabled={loadingotp ||
-                                                !enteredOtpemail ||
-                                                !/^\d{6}$/.test(
-                                                    enteredOtpemail,
-                                                )}
+											disabled={loadingotp ||
+												!enteredOtpemail ||
+												!/^\d{6}$/.test(
+													enteredOtpemail,
+												)}
 										>
 											{#if loadingotp}
-												<span
-													class="flex items-center"
-												>
+												<span class="flex items-center">
 													<Icon
 														icon="line-md:loading-alt-loop"
 														class="w-4 h-4 mr-1 animate-spin"
@@ -1056,9 +1044,7 @@
 										</button>
 									</div>
 									<div class="flex justify-end text-xs">
-										<span>
-											Didn't receive the code?</span
-										>
+										<span> Didn't receive the code?</span>
 										<button
 											type="button"
 											on:click={handleResendOtpemail}
@@ -1074,22 +1060,7 @@
 					</div>
 
 					<!-- Company Name Input -->
-					<!-- <div class="flex flex-col">
-<input
-  name="companyName"
-  type="text"
-  id="companyName"
-  placeholder="Company/Institution Name"
-  bind:value={companyName}
-  required
-  class="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 p-2 text-sm h-9 w-full"
-  on:input={() => validateField('companyName')}
-/>
 
-</div>
-{#if errors.companyName}
-  <p class="text-red-500 text-xs mt-1">{errors.companyName}</p>
-{/if} -->
 
 					<div class="flex flex-col">
 						<input
@@ -1109,15 +1080,7 @@
 
 								validateField("companyName");
 
-								errors.companyName = !companyName
-									? "*Required"
-									: companyName.length < 3
-										? "Must be at least 3 characters"
-										: !/^[A-Za-z@.,!#$%^&*(_)+\-\s]+$/.test(
-													companyName,
-											  )
-											? "Please enter a valid company name"
-											: "";
+								
 							}}
 						/>
 						{#if errors?.companyName}
@@ -1146,14 +1109,16 @@
 								class="flex-1 outline-none w-full border border-gray-300 rounded focus:ring-0 focus:border-primary-400 p-2 text-sm"
 								required
 							/>
-						<!-- svelte-ignore a11y-click-events-have-key-events -->
-						<!-- svelte-ignore a11y-no-static-element-interactions -->
-						<div
+							<!-- svelte-ignore a11y-click-events-have-key-events -->
+							<!-- svelte-ignore a11y-no-static-element-interactions -->
+							<div
 								on:click|stopPropagation={toggleDropdown}
 								class="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
 							>
 								<Icon
-									icon={showDropdown ? 'ep:arrow-up-bold' : 'ep:arrow-down-bold'}
+									icon={showDropdown
+										? "ep:arrow-up-bold"
+										: "ep:arrow-down-bold"}
 									class="text-gray-500 mr-1 text-2s font-bold"
 								/>
 							</div>
