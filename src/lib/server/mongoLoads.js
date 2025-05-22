@@ -694,6 +694,7 @@ export const loadProductsubcategory = async (
     const aggregation = [
 
       { $match: matchCondition },
+      {$sort:{image:-1}},
       {
         $skip:num.skip
       },
@@ -824,8 +825,9 @@ export const loadProductsubcategory = async (
             },
             {
               $sort: Object.assign(
-                { hasStockDetails: -1 },  // true (non-empty) comes first
-                sortConditions           // then apply your original sort
+                sortConditions,
+                { hasStockDetails: -1 } // true (non-empty) comes first
+                           // then apply your original sort
               )
             },
             // {

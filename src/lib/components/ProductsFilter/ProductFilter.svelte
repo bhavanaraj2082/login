@@ -552,9 +552,9 @@ function handleMouseLeave() {
                <input type="text" bind:value={selectedManufacturer}
                       placeholder="Search manufacturers..." 
                       on:input={e => handleManufacturer(e.target.value)} 
-                      class="w-full text-xs rounded-md border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
+                      class="w-full {searchManufacture.length <5 ? "hidden" : ""} text-xs rounded-md border-1 border-gray-300 focus:ring-0 focus:border-primary-500">
                       {#if loading}
-                        <Icon icon="line-md:loading-loop" class=" absolute right-2 top-2.5 text-xl text-primary-500"/>
+                        <Icon icon="line-md:loading-loop" class=" absolute {searchManufacture.length <5 ? "hidden" : ""} right-2 top-2.5 text-xl text-primary-500"/>
                       {/if}
                <div class="space-y-2.5 py-2.5 border-1 rounded-md px-2 overflow-y-auto my-1 scroll">
                    {#if !searchManufacture.length}
