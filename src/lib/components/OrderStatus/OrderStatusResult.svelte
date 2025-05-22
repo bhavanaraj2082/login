@@ -1,5 +1,5 @@
 <script>
-	import { page } from '$app/stores';
+  import { page } from "$app/stores";
   import { authedUser } from "$lib/stores/mainStores.js";
   import { enhance } from "$app/forms";
   import AllOrders from "./AllOrders.svelte";
@@ -23,19 +23,20 @@
     id: product._id,
     productName: product.productName,
     // prodDesc: product.prodDesc,
-    image : product.image
+    image: product.image,
   }));
 
   let showCancelButton = true;
 
-  if(shipedProducts?.length >= 1){
-  showCancelButton = false
+  if (shipedProducts?.length >= 1) {
+    showCancelButton = false;
   }
 
   const shippedDetails = shipedProducts
     .filter(
       (shipment) =>
-        shipment.status === "Dispatched from Bengaluru" || shipment.status === "Delivered"
+        shipment.status === "Dispatched from Bengaluru" ||
+        shipment.status === "Delivered"
     )
     .map((shipment) => {
       return shipment.shipDetails.map((detail) => {
@@ -64,12 +65,12 @@
       ...(product && {
         productName: product.productName,
         // prodDesc: product.prodDesc,
-        image : product.image
+        image: product.image,
       }),
     };
   });
 
-  console.log("orderedproduct--------",orderedproduct);
+  console.log("orderedproduct--------", orderedproduct);
 
   const shippedQuantities = shippedDetails.reduce((acc, item) => {
     if (!acc[item.id]) {
@@ -88,11 +89,11 @@
 
       if (remainingQty > 0) {
         return {
-          image : product.image,
+          image: product.image,
           productName: product.productName,
           unitPrice: product.unitPrice,
           productId: product.productId,
-          productNumber :product.productNumber,
+          productNumber: product.productNumber,
           remainingQuantity: remainingQty,
         };
       }
@@ -100,19 +101,20 @@
     })
     .filter((item) => item !== null);
 
-    // console.log("------remainingProducts",remainingProducts);
+  // console.log("------remainingProducts",remainingProducts);
 
   function formatDate(dateString) {
     const date = new Date(dateString);
-    const options = {
-      weekday: "long",
-      day: "numeric",
-      month: "short",
-    };
+
     if (isNaN(date.getTime())) {
       return "--";
     }
-    return date.toLocaleDateString("en-US", options);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
   }
 
   let isAllActive = true;
@@ -137,25 +139,24 @@
     showCancelPopup = false;
   };
 
-	let param = $page.url;
-	let url = new URL(param);
-	let email = url.searchParams.get('email');
+  let param = $page.url;
+  let url = new URL(param);
+  let email = url.searchParams.get("email");
 
   function priceShowing(price, currency) {
     if (price === undefined || price === null || price === 0) {
-        return '--';
+      return "--";
     }
     const formattedPrice = Number(price.toFixed(2));
     if (currency === "inr") {
-         let showingPrice = formattedPrice.toLocaleString("en-IN");
-        return `₹ ${showingPrice}`;
+      let showingPrice = formattedPrice.toLocaleString("en-IN");
+      return `₹ ${showingPrice}`;
     }
     if (currency === "usd") {
-        return `$ ${formattedPrice}`;
+      return `$ ${formattedPrice}`;
     }
-    return formattedPrice; 
-}
-
+    return formattedPrice;
+  }
 </script>
 
 <div class="">
@@ -167,12 +168,13 @@
         >
           Items Order and Order Details
         </h2>
-        {#if (user === email) && (showCancelButton === true) }
+        {#if user === email && showCancelButton === true}
           {#if orderStatus === "pending"}
             <div>
               <button
                 on:click={showCancelConfirmation}
-                class="bg-red-500 hover:bg-red-600 text-white rounded-md px-3 py-1 my-3 shadow">
+                class="bg-red-500 hover:bg-red-600 text-white rounded-md px-3 py-1 my-3 shadow"
+              >
                 Cancel Order
               </button>
             </div>
@@ -188,7 +190,9 @@
       </div>
 
       {#if showCancelPopup}
-        <div class="fixed inset-0 bg-gray-400 bg-opacity-75 flex items-center justify-center z-50">
+        <div
+          class="fixed inset-0 bg-gray-400 bg-opacity-75 flex items-center justify-center z-50"
+        >
           <div class="bg-white rounded-sm p-5 shadow-lg w-80">
             <h2 class="text-lg text-heading font-semibold">Cancel Order</h2>
             <p class="mt-2 text-sm text-description">
@@ -197,22 +201,26 @@
             <div class="flex justify-end mt-4">
               <button
                 on:click={hideCancelPopup}
-                class="mr-2 bg-gray-200 text-gray-800 hover:bg-gray-300 rounded px-4 py-2" >
+                class="mr-2 bg-gray-200 text-gray-800 hover:bg-gray-300 rounded px-4 py-2"
+              >
                 Close
               </button>
               <div>
                 <form
                   method="POST"
                   action="?/cancelOrder"
-                  use:enhance={cancelOrder}>
+                  use:enhance={cancelOrder}
+                >
                   <input type="hidden" name="recordId" value={recordId} />
                   <input
                     type="hidden"
                     name="status"
-                    value="pending cancellation"/>
+                    value="pending cancellation"
+                  />
                   <button
                     type="submit"
-                    class="bg-red-500 text-white hover:bg-red-600 rounded px-4 py-2" >
+                    class="bg-red-500 text-white hover:bg-red-600 rounded px-4 py-2"
+                  >
                     Yes, cancel
                   </button>
                 </form>
@@ -222,36 +230,48 @@
         </div>
       {/if}
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8 bg-white shadow rounded-md pl-6 py-3 sm:p-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+      <div
+        class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8 bg-white shadow rounded-md pl-6 py-3 sm:p-6"
+      >
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"
+        >
           <div class="text-sm font-medium text-gray-500">Order ID:</div>
           <p class="text-sm font-semibold text-heading">
             {order.orderid || "--"}
           </p>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"
+        >
           <div class="text-sm font-medium text-gray-500">Items:</div>
           <p class="text-sm font-semibold text-heading">
             {order.products.length || "--"}
           </p>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"
+        >
           <div class="text-sm font-medium text-gray-500">Total:</div>
           <p class="text-sm font-semibold text-heading">
-            {priceShowing(order.totalprice , currencyType)}
+            {priceShowing(order.totalprice, currencyType)}
           </p>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"
+        >
           <h1 class="text-sm font-medium text-gray-500">Date:</h1>
           <p class="text-sm font-semibold text-heading">
             {formatDate(order.createdAt)}
           </p>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2"
+        >
           <h1 class="text-sm font-medium text-gray-500">Status:</h1>
           <p class="text-sm font-semibold text-heading capitalize">
             {orderStatus || "--"}
@@ -266,17 +286,19 @@
             isAllActive = true;
             isShippedActive = false;
             isPendingActive = false;
-          }}>
+          }}
+        >
           All
         </button>
         <button
-          class="px-3 py-2 font-semibold rounded-md shadow "
+          class="px-3 py-2 font-semibold rounded-md shadow"
           class:bg-gray-200={isShippedActive}
           on:click={() => {
             isShippedActive = true;
             isAllActive = false;
             isPendingActive = false;
-          }}>
+          }}
+        >
           <p>
             Shipments
             <span class="ml-2 rounded-3xl px-2 bg-gray-100 text-primary-400">
@@ -307,14 +329,16 @@
         {/if}
 
         <div>
-          <div class="mt-3 ">
+          <div class="mt-3">
             <h2 class="text-sm font-semibold mb-2 text-gray-600">
               Order Summary
             </h2>
-            <div class="mb-4 px-4 py-4 rounded-md shadow bg-white flex flex-col gap-1">
+            <div
+              class="mb-4 px-4 py-4 rounded-md shadow bg-white flex flex-col gap-1"
+            >
               <div class="flex justify-between">
                 <p class="text-gray-500 text-sm font-medium">Subtotal:</p>
-                <p class="text-heading text-sm font-semibold">               
+                <p class="text-heading text-sm font-semibold">
                   {priceShowing(order.subtotalprice, currencyType)}
                 </p>
               </div>
@@ -330,12 +354,12 @@
               <div class="flex justify-between mt-2">
                 <p class="text-gray-500 text-sm font-medium">Total:</p>
                 <p class="text-heading text-sm font-semibold">
-                  {priceShowing(order.totalprice, currencyType)}  
+                  {priceShowing(order.totalprice, currencyType)}
                 </p>
               </div>
             </div>
 
-            <div class="mb-6 ">
+            <div class="mb-6">
               <h1 class="font-semibold mb-2 text-sm text-gray-600">
                 Billing Address
               </h1>
@@ -351,6 +375,29 @@
                 <p class="font-medium text-sm text-gray-500">
                   {order.shippingaddress || "--"}
                 </p>
+              </div>
+            </div>
+            <div class="mb-4 shadow rounded-sm">
+              <div
+                class="bg-white p-4 rounded shadow-sm text-gray-700 text-sm space-y-2"
+              >
+                <h1 class="font-semibold text-sm text-gray-600">
+                  For any inquiries regarding your order, please contact:
+                </h1>
+
+                <div class="flex flex-col sm:flex-row gap-1 sm:gap-4">
+                  <span class="font-medium text-gray-500">Phone:</span>
+                  <a href="tel:7829922222" >
+                  <span class="font-semibold hover:text-primary-500 text-gray-600">7829922222</span>
+                  </a>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-1 sm:gap-4">
+                  <span class="font-medium text-gray-500">Email:</span>
+                  <a href="mailto:sales@chemikart.com">
+                  <span class="font-semibold hover:text-primary-500 text-gray-600">sales@chemikart.com</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>

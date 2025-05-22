@@ -1,7 +1,7 @@
 <script>
   export let data;
   import Icon from "@iconify/svelte";
-  import {PUBLIC_IMAGE_URL} from "$env/static/public"
+  import { PUBLIC_IMAGE_URL } from "$env/static/public";
   export let currencyType;
   let products = data?.order?.products || [];
   let shipments = data?.order?.shipdetails || [];
@@ -9,7 +9,7 @@
   const productDetails = products.map((product) => ({
     id: product._id,
     productName: product.productName,
-    image : product.image
+    image: product.image,
   }));
 
   const shipmentdetails = shipments.map((shipment, index) => ({
@@ -26,7 +26,7 @@
         return {
           ...detail,
           productName: product.productName,
-          image : product.image
+          image: product.image,
         };
       }
       return detail;
@@ -35,49 +35,74 @@
 
   function formatDate(dateString) {
     const date = new Date(dateString);
-    const options = {
-      weekday: "long",
-      day: "numeric",
-      month: "short",
-    };
+
     if (isNaN(date.getTime())) {
       return "--";
     }
-    return date.toLocaleDateString("en-US", options);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
   }
-  console.log("shipmenettt ---->",shipmentdetails);
+
+  console.log("shipmenettt ---->", shipmentdetails);
 
   function priceShowing(price, currency) {
     if (price === undefined || price === null || price === 0) {
-        return '--';
+      return "--";
     }
     const formattedPrice = Number(price.toFixed(2));
     if (currency === "inr") {
       let showingPrice = formattedPrice.toLocaleString("en-IN");
-        return `₹ ${showingPrice}`;
+      return `₹ ${showingPrice}`;
     }
     if (currency === "usd") {
-        return `$ ${formattedPrice}`;
+      return `$ ${formattedPrice}`;
     }
-    return formattedPrice; 
-}
+    return formattedPrice;
+  }
 </script>
 
 <div class="col-span-2 mt-2">
   {#if !shipmentdetails.length > 0}
-    <div class="flex items-center justify-center mt-8 p-8 rounded-md shadow bg-white">
+    <div
+      class="flex items-center justify-center mt-8 p-8 rounded-md shadow bg-white"
+    >
       <span class="bg-primary-50 rounded-full items-center">
-        <Icon icon="mdi:box-alert-outline" class="text-primary-500 md:text-xl text-sm m-2 "/>
+        <Icon
+          icon="mdi:box-alert-outline"
+          class="text-primary-500 md:text-xl text-sm m-2 "
+        />
       </span>
-      <p class="md:text-content font-light ml-1 text-xs">No products have been shipped yet.</p>
+      <p class="md:text-content font-light ml-1 text-xs">
+        No products have been shipped yet.
+      </p>
     </div>
   {/if}
   {#each shipmentdetails as shipment, index}
     <div class="mb-5">
-      <div class="mb-3">
-        <h1 class="text-base text-gray-600 font-semibold">
-          Shipment {index + 1}
+      <div class="mb-3 flex gap-6">
+        <h1 class="text-base text-gray-600 flex gap-2 items-center font-semibold">
+          Shipment <span>{index + 1}</span>
         </h1>
+        <div
+          class="w-full flex flex-col md:flex-row gap-4 px-2 py-2 "
+        >
+          <h1 class="flex gap-2 items-center">
+            <span class="text-xs font-medium text-gray-500">Est.Date:</span>
+            <span class="font-semibold text-sm text-gray-600">
+              {formatDate(shipment?.deliveryDate)}
+            </span>
+          </h1>
+          <h1 class="flex gap-2 items-center">
+            <span class="text-xs font-medium text-gray-500">Shipped Date:</span>
+            <span class="font-semibold text-sm text-gray-600">
+              {formatDate(shipment?.shippedDate)}
+            </span>
+          </h1>
+        </div>
       </div>
       {#each shipment.shipDetails as item}
         <div class="rounded-lg mb-5 bg-white">
@@ -86,18 +111,25 @@
           >
             <div class="flex gap-3 col-span-3 sm:col-span-2">
               <div>
-                  <!-- svelte-ignore a11y-missing-attribute -->
-            <img  
-            src="{PUBLIC_IMAGE_URL}/{item?.image}"
-            onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
-            class="w-16 rounded-lg" />
+                <!-- svelte-ignore a11y-missing-attribute -->
+                <img
+                  src="{PUBLIC_IMAGE_URL}/{item?.image}"
+                  onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"
+                  class="w-16 rounded-lg"
+                />
               </div>
               <div class="flex flex-col justify-center">
                 <a href="/products/details/{item.productNumber}">
-                  <p class="text-primary-400 hover:underline text-sm font-semibold">{item.productNumber}</p>
-                <p class="text-gray-600 hover:underline hover:text-primary-400 text-sm font-semibold">
-                  {item.productName || "--"}
-                </p>
+                  <p
+                    class="text-primary-400 hover:underline text-sm font-semibold"
+                  >
+                    {item.productNumber}
+                  </p>
+                  <p
+                    class="text-gray-600 hover:underline hover:text-primary-400 text-sm font-semibold"
+                  >
+                    {item.productName || "--"}
+                  </p>
                 </a>
                 <p class="font-medium text-sm text-gray-500">
                   Qty : <span class="text-gray-700">{item.quantity || "-"}</span
@@ -134,22 +166,26 @@
                     />
                     <h3 class="font-semibold text-sm text-gray-500">Shipped</h3>
                   </div>
-                {:else if ( shipment.status === "Order Loaded")}
+                {:else if shipment.status === "Order Loaded"}
                   <div class="flex gap-2">
                     <Icon
                       icon="mingcute:time-duration-line"
                       class="text-primary-500 text-xl"
                     />
-                    <h3 class="font-semibold text-sm text-gray-500">{shipment.status}</h3>
+                    <h3 class="font-semibold text-sm text-gray-500">
+                      {shipment.status}
+                    </h3>
                   </div>
                 {:else if shipment.status === "Picked up from warehouse"}
-                <div class="flex gap-2">
-                  <Icon
-                    icon="mingcute:time-duration-line"
-                    class="text-primary-500 text-xl"
-                  />
-                  <h3 class="font-semibold text-sm text-gray-500">{shipment.status}</h3>
-                </div>
+                  <div class="flex gap-2">
+                    <Icon
+                      icon="mingcute:time-duration-line"
+                      class="text-primary-500 text-xl"
+                    />
+                    <h3 class="font-semibold text-sm text-gray-500">
+                      {shipment.status}
+                    </h3>
+                  </div>
                 {:else if shipment.status === "Cancelled"}
                   <div class="flex gap-2">
                     <Icon

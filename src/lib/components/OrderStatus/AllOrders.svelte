@@ -9,6 +9,7 @@
 
   console.log("daaaaaaaaa",data);
 
+  console.log("currecny",currencyType);
   function priceShowing(price, currency) {
     if (price === undefined || price === null || price === 0) {
       return "--";
@@ -25,13 +26,17 @@
   }
   function downloadExcel() {
     if (orderedproduct && orderedproduct.length > 0) {
+
+
+      const currencySymbol = currencyType === "inr" ? "₹" : "$";
+
       const excelData = orderedproduct.map(product => ({
         'Product Name': product.productName || '--',
         'Manufacturer Name': product.manufacturerName || '--',
         'Order Qty': product.orderQty || '--',
         'Backorder' : product.backOrder || "--",
-        'Unit Price': formatPriceForExcel(product.unitPrice),
-        'Extended Price': formatPriceForExcel(product.extendedPrice)
+        [`Unit Price (${currencySymbol})`]: formatPriceForExcel(product.unitPrice),
+        [`Extended Price (${currencySymbol})`]: formatPriceForExcel(product.extendedPrice)
       }));
 
       let subtotal = data.order?.subtotalprice || 0;
@@ -45,7 +50,7 @@
       const totalRowIdx = excelData.length + 2;
 
       XLSX.utils.sheet_add_aoa(worksheet, 
-        [['', '', '', '', 'Subtotal:', formatPriceForExcel(subtotal)]], 
+        [['', '', '', '', `Subtotal (${currencySymbol}):`, formatPriceForExcel(subtotal)]], 
         {origin: `A${totalRowIdx}`}
       );
       
