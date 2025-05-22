@@ -191,7 +191,7 @@
 								bind:value={email}
 								required
 								maxlength="50"
-								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+								class="w-full placeholder:text-xs text-sm pl-2 pr-10 py-2 rounded bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
 								placeholder="Email"
 								on:input={() => {
 									errors.email = !email
@@ -364,7 +364,7 @@
 						<div class="flex gap-3 shadow rounded-md p-4 cursor-pointer hover:shadow-md transition-all duration-300 ease-in-out">
 							<img
 							    src="{PUBLIC_IMAGE_URL}/{item?.image}"
-								class="w-20 h-20 object-cover rounded-md text-sm"
+								class="w-20 h-20 object-contain rounded-md text-sm"
 								onerror="this.src='/fallback.jpg'"
 								alt={item?.productName}/>
 							<div class="overflow-hidden">
