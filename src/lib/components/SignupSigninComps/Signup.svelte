@@ -55,7 +55,7 @@
     let newErrors = { ...errors }; // Create a new object for reactivity
 
     if (!username) {
-      newErrors.username = "*Required";
+      newErrors.username = "Required";
     } else if (username.length < 3) {
       newErrors.username = "Please enter at least 3 characters";
     } else if (/^[^a-zA-Z]/.test(username)) {
@@ -80,7 +80,7 @@
     let newErrors = { ...errors }; // Create a new object for reactivity
 
     if (!email) {
-      newErrors.email = "*Required";
+      newErrors.email = "Required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       newErrors.email = "Please enter a valid email.";
     } else {
@@ -94,7 +94,7 @@
     let newErrors = { ...errors }; // Ensure reactivity
 
     if (!firstName) {
-      newErrors.firstName = "*Required";
+      newErrors.firstName = "Required";
     } else if (!/^[a-zA-Z\s]+$/.test(firstName)) {
       newErrors.firstName = "First name can only contain letters and spaces";
     } else {
@@ -107,9 +107,7 @@
   function validateLastName() {
     let newErrors = { ...errors }; // Ensure reactivity
 
-    if (!lastName) {
-      newErrors.lastName = "*Required";
-    } else if (!/^[a-zA-Z\s]+$/.test(lastName)) {
+    if (lastName && !/^[a-zA-Z\s]+$/.test(lastName.trim())) {
       newErrors.lastName = "Last name can only contain letters and spaces";
     } else {
       delete newErrors.lastName;
@@ -127,7 +125,7 @@
     let newErrors = { ...errors };
 
     if (!password) {
-      newErrors.password = "*Required";
+      newErrors.password = "Required";
       passwordStrength = 0;
     } else if (password.length < 8) {
       newErrors.password = "Password must be at least 8 characters long";
@@ -164,7 +162,7 @@
   function validateConfirmPassword() {
     let newErrors = { ...errors };
     if (!passwordConfirm) {
-      newErrors.passwordConfirm = "*Required";
+      newErrors.passwordConfirm = "Required";
     } else if (passwordConfirm !== password) {
       newErrors.passwordConfirm = "Passwords do not match";
     } else {
@@ -230,7 +228,7 @@
     let newErrors = { ...errors };
 
     if (!phone) {
-      newErrors.phone = "*Required";
+      newErrors.phone = "Required";
     } else if (!countryName) {
       newErrors.phone = "Select a country before entering your phone number";
     } else {
@@ -265,7 +263,7 @@
 
   function validateCountry() {
     if (!country || country.trim() === "") {
-      errors.country = "*Required";
+      errors.country = "Required";
     } else {
       const match = countries.find(
         (c) => c.name.toLowerCase() === country.toLowerCase()
@@ -293,77 +291,12 @@
     localStorage.setItem("selectedCountry", JSON.stringify(selectedCountry));
   }
 
-  // function toggleDropdown() {
-  //   showDropdown = !showDropdown;
-  // }
-
   function handleSearchChange() {
     filteredCountries = countries.filter((country) =>
       country.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     showDropdown = filteredCountries.length > 0 && searchTerm !== "";
   }
-
-  // function handleInputChange(event, fromValidation = false) {
-  //   searchTerm = event.target.value.trim();
-
-  //   const isDeleting =
-  //     event.inputType === "deleteContentBackward" ||
-  //     event.inputType === "deleteContentForward";
-
-  //   filterCountriesWithoutAutoSelect();
-
-  //   const codeSearch = searchTerm.replace("+", "").trim();
-  //   showDropdown = !fromValidation;
-
-  //   if (searchTerm.length === 0) {
-  //     errors.country = "Invalid country selected";
-  //     errors.phone = "Invalid country selected to validate phone";
-  //     return;
-  //   }
-
-  //   if (!isDeleting) {
-  //     const exactCodeMatches = filteredCountries.filter(
-  //       (country) => country.code.replace("+", "") === codeSearch
-  //     );
-
-  //     if (exactCodeMatches.length === 1) {
-  //       selectCountry(exactCodeMatches[0]);
-  //       return;
-  //     }
-
-  //     const nameMatches = filteredCountries.filter((country) =>
-  //       country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-  //     );
-
-  //     if (nameMatches.length === 1) {
-  //       selectCountry(nameMatches[0]);
-  //       return;
-  //     }
-  //   }
-
-  //   const countryExists = countries.some((c) =>
-  //     c.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-  //   );
-
-  //   if (!countryExists) {
-  //     errors.country = "Invalid country selected";
-  //     errors.phone = "Invalid country selected to validate phone";
-  //   } else {
-  //     delete errors.country;
-  //     delete errors.phone;
-  //   }
-  // }
-
-  // function filterCountriesWithoutAutoSelect() {
-  //   filteredCountries = countries.filter(
-  //     (country) =>
-  //       country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       country.code
-  //         .replace("+", "")
-  //         .includes(searchTerm.replace("+", "").toLowerCase())
-  //   );
-  // }
 
   function handleKeyDown(event) {
     const exactCountryMatch = countries.some(
@@ -654,7 +587,7 @@
     }
 
     if (!country) {
-      errors.country = "*Required";
+      errors.country = "Required";
     } else {
       delete errors.country;
 
@@ -690,7 +623,7 @@
 
     const checkbox = document.querySelector('input[type="checkbox"]');
     if (!checkbox) {
-      errors.termsAndConditions = "*Required";
+      errors.termsAndConditions = "Required";
     } else if (!checkbox.checked) {
       errors.termsAndConditions =
         "You need to agree to the Terms of Service and Privacy Policy to proceed";
@@ -698,7 +631,7 @@
       delete errors.termsAndConditions;
     }
 
-    if (!(isOtpVerified === true)) {
+    if (Object.keys(errors).length === 0 && !(isOtpVerified === true)) {
       toast.error("Please verify your email to proceed");
     }
 
@@ -730,9 +663,9 @@
     //   return;
     // }
     isProcessing = true;
-    formData.append('currency', currency);
-    formData.append('isEmailVerified', isOtpVerified);
-    formData.append('email', email);
+    formData.append("currency", currency);
+    formData.append("isEmailVerified", isOtpVerified);
+    formData.append("email", email);
     return async ({ result, update }) => {
       console.log("result", result);
       isProcessing = false;
@@ -882,7 +815,7 @@
       <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
         <div class="flex-1 mb-2 md:mb-0">
           <label for="username" class="block text-sm font-medium text-gray-600"
-            >Username</label
+            ><span class="text-red-500">*</span> Username</label
           >
           <input
             type="text"
@@ -890,7 +823,10 @@
             name="username"
             maxlength="50"
             bind:value={username}
-            on:input={() => validateUsername()}
+            on:input={(e) => {
+              username = e.target.value.trimStart();
+              validateUsername();
+            }}
             placeholder="Enter your username"
             class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
           />
@@ -900,15 +836,15 @@
         </div>
         <div class="flex-1 mb-2 md:mb-0 relative">
           <label for="email" class="block text-sm font-medium text-gray-600"
-            >Email</label
+            ><span class="text-red-500">*</span> Email</label
           >
           <div class="relative">
             <form
               action="?/verifyemail"
               bind:this={form5}
               method="POST"
-              use:enhance={({formData}) => {
-                formData.append('email', email);
+              use:enhance={({ formData }) => {
+                formData.append("email", email);
                 return async ({ result }) => {
                   console.log("result", result);
 
@@ -1018,8 +954,8 @@
           <form
             action="?/verifyOtp"
             method="POST"
-            use:enhance={({formData}) => {
-              formData.append('email', email);
+            use:enhance={({ formData }) => {
+              formData.append("email", email);
               return async ({ result }) => {
                 console.log(result);
                 isOtpVerified = result.data.isEmailVerified;
@@ -1126,7 +1062,7 @@
       <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
         <div class="flex-1 mb-2 md:mb-0">
           <label for="firstName" class="block text-sm font-medium text-gray-600"
-            >First Name</label
+            ><span class="text-red-500">*</span> First Name</label
           >
           <input
             class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
@@ -1135,7 +1071,10 @@
             maxlength="50"
             bind:value={firstName}
             placeholder="First Name"
-            on:input={validateFirstName}
+            on:input={(e) => {
+              firstName = e.target.value.trimStart();
+              validateFirstName();
+            }}
           />
           <p class=" text-red-500 text-left text-xs">
             {errors?.firstName || ""}
@@ -1152,7 +1091,10 @@
             maxlength="50"
             bind:value={lastName}
             placeholder="Last Name"
-            on:input={validateLastName}
+            on:input={(e) => {
+              lastName = e.target.value.trimStart();
+              validateLastName();
+            }}
           />
           <p class=" text-red-500 text-left text-xs">
             {errors?.lastName || ""}
@@ -1162,10 +1104,14 @@
       <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
         <div class="w-full sm:mx-auto grid">
           <label for="country" class="block text-sm font-medium text-gray-600"
-            >Country</label
+            ><span class="text-red-500">*</span> Country</label
           >
-            <div class="dropdown-container">
-              <div class="relative">
+          <div class="dropdown-container">
+            <div class="relative">
+              <!-- Wrap input and icon in a group to control toggle behavior -->
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <div class="flex items-center" on:click={toggleDropdown}>
                 <input
                   type="text"
                   name="country"
@@ -1173,54 +1119,57 @@
                   bind:value={country}
                   placeholder="Search Country"
                   on:input={handleInputChange}
-                  on:click={toggleDropdown}
                   on:keydown={handleKeyDown}
                   class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
-                        focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
-                        placeholder:text-sm h-10"
+                          focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
+                          placeholder:text-sm h-10 pr-8"
                 />
                 <Icon
-                  icon={showDropdown ? "ep:arrow-up-bold" : "ep:arrow-down-bold"}
-                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer"
+                  icon={showDropdown
+                    ? "ep:arrow-up-bold"
+                    : "ep:arrow-down-bold"}
+                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer pointer-events-none"
                 />
-
-                {#if showDropdown}
-                  <div
-                    bind:this={dropdownEl}
-                    class="absolute w-full top-full mt-px bg-white border border-gray-300 rounded-md shadow-lg z-10"
-                  >
-                    <ul class="max-h-60 overflow-y-auto text-sm">
-                      {#each filteredCountries as country, index}
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                        <li
-                          on:click={() => selectCountry(country)}
-                          class="px-4 py-2 cursor-pointer {highlightedIndex === index
-                            ? 'bg-primary-100'
-                            : 'hover:bg-primary-50'}"
-                        >
-                          {country.name} ({country.code})
-                        </li>
-                      {/each}
-                      {#if filteredCountries.length === 0}
-                        <div class="flex items-center px-4 py-3">
-                          <Icon
-                            icon="tabler:info-square-rounded-filled"
-                            class="text-red-500 text-base mr-2"
-                          />
-                          <li class="text-gray-800 text-xs">
-                            No matching countries found!
-                          </li>
-                        </div>
-                      {/if}
-                    </ul>
-                  </div>
-                {/if}
               </div>
-              {#if errors.country}
-                <div class="text-red-500 text-xs mt-1">{errors.country}</div>
+
+              {#if showDropdown}
+                <div
+                  bind:this={dropdownEl}
+                  class="absolute w-full top-full mt-px bg-white border border-gray-300 rounded-md shadow-lg z-10"
+                >
+                  <ul class="max-h-60 overflow-y-auto text-sm">
+                    {#each filteredCountries as country, index}
+                      <!-- svelte-ignore a11y-click-events-have-key-events -->
+                      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                      <li
+                        on:click={() => selectCountry(country)}
+                        class="px-4 py-2 cursor-pointer {highlightedIndex ===
+                        index
+                          ? 'bg-primary-100'
+                          : 'hover:bg-primary-50'}"
+                      >
+                        {country.name} ({country.code})
+                      </li>
+                    {/each}
+                    {#if filteredCountries.length === 0}
+                      <div class="flex items-center px-4 py-3">
+                        <Icon
+                          icon="tabler:info-square-rounded-filled"
+                          class="text-red-500 text-base mr-2"
+                        />
+                        <li class="text-gray-800 text-xs">
+                          No matching countries found!
+                        </li>
+                      </div>
+                    {/if}
+                  </ul>
+                </div>
               {/if}
             </div>
+            {#if errors.country}
+              <div class="text-red-500 text-xs mt-1">{errors.country}</div>
+            {/if}
+          </div>
         </div>
 
         <!-- <div class="w-full sm:mx-auto grid">
@@ -1253,9 +1202,9 @@
       </div>
 
       <div class="mb-4">
-        <label for="phone" class="block text-sm font-medium text-gray-600"
-          >Phone Number</label
-        >
+        <label for="phone" class="block text-sm font-medium text-gray-600">
+          <span class="text-red-500">*</span> Phone Number
+        </label>
         <input
           type="tel"
           id="phone"
@@ -1269,15 +1218,17 @@
                     focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
                     placeholder:text-sm h-10"
         />
-        <div class="flex items-center text-sm text-gray-700">
-          <Icon
-            icon="carbon:location-info-filled"
-            class="text-sm inline text-primary-400"
-          />
-          <span class="text-2s text-gray-700"
-            >Enter phone number without country code</span
-          >
-        </div>
+        {#if errors.phone}
+          <div class="flex items-center text-sm text-gray-700">
+            <Icon
+              icon="carbon:location-info-filled"
+              class="text-sm inline text-primary-400"
+            />
+            <span class="text-2s text-gray-700"
+              >Enter phone number without country code</span
+            >
+          </div>
+        {/if}
         {#if errors.phone}
           <div class="text-red-500 text-xs mt-1">{errors.phone}</div>
         {/if}
@@ -1351,7 +1302,7 @@
 
       <div class="mb-4 relative">
         <label for="password" class="block text-sm font-medium text-gray-600">
-          Password
+          <span class="text-red-500">*</span> Password
         </label>
         <div class="relative">
           <input
@@ -1360,7 +1311,10 @@
             type="password"
             maxlength="50"
             bind:value={password}
-            on:input={() => validatePassword()}
+            on:input={(e) => {
+              password = e.target.value.trim();
+              validatePassword();
+            }}
             placeholder="Enter your password"
             class="mt-1 block w-full p-2 pr-10 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 text-sm placeholder:text-sm h-10"
           />
@@ -1482,7 +1436,7 @@
           for="passwordConfirm"
           class="block text-sm font-medium text-gray-600"
         >
-          Confirm Password</label
+          <span class="text-red-500">*</span> Confirm Password</label
         >
         <div class="relative">
           <input
@@ -1491,7 +1445,10 @@
             type="password"
             maxlength="50"
             bind:value={passwordConfirm}
-            on:input={validateConfirmPassword}
+            on:input={(e) => {
+              passwordConfirm = e.target.value.trim();
+              validateConfirmPassword();
+            }}
             placeholder="Confirm your password"
             class="mt-1 block w-full p-2 pr-10 border text-sm border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10"
           />
