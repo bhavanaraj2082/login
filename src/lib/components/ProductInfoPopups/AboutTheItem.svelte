@@ -4,7 +4,7 @@
 
 {#each data.records as product}
   {#if product.filteredProductData && Object.keys(product.filteredProductData).length > 0}
-    <div class="border-t border-gray-400 mt-8"></div>
+    <div class="border-t border-gray-300 mt-8"></div>
     <div class="w-full mt-3">
       <h3 class="text-base font-bold text-heading pb-1">About This Item</h3>
       <div class="transition-all duration-300">

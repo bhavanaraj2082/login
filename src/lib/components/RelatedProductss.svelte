@@ -1,10 +1,10 @@
 <script>
-  import {PUBLIC_IMAGE_URL} from "$env/static/public"
+  import { PUBLIC_IMAGE_URL } from "$env/static/public";
   import { onMount } from "svelte";
   import { toast, Toaster } from "svelte-sonner";
   import { invalidate } from "$app/navigation";
   import Icon from "@iconify/svelte";
-  import { goto } from '$app/navigation';
+  import { goto } from "$app/navigation";
   import { currencyState, cartTotalComps } from "$lib/stores/mainStores.js";
   import { addItemToCart, cart, guestCart } from "$lib/stores/cart.js";
   import { authedUser } from "$lib/stores/mainStores.js";
@@ -15,12 +15,10 @@
   let showQuoteModal = false;
   let productQuote = null;
   let form5;
-  console.log("relatedProducts",relatedProducts);
+  // console.log("relatedProducts", relatedProducts);
   import { enhance } from "$app/forms";
   $: displayPrice =
-    $currencyState === "usd"
-      ? selectedProduct.USD
-      : selectedProduct.INR;
+    $currencyState === "usd" ? selectedProduct.USD : selectedProduct.INR;
   $: currencySymbol = $currencyState === "usd" ? "$" : "₹";
 
   // const productsData = relatedProducts;
@@ -28,14 +26,14 @@
   let showCartPopup = false;
   let RelatedProductData = relatedProducts;
   // console.log("final RelatedProductData",RelatedProductData);
-  
+
   let currentIndex = 0;
   let logosPerSlide = 4;
   let totalSlides = Math.ceil(RelatedProductData.length / logosPerSlide);
 
   function handleViewCartClick() {
     showCartPopup = false;
-    goto('/cart');
+    goto("/cart");
   }
 
   function prevSlide() {
@@ -284,7 +282,9 @@
   <input type="hidden" name="loggedInUser" value={$authedUser?.id} />
 </form>
 <div class="max-w-7xl mx-auto my-10 md:w-11/12">
-  <h3 class="text-xl font-bold text-heading p-1 mx-auto uppercase">Related Products</h3>
+  <h3 class="text-xl font-bold text-heading p-1 mx-auto uppercase">
+    Related Products
+  </h3>
 
   <div class="relative mt-1">
     <div class="flex items-center">
@@ -429,12 +429,16 @@
         </button>
       </div>
       <div class="flex flex-row sm:flex-row gap-4 mb-3">
-        <img
-          src="{PUBLIC_IMAGE_URL}/{selectedProduct?.image}"
-          onerror="this.src='/fallback.jpg'"
-          alt="ProductImage"
-          class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border mx-auto sm:mx-0"
-        />
+        <a
+          href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
+        >
+          <img
+            src="{PUBLIC_IMAGE_URL}/{selectedProduct?.image}"
+            onerror="this.src='/fallback.jpg'"
+            alt="ProductImage"
+            class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border mx-auto sm:mx-0"
+          /></a
+        >
         <div>
           <p class="text-xs font-semibold text-left">
             {selectedProduct.brand || "--"}
@@ -457,7 +461,7 @@
 
       <div class="pl-2">
         <!-- {#if selectedProduct?.variants?.length > 0} -->
-          <!-- {#if selectedProduct?.variants?.length > 0}
+        <!-- {#if selectedProduct?.variants?.length > 0}
             <p class="text-gray-700 text-sm">
               Multiple variants of this product are available with different
               prices. View more details below.
@@ -471,8 +475,8 @@
             </button>
           {/if} -->
 
-          <!-- {#if selectedProduct?.variants?.length === 0} -->
-            <!-- {#if selectedPrice}
+        <!-- {#if selectedProduct?.variants?.length === 0} -->
+        <!-- {#if selectedPrice}
               <div
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start"
               >
@@ -500,7 +504,7 @@
                 </p>
               </div>
             {/if} -->
-          <!-- {/if} -->
+        <!-- {/if} -->
         <!-- {:else if selectedProduct?.variants?.length === 0 && selectedProduct?.priceSize?.length === 0} -->
         {#if selectedProduct?.priceSize?.length === 0}
           <div>
@@ -563,13 +567,13 @@
                 </p>
               </div>
 
-              <form class="flex  items-center gap-3">
+              <form class="flex items-center gap-3">
                 <div
                   class="border border-gray-300 rounded-md flex gap-2 justify-between items-center hover:shadow-lg hover:shadow-orange-100 w-full sm:w-36"
                 >
                   <button
                     type="button"
-                    class="pl-3 text-xl text-primary-500   m-1 hover:scale-110"
+                    class="pl-3 text-xl text-primary-500 m-1 hover:scale-110"
                     on:click={decrementPopupQuantity}
                   >
                     -
@@ -746,21 +750,19 @@
             <div class="flex flex-col items-center gap-1 mt-1">
               <p class="text-sm font-bold text-gray-500">
                 {#if $currencyState === "usd"}
-                  $ {(Number(selectedPrice?.USD || 0) * Number(popupQuantity || 1)).toLocaleString(
-                    "en-US",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }
-                  )}
+                  $ {(
+                    Number(selectedPrice?.USD || 0) * Number(popupQuantity || 1)
+                  ).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 {:else}
-                  ₹ {(Number(selectedPrice?.INR || 0) * Number(popupQuantity || 1)).toLocaleString(
-                    "en-IN",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }
-                  )}
+                  ₹ {(
+                    Number(selectedPrice?.INR || 0) * Number(popupQuantity || 1)
+                  ).toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 {/if}
               </p>
               <p class="text-xs text-gray-400">without GST</p>

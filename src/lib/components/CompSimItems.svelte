@@ -1,8 +1,8 @@
 <script>
-  import {PUBLIC_IMAGE_URL} from "$env/static/public"
+  import { PUBLIC_IMAGE_URL } from "$env/static/public";
   import { onMount } from "svelte";
   import { toast, Toaster } from "svelte-sonner";
-  import { goto } from '$app/navigation';
+  import { goto } from "$app/navigation";
   import { invalidate } from "$app/navigation";
   import Icon from "@iconify/svelte";
   import { currencyState, cartTotalComps } from "$lib/stores/mainStores.js";
@@ -18,9 +18,7 @@
   // console.log("compareSimilarity",compareSimilarity);
   import { enhance } from "$app/forms";
   $: displayPrice =
-    $currencyState === "usd"
-      ? selectedProduct.USD
-      : selectedProduct.INR;
+    $currencyState === "usd" ? selectedProduct.USD : selectedProduct.INR;
   $: currencySymbol = $currencyState === "usd" ? "$" : "₹";
   let showDifference = false;
   function toggleDifference(event) {
@@ -47,7 +45,7 @@
     "packaging",
     "parameter",
     "fitting",
-    "compatability"
+    "compatability",
   ];
   function truncateByLength(text, maxLength) {
     if (text.length > maxLength) {
@@ -67,7 +65,7 @@
 
   function handleViewCartClick() {
     showCartPopup = false;
-    goto('/cart');
+    goto("/cart");
   }
 
   // const productsData = compareSimilarity;
@@ -109,7 +107,7 @@
 
   let CompareSimilarityData = compareSimilarity;
   // console.log("final RelatedProductData",RelatedProductData);
-  
+
   let currentIndex = 0;
   let logosPerSlide = 4;
   let totalSlides = Math.ceil(CompareSimilarityData.length / logosPerSlide);
@@ -351,13 +349,13 @@
   }
 
   function isSameAsFirst(value, key) {
-    if (CompareSimilarityData.length === 0 ) {
-    return false; 
-  }
+    if (CompareSimilarityData.length === 0) {
+      return false;
+    }
 
-  const firstValue = CompareSimilarityData[0].properties[key];
-  return value === firstValue;
-}
+    const firstValue = CompareSimilarityData[0].properties[key];
+    return value === firstValue;
+  }
 </script>
 
 <form
@@ -466,32 +464,39 @@
                   </button>
                 </div>
 
-              <!-- details div -->
+                <!-- details div -->
                 <div class="px-3 mb-3">
                   <h3 class="text-gray-700">
                     {#each Object.keys(product.properties) as key}
-                    {#if key !== 'Languages'}
-                    <hr class="border-t border-gray-300" />
-                    <div class="py-2 {showDifference && !isSameAsFirst(product.properties[key], key) && product.properties[key] && product.properties[key] !== '__' ? 'bg-blue-100 px-1' : 'bg-white'} min-h-[60px] max-h-[60px] overflow-hidden">
-                      <div class="text-left text-xs font-semibold">{key}:</div>
-                      <div class="text-gray-500 text-xs pt-1 font-normal">
-                        {#if product.properties[key]}
-                          {#if typeof product.properties[key] === "object"}
-                            {JSON.stringify(product.properties[key])}
-                          {:else}
-                            {product.properties[key]}
-                          {/if}
-                        {:else}
-                          -
-                        {/if}
-                      </div>
-                    </div>
-                    {/if}
+                      {#if key !== "Languages"}
+                        <hr class="border-t border-gray-300" />
+                        <div
+                          class="py-2 {showDifference &&
+                          !isSameAsFirst(product.properties[key], key) &&
+                          product.properties[key] &&
+                          product.properties[key] !== '__'
+                            ? 'bg-blue-100 px-1'
+                            : 'bg-white'} min-h-[60px] max-h-[60px] overflow-hidden"
+                        >
+                          <div class="text-left text-xs font-semibold">
+                            {key}:
+                          </div>
+                          <div class="text-gray-500 text-xs pt-1 font-normal">
+                            {#if product.properties[key]}
+                              {#if typeof product.properties[key] === "object"}
+                                {JSON.stringify(product.properties[key])}
+                              {:else}
+                                {product.properties[key]}
+                              {/if}
+                            {:else}
+                              -
+                            {/if}
+                          </div>
+                        </div>
+                      {/if}
                     {/each}
                   </h3>
                 </div>
-                
-
               </div>
             </div>
           {/each}
@@ -533,12 +538,16 @@
         </button>
       </div>
       <div class="flex flex-row sm:flex-row gap-4 mb-3">
-        <img
-          src="{PUBLIC_IMAGE_URL}/{selectedProduct?.image}"
-          onerror="this.src='/fallback.jpg'"
-          alt="ProductImage"
-          class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border mx-auto sm:mx-0"
-        />
+        <a
+          href="/products/{selectedProduct.category}/{selectedProduct.subCategory}/{selectedProduct.partNumber}"
+        >
+          <img
+            src="{PUBLIC_IMAGE_URL}/{selectedProduct?.image}"
+            onerror="this.src='/fallback.jpg'"
+            alt="ProductImage"
+            class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border mx-auto sm:mx-0"
+          /></a
+        >
         <div>
           <p class="text-xs font-semibold text-left">
             {selectedProduct.brand || "--"}
@@ -561,7 +570,7 @@
 
       <div class="pl-2">
         <!-- {#if selectedProduct?.variants?.length > 0} -->
-          <!-- {#if selectedProduct?.variants?.length > 0}
+        <!-- {#if selectedProduct?.variants?.length > 0}
             <p class="text-gray-700 text-sm">
               Multiple variants of this product are available with different
               prices. View more details below.
@@ -575,7 +584,7 @@
             </button>
           {/if} -->
 
-          <!-- {#if selectedProduct?.variants?.length === 0}
+        <!-- {#if selectedProduct?.variants?.length === 0}
             {#if selectedPrice}
               <div
                 class="mt-5 flex gap-6 items-center justify-between sm:justify-start"
@@ -849,21 +858,19 @@
             <div class="flex flex-col items-center gap-1 mt-1">
               <p class="text-sm font-bold text-gray-500">
                 {#if $currencyState === "usd"}
-                  $ {(Number(selectedPrice?.USD || 0) * Number(popupQuantity || 1)).toLocaleString(
-                    "en-US",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }
-                  )}
+                  $ {(
+                    Number(selectedPrice?.USD || 0) * Number(popupQuantity || 1)
+                  ).toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 {:else}
-                  ₹ {(Number(selectedPrice?.INR || 0) * Number(popupQuantity || 1)).toLocaleString(
-                    "en-IN",
-                    {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }
-                  )}
+                  ₹ {(
+                    Number(selectedPrice?.INR || 0) * Number(popupQuantity || 1)
+                  ).toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 {/if}
               </p>
               <p class="text-xs text-gray-400">without GST</p>

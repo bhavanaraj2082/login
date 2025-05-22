@@ -543,7 +543,7 @@
     </div>
 
     {#if totalPages > 1}
-      <div class="flex items-center justify-center gap-2 flex-wrap my-6">
+      <div class="flex items-center justify-center gap-2 flex-wrap py-8">
         <button
           class="inline-flex h-8 w-8 items-center justify-center rounded-md px-2 text-sm shadow-sm border border-gray-300 bg-white text-gray-700 transition-all duration-200 transform hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
           on:click={() => handlePageChange(1)}

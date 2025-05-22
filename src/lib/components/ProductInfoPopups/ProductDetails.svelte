@@ -508,12 +508,12 @@
               <thead>
                 <tr class="text-sm sm:font-semibold">
                   <th
-                    class="px-1 pl-0 whitespace-nowrap border-b border-gray-300"
+                    class="px-1 pl-0 whitespace-nowrap border-b-1 border-gray-300"
                     >Pack Size</th
                   >
-                  <th class="px-1 border-b border-gray-300">SKU</th>
-                  <th class="px-1 border-b border-gray-300">Availability</th>
-                  <th class="px-1 border-b border-gray-300">Price</th>
+                  <th class="px-1 border-b-1 border-gray-300">SKU</th>
+                  <th class="px-1 border-b-1 border-gray-300">Availability</th>
+                  <th class="px-1 border-b-1 border-gray-300">Price</th>
                 </tr>
               </thead>
               <tbody>
