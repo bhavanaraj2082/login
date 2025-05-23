@@ -283,6 +283,9 @@ async function submitForm() {
 
 	function handleInput(event) {
 		searchQuery = event.target.value;
+		if (searchQuery.length === 0) {
+		searchResults=[]
+		}
 		if (searchQuery.length >= 3) {
 		isLoading = true;
 		debounce(handleSearchSubmit, 300);
