@@ -141,9 +141,7 @@
     }
 
     if (!fieldName || fieldName === "lastName") {
-      if (!lastName) {
-        errors.lastName = "*Required";
-      } else if (!/^[A-Za-z\s]+$/.test(lastName)) {
+       if (!/^[A-Za-z\s]+$/.test(lastName)) {
         errors.lastName = "Only letters and spaces are allowed.";
       } else {
         delete errors.lastName;
@@ -233,21 +231,24 @@
       }
     }
 
-    if (!fieldName || fieldName === "assistance") {
-      if (!assistance) {
-        errors.assistance = "*Required";
-      } else if (assistance.length < 3) {
-        errors.assistance = "Must be at least 3 characters.";
-      } else if (
-        !/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(assistance) ||
-        /<script.*?>.*?<\/script>/i.test(assistance) ||
-        /<[^>]*>/i.test(assistance)
-      ) {
-        errors.assistance = "Please enter valid assistance details.";
-      } else {
-        delete errors.assistance;
-      }
-    }
+
+if (!fieldName || fieldName === "assistance") {
+	if (!assistance) {
+		errors.assistance = "*Required";
+	} else if (assistance.length < 3) {
+		errors.assistance = "Must be at least 3 characters.";
+	} else if (/^\d+$/.test(assistance.trim())) {
+		errors.assistance = "Assistance cannot contain only numbers.";
+	} else if (
+		!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(assistance) ||
+		/<script.*?>.*?<\/script>/i.test(assistance) ||
+		/<[^>]*>/i.test(assistance)
+	) {
+		errors.assistance = "Please enter valid assistance details.";
+	} else {
+		delete errors.assistance;
+	}
+}
 
     if (!fieldName || fieldName === "issue") {
       if (!issue) {
@@ -516,7 +517,7 @@
     errors = {};
 
     validateField("firstName");
-    validateField("lastName");
+    // validateField("lastName");
     validateField("email");
     validateField("phoneNumber");
     validateField("companyName");
@@ -732,13 +733,7 @@ const handlesubmit = ({ formData } = {}) => {
               e.target.value = e.target.value.replace(/^\s+/, "");
               assistance = e.target.value;
               validateField("assistance");
-              errors.assistance = !assistance
-                ? "*Required"
-                : assistance.length < 3
-                  ? "Must be at least 3 characters"
-                  : !/^[A-Za-z0-9\s&-.,!@():;""'']+$/.test(assistance)
-                    ? "Please enter a valid assistance "
-                    : "";
+             
             }}
              on:keydown={(event) => {
                     if (event.key === "Enter") {
@@ -886,11 +881,6 @@ const handlesubmit = ({ formData } = {}) => {
 
                 validateField("lastName");
 
-                errors.lastName = !lastName
-                  ? "*Required"
-                  : !/^[A-Za-z\s]+$/.test(lastName)
-                    ? "Please enter a valid last name"
-                    : "";
               }}
                on:keydown={(event) => {
                     if (event.key === "Enter") {

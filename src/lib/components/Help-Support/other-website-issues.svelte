@@ -149,9 +149,7 @@
 		}
 
 		if (!fieldName || fieldName === "lastName") {
-			if (!lastName) {
-				errors.lastName = "*Required";
-			} else if (!/^[A-Za-z\s]+$/.test(lastName)) {
+			if (!/^[A-Za-z\s]+$/.test(lastName)) {
 				errors.lastName = "Only letters and spaces are allowed.";
 			} else {
 				delete errors.lastName;
@@ -236,19 +234,20 @@
 				delete errors.accountNumber;
 			}
 		}
-        if (!fieldName || fieldName === "companyName") {
-            if (!companyName) {
-                errors.companyName = "*Required";
-            } else if (companyName.length < 3) {
-                errors.companyName = "Company name must be at least 3 characters";
-            } else if (!/^[A-Za-z0-9@.,\s&-]+$/.test(companyName)) {
-                errors.companyName = "Please enter a valid company name";
-            } else if (/^\d+$/.test(companyName)) {
-                errors.companyName = "Company name cannot contain only numbers";
-            } else {
-                delete errors.companyName;
-            }
-        }
+		if (!fieldName || fieldName === "companyName") {
+			if (!companyName) {
+				errors.companyName = "*Required";
+			} else if (companyName.length < 3) {
+				errors.companyName =
+					"Company name must be at least 3 characters";
+			} else if (!/^[A-Za-z0-9@.,\s&-]+$/.test(companyName)) {
+				errors.companyName = "Please enter a valid company name";
+			} else if (/^\d+$/.test(companyName)) {
+				errors.companyName = "Company name cannot contain only numbers";
+			} else {
+				delete errors.companyName;
+			}
+		}
 
 		if (fieldName === "technical_issue") {
 			if (!selectedOption) {
@@ -263,6 +262,10 @@
 				errors.assistanceMessage = "*Required";
 			} else if (assistanceMessage.length < 3) {
 				errors.assistanceMessage = "Must be at least 3 characters.";
+			} else if (/^\d+$/.test(assistanceMessage.trim())) {
+				// Only numbers
+				errors.assistanceMessage =
+					"Message cannot contain only numbers.";
 			} else if (
 				!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(assistanceMessage) ||
 				/<script.*?>.*?<\/script>/i.test(assistanceMessage) ||
@@ -594,7 +597,7 @@
 		errors = {};
 
 		validateField("firstName");
-		validateField("lastName");
+		// validateField("lastName");
 		validateField("email");
 		validateField("phoneNumber");
 		validateField("companyName");
@@ -797,16 +800,6 @@
 								assistanceMessage = e.target.value;
 
 								validateField("assistanceMessage");
-
-								errors.assistanceMessage = !assistanceMessage
-									? "*Required"
-									: assistanceMessage.length < 3
-										? "Must be at least 3 characters"
-										: !/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(
-													assistanceMessage,
-											  )
-											? "Please enter a valid assistance"
-											: "";
 							}}
 							rows="4"
 							class="mt-1 block w-3/4 p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400"
@@ -878,12 +871,6 @@
 									lastName = e.target.value;
 
 									validateField("lastName");
-
-									errors.lastName = !lastName
-										? "*Required"
-										: !/^[A-Za-z\s]+$/.test(lastName)
-											? "Please enter a valid last name"
-											: "";
 								}}
 							/>
 							{#if errors?.lastName}
@@ -1177,8 +1164,6 @@
 									companyName = e.target.value;
 
 									validateField("companyName");
-
-								
 								}}
 							/>
 							{#if errors?.companyName}
