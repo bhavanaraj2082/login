@@ -411,7 +411,7 @@ function scrollToHighlightedItem() {
 		);
 
 		if (exactCodeMatches.length === 1) {
-			selectlocation(exactCodeMatches[0]);
+			selectCountry(exactCodeMatches[0]);
 			return;
 		}
 	}
@@ -421,7 +421,7 @@ function scrollToHighlightedItem() {
 	);
 
 	if (countriesStartingWith.length === 1) {
-		selectlocation(countriesStartingWith[0]);
+		selectCountry(countriesStartingWith[0]);
 	}
 } else {
 	filterCountriesWithoutAutoSelect();
@@ -761,6 +761,11 @@ function verifyCaptcha() {
 // 	$: if (country) {
 //     validateField("phone");
 // }
+
+$: if (country && phone) {
+	validateField("phone");
+}
+
 </script>
 
 {#if showSuccesDiv}
@@ -892,8 +897,8 @@ function verifyCaptcha() {
 								<div
 									class="sm:text-sm text-xs hover:text-primary-500 cursor-pointer"
 								>
-									<a href="mailto:sales@partskeys.com"
-										>chemikart@gmail.com</a
+									<a href="mailto:sales@chemikart.com"
+										>sales@chemikart.com</a
 									>
 								</div>
 							</div>
@@ -959,11 +964,11 @@ function verifyCaptcha() {
 {/if}
 
 								  </div>
-								<!-- <input
+								 <input
 									type="hidden"
 									name="email"
 									id="email"
-									bind:value={email}/> -->
+									bind:value={email}/> 
 								<div class="flex-1">
 									<div class="flex-1 ">
 										<form
@@ -1035,6 +1040,7 @@ function verifyCaptcha() {
   <input
     type="text"
     name="email"
+	maxlength="100"
     id="email"
     bind:value={email}
     class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
@@ -1161,12 +1167,12 @@ function verifyCaptcha() {
 												<div
 													class="relative w-full mb-2"
 												>
-													<!-- <input
+													<input
 														type="hidden"
 														name="email"
 														id="email"
 														bind:value={email}
-													/> -->
+													/> 
 													<input
 														type="text"
 														name="enteredOtp"
@@ -1302,14 +1308,7 @@ function verifyCaptcha() {
 {country.name} ({country.code})
 </li>
 
-<!-- <li
-                          on:click={() => selectCountry(country)}
-                          class="px-4 py-2 cursor-pointer {highlightedIndex === index
-                            ? 'bg-primary-100'
-                            : 'hover:bg-primary-50'}"
-                        >
-                          {country.name} ({country.code})
-                        </li> -->
+
 
 
 											{/each}

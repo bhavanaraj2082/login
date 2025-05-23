@@ -6,6 +6,8 @@
   import { toast, Toaster } from "svelte-sonner";
   let showNav = false;
   let showErrors = false;
+  let invalid = false;
+  let invalidLot = false;
   let showProductDetails = false;
   let showProductDetails1 = false;
   let activeTab = "safetydata sheets";
@@ -16,6 +18,8 @@
   let submitting = false;
   function handleInput(event) {
     inputValue = event.target.value.toUpperCase();
+    invalid = false;
+    invalidLot = false;
   }
   function handleInput1(event) {
     inputValue1 = event.target.value.toUpperCase();
@@ -37,6 +41,7 @@
   $: if (activeTab) {
     status = "";
     showErrors = false;
+    invalid = false;
   }
   function showMessage(safetyDatasheet) {
   if (typeof safetyDatasheet === "string" && safetyDatasheet.startsWith("http")) {
@@ -201,6 +206,22 @@ function RemoveUrl(urlToRemove) {
       window.history.replaceState({}, document.title, currentUrl.toString());
     }
 }
+function containsScriptTag(str) {
+  if (!str) return false;
+
+  const input = str.trim();
+
+  // Block any <script> tag attempts
+  const scriptTagRegex = /<\s*script.*?>.*?<\s*\/\s*script\s*>/gi;
+
+  // Block individual forbidden characters
+  const forbiddenCharsRegex = /[<>{}@#\$%\^&\*\(\)=\+\[\]\\;:'",\?\/|`~]/;
+
+  return scriptTagRegex.test(input) || forbiddenCharsRegex.test(input);
+}
+
+
+
 </script>
 
 <div class="w-[90%] mx-auto pb-10">
@@ -247,40 +268,42 @@ function RemoveUrl(urlToRemove) {
           <p class="mb-6 sm:text-md text-sm text-description mx-auto">
             To search for a Safety Data Sheet, please enter the product number.
           </p>
-          <form
-            method="post"
-            action="?/document"
-            use:enhance={(event) => {
-              showErrors = inputValue.length === 0;
-              if (showErrors) {
-                event.preventDefault();
-                return;
-              }
-              return async ({ result }) => {
-                
+<form
+  method="post"
+  action="?/document"
+  use:enhance={(event) => {
+    showErrors = inputValue.length === 0;
+    invalid = containsScriptTag(inputValue);
+    
+    
+//       console.log("inputValue", inputValue);
+// console.log("containsScriptTag", containsScriptTag(inputValue));
+    if (showErrors || invalid) {
+      event.preventDefault();  
+      return;
+    }
 
-                try {
-                  if (result.data) {
-                    const safetyDatasheet = result.data.sds;
-                    showMessage(safetyDatasheet);
-                    submitting = true;
-                    console.log("pdf_url", safetyDatasheet);
-                  } else if (result) {
-                    console.log(result);
-                    const errormssg = result.data.props.error;
-                    showMessage(errormssg);
-                  }
-                } catch (error) {
-                  console.error("Error processing result:", error);
-                  showMessage(
-                    "An error occurred while processing your request.",
-                  );
-                } finally {
-                  submitting = false;
-                }
-              };
-            }}
-          >
+    return async ({ result }) => {
+      try {
+        if (result.data) {
+          const safetyDatasheet = result.data.sds;
+          showMessage(safetyDatasheet);
+          submitting = true;
+          console.log("pdf_url", safetyDatasheet);
+        } else if (result) {
+          const errormssg = result.data.props.error;
+          showMessage(errormssg);
+        }
+      } catch (error) {
+        console.error("Error processing result:", error);
+        showMessage("An error occurred while processing your request.");
+      } finally {
+        submitting = false;
+      }
+    };
+  }}
+>
+
             <label
               for="product-number-sds"
               class="block sm:text-sm text-xs font-medium mb-1 {sdsProductNumberError
@@ -292,6 +315,7 @@ function RemoveUrl(urlToRemove) {
             <div class="w-full">
               <input
                 type="text"
+                maxlength=25
                 bind:value={inputValue}
                 on:input={handleInput}
                 id="product-number-sds"
@@ -306,6 +330,13 @@ function RemoveUrl(urlToRemove) {
                 <div class="flex text-start">
                   <span class="text-red-500 sm:text-xs text-2s font-medium"
                     >Product Number is required</span
+                  >
+                </div>
+              {/if}
+                {#if invalid}
+                <div class="flex text-start">
+                  <span class="text-red-500 sm:text-xs text-2s font-medium"
+                    >Product Number must not contain invalid characters</span
                   >
                 </div>
               {/if}
@@ -349,7 +380,9 @@ function RemoveUrl(urlToRemove) {
             use:enhance={() => {
               return async ({ result }) => {
                 showErrors = inputValue1.length === 0 || lotNumber.length === 0;
-                if (showErrors) {
+                invalid = containsScriptTag(inputValue1);
+                 invalidLot = containsScriptTag(lotNumber);
+                 if (showErrors || invalid || invalidLot) {
                   return;
                 }
                 if (result.data) {
@@ -380,6 +413,7 @@ function RemoveUrl(urlToRemove) {
                 bind:value={inputValue1}
                 on:input={handleInput1}
                 type="text"
+                maxlength=25
                 id="product-number-sds"
                 name="productNumber"
                 placeholder="E.G. ZWCL01F50"
@@ -393,6 +427,14 @@ function RemoveUrl(urlToRemove) {
                   >
                 </div>
               {/if}
+               {#if invalid}
+                <div class="flex text-start">
+                  <span class="text-red-500 sm:text-xs text-2s font-medium"
+                    >Product Number must not contain invalid characters</span
+                  >
+                </div>
+              {/if}
+                
               {#if sdsProductNumberError}
                 <p class="text-red-500 text-md">{sdsProductNumberError}</p>
               {/if}
@@ -411,6 +453,7 @@ function RemoveUrl(urlToRemove) {
                   type="text"
                   id="product-number"
                   name="product-number"
+                  maxlength=25
                   bind:value={lotNumber}
                   placeholder="E.G. 708371"
                   class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
@@ -422,6 +465,13 @@ function RemoveUrl(urlToRemove) {
                     >
                   </div>
                 {/if}
+                {#if invalidLot}
+                <div class="flex text-start">
+                  <span class="text-red-500 sm:text-xs text-2s font-medium"
+                    >Lot Number must not contain invalid characters</span
+                  >
+                </div>
+              {/if}
               </div>
               <div class="flex items-center justify-end mt-2">
                 <button
@@ -460,7 +510,9 @@ function RemoveUrl(urlToRemove) {
                 submitting = true;
                 showErrors =
                   inputValue2.length === 0 || lotNumber1.length === 0;
-                if (showErrors) {
+                   invalid = containsScriptTag(inputValue2);
+                   invalidLot = containsScriptTag(lotNumber1);
+                if (showErrors || invalid || invalidLot) {
                   return;
                 }
                 if (result.data) {
@@ -490,6 +542,7 @@ function RemoveUrl(urlToRemove) {
                 bind:value={inputValue2}
                 on:input={handleInput2}
                 type="text"
+                maxlength=25
                 id="product-number-sds"
                 name="productNumber"
                 placeholder="E.G. ZWCL01F50"
@@ -500,6 +553,13 @@ function RemoveUrl(urlToRemove) {
                 <div class="flex text-start">
                   <span class="text-red-500 sm:text-xs text-2s font-medium"
                     >Product Number is required</span
+                  >
+                </div>
+              {/if}
+                {#if invalid}
+                <div class="flex text-start">
+                  <span class="text-red-500 sm:text-xs text-2s font-medium"
+                    >Product Number must not contain invalid characters</span
                   >
                 </div>
               {/if}
@@ -521,6 +581,7 @@ function RemoveUrl(urlToRemove) {
                   id="product-number"
                   name="product-number"
                   bind:value={lotNumber1}
+                  maxlength=25
                   placeholder="E.G. 708371"
                   class="flex w-full border-1 mt-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
                 />
@@ -531,6 +592,13 @@ function RemoveUrl(urlToRemove) {
                     >
                   </div>
                 {/if}
+                {#if invalidLot}
+                <div class="flex text-start">
+                  <span class="text-red-500 sm:text-xs text-2s font-medium"
+                    >Lot Number must not contain invalid characters</span
+                  >
+                </div>
+              {/if}
                 {#if lotNumber === "" || lotNumber === null}
                   <p class="text-red-500 text-md mt-1">{sdsLottNumberError}</p>
                 {/if}
@@ -572,7 +640,9 @@ function RemoveUrl(urlToRemove) {
                 submitting = true;
                 showErrors =
                   inputValue3.length === 0 || lotNumber2.length === 0;
-                if (showErrors) {
+                   invalid = containsScriptTag(inputValue3);
+                    invalidLot = containsScriptTag(lotNumber2);
+                if (showErrors || invalid || invalidLot) {
                   return;
                 }
                 if (result.data) {
@@ -602,6 +672,7 @@ function RemoveUrl(urlToRemove) {
                 bind:value={inputValue3}
                 on:input={handleInput3}
                 type="text"
+                maxlength=25
                 id="product-number-sds"
                 name="productNumber"
                 placeholder="E.G. ZWCL01F50"
@@ -613,6 +684,13 @@ function RemoveUrl(urlToRemove) {
                 <div class="flex text-start">
                   <span class="text-red-500 sm:text-xs text-2s font-medium"
                     >Product Number is required</span
+                  >
+                </div>
+              {/if}
+                {#if invalid}
+                <div class="flex text-start">
+                  <span class="text-red-500 sm:text-xs text-2s font-medium"
+                    >Product Number must not contain invalid characters</span
                   >
                 </div>
               {/if}
@@ -631,6 +709,7 @@ function RemoveUrl(urlToRemove) {
                   id="product-number"
                   name="product-number"
                   bind:value={lotNumber2}
+                  maxlength=25
                   placeholder="E.G. 708371"
                   class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
                 />
@@ -641,6 +720,13 @@ function RemoveUrl(urlToRemove) {
                     >
                   </div>
                 {/if}
+                {#if invalidLot}
+                <div class="flex text-start">
+                  <span class="text-red-500 sm:text-xs text-2s font-medium"
+                    >Lot Number must not contain invalid characters</span
+                  >
+                </div>
+              {/if}
                 {#if lotNumber === "" || lotNumber === null}
                   <p class="text-red-500 text-md mt-1">{sdsLottNumberError}</p>
                 {/if}
