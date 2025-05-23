@@ -155,9 +155,7 @@
 		}
 
 		if (!fieldName || fieldName === "lastName") {
-			if (!lastName) {
-				errors.lastName = "*Required";
-			} else if (!/^[A-Za-z\s]+$/.test(lastName)) {
+			 if (!/^[A-Za-z\s]+$/.test(lastName)) {
 				errors.lastName = "Only letters and spaces are allowed.";
 			} else {
 				delete errors.lastName;
@@ -587,7 +585,7 @@
 		errors = {};
 
 		validateField("firstName");
-		validateField("lastName");
+
 		validateField("email");
 		validateField("phoneNumber");
 		validateField("companyName");
@@ -958,11 +956,7 @@ const handlesubmit = ({ formData } = {}) => {
 
 								validateField("lastName");
 
-								errors.lastName = !lastName
-									? "*Required"
-									: !/^[A-Za-z\s]+$/.test(lastName)
-										? "Please enter a valid last name"
-										: "";
+							
 							}}
 						/>
 						{#if errors?.lastName}

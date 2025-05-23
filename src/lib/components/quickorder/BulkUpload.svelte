@@ -854,6 +854,58 @@
   // $: {
   //   console.log("REACTIVE: editedLines changed:", Array.from(editedLines));
   // }
+  // Add these functions to your component's script section
+
+  function handleOverlayScroll(event) {
+    // Prevent default scrolling on the overlay
+    event.preventDefault();
+
+    // Calculate scroll delta
+    const delta = event.deltaY;
+
+    // Apply scroll to the textarea
+    if (textareaElement) {
+      const currentScrollTop = textareaElement.scrollTop;
+      const maxScrollTop =
+        textareaElement.scrollHeight - textareaElement.clientHeight;
+      const newScrollTop = Math.max(
+        0,
+        Math.min(maxScrollTop, currentScrollTop + delta),
+      );
+
+      textareaElement.scrollTop = newScrollTop;
+
+      // Update our scroll tracking
+      scrollTop = newScrollTop;
+    }
+  }
+
+  function handleOverlayTouch(event) {
+    // For touch devices, we need to handle touch events
+    if (event.type === "touchstart") {
+      touchStartY = event.touches[0].clientY;
+    } else if (event.type === "touchmove") {
+      event.preventDefault();
+
+      const touchY = event.touches[0].clientY;
+      const delta = touchStartY - touchY;
+      touchStartY = touchY;
+
+      if (textareaElement) {
+        const currentScrollTop = textareaElement.scrollTop;
+        const maxScrollTop =
+          textareaElement.scrollHeight - textareaElement.clientHeight;
+        const newScrollTop = Math.max(
+          0,
+          Math.min(maxScrollTop, currentScrollTop + delta),
+        );
+
+        textareaElement.scrollTop = newScrollTop;
+        scrollTop = newScrollTop;
+      }
+    }
+  }
+  let touchStartY = 0;
 </script>
 
 <div class="text-black text-sm md:ml-2 mb-1">
@@ -877,8 +929,13 @@
     isLoading = true;
     textEditedAfterValidation = false;
     showValidateButton = false;
+    let lines = rawFileData.trim().split("\n");
 
-    const lines = rawFileData.trim().split("\n");
+    const firstLine = lines[0].trim().toLowerCase();
+    if (firstLine === "sku,quantity" || firstLine === "sku,1") {
+      lines = lines.slice(1);
+    }
+
     let formatError = false;
     let errorMessage = "";
     if (lines.length > 100) {
@@ -1040,6 +1097,9 @@
             bind:value={rawFileData}
             on:input={handleTextChange}
             on:scroll={handleScroll}
+            on:wheel={handleOverlayScroll}
+            on:touchstart={handleOverlayTouch}
+            on:touchmove={handleOverlayTouch}
             class="w-full placeholder:text-sm min-h-72 p-3 border border-primary-200 rounded-md focus:ring-0 focus:border-primary-400"
             bind:this={textareaElement}
             placeholder="Upload a file containing product data...
@@ -1050,7 +1110,7 @@ Example file content:
           ></textarea>
           {#if isValidated && rawFileData.trim()}
             <div
-              class="absolute mt-2 top-0 left-0 w-full h-full pointer-events-none"
+              class=" absolute mt-2 top-0 left-0 w-full h-full pointer-events-none"
               bind:this={overlayElement}
               style="transform: translateY({-scrollTop}px);"
             >
@@ -1061,18 +1121,15 @@ Example file content:
                   .split(" ")[0]
                   .trim()}
                 {@const validationMessage = validationMessages.find((msg) => {
-                  // Try exact match first
                   if (msg.productNumber === fullProductInfo) return true;
-                  // Then try base product number match
                   if (msg.productNumber === baseProductNumber) return true;
-                  // Finally try checking if the full product info contains the validation product number
                   return fullProductInfo.startsWith(msg.productNumber);
                 })}
 
-                {#if lineIndex * lineHeight >= scrollTop - lineHeight * 2 && lineIndex * lineHeight <= scrollTop + viewportHeight}
+                {#if lineIndex * lineHeight >= scrollTop - lineHeight * 1 && lineIndex * lineHeight <= scrollTop + viewportHeight}
                   <div
                     class="flex items-center pointer-events-auto"
-                    style="position: absolute; top: {3 +
+                    style="position: absolute; top: {2 +
                       lineIndex * lineHeight}px; right: 10px;"
                   >
                     <div class="validation-status">
@@ -1155,20 +1212,20 @@ Example file content:
         <div
           class="flex justify-center bg-white items-center h-12 border rounded-md hover:bg-primary-200 hover:text-primary-600"
         >
-          <a
+          <button
             class="flex items-center gap-2 text-sm font-medium text-primary-500"
             href="/quick_order_template.xls"
             download
           >
             <Icon icon="pajamas:download" class="text-lg " /> Download Template
-          </a>
+          </button>
         </div>
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
           on:click={triggerUpload}
           bind:this={dropzone}
-          class="w-full flex flex-col justify-center bg-white items-center rounded-md h-[210px] mt-2 space-y-2 py-6 border hover:bg-primary-100 hover:text-primary-600"
+          class="w-full flex flex-col justify-center bg-white items-center rounded-md h-[210px] mt-2 space-y-2 py-6 border hover:bg-primary-100 hover:text-primary-600 cursor-pointer"
           on:drop={handleDrop}
           on:dragover={handleDragOver}
           on:dragleave={handleDragLeave}
@@ -1249,7 +1306,7 @@ Example file content:
       {#if validationMessages.some((message) => !message.isValid)}
         <button
           type="button"
-          class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+          class="bg-red-500 mb-4 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
           on:click={removeAllInvalidProducts}
         >
           Remove All Invalid Products
