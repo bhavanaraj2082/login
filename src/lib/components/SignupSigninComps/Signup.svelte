@@ -56,8 +56,6 @@
 
     if (!username) {
       newErrors.username = "Required";
-    } else if (username.length < 3) {
-      newErrors.username = "Please enter at least 3 characters";
     } else if (/^[^a-zA-Z]/.test(username)) {
       newErrors.username = "Username must start with a letter";
     } else if (/[^a-zA-Z0-9_]/.test(username)) {
@@ -69,6 +67,8 @@
       newErrors.username = "Username cannot contain only underscores ( _ )";
     } else if (!/^(?=(.*[a-zA-Z]){3,})[a-zA-Z0-9_]+$/.test(username.trim())) {
       newErrors.username = "Username must contain at least 3 letters";
+    } else if (username.length < 3) {
+      newErrors.username = "Please enter at least 3 characters";
     } else {
       delete newErrors.username;
     }
@@ -1528,19 +1528,6 @@
         {/if}
       </button>
       <div class="hidden sm:flex sm:space-x-4 sm:justify-between w-full py-2">
-        <div
-          class="flex items-center justify-center py-2 px-6 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200"
-        >
-          <a href={linkedinUrl} class="flex items-center space-x-2">
-            <Icon icon="bi:linkedin" class="text-xl" />
-            <span class="text-sm font-medium">Continue with LinkedIn</span>
-          </a>
-        </div>
-        <div class="relative flex items-center py-1 w-1/6">
-          <div class="flex-grow border-t border-gray-300"></div>
-          <span class="px-2 text-sm text-gray-500 font-bold bg-white">OR</span>
-          <div class="flex-grow border-t border-gray-300"></div>
-        </div>
         <button
           type="submit"
           class="w-full sm:w-auto bg-primary-400 text-white py-2 px-6 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center"
@@ -1556,6 +1543,19 @@
             Create Account
           {/if}
         </button>
+        <div class="relative flex items-center py-1 w-1/6">
+          <div class="flex-grow border-t border-gray-300"></div>
+          <span class="px-2 text-sm text-gray-500 font-bold bg-white">OR</span>
+          <div class="flex-grow border-t border-gray-300"></div>
+        </div>
+        <div
+          class="flex items-center justify-center py-2 px-6 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200"
+        >
+          <a href={linkedinUrl} class="flex items-center space-x-2">
+            <Icon icon="bi:linkedin" class="text-xl" />
+            <span class="text-sm font-medium">Continue with LinkedIn</span>
+          </a>
+        </div>
       </div>
     </form>
     <div class="relative flex items-center my-4 w-full sm:hidden">
@@ -1575,11 +1575,17 @@
 </div>
 <Toaster position="bottom-right" richColors />
 {#if showRedirectModal}
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-slate-800 bg-opacity-50"
+    on:click={handleRedirectCancel}
   >
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
       class="bg-white rounded-xl border border-gray-300 shadow-2xl p-8 max-w-md w-full transform transition-all ease-in-out scale-100 opacity-100"
+      on:click|stopPropagation
     >
       <h2 class="text-2xl font-semibold mb-4 text-gray-800">
         Email Already Exists
