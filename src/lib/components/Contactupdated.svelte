@@ -460,7 +460,7 @@ function scrollToHighlightedItem() {
 
 		const country = getCountryByCode(countryCode);
 		if (!country) {
-			errors.phone = "Select your country before entering number";
+			errors.phone = "Select a country from the dropdown before entering number";
 			errors.country = "";
 			return false;
 		}
