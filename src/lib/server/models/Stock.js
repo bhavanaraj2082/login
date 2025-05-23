@@ -21,6 +21,8 @@ const stockSchema = new Schema(
     }
 );
 stockSchema.index({ sku: 1 });
+stockSchema.index({productNumber : 1 });
+stockSchema.index({productid : 1});
 //delete mongoose.models.Stock
 export const Stock = mongoose.models.Stock || mongoose.model('Stock', stockSchema);
 export default Stock;

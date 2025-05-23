@@ -37,7 +37,7 @@
 
 	$:cartId = data?.cart?.cart[0]?.cartId || ""
 
-	
+	let focusedIndex = -1; 
 
 	let menus = [];
 	let submenuLeaveTimeoutId;
@@ -86,6 +86,7 @@
 
 	function closeSuggestions() {
 		searchQuery = '';
+		focusedIndex = -1;
 		showSuggestions = false;
 	}
 
@@ -273,8 +274,12 @@ async function submitForm() {
 		}, delay);
 	}
 
-	function selectProduct() {
+	function selectProduct(product) {
 		searchQuery = '';
+		focusedIndex = -1;
+		const url = `/products/${product?.category?.urlName}/${product?.subCategory?.urlName}/${product?.productNumber}`;
+		// console.log(url);
+		goto(url);
 	}
 
 	function handleSearchSubmit() {
@@ -285,6 +290,7 @@ async function submitForm() {
 		searchQuery = event.target.value;
 		if (searchQuery.length === 0) {
 		searchResults=[]
+		focusedIndex = -1;
 		}
 		if (searchQuery.length >= 3) {
 		isLoading = true;
@@ -364,6 +370,22 @@ async function submitForm() {
       return newCurrency; 
     });
   }
+  const handleKeyDown = (e) => {
+		if (!searchResults || searchResults.length === 0) return;
+
+		if (e.key === 'ArrowDown') {
+			e.preventDefault();
+			focusedIndex = (focusedIndex + 1) % searchResults.length;
+		} else if (e.key === 'ArrowUp') {
+			e.preventDefault();
+			focusedIndex = (focusedIndex - 1 + searchResults.length) % searchResults.length;
+		} else if (e.key === 'Enter') {
+			if (focusedIndex >= 0 && focusedIndex < searchResults.length) {
+				selectProduct(searchResults[focusedIndex]);
+				e.preventDefault(); // prevent form submission
+			}
+		}
+	};
 </script>
 <form method="POST" action="/?/getCartValue" bind:this={form2} use:enhance={handleDataCart}>
 	<input type="hidden" name="loggedInUser" value={$authedUser?.id} />
@@ -616,6 +638,7 @@ async function submitForm() {
 						bind:value={searchQuery}
 						name="query"
 						maxlength="90"
+						on:keydown={handleKeyDown}
 						on:input={handleInput}
 						class=" border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary-400 focus:border-primary-400 w-full px-3 py-2 md:py-3 text-sm placeholder:text-xs truncate pr-12 sm:pr-10"/>
 					{#if isLoading}
@@ -631,15 +654,15 @@ async function submitForm() {
 				</div>
 				{#if searchQuery.trim() && searchResults && searchResults.length > 0}
 					<ul class="absolute w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-50 max-h-60 overflow-y-auto">
-						{#each searchResults as product}
+						{#each searchResults as product,index}
 							<!-- svelte-ignore a11y-click-events-have-key-events -->
 							<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-							<li class="px-0 py-0 text-sm text-gray-800 hover:bg-primary-200 cursor-pointer" on:click={() => selectProduct(product)}>
-								<a href={`/products/${product?.category?.urlName}/${product?.subCategory?.urlName}/${product?.productNumber}`}
+							<li class="px-0 py-0 text-sm text-gray-800 hover:bg-primary-200 cursor-pointer {focusedIndex === index ? 'bg-primary-200' : ''}" on:click={() => selectProduct(product)}>
+								<div 
 									class="block w-full text-sm text-gray-900 px-4 py-2">
 									<p class="text-md ">{product?.productName}</p>
 									<p class="text-md text-gray-900 ">{product?.CAS || ""}  {#if product?.manufacturerName && product?.CAS} <span>-</span>{/if} {#if product?.manufacturerName}<span class="text-sm text-gray-700 italic pl-2">  {product?.manufacturerName}</span> {/if}</p>
-								</a>
+							</div>
 							</li>
 							<!-- <hr class=""> -->
 						{/each}

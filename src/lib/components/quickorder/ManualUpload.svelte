@@ -185,60 +185,10 @@
 
   let debounceTimeout;
 let debounceTimeouts = {}; 
-  // function handleInput(event, sku, index) {
-  //   let value = event.target.value.trim();
-  //   rows[index].sku = value;
-  //   searchQuery = value;
-  //   if (
-  //     rows[index].selectedProduct &&
-  //     value !==
-  //       `${rows[index].selectedProduct.productNumber} - ${rows[index].selectedSize}`
-  //   ) {
-  //     rows[index] = {
-  //       ...rows[index],
-  //       selectedProduct: null,
-  //       selectedSize: "",
-  //       sku: value,
-  //     };
-  //   }
-
-  //   if (value.length > 2) {
-  //     clearTimeout(debounceTimeout);
-  //     debounceTimeout = setTimeout(() => {
-  //       const form = document.querySelector(`#form-${index}`);
-  //       if (form) {
-  //         form.requestSubmit();
-  //       }
-
-  //       // Only update the filteredProducts for the current index
-  //       const filteredProds = filterProducts(value);
-  //       // Create a new array reference so Svelte detects the change
-  //       rows = rows.map((row, i) => {
-  //         if (i === index) {
-  //           return {
-  //             ...row,
-  //             filteredProducts: filteredProds,
-  //           };
-  //         }
-  //         return row;
-  //       });
-  //     }, 300);
-  //   } else {
-  //     rows = rows.map((row, i) => {
-  //       if (i === index) {
-  //         return {
-  //           ...row,
-  //           filteredProducts: [],
-  //         };
-  //       }
-  //       return row;
-  //     });
-  //   }
-  // }
 
 
 function handleInput(event, sku, index) {
-  let value = event.target.value.trim();
+   let value = event.target.value.replace(/[<>]/g, '').trim();
   rows[index].sku = value;
   searchQuery = value;
   
@@ -278,7 +228,7 @@ function handleInput(event, sku, index) {
           return row;
         });
       }
-    }, 800); 
+    }, 400); 
   } else {
     rows = rows.map((row, i) => {
       if (i === index) {
@@ -1485,6 +1435,7 @@ function handleInput(event, sku, index) {
                   name="quickSearch"
                   bind:value={row.sku}
                   placeholder="Product SKU-Size"
+                  maxlength="50"
                   on:input={(event) => handleInput(event, row.sku, index)}
                   class="w-full hover:border-primary-500 h-10 focus:border-primary-400 focus:outline-none focus:ring-0 rounded-md px-2 items-center text-sm border-1 border-gray-200 transition duration-200"
                 />

@@ -147,9 +147,7 @@
 		}
 
 		if (!fieldName || fieldName === "lastName") {
-			if (!lastName) {
-				errors.lastName = "*Required";
-			} else if (!/^[A-Za-z\s]+$/.test(lastName)) {
+			 if (!/^[A-Za-z\s]+$/.test(lastName)) {
 				errors.lastName = "Only letters and spaces are allowed.";
 			} else {
 				delete errors.lastName;
@@ -248,22 +246,25 @@
 			}
 		}
 
-		if (!fieldName || fieldName === "assistanceMessage") {
-			if (!assistanceMessage) {
-				errors.assistanceMessage = "*Required";
-			} else if (assistanceMessage.length < 3) {
-				errors.assistanceMessage = "Must be at least 3 characters.";
-			} else if (
-				!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(assistanceMessage) ||
-				/<script.*?>.*?<\/script>/i.test(assistanceMessage) ||
-				/<[^>]*>/i.test(assistanceMessage)
-			) {
-				errors.assistanceMessage =
-					"Please enter valid assistance details.";
-			} else {
-				delete errors.assistanceMessage;
-			}
-		}
+	if (!fieldName || fieldName === "assistanceMessage") {
+	if (!assistanceMessage) {
+		errors.assistanceMessage = "*Required";
+	} else if (assistanceMessage.length < 3) {
+		errors.assistanceMessage = "Must be at least 3 characters.";
+	} else if (/^\d+$/.test(assistanceMessage.trim())) {
+		// Only numbers
+		errors.assistanceMessage = "Message cannot contain only numbers.";
+	} else if (
+		!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(assistanceMessage) ||
+		/<script.*?>.*?<\/script>/i.test(assistanceMessage) ||
+		/<[^>]*>/i.test(assistanceMessage)
+	) {
+		errors.assistanceMessage = "Please enter valid assistance details.";
+	} else {
+		delete errors.assistanceMessage;
+	}
+}
+
 		if (!fieldName || fieldName === "issue") {
 			if (!issue) {
 				errors.issue = "Please select any one Option ";
@@ -531,7 +532,7 @@ codeMatches.forEach(country => {
 		errors = {};
 
 		validateField("firstName");
-		validateField("lastName");
+		// validateField("lastName");
 		validateField("email");
 		validateField("phoneNumber");
 		validateField("companyName");
@@ -743,15 +744,7 @@ if(formData){
 
 								validateField("assistanceMessage");
 
-								errors.assistanceMessage = !assistanceMessage
-									? "*Required"
-									: assistanceMessage.length < 3
-										? "Must be at least 3 characters"
-										: !/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(
-													assistanceMessage,
-											  )
-											? "Please enter a valid assistance"
-											: "";
+								
 							}}
 							 
 							required
@@ -827,11 +820,7 @@ if(formData){
 
 									validateField("lastName");
 
-									errors.lastName = !lastName
-										? "*Required"
-										: !/^[A-Za-z\s]+$/.test(lastName)
-											? "Please enter a valid last name"
-											: "";
+									
 								}}
 							/>
 							{#if errors?.lastName}
