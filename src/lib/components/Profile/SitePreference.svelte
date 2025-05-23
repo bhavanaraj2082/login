@@ -28,13 +28,19 @@
     }
     
     const increment = (type)=>{
-        if(type === 'quickorder') quickOrder++
+        if (type === 'quickorder' && quickOrder < 12) {
+            quickOrder++;
+        }
+        // if(type === 'quickorder') quickOrder++
         if(type === 'orderpage') orderPage++
         if(type === 'quotepage') quotePage++
 
     }
     const decrement = (type)=>{
-        if(type === 'quickorder') quickOrder === 3 ? quickOrder = 3 :quickOrder--
+        if (type === 'quickorder' && quickOrder > 3) {
+            quickOrder--;
+        }
+        // if(type === 'quickorder') quickOrder === 3 ? quickOrder = 3 :quickOrder--
         if(type === 'orderpage') orderPage === 3 ? orderPage = 3 :orderPage--
         if(type === 'quotepage') quotePage === 3 ? quotePage = 3 :quotePage--
 
@@ -86,10 +92,16 @@ const handleSubmit =()=>{
             <div class=" w-full">
                 <label class=" text-xs md:text-sm font-medium" for="lastname">Product Entry Preference</label><br>
                 <select bind:value={productEntry}
+                    class="outline-none w-full border-1 focus:ring-0 mt-2 border-gray-400 font-medium rounded-md p-2 text-sm focus:border-primary-500"
+                    disabled>
+                    <option class="hover:bg-primary-200" value="Manual Entry">Manual Entry</option>
+                </select>
+
+                <!-- <select bind:value={productEntry}
                 class=" outline-none w-full border-1 focus:ring-0 mt-2 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500">
                     <option class=" hover:bg-primary-200" value="Manual Entry">Manual Entry</option>
-                    <!-- <option class=" hover:bg-primary-200" value="Bulk Upload">Bulk Upload</option> -->
-                </select>
+                    <!-- <option class=" hover:bg-primary-200" value="Bulk Upload">Bulk Upload</option> --
+                </select> -->
             </div>
             <div class=" sm:w-full">
             <p class=" text-xs md:text-sm font-medium mb-3">Default number of entry fields on Quick Order</p>
