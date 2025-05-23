@@ -45,7 +45,7 @@
 	$: isFormData =
 		$Cusdetails.FirstName &&
 		$Cusdetails.LastName &&
-		$Cusdetails.Organisation &&
+		// $Cusdetails.Organisation &&
 		$Cusdetails.Country &&
 		$Cusdetails.Email &&
 		$Cusdetails.Number;
@@ -80,26 +80,31 @@ else {
     }
 }
 function validatecompany(event) {
-	const input = event.target.value.trim();
-	const regex = /^[a-zA-Z0-9\s&\-.,!@():;"']+$/;
+  const input = event.target.value.trim();
+  const regex = /^[a-zA-Z0-9\s&\-.,!@():;"']+$/;
 
-	if (!input) {
-		errorMessage5 = '';
-		return false;
-	} else if (input.length < 3 || input.length > 100) {
-	errorMessage5 = 'Company Name must be between 3 and 100 characters';
-	return false;
-}else if (!regex.test(input)) {
-		errorMessage5 = 'Invalid characters in Company Name';
-		return false;
-	} else if (/<[^>]*>/.test(input)) {
-		errorMessage5 = 'Company Name should not contain HTML tags';
-		return false;
-	} else {
-		errorMessage5 = '';
-		return true;
-	}
+  if (input.length === 0) {
+    errorMessage5 = '';
+    return true; // Optional field
+  } else if (/^\d+$/.test(input)) {
+    errorMessage5 = 'Company name cannot contain only numbers, Please include letters as well';
+    return false;
+  } else if ((input.length > 0 && input.length < 3) || input.length > 100) {
+    errorMessage5 = 'Company Name must be between 3 and 100 characters';
+    return false;
+  } else if (!regex.test(input)) {
+    errorMessage5 = 'Invalid characters in Company Name';
+    return false;
+  } else if (/<[^>]*>/.test(input)) {
+    errorMessage5 = 'Company Name should not contain HTML tags';
+    return false;
+  } else {
+    errorMessage5 = '';
+    return true;
+  }
 }
+
+
 function validateEmail(event) {
     const input = event.target.value;
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -115,7 +120,7 @@ function validatePhNo(country, number) {
     } else {
         const pattern = phoneNumberPatterns[country];
         if (!pattern) {
-            errorMessage4 = 'No validation pattern found for this country';
+            errorMessage4 = 'Select a country from the dropdown before entering number';
         } else if (!pattern.test(number)) {
             errorMessage4 = `Please enter a valid phone number for ${country}`;
         } else {
@@ -236,37 +241,40 @@ let searchTerm = "";
 		// delete errors.$Cusdetails.Country;
 		validatePhNo($Cusdetails.Country, $Cusdetails.Number);
 	}
-function handleInputChange(event) {
-  searchTerm = event.target.value;
-    const isDeleting = event.inputType === 'deleteContentBackward' || 
-                     event.inputType === 'deleteContentForward';
-  if (searchTerm.length > 0 && !isDeleting) {
-    filterCountriesWithoutAutoSelect();
-        showDropdown = filteredCountries.length > 0;
-        const codeSearch = searchTerm.replace('+', '').trim();
-    if (codeSearch.length > 0) {
-      const exactCodeMatches = filteredCountries.filter(
-        (country) => country.code.replace('+', '') === codeSearch
-      );
+	function handleInputChange(event) {
+		searchTerm = event.target.value;
+		const isDeleting =
+			event.inputType === "deleteContentBackward" ||
+			event.inputType === "deleteContentForward";
 
-      if (exactCodeMatches.length === 1) {
-        selectCountry(exactCodeMatches[0]);
-        return;
-      }
-    }
+				if (searchTerm.length > 0 && !isDeleting) {
+	filterCountriesWithoutAutoSelect();
+	showDropdown = true; // Always show, even if no matches
 
-    const countriesStartingWith = filteredCountries.filter(
-      (country) => country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-    );
-    
-    if (countriesStartingWith.length === 1) {
-      selectCountry(countriesStartingWith[0]);
-    }
-  } else {
-    filterCountriesWithoutAutoSelect();
-    showDropdown = filteredCountries.length > 0;
-  }
+	const codeSearch = searchTerm.replace("+", "").trim();
+	if (codeSearch.length > 0) {
+		const exactCodeMatches = filteredCountries.filter(
+			(country) => country.code.replace("+", "") === codeSearch
+		);
+
+		if (exactCodeMatches.length === 1) {
+			selectlocation(exactCodeMatches[0]);
+			return;
+		}
+	}
+
+	const countriesStartingWith = filteredCountries.filter((country) =>
+		country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+	);
+
+	if (countriesStartingWith.length === 1) {
+		selectlocation(countriesStartingWith[0]);
+	}
+} else {
+	filterCountriesWithoutAutoSelect();
+	showDropdown = true; // Keep it open regardless
 }
+	}
 function filterCountriesWithoutAutoSelect() {
   filteredCountries = countries.filter(
     (country) =>
@@ -462,7 +470,7 @@ const handleEdit = (step, toggleFn) => {
 		 
 		</div>
 		<div class="sm:col-span-2">
-			<label for="" class="sm:text-sm text-xs">Last name <span class="text-primary-500"> *</span></label>
+			<label for="" class="sm:text-sm text-xs">Last name <span class="text-primary-500"> *</span> </label>
 			<div class="">
 			<input
 					type="text"
@@ -569,6 +577,7 @@ const handleEdit = (step, toggleFn) => {
 						{#if filteredCountries.length === 0}
 							<div class="px-4 py-1.5 text-gray-600 text-xs">No matching countries found!</div>
 						{/if}
+						
 					</ul>
 				</div>
 			{/if}
@@ -576,6 +585,13 @@ const handleEdit = (step, toggleFn) => {
 			<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
 				Country is required</div>
 			{/if}
+			{#if filteredCountries.length === 0}
+												<p
+												class="ml-1 text-red-600 text-xs mt-1 "
+											>
+												Invalid country selected
+											</p>
+											{/if}
 		</div>
 	</div>
 	<div class="mt-2 mb-2">
@@ -830,7 +846,7 @@ const handleEdit = (step, toggleFn) => {
 		{/if}
 	</div>
 	<div class="mt-2 mb-2">
-		<label for="" class="sm:text-sm text-xs">Company name <span class="text-primary-500"> *</span></label>
+		<label for="" class="sm:text-sm text-xs">Company name </label>
 		<br />
   <input
   type="text"
@@ -838,24 +854,28 @@ const handleEdit = (step, toggleFn) => {
   id="organisation"
   bind:value={$Cusdetails.Organisation}
   class="block rounded md:w-3/4 sm:2/5 lg:w-1/2 sm:text-sm text-xs w-full py-1.5 border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
-  on:input={() => {
-    $Cusdetails.Organisation = $Cusdetails.Organisation.trimStart(); // Avoid leading spaces
+ on:input={() => {
+  $Cusdetails.Organisation = $Cusdetails.Organisation.trimStart(); // Avoid leading spaces
+  const org = $Cusdetails.Organisation.trim();
 
-    const org = $Cusdetails.Organisation.trim();
+  if (org.length === 0) {
+    const { organisation, ...rest } = errors;
+    errors = rest; // clear any previous error if it's empty
+  } else if (org && Number.isInteger(Number(org))) {
+      errors = { ...errors, organisation:"Company name cannot contain only numbers, Please include letters as well"};
+  }
+  else if ((org.length > 0 && org.length < 3) || org.length > 100) {
+    errors = { ...errors, organisation: "Company Name must be between 3 and 100 characters" };
+  } else if (!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(org)) {
+    errors = { ...errors, organisation: "Invalid characters in Company Name" };
+  } else if (/<[^>]*>/.test(org)) {
+    errors = { ...errors, organisation: "Company Name should not contain HTML tags" };
+  } else {
+    const { organisation, ...rest } = errors;
+    errors = rest;
+  }
+}}
 
-    if (!org) {
-      errors = { ...errors, organisation: "" };
-    } else if (org.length < 3 || org.length > 100) {
-  errors = { ...errors, organisation: "Company Name must be between 3 and 100 characters" };
-}else if (!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(org)) {
-      errors = { ...errors, organisation: "Invalid characters in Company Name" };
-    } else if (/<[^>]*>/.test(org)) {
-      errors = { ...errors, organisation: "Company Name should not contain HTML tags" };
-    } else {
-      const { organisation, ...rest } = errors;
-      errors = rest; 
-    }
-  }}
 />
 
 {#if errors?.organisation}
@@ -864,10 +884,10 @@ const handleEdit = (step, toggleFn) => {
   </span>
 {/if}
 
-{#if errorMessage && !$Cusdetails.Organisation}
+<!-- {#if errorMessage && !$Cusdetails.Organisation}
 <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">   
 	Company Name is required</div>
-{/if}
+{/if} -->
 	</div>
 	<div class="flex space-x-4">
 		<button
