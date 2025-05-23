@@ -23,9 +23,10 @@
     } = contact
     let toggleEdit = false;
     let errors
-    $:console.log(errors);
 
-    import { onMount, onDestroy } from 'svelte';
+    // $:console.log(errors);
+
+    import { onMount} from 'svelte';
 
 let containerRef;
 let showErrors = false;
@@ -165,21 +166,21 @@ const validateField = (name, value) => {
             } else if (value.length > 20) {
                 message = "First name must not exceed 20 characters";
             } else if (!/^[A-Za-z\s]+$/.test(value)) {
-                message = "First name must contain only letters";
+                message = "First name must contain only letters and spaces, no numbers or special characters allowed";
             }
             break;
-
+        
         case "lastName":
             if (value) {
-              if (value.length > 20) {
+                if (value.length > 20) {
                     message = "Last name must not exceed 20 characters";
                 } else if (!/^[A-Za-z\s]+$/.test(value)) {
-                    message = "Last name must contain only letters";
+                    message = "Last name must contain only letters and spaces, no numbers or special characters allowed";
                 }
             }
             break;
 
-            case "country":
+        case "country":
             if (!value) {
                 message = "Country is required";  // Country must be selected
             } else if (!countries.some(c => c.name.toLowerCase() === value.toLowerCase())) {
@@ -187,7 +188,7 @@ const validateField = (name, value) => {
             }
             break;
 
-            case "cellPhone":
+        case "cellPhone":
             if (!value) message = "Primary phone is required";
             else if (pattern && !pattern.test(value)) message = `Primary phone is invalid for ${country}`;
             break;
@@ -198,41 +199,53 @@ const validateField = (name, value) => {
             }
             break;
 
-            case "companyName":
-    if (value) {
-        if (value.length < 3) message = "Company name must be at least 3 characters";
-        else if (value.length > 35) message = "Company name must not exceed 35 characters";
-        else if (!/^[\w\s.,&()-]+$/.test(value)) message = "Company name contains invalid characters";
-    }
-    break;
+        case "companyName":
+            if (value) {
+            if (value.length < 3) {
+                message = "Company name must be at least 3 characters";
+            } else if (value.length > 35) {
+                message = "Company name must not exceed 35 characters";
+            } 
 
-case "companytype":
-    if (value) {
-        if (value.length < 3) message = "Company type must be at least 3 characters";
-        else if (value.length > 25) message = "Company type must not exceed 25 characters";
-        else if (!/^[A-Za-z\s]+$/.test(value)) message = "Company type should contain only letters";
-    }
-    break;
+            else if (!/^[A-Za-z][\w\s.,&()-]*$/.test(value)) {
+                message = "Company name contains invalid characters or starts with a number";
+            } }
+            break;
 
-case "jobtitle":
-    if (value) {
-        if (value.length < 3) message = "Job title must be at least 3 characters";
-        else if (value.length > 30) message = "Job title must not exceed 30 characters";
-        else if (!/^[A-Za-z\s]+$/.test(value)) message = "Job title should contain only letters";
-    }
-    break;
+        case "companytype":
+            if (value) {
+                if (value.length < 3) message = "Company type must be at least 3 characters";
+                else if (value.length > 25) message = "Company type must not exceed 25 characters";
+                else if (!/^[A-Za-z\s]+$/.test(value)) message = "Company type should contain only letters";
+            }
+            break;
 
+
+        case "jobtitle":
+            if (value) {
+                value = value.replace(/\b0+(\d)/g, "$1");
+
+                if (/ \b0\b/.test(value)) {
+                    message = "Job title cannot contain level 0";
+                }
+
+                else if (value.length < 3) message = "Job title must be at least 3 characters";
+                else if (value.length > 30) message = "Job title must not exceed 30 characters";
+
+                // Regex to allow letters, spaces, hyphens, periods, and valid levels (1/2/3 or I/II/III, up to 3 levels)
+                else if (!/^[A-Za-z\s.-]+( (I{1,3}|\d{1})(\/(I{1,3}|\d{1})){0,2})?$/.test(value)) 
+                    message = "Job title should contain only letters, spaces, hyphens, periods, or valid levels (e.g., 1/2/3 or I/II/III, up        to 3 levels)";
+            }
+            break;
 
         case "gstNumber":
             if (value && !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}[Z]{1}[A-Z0-9]{1}$/.test(value)) message = "Invalid GST number format (e.g, 12ABCDE1234F4Z5)";
-            break;
-
-       
+        break;
 
         case "tanNumber":
-            if (value && !/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(value)) message = "Invalid TAN format (e.g., ABCD12345E)";
-            break;
-    }
+                if (value && !/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(value)) message = "Invalid TAN format (e.g., ABCD12345E)";
+                break;
+        }
 
     errors = { ...errors, [name]: message };
 }
@@ -317,8 +330,6 @@ const handleSubmit =({cancel})=>{
 					<span class="text-red-600 text-xs">{errors.firstName}</span>
 				     {/if}
                 </div>
-
-
                 <div class=" w-full">
                     <label class=" text-xs md:text-sm font-medium" for="lastName">
                         Last Name</label><br>
@@ -335,7 +346,7 @@ const handleSubmit =({cancel})=>{
                     <label class=" text-xs md:text-sm font-medium" for="country">
                         <span class=" text-sm font-bold text-red-500">*</span>Country</label><br>
                     <div class="relative z-10" bind:this={containerRef}>
-                      <div class="flex items-center border border-gray-300 rounded my-1 overflow-hidden">
+                      <div class="flex items-center border-1 border-gray-300 rounded-md my-1 overflow-hidden">
                           <input
                             type="text"
                             name="country"
@@ -351,7 +362,7 @@ const handleSubmit =({cancel})=>{
                         country = country.trimStart(); 
                         validateField("country", country);
                       }}
-                      class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-none"
+                      class="w-full focus:ring-0 focus:border-primary-400 px-2 py-2 text-xs md:text-sm border-none"
                           />
                       <!-- svelte-ignore a11y-click-events-have-key-events -->
                       <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -363,32 +374,28 @@ const handleSubmit =({cancel})=>{
                       stroke="currentColor"
                       stroke-width="2"
                       style:transform={showDropdown ? 'rotate(180deg)' : 'rotate(0deg)'}
-                      on:click={toggleDropdown}
-                    >
+                      on:click={toggleDropdown}>
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        d="M19 9l-7 7-7-7"
-                      />
+                        d="M19 9l-7 7-7-7"/>
                     </svg>
                     </div>
                           {#if showDropdown}
-                            <ul class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-auto">
+                            <ul class="absolute z-10 w-full text-sm sm:text-base bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-auto">
                               {#each filteredCountries as { name, code },index}
                                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                                 <!-- <li on:click|stopPropagation={() => selectCountry({ name, code })} class="cursor-pointer px-1 py-0 sm:text-sm text-xs hover:bg-gray-200">
                                   <option value={code}>{name} ({code})</option>
                                 </li> -->
-                                <li
-	id={`dropdown-item-${index}`}
-	class="px-4 py-2 cursor-pointer {highlightedIndex === index
-	? 'bg-primary-100'
-	: 'hover:bg-primary-50'}"
-	on:click|stopPropagation={() => selectCountry({ name, code })}
->
-{name} ({code})
-</li>
+                                <li id={`dropdown-item-${index}`}
+                                	class="px-4 py-2 cursor-pointer {highlightedIndex === index
+                                	? 'bg-primary-100'
+                                	: 'hover:bg-primary-50'}"
+                                	on:click|stopPropagation={() => selectCountry({ name, code })} >
+                                {name} ({code})
+                                </li>
                               {/each}
                               {#if filteredCountries.length === 0}
                                 <li class="px-2 py-1 text-gray-500">No results found</li>
@@ -396,7 +403,6 @@ const handleSubmit =({cancel})=>{
                             </ul>
                           {/if}
                         </div>
-                  
                         {#if errors?.country}
                           <p class="text-red-500 text-xs mt-1">{errors.country}</p>
                         {/if}
@@ -483,112 +489,159 @@ const handleSubmit =({cancel})=>{
     {/if}
 
     {#if !toggleEdit}
-    <div class="overflow-hidden">
-        <h1 class=" font-bold text-4s md:text-lg mb-2">
+    <div class="overflow-hidden mt-4 sm:mt-0">
+        <h1 class="font-bold text-lg lg:text-xl mb-4 px-2 sm:px-0">
             Manage Your Personal Information
         </h1>
         <div class="mt-4 px-2">
-            <div class=" flex items-center justify-between border-b-1 mt-2 pb-2">
-                <h2 class=" font-semibold text-4s">Contact Information</h2>
-                <button on:click={()=>toggleEdit = true} class=" w-20 rounded-md py-1.5 font-medium text-xs md:text-sm text-white bg-primary-500 hover:bg-primary-600">Edit</button>
+            <div class="flex items-center justify-between border-b border-gray-200 pb-3 mb-4">
+                <h2 class="font-semibold text-base lg:text-lg">Contact Information</h2>
+                <button 
+                    on:click={() => toggleEdit = true} 
+                    class="px-4 py-2 rounded-md font-medium text-sm text-white bg-primary-500 hover:bg-primary-600 transition-colors duration-200 min-w-[80px]">
+                    Edit
+                </button>
             </div>
-            <section class=" w-full flex flex-col sm:flex-row flex-wrap gap-y-4 py-3">
-                <div class="flex sm:flex-row items-center text-sm md:text-4s w-full sm:w-1/2">
-                    <h4 class="font-medium">Name :  </h4>
-                    <!-- svelte-ignore a11y-click-events-have-key-events -->
-                    <!-- svelte-ignore a11y-no-static-element-interactions -->
-                    <!-- svelte-ignore a11y-missing-attribute -->
-
-                    <!-- {#if !firstName}
-                    <a on:click={() => toggleEdit = true} class="text-primary-500 font-medium ml-2 text-sm hover:underline cursor-pointer">
-                        Update Name
-                    </a>
-                    {:else}
-                        <p class="ml-2 text-sm">{firstName || "Update Name"} {lastName || ""}</p>
-                    {/if} -->
-                    {#if firstName && firstName !== 'N/A' || lastName && lastName !== 'N/A'}
-                    <span class="text-description text-xs sm:text-sm ml-2">{firstName}</span>
-                  {:else}
-                    <span class="text-description text-xs sm:text-sm ml-2">
-                      {#if email && email.includes('@')}
-                        {email.split('@')[0]}
-                      {:else}
-                        {email}
-                      {/if}
-                    </span>
-                  {/if}
-
-
-
-                </div>
-                <div class="w-full flex sm:flex-row items-center sm:w-1/2">
-                    <label class="text-xs md:text-sm font-semibold" for="cellPhone">
-                        Primary Phone :
-                    </label><br>
-                    {#if !cellPhone && (firstName && lastName && email || email)}
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
-                        <!-- svelte-ignore a11y-missing-attribute -->
-                        <a on:click={() => toggleEdit = true} class="text-primary-500 font-medium ml-2 text-sm hover:underline cursor-pointer">
-                            Update Phone Number
-                        </a>
-                    {:else}
-                    <p class=" text-sm ml-2">{cellPhone || "N/A"}</p>
-                        {#if errors?.cellPhone}
-                            <span class="text-red-600 text-xs">{errors.cellPhone}</span>
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center">
+                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                    <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Name:</label>
+                    <div class="text-sm text-gray-600 min-h-[20px] sm:ml-1">
+                        {#if firstName && firstName !== 'N/A' || lastName && lastName !== 'N/A'}
+                            <span>{firstName} {lastName}</span>
+                        {:else}
+                            <span>
+                                {#if email && email.includes('@')}
+                                    {email.split('@')[0]}
+                                {:else}
+                                    {email}
+                                {/if}
+                            </span>
                         {/if}
-                    {/if}
-                </div>
-                <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
-                    <h4 class="font-medium">Alternative Phone :</h4>
-                    <p class=" text-sm ml-2">{alternatePhone || "--"}</p>
-                </div>
-                <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
-                    <div class="flex items-center gap-2">
-                    <h4 class="font-medium">Email:</h4>
-                </div>
-                <p class=" text-sm ml-2">{email || "N/A"}</p>
-                <Icon icon="tdesign:verified-filled" class=" text-xl ml-2 {isEmailVerified ? "text-green-500":"text-gray-400"}"/>
-                </div>
-                {#if needsPasswordSetup}
-                <div class="w-full flex items-center bg-primary-50 border border-primary-200 rounded-lg p-2">
-                    <p class="text-xs text-primary-600">
-                        We noticed you haven’t set up a password yet. To keep your account safe, please create one now. 
-                        <a href="/reset-password" class="text-primary-600 text-xs font-medium hover:underline hover:text-primary-500">Click here to setup your password</a>
-                    </p>
-                </div>
-                {:else}
-                <div class=" w-full flex sm:flex-row items-center sm:w-1/2">
-                    <h4 class="font-medium">Password :</h4>
-                    <a href="/reset-password" class="text-xs text-primary-500 font-semibold ml-2">Reset Password</a>
-                    <div class=" flex items-center gap-2 -mt-1.5">
                     </div>
                 </div>
+                <div class="flex flex-col sm:flex-row sm:items-center">
+                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                    <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Primary Phone:</label>
+                    <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
+                        {#if !cellPhone && (firstName && lastName && email || email)}
+                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                            <!-- svelte-ignore a11y-no-static-element-interactions -->
+                            <!-- svelte-ignore a11y-missing-attribute -->
+                            <a 
+                                on:click={() => toggleEdit = true} 
+                                class="text-primary-500 font-medium hover:underline cursor-pointer transition-colors duration-200">
+                                Update Phone Number
+                            </a>
+                        {:else}
+                            <span>{cellPhone || "N/A"}</span>
+                            {#if errors?.cellPhone}
+                                <div class="text-red-600 text-xs mt-1">{errors.cellPhone}</div>
+                            {/if}
+                        {/if}
+                    </div>
+                </div>
+                {#if alternatePhone}
+                    <div class="flex flex-col sm:flex-row sm:items-center ">
+                        <!-- svelte-ignore a11y-label-has-associated-control -->
+                        <label class="font-medium text-sm text-gray-700 sm:min-w-[130px] sm:flex-shrink-0">Alternative Phone:</label>
+                        <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
+                            <span>{alternatePhone}</span>
+                        </div>
+                    </div>
                 {/if}
+                
+                <div class="flex flex-col sm:flex-row sm:items-center">
+                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                    <label class="font-medium text-sm text-gray-700 sm:min-w-[60px] sm:flex-shrink-0">Email:</label>
+                    <div class="flex items-center space-x-2 min-h-[20px] sm:ml-0.5">
+                        <span class="text-sm text-gray-600 break-all">{email || "N/A"}</span>
+                        <Icon 
+                            icon="tdesign:verified-filled" 
+                            class="text-lg flex-shrink-0 {isEmailVerified ? 'text-green-500' : 'text-gray-400'}"/>
+                    </div>
+                </div>
+                <div class="lg:col-span-2">
+                    {#if needsPasswordSetup}
+                        <div class="bg-primary-50 border border-primary-200 rounded-lg p-4">
+                            <p class="text-sm text-primary-600 leading-relaxed">
+                                We noticed you haven't set up a password yet. To keep your account safe, please create one now. 
+                                <a 
+                                    href="/reset-password" 
+                                    class="text-primary-600 font-medium hover:underline hover:text-primary-500 transition-colors duration-200">
+                                    Click here to setup your password
+                                </a>
+                            </p>
+                        </div>
+                    {:else}
+                        <div class="flex flex-col sm:flex-row sm:items-center">
+                            <!-- svelte-ignore a11y-label-has-associated-control -->
+                            <label class="font-medium text-sm text-gray-700 sm:min-w-[80px] sm:flex-shrink-0">Password:</label>
+                            <div class="min-h-[20px] sm:ml-0.5">
+                                <a 
+                                    href="/reset-password" 
+                                    class="text-sm text-primary-500 font-semibold hover:underline transition-colors duration-200">
+                                    Reset Password
+                                </a>
+                            </div>
+                        </div>
+                    {/if}
+                </div>
             </section>
-            <div class="mt-4">
-                <h2 class="font-semibold text-4s border-b-1 pb-2 pt-5">Business Information</h2>
-                <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
-                    <h4 class="font-normal text-sm">Company Name:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{companyName || "--"}</p>
+            {#if companyName || companytype || jobtitle || gstNumber || tanNumber}
+                <div class="mt-8">
+                    <h2 class="font-semibold text-base lg:text-lg border-b border-gray-200 pb-3 mb-4">
+                        Business Information
+                    </h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                        {#if companyName}
+                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                                <!-- svelte-ignore a11y-label-has-associated-control -->
+                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Company Name:</label>
+                                <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
+                                    <span>{companyName || "--"}</span>
+                                </div>
+                            </div>
+                        {/if}
+                        {#if companytype}
+                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                                <!-- svelte-ignore a11y-label-has-associated-control -->
+                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Company Type:</label>
+                                <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
+                                    <span>{companytype || "--"}</span>
+                                </div>
+                            </div>
+                        {/if}
+                        {#if gstNumber}
+                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                                <!-- svelte-ignore a11y-label-has-associated-control -->
+                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">GST Number:</label>
+                                <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
+                                    <span>{gstNumber || "--"}</span>
+                                </div>
+                            </div>
+                        {/if}
+                        {#if tanNumber}
+                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                                <!-- svelte-ignore a11y-label-has-associated-control -->
+                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">TAN Number:</label>
+                                <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
+                                    <span>{tanNumber || "--"}</span>
+                                </div>
+                            </div>
+                        {/if}
+                        {#if jobtitle}
+                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                                <!-- svelte-ignore a11y-label-has-associated-control -->
+                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Job Title:</label>
+                                <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
+                                    <span>{jobtitle || "--"}</span>
+                                </div>
+                            </div>
+                        {/if}
+                    </div>
                 </div>
-                <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
-                    <h4 class=" font-normal text-sm">Company Type:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{companytype || "--"}</p>
-                </div>
-                <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
-                    <h4 class=" font-normal text-sm">Job Title:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{jobtitle || "--"}</p>
-                </div>
-                <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
-                    <h4 class=" font-normal text-sm">GST Number:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{gstNumber || "--"}</p>
-                </div>
-                <div class="w-full flex sm:flex-row items-center sm:w-1/2 mt-2 pb-2">
-                    <h4 class=" font-normal text-sm">TAN Number:</h4>
-                    <p class=" text-sm ml-2 font-semibold">{tanNumber || "--"}</p>
-                </div>
-            </div>
+            {/if}
         </div>
     </div>
     {/if}
