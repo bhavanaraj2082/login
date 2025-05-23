@@ -130,7 +130,6 @@
 	// 		searchTerm.length >= 3 &&
 	// 		filteredCountries.length > 0
 	// 	) {
-	// 		selectlocation(filteredCountries[0]);
 	// 		event.preventDefault();
 	// 	}
 	// }
@@ -212,11 +211,11 @@ function scrollToHighlightedItem() {
 		details.trim().length > 500 ||
         !/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(details) ||
         /<[^>]*>/.test(details) ||
-        role.length === 0 ||
-        role.trim() === "" ||
+        // role.length === 0 ||
+        // role.trim() === "" ||
         !/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(role) ||
         /<[^>]*>/.test(role) ||
-		role.trim().length < 3 ||
+		(role.trim().length > 0 && role.trim().length < 3)||
 		role.trim().length > 150 ||
 		/^\d+$/.test(role.trim())||
         reason.length === 0 
@@ -245,7 +244,7 @@ function showPopup() {
     // Log the state of CAPTCHA and form validation
     console.log({ showCaptchaPopup, formValid, isCheckedcap });
 
-    if (isCheckedcap && !showCaptchaPopup) { // Only show CAPTCHA if needed
+    if ( !showCaptchaPopup) { // Only show CAPTCHA if needed
         console.log("Displaying CAPTCHA Popup");
         showCaptchaPopup = true;
         generateMathQuestion();
@@ -469,7 +468,7 @@ $: trimmedDetails = details.trim();
 		if (successMessage) {
 			isChecked = true;
 		} else {
-			isChecked = false;
+			isChecked = true;
 		}
 	}
 
@@ -604,6 +603,10 @@ if (!isInCountry) {
   showDropdown = false;
 }
 }
+
+// $: if (location && phone) {
+// 	validateField("phone");
+// }
 
 </script>
 
@@ -1416,7 +1419,7 @@ if (!isInCountry) {
 	id="role"
 	bind:value={role}
 	class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-	placeholder="Role*"
+	placeholder="Role"
 	on:input={() => {
 		role = role.trimStart();
 		showdisErrors = true;
@@ -1439,23 +1442,23 @@ if (!isInCountry) {
 
 
 	
-{#if showErrors && role.length === 0}
+<!-- {#if showErrors && role.length === 0}
 								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
 								>
 									*Required
 								</span>
-							{/if}			
+							{/if}			 -->
 						</div>
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
-							<!-- <input
+							 <input
 								type="hidden"
 								name="email"
 								id="email"
 								bind:value={email}
-							/> -->
+							/> 
 							<form
 								action="?/verifyemail"
 								bind:this={form3}
@@ -1512,6 +1515,7 @@ if (!isInCountry) {
 									<input
 										type="text"
 										name="email"
+										maxlength="100"
 										id="email"
 										bind:value={email}
 										class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
@@ -1642,12 +1646,12 @@ if (!isInCountry) {
 									}}
 								>
 									<div class="relative w-full">
-										<!-- <input
+										<input
 											type="hidden"
 											name="email"
 											id="email"
 											bind:value={email}
-										/> -->
+										/> 
 										<input
 											type="text"
 											name="enteredOtp"
@@ -1748,38 +1752,33 @@ if (!isInCountry) {
 									value="captcha"
 									class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded cursor-pointer hover:border-primary-500 transition-colors duration-300"
 									bind:checked={isCheckedcap}
-									on:click={(event) => {
-										event.preventDefault();
-										handleSubmit(event);
-										if (!formValid) {
-											if (
-												Object.keys(errors).length > 0
-											) {
-												toast.error(
-													"Please fill all the required fields.",
-												);
-												isCheckedcap = false;
-												return;
-											}
-											return;
-										}
+							on:click={(event) => {
+    event.preventDefault();
+    handleSubmit(event);
 
-										if (
-											!(
-												ProfileEmailVerified ||
-												authedUserEmailVerified === true
-											)
-										) {
-											toast.error(
-												"Please verify your email to proceed",
-											);
-											isCheckedcap = false;
-											return;
-										}
+    // Check form validation
+    if (!formValid) {
+        if (Object.keys(errors).length > 0) {
+            toast.error("Please fill all the required fields.");
+        }
+        isCheckedcap = false;
+        return;
+    }
 
-										isCheckedcap = true;
-										showPopup();
-									}}
+    // Check email verification
+    if (!(ProfileEmailVerified || authedUserEmailVerified === true)) {
+        toast.error("Please verify your email to proceed");
+        isCheckedcap = false;
+        return;
+    }
+
+    // All checks passed
+    // isCheckedcap = true;
+
+    // Make sure showPopup is defined
+    showPopup();
+}}
+
 									on:keydown={(event) => {
 										if (event.key === "Enter") {
 											event.preventDefault();
@@ -1796,8 +1795,11 @@ if (!isInCountry) {
 								<button
 									type="submit"
 									on:click={(event) => {
+										console.log("isCheckedcap",isCheckedcap);
 										handleSubmit(event);
 										if (!isCheckedcap) {
+											
+											
 											toast.error(
 												"Please complete the CAPTCHA to proceed with the submission.",
 											);

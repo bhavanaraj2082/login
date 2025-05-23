@@ -495,6 +495,7 @@ on:input={() => {
           name="email"
           id="email"
           bind:value={formData.email}
+          maxlength="100"
       />
           <label for="email" class="block tsm:text-sm text-xs font-base text-gray-900 pb-1">Email<span class="text-red-500 text-xs font-semibold">*</span></label>
         <form
@@ -554,6 +555,7 @@ on:input={() => {
           name="email"
           id="email"
           bind:value={formData.email}
+          maxlength="100"
             class="block w-full md:mt-1 rounded-md focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
           placeholder="Email"
           on:input={() => {
@@ -687,6 +689,7 @@ on:input={() => {
              name="email"
              id="email"
              bind:value={formData.email}
+             maxlength="100"
          />
          <input
              type="text"

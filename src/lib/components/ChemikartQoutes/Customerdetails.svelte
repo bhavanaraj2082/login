@@ -258,7 +258,7 @@ let searchTerm = "";
 		);
 
 		if (exactCodeMatches.length === 1) {
-			selectlocation(exactCodeMatches[0]);
+			selectCountry(exactCodeMatches[0]);
 			return;
 		}
 	}
@@ -268,7 +268,7 @@ let searchTerm = "";
 	);
 
 	if (countriesStartingWith.length === 1) {
-		selectlocation(countriesStartingWith[0]);
+		selectCountry(countriesStartingWith[0]);
 	}
 } else {
 	filterCountriesWithoutAutoSelect();

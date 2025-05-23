@@ -44,9 +44,27 @@ export const actions = {
               const ipAddress = await getClientIP();
             const components = JSON.parse(data.components);
 
-            const componentsList = components.map(component => {
-              return `Component Name: ${component['Component Name']}, CAS Number ${component.CasNumber}, Concentration: ${component.Concentration}%</li>`;
-            }).join('');
+            const componentsList = `
+  <table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+    <thead>
+      <tr>
+        <th style="text-align: left; width: 25%;">CAS Number</th>
+        <th style="text-align: left; width: 50%;">Component Name</th>
+        <th style="text-align: left; width: 25%;">Concentration (%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${components.map(component => `
+        <tr>
+          <td>${component.CasNumber}</td>
+          <td>${component['Component Name']}</td>
+          <td>${component.Concentration}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+`;
+
             const record = await Addquotes(data);
             const targetEmailContent = sendemail.emailTemplatequotes
                 .replaceAll('{{PUBLIC_WEBSITE_NAME}}', PUBLIC_WEBSITE_NAME)
