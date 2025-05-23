@@ -3124,7 +3124,7 @@ export const getGuestCart = async (body) => {
 		// Fetch all product details in a single query
 		const productMapPromise = Product.find(
 			{ _id: { $in: productIds } },
-			{ image: 1, productName: 1, productNumber: 1 }
+			{ image: 1, productName: 1, productNumber: 1,manufacturerName:1 }
 		).then(products =>
 			products.reduce((acc, p) => {
 				acc[p._id] = p;

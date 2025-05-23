@@ -57,8 +57,106 @@
 	calculateTotalPrice($cart)
 	}
 	calculateTotalPrice($cart)
-	const downloadExcel = () => {
-    // Define the data (same as the original CSV content)
+	// const downloadExcel = () => {
+    // // Define the data (same as the original CSV content)
+    // const headers = [
+    //     'Product Name',
+    //     'Manufacturer',
+    //     'Quantity',
+    //     'Back Order',
+    //     'Price',
+    //     'Total Price'
+    // ];
+
+    // console.log($cart);
+
+    // const data = $cart.map((item) => [
+    //     item?.productDetails?.productName,
+    //     item?.mfrDetails?.name,
+    //     item.quantity,
+    //     item.quantity - item?.stockDetails?.stock < 0 ? 0 : item.quantity - item?.stockDetails?.stock,
+	// 	!$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india") ?
+	// 	$currencyState === "inr" ? "₹ "+item.currentPrice?.INR.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) : "$ "+item?.currentPrice?.USD.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) :
+    //     $currencyState === "inr" ? "₹ "+(item.currentPrice?.INR*(1 + (18 / 100))).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) : "$ "+(item?.currentPrice?.USD*(1 + (18 / 100))).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}),
+	// 	!$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india") ?
+    //     $currencyState === "inr" ? "₹ "+(item?.currentPrice?.INR * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) : "$ "+ (item?.currentPrice?.USD * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) :
+    //     $currencyState === "inr" ? "₹ "+((item?.currentPrice?.INR*(1 + (18 / 100))) * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) : "$ "+ ((item?.currentPrice?.USD*(1 + (18 / 100))) * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})
+	// ]);
+	
+    // let totalPrice
+	// if(!$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india")){
+	// 	totalPrice = $cart.reduce((total, item) => {
+    //     return total + ($currencyState === "inr" ? (item?.currentPrice?.INR * item.quantity) : (item?.currentPrice?.USD * item.quantity));
+    // }, 0);
+	// }else{
+	// 	totalPrice = $cart.reduce((total, item) => {
+    //     return total + ($currencyState === "inr" ? ((item?.currentPrice?.INR*(1 + (18 / 100))) * item.quantity) : ((item?.currentPrice?.USD*(1 + (18 / 100))) * item.quantity));
+    // }, 0);
+	// }
+     
+
+    // // Add a new row for the total price at the bottom
+    // const totalRow = [
+    //     '', '', '', '', 'Total Price',($currencyState === "inr" ? "₹ " : "$")+totalPrice.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})
+    // ];
+
+    // // Prepare the data for SheetJS
+    // const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data, totalRow]); // AoA = Array of Arrays
+    // const workbook = XLSX.utils.book_new(); // Create a new workbook
+    // XLSX.utils.book_append_sheet(workbook, worksheet, 'Cart Details'); // Append the sheet
+
+    // // Apply styles to the header row
+    // const headerStyle = {
+    //     font: { bold: true, color: { rgb: 'FFFFFF' } }, // Bold white text
+    //     fill: { fgColor: { rgb: '4F81BD' } }, // Blue background
+    //     alignment: { horizontal: 'center', vertical: 'center' }, // Center text
+    //     border: {
+    //         top: { style: 'thin', color: { rgb: '000000' } },
+    //         bottom: { style: 'thin', color: { rgb: '000000' } },
+    //         left: { style: 'thin', color: { rgb: '000000' } },
+    //         right: { style: 'thin', color: { rgb: '000000' } }
+    //     }
+    // };
+
+    // // Apply styles for header row cells
+    // for (let c = 0; c < headers.length; c++) {
+    //     const cell = worksheet[XLSX.utils.encode_cell({ r: 0, c: c })];
+    //     if (!cell) worksheet[XLSX.utils.encode_cell({ r: 0, c: c })] = {}; // Ensure cell exists
+    //     worksheet[XLSX.utils.encode_cell({ r: 0, c: c })].s = headerStyle;
+    // }
+
+    // // Apply column width (optional)
+    // worksheet['!cols'] = headers.map(() => ({ width: 20 })); // Set column width
+
+    // // Apply styles to the data rows (optional)
+    // const dataStyle = {
+    //     alignment: { horizontal: 'center', vertical: 'center' }, // Center text
+    //     border: {
+    //         top: { style: 'thin', color: { rgb: '000000' } },
+    //         bottom: { style: 'thin', color: { rgb: '000000' } },
+    //         left: { style: 'thin', color: { rgb: '000000' } },
+    //         right: { style: 'thin', color: { rgb: '000000' } }
+    //     }
+    // };
+
+    // // Apply styles to all data rows
+    // for (let r = 1; r < data.length + 2; r++) { // Include the total row
+    //     for (let c = 0; c < headers.length; c++) {
+    //         const cell = worksheet[XLSX.utils.encode_cell({ r: r, c: c })];
+    //         if (!cell) worksheet[XLSX.utils.encode_cell({ r: r, c: c })] = {}; // Ensure the cell exists
+    //         worksheet[XLSX.utils.encode_cell({ r: r, c: c })].s = dataStyle;
+    //     }
+    // }
+
+    // // Generate Excel file and trigger download
+    // XLSX.writeFile(workbook, 'cart_details.xlsx');
+    // };
+
+	import ExcelJS from 'exceljs';
+const downloadExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Cart Details');
+
     const headers = [
         'Product Name',
         'Manufacturer',
@@ -68,89 +166,98 @@
         'Total Price'
     ];
 
-    console.log($cart);
+    worksheet.addRow(headers); // Add header row
 
-    const data = $cart.map((item) => [
-        item?.productDetails?.productName,
-        item?.mfrDetails?.name,
-        item.quantity,
-        item.quantity - item?.stockDetails?.stock < 0 ? 0 : item.quantity - item?.stockDetails?.stock,
-		!$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india") ?
-		$currencyState === "inr" ? "₹ "+item.currentPrice?.INR.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) : "$ "+item?.currentPrice?.USD.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) :
-        $currencyState === "inr" ? "₹ "+(item.currentPrice?.INR*(1 + (18 / 100))).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) : "$ "+(item?.currentPrice?.USD*(1 + (18 / 100))).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}),
-		!$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india") ?
-        $currencyState === "inr" ? "₹ "+(item?.currentPrice?.INR * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) : "$ "+ (item?.currentPrice?.USD * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) :
-        $currencyState === "inr" ? "₹ "+((item?.currentPrice?.INR*(1 + (18 / 100))) * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2}) : "$ "+ ((item?.currentPrice?.USD*(1 + (18 / 100))) * item.quantity).toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})
-	]);
-	
-    let totalPrice
-	if(!$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india")){
-		totalPrice = $cart.reduce((total, item) => {
-        return total + ($currencyState === "inr" ? (item?.currentPrice?.INR * item.quantity) : (item?.currentPrice?.USD * item.quantity));
+    // Map and add cart data rows
+    const dataRows = $cart.map(item => {
+        const isInternational = !$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india");
+        const priceINR = item.currentPrice?.INR;
+        const priceUSD = item.currentPrice?.USD;
+        const qty = item.quantity;
+        const taxMultiplier = isInternational ? 1 : 1.18;
+
+        const unitPrice = $currencyState === 'inr'
+            ? `₹ ${(priceINR * taxMultiplier).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+            : `$ ${(priceUSD * taxMultiplier).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+        const totalPrice = $currencyState === 'inr'
+            ? `₹ ${(priceINR * taxMultiplier * qty).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+            : `$ ${(priceUSD * taxMultiplier * qty).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+        return [
+            item?.productDetails?.productName,
+            item?.mfrDetails?.name,
+            qty,
+            qty - item?.stockDetails?.stock < 0 ? 0 : qty - item?.stockDetails?.stock,
+            unitPrice,
+            totalPrice
+        ];
+    });
+
+    dataRows.forEach(row => worksheet.addRow(row));
+
+    // Total row calculation
+    const isInternational = !$billingAddress?.toLowerCase().includes("india") && !$shippingAddress?.toLowerCase().includes("india");
+    const totalValue = $cart.reduce((sum, item) => {
+        const price = $currencyState === 'inr' ? item.currentPrice?.INR : item.currentPrice?.USD;
+        const qty = item.quantity;
+        const taxMultiplier = isInternational ? 1 : 1.18;
+        return sum + (price * taxMultiplier * qty);
     }, 0);
-	}else{
-		totalPrice = $cart.reduce((total, item) => {
-        return total + ($currencyState === "inr" ? ((item?.currentPrice?.INR*(1 + (18 / 100))) * item.quantity) : ((item?.currentPrice?.USD*(1 + (18 / 100))) * item.quantity));
-    }, 0);
-	}
-     
 
-    // Add a new row for the total price at the bottom
-    const totalRow = [
-        '', '', '', '', 'Total Price',($currencyState === "inr" ? "₹ " : "$")+totalPrice.toLocaleString("en-IN",{ minimumFractionDigits: 2,maximumFractionDigits: 2})
-    ];
+    const totalFormatted = ($currencyState === "inr" ? "₹ " : "$") + totalValue.toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 
-    // Prepare the data for SheetJS
-    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data, totalRow]); // AoA = Array of Arrays
-    const workbook = XLSX.utils.book_new(); // Create a new workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Cart Details'); // Append the sheet
+    worksheet.addRow(['', '', '', '', 'Total Price', totalFormatted]);
 
-    // Apply styles to the header row
-    const headerStyle = {
-        font: { bold: true, color: { rgb: 'FFFFFF' } }, // Bold white text
-        fill: { fgColor: { rgb: '4F81BD' } }, // Blue background
-        alignment: { horizontal: 'center', vertical: 'center' }, // Center text
-        border: {
-            top: { style: 'thin', color: { rgb: '000000' } },
-            bottom: { style: 'thin', color: { rgb: '000000' } },
-            left: { style: 'thin', color: { rgb: '000000' } },
-            right: { style: 'thin', color: { rgb: '000000' } }
-        }
+    // Style setup
+    const borderStyle = {
+        top: { style: 'thin' },
+        bottom: { style: 'thin' },
+        left: { style: 'thin' },
+        right: { style: 'thin' }
     };
 
-    // Apply styles for header row cells
-    for (let c = 0; c < headers.length; c++) {
-        const cell = worksheet[XLSX.utils.encode_cell({ r: 0, c: c })];
-        if (!cell) worksheet[XLSX.utils.encode_cell({ r: 0, c: c })] = {}; // Ensure cell exists
-        worksheet[XLSX.utils.encode_cell({ r: 0, c: c })].s = headerStyle;
-    }
+    // Header row style (light gray)
+    const headerRow = worksheet.getRow(1);
+    headerRow.height = 25;
+    headerRow.eachCell(cell => {
+        cell.font = { bold: true, color: { argb: 'FF000000' } }; // black text
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFD3D3D3' } // light gray
+        };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = borderStyle;
+    });
 
-    // Apply column width (optional)
-    worksheet['!cols'] = headers.map(() => ({ width: 20 })); // Set column width
+    // Style all other rows
+    worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return; // skip header again
+        row.height = 25;
+        row.eachCell(cell => {
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell.border = borderStyle;
+        });
+    });
 
-    // Apply styles to the data rows (optional)
-    const dataStyle = {
-        alignment: { horizontal: 'center', vertical: 'center' }, // Center text
-        border: {
-            top: { style: 'thin', color: { rgb: '000000' } },
-            bottom: { style: 'thin', color: { rgb: '000000' } },
-            left: { style: 'thin', color: { rgb: '000000' } },
-            right: { style: 'thin', color: { rgb: '000000' } }
-        }
-    };
+    // Set column widths
+    const colWidths = [25, 25, 15, 15, 20, 20];
+    colWidths.forEach((w, i) => {
+        worksheet.getColumn(i + 1).width = w;
+    });
 
-    // Apply styles to all data rows
-    for (let r = 1; r < data.length + 2; r++) { // Include the total row
-        for (let c = 0; c < headers.length; c++) {
-            const cell = worksheet[XLSX.utils.encode_cell({ r: r, c: c })];
-            if (!cell) worksheet[XLSX.utils.encode_cell({ r: r, c: c })] = {}; // Ensure the cell exists
-            worksheet[XLSX.utils.encode_cell({ r: r, c: c })].s = dataStyle;
-        }
-    }
-
-    // Generate Excel file and trigger download
-    XLSX.writeFile(workbook, 'cart_details.xlsx');
-    };
+    // Save file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'cart_details.xlsx';
+    link.click();
+};
 
 	let filteredBillingAddress
      let filteredShippingAddress
@@ -490,7 +597,7 @@
 					
 							<h3 class=" lg:hidden font-medium text-xs sm:text-sm">Product</h3>
 							<div class="flex items-center w-full md:w-6/12 md:pr-2">
-				<img src="{PUBLIC_IMAGE_URL}/{item?.productDetails?.image}" onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"  alt={item?.productDetails?.productName} class="w-20 h-20 shrink-0 object-cover rounded-md" />
+				<img src="{PUBLIC_IMAGE_URL}/{item?.productDetails?.image}" onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'"  alt={item?.productDetails?.productName} class="w-20 h-20 object-contain rounded-md" />
 								<div class="ml-2">
 									<p class="text-sm text-black font-semibold">{item?.productDetails?.productNumber}</p>
 									<p class=" text-gray-800 text-xs lg:text-3s font-medium">{item?.productDetails?.productName}</p>

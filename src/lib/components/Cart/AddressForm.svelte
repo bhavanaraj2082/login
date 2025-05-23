@@ -605,7 +605,14 @@ function validatePhoneNumber(countryCode, phone) {
 	let isValid = true;
   	
  function validateForm(fieldName) {
-
+  street = street.trim()
+  organizationName = organizationName.trim()
+  department = department.trim()
+  attentionTo = attentionTo.trim()
+  location = location.trim()
+  state = state.trim()
+  city = city.trim()
+  postalCode = postalCode.trim()
   if (!fieldName || fieldName === 'street') {
     if (!street || !/^[a-zA-Z0-9\s,.'\-/#()]*$/.test(street)) {
       errors.street = 'Address is required and can contain only letters, numbers, and a few special characters.';
@@ -631,6 +638,12 @@ function validatePhoneNumber(countryCode, phone) {
       errors.attentionTo = 'Person name is required and can contain only letters';
     } else {
       delete errors.attentionTo;
+    }
+
+    if (!city || !/^[a-zA-Z\s.'-]+$/.test(city)) {
+      errors.city = 'Please enter a valid city Name';
+    } else {
+      delete errors.city;
     }
 
 //   if (!fieldName || fieldName === 'phone') {
@@ -921,14 +934,9 @@ $:console.log(location,"location");
               }
             }}
 			bind:value={city}/>
-			{#if city.length > 0 && !/^[a-zA-Z\s.'-]+$/.test(city)}
-				<span class="text-red-500 text-xs block">Please enter a valid city Name</span>
-			{/if}
-            {#if showErrors && city.length === 0}
-				<span class="text-red-500 text-xs block">City is required</span>
+		{#if errors?.city}
+			    <p class="text-red-500 text-xs mt-1">{errors.city}</p>
 		    {/if}
-
-
 		    <label class="w-full text-xs md:text-sm font-medium mt-1" for="state">State</label>
             {#if location === 'India' || location === 'india' }
             <select class="w-full focus:ring-0 focus:border-primary-400 px-2 py-1.5 md:py-2 text-xs md:text-sm border-1 rounded my-1 border-gray-300"

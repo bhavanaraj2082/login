@@ -244,11 +244,11 @@ function calculateTotalPrice(price, quantity) {
     return isNaN(numericPrice) ? 'N/A' : (numericPrice * quantity).toLocaleString("en-IN");
 }
 
-    let timeout
+    let timeout,hid = false
     function handleQty(item,quantity){
-        console.log(item,"input");
         clearTimeout(timeout)
-        if(isNaN(quantity) || quantity === 0){
+            hid =true
+        if(isNaN(quantity) || quantity <= 0){
             quantity = 1
         }
         if(quantity >= 10000000) quantity = 10000000
@@ -259,7 +259,8 @@ function calculateTotalPrice(price, quantity) {
          item.quantity = selectedQty
          favData = [...favData];
          tog = null
-         },1500);
+         hid = false
+         },1200);
     }
 
     function increaseQuantity(item,orderMultiple) {
@@ -445,14 +446,15 @@ onMount(() => {
                 }}>
                 <button 
                     type="submit"
-                    class="flex w-full bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 px-5 py-2.5 rounded-md whitespace-nowrap">
+                    disabled={hid}
+                    class="flex w-full bg-primary-500 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 hover:bg-primary-500 border-primary-500 px-5 py-2.5 rounded-md whitespace-nowrap disabled:bg-gray-400 disabled:cursor-not-allowed">
                     <Icon icon="heroicons-solid:shopping-cart" width="20" />
                     <span class=" md:text-sm font-medium text-xs">Add All to Cart</span>
                 </button>
             </form>
                 <button 
                     type="button" on:click={()=>isDeleteAll = true}
-                    class="flex w-full bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2.5 rounded-md whitespace-nowrap">
+                    class="{$fav.length === 0 ? "hidden" : ""} flex w-full bg-red-600 items-center space-x-1 text-white hover:scale-95 transition-all duration-300 border-red-500 px-5 py-2.5 rounded-md whitespace-nowrap">
                     <Icon icon="mdi:delete-forever" width="20" />
                     <span class=" font-medium md:text-sm text-xs">Remove All</span>
                 </button>
@@ -465,7 +467,7 @@ onMount(() => {
             </div>
 		{:else}
             {#each $fav as item,index}
-                <div class="flex flex-col sm:flex-row gap-2 items-center justify-between p-6 sm:p-3 md:p-6 border bg-white border-gray-200 rounded-md w-full shadow">
+                <div class="flex w-full flex-col sm:flex-row gap-2 items-start xs:px-[30%] justify-between p-6 sm:p-3 md:p-6 border bg-white border-gray-200 rounded-md shadow">
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                 <img 
@@ -475,23 +477,23 @@ onMount(() => {
                     alt={item.name} 
                     class=" w-32 h-32 sm:w-20 sm:h-20 md:w-28 md:h-28 xl:w-32 xl:h-32 object-contain rounded-md-md mb-3 md:mb-0 md:mr-4"/>
                      
-                <div class="flex-1 w-fit text-start md:text-left space-y-0.5 sm:space-y-0 space-x-0.5">
-                    <h2 class=" text-sm sm:text-2s md:text-sm font-bold text-gray-800">
-                        <a href={`/products/details/${item?.partNumber}`} class=" text-sm sm:text-2s md:text-sm font-semibold text-primary-500 hover:underline transition-all duration-300">{item?.name || ""}</a>
+                <div class="flex-1 w-fit text-start md:text-left space-y-1">
+                    <h2 class=" text-sm sm:text-2s md:text-xs lg:text-sm font-bold text-gray-800">
+                        <a href={`/products/details/${item?.partNumber}`} class=" text-sm sm:text-2s md:text-xs lg:text-sm font-semibold text-primary-500 hover:underline transition-all duration-300">{item?.name || ""}</a>
                     </h2>
                     <!-- <div class=" w-10/12 ">
-                        <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm: text2sm sm:text-2s md:text-sm font-semibold text-primary-500 hover:underline">{item?.partNumber || ""}</a>
+                        <a href={`/products/details/${item?.partNumber}`} class=" text-xs sm: text2sm sm:text-2s md:text-xs lg:text-sm font-semibold text-primary-500 hover:underline">{item?.partNumber || ""}</a>
                     </div> -->
-                    <p class=" text-sm sm:text-2s md:text-sm">
-                        <span class="font-semibold">Product Number:</span> <a href={`/products/details/${item?.partNumber}`} class="text-sm sm:text-2s md:text-sm font-semibold hover:text-primary-500 hover:underline transition-all duration-300">{item?.partNumber || ""}</a>
+                    <p class=" text-sm sm:text-2s md:text-xs lg:text-sm">
+                        <span class="font-semibold">Product Number:</span> <a href={`/products/details/${item?.partNumber}`} class="text-sm sm:text-2s md:text-xs lg:text-sm font-semibold hover:text-primary-500 hover:underline transition-all duration-300">{item?.partNumber || ""}</a>
                     </p>
-                    <p class=" text-sm sm:text-2s md:text-sm">
+                    <p class=" text-sm sm:text-2s md:text-xs lg:text-sm">
                         <span class="font-semibold">Manufacturer:</span> {item?.manufacturerName || ''}
                     </p>
-                    <p class=" text-sm sm:text-2s md:text-sm">
+                    <p class=" text-sm sm:text-2s md:text-xs lg:text-sm">
                         <span class="font-semibold">Distributor:</span> {item?.distributorName || ''}
                     </p>
-                    <p class=" text-sm sm:text-2s md:text-sm font-semibold">
+                    <p class=" text-sm sm:text-2s md:text-xs lg:text-sm font-semibold">
                         Price: <span class="text-black">
                             { $currencyState === "usd" 
                                 ? `$${item.stockInfo[item.specIndex].pricing.USD.toLocaleString("en-IN")}` 
@@ -500,7 +502,7 @@ onMount(() => {
                                     : 'Price not available'}
                         </span>
                     </p>
-                        <div class=" text-sm sm:text-2s md:text-sm font-semibold flex gap-2">
+                        <div class=" text-sm sm:text-2s md:text-xs lg:text-sm font-semibold flex gap-2">
                             Specification: 
                             {#each item.stockInfo as spec,index }
                             <button on:click={()=>{
@@ -512,7 +514,7 @@ onMount(() => {
                             {/each}
                         </div>
                 </div>
-                <div class="flex pl-2 justify-start md:w-1/4 sm:items-center m-1 p-2 rounded-md sm:justify-center">
+                <div class="flex sm:pl-2 justify-start md:w-1/4 sm:items-center sm:p-2 rounded-md sm:justify-center">
                     <div class="flex flex-col items-start">
                         <p class="font-semibold" 
                            class:text-green-600={item.stockInfo[item.specIndex].stock > 0} 
@@ -557,7 +559,8 @@ onMount(() => {
                         }}>
                         <button 
                             type="submit" 
-                            class="flex bg-primary-500 items-center text-white hover:scale-95 transition-all duration-300 border-primary-500 px-2.5 py-2 rounded-md"
+                            disabled={hid}
+                            class="flex bg-primary-500 items-center text-white hover:scale-95 transition-all duration-300 border-primary-500 px-2.5 py-2 rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed"
                             >
                             <Icon 
                             icon="heroicons-solid:shopping-cart" 
@@ -601,8 +604,8 @@ onMount(() => {
                     <div class="flex items-center">
                     <input type="number" bind:value={item.quantity}
                      on:input={e=>handleQty(item,parseInt(e.target.value))}
-                    class="{tog === index ? "" : "hidden"} border-1 w-32 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">   
-                    <div class=" {tog === index ? "hidden" : ""} flex items-center justify-center md:justify-start border-1 rounded-md">
+                    class="{tog === index ? "" : "hidden"} border-1 w-40 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">   
+                    <div class=" {tog === index ? "hidden" : ""} flex items-center w-40 justify-center md:justify-start border-1 rounded-md">
                         <button 
                             on:click={() => decreaseQuantity(item,item.stockInfo[item.specIndex].orderMultiple)} 
                             class="px-2 py-1.5 rounded-md text-primary-500 disabled:opacity-50"

@@ -109,6 +109,7 @@ export const actions = {
   },
   getCartData: async ({ request }) => {
     const body = Object.fromEntries(await request.formData());
+    console.log(body,"form server");
     try {
       const cartData = await getCart(body.loggedInUser);
       return cartData;
