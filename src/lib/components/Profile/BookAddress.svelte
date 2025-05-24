@@ -1,14 +1,13 @@
 <script>
-    import Icon from '@iconify/svelte';
     import { enhance } from '$app/forms';
     import { createEventDispatcher } from 'svelte';
     import { onMount, onDestroy } from 'svelte';
+    import { countries, postalCodePatterns } from '$lib/Data/constants.js';
     
     const dispatch = createEventDispatcher();
     export let recordId;
     export let shippingAddress;
     export let billingAddress;
-    import { countries, postalCodePatterns } from '$lib/Data/constants.js';
   
     let active = 2;
     let activeAddressType = 'shipping';
@@ -51,6 +50,54 @@
     let stateDropdownRef;
     let activeIndex = -1;
     let stateError = '';
+
+    function capitalize(str) {
+        if (!str) return str;
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    const handleAddressCopy = (type, checked) => {
+        if (checked === true) {
+            if (type === "billing" && billingAddress) {
+                activeAddress.organizationName = billingAddress.organizationName || '';
+                activeAddress.attentionTo = billingAddress.attentionTo || '';
+                activeAddress.street = billingAddress.street || '';
+                activeAddress.city = billingAddress.city || '';
+                activeAddress.state = billingAddress.state || '';
+                activeAddress.location = capitalize(billingAddress.location) || '';
+                activeAddress.department = billingAddress.department || '';
+                activeAddress.postalCode = billingAddress.postalCode || '';
+                activeAddress.building = billingAddress.building || '';
+                stateSearch = billingAddress.state || '';
+            } else if (type === "shipping" && shippingAddress) {
+                activeAddress.organizationName = shippingAddress.organizationName || '';
+                activeAddress.attentionTo = shippingAddress.attentionTo || '';
+                activeAddress.street = shippingAddress.street || '';
+                activeAddress.city = shippingAddress.city || '';
+                activeAddress.state = shippingAddress.state || '';
+                activeAddress.location = capitalize(shippingAddress.location) || '';
+                activeAddress.department = shippingAddress.department || '';
+                activeAddress.postalCode = shippingAddress.postalCode || '';
+                activeAddress.building = shippingAddress.building || '';
+                stateSearch = shippingAddress.state || '';
+            }
+            
+            errors = {};
+            showErrors = false;
+            stateError = '';
+            
+            filteredCountries = countries;
+            filteredStates = states;
+            
+            showDropdown = false;
+            showStateDropdown = false;
+            highlightedIndex = -1;
+            activeIndex = -1;
+            
+            autoSelectedOnce = false;
+            autoSelectedStateOnce = false;
+        }
+    };
   
     onMount(() => {
         activeBook(2, 'shipping');
@@ -489,6 +536,25 @@
                     <span class="text-sm font-bold text-red-500">*</span>Represents required fields
                 </span>
             </h1>
+            <div class="text-sm flex items-center gap-2 py-2.5">
+                {#if activeAddressType === 'shipping'}
+                    {#if billingAddress}
+                        <input 
+                            class="focus:ring-0 outline-none text-primary-500" 
+                            on:change={(e) => handleAddressCopy("billing", e.target.checked)} 
+                            type="checkbox" > 
+                        same as billing address
+                    {/if}
+                {:else}
+                    {#if shippingAddress}
+                        <input 
+                            class="focus:ring-0 outline-none text-primary-500" 
+                            on:change={(e) => handleAddressCopy("shipping", e.target.checked)} 
+                            type="checkbox"> 
+                        same as shipping address
+                    {/if}
+                {/if}
+            </div>
             <form class="my-3 flex flex-col sm:flex-row flex-wrap gap-y-3 py-3" method="POST" action="?/editAddresses" use:enhance={handleSubmit}>
                 <input type="hidden" name="recordId" value={recordId}>
                 <input type="hidden" name="addressType" value={activeAddressType}>

@@ -84,7 +84,7 @@ const handleSubmit =()=>{
 
     {#if toggleEdit}
       <div class=" max-w-2xl">
-        <p class="mt-3 text-sm font-bold">Order/Quote Preference</p>
+        <!-- <p class="mt-3 text-sm font-bold">Order/Quote Preference</p> -->
         <form class="my-3 flex flex-col sm:flex-row flex-wrap gap-y-6"
         method="POST" action="?/editSitePreferences" use:enhance={handleSubmit}>
             <input type="hidden" name="recordId" value={recordId}>
@@ -100,7 +100,7 @@ const handleSubmit =()=>{
                 <!-- <select bind:value={productEntry}
                 class=" outline-none w-full border-1 focus:ring-0 mt-2 border-gray-300 font-medium rounded-md p-2 text-sm focus:border-primary-500">
                     <option class=" hover:bg-primary-200" value="Manual Entry">Manual Entry</option>
-                    <!-- <option class=" hover:bg-primary-200" value="Bulk Upload">Bulk Upload</option> --
+                    <option class=" hover:bg-primary-200" value="Bulk Upload">Bulk Upload</option> --
                 </select> -->
             </div>
             <div class=" sm:w-full">
