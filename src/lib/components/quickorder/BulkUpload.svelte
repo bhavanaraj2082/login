@@ -1213,11 +1213,15 @@ Example file content:
           class="flex justify-center bg-white items-center h-12 border rounded-md hover:bg-primary-200 hover:text-primary-600"
         >
           <button
-            class="flex items-center gap-2 text-sm font-medium text-primary-500"
-            href="/quick_order_template.xls"
-            download
+            class="flex justify-center items-center h-12 hover:bg-primary-200 hover:text-primary-600 text-primary-500 text-sm font-medium gap-2"
+            type="button"
+            data-download-url="/quick_order_template.xls"
+            onclick="this.querySelector('a').click()"
           >
-            <Icon icon="pajamas:download" class="text-lg " /> Download Template
+            <!-- svelte-ignore a11y-missing-content -->
+            <a href="/quick_order_template.xls" download style="display: none;"
+            ></a>
+            <i class="text-lg" data-icon="pajamas:download"></i> Download Template
           </button>
         </div>
 
