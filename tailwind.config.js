@@ -49,6 +49,13 @@ export default {
 				'bubble': 'bubble 4s ease-in-out infinite',
 				'bubble-delay': 'bubble 5s ease-in-out 1s infinite',
 				'bubble-slow': 'bubble 6s ease-in-out 2s infinite',
+				'gradient-flow': 'gradientFlow 5s ease infinite',
+			},
+			backgroundSize: {
+				"200p-200p": "200% 200%", 
+			},
+			backgroundPosition: {
+				"0p-50p": "0% 50%", 
 			},
 			keyframes: {
 				shimmer: {
@@ -87,6 +94,17 @@ export default {
 					'0%': { opacity: 0 },
 					'100%': { opacity: 1 },
 				  },
+				gradientFlow: {
+					"0%": {
+						backgroundPosition: "0% 50%",
+					},
+					"50%": {
+						backgroundPosition: "100% 50%",
+					},
+					"100%": {
+						backgroundPosition: "0% 50%",
+					},
+				},
 			},
 		},
 	},
