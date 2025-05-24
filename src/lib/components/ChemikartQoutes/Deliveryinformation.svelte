@@ -646,11 +646,10 @@ errors = { ...errors, Address2: "Address2 must be between 3–200 chars" };
       <input type="text" 
       class="block rounded  md:w-3/4 w-full lg:w-1/2 py-1.5  sm:text-sm text-xs border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-500 border-1 focus:border-primary-500"
       name="County" id="" bind:value={$Delivery.County} 
-              on:input={() => {
-                  validateGST
-                  const trimmedGST = $Delivery.County.trim();
-                            $Delivery.County= trimmedGST;
-                  }}
+             on:input={(event) => {
+			$Delivery.County = event.target.value.trim();
+			validateGST(event);
+		}}
               />
               {#if errorMessages.gst}
               <div class="text-red-500 ml-1 mt-1 text-xs font-medium">

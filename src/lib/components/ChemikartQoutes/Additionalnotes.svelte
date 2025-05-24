@@ -14,14 +14,10 @@
 	export let showStep2 = true;
 	export let showStep3 = true;
 
-	const handleSubmit = () => {
-		if (!get(AddNoted)) {
-			showRequiredMessage = true;
-		} else {
-			showRequiredMessage = false;
-			tog3();
-			// scrollToStep('step5');
-		}
+	const validateInput = () => {
+		const value = get(AddNoted);
+		showRequiredMessage = value.trim() === '';
+		showInvalidCharMessage = !validInputRegex.test(value);
 	};
 
 	const scrollToStep = (stepId) => {
@@ -30,6 +26,25 @@
 			element.scrollIntoView({ behavior: 'smooth', block: 'start' });
 		}
 	};
+const validInputRegex = /^[a-zA-Z0-9\s.,!?'"()\-]*$/;
+let showInvalidCharMessage = false;
+
+const handleSubmit = () => {
+	const note = get(AddNoted);
+
+	if (!note) {
+		showRequiredMessage = true;
+		showInvalidCharMessage = false;
+	} else if (!validInputRegex.test(note)) {
+		showRequiredMessage = false;
+		showInvalidCharMessage = true;
+	} else {
+		showRequiredMessage = false;
+		showInvalidCharMessage = false;
+		tog3();
+		// scrollToStep('step5');
+	}
+};
 
 	const handleEdit = (step, toggleFn) => {
 		toggleFn();
@@ -95,11 +110,16 @@
 			border-1 focus:border-primary-500 placeholder:text-sm sm:text-sm text-xs"
 			bind:value={$AddNoted}
 			name="furtherdetails"
+			on:input={validateInput}
 			placeholder="Add your notes here..."
 		></textarea>
 		{#if showRequiredMessage}
 			<p class="text-red-500 text-sm font-medium ml-1">This field is required.</p>
 		{/if}
+		{#if showInvalidCharMessage}
+	<p class="text-red-500 text-sm font-medium ml-1">Please avoid special characters.</p>
+{/if}
+
 		
 	</div>
 	<button
