@@ -2,7 +2,7 @@
     import Icon from "@iconify/svelte";
   export let data;
 
-  $: categoryData = data.categoryData 
+  $: categoryData = data?.categoryData 
 
   $: filteredCategories = searchTerm.trim() === "" 
   ? categoryData 
@@ -75,9 +75,9 @@
     {/each}
   </div>
   {:else}
-  <div class="mt-8 flex flex-col items-center bg-white shadow rounded-md justify-center p-8 text-center">
+  <div class="my-8 flex flex-col items-center bg-white shadow rounded-md justify-center p-8 text-center">
     <Icon
-      icon="ph:package-duotone"
+      icon="mdi:flask-empty-remove-outline"
       width="64"
       height="64"
       class="text-primary-400 mb-4"
@@ -85,7 +85,7 @@
     <h3 class="text-xl font-medium text-gray-900 mb-2">
       No Applications categories available
     </h3>
-    <p class="text-gray-500 max-w-md">
+    <p class="text-gray-500 text-sm max-w-md">
       We couldn't find any categories matching your search criteria. Please
       try a different search term or check back later.
     </p>

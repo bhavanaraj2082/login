@@ -220,7 +220,6 @@ const validateField = (name, value) => {
             }
             break;
 
-
         case "jobtitle":
             if (value) {
                 value = value.replace(/\b0+(\d)/g, "$1");
@@ -313,7 +312,7 @@ const handleSubmit =({cancel})=>{
 }
 
 </script>
-<div class="shadow max-w-7xl rounded p-5 bg-white">
+<div class="shadow max-w-7xl p-4 mt-3 sm:mt-0 rounded-md bg-white">
     {#if toggleEdit}
     <div class="">
         <h1 class=" text-xl font-bold"> Edit Contact Information <span class=" text-xs font-normal"> <span class=" text-sm font-bold text-red-500">*</span>Represent required fields</span></h1>
@@ -505,10 +504,16 @@ const handleSubmit =({cancel})=>{
             <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-6">
                 <div class="flex flex-col sm:flex-row sm:items-center">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
-                    <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Name:</label>
-                    <div class="text-sm text-gray-600 min-h-[20px] sm:ml-1">
+                    <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Name :</label>
+                    <div class="text-sm text-gray-600 sm:ml-1">
                         {#if firstName && firstName !== 'N/A' || lastName && lastName !== 'N/A'}
-                            <span>{firstName} {lastName}</span>
+                            <span>{firstName} 
+                                {#if lastName}
+                                <span>
+                                    {lastName}
+                                </span>    
+                                {/if}
+                            </span>
                         {:else}
                             <span>
                                 {#if email && email.includes('@')}
@@ -522,7 +527,7 @@ const handleSubmit =({cancel})=>{
                 </div>
                 <div class="flex flex-col sm:flex-row sm:items-center">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
-                    <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Primary Phone:</label>
+                    <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Primary Phone :</label>
                     <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
                         {#if !cellPhone && (firstName && lastName && email || email)}
                             <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -544,7 +549,7 @@ const handleSubmit =({cancel})=>{
                 {#if alternatePhone}
                     <div class="flex flex-col sm:flex-row sm:items-center ">
                         <!-- svelte-ignore a11y-label-has-associated-control -->
-                        <label class="font-medium text-sm text-gray-700 sm:min-w-[130px] sm:flex-shrink-0">Alternative Phone:</label>
+                        <label class="font-medium text-sm text-gray-700 sm:min-w-[130px] sm:flex-shrink-0">Alternative Phone :</label>
                         <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
                             <span>{alternatePhone}</span>
                         </div>
@@ -553,8 +558,8 @@ const handleSubmit =({cancel})=>{
                 
                 <div class="flex flex-col sm:flex-row sm:items-center">
                     <!-- svelte-ignore a11y-label-has-associated-control -->
-                    <label class="font-medium text-sm text-gray-700 sm:min-w-[60px] sm:flex-shrink-0">Email:</label>
-                    <div class="flex items-center space-x-2 min-h-[20px] sm:ml-0.5">
+                    <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Email :</label>
+                    <div class="flex items-center space-x-2 sm:ml-0.5">
                         <span class="text-sm text-gray-600 break-all">{email || "N/A"}</span>
                         <Icon 
                             icon="tdesign:verified-filled" 
@@ -576,8 +581,8 @@ const handleSubmit =({cancel})=>{
                     {:else}
                         <div class="flex flex-col sm:flex-row sm:items-center">
                             <!-- svelte-ignore a11y-label-has-associated-control -->
-                            <label class="font-medium text-sm text-gray-700 sm:min-w-[80px] sm:flex-shrink-0">Password:</label>
-                            <div class="min-h-[20px] sm:ml-0.5">
+                            <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Password :</label>
+                            <div class=" sm:ml-1">
                                 <a 
                                     href="/reset-password" 
                                     class="text-sm text-primary-500 font-semibold hover:underline transition-colors duration-200">
@@ -595,45 +600,45 @@ const handleSubmit =({cancel})=>{
                     </h2>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                         {#if companyName}
-                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-1">
                                 <!-- svelte-ignore a11y-label-has-associated-control -->
-                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Company Name:</label>
+                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Company Name :</label>
                                 <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
                                     <span>{companyName || "--"}</span>
                                 </div>
                             </div>
                         {/if}
                         {#if companytype}
-                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-1">
                                 <!-- svelte-ignore a11y-label-has-associated-control -->
-                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Company Type:</label>
+                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Company Type :</label>
                                 <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
                                     <span>{companytype || "--"}</span>
                                 </div>
                             </div>
                         {/if}
                         {#if gstNumber}
-                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-1">
                                 <!-- svelte-ignore a11y-label-has-associated-control -->
-                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">GST Number:</label>
+                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">GST Number :</label>
                                 <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
                                     <span>{gstNumber || "--"}</span>
                                 </div>
                             </div>
                         {/if}
                         {#if tanNumber}
-                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-1">
                                 <!-- svelte-ignore a11y-label-has-associated-control -->
-                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">TAN Number:</label>
+                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">TAN Number :</label>
                                 <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
                                     <span>{tanNumber || "--"}</span>
                                 </div>
                             </div>
                         {/if}
                         {#if jobtitle}
-                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                            <div class="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-1">
                                 <!-- svelte-ignore a11y-label-has-associated-control -->
-                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Job Title:</label>
+                                <label class="font-medium text-sm text-gray-700 sm:flex-shrink-0">Job Title :</label>
                                 <div class="text-sm text-gray-600 min-h-[20px] sm:ml-0.5">
                                     <span>{jobtitle || "--"}</span>
                                 </div>

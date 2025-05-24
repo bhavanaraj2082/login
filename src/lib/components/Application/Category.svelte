@@ -3,8 +3,8 @@
   import Card from '$lib/components/Application/Card.svelte'; 
   export let data;
   
-  $: categoryData = data.categoryData;
-  $: subcategories = data.categoryData.subcategories;
+  $: categoryData = data?.categoryData;
+  $: subcategories = data?.categoryData?.subcategories;
 
   // $: console.log('==++',subcategories)
 
@@ -38,8 +38,7 @@
         type="text"
         bind:value={searchTerm}
         placeholder="Search Sub categories..."
-        class="w-full pl-7 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent placeholder:text-xs text-xs p-3"
-      />
+        class="w-full pl-7 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-transparent placeholder:text-xs text-xs p-3"/>
       {#if searchTerm}
       <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer rounded bg-red-50 p-1" style="color: #cb1919" on:click={clearSearch}>
         <Icon icon="oui:cross" width="16" height="16" class="font-bold" />
@@ -47,7 +46,7 @@
     {/if}
     </div>
   </div>
-  <p class="mt-3 text-sm text-gray-600 sm:px-2 md:pl-0 mx-2 lg:mx-0 text-justify">{categoryData.description}</p>
+  <p class="mt-3 text-sm text-gray-600 sm:px-2 md:pl-0 mx-2 lg:mx-0 text-justify">{categoryData?.description}</p>
   {#if filteredSubCategories.length > 0}
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8 lg:mx-0 mx-2.5 my-8">
     {#each filteredSubCategories as subcategory}
@@ -61,18 +60,17 @@
     {/each}
   </div>
   {:else}
-  <div class="mt-8 flex flex-col items-center bg-white shadow rounded-md justify-center p-8 text-center">
+  <div class="my-8 flex flex-col items-center bg-white shadow rounded-md justify-center p-8 text-center">
     <Icon
-      icon="ph:package-duotone"
+      icon="mdi:flask-empty-remove-outline"
       width="64"
       height="64"
-      class="text-primary-400 mb-4"
-    />
+      class="text-primary-400 mb-4" />
     <h3 class="text-xl font-medium text-gray-900 mb-2">
       No Search related sub Category available
     </h3>
-    <p class="text-gray-500 max-w-md">
-      We couldn't find any Sub categories matching your search criteria. Please
+    <p class="text-gray-500 text-sm max-w-xl">
+      We couldn't find any sub categories matching your search criteria. <br> Please
       try a different search term or check back later.
     </p>
   </div>

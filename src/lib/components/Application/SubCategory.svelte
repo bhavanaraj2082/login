@@ -63,44 +63,42 @@
             imageSrc={subsubcategory.image}
             altText={subsubcategory?.name}
             name={subsubcategory?.name}
-            description={subsubcategory?.description}
-          />
+            description={subsubcategory?.description}/>
         {/each}
       </div>
     {:else}
-      <div class="mt-8 flex flex-col items-center bg-white shadow rounded-md justify-center p-8 text-center">
+      <div class="my-8 flex flex-col items-center bg-white shadow rounded-md justify-center p-8 text-center">
         <Icon
-          icon="ph:package-duotone"
+          icon="mdi:flask-empty-remove-outline"
           width="64"
           height="64"
-          class="text-primary-400 mb-4"
-        />
+          class="text-primary-400 mb-4" />
         <h3 class="text-xl font-medium text-gray-900 mb-2">
           No Search related sub sub Category available
         </h3>
-        <p class="text-gray-500 max-w-md">
-          We couldn't find any categories matching your search criteria. Please
+        <p class="text-gray-500 text-sm max-w-xl">
+          We couldn't find any sub sub categories matching your search criteria. <br> Please
           try a different search term or check back later.
         </p>
       </div>
     {/if}
   {:else}
-    <div class="flex flex-col md:flex-row items-center lg:items-start gap-2 my-8">
+    <div class="flex flex-col md:flex-row items-center lg:items-start gap-2 px-4 my-8">
       <div class="flex-shrink-0 w-full md:w-1/3">
         <img
           src={subcategoryData?.image}
           alt={subcategoryData?.name}
-          class="h-80 rounded-lg shadow"/>
+          class=" md:h-80 w-full rounded-lg shadow-lg"/>
       </div>
       <div class="flex-grow w-full md:w-2/3">
-        <h2 class="sm:text-2xl text-xl text-heading font-semibold">
+        <h2 class="sm:text-2xl text-xl md:ml-3 ml-0 text-heading font-semibold">
           {subcategoryData?.name}
         </h2>
-        <p class="mt-2 sm:text-md  text-gray-600 text-justify">{subcategoryData?.description}</p>
+        <p class="mt-2 sm:text-md text-sm  text-gray-600 text-justify md:ml-3 ml-0">{subcategoryData?.description}</p>
       </div>
     </div>
     {#if subcategoryData.additionalInfo && subcategoryData.additionalInfo.length > 0}
-      <div class="mt-8">
+      <div class="mt-8 px-4">
         <h3 class="text-xl font-semibold text-gray-800">Overview</h3>
         <div class="mt-4 text-gray-600">
           {#each subcategoryData?.additionalInfo as info}

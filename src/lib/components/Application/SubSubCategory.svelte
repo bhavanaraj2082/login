@@ -1,7 +1,7 @@
 <script>
   import RelatedProductss from "$lib/components/RelatedProductss.svelte";
   export let data;
-  let subsubcategoryData = data.subsubcategoryData;
+  let subsubcategoryData = data?.subsubcategoryData;
   let relatedProducts = data?.relatedProducts;
   //console.log("form subsubcategory",relatedProducts);
 </script>
@@ -12,15 +12,15 @@
       <img
         src={subsubcategoryData?.image}
         alt={subsubcategoryData?.name}
-        class=" md:h-80 rounded-lg shadow-lg"
+        class=" md:h-80 w-full rounded-lg shadow-lg"
       />
     </div>
 
-    <div class="flex-grow w-full lg:w-2/3">
-      <h1 class="text-2xl font-semibold text-heading">
+    <div class="flex-grow w-full lg:w-2/3 ml-2">
+      <h1 class="text-xl sm:text-2xl font-semibold text-heading">
         {subsubcategoryData?.name}
       </h1>
-      <p class="mt-2 sm:text-base text-xs text-gray-600 text-justify">
+      <p class="mt-2 md:text-base text-xs text-gray-600 text-justify">
         {subsubcategoryData?.description}
       </p>
     </div>
