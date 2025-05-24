@@ -43,129 +43,175 @@
       window.removeEventListener('mousedown', handleClickOutside); 
     };
   });
+
+  const contactInfo = [
+	  { icon: 'mdi:phone-outline', text: '7829922222', href: 'tel:7829922222', ariaLabel: 'Call us' },
+	  { icon: 'mdi:email-outline', text: 'sales@partskeys.com', href: 'mailto:sales@partskeys.com', ariaLabel: 'Email us' },
+	  { 
+            icon: 'ic:baseline-whatsapp', 
+            text: 'Chat with us on', 
+            href: 'javascript:void(0)', 
+            onClick: "window.open('https://wa.me/917829922222?text=Hello%2C%0A%0AI%20am%20interested%20in%20discussing%20the%20availability%20of%20your%20products%20and%20services.%20I%20would%20like%20to%20know%20if%20the%20following%20part%20is%20available%3A%20%5BInsert%20Part%20Number%20Here%5D%20If%20not%2C%20could%20you%20inform%20me%20when%20it%20will%20be%20available%20or%20send%20me%20an%20email%20with%20the%20details%3F%0A%0AThank%20you%20for%20your%20assistance.%20I%20look%20forward%20to%20your%20response.%0A%0ABest%20regards%2C%0A%5BYour%20Name%5D', '_blank')",
+            ariaLabel: 'Chat with us on WhatsApp' 
+          },
+	];
 </script>
-<div  class="block md:hidden">
-{#if showCrcl}
-<!-- <div  class="block md:hidden"> -->
-  <div class="relative w-full  flex items-center justify-center">
-    <button
-        class="font-semibold rounded-full flex flex-col items-center py-2 gap-3 transition-opacity duration-300 w-full max-w-4xl z-30"
-        on:click={toggleHelp}
-    >
-        <!-- Inner div with larger content -->
-        <div class="w-full h-10 bg-primary-400 text-white rounded-lg flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer">
-            <p class="text-lg sm:text-xl md:text-2xl">Feedback</p>
-            <Icon icon="material-symbols:chat-outline-rounded" class="text-bold text-2xl ml-2 mt-1" />
-        </div>
-    </button>
-</div>
+<div class="block md:hidden">
+	{#if showCrcl}
+		<!-- <div  class="block md:hidden"> -->
+		<div class="relative w-full flex items-center justify-center">
+			<button
+				class="font-semibold rounded-full flex flex-col items-center p-2 gap-3 transition-opacity duration-300 w-full max-w-4xl z-30"
+				on:click={toggleHelp}
+			>
+				<!-- Inner div with larger content -->
+				<div
+					class="w-full h-10 bg-primary-400 text-white rounded-lg flex items-center justify-center text-2xl shadow-md hover:shadow-primary-500/50 transition-shadow duration-300 cursor-pointer"
+				>
+					<p class="text-lg sm:text-xl md:text-2xl">Feedback</p>
+					<Icon icon="material-symbols:chat-outline-rounded" class="text-bold text-2xl ml-2 mt-1" />
+				</div>
+			</button>
+		</div>
 
-<!-- </div> -->
-{/if}
-{#if isHelpVisible}
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div
-  class="fixed inset-0 bg-gray-500 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-30"
-  on:click={handleClickOutside} transition:fade
->
-  <div
-    class="fixed bg-primary-500 rounded-lg shadow-xl mx-auto overflow-hidden lg:w-[900px] md:w-[750px] w-full"
-    bind:this={popupRef}
-    on:click|stopPropagation transition:fade
-  >
-    <div class="flex justify-between items-center">
-      <div class="flex items-center p-3 text-black">
-        <span class="text-xl font-extrabold text-white font-serif">Chemikart</span>  
-      </div>
-      <!-- <button
-      class="p-1 hover:bg-gray-100 rounded transition-colors duration-200 text-end"
-      on:click={hideHelp}>
-      <Icon icon="mdi:close" class="text-xl text-white hover:text-white" />
-    </button> -->
-    <button
-        class="text-white text-lg font-bold mr-2"
-        on:click={hideHelp}
-      >
-        ✖
-      </button> 
-    </div>
-    <div class="text-xs bg-white overflow-y-auto scroll p-3" style="max-height: 400px">
-  
-      <div class="w-full">
-        <div class="slide h-10 flex justify-start items-start text-center text-sm font-semibold font-montserrat">
-            <Icon icon="noto:waving-hand" class="text-bold text-3xl" />
-            &nbsp; &nbsp; Hi! there
-        </div>
+		<!-- </div> -->
+	{/if}
+	{#if isHelpVisible}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div
+			class="fixed inset-0 flex items-center justify-center z-30"
+			on:click={handleClickOutside}
+			transition:slide
+		>
+			<!-- <div
+      class="fixed bg-primary-500 p-3 rounded-xl shadow-xl mx-auto overflow-hidden md:w-1/3 lg:w-1/4 right-0 h-56 bottom-56"
+      bind:this={popupRef}
+      on:click|stopPropagation
+      transition:slide
+    > -->
 
-         <div class="text-lg font-semibold font-serif">
-      We value your Feedback
-    </div>
-        <div class="flex flex-row items-center w-full p-1">
+			<div
+				class="fixed bg-white pb-3 rounded-xl shadow-xl mx-3 overflow-hidden md:w-1/3 lg:w-1/3 xl:w-1/4 h-96 bottom-20 border-gray-100"
+				bind:this={popupRef}
+				on:click|stopPropagation
+				transition:slide
+			>
+				<div
+					class="relative bg-primary-500 rounded-t-xl pt-4 pb-6 px-2 shadow-xl flex justify-between"
+				>
+					<span class="text-lg font-bold text-white font-serif mx-2">Chemikart</span>
+					<button
+						class="top-2 right-2 transform -translate-x-2 text-white text-lg font-bold"
+						on:click={hideHelp}
+					>
+						<Icon
+							icon="ion:close"
+							width="26"
+							height="26"
+							class="transition-transform hover:scale-110 duration-200 ease-in-out"
+						/>
+					</button>
+				</div>
+				<div
+					class="relative -mt-4 bg-white rounded-t-xl pb-4 border border-gray-100 shadow-xl overflow-hidden"
+				>
+					<div class="w-full max-w-lg px-2 py-6 rounded-t-xl">
+						<div
+							class="slide h-10 flex justify-start items-start text-center text-md font-semibold font-montserrat"
+						>
+							<Icon icon="noto:waving-hand" class="text-bold text-2xl" />
+							<span class="px-2 pb-2">Hi! there</span>
+						</div>
+						<div
+							class="text-md font-semibold p-2 border hover:border-transparent hover:bg-primary-400 hover:text-white rounded-md group transition-colors duration-300 ease-in-out cursor-pointer"
+							on:click={() => {
+								toggleHelps();
+								goto('/feedback');
+							}}
+						>
+							We value your <span class="text-primary-500 group-hover:text-white">Feedback</span>
 
-  <!-- Left side: Text content (3/4 width) -->
-  <div class="w-3/4 flex flex-col space-y-0">
-  
-    <div class="text-sm font-semibold font-montserrat">
-      Please take a moment to fill out our form
-    </div>
-  </div>
+							<div class="flex flex-row gap-2 items-center w-full p-1">
+								<!-- Left side: Text content (3/4 width) -->
+								<div class=" flex flex-col space-y-0">
+									<div class="text-sm lg:text-sm sm:text-xs font-semibold font-montserrat">
+										Please take a moment to fill out our form
+									</div>
+								</div>
 
-  <!-- Right side: Button with icon (1/4 width) -->
-  <div class="w-1/4 flex justify-end items-center cursor-pointer mt-2" on:click={() => { toggleHelps(); goto('/feedback'); }}>
-   <button class="absolute text-sm text-primary-500 font-semibold border-1 p-2 rounded-md mb-5" type='submit'>
-            Click here
-          </button>
-            <Icon icon="ph:hand-pointing-thin" class="absolute text-bold text-3xl text-gray-500 icon-1 mt-6" />
-</div>
+								<!-- Right side: Button with icon (1/4 width) -->
+								<div class=" flex justify-end items-center cursor-pointer">
+									<button
+										class=" sm:text-md text-xs text-nowrap text-white group-hover:text-primary-500 font-semibold border-1 p-2 rounded-md bg-white group-hover:bg-white group-hover:bg-none bg-gradient-to-r from-primary-500 via-primary-400 to-primary-300 bg-200p-200p bg-0p-50p animate-gradient-flow transition-all duration-300"
+										type="submit"
+									>
+										Click here
+									</button>
+								</div>
+							</div>
+						</div>
 
+						<div class="w-full max-w-lg py-2">
+							<div
+								class="text-md font-semibold p-2 border hover:border-transparent hover:bg-primary-400 hover:text-white rounded-md group transition-colors duration-300 ease-in-out cursor-pointer"
+								on:click={() => {
+									toggleHelps();
+									goto('/help-support');
+								}}
+							>
+								We're here to <span class="text-primary-500 group-hover:text-white">Help</span>
 
+								<div class="flex flex-row-reverse gap-2 items-center w-full p-1">
+									<!-- Left side: Text content (3/4 width) -->
+									<div class=" flex flex-col space-y-0">
+										<div class="text-sm lg:text-sm sm:text-xs font-semibold font-montserrat">
+											Get in touch if you have any questions or issues
+										</div>
+									</div>
 
-</div>
-
-
- <div class="w-full">
-   
-        <div class="text-lg font-semibold font-serif">
-      We're here to help
-    </div>
-
-     <div class="flex flex-row items-center w-full p-1">
-
-  <!-- Left side: Text content (3/4 width) -->
-  <div class="w-1/2 flex flex-col space-y-0">
-  
-    <div class="text-sm font-semibold font-montserrat">
-     Get in touch if you have any questions, issues
-    </div>
-  </div>
-
-  <!-- Right side: Button with icon (1/4 width) -->
-  <div class="w-1/2 flex justify-end items-center cursor-pointer mt-2" on:click={() => { toggleHelps(); goto('/help-support'); }}>
-   <button class="absolute text-sm text-primary-500 font-semibold border-1 p-2 rounded-md mb-5" type='submit'>
-            Click here
-          </button>
-            <Icon icon="ph:hand-pointing-thin" class="absolute text-bold text-3xl text-gray-500 icon-1 mt-6" />
-</div>
-
-
-
-</div>
-
-
-
-     
-    </div>
-      </div>
-    </div>
-
-
-
-
-    
-  </div>
-</div>
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-{/if}
+									<!-- Right side: Button with icon (1/4 width) -->
+									<div class=" flex justify-end items-center cursor-pointer">
+										<button
+											class=" sm:text-md text-xs text-nowrap text-white group-hover:text-primary-500 font-semibold border-1 p-2 rounded-md bg-white group-hover:bg-white group-hover:bg-none bg-gradient-to-r from-primary-500 via-primary-400 to-primary-300 bg-200p-200p bg-0p-50p animate-gradient-flow transition-all duration-300"
+											type="submit"
+										>
+											Click here
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div>
+							<div>
+								<ul class="flex flex-row items-center justify-around space-x-4 mt-2">
+									{#each contactInfo as { icon, text, href, ariaLabel, onClick }}
+										<li>
+											<a
+												{href}
+												class="w-10 h-10 flex items-center justify-center
+         text-xl text-white bg-primary-400
+         hover:bg-primary-500 transition-all duration-300
+         rounded-full"
+												aria-label={ariaLabel}
+												on:click={onClick
+													? (e) => {
+															e.preventDefault();
+															eval(onClick);
+														}
+													: undefined}
+											>
+												<Icon {icon} class="w-5 h-5" />
+											</a>
+										</li>
+									{/each}
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- </div> -->
+	{/if}
 </div>
