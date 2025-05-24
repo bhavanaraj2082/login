@@ -1,4 +1,5 @@
 <script>
+	import ExcelJS from 'exceljs';
 	import { sendMessage } from '$lib/utils.js';
 	import { goto,invalidate } from '$app/navigation';
 	import { browser } from '$app/environment';
@@ -10,12 +11,11 @@
 	import { cart, guestCart,removeFromCart } from '$lib/stores/cart.js';
 	import { toast } from 'svelte-sonner';
 	import { page } from '$app/stores';
-	import * as XLSX from 'xlsx';
 	import { PUBLIC_IMAGE_URL } from "$env/static/public"
 
 	export let data
 	let loading = true;
-	let isLoggedIn = $authedUser?.id ? true : false
+	$: isLoggedIn = $authedUser?.id ? true : false
 	let filteredGuestCart = ''
 	let container
 	let addToCartModal = false
@@ -93,7 +93,8 @@
 			cart.set(cartData);
 			loading = false
 		    calculateTotalPrice($cart);
-			if(isLoggedIn && filteredGuestCart.length && !cartId.length){
+			if(isLoggedIn && filteredGuestCart.length && cartId?.length ===0){
+			console.log('cart page cartid',cartId);
 	    	const formdata = new FormData()
 	    	formdata.append("guestCart",JSON.stringify(filteredGuestCart))
 	    	sendMessage("?/newcart",formdata,(result)=>{
@@ -127,8 +128,11 @@
         }
      }
     }
-	const downloadExcel = () => {
-    // Define the data (same as the original CSV content)
+
+const downloadExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Cart Details');
+
     const headers = [
         'Product Name',
         'Manufacturer',
@@ -138,79 +142,81 @@
         'Total Price'
     ];
 
-    // console.log($cart);
+    // Add headers
+    worksheet.addRow(headers);
 
-    const data = $cart.map((item) => [
+    // Add data rows
+    const data = $cart.map(item => [
         item?.productDetails?.productName,
-        item?.mfrDetails?.name,
+        item?.mfrDetails?.name ? item?.mfrDetails?.name : item?.productDetails?.manufacturerName,
         item.quantity,
         item.quantity - item?.stockDetails?.stock < 0 ? 0 : item.quantity - item?.stockDetails?.stock,
-		$currencyState === "inr" ? "₹ "+item?.currentPrice?.INR.toLocaleString("en-IN") : "$ "+item?.currentPrice?.USD.toLocaleString("en-IN"),
-        $currencyState === "inr" ? "₹ "+(item?.pricing?.INR * item.quantity).toLocaleString("en-IN") : "$ "+ (item?.pricing?.USD * item.quantity).toLocaleString("en-IN"),
-      ]);
+        $currencyState === "inr"
+            ? "₹ " + item?.currentPrice?.INR.toLocaleString("en-IN")
+            : "$ " + item?.currentPrice?.USD.toLocaleString("en-IN"),
+        $currencyState === "inr"
+            ? "₹ " + (item?.pricing?.INR * item.quantity).toLocaleString("en-IN")
+            : "$ " + (item?.pricing?.USD * item.quantity).toLocaleString("en-IN")
+    ]);
 
-    // Calculate total price (sum of the last column - 'Extended Price')
-    const totalPrice = $cart.reduce((total, item) => {
-        return total + ($currencyState === "inr" ? (item.pricing.INR * item.quantity) : (item.pricing.USD * item.quantity));
-    }, 0);
-	console.log(totalPrice,"PPP");
-    
-    // Add a new row for the total price at the bottom
-    const totalRow = [
-        '', '', '', '', 'Total Price',($currencyState === "inr" ? "₹ " : "$")+totalPrice.toLocaleString("en-IN")
-    ];
+    data.forEach(row => worksheet.addRow(row));
 
-    // Prepare the data for SheetJS
-    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data, totalRow]); // AoA = Array of Arrays
-    const workbook = XLSX.utils.book_new(); // Create a new workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Cart Details'); // Append the sheet
+    // Add total row
+    const totalPrice = $cart.reduce((total, item) =>
+        total + ($currencyState === "inr"
+            ? (item.pricing.INR * item.quantity)
+            : (item.pricing.USD * item.quantity)), 0);
 
-    // Apply styles to the header row
-    const headerStyle = {
-        font: { bold: true, color: { rgb: 'FFFFFF' } }, // Bold white text
-        fill: { fgColor: { rgb: '4F81BD' } }, // Blue background
-        alignment: { horizontal: 'center', vertical: 'center' }, // Center text
-        border: {
-            top: { style: 'thin', color: { rgb: '000000' } },
-            bottom: { style: 'thin', color: { rgb: '000000' } },
-            left: { style: 'thin', color: { rgb: '000000' } },
-            right: { style: 'thin', color: { rgb: '000000' } }
-        }
+    worksheet.addRow([
+        '', '', '', '', 'Total Price',
+        ($currencyState === "inr" ? "₹ " : "$") + totalPrice.toLocaleString("en-IN")
+    ]);
+
+    // Apply styles
+    const borderStyle = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
     };
 
-    // Apply styles for header row cells
-    for (let c = 0; c < headers.length; c++) {
-        const cell = worksheet[XLSX.utils.encode_cell({ r: 0, c: c })];
-        if (!cell) worksheet[XLSX.utils.encode_cell({ r: 0, c: c })] = {}; // Ensure cell exists
-        worksheet[XLSX.utils.encode_cell({ r: 0, c: c })].s = headerStyle;
-    }
+    // Header styling
+    const headerRow = worksheet.getRow(1);
+    headerRow.eachCell(cell => {
+        cell.font = { bold: true, color: { argb: 'FF000000' } };
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFD3D3D3' } // Blue background
+        };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = borderStyle;
+    });
 
-    // Apply column width (optional)
-    worksheet['!cols'] = headers.map(() => ({ width: 20 })); // Set column width
+    // Data + total row styling
+    worksheet.eachRow((row, rowNumber) => {
+        row.height = 25; // Set row height
+        row.eachCell(cell => {
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell.border = borderStyle;
+        });
+    });
 
-    // Apply styles to the data rows (optional)
-    const dataStyle = {
-        alignment: { horizontal: 'center', vertical: 'center' }, // Center text
-        border: {
-            top: { style: 'thin', color: { rgb: '000000' } },
-            bottom: { style: 'thin', color: { rgb: '000000' } },
-            left: { style: 'thin', color: { rgb: '000000' } },
-            right: { style: 'thin', color: { rgb: '000000' } }
-        }
-    };
+    // Set column widths
+    const colWidths = [25, 25, 15, 15, 20, 20];
+    colWidths.forEach((width, idx) => {
+        worksheet.getColumn(idx + 1).width = width;
+    });
 
-    // Apply styles to all data rows
-    for (let r = 1; r < data.length + 2; r++) { // Include the total row
-        for (let c = 0; c < headers.length; c++) {
-            const cell = worksheet[XLSX.utils.encode_cell({ r: r, c: c })];
-            if (!cell) worksheet[XLSX.utils.encode_cell({ r: r, c: c })] = {}; // Ensure the cell exists
-            worksheet[XLSX.utils.encode_cell({ r: r, c: c })].s = dataStyle;
-        }
-    }
+    // Save file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'cart_details.xlsx';
+    link.click();
+};
 
-    // Generate Excel file and trigger download
-    XLSX.writeFile(workbook, 'cart_details.xlsx');
-    };
 
 	const recurrencePeriod =(recurring)=>{
 		if(recurring === 1){
@@ -390,6 +396,7 @@
 		if(!isLoggedIn){
 			removeFromCart()
 			toast.success(`All products are deleted successfully`);
+			isDeleteAll = false
 			return
 		}
 		const formdata = new FormData()
@@ -489,7 +496,7 @@
 				        <button
 					        type="button"
 					        on:click={()=>isDeleteAll = true}
-					        class=" text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded-md text-white bg-primary-500 hover:bg-primary-600 font-medium">
+					        class="{$cart.length === 1 ? "hidden" : ""} text-2s sm:text-xs w-fit flex justify-center items-center gap-1 p-1.5 sm:px-4 md:py-2 rounded-md text-white bg-primary-500 hover:bg-primary-600 font-medium">
 							<Icon icon="mdi:delete-forever" class="text-lg sm:text-xl rounded-md text-white"/>
 							<span class="hidden sm:block">Delete All</span>
 						</button>
@@ -530,7 +537,7 @@
 									<img 
 									src="{PUBLIC_IMAGE_URL}/{item.productDetails?.image}"
 									onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
-									class="cursor-pointer w-24 h-24 objec-cover bg-red-200" 
+									class="cursor-pointer w-24 h-24 object-contain" 
 									alt={item.productDetails?.productName}
 									on:click={() => imagemodal(item.productDetails?.image)}
 									on:mouseenter={() => handleMouseEnter(item.productDetails?.image , index)}
@@ -741,7 +748,7 @@
 
 </div>
 
-{#if isLoggedIn  && filteredGuestCart.length && cartId.length}
+{#if isLoggedIn && filteredGuestCart.length && cartId?.length > 1}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div

@@ -1716,6 +1716,7 @@ export async function CompareSimilarityData(productId) {
 
 export const getCart = async(userId,cartId)=>{
    //if(!userId) return { cart:[]}
+   console.log(userId,cartId);
    let matchConditions = {}
    if (userId){
     matchConditions = {
@@ -1730,7 +1731,8 @@ export const getCart = async(userId,cartId)=>{
   const cart = await Cart.aggregate([
     // Match the specific cart by cartId
     { $match: matchConditions },
-    { $unwind: '$cartItems' },
+    { $unwind: { path: '$cartItems', preserveNullAndEmptyArrays: true } },
+
 
     // Lookup components with only required fields
     {
@@ -1855,9 +1857,14 @@ export const getCart = async(userId,cartId)=>{
       }
     }
   ]);
-  
+  console.log(cart,"hgfdsa");
   if(cart.length === 0){
-   return {cart:[]}
+    return {cart:[]}
+  }
+  if(Array.isArray(cart) && Object.keys(cart[0]?.cartItems[0]).length === 0){
+    let data = JSON.parse(JSON.stringify(cart))
+    data[0].cartItems = []
+   return {cart:data}
   }
   const currency = await Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).exec();
   const updatedcart = cart[0]?.cartItems?.map((crt) => {
@@ -1907,7 +1914,7 @@ export const getCart = async(userId,cartId)=>{
      
    return { ...cartItemsData, pricing, currentPrice:price,normalPrice:{INR,USD}, itemTotalPrice };
  });
-  cart[0].cartItems = updatedcart
+  cart[0].cartItems = updatedcart.reverse()
   return {cart:JSON.parse(JSON.stringify(cart))}
 }
 

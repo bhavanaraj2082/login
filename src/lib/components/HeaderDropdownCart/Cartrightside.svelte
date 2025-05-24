@@ -21,7 +21,7 @@
 	let tog = null;
 	let form;
 	let form2;
-	let isLoggedIn = $authedUser?.id ? true : false;
+	$: isLoggedIn = $authedUser?.id ? true : false;
 	let selectedId = ''
 	let container
 	let addToCartModal = false
@@ -314,24 +314,25 @@
 			// console.log("result from page server for carat data",result.data);
 			const totalComps = result.data?.cart[0]?.cartItems.length;
 			localStorage.setItem("totalCompsChemi", totalComps);
-			cartId = result.data?.cart[0]?.cartId;
-			//console.log("totalComps",cartId);
+			cartId = result.data?.cart[0]?.cartId || ''
 			filteredGuestCart = $guestCart.filter(guestItem => 
             !$cart.some(cartItem => cartItem.productId === guestItem.productId)
             );
-			if(isLoggedIn && filteredGuestCart.length && !cartId?.length){
+			if(isLoggedIn && filteredGuestCart.length && cartId?.length === 0){
+				console.log("form te new cart",cartId);
 	    	const formdata = new FormData()
 	    	formdata.append("guestCart",JSON.stringify(filteredGuestCart))
 	    	sendMessage("/cart?/newcart",formdata,(result)=>{
 	    		console.log(result);
-	    		localStorage.removeItem("cart")
+	    		browser ? localStorage.setItem("cart",JSON.stringify([])):''
 				filteredGuestCart = []
-	    		invalidate("data:cart")
+				goto('/cart')
 	    	})
 		}
 		$cart = result.data?.cart[0]?.cartItems || [];
 			syncLocalStorageToStore();
 		};
+
 	}
 
 	function syncLocalStorageToStore() {
@@ -359,6 +360,7 @@
 	onMount(() => {
 		//   loadCartFromLocalStorage();
 		//   observeLocalStorage();
+		
 		if (typeof window !== "undefined") {
 			window.addEventListener("storage", handleStorageChange);
 		}
@@ -612,7 +614,7 @@
 {/if}
 
 
-{#if isLoggedIn  && filteredGuestCart.length && cartId?.length}
+{#if isLoggedIn  && filteredGuestCart.length && cartId?.length > 1}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div
@@ -621,9 +623,11 @@
 	>
 		<div bind:this={container} class="bg-white relative p-6 rounded-md shadow-lg w-11/12 sm:w-3/5 md:w-2/5 2xl:w-2/6 space-y-2">
             <button on:click={()=>{
-				addToCartModal = !addToCartModal
 				browser ? localStorage.setItem("cart",JSON.stringify([])) : ""
+				cart.set([])
+				guestCart.set([])
 				invalidate("data:cart")
+				addToCartModal = !addToCartModal
 			}} class=" absolute right-5 top-5">
 				<Icon icon="maki:cross" class=" text-lg sm:text-xl"/>
 			</button>
