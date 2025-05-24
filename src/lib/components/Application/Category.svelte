@@ -72,7 +72,7 @@
       No Search related sub Category available
     </h3>
     <p class="text-gray-500 max-w-md">
-      We couldn't find any categories matching your search criteria. Please
+      We couldn't find any Sub categories matching your search criteria. Please
       try a different search term or check back later.
     </p>
   </div>

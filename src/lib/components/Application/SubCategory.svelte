@@ -29,7 +29,7 @@
 
 </script>
 
-<section class="lg:w-11/12 w-full mx-auto my-3 max-w-7xl px-4 sm:px-0">
+<section class="lg:w-11/12 w-full mx-auto my-3 max-w-7xl px-4 md:px-2">
   {#if subsubcategories && subsubcategories.length > 0}
     <h1 class="sm:hidden block sm:px-0 mb-2 sm:mb-0 font-bold sm:text-2xl text-lg text-heading">
       {subcategoryData?.name}
