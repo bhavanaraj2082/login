@@ -29,7 +29,7 @@
     <RelatedProductss {relatedProducts} />
   {/if}
   {#if subsubcategoryData?.additionalInfo && subsubcategoryData?.additionalInfo.length > 0}
-    <div class="mt-8">
+    <div class="mt-4">
       <h2 class="text-2xl font-semibold text-gray-800">Overview</h2>
       <div class="mt-4 text-gray-600">
         {#each subsubcategoryData?.additionalInfo as info}
