@@ -165,13 +165,113 @@
   }
   let formatError = false;
 
+  // function handleTextChange(event) {
+  //   const newText = event.target.value;
+  //   const newLines = newText.split("\n");
+  //   const oldLines = rawFileData.split("\n");
+  //   if (isValidated && originalLineContent.length === 0) {
+  //     originalLineContent = [...oldLines];
+  //   }
+  //   if (isValidated) {
+  //     const newEditedLines = new Set();
+  //     for (
+  //       let i = 0;
+  //       i < Math.max(newLines.length, originalLineContent.length);
+  //       i++
+  //     ) {
+  //       const newLine = i < newLines.length ? newLines[i] : "";
+  //       const originalLine =
+  //         i < originalLineContent.length ? originalLineContent[i] : "";
+
+  //       if (newLine !== originalLine) {
+  //         newEditedLines.add(Number(i));
+  //         // console.log(`Line ${i} was edited: "${originalLine}" → "${newLine}"`);
+  //       }
+  //     }
+  //     editedLines = newEditedLines;
+  //     // console.log("Updated editedLines:", Array.from(editedLines));
+  //     textEditedAfterValidation = editedLines.size > 0;
+  //     showValidateButton = editedLines.size > 0;
+  //   }
+
+  //   rawFileData = newText;
+  //   const { duplicates } = checkForDuplicates(rawFileData);
+  //   duplicateEntries = duplicates;
+
+  //   formatError = false;
+  //   fileError = "";
+
+  //   if (!rawFileData.trim()) {
+  //     return;
+  //   }
+
+  //   const lines = newLines.filter((line) => line.trim());
+  //   if (lines.length > 100) {
+  //     formatError = true;
+  //     cartloading = false;
+  //     fileError =
+  //       "Error(s) found in product input:\n* Bulk upload limited to 100 items at a time";
+  //     return;
+  //   }
+  //   for (let i = 0; i < lines.length; i++) {
+  //     const line = lines[i].trim();
+  //     const parts = line.split(",");
+
+  //     if (parts.length === 0 || !parts[0].trim()) {
+  //       formatError = true;
+  //       cartloading = false;
+  //       fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+  //       toast.error(fileError);
+  //       break;
+  //     }
+  //     if (
+  //       parts.length > 1 &&
+  //       parts[1].trim() &&
+  //       isNaN(Number(parts[1].trim()))
+  //     ) {
+  //       formatError = true;
+  //       cartloading = false;
+  //       fileError = `Invalid format at line ${i + 1}. Each line should have a product number-size.`;
+  //       toast.error(fileError);
+  //       break;
+  //     }
+  //     // if (parts.length > 1 && parts[1].trim()) {
+  //     //   const quantity = Number(parts[1].trim());
+  //     //   if (!isNaN(quantity) && quantity > 999) {
+  //     //     formatError = true;
+  //     //     cartloading = false;
+  //     //     fileError = `Quantity at line ${i + 1} must not be greater than 999.`;
+  //     //     toast.error(fileError);
+  //     //     break;
+  //     //   }
+  //     // }
+  //   }
+  // }
   function handleTextChange(event) {
     const newText = event.target.value;
     const newLines = newText.split("\n");
     const oldLines = rawFileData.split("\n");
+    if (!newText.trim()) {
+      validationMessages = [];
+      isValidated = false;
+      editedLines = new Set();
+      originalLineContent = [];
+      textEditedAfterValidation = false;
+      showValidateButton = false;
+      invalidProductLines = [];
+      validatedProducts = [];
+      duplicateEntries = [];
+      formatError = false;
+      fileError = "";
+
+      rawFileData = newText;
+      return;
+    }
+
     if (isValidated && originalLineContent.length === 0) {
       originalLineContent = [...oldLines];
     }
+
     if (isValidated) {
       const newEditedLines = new Set();
       for (
@@ -185,11 +285,9 @@
 
         if (newLine !== originalLine) {
           newEditedLines.add(Number(i));
-          // console.log(`Line ${i} was edited: "${originalLine}" → "${newLine}"`);
         }
       }
       editedLines = newEditedLines;
-      // console.log("Updated editedLines:", Array.from(editedLines));
       textEditedAfterValidation = editedLines.size > 0;
       showValidateButton = editedLines.size > 0;
     }
@@ -201,10 +299,6 @@
     formatError = false;
     fileError = "";
 
-    if (!rawFileData.trim()) {
-      return;
-    }
-
     const lines = newLines.filter((line) => line.trim());
     if (lines.length > 100) {
       formatError = true;
@@ -213,6 +307,7 @@
         "Error(s) found in product input:\n* Bulk upload limited to 100 items at a time";
       return;
     }
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       const parts = line.split(",");
@@ -235,16 +330,6 @@
         toast.error(fileError);
         break;
       }
-      // if (parts.length > 1 && parts[1].trim()) {
-      //   const quantity = Number(parts[1].trim());
-      //   if (!isNaN(quantity) && quantity > 999) {
-      //     formatError = true;
-      //     cartloading = false;
-      //     fileError = `Quantity at line ${i + 1} must not be greater than 999.`;
-      //     toast.error(fileError);
-      //     break;
-      //   }
-      // }
     }
   }
   function handleValidateClick() {
@@ -385,7 +470,12 @@
       return;
     }
 
-    const lines = rawFileData.split("\n").filter((line) => line.trim());
+    let lines = rawFileData.split("\n").filter((line) => line.trim());
+
+    const firstLine = lines[0].trim().toLowerCase();
+    if (firstLine === "sku,quantity" || firstLine === "sku,1") {
+      lines = lines.slice(1);
+    }
     let formatError = false;
     let errorMessage = "";
     const processedLines = [];
@@ -1126,11 +1216,18 @@ Example file content:
                   return fullProductInfo.startsWith(msg.productNumber);
                 })}
 
-                {#if lineIndex * lineHeight >= scrollTop - lineHeight * 1 && lineIndex * lineHeight <= scrollTop + viewportHeight}
+                <!-- {#if lineIndex * lineHeight >= scrollTop - lineHeight * 1 && lineIndex * lineHeight <= scrollTop + viewportHeight}
                   <div
                     class="flex items-center pointer-events-auto"
                     style="position: absolute; top: {2 +
                       lineIndex * lineHeight}px; right: 10px;"
+                  > -->
+                {#if lineIndex * lineHeight >= scrollTop - lineHeight * 1 && lineIndex * lineHeight <= scrollTop + viewportHeight}
+                  <div
+                    class="flex items-center pointer-events-auto"
+                    style="position: absolute; top: {2 +
+                      lineIndex * lineHeight -
+                      lineHeight * 0.4}px; right: 10px;"
                   >
                     <div class="validation-status">
                       {#if editedLines.has(lineIndex)}
