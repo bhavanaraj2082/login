@@ -216,18 +216,39 @@
     productQuote = selectedProduct;
   }
 
-  const DOTS = "...";
+  const DOTS = '...';
   const VISIBLE_PAGES = 5;
   let currentPage = writable(1);
   const rowsPerPage = 10;
+  let rowRefs = [];
+  let firstRecordRef;
+  let hasPageChanged = false;
 
   $: totalPages = Math.ceil(allVariants.length / rowsPerPage);
-  $: paginatedVariants = getPaginatedData(
-    allVariants,
-    $currentPage,
-    rowsPerPage
-  );
+  $: paginatedVariants = getPaginatedData(allVariants, $currentPage, rowsPerPage);
   $: pageNumbers = getPageRange($currentPage, allVariants.length);
+
+  $: {
+    if (rowRefs.length > 0) {
+      firstRecordRef = rowRefs[0];
+    }
+  }
+
+  $: if (hasPageChanged && firstRecordRef) {
+    setTimeout(() => {
+      firstRecordRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }
+
+  $: if (!hasPageChanged && $currentPage !== 1) {
+    hasPageChanged = true;
+  }
+
+  $: {
+    if ($currentPage !== 1 || hasPageChanged) {
+      hasPageChanged = true;
+    }
+  }
 
   function getPageRange(current, totalItems) {
     const range = [];
@@ -312,10 +333,11 @@
           </tr>
         </thead>
         <tbody>
-          {#each paginatedVariants as variant (variant._id)}
+          {#each paginatedVariants as variant, index (variant._id)}
             {@const { minPriceINR, maxPriceINR, minPriceUSD, maxPriceUSD } =
               getMinMaxPrices(variant.pricing)}
             <tr
+              bind:this={rowRefs[index]}
               class={selectedProductId === variant._id
                 ? "bg-white cursor-pointer"
                 : "bg-white border-b hover:bg-gray-50 cursor-pointer"}
