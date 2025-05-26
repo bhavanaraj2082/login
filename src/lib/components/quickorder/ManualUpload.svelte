@@ -184,63 +184,64 @@
   }
 
   let debounceTimeout;
-let debounceTimeouts = {}; 
+  let debounceTimeouts = {};
 
+  function handleInput(event, sku, index) {
+    let value = event.target.value.replace(/[<>]/g, "").trim();
+    rows[index].sku = value;
+    searchQuery = value;
 
-function handleInput(event, sku, index) {
-   let value = event.target.value.replace(/[<>]/g, '').trim();
-  rows[index].sku = value;
-  searchQuery = value;
-  
-  if (
-    rows[index].selectedProduct &&
-    value !==
-      `${rows[index].selectedProduct.productNumber} - ${rows[index].selectedSize}`
-  ) {
-    rows[index] = {
-      ...rows[index],
-      selectedProduct: null,
-      selectedSize: "",
-      sku: value,
-    };
-  }
+    if (
+      rows[index].selectedProduct &&
+      value !==
+        `${rows[index].selectedProduct.productNumber} - ${rows[index].selectedSize}`
+    ) {
+      rows[index] = {
+        ...rows[index],
+        selectedProduct: null,
+        selectedSize: "",
+        sku: value,
+      };
+    }
 
-  if (debounceTimeouts[index]) {
-    clearTimeout(debounceTimeouts[index]);
-  }
+    if (debounceTimeouts[index]) {
+      clearTimeout(debounceTimeouts[index]);
+    }
 
-  if (value.length > 2) {
-    debounceTimeouts[index] = setTimeout(() => {
-      if (rows[index].sku.trim() === value && value.length > 2) {
-        const form = document.querySelector(`#form-${index}`);
-        if (form) {
-          console.log(`Submitting form for index ${index} with value: ${value}`);
-          form.requestSubmit();
-        }
-        const filteredProds = filterProducts(value, index);
-        rows = rows.map((row, i) => {
-          if (i === index) {
-            return {
-              ...row,
-              filteredProducts: filteredProds,
-            };
+    if (value.length > 2) {
+      debounceTimeouts[index] = setTimeout(() => {
+        if (rows[index].sku.trim() === value && value.length > 2) {
+          const form = document.querySelector(`#form-${index}`);
+          if (form) {
+            console.log(
+              `Submitting form for index ${index} with value: ${value}`,
+            );
+            form.requestSubmit();
           }
-          return row;
-        });
-      }
-    }, 400); 
-  } else {
-    rows = rows.map((row, i) => {
-      if (i === index) {
-        return {
-          ...row,
-          filteredProducts: [],
-        };
-      }
-      return row;
-    });
+          const filteredProds = filterProducts(value, index);
+          rows = rows.map((row, i) => {
+            if (i === index) {
+              return {
+                ...row,
+                filteredProducts: filteredProds,
+              };
+            }
+            return row;
+          });
+        }
+      }, 400);
+    } else {
+      rows = rows.map((row, i) => {
+        if (i === index) {
+          return {
+            ...row,
+            filteredProducts: [],
+          };
+        }
+        return row;
+      });
+    }
   }
-}
 
   function formatDate(date) {
     const options = { year: "numeric", month: "short", day: "numeric" };
@@ -1672,19 +1673,32 @@ function handleInput(event, sku, index) {
               {row.error}
             </div>
           {/if}
-
           {#if row.sku}
             {#if row.selectedProduct && !loadingState[index]}
               <div
                 class="w-full ml-5 gap-4 items-start flex flex-col md:flex-row lg:flex-row xl:flex-row"
               >
-                <span class="font-semibold text-sm">
-                  {row.selectedProduct.productName}
-                </span>
-                <span>
+                <!-- Product name with close icon - inline on small screens -->
+                <div class="flex items-center justify-between w-full md:w-auto">
+                  <span class="font-semibold text-sm">
+                    {row.selectedProduct.productName}
+                  </span>
+                  <!-- Close icon - inline with product name on small screens, hidden on larger screens -->
+                  <!-- svelte-ignore a11y-click-events-have-key-events -->
+                  <!-- svelte-ignore a11y-no-static-element-interactions -->
+                  <div
+                    class="text-red-500 mr-10 cursor-pointer hover:scale-105 md:hidden"
+                    on:click={() => clearSelectedProduct(index)}
+                  >
+                    <Icon icon="mdi:close-circle" class="w-6 h-6" />
+                  </div>
+                </div>
+
+                <span class="text-sm">
                   Size: {row.selectedSize || "No Size Available"}
                 </span>
-                <span>
+
+                <span class="text-sm">
                   {#if row.selectedProduct.pricing?.[0]?.usd || row.selectedProduct.pricing?.[0]?.inr}
                     {#if $currencyState === "usd"}
                       $ {row.selectedProduct.pricing[0]?.usd}
@@ -1701,7 +1715,7 @@ function handleInput(event, sku, index) {
                           row.selectedProduct,
                           row.quantity,
                         )}
-                      class="text-primary-400 hover:underline"
+                      class="text-primary-400 hover:underline text-sm"
                     >
                       Request a Quote
                     </button>
@@ -1710,7 +1724,7 @@ function handleInput(event, sku, index) {
 
                 {#if row.selectedProduct.pricing?.[0]?.usd || row.selectedProduct.pricing?.[0]?.inr}
                   <button
-                    class="text-primary-400 rounded"
+                    class="text-primary-400 rounded text-sm"
                     on:click={() => {
                       const usdPrice = row.selectedProduct.pricing[0].usd;
                       const inrPrice = row.selectedProduct.pricing[0].inr;
@@ -1730,10 +1744,11 @@ function handleInput(event, sku, index) {
                   </button>
                 {/if}
 
+                <!-- Close icon - shown only on medium and larger screens -->
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <div
-                  class="text-red-500 cursor-pointer hover:scale-105"
+                  class="text-red-500 cursor-pointer hover:scale-105 hidden md:block"
                   on:click={() => clearSelectedProduct(index)}
                 >
                   <Icon icon="mdi:close-circle" class="w-6 h-6" />
