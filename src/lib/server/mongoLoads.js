@@ -693,7 +693,7 @@ export const loadProductsubcategory = async (
 
     let aggregation
      
-    if (subcategory.name === "Primary Antibodies" || subcategory.name === "Building Blocks" || subcategory.name === "Uncategorized" ) {
+    if (subcategory.name === "Primary Antibodies" || subcategory.name === "Building Blocks" || subcategory.name === "Uncategorized"  || subcategory.name === "Skeleton"  || subcategory.name === "Functional Group" ) {
        aggregation = [
 
       { $match: matchCondition },
