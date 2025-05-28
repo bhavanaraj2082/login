@@ -689,17 +689,18 @@ export const loadProductsubcategory = async (
     }else{
       sortConditions["productNumber"] = 1;
     }
+
+
+    let aggregation
      
-    const aggregation = [
+    if (subcategory.name === "Primary Antibodies" || subcategory.name === "Building Blocks" || subcategory.name === "Uncategorized" ) {
+       aggregation = [
 
       { $match: matchCondition },
       {$sort:{image:-1}},
-      // {
-      //   $skip:num.skip
-      // },
-      // {
-      //   $limit:20000
-      // },
+      {
+        $limit:10
+      },
       {
         $lookup: {
           from: "stocks",
@@ -718,25 +719,7 @@ export const loadProductsubcategory = async (
       {
         $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true }
       },
-      
-    ]
-    let cond = {}
-     
-     if (subcategory.name === "Primary Antibodies" || subcategory.name === "Building Blocks" || subcategory.name === "Uncategorized") {
-        cond = {$sort:{hasStockDetails: -1 }}
-     }else{
-       cond = {
-              $sort: Object.assign(
-                sortConditions,
-                { hasStockDetails: -1 } // true (non-empty) comes first
-                           // then apply your original sort
-              )
-       }
-     }
-   
-    aggregation.push(
-       
-      {
+       {
         $facet: {
           data: [
             {
@@ -761,10 +744,13 @@ export const loadProductsubcategory = async (
                 }
               }
             },
-            cond,
-            // {
-            //   $sort:sortConditions
-            // },
+            {
+              $sort: Object.assign(
+                sortConditions,
+                { hasStockDetails: -1 } // true (non-empty) comes first
+                           // then apply your original sort
+              )
+            },
             {
               $project: {
                 _id: 1,
@@ -808,9 +794,109 @@ export const loadProductsubcategory = async (
             { $count: "count" }
           ]
         },
+      }
+    ]
+    }else{
+      aggregation = [
+
+      { $match: matchCondition },
+      {$sort:{image:-1}},
+      {
+        $lookup: {
+          from: "stocks",
+          let: { productId: "$_id" },  // use let to pass local field to the pipeline
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$productid", "$$productId"] },  // match the stock with product id
+              },
+            },
+            { $project: { _id: 1, pricing: 1, stock: 1, orderMultiple: 1, distributor: 1,manufacturer:1 } },  // choose fields you need
+          ],
+          as: "stockDetails",
+        },
       },
-    );
-  //}
+      {
+        $unwind: { path: "$stockDetails", preserveNullAndEmptyArrays: true }
+      },
+       {
+        $facet: {
+          data: [
+            {
+              $group: {
+                _id: "$_id",
+                productNumber: { $first: "$productNumber" },
+                productName: { $first: "$productName" },
+                prodDesc: { $first: "$prodDesc" },
+                image: { $first: "$image" },
+                CAS: { $first: "$CAS" },
+                variants: { $first: "$variants" },
+                manufacturerName: { $first: "$manufacturerName" },
+                stockDetails: { $push: "$stockDetails" },
+                pricingINRSort: { $first: "$stockDetails.pricing.INR" },
+                pricingUSDSort: { $first: "$stockDetails.pricing.USD" }
+              }
+            },
+            {
+              $addFields: {
+                hasStockDetails: {
+                  $gt: [{ $size: "$stockDetails" }, 0]  // true if stockDetails has items
+                }
+              }
+            },
+            {
+              $sort: Object.assign(
+                sortConditions,
+                { hasStockDetails: -1 } // true (non-empty) comes first
+                           // then apply your original sort
+              )
+            },
+            {
+              $project: {
+                _id: 1,
+                productNumber: 1,
+                productName: 1,
+                prodDesc: 1,
+                image: 1,
+                CAS: 1,
+                variants: 1,
+                manufacturerName: 1,
+                stockDetails: {
+                  $map: {
+                    input: "$stockDetails",
+                    as: "stock",
+                    in: {
+                      _id: "$$stock._id",
+                      pricing: "$$stock.pricing",
+                      stock: "$$stock.stock",
+                      orderMultiple: "$$stock.orderMultiple",
+                      distributor: "$$stock.distributor",
+                      manufacturer: "$$stock.manufacturer"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              $skip: (Number(page) - 1) * Number(pageSize),
+            },
+        
+            {
+              $limit: Number(pageSize),
+            },
+          ],
+          totalCount: [
+            {
+              $group: {
+                _id: "$_id"
+              }
+            },
+            { $count: "count" }
+          ]
+        },
+      }
+    ]
+    }
 
     const products = await Product.aggregate(aggregation);
    const totalCount = await Product.countDocuments(matchCondition);
