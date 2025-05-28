@@ -356,18 +356,20 @@
                 </a>
               </td>
               <td class="py-1 px-2 text-primary-500 text-sm cursor-pointer">
-                <div class="relative group w-52 max-w-full">
-                  <div
-                    class="overflow-hidden text-ellipsis whitespace-nowrap
-                          group-hover:whitespace-normal group-hover:overflow-visible
-                          group-hover:z-10 group-hover:absolute group-hover:bg-white
-                          group-hover:shadow-md group-hover:p-2 group-hover:rounded-md
-                          group-hover:max-w-xs group-hover:w-max group-hover:h-max group-hover:text-gray-800
-                          group-hover:text-xs group-hover:top-1/2 group-hover:left-0 group-hover:-translate-y-1/2"
-                  >
-                    {variant.productName}
+                <a href={variant.productNumber}>
+                  <div class="relative group w-52 max-w-full">
+                    <div
+                      class="overflow-hidden text-ellipsis whitespace-nowrap
+                            group-hover:whitespace-normal group-hover:overflow-visible
+                            group-hover:z-10 group-hover:absolute group-hover:bg-white
+                            group-hover:shadow-md group-hover:p-2 group-hover:rounded-md
+                            group-hover:max-w-xs group-hover:w-max group-hover:h-max group-hover:text-gray-800
+                            group-hover:text-xs group-hover:top-1/2 group-hover:left-0 group-hover:-translate-y-1/2"
+                    >
+                      {variant.productName}
+                    </div>
                   </div>
-                </div>
+                </a>
               </td>
               <td class="py-1 px-2">{variant.manufacturerName}</td>
               <td class="py-1 px-2">
