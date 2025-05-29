@@ -9,40 +9,62 @@
   import { isFavoriteStore } from "$lib/stores/favorites.js";
   import { tick } from "svelte";
   export let data;
-  import { page } from '$app/stores';
+  import { page } from "$app/stores";
   // console.log("Data  ==>(:", data);
 
   $: tick().then(() => {
     isFavoriteStore.set(data.isFavorite);
   });
 
-  function generateProgressiveStrings(input) {
-  if (input.length < 5) {
-    return input; 
-  }
-  const progressiveSlices = Array.from({ length: input.length - 4 }, (_, index) => {
-    return input.slice(0, index + 5); 
-  });
-  const filteredSlices = progressiveSlices.filter(item => !item.endsWith('-'));
-  return filteredSlices.join(', ');
-}   
+  // function generateProgressiveStrings(input) {
+  //   if (input.length < 5) {
+  //     return input;
+  //   }
+  //   const progressiveSlices = Array.from(
+  //     { length: input.length - 4 },
+  //     (_, index) => {
+  //       return input.slice(0, index + 5);
+  //     }
+  //   );
+  //   const filteredSlices = progressiveSlices.filter(
+  //     (item) => !item.endsWith("-")
+  //   );
+  //   return filteredSlices.join(", ");
+  // }
 
-  let url = $page.url.pathname; 
-  let urlArray = url.split('/');
+  let url = $page.url.pathname;
+  let urlArray = url.split("/");
 
   let productData = data?.productData?.records[0];
-  
-  let relatedProductsNames = data.relatedProducts?.map((item) => {
-  return `Buy ${productData?.manufacturer?.name} ${item.productName} ${item.productNumber}.`;
-  }).join(' ');
+
+  const productName = productData?.productName || "";
+  const wordList = productName.split(/\s+/);
+  const commaSeparatedProductName = wordList.join(", ");
+  // console.log("--commaSeparatedProductName>", commaSeparatedProductName);
+
+  const productName2 = productData?.productName || "";
+  const words = productName2.trim().split(/\s+/);
+
+  const prefixes = [];
+  for (let i = 2; i <= words.length; i++) {
+    prefixes.push(words.slice(0, i).join(" "));
+  }
+  const resultString = prefixes.join(", ");
+  // console.log("-------resultString------>", resultString);
+
+  let relatedProductsNames = data.relatedProducts
+    ?.map((item) => {
+      return `Buy ${productData?.manufacturer?.name} ${item.productName} ${item.productNumber}.`;
+    })
+    .join(" ");
 
   // console.log("relatedProductsNames", relatedProductsNames);
 
-  let categoryUrl = urlArray[(urlArray.length)-3];
-  let subCategoryUrl = urlArray[(urlArray.length)-2];
+  let categoryUrl = urlArray[urlArray.length - 3];
+  let subCategoryUrl = urlArray[urlArray.length - 2];
   let sliceNum = data?.productData?.records[0]?.productNumber;
-  const slicedNumber = generateProgressiveStrings(sliceNum);
-  
+  // const slicedNumber = generateProgressiveStrings(sliceNum);
+
   let metadata = {
     title:
       `${productData?.productName} | ${productData?.manufacturer?.name} | ${PUBLIC_WEBSITE_NAME} ` ||
@@ -51,7 +73,7 @@
       `Order ${productData?.manufacturer?.name} manufacturers ${productData?.productName} partnumber online at ${PUBLIC_WEBSITE_NAME}.` ||
       "Default product description",
     keywords:
-      `${slicedNumber},${productData?.manufacturer?.name}, ${productData?.productName},${productData?.description},${relatedProductsNames}` ||
+      `${sliceNum},${resultString},${productData?.manufacturer?.name}, ${commaSeparatedProductName},${productData?.description},${relatedProductsNames}` ||
       "default, product, keywords",
     urlPath:
       `${PUBLIC_WEBSITE_URL}/products/${categoryUrl}/${subCategoryUrl}/${productData?.productNumber}` ||
