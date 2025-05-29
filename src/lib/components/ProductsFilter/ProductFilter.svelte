@@ -554,7 +554,7 @@ function handleMouseLeave() {
              </div>
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <!-- svelte-ignore a11y-no-static-element-interactions -->
-             <div on:click={()=>showMfrDropdown = !showMfrDropdown} class="mr-1 cursor-pointer font-semibold text-xs flex items-center justify-between p-1 rounded-md border-1 border-gray-300 ">
+             <div on:click={()=>showMfrDropdown = !showMfrDropdown} class="mr-1 {subCatName === "Primary Antibodies" || subCatName === "Functional Group" || subCatName === "Skeleton" || subCatName === "Uncategorized" ? "hidden" : ""} cursor-pointer font-semibold text-xs flex items-center justify-between p-1 rounded-md border-1 border-gray-300 ">
               <span class="ml-2">Manufacturer</span>
               <Icon icon={showMfrDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
              </div>
@@ -588,7 +588,7 @@ function handleMouseLeave() {
              
              <!-- svelte-ignore a11y-click-events-have-key-events -->
              <!-- svelte-ignore a11y-no-static-element-interactions -->
-             <div on:click={()=>showSortByDropdown = !showSortByDropdown} class="mr-1 {subCategoryName === "Primary Antibodies" || subCategoryName === "Building Blocks" || subCategoryName === "Uncategorized" ? "hidden" : ""} cursor-pointer font-semibold text-xs flex items-center justify-between p-1 rounded-md border-1 border-gray-300 ">
+             <div on:click={()=>showSortByDropdown = !showSortByDropdown} class="mr-1 {subCatName === "Primary Antibodies" || subCatName === "Functional Group" || subCatName === "Skeleton" || subCatName === "Uncategorized" ? "hidden" : ""} cursor-pointer font-semibold text-xs flex items-center justify-between p-1 rounded-md border-1 border-gray-300 ">
                 <span class="ml-2">Sort By</span>
                 <Icon icon={showSortByDropdown ? "iconamoon:arrow-up-2-duotone":"iconamoon:arrow-down-2-duotone"} class="text-2xl"/>
              </div>
