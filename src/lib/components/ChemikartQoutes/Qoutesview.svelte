@@ -282,7 +282,7 @@
 
 
 
-<div class="flex flex-col sm:flex-row gap-x-16 gap-y-4 w-full">
+<div class="flex lg:flex-row flex-col gap-x-16 gap-y-4 w-full">
   <div class="flex items-center sm:hidden block">
     <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs mr-5 block sm:hidden" on:click={tog4}>Edit</button>
     <h1 class="font-semibold sm:text-lg text-sm">Customer Details:</h1>
