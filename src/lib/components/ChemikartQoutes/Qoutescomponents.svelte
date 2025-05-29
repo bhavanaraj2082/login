@@ -2,7 +2,8 @@
 	import Icon from "@iconify/svelte";
   export let data;
   console.log(data, "quotesPage1");
-
+let scrollTarget;
+let scrollTargetCust;
   import Qoutes from "$lib/components/ChemikartQoutes/Customsolution.svelte";
   import Qoutes1 from "$lib/components/ChemikartQoutes/Customformat.svelte";
   import Qoutes2 from "$lib/components/ChemikartQoutes/Configurecustom.svelte";
@@ -28,9 +29,17 @@
   };
   const toggleQoutes4 = () => {
     currentView = currentView === "qoutes4" ? null : "qoutes4";
+    scrollTargetCust?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+     setTimeout(() => {
+      window.scrollBy({ top: -300, behavior: 'smooth' }); 
+    }, 300);
   };
   const toggleQoutes5 = () => {
     currentView = currentView === "qoutes5" ? null : "qoutes5";
+    scrollTarget?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+     setTimeout(() => {
+      window.scrollBy({ top: -0, behavior: 'smooth' }); 
+    }, 300);
   };
 
   const toggleQoutes6 = () => {
@@ -229,7 +238,7 @@
       </div>
     </div>
   </div>
-    <div class="px-4">
+    <div class="px-4" >
     <Qoutes4
       tog={toggleQoutes}
       tog1={toggleQoutes1}
@@ -272,7 +281,7 @@
       </div>
     </div>
   </div>
-    <div class="px-4">
+    <div class="px-4" bind:this={scrollTargetCust}>
     <Qoutes5
       tog={toggleQoutes}
       tog1={toggleQoutes1}
@@ -285,7 +294,7 @@
   {/if}
 
   {#if currentView === "qoutes6"}
-  <div class="px-4 pt-5">
+  <div class="px-4 pt-5" bind:this={scrollTarget}>
     <Qoutes6
       tog={toggleQoutes}
       tog1={toggleQoutes1}
