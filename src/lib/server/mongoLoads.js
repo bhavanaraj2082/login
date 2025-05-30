@@ -699,7 +699,11 @@ export const loadProductsubcategory = async (
       { $match: matchCondition },
       {$sort:{image:-1}},
       {
-        $limit:10
+        $skip: (Number(page) - 1) * Number(pageSize),
+      },
+  
+      {
+        $limit: Number(pageSize),
       },
       {
         $lookup: {
@@ -776,13 +780,6 @@ export const loadProductsubcategory = async (
                   }
                 }
               }
-            },
-            {
-              $skip: (Number(page) - 1) * Number(pageSize),
-            },
-        
-            {
-              $limit: Number(pageSize),
             },
           ],
           totalCount: [
