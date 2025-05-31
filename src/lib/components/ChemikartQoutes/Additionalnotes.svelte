@@ -41,8 +41,10 @@ const handleSubmit = () => {
 	} else {
 		showRequiredMessage = false;
 		showInvalidCharMessage = false;
+		setTimeout(() => {
+        window.scrollBy({ top: 500 , behavior: 'smooth' });
+      }, 400);
 		tog3();
-		// scrollToStep('step5');
 	}
 };
 

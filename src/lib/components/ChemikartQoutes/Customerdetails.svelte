@@ -45,7 +45,7 @@
 	$: isFormData =
 		$Cusdetails.FirstName &&
 		$Cusdetails.LastName &&
-		// $Cusdetails.Organisation &&
+		$Cusdetails.Organisation &&
 		$Cusdetails.Country &&
 		$Cusdetails.Email &&
 		$Cusdetails.Number;
@@ -460,7 +460,7 @@ const handleEdit = (step, toggleFn) => {
 	  {/if}
         {#if errorMessage && !$Cusdetails.FirstName}
 		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">   
-			FirstName is required</div>
+			*Required</div>
 		{/if}
 		{#if errorMessage1}
 		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1 md:hidden block ">
@@ -505,7 +505,7 @@ const handleEdit = (step, toggleFn) => {
 	  {/if}
                 {#if errorMessage && !$Cusdetails.LastName}
                 <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
-                    LastName is required</div>
+                    *Required</div>
                 {/if}
 				{#if errorMessage2}
 		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1 md:hidden block">
@@ -583,7 +583,7 @@ const handleEdit = (step, toggleFn) => {
 			{/if}
 			{#if errorMessage && !$Cusdetails.Country}
 			<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
-				Country is required</div>
+				*Required</div>
 			{/if}
 			{#if filteredCountries.length === 0}
 												<p
@@ -613,7 +613,7 @@ const handleEdit = (step, toggleFn) => {
             />
 			{#if errorMessage && !$Cusdetails.Number}
 			<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
-				Phone number is required</div>
+				*Required</div>
 			{/if}
 		{#if $Cusdetails.Number && errorMessage4}
 <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
@@ -746,7 +746,7 @@ const handleEdit = (step, toggleFn) => {
 		{/if}
 		{#if errorMessage && !$Cusdetails.Email}
 		<div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
-			Email is required</div>
+			*Required</div>
 		{/if}
 		{#if errorMessage7}
     <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">
@@ -884,10 +884,10 @@ const handleEdit = (step, toggleFn) => {
   </span>
 {/if}
 
-<!-- {#if errorMessage && !$Cusdetails.Organisation}
+{#if errorMessage && !$Cusdetails.Organisation}
 <div class="text-red-500 sm:text-xs text-2s font-medium ml-1 mt-1">   
-	Company Name is required</div>
-{/if} -->
+	*Required</div>
+{/if}
 	</div>
 	<div class="flex space-x-4">
 		<button
