@@ -463,7 +463,7 @@ autocomplete="off"
                 </div>
                 {#if errorMessage && (!state || !$Delivery.Country)}
                 <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-                  State is required
+                  *Required
                 </div>
               {/if}
               
@@ -494,7 +494,7 @@ errors = { ...errors, Country: "State must be between 3–300 chars" };
                />
               {#if errorMessage && !$Delivery.Country}
               <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-                  State is required</div>
+                  *Required</div>
               {/if}
 
               {#if errors?.Country}
@@ -531,7 +531,7 @@ errors = { ...errors, Country: "State must be between 3–300 chars" };
                     }} />
                 {#if errorMessage && !$Delivery.City}
                 <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-                    City is required</div>
+                    *Required</div>
                 {/if}
                 {#if errors?.City}
     <span class="text-red-500 text-xs sm:text-xs text-2s font-medium">
@@ -571,7 +571,7 @@ errors = { ...errors, Address1: "Address1 must be between 3–200 chars" };
   {/if} -->
       {#if errorMessage && !$Delivery.Address1}
               <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-                  Address1 is required</div>
+                  *Required</div>
               {/if}
               {#if errors?.Address1}
   <span class="text-red-500 text-xs sm:text-xs text-2s font-medium">
@@ -615,7 +615,7 @@ errors = { ...errors, Address2: "Address2 must be between 3–200 chars" };
   {/if}
       {#if errorMessage && !$Delivery.Address2}
               <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-                  Address2 is required</div>
+                  *Required</div>
               {/if}
 
       </div>
@@ -638,7 +638,7 @@ errors = { ...errors, Address2: "Address2 must be between 3–200 chars" };
                 {/if}
                 {#if errorMessage && !$Delivery.Post}
               <div class="text-red-500 ml-1 mt-1 text-xs font-medium">
-                  postalCode is required</div>
+                  *Required</div>
               {/if}
       </div>
       <div class="mt-2 mb-2 ">
