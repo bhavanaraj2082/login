@@ -1306,21 +1306,20 @@ Example file content:
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div class="flex flex-col gap-3">
-        <div
-          class="flex justify-center bg-white items-center h-12 border rounded-md hover:bg-primary-200 hover:text-primary-600"
-        >
-          <button
-            class="flex justify-center items-center h-12 hover:bg-primary-200 hover:text-primary-600 text-primary-500 text-sm font-medium gap-2"
-            type="button"
-            data-download-url="/quick_order_template.xls"
-            onclick="this.querySelector('a').click()"
-          >
-            <!-- svelte-ignore a11y-missing-content -->
-            <a href="/quick_order_template.xls" download style="display: none;"
-            ></a>
-            <i class="text-lg" data-icon="pajamas:download"></i> Download Template
-          </button>
-        </div>
+       <div
+  class="flex justify-center bg-white items-center h-12 border rounded-md hover:bg-primary-200 hover:text-primary-600 cursor-pointer"
+  onclick="this.querySelector('a').click()"
+>
+  <button
+    class="flex justify-center items-center h-12 hover:bg-primary-200 hover:text-primary-600 text-primary-500 text-sm font-medium gap-2 pointer-events-none"
+    type="button"
+    data-download-url="/quick_order_template.xls"
+  >
+    <!-- svelte-ignore a11y-missing-content -->
+    <a href="/quick_order_template.xls" download style="display: none;"></a>
+    <Icon icon="pajamas:download" class="text-lg" /> Download Template
+  </button>
+</div>
 
         <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
