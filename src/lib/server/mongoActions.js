@@ -2558,20 +2558,22 @@ export const quicksearch = async ({ query }) => {
 			.exec();
 
 		if (stockItems.length === 0) {
-			const productQuery = isLongQuery ? 
-				{
-					$or: [
-						{ productName: trimmedQuery },
-						{ productNumber: trimmedQuery }
-					]
-				} : 
-				{
-					$or: [
-						{ productName: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } },
-						{ productNumber: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } }
-					]
-				};
-
+			// const productQuery = isLongQuery ? 
+			// 	{
+			// 		$or: [
+			// 			{ productName: trimmedQuery },
+			// 			{ productNumber: trimmedQuery }
+			// 		]
+			// 	} : 
+			// 	{
+			// 		$or: [
+			// 			{ productName: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } },
+			// 			{ productNumber: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } }
+			// 		]
+			// 	};
+const productQuery = isLongQuery ? 
+    { productNumber: trimmedQuery } : 
+    { productNumber: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } };
 			const directProducts = await Product.find(productQuery)
 				.select('_id productName productNumber image')
 				.limit(50)
