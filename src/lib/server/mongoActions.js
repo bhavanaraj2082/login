@@ -2389,6 +2389,7 @@ export const addAllToCart = async (items, userId, userEmail) => {
 
 //Myfavouries actions ends
 
+
 // export const quicksearch = async ({ query }) => {
 // 	const startTime = Date.now();
 // 	console.log(query, "query");
@@ -2396,112 +2397,58 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 		if (!query || !query.trim()) {
 // 			return [];
 // 		}
-// 		const regexPattern = new RegExp(query, 'i');
-// 		const stockItems = await Stock.find({
-// 			$or: [
-// 				{ sku: { $regex: regexPattern } },
-// 				{ productNumber: { $regex: regexPattern } },
-// 			]
-// 		})
-// 			.select('_id stock pricing distributor manufacturer productNumber productid sku')
-// 			.limit(100)
-// 			.lean()
-// 			.exec();
-// 		let productIds = [];
-// 		let directProducts = [];
 
-// 		if (stockItems.length > 0) {
-// 			productIds = [...new Set(stockItems.map(item => item.productid).filter(Boolean))];
-// 		} else {
-// 			directProducts = await Product.find({
+// 		const trimmedQuery = query.trim();
+// 		const isLongQuery = trimmedQuery.length > 8;
+// 		let stockQuery;
+		
+// 		if (isLongQuery) {
+// 			stockQuery = {
 // 				$or: [
-// 					{ productName: { $regex: regexPattern } },
+// 					{ sku: trimmedQuery },
+// 					{ productNumber: trimmedQuery }
+// 				]
+// 			};
+// 		} else {
+// 			const regexPattern = new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+// 			stockQuery = {
+// 				$or: [
+// 					{ sku: { $regex: regexPattern } },
 // 					{ productNumber: { $regex: regexPattern } }
 // 				]
-// 			})
-// 				.select('_id productName productNumber image')
+// 			};
+// 		}
 
+// 		const stockItems = await Stock.find(stockQuery)
+// 			.select('_id stock pricing distributor manufacturer productNumber productid sku')
+// 			.limit(50) 
+// 			.lean()
+// 			.exec();
+
+// 		if (stockItems.length === 0) {
+// 			// const productQuery = isLongQuery ? 
+// 			// 	{
+// 			// 		$or: [
+// 			// 			{ productName: trimmedQuery },
+// 			// 			{ productNumber: trimmedQuery }
+// 			// 		]
+// 			// 	} : 
+// 			// 	{
+// 			// 		$or: [
+// 			// 			{ productName: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } },
+// 			// 			{ productNumber: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } }
+// 			// 		]
+// 			// 	};
+// const productQuery = isLongQuery ? 
+//     { productNumber: trimmedQuery } : 
+//     { productNumber: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } };
+// 			const directProducts = await Product.find(productQuery)
+// 				.select('_id productName productNumber image')
+// 				.limit(50)
 // 				.lean()
 // 				.exec();
 
-// 			productIds = directProducts.map(p => p._id);
-// 		}
-
-// 		if (productIds.length === 0) {
-// 			return [];
-// 		}
-// 		const [currency, products] = await Promise.all([
-// 			Curconversion.findOne({ currency: 'USD' })
-// 				.sort({ createdAt: -1 })
-// 				.lean()
-// 				.exec(),
-// 			directProducts.length > 0 ?
-// 				Promise.resolve(directProducts) :
-// 				Product.find({
-// 					_id: { $in: productIds }
-// 				})
-// 					.select('_id productName productNumber image')
-// 					.lean()
-// 					.exec()
-// 		]);
-
-// 		const productMap = products.reduce((map, product) => {
-// 			map[product._id.toString()] = product;
-// 			return map;
-// 		}, {});
-
-// 		const rate = currency?.rate || 1;
-// 		if (stockItems.length > 0) {
-// 			const enrichedProducts = stockItems
-// 				.map(stockItem => {
-// 					const productId = stockItem.productid?.toString();
-// 					const product = productId ? productMap[productId] : null;
-
-// 					if (!product) {
-// 						return null;
-// 					}
-
-// 					const entryPricing = stockItem.pricing ?
-// 						(Array.isArray(stockItem.pricing) ? stockItem.pricing : [stockItem.pricing]) : [];
-
-// 					let processedPricing = entryPricing;
-// 					let priceoneValue = "";
-// 					if (entryPricing.length > 0) {
-// 						if (entryPricing[0]?.INR !== undefined && entryPricing[0]?.INR !== null) {
-// 							processedPricing = entryPricing.map(price => ({
-// 								...price,
-// 								USD: (price.INR / rate).toFixed(2)
-// 							}));
-// 							priceoneValue = entryPricing[0]?.INR || "";
-// 						} else if (entryPricing[0]?.USD !== undefined && entryPricing[0]?.USD !== null) {
-// 							processedPricing = entryPricing.map(price => ({
-// 								...price,
-// 								INR: (price.USD * rate).toFixed(2)
-// 							}));
-// 							priceoneValue = entryPricing[0]?.USD || "";
-// 						}
-// 					}
-
-// 					return {
-// 						id: product._id.toString(),
-// 						image: product.image || null,
-// 						description: product.prodDesc || null,
-// 						productName: product.productName,
-// 						productNumber: product.productNumber,
-// 						stockId: stockItem._id.toString(),
-// 						manufacturer: stockItem.manufacturer ? stockItem.manufacturer.toString() : null,
-// 						distributer: stockItem.distributor ? stockItem.distributor.toString() : null,
-// 						stock: stockItem.stock || 0,
-// 						priceone: priceoneValue,
-// 						pricing: processedPricing,
-// 						sku: stockItem.sku || null
-// 					};
-// 				})
-// 				.filter(Boolean);
-
-// 			return enrichedProducts;
-// 		} else {
-// 			return products.map(product => ({
+// 			return directProducts.map(product => ({
 // 				id: product._id.toString(),
 // 				image: product.image || null,
 // 				description: product.prodDesc || null,
@@ -2516,6 +2463,74 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 				sku: null
 // 			}));
 // 		}
+// 		const productIds = [...new Set(stockItems.map(item => item.productid).filter(Boolean))];
+		
+// 		if (productIds.length === 0) {
+// 			return [];
+// 		}
+// 		const [currency, products] = await Promise.all([
+// 			Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).lean().exec(),
+// 			Product.find({ _id: { $in: productIds } })
+// 				.select('_id productName productNumber image')
+// 				.lean()
+// 				.exec()
+// 		]);
+// 		const productMap = {};
+// 		products.forEach(product => {
+// 			productMap[product._id.toString()] = product;
+// 		});
+
+// 		const rate = currency?.rate || 1;
+// 		const result = stockItems
+// 			.map(stockItem => {
+// 				const productId = stockItem.productid?.toString();
+// 				const product = productMap[productId];
+
+// 				if (!product) return null;
+// 				let priceoneValue = "";
+// 				let processedPricing = [];
+				
+// 				if (stockItem.pricing) {
+// 					const entryPricing = Array.isArray(stockItem.pricing) ? stockItem.pricing : [stockItem.pricing];
+					
+// 					if (entryPricing.length > 0) {
+// 						const firstPrice = entryPricing[0];
+						
+// 						if (firstPrice?.INR !== undefined && firstPrice?.INR !== null) {
+// 							priceoneValue = firstPrice.INR;
+// 							processedPricing = entryPricing.map(price => ({
+// 								...price,
+// 								USD: (price.INR / rate).toFixed(2)
+// 							}));
+// 						} else if (firstPrice?.USD !== undefined && firstPrice?.USD !== null) {
+// 							priceoneValue = firstPrice.USD;
+// 							processedPricing = entryPricing.map(price => ({
+// 								...price,
+// 								INR: (price.USD * rate).toFixed(2)
+// 							}));
+// 						}
+// 					}
+// 				}
+
+// 				return {
+// 					id: product._id.toString(),
+// 					image: product.image || null,
+// 					description: product.prodDesc || null,
+// 					productName: product.productName,
+// 					productNumber: product.productNumber,
+// 					stockId: stockItem._id.toString(),
+// 					manufacturer: stockItem.manufacturer?.toString() || null,
+// 					distributer: stockItem.distributor?.toString() || null,
+// 					stock: stockItem.stock || 0,
+// 					priceone: priceoneValue,
+// 					pricing: processedPricing,
+// 					sku: stockItem.sku || null
+// 				};
+// 			})
+// 			.filter(Boolean);
+
+// 		console.log(`Quicksearch completed in ${Date.now() - startTime}ms`);
+// 		return result;
 
 // 	} catch (error) {
 // 		console.error("Error in quicksearch:", error);
@@ -2525,6 +2540,7 @@ export const addAllToCart = async (items, userId, userEmail) => {
 export const quicksearch = async ({ query }) => {
 	const startTime = Date.now();
 	console.log(query, "query");
+	
 	try {
 		if (!query || !query.trim()) {
 			return [];
@@ -2532,8 +2548,9 @@ export const quicksearch = async ({ query }) => {
 
 		const trimmedQuery = query.trim();
 		const isLongQuery = trimmedQuery.length > 8;
-		let stockQuery;
+		const regexPattern = isLongQuery ? null : new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
 		
+		let stockQuery;
 		if (isLongQuery) {
 			stockQuery = {
 				$or: [
@@ -2542,7 +2559,6 @@ export const quicksearch = async ({ query }) => {
 				]
 			};
 		} else {
-			const regexPattern = new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
 			stockQuery = {
 				$or: [
 					{ sku: { $regex: regexPattern } },
@@ -2550,36 +2566,20 @@ export const quicksearch = async ({ query }) => {
 				]
 			};
 		}
-
 		const stockItems = await Stock.find(stockQuery)
 			.select('_id stock pricing distributor manufacturer productNumber productid sku')
-			.limit(50) 
+			.limit(50)
 			.lean()
 			.exec();
-
 		if (stockItems.length === 0) {
-			// const productQuery = isLongQuery ? 
-			// 	{
-			// 		$or: [
-			// 			{ productName: trimmedQuery },
-			// 			{ productNumber: trimmedQuery }
-			// 		]
-			// 	} : 
-			// 	{
-			// 		$or: [
-			// 			{ productName: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } },
-			// 			{ productNumber: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } }
-			// 		]
-			// 	};
-const productQuery = isLongQuery ? 
-    { productNumber: trimmedQuery } : 
-    { productNumber: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } };
+			const productQuery = isLongQuery ? 
+				{ productNumber: trimmedQuery } : 
+				{ productNumber: { $regex: regexPattern } };
 			const directProducts = await Product.find(productQuery)
-				.select('_id productName productNumber image')
-				.limit(50)
+				.select('_id productName productNumber image prodDesc') 
+				.limit(20) 
 				.lean()
 				.exec();
-
 			return directProducts.map(product => ({
 				id: product._id.toString(),
 				image: product.image || null,
@@ -2595,73 +2595,90 @@ const productQuery = isLongQuery ?
 				sku: null
 			}));
 		}
-		const productIds = [...new Set(stockItems.map(item => item.productid).filter(Boolean))];
-		
+		const productIds = stockItems
+			.map(item => item.productid)
+			.filter(Boolean)
+			.filter((id, index, arr) => arr.indexOf(id) === index); 
+
 		if (productIds.length === 0) {
 			return [];
 		}
 		const [currency, products] = await Promise.all([
-			Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).lean().exec(),
+			Curconversion.findOne({ currency: 'USD' })
+				.sort({ createdAt: -1 })
+				.select('rate') 
+				.lean()
+				.exec(),
 			Product.find({ _id: { $in: productIds } })
-				.select('_id productName productNumber image')
+				.select('_id productName productNumber image prodDesc') 
 				.lean()
 				.exec()
 		]);
-		const productMap = {};
+
+		const productMap = new Map();
 		products.forEach(product => {
-			productMap[product._id.toString()] = product;
+			productMap.set(product._id.toString(), product);
 		});
 
 		const rate = currency?.rate || 1;
-		const result = stockItems
-			.map(stockItem => {
-				const productId = stockItem.productid?.toString();
-				const product = productMap[productId];
+		const result = [];
+		for (const stockItem of stockItems) {
+			const productId = stockItem.productid?.toString();
+			const product = productMap.get(productId);
 
-				if (!product) return null;
-				let priceoneValue = "";
-				let processedPricing = [];
+			if (!product) continue;
+
+			let priceoneValue = "";
+			let processedPricing = [];
+			
+			if (stockItem.pricing) {
+				const entryPricing = Array.isArray(stockItem.pricing) ? stockItem.pricing : [stockItem.pricing];
 				
-				if (stockItem.pricing) {
-					const entryPricing = Array.isArray(stockItem.pricing) ? stockItem.pricing : [stockItem.pricing];
+				if (entryPricing.length > 0) {
+					const firstPrice = entryPricing[0];
+
+					// console.log('Pricing data:', JSON.stringify(firstPrice, null, 2));
 					
-					if (entryPricing.length > 0) {
-						const firstPrice = entryPricing[0];
-						
-						if (firstPrice?.INR !== undefined && firstPrice?.INR !== null) {
-							priceoneValue = firstPrice.INR;
-							processedPricing = entryPricing.map(price => ({
-								...price,
-								USD: (price.INR / rate).toFixed(2)
-							}));
-						} else if (firstPrice?.USD !== undefined && firstPrice?.USD !== null) {
-							priceoneValue = firstPrice.USD;
-							processedPricing = entryPricing.map(price => ({
-								...price,
-								INR: (price.USD * rate).toFixed(2)
-							}));
+					if (firstPrice?.INR !== undefined && firstPrice?.INR !== null && firstPrice.INR !== "") {
+						priceoneValue = firstPrice.INR.toString();
+						processedPricing = entryPricing.map(price => ({
+							...price,
+							USD: price.INR ? (price.INR / rate).toFixed(2) : "0.00"
+						}));
+					} else if (firstPrice?.USD !== undefined && firstPrice?.USD !== null && firstPrice.USD !== "") {
+						priceoneValue = firstPrice.USD.toString();
+						processedPricing = entryPricing.map(price => ({
+							...price,
+							INR: price.USD ? (price.USD * rate).toFixed(2) : "0.00"
+						}));
+					} else {
+						for (const [key, value] of Object.entries(firstPrice)) {
+							if (typeof value === 'number' && value > 0) {
+								priceoneValue = value.toString();
+								break;
+							}
 						}
 					}
 				}
+			}
 
-				return {
-					id: product._id.toString(),
-					image: product.image || null,
-					description: product.prodDesc || null,
-					productName: product.productName,
-					productNumber: product.productNumber,
-					stockId: stockItem._id.toString(),
-					manufacturer: stockItem.manufacturer?.toString() || null,
-					distributer: stockItem.distributor?.toString() || null,
-					stock: stockItem.stock || 0,
-					priceone: priceoneValue,
-					pricing: processedPricing,
-					sku: stockItem.sku || null
-				};
-			})
-			.filter(Boolean);
+			result.push({
+				id: product._id.toString(),
+				image: product.image || null,
+				description: product.prodDesc || null,
+				productName: product.productName,
+				productNumber: product.productNumber,
+				stockId: stockItem._id.toString(),
+				manufacturer: stockItem.manufacturer?.toString() || null,
+				distributer: stockItem.distributor?.toString() || null,
+				stock: stockItem.stock || 0,
+				priceone: priceoneValue,
+				pricing: processedPricing,
+				sku: stockItem.sku || null
+			});
+		}
 
-		console.log(`Quicksearch completed in ${Date.now() - startTime}ms`);
+		// console.log(`Quicksearch completed in ${Date.now() - startTime}ms`);
 		return result;
 
 	} catch (error) {
@@ -2670,114 +2687,6 @@ const productQuery = isLongQuery ?
 	}
 };
 
-// export const quicksearch = async ({ query }) => {
-//     const startTime = Date.now();
-//     console.log(query, "query");
-//     try {
-//         if (!query || !query.trim()) {
-//             return [];
-//         }
-//         // First find matching stock items based on productNumber
-//         const stockIndexHint = { sku: 1 };
-       
-//         // Use a more specific regex pattern to improve match speed
-//         const regexPattern = new RegExp('^' + query, 'i');
-       
-//         // Add limit to prevent processing too many records
-//         const stockItems = await Stock.find({
-//             sku: { $regex: regexPattern }
-//         })
-//             .select('_id stock pricing distributor manufacturer productNumber productid sku')
-//             .hint(stockIndexHint)
-//             .limit(100) // Limit results for faster response
-//             .lean()
-//             .exec();
-//         if (stockItems.length === 0) {
-//             return [];
-//         }
-//         console.log(stockItems,"stockItems");
-       
-//         const productIds = [...new Set(stockItems.map(item => item.productid).filter(Boolean))];
-       
-//         // Run currency and product queries in parallel
-//         const [currency, products] = await Promise.all([
-//             Curconversion.findOne({ currency: 'USD' })
-//                 .sort({ createdAt: -1 })
-//                 .lean()
-//                 .exec(),
-           
-//             Product.find({
-//                 _id: { $in: productIds }
-//             })
-//                 .select('_id productName productNumber image')
-//                 .lean()
-//                 .exec()
-//         ]);
-       
-//         // Create a map for quick product lookup
-//         const productMap = products.reduce((map, product) => {
-//             map[product._id.toString()] = product;
-//             return map;
-//         }, {});
-//         const rate = currency?.rate || 1;
-       
-//         // Build the enriched products array
-//         const enrichedProducts = stockItems
-//             .map(stockItem => {
-//                 const productId = stockItem.productid?.toString();
-//                 const product = productId ? productMap[productId] : null;
-               
-//                 if (!product) {
-//                     // Skip if we couldn't find the product
-//                     return null;
-//                 }
-               
-//                 const entryPricing = stockItem.pricing ?
-//                     (Array.isArray(stockItem.pricing) ? stockItem.pricing : [stockItem.pricing]) : [];
-               
-//                 let processedPricing = entryPricing;
-//                 let priceoneValue = "";
-               
-//                 // Process pricing directly instead of using a separate function
-//                 if (entryPricing.length > 0) {
-//                     if (entryPricing[0]?.INR !== undefined && entryPricing[0]?.INR !== null) {
-//                         processedPricing = entryPricing.map(price => ({
-//                             ...price,
-//                             USD: (price.INR / rate).toFixed(2)
-//                         }));
-//                         priceoneValue = entryPricing[0]?.INR || "";
-//                     } else if (entryPricing[0]?.USD !== undefined && entryPricing[0]?.USD !== null) {
-//                         processedPricing = entryPricing.map(price => ({
-//                             ...price,
-//                             INR: (price.USD * rate).toFixed(2)
-//                         }));
-//                         priceoneValue = entryPricing[0]?.USD || "";
-//                     }
-//                 }
-//                 return {
-//                     id: product._id.toString(),
-//                     image: product.image || null,
-//                     description: product.prodDesc || null,
-//                     productName: product.productName,
-//                     productNumber: product.productNumber,
-//                     stockId: stockItem._id.toString(),
-//                     manufacturer: stockItem.manufacturer ? stockItem.manufacturer.toString() : null,
-//                     distributer: stockItem.distributor ? stockItem.distributor.toString() : null,
-//                     stock: stockItem.stock || 0,
-//                     priceone: priceoneValue,
-//                     pricing: processedPricing,
-//                     sku: stockItem.sku || null
-//                 };
-//             })
-//             .filter(Boolean); // Remove null entries
-//         console.log(enrichedProducts.length, "enrichedProducts");
-//         // console.log([TIMING] Total function execution time: ${Date.now() - startTime}ms);
-//         return enrichedProducts;
-//     } catch (error) {
-//         // console.error("Error in quicksearch:", error);
-//         throw new Error("An error occurred while processing the quicksearch.");
-//     }
-// };
 
 export const uploadFile = async ({ query }) => {
 	const startTime = Date.now();
