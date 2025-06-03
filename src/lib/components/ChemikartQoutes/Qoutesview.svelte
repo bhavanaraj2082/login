@@ -265,9 +265,9 @@
     <div class="sm:flex justify-between items-center ">
       <div class="flex items-center">
         <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs mr-5 block sm:hidden" on:click={tog5}>Edit</button>
-        <h1 class="font-semibold sm:text-lg text-sm">Delivery information:</h1>
+        <h1 class="font-semibold sm:text-lg text-sm hidden lg:block">Delivery information:</h1>
       </div>
-      <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs sm:mt-0 mt-5 hidden sm:block ml-5" on:click={tog5}>Edit</button>
+      <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs sm:mt-0 mt-5 hidden lg:block ml-5" on:click={tog5}>Edit</button>
     </div>
   </div>
 </div>
@@ -299,9 +299,12 @@
 {/if}
 {/each}
 </div>
-<div class="flex items-center sm:hidden block">
+<div class="flex items-center block lg:hidden">
   <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs mr-5 block sm:hidden" on:click={tog5}>Edit</button>
   <h1 class="font-semibold sm:text-lg text-sm">Delivery information:</h1>
+    <button type="button" class="font-semibold text-primary-500 hover:text-primary-600 sm:text-base text-xs ml-5 hidden md:block lg:hidden" on:click={tog5}>Edit</button>
+
+  
 </div>
 <div class="rounded pr-36 pl-2 py-2 space-y-4 border border-gray-300">
     {#each Object.entries($Delivery) as [key, value]}

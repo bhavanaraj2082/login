@@ -16,19 +16,35 @@
   let inputValue2 = "";
   let inputValue3 = "";
   let submitting = false;
-  function handleInput(event) {
-    inputValue = event.target.value.toUpperCase();
-    invalid = false;
-    invalidLot = false;
-  }
+function handleInput(event) {
+  inputValue = event.target.value.toUpperCase();
+  invalid = containsScriptTag(inputValue);
+  // invalidLot = containsScriptTag(lotNumber);
+}
+
   function handleInput1(event) {
     inputValue1 = event.target.value.toUpperCase();
+      invalid = containsScriptTag(inputValue1);
+  }
+    function handleInt1(event) {
+    lotNumber = event.target.value.toUpperCase();
+   invalidLot = containsScriptTag(lotNumber);
   }
   function handleInput2(event) {
     inputValue2 = event.target.value.toUpperCase();
+      invalid = containsScriptTag(inputValue2);
+  }
+    function handleInt2(event) {
+    lotNumber1 = event.target.value.toUpperCase();
+  invalidLot = containsScriptTag(lotNumber1);
   }
   function handleInput3(event) {
     inputValue3 = event.target.value.toUpperCase();
+      invalid = containsScriptTag(inputValue3);
+  }
+    function handleInt3(event) {
+    lotNumber2 = event.target.value.toUpperCase();
+  invalidLot = containsScriptTag(lotNumber2);
   }
   let lotNumber = "";
   let lotNumber1 = "";
@@ -323,6 +339,13 @@ function containsScriptTag(str) {
                 placeholder="E.G. ZWCL01F50"
                 class="flex w-full border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
               />
+                           {#if invalid}
+                <div class="flex text-start">
+                  <span class="text-red-500 sm:text-xs text-2s font-medium"
+                    >Product Number must not contain invalid characters</span
+                  >
+                </div>
+              {/if}
               <!-- <p>{inputValue}</p> -->
 
               <!-- class="block w-full p-3 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-300 sm:text-sm mb-0" -->
@@ -333,13 +356,7 @@ function containsScriptTag(str) {
                   >
                 </div>
               {/if}
-                {#if invalid}
-                <div class="flex text-start">
-                  <span class="text-red-500 sm:text-xs text-2s font-medium"
-                    >Product Number must not contain invalid characters</span
-                  >
-                </div>
-              {/if}
+   
               {#if sdsProductNumberError}
                 <p class="text-red-500 text-md">{sdsProductNumberError}</p>
               {/if}
@@ -455,6 +472,7 @@ function containsScriptTag(str) {
                   name="product-number"
                   maxlength=25
                   bind:value={lotNumber}
+                  on:input={handleInt1}
                   placeholder="E.G. 708371"
                   class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
                 />
@@ -581,6 +599,7 @@ function containsScriptTag(str) {
                   id="product-number"
                   name="product-number"
                   bind:value={lotNumber1}
+                  on:input={handleInt2}
                   maxlength=25
                   placeholder="E.G. 708371"
                   class="flex w-full border-1 mt-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
@@ -710,6 +729,7 @@ function containsScriptTag(str) {
                   name="product-number"
                   bind:value={lotNumber2}
                   maxlength=25
+                  on:input={handleInt3}
                   placeholder="E.G. 708371"
                   class="flex w-full mt-1 border-1 placeholder:text-xs sm:text-sm text-xs border-gray-300 p-2 rounded-md focus:outline-none focus:border-primary-500 focus:shadow-none focus:ring-0 placeholder-gray-400"
                 />
