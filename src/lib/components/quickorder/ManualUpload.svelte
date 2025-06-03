@@ -1424,7 +1424,7 @@
         {#each rows as row, index}
           <div class="flex w-full">
             <form
-              class="w-1/2 sm:w-2/3 p-0 sm:p-4"
+              class="w-3/4 sm:w-2/3 p-0 sm:p-4"
               id="form-{index}"
               action="?/quicksearch"
               method="POST"
@@ -1452,120 +1452,118 @@
                     Loading...
                   </span>
                 {/if}
-                {#if row.sku.length >= 2 && row.filteredProducts.length > 0 && !loadingState[index]}
-                  <div
-                    class="absolute top-full w-full max-h-40 overflow-y-auto bg-white border border-gray-300 rounded-md z-10"
-                  >
-                    <button
-                      class="absolute top-2 right-2 bg-transparent text-primary-400 hover:text-gray-600 p-1"
-                      on:click={() => clearSearch(index)}
+              {#if row.sku.length >= 2 && row.filteredProducts.length > 0 && !loadingState[index]}
+  <div class="absolute top-full w-full bg-white border border-gray-300 rounded-md z-10">
+    <!-- Header with close button -->
+    <div class="relative flex justify-end p-2 border-b border-gray-200">
+      <button
+        class="bg-transparent text-red-500 hover:text-primary-600 p-1 hover:scale-105"
+        on:click={() => clearSearch(index)}
+      >
+        <Icon icon="mdi:close-circle" class="w-4 h-4" />
+      </button>
+    </div>
+
+    <!-- Scrollable content area -->
+    <div class="max-h-36 overflow-y-auto"> <!-- Reduced height since we have header now -->
+      {#each row.filteredProducts as result}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <div
+          class="p-4 border-b border-gray-300 last:border-b-0 hover:bg-primary-100 cursor-pointer text-sm"
+          on:click={() => {
+            if (
+              result.pricing?.length > 0 &&
+              result.pricing[0]?.break !== "N/A"
+            ) {
+              selectProduct(result, index, result.pricing[0]);
+            } else {
+              selectProduct(result, index, { break: null });
+            }
+          }}
+        >
+          <div class="space-y-1 mt-2">
+            {#if result.pricing?.length > 0}
+              {#each result.pricing as size}
+                {#if size.break !== "N/A"}
+                  <div class="flex items-center gap-2">
+                    <!-- svelte-ignore a11y-click-events-have-key-events -->
+                    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                    <!-- svelte-ignore a11y-label-has-associated-control -->
+                    <label
+                      class="cursor-pointer transition-colors"
+                      class:text-primary-400={row.selectedSize ===
+                        `${result.productNumber}-${size.break}`}
+                      class:font-bold={row.selectedSize ===
+                        `${result.productNumber}-${size.break}`}
+                      class:hover:text-primary-400={row.selectedSize !==
+                        `${result.productNumber}-${size.break}`}
+                      class:hover:font-bold={row.selectedSize !==
+                        `${result.productNumber}-${size.break}`}
+                      on:click={(e) => {
+                        e.stopPropagation();
+                        selectProduct(result, index, size);
+                      }}
                     >
-                      <Icon icon="cuida:x-outline" class="w-5 h-5" />
-                    </button>
-
-                    {#each row.filteredProducts as result}
-                      <!-- svelte-ignore a11y-click-events-have-key-events -->
-                      <!-- svelte-ignore a11y-no-static-element-interactions -->
-                      <div
-                        class="p-4 border-b border-gray-300 last:border-b-0 hover:bg-primary-100 cursor-pointer text-sm"
-                        on:click={() => {
-                          if (
-                            result.pricing?.length > 0 &&
-                            result.pricing[0]?.break !== "N/A"
-                          ) {
-                            selectProduct(result, index, result.pricing[0]);
-                          } else {
-                            selectProduct(result, index, { break: null });
-                          }
-                        }}
-                      >
-                        <div class="space-y-1 mt-2">
-                          {#if result.pricing?.length > 0}
-                            {#each result.pricing as size}
-                              {#if size.break !== "N/A"}
-                                <div class="flex items-center gap-2">
-                                  <!-- svelte-ignore a11y-click-events-have-key-events -->
-                                  <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                                  <!-- svelte-ignore a11y-label-has-associated-control -->
-                                  <label
-                                    class="cursor-pointer transition-colors"
-                                    class:text-primary-400={row.selectedSize ===
-                                      `${result.productNumber}-${size.break}`}
-                                    class:font-bold={row.selectedSize ===
-                                      `${result.productNumber}-${size.break}`}
-                                    class:hover:text-primary-400={row.selectedSize !==
-                                      `${result.productNumber}-${size.break}`}
-                                    class:hover:font-bold={row.selectedSize !==
-                                      `${result.productNumber}-${size.break}`}
-                                    on:click={(e) => {
-                                      e.stopPropagation();
-                                      selectProduct(result, index, size);
-                                    }}
-                                  >
-                                    {result.sku}
-                                  </label>
-                                  <input
-                                    type="radio"
-                                    class="hidden"
-                                    id="size-{size.break}"
-                                    name="size-{result.productNumber}"
-                                    value={size.break}
-                                    bind:group={row.selectedSize}
-                                    checked={row.selectedSize ===
-                                      `${result.productNumber}-${size.break}`}
-                                    on:change={() =>
-                                      selectProduct(result, index, size)}
-                                  />
-                                </div>
-                              {/if}
-                            {/each}
-                          {:else}
-                            <div class="flex items-center gap-2">
-                              <!-- svelte-ignore a11y-click-events-have-key-events -->
-                              <!-- svelte-ignore a11y-label-has-associated-control -->
-                              <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                              <label
-                                class="cursor-pointer transition-colors"
-                                class:text-primary-400={row.selectedSize ===
-                                  result.productNumber}
-                                class:font-bold={row.selectedSize ===
-                                  result.productNumber}
-                                class:hover:text-primary-400={row.selectedSize !==
-                                  result.productNumber}
-                                class:hover:font-bold={row.selectedSize !==
-                                  result.productNumber}
-                                on:click={(e) => {
-                                  e.stopPropagation();
-                                  selectProduct(result, index, { break: null });
-                                }}
-                              >
-                                {result.productNumber}
-                              </label>
-                              <input
-                                type="radio"
-                                class="hidden"
-                                id="product-{result.productNumber}"
-                                name="size-{result.productNumber}"
-                                value={result.productNumber}
-                                bind:group={row.selectedSize}
-                                checked={row.selectedSize ===
-                                  result.productNumber}
-                                on:change={() =>
-                                  selectProduct(result, index, { break: null })}
-                              />
-                            </div>
-                          {/if}
-
-                          <!-- {#if result.pricing?.every((size) => size.break === "N/A")}
-                          <div class="text-primary-600 mt-2">
-                            Request a Quote
-                          </div>
-                        {/if} -->
-                        </div>
-                      </div>
-                    {/each}
+                      {result.sku}
+                    </label>
+                    <input
+                      type="radio"
+                      class="hidden"
+                      id="size-{size.break}"
+                      name="size-{result.productNumber}"
+                      value={size.break}
+                      bind:group={row.selectedSize}
+                      checked={row.selectedSize ===
+                        `${result.productNumber}-${size.break}`}
+                      on:change={() =>
+                        selectProduct(result, index, size)}
+                    />
                   </div>
                 {/if}
+              {/each}
+            {:else}
+              <div class="flex items-center gap-2">
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-label-has-associated-control -->
+                <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                <label
+                  class="cursor-pointer transition-colors"
+                  class:text-primary-400={row.selectedSize ===
+                    result.productNumber}
+                  class:font-bold={row.selectedSize ===
+                    result.productNumber}
+                  class:hover:text-primary-400={row.selectedSize !==
+                    result.productNumber}
+                  class:hover:font-bold={row.selectedSize !==
+                    result.productNumber}
+                  on:click={(e) => {
+                    e.stopPropagation();
+                    selectProduct(result, index, { break: null });
+                  }}
+                >
+                  {result.productNumber}
+                </label>
+                <input
+                  type="radio"
+                  class="hidden"
+                  id="product-{result.productNumber}"
+                  name="size-{result.productNumber}"
+                  value={result.productNumber}
+                  bind:group={row.selectedSize}
+                  checked={row.selectedSize ===
+                    result.productNumber}
+                  on:change={() =>
+                    selectProduct(result, index, { break: null })}
+                />
+              </div>
+            {/if}
+          </div>
+        </div>
+      {/each}
+    </div>
+  </div>
+{/if}
               </div>
             </form>
 

@@ -9,7 +9,7 @@ import sendemail from '$lib/data/sendemail.json';
 import { sendNotificationEmail, sendEmailToUser } from '$lib/server/emailNotification.js';
 import { sanitizeFormData } from '$lib/utils/sanitize.js';
 export const actions = {
-  contactus: async ({ request }) => {
+  ecommerce: async ({ request }) => {
     try {
       // const body = Object.fromEntries(await request.formData());
 

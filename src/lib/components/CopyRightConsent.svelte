@@ -4,6 +4,11 @@
     import { toast, Toaster } from "svelte-sonner";
     import Icon from "@iconify/svelte";
     import { countries, phoneNumberPatterns } from "$lib/Data/constants.js";
+    import { CaptchaUtils } from "$lib/utils/Captcha.js";
+    const captchaUtils = new CaptchaUtils();
+    let captchaState = captchaUtils.getState();
+
+    $: captchaState = captchaUtils.getState();
     export let data;
     // console.log(data, "i a consent");
     let submitting = false;
@@ -165,35 +170,62 @@
             showDropdown = false;
         }
     }
-    // function refreshMathQuestion() {
-    // 	rotationClass = 'rotate-[360deg]';
 
-    // 	setTimeout(() => {
-    // 		generateMathQuestion();
-    // 		rotationClass = '';
-    // 	}, 1000);
-    // }
-    function refreshMathQuestion(event) {
-        if (event) {
-            event.preventDefault();
-            event.stopPropagation();
+    function refreshMathQuestion() {
+        // Prevent refresh if already submitting or verifying
+        if (captchaState.isSubmitting || captchaState.isVerified) return;
+
+        // Clear any existing answers and errors
+        captchaUtils.reset();
+
+        // Generate new question
+        captchaUtils.generateMathQuestion();
+
+        // Force state update
+        captchaState = captchaUtils.getState();
+
+        // Clear user input
+        if (captchaState.userAnswer) {
+            captchaState.userAnswer = "";
         }
 
-        rotationClass = "rotate-[360deg]";
-
+        // Force a tick to ensure UI updates
         setTimeout(() => {
-            generateMathQuestion();
-            rotationClass = "";
-            userAnswer = ""; // Clear the previous answer when refreshing
-            errorMessagecap = ""; // Clear any error messages
-            successMessage = ""; // Clear any success messages
-        }, 1000);
+            captchaState = captchaUtils.getState();
+        }, 0);
     }
+    // function refreshMathQuestion(event) {
+    //     if (event) {
+    //         event.preventDefault();
+    //         event.stopPropagation();
+    //     }
+
+    //     rotationClass = "rotate-[360deg]";
+
+    //     setTimeout(() => {
+    //         generateMathQuestion();
+    //         rotationClass = "";
+    //         userAnswer = ""; // Clear the previous answer when refreshing
+    //         errorMessagecap = ""; // Clear any error messages
+    //         successMessage = ""; // Clear any success messages
+    //     }, 1000);
+    // }
+    // function showPopup() {
+    //     if (isChecked) {
+    //         showCaptchaPopup = true;
+    //         generateMathQuestion();
+    //     }
+    // }
     function showPopup() {
         if (isChecked) {
             showCaptchaPopup = true;
-            generateMathQuestion();
+            captchaUtils.reset();
+            captchaUtils.generateMathQuestion();
+            captchaState = captchaUtils.getState();
         }
+    }
+    function forceStateUpdate() {
+        captchaState = { ...captchaUtils.getState() };
     }
     onMount(() => {
         if (data && data.profile) {
@@ -236,7 +268,8 @@
                 }
             }
         }
-
+        captchaUtils.generateMathQuestion();
+        captchaState = captchaUtils.getState();
         isEditable = false;
         document.addEventListener("click", handleClickOutside);
         return () => document.removeEventListener("click", handleClickOutside);
@@ -248,9 +281,32 @@
     // 		errorMessagecap = '';
     // 	}
     // }
+    // function onInputChange() {
+    //     if (errorMessagecap && userAnswer.trim()) {
+    //         errorMessagecap = "";
+    //     }
+    // }
     function onInputChange() {
-        if (errorMessagecap && userAnswer.trim()) {
-            errorMessagecap = "";
+        // Don't process if already submitting
+        if (captchaState.isSubmitting) return;
+
+        const isValid = captchaUtils.setUserAnswer(captchaState.userAnswer);
+        captchaState = captchaUtils.getState();
+
+        if (isValid) {
+            if (captchaUtils.startSubmission()) {
+                const interval = setInterval(() => {
+                    progress += 5;
+                    if (progress >= 96) {
+                        // Fixed assignment operator
+                        clearInterval(interval);
+                    }
+                }, 500);
+                captchaState = captchaUtils.getState();
+                setTimeout(() => {
+                    submitFormAutomatically();
+                }, 2000);
+            }
         }
     }
     function verifyCaptcha() {
@@ -261,16 +317,32 @@
         }
     }
 
+    // function closeCaptchaPopup() {
+    //     showCaptchaPopup = false;
+
+    //     userAnswer = "";
+
+    //     if (successMessage) {
+    //         isChecked = true;
+    //     } else {
+    //         isChecked = false;
+    //     }
+    // }
     function closeCaptchaPopup() {
         showCaptchaPopup = false;
 
-        userAnswer = "";
-
-        if (successMessage) {
-            isChecked = true;
-        } else {
+        if (!captchaState.isVerified && !captchaState.isSubmitting) {
+            captchaUtils.reset();
+            captchaState = captchaUtils.getState();
             isChecked = false;
         }
+
+        setTimeout(() => {
+            if (!showCaptchaPopup) {
+                captchaUtils.completeSubmission();
+                captchaState = captchaUtils.getState();
+            }
+        }, 1000);
     }
 
     function handleFileChange(event) {
@@ -317,35 +389,55 @@
         }
         return content;
     }
-
     const handlesubmit = async (data) => {
         if (!formValid()) {
             cancel();
             return;
         }
-
-        try {
-            const result = await submitForm(data);
-            console.log(result, "result");
-            submitting = true;
-            return async ({ result }) => {
-                if (result.type === "success") {
-                    form = result.data;
-                    thankYouMessageVisible = true;
-                    showSuccesDiv = true;
-                    submitting = false;
-
-                    showSuccesDiv = true;
-                }
-            };
-        } catch (error) {
-            console.error("Error submitting form:", error);
-            // loading = false;
-            showFailureDiv = true;
-            submitting = false;
+        if (!isValid) {
+            isChecked = false;
+            cancel();
+            toast.error("Please fill all the required fields.");
+            return;
         }
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (!captchaUtils.isValid()) {
+            toast.error("Please complete the captcha verification");
+            cancel();
+            return;
+        }
+
+        submitting = true;
+        submitFormAutomatically();
     };
+
+    // const handlesubmit = async (data) => {
+    //     if (!formValid()) {
+    //         cancel();
+    //         return;
+    //     }
+
+    //     try {
+    //         const result = await submitForm(data);
+    //         console.log(result, "result");
+    //         submitting = true;
+    //         return async ({ result }) => {
+    //             if (result.type === "success") {
+    //                 form = result.data;
+    //                 thankYouMessageVisible = true;
+    //                 showSuccesDiv = true;
+    //                 submitting = false;
+
+    //                 showSuccesDiv = true;
+    //             }
+    //         };
+    //     } catch (error) {
+    //         console.error("Error submitting form:", error);
+    //         // loading = false;
+    //         showFailureDiv = true;
+    //         submitting = false;
+    //     }
+    //     window.scrollTo({ top: 0, behavior: "smooth" });
+    // };
     const submitForm = async (data) => {
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -1578,7 +1670,7 @@
                                         ? "Please enter a valid description"
                                         : "";
                             }}
-                            class="bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 rounded-md w-full p-3 text-sm"
+                            class="bg-gray-50 min-h-32 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 rounded-md w-full p-3 text-sm"
                         ></textarea>
                         {#if errors.description}
                             <p class="text-red-500 text-xs mt-1">
@@ -1755,7 +1847,7 @@
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <!-- svelte-ignore a11y-no-static-element-interactions -->
                     <div
-                        class="fixed !mt-0 inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
+                        class="fixed inset-0 flex justify-center items-center bg-black backdrop-blur-sm bg-opacity-50 z-50"
                         on:click={closeCaptchaPopup}
                     >
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -1774,19 +1866,22 @@
                                 <p
                                     class="flex items-center justify-between text-gray-700 font-medium"
                                 >
-                                    <span class="text-lg">{mathQuestion}</span>
+                                    <span class="text-lg"
+                                        >{captchaState.mathQuestion}</span
+                                    >
                                     <button
                                         class="ml-4 text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-all duration-300 {submittingForm
                                             ? 'opacity-50 cursor-not-allowed'
                                             : ''}"
-                                        on:click={submittingForm
-                                            ? null
-                                            : (e) => refreshMathQuestion(e)}
-                                        disabled={submittingForm}
+                                        on:click={refreshMathQuestion}
+                                        disabled={captchaState.isSubmitting ||
+                                            captchaState.isVerified}
+                                        title="Generate new question"
+                                        type="button"
                                     >
                                         <Icon
                                             icon="ic:round-refresh"
-                                            class={`w-5 h-5 text-primary-600 ${submittingForm ? "" : "cursor-pointer hover:scale-110"} transition transform ${rotationClass}`}
+                                            class={`w-5 h-5 text-primary-600 ${captchaState.rotationClass} ${captchaState.isSubmitting ? "" : "cursor-pointer hover:scale-110"} transition transform ${rotationClass}`}
                                         />
                                     </button>
                                 </p>
@@ -1795,95 +1890,97 @@
                             <div class="mb-6">
                                 <input
                                     type="text"
-                                    bind:value={userAnswer}
+                                    bind:value={captchaState.userAnswer}
                                     placeholder="Your Answer"
                                     class="border border-gray-300 rounded-lg w-full p-3 text-gray-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all"
                                     on:input={onInputChange}
                                     readonly={inputReadOnly}
+                                    disabled={captchaState.isSubmitting ||
+                                        captchaState.isVerified}
+                                    autocomplete="off"
                                 />
 
-                                {#if errorMessagecap}
-                                    <p
-                                        class="text-red-500 text-sm mt-2 flex items-center"
+                                {#if captchaState.errorMessage}
+                                    <div
+                                        class="flex items-center space-x-2 text-red-500 bg-red-50 border border-red-200 rounded-lg p-3 animate-pulse"
                                     >
                                         <Icon
                                             icon="mdi:alert-circle"
-                                            class="w-4 h-4 mr-1"
+                                            class="w-5 h-5 flex-shrink-0 animate-bounce"
                                         />
-                                        {errorMessagecap}
-                                    </p>
+                                        <p class="text-sm font-medium">
+                                            {captchaState.errorMessage}
+                                        </p>
+                                    </div>
                                 {/if}
-
-                                {#if successMessage}
-                                    <p
-                                        class="text-green-500 text-sm mt-2 flex items-center"
+                                {#if captchaState.successMessage}
+                                    <div
+                                        class="flex items-center space-x-2 text-green-600 bg-green-50 border border-green-200 rounded-lg p-3 animate-pulse"
                                     >
                                         <Icon
                                             icon="mdi:check-circle"
-                                            class="w-4 h-4 mr-1"
+                                            class="w-5 h-5 flex-shrink-0 animate-bounce"
                                         />
-                                        {successMessage}
-                                    </p>
+                                        <p class="text-sm font-medium">
+                                            {captchaState.successMessage}
+                                        </p>
+                                    </div>
                                 {/if}
                             </div>
+                            {#if captchaState.isSubmitting}
+                                <div class="mb-6">
+                                    <!-- <div class="flex items-center justify-center space-x-3 py-4">
+						<Icon
+							icon="line-md:loading-alt-loop"
+							class="w-6 h-6 animate-spin text-primary-600"
+						/>
 
-                            {#if submittingForm}
-                                <div class="w-full mb-4">
-                                    <p
-                                        class="text-sm mb-2 flex items-center text-primary-600"
+					</div> -->
+                                    <div
+                                        class="w-full bg-gray-200 rounded-full h-3 shadow-inner overflow-hidden"
                                     >
-                                        <Icon
-                                            icon="mdi:loading"
-                                            class="w-4 h-4 mr-2 animate-spin"
-                                        />
-                                        Submitting form
-                                    </p>
-                                    <div class="relative">
                                         <div
-                                            class="w-full h-2 bg-gray-200 rounded-full overflow-hidden"
-                                        >
-                                            <!-- Bind the width of the progress bar to the progress variable -->
-                                            <div
-                                                class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
-                                                style="width: {progress}%;"
-                                            ></div>
-                                        </div>
+                                            class="bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-500 ease-out shadow-sm animate-pulse"
+                                            style="width: {progress}%"
+                                        ></div>
                                     </div>
                                 </div>
                             {/if}
-                            <button
-                                class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base {submittingForm
-                                    ? 'opacity-50 cursor-not-allowed'
-                                    : ''}"
-                                on:click={(e) => {
-                                    if (!submittingForm) {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        verifyCaptcha();
-                                    }
-                                }}
-                                disabled={submittingForm}
-                            >
-                                {submittingForm ? "Verifying..." : "Verify Now"}
-                            </button>
                             <!-- <button
-                            class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base"
-                            on:click={() => {
-                                onInputChange();
-                                if (!errorMessagecap && userAnswer) {
-                                    submittingForm = true;
-            
-                                    setTimeout(() => {
-                                        submittingForm = false;
-                                        successMessage = 'Verification successful!';
-                                    }, 2000);
-                                } else {
-                                    errorMessagecap = '*Please answer the question correctly';
-                                }
-                            }}
-                        >
-                            Verify Now
-                        </button> -->
+								class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base"
+								on:click={() => {
+									onInputChange();
+									if (!errorMessagecap && userAnswer) {
+										submittingForm = true;
+				
+										setTimeout(() => {
+											submittingForm = false;
+											successMessage = 'Verification successful!';
+										}, 2000);
+									} else {
+										errorMessagecap = '*Please answer the question correctly';
+									}
+								}}
+							>
+								Verify Now
+							</button> -->
+                            {#if !captchaState.isVerified && !captchaState.isSubmitting}
+                                <button
+                                    type="button"
+                                    class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-4 focus:ring-primary-500/50 group"
+                                    on:click={onInputChange}
+                                >
+                                    <div
+                                        class="flex items-center justify-center space-x-2"
+                                    >
+                                        <Icon
+                                            icon="mdi:shield-check"
+                                            class="w-5 h-5 group-hover:animate-bounce"
+                                        />
+                                        <span>Verify Answer</span>
+                                    </div>
+                                </button>
+                            {/if}
                         </div>
                     </div>
                 {/if}

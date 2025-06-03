@@ -338,7 +338,7 @@ export async function favorite(favdata) {
 
 export const checkoutOrder = async (data) => {
 	try {
-		const {firstname,lastname,...order} = data
+		const { firstname, lastname, ...order } = data
 		let orderid
 		const counter = JSON.parse(JSON.stringify(await Counter.findOne({})))
 		if (counter?._id) {
@@ -366,11 +366,11 @@ export const checkoutOrder = async (data) => {
 				actionName: "Ordered"
 			})
 		}
-		const cart = await Cart.findOneAndUpdate({userId:order.userId,isActiveCart:true},{ $set: {"cartItems.$[elem].isQuote": false,"cartItems.$[elem].isCart": false},isActiveCart:false},{arrayFilters:[{ "elem._id": { $exists: true } } ]})
-		const admin = orderMsgToAdmin(newOrder,firstname,lastname)
-		const user = orderMsgToUser(newOrder,firstname,lastname)
-		sendEmail("New Order Created in Chemikart",admin,NOTIFICATION_TARGET_EMAIL)
-		sendEmail("Order Created Successfully",user,newOrder.userEmail)
+		const cart = await Cart.findOneAndUpdate({ userId: order.userId, isActiveCart: true }, { $set: { "cartItems.$[elem].isQuote": false, "cartItems.$[elem].isCart": false }, isActiveCart: false }, { arrayFilters: [{ "elem._id": { $exists: true } }] })
+		const admin = orderMsgToAdmin(newOrder, firstname, lastname)
+		const user = orderMsgToUser(newOrder, firstname, lastname)
+		sendEmail("New Order Created in Chemikart", admin, NOTIFICATION_TARGET_EMAIL)
+		sendEmail("Order Created Successfully", user, newOrder.userEmail)
 
 		if (newOrder._id) {
 			return { success: true, message: 'Successfully Ordered', orderId: newOrder.orderid, email: newOrder.userEmail };
@@ -2492,7 +2492,7 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 		const trimmedQuery = query.trim();
 // 		const isLongQuery = trimmedQuery.length > 8;
 // 		let stockQuery;
-		
+
 // 		if (isLongQuery) {
 // 			stockQuery = {
 // 				$or: [
@@ -2555,7 +2555,7 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 			}));
 // 		}
 // 		const productIds = [...new Set(stockItems.map(item => item.productid).filter(Boolean))];
-		
+
 // 		if (productIds.length === 0) {
 // 			return [];
 // 		}
@@ -2580,13 +2580,13 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 				if (!product) return null;
 // 				let priceoneValue = "";
 // 				let processedPricing = [];
-				
+
 // 				if (stockItem.pricing) {
 // 					const entryPricing = Array.isArray(stockItem.pricing) ? stockItem.pricing : [stockItem.pricing];
-					
+
 // 					if (entryPricing.length > 0) {
 // 						const firstPrice = entryPricing[0];
-						
+
 // 						if (firstPrice?.INR !== undefined && firstPrice?.INR !== null) {
 // 							priceoneValue = firstPrice.INR;
 // 							processedPricing = entryPricing.map(price => ({
@@ -2631,16 +2631,17 @@ export const addAllToCart = async (items, userId, userEmail) => {
 export const quicksearch = async ({ query }) => {
 	const startTime = Date.now();
 	console.log(query, "query");
-	
+
 	try {
 		if (!query || !query.trim()) {
 			return [];
 		}
 
-		const trimmedQuery = query.trim();
+		const trimmedQuery = query.trim().toUpperCase();
+
 		const isLongQuery = trimmedQuery.length > 8;
 		const regexPattern = isLongQuery ? null : new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-		
+
 		let stockQuery;
 		if (isLongQuery) {
 			stockQuery = {
@@ -2663,12 +2664,12 @@ export const quicksearch = async ({ query }) => {
 			.lean()
 			.exec();
 		if (stockItems.length === 0) {
-			const productQuery = isLongQuery ? 
-				{ productNumber: trimmedQuery } : 
+			const productQuery = isLongQuery ?
+				{ productNumber: trimmedQuery } :
 				{ productNumber: { $regex: regexPattern } };
 			const directProducts = await Product.find(productQuery)
-				.select('_id productName productNumber image prodDesc') 
-				.limit(20) 
+				.select('_id productName productNumber image prodDesc')
+				.limit(20)
 				.lean()
 				.exec();
 			return directProducts.map(product => ({
@@ -2689,7 +2690,7 @@ export const quicksearch = async ({ query }) => {
 		const productIds = stockItems
 			.map(item => item.productid)
 			.filter(Boolean)
-			.filter((id, index, arr) => arr.indexOf(id) === index); 
+			.filter((id, index, arr) => arr.indexOf(id) === index);
 
 		if (productIds.length === 0) {
 			return [];
@@ -2697,11 +2698,11 @@ export const quicksearch = async ({ query }) => {
 		const [currency, products] = await Promise.all([
 			Curconversion.findOne({ currency: 'USD' })
 				.sort({ createdAt: -1 })
-				.select('rate') 
+				.select('rate')
 				.lean()
 				.exec(),
 			Product.find({ _id: { $in: productIds } })
-				.select('_id productName productNumber image prodDesc') 
+				.select('_id productName productNumber image prodDesc')
 				.lean()
 				.exec()
 		]);
@@ -2721,15 +2722,15 @@ export const quicksearch = async ({ query }) => {
 
 			let priceoneValue = "";
 			let processedPricing = [];
-			
+
 			if (stockItem.pricing) {
 				const entryPricing = Array.isArray(stockItem.pricing) ? stockItem.pricing : [stockItem.pricing];
-				
+
 				if (entryPricing.length > 0) {
 					const firstPrice = entryPricing[0];
 
 					// console.log('Pricing data:', JSON.stringify(firstPrice, null, 2));
-					
+
 					if (firstPrice?.INR !== undefined && firstPrice?.INR !== null && firstPrice.INR !== "") {
 						priceoneValue = firstPrice.INR.toString();
 						processedPricing = entryPricing.map(price => ({
@@ -3037,7 +3038,7 @@ export const getGuestCart = async (body) => {
 		// Fetch all product details in a single query
 		const productMapPromise = Product.find(
 			{ _id: { $in: productIds } },
-			{ image: 1, productName: 1, productNumber: 1,manufacturerName:1 }
+			{ image: 1, productName: 1, productNumber: 1, manufacturerName: 1 }
 		).then(products =>
 			products.reduce((acc, p) => {
 				acc[p._id] = p;

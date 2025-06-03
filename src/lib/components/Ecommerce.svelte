@@ -4,6 +4,11 @@
 	import { tick } from "svelte";
 	import { toast, Toaster } from "svelte-sonner";
 	import { countries, phoneNumberPatterns } from "$lib/Data/constants.js";
+	import { CaptchaUtils } from "$lib/utils/Captcha.js";
+	const captchaUtils = new CaptchaUtils();
+	let captchaState = captchaUtils.getState();
+
+	$: captchaState = captchaUtils.getState();
 	let selectedNames = [];
 	let reason = [];
 	let hovered = false;
@@ -83,7 +88,10 @@
 				}
 			}
 		}
+
 		isEditable = false;
+			captchaUtils.generateMathQuestion();
+		captchaState = captchaUtils.getState();
 		// document.addEventListener("click", handleClickOutside);
 		// return () => document.removeEventListener("click", handleClickOutside);
 	});
@@ -122,7 +130,7 @@
 		role = "";
 		selectedNames = [];
 	}
-			let showDropdown = false;
+	let showDropdown = false;
 
 	// function handleKeyDown(event) {
 	// 	if (
@@ -137,132 +145,145 @@
 	let highlightedIndex = -1;
 
 	function handleKeyDown(event) {
-	if (!showDropdown) return;
+		if (!showDropdown) return;
 
-	if (event.key === 'ArrowDown') {
-		event.preventDefault();
-		highlightedIndex = (highlightedIndex + 1) % filteredCountries.length;
-		scrollToHighlightedItem();
-	} else if (event.key === 'ArrowUp') {
-		event.preventDefault();
-		highlightedIndex = (highlightedIndex - 1 + filteredCountries.length) % filteredCountries.length;
-		scrollToHighlightedItem();
-	} else if (event.key === 'Enter') {
-		event.preventDefault();
-		if (highlightedIndex >= 0) {
-			selectlocation(filteredCountries[highlightedIndex]);
-		} else {
-			selectlocation(filteredCountries[0]);
+		if (event.key === "ArrowDown") {
+			event.preventDefault();
+			highlightedIndex =
+				(highlightedIndex + 1) % filteredCountries.length;
+			scrollToHighlightedItem();
+		} else if (event.key === "ArrowUp") {
+			event.preventDefault();
+			highlightedIndex =
+				(highlightedIndex - 1 + filteredCountries.length) %
+				filteredCountries.length;
+			scrollToHighlightedItem();
+		} else if (event.key === "Enter") {
+			event.preventDefault();
+			if (highlightedIndex >= 0) {
+				selectlocation(filteredCountries[highlightedIndex]);
+			} else {
+				selectlocation(filteredCountries[0]);
+			}
+			showDropdown = false;
+			highlightedIndex = -1;
 		}
-		showDropdown = false;
-		highlightedIndex = -1;
 	}
-}
 
+	$: isDetailsEmpty = trimmedDetails.length === 0;
 
-$: isDetailsEmpty = trimmedDetails.length === 0;
+	$: isDetailsCharsValid =
+		/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(trimmedDetails) &&
+		!/<[^>]*>/.test(trimmedDetails);
 
-$: isDetailsCharsValid =
-  /^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(trimmedDetails) &&
-  !/<[^>]*>/.test(trimmedDetails);
+	$: isDetailsLengthValid =
+		trimmedDetails.length >= 5 && trimmedDetails.length <= 500;
 
-$: isDetailsLengthValid =
-  trimmedDetails.length >= 5 && trimmedDetails.length <= 500;
-
-
-
-function scrollToHighlightedItem() {
-  const item = document.getElementById(`dropdown-item-${highlightedIndex}`);
-  if (item) item.scrollIntoView({ block: "nearest" });
-}
+	function scrollToHighlightedItem() {
+		const item = document.getElementById(
+			`dropdown-item-${highlightedIndex}`,
+		);
+		if (item) item.scrollIntoView({ block: "nearest" });
+	}
 	function handleSubmit(event) {
-    console.log("Form Validation Started");
+		console.log("Form Validation Started");
 
-    // Log the state of all fields
-    console.log({ number, email, fname, lname, company, details, role, reason, isChecked });
+		// Log the state of all fields
+		console.log({
+			number,
+			email,
+			fname,
+			lname,
+			company,
+			details,
+			role,
+			reason,
+			isChecked,
+		});
 
-    if (
-        number?.length === 0 ||
-        email.length === 0 ||
-        fname.length === 0 ||
-        fname.trim() === "" ||
-        !/^[A-Za-z\s]+$/.test(fname) ||
-        /<[^>]*>/.test(fname) ||
-		fname.trim().length < 3 ||
-		fname.trim().length > 50 ||
-       (lname.trim().length > 0 && !/^[A-Za-z\s]+$/.test(lname)) ||
-      (lname.trim().length > 0 &&  /<[^>]*>/.test(lname)) ||
-		lname.trim().length > 50 ||
+		if (
+			number?.length === 0 ||
+			email.length === 0 ||
+			fname.length === 0 ||
+			fname.trim() === "" ||
+			!/^[A-Za-z\s]+$/.test(fname) ||
+			/<[^>]*>/.test(fname) ||
+			fname.trim().length < 3 ||
+			fname.trim().length > 50 ||
+			(lname.trim().length > 0 && !/^[A-Za-z\s]+$/.test(lname)) ||
+			(lname.trim().length > 0 && /<[^>]*>/.test(lname)) ||
+			lname.trim().length > 50 ||
+			(company.trim().length > 0 && company.trim().length < 3) ||
+			company.trim().length > 100 ||
+			!/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(company) ||
+			/<[^>]*>/.test(company) ||
+			(company.trim().length > 0 && Number.isInteger(Number(company))) ||
+			details.length === 0 ||
+			details.trim() === "" ||
+			details.trim().length < 5 ||
+			details.trim().length > 500 ||
+			!/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(details) ||
+			/<[^>]*>/.test(details) ||
+			// role.length === 0 ||
+			// role.trim() === "" ||
+			!/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(role) ||
+			/<[^>]*>/.test(role) ||
+			(role.trim().length > 0 && role.trim().length < 3) ||
+			role.trim().length > 150 ||
+			/^\d+$/.test(role.trim()) ||
+			reason.length === 0
+		) {
+			console.log("Validation failed: Missing required fields");
+			event.preventDefault();
+			formValid = false;
+			showErrors = true;
+		} else {
+			console.log("Validation Passed");
+			formValid = true;
+			formSubmitted = true;
+			showErrors = false;
+		}
 
+		if (!formValid) {
+			event.preventDefault();
+		}
+	}
 
-       (company.trim().length > 0 && company.trim().length < 3) ||
-		company.trim().length > 100 ||
-        !/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(company) ||
-        /<[^>]*>/.test(company) ||
-		 (company.trim().length > 0 && Number.isInteger(Number(company)))||
+	function showPopup() {
+		console.log("Attempting to show CAPTCHA Popup...");
 
+		// Log the state of CAPTCHA and form validation
+		console.log({ showCaptchaPopup, formValid, isCheckedcap });
 
+		if (!showCaptchaPopup) {
+			// Only show CAPTCHA if needed
+			console.log("Displaying CAPTCHA Popup");
+			showCaptchaPopup = true;
+			captchaUtils.reset();
+			captchaUtils.generateMathQuestion();
+			captchaState = captchaUtils.getState();
+			generateMathQuestion();
+		}
+	}
+		function forceStateUpdate() {
+		captchaState = { ...captchaUtils.getState() };
+	}
 
+	function closeCaptcha() {
+		console.log("Closing CAPTCHA Popup...");
 
-
-        details.length === 0 ||
-        details.trim() === "" ||
-		details.trim().length < 5 ||
-		details.trim().length > 500 ||
-        !/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(details) ||
-        /<[^>]*>/.test(details) ||
-        // role.length === 0 ||
-        // role.trim() === "" ||
-        !/^[A-Za-z0-9\s&-.,!@():;""'']*$/.test(role) ||
-        /<[^>]*>/.test(role) ||
-		(role.trim().length > 0 && role.trim().length < 3)||
-		role.trim().length > 150 ||
-		/^\d+$/.test(role.trim())||
-        reason.length === 0 
-		
-       
-    ) {
-        console.log("Validation failed: Missing required fields");
-        event.preventDefault();
-        formValid = false;
-        showErrors = true;
-    } else {
-        console.log("Validation Passed");
-        formValid = true;
-        formSubmitted = true;
-        showErrors = false;
-    }
-
-    if (!formValid) {
-        event.preventDefault();
-    }
-}
-
-function showPopup() {
-    console.log("Attempting to show CAPTCHA Popup...");
-
-    // Log the state of CAPTCHA and form validation
-    console.log({ showCaptchaPopup, formValid, isCheckedcap });
-
-    if ( !showCaptchaPopup) { // Only show CAPTCHA if needed
-        console.log("Displaying CAPTCHA Popup");
-        showCaptchaPopup = true;
-        generateMathQuestion();
-    }
-}
-
-function closeCaptcha() {
-    console.log("Closing CAPTCHA Popup...");
-
-    // Reset form state and CAPTCHA popup
-    showCaptchaPopup = false;
-    isCheckedcap = false;  // Reset CAPTCHA state (if required)
-    formValid = false;     // Reset form validation state
-    formSubmitted = false; // Reset form submission state
-    showErrors = false;    // Hide error messages
-    console.log("State after closing CAPTCHA:", { showCaptchaPopup, formValid, isCheckedcap });
-}
-
+		// Reset form state and CAPTCHA popup
+		showCaptchaPopup = false;
+		isCheckedcap = false; // Reset CAPTCHA state (if required)
+		formValid = false; // Reset form validation state
+		formSubmitted = false; // Reset form submission state
+		showErrors = false; // Hide error messages
+		console.log("State after closing CAPTCHA:", {
+			showCaptchaPopup,
+			formValid,
+			isCheckedcap,
+		});
+	}
 
 	// function handleSubmit(event) {
 	// 	if (
@@ -404,35 +425,58 @@ function closeCaptcha() {
 	// }
 
 	$: trimmedRole = role.trim();
-$: isRoleLengthValid = trimmedRole.length >= 3 && trimmedRole.length <= 150;
-$: isRoleNotOnlyNumbers = !Number.isInteger(Number(trimmedRole)) || trimmedRole === "";
+	$: isRoleLengthValid = trimmedRole.length >= 3 && trimmedRole.length <= 150;
+	$: isRoleNotOnlyNumbers =
+		!Number.isInteger(Number(trimmedRole)) || trimmedRole === "";
 
-$: isRoleCharsValid =
-	/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(trimmedRole) &&
-	!/<[^>]*>/.test(trimmedRole);
+	$: isRoleCharsValid =
+		/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(trimmedRole) &&
+		!/<[^>]*>/.test(trimmedRole);
 
-$: isValidRole = isRoleLengthValid && isRoleCharsValid && isRoleNotOnlyNumbers;
-$: trimmedDetails = details.trim();
+	$: isValidRole =
+		isRoleLengthValid && isRoleCharsValid && isRoleNotOnlyNumbers;
+	$: trimmedDetails = details.trim();
 	$: isValidDetails =
-		trimmedDetails.length >= 5 &&
-		trimmedDetails.length <= 500 ;
+		trimmedDetails.length >= 5 && trimmedDetails.length <= 500;
+	function refreshMathQuestion() {
+		// Prevent refresh if already submitting or verifying
+		if (captchaState.isSubmitting || captchaState.isVerified) return;
 
-	function refreshMathQuestion(event) {
-		if (event) {
-			event.preventDefault();
-			event.stopPropagation();
+		// Clear any existing answers and errors
+		captchaUtils.reset();
+
+		// Generate new question
+		captchaUtils.generateMathQuestion();
+
+		// Force state update
+		captchaState = captchaUtils.getState();
+
+		// Clear user input
+		if (captchaState.userAnswer) {
+			captchaState.userAnswer = "";
 		}
 
-		rotationClass = "rotate-[360deg]";
-
+		// Force a tick to ensure UI updates
 		setTimeout(() => {
-			generateMathQuestion();
-			rotationClass = "";
-			userAnswer = ""; // Clear the previous answer when refreshing
-			errorMessagecap = ""; // Clear any error messages
-			successMessage = ""; // Clear any success messages
-		}, 1000);
+			captchaState = captchaUtils.getState();
+		}, 0);
 	}
+	// function refreshMathQuestion(event) {
+	// 	if (event) {
+	// 		event.preventDefault();
+	// 		event.stopPropagation();
+	// 	}
+
+	// 	rotationClass = "rotate-[360deg]";
+
+	// 	setTimeout(() => {
+	// 		generateMathQuestion();
+	// 		rotationClass = "";
+	// 		userAnswer = ""; // Clear the previous answer when refreshing
+	// 		errorMessagecap = ""; // Clear any error messages
+	// 		successMessage = ""; // Clear any success messages
+	// 	}, 1000);
+	// }
 	function carrnchange() {
 		carrn = true;
 	}
@@ -447,10 +491,33 @@ $: trimmedDetails = details.trim();
 	let showdisErrors = false;
 	let showdatErrors = false;
 
-	function onInputChange() {
-		// Just clear the error message when typing, don't validate yet
-		if (errorMessagecap && userAnswer.trim()) {
-			errorMessagecap = "";
+	// function onInputChange() {
+	// 	// Just clear the error message when typing, don't validate yet
+	// 	if (errorMessagecap && userAnswer.trim()) {
+	// 		errorMessagecap = "";
+	// 	}
+	// }
+		function onInputChange() {
+		// Don't process if already submitting
+		if (captchaState.isSubmitting) return;
+
+		const isValid = captchaUtils.setUserAnswer(captchaState.userAnswer);
+		captchaState = captchaUtils.getState();
+
+		if (isValid) {
+			if (captchaUtils.startSubmission()) {
+				const interval = setInterval(() => {
+					progress += 5;
+					if (progress >= 96) {
+						// Fixed assignment operator
+						clearInterval(interval);
+					}
+				}, 500);
+				captchaState = captchaUtils.getState();
+				setTimeout(() => {
+					submitFormAutomatically();
+				}, 2000);
+			}
 		}
 	}
 	function verifyCaptcha() {
@@ -460,16 +527,32 @@ $: trimmedDetails = details.trim();
 			errorMessagecap = "Please answer the question";
 		}
 	}
-	function closeCaptchaPopup() {
+	// function closeCaptchaPopup() {
+	// 	showCaptchaPopup = false;
+
+	// 	userAnswer = "";
+
+	// 	if (successMessage) {
+	// 		isChecked = true;
+	// 	} else {
+	// 		isChecked = true;
+	// 	}
+	// }
+		function closeCaptchaPopup() {
 		showCaptchaPopup = false;
 
-		userAnswer = "";
-
-		if (successMessage) {
-			isChecked = true;
-		} else {
-			isChecked = true;
+		if (!captchaState.isVerified && !captchaState.isSubmitting) {
+			captchaUtils.reset();
+			captchaState = captchaUtils.getState();
+			isChecked = false;
 		}
+
+		setTimeout(() => {
+			if (!showCaptchaPopup) {
+				captchaUtils.completeSubmission();
+				captchaState = captchaUtils.getState();
+			}
+		}, 1000);
 	}
 
 	function showMessage(message1, keywordError) {
@@ -487,16 +570,17 @@ $: trimmedDetails = details.trim();
 			}, 2000);
 		}
 	}
-	
-	function validatePhoneNumber(location, number) {
-	const pattern = phoneNumberPatterns[location];
-	if (!pattern) {
-		console.warn(`No validation pattern found for location: ${location}`);
-		return false;
-	}
-	return pattern.test(number);
-}
 
+	function validatePhoneNumber(location, number) {
+		const pattern = phoneNumberPatterns[location];
+		if (!pattern) {
+			console.warn(
+				`No validation pattern found for location: ${location}`,
+			);
+			return false;
+		}
+		return pattern.test(number);
+	}
 
 	let loadingotp = false;
 	const handleResendOtpemail = () => {
@@ -539,7 +623,9 @@ $: trimmedDetails = details.trim();
 	function filterCountriesWithoutAutoSelect() {
 		filteredCountries = countries.filter(
 			(country) =>
-				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
+				country.name
+					.toLowerCase()
+					.startsWith(searchTerm.toLowerCase()) ||
 				country.code
 					.replace("+", "")
 					.includes(searchTerm.replace("+", "").toLowerCase()),
@@ -553,33 +639,32 @@ $: trimmedDetails = details.trim();
 			event.inputType === "deleteContentForward";
 
 		if (searchTerm.length > 0 && !isDeleting) {
-	filterCountriesWithoutAutoSelect();
-	showDropdown = true; // Always show, even if no matches
+			filterCountriesWithoutAutoSelect();
+			showDropdown = true; // Always show, even if no matches
 
-	const codeSearch = searchTerm.replace("+", "").trim();
-	if (codeSearch.length > 0) {
-		const exactCodeMatches = filteredCountries.filter(
-			(country) => country.code.replace("+", "") === codeSearch
-		);
+			const codeSearch = searchTerm.replace("+", "").trim();
+			if (codeSearch.length > 0) {
+				const exactCodeMatches = filteredCountries.filter(
+					(country) => country.code.replace("+", "") === codeSearch,
+				);
 
-		if (exactCodeMatches.length === 1) {
-			selectlocation(exactCodeMatches[0]);
-			return;
+				if (exactCodeMatches.length === 1) {
+					selectlocation(exactCodeMatches[0]);
+					return;
+				}
+			}
+
+			const countriesStartingWith = filteredCountries.filter((country) =>
+				country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
+			);
+
+			if (countriesStartingWith.length === 1) {
+				selectlocation(countriesStartingWith[0]);
+			}
+		} else {
+			filterCountriesWithoutAutoSelect();
+			showDropdown = true; // Keep it open regardless
 		}
-	}
-
-	const countriesStartingWith = filteredCountries.filter((country) =>
-		country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
-	);
-
-	if (countriesStartingWith.length === 1) {
-		selectlocation(countriesStartingWith[0]);
-	}
-} else {
-	filterCountriesWithoutAutoSelect();
-	showDropdown = true; // Keep it open regardless
-}
-
 	}
 
 	function toggleDropdown() {
@@ -597,17 +682,16 @@ $: trimmedDetails = details.trim();
 
 	let countryDropdownRef;
 
-function handleFormClick(event) {
-const isInCountry = countryDropdownRef?.contains(event.target);
-if (!isInCountry) {
-  showDropdown = false;
-}
-}
+	function handleFormClick(event) {
+		const isInCountry = countryDropdownRef?.contains(event.target);
+		if (!isInCountry) {
+			showDropdown = false;
+		}
+	}
 
-// $: if (location && phone) {
-// 	validateField("phone");
-// }
-
+	// $: if (location && phone) {
+	// 	validateField("phone");
+	// }
 </script>
 
 {#if showSuccesDiv}
@@ -661,7 +745,10 @@ if (!isInCountry) {
 {:else}
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<section class="md:w-11/12 mx-auto max-w-7xl bg-gray-50 sm:pb-0 px-2 pb-10" on:click={handleFormClick}>
+	<section
+		class="md:w-11/12 mx-auto max-w-7xl bg-gray-50 sm:pb-0 px-2 pb-10"
+		on:click={handleFormClick}
+	>
 		<section>
 			<div class="font-bold text-xl text-gray-700 md:text-2xl pb-4">
 				Chemikart Solutions
@@ -979,11 +1066,11 @@ if (!isInCountry) {
 			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			<form
 				method="POST"
-				action="?/contactus"
+				action="?/ecommerce"
 				bind:this={form}
 				class="w-full md:mt-3 mt-0 max-w-3xl sm:ml-3 ml-0"
-				use:enhance={({event,formData}) => {
-					formData.append("email",email)
+				use:enhance={({ event, formData }) => {
+					formData.append("email", email);
 					const isEmailVerified = ProfileEmailVerified;
 					const isAuthedUserEmailVerified = authedUserEmailVerified;
 					console.log(
@@ -1038,67 +1125,85 @@ if (!isInCountry) {
 				<div>
 					<div class="flex items-center space-x-2 text-lg">
 						<input
-						  id="questionCheckbox"
-						  type="checkbox"
-						  bind:group={selectedNames}
-						  class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
-						  value="I have a question about an existing B2B connection "
+							id="questionCheckbox"
+							type="checkbox"
+							bind:group={selectedNames}
+							class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
+							value="I have a question about an existing B2B connection "
 						/>
-						<label for="questionCheckbox" class="mb-5 text-xs cursor-default select-none">
-						  I have a question about an existing B2B connection.
+						<label
+							for="questionCheckbox"
+							class="mb-5 text-xs cursor-default select-none"
+						>
+							I have a question about an existing B2B connection.
 						</label>
-					  </div>
-					  <div class="flex items-center space-x-2 text-lg">
+					</div>
+					<div class="flex items-center space-x-2 text-lg">
 						<input
-						  id="infoCheckbox1"
-						  type="checkbox"
-						  bind:group={selectedNames}
-						  class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
-						  value="I would like to have more information about B2B solutions"
+							id="infoCheckbox1"
+							type="checkbox"
+							bind:group={selectedNames}
+							class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
+							value="I would like to have more information about B2B solutions"
 						/>
-						<label for="infoCheckbox1" class="mb-5 text-xs cursor-default select-none">
-						  I would like to have more information about B2B solutions
+						<label
+							for="infoCheckbox1"
+							class="mb-5 text-xs cursor-default select-none"
+						>
+							I would like to have more information about B2B
+							solutions
 						</label>
-					  </div>
-					  
-					  <div class="flex items-center space-x-2 text-lg">
+					</div>
+
+					<div class="flex items-center space-x-2 text-lg">
 						<input
-						  id="infoCheckbox2"
-						  type="checkbox"
-						  bind:group={selectedNames}
-						  class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
-						  value="I would like to be contacted about setting up a B2B connection"
+							id="infoCheckbox2"
+							type="checkbox"
+							bind:group={selectedNames}
+							class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
+							value="I would like to be contacted about setting up a B2B connection"
 						/>
-						<label for="infoCheckbox2" class="mb-5 text-xs cursor-default select-none">
-						  I would like to be contacted about setting up a B2B connection
+						<label
+							for="infoCheckbox2"
+							class="mb-5 text-xs cursor-default select-none"
+						>
+							I would like to be contacted about setting up a B2B
+							connection
 						</label>
-					  </div>
-					  
-					  <div class="flex items-center space-x-2 text-lg">
+					</div>
+
+					<div class="flex items-center space-x-2 text-lg">
 						<input
-						  id="infoCheckbox3"
-						  type="checkbox"
-						  bind:group={selectedNames}
-						  class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
-						  value="I would like to know if there is an existing B2B connection for my organization"
+							id="infoCheckbox3"
+							type="checkbox"
+							bind:group={selectedNames}
+							class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
+							value="I would like to know if there is an existing B2B connection for my organization"
 						/>
-						<label for="infoCheckbox3" class="mb-5 text-xs cursor-default select-none">
-						  I would like to know if there is an existing B2B connection for my organization
+						<label
+							for="infoCheckbox3"
+							class="mb-5 text-xs cursor-default select-none"
+						>
+							I would like to know if there is an existing B2B
+							connection for my organization
 						</label>
-					  </div>
-					  
-					  <div class="flex items-center space-x-2 text-lg">
+					</div>
+
+					<div class="flex items-center space-x-2 text-lg">
 						<input
-						  id="infoCheckbox4"
-						  type="checkbox"
-						  bind:group={selectedNames}
-						  class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
-						  value="I have another question (fill in Additional details)"
+							id="infoCheckbox4"
+							type="checkbox"
+							bind:group={selectedNames}
+							class="w-4 h-4 mb-5 form-checkbox rounded-sm text-primary-400 focus:outline-none focus:ring-0 cursor-pointer"
+							value="I have another question (fill in Additional details)"
 						/>
-						<label for="infoCheckbox4" class="mb-5 text-xs cursor-default select-none">
-						  I have another question (fill in Additional details)
+						<label
+							for="infoCheckbox4"
+							class="mb-5 text-xs cursor-default select-none"
+						>
+							I have another question (fill in Additional details)
 						</label>
-					  </div>
+					</div>
 				</div>
 				<div>
 					<label class=" items-center space-x-2 hidden">
@@ -1145,14 +1250,15 @@ if (!isInCountry) {
 											...errors,
 											name: "First Name should contain only letters and spaces",
 										};
-									}
-									else if (fname.trim().length < 3 || fname.trim().length > 50) {
+									} else if (
+										fname.trim().length < 3 ||
+										fname.trim().length > 50
+									) {
 										errors = {
 											...errors,
 											name: "First name Name must be between 3 and 50 characters",
 										};
-									}
-									 else {
+									} else {
 										const { name, ...rest } = errors;
 										errors = rest; // Remove error when valid
 									}
@@ -1173,34 +1279,34 @@ if (!isInCountry) {
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
-	type="text"
-	name="lname"
-	id="lname"
-	bind:value={lname}
-	class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-	placeholder="Last Name"
-	on:input={() => {
-		lname = lname.trimStart(); // Optional: trim leading spaces
+								type="text"
+								name="lname"
+								id="lname"
+								bind:value={lname}
+								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+								placeholder="Last Name"
+								on:input={() => {
+									lname = lname.trimStart(); // Optional: trim leading spaces
 
-		if (lname.trim() === "") {
-			const { lname, ...rest } = errors;
-			errors = rest; // Clear any last name errors if field is empty (optional)
-		} else if (!/^[A-Za-z\s]+$/.test(lname)) {
-			errors = {
-				...errors,
-				lname: "Last Name should contain only letters and spaces",
-			};
-		} else if (lname.trim().length > 50) {
-			errors = {
-				...errors,
-				lname: "Last Name must be less than 50 characters",
-			};
-		} else {
-			const { lname, ...rest } = errors;
-			errors = rest; // Clear error if valid
-		}
-	}}
-/>
+									if (lname.trim() === "") {
+										const { lname, ...rest } = errors;
+										errors = rest; // Clear any last name errors if field is empty (optional)
+									} else if (!/^[A-Za-z\s]+$/.test(lname)) {
+										errors = {
+											...errors,
+											lname: "Last Name should contain only letters and spaces",
+										};
+									} else if (lname.trim().length > 50) {
+										errors = {
+											...errors,
+											lname: "Last Name must be less than 50 characters",
+										};
+									} else {
+										const { lname, ...rest } = errors;
+										errors = rest; // Clear error if valid
+									}
+								}}
+							/>
 
 							{#if errors?.lname}
 								<span class="text-red-500 text-xs">
@@ -1218,42 +1324,50 @@ if (!isInCountry) {
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 relative w-full">
-							<div class="relative" bind:this={countryDropdownRef}>
-								<div class="flex items-center relative overflow-hidden w-full bg-gray-50">
-								<input
-									type="text"
-									id="location"
-									name="location"
-									bind:value={location}
-									placeholder="Location*"
-									on:input={handleInputChange}
-									on:click={toggleDropdown}
-									on:keydown={handleKeyDown}
-									on:input={() => {
-										const trimmedLocation = location.trim();
-										location = trimmedLocation;
-									}}
-									class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-								/>
-								<!-- SVG Icon -->
-											<!-- svelte-ignore a11y-no-static-element-interactions -->
-											<svg
-											  xmlns="http://www.w3.org/2000/svg"
-											  class="h-5 w-5 text-gray-500 transition-transform duration-200 cursor-pointer absolute right-2"
-											  fill="none"
-											  viewBox="0 0 24 24"
-											  stroke="currentColor"
-											  stroke-width="2"
-											  style:transform={showDropdown ? 'rotate(180deg)' : 'rotate(0deg)'}
-											  on:click={toggleDropdown}
-											>
-											  <path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												d="M19 9l-7 7-7-7"
-											  />
-											</svg>
-							</div>
+							<div
+								class="relative"
+								bind:this={countryDropdownRef}
+							>
+								<div
+									class="flex items-center relative overflow-hidden w-full bg-gray-50"
+								>
+									<input
+										type="text"
+										id="location"
+										name="location"
+										bind:value={location}
+										placeholder="Location*"
+										on:input={handleInputChange}
+										on:click={toggleDropdown}
+										on:keydown={handleKeyDown}
+										on:input={() => {
+											const trimmedLocation =
+												location.trim();
+											location = trimmedLocation;
+										}}
+										class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+									/>
+									<!-- SVG Icon -->
+									<!-- svelte-ignore a11y-no-static-element-interactions -->
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 text-gray-500 transition-transform duration-200 cursor-pointer absolute right-2"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										stroke-width="2"
+										style:transform={showDropdown
+											? "rotate(180deg)"
+											: "rotate(0deg)"}
+										on:click={toggleDropdown}
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											d="M19 9l-7 7-7-7"
+										/>
+									</svg>
+								</div>
 							</div>
 							{#if showDropdown}
 								<div
@@ -1265,16 +1379,18 @@ if (!isInCountry) {
 										{#each filteredCountries as location, index (location.name)}
 											<!-- svelte-ignore a11y-click-events-have-key-events -->
 											<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-											
+
 											<li
-	id={`dropdown-item-${index}`}
-	class="px-4 py-2 cursor-pointer {highlightedIndex === index
-	? 'bg-primary-100'
-	: 'hover:bg-primary-50'}"
-	on:click={() => selectlocation(location)}
->
-{location.name} ({location.code})
-</li>
+												id={`dropdown-item-${index}`}
+												class="px-4 py-2 cursor-pointer {highlightedIndex ===
+												index
+													? 'bg-primary-100'
+													: 'hover:bg-primary-50'}"
+												on:click={() =>
+													selectlocation(location)}
+											>
+												{location.name} ({location.code})
+											</li>
 										{/each}
 										{#if filteredCountries.length === 0}
 											<div
@@ -1283,14 +1399,6 @@ if (!isInCountry) {
 												No matching countries found!
 											</div>
 										{/if}
-
-
-
-
-
-
-
-
 									</ul>
 								</div>
 							{/if}
@@ -1302,11 +1410,11 @@ if (!isInCountry) {
 							{/if}
 
 							{#if filteredCountries.length === 0}
-											<span
+								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
 									>No matching countries found!</span
 								>
-										{/if}
+							{/if}
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
@@ -1325,28 +1433,32 @@ if (!isInCountry) {
 							/>
 
 							{#if showErrors && !number}
-	<span class="text-red-500 sm:text-xs text-2s font-medium">
-		*Required
-	</span>
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									*Required
+								</span>
+							{:else if !location && hovered}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Please select your country before entering
+									Number
+								</span>
 
-{:else if !location && hovered}
-	<span class="text-red-500 sm:text-xs text-2s font-medium">
-		Please select your country before entering Number
-	</span>
-
-<!-- {:else if number?.length > 0 && !validatePhoneNumber(location, number) && (showErrors || dirty)} -->
- {:else if number?.length > 0 && !validatePhoneNumber(location, number)}
-	<span class="text-red-500 sm:text-xs text-2s font-medium">
-	{#if filteredCountries.find(c => c.name === location)}
-  Please enter a valid phone number for {location}
-{:else}
- First select a valid country from the dropdown
-{/if}
-
-	</span>
-{/if}
-
-							
+								<!-- {:else if number?.length > 0 && !validatePhoneNumber(location, number) && (showErrors || dirty)} -->
+							{:else if number?.length > 0 && !validatePhoneNumber(location, number)}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									{#if filteredCountries.find((c) => c.name === location)}
+										Please enter a valid phone number for {location}
+									{:else}
+										First select a valid country from the
+										dropdown
+									{/if}
+								</span>
+							{/if}
 						</div>
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
@@ -1361,23 +1473,25 @@ if (!isInCountry) {
 								on:input={() => {
 									company = company.trimStart(); // Avoid leading spaces
 
-								 if (company.trim().length > 0 && (company.trim().length < 3 || company.trim().length > 100)) {
+									if (
+										company.trim().length > 0 &&
+										(company.trim().length < 3 ||
+											company.trim().length > 100)
+									) {
 										errors = {
 											...errors,
-											company: "Company Name must be between 3 and 100 characters",
+											company:
+												"Company Name must be between 3 and 100 characters",
 										};
-									}
-
-									else if (Number.isInteger(Number(company))
+									} else if (
+										Number.isInteger(Number(company))
 									) {
 										errors = {
 											...errors,
 											company:
 												"Company name cannot contain only numbers. Please include letters as well.",
 										};
-									}
-									
-									else if (
+									} else if (
 										!/^[A-Za-z0-9\s&\-.,!@():;"']+$/.test(
 											company,
 										)
@@ -1414,35 +1528,41 @@ if (!isInCountry) {
 						</div>
 						<div class="flex-1 mb-4 sm:w-full">
 							<input
-	type="text"
-	name="role"
-	id="role"
-	bind:value={role}
-	class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
-	placeholder="Role"
-	on:input={() => {
-		role = role.trimStart();
-		showdisErrors = true;
-	}}
-/>
+								type="text"
+								name="role"
+								id="role"
+								bind:value={role}
+								class="w-full placeholder:text-xs text-sm px-2 py-2 rounded-md bg-gray-50 border border-gray-300 focus:outline-none focus:ring-0 focus:ring-primary-300 focus:border-primary-300"
+								placeholder="Role"
+								on:input={() => {
+									role = role.trimStart();
+									showdisErrors = true;
+								}}
+							/>
 
-{#if showdisErrors && !isRoleCharsValid}
-	<span class="text-red-500 sm:text-xs text-2s font-medium">
-		Only letters, numbers, and valid symbols (& - . , ! @ ( ) : ; " ') are allowed.
-	</span>
-{:else if showdisErrors && !isRoleLengthValid}
-	<span class="text-red-500 sm:text-xs text-2s font-medium">
-		Must be between 3 and 150 characters.
-	</span>
-{:else if showdisErrors && !isRoleNotOnlyNumbers}
-	<span class="text-red-500 sm:text-xs text-2s font-medium">
-		Role cannot contain only numbers, Please include letters as well.
-	</span>
-{/if}
+							{#if showdisErrors && !isRoleCharsValid}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Only letters, numbers, and valid symbols (&
+									- . , ! @ ( ) : ; " ') are allowed.
+								</span>
+							{:else if showdisErrors && !isRoleLengthValid}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Must be between 3 and 150 characters.
+								</span>
+							{:else if showdisErrors && !isRoleNotOnlyNumbers}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Role cannot contain only numbers, Please
+									include letters as well.
+								</span>
+							{/if}
 
-
-	
-<!-- {#if showErrors && role.length === 0}
+							<!-- {#if showErrors && role.length === 0}
 								<span
 									class="text-red-500 sm:text-xs text-2s font-medium"
 								>
@@ -1453,18 +1573,18 @@ if (!isInCountry) {
 					</div>
 					<div class="flex flex-col md:flex-row md:space-x-4">
 						<div class="flex-1 mb-4 sm:w-full">
-							 <input
+							<input
 								type="hidden"
 								name="email"
 								id="email"
 								bind:value={email}
-							/> 
+							/>
 							<form
 								action="?/verifyemail"
 								bind:this={form3}
 								method="POST"
-								use:enhance={({formData}) => {
-												formData.append("email",email)
+								use:enhance={({ formData }) => {
+									formData.append("email", email);
 									return async ({ result }) => {
 										isLoading = false;
 										console.log("result", result);
@@ -1553,7 +1673,7 @@ if (!isInCountry) {
 									{:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
 										<button
 											type="submit"
-											class={`absolute right-2  transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed ${!showErrors ? 'top-1/2' : 'top-1/3'}`}
+											class={`absolute right-2  transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed ${!showErrors ? "top-1/2" : "top-1/3"}`}
 											disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
 												email,
 											) ||
@@ -1563,21 +1683,20 @@ if (!isInCountry) {
 										>
 											Verify
 										</button>
-										
 									{:else if emailSent}
 										<span
 											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
 										>
 											{#if isOtpVerified}
 												<span
-											class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-										>
-											Verified
-											<Icon
-																icon="material-symbols:verified-rounded"
-																class="w-4 h-4 ml-1"
-															/>
-										</span>
+													class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+												>
+													Verified
+													<Icon
+														icon="material-symbols:verified-rounded"
+														class="w-4 h-4 ml-1"
+													/>
+												</span>
 											{:else}
 												<Icon
 													icon="fluent:mail-all-read-16-filled"
@@ -1592,9 +1711,9 @@ if (!isInCountry) {
 										>
 											Verified
 											<Icon
-																icon="material-symbols:verified-rounded"
-																class="w-4 h-4 ml-1"
-															/>
+												icon="material-symbols:verified-rounded"
+												class="w-4 h-4 ml-1"
+											/>
 										</span>
 									{/if}
 								</div>
@@ -1605,8 +1724,8 @@ if (!isInCountry) {
 								<form
 									action="?/verifyOtpEmail"
 									method="POST"
-									use:enhance={({formData}) => {
-													formData.append("email",email)
+									use:enhance={({ formData }) => {
+										formData.append("email", email);
 										return async ({ result }) => {
 											loadingotp = false;
 											if (result.status === 200) {
@@ -1651,7 +1770,7 @@ if (!isInCountry) {
 											name="email"
 											id="email"
 											bind:value={email}
-										/> 
+										/>
 										<input
 											type="text"
 											name="enteredOtp"
@@ -1715,21 +1834,26 @@ if (!isInCountry) {
 							}}
 						></textarea>
 						{#if showErrors || showdatErrors}
-  {#if isDetailsEmpty}
-    <span class="text-red-500 sm:text-xs text-2s font-medium">
-      *Required
-    </span>
-  {:else if !isDetailsCharsValid}
-    <span class="text-red-500 sm:text-xs text-2s font-medium">
-      Invalid characters in Details
-    </span>
-  {:else if !isDetailsLengthValid}
-    <span class="text-red-500 sm:text-xs text-2s font-medium">
-      Must be between 5 and 500 valid characters.
-    </span>
-  {/if}
-{/if}
-
+							{#if isDetailsEmpty}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									*Required
+								</span>
+							{:else if !isDetailsCharsValid}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Invalid characters in Details
+								</span>
+							{:else if !isDetailsLengthValid}
+								<span
+									class="text-red-500 sm:text-xs text-2s font-medium"
+								>
+									Must be between 5 and 500 valid characters.
+								</span>
+							{/if}
+						{/if}
 					</div>
 					<span class="flex-1 w-1/3 mb-4">
 						<label
@@ -1752,33 +1876,43 @@ if (!isInCountry) {
 									value="captcha"
 									class="w-5 h-5 border-2 border-gray-400 text-primary-600 focus:ring-primary-500 rounded cursor-pointer hover:border-primary-500 transition-colors duration-300"
 									bind:checked={isCheckedcap}
-							on:click={(event) => {
-    event.preventDefault();
-    handleSubmit(event);
+									on:click={(event) => {
+										event.preventDefault();
+										handleSubmit(event);
 
-    // Check form validation
-    if (!formValid) {
-        if (Object.keys(errors).length > 0) {
-            toast.error("Please fill all the required fields.");
-        }
-        isCheckedcap = false;
-        return;
-    }
+										// Check form validation
+										if (!formValid) {
+											if (
+												Object.keys(errors).length > 0
+											) {
+												toast.error(
+													"Please fill all the required fields.",
+												);
+											}
+											isCheckedcap = false;
+											return;
+										}
 
-    // Check email verification
-    if (!(ProfileEmailVerified || authedUserEmailVerified === true)) {
-        toast.error("Please verify your email to proceed");
-        isCheckedcap = false;
-        return;
-    }
+										// Check email verification
+										if (
+											!(
+												ProfileEmailVerified ||
+												authedUserEmailVerified === true
+											)
+										) {
+											toast.error(
+												"Please verify your email to proceed",
+											);
+											isCheckedcap = false;
+											return;
+										}
 
-    // All checks passed
-    // isCheckedcap = true;
+										// All checks passed
+										// isCheckedcap = true;
 
-    // Make sure showPopup is defined
-    showPopup();
-}}
-
+										// Make sure showPopup is defined
+										showPopup();
+									}}
 									on:keydown={(event) => {
 										if (event.key === "Enter") {
 											event.preventDefault();
@@ -1795,11 +1929,12 @@ if (!isInCountry) {
 								<button
 									type="submit"
 									on:click={(event) => {
-										console.log("isCheckedcap",isCheckedcap);
+										console.log(
+											"isCheckedcap",
+											isCheckedcap,
+										);
 										handleSubmit(event);
 										if (!isCheckedcap) {
-											
-											
 											toast.error(
 												"Please complete the CAPTCHA to proceed with the submission.",
 											);
@@ -1847,20 +1982,21 @@ if (!isInCountry) {
 										class="flex items-center justify-between text-gray-700 font-medium"
 									>
 										<span class="text-lg"
-											>{mathQuestion}</span
+											>{captchaState.mathQuestion}</span
 										>
 										<button
 											class="ml-4 text-gray-700 p-2 rounded-full hover:bg-gray-200 transition-all duration-300 {submittingForm
 												? 'opacity-50 cursor-not-allowed'
 												: ''}"
-											on:click={submittingForm
-												? null
-												: (e) => refreshMathQuestion(e)}
-											disabled={submittingForm}
+											on:click={refreshMathQuestion}
+											disabled={captchaState.isSubmitting ||
+												captchaState.isVerified}
+											title="Generate new question"
+											type="button"
 										>
 											<Icon
 												icon="ic:round-refresh"
-												class={`w-5 h-5 text-primary-600 ${submittingForm ? "" : "cursor-pointer hover:scale-110"} transition transform ${rotationClass}`}
+												class={`w-5 h-5 text-primary-600 ${captchaState.rotationClass} ${captchaState.isSubmitting ? "" : "cursor-pointer hover:scale-110"} transition transform ${rotationClass}`}
 											/>
 										</button>
 									</p>
@@ -1869,58 +2005,59 @@ if (!isInCountry) {
 								<div class="mb-6">
 									<input
 										type="text"
-										bind:value={userAnswer}
+										bind:value={captchaState.userAnswer}
 										placeholder="Your Answer"
 										class="border border-gray-300 rounded-lg w-full p-3 text-gray-700 focus:ring-2 focus:ring-primary-300 focus:border-primary-500 focus:outline-none transition-all"
 										on:input={onInputChange}
 										readonly={inputReadOnly}
+										disabled={captchaState.isSubmitting ||
+											captchaState.isVerified}
+										autocomplete="off"
 									/>
 
-									{#if errorMessagecap}
-										<p
-											class="text-red-500 text-sm mt-2 flex items-center"
+									{#if captchaState.errorMessage}
+										<div
+											class="flex mt-4 items-center space-x-2 text-red-500 bg-red-50 border border-red-200 rounded-lg p-3 animate-pulse"
 										>
 											<Icon
 												icon="mdi:alert-circle"
-												class="w-4 h-4 mr-1"
+												class="w-5 h-5 flex-shrink-0 animate-bounce"
 											/>
-											{errorMessagecap}
-										</p>
+											<p class="text-sm font-medium">
+												{captchaState.errorMessage}
+											</p>
+										</div>
 									{/if}
-
-									{#if successMessage}
-										<p
-											class="text-green-500 text-sm mt-2 flex items-center"
+									{#if captchaState.successMessage}
+										<div
+											class="flex mt-4 items-center space-x-2 text-green-600 bg-green-50 border border-green-200 rounded-lg p-3 animate-pulse"
 										>
 											<Icon
 												icon="mdi:check-circle"
-												class="w-4 h-4 mr-1"
+												class="w-5 h-5 flex-shrink-0 animate-bounce"
 											/>
-											{successMessage}
-										</p>
+											<p class="text-sm font-medium">
+												{captchaState.successMessage}
+											</p>
+										</div>
 									{/if}
 								</div>
+								{#if captchaState.isSubmitting}
+									<div class="mb-6">
+										<!-- <div class="flex items-center justify-center space-x-3 py-4">
+						<Icon
+							icon="line-md:loading-alt-loop"
+							class="w-6 h-6 animate-spin text-primary-600"
+						/>
 
-								{#if submittingForm}
-									<div class="w-full mb-4">
-										<p
-											class="text-sm mb-2 flex items-center text-primary-600"
+					</div> -->
+										<div
+											class="w-full bg-gray-200 rounded-full h-3 shadow-inner overflow-hidden"
 										>
-											<Icon
-												icon="mdi:loading"
-												class="w-4 h-4 mr-2 animate-spin"
-											/>
-											Submitting form
-										</p>
-										<div class="relative">
 											<div
-												class="w-full h-2 bg-gray-200 rounded-full overflow-hidden"
-											>
-												<div
-													class="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-300"
-													style="width: {progress}%;"
-												></div>
-											</div>
+												class="bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-500 ease-out shadow-sm animate-pulse"
+												style="width: {progress}%"
+											></div>
 										</div>
 									</div>
 								{/if}
@@ -1942,23 +2079,23 @@ if (!isInCountry) {
 							>
 								Verify Now
 							</button> -->
-								<button
-									class="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transform transition font-medium text-base {submittingForm
-										? 'opacity-50 cursor-not-allowed'
-										: ''}"
-									on:click={(e) => {
-										if (!submittingForm) {
-											e.preventDefault();
-											e.stopPropagation();
-											verifyCaptcha();
-										}
-									}}
-									disabled={submittingForm}
-								>
-									{submittingForm
-										? "Verifying..."
-										: "Verify Now"}
-								</button>
+								{#if !captchaState.isVerified && !captchaState.isSubmitting}
+									<button
+										type="button"
+										class="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-4 focus:ring-primary-500/50 group"
+										on:click={onInputChange}
+									>
+										<div
+											class="flex items-center justify-center space-x-2"
+										>
+											<Icon
+												icon="mdi:shield-check"
+												class="w-5 h-5 group-hover:animate-bounce"
+											/>
+											<span>Verify Answer</span>
+										</div>
+									</button>
+								{/if}
 							</div>
 						</div>
 					{/if}
