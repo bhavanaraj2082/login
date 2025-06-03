@@ -720,6 +720,97 @@ export const loginWithLinkedIn = async (userData, cookies) => {
 	}
 };
 
+export const loginWithGoogle = async (userData, cookies) => {
+	try {
+		const existingUser = await auth.getKey('email', userData.email);
+		if (existingUser) {
+			console.log('Existing Lucia user found:', existingUser);
+
+			let existingUserProfile;
+			try {
+				existingUserProfile = await auth.getUser(existingUser.userId);
+				console.log('Existing Lucia user profile:', existingUserProfile);
+			} catch (userProfileError) {
+				console.error("Error retrieving the existing user's profile:", userProfileError);
+				throw new Error('Failed to fetch user profile.');
+			}
+
+			let session;
+			try {
+				session = await auth.createSession({
+					userId: existingUser.userId,
+					attributes: {}
+				});
+				console.log('Session created:', session);
+			} catch (sessionError) {
+				console.error('Error creating session:', sessionError);
+				throw new Error('Failed to create session for the user.');
+			}
+
+			try {
+				if (!cookies || typeof cookies.set !== 'function') {
+					console.error('Cookies object is not defined or invalid.');
+					throw new Error('Cookies object is undefined or does not have a set method.');
+				}
+
+				const sessionCookie = auth.createSessionCookie(session);
+				cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+				console.log('Session cookie set:', sessionCookie);
+			} catch (cookieError) {
+				console.error('Error setting session cookie:', cookieError);
+			}
+
+			return; // Exit early since user exists
+		}
+	} catch (error) {
+		console.error('Existing Lucia user not found:', error.code === 'AUTH_INVALID_KEY_ID');
+		console.log('Creating new user due to error:', error);
+
+		// New user creation
+		const luciaUser = await auth.createUser({
+			key: {
+				providerId: 'email',
+				providerUserId: userData.email,
+				password: null 
+			},
+			attributes: {
+				username: userData.firstname,
+				email: userData.email,
+			}
+		});
+		console.log('Lucia user created:', luciaUser);
+
+		const newProfile = new Profile({
+			userId: luciaUser.userId,
+			firstName: userData.firstname,
+			lastName: userData.lastname,
+			email: userData.email,
+      		profilePicture: userData.profilePicture,
+			isEmailVerified: userData.isEmailVerified,
+			profilePicture: userData.profilePicture,
+			needsPasswordSetup: true,
+			sitePreferences: {
+				productEntryType: "Manual Entry",
+				noOfQuickOrderFields: 3,
+				noOfOrdersPerPage: 3,
+				noOfQuotesPerPage: 3
+			}
+		});
+		console.log('New Profile:', newProfile);
+		const savedProfile = JSON.parse(JSON.stringify(await newProfile.save()));
+		console.log('Saved Profile:', savedProfile);
+
+		const session = await auth.createSession({
+			userId: luciaUser.userId,
+			attributes: {}
+		});
+
+		const sessionCookie = auth.createSessionCookie(session);
+		cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
+		console.log('Signup with Google successful');
+	}
+};
+
 const sendVerificationEmail = async (email, verificationUrl) => {
 	const transporter = nodemailer.createTransport({
 		service: 'partskeys',
