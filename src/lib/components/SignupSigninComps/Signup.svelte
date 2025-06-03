@@ -45,11 +45,21 @@
   const scope = import.meta.env.VITE_LINKEDIN_SCOPE;
   const baseUrl = import.meta.env.VITE_LINKEDIN_BASE_URL;
   const linkedinUrl = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(callbackUrl)}&scope=${scope}`;
+  // Google
+  const GoogleclientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const GooglecallbackUrl = import.meta.env.VITE_GOOGLE_CALLBACK_URL;
+  const Googlescope = import.meta.env.VITE_GOOGLE_SCOPE;
+  const GooglebaseUrl = import.meta.env.VITE_GOOGLE_BASE_URL;
+  const googleUrl = `${GooglebaseUrl}?response_type=code&client_id=${GoogleclientId}&redirect_uri=${encodeURIComponent(GooglecallbackUrl)}&scope=${Googlescope}&access_type=offline&prompt=consent`;
   const passwordRegex =
     /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%_\-*])[A-Za-z\d!@#$%_\-*]{8,}$/;
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const usernameRegex = /^[A-Za-z]+$/;
   const phoneRegex = /^[6-9]\d{9}$/;
+
+  function redirectTo(url) {
+    window.location.href = url;
+  }
 
   function validateUsername() {
     let newErrors = { ...errors }; // Create a new object for reactivity
@@ -1512,65 +1522,50 @@
         </div>
       {/if}
 
-      <button
-        type="submit"
-        class="w-full bg-primary-400 text-white py-2 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center sm:hidden"
-      >
-        {#if isProcessing}
-          <Icon
-            icon="line-md:loading-alt-loop"
-            class="text-lg text-center inline"
-          />
-          Processing...
-        {:else}
-          <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
-          Create Account
-        {/if}
-      </button>
-      <div class="hidden sm:flex sm:space-x-4 sm:justify-between w-full py-2">
-        <button
-          type="submit"
-          class="w-full sm:w-auto bg-primary-400 text-white py-2 px-6 rounded-md hover:bg-primary-500 transition duration-200 flex items-center justify-center"
-        >
-          {#if isProcessing}
-            <Icon
-              icon="line-md:loading-alt-loop"
-              class="text-lg text-center inline"
-            />
-            Processing...
-          {:else}
-            <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
-            Create Account
-          {/if}
-        </button>
-        <div class="relative flex items-center py-1 w-1/6">
-          <div class="flex-grow border-t border-gray-300"></div>
-          <span class="px-2 text-sm text-gray-500 font-bold bg-white">OR</span>
-          <div class="flex-grow border-t border-gray-300"></div>
+      <div class="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+        <div class="max-sm:space-y-4 sm:flex md:flex lg:flex gap-4">
+          <button
+            type="submit"
+            class="w-full bg-primary-500 text-white py-2 px-6 rounded hover:bg-primary-600 transition duration-200 flex items-center justify-center"
+          >
+            {#if isProcessing}
+              <Icon icon="line-md:loading-alt-loop" class="text-lg mr-2" />
+              Processing...
+            {:else}
+              <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
+              Create Account
+            {/if}
+          </button>
+
+          <!-- OR Divider -->
+          <div class="flex items-center text-sm text-gray-500 font-semibold">
+            <div class="flex-grow border-t border-gray-300"></div>
+            <span class="px-3">OR</span>
+            <div class="flex-grow border-t border-gray-300"></div>
+          </div>
         </div>
-        <div
-          class="flex items-center justify-center py-2 px-6 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200"
-        >
-          <a href={linkedinUrl} class="flex items-center space-x-2">
-            <Icon icon="bi:linkedin" class="text-xl" />
-            <span class="text-sm font-medium">Continue with LinkedIn</span>
-          </a>
+
+        <div class="space-y-4">
+          <button
+            on:click={() => redirectTo(linkedinUrl)}
+            type="button"
+            class="w-full flex items-center justify-center gap-3 py-2 px-4 text-black bg-white border border-gray-500 rounded transition duration-200"
+          >
+            <Icon icon="fa:linkedin-square" class="text-2xl text-blue-600" />
+            <span class="text-sm font-medium">Sign up with LinkedIn</span>
+          </button>
+
+          <button
+            on:click={() => redirectTo(googleUrl)}
+            type="button"
+            class="w-full flex items-center justify-center gap-3 py-2 px-4 text-black bg-white border border-gray-500 rounded transition duration-200"
+          >
+            <Icon icon="flat-color-icons:google" class="text-2xl" />
+            <span class="text-sm font-medium">Sign up with Google</span>
+          </button>
         </div>
       </div>
     </form>
-    <div class="relative flex items-center my-4 w-full sm:hidden">
-      <div class="flex-grow border-t border-gray-300"></div>
-      <span class="px-2 text-sm text-gray-500 font-bold bg-white">OR</span>
-      <div class="flex-grow border-t border-gray-300"></div>
-    </div>
-    <button
-      class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-600 rounded-md transition duration-200 sm:hidden"
-    >
-      <a href={linkedinUrl} class="flex items-center space-x-2">
-        <Icon icon="bi:linkedin" class="text-2xl" />
-        <span class="text-sm font-medium">Continue with LinkedIn</span>
-      </a>
-    </button>
   </div>
 </div>
 <Toaster position="bottom-right" richColors />

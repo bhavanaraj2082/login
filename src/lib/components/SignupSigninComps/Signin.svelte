@@ -3,6 +3,11 @@
   const callbackUrl = import.meta.env.VITE_LINKEDIN_CALLBACK_URL;
   const scope = import.meta.env.VITE_LINKEDIN_SCOPE;
   const baseUrl = import.meta.env.VITE_LINKEDIN_BASE_URL;
+  // Google
+  const GoogleclientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const GooglecallbackUrl = import.meta.env.VITE_GOOGLE_CALLBACK_URL;
+  const Googlescope = import.meta.env.VITE_GOOGLE_SCOPE;
+  const GooglebaseUrl = import.meta.env.VITE_GOOGLE_BASE_URL;
   import Icon from "@iconify/svelte";
   import { enhance, applyAction } from "$app/forms";
   import { toast, Toaster } from "svelte-sonner";
@@ -24,6 +29,11 @@
   let timerInterval;
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const linkedinUrl = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(callbackUrl)}&scope=${scope}`;
+  const googleUrl = `${GooglebaseUrl}?response_type=code&client_id=${GoogleclientId}&redirect_uri=${encodeURIComponent(GooglecallbackUrl)}&scope=${Googlescope}&access_type=offline&prompt=consent`;
+
+  function redirectTo(url) {
+    window.location.href = url;
+  }
 
   function validateEmail() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -534,15 +544,24 @@
               <span class="text-sm">Sign In with OTP</span>
             </button>
           {/if}
-
+        <div class="space-y-3"> 
           <button
-            class="w-full flex items-center justify-center py-2 px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition duration-200 font-medium"
+            on:click={() => redirectTo(linkedinUrl)}
+            type="button"
+            class="w-full flex items-center justify-center gap-3 py-2 px-4 text-black bg-white border border-gray-500 rounded transition duration-200"
           >
-            <a href={linkedinUrl} class="flex items-center">
-              <Icon icon="bi:linkedin" class="mr-2 text-lg" />
-              <span class="text-sm">Sign In with LinkedIn</span>
-            </a>
+            <Icon icon="fa:linkedin-square" class="text-2xl text-blue-600" />
+            <span class="text-sm font-medium">Sign in with LinkedIn</span>
           </button>
+          <button
+            on:click={() => redirectTo(googleUrl)}
+            type="button"
+            class="w-full flex items-center justify-center gap-3 py-2 px-4 text-black bg-white border border-gray-500 rounded transition duration-200"
+          >
+            <Icon icon="flat-color-icons:google" class="text-2xl" />
+            <span class="text-sm font-medium">Sign in with Google</span>
+          </button>
+        </div>
         </div>
       </div>
     </div>
