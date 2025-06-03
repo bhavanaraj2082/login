@@ -846,7 +846,7 @@ const handleEdit = (step, toggleFn) => {
 		{/if}
 	</div>
 	<div class="mt-2 mb-2">
-		<label for="" class="sm:text-sm text-xs">Company name </label>
+		<label for="" class="sm:text-sm text-xs">Company name <span class="text-primary-500"> *</span></label>
 		<br />
   <input
   type="text"

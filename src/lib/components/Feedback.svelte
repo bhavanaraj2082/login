@@ -588,89 +588,77 @@
                   }}
                 >
                   <div class="relative w-full">
-                    <input
-                      type="text"
-                      name="email"
-                      id="email"
-                      bind:value={formData.email}
-                      class="block w-full md:mt-1 rounded-md focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500 bg-white px-3 py-1.5 text-sm text-gray-900"
-                      placeholder="Email"
-                      on:input={() => {
-                        showEmailError = false;
-                        formData.email = formData.email.trimStart();
-                        // validateField("email");
-                        errors.email = !formData.email
-                          ? "*Required"
-                          : !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-                                formData.email,
-                              ) ||
-                              formData.email.split("@")[1].includes("gamil")
-                            ? "Please enter a valid email address"
-                            : "";
-                        ProfileEmailVerified = false;
-                        emailSent = false;
-                        authedUserEmailVerified = false;
-                      }}
-                    />
-                    {#if showEmailError}
+                   <div class="flex items-center w-full gap-2 relative rounded-md md:mt-1 focus:ring-0 focus:outline-none border-1 border-gray-300 focus:border-primary-500 bg-white text-sm text-gray-900">
+  <!-- Input container -->
+  <div class="w-[80%] overflow-x-auto">
+    <input
+      type="text"
+      name="email"
+      id="email"
+      bind:value={formData.email}
+class="w-full whitespace-nowrap overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 p-1 border-none outline-none focus:outline-none focus:ring-0 focus:border-transparent"
+      placeholder="Email"
+      on:input={() => {
+        showEmailError = false;
+        formData.email = formData.email.trimStart();
+        errors.email = !formData.email
+          ? "*Required"
+          : !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(formData.email) ||
+            formData.email.split("@")[1].includes("gamil")
+          ? "Please enter a valid email address"
+          : "";
+        ProfileEmailVerified = false;
+        emailSent = false;
+        authedUserEmailVerified = false;
+      }}
+    />
+  </div>
+
+  <!-- Status/Action area (20%) -->
+  <div class="w-[20%] flex justify-end items-center text-2xs text-nowrap mt-1 ml-2">
+    {#if isLoading}
+      <span class="text-primary-600 flex items-center text-xs">
+        <Icon icon="line-md:loading-alt-loop" class="w-4 h-4 mr-1" />
+        Verifying...
+      </span>
+    {:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
+      <button
+        type="submit"
+        class="text-primary-600 text-xs font-semibold hover:underline cursor-pointer disabled:cursor-not-allowed"
+        disabled={
+          !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(formData.email) ||
+          formData.email.split("@")[1].includes("gamil")
+        }
+      >
+        Verify
+      </button>
+    {:else if emailSent}
+      <span class="text-green-600 text-xs flex items-center">
+        {#if isOtpVerified}
+          Verified
+          <Icon icon="material-symbols:verified-rounded" class="w-4 h-4 ml-1" />
+        {:else}
+          <Icon icon="fluent:mail-all-read-16-filled" class="w-4 h-4 mr-1" />
+          Check your inbox
+        {/if}
+      </span>
+    {:else}
+      <span class="text-green-600 text-xs flex items-center">
+        Verified
+        <Icon icon="material-symbols:verified-rounded" class="w-4 h-4 ml-1" />
+      </span>
+    {/if}
+
+    {#if showEmailError}
                       <div
                         class="text-red-500 sm:text-xs text-2s font-medium mt-1"
                       >
                         *Required
                       </div>
                     {/if}
-                    <!-- {#if showEmailVerifyError}
-  <div class="text-red-500 sm:text-xs text-2s font-medium mt-1">Please select at least one issue.</div>
-{/if} -->
-                    {#if isLoading}
-                      <span
-                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
-                      >
-                        <Icon
-                          icon="line-md:loading-alt-loop"
-                          class="w-4 h-4 mr-1"
-                        />
-                        Verifying...
-                      </span>
-                    {:else if !ProfileEmailVerified && !emailSent && authedUserEmailVerified !== true && data.isEmailVerified !== true}
-                      <button
-                        type="submit"
-                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 hover:underline cursor-pointer disabled:cursor-not-allowed"
-                        disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-                          formData.email,
-                        ) || formData.email.split("@")[1].includes("gamil")}
-                      >
-                        Verify
-                      </button>
-                    {:else if emailSent}
-                      <span
-                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-                      >
-                        {#if isOtpVerified}
-                          Verified
-                          <Icon
-                            icon="material-symbols:verified-rounded"
-                            class="w-4 h-4 mt-2 ml-1"
-                          />
-                        {:else}
-                          <Icon
-                            icon="fluent:mail-all-read-16-filled"
-                            class="w-4  h-4 mr-1"
-                          />
-                          Check your inbox
-                        {/if}
-                      </span>
-                    {:else}
-                      <span
-                        class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-                      >
-                        Verified
-                        <Icon
-                          icon="material-symbols:verified-rounded"
-                          class="w-4 h-4 ml-1"
-                        />
-                      </span>
-                    {/if}
+  </div>
+</div>
+         
                   </div>
                 </form>
 
