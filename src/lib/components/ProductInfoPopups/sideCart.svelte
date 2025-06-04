@@ -246,7 +246,7 @@
             } else if (orderMultiple) {
               let adjustedQuantity =
                 Math.round(inputValue / orderMultiple) * orderMultiple;
-              $quantity = adjustedQuantity > 999 ? 999 : adjustedQuantity;
+              $quantity = adjustedQuantity > 100 ? 100 : adjustedQuantity;
               e.target.value = $quantity;
             }
 
@@ -265,11 +265,11 @@
             }
 
             let parsedValue = parseInt(e.target.value, 10);
-            $quantity = parsedValue > 999 ? 999 : parsedValue;
+            $quantity = parsedValue > 100 ? 100 : parsedValue;
             e.target.value = $quantity;
           }}
           aria-label="Quantity"
-          max="999"
+          max="100"
         />
         <button
           on:click={increaseQuantity}
