@@ -44,7 +44,7 @@
     let val = event.target.value.replace(/[^0-9]/g, "");
     if (val.startsWith("0")) val = val.slice(1);
     pricingQuantities.update((q) => {
-      q[variantId][index] = val ? Math.min(parseInt(val), 999) : "";
+      q[variantId][index] = val ? Math.min(parseInt(val), 100) : "";
       return q;
     });
   }
@@ -52,7 +52,7 @@
   function increaseRowQuantity(variantId, index) {
     pricingQuantities.update((q) => {
       const current = parseInt(q[variantId][index] || "0", 10);
-      if (current < 999) q[variantId][index] = current + 1;
+      if (current < 100) q[variantId][index] = current + 1;
       return q;
     });
   }

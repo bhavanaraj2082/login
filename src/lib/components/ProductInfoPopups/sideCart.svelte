@@ -147,82 +147,67 @@
     </div>
 
     <div class="w-full !ml-0">
-      {#if $quantity > 0}
-        <div class="mt-2 flex justify-between gap-3">
+      <!-- {#if $quantity > 0} -->
+        <div
+          class={`mt-2 flex justify-between gap-3 transition-all duration-200 ${
+            $quantity > 0 ? '' : 'invisible h-0 overflow-hidden min-w-[225px]'
+          }`}
+        >
           <div class="flex flex-col text-heading">
             <p class="font-medium text-sm">Quantity</p>
             <p class="font-semibold text-center text-md mt-4">{$quantity}</p>
           </div>
-          <div class="flex flex-col text-heading">
-            <p
-              class="font-normal flex justify-between items-center text-xs py-px whitespace-nowrap"
-            >
+
+          <div class="flex flex-col text-heading min-w-[160px]">
+            <p class="font-normal flex justify-between items-center text-xs py-px whitespace-nowrap">
               Base Price:
-              <span class="font-medium text-xs">
+              <span class="font-medium text-xs min-w-[80px] text-right inline-block">
                 {#if $currencyState === "usd"}
-                  $ {(
-                    (Number(product?.priceSize[index]?.USD) || 0) *
-                    (Number($quantity) || 0)
-                  ).toLocaleString("en-US", {
+                  $ {(Number(product?.priceSize[index]?.USD) * Number($quantity) || 0).toLocaleString("en-US", {
                     minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
+                    maximumFractionDigits: 2
                   })}
                 {:else}
-                  ₹ {(
-                    (Number(product?.priceSize[index]?.INR) || 0) *
-                    (Number($quantity) || 0)
-                  ).toLocaleString("en-IN", {
+                  ₹ {(Number(product?.priceSize[index]?.INR) * Number($quantity) || 0).toLocaleString("en-IN", {
                     minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
+                    maximumFractionDigits: 2
                   })}
                 {/if}
               </span>
             </p>
 
-            <p
-              class="font-normal flex justify-between items-center text-xs border-b-1 border-gray-400 border-dotted pb-1 whitespace-nowrap"
-            >
+            <p class="font-normal flex justify-between items-center text-xs border-b border-gray-400 border-dotted pb-1 whitespace-nowrap">
               GST (18%):
-              <span class="font-medium text-xs">
+              <span class="font-medium text-xs min-w-[80px] text-right inline-block">
                 {#if $currencyState === "usd"}
-                  $ {(
-                    (Number(product?.priceSize[index]?.USD) || 0) *
-                    0.18 *
-                    (Number($quantity) || 0)
-                  ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  $ {(Number(product?.priceSize[index]?.USD) * 0.18 * Number($quantity) || 0).toLocaleString("en-US", {
+                    minimumFractionDigits: 2
+                  })}
                 {:else}
-                  ₹ {(
-                    (Number(product?.priceSize[index]?.INR) || 0) *
-                    0.18 *
-                    (Number($quantity) || 0)
-                  ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  ₹ {(Number(product?.priceSize[index]?.INR) * 0.18 * Number($quantity) || 0).toLocaleString("en-IN", {
+                    minimumFractionDigits: 2
+                  })}
                 {/if}
               </span>
             </p>
 
-            <p
-              class="font-medium text-xs mt-1 flex justify-between items-center whitespace-nowrap"
-            >
+            <p class="font-medium text-xs mt-1 flex justify-between items-center whitespace-nowrap">
               Total Price:
-              <span class="font-semibold text-xs">
+              <span class="font-semibold text-xs min-w-[80px] text-right inline-block">
                 {#if $currencyState === "usd"}
-                  $ {(
-                    (Number(product?.priceSize[index]?.USD) || 0) *
-                    1.18 *
-                    (Number($quantity) || 0)
-                  ).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  $ {(Number(product?.priceSize[index]?.USD) * 1.18 * Number($quantity) || 0).toLocaleString("en-US", {
+                    minimumFractionDigits: 2
+                  })}
                 {:else}
-                  ₹ {(
-                    (Number(product?.priceSize[index]?.INR) || 0) *
-                    1.18 *
-                    (Number($quantity) || 0)
-                  ).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  ₹ {(Number(product?.priceSize[index]?.INR) * 1.18 * Number($quantity) || 0).toLocaleString("en-IN", {
+                    minimumFractionDigits: 2
+                  })}
                 {/if}
               </span>
             </p>
           </div>
         </div>
-      {/if}
+      <!-- {/if} -->
       <div
         class="flex items-center border border-gray-300 justify-between w-full space-x-4 mt-5 rounded-md"
       >
@@ -246,7 +231,7 @@
             } else if (orderMultiple) {
               let adjustedQuantity =
                 Math.round(inputValue / orderMultiple) * orderMultiple;
-              $quantity = adjustedQuantity > 999 ? 999 : adjustedQuantity;
+              $quantity = adjustedQuantity > 100 ? 100 : adjustedQuantity;
               e.target.value = $quantity;
             }
 
@@ -265,11 +250,11 @@
             }
 
             let parsedValue = parseInt(e.target.value, 10);
-            $quantity = parsedValue > 999 ? 999 : parsedValue;
+            $quantity = parsedValue > 100 ? 100 : parsedValue;
             e.target.value = $quantity;
           }}
           aria-label="Quantity"
-          max="999"
+          max="100"
         />
         <button
           on:click={increaseQuantity}
