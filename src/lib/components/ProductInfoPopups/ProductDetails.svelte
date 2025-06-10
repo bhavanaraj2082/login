@@ -155,7 +155,7 @@
   const increaseQuantity = () => {
     quantity.update((q) => {
       let newQuantity = q + orderMultiple;
-      return newQuantity > 999 ? 999 : newQuantity;
+      return newQuantity > 100 ? 100 : newQuantity;
     });
   };
 

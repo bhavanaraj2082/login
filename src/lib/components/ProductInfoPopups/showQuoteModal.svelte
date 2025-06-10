@@ -56,7 +56,7 @@
     validateCountry();
     validatePhoneNumber(country, phone);
 
-    if (!(isOtpVerified === true)) {
+    if (Object.keys(formErrors).length === 0 && !(isOtpVerified === true)) {
       toast.error("Please verify your email to proceed");
     }
 

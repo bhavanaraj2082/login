@@ -11,11 +11,13 @@
         <div class="flex max-md:block gap-4">
           <div class="col-span-1 w-full">
             {#each Object.entries(product.filteredProductData).filter(([key]) => key !== "Synonym(s)" && key !== "CAS Number") as [key, value]}
-              <div class="grid grid-cols-[130px_1fr] gap-x-2 py-0.5 w-full">
-                <h4 class="text-sm font-medium text-gray-800 break-words">
+              <div class="grid grid-cols-[130px_1fr] gap-x-2 py-0.5 w-full min-w-0">
+                <h4 class="text-sm font-medium text-gray-800 break-words break-all whitespace-pre-wrap min-w-0">
                   {key}
                 </h4>
-                <p class="text-sm">{value}</p>
+                <p class="text-sm break-words break-all whitespace-pre-wrap min-w-0">
+                  {value}
+                </p>
               </div>
             {/each}
           </div>
