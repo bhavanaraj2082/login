@@ -79,6 +79,10 @@ const cartSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
+    isCheckout:{
+        type:Boolean,
+        default:false
+    },
     isActiveCart:{
         type:Boolean,
         default:false

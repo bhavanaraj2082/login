@@ -366,7 +366,7 @@ export const checkoutOrder = async (data) => {
 				actionName: "Ordered"
 			})
 		}
-		const cart = await Cart.findOneAndUpdate({ userId: order.userId, isActiveCart: true }, { $set: { "cartItems.$[elem].isQuote": false, "cartItems.$[elem].isCart": false }, isActiveCart: false }, { arrayFilters: [{ "elem._id": { $exists: true } }] })
+		const cart = await Cart.findOneAndUpdate({ userId: order.userId, isActiveCart: true }, { $set: { "cartItems.$[elem].isQuote": false, "cartItems.$[elem].isCart": false }, isActiveCart: false, isCheckout:true }, { arrayFilters: [{ "elem._id": { $exists: true } }] })
 		const admin = orderMsgToAdmin(newOrder, firstname, lastname)
 		const user = orderMsgToUser(newOrder, firstname, lastname)
 		sendEmail("New Order Created in Chemikart", admin, NOTIFICATION_TARGET_EMAIL)
@@ -3238,6 +3238,7 @@ export const resumeCart = async (cartId, userId) => {
 			{
 				$set: {
 					isActiveCart: true,
+					isCheckout:false,
 					updatedAt: new Date()
 				}
 			},
