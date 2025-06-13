@@ -110,7 +110,7 @@
 		}
 		quantity = Math.abs(quantity)
 		clearTimeout(timeout);
-		if (quantity > 10000000) quantity = 10000000;
+		if (quantity > 100) quantity = 100;
 		timeout = setTimeout(() => {
 		if(quantity <= stock.orderMultiple ) quantity = stock.orderMultiple
 		const selectedQty = Math.ceil(quantity/ stock.orderMultiple) * stock.orderMultiple
@@ -159,7 +159,7 @@
 		// console.log("indx",indx);
 		if (!isLoggedIn) {
 			cart.update((item) => {
-				if(item[indx].quantity >= 10000000) return item
+				if(item[indx].quantity >= 100) return item
 				item[indx].quantity += item[indx].stockDetails.orderMultiple;
 				return item;
 			});
@@ -170,7 +170,7 @@
 		const index = $cart.findIndex((item) => item._id === _id);
 		if (index !== -1) {
 			cart.update((item) => {
-				if(item[indx].quantity >= 10000000) return item
+				if(item[indx].quantity >= 100) return item
 				item[index].quantity += item[indx].stockDetails.orderMultiple;
 				return item;
 			});
@@ -534,8 +534,8 @@
 								<div class="flex items-center">
 					
 									<input type="number" bind:value={item.quantity} on:input={(e) =>handleQty(parseInt(e.target.value),item?.stockDetails,item._id,index)}
-										class="{tog === index ? '' : 'hidden'} border-1 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400"
-							            min="1" max="10000000" />
+										class="{tog === index ? '' : 'hidden'} border-1 w-24 border-gray-200 rounded outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400"
+							            min="1" max="100" />
 									<div class=" {tog === index ? 'hidden' : ''} flex items-center border-1 rounded">
 									  {#if item.isCart || item.isQuote}
 									   <button class=" border-r-1 p-1.5 bg-gray-200 text-white ">

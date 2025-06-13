@@ -251,10 +251,10 @@ function calculateTotalPrice(price, quantity) {
         if(isNaN(quantity) || quantity <= 0){
             quantity = 1
         }
-        if(quantity >= 10000000) quantity = 10000000
+        if(quantity >= 100) quantity = 100
          timeout = setTimeout(()=>{
             let selectedQty = Math.ceil(quantity/ item.stockInfo[0].orderMultiple) * item.stockInfo[0].orderMultiple;
-        //if(selectedQty >= 10000000) selectedQty = 10000000
+        //if(selectedQty >= 100) selectedQty = 100
         console.log(selectedQty,"qty");
          item.quantity = selectedQty
          favData = [...favData];
@@ -264,7 +264,7 @@ function calculateTotalPrice(price, quantity) {
     }
 
     function increaseQuantity(item,orderMultiple) {
-               if(item.quantity >= 10000000){
+               if(item.quantity >= 100){
                 return
                }
               item.quantity = parseInt(item.quantity) + orderMultiple;
@@ -604,7 +604,7 @@ onMount(() => {
                     <div class="flex items-center">
                     <input type="number" bind:value={item.quantity}
                      on:input={e=>handleQty(item,parseInt(e.target.value))}
-                    class="{tog === index ? "" : "hidden"} border-1 w-40 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">   
+                    class="{tog === index ? "" : "hidden"} border-1 w-40 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="100">   
                     <div class=" {tog === index ? "hidden" : ""} flex items-center w-40 justify-center md:justify-start border-1 rounded-md">
                         <button 
                             on:click={() => decreaseQuantity(item,item.stockInfo[item.specIndex].orderMultiple)} 
