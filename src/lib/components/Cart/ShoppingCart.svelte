@@ -236,8 +236,8 @@ const downloadExcel = async () => {
 			//calculateTotalPrice($cart)
 			quantity = 1
 		}
-		if (quantity > 10000000){
-			quantity = 10000000
+		if (quantity > 100){
+			quantity = 100
 		}
 		if(quantity <= stock.orderMultiple || isNaN(quantity)) quantity = stock.orderMultiple
 		clearTimeout(timeout)
@@ -287,7 +287,7 @@ const downloadExcel = async () => {
 	}
 
 	const incrementQuantity = (quantity,stock,_id,indx) => {
-		if (quantity >= 10000000) return
+		if (quantity >= 100) return
 		clearTimeout(timeout)
         checkoutDisabled = true
 		if(!isLoggedIn){
@@ -586,7 +586,7 @@ const downloadExcel = async () => {
 							        <div class="flex items-center md:w-2/12">
 										<input type="number" bind:value={item.quantity}
 										on:input={e=>handleQty(parseInt(e.target.value),item?.stockDetails,item._id,index)}
-										class="{tog === index ? "" : "hidden"} border border-gray-200 rounded-md outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
+										class="{tog === index ? "" : "hidden"} border w-24 border-gray-200 rounded-md outline-none text-xs p-1 font-medium focus:ring-0 focus:border-primary-400" min="1" max="100">
 							        	<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded-md">
 							        		{#if item.isCart || item.isQuote}
 											<button

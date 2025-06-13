@@ -188,7 +188,7 @@ function handleMouseLeave() {
             quantity = 1
         }
         quantity = Math.abs(quantity)
-        if(quantity >10000000) quantity = 10000000
+        if(quantity >100) quantity = 100
         if(quantity === 0) quantity = 1
          clearTimeout(timeout)
          timeout = setTimeout(()=>{
@@ -237,7 +237,7 @@ function handleMouseLeave() {
         if (product._id === id) {
            let stockDetails = product.stockDetails.map(x=>{
               if(x.stockId === stockId){
-                if(x.quantity >= 10000000) return x
+                if(x.quantity >= 100) return x
                 let priceINR = x.pricing.INR*(x.quantity+x.orderMultiple)
                 let priceUSD = x.pricing.USD*(x.quantity+x.orderMultiple)
                 return {...x,quantity: x.quantity + x.orderMultiple,totalPrice:{priceINR,priceUSD}};
@@ -753,7 +753,7 @@ function handleMouseLeave() {
                             <div class="flex items-center">
                                 <input type="number" value={product?.stockDetails[product.stockIndex]?.quantity}
 					            on:input={e=>handleQty(product?._id,product?.stockDetails[product.stockIndex]?.stockId,parseInt(e.target.value))}
-					            class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
+					            class="{tog === index ? "" : "hidden"} border-1 w-24 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="100">
 					        <div class=" {tog === index ? "hidden" : ""} flex items-center border-1 border-primary-300 rounded-md">
 						    <button
 							on:click={() => decrementQuantity(product?._id, product?.stockDetails[product.stockIndex].stockId)}
@@ -800,7 +800,7 @@ function handleMouseLeave() {
                     <div class="flex items-center">
                         <input type="number" value={product?.stockDetails[product.stockIndex]?.quantity}
 					on:input={e=>handleQty(product._id,product?.stockDetails[product?.stockIndex]?.stockId,parseInt(e.target.value))}
-					class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="10000000">
+					class="{tog === index ? "" : "hidden"} border-1 border-gray-200 rounded-md outline-none text-xs p-2 font-medium focus:ring-0 focus:border-primary-400" min="1" max="100">
 					<div class=" {tog === index ? "hidden" : ""} flex items-center border-1 rounded-md">
 						<button
 							on:click={() => decrementQuantity(product?._id,product?.stockDetails[product.stockIndex].stockId)}
