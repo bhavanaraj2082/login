@@ -677,14 +677,14 @@ function handleMouseLeave() {
             </div>
             <div class=" flex items-start gap-2 md:gap-8">
                 <!-- <a href={`/products/${categoryName}/${subCategoryName}/${product?.productNumber}`}> -->
-                <div class="relative">
+                <div class="relative shrink-0">
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
                 <img 
                 src="{PUBLIC_IMAGE_URL}/{product?.image}"
                 onerror="this.src='{PUBLIC_IMAGE_URL}/default.jpg'" 
                 loading="lazy"
-                class="cursor-pointer w-28 h-28 sm:w-36 sm:h-36 object-contain" 
+                class="cursor-pointer shrink-0 w-20 h-20 xs:w-28 xs:h-28 sm:w-36 sm:h-36 lg:w-40 lg:h-36 object-contain" 
                 alt=""
                 on:click={() => imagemodal(product?.image)}
                 on:mouseenter={() => handleMouseEnter(product?.image , index)}
@@ -702,7 +702,7 @@ function handleMouseLeave() {
                 </div>
               {/if}
 
-                {#if showimage}
+          {#if showimage}
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
 					<div
@@ -725,7 +725,7 @@ function handleMouseLeave() {
 							<img src="{PUBLIC_IMAGE_URL}/{selectedImage}" alt="image" class=" w-56 h-56 md:w-96 md:h-96 mx-auto object-contain" />
 						</div>
 					</div>
-				{/if}
+				  {/if}
                 <!-- </a> -->
                 </div>
                 <div class=" text-xs md:text-sm space-y-1 grow font-medium">
@@ -737,7 +737,7 @@ function handleMouseLeave() {
                     <p>Manufacturer : <span class=" font-semibold ">{product?.manufacturerDetails.name || ""}</span></p>
                     <!-- <p>Price : <span class=" font-semibold">{$currencyState === "inr" ? "₹" + product?.pricing.INR.toLocaleString("en-IN"): "$"+ product?.pricing.USD.toLocaleString("en-IN")}</span></p> -->
                     {#if product?.stockDetails.length > 0 && Object.keys(product?.stockDetails[0]?.pricing).length > 0}
-                    <div class=" flex gap-1 items-center">Size :
+                    <div class=" flex flex-wrap gap-1 items-center">Size :
                       {#each product?.stockDetails as {pricing},index }
                       <button on:click={()=>{
                         let search = products.find(x=>x._id === product._id)
