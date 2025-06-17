@@ -79,9 +79,8 @@
           ></div>
           <a href="/products/{category.urlName}" class="block relative z-10">
             <div class="relative">
-              <img
-                src="/category/{category.name}.webp"
-                alt={category.name}
+              <img src={`/category/${category.name === "Inhibitors/Agonists" ? "InhibitorsAgonists" : category.name}.webp`} 
+                alt={category.name} 
                 class="w-full h-60 object-cover opacity-90 transition-transform duration-1000 ease-in-out group-hover:scale-105 group-hover:opacity-100"
               />
             </div>
