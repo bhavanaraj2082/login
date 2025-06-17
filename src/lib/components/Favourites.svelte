@@ -502,7 +502,7 @@ onMount(() => {
                                     : 'Price not available'}
                         </span>
                     </p>
-                        <div class=" text-sm sm:text-2s md:text-xs lg:text-sm font-semibold flex gap-2">
+                        <div class=" text-sm sm:text-2s md:text-xs lg:text-sm font-semibold flex flex-wrap gap-2">
                             Specification: 
                             {#each item.stockInfo as spec,index }
                             <button on:click={()=>{
