@@ -366,7 +366,7 @@ export const checkoutOrder = async (data) => {
 				actionName: "Ordered"
 			})
 		}
-		const cart = await Cart.findOneAndUpdate({ userId: order.userId, isActiveCart: true }, { $set: { "cartItems.$[elem].isQuote": false, "cartItems.$[elem].isCart": false }, isActiveCart: false, isCheckout:true }, { arrayFilters: [{ "elem._id": { $exists: true } }] })
+		const cart = await Cart.findOneAndUpdate({ userId: order.userId, isActiveCart: true }, { $set: { "cartItems.$[elem].isQuote": false, "cartItems.$[elem].isCart": false }, isActiveCart: false, isCheckout: true }, { arrayFilters: [{ "elem._id": { $exists: true } }] })
 		const admin = orderMsgToAdmin(newOrder, firstname, lastname)
 		const user = orderMsgToUser(newOrder, firstname, lastname)
 		sendEmail("New Order Created in Chemikart", admin, NOTIFICATION_TARGET_EMAIL)
@@ -771,7 +771,7 @@ export const loginWithGoogle = async (userData, cookies) => {
 			key: {
 				providerId: 'email',
 				providerUserId: userData.email,
-				password: null 
+				password: null
 			},
 			attributes: {
 				username: userData.firstname,
@@ -785,7 +785,7 @@ export const loginWithGoogle = async (userData, cookies) => {
 			firstName: userData.firstname,
 			lastName: userData.lastname,
 			email: userData.email,
-      		profilePicture: userData.profilePicture,
+			profilePicture: userData.profilePicture,
 			isEmailVerified: userData.isEmailVerified,
 			profilePicture: userData.profilePicture,
 			needsPasswordSetup: true,
@@ -2481,18 +2481,24 @@ export const addAllToCart = async (items, userId, userEmail) => {
 //Myfavouries actions ends
 
 
+
 // export const quicksearch = async ({ query }) => {
 // 	const startTime = Date.now();
 // 	console.log(query, "query");
+
 // 	try {
 // 		if (!query || !query.trim()) {
 // 			return [];
 // 		}
 
-// 		const trimmedQuery = query.trim();
-// 		const isLongQuery = trimmedQuery.length > 8;
-// 		let stockQuery;
+// 		const trimmedQuery = query.trim().toUpperCase();
+// console.log(trimmedQuery,"trimmedQuery");
 
+// 		const isLongQuery = trimmedQuery.length > 8;
+// 		const regexPattern = isLongQuery ? null : new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+// console.log(regexPattern,"regexPattern");
+
+// 		let stockQuery;
 // 		if (isLongQuery) {
 // 			stockQuery = {
 // 				$or: [
@@ -2501,7 +2507,6 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 				]
 // 			};
 // 		} else {
-// 			const regexPattern = new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
 // 			stockQuery = {
 // 				$or: [
 // 					{ sku: { $regex: regexPattern } },
@@ -2509,36 +2514,20 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 				]
 // 			};
 // 		}
-
 // 		const stockItems = await Stock.find(stockQuery)
 // 			.select('_id stock pricing distributor manufacturer productNumber productid sku')
-// 			.limit(50) 
+// 			.limit(50)
 // 			.lean()
 // 			.exec();
-
 // 		if (stockItems.length === 0) {
-// 			// const productQuery = isLongQuery ? 
-// 			// 	{
-// 			// 		$or: [
-// 			// 			{ productName: trimmedQuery },
-// 			// 			{ productNumber: trimmedQuery }
-// 			// 		]
-// 			// 	} : 
-// 			// 	{
-// 			// 		$or: [
-// 			// 			{ productName: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } },
-// 			// 			{ productNumber: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } }
-// 			// 		]
-// 			// 	};
-// const productQuery = isLongQuery ? 
-//     { productNumber: trimmedQuery } : 
-//     { productNumber: { $regex: new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') } };
+// 			const productQuery = isLongQuery ?
+// 				{ productNumber: trimmedQuery } :
+// 				{ productNumber: { $regex: regexPattern } };
 // 			const directProducts = await Product.find(productQuery)
-// 				.select('_id productName productNumber image')
-// 				.limit(50)
+// 				.select('_id productName productNumber image prodDesc')
+// 				.limit(20)
 // 				.lean()
 // 				.exec();
-
 // 			return directProducts.map(product => ({
 // 				id: product._id.toString(),
 // 				image: product.image || null,
@@ -2554,73 +2543,90 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 				sku: null
 // 			}));
 // 		}
-// 		const productIds = [...new Set(stockItems.map(item => item.productid).filter(Boolean))];
+// 		const productIds = stockItems
+// 			.map(item => item.productid)
+// 			.filter(Boolean)
+// 			.filter((id, index, arr) => arr.indexOf(id) === index);
 
 // 		if (productIds.length === 0) {
 // 			return [];
 // 		}
 // 		const [currency, products] = await Promise.all([
-// 			Curconversion.findOne({ currency: 'USD' }).sort({ createdAt: -1 }).lean().exec(),
+// 			Curconversion.findOne({ currency: 'USD' })
+// 				.sort({ createdAt: -1 })
+// 				.select('rate')
+// 				.lean()
+// 				.exec(),
 // 			Product.find({ _id: { $in: productIds } })
-// 				.select('_id productName productNumber image')
+// 				.select('_id productName productNumber image prodDesc')
 // 				.lean()
 // 				.exec()
 // 		]);
-// 		const productMap = {};
+
+// 		const productMap = new Map();
 // 		products.forEach(product => {
-// 			productMap[product._id.toString()] = product;
+// 			productMap.set(product._id.toString(), product);
 // 		});
 
 // 		const rate = currency?.rate || 1;
-// 		const result = stockItems
-// 			.map(stockItem => {
-// 				const productId = stockItem.productid?.toString();
-// 				const product = productMap[productId];
+// 		const result = [];
+// 		for (const stockItem of stockItems) {
+// 			const productId = stockItem.productid?.toString();
+// 			const product = productMap.get(productId);
 
-// 				if (!product) return null;
-// 				let priceoneValue = "";
-// 				let processedPricing = [];
+// 			if (!product) continue;
 
-// 				if (stockItem.pricing) {
-// 					const entryPricing = Array.isArray(stockItem.pricing) ? stockItem.pricing : [stockItem.pricing];
+// 			let priceoneValue = "";
+// 			let processedPricing = [];
 
-// 					if (entryPricing.length > 0) {
-// 						const firstPrice = entryPricing[0];
+// 			if (stockItem.pricing) {
+// 				const entryPricing = Array.isArray(stockItem.pricing) ? stockItem.pricing : [stockItem.pricing];
 
-// 						if (firstPrice?.INR !== undefined && firstPrice?.INR !== null) {
-// 							priceoneValue = firstPrice.INR;
-// 							processedPricing = entryPricing.map(price => ({
-// 								...price,
-// 								USD: (price.INR / rate).toFixed(2)
-// 							}));
-// 						} else if (firstPrice?.USD !== undefined && firstPrice?.USD !== null) {
-// 							priceoneValue = firstPrice.USD;
-// 							processedPricing = entryPricing.map(price => ({
-// 								...price,
-// 								INR: (price.USD * rate).toFixed(2)
-// 							}));
+// 				if (entryPricing.length > 0) {
+// 					const firstPrice = entryPricing[0];
+
+// 					// console.log('Pricing data:', JSON.stringify(firstPrice, null, 2));
+
+// 					if (firstPrice?.INR !== undefined && firstPrice?.INR !== null && firstPrice.INR !== "") {
+// 						priceoneValue = firstPrice.INR.toString();
+// 						processedPricing = entryPricing.map(price => ({
+// 							...price,
+// 							USD: price.INR ? (price.INR / rate).toFixed(2) : "0.00"
+// 						}));
+// 					} else if (firstPrice?.USD !== undefined && firstPrice?.USD !== null && firstPrice.USD !== "") {
+// 						priceoneValue = firstPrice.USD.toString();
+// 						processedPricing = entryPricing.map(price => ({
+// 							...price,
+// 							INR: price.USD ? (price.USD * rate).toFixed(2) : "0.00"
+// 						}));
+// 					} else {
+// 						for (const [key, value] of Object.entries(firstPrice)) {
+// 							if (typeof value === 'number' && value > 0) {
+// 								priceoneValue = value.toString();
+// 								break;
+// 							}
 // 						}
 // 					}
 // 				}
+// 			}
 
-// 				return {
-// 					id: product._id.toString(),
-// 					image: product.image || null,
-// 					description: product.prodDesc || null,
-// 					productName: product.productName,
-// 					productNumber: product.productNumber,
-// 					stockId: stockItem._id.toString(),
-// 					manufacturer: stockItem.manufacturer?.toString() || null,
-// 					distributer: stockItem.distributor?.toString() || null,
-// 					stock: stockItem.stock || 0,
-// 					priceone: priceoneValue,
-// 					pricing: processedPricing,
-// 					sku: stockItem.sku || null
-// 				};
-// 			})
-// 			.filter(Boolean);
+// 			result.push({
+// 				id: product._id.toString(),
+// 				image: product.image || null,
+// 				description: product.prodDesc || null,
+// 				productName: product.productName,
+// 				productNumber: product.productNumber,
+// 				stockId: stockItem._id.toString(),
+// 				manufacturer: stockItem.manufacturer?.toString() || null,
+// 				distributer: stockItem.distributor?.toString() || null,
+// 				stock: stockItem.stock || 0,
+// 				priceone: priceoneValue,
+// 				pricing: processedPricing,
+// 				sku: stockItem.sku || null
+// 			});
+// 		}
 
-// 		console.log(`Quicksearch completed in ${Date.now() - startTime}ms`);
+// 		// console.log(`Quicksearch completed in ${Date.now() - startTime}ms`);
 // 		return result;
 
 // 	} catch (error) {
@@ -2628,45 +2634,36 @@ export const addAllToCart = async (items, userId, userEmail) => {
 // 		throw new Error("An error occurred while processing the quicksearch.");
 // 	}
 // };
+
+
 export const quicksearch = async ({ query }) => {
 	const startTime = Date.now();
-	console.log(query, "query");
-
 	try {
 		if (!query || !query.trim()) {
 			return [];
 		}
 
-		const trimmedQuery = query.trim().toUpperCase();
+		const trimmedQuery = query.trim();
+		console.log(trimmedQuery, "trimmedQuery");
 
 		const isLongQuery = trimmedQuery.length > 8;
-		const regexPattern = isLongQuery ? null : new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+		const regexPattern = new RegExp(trimmedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+		const stockQuery = {
+			$or: [
+				{ sku: { $regex: regexPattern } },
+				{ productNumber: { $regex: regexPattern } }
+			]
+		};
 
-		let stockQuery;
-		if (isLongQuery) {
-			stockQuery = {
-				$or: [
-					{ sku: trimmedQuery },
-					{ productNumber: trimmedQuery }
-				]
-			};
-		} else {
-			stockQuery = {
-				$or: [
-					{ sku: { $regex: regexPattern } },
-					{ productNumber: { $regex: regexPattern } }
-				]
-			};
-		}
 		const stockItems = await Stock.find(stockQuery)
 			.select('_id stock pricing distributor manufacturer productNumber productid sku')
 			.limit(50)
 			.lean()
 			.exec();
+
 		if (stockItems.length === 0) {
-			const productQuery = isLongQuery ?
-				{ productNumber: trimmedQuery } :
-				{ productNumber: { $regex: regexPattern } };
+			const productQuery = { productNumber: { $regex: regexPattern } };
+
 			const directProducts = await Product.find(productQuery)
 				.select('_id productName productNumber image prodDesc')
 				.limit(20)
@@ -2687,6 +2684,7 @@ export const quicksearch = async ({ query }) => {
 				sku: null
 			}));
 		}
+
 		const productIds = stockItems
 			.map(item => item.productid)
 			.filter(Boolean)
@@ -2695,6 +2693,7 @@ export const quicksearch = async ({ query }) => {
 		if (productIds.length === 0) {
 			return [];
 		}
+
 		const [currency, products] = await Promise.all([
 			Curconversion.findOne({ currency: 'USD' })
 				.sort({ createdAt: -1 })
@@ -2728,8 +2727,6 @@ export const quicksearch = async ({ query }) => {
 
 				if (entryPricing.length > 0) {
 					const firstPrice = entryPricing[0];
-
-					// console.log('Pricing data:', JSON.stringify(firstPrice, null, 2));
 
 					if (firstPrice?.INR !== undefined && firstPrice?.INR !== null && firstPrice.INR !== "") {
 						priceoneValue = firstPrice.INR.toString();
@@ -2770,15 +2767,12 @@ export const quicksearch = async ({ query }) => {
 			});
 		}
 
-		// console.log(`Quicksearch completed in ${Date.now() - startTime}ms`);
 		return result;
 
 	} catch (error) {
-		console.error("Error in quicksearch:", error);
 		throw new Error("An error occurred while processing the quicksearch.");
 	}
 };
-
 
 export const uploadFile = async ({ query }) => {
 	const startTime = Date.now();
@@ -3238,7 +3232,7 @@ export const resumeCart = async (cartId, userId) => {
 			{
 				$set: {
 					isActiveCart: true,
-					isCheckout:false,
+					isCheckout: false,
 					updatedAt: new Date()
 				}
 			},

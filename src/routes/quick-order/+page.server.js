@@ -135,6 +135,8 @@ export const actions = {
   quicksearch: async ({ request }) => {
     const data = Object.fromEntries(await request.formData());
     const { quickSearch } = data;
+    console.log(data,"data");
+    
 
     if (quickSearch && quickSearch.length >= 0) {
       try {

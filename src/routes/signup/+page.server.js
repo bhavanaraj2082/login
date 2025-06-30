@@ -3,16 +3,49 @@ import { sendemailOtp, verifyemailOtp } from "$lib/server/mongoActions.js";
 import { sanitizeFormData } from "$lib/utils/sanitize.js";
 import Profile from "$lib/server/models/Profile.js";
 import TokenVerification from "$lib/server/models/TokenVerification.js";
-
+import { sendRegistrationSuccessEmail } from '$lib/server/emailRegister.js';
 export const actions = {
-  register: async ({ request,cookies }) => {
+  register: async ({ request, cookies }) => {
     try {
-      const body = Object.fromEntries(await request.formData());      
-      return await signUp(body,cookies);  
+      const body = Object.fromEntries(await request.formData());
+      console.log(body, "body");
+
+      const result = await signUp(body, cookies);
+       console.log(result,"resultttttttttttttttttttttttttttttttttttttttttt");
+
+      if (result && (result.success === true || result.message === "Signup successful" || result.record)) {
+
+        const userEmail = body.email || result.record?.email || result.email;
+        const username = body.username || body.firstName || result.record.username;
+
+        if (userEmail && userEmail.trim()) {
+
+          try {
+            await sendRegistrationSuccessEmail(userEmail, username);
+            // console.log('Registration success email sent successfully to:', userEmail);
+          }
+          catch (emailError) {
+            // console.error('Failed to send registration success email:', {
+            //     email: userEmail,
+            //     error: emailError.message,
+            //     stack: emailError.stack
+            // });
+            console.log("Email not sent")
+          }
+        }
+        // else {
+        //     console.warn('No valid email address found for sending registration email', {
+        //         bodyEmail: body.email,
+        //         resultRecordEmail: result.record?.email,
+        //         resultEmail: result.email
+        //     });
+        // }
+      }
+      return result;
     } catch (error) {
       return {
-        success:false,
-        message:"Something went wrong while processing your request. Please try again later" 
+        success: false,
+        message: "Something went wrong while processing your request. Please try again later"
       };
     }
   },
