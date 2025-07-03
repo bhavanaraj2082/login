@@ -105,7 +105,11 @@
   //   };
   // });
 
-  let CompareSimilarityData = compareSimilarity;
+  let CompareSimilarityData = [];
+  $: CompareSimilarityData = compareSimilarity && Array.isArray(compareSimilarity)
+    ? compareSimilarity
+    : [];
+
   // console.log("final RelatedProductData",RelatedProductData);
 
   let currentIndex = 0;
@@ -368,7 +372,7 @@
 </form>
 <div class="max-w-7xl mx-auto my-10">
   <div class="flex justify-between items-center mb-4 md:w-11/12 mx-auto">
-    <h3 class="text-xl font-bold text-heading p-1">Compare Similar Items</h3>
+    <h3 class="text-lg font-bold text-heading p-1 uppercase">Compare Similar Items</h3>
     <div class="flex items-center space-x-2 p-1">
       <h3 class="text-base font-bold text-heading">Show Difference</h3>
       <label class="relative inline-flex items-center cursor-pointer">
