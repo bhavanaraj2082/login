@@ -138,6 +138,15 @@ export const actions = {
           const existingKey = await auth
             .getKey("email", email)
             .catch(() => null);
+
+          const name = email
+            .trim()
+            .split("@")[0]
+            .replace(/[^a-zA-Z]/g, "");
+
+          const formattedName =
+            name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+
           if (!existingKey) {
             const luciaUser = await auth.createUser({
               key: {
@@ -145,13 +154,13 @@ export const actions = {
                 providerUserId: email,
                 password: null,
               },
-              attributes: { email, username: `${email.split("@")[0]}` },
+              attributes: { email, username: formattedName },
             });
             user = luciaUser;
             await new Profile({
               userId: luciaUser.userId,
               email,
-              firstName: `${email.split("@")[0]}`,
+              firstName: formattedName,
               needsPasswordSetup: true,
               sitePreferences: {
                 productEntryType: "Manual Entry",
