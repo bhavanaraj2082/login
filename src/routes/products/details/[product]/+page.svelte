@@ -101,9 +101,9 @@
     profile={data.profile}
   />
 {/if}
-{#if data.productData.length !== 0}
+<!-- {#if data.productData.length !== 0}
   <Properties data={data.productData} />
-{/if}
+{/if} -->
 {#if data.productData.length !== 0}
   <Description data={data.productData} />
 {/if}

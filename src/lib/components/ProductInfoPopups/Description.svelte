@@ -35,7 +35,7 @@
         <section
           class="md:w-11/12 max-w-7xl p-4 mx-auto text-justify bg-white shadow rounded m-10"
         >
-          <h2 class="text-xl font-bold mb-3">SAFETY INFORMATION</h2>
+          <h2 class="text-lg font-bold mb-3">SAFETY INFORMATION</h2>
           <ul class="list-disc pl-5">
             {#each product.safetyInfo as item}
               {#if item.includes(":")}
@@ -56,7 +56,7 @@
       <section
         class="md:w-11/12 max-w-7xl p-4 mx-auto text-justify bg-white shadow rounded m-10"
       >
-        <h2 class="text-xl font-bold mb-3">SAFETY INFORMATION</h2>
+        <h2 class="text-lg font-bold mb-3">SAFETY INFORMATION</h2>
         <div class="grid grid-cols-2 gap-9 md:grid-cols-3">
           {#each Object.entries(product.safetyInfo).filter( ([key, value]) => value?.trim() ) as [key, value]}
             <div>

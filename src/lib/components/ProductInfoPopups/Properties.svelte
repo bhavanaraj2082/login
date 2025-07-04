@@ -5,11 +5,11 @@
 {#each data.records as product}
   {#if product.properties && Object.keys(product.properties).length > 0}
     <div
-      class="md:w-11/12 max-w-7xl lg:flex mx-auto bg-white shadow rounded my-8"
+      class="lg:flex"
     >
-      <div class="p-4 w-full">
-        <button type="button" class="w-full text-left pb-2">
-          <h2 class="text-xl font-bold text-heading uppercase">Properties</h2>
+      <div class="w-full">
+        <button type="button" class="w-full text-left">
+          <h2 class="text-base font-bold text-heading uppercase">Properties</h2>
         </button>
         <div class="transition-all duration-300">
           <div class="flex max-md:block gap-4">
