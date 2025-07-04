@@ -83,7 +83,6 @@
                 alt={category.name} 
                 class="w-full h-60 object-cover opacity-90 transition-transform duration-1000 ease-in-out group-hover:scale-105 group-hover:opacity-100"
               />
-            </div>
             <div class="p-4 bg-white">
               <div class="flex justify-between items-center">
                 <h4
