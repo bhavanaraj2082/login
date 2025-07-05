@@ -373,7 +373,10 @@
                   action="?/favorite"
                   use:enhance={({ formData }) => {
                     formData.append("productId", product.productId);
-                    formData.append("manufacturerId", product?.manufacturer?._id);
+                    formData.append(
+                      "manufacturerId",
+                      product?.manufacturer?._id
+                    );
                     formData.append("authedEmail", authedEmail);
                     formData.append("stockId", selectedStockId);
                     formData.append("distributorId", product?.distributorId);
@@ -514,7 +517,8 @@
                       >Pack Size</th
                     >
                     <th class="px-1 border-b-1 border-gray-300">SKU</th>
-                    <th class="px-1 border-b-1 border-gray-300">Availability</th>
+                    <th class="px-1 border-b-1 border-gray-300">Availability</th
+                    >
                     <th class="px-1 border-b-1 border-gray-300">Price</th>
                   </tr>
                 </thead>
@@ -626,15 +630,21 @@
                     </div>
                     <div class="text-sm text-gray-700">
                       {#if $currencyState === "usd"}
-                        $ {(Number(priceItem.USD) || 0).toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
+                        $ {(Number(priceItem.USD) || 0).toLocaleString(
+                          "en-US",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        )}
                       {:else}
-                        ₹ {(Number(priceItem.INR) || 0).toLocaleString("en-IN", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
+                        ₹ {(Number(priceItem.INR) || 0).toLocaleString(
+                          "en-IN",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        )}
                       {/if}
                     </div>
                   </div>
@@ -646,7 +656,8 @@
           {#if !(product?.priceSize?.length > 0)}
             <div>
               <p class="text-gray-700 text-sm {!authedEmail ? 'mt-6' : ''}">
-                The price for this product is unavailable. Please request a quote
+                The price for this product is unavailable. Please request a
+                quote
               </p>
               <button
                 on:click={() => toggleQuoteModal(product)}
@@ -682,7 +693,7 @@
     <div class="!mx-0 mt-3">
       <!-- <AboutTheItem {data} /> -->
       {#if product.properties && Object.keys(product.properties).length > 0}
-      <Properties {data} />
+        <Properties {data} />
       {/if}
     </div>
   </div>
