@@ -2,10 +2,7 @@
   import Icon from "@iconify/svelte";
   import { enhance, applyAction } from "$app/forms";
   import { toast, Toaster } from "svelte-sonner";
-  import {
-    countries,
-    phoneNumberPatterns,
-  } from "$lib/Data/constants.js";
+  import { countries, phoneNumberPatterns } from "$lib/Data/constants.js";
 
   export let productName;
   export let toggleQuoteModal;
@@ -69,7 +66,7 @@
       return;
     }
     isSubmitting = true;
-    formData.append('email', email);
+    formData.append("email", email);
     return async ({ result, update }) => {
       console.log("result", result);
 
@@ -86,200 +83,7 @@
     };
   }
 
-  let currencies = [
-    "AFN",
-    "ALL",
-    "DZD",
-    "EUR",
-    "AOA",
-    "XCD",
-    "ARS",
-    "AMD",
-    "AUD",
-    "EUR",
-    "AZN",
-    "BSD",
-    "BHD",
-    "BDT",
-    "BBD",
-    "BYN",
-    "EUR",
-    "BZD",
-    "XOF",
-    "BTN",
-    "BOB",
-    "BAM",
-    "BWP",
-    "BRL",
-    "BND",
-    "BGN",
-    "XOF",
-    "BIF",
-    "CVE",
-    "KHR",
-    "XAF",
-    "CAD",
-    "XAF",
-    "XAF",
-    "CLP",
-    "CNY",
-    "COP",
-    "KMF",
-    "CDF",
-    "XAF",
-    "CRC",
-    "HRK",
-    "CUP",
-    "EUR",
-    "CZK",
-    "DKK",
-    "DJF",
-    "XCD",
-    "DOP",
-    "USD",
-    "EGP",
-    "USD",
-    "XAF",
-    "ERN",
-    "EUR",
-    "SZL",
-    "ETB",
-    "FJD",
-    "EUR",
-    "EUR",
-    "XAF",
-    "GMD",
-    "GEL",
-    "EUR",
-    "GHS",
-    "EUR",
-    "XCD",
-    "GTQ",
-    "GNF",
-    "XOF",
-    "GYD",
-    "HTG",
-    "HNL",
-    "HUF",
-    "ISK",
-    "INR",
-    "IDR",
-    "IRR",
-    "IQD",
-    "EUR",
-    "ILS",
-    "EUR",
-    "JMD",
-    "JPY",
-    "JOD",
-    "KZT",
-    "KES",
-    "AUD",
-    "KWD",
-    "KGS",
-    "LAK",
-    "EUR",
-    "LBP",
-    "LSL",
-    "LRD",
-    "LYD",
-    "CHF",
-    "EUR",
-    "EUR",
-    "MGA",
-    "MWK",
-    "MYR",
-    "MVR",
-    "XOF",
-    "EUR",
-    "USD",
-    "MRU",
-    "MUR",
-    "MXN",
-    "USD",
-    "MDL",
-    "EUR",
-    "MNT",
-    "EUR",
-    "MAD",
-    "MZN",
-    "MMK",
-    "NAD",
-    "AUD",
-    "NPR",
-    "EUR",
-    "NZD",
-    "NIO",
-    "XOF",
-    "NGN",
-    "MKD",
-    "NOK",
-    "OMR",
-    "PKR",
-    "USD",
-    "ILS",
-    "PAB",
-    "PGK",
-    "PYG",
-    "PEN",
-    "PHP",
-    "PLN",
-    "EUR",
-    "QAR",
-    "RON",
-    "RUB",
-    "RWF",
-    "XCD",
-    "XCD",
-    "XCD",
-    "WST",
-    "EUR",
-    "STN",
-    "SAR",
-    "XOF",
-    "RSD",
-    "SCR",
-    "SLL",
-    "SGD",
-    "EUR",
-    "EUR",
-    "SBD",
-    "SOS",
-    "ZAR",
-    "KRW",
-    "EUR",
-    "LKR",
-    "SDG",
-    "SRD",
-    "SEK",
-    "CHF",
-    "SYP",
-    "TWD",
-    "TJS",
-    "TZS",
-    "THB",
-    "XOF",
-    "TOP",
-    "TTD",
-    "TND",
-    "TRY",
-    "TMT",
-    "AUD",
-    "UGX",
-    "UAH",
-    "AED",
-    "GBP",
-    "USD",
-    "UYU",
-    "UZS",
-    "VUV",
-    "EUR",
-    "VES",
-    "VND",
-    "YER",
-    "ZMW",
-    "ZWL",
-  ];
+  let currencies = ["AFN","ALL","DZD","EUR","AOA","XCD","ARS","AMD","AUD","EUR","AZN","BSD","BHD","BDT","BBD","BYN","EUR","BZD","XOF","BTN","BOB","BAM","BWP","BRL","BND","BGN","XOF","BIF","CVE","KHR","XAF","CAD","XAF","XAF","CLP","CNY","COP","KMF","CDF","XAF","CRC","HRK","CUP","EUR","CZK","DKK","DJF","XCD","DOP","USD","EGP","USD","XAF","ERN","EUR","SZL","ETB","FJD","EUR","EUR","XAF","GMD","GEL","EUR","GHS","EUR","XCD","GTQ","GNF","XOF","GYD","HTG","HNL","HUF","ISK","INR","IDR","IRR","IQD","EUR","ILS","EUR","JMD","JPY","JOD","KZT","KES","AUD","KWD","KGS","LAK","EUR","LBP","LSL","LRD","LYD","CHF","EUR","EUR","MGA","MWK","MYR","MVR","XOF","EUR","USD","MRU","MUR","MXN","USD","MDL","EUR","MNT","EUR","MAD","MZN","MMK","NAD","AUD","NPR","EUR","NZD","NIO","XOF","NGN","MKD","NOK","OMR","PKR","USD","ILS","PAB","PGK","PYG","PEN","PHP","PLN","EUR","QAR","RON","RUB","RWF","XCD","XCD","XCD","WST","EUR","STN","SAR","XOF","RSD","SCR","SLL","SGD","EUR","EUR","SBD","SOS","ZAR","KRW","EUR","LKR","SDG","SRD","SEK","CHF","SYP","TWD","TJS","TZS","THB","XOF","TOP","TTD","TND","TRY","TMT","AUD","UGX","UAH","AED","GBP","USD","UYU","UZS","VUV","EUR","VES","VND","YER","ZMW","ZWL"];
 
   currencies = currencies.sort();
   let filteredCountries = countries;
@@ -340,8 +144,8 @@
   function validateUnits() {
     if (!units) {
       formErrors.units = "*Required";
-    } else if (Number(units) < 1 || Number(units) > 999) {
-      formErrors.units = "Units must be between 1 and 999.";
+    } else if (Number(units) < 1 || Number(units) > 100) {
+      formErrors.units = "Units must be between 1 and 100.";
     } else {
       delete formErrors.units;
     }
@@ -391,27 +195,30 @@
   function handleInputChange(event) {
     searchTerm = event.target.value.trim();
     const searchLower = searchTerm.toLowerCase();
-    const normalizedSearch = searchTerm.replace(/^\+/, '');
+    const normalizedSearch = searchTerm.replace(/^\+/, "");
     country = searchTerm;
 
     filteredCountries = countries
-      .filter((c) =>
-        c.name.toLowerCase().includes(searchLower) ||
-        c.code.replace(/^\+/, '').includes(normalizedSearch) 
+      .filter(
+        (c) =>
+          c.name.toLowerCase().includes(searchLower) ||
+          c.code.replace(/^\+/, "").includes(normalizedSearch)
       )
       .sort((a, b) => {
         const aName = a.name.toLowerCase();
         const bName = b.name.toLowerCase();
-        const aCode = a.code.replace(/^\+/, '');
-        const bCode = b.code.replace(/^\+/, '');
+        const aCode = a.code.replace(/^\+/, "");
+        const bCode = b.code.replace(/^\+/, "");
 
         const aExact = aName === searchLower || aCode === normalizedSearch;
         const bExact = bName === searchLower || bCode === normalizedSearch;
         if (aExact && !bExact) return -1;
         if (!aExact && bExact) return 1;
 
-        const aStarts = aName.startsWith(searchLower) || aCode.startsWith(normalizedSearch);
-        const bStarts = bName.startsWith(searchLower) || bCode.startsWith(normalizedSearch);
+        const aStarts =
+          aName.startsWith(searchLower) || aCode.startsWith(normalizedSearch);
+        const bStarts =
+          bName.startsWith(searchLower) || bCode.startsWith(normalizedSearch);
         if (aStarts && !bStarts) return -1;
         if (!aStarts && bStarts) return 1;
 
@@ -420,10 +227,8 @@
 
     if (
       filteredCountries.length > 0 &&
-      (
-        filteredCountries[0].name.toLowerCase() === searchLower ||
-        filteredCountries[0].code.replace(/^\+/, '') === normalizedSearch
-      )
+      (filteredCountries[0].name.toLowerCase() === searchLower ||
+        filteredCountries[0].code.replace(/^\+/, "") === normalizedSearch)
     ) {
       selectCountry(filteredCountries[0]);
       showDropdown = false;
@@ -489,8 +294,8 @@
 
   const sanitizeInput = (e) => {
     let value = e.target.value;
-    value = value.replace(/<script.*?>.*?<\/script>/gi, '');
-    value = value.replace(/[&*+\-<>|^+-/%{}/]/g, '');
+    value = value.replace(/<script.*?>.*?<\/script>/gi, "");
+    value = value.replace(/[&*+\-<>|^+-/%{}/]/g, "");
     message = value;
   };
 </script>
@@ -503,7 +308,7 @@
   class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 backdrop-blur-sm z-50 transition-opacity"
   on:click={toggleQuoteModal}
   on:keydown={(e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
     }
@@ -557,7 +362,7 @@
         <input
           type="number"
           min="1"
-          max="999"
+          max="100"
           maxlength="10"
           name="units"
           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
@@ -819,8 +624,8 @@
         <form
           action="/signup?/verifyOtp"
           method="POST"
-          use:enhance={({formData}) => {
-            formData.append('email', email);
+          use:enhance={({ formData }) => {
+            formData.append("email", email);
             return async ({ result }) => {
               console.log(result);
               isOtpVerified = result.data.isEmailVerified;
@@ -884,7 +689,7 @@
           placeholder="Your message"
           name="futherdetails"
           bind:value={message}
-    on:input={sanitizeInput}
+          on:input={sanitizeInput}
         ></textarea>
       </div>
       {#if successMessage}

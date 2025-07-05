@@ -216,7 +216,7 @@
     productQuote = selectedProduct;
   }
 
-  const DOTS = '...';
+  const DOTS = "...";
   const VISIBLE_PAGES = 5;
   let currentPage = writable(1);
   const rowsPerPage = 10;
@@ -225,7 +225,11 @@
   let hasPageChanged = false;
 
   $: totalPages = Math.ceil(allVariants.length / rowsPerPage);
-  $: paginatedVariants = getPaginatedData(allVariants, $currentPage, rowsPerPage);
+  $: paginatedVariants = getPaginatedData(
+    allVariants,
+    $currentPage,
+    rowsPerPage
+  );
   $: pageNumbers = getPageRange($currentPage, allVariants.length);
 
   $: {
@@ -236,7 +240,7 @@
 
   $: if (hasPageChanged && firstRecordRef) {
     setTimeout(() => {
-      firstRecordRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      firstRecordRef.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 0);
   }
 
