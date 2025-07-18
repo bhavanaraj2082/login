@@ -41,50 +41,13 @@
   let showRedirectModal = false;
   let isProcessing = false;
   const clientId = import.meta.env.VITE_LINKEDIN_CLIENT_ID;
-  const callbackUrl = import.meta.env.VITE_LINKEDIN_CALLBACK_URL;
-  const scope = import.meta.env.VITE_LINKEDIN_SCOPE;
-  const baseUrl = import.meta.env.VITE_LINKEDIN_BASE_URL;
-  const linkedinUrl = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(callbackUrl)}&scope=${scope}`;
-  // Google
-  const GoogleclientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-  const GooglecallbackUrl = import.meta.env.VITE_GOOGLE_CALLBACK_URL;
-  const Googlescope = import.meta.env.VITE_GOOGLE_SCOPE;
-  const GooglebaseUrl = import.meta.env.VITE_GOOGLE_BASE_URL;
-  const googleUrl = `${GooglebaseUrl}?response_type=code&client_id=${GoogleclientId}&redirect_uri=${encodeURIComponent(GooglecallbackUrl)}&scope=${Googlescope}&access_type=offline&prompt=consent`;
+
   const passwordRegex =
     /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%_\-*])[A-Za-z\d!@#$%_\-*]{8,}$/;
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const usernameRegex = /^[A-Za-z]+$/;
   const phoneRegex = /^[6-9]\d{9}$/;
 
-  function redirectTo(url) {
-    window.location.href = url;
-  }
-
-  function validateUsername() {
-    let newErrors = { ...errors }; // Create a new object for reactivity
-
-    if (!username) {
-      newErrors.username = "Required";
-    } else if (/^[^a-zA-Z]/.test(username)) {
-      newErrors.username = "Username must start with a letter";
-    } else if (/[^a-zA-Z0-9_]/.test(username)) {
-      newErrors.username =
-        "Username can include only letters, numbers, and underscore ( _ )";
-    } else if (/^[0-9]+$/.test(username)) {
-      newErrors.username = "Username cannot contain only numbers";
-    } else if (/^[_]+$/.test(username)) {
-      newErrors.username = "Username cannot contain only underscores ( _ )";
-    } else if (!/^(?=(.*[a-zA-Z]){3,})[a-zA-Z0-9_]+$/.test(username.trim())) {
-      newErrors.username = "Username must contain at least 3 letters";
-    } else if (username.length < 3) {
-      newErrors.username = "Please enter at least 3 characters";
-    } else {
-      delete newErrors.username;
-    }
-
-    errors = newErrors; // Reassign errors to trigger reactivity
-  }
 
   function validateEmail() {
     let newErrors = { ...errors }; // Create a new object for reactivity
@@ -145,7 +108,7 @@
       newErrors.password = "Only !@#$%^&* special characters are allowed";
     } else if (
       !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(
-        password
+        password,
       )
     ) {
       newErrors.password =
@@ -193,23 +156,204 @@
   }
 
   let currencies = [
-    "AFN","ALL","DZD","EUR","AOA","XCD","ARS","AMD","AUD","EUR","AZN","BSD","BHD","BDT","BBD","BYN","EUR","BZD","XOF",
-    "BTN","BOB","BAM","BWP","BRL","BND","BGN","XOF","BIF","CVE","KHR","XAF","CAD","XAF","XAF","CLP","CNY","COP","KMF",
-    "CDF","XAF","CRC","HRK","CUP","EUR","CZK","DKK","DJF","XCD","DOP","USD","EGP","USD","XAF","ERN","EUR","SZL","ETB",
-    "FJD","EUR","EUR","XAF","GMD","GEL","EUR","GHS","EUR","XCD","GTQ","GNF","XOF","GYD","HTG","HNL","HUF","ISK","INR",
-    "IDR","IRR","IQD","EUR","ILS","EUR","JMD","JPY","JOD","KZT","KES","AUD","KWD","KGS","LAK","EUR","LBP","LSL","LRD",
-    "LYD","CHF","EUR","EUR","MGA","MWK","MYR","MVR","XOF","EUR","USD","MRU","MUR","MXN","USD","MDL","EUR","MNT","EUR",
-    "MAD","MZN","MMK","NAD","AUD","NPR","EUR","NZD","NIO","XOF","NGN","MKD","NOK","OMR","PKR","USD","ILS","PAB","PGK",
-    "PYG","PEN","PHP","PLN","EUR","QAR","RON","RUB","RWF","XCD","XCD","XCD","WST","EUR","STN","SAR","XOF","RSD","SCR",
-    "SLL","SGD","EUR","EUR","SBD","SOS","ZAR","KRW","EUR","LKR","SDG","SRD","SEK","CHF","SYP","TWD","TJS","TZS","THB",
-    "XOF","TOP","TTD","TND","TRY","TMT","AUD","UGX","UAH","AED","GBP","USD","UYU","UZS","VUV","EUR","VES","VND","YER",
-    "ZMW","ZWL",
+    "ALL",
+    "AFN",
+    "DZD",
+    "EUR",
+    "AOA",
+    "XCD",
+    "ARS",
+    "AMD",
+    "AUD",
+    "EUR",
+    "AZN",
+    "BSD",
+    "BHD",
+    "BDT",
+    "BBD",
+    "BYN",
+    "EUR",
+    "BZD",
+    "XOF",
+    "BTN",
+    "BOB",
+    "BAM",
+    "BWP",
+    "BRL",
+    "BND",
+    "BGN",
+    "XOF",
+    "BIF",
+    "CVE",
+    "KHR",
+    "XAF",
+    "CAD",
+    "XAF",
+    "XAF",
+    "CLP",
+    "CNY",
+    "COP",
+    "KMF",
+    "CDF",
+    "XAF",
+    "CRC",
+    "HRK",
+    "CUP",
+    "EUR",
+    "CZK",
+    "DKK",
+    "DJF",
+    "XCD",
+    "DOP",
+    "USD",
+    "EGP",
+    "USD",
+    "XAF",
+    "ERN",
+    "EUR",
+    "SZL",
+    "ETB",
+    "FJD",
+    "EUR",
+    "EUR",
+    "XAF",
+    "GMD",
+    "GEL",
+    "EUR",
+    "GHS",
+    "EUR",
+    "XCD",
+    "GTQ",
+    "GNF",
+    "XOF",
+    "GYD",
+    "HTG",
+    "HNL",
+    "HUF",
+    "ISK",
+    "INR",
+    "IDR",
+    "IRR",
+    "IQD",
+    "EUR",
+    "ILS",
+    "EUR",
+    "JMD",
+    "JPY",
+    "JOD",
+    "KZT",
+    "KES",
+    "AUD",
+    "KWD",
+    "KGS",
+    "LAK",
+    "EUR",
+    "LBP",
+    "LSL",
+    "LRD",
+    "LYD",
+    "CHF",
+    "EUR",
+    "EUR",
+    "MGA",
+    "MWK",
+    "MYR",
+    "MVR",
+    "XOF",
+    "EUR",
+    "USD",
+    "MRU",
+    "MUR",
+    "MXN",
+    "USD",
+    "MDL",
+    "EUR",
+    "MNT",
+    "EUR",
+    "MAD",
+    "MZN",
+    "MMK",
+    "NAD",
+    "AUD",
+    "NPR",
+    "EUR",
+    "NZD",
+    "NIO",
+    "XOF",
+    "NGN",
+    "MKD",
+    "NOK",
+    "OMR",
+    "PKR",
+    "USD",
+    "ILS",
+    "PAB",
+    "PGK",
+    "PYG",
+    "PEN",
+    "PHP",
+    "PLN",
+    "EUR",
+    "QAR",
+    "RON",
+    "RUB",
+    "RWF",
+    "XCD",
+    "XCD",
+    "XCD",
+    "WST",
+    "EUR",
+    "STN",
+    "SAR",
+    "XOF",
+    "RSD",
+    "SCR",
+    "SLL",
+    "SGD",
+    "EUR",
+    "EUR",
+    "SBD",
+    "SOS",
+    "ZAR",
+    "KRW",
+    "EUR",
+    "LKR",
+    "SDG",
+    "SRD",
+    "SEK",
+    "CHF",
+    "SYP",
+    "TWD",
+    "TJS",
+    "TZS",
+    "THB",
+    "XOF",
+    "TOP",
+    "TTD",
+    "TND",
+    "TRY",
+    "TMT",
+    "AUD",
+    "UGX",
+    "UAH",
+    "AED",
+    "GBP",
+    "USD",
+    "UYU",
+    "UZS",
+    "VUV",
+    "EUR",
+    "VES",
+    "VND",
+    "YER",
+    "ZMW",
+    "ZWL",
   ];
 
   function updateCurrency(country) {
     const normalizedCountry = country.trim().toLowerCase();
     const selectedCurrency = Object.keys(countryCurrencyMap).find(
-      (key) => key.toLowerCase() === normalizedCountry
+      (key) => key.toLowerCase() === normalizedCountry,
     );
 
     if (selectedCurrency) {
@@ -268,7 +412,7 @@
   const mapLength = Object.keys(countryCurrencyMap).length;
   const countryNames = countries.map((country) => country.name);
   const missingPatterns = countryNames.filter(
-    (name) => !phoneNumberPatterns.hasOwnProperty(name)
+    (name) => !phoneNumberPatterns.hasOwnProperty(name),
   );
 
   function validateCountry() {
@@ -276,7 +420,7 @@
       errors.country = "Required";
     } else {
       const match = countries.find(
-        (c) => c.name.toLowerCase() === country.toLowerCase()
+        (c) => c.name.toLowerCase() === country.toLowerCase(),
       );
       if (!match) {
         errors.country = "Invalid country selected";
@@ -303,14 +447,14 @@
 
   function handleSearchChange() {
     filteredCountries = countries.filter((country) =>
-      country.name.toLowerCase().includes(searchTerm.toLowerCase())
+      country.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
     showDropdown = filteredCountries.length > 0 && searchTerm !== "";
   }
 
   function handleKeyDown(event) {
     const exactCountryMatch = countries.some(
-      (c) => c.name === country && c.name === searchTerm
+      (c) => c.name === country && c.name === searchTerm,
     );
 
     if (
@@ -423,7 +567,7 @@
     showDropdown = true;
 
     const match = countries.find(
-      (c) => c.name.toLowerCase() === searchTerm.toLowerCase()
+      (c) => c.name.toLowerCase() === searchTerm.toLowerCase(),
     );
 
     if (match) {
@@ -438,7 +582,7 @@
       const codeSearch = searchTerm.replace("+", "").trim();
       if (codeSearch.length > 0) {
         const exactCodeMatches = filteredCountries.filter(
-          (country) => country.code.replace("+", "") === codeSearch
+          (country) => country.code.replace("+", "") === codeSearch,
         );
 
         if (exactCodeMatches.length === 1) {
@@ -448,7 +592,7 @@
       }
 
       const countriesStartingWith = filteredCountries.filter((country) =>
-        country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+        country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
       );
 
       if (countriesStartingWith.length === 1) {
@@ -459,20 +603,20 @@
 
   function filterCountriesWithoutAutoSelect() {
     const countriesStartingWith = countries.filter((country) =>
-      country.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+      country.name.toLowerCase().startsWith(searchTerm.toLowerCase()),
     );
 
     const countriesContaining = countries.filter(
       (country) =>
         !country.name.toLowerCase().startsWith(searchTerm.toLowerCase()) &&
-        country.name.toLowerCase().includes(searchTerm.toLowerCase())
+        country.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
     filteredCountries = [...countriesStartingWith, ...countriesContaining];
     const codeMatches = countries.filter((country) =>
       country.code
         .replace("+", "")
-        .includes(searchTerm.replace("+", "").toLowerCase())
+        .includes(searchTerm.replace("+", "").toLowerCase()),
     );
     codeMatches.forEach((country) => {
       if (!filteredCountries.some((c) => c.name === country.name)) {
@@ -520,7 +664,7 @@
         country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         country.code
           .replace("+", "")
-          .includes(searchTerm.replace("+", "").toLowerCase())
+          .includes(searchTerm.replace("+", "").toLowerCase()),
     );
     if (
       filteredCountries.length === 1 &&
@@ -607,7 +751,7 @@
         showDropdown = false;
         handleInputChange(
           { target: countryInput, inputType: "insertText" },
-          true
+          true,
         );
         showDropdown = previousDropdownState;
       }
@@ -623,7 +767,7 @@
       }
     }
 
-    validateUsername();
+    // validateUsername();
     validateEmail();
     validateFirstName();
     validateLastName();
@@ -744,47 +888,72 @@
 
   function handleRedirectConfirm() {
     showRedirectModal = false;
-    goto("/signin");
+    goto("/login");
   }
 
   function handleRedirectCancel() {
     showRedirectModal = false;
   }
+
+  function redirectTo(url) {
+    window.location.href = url;
+  }
 </script>
 
-<div
-  class="flex flex-col w-11/12 md:flex-row justify-center z-50 items-start shadow-md mt-20 mb-12 rounded-lg max-w-3xl bg-white mx-auto border-gray-300 border"
->
-  <button
-    on:click={() => goto("/")}
-    class="absolute top-0.5 right-4 md:right-4 flex z-50 items-center justify-center py-2 px-2 sm:px-3 text-primary-500 bg-white hover:bg-primary-600 hover:text-white sm:rounded-md rounded-full transition duration-200 shadow-md"
-  >
-    <div class="flex items-center space-x-2">
-      <Icon icon="mdi:home" class="text-xl" />
-      <span class="hidden sm:inline text-sm font-medium">Back to Home</span>
-    </div>
-  </button>
-  <div
-    class="content w-full p-4 md:p-10 flex flex-col justify-center rounded-tr-lg rounded-b-lg md:rounded-l-lg md:rounded-tl-none"
-  >
-    <h2 class="text-2xl font-bold text-primary-500 sm:pt-0 pt-2 sm:pb-2 pb-4">
-      Sign Up
-    </h2>
-    <p class="text-gray-500 mb-5 md:text-sm text-xs">
-      Already have an account? <a
-        href="/signin"
-        class="text-primary-500 hover:text-primary-600 font-semibold">Sign In</a
-      >
-    </p>
-    <!-- <p class="text-gray-500 mb-5">
-      Already have an account? <a
-        href="/login"
-        class="underline text-primary-500 hover:text-primary-600">Login.</a
-      >
-    </p> -->
+<div class="flex flex-col md:flex-row justify-center z-50 items-start  my-8 rounded-2xl  mx-auto">
+        <!-- Home Button -->
+        <button
+            onclick="window.location.href='/'"
+            class="absolute top-4 right-4 md:right-6 flex z-50 items-center justify-center py-2.5 px-4 text-primary-600 bg-white/90 backdrop-blur-sm hover:bg-primary-600 hover:text-white rounded-full transition-all duration-300 shadow-lg hover:shadow-xl border border-primary-100 hover:border-primary-600"
+        >
+            <div class="flex items-center space-x-2">
+                <iconify-icon icon="mdi:home" class="text-xl"></iconify-icon>
+                <span class="hidden sm:inline text-sm font-medium">Back to Home</span>
+            </div>
+        </button>
 
-    <form method="POST" action="?/register" use:enhance={handleFormSubmission}>
-      <!-- <div class="flex items-center gap-3 mx text-md mt-2 mb-5">
+        <div class="flex flex-col md:flex-row bg-white/95 backdrop-blur-xl rounded-2xl overflow-hidden shadow-2xl border border-white/20">
+            <!-- Mobile Header -->
+            <div class="w-full md:hidden p-8 flex flex-col justify-center relative overflow-hidden bg-gradient-to-br from-primary-500/90 via-primary-600/90 to-primary-700/90">
+                <div class="flex flex-col justify-center items-center text-center z-10">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                        <h1 class="text-2xl font-bold text-white mb-2">
+                            Welcome to Register
+                        </h1>
+                        <p class="text-white/90 text-sm">
+                            Create a new account to get started.
+                        </p>
+                    </div>
+                </div>
+                <div class="relative mt-8 z-10 flex justify-center">
+                    <div class="w-48 h-48 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20">
+                          <img src="/CWAbout.webp" alt="login" class="w-[200px] items-center justify-center"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+              <div class="content p-6 md:p-12 flex flex-col justify-center bg-white min-w-0 md:min-w-[500px]">
+                <div class="space-y-6">
+                    <!-- Header -->
+                    <div class="text-center md:text-left">
+                        <h2 class="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent mb-2">
+                            Create Account
+                        </h2>
+                        <p class="text-gray-600 text-sm">
+                            Already have an account? 
+                            <a href="/login" class="text-primary-600 hover:text-primary-700 font-semibold hover:underline transition-colors">
+                                Sign in here
+                            </a>
+                        </p>
+                    </div>
+
+               <form
+        method="POST"
+        action="?/register"
+        use:enhance={handleFormSubmission}
+      >
+        <!-- <div class="flex items-center gap-3 mx text-md mt-2 mb-5">
         <label class="flex items-center md:gap-2 font-medium">
           For a Business
           <input
@@ -819,206 +988,11 @@
           </span>
         </label>
       </div> -->
-      <!-- {#if showBusinessDetails} -->
+        <!-- {#if showBusinessDetails} -->
 
-      <!-- {/if} -->
-      <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
-        <div class="flex-1 mb-2 md:mb-0">
-          <label for="username" class="block text-sm font-medium text-gray-600"
-            ><span class="text-red-500">*</span> Username</label
-          >
-          <input
-            type="text"
-            id="username"
-            name="username"
-            maxlength="50"
-            bind:value={username}
-            on:input={(e) => {
-              username = e.target.value.trimStart();
-              validateUsername();
-            }}
-            placeholder="Enter your username"
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
-          />
-          {#if errors.username}
-            <div class="text-red-500 text-xs mt-1">{errors.username}</div>
-          {/if}
-        </div>
-        <div class="flex-1 mb-2 md:mb-0 relative">
-          <label for="email" class="block text-sm font-medium text-gray-600"
-            ><span class="text-red-500">*</span> Email</label
-          >
-          <div class="relative">
-            <form
-              action="?/verifyemail"
-              bind:this={form5}
-              method="POST"
-              use:enhance={({ formData }) => {
-                formData.append("email", email);
-                return async ({ result }) => {
-                  console.log("result", result);
+        <!-- {/if} -->
 
-                  isLoading = false;
-                  console.log(result);
-                  if (result.data?.status === 200) {
-                    toast.success(result.data.message);
-                    ProfileEmailVerified = result.data.isEmailVerified;
-                    verificationMessage = result.data.message;
-
-                    if (
-                      verificationMessage.includes(
-                        "Verification email sent successfully. Please check your inbox."
-                      )
-                    ) {
-                      displayMessage = "Please check your inbox.";
-                      emailSent = true;
-                      isOtpVerified = false;
-                    } else {
-                      displayMessage = verificationMessage;
-                      emailSent = false;
-                      isOtpVerified = true;
-                    }
-                  } else {
-                    ProfileEmailVerified = result.data.isEmailVerified;
-                    toast.error(result.data.message);
-                    emailSent = false;
-                  }
-                };
-              }}
-              on:submit={() => {
-                isLoading = true;
-              }}
-            >
-              <input
-                type="email"
-                id="email"
-                name="email"
-                maxlength="100"
-                bind:value={email}
-                on:input={() => {
-                  validateEmail();
-                  ProfileEmailVerified = false;
-                  emailSent = false;
-                  isOtpVerified = false;
-                }}
-                placeholder="Enter your email"
-                class="mt-1 block w-full p-2 pr-24 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm text-sm h-10"
-              />
-
-              {#if isLoading}
-                <span
-                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
-                >
-                  <Icon icon="line-md:loading-alt-loop" class="w-4 h-4 mr-1" />
-                  Sending...
-                </span>
-              {:else if !ProfileEmailVerified && !emailSent}
-                <button
-                  type="submit"
-                  class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-500 font-semibold text-2s pl-2 py-1 rounded hover:underline disabled:cursor-not-allowed"
-                  disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
-                    email
-                  ) || email.split("@")[1].includes("gamil")}
-                >
-                  Verify
-                </button>
-              {:else if emailSent}
-                <span
-                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-                >
-                  {#if isOtpVerified}
-                    Verified
-                    <Icon
-                      icon="material-symbols:verified-rounded"
-                      class="w-4 h-4 ml-1"
-                    />
-                  {:else}
-                    <Icon
-                      icon="fluent:mail-all-read-16-filled"
-                      class="w-4 h-4 mr-1"
-                    />
-                    Check inbox
-                  {/if}
-                </span>
-              {:else}
-                <span
-                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
-                >
-                  Verified
-                  <Icon
-                    icon="material-symbols:verified-rounded"
-                    class="w-4 h-4 ml-1"
-                  />
-                </span>
-              {/if}
-            </form>
-          </div>
-          {#if errors.email}
-            <div class="text-red-500 text-xs mt-1">{errors.email}</div>
-          {/if}
-        </div>
-      </div>
-
-      <div class="mt-1 mb-4">
-        {#if emailSent && isOtpVerified === false}
-          <form
-            action="?/verifyOtp"
-            method="POST"
-            use:enhance={({ formData }) => {
-              formData.append("email", email);
-              return async ({ result }) => {
-                console.log(result);
-                isOtpVerified = result.data.isEmailVerified;
-                if (result.data?.status === 200) {
-                  toast.success(result.data.message);
-                  enteredOtp = "";
-                  isOtpVerified = true;
-                  ProfileEmailVerified = true;
-                } else if (result.data?.status === 500) {
-                  toast.error(result.data.message);
-                }
-                console.log(isOtpVerified, "isOtpVerified");
-              };
-            }}
-          >
-            <div class="relative w-full">
-              <label
-                for="enteredOtp"
-                class="block text-sm font-medium text-gray-600"
-                >Enter the Recieved 6-digit OTP</label
-              >
-              <input
-                type="text"
-                maxlength="6"
-                name="enteredOtp"
-                bind:value={enteredOtp}
-                on:input={handleInput}
-                placeholder="Enter 6-digit OTP"
-                class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
-                    focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
-                    placeholder:text-sm h-10"
-              />
-              <button
-                type="submit"
-                class="absolute top-1/2 right-2 transform text-primary-500 font-bold text-2s py-1 rounded hover:underline"
-              >
-                Verify
-              </button>
-            </div>
-          </form>
-          <p class="mt-px text-2s text-right text-gray-600">
-            Didn't receive the code?
-            <button
-              type="button"
-              on:click={handleResendemailOtp}
-              class="text-primary-500 font-medium hover:underline"
-            >
-              Get a new code
-            </button>
-          </p>
-        {/if}
-      </div>
-      <!-- <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
+        <!-- <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
         <div class="flex-1 mb-2 md:mb-0">
           <label
             for="companyname"
@@ -1069,120 +1043,325 @@
         </div>
       </div> -->
 
-      <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
-        <div class="flex-1 mb-2 md:mb-0">
-          <label for="firstName" class="block text-sm font-medium text-gray-600"
-            ><span class="text-red-500">*</span> First Name</label
-          >
-          <input
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
-            type="text"
-            name="firstName"
-            maxlength="50"
-            bind:value={firstName}
-            placeholder="First Name"
-            on:input={(e) => {
-              firstName = e.target.value.trimStart();
-              validateFirstName();
-            }}
-          />
-          <p class=" text-red-500 text-left text-xs">
-            {errors?.firstName || ""}
-          </p>
+        <div class="mb-4 flex flex-col md:space-y-4">
+          <div class="flex-1 mb-2 md:mb-0">
+            <label
+              for="firstName"
+              class="block text-sm font-medium text-gray-600"
+              ><span class="text-red-500">*</span> First Name</label
+            >
+            <input
+              class="mt-1 block w-full p-2 border focus:outline-none border-gray-300 rounded-lg pl-5 focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+              type="text"
+              name="firstName"
+              maxlength="50"
+              bind:value={firstName}
+              placeholder="First Name"
+              on:input={(e) => {
+                firstName = e.target.value.trimStart();
+                validateFirstName();
+              }}
+            />
+            <p class=" text-red-500 text-left text-xs">
+              {errors?.firstName || ""}
+            </p>
+          </div>
+          <div class="flex-1 mb-2 md:mb-0">
+            <label
+              for="lastName"
+              class="block text-sm font-medium text-gray-600"
+              >Last Name
+            </label>
+            <input
+              class="mt-1 block w-full p-2 border focus:outline-none border-gray-300 rounded-lg pl-5 focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+              type="text"
+              name="lastName"
+              maxlength="50"
+              bind:value={lastName}
+              placeholder="Last Name"
+              on:input={(e) => {
+                lastName = e.target.value.trimStart();
+                validateLastName();
+              }}
+            />
+            <p class=" text-red-500 text-left text-xs">
+              {errors?.lastName || ""}
+            </p>
+          </div>
         </div>
-        <div class="flex-1 mb-2 md:mb-0">
-          <label for="lastName" class="block text-sm font-medium text-gray-600"
-            >Last Name
-          </label>
-          <input
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
-            type="text"
-            name="lastName"
-            maxlength="50"
-            bind:value={lastName}
-            placeholder="Last Name"
-            on:input={(e) => {
-              lastName = e.target.value.trimStart();
-              validateLastName();
-            }}
-          />
-          <p class=" text-red-500 text-left text-xs">
-            {errors?.lastName || ""}
-          </p>
-        </div>
-      </div>
-      <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
-        <div class="w-full sm:mx-auto grid">
-          <label for="country" class="block text-sm font-medium text-gray-600"
-            ><span class="text-red-500">*</span> Country</label
-          >
-          <div class="dropdown-container">
+        <div class="mb-4 flex flex-col md:space-y-4">
+          <!-- <div class="flex-1 mb-2 md:mb-0">
+            <label
+              for="username"
+              class="block text-sm font-medium text-gray-600"
+              ><span class="text-red-500">*</span> Username</label
+            >
+            <input
+              type="text"
+              id="username"
+              name="username"
+              maxlength="50"
+              bind:value={username}
+              on:input={(e) => {
+                username = e.target.value.trimStart();
+                validateUsername();
+              }}
+              placeholder="Enter your username"
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-lg pl-5 focus:border-primary-400 focus:outline-none focus:ring-1 focus:ring-primary-100 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
+            />
+            {#if errors.username}
+              <div class="text-red-500 text-xs mt-1">{errors.username}</div>
+            {/if}
+          </div> -->
+          <div class="flex-1 mb-2 md:mb-0 relative">
+            <label for="email" class="block text-sm font-medium text-gray-600"
+              ><span class="text-red-500">*</span> Email</label
+            >
             <div class="relative">
-              <!-- Wrap input and icon in a group to control toggle behavior -->
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <div class="flex items-center" on:click={toggleDropdown}>
-                <input
-                  type="text"
-                  name="country"
-                  maxlength="50"
-                  bind:value={country}
-                  placeholder="Search Country"
-                  on:input={handleInputChange}
-                  on:keydown={handleKeyDown}
-                  class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
-                          focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
-                          placeholder:text-sm h-10 pr-8"
-                />
-                <Icon
-                  icon={showDropdown
-                    ? "ep:arrow-up-bold"
-                    : "ep:arrow-down-bold"}
-                  class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer pointer-events-none"
-                />
-              </div>
+              <form
+                action="?/verifyemail"
+                bind:this={form5}
+                method="POST"
+                use:enhance={({ formData }) => {
+                  formData.append("email", email);
+                  return async ({ result }) => {
+                    console.log("result", result);
 
-              {#if showDropdown}
-                <div
-                  bind:this={dropdownEl}
-                  class="absolute w-full top-full mt-px bg-white border border-gray-300 rounded-md shadow-lg z-10"
-                >
-                  <ul class="max-h-60 overflow-y-auto text-sm">
-                    {#each filteredCountries as country, index}
-                      <!-- svelte-ignore a11y-click-events-have-key-events -->
-                      <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-                      <li
-                        on:click={() => selectCountry(country)}
-                        class="px-4 py-2 cursor-pointer {highlightedIndex ===
-                        index
-                          ? 'bg-primary-100'
-                          : 'hover:bg-primary-50'}"
-                      >
-                        {country.name} ({country.code})
-                      </li>
-                    {/each}
-                    {#if filteredCountries.length === 0}
-                      <div class="flex items-center px-4 py-3">
-                        <Icon
-                          icon="tabler:info-square-rounded-filled"
-                          class="text-red-500 text-base mr-2"
-                        />
-                        <li class="text-gray-800 text-xs">
-                          No matching countries found!
-                        </li>
-                      </div>
+                    isLoading = false;
+                    console.log(result);
+                    if (result.data?.status === 200) {
+                      toast.success(result.data.message);
+                      ProfileEmailVerified = result.data.isEmailVerified;
+                      verificationMessage = result.data.message;
+
+                      if (
+                        verificationMessage.includes(
+                          "Verification email sent successfully. Please check your inbox.",
+                        )
+                      ) {
+                        displayMessage = "Please check your inbox.";
+                        emailSent = true;
+                        isOtpVerified = false;
+                      } else {
+                        displayMessage = verificationMessage;
+                        emailSent = false;
+                        isOtpVerified = true;
+                      }
+                    } else {
+                      ProfileEmailVerified = result.data.isEmailVerified;
+                      toast.error(result.data.message);
+                      emailSent = false;
+                    }
+                  };
+                }}
+                on:submit={() => {
+                  isLoading = true;
+                }}
+              >
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  maxlength="100"
+                  bind:value={email}
+                  on:input={() => {
+                    validateEmail();
+                    ProfileEmailVerified = false;
+                    emailSent = false;
+                    isOtpVerified = false;
+                  }}
+                  placeholder="Enter your email"
+                  class="mt-1 block w-full p-2 pr-24 border border-gray-300 rounded-lg pl-5 focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm focus:outline-none text-sm h-10"
+                />
+
+                {#if isLoading}
+                  <span
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-primary-600 flex items-center"
+                  >
+                    <Icon
+                      icon="line-md:loading-alt-loop"
+                      class="w-4 h-4 mr-1"
+                    />
+                    Sending...
+                  </span>
+                {:else if !ProfileEmailVerified && !emailSent}
+                  <button
+                    type="submit"
+                    class="absolute top-1/2 right-2 transform -translate-y-1/2 text-primary-500 font-semibold text-2s pl-2 py-1 rounded hover:underline disabled:cursor-not-allowed"
+                    disabled={!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(
+                      email,
+                    ) || email.split("@")[1].includes("gamil")}
+                  >
+                    Verify
+                  </button>
+                {:else if emailSent}
+                  <span
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+                  >
+                    {#if isOtpVerified}
+                      Verified
+                      <Icon
+                        icon="material-symbols:verified-rounded"
+                        class="w-4 h-4 ml-1"
+                      />
+                    {:else}
+                      <Icon
+                        icon="fluent:mail-all-read-16-filled"
+                        class="w-4 h-4 mr-1"
+                      />
+                      Check inbox
                     {/if}
-                  </ul>
-                </div>
-              {/if}
+                  </span>
+                {:else}
+                  <span
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-2s font-semibold text-green-600 flex items-center"
+                  >
+                    Verified
+                    <Icon
+                      icon="material-symbols:verified-rounded"
+                      class="w-4 h-4 ml-1"
+                    />
+                  </span>
+                {/if}
+              </form>
             </div>
-            {#if errors.country}
-              <div class="text-red-500 text-xs mt-1">{errors.country}</div>
+            {#if errors.email}
+              <div class="text-red-500 text-xs mt-1">{errors.email}</div>
             {/if}
           </div>
         </div>
 
-        <!-- <div class="w-full sm:mx-auto grid">
+        <div class="mt-1 mb-4">
+          {#if emailSent && isOtpVerified === false}
+            <form
+              action="?/verifyOtp"
+              method="POST"
+              use:enhance={({ formData }) => {
+                formData.append("email", email);
+                return async ({ result }) => {
+                  console.log(result);
+                  isOtpVerified = result.data.isEmailVerified;
+                  if (result.data?.status === 200) {
+                    toast.success(result.data.message);
+                    enteredOtp = "";
+                    isOtpVerified = true;
+                    ProfileEmailVerified = true;
+                  } else if (result.data?.status === 500) {
+                    toast.error(result.data.message);
+                  }
+                  console.log(isOtpVerified, "isOtpVerified");
+                };
+              }}
+            >
+              <div class="relative w-full">
+                <label
+                  for="enteredOtp"
+                  class="block text-sm font-medium text-gray-600"
+                  >Enter the Recieved 6-digit OTP</label
+                >
+                <input
+                  type="text"
+                  maxlength="6"
+                  name="enteredOtp"
+                  bind:value={enteredOtp}
+                  on:input={handleInput}
+                  placeholder="Enter 6-digit OTP"
+                  class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-lg pl-5
+                    focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
+                    placeholder:text-sm h-10"
+                />
+                <button
+                  type="submit"
+                  class="absolute top-1/2 right-2 transform text-primary-500 font-bold text-2s py-1 rounded hover:underline"
+                >
+                  Verify
+                </button>
+              </div>
+            </form>
+            <p class="mt-px text-2s text-right text-gray-600">
+              Didn't receive the code?
+              <button
+                type="button"
+                on:click={handleResendemailOtp}
+                class="text-primary-500 font-medium hover:underline"
+              >
+                Get a new code
+              </button>
+            </p>
+          {/if}
+        </div>
+        <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
+          <div class="w-full sm:mx-auto grid">
+            <label for="country" class="block text-sm font-medium text-gray-600"
+              ><span class="text-red-500">*</span> Country</label
+            >
+            <div class="dropdown-container">
+              <div class="relative">
+                <!-- Wrap input and icon in a group to control toggle behavior -->
+                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                <div class="flex items-center" on:click={toggleDropdown}>
+                  <input
+                    type="text"
+                    name="country"
+                    maxlength="50"
+                    bind:value={country}
+                    placeholder="Search Country"
+                    on:input={handleInputChange}
+                    on:keydown={handleKeyDown}
+                    class="mt-1 block w-full p-2 border focus:outline-none text-sm border-gray-300 rounded-lg pl-5
+                          focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
+                          placeholder:text-sm h-10 pr-8"
+                  />
+                  <Icon
+                    icon={showDropdown
+                      ? "ep:arrow-up-bold"
+                      : "ep:arrow-down-bold"}
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 mr-1 text-2s font-bold cursor-pointer pointer-events-none"
+                  />
+                </div>
+
+                {#if showDropdown}
+                  <div
+                    bind:this={dropdownEl}
+                    class="absolute w-full top-full mt-px bg-white border border-gray-300 rounded-md shadow-lg z-10"
+                  >
+                    <ul class="max-h-60 overflow-y-auto text-sm">
+                      {#each filteredCountries as country, index}
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+                        <li
+                          on:click={() => selectCountry(country)}
+                          class="px-4 py-2 cursor-pointer {highlightedIndex ===
+                          index
+                            ? 'bg-primary-100'
+                            : 'hover:bg-primary-50'}"
+                        >
+                          {country.name} ({country.code})
+                        </li>
+                      {/each}
+                      {#if filteredCountries.length === 0}
+                        <div class="flex items-center px-4 py-3">
+                          <Icon
+                            icon="tabler:info-square-rounded-filled"
+                            class="text-red-500 text-base mr-2"
+                          />
+                          <li class="text-gray-800 text-xs">
+                            No matching countries found!
+                          </li>
+                        </div>
+                      {/if}
+                    </ul>
+                  </div>
+                {/if}
+              </div>
+              {#if errors.country}
+                <div class="text-red-500 text-xs mt-1">{errors.country}</div>
+              {/if}
+            </div>
+          </div>
+
+          <!-- <div class="w-full sm:mx-auto grid">
           <label for="currency" class="block text-sm font-medium text-gray-600"
             >Currency</label
           >
@@ -1209,42 +1388,42 @@
             <div class="text-red-500 text-xs mt-1">{errors.country}</div>
           {/if}
         </div> -->
-      </div>
+        </div>
 
-      <div class="mb-4">
-        <label for="phone" class="block text-sm font-medium text-gray-600">
-          <span class="text-red-500">*</span> Phone Number
-        </label>
-        <input
-          type="tel"
-          id="phone"
-          name="phone"
-          maxlength="20"
-          oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-          bind:value={phone}
-          on:input={() => validatePhoneNumber(country, phone)}
-          placeholder="Enter your phone number"
-          class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
-                    focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
+        <div class="mb-4">
+          <label for="phone" class="block text-sm font-medium text-gray-600">
+            <span class="text-red-500">*</span> Phone Number
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            maxlength="20"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+            bind:value={phone}
+            on:input={() => validatePhoneNumber(country, phone)}
+            placeholder="Enter your phone number"
+            class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-lg pl-5
+                    focus:border-primary-400 focus:outline-none focus:ring-0 focus:ring-primary-400 placeholder-gray-400
                     placeholder:text-sm h-10"
-        />
-        {#if errors.phone}
-          <div class="flex items-center text-sm text-gray-700">
-            <Icon
-              icon="carbon:location-info-filled"
-              class="text-sm inline text-primary-400"
-            />
-            <span class="text-2s text-gray-700"
-              >Enter phone number without country code</span
-            >
-          </div>
-        {/if}
-        {#if errors.phone}
-          <div class="text-red-500 text-xs mt-1">{errors.phone}</div>
-        {/if}
-      </div>
+          />
+          {#if errors.phone}
+            <div class="flex items-center text-sm text-gray-700">
+              <Icon
+                icon="carbon:location-info-filled"
+                class="text-sm inline text-primary-400"
+              />
+              <span class="text-2s text-gray-700"
+                >Enter phone number without country code</span
+              >
+            </div>
+          {/if}
+          {#if errors.phone}
+            <div class="text-red-500 text-xs mt-1">{errors.phone}</div>
+          {/if}
+        </div>
 
-      <!-- <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
+        <!-- <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
           <div class="flex-1 mb-2 md:mb-0">
             <label
               for="gstNumber"
@@ -1286,7 +1465,7 @@
           </div>
         </div> -->
 
-      <!-- <div class="mb-4">
+        <!-- <div class="mb-4">
         <label for="password" class="block text-sm font-medium text-gray-600"
           >Password</label
         >
@@ -1310,264 +1489,272 @@
         </div>
       </div> -->
 
-      <div class="mb-4 relative">
-        <label for="password" class="block text-sm font-medium text-gray-600">
-          <span class="text-red-500">*</span> Password
-        </label>
-        <div class="relative">
-          <input
-            id="password"
-            name="password"
-            type="password"
-            maxlength="50"
-            bind:value={password}
-            on:input={(e) => {
-              password = e.target.value.trim();
-              validatePassword();
-            }}
-            placeholder="Enter your password"
-            class="mt-1 block w-full p-2 pr-10 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 text-sm placeholder:text-sm h-10"
-          />
-          <button
-            type="button"
-            on:click={togglePasswordVisibility}
-            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-            aria-label={passwordVisible ? "Hide password" : "Show password"}
+        <div class="mb-4 relative">
+          <label for="password" class="block text-sm font-medium text-gray-600">
+            <span class="text-red-500">*</span> Password
+          </label>
+          <div class="relative">
+            <input
+              id="password"
+              name="password"
+              type="password"
+              maxlength="50"
+              bind:value={password}
+              on:input={(e) => {
+                password = e.target.value.trim();
+                validatePassword();
+              }}
+              placeholder="Enter your password"
+              class="mt-1 block focus:outline-none w-full p-2 pr-10 border border-gray-300 rounded-lg pl-5 focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 text-sm placeholder:text-sm h-10"
+            />
+            <button
+              type="button"
+              on:click={togglePasswordVisibility}
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              aria-label={passwordVisible ? "Hide password" : "Show password"}
+            >
+              {#if passwordVisible}
+                <Icon icon="mdi:eye-off-outline" class="w-5 h-5" />
+              {:else}
+                <Icon icon="mdi:eye-outline" class="w-5 h-5" />
+              {/if}
+            </button>
+          </div>
+          {#if errors.password}
+            <div class="text-red-500 text-xs mt-1">{errors.password}</div>
+          {/if}
+        </div>
+        {#if typing}
+          <div
+            class="bg-primary-50 px-2 mt-3 py-2 rounded-lg pl-5 border border-gray-200"
           >
-            {#if passwordVisible}
-              <Icon icon="mdi:eye-off-outline" class="w-5 h-5" />
-            {:else}
-              <Icon icon="mdi:eye-outline" class="w-5 h-5" />
-            {/if}
-          </button>
-        </div>
-        {#if errors.password}
-          <div class="text-red-500 text-xs mt-1">{errors.password}</div>
-        {/if}
-      </div>
-      {#if typing}
-        <div
-          class="bg-primary-50 px-2 mt-3 py-2 rounded-md border border-gray-200"
-        >
-          <ul class="w-full text-xs text-gray-500 text-left list-none ml-1">
-            <li class="flex justify-start items-center sm:text-xs text-2s py-1">
-              {#if !password.includes("password")}
-                <span class="text-green-500">
-                  <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
-                </span>
-              {:else}
-                <span class="text-red-500">
-                  <Icon
-                    icon="lets-icons:close-ring-duotone"
-                    class="w-4 h-4 mr-1"
-                  />
-                </span>
-              {/if}
-              Cannot contain common or guessable text
-            </li>
-            <li class="flex justify-start items-center sm:text-xs text-2s py-1">
-              {#if password.length >= 8}
-                <span class="text-green-500">
-                  <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
-                </span>
-              {:else}
-                <span class="text-red-500">
-                  <Icon
-                    icon="lets-icons:close-ring-duotone"
-                    class="w-4 h-4 mr-1"
-                  />
-                </span>
-              {/if}
-              Contain at least 8 characters
-            </li>
-            <li class="flex justify-start items-center sm:text-xs text-2s py-1">
-              {#if /[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password)}
-                <span class="text-green-500">
-                  <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
-                </span>
-              {:else}
-                <span class="text-red-500">
-                  <Icon
-                    icon="lets-icons:close-ring-duotone"
-                    class="w-4 h-4 mr-1"
-                  />
-                </span>
-              {/if}
-              Contain at least one uppercase letter, one lowercase letter, one number
-            </li>
-            <li class="flex justify-start items-center sm:text-xs text-2s py-1">
-              {#if /[!@#$%^&*\\-]/.test(password)}
-                <span class="text-green-500">
-                  <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
-                </span>
-              {:else}
-                <span class="text-red-500">
-                  <Icon
-                    icon="lets-icons:close-ring-duotone"
-                    class="w-4 h-4 mr-1"
-                  />
-                </span>
-              {/if}
-              Contain one of the following special characters !@#$%^&*
-            </li>
-          </ul>
-        </div>
+            <ul class="w-full text-xs text-gray-500 text-left list-none ml-1">
+              <li
+                class="flex justify-start items-center sm:text-xs text-2s py-1"
+              >
+                {#if !password.includes("password")}
+                  <span class="text-green-500">
+                    <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+                  </span>
+                {:else}
+                  <span class="text-red-500">
+                    <Icon
+                      icon="lets-icons:close-ring-duotone"
+                      class="w-4 h-4 mr-1"
+                    />
+                  </span>
+                {/if}
+                Cannot contain common or guessable text
+              </li>
+              <li
+                class="flex justify-start items-center sm:text-xs text-2s py-1"
+              >
+                {#if password.length >= 8}
+                  <span class="text-green-500">
+                    <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+                  </span>
+                {:else}
+                  <span class="text-red-500">
+                    <Icon
+                      icon="lets-icons:close-ring-duotone"
+                      class="w-4 h-4 mr-1"
+                    />
+                  </span>
+                {/if}
+                Contain at least 8 characters
+              </li>
+              <li
+                class="flex justify-start items-center sm:text-xs text-2s py-1"
+              >
+                {#if /[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password)}
+                  <span class="text-green-500">
+                    <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+                  </span>
+                {:else}
+                  <span class="text-red-500">
+                    <Icon
+                      icon="lets-icons:close-ring-duotone"
+                      class="w-4 h-4 mr-1"
+                    />
+                  </span>
+                {/if}
+                Contain at least one uppercase letter, one lowercase letter, one
+                number
+              </li>
+              <li
+                class="flex justify-start items-center sm:text-xs text-2s py-1"
+              >
+                {#if /[!@#$%^&*\\-]/.test(password)}
+                  <span class="text-green-500">
+                    <Icon icon="lets-icons:check-fill" class="w-4 h-4 mr-1" />
+                  </span>
+                {:else}
+                  <span class="text-red-500">
+                    <Icon
+                      icon="lets-icons:close-ring-duotone"
+                      class="w-4 h-4 mr-1"
+                    />
+                  </span>
+                {/if}
+                Contain one of the following special characters !@#$%^&*
+              </li>
+            </ul>
+          </div>
 
-        <div class="mt-2">
-          <div class="relative pt-1">
-            <div class="flex mb-2 items-center justify-between"></div>
-            <div class="flex mb-2">
-              <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div
-                  class="h-2.5 rounded-full transition-all duration-300 ease-in-out"
-                  style="width: {passwordStrength}%"
-                  class:bg-red-500={passwordStrength <= 33}
-                  class:bg-yellow-500={passwordStrength > 33 &&
-                    passwordStrength <= 66}
-                  class:bg-green-500={passwordStrength > 66}
-                ></div>
+          <div class="mt-2">
+            <div class="relative pt-1">
+              <div class="flex mb-2 items-center justify-between"></div>
+              <div class="flex mb-2">
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    class="h-2.5 focus:outline-none rounded-full transition-all duration-300 ease-in-out"
+                    style="width: {passwordStrength}%"
+                    class:bg-red-500={passwordStrength <= 33}
+                    class:bg-yellow-500={passwordStrength > 33 &&
+                      passwordStrength <= 66}
+                    class:bg-green-500={passwordStrength > 66}
+                  ></div>
+                </div>
+              </div>
+              <div class="mt-1 md:text-xs text-2s font-medium pb-2">
+                {#if passwordStrength <= 33}
+                  <span class="text-red-500">Weak</span>
+                {:else if passwordStrength <= 66}
+                  <span class="text-yellow-500">Moderate</span>
+                {:else}
+                  <span class="text-green-500">Strong</span>
+                {/if}
               </div>
             </div>
-            <div class="mt-1 md:text-xs text-2s font-medium pb-2">
-              {#if passwordStrength <= 33}
-                <span class="text-red-500">Weak</span>
-              {:else if passwordStrength <= 66}
-                <span class="text-yellow-500">Moderate</span>
+          </div>
+        {/if}
+
+        <div class="mb-4 relative">
+          <label
+            for="passwordConfirm"
+            class="block text-sm font-medium text-gray-600"
+          >
+            <span class="text-red-500">*</span> Confirm Password</label
+          >
+          <div class="relative">
+            <input
+              id="passwordConfirm"
+              name="confirmpassword"
+              type="password"
+              maxlength="50"
+              bind:value={passwordConfirm}
+              on:input={(e) => {
+                passwordConfirm = e.target.value.trim();
+                validateConfirmPassword();
+              }}
+              placeholder="Confirm your password"
+              class="mt-1 focus:outline-none block w-full p-2 pr-10 border text-sm border-gray-300 rounded-lg pl-5 focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10"
+            />
+            <button
+              type="button"
+              on:click={toggleConfirmPasswordVisibility}
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+              aria-label={confirmPasswordVisible
+                ? "Hide confirm password"
+                : "Show confirm password"}
+            >
+              {#if confirmPasswordVisible}
+                <Icon icon="mdi:eye-off-outline" class="w-5 h-5" />
               {:else}
-                <span class="text-green-500">Strong</span>
+                <Icon icon="mdi:eye-outline" class="w-5 h-5" />
               {/if}
+            </button>
+          </div>
+
+          {#if errors.passwordConfirm}
+            <div class="text-red-500 text-xs mt-1">
+              {errors.passwordConfirm}
             </div>
+          {/if}
+        </div>
+
+        <div class="flex gap-2 {errors.termsAndConditions ? 'mb-1' : 'mb-6'}">
+          <input
+            type="checkbox"
+            name="termsAndConditions"
+            value={true}
+            on:change={handleCheckboxChange}
+            class="mt-0.5 text-primary-500 rounded focus:ring-0 outline-none"
+          />
+          <div class="text-xs">
+            I have read and agreed to the
+            <a
+              class="font-medium text-primary-500 hover:underline"
+              href="/terms"
+            >
+              Terms of Service
+            </a>
+            and
+            <a
+              class="font-medium text-primary-500 hover:underline"
+              href="/privacy-policy">Privacy Policy</a
+            >
           </div>
         </div>
-      {/if}
-
-      <div class="mb-4 relative">
-        <label
-          for="passwordConfirm"
-          class="block text-sm font-medium text-gray-600"
-        >
-          <span class="text-red-500">*</span> Confirm Password</label
-        >
-        <div class="relative">
-          <input
-            id="passwordConfirm"
-            name="confirmpassword"
-            type="password"
-            maxlength="50"
-            bind:value={passwordConfirm}
-            on:input={(e) => {
-              passwordConfirm = e.target.value.trim();
-              validateConfirmPassword();
-            }}
-            placeholder="Confirm your password"
-            class="mt-1 block w-full p-2 pr-10 border text-sm border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10"
-          />
-          <button
-            type="button"
-            on:click={toggleConfirmPasswordVisibility}
-            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-            aria-label={confirmPasswordVisible
-              ? "Hide confirm password"
-              : "Show confirm password"}
-          >
-            {#if confirmPasswordVisible}
-              <Icon icon="mdi:eye-off-outline" class="w-5 h-5" />
-            {:else}
-              <Icon icon="mdi:eye-outline" class="w-5 h-5" />
-            {/if}
-          </button>
-        </div>
-
-        {#if errors.passwordConfirm}
-          <div class="text-red-500 text-xs mt-1">{errors.passwordConfirm}</div>
+        {#if !isTermsAccepted && errors.termsAndConditions}
+          <div class="text-red-500 text-xs block mb-4">
+            {errors.termsAndConditions}
+          </div>
         {/if}
-      </div>
-      <div class="mb-4">
-        <div class="text-primary-500 sm:text-sm text-xs font-semibold pb-2">
-          TERMS AND CONDITION:
-        </div>
-        <p class="text-gray-500 sm:text-xs text-2s">
-          We will occasionally contact you with relevant updates about your
-          account and our products and services. You may manage your account
-          preferences in your account or unsubscribe at any time. We are
-          committed to protecting the privacy of your personal data.
-        </p>
-      </div>
-      <div class="flex gap-2 {errors.termsAndConditions ? 'mb-1' : 'mb-6'}">
-        <input
-          type="checkbox"
-          name="termsAndConditions"
-          value={true}
-          on:change={handleCheckboxChange}
-          class="mt-0.5 text-primary-500 rounded focus:ring-0 outline-none"
-        />
-        <div class=" sm:text-sm text-xs">
-          I have read and agreed to the
-          <a
-            class="font-medium text-primary-500 hover:underline"
-            href="/terms/site-and-terms"
-          >
-            Terms of Service
-          </a>
-          and
-          <a
-            class="font-medium text-primary-500 hover:underline"
-            href="/terms/privacy-notice">Privacy Policy</a
-          >
-        </div>
-      </div>
-      {#if !isTermsAccepted && errors.termsAndConditions}
-        <div class="text-red-500 text-xs block mb-4">
-          {errors.termsAndConditions}
-        </div>
-      {/if}
-
-      <div class="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-        <div class="max-sm:space-y-4 sm:flex md:flex lg:flex gap-4">
+        <div
+          class="w-full flex flex-col items-center justify-center px-4 sm:px-4 py-6"
+        >
+          <!-- Primary Button -->
           <button
             type="submit"
-            class="w-full bg-primary-500 text-white py-2 px-6 rounded hover:bg-primary-600 transition duration-200 flex items-center justify-center"
+            class="w-full max-w-md bg-primary-500 text-white py-2 px-4 rounded-lg hover:bg-primary-600 transition duration-200 flex items-center justify-center mb-6"
           >
             {#if isProcessing}
               <Icon icon="line-md:loading-alt-loop" class="text-lg mr-2" />
               Processing...
             {:else}
-              <Icon icon="material-symbols:account-box" class="text-2xl mr-2" />
-              Create Account
+              <Icon
+                icon="fluent:inprivate-account-28-filled"
+                class="text-2xl mr-2"
+              />
+              Set Up Account
             {/if}
           </button>
 
-          <!-- OR Divider -->
-          <div class="flex items-center text-sm text-gray-500 font-semibold">
-            <div class="flex-grow border-t border-gray-300"></div>
-            <span class="px-3">OR</span>
-            <div class="flex-grow border-t border-gray-300"></div>
-          </div>
-        </div>
 
-        <div class="space-y-4">
-          <button
-            on:click={() => redirectTo(linkedinUrl)}
-            type="button"
-            class="w-full flex items-center justify-center gap-3 py-2 px-4 text-black bg-white border border-gray-500 rounded transition duration-200"
-          >
-            <Icon icon="fa:linkedin-square" class="text-2xl text-blue-600" />
-            <span class="text-sm font-medium">Sign up with LinkedIn</span>
-          </button>
 
-          <button
-            on:click={() => redirectTo(googleUrl)}
-            type="button"
-            class="w-full flex items-center justify-center gap-3 py-2 px-4 text-black bg-white border border-gray-500 rounded transition duration-200"
-          >
-            <Icon icon="flat-color-icons:google" class="text-2xl" />
-            <span class="text-sm font-medium">Sign up with Google</span>
-          </button>
         </div>
-      </div>
-    </form>
-  </div>
-</div>
+      </form>
+                </div>
+            </div>
+
+            <!-- Desktop Side Panel -->
+            <div class="hidden md:flex w-full max-w-md p-8 flex-col justify-center relative overflow-hidden bg-gradient-to-br from-primary-500/90 via-primary-600/90 to-primary-700/90">
+                <!-- Decorative Elements -->
+                <div class="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -translate-x-16 -translate-y-16"></div>
+                <div class="absolute bottom-0 right-0 w-40 h-40 bg-white/10 rounded-full translate-x-20 translate-y-20"></div>
+                
+                <!-- Content -->
+                <div class="relative z-10 text-center">
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 mb-8">
+                        <h1 class="text-3xl font-bold text-white mb-4">
+                            Welcome to Register
+                        </h1>
+                        <p class="text-white/90 text-lg leading-relaxed">
+                            Create a new account to get started with our amazing platform.
+                        </p>
+                    </div>
+                    
+                    <!-- Illustration -->
+                    <div class="flex justify-center">
+                        <div class="w-64 h-64 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/20">
+                          <img src="/CWAbout.webp" alt="login" class="w-[200px] items-center justify-center"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 <Toaster position="bottom-right" richColors />
 {#if showRedirectModal}
   <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -1586,7 +1773,7 @@
         Email Already Exists
       </h2>
       <p class="mb-6 text-sm text-gray-600">
-        This email is already registered. Would you like to go to the sign in
+        This email is already registered. Would you like to go to the login
         page?
       </p>
       <div class="flex justify-end space-x-4">
@@ -1600,7 +1787,7 @@
           on:click={handleRedirectConfirm}
           class="px-5 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50 transition duration-200"
         >
-          Go to Sign in
+          Go to Login
         </button>
       </div>
     </div>

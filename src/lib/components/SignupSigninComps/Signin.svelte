@@ -1,13 +1,4 @@
 <script>
-  const clientId = import.meta.env.VITE_LINKEDIN_CLIENT_ID;
-  const callbackUrl = import.meta.env.VITE_LINKEDIN_CALLBACK_URL;
-  const scope = import.meta.env.VITE_LINKEDIN_SCOPE;
-  const baseUrl = import.meta.env.VITE_LINKEDIN_BASE_URL;
-  // Google
-  const GoogleclientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-  const GooglecallbackUrl = import.meta.env.VITE_GOOGLE_CALLBACK_URL;
-  const Googlescope = import.meta.env.VITE_GOOGLE_SCOPE;
-  const GooglebaseUrl = import.meta.env.VITE_GOOGLE_BASE_URL;
   import Icon from "@iconify/svelte";
   import { enhance, applyAction } from "$app/forms";
   import { toast, Toaster } from "svelte-sonner";
@@ -28,12 +19,8 @@
   let timeLeft;
   let timerInterval;
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  const linkedinUrl = `${baseUrl}?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(callbackUrl)}&scope=${scope}`;
-  const googleUrl = `${GooglebaseUrl}?response_type=code&client_id=${GoogleclientId}&redirect_uri=${encodeURIComponent(GooglecallbackUrl)}&scope=${Googlescope}&access_type=offline&prompt=consent`;
 
-  function redirectTo(url) {
-    window.location.href = url;
-  }
+
 
   function validateEmail() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -387,39 +374,13 @@
               use:enhance={handleFormSubmit}
               class="space-y-4"
             >
-              <!-- <div class="space-y-1">
-                <label
-                  for="email"
-                  class="block text-sm font-medium text-gray-700"
-                  >Email address</label
-                >
-                <div class="relative">
-                  <div
-                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
-                  >
-                    <Icon icon="heroicons:envelope" class="text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    name="email"
-                    id="email"
-                    bind:value={email}
-                    on:input={validateEmail}
-                    placeholder="username@example.com"
-                    class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
-                  />
-                </div>
-                {#if errors.email}
-                  <p class="text-red-500 text-xs mt-1">{errors.email}</p>
-                {/if}
-              </div> -->
 
               <div class="space-y-1">
                 <label
                   for="emailOrUsername"
                   class="block text-sm font-medium text-gray-700"
                 >
-                  Email or Username
+                  Email 
                 </label>
                 <div class="relative">
                   <div
@@ -433,7 +394,7 @@
                     id="emailOrUsername"
                     bind:value={emailOrUsername}
                     on:input={validateEmailOrUsername}
-                    placeholder="Enter your email or username"
+                    placeholder="Enter your email"
                     class="pl-10 w-full rounded-md border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-0 focus:ring-primary-500"
                   />
                 </div>
@@ -544,24 +505,7 @@
               <span class="text-sm">Sign In with OTP</span>
             </button>
           {/if}
-        <div class="space-y-3"> 
-          <button
-            on:click={() => redirectTo(linkedinUrl)}
-            type="button"
-            class="w-full flex items-center justify-center gap-3 py-2 px-4 text-black bg-white border border-gray-500 rounded transition duration-200"
-          >
-            <Icon icon="fa:linkedin-square" class="text-2xl text-blue-600" />
-            <span class="text-sm font-medium">Sign in with LinkedIn</span>
-          </button>
-          <button
-            on:click={() => redirectTo(googleUrl)}
-            type="button"
-            class="w-full flex items-center justify-center gap-3 py-2 px-4 text-black bg-white border border-gray-500 rounded transition duration-200"
-          >
-            <Icon icon="flat-color-icons:google" class="text-2xl" />
-            <span class="text-sm font-medium">Sign in with Google</span>
-          </button>
-        </div>
+  
         </div>
       </div>
     </div>

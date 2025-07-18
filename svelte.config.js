@@ -1,4 +1,4 @@
-// import adapter from '@sveltejs/adapter-auto';
+
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import { preprocessMeltUI, sequence } from '@melt-ui/pp';
 import adapter from '@sveltejs/adapter-node';
@@ -9,7 +9,7 @@ const config = {
 		adapter: adapter({
 			out: 'out',
 			precompress: true,
-			envPrefix: 'CHEMIKART_',
+			envPrefix: 'LOGIN_',
 			assets: 'static'
 		}),
 		csrf: {

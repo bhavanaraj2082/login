@@ -11,7 +11,7 @@ const sessionSchema = new mongoose.Schema(
 			type: String,
 			required: true
 		},
-		user_id: {
+		user_iad: {
 			type: String,
 			required: true
 		},

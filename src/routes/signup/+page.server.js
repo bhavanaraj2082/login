@@ -1,6 +1,6 @@
 import { signUp } from "$lib/server/mongoActions.js";
 import { sendemailOtp, verifyemailOtp } from "$lib/server/mongoActions.js";
-import { sanitizeFormData } from "$lib/utils/sanitize.js";
+
 import Profile from "$lib/server/models/Profile.js";
 import TokenVerification from "$lib/server/models/TokenVerification.js";
 import { sendRegistrationSuccessEmail } from '$lib/server/emailRegister.js';
@@ -25,11 +25,6 @@ export const actions = {
             // console.log('Registration success email sent successfully to:', userEmail);
           }
           catch (emailError) {
-            // console.error('Failed to send registration success email:', {
-            //     email: userEmail,
-            //     error: emailError.message,
-            //     stack: emailError.stack
-            // });
             console.log("Email not sent")
           }
         }
@@ -51,7 +46,7 @@ export const actions = {
   },
   verifyemail: async ({ request }) => {
     const rawData = Object.fromEntries(await request.formData());
-    const body = sanitizeFormData(rawData);
+    const body = rawData;
     // const body=rawData;
     const email = body.email;
     console.log(body, "body");

@@ -1,31 +1,32 @@
 <script>
-	import '../app.css';
-	import { Toaster } from 'svelte-sonner';
-	import { navigating , page } from '$app/stores';
-	import Header from '$lib/components/HeaderDropdownCart/Header.svelte';
-	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
-	import LoadingBar from '$lib/components/LoadingBar.svelte';
-	import { isLoading } from '$lib/stores/mainStores.js';
-	import Footer from '$lib/components/Footer.svelte';
-	import { authedUser } from '$lib/stores/mainStores.js';
-	import AllowCookies from '$lib/components/AllowCookies.svelte';
+  import '../app.css';
+  import { authedUser } from '$lib/stores/mainStores.js';
+  import { page } from '$app/stores';
+  import { derived } from 'svelte/store';
 
-	export let data;
-	// console.log('Layout==>',data);
-    $authedUser = data?.authedUser;
+  // import NavBar from '$lib/components/Home.svelte';
 
-	$: $isLoading = $navigating !== null;
-	$: isAuthRoute = $page.url.pathname === '/signup' || $page.url.pathname === '/forgot' || $page.url.pathname === '/reset-password' || $page.url.pathname === '/signin';
+
+
+  export let data;
+  $authedUser = data?.authedUser;
+
+
+
+
 </script>
-{#if !isAuthRoute}
- <Header {data}/>
-<Breadcrumb/> 
-<LoadingBar />
-{/if}
-<div class="flex-grow sm:px-0 mx-auto {isAuthRoute ? 'w-full' : ''}">
-<slot />
+
+<div class="flex flex-col min-h-screen">
+  <!-- {#if !$hideLayout}
+    <NavBar {data} />
+  {/if} -->
+
+  <main class="flex-grow">
+    <slot />
+  </main>
+
+
+
+  
+
 </div>
-{#if !isAuthRoute}
-<Footer />
-<Toaster position="bottom-right" richColors />
-{/if}
