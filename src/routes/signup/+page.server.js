@@ -47,7 +47,6 @@ export const actions = {
   verifyemail: async ({ request }) => {
     const rawData = Object.fromEntries(await request.formData());
     const body = rawData;
-    // const body=rawData;
     const email = body.email;
     console.log(body, "body");
 

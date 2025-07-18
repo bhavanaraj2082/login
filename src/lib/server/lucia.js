@@ -1,7 +1,7 @@
 import { lucia } from "lucia";
 import { mongoose as mongooseAdapter } from "@lucia-auth/adapter-mongoose";
-import { User } from "$lib/server/models/User.js"; // Your User schema
-import { Session } from "$lib/server/models/Session.js"; // Your Session schema
+import { User } from "$lib/server/models/User.js"; 
+import { Session } from "$lib/server/models/Session.js";
 import { Key } from "$lib/server/models/Key.js";
 import { LUCIA_SECRET } from "$env/static/private";
 
@@ -36,13 +36,12 @@ export const authErrorMessages = {
     "There was an issue processing your request. Please contact support if the problem persists.",
 };
 
-// Configure Lucia authentication
 export const auth = lucia({
-  adapter: mongooseAdapter({ User, Key, Session }), // Pass the required models
-  env: "PROD", // Change to 'DEV' if in development
+  adapter: mongooseAdapter({ User, Key, Session }), 
+  env: "PROD", 
   secret: LUCIA_SECRET,
   cookies: {
-    secure: true, // Use `false` for local development with HTTP
+    secure: true, 
   },
   transformUser: (user) => ({
     id: user.id.toString(),
@@ -54,7 +53,6 @@ export const auth = lucia({
     return {
       username: databaseUser.username,
       email: databaseUser.email,
-      // phone: databaseUser.phone,
     };
   },
 });

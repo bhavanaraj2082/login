@@ -29,7 +29,6 @@ h1,h2,h3,h4,h5,h6,button{
     @apply bg-primary-400 rounded-md h-10;
   }
   
-  /* Handle on hover */
   .scroll::-webkit-scrollbar-thumb:hover {
     @apply bg-primary-600;
   }

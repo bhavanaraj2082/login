@@ -11,7 +11,6 @@ export const sendEmailToUser = async (subject, content, userEmail) => {
             pass: SENDER_PASSWORD,
         },
     });
-
     const mailOptions = {
         from: SENDER_EMAIL,
         to: userEmail,

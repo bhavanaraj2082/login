@@ -1,5 +1,4 @@
 import { deserialize } from '$app/forms';
-
 export const sendMessage = (actionTarget, formData, callback) => {
 	try {
 		fetch(actionTarget, {

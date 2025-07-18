@@ -1,20 +1,13 @@
 import { PUBLIC_SDS_URL } from "$env/static/public";
-
-
 import Register from '$lib/server/models/Register.js';
 import Profile from '$lib/server/models/Profile.js';
-
 import User from '$lib/server/models/User.js'
-
 import TokenVerification from '$lib/server/models/TokenVerification.js';
-
 import { redirect, error } from '@sveltejs/kit';
 import { v4 as uuidv4 } from 'uuid';
-import { auth, authErrorMessages } from '$lib/server/lucia.js';
+import { auth } from '$lib/server/lucia.js';
 import nodemailer from 'nodemailer';
-import { nanoid } from 'nanoid';
-// import { lucia } from 'lucia';
-import { LuciaError } from 'lucia';
+
 import {
 	APP_URL,
 	SENDER_EMAIL,
@@ -26,11 +19,6 @@ import {
 import { PUBLIC_WEBSITE_NAME } from '$env/static/public';
 
 import { sendEmail } from '$lib/server/utils/sendEmail.js';
-
-
-
-
-
 
 export async function login(body, cookies) {
 	const { email, password } = body;
@@ -73,9 +61,6 @@ export async function login(body, cookies) {
 		};
 	}
 }
-
-
-
 export const signUp = async (body, cookies) => {
 	// console.log(body, "bodysignUp");
 	const existingUser = await auth.getKey("email", body.email).catch(() => null);
@@ -184,61 +169,6 @@ export const signUp = async (body, cookies) => {
 		success: true,
 		message: "Signup successful",
 	};
-};
-
-
-
-const sendVerificationEmail = async (email, verificationUrl) => {
-	const transporter = nodemailer.createTransport({
-		service: 'partskeys',
-		host: MAIL_HOST,
-		port: 587,
-		secure: false,
-		auth: {
-			user: SENDER_EMAIL,
-			pass: SENDER_PASSWORD
-		}
-	});
-
-	const mailOptions = {
-		from: SENDER_EMAIL,
-		to: email,
-		subject: 'Email Verification for Your Account',
-		html: `
-		<html>
-			<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-				<div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-					<h2 style="color: #333333; text-align: center; font-size: 24px;">Verify Your Email Address</h2>
-					<p style="font-size: 16px; color: #555555; line-height: 1.5; text-align: center;">
-						Hi there,<br/><br/>
-						Welcome to ${PUBLIC_WEBSITE_NAME}! Please verify your email address by clicking the button below.
-					</p>
-					<div style="text-align: center;">
-						<a href="${APP_URL}/verify-email?token=${verificationUrl}" style="display: inline-block; background-color: #6c67f4; color: #ffffff; padding: 15px 30px; font-size: 16px; text-decoration: none; border-radius: 5px; text-transform: uppercase; font-weight: bold; margin-top: 20px;">
-							Verify Email
-						</a>
-					</div>
-					<p style="font-size: 14px; color: #777777; text-align: center; margin-top: 30px;">
-						If you didn't sign up for this account, you can ignore this email.
-					</p>
-					<p style="font-size: 14px; color: #777777; text-align: center;">
-						Thanks,<br/>
-						The ${PUBLIC_WEBSITE_NAME} Team
-					</p>
-				</div>
-			</body>
-		</html>
-		`
-	};
-
-	try {
-		const result = await transporter.sendMail(mailOptions);
-		console.log('Verification email sent: ', result);
-		return true;
-	} catch (error) {
-		console.error('Error sending verification email:', error);
-		return false;
-	}
 };
 
 const sendVerificationEmailform = async (email, verificationUrl) => {

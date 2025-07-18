@@ -141,7 +141,7 @@
     } else {
       delete newErrors.passwordConfirm;
     }
-    errors = newErrors; // Reassign to trigger reactivity
+    errors = newErrors; 
   }
 
   const handleResendemailOtp = () => {
@@ -155,200 +155,7 @@
     enteredOtp = enteredOtp.replace(/[^0-9]/g, "").trim();
   }
 
-  let currencies = [
-    "ALL",
-    "AFN",
-    "DZD",
-    "EUR",
-    "AOA",
-    "XCD",
-    "ARS",
-    "AMD",
-    "AUD",
-    "EUR",
-    "AZN",
-    "BSD",
-    "BHD",
-    "BDT",
-    "BBD",
-    "BYN",
-    "EUR",
-    "BZD",
-    "XOF",
-    "BTN",
-    "BOB",
-    "BAM",
-    "BWP",
-    "BRL",
-    "BND",
-    "BGN",
-    "XOF",
-    "BIF",
-    "CVE",
-    "KHR",
-    "XAF",
-    "CAD",
-    "XAF",
-    "XAF",
-    "CLP",
-    "CNY",
-    "COP",
-    "KMF",
-    "CDF",
-    "XAF",
-    "CRC",
-    "HRK",
-    "CUP",
-    "EUR",
-    "CZK",
-    "DKK",
-    "DJF",
-    "XCD",
-    "DOP",
-    "USD",
-    "EGP",
-    "USD",
-    "XAF",
-    "ERN",
-    "EUR",
-    "SZL",
-    "ETB",
-    "FJD",
-    "EUR",
-    "EUR",
-    "XAF",
-    "GMD",
-    "GEL",
-    "EUR",
-    "GHS",
-    "EUR",
-    "XCD",
-    "GTQ",
-    "GNF",
-    "XOF",
-    "GYD",
-    "HTG",
-    "HNL",
-    "HUF",
-    "ISK",
-    "INR",
-    "IDR",
-    "IRR",
-    "IQD",
-    "EUR",
-    "ILS",
-    "EUR",
-    "JMD",
-    "JPY",
-    "JOD",
-    "KZT",
-    "KES",
-    "AUD",
-    "KWD",
-    "KGS",
-    "LAK",
-    "EUR",
-    "LBP",
-    "LSL",
-    "LRD",
-    "LYD",
-    "CHF",
-    "EUR",
-    "EUR",
-    "MGA",
-    "MWK",
-    "MYR",
-    "MVR",
-    "XOF",
-    "EUR",
-    "USD",
-    "MRU",
-    "MUR",
-    "MXN",
-    "USD",
-    "MDL",
-    "EUR",
-    "MNT",
-    "EUR",
-    "MAD",
-    "MZN",
-    "MMK",
-    "NAD",
-    "AUD",
-    "NPR",
-    "EUR",
-    "NZD",
-    "NIO",
-    "XOF",
-    "NGN",
-    "MKD",
-    "NOK",
-    "OMR",
-    "PKR",
-    "USD",
-    "ILS",
-    "PAB",
-    "PGK",
-    "PYG",
-    "PEN",
-    "PHP",
-    "PLN",
-    "EUR",
-    "QAR",
-    "RON",
-    "RUB",
-    "RWF",
-    "XCD",
-    "XCD",
-    "XCD",
-    "WST",
-    "EUR",
-    "STN",
-    "SAR",
-    "XOF",
-    "RSD",
-    "SCR",
-    "SLL",
-    "SGD",
-    "EUR",
-    "EUR",
-    "SBD",
-    "SOS",
-    "ZAR",
-    "KRW",
-    "EUR",
-    "LKR",
-    "SDG",
-    "SRD",
-    "SEK",
-    "CHF",
-    "SYP",
-    "TWD",
-    "TJS",
-    "TZS",
-    "THB",
-    "XOF",
-    "TOP",
-    "TTD",
-    "TND",
-    "TRY",
-    "TMT",
-    "AUD",
-    "UGX",
-    "UAH",
-    "AED",
-    "GBP",
-    "USD",
-    "UYU",
-    "UZS",
-    "VUV",
-    "EUR",
-    "VES",
-    "VND",
-    "YER",
-    "ZMW",
-    "ZWL",
-  ];
+  let currencies = [];
 
   function updateCurrency(country) {
     const normalizedCountry = country.trim().toLowerCase();
@@ -817,7 +624,6 @@
     //   return;
     // }
     isProcessing = true;
-    formData.append("currency", currency);
     formData.append("isEmailVerified", isOtpVerified);
     formData.append("email", email);
     return async ({ result, update }) => {
@@ -927,7 +733,7 @@
                 </div>
                 <div class="relative mt-8 z-10 flex justify-center">
                     <div class="w-48 h-48 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20">
-                          <img src="/CWAbout.webp" alt="login" class="w-[200px] items-center justify-center"/>
+                          <img src="/Register.webp" alt="login" class="w-[200px] items-center justify-center"/>
                     </div>
                 </div>
             </div>
@@ -953,96 +759,6 @@
         action="?/register"
         use:enhance={handleFormSubmission}
       >
-        <!-- <div class="flex items-center gap-3 mx text-md mt-2 mb-5">
-        <label class="flex items-center md:gap-2 font-medium">
-          For a Business
-          <input
-            type="radio"
-            name="account"
-            value="For a Business"
-            class="peer hidden"
-            on:change={toggleFields}
-          />
-          <span
-            class="w-4 h-4 rounded-full border border-black bg-white flex items-center justify-center peer-checked:border-primary-600 peer-checked:bg-primary-600"
-          >
-            <span class="w-2 h-2 rounded-full bg-white peer-checked:bg-white"
-            ></span>
-          </span>
-        </label>
-        <label class="flex items-center gap-2 font-medium">
-          For Myself
-          <input
-            type="radio"
-            name="account"
-            value="For Myself"
-            checked
-            class="peer hidden"
-            on:change={toggleFields}
-          />
-          <span
-            class="w-4 h-4 rounded-full border border-black bg-white flex items-center justify-center peer-checked:border-primary-600 peer-checked:bg-primary-600"
-          >
-            <span class="w-2 h-2 rounded-full bg-white peer-checked:bg-white"
-            ></span>
-          </span>
-        </label>
-      </div> -->
-        <!-- {#if showBusinessDetails} -->
-
-        <!-- {/if} -->
-
-        <!-- <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
-        <div class="flex-1 mb-2 md:mb-0">
-          <label
-            for="companyname"
-            class="block text-sm font-medium text-gray-600"
-            >Company Name</label
-          >
-          <input
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
-            type="text"
-            name="companyname"
-            bind:value={companyName}
-            placeholder="Company Name"
-            on:input={() => {
-              errors.companyName = !companyName
-                ? "*Required"
-                : !/^[a-zA-Z\s]+$/.test(companyName)
-                  ? "Company name can only contain letters and spaces"
-                  : "";
-            }}
-          />
-          <p class=" text-red-500 text-left text-xs">
-            {errors?.companyName || ""}
-          </p>
-        </div>
-        <div class="flex-1 mb-2 md:mb-0">
-          <label
-            for="companytype"
-            class="block text-sm font-medium text-gray-600"
-            >Company Type
-          </label>
-          <input
-            class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
-            type="text"
-            name="companytype"
-            bind:value={companyType}
-            placeholder="Company Type"
-            on:input={() => {
-              errors.companyType = !companyType
-                ? "*Required"
-                : !/^[a-zA-Z\s]+$/.test(companyType)
-                  ? "Company type can only contain letters and spaces"
-                  : "";
-            }}
-          />
-          <p class=" text-red-500 text-left text-xs">
-            {errors?.companyType || ""}
-          </p>
-        </div>
-      </div> -->
-
         <div class="mb-4 flex flex-col md:space-y-4">
           <div class="flex-1 mb-2 md:mb-0">
             <label
@@ -1090,29 +806,6 @@
           </div>
         </div>
         <div class="mb-4 flex flex-col md:space-y-4">
-          <!-- <div class="flex-1 mb-2 md:mb-0">
-            <label
-              for="username"
-              class="block text-sm font-medium text-gray-600"
-              ><span class="text-red-500">*</span> Username</label
-            >
-            <input
-              type="text"
-              id="username"
-              name="username"
-              maxlength="50"
-              bind:value={username}
-              on:input={(e) => {
-                username = e.target.value.trimStart();
-                validateUsername();
-              }}
-              placeholder="Enter your username"
-              class="mt-1 block w-full p-2 border border-gray-300 rounded-lg pl-5 focus:border-primary-400 focus:outline-none focus:ring-1 focus:ring-primary-100 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
-            />
-            {#if errors.username}
-              <div class="text-red-500 text-xs mt-1">{errors.username}</div>
-            {/if}
-          </div> -->
           <div class="flex-1 mb-2 md:mb-0 relative">
             <label for="email" class="block text-sm font-medium text-gray-600"
               ><span class="text-red-500">*</span> Email</label
@@ -1297,7 +990,6 @@
             >
             <div class="dropdown-container">
               <div class="relative">
-                <!-- Wrap input and icon in a group to control toggle behavior -->
                 <!-- svelte-ignore a11y-click-events-have-key-events -->
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <div class="flex items-center" on:click={toggleDropdown}>
@@ -1360,34 +1052,6 @@
               {/if}
             </div>
           </div>
-
-          <!-- <div class="w-full sm:mx-auto grid">
-          <label for="currency" class="block text-sm font-medium text-gray-600"
-            >Currency</label
-          >
-          <select
-            class="mt-1 block w-full p-2 border text-sm border-gray-300 rounded-md
-                    focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400
-                    placeholder:text-sm h-10"
-            name="currency"
-            bind:value={currency}
-            id="currency-select"
-            disabled
-          >
-            <option
-              class="Currency placeholder:text-sm"
-              disabled
-              selected
-              value="">Currency</option
-            >
-            {#each currencies as currency}
-              <option class="bg-primary-50" value={currency}>{currency}</option>
-            {/each}
-          </select>
-          {#if errors.country}
-            <div class="text-red-500 text-xs mt-1">{errors.country}</div>
-          {/if}
-        </div> -->
         </div>
 
         <div class="mb-4">
@@ -1423,71 +1087,6 @@
           {/if}
         </div>
 
-        <!-- <div class="mb-4 flex flex-col md:flex-row md:space-x-4">
-          <div class="flex-1 mb-2 md:mb-0">
-            <label
-              for="gstNumber"
-              class="block text-sm font-medium text-gray-600">GST Number</label
-            >
-            <input
-              type="text"
-              id="gstNumber"
-              name="gstNumber"
-              placeholder="Enter your GST number"
-              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm h-10 text-sm"
-              bind:value={gstNumber}
-              on:input={validateGstNumber}
-            />
-            {#if errors.gstNumber}
-              <div class="text-red-500 text-xs mt-1">{errors.gstNumber}</div>
-            {/if}
-          </div>
-
-          <div class="flex-1 mb-2 md:mb-0 relative">
-            <label
-              for="tanNumber"
-              class="block text-sm font-medium text-gray-600">TAN Number</label
-            >
-            <div class="relative">
-              <input
-                type="text"
-                id="tanNumber"
-                name="tanNumber"
-                placeholder="Enter your TAN number"
-                class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 placeholder:text-sm text-sm h-10"
-                on:input={validateTanNumber}
-                bind:value={tanNumber}
-              />
-              {#if errors.tanNumber}
-                <div class="text-red-500 text-xs mt-1">{errors.tanNumber}</div>
-              {/if}
-            </div>
-          </div>
-        </div> -->
-
-        <!-- <div class="mb-4">
-        <label for="password" class="block text-sm font-medium text-gray-600"
-          >Password</label
-        >
-        <input
-          type="password"
-          id="password"
-          name="password"
-          bind:value={password}
-          on:input={() => validatePassword()}
-          placeholder="Enter your password"
-          class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:border-primary-400 focus:ring-0 focus:ring-primary-400 placeholder-gray-400 text-sm placeholder:text-sm h-10"
-        />
-        {#if errors.password}
-          <div class="text-red-500 text-xs mt-1">{errors.password}</div>
-        {/if}
-        <div class="text-gray-400 text-sm mt-1">
-          <p>*Contain at least 8 Characters</p>
-          <p>*Cannot contain common or guessable text</p>
-          <p>*Contain at least one number</p>
-          <p>*Contain one of the following special characters !@#$%_-*</p>
-        </div>
-      </div> -->
 
         <div class="mb-4 relative">
           <label for="password" class="block text-sm font-medium text-gray-600">
@@ -1748,7 +1347,7 @@
                     <!-- Illustration -->
                     <div class="flex justify-center">
                         <div class="w-64 h-64 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/20">
-                          <img src="/CWAbout.webp" alt="login" class="w-[200px] items-center justify-center"/>
+                          <img src="/Register.webp" alt="login" class="w-[200px] items-center justify-center"/>
                         </div>
                     </div>
                 </div>

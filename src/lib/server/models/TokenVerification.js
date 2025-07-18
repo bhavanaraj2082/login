@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-
 const emailVerificationSchema = new mongoose.Schema({
     email: { type: String, required: true },
     token: { type: String, required: true },
@@ -8,8 +7,7 @@ const emailVerificationSchema = new mongoose.Schema({
     isPhoneVerified: { type: Boolean, default: false },
     verificationType: { type: String, required: true },
     userId: { type: String }
-},
-    {
+},{
         timestamps: true,
         collection: "tokenverifications"
     }

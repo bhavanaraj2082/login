@@ -1,4 +1,3 @@
-// favourites redirection
 import { fail, redirect } from "@sveltejs/kit";
 import { auth } from "$lib/server/lucia.js";
 import { LuciaError } from "lucia";

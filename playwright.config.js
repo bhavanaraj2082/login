@@ -7,5 +7,4 @@ const config = {
 	testDir: 'tests',
 	testMatch: /(.+\.)?(test|spec)\.[jt]s/
 };
-
 export default config;

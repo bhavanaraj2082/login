@@ -4,7 +4,6 @@ const jsonSchema = {
   type: mongoose.Schema.Types.Mixed,
   default: null,
 };
-
 const chemiDashProfileSchema = new mongoose.Schema(
   {
     companyName: { type: String, required: false, unique: false },

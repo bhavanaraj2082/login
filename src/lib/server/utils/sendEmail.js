@@ -12,8 +12,7 @@ export async function sendEmail(subject, content,userEmail) {
             pass: SENDER_PASSWORD,  
         },
     });
-
-    const mailOptions = {
+ const mailOptions = {
         from: SENDER_EMAIL,
         to: userEmail,
         subject: subject,

@@ -24,7 +24,6 @@ export const sendRegistrationSuccessEmail = async (email, username = null) => {
   const mailOptions = {
     from: `"PARTSKEYS" <${SENDER_EMAIL}>`,
     to: email,
-    // subject: `Welcome to ${PUBLIC_WEBSITE_NAME} - Registration Successful! 🎉`,
     subject: `Welcome to ${PUBLIC_WEBSITE_NAME} - Registration Successful! `,
     html: `<html>
   <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">

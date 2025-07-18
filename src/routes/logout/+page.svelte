@@ -4,7 +4,6 @@
 	
 	export let data;
 	console.log(data, "data from forgot");
-  
 	onMount(() => {
 	  cartTotal.set(0);
 	  cartTotalComps.set(0);

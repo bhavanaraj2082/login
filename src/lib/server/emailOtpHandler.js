@@ -7,16 +7,12 @@ import {
 } from "$env/static/private";
 import { PUBLIC_WEBSITE_NAME } from "$env/static/public";
 
-// Store OTP temporarily in memory
 const otpStore = new Map();
-
-// Send OTP via email
 export const sendEmailOTP = async (email) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-  // Store OTP for the email
   otpStore.set(email, otp);
-  setTimeout(() => otpStore.delete(email), 1 * 60 * 1000); // OTP expires in 1 minutes
+  setTimeout(() => otpStore.delete(email), 1 * 60 * 1000); 
 
   const transporter = nodemailer.createTransport({
     service: "partskeys",
@@ -28,7 +24,6 @@ export const sendEmailOTP = async (email) => {
       pass: SENDER_PASSWORD,
     },
   });
-
   const mailOptions = {
     from: SENDER_EMAIL,
     to: email,
@@ -69,7 +64,6 @@ export const sendEmailOTP = async (email) => {
   </body>
 </html>`,
   };
-
   try {
     const result = await transporter.sendMail(mailOptions);
     console.log("Verification email sent successfully:", result);
@@ -80,8 +74,6 @@ export const sendEmailOTP = async (email) => {
     return false;
   }
 };
-
-// Function to verify OTP for email authentication
 export function verifyOtp(email, enteredOtp) {
   const storedOtp = otpStore.get(email);
   return storedOtp === enteredOtp;

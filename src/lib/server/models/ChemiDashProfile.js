@@ -4,7 +4,6 @@ const jsonSchema = {
   type: mongoose.Schema.Types.Mixed,
   default: null
 };
-
 const chemiDashProfileSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -43,10 +42,6 @@ const chemiDashProfileSchema = new mongoose.Schema({
   timestamps: true,
   collection:"chemidashprofile"
 });
-// if(mongoose.models.ChemiDashProfile){
-//   delete mongoose.models.ChemiDashProfile
-// }
-// Create and export the Mongoose model
 const ChemiDashProfile = mongoose.models.ChemiDashProfile || mongoose.model('ChemiDashProfile', chemiDashProfileSchema);
 
 export default ChemiDashProfile

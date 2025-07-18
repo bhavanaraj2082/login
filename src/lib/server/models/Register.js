@@ -12,7 +12,7 @@ const registerSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // Optional: add createdAt and updatedAt fields
+    timestamps: true, 
     collection:"users"
   }
 );
