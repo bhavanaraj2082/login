@@ -23,7 +23,7 @@
           </svg>
         </div>
         <h1 class="text-5xl md:text-6xl font-bold text-white mb-4">
-          Welcome to <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-400">YourApp</span>
+          Welcome to <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-pink-400">Login Register</span>
         </h1>
         <p class="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
           Join thousands of users who trust us with their digital experience. Start your journey today.
